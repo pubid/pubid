@@ -8,7 +8,7 @@ module Pubid::Iso
 
       TYPED_STAGES = {}.freeze
 
-      attr_accessor :edition_publisher
+      attribute :edition_publisher, :string
 
       def initialize(edition_publisher: nil, **opts)
         super(**opts)

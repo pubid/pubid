@@ -1,10 +1,16 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Itu
   module Identifier
     class Base < Pubid::Core::Identifier::Base
-      attr_accessor :series, :sector, :date, :amendment, :subseries,
-                    :second_number, :annex, :range
+      attribute :series, :string
+      attribute :sector, :string
+      attribute :date, :string
+      attribute :amendment, :string
+      attribute :subseries, :string
+      attribute :second_number, :string
+      attribute :annex, :string
+      attribute :range, :string
 
       extend Forwardable
 

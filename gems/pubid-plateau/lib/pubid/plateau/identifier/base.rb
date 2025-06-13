@@ -1,11 +1,12 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Plateau
   module Identifier
     class Base < Pubid::Core::Identifier::Base
       extend Forwardable
 
-      attr_accessor :annex, :type
+      attribute :annex, :string
+      attribute :type, :string
 
       def self.type
         { key: :plateau }

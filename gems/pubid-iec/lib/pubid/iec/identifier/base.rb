@@ -2,10 +2,20 @@ require "forwardable"
 
 module Pubid::Iec
   class Base < Pubid::Core::Identifier::Base
-
-    attr_accessor :vap, :database, :fragment, :version, :decision_sheet,
-                  :conjuction_part, :part_version, :trf_publisher,
-                  :trf_series, :trf_version, :test_type, :month, :day, :sheet
+    attribute :vap, :string
+    attribute :database, :boolean
+    attribute :fragment, :string
+    attribute :version, :string
+    attribute :decision_sheet, :string
+    attribute :conjuction_part, :string
+    attribute :part_version, :string
+    attribute :trf_publisher, :string
+    attribute :trf_series, :string
+    attribute :trf_version, :string
+    attribute :test_type, :string
+    attribute :month, :integer
+    attribute :day, :integer
+    attribute :sheet, :string
 
     extend Forwardable
 

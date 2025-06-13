@@ -3,7 +3,7 @@ require_relative "../renderer/amendment"
 module Pubid::Jis
   module Identifier
     class Amendment < Base
-      attr_accessor :base
+      attribute :base, :string
 
       def_delegators 'Pubid::Jis::Identifier::Amendment', :type
 

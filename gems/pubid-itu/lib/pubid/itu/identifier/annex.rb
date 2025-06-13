@@ -3,7 +3,7 @@ module Pubid::Itu
     class Annex < Supplement
       def_delegators 'Pubid::Itu::Identifier::Annex', :type
 
-      attr_accessor :base
+      attribute :base, :string
 
       def initialize(base: nil, **opts)
         super(**opts)

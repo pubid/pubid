@@ -1,9 +1,14 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Bsi
   module Identifier
     class Base < Pubid::Core::Identifier::Base
-      attr_accessor :month, :supplement, :adopted, :tracked_changes, :translation, :pdf
+      attribute :month, :integer
+      attribute :supplement, :string
+      attribute :adopted, :string
+      attribute :tracked_changes, :boolean, default: -> { false }
+      attribute :translation, :string
+      attribute :pdf, :boolean, default: -> { false }
 
       extend Forwardable
 
@@ -38,7 +43,8 @@ module Pubid::Bsi
           if identifier_params[:national_annex]
             return transform_national_annex(
               identifier_params[:national_annex],
-              identifier_params.dup.tap { |h| h.delete(:national_annex) })
+              identifier_params.dup.tap { |h| h.delete(:national_annex) },
+            )
           end
 
           return transform_expert_commentary(identifier_params) if identifier_params[:expert_commentary]
@@ -50,7 +56,9 @@ module Pubid::Bsi
 
         def transform_collection(params)
           first_identifier_params =
-            params.reject { |k, _| %i[second_number year supplement].include?(k) }
+            params.reject do |k, _|
+              %i[second_number year supplement].include?(k)
+            end
           second_identifier_params = first_identifier_params.dup
           second_identifier_params[:number] = params[:second_number]
           Collection.new(identifiers: [Identifier.create(**first_identifier_params),
@@ -59,8 +67,11 @@ module Pubid::Bsi
         end
 
         def transform_expert_commentary(base_params)
-          Identifier.create(type: :ec,
-                            base: Identifier.create(**base_params))
+          # Remove expert_commentary flag from base params
+          clean_base_params = base_params.dup
+          clean_base_params.delete(:expert_commentary)
+
+          ExpertCommentary.new(base: Identifier.create(**clean_base_params))
         end
 
         def transform_national_annex(params, base_params)

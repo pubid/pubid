@@ -5,7 +5,9 @@ module Pubid::Ccsds
     class Base < Pubid::Core::Identifier::Base
       extend Forwardable
 
-      attr_accessor :series, :retired, :book_color
+      attribute :series, :string
+      attribute :retired, :boolean
+      attribute :book_color, :string
 
       def self.type
         { key: :ccsds, title: "The Consultative Committee for Space Data Systems" }

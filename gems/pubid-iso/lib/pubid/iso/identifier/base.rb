@@ -1,4 +1,5 @@
 require "forwardable"
+require "lutaml/model"
 require_relative "../renderer/urn"
 require_relative "../renderer/urn-tc"
 
@@ -7,15 +8,21 @@ module Pubid::Iso
     class Base < Pubid::Core::Identifier::Base
       extend Forwardable
 
-      attr_accessor :stage,
-                    :iteration, :joint_document,
-                    :tctype, :sctype, :wgtype, :tcnumber, :scnumber, :wgnumber,
-                    :dirtype,
-                    :base,
-                    :supplements,
-                    :addendum,
-                    :jtc_dir,
-                    :month
+      attribute :stage, :string
+      attribute :iteration, :integer
+      attribute :joint_document, :string
+      attribute :tctype, :string
+      attribute :sctype, :string
+      attribute :wgtype, :string
+      attribute :tcnumber, :string
+      attribute :scnumber, :string
+      attribute :wgnumber, :string
+      attribute :dirtype, :string
+      attribute :base, :string
+      attribute :supplements, :string, collection: true
+      attribute :addendum, :string
+      attribute :jtc_dir, :string
+      attribute :month, :integer
 
       # Creates new identifier from options provided, includes options from
       # Pubid::Core::Identifier#initialize

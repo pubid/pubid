@@ -3,7 +3,7 @@ module Pubid::Itu
     class Supplement < Base
       def_delegators 'Pubid::Itu::Identifier::Supplement', :type
 
-      attr_accessor :base
+      attribute :base, :string
 
       def initialize(base: nil, **opts)
         super(**opts)

@@ -7,11 +7,7 @@ inherit_from:
 # ...
 
 AllCops:
-  TargetRubyVersion: 3.0
-  Include:
-    - 'gems/*/lib/**/*.rb'
-    - 'gems/*/spec/**/*.rb'
-    - 'Rakefile'
-  Exclude:
-    - 'gems/*/vendor/**/*'
-    - 'gems/*/tmp/**/*'
+  TargetRubyVersion: 3.1
+
+Lint/MissingSuper:
+  AllowedParentClasses: [Liquid::Drop]

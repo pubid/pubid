@@ -9,12 +9,26 @@ module Pubid::Nist
   module Identifier
     class Base < Pubid::Core::Identifier::Base
       extend Forwardable
-      attr_accessor :series, :code, :revision, :publisher, :version, :volume,
-                    :part, :addendum, :stage, :translation,
-                    :edition, :supplement, :update,
-                    :section, :appendix, :errata, :index, :insert
 
       def initialize(publisher: "NIST", series:, number: nil, stage: nil, supplement: nil,
+      attribute :series, :string
+      attribute :code, :string
+      attribute :revision, :string
+      attribute :publisher, :string
+      attribute :version, :string
+      attribute :volume, :string
+      attribute :part, :string
+      attribute :addendum, :string
+      attribute :stage, :string
+      attribute :translation, :string
+      attribute :edition, :string
+      attribute :supplement, :string
+      attribute :update, :string
+      attribute :section, :string
+      attribute :appendix, :string
+      attribute :errata, :string
+      attribute :index, :string
+      attribute :insert, :string
                      edition_month: nil, edition_year: nil, edition_day: nil, update: nil,
                      edition: nil, **opts)
         @publisher = publisher.is_a?(Publisher) ? publisher : Publisher.new(publisher: publisher.to_s)

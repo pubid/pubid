@@ -43,7 +43,7 @@ module Pubid::Nist
       end
 
       rule(:revision) do
-        ((str("rev") | str("r") | str(" Rev. ")) >> (digits >> match("[a-z]").maybe).as(:revision)) |
+        ((str(" rev ") | str("rev") | str("r") | str(" Rev. ")) >> (digits >> match("[a-z]").maybe).as(:revision)) |
           (str("-") >> digits.as(:revision)) |
           (str("r") >> match("[a-z]").as(:revision)) |
           ((str("r") | str(" Revision (r)")) >> str("").as(:revision))

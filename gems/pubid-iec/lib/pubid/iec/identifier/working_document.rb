@@ -13,7 +13,7 @@ module Pubid::Iec
 
       extend Forwardable
 
-      attr_accessor :technical_committee
+      attribute :technical_committee, :string
 
       def initialize(publisher: "IEC", technical_committee: nil, stage: nil, **args)
         super(**args.merge(publisher: publisher))

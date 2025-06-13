@@ -5,7 +5,8 @@ module Pubid::Etsi
     class Base < Pubid::Core::Identifier::Base
       extend Forwardable
 
-      attr_accessor :version, :published
+      attribute :version, :string
+      attribute :published, :boolean
 
       def self.type
         { key: :etsi }

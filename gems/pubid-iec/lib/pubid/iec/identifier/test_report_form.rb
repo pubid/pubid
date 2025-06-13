@@ -2,9 +2,14 @@ module Pubid::Iec
   module Identifier
     class TestReportForm < Base
 
-      attr_accessor :version, :decision_sheet,
-                    :conjuction_part, :part_version, :trf_publisher,
-                    :trf_series, :trf_version, :test_type
+      attribute :version, :string
+      attribute :decision_sheet, :string
+      attribute :conjuction_part, :string
+      attribute :part_version, :string
+      attribute :trf_publisher, :string
+      attribute :trf_series, :string
+      attribute :trf_version, :string
+      attribute :test_type, :string
 
       def initialize(publisher: "IEC", decision_sheet: nil, trf_publisher: nil,
                      trf_series: nil, trf_version: nil, test_type: nil,

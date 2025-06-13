@@ -1,9 +1,10 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Jis
   module Identifier
     class Base < Pubid::Core::Identifier::Base
-      attr_accessor :series, :all_parts
+      attribute :series, :string
+      attribute :all_parts, :boolean
       extend Forwardable
 
       def self.type

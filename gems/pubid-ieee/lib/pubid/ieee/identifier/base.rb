@@ -1,8 +1,10 @@
-require 'date'
+require "date"
 require "yaml"
+require "lutaml/model"
 
 module Pubid::Ieee
-  UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__), "../../../../update_codes.yaml"))
+  UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__),
+                                          "../../../../update_codes.yaml"))
 
   module Identifier
     class Base < Pubid::Core::Identifier::Base
