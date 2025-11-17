@@ -1,0 +1,52 @@
+require_relative "../supplement_identifier"
+require_relative "../../components/typed_stage"
+
+module PubidNew
+  module Iec
+  module Identifiers
+    # Corrigendum Identifier
+    class Corrigendum < SupplementIdentifier
+      attribute :type, Components::Type, default: -> { type[:key] }
+
+      TYPED_STAGES = [
+        Components::TypedStage.new(
+          code: :cdcor,
+          stage_code: :cd,
+          type_code: :cor,
+          abbr: ["CDCor"],
+          name: "Committee Draft Corrigendum",
+          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+        ),
+        Components::TypedStage.new(
+          code: :dcor,
+          stage_code: :dcor,
+          type_code: :cor,
+          abbr: ["DCOR"],
+          name: "Draft Corrigendum",
+          harmonized_stages: %w[40.00 40.20 40.60 40.92 40.98 40.99],
+        ),
+        Components::TypedStage.new(
+          code: :fdcor,
+          stage_code: :fdcor,
+          type_code: :cor,
+          abbr: ["FDCOR"],
+          name: "Final Draft Corrigendum",
+          harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+        ),
+        Components::TypedStage.new(
+          code: :pubcor,
+          stage_code: :published,
+          type_code: :cor,
+          abbr: ["Cor", "COR"],
+          name: "Corrigendum",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+      ].freeze
+
+      def self.type
+        { key: :cor, title: "Corrigendum", short: "COR" }
+      end
+    end
+  end
+end
+end

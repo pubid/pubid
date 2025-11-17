@@ -50,17 +50,12 @@ module PubidNew
       end
 
       def build(parsed_hash)
-        puts "Building identifier from source: #{parsed_hash.inspect}"
-
         # Check the `:type_with_stage` to determine the identifier class
         # :type_with_stage will be nil if it is an IS.
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
-        puts "Typed stage is #{typed_stage.inspect}"
 
         # Instantiate the identifier based on the typed stage
         identifier = locate_identifier_klass(typed_stage.type_code).new
-
-        puts "The identifier is #{identifier.class}" if identifier
 
         # For French GUIDE entries: "Guide ISO/CEI 37:1995"
         if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
@@ -71,25 +66,13 @@ module PubidNew
           realized_components = cast(key.to_sym, value)
           next if realized_components.nil?
 
-          puts "Setting #{key} with value: #{realized_components.inspect}"
-
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              puts "Setting sub-component #{sub_key} with value: #{sub_value.inspect}"
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=", sub_value)
-              else
-                puts "Warning: #{sub_key} is not a valid attribute for Identifier"
-              end
+              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
             end
           else
-            puts "Setting component #{key} with value: #{realized_components.inspect}"
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=", realized_components)
-            else
-              puts "Warning: #{key} is not a valid attribute for Identifier"
-            end
+            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
           end
         end
 
@@ -97,8 +80,6 @@ module PubidNew
       end
 
       def cast(type, value)
-        puts "Casting #{type} with value: #{value.inspect}"
-
         case type
         when :base_identifier
           # If it has a base identifier, we need to build a supplement

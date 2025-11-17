@@ -6,6 +6,7 @@ module PubidNew
     module Identifiers
       class Directives < SingleIdentifier
         attribute :type, Components::Type, default: -> { type[:key] }
+        attribute :subgroup, Components::Code
 
         TYPED_STAGES = [
           Components::TypedStage.new(
@@ -26,12 +27,14 @@ module PubidNew
         def publisher_portion(lang: :en)
           return [
               publisher.body,
+              (subgroup ? " #{subgroup.value}" : ""),
               (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
             ].join('') unless copublishers&.any?
 
           # If there are copublishers, join them with slashes
           [
             ([publisher] + copublishers).map(&:body).join("/"),
+            (subgroup ? " #{subgroup.value}" : ""),
             (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
           ].join('')
         end
@@ -40,7 +43,7 @@ module PubidNew
         # a variant (ISO or IEC) after the number rendered as a part but
         # separated by a space.
         def number_portion(lang_single: false)
-          [
+          result = [
             # Directives may not have a number
             (number ? "#{number.value}" : ""),
 
@@ -54,6 +57,9 @@ module PubidNew
             # Date is optional
             (date ? ":#{date.year}" : ""),
           ].join('')
+
+          # Return nil if there's nothing to render
+          result.empty? ? nil : result
         end
 
         # def to_s(lang: :en, lang_single: false, with_edition: false)

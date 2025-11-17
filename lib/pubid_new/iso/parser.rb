@@ -120,8 +120,8 @@ module PubidNew
 
       EDITION_STRINGS = %w[Edition Ed. ED Ed].freeze
       rule(:edition) do
-        # We ignore the case where there is "Ed" but no number
-        array_to_str(EDITION_STRINGS) >> space? >> digits.maybe.as(:edition)
+        # Capture the entire edition text for exact reproduction
+        (array_to_str(EDITION_STRINGS) >> space? >> digits.maybe).as(:edition)
       end
 
       rule(:stage_iteration) do
@@ -255,13 +255,14 @@ module PubidNew
         (number >> directives_part_and_subpart.maybe).as(:number_with_part)
       end
 
-      # TODO:
       # ISO/IEC DIR 1 IEC (IEC version of the ISO/IEC DIR 1)
       # ISO/IEC DIR 2 ISO:2022 (ISO version of the ISO/IEC DIR 2)
+      # But NOT: ISO/IEC DIR 1 ISO SUP:2022 (ISO is supplement publisher)
       # "1 IEC"
       # "2 ISO"
       rule(:directives_part_and_subpart) do
-        space >> (str("ISO") | str("IEC"))
+        # Only match ISO/IEC if NOT followed by supplement keywords
+        space >> (str("ISO") | str("IEC")) >> (space >> str("SUP")).absent?
       end
 
       DIRECTIVES_TYPED_STAGES = Identifiers::Directives::TYPED_STAGES.map(&:abbr).flatten.sort_by(&:length).reverse
@@ -294,16 +295,22 @@ module PubidNew
         directives_supplement_part_no_third >> third_part.maybe
       end
 
-      # TODO: Implement combined identifiers
       # ISO/IEC DIR 1 + IEC SUP:2016-05
       # ISO/IEC DIR 1:2022 + IEC SUP:2022
-      rule(:directives_identifier_with_supplement) do
-        directives_identifier_no_third.as(:base_identifier) >> str(" + ") >>
-          directives_supplement_part_no_third >> third_part.maybe
+      rule(:directives_bundled_identifier) do
+        (
+          directives_identifier_no_third >>
+          (third_part >> space?).maybe >>
+          (date >> space?).maybe
+        ).as(:base_document) >>
+        (
+          str("+ ") >>
+          directives_supplement_part_no_third.as(:supplement)
+        ).repeat(1).as(:supplements)
       end
 
       rule(:directives_identifiers) do
-        directives_identifier_with_supplement |
+        directives_bundled_identifier |
           directives_supplement_identifier |
           directives_identifier
       end

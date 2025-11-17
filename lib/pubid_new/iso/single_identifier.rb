@@ -11,7 +11,8 @@ module PubidNew
         [].tap do |parts|
           parts << publisher_portion(lang: lang)
           parts << number_portion(lang_single: lang_single)
-          parts << edition_portion(lang: lang) if with_edition
+          # Always render edition if present (number OR original_text)
+          parts << edition_portion(lang: lang) if edition && (edition.number || edition.original_text)
         end.compact.join(' ').tap do |s|
           s << language_portion(lang_single: lang_single) if languages&.any?
         end
@@ -86,9 +87,10 @@ module PubidNew
       end
 
       def edition_portion(lang: :en)
-        return nil unless edition&.number
+        return nil unless edition && (edition.number || edition.original_text)
 
-        "ED#{edition.number}"
+        # Use the edition's to_s method which preserves original format
+        edition.to_s
       end
 
     end

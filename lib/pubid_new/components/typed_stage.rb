@@ -9,6 +9,7 @@ module PubidNew
       attribute :stage_code, :string
       attribute :abbr, :string, collection: true
       attribute :harmonized_stages, :string, collection: true
+      attribute :original_abbr, :string  # Store the actual parsed abbreviation
 
       def to_stage
         Stage.new(
@@ -28,7 +29,8 @@ module PubidNew
       end
 
       def abbreviation
-        abbr.first
+        # Use original parsed abbreviation if available, otherwise canonical form
+        original_abbr || abbr.first
       end
 
     end

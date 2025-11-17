@@ -6,20 +6,30 @@ module PubidNew
     module Identifiers
       class DirectivesSupplement < SupplementIdentifier
         attribute :type, Components::Type, default: -> { type[:key] }
+        attribute :supplement_publisher, Components::Publisher
+
+        # Delegate base identifier attributes for easier access
+        def copublishers
+          base_identifier&.copublishers
+        end
+
+        def publisher
+          base_identifier&.publisher
+        end
 
         TYPED_STAGES = [
           Components::TypedStage.new(
             code: :pubdirsup,
             stage_code: :published,
-            type_code: :dirsup,
-            abbr: ["SUP", "Supplement"],
-            name: "Supplement",
+            type_code: :"dir-sup",
+            abbr: ["DIR SUP", "SUP", "Supplement"],
+            name: "Directives Supplement",
             harmonized_stages: %w[60.00 60.60],
           ),
         ].freeze
 
         def self.type
-          { key: :dirsup, title: "Directives Supplement", short: "SUP" }
+          { key: :"dir-sup", title: "Directives Supplement", short: "SUP" }
         end
 
         # def render_directives_supplement_identifier(identifier)
@@ -32,11 +42,33 @@ module PubidNew
         # end
 
         def to_s(lang: :en, lang_single: false)
+          if base_identifier
+            # Full rendering with base identifier
+            [
+              base_identifier.to_s(lang: lang, lang_single: lang_single),
+              " #{supplement_publisher.body}",
+              " SUP",  # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
+              (date ? ":#{date.year}" : "")
+            ].join('')
+          else
+            # Simplified rendering for bundled identifiers (just the supplement part)
+            to_supplement_s(lang: lang, lang_single: lang_single)
+          end
+        end
+
+        # Render just the supplement part (for use in bundled identifiers)
+        def to_supplement_s(lang: :en, lang_single: false)
+          date_str = if date
+            month_part = date.month ? "-#{date.month}" : ""
+            ":#{date.year}#{month_part}"
+          else
+            ""
+          end
+
           [
-            base_identifier.to_s(lang: lang, lang_single: lang_single),
-            " #{publisher.body}",
-            " #{typed_stage.abbreviation}",
-            (date ? ":#{date.year}" : "")
+            supplement_publisher.body,
+            " SUP",
+            date_str
           ].join('')
         end
       end

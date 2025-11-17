@@ -34,6 +34,12 @@ module PubidNew
           return CombinedIdentifier
         end
 
+        # If there are supplements, we need to use a BundledIdentifier
+        # which takes `base_document` and `supplements`
+        if parsed_hash[:supplements]
+          return ::PubidNew::BundledIdentifier
+        end
+
         # Check the `:type_with_stage` to determine the identifier class
         # 1. :type_with_stage will be nil if:
         # a) It is an IS.
@@ -45,22 +51,22 @@ module PubidNew
         end
 
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
-        puts "Typed stage is #{typed_stage.inspect}"
 
         @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
       end
 
       def build(parsed_hash)
-        puts "Building identifier from source: #{parsed_hash.inspect}"
-
         # Instantiate the identifier based on the typed stage
         identifier = locate_identifier_klass(parsed_hash).new
-
-        puts "The identifier is #{identifier.class}" if identifier
 
         # For French GUIDE entries: "Guide ISO/CEI 37:1995"
         if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
           parsed_hash[:type_with_stage] = type_with_stage_fr
+        end
+
+        # For DirectivesSupplement, rename :publisher to :supplement_publisher
+        if identifier.is_a?(Identifiers::DirectivesSupplement) && parsed_hash[:publisher]
+          parsed_hash[:supplement_publisher] = parsed_hash.delete(:publisher)
         end
 
         parsed_hash.each_pair do |key, value|
@@ -72,29 +78,16 @@ module PubidNew
             # the realized component is an Identifier class to be added to a CombinedIdentifier
             identifier.additional_identifiers ||= []
             identifier.additional_identifiers << realized_components
-            puts "Added joint identifier: #{realized_components.inspect}"
             next
           end
-
-          puts "Setting #{key} with value: #{realized_components.inspect}"
 
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              puts "Setting sub-component #{sub_key} with value: #{sub_value.inspect}"
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=", sub_value)
-              else
-                puts "Warning: #{sub_key} is not a valid attribute for Identifier"
-              end
+              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
             end
           else
-            puts "Setting component #{key} with value: #{realized_components.inspect}"
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=", realized_components)
-            else
-              puts "Warning: #{key} is not a valid attribute for Identifier"
-            end
+            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
           end
         end
 
@@ -132,8 +125,6 @@ module PubidNew
       end
 
       def cast(type, value)
-        puts "Casting #{type} with value: #{value.inspect}"
-
         case type
         when :base_identifier
           # If it has a base identifier, we need to build a supplement
@@ -142,7 +133,7 @@ module PubidNew
 
           # If there is a base_identifier, and it has a joint_identifier, we need to use a CombinedIdentifier.
 
-        when :publisher, :directives_supplement_body
+        when :publisher, :directives_supplement_body, :supplement_publisher
           Components::Publisher.new(body: value)
 
         when :copublishers
@@ -195,16 +186,21 @@ module PubidNew
           # "WD"
           # "PAS"
           # "CD TR"
-          iteration = value.to_s.match(/(\d+)$/)
-          value = value.to_s.sub(iteration.to_s, "")
-          typed_stage = locate_typed_stage(value || "")
+          original_value = value.to_s  # Store the original parsed value
+          iteration = original_value.match(/(\d+)$/)
+          normalized_value = original_value.sub(iteration.to_s, "")
+          typed_stage = locate_typed_stage(normalized_value || "")
+          
+          # Create a copy with the original abbreviation preserved
+          typed_stage_with_original = typed_stage.dup
+          typed_stage_with_original.original_abbr = original_value.strip
 
           ## IMPORTANT!!
           # Always use TypedStage in an Identifier or separate Type and Stage.
           {
-            stage: typed_stage.to_stage,
-            type: typed_stage.to_type,
-            typed_stage: typed_stage,
+            stage: typed_stage_with_original.to_stage,
+            type: typed_stage_with_original.to_type,
+            typed_stage: typed_stage_with_original,
           }
         when :stage_iteration
           # "1" or "2"
@@ -224,17 +220,23 @@ module PubidNew
           end
 
         when :edition
-          Components::Edition.new(number: value)
+          # value can be "Ed.2", "Ed 2", "ED1", "Edition 13", or just "Ed"
+          original_text = value.to_s
+          # Extract just the digit(s) for the number field
+          number = original_text.match(/\d+/)&.to_s
+          Components::Edition.new(number: number, original_text: original_text)
 
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
-          value = value.to_s.gsub("/", ",")
+          original_value = value.to_s
+          normalized_value = original_value.gsub("/", ",")
 
-          value.split(",").map do |lang|
+          normalized_value.split(",").map.with_index do |lang, idx|
             # We need to convert these into 2 char language codes
             lang = lang.strip
+            original_lang = lang  # Store original format before conversion
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            Components::Language.new(code: lang)
+            Components::Language.new(code: lang, original_code: original_lang)
           end
 
         when :all_parts
@@ -247,8 +249,23 @@ module PubidNew
             require_relative '../idf/builder'
             Idf::Builder.new(Idf::Scheme).build(value)
           end
+
+        when :subgroup
+          # Handle JTC 1 subgroup in directives (ISO/IEC JTC 1 DIR)
+          # Store as a component for potential use in rendering
+          Components::Code.new(value: value.to_s)
+
+        when :supplements
+          # Handle bundled supplements (+ operator)
+          # Each supplement is a hash that needs to be built
+          value.map { |supplement_hash| build(supplement_hash[:supplement]) }
+
+        when :base_document
+          # For bundled identifiers, build the base document
+          build(value)
+
         else
-          raise ArgumentError, "Joint identifier type not yet implemented: #{type}"
+          raise ArgumentError, "Unknown parameter type: #{type}"
         end
       end
     end

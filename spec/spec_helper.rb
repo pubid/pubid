@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require "pubid_new"
-require "parslet/rig/rspec"
+require_relative "../lib/pubid_new"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -12,5 +11,16 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  # Shared context for all specs
+  config.before(:suite) do
+    puts "PubID v2 Test Suite - Testing all flavors"
+    puts "=" * 60
+  end
+
+  config.after(:suite) do
+    puts "=" * 60
+    puts "Test suite completed"
   end
 end

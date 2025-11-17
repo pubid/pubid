@@ -488,8 +488,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
     end
   end
 
-  # Test combined identifiers (if supported)
-  xcontext "combined identifiers" do
+  # Test combined identifiers (now supported!)
+  context "combined identifiers" do
     describe "ISO/IEC DIR 1:2022 + IEC SUP:2022" do
       subject { "ISO/IEC DIR 1:2022 + IEC SUP:2022" }
       let(:parsed) { described_class.parse(subject) }
@@ -533,8 +533,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
     end
   end
 
-  # Test combined identifiers (if supported)
-  xcontext "combined identifiers" do
+  # Test combined identifiers (now supported!)
+  context "combined identifiers" do
     describe "ISO/IEC DIR 1:2022 + IEC SUP:2022" do
       subject { "ISO/IEC DIR 1:2022 + IEC SUP:2022" }
       let(:parsed) { described_class.parse(subject) }

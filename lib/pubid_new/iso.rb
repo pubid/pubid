@@ -1,5 +1,15 @@
 module PubidNew
   module Iso
+    # Parse an ISO identifier string
+    # @param identifier [String] the identifier string to parse
+    # @return [Identifier] the parsed identifier
+    def self.parse(identifier)
+      parser = Parser.new
+      builder = Builder.new(Scheme)
+      
+      parsed = parser.parse(identifier)
+      builder.build(parsed)
+    end
   end
 end
 

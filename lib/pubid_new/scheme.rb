@@ -49,7 +49,6 @@ module PubidNew
     end
 
     def locate_typed_stage_by_abbr(abbr)
-      puts "Locating typed stage by abbr: #{abbr}"
       typed_stage = all_typed_stages.detect do |typed_stage|
         typed_stage.abbr.include?(abbr)
       end
