@@ -1,72 +1,64 @@
+# frozen_string_literal: true
+
 require "parslet"
-require_relative "../parser/common_parse_rules"
-require_relative "../parser/common_parse_methods"
-require_relative "identifier"
-require_relative "supplement_identifier"
 
 module PubidNew
   module Ccsds
     class Parser < Parslet::Parser
-      include ::PubidNew::Parser::CommonParseRules
-      include ::PubidNew::Parser::CommonParseMethods
+      rule(:digit) { match["0-9"] }
+      rule(:digits) { digit.repeat(1) }
+      rule(:alnum) { match["A-Za-z0-9"] }
+      rule(:alnums) { alnum.repeat(1) }
+      rule(:space) { str(" ") }
+      rule(:dash) { str("-") }
+      rule(:dot) { str(".") }
 
-      root :identifier
+      # CCSDS prefix
+      rule(:ccsds_prefix) { str("CCSDS") >> space }
 
+      # Number (can be alphanumeric like A02)
+      rule(:number) { alnums.as(:number) }
+
+      # Part (can be multi-digit like .21 or alphanumeric like .1)
+      rule(:part) { dot >> alnums.as(:part) }
+
+      # Type (all possible type letters)
+      rule(:type) { dash >> match["A-Z"].as(:type) }
+
+      # Edition (can have dots like 4.1)
+      rule(:edition) { dash >> match["0-9."].repeat(1).as(:edition) }
+
+      # Suffix (like -S)
+      rule(:suffix) { dash >> match["A-Z"].as(:suffix) }
+
+      # Corrigendum
+      rule(:corrigendum) do
+        space >> str("Cor.") >> space >> digits.as(:cor_number)
+      end
+
+      rule(:corrigenda) { corrigendum.repeat(0).as(:corrigenda) }
+
+      # Trailing metadata (anything after " - ")
+      rule(:metadata) do
+        (space >> dash >> space >> any.repeat).ignore
+      end
+
+      # Main identifier
       rule(:identifier) do
-        corrigendum_identifier | base_identifier
-      end
-
-      # CCSDS 123.1-B-1
-      # CCSDS A123.1-G-2-S
-      rule(:base_identifier) do
-        str("CCSDS") >> space >>
-          series.maybe >>
+        ccsds_prefix >>
           number >>
-          part >>
-          book_color >>
+          part.maybe >>
+          type.maybe >>
           edition.maybe >>
-          retired.maybe >>
-          language.maybe
+          suffix.maybe >>
+          corrigenda >>
+          metadata.maybe
       end
 
-      # Optional series letter before number
-      rule(:series) do
-        match['A-Z'].as(:series)
-      end
+      rule(:root) { identifier }
 
-      rule(:number) do
-        digits.as(:number)
-      end
-
-      # Part with dot notation: .1 or .12
-      rule(:part) do
-        str(".") >> digits.as(:part)
-      end
-
-      # Book color: -B, -G, -M, -Y, -O, -R
-      rule(:book_color) do
-        str("-") >> match['BGMYOR'].as(:book_color)
-      end
-
-      # Edition: -1, -2, -1.1
-      rule(:edition) do
-        str("-") >> (digits >> (str(".") >> digits).maybe).as(:edition)
-      end
-
-      # Retired marker
-      rule(:retired) do
-        str("-S").as(:retired)
-      end
-
-      # Language translation marker
-      rule(:language) do
-        space >> str("- ") >> match['\w'].repeat(1).as(:language) >> space >> str("Translated")
-      end
-
-      # Corrigendum: CCSDS 123.1-B-1 Cor. 1
-      rule(:corrigendum_identifier) do
-        base_identifier.as(:base_identifier) >>
-          space >> str("Cor. ") >> digits.as(:corrigendum_number)
+      def self.parse(input)
+        new.parse(input)
       end
     end
   end

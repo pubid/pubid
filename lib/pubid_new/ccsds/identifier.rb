@@ -1,16 +1,16 @@
-require "lutaml/model"
+# frozen_string_literal: true
+
+require_relative "parser"
+require_relative "builder"
 
 module PubidNew
   module Ccsds
-    class Identifier < Lutaml::Model::Serializable
-      # Base class for all CCSDS identifiers
-
-      def to_s(lang: :en, lang_single: false)
-        raise NotImplementedError, "Subclasses must implement #to_s"
-      end
-
-      def <=>(other)
-        raise NotImplementedError, "Subclasses must implement #<=>"
+    module Identifier
+      def self.parse(identifier)
+        parsed = PubidNew::Ccsds::Parser.parse(identifier)
+        PubidNew::Ccsds::Builder.build(parsed)
+      rescue Parslet::ParseFailed => e
+        raise "Failed to parse CCSDS identifier '#{identifier}': #{e.message}"
       end
     end
   end

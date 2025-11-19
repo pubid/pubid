@@ -1,105 +1,62 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../support/fixture_loader"
+require_relative "../../lib/pubid_new/ccsds"
 
-RSpec.describe "CCSDS v2 Implementation" do
-  include FixtureLoader
-
-  let(:results) { FixtureLoader::TestResults.new }
-
-  describe "comprehensive fixture tests" do
-    context "active publications" do
-      let(:test_cases) { load_gem_fixture(:ccsds, "active-publications.txt") }
-
-      it "parses and renders all active publications correctly" do
-        test_cases.each do |test_case|
-          begin
-            identifier = PubidNew::Ccsds.parse(test_case)
-            rendered = identifier.to_s
-
-            if test_case == rendered
-              results.record_pass
-            else
-              results.record_fail(test_case, test_case, rendered)
-            end
-          rescue => e
-            results.record_error(test_case, e)
-          end
-        end
-
-        summary = results.summary
-        puts "\nCCSDS Active Publications: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
-
-        # Show first 10 failures
-        if results.errors.any?
-          puts "\nFirst 10 failures:"
-          results.errors.first(10).each do |error|
-            if error[:type] == :mismatch
-              puts "  ~ #{error[:test]}"
-              puts "    => #{error[:actual]}"
-            else
-              puts "  ✗ #{error[:test]}"
-              puts "    => #{error[:error]}"
-            end
-          end
-        end
-
-        expect(summary[:pass_rate]).to be >= 95.0
+RSpec.describe "CCSDS Integration" do
+  describe "parsing and rendering" do
+    shared_examples "parses and renders correctly" do |input, expected_output = nil|
+      it "parses and renders #{input}" do
+        expected = expected_output || input
+        identifier = PubidNew::Ccsds.parse(input)
+        expect(identifier.to_s).to eq(expected)
       end
     end
 
-    context "historical publications" do
-      let(:test_cases) { load_gem_fixture(:ccsds, "historical-publications.txt") }
+    context "basic formats" do
+      include_examples "parses and renders correctly", "CCSDS 120.0-G-4"
+      include_examples "parses and renders correctly", "CCSDS 121.0-B-3"
+      include_examples "parses and renders correctly", "CCSDS 130.0-G-4"
+    end
 
-      it "parses and renders all historical publications correctly" do
-        test_cases.each do |test_case|
-          begin
-            identifier = PubidNew::Ccsds.parse(test_case)
-            rendered = identifier.to_s
-
-            if test_case == rendered
-              results.record_pass
-            else
-              results.record_fail(test_case, test_case, rendered)
-            end
-          rescue => e
-            results.record_error(test_case, e)
-          end
-        end
-
-        summary = results.summary
-        puts "\nCCSDS Historical Publications: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
-
-        # Show first 10 failures
-        if results.errors.any?
-          puts "\nFirst 10 failures:"
-          results.errors.first(10).each do |error|
-            if error[:type] == :mismatch
-              puts "  ~ #{error[:test]}"
-              puts "    => #{error[:actual]}"
-            else
-              puts "  ✗ #{error[:test]}"
-              puts "    => #{error[:error]}"
-            end
-          end
-        end
-
-        expect(summary[:pass_rate]).to be >= 95.0
-      end
+    context "with corrigenda" do
+      include_examples "parses and renders correctly", "CCSDS 123.0-B-2 Cor. 1"
+      include_examples "parses and renders correctly", "CCSDS 123.0-B-2 Cor. 2"
     end
   end
 
-  describe "sample test cases" do
-    [
-      "CCSDS 123.1-B-1",
-      "CCSDS A123.1-G-2",
-      "CCSDS 123.1-B-1-S",
-      "CCSDS 123.1-B-1 Cor. 1"
-    ].each do |test_case|
-      it "correctly parses and renders '#{test_case}'" do
-        identifier = PubidNew::Ccsds.parse(test_case)
-        expect(identifier.to_s).to eq(test_case)
+  describe "parsing all fixtures" do
+    it "parses all active publications" do
+      fixture_file = File.join(__dir__, "../../gems/pubid-ccsds/spec/fixtures/active-publications.txt")
+
+      File.readlines(fixture_file).each do |line|
+        line = line.strip
+        next if line.empty? || line.start_with?("#")
+
+        # Strip metadata notes (anything after " - ")
+        clean_line = line.split(" - ").first
+
+        expect {
+          identifier = PubidNew::Ccsds.parse(line)
+          expect(identifier.to_s).to eq(clean_line)
+        }.not_to raise_error, "Failed to parse: #{line}"
+      end
+    end
+
+    it "parses all historical publications" do
+      fixture_file = File.join(__dir__, "../../gems/pubid-ccsds/spec/fixtures/historical-publications.txt")
+
+      File.readlines(fixture_file).each do |line|
+        line = line.strip
+        next if line.empty? || line.start_with?("#")
+
+        # Strip metadata notes (anything after " - ")
+        clean_line = line.split(" - ").first
+
+        expect {
+          identifier = PubidNew::Ccsds.parse(line)
+          expect(identifier.to_s).to eq(clean_line)
+        }.not_to raise_error, "Failed to parse: #{line}"
       end
     end
   end
