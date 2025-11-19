@@ -10,7 +10,7 @@ module FixtureLoader
     path = fixture_path(flavor, filename)
     return [] unless File.exist?(path)
 
-    File.readlines(path).map(&:strip).reject(&:empty?)
+    File.readlines(path).map(&:strip).reject(&:empty?).reject { |line| line.start_with?('#') }
   end
 
   # Get fixture file path
@@ -31,7 +31,7 @@ module FixtureLoader
     path = File.join(__dir__, "..", "..", "gems", "pubid-#{flavor}", "spec", "fixtures", filename)
     return [] unless File.exist?(path)
 
-    File.readlines(path).map(&:strip).reject(&:empty?)
+    File.readlines(path).map(&:strip).reject(&:empty?).reject { |line| line.start_with?('#') }
   end
 
   # Test result tracker
