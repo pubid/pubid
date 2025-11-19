@@ -17,28 +17,37 @@ module PubidNew
       end
 
       def publisher_portion(lang: :en)
-        # IEC identifiers can have copublishers (e.g., ISO/IEC)
-        # The pattern is similar to ISO but IEC is the main publisher
+        # IEC identifiers can have copublishers (e.g., IEC/IEEE, ISO/IEC)
 
-        # If there are no copublishers, just return the main publisher and type
-        return [
-            publisher.body,
-            (typed_stage.abbreviation.empty? ? "" : "/#{typed_stage.abbreviation}"),
-          ].join('') unless copublishers&.any?
+        # Build publisher string
+        if copublishers&.any?
+          # Has copublishers: "IEC/IEEE" or "ISO/IEC"
+          pub_string = ([publisher] + copublishers).map(&:body).join("/")
+        else
+          # No copublishers: just "IEC"
+          pub_string = publisher.body
+        end
 
-        # If there are copublishers, join them with slashes
-        [
-          ([publisher] + copublishers).map(&:body).join("/"),
-          (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
-        ].join('')
+        # Add type abbreviation if present
+        if typed_stage && !typed_stage.abbreviation.empty?
+          abbr = typed_stage.abbreviation
+          # For copublishers or empty abbr, use space; otherwise use slash
+          if copublishers&.any? || abbr == ""
+            pub_string += (abbr == "" ? "" : " #{abbr}")
+          else
+            pub_string += "/#{abbr}"
+          end
+        end
+
+        pub_string
       end
 
       def number_portion(lang_single: false)
         [
-          (number ? "#{number.value}" : ""),
-          (part ? "-#{part.value}" : ""),
-          (subpart ? "-#{subpart.value}" : ""),
-          (stage_iteration ? ".#{stage_iteration.value}" : ""),
+          (number ? "#{number.to_s}" : ""),
+          (part ? "-#{part.to_s}" : ""),
+          (subpart ? "-#{subpart.to_s}" : ""),
+          (stage_iteration ? ".#{stage_iteration.to_s}" : ""),
           (date ? ":#{date.year}" : ""),
         ].join('')
       end

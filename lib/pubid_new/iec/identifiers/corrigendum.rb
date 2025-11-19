@@ -6,10 +6,10 @@ module PubidNew
   module Identifiers
     # Corrigendum Identifier
     class Corrigendum < SupplementIdentifier
-      attribute :type, Components::Type, default: -> { type[:key] }
+      attribute :type, PubidNew::Components::Type, default: -> { type[:key] }
 
       TYPED_STAGES = [
-        Components::TypedStage.new(
+        PubidNew::Components::TypedStage.new(
           code: :cdcor,
           stage_code: :cd,
           type_code: :cor,
@@ -17,7 +17,7 @@ module PubidNew
           name: "Committee Draft Corrigendum",
           harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
         ),
-        Components::TypedStage.new(
+        PubidNew::Components::TypedStage.new(
           code: :dcor,
           stage_code: :dcor,
           type_code: :cor,
@@ -25,7 +25,7 @@ module PubidNew
           name: "Draft Corrigendum",
           harmonized_stages: %w[40.00 40.20 40.60 40.92 40.98 40.99],
         ),
-        Components::TypedStage.new(
+        PubidNew::Components::TypedStage.new(
           code: :fdcor,
           stage_code: :fdcor,
           type_code: :cor,
@@ -33,7 +33,7 @@ module PubidNew
           name: "Final Draft Corrigendum",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
         ),
-        Components::TypedStage.new(
+        PubidNew::Components::TypedStage.new(
           code: :pubcor,
           stage_code: :published,
           type_code: :cor,

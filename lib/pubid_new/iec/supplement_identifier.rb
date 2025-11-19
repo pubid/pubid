@@ -7,17 +7,29 @@ module PubidNew
       attribute :base_identifier, Identifier, polymorphic: true
 
       def to_s(lang: :en, lang_single: false, with_edition: false)
-        [].tap do |parts|
-          parts << [
-            base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition),
-            "/#{typed_stage.abbreviation}",
-          ].join('')
-          parts << ' '
-          parts << number_portion(lang_single: lang_single)
+        # If we have a base_identifier, render it first
+        # Format: "IEC 60050-102:2007/AMD1:2017"
+        # With edition: "IEC 60050-102:2007/AMD1:2017 ED1"
+        if base_identifier
+          parts = []
+          parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
 
-          parts << ' ' + edition_portion(lang: lang) if with_edition && edition&.number
-          parts << language_portion(lang_single: lang_single) if languages&.any?
-        end.compact.join('')
+          # Supplement notation
+          supp_part = "/#{typed_stage.abbreviation.upcase}#{number.to_s}"
+          supp_part += ":#{date.year}" if date
+          parts << supp_part
+
+          # Add edition if present
+          parts << " #{edition.to_s}" if edition && edition.number
+
+          result = parts.join
+        else
+          # For consolidated rendering (no base shown)
+          result = "/#{typed_stage.abbreviation.upcase}#{number.to_s}"
+          result += ":#{date.year}" if date
+          result += " #{edition.to_s}" if edition && edition.number
+          result
+        end
       end
     end
   end

@@ -1,84 +1,89 @@
-require_relative "../single_identifier"
+require_relative "base"
 require_relative "../../components/typed_stage"
 
 module PubidNew
   module Iec
-  module Identifiers
-    # International Standard Identifier
-    class InternationalStandard < SingleIdentifier
-      attribute :type, Components::Type, default: -> { type[:key] }
+    module Identifiers
+      # International Standard identifier class
+      # Single Responsibility: Represents IEC International Standard documents
+      class InternationalStandard < Base
+        # International Standards need a TypedStage with empty abbr for published standards
+        # From gems/pubid-iec/lib/pubid/iec/identifier/international_standard.rb
+        TYPED_STAGES = [
+          PubidNew::Components::TypedStage.new(
+            code: :is,
+            stage_code: :published,
+            type_code: :is,
+            abbr: [""],
+            name: "International Standard",
+            harmonized_stages: %w[60.00 60.60]
+          )
+        ].freeze
 
-      TYPED_STAGES = [
-        Components::TypedStage.new(
-          code: :pwiis,
-          stage_code: :pwi,
-          type_code: :is,
-          abbr: ["PWI"],
-          name: "Proposed Work Item for International Standard",
-          harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
-        ),
-        Components::TypedStage.new(
-          code: :isnp,
-          stage_code: :np,
-          type_code: :is,
-          abbr: ["NP", "NWIP"],
-          name: "New Work Item Proposal for International Standard",
-          harmonized_stages: %w[10.00 10.20 10.60 10.92 10.93 10.98],
-        ),
-        Components::TypedStage.new(
-          code: :awiis,
-          stage_code: :awi,
-          type_code: :is,
-          abbr: ["AWI"],
-          name: "Approved Work Item for International Standard",
-          harmonized_stages: %w[10.99 20.00],
-        ),
-        Components::TypedStage.new(
-          code: :wdis,
-          stage_code: :wd,
-          type_code: :is,
-          abbr: ["WD"],
-          name: "Working Draft for International Standard",
-          harmonized_stages: %w[20.20 20.60 20.92 20.93 20.98 20.99],
-        ),
-        Components::TypedStage.new(
-          code: :cdis,
-          stage_code: :cd,
-          type_code: :is,
-          abbr: ["CD"],
-          name: "Committee Draft for International Standard",
-          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
-        ),
-        Components::TypedStage.new(
-          code: :cdvis,
-          stage_code: :cdv,
-          type_code: :is,
-          abbr: ["CDV"],
-          name: "Committee Draft for Vote",
-          harmonized_stages: %w[40.20 40.60 40.91 40.92 40.93 40.99],
-        ),
-        Components::TypedStage.new(
-          code: :fdis,
-          stage_code: :fdis,
-          type_code: :is,
-          abbr: ["FDIS"],
-          name: "Final Draft International Standard",
-          harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        ),
-        Components::TypedStage.new(
-          code: :is,
-          stage_code: :published,
-          type_code: :is,
-          abbr: [""],
-          name: "International Standard",
-          harmonized_stages: %w[60.00 60.60],
-        ),
-      ].freeze
+        # Project stages specific to International Standards
+        # These are IEC-specific workflow stages
+        PROJECT_STAGES = {
+          afdis: {
+            abbr: "AFDIS",
+            name: "Approved for FDIS",
+            harmonized_stages: %w[40.99]
+          },
+          ccdv: {
+            abbr: "CCDV",
+            name: "Draft circulated as CDV",
+            harmonized_stages: %w[40.20]
+          },
+          cdvm: {
+            abbr: "CDVM",
+            name: "Rejected CDV to be discussed at a meeting",
+            harmonized_stages: %w[40.91]
+          },
+          cfdis: {
+            abbr: "CFDIS",
+            name: "Draft circulated as FDIS",
+            harmonized_stages: %w[50.20]
+          },
+          decfdis: {
+            abbr: "DECFDIS",
+            name: "FDIS at editing check",
+            harmonized_stages: %w[50.00]
+          },
+          ncdv: {
+            abbr: "NCDV",
+            name: "CDV rejected",
+            harmonized_stages: %w[40.91]
+          },
+          nfdis: {
+            abbr: "NFDIS",
+            name: "FDIS rejected",
+            harmonized_stages: %w[50.92]
+          },
+          prvc: {
+            abbr: "PRVC",
+            name: "Preparation of RVC",
+            harmonized_stages: %w[40.60]
+          },
+          prvd: {
+            abbr: "PRVD",
+            name: "Preparation of RVD",
+            harmonized_stages: %w[50.60]
+          },
+          rfdis: {
+            abbr: "RFDIS",
+            name: "FDIS received and registered",
+            harmonized_stages: %w[50.00]
+          },
+          tcdv: {
+            abbr: "TCDV",
+            name: "Translation of CDV",
+            harmonized_stages: %w[40.00]
+          }
+        }.freeze
 
-      def self.type
-        { key: :is, title: "International Standard", short: nil }
+        def self.type
+          { key: :is, title: "International Standard", short: nil }
+        end
       end
     end
   end
-end
 end

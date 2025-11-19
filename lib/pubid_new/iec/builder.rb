@@ -23,10 +23,25 @@ module PubidNew
         # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
         typed_stage_string = "" if typed_stage_string.nil?
 
+        # Handle FRAG as special fragment notation
+        return nil if typed_stage_string == "FRAG"
+
         @scheme.locate_typed_stage_by_abbr(typed_stage_string)
       end
 
       def locate_identifier_klass(parsed_hash)
+        # Check for working programme
+        if parsed_hash[:wp_stage]
+          require_relative 'identifiers/working_document'
+          return Identifiers::WorkingDocument
+        end
+
+        # Check for working document
+        if parsed_hash[:technical_committee] && parsed_hash[:wd_number]
+          require_relative 'identifiers/working_document'
+          return Identifiers::WorkingDocument
+        end
+
         # Check the `:type_with_stage` to determine the identifier class
         # :type_with_stage will be nil if it is an IS.
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
@@ -35,6 +50,50 @@ module PubidNew
       end
 
       def build(parsed_hash)
+        # Extract FRAG/FRAGC indicator if present
+        is_fragment = parsed_hash[:type_with_stage] == "FRAG" || parsed_hash[:type_with_stage] == "FRAGC"
+        fragment_number = nil
+        fragment_edition = nil
+
+        if is_fragment
+          # For FRAG/FRAGC, we need to build the base Amendment/Corrigendum
+          # then wrap it with FragmentIdentifier
+          if parsed_hash[:number_with_part]
+            fragment_number = parsed_hash[:number_with_part].to_s
+          end
+
+          # Extract edition for fragment
+          fragment_edition = parsed_hash.delete(:edition)
+
+          # Build the base identifier (Amendment/Corrigendum) directly
+          if parsed_hash[:base_identifier]
+            base_id = build(parsed_hash[:base_identifier])
+            return wrap_with_fragment(base_id, fragment_number, fragment_edition)
+          end
+        end
+
+        # Check for TRF with CISPR - build embedded identifier
+        trf_org = parsed_hash.delete(:trf_org)
+        if trf_org && parsed_hash[:number_with_part]
+          # Build CISPR identifier without year
+          cispr_number = parsed_hash.delete(:number_with_part)
+          cispr_id = Identifiers::InternationalStandard.new(
+            publisher: Components::Publisher.new(body: "CISPR")
+          )
+          # Set number via cast
+          number_components = cast(:number_with_part, cispr_number)
+          number_components.each_pair do |k, v|
+            cispr_id.send("#{k}=", v) if cispr_id.respond_to?("#{k}=")
+          end
+          parsed_hash[:cispr_identifier] = cispr_id
+        end
+
+        # Extract and store wrapper data before building
+        consolidated_supplements_data = parsed_hash.delete(:consolidated_supplements)
+        vap_suffix_data = parsed_hash.delete(:vap_suffix)
+        sheet_number_data = parsed_hash.delete(:sheet_number)
+        sheet_year_data = parsed_hash.delete(:sheet_year)
+
         # Instantiate the identifier based on the typed stage
         identifier = locate_identifier_klass(parsed_hash).new
 
@@ -49,7 +108,7 @@ module PubidNew
           next if realized_components.nil?
 
           if key == :joint_identifier
-            # the realized component is an Identifier class to be added to a CombinedIdentifier
+            # the realized component is an Identifier class to be added to a Combined Identifier
             identifier.additional_identifiers ||= []
             identifier.additional_identifiers << realized_components
             next
@@ -65,12 +124,105 @@ module PubidNew
           end
         end
 
+        # After building base identifier, apply wrappers
+        identifier = wrap_with_sheet(identifier, sheet_number_data, sheet_year_data) if sheet_number_data
+        identifier = wrap_with_consolidated(identifier, consolidated_supplements_data) if consolidated_supplements_data
+        identifier = wrap_with_vap(identifier, vap_suffix_data) if vap_suffix_data
+
         identifier
+      end
+
+      # Wrap identifier with FragmentIdentifier for /FRAGN notation
+      def wrap_with_fragment(base_identifier, fragment_number, edition_data = nil)
+        require_relative 'identifiers/fragment_identifier'
+
+        fragment = Identifiers::FragmentIdentifier.new(
+          base_identifier: base_identifier,
+          fragment_number: fragment_number
+        )
+
+        # Set edition if provided
+        if edition_data
+          fragment.edition = cast(:edition, edition_data)
+        end
+
+        fragment
+      end
+
+      # Wrap identifier with SheetIdentifier for /N:YEAR notation
+      def wrap_with_sheet(base_identifier, sheet_number, sheet_year)
+        require_relative 'identifiers/sheet_identifier'
+
+        Identifiers::SheetIdentifier.new(
+          base_identifier: base_identifier,
+          sheet_number: sheet_number.to_s,
+          year: sheet_year.to_s
+        )
+      end
+
+      # Wrap identifier with ConsolidatedIdentifier for +AMD chains
+      def wrap_with_consolidated(base_identifier, supplements_data)
+        require_relative 'identifiers/consolidated_identifier'
+        require_relative 'identifiers/amendment'
+        require_relative 'identifiers/corrigendum'
+
+        supplements = supplements_data.map do |supp|
+          type = supp[:supplement_type].to_s
+          number = supp[:supplement_number].to_s
+          year = supp[:supplement_year].to_s
+
+          if type == "AMD"
+            Identifiers::Amendment.new(
+              number: Components::Code.new(value: number),
+              date: PubidNew::Components::Date.new(year: year)
+            )
+          elsif type == "COR"
+            Identifiers::Corrigendum.new(
+              number: Components::Code.new(value: number),
+              date: PubidNew::Components::Date.new(year: year)
+            )
+          end
+        end.compact
+
+        Identifiers::ConsolidatedIdentifier.new(
+          identifiers: [base_identifier] + supplements
+        )
+      end
+
+      # Wrap identifier with VapIdentifier for CSV/CMV/RLV/SER suffix
+      def wrap_with_vap(base_identifier, vap_suffix_data)
+        require_relative 'identifiers/vap_identifier'
+        require_relative 'identifiers/consolidated_identifier'
+        require_relative 'components/vap_suffix'
+
+        vap_suffix = Components::VapSuffix.new(code: vap_suffix_data.to_s)
+
+        # Extract edition - need to go deep for ConsolidatedIdentifier
+        edition = nil
+        if base_identifier.is_a?(Identifiers::ConsolidatedIdentifier)
+          # Edition is on the first identifier (base document)
+          edition = base_identifier.identifiers.first.edition if base_identifier.identifiers.first.respond_to?(:edition)
+          # Clear it from base document
+          base_identifier.identifiers.first.edition = nil if base_identifier.identifiers.first.respond_to?(:edition=)
+        elsif base_identifier.respond_to?(:edition)
+          edition = base_identifier.edition
+          # Clear edition from base identifier since it moves to VAP level
+          base_identifier.edition = nil if base_identifier.respond_to?(:edition=)
+        end
+
+        Identifiers::VapIdentifier.new(
+          base_identifier: base_identifier,
+          vap_suffix: vap_suffix,
+          edition: edition
+        )
       end
 
       # Convert roman numeral to integer
       def convert_roman_to_integer(roman_numeral)
         return roman_numeral unless roman_numeral.to_s.match?(/^[IVXLCDM]+$/i)
+
+        # Don't convert single X - it's often used as a literal character in part numbers
+        return roman_numeral if roman_numeral.to_s.upcase == "X"
 
         roman_to_int_map = {
           "I" => 1,
@@ -117,6 +269,14 @@ module PubidNew
             end
           end
 
+        when :technical_committee, :wd_number, :wd_stage, :wd_language, :wp_stage, :wp_type
+          # Working document/programme fields - just return as string
+          value.to_s
+
+        when :cispr_identifier
+          # CISPR identifier object for TRF
+          value
+
         when :number_with_part
           # "60038" (no part)
           # or "60038-1" ('1' is part)
@@ -149,6 +309,9 @@ module PubidNew
           # "WD"
           # "TS"
           # "Guide"
+          # Skip FRAG as it's handled specially
+          return nil if value == "FRAG"
+
           iteration = value.to_s.match(/(\d+)$/)
           value = value.to_s.sub(iteration.to_s, "")
           typed_stage = locate_typed_stage(value || "")
@@ -169,16 +332,16 @@ module PubidNew
           # If there is month, "2005-12"
           if value.match?(/^\d{4}(-\d{2})?$/)
             year, month = value.split("-")
-            Components::Date.new(year: year, month: month || nil)
+            PubidNew::Components::Date.new(year: year, month: month || nil)
           elsif value.is_a?(Integer) || value.is_a?(String) && value.match?(/^\d{4}$/)
             # If it's just a year, "2005"
-            Components::Date.new(year: value)
+            PubidNew::Components::Date.new(year: value)
           else
             raise ArgumentError, "Invalid date format: #{value.inspect}"
           end
 
         when :edition
-          Components::Edition.new(number: value)
+          PubidNew::Components::Edition.new(number: value)
 
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
@@ -188,11 +351,15 @@ module PubidNew
             # We need to convert these into 2 char language codes
             lang = lang.strip
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            Components::Language.new(code: lang)
+            PubidNew::Components::Language.new(code: lang)
           end
 
         when :all_parts
-          Components::Locality.new(all_parts: true)
+          PubidNew::Components::Locality.new(all_parts: true)
+
+        when :database
+          # Database flag - return true if DB suffix present
+          true
 
         # Handle joint identifiers with ISO
         when :joint_identifier
