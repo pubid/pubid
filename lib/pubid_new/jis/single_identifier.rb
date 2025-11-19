@@ -1,74 +1,38 @@
-require "lutaml/model"
-require_relative "identifier"
+# frozen_string_literal: true
+
+require_relative "identifiers/base"
 
 module PubidNew
   module Jis
-    class SingleIdentifier < Identifier
-      attribute :publisher, Components::Publisher, default: -> { Components::Publisher.new(body: "JIS") }
-      attribute :series, Components::Code
-      attribute :number, Components::Code
-      attribute :part, Components::Code
-      attribute :date, Components::Date
-      attribute :language, Components::Code
-      attribute :type, Components::Type
-      attribute :typed_stage, Components::TypedStage
+    # Base class for single (non-supplement) JIS identifiers
+    # Includes: JapaneseIndustrialStandard, TechnicalReport, TechnicalSpecification
+    class SingleIdentifier < Identifiers::Base
+      # Type prefix to identifier class mapping
+      TYPE_CLASSES = {
+        "TR" => "TechnicalReport",
+        "TS" => "TechnicalSpecification",
+        nil => "JapaneseIndustrialStandard"  # Default
+      }.freeze
 
-      def to_s(lang: :en, lang_single: false)
-        parts = []
-        
-        # Publisher (JIS)
-        parts << publisher.body if publisher
-        
-        # Type for TR/TS
-        type_short = self.class.type[:short]
-        parts << type_short if type_short != "JIS"
-        
-        # Series and number
-        if series && number
-          parts << "#{series.value} #{number.value}"
-        elsif number
-          parts << number.value
-        end
-        
-        result = parts.join(" ")
-        
-        # Part (with hyphen)
-        result += "-#{part.value}" if part
-        
-        # Date
-        result += ":#{date.year}" if date
-        
-        # Language in parentheses
-        result += "(#{language.value})" if language
-        
-        result
+      # Determine identifier class from type prefix
+      def self.identifier_class_for_type(type)
+        class_name = TYPE_CLASSES[type]
+        return nil unless class_name
+
+        Identifiers.const_get(class_name)
       end
 
-      def <=>(other)
-        return nil unless other.is_a?(SingleIdentifier)
-        
-        # Compare by series first
-        series_cmp = (series&.value || "") <=> (other.series&.value || "")
-        return series_cmp unless series_cmp.zero?
-        
-        # Then by number
-        num_cmp = number.value.to_i <=> other.number.value.to_i
-        return num_cmp unless num_cmp.zero?
-        
-        # Then by part
-        part_cmp = (part&.value&.to_i || 0) <=> (other.part&.value&.to_i || 0)
-        return part_cmp unless part_cmp.zero?
-        
-        # Then by date
-        if date && other.date
-          date.year.to_i <=> other.date.year.to_i
-        elsif date
-          1
-        elsif other.date
-          -1
-        else
-          0
-        end
+      def to_s(with_publisher: true)
+        parts = []
+        parts << publisher if with_publisher
+        parts << type_prefix if respond_to?(:type_prefix) && type_prefix
+        result = parts.join(" ")
+        result += " " if result.length > 0
+        result += code.to_s
+        result += ":#{year}" if year
+        result += "(#{language})" if language
+        result += "（規格群）" if all_parts?
+        result
       end
     end
   end

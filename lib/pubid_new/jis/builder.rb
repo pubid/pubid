@@ -1,98 +1,130 @@
-require_relative "../components/publisher"
-require_relative "../components/code"
-require_relative "../components/date"
+# frozen_string_literal: true
+
+require_relative "components/code"
+require_relative "identifiers/japanese_industrial_standard"
+require_relative "identifiers/technical_report"
+require_relative "identifiers/technical_specification"
+require_relative "identifiers/amendment"
+require_relative "identifiers/explanation"
 
 module PubidNew
   module Jis
     class Builder
-      def initialize(scheme)
-        @scheme = scheme
-        self
+      def self.build(parsed_data)
+        new.build(parsed_data)
       end
 
-      def locate_typed_stage(type_string)
-        # Default to JIS if no type specified
-        type_string = "JIS" if type_string.nil? || type_string.to_s.empty?
-        
-        @scheme.locate_typed_stage_by_abbr(type_string.to_s)
-      end
-
-      def locate_identifier_klass(parsed_hash)
-        # Check for type_prefix (TR or TS)
-        type_str = if parsed_hash[:type_prefix]
-          parsed_hash[:type_prefix]
-        else
-          "JIS"
+      def build(data)
+        # Handle supplement case first
+        if data[:amendment]
+          return build_amendment(data)
+        elsif data[:explanation]
+          return build_explanation(data)
         end
-        
-        typed_stage = locate_typed_stage(type_str)
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+
+        # Build regular identifier
+        build_single_identifier(data)
       end
 
-      def build(parsed_hash)
-        identifier = locate_identifier_klass(parsed_hash).new
+      private
 
-        parsed_hash.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
+      def build_single_identifier(data)
+        # Build code component
+        code = build_code(data)
 
-          next if realized_components.nil?
+        # Extract other attributes
+        attrs = {
+          code: code,
+          year: data[:year]&.to_i,
+          language: data[:language]&.to_s,
+          all_parts: data[:all_parts] ? true : false
+        }
 
-          case realized_components
-          when Hash
-            # Spread hash components into identifier
-            realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+        # Determine identifier class from type
+        type = data[:type]&.to_s
+        klass = case type
+                when "TR"
+                  Identifiers::TechnicalReport
+                when "TS"
+                  Identifiers::TechnicalSpecification
+                else
+                  Identifiers::JapaneseIndustrialStandard
+                end
+
+        klass.new(**attrs)
+      end
+
+      def build_amendment(data)
+        amd_data = data[:amendment]
+
+        # Build base document (without supplement)
+        base_data = data.reject { |k, _| k == :amendment }
+        base = build_single_identifier(base_data)
+
+        # Build amendment
+        Identifiers::Amendment.new(
+          base: base,
+          number: amd_data[:amd_number].to_i,
+          year: amd_data[:amd_year].to_i
+        )
+      end
+
+      def build_explanation(data)
+        expl_data = data[:explanation]
+
+        # Build base document (without supplement)
+        base_data = data.reject { |k, _| k == :explanation }
+        base = build_single_identifier(base_data)
+
+        # Build explanation
+        Identifiers::Explanation.new(
+          base: base,
+          number: expl_data[:expl_number]&.to_i,
+          year: base.year
+        )
+      end
+
+      def build_code(data)
+        series = data[:series].to_s
+        number_str = data[:number].to_s
+        number = number_str.to_i
+
+        # Extract parts with both integer values and original strings
+        parts_result = extract_parts(data[:parts])
+        parts = parts_result[:parts]
+        part_strings = parts_result[:part_strings]
+
+        Components::Code.new(
+          series: series,
+          number: number,
+          parts: parts,
+          number_string: number_str,
+          part_strings: part_strings
+        )
+      end
+
+      def extract_parts(parts_data)
+        parts = []
+        part_strings = []
+
+        return { parts: parts, part_strings: part_strings } unless parts_data
+
+        # parts_data is an array of hashes with :part key
+        if parts_data.is_a?(Array)
+          parts_data.each do |part_hash|
+            if part_hash[:part]
+              part_str = part_hash[:part].to_s
+              parts << part_str.to_i
+              part_strings << part_str
             end
-          else
-            # Direct assignment
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
           end
+        elsif parts_data.is_a?(Hash) && parts_data[:part]
+          part_str = parts_data[:part].to_s
+          parts << part_str.to_i
+          part_strings << part_str
         end
 
-        identifier
-      end
-
-      def cast(type, value)
-        case type
-        when :publisher
-          Components::Publisher.new(body: value)
-
-        when :series
-          Components::Code.new(value: value)
-
-        when :number
-          Components::Code.new(value: value)
-
-        when :part
-          # Part can be "-1" or "-1-2" or "-2-1"
-          # Remove leading dash and treat as full part string
-          part_str = value.to_s.sub(/^-/, "")
-          Components::Code.new(value: part_str)
-
-        when :language
-          Components::Code.new(value: value)
-
-        when :type_prefix
-          # "TR", "TS"
-          typed_stage = locate_typed_stage(value.to_s)
-
-          {
-            type: typed_stage.to_type,
-            typed_stage: typed_stage,
-          }
-
-        when :date
-          value = value.to_s
-          if value.match?(/^\d{4}$/)
-            Components::Date.new(year: value)
-          else
-            raise ArgumentError, "Invalid date format: #{value.inspect}"
-          end
-
-        else
-          # Don't process unknown keys
-          nil
-        end
+        { parts: parts, part_strings: part_strings }
       end
     end
   end

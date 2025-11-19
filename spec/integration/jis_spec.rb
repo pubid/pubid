@@ -1,64 +1,112 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../support/fixture_loader"
+require_relative "../../lib/pubid_new/jis"
 
-RSpec.describe "JIS v2 Implementation" do
-  include FixtureLoader
-
-  let(:results) { FixtureLoader::TestResults.new }
-
-  describe "comprehensive fixture tests" do
-    context "JIS identifiers" do
-      let(:test_cases) { load_gem_fixture(:jis, "jis-pubids.txt") }
-
-      it "parses and renders all JIS identifiers correctly" do
-        test_cases.each do |test_case|
-          begin
-            identifier = PubidNew::Jis.parse(test_case)
-            rendered = identifier.to_s
-
-            if test_case == rendered
-              results.record_pass
-            else
-              results.record_fail(test_case, test_case, rendered)
-            end
-          rescue => e
-            results.record_error(test_case, e)
-          end
-        end
-
-        summary = results.summary
-        puts "\nJIS Identifiers: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
-
-        # Show first 20 failures for analysis
-        if results.errors.any?
-          puts "\nFirst 20 failures:"
-          results.errors.first(20).each do |error|
-            if error[:type] == :mismatch
-              puts "  ~ #{error[:test]}"
-              puts "    => #{error[:actual]}"
-            else
-              puts "  ✗ #{error[:test]}"
-              puts "    => #{error[:error]}"
-            end
-          end
-        end
-
-        expect(summary[:pass_rate]).to be >= 90.0
+RSpec.describe "JIS Integration" do
+  describe "parsing and rendering" do
+    shared_examples "parses and renders correctly" do |input, expected_output = nil|
+      it "parses and renders #{input}" do
+        expected = expected_output || input
+        identifier = PubidNew::Jis.parse(input)
+        expect(identifier.to_s).to eq(expected)
       end
+    end
+
+    context "basic standards" do
+      include_examples "parses and renders correctly", "JIS A 0001:1999"
+      include_examples "parses and renders correctly", "JIS B 0001:2019"
+      include_examples "parses and renders correctly", "JIS C 0303:2000"
+    end
+
+    context "without year" do
+      include_examples "parses and renders correctly", "JIS A 0001"
+      include_examples "parses and renders correctly", "JIS B 0060"
+    end
+
+    context "with parts" do
+      include_examples "parses and renders correctly", "JIS A 1129-1:2010"
+      include_examples "parses and renders correctly", "JIS B 0060-1:2015"
+      include_examples "parses and renders correctly", "JIS C 61000-3-2:2019"
+    end
+
+    context "with language" do
+      include_examples "parses and renders correctly", "JIS Z 8301:2019(E)"
+      include_examples "parses and renders correctly", "JIS Z 8301:2019(J)"
+    end
+
+    context "all-parts notation" do
+      include_examples "parses and renders correctly", "JIS C 0617（規格群）"
+      include_examples "parses and renders correctly", "JIS B 0060（規格群）"
+    end
+
+    context "technical reports" do
+      include_examples "parses and renders correctly", "JIS TR Z 8301:2019"
+      include_examples "parses and renders correctly", "JIS TR B 0035:2019"
+      include_examples "parses and renders correctly", "JIS/TR X 0005:1998", "JIS TR X 0005:1998"
+      include_examples "parses and renders correctly", "TR B 0035:2019", "JIS TR B 0035:2019"
+    end
+
+    context "technical specifications" do
+      include_examples "parses and renders correctly", "JIS TS Z 8301:2019"
+      include_examples "parses and renders correctly", "JIS TS Z 0030-1:2017"
+      include_examples "parses and renders correctly", "TS Z0030-1:2017", "JIS TS Z 0030-1:2017"
+    end
+
+    context "amendments" do
+      include_examples "parses and renders correctly", "JIS A 0001:1999/AMD 1:2000"
+      include_examples "parses and renders correctly", "JIS X 0208:1997/AMENDMENT 1:2012", "JIS X 0208:1997/AMD 1:2012"
+    end
+
+    context "explanations" do
+      include_examples "parses and renders correctly", "JIS K 2151:2004/EXPL"
+      include_examples "parses and renders correctly", "JIS K 2249-4:2011/EXPL 4"
+      include_examples "parses and renders correctly", "JIS K 2249-4:2011/EXPLANATION 4", "JIS K 2249-4:2011/EXPL 4"
+    end
+
+    context "Japanese characters" do
+      include_examples "parses and renders correctly", "JIS　B　0001", "JIS B 0001"
+      include_examples "parses and renders correctly", "JIS C 61000ｰ3ｰ2", "JIS C 61000-3-2"
+      include_examples "parses and renders correctly", "JIS C 61000-3-2：2011", "JIS C 61000-3-2:2011"
+      include_examples "parses and renders correctly", "JISX0902-1:2019", "JIS X 0902-1:2019"
+      include_examples "parses and renders correctly", "JISX0836:2005", "JIS X 0836:2005"
+    end
+
+    context "without publisher prefix" do
+      include_examples "parses and renders correctly", "B 0001", "JIS B 0001"
+      include_examples "parses and renders correctly", "A 0001:1999", "JIS A 0001:1999"
     end
   end
 
-  describe "sample test cases" do
-    [
-      "JIS A 0001:2019",
-      "JIS B 1234:2020",
-      "JIS X 0001:2018"
-    ].each do |test_case|
-      it "correctly parses and renders '#{test_case}'" do
-        identifier = PubidNew::Jis.parse(test_case)
-        expect(identifier.to_s).to eq(test_case)
+  describe "all_parts comparison" do
+    it "matches identifiers with same series and number regardless of year/part" do
+      all_parts_id = PubidNew::Jis.parse("JIS C 0617（規格群）")
+      specific_id = PubidNew::Jis.parse("JIS C 0617-2:2017")
+
+      expect(all_parts_id).to eq(specific_id)
+      expect(specific_id).to eq(all_parts_id)
+    end
+
+    it "does not match identifiers with different series" do
+      all_parts_id = PubidNew::Jis.parse("JIS C 0617（規格群）")
+      different_id = PubidNew::Jis.parse("JIS C 0618-1")
+
+      expect(all_parts_id).not_to eq(different_id)
+    end
+  end
+
+  describe "parsing all fixtures" do
+    it "parses all identifiers from jis-pubids.txt" do
+      fixture_file = File.join(__dir__, "../../gems/pubid-jis/spec/fixtures/jis-pubids.txt")
+
+      File.readlines(fixture_file).each do |line|
+        line = line.strip
+        next if line.empty? || line.start_with?("#")
+
+        expect {
+          identifier = PubidNew::Jis.parse(line)
+          expect(identifier.to_s.upcase).to eq(line.upcase)
+        }.not_to raise_error, "Failed to parse: #{line}"
       end
     end
   end
