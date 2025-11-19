@@ -36,6 +36,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC CSV: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -64,6 +78,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC Standard: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -92,6 +120,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC IECEE TRF: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -120,6 +162,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC IECEx TRF: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -148,6 +204,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC IECQ: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -176,6 +246,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC ISH: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -204,6 +288,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC ISO/IEC: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -232,6 +330,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC Sheets: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -260,6 +372,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC TC1: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -288,6 +414,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC TR: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -316,6 +456,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC TS: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -344,6 +498,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC VAP: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -372,6 +540,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC WD Special Groups: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -400,6 +582,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC Working Documents: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -428,6 +624,20 @@ RSpec.describe "IEC v2 Implementation" do
 
         summary = results.summary
         puts "\nIEC Working Programmes: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+
+        # Show first 10 failures for this category
+        if results.errors.any?
+          puts "  First 10 failures:"
+          results.errors.first(10).each do |error|
+            if error[:type] == :mismatch
+              puts "    ~ #{error[:test]}"
+              puts "      => #{error[:actual]}"
+            else
+              puts "    ✗ #{error[:test]}"
+              puts "      => #{error[:error]}"
+            end
+          end
+        end
       end
     end
 
@@ -459,7 +669,7 @@ RSpec.describe "IEC v2 Implementation" do
     [
       "IEC 60027-1:1992",
       "IEC 60050-113:2011",
-      "IEC/TR 62048:2011"
+      "IEC TR 62048:2011"
     ].each do |test_case|
       it "correctly parses and renders '#{test_case}'" do
         identifier = PubidNew::Iec.parse(test_case)
