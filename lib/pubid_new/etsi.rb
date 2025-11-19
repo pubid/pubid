@@ -1,17 +1,13 @@
-require "parslet"
-require_relative "etsi/parser"
-require_relative "etsi/scheme"
-require_relative "etsi/builder"
+# frozen_string_literal: true
+
+require "lutaml/model"
+require_relative "components/date"
+require_relative "etsi/identifier"
 
 module PubidNew
   module Etsi
-    class << self
-      def parse(input)
-        parser = Parser.new
-        parsed = parser.parse(input)
-        builder = Builder.new(Scheme)
-        builder.build(parsed)
-      end
+    def self.parse(identifier)
+      Identifier.parse(identifier)
     end
   end
 end
