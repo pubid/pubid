@@ -3,6 +3,9 @@ module PubidNew
   end
 end
 
+# Require scheme first
+require_relative "scheme"
+
 # Require all identifier classes
 require_relative "iec/identifiers/international_standard"
 require_relative "iec/identifiers/technical_report"
