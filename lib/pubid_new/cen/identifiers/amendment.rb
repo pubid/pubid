@@ -1,42 +1,28 @@
-require "lutaml/model"
-require_relative "../supplement_identifier"
+# frozen_string_literal: true
+
+require_relative "base"
 
 module PubidNew
   module Cen
     module Identifiers
-      class Amendment < SupplementIdentifier
-        attribute :type, Components::Type, default: -> { type[:key] }
+      # Amendment Identifier
+      # Contains a base identifier plus amendment parameters
+      class Amendment < Base
+        attribute :base_identifier, Base, polymorphic: true
+        attribute :amendment_number, :string
+        attribute :amendment_year, :integer
+        attribute :separator, :string, default: -> { "+" }  # "/" or "+"
 
-        TYPED_STAGES = [
-          Components::TypedStage.new(
-            code: :pubamd,
-            stage_code: :published,
-            type_code: :amd,
-            abbr: ["A"],
-            name: "Amendment",
-            harmonized_stages: %w[60.00 60.60],
-          ),
-        ].freeze
-
-        def self.type
-          { key: :amd, title: "Amendment", short: "A" }
+        def to_s
+          if base_identifier
+            "#{base_identifier.to_s}#{separator}A#{amendment_number}:#{amendment_year}"
+          else
+            "#{separator}A#{amendment_number}:#{amendment_year}"
+          end
         end
 
-        def to_s(lang: :en, lang_single: false)
-          supplement_parts = []
-          supplement_parts << "A"
-          supplement_parts << number.value if number
-          
-          supplement_str = supplement_parts.join
-          supplement_str += ":#{date.year}" if date
-          
-          # If we have a base_identifier, render as slash supplement
-          # Otherwise, render as standalone (for bundled identifiers)
-          if base_identifier
-            "#{base_identifier.to_s(lang: lang, lang_single: lang_single)}/#{supplement_str}"
-          else
-            supplement_str
-          end
+        def publisher
+          base_identifier&.publisher
         end
       end
     end

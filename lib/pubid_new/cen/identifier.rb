@@ -1,17 +1,16 @@
-require "lutaml/model"
+# frozen_string_literal: true
+
+require_relative "parser"
+require_relative "builder"
 
 module PubidNew
   module Cen
-    class Identifier < Lutaml::Model::Serializable
-      # Base class for all CEN identifiers
-      # Subclasses: SingleIdentifier, SupplementIdentifier
-
-      def to_s(lang: :en, lang_single: false)
-        raise NotImplementedError, "Subclasses must implement #to_s"
-      end
-
-      def <=>(other)
-        raise NotImplementedError, "Subclasses must implement #<=>"
+    module Identifier
+      def self.parse(identifier)
+        parsed = Parser.parse(identifier)
+        Builder.build(parsed)
+      rescue Parslet::ParseFailed => e
+        raise "Failed to parse CEN identifier '#{identifier}': #{e.message}"
       end
     end
   end

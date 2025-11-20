@@ -1,42 +1,31 @@
-require "lutaml/model"
-require_relative "../supplement_identifier"
+# frozen_string_literal: true
+
+require_relative "base"
 
 module PubidNew
   module Cen
     module Identifiers
-      class Corrigendum < SupplementIdentifier
-        attribute :type, Components::Type, default: -> { type[:key] }
+      # Corrigendum Identifier
+      # Contains a base identifier plus corrigendum parameters
+      class Corrigendum < Base
+        attribute :base_identifier, Base, polymorphic: true
+        attribute :corrigendum_number, :string
+        attribute :corrigendum_year, :integer
 
-        TYPED_STAGES = [
-          Components::TypedStage.new(
-            code: :pubcor,
-            stage_code: :published,
-            type_code: :cor,
-            abbr: ["AC"],
-            name: "Corrigendum",
-            harmonized_stages: %w[60.00 60.60],
-          ),
-        ].freeze
-
-        def self.type
-          { key: :cor, title: "Corrigendum", short: "AC" }
+        def to_s
+          if base_identifier
+            result = base_identifier.to_s
+            result += "+AC"
+            result += corrigendum_number if corrigendum_number && !corrigendum_number.empty?
+            result += ":#{corrigendum_year}" if corrigendum_year
+            result
+          else
+            "+AC#{corrigendum_number}:#{corrigendum_year}"
+          end
         end
 
-        def to_s(lang: :en, lang_single: false)
-          supplement_parts = []
-          supplement_parts << "AC"
-          supplement_parts << number.value if number
-          
-          supplement_str = supplement_parts.join
-          supplement_str += ":#{date.year}" if date
-          
-          # If we have a base_identifier, render as slash supplement
-          # Otherwise, render as standalone (for bundled identifiers)
-          if base_identifier
-            "#{base_identifier.to_s(lang: lang, lang_single: lang_single)}/#{supplement_str}"
-          else
-            supplement_str
-          end
+        def publisher
+          base_identifier&.publisher
         end
       end
     end

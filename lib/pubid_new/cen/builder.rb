@@ -1,210 +1,144 @@
-require_relative "../components/publisher"
-require_relative "../components/code"
-require_relative "../components/date"
-require_relative "../bundled_identifier"
+# frozen_string_literal: true
+
+require_relative "identifiers/base"
+require_relative "identifiers/european_norm"
 
 module PubidNew
   module Cen
     class Builder
-      def initialize(scheme)
-        @scheme = scheme
-        self
+      def self.build(parsed_data)
+        new.build(parsed_data)
       end
 
-      def locate_typed_stage(typed_stage_string)
-        # Handle Hash input (when Parslet returns a hash)
-        if typed_stage_string.is_a?(Hash)
-          # Extract nested stage value
-          if typed_stage_string[:stage]
-            stage_val = typed_stage_string[:stage].to_s
-            # Combine with EN: pr + EN = prEN
-            typed_stage_string = "#{stage_val}EN"
-          else
-            typed_stage_string = typed_stage_string[:type_with_stage] || "EN"
-          end
-        end
-        
-        # Default to EN if no type specified
-        typed_stage_string = "EN" if typed_stage_string.nil? || typed_stage_string.to_s.empty?
-        
-        type_str = typed_stage_string.to_s
-        
-        # If it's a bare stage like "pr" or "Fpr", combine with EN
-        if %w[pr Fpr].include?(type_str)
-          type_str = "#{type_str}EN"
+      def build(data)
+        data = data.inject({}) { |acc, h| acc.merge(h) } if data.is_a?(Array)
+
+        publishers = []
+        publishers << data[:publisher].to_s if data[:publisher]
+        publishers << data[:copublisher].to_s if data[:copublisher]
+
+        parts = []
+        if data[:parts]
+          parts_data = data[:parts].is_a?(Array) ? data[:parts] : [data[:parts]]
+          parts = parts_data.map { |p| p[:part].to_s }
         end
 
-        @scheme.locate_typed_stage_by_abbr(type_str)
-      end
+        # Extract supplements
+        supplements_data = extract_supplements(data)
 
-      def locate_identifier_klass(parsed_hash)
-        # Check for bundled identifier first
-        return BundledIdentifier if parsed_hash[:base_document] && parsed_hash[:supplements]
+        # Build adopted identifier object if present
+        adopted_id_obj = build_adopted_identifier(data)
 
-        # Check if it's a supplement
-        if parsed_hash[:base_identifier]
-          typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
-          return @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
-        end
+        # Determine identifier class
+        klass = locate_identifier_class(publishers, data[:stage])
 
-        # Regular identifier - check type_with_stage or stage
-        type_str = if parsed_hash[:type_with_stage]
-          parsed_hash[:type_with_stage]
-        elsif parsed_hash[:stage]
-          # prEN or FprEN case
-          "#{parsed_hash[:stage]}EN"
+        # Build base identifier
+        base_id = klass.new(
+          publisher: publishers.empty? ? nil : publishers,
+          type: data[:type]&.to_s,
+          number: data[:number].to_s,
+          parts: parts.empty? ? nil : parts,
+          year: data[:year]&.to_i,
+          stage: data[:stage]&.to_s,
+          adopted_identifier: adopted_id_obj,
+          edition: data[:edition]&.to_s
+        )
+
+        # Wrap with consolidated if supplements present
+        if supplements_data.any?
+          wrap_with_consolidated(base_id, supplements_data)
         else
-          nil
+          base_id
         end
-        
-        typed_stage = locate_typed_stage(type_str)
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
       end
 
-      def build(parsed_hash)
-        identifier = locate_identifier_klass(parsed_hash).new
+      private
 
-        # Handle bundled identifiers specially
-        if identifier.is_a?(BundledIdentifier)
-          return build_bundled_identifier(parsed_hash)
+      def locate_identifier_class(publishers, stage)
+        # Return stage-based or publisher-based class
+        return Identifiers::Base if stage  # For prEN, FprEN use Base
+
+        # Determine class by publisher combination
+        case publishers.sort.join("/")
+        when "EN"
+          Identifiers::EuropeanNorm
+        else
+          Identifiers::Base  # Fallback for CEN, CLC, CWA, HD
         end
+      end
 
-        parsed_hash.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
+      def wrap_with_consolidated(base_identifier, supplements_data)
+        require_relative "identifiers/consolidated_identifier"
+        require_relative "identifiers/amendment"
+        require_relative "identifiers/corrigendum"
 
-          next if realized_components.nil?
-
-          # Map supplement_number to number for supplements
-          mapped_key = (key == :supplement_number) ? :number : key
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
-            end
+        supplement_ids = supplements_data.map do |supp|
+          if supp[:type] == :amendment
+            Identifiers::Amendment.new(
+              base_identifier: base_identifier,
+              amendment_number: supp[:number],
+              amendment_year: supp[:year]&.to_i,
+              separator: supp[:separator] || "+"
+            )
           else
-            identifier.send("#{mapped_key}=", realized_components) if identifier.respond_to?("#{mapped_key}=")
+            Identifiers::Corrigendum.new(
+              base_identifier: base_identifier,
+              corrigendum_number: supp[:number],
+              corrigendum_year: supp[:year]&.to_i
+            )
           end
         end
 
-        identifier
-      end
-
-      def build_bundled_identifier(parsed_hash)
-        base_doc = build(parsed_hash[:base_document])
-        supplements = parsed_hash[:supplements].map do |sup_hash|
-          sup_data = sup_hash[:supplement]
-          
-          # Determine the supplement class
-          typed_stage = locate_typed_stage(sup_data[:type_with_stage])
-          sup_klass = @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
-          
-          # Build the supplement with minimal data
-          sup = sup_klass.new
-          sup.typed_stage = typed_stage
-          sup.type = typed_stage.to_type
-          sup.stage = typed_stage.to_stage
-          sup.number = Components::Code.new(value: sup_data[:supplement_number]) if sup_data[:supplement_number]
-          sup.date = cast(:date, sup_data[:date]) if sup_data[:date]
-          
-          sup
-        end
-
-        BundledIdentifier.new(
-          base_document: base_doc,
-          supplements: supplements
+        Identifiers::ConsolidatedIdentifier.new(
+          identifiers: [base_identifier] + supplement_ids
         )
       end
 
-      def cast(type, value)
-        case type
-        when :base_identifier, :base_document
-          build(value)
+      def extract_supplements(data)
+        return [] unless data[:supplements]
 
-        when :publisher
-          Components::Publisher.new(body: value)
+        supps_array = data[:supplements]
+        return [] if supps_array.empty?
 
-        when :copublishers
-          if value.nil? || value.empty?
-            nil
-          else
-            value.map do |copublisher|
-              Components::Publisher.new(body: copublisher[:copublisher])
-            end
-          end
+        supps_array.map do |s|
+          supp_data = s.is_a?(Hash) && s[:supplement] ? s[:supplement] : s
 
-        when :number_with_part
-          # "10077" (no part)
-          # or "10077-1" ('1' is part)
-          # or "29110-5-1-1" ('5' is part, '1-1' is subpart)
-
-          normalized_value = value.to_s.tr(Parser::DASH_CHARS.join, "-")
-          parts = normalized_value.split("-")
-          number = parts.shift
-          part = parts.shift
-          subpart = parts.any? ? parts.join("-") : nil
-
-          code_hash = { number: Components::Code.new(value: number) }
-          code_hash[:part] = Components::Code.new(value: part) if part
-          code_hash[:subpart] = Components::Code.new(value: subpart) if subpart
-
-          code_hash
-
-        when :supplement_number
-          Components::Code.new(value: value)
-
-        when :type_with_stage
-          # "TS", "TR", "CWA", "HD", "Guide", "prEN", "FprEN"
-          # Or nested hash: {:stage=>"pr"}
-          
-          # Extract string value from nested hash if present
-          if value.is_a?(Hash) && value[:stage]
-            value_str = "#{value[:stage]}EN"
-          else
-            value_str = value.to_s
-          end
-          
-          # Special case: CWA and HD act as both publisher and type
-          if %w[CWA HD].include?(value_str)
-            typed_stage = locate_typed_stage(value_str)
-            return {
-              publisher: Components::Publisher.new(body: value_str),
-              stage: typed_stage.to_stage,
-              type: typed_stage.to_type,
-              typed_stage: typed_stage,
-            }
-          end
-          
-          typed_stage = locate_typed_stage(value_str.empty? ? "EN" : value_str)
+          # Determine separator - slash vs plus
+          separator = supp_data[:amd_sep_slash] ? "/" : "+"
 
           {
-            stage: typed_stage.to_stage,
-            type: typed_stage.to_type,
-            typed_stage: typed_stage,
+            type: supp_data[:amd_number] ? :amendment : :corrigendum,
+            number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
+            year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
+            separator: separator
           }
+        end
+      end
 
-        when :stage
-          # "pr" or "Fpr" from stage_prefix
-          # Don't process separately - it will be combined with type_with_stage
+      def build_adopted_string(data)
+        parts = []
+        parts << "ISO" if data[:adopted_iso]
+        parts << "IEC" if data[:adopted_iec]
+        parts << "CISPR" if data[:adopted_cispr]
+        parts.empty? ? nil : parts.join("/")
+      end
+
+      def build_adopted_identifier(data)
+        # Parse adopted_string if present
+        adopted_str = data[:adopted_string]&.to_s
+        return nil unless adopted_str && !adopted_str.empty?
+
+        # Parse with appropriate flavor parser based on prefix
+        if adopted_str.start_with?("ISO")
+          require_relative '../iso'
+          PubidNew::Iso.parse(adopted_str)
+        elsif adopted_str.start_with?("IEC")
+          require_relative '../iec'
+          PubidNew::Iec.parse(adopted_str)
+        elsif adopted_str.start_with?("CISPR")
+          # For now, return nil - CISPR might need specific handling
           nil
-
-        when :date
-          value = value.to_s
-          if value.match?(/^\d{4}(-\d{2})?(-\d{2})?$/)
-            parts = value.split("-")
-            Components::Date.new(
-              year: parts[0],
-              month: parts[1] || nil,
-              day: parts[2] || nil
-            )
-          elsif value.match?(/^\d{4}$/)
-            Components::Date.new(year: value)
-          else
-            raise ArgumentError, "Invalid date format: #{value.inspect}"
-          end
-
         else
-          # Don't process unknown keys
           nil
         end
       end
