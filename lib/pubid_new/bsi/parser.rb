@@ -1,117 +1,200 @@
 require "parslet"
 
+# frozen_string_literal: true
+
 module PubidNew
   module Bsi
     class Parser < Parslet::Parser
-      root(:identifier)
-
-      # Basic building blocks
+      # Basic rules
       rule(:space) { str(" ") }
       rule(:space?) { space.maybe }
-      rule(:digit) { match["0-9"] }
+      rule(:digit) { match("[0-9]") }
       rule(:digits) { digit.repeat(1) }
-      rule(:alpha) { match["A-Z"] }
+      rule(:letter) { match("[A-Za-z]") }
+      rule(:year_full) { digit.repeat(4, 4) }
+      rule(:year_short) { digit.repeat(2, 2) }
+      rule(:year) { (year_full | year_short).as(:year) }
+      rule(:month) { str("-") >> digit.repeat(2, 2).as(:month) }
+      rule(:dash) { str("-") }
+      rule(:colon) { str(":") }
+      rule(:slash) { str("/") }
+      rule(:plus) { str("+") }
+      rule(:dot) { str(".") }
 
-      # Year and month
-      rule(:year) { digit.repeat(2, 4).as(:year) }
-      rule(:month) { digit.repeat(2).as(:month) }
+      # Publishers/Types
+      rule(:bsi_type) { (str("BS") | str("PAS") | str("PD") | str("DD") | str("Flex")).as(:type) }
+      rule(:bsi_prefix) { str("BSI ").maybe }
 
-      # Document types
-      rule(:bs_type) { str("BS") }
-      rule(:pas_type) { str("PAS") }
-      rule(:pd_type) { str("PD") }
-      rule(:dd_type) { str("DD") }
-      rule(:bsi_flex) { str("BSI") >> space >> str("Flex") }
-      rule(:flex_type) { str("Flex") }
+      # Version/Edition (for Flex documents)
+      rule(:version) { str(" v") >> (digits >> dot >> digits).as(:version) }
 
-      rule(:doc_type) do
-        (bsi_flex.as(:type) | 
-         flex_type.as(:type) |
-         pas_type.as(:type) |
-         pd_type.as(:type) |
-         dd_type.as(:type) |
-         bs_type.as(:type))
-      end
+      # Collection number (second document in collection like PAS 2035/2030)
+      rule(:collection_number) { slash >> digits.as(:collection_number) }
 
-      # National Annex prefix
-      rule(:na_supplement) do
-        (str("+A") >> digits.as(:amd_number) >> (str(":") >> year).maybe.as(:amd_year)) |
-        (str("+C") >> digits.as(:cor_number) >> (str(":") >> year).maybe.as(:cor_year))
-      end
-
-      rule(:national_annex) do
-        (str("NA").as(:na_type) >> na_supplement.maybe.as(:na_supplement) >> 
-         space >> str("to") >> space).as(:national_annex)
-      end
-
-      # Numbers and parts
-      rule(:number) { digits.as(:number) }
-      rule(:part) { str("-") >> digits.as(:part) }
-      rule(:second_number) { str("/") >> digits.as(:second_number) }
-
-      # Edition (for Flex)
-      rule(:edition) { space >> str("v") >> (digits >> str(".") >> digits).as(:edition) }
-
-      # Year-month
-      rule(:year_with_month) { year >> (str("-") >> month).maybe }
+      # Parts
+      rule(:part) { dash >> digits.as(:part) }
+      rule(:parts) { part.repeat(1).as(:parts) }
 
       # Supplements
+      rule(:supplement_type) { (str("A") | str("C")).as(:supp_type) }
+      rule(:amd_number) { str("A") >> digits.as(:amd_number) }
+      rule(:cor_number) { str("C") >> digits.as(:cor_number) }
+      rule(:amd_year) { colon >> year.as(:amd_year) }
+      rule(:cor_year) { colon >> year.as(:cor_year) }
+
       rule(:amendment) do
-        str("+A") >> digits.as(:amd_number) >> (str(":") >> year).maybe.as(:amd_year)
+        plus >> amd_number >> amd_year.maybe
       end
 
       rule(:corrigendum) do
-        str("+C") >> digits.as(:cor_number) >> (str(":") >> year).maybe.as(:cor_year)
+        plus >> cor_number >> cor_year.maybe
       end
 
-      rule(:supplement) { (amendment | corrigendum).as(:supplement) }
+      rule(:supplement) do
+        (amendment | corrigendum).as(:supplement)
+      end
 
-      # Expert Commentary
-      rule(:expert_commentary) { space >> str("ExComm").as(:expert_commentary) }
+      rule(:supplements) { supplement.repeat(0) }
 
-      # Tracked Changes
-      rule(:tracked_changes) { space >> str("-") >> space >> str("TC").as(:tracked_changes) }
+      # ExComm, PDF, TC suffixes
+      rule(:excomm) { space >> str("ExComm").as(:excomm) }
+      rule(:pdf) { space >> str("PDF").as(:pdf) }
+      rule(:tracked_changes) { str(" - TC").as(:tc) }
 
       # Translation
+      rule(:translation_lang) { letter.repeat(1) }
       rule(:translation) do
         space >> (
-          (str("(") >> match["[A-Za-z]"].repeat(1).as(:translation) >> 
+          (str("(") >> translation_lang.as(:translation) >>
            (space >> (str("Translation") | str("version"))).maybe >> str(")")) |
-          (match["[A-Z]"].repeat(1).as(:translation) >> space >> str("TRANSLATION"))
+          (translation_lang.as(:translation) >> str(" TRANSLATION"))
         )
       end
 
-      # PDF
-      rule(:pdf) { space >> str("PDF").as(:pdf) }
-
-      # Adopted content - captures everything until supplement/expert/translation/pdf/TC
-      rule(:adopted_content) do
-        (supplement.absent? >> expert_commentary.absent? >> translation.absent? >>
-         pdf.absent? >> tracked_changes.absent? >> any).repeat(1).as(:adopted)
+      # Adopted organizations
+      rule(:adopted_org) do
+        (str("ISO") | str("IEC") | str("EN") | str("CEN") | str("CLC") | str("CISPR")).as(:adopted_org)
       end
 
-      # Standard number component
-      rule(:standard_number) do
-        number >> second_number.maybe >> part.maybe >> edition.maybe >>
-        (str(":") >> year_with_month).maybe
+      rule(:adopted_org2) do
+        slash >> (str("IEC") | str("IEEE")).as(:adopted_org2)
       end
 
-      # Main identifier structure
+      rule(:adopted_org3) do
+        space >> (str("ISO") | str("IEC")).as(:adopted_org3)
+      end
+
+      rule(:adopted_org4) do
+        slash >> (str("IEC") | str("IEEE")).as(:adopted_org4)
+      end
+
+      # Adopted type (TR, TS, etc.) - can be after slash or space
+      rule(:adopted_type) do
+        (slash | space) >> (str("TR") | str("TS") | str("Guide") |
+                  str("PAS") | str("DIS") | str("FDIS") | str("PRF PAS")).as(:adopted_type)
+      end
+
+      # Edition marker (ED1, ED2, etc.)
+      rule(:edition_marker) do
+        space >> str("ED") >> digits.as(:edition)
+      end
+
+      # CSV suffix
+      rule(:csv_suffix) do
+        space >> str("CSV").as(:csv)
+      end
+
+      # AMD supplement for IEC
+      rule(:amd_supplement) do
+        plus >> str("AMD") >> digits.as(:amd_number) >> (colon >> year.as(:amd_year)).maybe
+      end
+
+      # Adopted number and parts
+      rule(:adopted_number) { digits.as(:adopted_number) }
+      rule(:adopted_part) { (digit | dash | dot).repeat(1).as(:adopted_part) }
+      rule(:stage_iteration) { dot >> digits.as(:stage_iteration) }
+
+      # Adopted identifier patterns - now with optional edition/CSV/AMD/iteration
+      rule(:adopted_with_type) do
+        adopted_org >> adopted_type >> space >>
+          adopted_number >> stage_iteration.maybe >> (dash >> adopted_part).maybe >>
+          (colon >> year >> month.maybe).maybe >>
+          amd_supplement.maybe >>
+          edition_marker.maybe >>
+          csv_suffix.maybe
+      end
+
+      rule(:adopted_simple) do
+        adopted_org >> adopted_org2.maybe >> space >>
+          adopted_number >> stage_iteration.maybe >> (dash >> adopted_part).maybe >>
+          (colon >> year >> month.maybe).maybe >>
+          amd_supplement.maybe >>
+          edition_marker.maybe >>
+          csv_suffix.maybe
+      end
+
+      rule(:adopted_2level) do
+        adopted_org >> adopted_org2.maybe >>
+          (adopted_type.maybe) >>
+          adopted_org3 >> adopted_org4.maybe >> space >>
+          adopted_number >> stage_iteration.maybe >> (dash >> adopted_part).maybe >>
+          (colon >> year >> month.maybe).maybe >>
+          amd_supplement.maybe >>
+          edition_marker.maybe >>
+          csv_suffix.maybe
+      end
+
+      rule(:adopted) do
+        (adopted_with_type | adopted_2level | adopted_simple).as(:adopted)
+      end
+
+      # National Annex
+      rule(:na_supplements) { supplement.repeat(0) }
+      rule(:national_annex) do
+        (str("NA") >> na_supplements.as(:supplements) >> str(" to ")).as(:national_annex)
+      end
+
+      # Simple identifier (BS/PAS/PD/DD/Flex + number)
+      rule(:simple_number) do
+        bsi_prefix >> bsi_type >> space >>
+          digits.as(:number) >> collection_number.maybe >>
+          parts.maybe >> version.maybe >>
+          (colon >> year >> month.maybe).maybe
+      end
+
+      # Adopted identifier as unparsed string - must start with org name
+      rule(:org_prefix) do
+        str("ISO") | str("IEC") | str("EN") | str("CEN") | str("CLC") | str("CISPR")
+      end
+
+      rule(:adopted_string) do
+        # Must start with organization name, then capture rest
+        (org_prefix >> (supplement.absent? >> excomm.absent? >> tracked_changes.absent? >>
+       translation.absent? >> pdf.absent? >> edition_marker.absent? >>
+       match("[^\n]")).repeat(0)).as(:adopted_string)
+      end
+
+      # Adopted identifier (BS/PD/DD + adopted string)
+      rule(:with_adopted) do
+        bsi_type >> space >> adopted_string
+      end
+
+      # Standalone adopted (just the adopted string without BS/PD prefix)
+      rule(:standalone_adopted) { adopted_string }
+
+      # Main identifier
       rule(:identifier) do
         national_annex.maybe >>
-        (str("BSI") >> space).maybe >>
-        doc_type >> space >>
-        (
-          # Try standard number first
-          standard_number |
-          # Otherwise it's an adopted document
-          adopted_content
-        ) >>
-        supplement.repeat.as(:supplements) >>
-        expert_commentary.maybe >>
-        tracked_changes.maybe >>
-        translation.maybe >>
-        pdf.maybe
+          (simple_number | with_adopted | standalone_adopted) >>
+          supplements.as(:supplements) >>
+          edition_marker.maybe >>
+          excomm.maybe >> tracked_changes.maybe >> translation.maybe >> pdf.maybe
+      end
+
+      rule(:root) { identifier }
+
+      def self.parse(input)
+        new.parse(input)
       end
     end
   end
