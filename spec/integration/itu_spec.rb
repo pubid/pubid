@@ -1,64 +1,41 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../support/fixture_loader"
+require_relative "../../lib/pubid_new/itu"
 
-RSpec.describe "ITU v2 Implementation" do
-  include FixtureLoader
-
-  let(:results) { FixtureLoader::TestResults.new }
-
-  describe "comprehensive fixture tests" do
-    context "ITU-R recommendations" do
-      let(:test_cases) { load_gem_fixture(:itu, "itu-r.txt") }
-
-      it "parses and renders all ITU-R recommendations correctly" do
-        test_cases.each do |test_case|
-          begin
-            identifier = PubidNew::Itu.parse(test_case)
-            rendered = identifier.to_s
-
-            if test_case == rendered
-              results.record_pass
-            else
-              results.record_fail(test_case, test_case, rendered)
-            end
-          rescue => e
-            results.record_error(test_case, e)
-          end
-        end
-
-        summary = results.summary
-        puts "\nITU-R: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
-
-        # Show first 20 failures for analysis
-        if results.errors.any?
-          puts "\nFirst 20 failures:"
-          results.errors.first(20).each do |error|
-            if error[:type] == :mismatch
-              puts "  ~ #{error[:test]}"
-              puts "    => #{error[:actual]}"
-            else
-              puts "  ✗ #{error[:test]}"
-              puts "    => #{error[:error]}"
-            end
-          end
-        end
-
-        expect(summary[:pass_rate]).to be >= 95.0
+RSpec.describe "ITU Integration" do
+  describe "parsing and rendering" do
+    shared_examples "parses and renders correctly" do |input, expected_output = nil|
+      it "parses and renders #{input}" do
+        expected = expected_output || input
+        identifier = PubidNew::Itu.parse(input)
+        expect(identifier.to_s).to eq(expected)
       end
+    end
+
+    context "ITU-R recommendations" do
+      include_examples "parses and renders correctly", "ITU-R BO.600-1"
+      include_examples "parses and renders correctly", "ITU-R BO.791-0"
+      include_examples "parses and renders correctly", "ITU-R V.1234-1"
+    end
+
+    context "with subseries" do
+      include_examples "parses and renders correctly", "ITU-R BO.1234.5-2"
     end
   end
 
-  describe "sample test cases" do
-    [
-      "ITU-R BT.709-6",
-      "ITU-R BS.1770-4",
-      "ITU-R M.585-7"
-    ].each do |test_case|
-      it "correctly parses and renders '#{test_case}'" do
-        identifier = PubidNew::Itu.parse(test_case)
-        expect(identifier.to_s).to eq(test_case)
+  describe "parsing all fixtures" do
+    it "parses all ITU-R identifiers" do
+      fixture_file = File.join(__dir__, "../../gems/pubid-itu/spec/fixtures/itu-r.txt")
+
+      File.readlines(fixture_file).each do |line|
+        line = line.strip
+        next if line.empty? || line.start_with?("#")
+
+        expect {
+          identifier = PubidNew::Itu.parse(line)
+          expect(identifier.to_s).to eq(line)
+        }.not_to raise_error, "Failed to parse: #{line}"
       end
     end
   end
