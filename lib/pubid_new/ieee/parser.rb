@@ -33,14 +33,14 @@ module PubidNew
         str("May") | str("June") | str("July") | str("August") |
         str("September") | str("October") | str("November") | str("December") |
         str("Jan") | str("Feb") | str("Mar") | str("Apr") | str("Jun") |
-        str("Jul") | str("Aug") | str("Sep") | str("Oct") | str("Nov") | str("Dec")
+        str("Jul") | str("Aug") | str("Sep") | str("Sept") | str("Oct") | str("Nov") | str("Dec")
       end
 
       # Organizations
       rule(:organization) do
         str("IEEE") | str("AIEE") | str("ANSI") | str("ASA") |
         str("IEC") | str("ISO") | str("ASTM") | str("NACE") |
-        str("NSF") | str("ASHRAE") | str(" NCTA")
+        str("NSF") | str("ASHRAE") | str("NCTA")
       end
 
       rule(:publisher) do
@@ -51,15 +51,21 @@ module PubidNew
         (slash >> space? >> organization).as(:copublisher)
       end
 
-      # Document number
+      # Document number - enhanced to support dashed parts like P11073-10404
+      # but not consume years like -2007
       rule(:number) do
-        (str("P").maybe >> (digits | upper).repeat(1) >> lower.maybe).as(:number)
+        (str("P").maybe >>
+         (digits | upper).repeat(1) >>
+         (dash >> digits >> dash >> digits).maybe >>  # For patterns like P11073-10404
+         lower.maybe).as(:number)
       end
 
       # Type - handle "No." and "No" (case-insensitive), longest first
       rule(:type_word) do
-        str("Std") | str("STD") | str("Standard") |
-        match("[Nn]") >> str("o.") | match("[Nn]") >> str("o")
+        str("Draft Std") | str("STD") | str("Standard") |
+        str("Std No.") | str("Std") |  # Add "Std No." before "Std"
+        match("[Nn]") >> str("o.") | match("[Nn]") >> str("o") |
+        str("No")
       end
 
       # Part and subpart
@@ -68,8 +74,8 @@ module PubidNew
       end
 
       rule(:subpart) do
-        (dot | dash | str("_")) >> 
-        ((str("REV") | str("Rev")).maybe >> match("[0-9a-z]").repeat(1) >> 
+        (dot | dash | str("_")) >>
+        ((str("REV") | str("Rev")).maybe >> match("[0-9a-z]").repeat(1) >>
          (dot >> digits).maybe).as(:subpart)
       end
 
@@ -89,20 +95,23 @@ module PubidNew
 
       rule(:draft_version) do
         # D1, D2, DD3, D3Q, D2009-d, etc.
-        str("D") >> str("IS").absent? >> str("-").maybe >> 
+        str("D") >> str("IS").absent? >> str("-").maybe >>
         (match("[0-9A-Za-z]").repeat(1) >> str("-d").maybe).as(:draft_version)
       end
 
       rule(:draft_date) do
-        ((space? >> comma >> space? | space) >> month_name.as(:month)).maybe >>
+        # Enhanced to handle: ", Sept 2008" or " Sept 2008" or ", Month Year"
+        ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)) |
+        ((space? >> comma >> space? | space) >> month_name.as(:month) >>
         (
           ((space >> digits.as(:day)).maybe >> comma >> year_digits.as(:year)) |
-          (comma >> space? >> year_digits.as(:year))
-        )
+          (comma >> space? >> year_digits.as(:year)) |
+          (space >> year_digits.as(:year))
+        ))
       end
 
       rule(:draft) do
-        (draft_prefix >> draft_version.repeat(1, 2) >> 
+        (draft_prefix >> draft_version.repeat(1, 2) >>
          (dot >> digits.as(:revision)).maybe >>
          draft_date.maybe).as(:draft)
       end
@@ -110,8 +119,8 @@ module PubidNew
       # Edition
       rule(:edition) do
         (comma >> year_digits.as(:year) >> str(" Edition")) |
-        ((space | dash) >> str("Edition ") >> 
-         (digits >> dot >> digits).as(:edition) >> 
+        ((space | dash) >> str("Edition ") >>
+         (digits >> dot >> digits).as(:edition) >>
          (space | str(" - ")) >> year_digits.as(:year))
       end
 
@@ -128,13 +137,13 @@ module PubidNew
       # Corrigendum
       rule(:corrigendum) do
         ((str("_") | slash | dash) >> str("Cor") >> (dash | dot.maybe >> space?) >>
-         digits.as(:cor_number) >> 
+         digits.as(:cor_number) >>
          ((dash | str(":")) >> year_digits.as(:cor_year)).maybe).as(:corrigendum)
       end
 
       # Amendment
       rule(:amendment) do
-        (slash >> str("Amd") >> digits.as(:amd_number) >> 
+        (slash >> str("Amd") >> digits.as(:amd_number) >>
          (dash >> year_digits.as(:amd_year)).maybe).as(:amendment)
       end
 
@@ -150,21 +159,41 @@ module PubidNew
 
       # Additional parameters (inside parentheses)
       rule(:additional_parameters) do
-        (space? >> str("(") >> 
-         (reaffirmed | 
-          str("Revision of IEEE Std ") >> match("[^)]").repeat(1).as(:revision_of) |
-          str("Amendment to IEEE Std ") >> match("[^)]").repeat(1).as(:amendment_to) |
-          str("Adoption of ") >> match("[^)]").repeat(1).as(:adoption) |
+        (space.maybe >> str("(") >>  # Make space before '(' optional
+         (reaffirmed |
+          # Handle "Revision of IEEE Std ..." with optional space after Std
+          (str("Revision of IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
+          # Handle typo "Revison of IEEE Std ..." with optional space after Std
+          (str("Revison of IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
+          # Handle "Revision to IEEE Std ..." with optional space after Std
+          (str("Revision to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
+          # Handle "Revison to IEEE Std ..." with optional space after Std
+          (str("Revison to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
+          # Amendment patterns
+          (str("Amendment to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:amendment_to)) |
+          # Adoption patterns
+          (str("Adoption of ") >> match("[^)]").repeat(1).as(:adoption)) |
+          # Other patterns
+          (str("Notebooks") >> space? >> match("[^,\\)]").repeat(1).as(:notebooks)) |
+          (str("Standard Newspaper(s)") >> space? >> match("[^,\\)]").repeat(1).as(:standard_newspapers)) |
           match("[^)]").repeat(1).as(:note)
          ) >>
          str(")").maybe).as(:parameters)
       end
 
+      # IEC/IEEE copublished pattern - handle all variations comprehensively
+      rule(:iec_ieee_copublished) do
+        str("IEC/IEEE") >>
+        (space >> match("[^\n]").repeat(1)).as(:content)
+      end
+
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
-        (publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >>
+        iec_ieee_copublished |
+        ((publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >>
         space >> (draft_status.as(:draft_status)).maybe >>
-        (str("Draft ").maybe >> type_word.as(:type) >> space?).maybe >>
+        (str("Draft Std").as(:type) >> space?).maybe >>
+        (type_word.as(:type) >> (space >> str("No") >> space).maybe >> space?).maybe >>
         number >>
         (part_subpart_year | edition).maybe >>
         corrigendum.maybe >>
@@ -173,7 +202,7 @@ module PubidNew
         (comma >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         edition.maybe >>
         additional_parameters.maybe >>
-        redline.maybe
+        redline.maybe)
       end
 
       root(:identifier)

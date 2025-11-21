@@ -1,20 +1,22 @@
 # frozen_string_literal: true
 
+require_relative "ieee/identifier"
 require_relative "ieee/parser"
-require_relative "ieee/scheme"
 require_relative "ieee/builder"
+require_relative "ieee/components/code"
+require_relative "ieee/components/draft"
+require_relative "ieee/identifiers/base"
+require_relative "ieee/identifiers/adopted_standard"
+require_relative "ieee/identifiers/dual_published"
+require_relative "ieee/identifiers/redlined_standard"
+require_relative "ieee/identifiers/iec_ieee_copublished"
 
 module PubidNew
   module Ieee
-    # Parse an IEEE identifier string
-    # @param identifier [String] the identifier string to parse
-    # @return [Scheme] the parsed identifier scheme
-    def self.parse(identifier)
-      parser = Parser.new
-      builder = Builder.new(Scheme)
-      
-      parsed = parser.parse(identifier)
-      builder.build(parsed)
+    class << self
+      def parse(input)
+        Identifier.parse(input)
+      end
     end
   end
 end

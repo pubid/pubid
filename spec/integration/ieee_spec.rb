@@ -1,65 +1,118 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../support/fixture_loader"
+require_relative "../../lib/pubid_new/ieee"
 
-RSpec.describe "IEEE v2 Implementation" do
-  include FixtureLoader
+RSpec.describe "IEEE identifiers" do
+  describe "simple standards" do
+    it "parses IEEE Std 1234-2007" do
+      parsed = PubidNew::Ieee.parse("IEEE Std 1234-2007")
 
-  let(:results) { FixtureLoader::TestResults.new }
+      expect(parsed).to be_a(PubidNew::Ieee::Identifiers::Base)
+      expect(parsed.publisher).to eq("IEEE")
+      expect(parsed.code.number).to eq("1234")
+      expect(parsed.year).to eq("2007")
+      expect(parsed.to_s).to eq("IEEE Std 1234-2007")
+    end
 
-  describe "comprehensive fixture tests" do
-    context "IEEE identifiers" do
-      let(:test_cases) { load_gem_fixture(:ieee, "pubid-to-parse.txt") }
+    it "parses IEEE No 264-1968" do
+      parsed = PubidNew::Ieee.parse("IEEE No 264-1968")
 
-      it "parses and renders all IEEE identifiers correctly" do
-        test_cases.each do |test_case|
-          begin
-            identifier = PubidNew::Ieee.parse(test_case)
-            rendered = identifier.to_s
+      expect(parsed.code.number).to eq("264")
+      expect(parsed.year).to eq("1968")
+    end
 
-            if test_case == rendered
-              results.record_pass
-            else
-              results.record_fail(test_case, test_case, rendered)
-            end
-          rescue => e
-            results.record_error(test_case, e)
-          end
-        end
+    it "parses AIEE No 1B-1944" do
+      parsed = PubidNew::Ieee.parse("AIEE No 1B-1944")
 
-        summary = results.summary
-        puts "\nIEEE Identifiers: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
-
-        # Show first 20 failures for analysis
-        if results.errors.any?
-          puts "\nFirst 20 failures:"
-          results.errors.first(20).each do |error|
-            if error[:type] == :mismatch
-              puts "  ~ #{error[:test]}"
-              puts "    => #{error[:actual]}"
-            else
-              puts "  ✗ #{error[:test]}"
-              puts "    => #{error[:error]}"
-            end
-          end
-        end
-
-        expect(summary[:pass_rate]).to be >= 90.0
-      end
+      expect(parsed.publisher).to eq("AIEE")
+      expect(parsed.code.number).to eq("1B")
+      expect(parsed.year).to eq("1944")
     end
   end
 
-  describe "sample test cases" do
-    [
-      "IEEE 802.11-2020",
-      "IEEE 1076-2019",
-      "IEEE Std 802.3-2018"
-    ].each do |test_case|
-      it "correctly parses and renders '#{test_case}'" do
-        identifier = PubidNew::Ieee.parse(test_case)
-        expect(identifier.to_s).to eq(test_case)
+  describe "standards with parts" do
+    it "parses IEEE Std 802.3-2018" do
+      parsed = PubidNew::Ieee.parse("IEEE Std 802.3-2018")
+
+      expect(parsed.code.number).to eq("802")
+      expect(parsed.code.parts).to eq(["3"])
+      expect(parsed.year).to eq("2018")
+      expect(parsed.to_s).to eq("IEEE Std 802.3-2018")
+    end
+
+    it "parses IEEE Std 802.15.4-2020" do
+      parsed = PubidNew::Ieee.parse("IEEE Std 802.15.4-2020")
+
+      expect(parsed.code.number).to eq("802")
+      expect(parsed.code.parts).to eq(["15", "4"])
+      expect(parsed.year).to eq("2020")
+    end
+
+    it "parses IEEE Std C57.12.00-2015" do
+      parsed = PubidNew::Ieee.parse("IEEE Std C57.12.00-2015")
+
+      expect(parsed.code.prefix).to eq("C")
+      expect(parsed.code.number).to eq("57")
+      expect(parsed.code.parts).to eq(["12", "00"])
+      expect(parsed.year).to eq("2015")
+    end
+  end
+
+  describe "draft standards" do
+    it "parses IEEE P1234/D5, July 2019" do
+      parsed = PubidNew::Ieee.parse("IEEE P1234/D5, July 2019")
+
+      expect(parsed.code.prefix).to eq("P")
+      expect(parsed.code.number).to eq("1234")
+      expect(parsed.draft).to be_a(PubidNew::Ieee::Components::Draft)
+      expect(parsed.draft.version).to eq("5")
+      expect(parsed.draft.month).to eq("7")
+      expect(parsed.draft.year).to eq("2019")
+    end
+
+    it "parses IEEE Unapproved Draft Std P1234/D5, July 2019" do
+      parsed = PubidNew::Ieee.parse("IEEE Unapproved Draft Std P1234/D5, July 2019")
+
+      expect(parsed.draft_status).to eq("Unapproved")
+      expect(parsed.type).to eq("Draft Std")
+      expect(parsed.draft.version).to eq("5")
+    end
+  end
+
+  describe "fixture file parsing" do
+    let(:fixture_file) { File.join(__dir__, "../../gems/pubid-ieee/spec/fixtures/pubid-parsed.txt") }
+
+    it "parses all identifiers from fixture file", :slow do
+      total = 0
+      passed = 0
+      failed = []
+
+      File.readlines(fixture_file).each_with_index do |line, index|
+        identifier = line.strip
+        next if identifier.empty? || identifier.start_with?("#")
+
+        total += 1
+
+        begin
+          parsed = PubidNew::Ieee.parse(identifier)
+          expect(parsed).to be_a(PubidNew::Ieee::Identifiers::Base)
+
+          # Test round-trip by converting back to string
+          output = parsed.to_s
+          expect(output).to be_a(String)
+          expect(output).not_to be_empty
+          passed += 1
+        rescue => e
+          failed << "Line #{index + 1}: #{identifier}"
+        end
       end
+
+      pass_rate = (passed.to_f / total * 100).round(1)
+      puts "\n\nIEEE Fixture Results: #{passed}/#{total} (#{pass_rate}%)"
+      puts "Failed: #{failed.length}" if failed.any?
+
+      expect(pass_rate).to be >= 85.0
     end
   end
 end

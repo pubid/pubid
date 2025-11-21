@@ -5,23 +5,123 @@ module PubidNew
     # Builder class for constructing IEEE identifier scheme from parsed data
     # Single Responsibility: Transform parsed data into Scheme objects
     class Builder
-      attr_reader :scheme_class
+      attr_reader :identifier_class
 
-      def initialize(scheme_class = Scheme)
-        @scheme_class = scheme_class
+      def initialize(identifier_class = Identifiers::Base)
+        @identifier_class = identifier_class
       end
 
       # Build a scheme object from parsed data
       # @param parsed [Hash, Array] the parsed identifier data
       # @return [Scheme] the constructed scheme object
       def build(parsed)
-        # Parslet can return array of hashes - merge them
-        parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
-        attributes = extract_attributes(parsed_hash)
-        scheme_class.new(**attributes)
+        # Handle dual published patterns
+        if parsed[:first] && parsed[:second]
+          return build_dual_published(parsed)
+        end
+
+        # Handle IEC/IEEE copublished patterns
+        if parsed[:content]
+          return build_iec_ieee_copublished(parsed)
+        end
+
+        # Handle single identifier
+        build_single_identifier(parsed)
       end
 
       private
+
+      # Build IEC/IEEE copublished identifier
+      def build_iec_ieee_copublished(parsed)
+        content = extract_value(parsed[:content])
+
+        # Parse the content to extract components
+        copublished_number = nil
+        draft_info = nil
+        iec_year = nil
+        date_info = nil
+
+        if content
+          # Extract copublished number (everything before IEC: or comma or parenthesis)
+          if content.include?("IEC:")
+            copublished_number = content.split(" IEC:").first.strip
+          elsif content.include?(", ")
+            copublished_number = content.split(", ").first.strip
+          elsif content.include?(" (")
+            copublished_number = content.split(" (").first.strip
+          else
+            copublished_number = content.strip
+          end
+
+          # Extract draft info if present
+          if copublished_number.include?("/D")
+            parts = copublished_number.split("/D")
+            copublished_number = parts[0]
+            draft_info = "/D" + (parts[1] || "")
+          end
+
+          # Extract IEC year if present
+          if content.include?("IEC:")
+            iec_part = content.split("IEC:")[1]
+            if iec_part
+              iec_year = iec_part.split(" ").first
+            end
+          end
+
+          # Extract date info if present
+          if content.include?(" (")
+            date_part = content.split(" (")[1]
+            if date_part&.include?(")")
+              date_info = date_part.split(")")[0]
+            end
+          end
+        end
+
+        Identifiers::IecIeeeCopublished.new(
+          copublished_number: copublished_number,
+          draft_info: draft_info,
+          iec_year: iec_year,
+          date_info: date_info
+        )
+      end
+
+      # Build dual published identifier
+      def build_dual_published(parsed)
+        first_id = build_single_identifier(parsed[:first])
+        second_id = build_single_identifier(parsed[:second])
+
+        Identifiers::DualPublished.new(
+          first_identifier: first_id,
+          second_identifier: second_id
+        )
+      end
+
+      # Build single identifier
+      def build_single_identifier(parsed)
+        # Parslet can return array of hashes - merge them
+        parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
+        attributes = extract_attributes(parsed_hash)
+
+        # Route to appropriate identifier class based on content
+        identifier_class = determine_identifier_class(attributes)
+        identifier_class.new(**attributes)
+      end
+
+      # Determine which identifier class to use based on attributes
+      def determine_identifier_class(attributes)
+        # Check for adopted standards (parenthetical adoptions)
+        if attributes[:adoption] || (attributes[:parameters] && attributes[:parameters][:adoption])
+          return Identifiers::AdoptedStandard
+        end
+
+        # Check for redline standards
+        if attributes[:redline]
+          return Identifiers::RedlinedStandard
+        end
+
+        # Default to base identifier
+        Identifiers::Base
+      end
 
       # Merge an array of parsed hashes into a single hash
       # @param parsed_array [Array<Hash>] array of parsed hashes
@@ -42,29 +142,44 @@ module PubidNew
         if parsed[:publishers]
           pub_data = parsed[:publishers]
           attributes[:publisher] = extract_value(pub_data[:publisher])
-          
+
           if pub_data[:copublishers]
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            attributes[:copublishers] = copubs.map { |cp| extract_value(cp[:copublisher]) }.compact
+            attributes[:copublisher] = copubs.map { |cp| extract_value(cp[:copublisher]) }.compact
           end
         elsif parsed[:publisher]
           attributes[:publisher] = extract_value(parsed[:publisher])
         end
 
-        # Basic attributes
-        attributes[:number] = extract_value(parsed[:number])
+        # Build code component with parts and subparts
+        code_parts = []
+        code_parts << extract_value(parsed[:part]) if parsed[:part]
+        if parsed[:subpart]
+          subparts = parsed[:subpart]
+          subparts = [subparts] unless subparts.is_a?(Array)
+          code_parts.concat(subparts.map { |sp| extract_value(sp) }.compact)
+        end
+
+        # Create code string with parts
+        code_str = extract_value(parsed[:number])
+        if code_str && !code_parts.empty?
+          code_str += "." + code_parts.join(".")
+        end
+        attributes[:code] = code_str
+
+        # Basic attributes - always extract year if present
+        attributes[:year] = extract_value(parsed[:year]) if parsed[:year]
         attributes[:type] = extract_value(parsed[:type])
         attributes[:draft_status] = extract_value(parsed[:draft_status])
 
-        # Optional attributes
-        extract_optional(parsed, attributes, :part)
-        extract_optional(parsed, attributes, :subpart)
-        extract_optional(parsed, attributes, :year)
-        extract_optional(parsed, attributes, :month)
-        extract_optional(parsed, attributes, :day)
+        # Optional attributes (excluding part/subpart since they're in code)
         extract_optional(parsed, attributes, :edition)
         extract_optional(parsed, attributes, :revision)
+
+        # Month/day - always extract if present
+        extract_optional(parsed, attributes, :month)
+        extract_optional(parsed, attributes, :day)
 
         # Handle draft (can be complex)
         handle_draft(parsed, attributes)
@@ -93,12 +208,12 @@ module PubidNew
       def extract_value(value)
         return nil if value.nil?
         return nil if value.is_a?(Array) && value.empty?
-        
+
         if value.is_a?(Array)
           joined = value.map(&:to_s).join
           return joined.length > 0 ? joined : nil
         end
-        
+
         str_value = value.to_s.strip
         str_value.length > 0 ? str_value : nil
       end
@@ -112,32 +227,55 @@ module PubidNew
       # Handle draft information
       def handle_draft(parsed, attributes)
         return unless parsed[:draft]
-        
+
         draft_data = parsed[:draft]
-        
+
         # Draft can be an array of hash elements or a single hash
         if draft_data.is_a?(Array)
           # Merge all elements in the array
           merged = draft_data.inject({}) { |result, elem| result.merge(elem) }
           draft_data = merged
         end
-        
+
+        # Extract draft version and revision
+        version = nil
+        revision = nil
+        month = nil
+        year = nil
+        day = nil
+
         if draft_data.is_a?(Hash)
-          # Extract draft_version
           if draft_data[:draft_version]
             dv = draft_data[:draft_version]
             if dv.is_a?(Array)
-              attributes[:draft_version] = dv.map { |v| extract_value(v) }.join
+              version = dv.map { |v| extract_value(v) }.join
             else
-              attributes[:draft_version] = extract_value(dv)
+              version = extract_value(dv)
             end
           end
-          attributes[:revision] = extract_value(draft_data[:revision]) if draft_data[:revision]
-          attributes[:month] = extract_value(draft_data[:month]) if draft_data[:month]
-          attributes[:year] = extract_value(draft_data[:year]) if draft_data[:year]
-          attributes[:day] = extract_value(draft_data[:day]) if draft_data[:day]
+
+          revision = extract_value(draft_data[:revision]) if draft_data[:revision]
+
+          # Extract date information from draft data
+          month = extract_value(draft_data[:month]) if draft_data[:month]
+          year = extract_value(draft_data[:year]) if draft_data[:year]
+          day = extract_value(draft_data[:day]) if draft_data[:day]
         else
-          attributes[:draft] = extract_value(draft_data)
+          version = extract_value(draft_data)
+        end
+
+        # Create Draft component object if we have version info
+        if version
+          require_relative "./components/draft"
+          draft_obj = Components::Draft.new(
+            version: version,
+            revision: revision,
+            month: month,
+            year: year,
+            day: day
+          )
+          attributes[:draft_obj] = draft_obj
+          attributes[:draft] = draft_obj.to_s
         end
       end
 
