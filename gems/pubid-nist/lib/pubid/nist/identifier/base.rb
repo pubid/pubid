@@ -10,27 +10,12 @@ module Pubid::Nist
     class Base < Pubid::Core::Identifier::Base
       extend Forwardable
 
+      attr_accessor :revision, :volume, :version, :supplement, :errata,
+                    :index, :insert, :section, :appendix, :translation
+
       def initialize(publisher: "NIST", series:, number: nil, stage: nil, supplement: nil,
-      attribute :series, :string
-      attribute :code, :string
-      attribute :revision, :string
-      attribute :publisher, :string
-      attribute :version, :string
-      attribute :volume, :string
-      attribute :part, :string
-      attribute :addendum, :string
-      attribute :stage, :string
-      attribute :translation, :string
-      attribute :edition, :string
-      attribute :supplement, :string
-      attribute :update, :string
-      attribute :section, :string
-      attribute :appendix, :string
-      attribute :errata, :string
-      attribute :index, :string
-      attribute :insert, :string
                      edition_month: nil, edition_year: nil, edition_day: nil, update: nil,
-                     edition: nil, **opts)
+                     edition: nil, revision: nil, revision_month: nil, revision_year: nil, **opts)
         @publisher = publisher.is_a?(Publisher) ? publisher : Publisher.new(publisher: publisher.to_s)
         @series = series.is_a?(Series) ? series : Series.new(series: series)
         @code = number
@@ -41,8 +26,18 @@ module Pubid::Nist
         elsif edition
           @edition = Edition.new(number: edition)
         end
+        # Handle revision with date (e.g., e2revJune1908)
+        if revision_month && revision_year
+          @revision = parse_revision_date(revision_month, revision_year)
+        elsif revision
+          @revision = revision
+        end
         @update = update
         opts.each { |key, value| send("#{key}=", value.to_s) }
+      end
+      def parse_revision_date(revision_month, revision_year)
+        date = Date.parse("01/#{revision_month}/#{revision_year}")
+        "#{Date::MONTHNAMES[date.month]}#{date.year}"
       end
 
       def parse_edition(edition_month, edition_year, edition_day)

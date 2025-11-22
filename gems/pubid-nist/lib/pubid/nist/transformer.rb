@@ -47,5 +47,15 @@ module Pubid::Nist
     rule(draft: subtree(:draft)) do |context|
       { stage: { id: "i", type: "prd"} }
     end
+
+    # Handle edition with revision date (e.g., e2revJune1908)
+    rule(edition: simple(:edition), revision_month: simple(:revision_month),
+         revision_year: simple(:revision_year)) do |context|
+      {
+        edition: context[:edition].to_s,
+        revision_month: context[:revision_month].to_s,
+        revision_year: context[:revision_year].to_s
+      }
+    end
   end
 end

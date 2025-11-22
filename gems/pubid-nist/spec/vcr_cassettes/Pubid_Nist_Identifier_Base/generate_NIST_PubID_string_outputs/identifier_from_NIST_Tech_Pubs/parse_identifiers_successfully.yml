@@ -35,21 +35,21 @@ http_interactions:
       Content-Type:
       - text/plain; charset=utf-8
       X-Github-Request-Id:
-      - 6399:15673D:9469:116EA:68402B3D
+      - E523:3B5C9B:913E4:14D523:691AF863
       Accept-Ranges:
       - bytes
       Date:
-      - Wed, 04 Jun 2025 11:17:18 GMT
+      - Mon, 17 Nov 2025 10:26:44 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-nrt-rjtf7700082-NRT
+      - cache-hkg17920-HKG
       X-Cache:
       - MISS
       X-Cache-Hits:
       - '0'
       X-Timer:
-      - S1749035838.974413,VS0,VE271
+      - S1763375204.694278,VS0,VE312
       Vary:
       - Authorization,Accept-Encoding
       Access-Control-Allow-Origin:
@@ -57,13 +57,13 @@ http_interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - cca8beab7d2f7eebd3e04a490cf866416cbbb8ae
+      - 923a743979fd2be9595a0c8b7015845c8f7de564
       Expires:
-      - Wed, 04 Jun 2025 11:22:18 GMT
+      - Mon, 17 Nov 2025 10:31:44 GMT
       Source-Age:
       - '0'
     body:
       encoding: UTF-8
       string: '404: Not Found'
-  recorded_at: Wed, 04 Jun 2025 11:17:18 GMT
+  recorded_at: Mon, 17 Nov 2025 10:26:44 GMT
 recorded_with: VCR 6.3.1

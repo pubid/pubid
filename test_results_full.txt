@@ -1,0 +1,1595 @@
+PubID v2 Test Suite - Testing all flavors
+============================================================
+
+CCSDS v2 Implementation
+  comprehensive fixture tests
+    active publications
+
+CCSDS Active Publications: 230/230 (100.0%)
+      parses and renders all active publications correctly
+    historical publications
+
+CCSDS Historical Publications: 260/260 (100.0%)
+      parses and renders all historical publications correctly
+  sample test cases
+    correctly parses and renders 'CCSDS 123.1-B-1'
+    correctly parses and renders 'CCSDS A123.1-G-2'
+    correctly parses and renders 'CCSDS 123.1-B-1-S'
+    correctly parses and renders 'CCSDS 123.1-B-1 Cor. 1'
+
+ETSI v2 Implementation
+  comprehensive fixture tests
+    ETSI publications
+
+ETSI Publications: 24718/24718 (100.0%)
+      parses and renders all ETSI publications correctly
+  sample test cases
+    correctly parses and renders 'ETSI TS 102 894-2 V1.3.1' (FAILED - 1)
+    correctly parses and renders 'ETSI EN 301 549 V3.2.1' (FAILED - 2)
+    correctly parses and renders 'ETSI GS NFV-IFA 007 V2.4.1' (FAILED - 3)
+    correctly parses and renders 'ETSI ES 201 873-1 V4.12.1' (FAILED - 4)
+    correctly parses and renders 'ETSI TR 103 588 V1.1.1' (FAILED - 5)
+
+IEC v2 Implementation
+  comprehensive fixture tests
+    CSV publications
+
+IEC CSV: 0/1282 (0.0%)
+
+First 10 failures:
+  ✗ IEC CA 01:2020 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 11:2015+AMD1:2016+AMD2:2019 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 12:2007+AMD1:2009 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-1-2:2014+AMD1:2017 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-1-3:2004+AMD1:2016+AMD2:2020 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-1-4:2019+AMD1:2020 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-1-5:2014+AMD1:2016 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-1-6:2014+AMD1:2017+AMD2:2022 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-2-1:2014+AMD1:2017 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 16-2-3:2016+AMD1:2019 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all CSV identifiers correctly (FAILED - 6)
+    IEC publications
+
+IEC Publications: 0/2192 (0.0%)
+
+First 10 failures:
+  ✗ IEC 60050-351:2013
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-351:2013/AMD1:2016
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60381-1:1982
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60381-2:1978
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60382:1991
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60946:1988
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 61010-2-201:2017
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 61010-2-201:2017 RLV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 61010-2-202:2020 RLV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 61010-2-202:2020
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all IEC identifiers correctly (FAILED - 7)
+    IECEE TRF publications
+
+IECEE TRF: 0/2108 (0.0%)
+
+First 10 failures:
+  ✗ IECEE TRF 10079-1A:2020
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60034-2-1A:2016
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60044-1A:2010
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60044-7B:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60044-8B:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60065N:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60065K:2010
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60065J:2010
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60065I:2008
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEE TRF 60065E:2004
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all IECEE TRF identifiers correctly (FAILED - 8)
+    IECEx TRF publications
+
+IECEx TRF: 0/137 (0.0%)
+
+First 10 failures:
+  ✗ #IECEx TRF PART-TESTv1:2011
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ #IECEx TRF 16852v2A:2017
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ #IECEx TRF 16852v1arev:2015
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v7c_ds:2021
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v7B_ds:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v7B_DS:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v6B:2011
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v6B_DS:2017
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v5D:2011
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECEx TRF 60079-0v4F:2011
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all IECEx TRF identifiers correctly (FAILED - 9)
+    IECQ publications
+
+IECQ: 0/67 (0.0%)
+
+First 10 failures:
+  ✗ IECQ 01:2014
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 02:2013
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-1:2012
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-3-1:2013
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-3-2:2019
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-4:2014
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-5:2017
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-6:2012
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-7:2013
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IECQ 03-8:2015
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all IECQ identifiers correctly (FAILED - 10)
+    interpretation sheets
+
+IEC ISh: 0/120 (0.0%)
+
+First 10 failures:
+  ✗ IEC 60598-1:1992/ISH1:1996
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60598-2-20:1996/ISH1:2001
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60335-2-24:2010/AMD2:2017/ISH1:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 61000-4-3:2006/ISH1:2008
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60079-11:2011/ISH4:2019
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR 15:2018/ISH1:2019
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 61547:2009/ISH1:2013
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60598-2-20:1996/ISH3:2003
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60601-1:2005/ISH3:2013
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 62040-2:2016/ISH1:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all ISh identifiers correctly (FAILED - 11)
+    ISO/IEC joint publications
+
+ISO/IEC: 0/1144 (0.0%)
+
+First 10 failures:
+  ✗ ISO/IEC TS 22237-5:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 2:2004
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 14:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 17:2016
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 21-1:2005
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 21-2:2005
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 37:2012
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 41:2018
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 46:2017
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ISO/IEC GUIDE 50:2014
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all ISO/IEC identifiers correctly (FAILED - 12)
+    sheets publications
+
+IEC Sheets: 0/7 (0.0%)
+
+First 10 failures:
+  ✗ IEC 60695-2-1/1:1994
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60695-2-4/1:1991
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60695-2-1/2:1994
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60695-2-4/2:1994
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60695-2-1/3:1994
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60695-2-1/0:1994
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60695-2-1/1:1994/COR1:1995
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all sheets identifiers correctly (FAILED - 13)
+    TC1 publications
+
+IEC TC1: 0/1025 (0.0%)
+
+First 10 failures:
+  ✗ IEC 60050 ED0
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-05:1935
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-05:1954
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-07:1956
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-08:1960
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-101:1977
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-101:1977 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-101:1998
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-101:1998 ED2
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60050-102:2007
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all TC1 identifiers correctly (FAILED - 14)
+    technical reports
+
+IEC TR: 0/1397 (0.0%)
+
+First 10 failures:
+  ✗ CISPR TR 16-2-5:2008
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 16-3:2020 RLV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 16-4-1:2009
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 16-4-3:2004+AMD1:2006 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 16-4-4:2007+AMD1:2017+AMD2:2020 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 16-4-5:2006+AMD1:2014+AMD2:2021 CSV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 18-1:2017 RLV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 18-2:2017 RLV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 18-3:2017 RLV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ CISPR TR 28:1997
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all TR identifiers correctly (FAILED - 15)
+    technical specifications
+
+IEC TS: 0/820 (0.0%)
+
+First 10 failures:
+  ✗ IEC TS 60034-16-3:1996
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-18-33:2010
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-20-1:2002
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-24:2009
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-25:2014
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-27-2:2012
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-27-5:2021
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-30-2:2016
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-31:2021
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC TS 60034-32:2016
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all TS identifiers correctly (FAILED - 16)
+    VAP publications
+
+IEC VAP: 0/703 (0.0%)
+
+First 10 failures:
+  ✗ IEC 60034-9:2021 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60034-18-32:2022 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60079-10-1:2020 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60112:2020 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60320-1:2021 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60335-1:2020 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60335-2-10:2021 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60335-2-13:2021 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60335-2-24:2020 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 60335-2-36:2021 CMV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all VAP identifiers correctly (FAILED - 17)
+    working documents special groups
+
+IEC WD Special Groups: 0/753 (0.0%)
+
+First 10 failures:
+  ✗ ACEA/283/RM
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/284/DC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/285/AC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/286/DA
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/286A/DA
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/287/DC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/288/INF
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACEA/289/INF
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACOS/969/INF
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ ACOS/970/INF
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all WD special group identifiers correctly (FAILED - 18)
+    working documents
+
+IEC Working Documents: 0/1946 (0.0%)
+
+First 10 failures:
+  ✗ 100/3590/CDV
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3603/AC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3607/DC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3608/DC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3609/DC
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3610/Q
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3611/Q
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3612/Q
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3613/Q
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ 100/3614/Q
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all working document identifiers correctly (FAILED - 19)
+    working programmes
+
+IEC Working Programmes: 0/188 (0.0%)
+
+First 10 failures:
+  ✗ PWI TR 100-36 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PWI 100-44 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PWI 100-45 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PWI 100-46 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 62394 ED4
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ IEC 63448 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PNW 65-915 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PNW 65-916 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PNW 65-919 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+  ✗ PNW 65-920 ED1
+    => undefined method `parse' for PubidNew::Iec:Module
+
+            identifier = PubidNew::Iec.parse(test_case)
+                                      ^^^^^^
+      parses and renders all working programme identifiers correctly (FAILED - 20)
+  sample test cases
+    correctly parses and renders 'IEC 60950-1:2005' (FAILED - 21)
+    correctly parses and renders 'IEC 61000-4-2:2008' (FAILED - 22)
+    correctly parses and renders 'ISO/IEC 27001:2013' (FAILED - 23)
+    correctly parses and renders 'IEC TS 62607-6-11:2016' (FAILED - 24)
+    correctly parses and renders 'IEC TR 61000-2-14:2006' (FAILED - 25)
+
+IEEE v2 Implementation
+  comprehensive fixture tests
+    IEEE publications
+
+IEEE Publications: 122/640 (19.06%)
+
+First 20 failures:
+  ✗ IEEE 1076-CONC-I99O
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 15.
+  ✗ 1873-2015 IEEE Standard for Robot Map Data Representation for Navigation
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 2012 NESC Handbook, Seventh Edition
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 2017 NESC(R) Handbook, Premier Edition
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 2017 National Electrical Safety Code(R) (NESC(R))
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 2017 National Electrical Safety Code(R) (NESC(R)) - Redline
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 267A-1980 IEEE International System of Units Conversion
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 3006HistoricalData-2012 Historical Reliability Data for IEEE 3006 Standards
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 52 IRE 7.S2
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 55 IRE 2.S1 (IEEE Std No 147)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 61 IRE 15.S1 (IEEE 182)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 61 IRE 28 S1 (IEEE 216)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 62 IRE 12.S1 (IEEE 174)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 62 IRE 7.S2 (IEEE 161)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ 802.11ba Battery Life Improvement: IEEE Technology Report on Wake-Up Radio
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 1.
+  ✗ AIEE No 431 (105) -1958
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 18.
+  ✗ ANSI C37.45-1981(R1992) (Revision of ANSI C37.45-1969)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 24.
+  ✗ ANSI C37.47-1981 (R1992) (Revision of ANSI C37.47-19969)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 25.
+  ✗ ANSI C37.53.1-1989 (R1996) (Revision of ANSI C37.53.1-1982)
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 27.
+  ✗ ANSI C57.1 2.25-1990
+    => Failed to match sequence (publishers:(PUBLISHER copublishers:(COPUBLISHER{0, })) SPACE draft_status:DRAFT_STATUS? ('Draft '? type:TYPE_WORD SPACE?)? NUMBER (PART_SUBPART_YEAR / EDITION)? CORRIGENDUM? AMENDMENT? DRAFT? (COMMA month:MONTH_NAME SPACE year:YEAR_DIGITS)? EDITION? ADDITIONAL_PARAMETERS? REDLINE?) at line 1 char 11.
+      parses and renders all IEEE publications correctly (FAILED - 26)
+  sample test cases
+    correctly parses and renders 'IEEE 802.11-2020'
+    correctly parses and renders 'IEEE 1588-2019'
+    correctly parses and renders 'IEEE P802.3cd/D3.3'
+    correctly parses and renders 'IEEE Std 519-2014'
+    correctly parses and renders 'IEEE C37.118.1-2011'
+
+ISO v2 Implementation
+  comprehensive fixture tests
+    basic ISO identifiers
+
+ISO Basic: 7092/7114 (99.69%)
+
+First 10 failures:
+  ~ ISO /IEC 17030:2003
+    => ISO/IEC 17030:2003
+  ~ ISO 105/F
+    => ISO 105-F
+  ~ ISO 15848-1 :2015
+    => ISO 15848-1:2015
+  ~ ISO 15859-4 :2004
+    => ISO 15859-4:2004
+  ~ ISO 5843/6
+    => ISO 5843-6
+  ~ ISO GUIDE 1:1972
+    => ISO/GUIDE 1:1972
+  ~ ISO GUIDE 2:1976
+    => ISO/GUIDE 2:1976
+  ~ ISO GUIDE 2:1978
+    => ISO/GUIDE 2:1978
+  ~ ISO TR 16401-2
+    => ISO/TR 16401-2
+  ~ ISO/IEC/TR 24485
+    => ISO/IEC TR 24485
+      parses and renders all basic ISO identifiers correctly
+    committee draft identifiers
+
+ISO CD: 56/57 (98.25%)
+
+First 10 failures:
+  ~ ISO/CD2 14065:2018
+    => ISO/CD 14065.2:2018
+      parses and renders all CD identifiers correctly
+    corrigendum and amendment identifiers
+
+ISO Cor/Amd: 129/130 (99.23%)
+
+First 10 failures:
+  ~ ISO 6709:2008/Cor. 1:2009
+    => ISO 6709:2008/Cor.1:2009
+      parses and renders all Cor/Amd identifiers correctly
+    directives
+
+ISO Directives: 22/31 (70.97%)
+
+First 10 failures:
+  ~ ISO/IEC DIR 1 ISO SUP Edition 13
+    => ISO/IEC DIR 1 ISO SUP
+  ~ ISO/IEC DIR 1 ISO SUP Ed 13
+    => ISO/IEC DIR 1 ISO SUP
+  ~ ISO/IEC DIR 1:2022 + IEC SUP:2022
+    => ISO/IEC DIR 1:2022+IEC SUP:2022
+  ~ ISO/IEC Directives, IEC Supplement:2022
+    => ISO/IEC Directives, IEC SUP:2022
+  ✗ ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ~ ISO/IEC Directives, JTC 1 Supplement:2021
+    => ISO/IEC Directives, JTC 1 SUP:2021
+  ~ ISO/IEC Directives, Part 1:2022 + IEC Supplement:2022
+    => ISO/IEC Directives, Part 1:2022+IEC SUP:2022
+  ~ ISO/IEC JTC 1 DIR:2004
+    => ISO/IEC JTC 1 DIR :2004
+  ~ ISO/IEC DIR 1 + IEC SUP:2016-05
+    => ISO/IEC DIR 1+IEC SUP:2016-05
+      parses and renders all ISO directives correctly (FAILED - 27)
+    draft amendments and corrigenda
+
+ISO Draft Amd/Cor: 103/103 (100.0%)
+      parses and renders all draft Amd/Cor identifiers correctly
+    French identifiers
+
+ISO French: 17/24 (70.83%)
+
+First 10 failures:
+  ~ GUIDE ISO/CEI 71:2001(F)
+    => ISO/CEI GUIDE 71:2001(F)
+  ~ Guide ISO 34:2009
+    => ISO/Guide 34:2009
+  ~ Guide ISO/CEI 37:1995
+    => ISO/CEI Guide 37:1995
+  ~ Guide ISO/CEI 50
+    => ISO/CEI Guide 50
+  ~ Guide ISO/CEI 51:1999
+    => ISO/CEI Guide 51:1999
+  ~ Guide ISO/IEC 59:1994
+    => ISO/IEC Guide 59:1994
+  ~ ISO Guide 73:2009(fr)
+    => ISO/Guide 73:2009(fr)
+      parses and renders all French ISO identifiers correctly (FAILED - 28)
+    language variants
+
+ISO Languages: 58/60 (96.67%)
+
+First 10 failures:
+  ~ ISO/IEC 2382-36:2019(E/F)
+    => ISO/IEC 2382-36:2019(E,F)
+  ~ ISO/IEC GUIDE 2:2004(E/F/R)
+    => ISO/IEC GUIDE 2:2004(E,F,R)
+      parses and renders all language variant identifiers correctly
+    legacy TR/TS identifiers
+
+ISO Legacy TR/TS: 6/6 (100.0%)
+      parses and renders all legacy TR/TS identifiers correctly
+    national standards body identifiers
+
+ISO NSB: 0/28 (0.0%)
+
+First 10 failures:
+  ✗ FprISO 10140-4
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 105-A03
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 10993-1
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 12402-2
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 12402-3
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 12402-4
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 12402-5
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 13679
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 16119-5
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ FprISO 18674-5
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+      parses and renders all NSB identifiers correctly (FAILED - 29)
+    Russian identifiers
+
+ISO Russian: 0/44 (0.0%)
+
+First 10 failures:
+  ✗ ИСО 10335
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 1126
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 124
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 127
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 1304
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 1431-1
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 1435
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 15105
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 18064
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ ИСО 2321
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+      parses and renders all Russian ISO identifiers correctly (FAILED - 30)
+    supplement iteration identifiers
+
+ISO Supplement Iteration: 64/64 (100.0%)
+      parses and renders all supplement iteration identifiers correctly
+    IWA identifiers
+
+IWA: 19/20 (95.0%)
+
+First 10 failures:
+  ~ ISO/WD IWA 19
+    => WD IWA 19
+      parses and renders all IWA identifiers correctly
+    non-ISO identifiers
+
+Non-ISO: 4/8 (50.0%)
+
+First 10 failures:
+  ✗ CEN/TS 15370-1:2006
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ EN 12643:2014
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ JCGM 200:2007(F)
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+  ✗ JCGM 200:2008(F)
+    => Expected one of [DIRECTIVES_IDENTIFIERS, SUPPLEMENT_SUPPLEMENT_IDENTIFIER, SUPPLEMENT_IDENTIFIER, JOINT_IDENTIFIER, IDENTIFIER_COPUBLISHERS] at line 1 char 1.
+      parses and renders all non-ISO identifiers correctly (FAILED - 31)
+  sample test cases
+    correctly parses and renders 'ISO 9001:2015'
+    correctly parses and renders 'ISO/IEC 27001:2013'
+    correctly parses and renders 'ISO 14001:2015'
+    correctly parses and renders 'ISO/TS 16949:2009'
+    correctly parses and renders 'ISO/TR 14062:2002'
+
+ITU v2 Implementation
+  comprehensive fixture tests
+    ITU-R recommendations
+
+ITU-R: 2041/2041 (100.0%)
+      parses and renders all ITU-R recommendations correctly
+  sample test cases
+    correctly parses and renders 'ITU-R BT.709-6'
+    correctly parses and renders 'ITU-R BS.1770-4'
+    correctly parses and renders 'ITU-R M.585-7'
+
+JIS v2 Implementation
+  comprehensive fixture tests
+    JIS publications
+
+JIS Publications: 10635/10635 (100.0%)
+      parses and renders all JIS publications correctly
+  sample test cases
+    correctly parses and renders 'JIS A 0001:1999'
+    correctly parses and renders 'JIS A 1129-1:2010'
+    correctly parses and renders 'JIS B 7001:2018'
+    correctly parses and renders 'JIS C 60068-2-1:2010'
+    correctly parses and renders 'JIS X 0208:2012'
+
+NIST v2 Implementation
+  comprehensive fixture tests
+    all records
+
+NIST All Records: 17382/19488 (89.19%)
+
+First 20 failures:
+  ~ NBS BMS 144supp
+    => NBS BMS 144sup
+  ~ NBS BMS 17supp
+    => NBS BMS 17sup
+  ~ NBS BMS 17supp2
+    => NBS BMS 17sup2
+  ✗ NBS CIRC 13e2revJune1908
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ✗ NBS CIRC 15-April1909
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ~ NBS CIRC 25sup-1924
+    => NBS CIRC 25-1924sup
+  ~ NBS CIRC 25sup-1925
+    => NBS CIRC 25-1925sup
+  ~ NBS CIRC 25sup-1927
+    => NBS CIRC 25-1927sup
+  ~ NBS CIRC 25sup-1928
+    => NBS CIRC 25-1928sup
+  ~ NBS CIRC 25sup-1929
+    => NBS CIRC 25-1929sup
+  ~ NBS CIRC 467v1
+    => NBS CIRC 467verv1
+  ~ NBS CIRC 467v2
+    => NBS CIRC 467verv2
+  ~ NBS CIRC 467v3
+    => NBS CIRC 467verv3
+  ~ NBS CIRC 539v1
+    => NBS CIRC 539verv1
+  ~ NBS CIRC 539v10
+    => NBS CIRC 539verv10
+  ~ NBS CIRC 539v2
+    => NBS CIRC 539verv2
+  ~ NBS CIRC 539v3
+    => NBS CIRC 539verv3
+  ~ NBS CIRC 539v4
+    => NBS CIRC 539verv4
+  ~ NBS CIRC 539v5
+    => NBS CIRC 539verv5
+  ~ NBS CIRC 539v6
+    => NBS CIRC 539verv6
+      parses and renders all records correctly (FAILED - 32)
+    publication exports
+
+NIST Pubs Export: 565/764 (73.95%)
+
+First 20 failures:
+  ~ NIST SP 500-21 Vol. 1
+    => NIST SP 500-21v1
+  ~ NIST SP 500-21 Vol. 2
+    => NIST SP 500-21v2
+  ~ NIST SP 800-101 Rev. 1
+    => NIST SP 800-101rRev. 1
+  ~ NIST SP 800-107 Rev. 1
+    => NIST SP 800-107rRev. 1
+  ~ NIST SP 800-108 Rev. 1
+    => NIST SP 800-108rRev. 1
+  ~ NIST SP 800-108 Rev. 1
+    => NIST SP 800-108rRev. 1
+  ~ NIST SP 800-114 Rev. 1
+    => NIST SP 800-114rRev. 1
+  ~ NIST SP 800-114 Rev. 1
+    => NIST SP 800-114rRev. 1
+  ~ NIST SP 800-116 Rev. 1
+    => NIST SP 800-116rRev. 1
+  ~ NIST SP 800-116 Rev. 1
+    => NIST SP 800-116rRev. 1
+  ~ NIST SP 800-117 Rev. 1
+    => NIST SP 800-117rRev. 1
+  ~ NIST SP 800-12 Rev. 1
+    => NIST SP 800-12rRev. 1
+  ~ NIST SP 800-12 Rev. 1
+    => NIST SP 800-12rRev. 1
+  ~ NIST SP 800-121 Rev. 1
+    => NIST SP 800-121rRev. 1
+  ~ NIST SP 800-121 Rev. 2
+    => NIST SP 800-121rRev. 2
+  ~ NIST SP 800-121 Rev. 2
+    => NIST SP 800-121rRev. 2
+  ~ NIST SP 800-121 Rev. 2
+    => NIST SP 800-121rRev. 2
+  ~ NIST SP 800-124 Rev. 1
+    => NIST SP 800-124rRev. 1
+  ~ NIST SP 800-124 Rev. 2
+    => NIST SP 800-124rRev. 2
+  ~ NIST SP 800-124 Rev. 2
+    => NIST SP 800-124rRev. 2
+      parses and renders all publication exports correctly (FAILED - 33)
+    September 2024 updates
+
+NIST Sept 2024 Update: 0/98 (0.0%)
+
+First 20 failures:
+  ~ NIST.HB.135e2022-upd1
+    => NIST HB 135-upd1
+  ✗ NIST.IR.8170-upd
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ~ NIST.IR.8413-upd1
+    => NIST IR 8413-upd1
+  ✗ NIST.AMS.300-8r1/upd
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ✗ NIST.IR.8115r1-upd
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ✗ NIST.SP.500-300-upd
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ✗ NIST.IR.8211-upd
+    => Expected one of [COMPOUND_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?, PUBLISHER? (SPACE / DOT)? SIMPLE_SERIES (SPACE / DOT) REPORT_NUMBER PARTS{0, } DRAFT? TRANSLATION?] at line 1 char 1.
+  ~ NIST.SP.260-238-upd1
+    => NIST SP 260-238-upd1
+  ~ NIST.IR.8165-upd1
+    => NIST IR 8165-upd1
+  ~ NIST.IR.8406-upd1
+    => NIST IR 8406-upd1
+  ~ NIST.GCR.23-045-upd1
+    => NIST GCR 23-045-upd1
+  ~ NIST.AMS.600-13-upd1
+    => NIST AMS 600-13-upd1
+  ~ NIST.SP.260-227-upd1
+    => NIST SP 260-227-upd1
+  ~ NIST.SP.800-108r1-upd1
+    => NIST SP 800-108rr1-upd1
+  ~ NIST.HB.44-2023-upd1
+    => NIST HB 44-2023-upd1
+  ~ NIST.IR.8455-upd1
+    => NIST IR 8455-upd1
+  ~ NIST.FIPS.197-upd1
+    => NIST FIPS 197-upd1
+  ~ NIST.AMS.100-48-upd1
+    => NIST AMS 100-48-upd1
+  ~ NIST.TN.2221-upd1
+    => NIST TN 2221-upd1
+  ~ NIST.TN.2230-upd1
+    => NIST TN 2230-upd1
+      parses and renders all September 2024 updates correctly (FAILED - 34)
+  sample test cases
+    correctly parses and renders 'NIST SP 800-53 Rev. 5' (FAILED - 35)
+    correctly parses and renders 'NIST FIPS 140-3'
+    correctly parses and renders 'NIST IR 8259A'
+    correctly parses and renders 'NIST CSWP 29'
+    correctly parses and renders 'NIST TN 2050'
+============================================================
+Test suite completed
+
+Failures:
+
+  1) ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI TS 102 894-2 V1.3.1'
+     Failure/Error: parsed = parser.parse(input)
+
+     Parslet::ParseFailed:
+       Failed to match sequence (PUBLISHER SPACE DOC_TYPE SPACE NUMBER PARTS? AMENDMENT? CORRIGENDUM? SPACE (VERSION / EDITION) SPACE DATE) at line 1 char 25.
+     # ./lib/pubid_new/etsi.rb:11:in `parse'
+     # ./spec/integration/etsi_spec.rb:62:in `block (4 levels) in <top (required)>'
+
+  2) ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI EN 301 549 V3.2.1'
+     Failure/Error: parsed = parser.parse(input)
+
+     Parslet::ParseFailed:
+       Failed to match sequence (PUBLISHER SPACE DOC_TYPE SPACE NUMBER PARTS? AMENDMENT? CORRIGENDUM? SPACE (VERSION / EDITION) SPACE DATE) at line 1 char 23.
+     # ./lib/pubid_new/etsi.rb:11:in `parse'
+     # ./spec/integration/etsi_spec.rb:62:in `block (4 levels) in <top (required)>'
+
+  3) ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI GS NFV-IFA 007 V2.4.1'
+     Failure/Error: parsed = parser.parse(input)
+
+     Parslet::ParseFailed:
+       Failed to match sequence (PUBLISHER SPACE DOC_TYPE SPACE NUMBER PARTS? AMENDMENT? CORRIGENDUM? SPACE (VERSION / EDITION) SPACE DATE) at line 1 char 27.
+     # ./lib/pubid_new/etsi.rb:11:in `parse'
+     # ./spec/integration/etsi_spec.rb:62:in `block (4 levels) in <top (required)>'
+
+  4) ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI ES 201 873-1 V4.12.1'
+     Failure/Error: parsed = parser.parse(input)
+
+     Parslet::ParseFailed:
+       Failed to match sequence (PUBLISHER SPACE DOC_TYPE SPACE NUMBER PARTS? AMENDMENT? CORRIGENDUM? SPACE (VERSION / EDITION) SPACE DATE) at line 1 char 26.
+     # ./lib/pubid_new/etsi.rb:11:in `parse'
+     # ./spec/integration/etsi_spec.rb:62:in `block (4 levels) in <top (required)>'
+
+  5) ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI TR 103 588 V1.1.1'
+     Failure/Error: parsed = parser.parse(input)
+
+     Parslet::ParseFailed:
+       Failed to match sequence (PUBLISHER SPACE DOC_TYPE SPACE NUMBER PARTS? AMENDMENT? CORRIGENDUM? SPACE (VERSION / EDITION) SPACE DATE) at line 1 char 23.
+     # ./lib/pubid_new/etsi.rb:11:in `parse'
+     # ./spec/integration/etsi_spec.rb:62:in `block (4 levels) in <top (required)>'
+
+  6) IEC v2 Implementation comprehensive fixture tests CSV publications parses and renders all CSV identifiers correctly
+     Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+       expected: >= 95.0
+            got:    0.0
+     # ./spec/integration/iec_spec.rb:46:in `block (4 levels) in <top (required)>'
+
+  7) IEC v2 Implementation comprehensive fixture tests IEC publications parses and renders all IEC identifiers correctly
+     Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+       expected: >= 95.0
+            got:    0.0
+     # ./spec/integration/iec_spec.rb:86:in `block (4 levels) in <top (required)>'
+
+  8) IEC v2 Implementation comprehensive fixture tests IECEE TRF publications parses and renders all IECEE TRF identifiers correctly
+     Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+       expected: >= 95.0
+            got:    0.0
+     # ./spec/integration/iec_spec.rb:126:in `block (4 levels) in <top (required)>'
+
+  9) IEC v2 Implementation comprehensive fixture tests IECEx TRF publications parses and renders all IECEx TRF identifiers correctly
+     Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+       expected: >= 95.0
+            got:    0.0
+     # ./spec/integration/iec_spec.rb:166:in `block (4 levels) in <top (required)>'
+
+  10) IEC v2 Implementation comprehensive fixture tests IECQ publications parses and renders all IECQ identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:206:in `block (4 levels) in <top (required)>'
+
+  11) IEC v2 Implementation comprehensive fixture tests interpretation sheets parses and renders all ISh identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:246:in `block (4 levels) in <top (required)>'
+
+  12) IEC v2 Implementation comprehensive fixture tests ISO/IEC joint publications parses and renders all ISO/IEC identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:286:in `block (4 levels) in <top (required)>'
+
+  13) IEC v2 Implementation comprehensive fixture tests sheets publications parses and renders all sheets identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:326:in `block (4 levels) in <top (required)>'
+
+  14) IEC v2 Implementation comprehensive fixture tests TC1 publications parses and renders all TC1 identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:366:in `block (4 levels) in <top (required)>'
+
+  15) IEC v2 Implementation comprehensive fixture tests technical reports parses and renders all TR identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:406:in `block (4 levels) in <top (required)>'
+
+  16) IEC v2 Implementation comprehensive fixture tests technical specifications parses and renders all TS identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:446:in `block (4 levels) in <top (required)>'
+
+  17) IEC v2 Implementation comprehensive fixture tests VAP publications parses and renders all VAP identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:486:in `block (4 levels) in <top (required)>'
+
+  18) IEC v2 Implementation comprehensive fixture tests working documents special groups parses and renders all WD special group identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:526:in `block (4 levels) in <top (required)>'
+
+  19) IEC v2 Implementation comprehensive fixture tests working documents parses and renders all working document identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:566:in `block (4 levels) in <top (required)>'
+
+  20) IEC v2 Implementation comprehensive fixture tests working programmes parses and renders all working programme identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iec_spec.rb:606:in `block (4 levels) in <top (required)>'
+
+  21) IEC v2 Implementation sample test cases correctly parses and renders 'IEC 60950-1:2005'
+      Failure/Error: identifier = PubidNew::Iec.parse(test_case)
+
+      NoMethodError:
+        undefined method `parse' for PubidNew::Iec:Module
+
+                identifier = PubidNew::Iec.parse(test_case)
+                                          ^^^^^^
+      # ./spec/integration/iec_spec.rb:620:in `block (4 levels) in <top (required)>'
+
+  22) IEC v2 Implementation sample test cases correctly parses and renders 'IEC 61000-4-2:2008'
+      Failure/Error: identifier = PubidNew::Iec.parse(test_case)
+
+      NoMethodError:
+        undefined method `parse' for PubidNew::Iec:Module
+
+                identifier = PubidNew::Iec.parse(test_case)
+                                          ^^^^^^
+      # ./spec/integration/iec_spec.rb:620:in `block (4 levels) in <top (required)>'
+
+  23) IEC v2 Implementation sample test cases correctly parses and renders 'ISO/IEC 27001:2013'
+      Failure/Error: identifier = PubidNew::Iec.parse(test_case)
+
+      NoMethodError:
+        undefined method `parse' for PubidNew::Iec:Module
+
+                identifier = PubidNew::Iec.parse(test_case)
+                                          ^^^^^^
+      # ./spec/integration/iec_spec.rb:620:in `block (4 levels) in <top (required)>'
+
+  24) IEC v2 Implementation sample test cases correctly parses and renders 'IEC TS 62607-6-11:2016'
+      Failure/Error: identifier = PubidNew::Iec.parse(test_case)
+
+      NoMethodError:
+        undefined method `parse' for PubidNew::Iec:Module
+
+                identifier = PubidNew::Iec.parse(test_case)
+                                          ^^^^^^
+      # ./spec/integration/iec_spec.rb:620:in `block (4 levels) in <top (required)>'
+
+  25) IEC v2 Implementation sample test cases correctly parses and renders 'IEC TR 61000-2-14:2006'
+      Failure/Error: identifier = PubidNew::Iec.parse(test_case)
+
+      NoMethodError:
+        undefined method `parse' for PubidNew::Iec:Module
+
+                identifier = PubidNew::Iec.parse(test_case)
+                                          ^^^^^^
+      # ./spec/integration/iec_spec.rb:620:in `block (4 levels) in <top (required)>'
+
+  26) IEEE v2 Implementation comprehensive fixture tests IEEE publications parses and renders all IEEE publications correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    19.06
+      # ./spec/integration/ieee_spec.rb:48:in `block (4 levels) in <top (required)>'
+
+  27) ISO v2 Implementation comprehensive fixture tests directives parses and renders all ISO directives correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    70.97
+      # ./spec/integration/iso_spec.rb:166:in `block (4 levels) in <top (required)>'
+
+  28) ISO v2 Implementation comprehensive fixture tests French identifiers parses and renders all French ISO identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    70.83
+      # ./spec/integration/iso_spec.rb:246:in `block (4 levels) in <top (required)>'
+
+  29) ISO v2 Implementation comprehensive fixture tests national standards body identifiers parses and renders all NSB identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iso_spec.rb:368:in `block (4 levels) in <top (required)>'
+
+  30) ISO v2 Implementation comprehensive fixture tests Russian identifiers parses and renders all Russian ISO identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/iso_spec.rb:408:in `block (4 levels) in <top (required)>'
+
+  31) ISO v2 Implementation comprehensive fixture tests non-ISO identifiers parses and renders all non-ISO identifiers correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    50.0
+      # ./spec/integration/iso_spec.rb:528:in `block (4 levels) in <top (required)>'
+
+  32) NIST v2 Implementation comprehensive fixture tests all records parses and renders all records correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    89.19
+      # ./spec/integration/nist_spec.rb:47:in `block (4 levels) in <top (required)>'
+
+  33) NIST v2 Implementation comprehensive fixture tests publication exports parses and renders all publication exports correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    73.95
+      # ./spec/integration/nist_spec.rb:88:in `block (4 levels) in <top (required)>'
+
+  34) NIST v2 Implementation comprehensive fixture tests September 2024 updates parses and renders all September 2024 updates correctly
+      Failure/Error: expect(summary[:pass_rate]).to be >= 95.0
+
+        expected: >= 95.0
+             got:    0.0
+      # ./spec/integration/nist_spec.rb:129:in `block (4 levels) in <top (required)>'
+
+  35) NIST v2 Implementation sample test cases correctly parses and renders 'NIST SP 800-53 Rev. 5'
+      Failure/Error: expect(identifier.to_s).to eq(test_case)
+
+        expected: "NIST SP 800-53 Rev. 5"
+             got: "NIST SP 800-53rRev. 5"
+
+        (compared using ==)
+      # ./spec/integration/nist_spec.rb:144:in `block (4 levels) in <top (required)>'
+
+Finished in 56.33 seconds (files took 0.20579 seconds to load)
+74 examples, 35 failures
+
+Failed examples:
+
+rspec ./spec/integration/etsi_spec.rb[1:2:1] # ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI TS 102 894-2 V1.3.1'
+rspec ./spec/integration/etsi_spec.rb[1:2:2] # ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI EN 301 549 V3.2.1'
+rspec ./spec/integration/etsi_spec.rb[1:2:3] # ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI GS NFV-IFA 007 V2.4.1'
+rspec ./spec/integration/etsi_spec.rb[1:2:4] # ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI ES 201 873-1 V4.12.1'
+rspec ./spec/integration/etsi_spec.rb[1:2:5] # ETSI v2 Implementation sample test cases correctly parses and renders 'ETSI TR 103 588 V1.1.1'
+rspec ./spec/integration/iec_spec.rb:14 # IEC v2 Implementation comprehensive fixture tests CSV publications parses and renders all CSV identifiers correctly
+rspec ./spec/integration/iec_spec.rb:54 # IEC v2 Implementation comprehensive fixture tests IEC publications parses and renders all IEC identifiers correctly
+rspec ./spec/integration/iec_spec.rb:94 # IEC v2 Implementation comprehensive fixture tests IECEE TRF publications parses and renders all IECEE TRF identifiers correctly
+rspec ./spec/integration/iec_spec.rb:134 # IEC v2 Implementation comprehensive fixture tests IECEx TRF publications parses and renders all IECEx TRF identifiers correctly
+rspec ./spec/integration/iec_spec.rb:174 # IEC v2 Implementation comprehensive fixture tests IECQ publications parses and renders all IECQ identifiers correctly
+rspec ./spec/integration/iec_spec.rb:214 # IEC v2 Implementation comprehensive fixture tests interpretation sheets parses and renders all ISh identifiers correctly
+rspec ./spec/integration/iec_spec.rb:254 # IEC v2 Implementation comprehensive fixture tests ISO/IEC joint publications parses and renders all ISO/IEC identifiers correctly
+rspec ./spec/integration/iec_spec.rb:294 # IEC v2 Implementation comprehensive fixture tests sheets publications parses and renders all sheets identifiers correctly
+rspec ./spec/integration/iec_spec.rb:334 # IEC v2 Implementation comprehensive fixture tests TC1 publications parses and renders all TC1 identifiers correctly
+rspec ./spec/integration/iec_spec.rb:374 # IEC v2 Implementation comprehensive fixture tests technical reports parses and renders all TR identifiers correctly
+rspec ./spec/integration/iec_spec.rb:414 # IEC v2 Implementation comprehensive fixture tests technical specifications parses and renders all TS identifiers correctly
+rspec ./spec/integration/iec_spec.rb:454 # IEC v2 Implementation comprehensive fixture tests VAP publications parses and renders all VAP identifiers correctly
+rspec ./spec/integration/iec_spec.rb:494 # IEC v2 Implementation comprehensive fixture tests working documents special groups parses and renders all WD special group identifiers correctly
+rspec ./spec/integration/iec_spec.rb:534 # IEC v2 Implementation comprehensive fixture tests working documents parses and renders all working document identifiers correctly
+rspec ./spec/integration/iec_spec.rb:574 # IEC v2 Implementation comprehensive fixture tests working programmes parses and renders all working programme identifiers correctly
+rspec ./spec/integration/iec_spec.rb[1:2:1] # IEC v2 Implementation sample test cases correctly parses and renders 'IEC 60950-1:2005'
+rspec ./spec/integration/iec_spec.rb[1:2:2] # IEC v2 Implementation sample test cases correctly parses and renders 'IEC 61000-4-2:2008'
+rspec ./spec/integration/iec_spec.rb[1:2:3] # IEC v2 Implementation sample test cases correctly parses and renders 'ISO/IEC 27001:2013'
+rspec ./spec/integration/iec_spec.rb[1:2:4] # IEC v2 Implementation sample test cases correctly parses and renders 'IEC TS 62607-6-11:2016'
+rspec ./spec/integration/iec_spec.rb[1:2:5] # IEC v2 Implementation sample test cases correctly parses and renders 'IEC TR 61000-2-14:2006'
+rspec ./spec/integration/ieee_spec.rb:15 # IEEE v2 Implementation comprehensive fixture tests IEEE publications parses and renders all IEEE publications correctly
+rspec ./spec/integration/iso_spec.rb:134 # ISO v2 Implementation comprehensive fixture tests directives parses and renders all ISO directives correctly
+rspec ./spec/integration/iso_spec.rb:214 # ISO v2 Implementation comprehensive fixture tests French identifiers parses and renders all French ISO identifiers correctly
+rspec ./spec/integration/iso_spec.rb:336 # ISO v2 Implementation comprehensive fixture tests national standards body identifiers parses and renders all NSB identifiers correctly
+rspec ./spec/integration/iso_spec.rb:376 # ISO v2 Implementation comprehensive fixture tests Russian identifiers parses and renders all Russian ISO identifiers correctly
+rspec ./spec/integration/iso_spec.rb:496 # ISO v2 Implementation comprehensive fixture tests non-ISO identifiers parses and renders all non-ISO identifiers correctly
+rspec ./spec/integration/nist_spec.rb:14 # NIST v2 Implementation comprehensive fixture tests all records parses and renders all records correctly
+rspec ./spec/integration/nist_spec.rb:55 # NIST v2 Implementation comprehensive fixture tests publication exports parses and renders all publication exports correctly
+rspec ./spec/integration/nist_spec.rb:96 # NIST v2 Implementation comprehensive fixture tests September 2024 updates parses and renders all September 2024 updates correctly
+rspec ./spec/integration/nist_spec.rb[1:2:1] # NIST v2 Implementation sample test cases correctly parses and renders 'NIST SP 800-53 Rev. 5'
+

@@ -75,10 +75,8 @@ module Pubid::Nist
           ", Volume "
         when :abbrev
           ", Vol. "
-        when :short
-          params[:code] ? "v" : " v"
-        when :mr
-          params[:code] ? "v" : ".v"
+        when :short, :mr
+          "v"
         end + volume
       end
 
@@ -128,7 +126,7 @@ module Pubid::Nist
         when :abbrev
           " Suppl. "
         when :short, :mr
-          "sup"
+          "supp"
         end + supplement
       end
 

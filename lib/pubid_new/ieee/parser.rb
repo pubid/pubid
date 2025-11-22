@@ -40,7 +40,7 @@ module PubidNew
       rule(:organization) do
         str("IEEE") | str("AIEE") | str("ANSI") | str("ASA") |
         str("IEC") | str("ISO") | str("ASTM") | str("NACE") |
-        str("NSF") | str("ASHRAE") | str("NCTA")
+        str("NSF") | str("ASHRAE") | str("NCTA") | str("AESC")
       end
 
       rule(:publisher) do
@@ -51,12 +51,15 @@ module PubidNew
         (slash >> space? >> organization).as(:copublisher)
       end
 
-      # Document number - enhanced to support dashed parts like P11073-10404
-      # but not consume years like -2007
+      # Document number - support letters and digits, with optional prefix P
+      # Complex multi-part numbers like P11073-10404-10419 should be fully captured
+      # But simple cases like "623" should not consume the dash before year
       rule(:number) do
         (str("P").maybe >>
          (digits | upper).repeat(1) >>
-         (dash >> digits >> dash >> digits).maybe >>  # For patterns like P11073-10404
+         # Only consume dash+digits if followed by another dash+digits (multi-part pattern)
+         # This prevents consuming "623-1976" as a number but allows "P11073-10404-10419"
+         (dash >> digits >> (dash >> digits).repeat).maybe >>
          lower.maybe).as(:number)
       end
 
@@ -68,7 +71,7 @@ module PubidNew
         str("No")
       end
 
-      # Part and subpart
+      # Part and subpart - handle both dot and dash separators
       rule(:part) do
         (dot | dash) >> (match("[0-9A-Za-z]").repeat(1)).as(:part)
       end
@@ -116,12 +119,14 @@ module PubidNew
          draft_date.maybe).as(:draft)
       end
 
-      # Edition
+      # Edition - enhanced to support IEC formats like "Edition 1.0 2015-03"
       rule(:edition) do
         (comma >> year_digits.as(:year) >> str(" Edition")) |
         ((space | dash) >> str("Edition ") >>
          (digits >> dot >> digits).as(:edition) >>
-         (space | str(" - ")) >> year_digits.as(:year))
+         (space | str(" - ")) >>
+         year_digits.as(:year) >>
+         (dash >> digit.repeat(2, 2).as(:edition_month)).maybe)  # Capture -MM as edition_month
       end
 
       # Part/subpart/year combinations
@@ -173,10 +178,11 @@ module PubidNew
           (str("Amendment to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:amendment_to)) |
           # Adoption patterns
           (str("Adoption of ") >> match("[^)]").repeat(1).as(:adoption)) |
-          # Other patterns
+          # Other specific patterns
           (str("Notebooks") >> space? >> match("[^,\\)]").repeat(1).as(:notebooks)) |
           (str("Standard Newspaper(s)") >> space? >> match("[^,\\)]").repeat(1).as(:standard_newspapers)) |
-          match("[^)]").repeat(1).as(:note)
+          # Catch-all for any other parenthetical content (MUST BE LAST)
+          match("[^)]").repeat(1).as(:parenthetical_content)
          ) >>
          str(")").maybe).as(:parameters)
       end

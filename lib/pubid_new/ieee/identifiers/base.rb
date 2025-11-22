@@ -29,6 +29,11 @@ module PubidNew
         attribute :supersedes, Base, collection: true       # Superseded documents
         attribute :supplement_to, Base                      # For supplements
         attribute :iso_identifier, :string                   # For IEC/IEEE formats
+        attribute :parenthetical_content, :string           # Raw parenthetical content
+        attribute :note, :string                            # Parenthetical notes
+        attribute :adoption, :string                        # Adoption notes
+        attribute :amendment_to, :string                    # Amendment to relationships
+        attribute :edition_month, :string                   # Month part from Edition YYYY-MM
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -121,13 +126,22 @@ module PubidNew
           end
 
           # Check for adopted standards (parenthetical adoptions)
+          # Only consider it an adoption if the parenthetical content looks like an identifier
           if input.include?("(") && input.include?(")") && !input.start_with?("IEC/IEEE ")
             # Extract the part before parentheses and the adoption part
             main_part = input.split("(").first.strip
             adoption_match = input.match(/\(([^)]+)\)/)
             adoption_part = adoption_match ? adoption_match.captures.first : nil
 
-            if main_part && adoption_part
+            # Check if adoption_part looks like an identifier (contains publisher or type keywords)
+            # BUT exclude revision/amendment/supersedes notes
+            # AND exclude multi-part adoptions (containing commas)
+            if main_part && adoption_part &&
+               !adoption_part.include?(",") &&  # Skip multi-part adoptions
+               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Supersedes|Supercedes|Notebooks|Standard Newspaper)/i) &&
+               (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
+                adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
+                adoption_part.match?(/\bStd\s+\d+/))
               # Parse the main IEEE identifier
               ieee_id = parse_single(main_part)
 
@@ -139,6 +153,7 @@ module PubidNew
                 adopted_identifier: adopted_id
               )
             end
+            # If it doesn't look like an identifier, let the parser handle it as additional_parameters
           end
 
           # Fall back to single identifier parsing
@@ -164,33 +179,59 @@ module PubidNew
           # Draft status
           parts << draft_status if draft_status
 
-          # Type
-          parts << type
+          # Type (only add if present)
+          parts << type if type && !type.to_s.strip.empty?
 
-          # Code with year (no space before dash)
+          # Code - with year only if no edition and no draft
           if code_obj
             result = code_obj.to_s
-            result += "-#{year}" if year && !draft_obj
+            # Only attach year to code if there's no edition (IEEE style)
+            # IEC style puts year after edition
+            result += "-#{year}" if year && !draft_obj && !edition
             parts << result
           end
 
           # Draft
           parts << draft_obj.to_s if draft_obj
 
-          # Edition
-          parts << "Edition #{edition}" if edition
+          # Edition - with year if present (IEC style)
+          if edition
+            edition_str = "Edition #{edition}"
+            if year
+              edition_str += " #{year}"
+              edition_str += "-#{edition_month}" if edition_month
+            end
+            parts << edition_str
+          end
 
           # Month/Day (if not already in draft)
           if month && !draft_obj
             parts << ", #{month}"
             parts << " #{day}" if day
-            parts << ", #{year}" if year
+            parts << ", #{year}" if year && !edition  # Don't duplicate year
+          end
+
+          # Build the main identifier
+          result = parts.join(" ")
+
+          # Add parenthetical content if present
+          if parenthetical_content
+            result += " (#{parenthetical_content})"
+          elsif revision_of
+            result += " (Revision of IEEE Std #{revision_of})"
+          elsif amendment_to
+            result += " (Amendment to IEEE Std #{amendment_to})"
+          elsif adoption
+            result += " (Adoption of #{adoption})"
+          elsif note
+            # Only add note if it doesn't duplicate other content
+            result += " (#{note})" unless note.to_s.strip.empty?
           end
 
           # Redline suffix
-          parts << "- Redline" if redline
+          result += " - Redline" if redline
 
-          parts.join(" ")
+          result
         end
       end
     end

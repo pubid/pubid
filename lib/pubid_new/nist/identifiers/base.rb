@@ -119,18 +119,22 @@ module PubidNew
           result += " #{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-          # Add edition with month/year if present
+          # Add edition with month/year if present - use "rev" not dash when edition has both
           if edition && edition_month && edition_year
             result += "e#{edition}rev#{edition_month}#{edition_year}"
           elsif edition
             result += "e#{edition}"
           end
 
-          # Add edition year/month without edition number
+          # Add edition year/month without edition number - fix year rendering to use 4 digits
           if !edition && edition_month && edition_year
-            result += "-#{edition_month}#{edition_year}"
+            # Expand 2-digit years to 4-digit (e.g., 43 -> 1943)
+            expanded_year = edition_year.length == 2 ? "19#{edition_year}" : edition_year
+            result += "-#{edition_month}#{expanded_year}"
           elsif !edition && edition_year
-            result += "-#{edition_year}"
+            # Expand 2-digit years to 4-digit
+            expanded_year = edition_year.length == 2 ? "19#{edition_year}" : edition_year
+            result += "-#{expanded_year}"
           end
 
           # Add volume
@@ -152,7 +156,7 @@ module PubidNew
 
           result += " Ver. #{version}" if version
 
-          # Add supplement with date range support
+          # Add supplement with date range support - FIX: proper spacing
           if supplement_date_range_start && supplement_date_range_end
             result += "supp#{supplement_date_range_start}-#{supplement_date_range_end}"
           elsif supplement_has_revision

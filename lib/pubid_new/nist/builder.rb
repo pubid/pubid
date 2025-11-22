@@ -41,6 +41,10 @@ module PubidNew
         # Basic attributes
         attributes[:publisher] = extract_value(parsed[:publisher])
         attributes[:series] = extract_value(parsed[:series])
+
+        # Handle special patterns in first_number before normal extraction
+        handle_special_first_number(parsed, attributes)
+
         attributes[:first_number] = extract_value(parsed[:first_number])
         attributes[:second_number] = extract_value(parsed[:second_number])
         handle_crpl_range(parsed, attributes)
@@ -73,6 +77,27 @@ module PubidNew
         handle_addendum(parsed, attributes)
 
         attributes
+      end
+
+      # Handle special patterns embedded in first_number
+      def handle_special_first_number(parsed, attributes)
+        first_num = extract_value(parsed[:first_number])
+        return unless first_num
+
+        # Pattern: "154supprev" - supplement with revision
+        if first_num =~ /^(\d+)supprev$/
+          attributes[:first_number] = $1
+          attributes[:supplement] = ""
+          attributes[:supplement_has_revision] = true
+          parsed[:first_number] = $1  # Update parsed to avoid re-extraction
+        # Pattern: "13e2revJune1908" - edition with revision and date
+        elsif first_num =~ /^(\d+)e(\d+)rev([A-Za-z]+)(\d+)$/
+          attributes[:first_number] = $1
+          attributes[:edition] = $2
+          attributes[:edition_month] = $3
+          attributes[:edition_year] = $4
+          parsed[:first_number] = $1
+        end
       end
 
       # Handle CRPL range notation

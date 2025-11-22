@@ -1,0 +1,109 @@
+Duplicate subtrees while merging result of 
+  IDENTIFIER
+only the values of the latter will be kept. (keys: [:year])
+Duplicate subtrees while merging result of 
+  IDENTIFIER
+only the values of the latter will be kept. (keys: [:year])
+Total failures: 950
+
+First 100 failures:
+IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)
+IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)
+IEC 61671-2 Edition 1.0 2016-04
+IEC 61671-4 Edition 1.0 2016-04
+IEC 61671-5 Edition 1.0 2016-04
+IEC 61671-6 Edition 1.0 2016-04
+IEC 62525-Edition 1.0 - 2007
+IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)
+IEC 62014-5 IEEE Std 1734-2011
+IEC 62032-2005 IEEE C57.135-2005
+IEC 62142-2005 First edition 2005-06 IEEE Std 1364.1
+IEC 62243 First edition 2005-07 IEEE 1232
+IEC 62265-2005 First edition 2005-07 IEEE Std 1603
+IEC 62270 Edition 2.0 2013-09 IEEE Std 1249
+IEC 62530 Edition 2.0 2011-05 IEEE Std 1800
+IEC 62624 Edition 1.0 2009-08 IEEE Std 1650
+IEC 63003 Edition 1.0 2015-12 IEEE Std 1505.1
+IEC 63004 Edition 1.0 2015-12 IEEE Std 1505
+IEC 63147 Edition 1.0 2017-12 IEEE Std 497
+IEEE 1076 IEC 61691-1-1 First edition 2004-10
+IEEE 1076.4 IEC 61691-5 First edition 2004-10
+IEEE 1364 IEC 61691-4 First edition 2004-10
+IEEE 1588 IEC 61588 First edition 2004-09
+IEEE 488.1 IEC 60488-1 First edition 2004-07
+IEEE 488.2 IEC 60488-2 First edition 2004-05
+IEEE Std 1076.1 IEC 61691-6 Edition 1.0 2009-12
+IEEE Std 1249-2013 IEC 62270 Edition 2.0 2013-09
+ISO/IEC 15288 First edition 2002-11-01
+ISO/IEC 26702 IEEE Std 1220-2005 First edition 2007-07-15
+ISO/IEC 42010 IEEE Std 1471-2000 First edition 2007-07-15
+IEEE P11073-10419/D10, Feburary 2019
+IEEE P384/D1, Janurary 2018
+IEEE Std P1368/D23.5, Sept 2006
+ISO/IEC 15288 First edition 2002-11-01
+ISO/IEC/ IEEE 23026 First edition 2015-05-15
+ISO/IEC/IEEE 15288 First edition 2015-05-15
+ISO/IEC/IEEE 24748-4 First edition 2016-05-15
+ISO/IEC/IEEE 29119-5 First edition 2016-11-15
+ISO/IEC/IEEE 8802-1AX First edition 2016-01-15
+ISO/IEC/IEEE 8802-1BA First edition 2016-10-15
+ISO/IEC/IEEE 8802-1BR First edition 2016-10-15
+ISO/IEC/IEEE 8802-1Q First edition 2016-03-15
+IEC 62014-5 IEEE Std 1734-2011
+IEEE 1364 IEC 61691-4 First edition 2004-10
+IEEE 1588 IEC 61588 First edition 2004-09
+ISO/IEC 42010 IEEE Std 1471-2000 First edition 2007-07-15
+IEEE Unapproved Draft Std P11073-10404/D09, Sept 2008
+IEEE Unapproved Draft Std P11073-10472/D05, Sept 2009
+IEEE Unapproved Draft Std P1407/D08, Sept 2007
+IEEE Unapproved Draft Std P1410/D6, Sept 2009
+IEEE Unapproved Draft Std P1547.2/D11, Sept 2008
+IEEE Unapproved Draft Std P1580/D2, Sept 2009
+IEEE Unapproved Draft Std P16326/DFCD, Sept 2007
+IEEE Unapproved Draft Std P1641/D3, Sept 2009
+IEEE Unapproved Draft Std P269R/D9.0, Sept 2009
+IEEE Unapproved Draft Std P433/D15 Sept 2009
+IEEE Unapproved Draft Std P802.15.5/D7, Octobor 2008
+IEEE Unapproved Draft Std P802.21/D14, Sept 2008
+IEEE Unapproved Draft Std PC37.015/D9, Sept 2009
+IEEE Unapproved Draft Std PC37.20.6/D2.0, Sept 2007
+IEEE Unapproved Draft Std PC37.46/D5, Sept 2009
+IEEE Unapproved Draft Std PC57.12.34/D4F, Sept 2009
+IEEE Unapproved Draft Std PC57.12.51/D1.4, Sept 2007
+IEEE Unapproved Draft Std PC57.2/D12, Sept 2007
+IEEE Unapproved Draft Std PC57.93/D15, Sept 2007
+IEEE Unapproved Draft Std PC62.64/D14, feb 2009
+IEEE Approved Draft Std P1484.20.1/D7, May 07
+IEEE Approved Draft Std P1516.4/Dx.1, Jun 07
+IEEE Approved Draft Std P1542/D8, Aug 07
+IEEE Approved Draft Std P1617/D7.0, Jun 07
+IEEE Approved Draft Std P1636.1/D3, May 07
+IEEE Approved Draft Std P1661/D11, Jul 07
+IEEE Approved Draft Std P495/D13, Aug 07
+IEEE Approved Draft Std P532/D9.6, Apr 07
+IEEE Approved Draft Std P741/D2, Apr 07
+IEEE Approved Draft Std P99/D2.0, May 07
+IEEE Approved Draft Std PC37.20.7/D14, Dec 06
+IEEE Approved Draft Std PC37.230/D6.1, Jul 07
+IEEE Approved Draft Std PC37.235/D4, Mar 07
+IEEE Approved Draft Std PC57.12.36/D11, May 07
+IEEE Approved Draft Std PC57.129/D10, Jul 07
+IEEE P802.15.4q/D5.0, May, 20
+IEEE Std 1666 IEC61691-7 Edition 1.0 2009-12
+IEEE Std P1500/D11, Jan 06
+IEEE Unapproved Draft Std P1003.1_D3, Jun 07
+IEEE Unapproved Draft Std P1028/D5.1, Sep, 07
+IEEE Unapproved Draft Std P1189/D15, Jun 07
+IEEE Unapproved Draft Std P1407_D7, Mar 07
+IEEE Unapproved Draft Std P1561/D16, Jul 07
+IEEE Unapproved Draft Std P1610_D13, Aug 07
+IEEE Unapproved Draft Std P1619/D17, Jul 07
+IEEE Unapproved Draft Std P1631/D2, Sep 07
+IEEE Unapproved Draft Std P1636.1/D3, Jan 09
+IEEE Unapproved Draft Std P1686_D4, Jun 07
+IEEE Unapproved Draft Std P1900.2/D2.22, Jun 07
+IEEE Unapproved Draft Std P1900_D01, Jun 07
+IEEE Unapproved Draft Std P2600.1/D41b, Jan 09
+IEEE Unapproved Draft Std P2600.3/D41b, Jan 09
+IEEE Unapproved Draft Std P2600.4/D41b, Jan 09
+IEEE Unapproved Draft Std P532/D9.6, May 07

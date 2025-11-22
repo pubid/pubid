@@ -329,6 +329,7 @@ Now it's easy to screen through the anomalies and surface the data issues!
 
 | NBS | NBS CSM | Commercial Standards Monthly | N/A | `NBS.CSM`
 | https://nvlpubs.nist.gov/nistpubs/Legacy/CSM/nbscsmv9n10.pdf[NBS CSM v9n10]
+(Note: CSM uses volume-number format like v6n1, v7n12)
 
 | NIST | FIPS PUB | Federal Information Processing Standards Publication | Federal Inf. Process. Stds. | `NIST.FIPS`
 | https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf[FIPS PUB 202]
@@ -359,6 +360,10 @@ Now it's easy to screen through the anomalies and surface the data issues!
 
 | NBS | NBS LC | Letter Circular | N/A | `NBS.LC`
 | https://www.govinfo.gov/content/pkg/GOVPUB-C13-505e153915bb567dd587b7efd26b000a/pdf/GOVPUB-C13-505e153915bb567dd587b7efd26b000a.pdf[NBS LC 1128]
+
+| NBS | NBS LCIRC | Letter Circular | N/A | `NBS.LCIRC`
+| https://nvlpubs.nist.gov/nistpubs/Legacy/LCIRC/nbslcirc1000.pdf[NBS LCIRC 1000],
+https://nvlpubs.nist.gov/nistpubs/Legacy/LCIRC/nbslcirc1019r1963.pdf[NBS LCIRC 1019r1963]
 
 | NIST | NIST MN | Monograph | Monogr. | `NIST.MN`
 | https://nvlpubs.nist.gov/nistpubs/Legacy/MONO/nistmonograph175.pdf[NIST Monograph 175]
@@ -570,6 +575,64 @@ The year last updated, shown as a suffix to the identifier.
 
 
 == PubID patterns
+
+=== Advanced NBS identifier patterns
+
+The parser now supports several advanced historical NBS patterns:
+
+==== LCIRC series with revision dates
+
+The NBS Letter Circular (LCIRC) series supports revision notation.
+
+.Example NBS LCIRC identifiers with revisions
+====
+[source]
+----
+NBS LCIRC 1000       # Letter Circular 1000
+NBS LCIRC 1019r1963  # Letter Circular 1019, revised 1963
+NBS LCIRC 1035r1985  # Letter Circular 1035, revised 1985
+----
+====
+
+==== CSM volume-number format
+
+The Commercial Standards Monthly (CSM) series uses a special volume-number format.
+
+.Example NBS CSM volume-number identifiers
+====
+[source]
+----
+NBS CSM v6n1   # Volume 6, Number 1
+NBS CSM v7n12  # Volume 7, Number 12
+NBS CSM v9n9   # Volume 9, Number 9
+----
+====
+
+==== Supplement with revision
+
+Circular supplements can be combined with revisions.
+
+.Example supplement+revision identifiers
+====
+[source]
+----
+NBS CIRC 154supprev      # Circular 154, supplement with revision
+NBS CIRC 25suppJan1924   # Circular 25, supplement January 1924
+----
+====
+
+==== Edition with revision and date
+
+Edition numbers can combine with revision indicators and dates.
+
+.Example edition+revision+date identifiers
+====
+[source]
+----
+NBS CIRC 13e2revJune1908  # Circular 13, edition 2, revision June 1908
+NBS CIRC 24e4supp         # Circular 24, edition 4, supplement
+----
+====
 
 === Presentation
 

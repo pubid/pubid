@@ -168,8 +168,17 @@ module PubidNew
         end
         attributes[:code] = code_str
 
-        # Basic attributes - always extract year if present
-        attributes[:year] = extract_value(parsed[:year]) if parsed[:year]
+        # Extract year - check for edition_month parsed separately
+        if parsed[:year]
+          year_str = extract_value(parsed[:year])
+          attributes[:year] = year_str
+        end
+
+        # Extract edition_month if parsed separately
+        if parsed[:edition_month]
+          attributes[:edition_month] = extract_value(parsed[:edition_month])
+        end
+
         attributes[:type] = extract_value(parsed[:type])
         attributes[:draft_status] = extract_value(parsed[:draft_status])
 
@@ -177,8 +186,8 @@ module PubidNew
         extract_optional(parsed, attributes, :edition)
         extract_optional(parsed, attributes, :revision)
 
-        # Month/day - always extract if present
-        extract_optional(parsed, attributes, :month)
+        # Month/day - always extract if present (but not if already extracted from year)
+        extract_optional(parsed, attributes, :month) unless attributes[:edition_month]
         extract_optional(parsed, attributes, :day)
 
         # Handle draft (can be complex)
@@ -315,6 +324,12 @@ module PubidNew
       def handle_parameters(parsed, attributes)
         if parsed[:parameters].is_a?(Hash)
           param_data = parsed[:parameters]
+
+          # Handle parenthetical content (for multi-part adoptions like "ANSI Y32.21-1976, NCTA 006-0975")
+          if param_data[:parenthetical_content]
+            attributes[:parenthetical_content] = extract_value(param_data[:parenthetical_content])
+          end
+
           attributes[:revision_of] = extract_value(param_data[:revision_of]) if param_data[:revision_of]
           attributes[:amendment_to] = extract_value(param_data[:amendment_to]) if param_data[:amendment_to]
           attributes[:adoption] = extract_value(param_data[:adoption]) if param_data[:adoption]

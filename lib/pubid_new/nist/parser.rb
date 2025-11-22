@@ -44,7 +44,7 @@ module PubidNew
           str("ITL Bulletin") | str("NIST LC") | str("NIST PS") | str("NIST DCI") | str("NIST Other") |
           str("NSRDS-NBS") |
           # NBS specific patterns that conflict with simple series (shorter ones)
-          str("NBS CSM") | str("NBS CIRC") | str("NBS CRPL") | str("NBS CS") |
+          str("NBS LCIRC") | str("NBS CSM") | str("NBS CIRC") | str("NBS CRPL") | str("NBS CS") |
           str("NBS CIS") | str("NBS HR") | str("NBS IRPL") | str("NBS IP") | str("NBS LC") | str("NBS PS") |
           str("NBS BH")
         ).as(:series)
@@ -83,8 +83,16 @@ module PubidNew
       # Supplements should be handled as separate parts
       rule(:first_number) do
         (
+          # Volume-number format for CSM series: v6n1, v7n12
+          (str("v") >> digits >> str("n") >> digits) |
+          # Regular number with supplement and revision suffix: "154supprev"
+          (digits >> str("supprev")) |
+          # Regular number with edition, revision, and date: "13e2revJune1908"
+          (digits >> str("e") >> digits >> str("rev") >> month_abbrev >> digits) |
           # Regular number with eN suffix and optional supplement (e.g., "101e2supp") - most specific
           (digits >> str("e") >> digits >> str("supp") >> digits.maybe) |
+          # Edition prefix with revision and date: e2revJune1908
+          (str("e") >> digits >> str("rev") >> month_abbrev >> digits) |
           # Edition prefix followed by digits and optional supplement with digits
           (str("e") >> digits >> str("supp") >> digits.maybe) |
           # Regular number with eN suffix (e.g., "101e2")

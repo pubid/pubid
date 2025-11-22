@@ -51,9 +51,28 @@ module PubidNew
           result += number
 
           if parts && !parts.empty?
-            # Use first character after number to determine separator
-            # If all parts are numeric, use dot; otherwise use dash
-            separator = parts.all? { |p| p.match?(/^\d+$/) } ? "." : "-"
+            # Determine separator based on prefix and pattern:
+            # - Letter prefix (C, etc.) codes use dots: C37.111
+            # - P-prefix codes typically use dashes: P11073-10404
+            # - Pure numeric codes with 5+ digits use dashes: 61523-4 (IEC style)
+            # - Traditional IEEE codes like 802.11 use dots
+            #
+            # Heuristic:
+            # 1. P-prefix or long part (>3 chars) → dash
+            # 2. Letter prefix (except P) → dot
+            # 3. Long number (5+ digits) → dash (IEC pattern)
+            # 4. Default → dot (traditional IEEE)
+            if prefix == "P" || (!prefix && parts.first && parts.first.length > 3)
+              separator = "-"
+            elsif prefix && prefix != "P"
+              separator = "."
+            elsif !prefix && number && number.length >= 5
+              separator = "-"
+            else
+              # Default to dot for traditional IEEE codes like 802.11
+              separator = "."
+            end
+
             parts.each do |part|
               result += separator + part
             end
