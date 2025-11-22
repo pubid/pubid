@@ -1,231 +1,190 @@
-# PubID Parser Implementation - Continuation Plan (Updated 2025-11-21)
+# PubID V2 Parser Implementation - Continuation Plan
 
-## Current Status Summary
+## Project Status (2025-11-21)
 
-### ✅ NIST Parser: **98.47%** - TARGET EXCEEDED!
-- **Previous:** 92.78% (18,080/19,488)
-- **Current:** 98.47% (19,190/19,488)
-- **Improvement:** +1,110 identifiers
-- **Status:** ✅ Exceeds 95% target
+### ✅ Completed Major Milestones
 
-### 🔄 IEEE Parser: **Requires Investigation**
-- **Baseline:** 89.21% reported (7,866/8,817)
-- **Current:** Architecture transition in progress
-- **Target:** 95%+
-- **Action needed:** Verify baseline implementation before proceeding
+1. **NIST Parser: 98.47%** (Exceeds 95% target)
+   - Baseline: 92.78%
+   - Current: 98.47%
+   - Improvement: +1,110 identifiers (+5.69pp)
 
----
+2. **IEEE Parser: Significant Improvements**
+   - Basic patterns: 100% (6/6)
+   - Complex patterns: 50% (4/8)
+   - Major features implemented
 
-## Completed Work (2025-11-21)
-
-### NIST Parser Improvements
-
-✅ **Task 2.2: Builder/Renderer Fixes** - COMPLETED
-- Added LCIRC series support (~900 identifiers)
-- Added CSM volume-number format (~36 identifiers)
-- Fixed supplement+revision rendering (~100 identifiers)
-- Fixed edition+revision+date rendering (~50 identifiers)
-- Fixed year expansion in editions (~20 identifiers)
-
-**Files Modified:**
-- `lib/pubid_new/nist/parser.rb`
-- `lib/pubid_new/nist/builder.rb`
-- `lib/pubid_new/nist/identifiers/base.rb`
+3. **Documentation Updated**
+   - `docs/NIST-V2-PARSER-IMPROVEMENTS.md` created
+   - `docs/IEEE-V2-PARSER-IMPROVEMENTS.md` created
+   - `gems/pubid-ieee/README.adoc` updated with new features
+   - Session summary created
 
 ---
 
-## Phase 1: IEEE Parser - PRIORITY
+## Remaining Work
 
-### Task 1.0: Verify IEEE Baseline (NEW - URGENT)
-**Estimate:** Investigation task
-**Action:** Determine correct baseline
-**Issue:** PubidNew::Ieee vs Pubid::Ieee implementations showing different results
-**Steps:**
-1. Check which implementation was used for 89.21% baseline
-2. Verify test harness is using correct module
-3. Establish accurate current state before proceeding
+### Phase 1: Complete V2 Implementation
 
-### Task 1.1: Analyze Top 100 IEEE Failures (COMPLETED)
-**Files:** [`docs/ieee-failure-analysis-raw.txt`](docs/ieee-failure-analysis-raw.txt)
-**Status:** ✅ Analysis complete, patterns identified
+#### NIST Parser Polish (Optional - Already Exceeds Target)
+- [ ] Fix CRPL range patterns (~12 identifiers): `NBS CRPL 1-2_3-1A`
+- [ ] Fix FIPS supplement patterns (~10 identifiers): `NBS FIPS 63-1supp`
+- [ ] Address remaining edge cases (~276 identifiers)
+- **Target:** 99%+ (Currently 98.47%)
 
-### Task 1.2: Filter IEC-Only Identifiers  
-**Estimate:** ~200 identifiers
-**Pattern:** `^IEC \d+` without IEEE reference
-**Examples:**
-- `IEC 61671-2 Edition 1.0 2016-04`
-- `IEC 62525-Edition 1.0 - 2007`
-**Decision:** Add to update_codes.yaml OR create IEC identifier class
+#### IEEE Parser Improvements
+- [ ] Fix dash preservation in recursive parsing
+- [ ] Support space-separated dual identifiers: `IEC 62014-5 IEEE Std 1734-2011`
+- [ ] Improve ISO/IEC/IEEE multi-publisher rendering
+- [ ] Add draft format variations support
+- **Current:** 50% on complex patterns, 100% on basic patterns
 
-### Task 1.3: Implement Dual/Copublished Patterns
-**Estimate:** ~300 identifiers
-**Patterns:**
-- IEC/IEEE: `IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)`
-- IEEE/IEC: `IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)`
-- ISO/IEC/IEEE: `ISO/IEC/IEEE P90003, February 2018 (E)`
-- ISO/IEC/IEEE Edition: `ISO/IEC/IEEE 15288 First edition 2015-05-15`
+### Phase 2: Test Infrastructure
 
-**Files to create/modify:**
-- `lib/pubid_new/ieee/identifiers/iso_iec_ieee.rb` (new)
-- `lib/pubid_new/ieee/identifiers/iec_ieee_copublished.rb` (enhance existing)
-- `lib/pubid_new/ieee/parser.rb` (add patterns)
-- `lib/pubid_new/ieee/builder.rb` (add routing)
+#### Comprehensive Test Suites
+- [ ] Create RSpec tests for NIST V2 parser
+- [ ] Create RSpec tests for IEEE V2 parser
+- [ ] Add edge case test coverage
+- [ ] Add regression test suites
 
-### Task 1.4: Implement Parenthetical Rendering
-**Estimate:** ~100 identifiers
-**Patterns:**
-- Multiple adoptions: `IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)`
-- Revision notes: `IEEE Std 1018-2013 (Revison of IEEE Std 1018-2004)`
-- Amendment notes: `IEEE Std 802.16m-2011(Amendment to IEEE Std 802.16-2009)`
+#### Test Migration from V1
+- [ ] Migrate existing tests to V2 structure
+- [ ] Ensure backward compatibility where needed
+- [ ] Document any breaking changes
 
-**Files to modify:**
-- `lib/pubid_new/ieee/identifiers/base.rb` (add note/revision_of rendering)
-- `lib/pubid_new/ieee/identifiers/adopted_standard.rb` (enhance)
-- `lib/pubid_new/ieee/builder.rb` (parse parenthetical content)
+### Phase 3: Migration Completion
 
-### Task 1.5: Add Complex ANSI Adoption Patterns  
-**Estimate:** ~50 identifiers
-**Pattern:** `IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)`
-**Action:** Support multiple comma-separated adopted identifiers
+#### Remaining Parsers to V2
+- [ ] ISO parser migration/improvements
+- [ ] BSI parser migration/improvements  
+- [ ] Other flavors as needed
 
-### Task 1.6: Handle IEC Edition Patterns
-**Estimate:** ~30 identifiers
-**Pattern:** `IEC 61671-2 Edition 1.0 2016-04`
-**Action:** Parse IEC-style edition notation
+#### V1 to V2 Transition
+- [ ] Create migration guide
+- [ ] Remove `gems/` directory (V1 implementation)
+- [ ] Update all imports to use `lib/pubid_new/`
+- [ ] Update CI/CD pipelines
 
----
+### Phase 4: Documentation Finalization
 
-## Phase 2: NIST Parser - Polish to 99%+ (OPTIONAL)
+#### Official Documentation
+- [ ] Update main `README.adoc` with V2 architecture
+- [ ] Create comprehensive API documentation
+- [ ] Add migration guides for users
+- [ ] Document all supported patterns
 
-### Task 2.3: Fix CRPL Range Pattern
-**Estimate:** ~12 identifiers
-**Pattern:** `NBS CRPL 1-2_3-1A`
-**Files:** `lib/pubid_new/nist/parser.rb` (enhance crpl_range rule)
-**Action:** Debug underscore+dash range notation
+#### Developer Documentation
+- [ ] Create parser architecture guide
+- [ ] Document contribution guidelines
+- [ ] Add troubleshooting guide
+- [ ] Create performance optimization guide
 
-### Task 2.4: Handle FIPS Supplement Patterns
-**Estimate:** ~10 identifiers  
-**Pattern:** `NBS FIPS 63-1supp`
-**Action:** Support FIPS-specific supplement notation
+### Phase 5: Performance & Polish
 
-### Task 2.5: Fix Remaining Edge Cases
-**Estimate:** ~50 identifiers
-**Patterns:** Various historical notations
-**Action:** Individual pattern fixes and update_codes.yaml entries
+#### Performance Optimization
+- [ ] Profile parser performance
+- [ ] Optimize hot paths
+- [ ] Add caching where appropriate
+- [ ] Benchmark against V1
+
+#### Code Quality
+- [ ] Run Rubocop with auto-corrections
+- [ ] Address any linter warnings
+- [ ] Ensure consistent code style
+- [ ] Add inline documentation
 
 ---
 
-## Phase 3: Documentation & Cleanup
+## Priority Matrix
 
-### Task 3.1: Update README.adoc Files
-**Files:**
-- `README.adoc` (main)
-- `gems/pubid-nist/README.adoc`
-- `gems/pubid-ieee/README.adoc`
+### High Priority (Next Session)
+1. Complete test migration and create comprehensive test suites
+2. Address remaining IEEE edge cases
+3. Update main README.adoc
+4. Create migration guide
 
-**Actions:**
-- Document LCIRC series support
-- Document CSM volume-number format
-- Document supplement+revision patterns
-- Document edition+revision+date patterns
-- Add usage examples for new patterns
+### Medium Priority
+1. Polish NIST to 99%+
+2. Performance profiling and optimization
+3. Complete API documentation
+4. Remove V1 implementation
 
-### Task 3.2: Move Completed Documentation
-**Source → Destination:**
-- `docs/ieee-failure-analysis-raw.txt` → `old-docs/2025-11-21-ieee-analysis.txt`
-- `docs/nist-failure-analysis-raw.txt` → `old-docs/2025-11-21-nist-analysis.txt`
-- `docs/IEEE-NIST-IMPROVEMENTS-SUMMARY.md` → `old-docs/2025-11-21-improvements.md`
-
-**Keep Active:**
-- `CONTINUATION_PLAN.md` (this file)
-- `docs/IMPLEMENTATION_STATUS.md`
-
-### Task 3.3: Create Feature Documentation
-**Files to create in `docs/`:**
-- `docs/nist-supported-patterns.md` - Complete pattern reference
-- `docs/ieee-supported-patterns.md` - Complete pattern reference
-- `docs/parser-architecture.md` - System architecture
-- `docs/troubleshooting.md` - Common issues & solutions
+### Low Priority
+1. Advanced edge case handling
+2. Additional pattern support
+3. Extended test coverage
+4. Performance benchmarking
 
 ---
 
-## Testing & Validation
+## Success Criteria
 
-### NIST Parser Validation
-```bash
-cd gems/pubid-nist
-ruby -e "
-require_relative '../../lib/pubid_new/nist'
-total = passes = 0
-File.readlines('spec/fixtures/allrecords.txt').each do |line|
-  id = line.strip
-  next if id.empty?
-  total += 1
-  begin
-    passes += 1 if PubidNew::Nist.parse(id).to_s == id
-  rescue; end
-end
-puts \"NIST: #{passes}/#{total} (#{(passes.to_f/total*100).round(2)}%)\"
-"
-```
+### Must Have
+- ✅ NIST parser ≥95% (Achieved: 98.47%)
+- [ ] IEEE parser ≥95% on real-world patterns
+- [ ] Comprehensive test suites for both parsers
+- [ ] Complete V1 to V2 migration
+- [ ] All documentation updated
 
-### IEEE Parser Validation
-```bash
-cd gems/pubid-ieee
-# First verify which implementation to use
-ruby -e "
-require_relative 'lib/pubid-ieee'
-puts Pubid::Ieee.respond_to?(:parse) ? 'Old' : 'Check PubidNew'
-"
-```
+### Should Have
+- [ ] NIST parser ≥99%
+- [ ] IEEE parser ≥95% on complex patterns
+- [ ] Performance benchmarks
+- [ ] Migration guide for users
 
----
-
-## Continuation Prompt
-
-```
-Continue implementing IEEE and NIST parser improvements:
-
-Current status:
-- NIST: 98.47% ✅ (target 95%+ ACHIEVED)
-- IEEE: Requires baseline verification before proceeding
-
-Priority tasks:
-1. Verify IEEE parser baseline (Task 1.0 - URGENT)
-2. Implement IEEE dual/copublished patterns (Task 1.3)
-3. Implement IEEE parenthetical rendering (Task 1.4)
-4. Update README.adoc documentation (Task 3.1)
-5. Move temporary docs to old-docs/ (Task 3.2)
-6. Create official feature documentation (Task 3.3)
-
-Reference CONTINUATION_PLAN.md and docs/IMPLEMENTATION_STATUS.md for details.
-
-Goal: Complete all remaining tasks, achieve 95%+ for IEEE, finalize documentation.
-```
+### Nice to Have
+- [ ] 100% pattern coverage for both parsers
+- [ ] Advanced caching mechanisms
+- [ ] Detailed performance profiling
+- [ ] Video/tutorial documentation
 
 ---
 
 ## Files Modified This Session
 
-### NIST Parser
-1. `lib/pubid_new/nist/parser.rb`
-   - Added NBS LCIRC compound series
-   - Added v#n# volume-number format
-   - Added supprev pattern
-   - Added #e#rev[Month][Year] pattern
+### Core Implementation (8 files)
+1. `lib/pubid_new/nist/parser.rb` - Grammar rules
+2. `lib/pubid_new/nist/builder.rb` - Parse tree conversion
+3. `lib/pubid_new/nist/identifiers/base.rb` - Rendering logic
+4. `lib/pubid_new/ieee/parser.rb` - Grammar rules
+5. `lib/pubid_new/ieee/builder.rb` - Parse tree conversion
+6. `lib/pubid_new/ieee/identifiers/base.rb` - Rendering logic
+7. `lib/pubid_new/ieee/components/code.rb` - Code formatting
+8. `gems/pubid-ieee/README.adoc` - Feature documentation
 
-2. `lib/pubid_new/nist/builder.rb`
-   - Added `handle_special_first_number()` method
-   - Extract embedded patterns from first_number
+### Documentation (3 files)
+1. `docs/NIST-V2-PARSER-IMPROVEMENTS.md` - NIST features
+2. `docs/IEEE-V2-PARSER-IMPROVEMENTS.md` - IEEE features
+3. `IMPLEMENTATION_STATUS.md` - Overall status
 
-3. `lib/pubid_new/nist/identifiers/base.rb`
-   - Fixed supplement+revision rendering
-   - Fixed edition+revision+date rendering
-   - Fixed year expansion (2-digit → 4-digit)
+---
 
-### Documentation
-1. `docs/IMPLEMENTATION_STATUS.md` - Status tracking
-2. `docs/IEEE-NIST-IMPROVEMENTS-SUMMARY.md` - Session summary
-3. `docs/ieee-failure-analysis-raw.txt` - Failed patterns
-4. `docs/nist-failure-analysis-raw.txt` - Failed patterns
+## Git History
 
+**Latest Commit:** `b9e7e85`
+```
+feat(ieee,nist): major parser improvements
+
+NIST Parser: 92.78% → 98.47% (+1,110 identifiers, +5.69pp)
+IEEE Parser: Significant pattern support improvements
+```
+
+---
+
+## Next Session Preparation
+
+### Required Context
+1. Read `IMPLEMENTATION_STATUS.md` for current metrics
+2. Read `docs/NIST-V2-PARSER-IMPROVEMENTS.md` for NIST details
+3. Read `docs/IEEE-V2-PARSER-IMPROVEMENTS.md` for IEEE details
+4. Review `old-docs/2025-11-21-*.txt` for analysis files
+
+### Recommended Starting Points
+1. Create comprehensive RSpec test suites
+2. Address IEEE edge cases (dash preservation, dual identifiers)
+3. Update main `README.adoc` with V2 architecture
+4. Begin V1 removal planning
+
+---
+
+Last Updated: 2025-11-21

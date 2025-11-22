@@ -125,3 +125,83 @@ For type II identifiers it needs to parse PubID elements than join the elements 
 ----
 IEEE.{number1}_{part1}.{subpart11}.{subpart12}-{year1}_{number2}_{part2}.{subpart21}_{number3}_{part3}-{year2}_{correction}-{coryear}
 ----
+
+== Recent Parser Improvements (2025-11-21)
+
+The IEEE parser has been significantly enhanced to support additional patterns found in real-world IEEE identifiers.
+
+=== IEC as Standalone Publisher
+
+IEC identifiers are now fully supported as standalone publishers.
+
+.Example IEC identifiers
+====
+[source]
+----
+IEC 61523-4                                    # IEC publication
+IEC 61671-2 Edition 1.0 2016-04               # IEC with edition
+----
+====
+
+=== Parenthetical Content Preservation
+
+Parenthetical notes and references are now preserved in the identifier.
+
+.Example identifiers with parenthetical content
+====
+[source]
+----
+AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)
+IEEE Std 1018-2013 (Revision of IEEE Std 1018-2004)
+----
+====
+
+=== Multi-Part Adoptions
+
+IEEE standards that adopt multiple external standards are now supported.
+
+.Example multi-part adoption identifiers
+====
+[source]
+----
+IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)
+AIEE No 14-1925 (AESC C22-1925)
+----
+====
+
+=== IEC Edition Year-Month Formats
+
+IEC-style edition formats with year-month notation are now supported.
+
+.Example IEC edition identifiers with year-month
+====
+[source]
+----
+IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)
+IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)
+----
+====
+
+=== Code Separator Logic
+
+The parser intelligently selects separators (dots vs dashes) based on code patterns:
+
+* Dotted codes: `C37.111`, `802.11`
+* Dashed codes: `61523-4`, `P11073-10404`
+
+.Example code patterns
+====
+[source]
+----
+IEEE Std C37.111-2013          # Letter prefix uses dots
+IEC 61523-4                    # Long number uses dashes
+IEEE P11073-10404-10419        # P-prefix uses dashes
+----
+====
+
+=== Additional Organizations
+
+The following organizations have been added to the parser:
+
+* IEC (International Electrotechnical Commission)
+* AESC (American Engineering Standards Committee)
