@@ -46,7 +46,7 @@ module PubidNew
 
       # Typed stages (combined stage+type)
       rule(:typed_stage) do
-        (str("FDAM") | str("FDAMD") | str("PDAM") | str("DAM") | str("DAMD") |
+        (str("FDAM") | str("FDAMD") | str("PDAM") | str("DAM") | str("DAMD") | str("DAD") |
          str("FDCOR") | str("FCOR") | str("DCOR") |
          str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS")).as(:typed_stage)
       end
@@ -81,7 +81,7 @@ module PubidNew
       rule(:supplement_type) do
         (str("Amd") | str("AMD") | str("Amd.") |
          str("Cor") | str("COR") | str("Cor.") |
-         str("Suppl") | str("Ext")).as(:supplement_type)
+         str("Suppl") | str("Ext") | str("Add") | str("ADD") | str("Add.")).as(:supplement_type)
       end
 
       # Supplement identifier (appears after base with slash)
@@ -90,7 +90,7 @@ module PubidNew
           # Pattern 1: Typed stage alone (FDAM implies Amd, FDCOR implies Cor)
           (typed_stage.as(:typed_stage) >> space >> digits.as(:supplement_number) >> year.maybe) |
           # Pattern 2: Supplement type with optional number
-          (supplement_type >> (space >> digits).maybe.as(:supplement_number) >> year.maybe)
+          (supplement_type >> (space >> digits).maybe.as(:supplement_number) >> year.maybe >> language.maybe)
         )
       end
 
@@ -112,6 +112,15 @@ module PubidNew
           year.maybe
       end
 
+      # Legacy ISO/R identifier (ISO/R number:year or ISO/R number-part:year)
+      rule(:legacy_r_identifier) do
+        publisher >>
+          slash >> str("R").as(:type) >>
+          space >> number >> parts >>
+          year.maybe >>
+          language.maybe
+      end
+
       # Basic identifier (can be base or have supplements)
       rule(:base_identifier) do
         publisher >>
@@ -128,7 +137,7 @@ module PubidNew
 
       # Full identifier with optional supplements
       rule(:identifier) do
-        (dir_sup_identifier | iwa_identifier | base_identifier).as(:base) >>
+        (dir_sup_identifier | iwa_identifier | legacy_r_identifier | base_identifier).as(:base) >>
           supplement.repeat(0, 3).as(:supplements)
       end
 
