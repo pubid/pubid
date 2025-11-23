@@ -149,6 +149,8 @@ module PubidNew
                                  Identifiers::Amendment
                                when /cor/
                                  Identifiers::Corrigendum
+                               when /add/ # Addendum (legacy addendum format)
+                                 Identifiers::Supplement
                                when /suppl/
                                  Identifiers::Supplement
                                when /ext/
@@ -163,6 +165,8 @@ module PubidNew
                                  Identifiers::Amendment
                                when /COR/
                                  Identifiers::Corrigendum
+                               when /DAD/ # Draft Addendum
+                                 Identifiers::Supplement
                                else
                                  Identifiers::Supplement
                                end
@@ -173,13 +177,27 @@ module PubidNew
           # Extract stage from typed_stage
           stage_str = extract_supplement_stage(typed_stage_str)
 
-          # Find typed_stage - if no stage string, use published stage as default
-          typed_stage = if stage_str
+          # Find typed_stage - prefer supplement_type for matching, then stage string
+          typed_stage = if supplement_type && supplement_type !~ /suppl/ # Don't match "suppl" generically
+                          # Try to match by supplement_type first (for Add, Addendum, etc.)
+                          find_typed_stage(supplement_class, supplement_type.capitalize)
+                        elsif stage_str
                           find_typed_stage(supplement_class, stage_str)
                         else
                           # Default to published stage for the supplement class
                           find_published_typed_stage(supplement_class)
                         end
+
+          # Fallback to published if nothing found
+          typed_stage ||= find_published_typed_stage(supplement_class)
+
+          # Preserve original parsed abbreviation for correct rendering
+          if typed_stage && supplement_type
+            # Clone the typed_stage and set original_abbr
+            typed_stage = typed_stage.dup
+            # Capitalize first letter for canonical form (Add, Addendum, Suppl, etc.)
+            typed_stage.original_abbr = supplement_type.capitalize
+          end
 
           # Create this supplement with current_base as its base
           current_base = supplement_class.new(

@@ -70,7 +70,7 @@ module PubidNew
             code: :pubsuppl,
             stage_code: :published,
             type_code: :suppl,
-            abbr: ["Suppl", "Suppl."],
+            abbr: ["Add", "Addendum", "ADD", "Suppl", "Suppl."],
             name: "Supplement",
             harmonized_stages: %w[60.00 60.60],
           ),
