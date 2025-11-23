@@ -20,48 +20,64 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 5):**
-- ISO parser completed with full supplement recursion
-- Performance optimization: 0.20ms simple, 0.46ms complex parsing
-- 166 ISO tests passing (20 integration + unit tests)
-- Component architecture solidified (Publisher, Code, Date, Language, Stage, TypedStage)
+**Latest Session (Session 6 - V1 to V2 Test Migration):**
+- ✅ Migrated all 19 ISO identifier test files (2,648 tests) from V1 to V2 API
+- ✅ Created comprehensive API mapping documentation
+- ✅ Archived V1 specs to old_specs/
+- ✅ Current results: 682 passing (26%), 1,590 failing (60%), 376 pending (14%)
+- ✅ Core V2 tests remain solid: 166 passing, 0 failures
+- ✅ Documented parser gaps and next steps
 
 **Previous Sessions:**
-- NIST parser achieved 98.47% with historical NBS pattern support
-- IEEE parser handles dual-published and adopted standards
-- Established three-layer architecture pattern (Parser → Builder → Identifier)
+- Session 5: Created V1 to V2 migration plan
+- Session 4: ISO parser completed with full supplement recursion
+- Session 3: NIST parser achieved 98.47%, IEEE parser at 100%
+- Earlier: Established three-layer architecture pattern
 
 ### Next Steps
 
 **Immediate Priorities:**
 
-1. **Complete remaining parsers** to match complexity of the 100% complete flavors
-2. **Run comprehensive test suites** for BSI, CEN, IEEE (using V1 fixture files)
-3. **Document V2 patterns** in README.adoc for all completed flavors
+1. **ISO test refinement** (4-6 hours to 50% pass rate)
+   - Fix string/integer type mismatches
+   - Add nil checks for optional components
+   - Mark architectural differences as pending
+
+2. **ISO parser extensions** (4-6 hours to 75% pass rate)
+   - Add support for legacy `/R` prefix (Recommendations)
+   - Handle additional edge cases
+   - Comprehensive test refinement
 
 **Near-Term Goals:**
 
-1. Achieve 100% completion for all 10 flavors
-2. Verify round-trip accuracy for all identifier types
-3. Performance benchmarking across all parsers
-4. Update README with complete V2 usage examples
+1. Achieve 75-90% ISO test pass rate
+2. Apply migration pattern to other partial flavors
+3. Document per-class API patterns
 
 **Long-Term Vision:**
 
-1. Deprecate V1 code (`gems/` folder)
-2. Rename `lib/pubid_new/` → `lib/pubid/`
-3. Update namespace from `PubidNew` → `Pubid`
+1. Complete all flavor migrations to V2
+2. Deprecate V1 code (`gems/` folder)
+3. Rename `lib/pubid_new/` → `lib/pubid/`
 4. Release V2 as major version bump
-5. Archive V1 for historical reference
 
 ### Active Development Areas
 
-- **Not actively changing**: Core completed flavors (ISO, IEC, JIS, ETSI, ITU, CCSDS)
-- **Active development**: Test integration, documentation, remaining parser completions
-- **Architecture locked**: Three-layer pattern is established and proven
+- **Active**: ISO test refinement and parser extensions
+- **Not changing**: Core completed flavors (IEC, JIS, ETSI, ITU, CCSDS)
+- **Architecture locked**: Three-layer pattern established and proven
 
 ### Known Issues
 
-- None critical - all 6 completed flavors are production-ready
-- V1 code still exists but is not being actively developed
-- Some documentation gaps for V2 features (being addressed)
+- ISO: 1,590 test failures (parser gaps + API mismatches)
+- V1 code still exists but not being actively developed
+- Migration documentation complete and comprehensive
+
+### Files Changed in Session 6
+
+- 155 files changed, 42,104 insertions(+), 3,297 deletions(-)
+- Created docs/V1_TO_V2_API_MAPPING.md
+- Created docs/PARSER_GAPS.md  
+- Created docs/V1_TO_V2_MIGRATION_STATUS.md
+- Migrated all spec/pubid_new/iso/identifiers/*.rb files
+- Archived V1 and pre-migration V2 specs
