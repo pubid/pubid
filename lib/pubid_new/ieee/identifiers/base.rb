@@ -110,7 +110,64 @@ module PubidNew
             return parse_single(input)
           end
 
-          # Check for dual published patterns first
+          # Check for space-separated dual identifiers (e.g., "IEC 62014-5 IEEE Std 1734-2011")
+          # This must be checked before " and " pattern
+          # Look for pattern where a second publisher appears after the first complete identifier
+          # Publishers: IEEE, AIEE, ANSI, ASA, IEC, ISO, ASTM, NACE, NSF, ASHRAE, NCTA, AESC
+          publishers = %w[IEEE AIEE ANSI ASA IEC ISO ASTM NACE NSF ASHRAE NCTA AESC]
+
+          # Find all positions where publishers appear
+          publisher_positions = []
+          publishers.each do |pub|
+            # Look for publisher at word boundaries (preceded by space or start of string)
+            regex = /(?:^|\s)(#{Regexp.escape(pub)})(?:\s|\/)/
+            input.scan(regex) do
+              publisher_positions << { pos: Regexp.last_match.begin(1), publisher: pub }
+            end
+          end
+
+          # If we have 2 or more publishers at distinct positions (not co-publishers with /)
+          if publisher_positions.length >= 2
+            # Sort by position
+            publisher_positions.sort_by! { |p| p[:pos] }
+
+            # Check if they're not part of a co-published pattern (Publisher1/Publisher2)
+            # by ensuring there's no slash between them
+            first_pub = publisher_positions[0]
+            second_pub = publisher_positions[1]
+
+            # Get the substring between the two publishers
+            between = input[first_pub[:pos]..second_pub[:pos]-1]
+
+            # If there's no slash and no " and ", this might be space-separated dual
+            if !between.include?("/") && !between.include?(" and ")
+              # Try to split at the second publisher position
+              # Back up to find the space before the second publisher
+              split_pos = second_pub[:pos]
+              while split_pos > 0 && input[split_pos - 1] == " "
+                split_pos -= 1
+              end
+
+              first_part = input[0...split_pos].strip
+              second_part = input[split_pos..].strip
+
+              # Try to parse both parts
+              begin
+                first = parse_single(first_part)
+                second = parse_single(second_part)
+
+                # Only treat as dual if both parse successfully
+                return Identifiers::DualPublished.new(
+                  first_identifier: first,
+                  second_identifier: second
+                )
+              rescue Parslet::ParseFailed
+                # If parsing fails, continue with normal flow
+              end
+            end
+          end
+
+          # Check for dual published patterns with " and "
           if input.include?(" and ")
             parts = input.split(" and ")
             if parts.length == 2
@@ -169,8 +226,9 @@ module PubidNew
         def to_s
           parts = []
 
-          # Publisher(s)
+          # Publisher(s) - handle copublisher array properly
           if copublisher && !copublisher.empty?
+            # Copublisher is an array, join all publishers with single slash
             parts << [publisher, *copublisher].join("/")
           else
             parts << publisher
@@ -182,12 +240,13 @@ module PubidNew
           # Type (only add if present)
           parts << type if type && !type.to_s.strip.empty?
 
-          # Code - with year only if no edition and no draft
+          # Code - with year only if no edition, no draft, AND no month
           if code_obj
             result = code_obj.to_s
-            # Only attach year to code if there's no edition (IEEE style)
+            # Only attach year to code if there's no edition (IEEE style), no month, and no draft
             # IEC style puts year after edition
-            result += "-#{year}" if year && !draft_obj && !edition
+            # Month style puts year after month
+            result += "-#{year}" if year && !draft_obj && !edition && !month
             parts << result
           end
 
@@ -204,15 +263,16 @@ module PubidNew
             parts << edition_str
           end
 
-          # Month/Day (if not already in draft)
-          if month && !draft_obj
-            parts << ", #{month}"
-            parts << " #{day}" if day
-            parts << ", #{year}" if year && !edition  # Don't duplicate year
-          end
-
-          # Build the main identifier
+          # Build the main identifier (without month yet)
           result = parts.join(" ")
+
+          # Month/Day - append directly to avoid extra space before comma
+          if month && !draft_obj
+            # Format: ", Month Day, Year" or ", Month Year"
+            result += ", #{month}"
+            result += " #{day}" if day
+            result += " #{year}" if year && !edition  # Don't duplicate year if already in edition
+          end
 
           # Add parenthetical content if present
           if parenthetical_content

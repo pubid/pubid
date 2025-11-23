@@ -220,5 +220,4 @@ RSpec.describe PubidNew::Iso::CombinedIdentifier do
       end
     end
   end
-
 end

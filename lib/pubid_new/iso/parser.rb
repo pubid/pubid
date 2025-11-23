@@ -27,12 +27,15 @@ module PubidNew
       # Publisher with copublishers
       rule(:publisher) do
         iso.as(:publisher) >>
-        (slash >> (iec | ieee | sae | astm | cie | hl7 | oecd).as(:copublisher)).repeat(0, 3)
+          (slash >> (iec | ieee | sae | astm | cie | hl7 | oecd).as(:copublisher)).repeat(
+            0, 3
+          )
       end
 
       # Type (including legacy R for Recommendation, TTA for Technology Trends Assessment)
       rule(:type) do
         (str("Guide") | str("GUIDE") | str("ISP") | str("IWA") | str("TTA") |
+         str("DATA") | str("DIR") | str("SUP") |
          str("TR") | str("TS") | str("PAS") | str("R")).as(:type)
       end
 
@@ -43,7 +46,9 @@ module PubidNew
 
       # Typed stages (combined stage+type)
       rule(:typed_stage) do
-        (str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS")).as(:typed_stage)
+        (str("FDAM") | str("FDAMD") | str("PDAM") | str("DAM") | str("DAMD") |
+         str("FDCOR") | str("FCOR") | str("DCOR") |
+         str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS")).as(:typed_stage)
       end
 
       # Number
@@ -65,31 +70,78 @@ module PubidNew
       # Iteration
       rule(:iteration) { str(".") >> digits.as(:iteration) }
 
-      # Language
+      # Language (can be single letters or multi-letter codes, with slashes or commas)
       rule(:language) do
-        str("(") >> match["a-zA-Z"].repeat(1).as(:language) >> str(")")
+        str("(") >>
+          (match["A-Z"].repeat(1) >> (str("/") | str(",")).maybe).repeat(1).as(:language) >>
+          str(")")
       end
 
-      # Basic identifier
-      rule(:identifier) do
+      # Supplement type
+      rule(:supplement_type) do
+        (str("Amd") | str("AMD") | str("Amd.") |
+         str("Cor") | str("COR") | str("Cor.") |
+         str("Suppl") | str("Ext")).as(:supplement_type)
+      end
+
+      # Supplement identifier (appears after base with slash)
+      rule(:supplement) do
+        slash >> (
+          # Pattern 1: Typed stage alone (FDAM implies Amd, FDCOR implies Cor)
+          (typed_stage.as(:typed_stage) >> space >> digits.as(:supplement_number) >> year.maybe) |
+          # Pattern 2: Supplement type with optional number
+          (supplement_type >> (space >> digits).maybe.as(:supplement_number) >> year.maybe)
+        )
+      end
+
+      # IWA pattern (can start without ISO/)
+      rule(:iwa_identifier) do
+        str("IWA").as(:type) >> space >>
+          number >> parts >>
+          year.maybe >>
+          language.maybe
+      end
+
+      # DIR SUP pattern (special directives supplement)
+      rule(:dir_sup_identifier) do
         publisher >>
-        # Typed stage or regular stage
-        ((slash | space) >> (typed_stage | stage)).maybe >>
-        # Type comes after space or slash
-        ((space | slash) >> type).maybe >>
-        space >> number >> parts >>
-        iteration.maybe >>
-        year.maybe >>
-        edition.maybe >>
-        language.maybe
+          (slash | space) >> str("DIR").as(:type) >>
+          space >> number >> parts >>
+          space >> publisher.as(:sup_publisher) >>
+          space >> str("SUP").as(:sup_type) >>
+          year.maybe
+      end
+
+      # Basic identifier (can be base or have supplements)
+      rule(:base_identifier) do
+        publisher >>
+          # Typed stage or regular stage
+          ((slash | space) >> (typed_stage | stage)).maybe >>
+          # Type comes after space or slash
+          ((space | slash) >> type).maybe >>
+          space >> number >> parts >>
+          iteration.maybe >>
+          year.maybe >>
+          edition.maybe >>
+          language.maybe
+      end
+
+      # Full identifier with optional supplements
+      rule(:identifier) do
+        (dir_sup_identifier | iwa_identifier | base_identifier).as(:base) >>
+          supplement.repeat(0, 3).as(:supplements)
       end
 
       rule(:root) { identifier }
 
       def self.parse(input)
         # Normalize whitespace around colons
-        normalized = input.gsub(/\s+:/, ':')
-        new.parse(normalized)
+        normalized = input.gsub(/\s+:/, ":")
+        parser_instance.parse(normalized)
+      end
+
+      def self.parser_instance
+        @parser_instance ||= new
       end
     end
   end

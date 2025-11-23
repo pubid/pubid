@@ -28,11 +28,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
     context "extract with base identifier" do
       describe "ISO 1101:1983/Ext 1:1983" do
         subject { "ISO 1101:1983/Ext 1:1983" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:1101:ext:1983:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.body).to eq("ISO")
+          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
@@ -40,7 +40,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1983")
+          expect(parsed.base_identifier.date.date.year).to eq("1983")
         end
 
         it "parses extract number" do
@@ -48,7 +48,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
         end
 
         it "parses extract date" do
-          expect(parsed.date.year).to eq("1983")
+          expect(parsed.date.date.year).to eq("1983")
         end
 
         it "round-trips" do
@@ -56,15 +56,15 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
         end
 
         it "provides type code" do
-          expect(parsed.type.type_code).to eq("ext")
+          expect(parsed.typed_stage.type_code).to eq("ext")
         end
 
         it "provides stage code" do
-          expect(parsed.stage.stage_code).to eq("published")
+          expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
-          expect(parsed.typed_stage.abbreviation).to eq("Ext")
+          expect(parsed.typed_stage.abbr.first).to eq("Ext")
         end
 
         xit "generates urn" do

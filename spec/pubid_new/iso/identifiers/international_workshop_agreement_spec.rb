@@ -27,7 +27,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 1:2001
     describe "IWA 1:2001" do
       subject { "IWA 1:2001" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:1" }
 
       it "parses publisher" do
@@ -39,11 +39,11 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part.value).to be_nil
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("2001")
+        expect(parsed.date.date.year).to eq("2001")
       end
 
       it "round-trips" do
@@ -51,11 +51,11 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("iwa")
+        expect(parsed.typed_stage.type_code).to eq("iwa")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
@@ -66,7 +66,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 32:2019(en)
     describe "IWA 32:2019(en)" do
       subject { "IWA 32:2019(en)" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:32:en" }
 
       it "parses publisher" do
@@ -78,7 +78,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("2019")
+        expect(parsed.date.date.year).to eq("2019")
       end
 
       it "round-trips" do
@@ -96,7 +96,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 8
     describe "IWA 8" do
       subject { "IWA 8" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:8" }
 
       it "parses publisher" do
@@ -108,7 +108,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part.value).to be_nil
       end
 
       it "parses date" do
@@ -130,7 +130,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 14-1:2013
     describe "IWA 14-1:2013" do
       subject { "IWA 14-1:2013" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:14:-1" }
 
       it "parses publisher" do
@@ -146,7 +146,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("2013")
+        expect(parsed.date.date.year).to eq("2013")
       end
 
       it "round-trips" do
@@ -165,7 +165,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # NP IWA 21
       describe "NP IWA 21" do
         subject { "NP IWA 21" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:21:stage-00.00" }
 
         it "parses publisher" do
@@ -177,7 +177,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("np")
+          expect(parsed.typed_stage.stage_code).to eq("np")
         end
 
         it "round-trips" do
@@ -194,7 +194,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # AWI IWA 39
       describe "AWI IWA 39" do
         subject { "AWI IWA 39" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:39:stage-10.99" }
 
         it "parses publisher" do
@@ -206,7 +206,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("awi")
+          expect(parsed.typed_stage.stage_code).to eq("awi")
         end
 
         it "round-trips" do
@@ -221,7 +221,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # WD IWA 19
       describe "WD IWA 19" do
         subject { "WD IWA 19" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:19:stage-20.20" }
 
         it "parses publisher" do
@@ -233,7 +233,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("wd")
+          expect(parsed.typed_stage.stage_code).to eq("wd")
         end
 
         it "round-trips" do
@@ -248,7 +248,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # WD IWA 48(en)
       describe "WD IWA 48(en)" do
         subject { "WD IWA 48(en)" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:48:stage-20.20:en" }
 
         it "parses publisher" do
@@ -260,7 +260,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("wd")
+          expect(parsed.typed_stage.stage_code).to eq("wd")
         end
 
         it "round-trips" do
@@ -277,7 +277,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # CD IWA 37
       describe "CD IWA 37" do
         subject { "CD IWA 37" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:37:stage-30.00" }
 
         it "parses publisher" do
@@ -289,7 +289,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("cd")
+          expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
         it "round-trips" do
@@ -304,7 +304,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # CD IWA 37-1
       describe "CD IWA 37-1" do
         subject { "CD IWA 37-1" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:37:-1:stage-30.00" }
 
         it "parses publisher" do
@@ -320,7 +320,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("cd")
+          expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
         it "round-trips" do
@@ -337,7 +337,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       # PRF IWA 36
       describe "PRF IWA 36" do
         subject { "PRF IWA 36" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:36:stage-60.00" }
 
         it "parses publisher" do
@@ -349,7 +349,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("prf")
+          expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
         it "round-trips" do
@@ -368,7 +368,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
     # WD IWA 48.2
     describe "WD IWA 48.2" do
       subject { "WD IWA 48.2" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:48:stage-20.20.v2" }
 
       it "parses publisher" do
@@ -380,7 +380,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to eq("wd")
+        expect(parsed.typed_stage.stage_code).to eq("wd")
       end
 
       it "parses iteration" do
@@ -402,13 +402,13 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
     # ISO/WD IWA 19 -> WD IWA 19
     describe "ISO/WD IWA 19" do
       subject { "ISO/WD IWA 19" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "WD IWA 19" }
       let(:urn) { "urn:iso:std:iso:iwa:19:stage-20.20" }
 
       # Publisher is not rendered but still exists
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -416,7 +416,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to eq("wd")
+        expect(parsed.typed_stage.stage_code).to eq("wd")
       end
 
       it "normalizes format" do

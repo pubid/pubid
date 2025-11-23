@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../../identifier"
 require_relative "../../components/date"
 require_relative "../components/publisher"
 require_relative "../components/code"
@@ -9,41 +10,52 @@ module PubidNew
   module Iso
     module Identifiers
       # Base class for ISO identifiers
-      class Base < Lutaml::Model::Serializable
-        attribute :publisher, PubidNew::Iso::Components::Publisher
-        attribute :type, :string  # TR, TS, Guide, etc.
-        attribute :code, PubidNew::Iso::Components::Code
-        attribute :year, :integer
-        attribute :stage, :string  # WD, CD, DIS, FDIS, etc.
-        attribute :iteration, :integer
-        attribute :edition, :integer
-        attribute :language, :string
+      class Base < ::PubidNew::Identifier
+        # Inherit all attributes from parent: number, part, date, publisher, type, stage, etc.
+        # No need to redefine them here
 
-        def to_s
+        # Only add ISO-specific attributes if needed
+        attribute :stage_iteration, ::PubidNew::Components::Code
+
+        def to_s(lang: :en, lang_single: false, with_edition: false)
           result = publisher.to_s
 
           # Add stage if present
-          if stage
-            result += publisher.has_copublisher? ? " #{stage}" : "/#{stage}"
+          if stage&.value
+            result += publisher.has_copublisher? ? " #{stage.value}" : "/#{stage.value}"
           end
 
-          # Add type if present (TR, TS, Guide)
-          if type && type != "IS"
-            sep = (stage || publisher.has_copublisher?) ? " " : "/"
-            result += "#{sep}#{type}"
+          # Add type if present (TR, TS, Guide, PAS, DATA, TTA, R, ISP)
+          # Type should display for all non-IS types
+          if type&.abbr && type.abbr != "IS"
+            # Separator: space after stage or copublisher, slash otherwise
+            has_prefix = stage&.value || publisher.has_copublisher?
+            sep = has_prefix ? " " : "/"
+            result += "#{sep}#{type.abbr}"
           end
 
-          # Add code
-          result += " #{code}"
+          # Add number
+          result += " #{number.value}" if number&.value
 
-          # Add iteration if present
-          result += ".#{iteration}" if iteration
+          # Add part (with dash)
+          result += "-#{part.value}" if part&.value
+
+          # Add stage iteration if present
+          result += ".#{stage_iteration.value}" if stage_iteration&.value
 
           # Add year
-          result += ":#{year}" if year
+          result += ":#{date.year}" if date&.year
+
+          # Add edition if with_edition flag is set
+          result += " Ed #{edition.number}" if with_edition && edition&.number
 
           # Add language
-          result += "(#{language})" if language
+          if languages&.any?
+            # Use the language's to_s method which handles original_code properly
+            result += "(#{languages.map do |l|
+              l.to_s(lang_single: lang_single)
+            end.join('/')})"
+          end
 
           result
         end
@@ -53,8 +65,9 @@ module PubidNew
 
           publisher == other.publisher &&
             type == other.type &&
-            code == other.code &&
-            year == other.year &&
+            number == other.number &&
+            part == other.part &&
+            date == other.date &&
             stage == other.stage
         end
       end

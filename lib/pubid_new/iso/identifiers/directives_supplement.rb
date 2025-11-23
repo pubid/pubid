@@ -5,8 +5,10 @@ module PubidNew
   module Iso
     module Identifiers
       class DirectivesSupplement < SupplementIdentifier
-        attribute :type, Components::Type, default: -> { type[:key] }
-        attribute :supplement_publisher, Components::Publisher
+        attribute :type, ::PubidNew::Components::Type, default: -> {
+          type[:key]
+        }
+        attribute :supplement_publisher, ::PubidNew::Components::Publisher
 
         # Delegate base identifier attributes for easier access
         def copublishers
@@ -18,7 +20,7 @@ module PubidNew
         end
 
         TYPED_STAGES = [
-          Components::TypedStage.new(
+          ::PubidNew::Components::TypedStage.new(
             code: :pubdirsup,
             stage_code: :published,
             type_code: :"dir-sup",
@@ -44,12 +46,13 @@ module PubidNew
         def to_s(lang: :en, lang_single: false)
           if base_identifier
             # Full rendering with base identifier
+            supp_pub_str = supplement_publisher ? " #{supplement_publisher}" : ""
             [
               base_identifier.to_s(lang: lang, lang_single: lang_single),
-              " #{supplement_publisher.body}",
-              " SUP",  # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
-              (date ? ":#{date.year}" : "")
-            ].join('')
+              supp_pub_str,
+              " SUP", # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
+              (date ? ":#{date.year}" : ""),
+            ].join
           else
             # Simplified rendering for bundled identifiers (just the supplement part)
             to_supplement_s(lang: lang, lang_single: lang_single)
@@ -59,17 +62,18 @@ module PubidNew
         # Render just the supplement part (for use in bundled identifiers)
         def to_supplement_s(lang: :en, lang_single: false)
           date_str = if date
-            month_part = date.month ? "-#{date.month}" : ""
-            ":#{date.year}#{month_part}"
-          else
-            ""
-          end
+                       month_part = date.month ? "-#{date.month}" : ""
+                       ":#{date.year}#{month_part}"
+                     else
+                       ""
+                     end
 
+          supp_pub_str = supplement_publisher ? supplement_publisher.to_s : ""
           [
-            supplement_publisher.body,
+            supp_pub_str,
             " SUP",
-            date_str
-          ].join('')
+            date_str,
+          ].join
         end
       end
     end

@@ -27,11 +27,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 125:1966
     describe "ISO/R 125:1966" do
       subject { "ISO/R 125:1966" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:125" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -39,11 +39,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part.value).to be_nil
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("1966")
+        expect(parsed.date.date.year).to eq("1966")
       end
 
       it "round-trips" do
@@ -51,15 +51,15 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("R")
+        expect(parsed.typed_stage.abbr.first).to eq("R")
       end
 
       xit "generates urn" do
@@ -73,11 +73,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 4
     describe "ISO/R 4" do
       subject { "ISO/R 4" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:4" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -85,7 +85,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part.value).to be_nil
       end
 
       it "parses date" do
@@ -97,15 +97,15 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("R")
+        expect(parsed.typed_stage.abbr.first).to eq("R")
       end
 
       xit "generates urn" do
@@ -119,11 +119,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
   context "parse legacy format with date" do
     xdescribe "ISO/R 170-1960" do
       subject { "ISO/R 170-1960" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:170" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -131,7 +131,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part.value).to be_nil
       end
 
       it "parses date" do
@@ -143,11 +143,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
@@ -161,11 +161,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 93-3:1969
     describe "ISO/R 93-3:1969" do
       subject { "ISO/R 93-3:1969" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:93:-3" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -177,7 +177,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("1969")
+        expect(parsed.date.date.year).to eq("1969")
       end
 
       it "round-trips" do
@@ -185,15 +185,15 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("R")
+        expect(parsed.typed_stage.abbr.first).to eq("R")
       end
 
       xit "generates urn" do
@@ -208,12 +208,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # Test legacy format ISO/R 93/1-1963 normalizes to ISO/R 93-1:1963
     describe "ISO/R 93/1-1963" do
       subject { "ISO/R 93/1-1963" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/R 93-1:1963" }
       let(:urn) { "urn:iso:std:iso:r:93:-1" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -225,7 +225,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("1963")
+        expect(parsed.date.date.year).to eq("1963")
       end
 
       it "normalizes to standard format" do
@@ -233,11 +233,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
@@ -249,12 +249,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # Test roman numeral parts ISO/R 300/III-1968 normalizes to ISO/R 300-3:1968
     describe "ISO/R 300/III-1968" do
       subject { "ISO/R 300/III-1968" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/R 300-3:1968" }
       let(:urn) { "urn:iso:std:iso:r:300:-3" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -266,7 +266,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("1968")
+        expect(parsed.date.date.year).to eq("1968")
       end
 
       it "normalizes roman numeral to arabic" do
@@ -274,11 +274,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
@@ -290,12 +290,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # Test undated roman numeral parts ISO/R 657/IV normalizes to ISO/R 657-4
     describe "ISO/R 657/IV" do
       subject { "ISO/R 657/IV" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/R 657-4" }
       let(:urn) { "urn:iso:std:iso:r:657:-4" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -315,18 +315,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
-
   end
 
   # Modern version of ISO/R
@@ -335,11 +334,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 105-1:1959
     describe "ISO/R 105-1:1959" do
       subject { "ISO/R 105-1:1959" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:105:-1" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -351,7 +350,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("1959")
+        expect(parsed.date.date.year).to eq("1959")
       end
 
       it "round-trips" do
@@ -359,11 +358,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
@@ -375,11 +374,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 355-8:1973
     describe "ISO/R 355-8:1973" do
       subject { "ISO/R 355-8:1973" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:355:-8" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -391,7 +390,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("1973")
+        expect(parsed.date.date.year).to eq("1973")
       end
 
       it "round-trips" do
@@ -399,11 +398,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("rec")
+        expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       xit "generates urn" do
@@ -411,5 +410,4 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
     end
   end
-
 end

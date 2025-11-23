@@ -1,24 +1,36 @@
-require_relative "identifier"
+require_relative "single_identifier"
+require_relative "../identifier"
 
 module PubidNew
   module Iso
     # Identifier that represents a supplement to a base identifier.
     class SupplementIdentifier < SingleIdentifier
-      attribute :base_identifier, Identifier, polymorphic: true
+      attribute :base_identifier, ::PubidNew::Identifier, polymorphic: true
 
       def to_s(lang: :en, lang_single: false, with_edition: false)
-        [].tap do |parts|
-          parts << [
-            base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition),
-            "/#{typed_stage.abbreviation}",
-          ].join('')
-          # Only add space if abbreviation doesn't end with a period
-          parts << (typed_stage.abbreviation.end_with?('.') ? '' : ' ')
-          parts << number_portion(lang_single: lang_single)
+        # Determine supplement abbreviation - from typed_stage or class default
+        supplement_abbr = if typed_stage&.abbreviation
+                            typed_stage.abbreviation
+                          elsif self.class.respond_to?(:type)
+                            self.class.type[:short]
+                          else
+                            "SUP" # Generic fallback
+                          end
 
-          parts << ' ' + edition_portion(lang: lang) if with_edition && edition&.number
-          parts << language_portion(lang_single: lang_single) if languages&.any?
-        end.compact.join('')
+        result = base_identifier.to_s(lang: lang, lang_single: lang_single,
+                                      with_edition: with_edition)
+        result += "/#{supplement_abbr}"
+
+        # Add number - check if abbr already has trailing space
+        if number&.value
+          separator = supplement_abbr.end_with?(" ") ? "" : " "
+          result += "#{separator}#{number.value}"
+        end
+        result += ":#{date.year}" if date&.year
+        result += " #{edition_portion(lang: lang)}" if with_edition && edition&.number
+        result += language_portion(lang_single: lang_single) if languages&.any?
+
+        result
       end
     end
   end

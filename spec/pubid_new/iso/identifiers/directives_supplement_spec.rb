@@ -26,15 +26,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "basic directives supplement identifiers" do
     describe "ISO/IEC DIR 1 ISO SUP:2022" do
       subject { "ISO/IEC DIR 1 ISO SUP:2022" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso:2022" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
@@ -42,11 +42,11 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
-        expect(parsed.date.year).to eq("2022")
+        expect(parsed.date.date.year).to eq("2022")
       end
 
       it "round-trips" do
@@ -54,15 +54,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -72,23 +72,23 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR IEC SUP:2022" do
       subject { "ISO/IEC DIR IEC SUP:2022" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec:2022" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
-        expect(parsed.date.year).to eq("2022")
+        expect(parsed.date.date.year).to eq("2022")
       end
 
       it "round-trips" do
@@ -96,15 +96,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -114,15 +114,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR 1 IEC SUP" do
       subject { "ISO/IEC DIR 1 IEC SUP" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iec" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
@@ -130,7 +130,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -142,15 +142,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -160,19 +160,19 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR IEC SUP" do
       subject { "ISO/IEC DIR IEC SUP" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -184,15 +184,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -202,15 +202,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR 1 ISO SUP" do
       subject { "ISO/IEC DIR 1 ISO SUP" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
@@ -218,7 +218,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -230,15 +230,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -251,23 +251,23 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "JTC variations" do
     describe "ISO/IEC DIR JTC 1 SUP:2021" do
       subject { "ISO/IEC DIR JTC 1 SUP:2021" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:jtc:1:sup:2021" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
-        expect(parsed.date.year).to eq("2021")
+        expect(parsed.date.date.year).to eq("2021")
       end
 
       it "round-trips" do
@@ -275,15 +275,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -293,19 +293,19 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR JTC 1 SUP" do
       subject { "ISO/IEC DIR JTC 1 SUP" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:jtc:1:sup" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -317,15 +317,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -338,24 +338,24 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "format normalization" do
     describe "ISO/IEC Directives, IEC Supplement:2022" do
       subject { "ISO/IEC Directives, IEC Supplement:2022" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR IEC SUP:2022" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec:2022" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
-        expect(parsed.date.year).to eq("2022")
+        expect(parsed.date.date.year).to eq("2022")
       end
 
       it "normalizes format" do
@@ -363,15 +363,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -381,16 +381,16 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" do
       subject { "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR 1 ISO SUP" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
@@ -398,7 +398,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -410,15 +410,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do
@@ -431,15 +431,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "editions" do
     describe "ISO/IEC DIR 1 ISO SUP Edition 13" do
       subject { "ISO/IEC DIR 1 ISO SUP Edition 13" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso:ed-13" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
@@ -447,11 +447,11 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.type.type_code).to eq("dir")
+        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
       end
 
       it "parses edition" do
-        expect(parsed.edition.number).to eq("13")
+        expect(parsed.edition.number.value).to eq("13")
       end
 
       it "parses supplement date" do
@@ -463,15 +463,15 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("dir-sup")
+        expect(parsed.typed_stage.type_code).to eq("dir-sup")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("DIR SUP")
+        expect(parsed.typed_stage.abbr.first).to eq("DIR SUP")
       end
 
       xit "generates urn" do

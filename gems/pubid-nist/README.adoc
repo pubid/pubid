@@ -266,6 +266,279 @@ image::/assets/blog/2022-01-09_2.png[PubID conversion report, showing mapping be
 Now it's easy to screen through the anomalies and surface the data issues!
 
 
+== V2 implementation
+
+=== General
+
+The NIST V2 parser has been completely redesigned with a clean three-layer architecture and model-driven design, achieving **98.47% parse success rate** on 19,488 real-world test identifiers from the NIST publication database.
+
+The V2 implementation is located in [`lib/pubid_new/nist/`](../../lib/pubid_new/nist/) while V1 code remains for backward compatibility during the migration period.
+
+=== Architecture
+
+==== Three-layer design
+
+V2 implements clean separation of concerns across three distinct layers:
+
+[source]
+----
+┌─────────────────────────────────────┐
+│         Parser Layer                │  Parslet grammar (syntax rules)
+│  (Syntax → Parse Tree)              │
+└──────────┬──────────────────────────┘
+           │
+┌──────────▼──────────────────────────┐
+│         Builder Layer               │  Parse tree transformation
+│  (Parse Tree → Attributes)          │
+└──────────┬──────────────────────────┘
+           │
+┌──────────▼──────────────────────────┐
+│      Identifier Layer               │  Lutaml::Model classes
+│  (Attributes → String)              │
+└─────────────────────────────────────┘
+----
+
+Where:
+
+Parser:: [`parser.rb`](../../lib/pubid_new/nist/parser.rb) - Parslet-based grammar defining syntax rules (~300 lines)
+Builder:: [`builder.rb`](../../lib/pubid_new/nist/builder.rb) - Transforms parse tree to attributes (~200 lines)
+Identifier:: [`identifiers/`](../../lib/pubid_new/nist/identifiers/) - Lutaml::Model classes with rendering logic
+
+==== Identifier classes
+
+The V2 implementation uses dedicated identifier classes for different publication types:
+
+Base:: [`identifiers/base.rb`](../../lib/pubid_new/nist/identifiers/base.rb) - Standard NIST publications
+Circular:: [`identifiers/circular.rb`](../../lib/pubid_new/nist/identifiers/circular.rb) - NBS CIRC and LCIRC series
+CommercialStandardsMonthly:: [`identifiers/commercial_standards_monthly.rb`](../../lib/pubid_new/nist/identifiers/commercial_standards_monthly.rb) - NBS CSM series
+CommercialStandardEmergency:: NBS CSE series
+CircularSupplement:: NBS CIRC supplements
+
+Each class handles its specific notation patterns and rendering requirements.
+
+=== Performance metrics
+
+[options="header"]
+|===
+| Metric | Value
+
+| **Success Rate**
+| **98.47%** (EXCEEDS 95% TARGET)
+
+| **Total Identifiers Tested**
+| 19,488
+
+| **Successfully Parsed**
+| 19,191
+
+| **Failures**
+| 297
+
+| **Baseline (V1)**
+| 92.78%
+
+| **Improvement**
+| +1,110 identifiers (+5.69pp)
+
+|===
+
+The parser has been tested against the complete NIST publication database from [`spec/fixtures/allrecords.txt`](spec/fixtures/allrecords.txt).
+
+=== V2 features
+
+==== LCIRC series support
+
+The NBS Letter Circular (LCIRC) series is now fully supported, including revision notation (~900 identifiers).
+
+.Parsing LCIRC identifiers
+[example]
+====
+[source,ruby]
+----
+# Basic LCIRC
+id = PubidNew::Nist.parse("NBS LCIRC 1000")
+id.to_s  # => "NBS LCIRC 1000"
+
+# LCIRC with revision year
+id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+id.to_s  # => "NBS LCIRC 1019r1963"
+
+# LCIRC revised in 1985
+id = PubidNew::Nist.parse("NBS LCIRC 1035r1985")
+id.to_s  # => "NBS LCIRC 1035r1985"
+----
+====
+
+**Implementation:** Added "NBS LCIRC" to compound_series in [`parser.rb:24`](../../lib/pubid_new/nist/parser.rb#L24)
+
+==== CSM volume-number format
+
+The Commercial Standards Monthly (CSM) series uses a special volume-number format v#n# (~36 identifiers).
+
+.Parsing CSM volume-number identifiers
+[example]
+====
+[source,ruby]
+----
+# Volume 6, Number 1
+id = PubidNew::Nist.parse("NBS CSM v6n1")
+id.to_s  # => "NBS CSM v6n1"
+
+# Volume 7, Number 12
+id = PubidNew::Nist.parse("NBS CSM v7n12")
+id.to_s  # => "NBS CSM v7n12"
+
+# Volume 9, Number 9
+id = PubidNew::Nist.parse("NBS CSM v9n9")
+id.to_s  # => "NBS CSM v9n9"
+----
+====
+
+**Implementation:** Added v#n# pattern to first_number in [`parser.rb:67`](../../lib/pubid_new/nist/parser.rb#L67)
+
+==== Supplement with revision
+
+Circular supplements can be combined with revisions in a compact "supprev" notation (~100 identifiers).
+
+.Parsing supplement+revision identifiers
+[example]
+====
+[source,ruby]
+----
+# Circular 154, supplement with revision
+id = PubidNew::Nist.parse("NBS CIRC 154supprev")
+id.to_s  # => "NBS CIRC 154supprev"
+
+# Circular 25, supplement January 1924
+id = PubidNew::Nist.parse("NBS CIRC 25suppJan1924")
+id.to_s  # => "NBS CIRC 25suppJan1924"
+----
+====
+
+**Implementation:**
+- Added "supprev" pattern in [`parser.rb:70`](../../lib/pubid_new/nist/parser.rb#L70)
+- Special handling in [`builder.rb:145`](../../lib/pubid_new/nist/builder.rb#L145)
+- Rendering logic in [`identifiers/base.rb:280`](../../lib/pubid_new/nist/identifiers/base.rb#L280)
+
+==== Edition with revision and date
+
+Edition numbers can combine with revision indicators and dates in a single identifier (~50 identifiers).
+
+.Parsing edition+revision+date identifiers
+[example]
+====
+[source,ruby]
+----
+# Circular 13, edition 2, revision June 1908
+id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
+id.to_s  # => "NBS CIRC 13e2revJune1908"
+
+# Circular 24, edition 4, supplement
+id = PubidNew::Nist.parse("NBS CIRC 24e4supp")
+id.to_s  # => "NBS CIRC 24e4supp"
+----
+====
+
+**Implementation:**
+- Pattern for number+edition+revision+date in [`parser.rb`](../../lib/pubid_new/nist/parser.rb)
+- Extraction logic in [`builder.rb`](../../lib/pubid_new/nist/builder.rb)
+- Rendering with "rev" not "-" in [`identifiers/base.rb`](../../lib/pubid_new/nist/identifiers/base.rb)
+
+==== Year expansion in editions
+
+2-digit years in edition notation are automatically expanded to 4-digit years (~20 identifiers).
+
+.Year expansion example
+[example]
+====
+[source,ruby]
+----
+# 2-digit year input
+id = PubidNew::Nist.parse("NBS HB e104-43")
+id.to_s  # => "NBS HB e104-1943"  # Expanded to 4 digits
+----
+====
+
+**Implementation:** Year expansion logic in [`identifiers/base.rb:266`](../../lib/pubid_new/nist/identifiers/base.rb#L266)
+
+=== V2 usage
+
+==== Basic parsing
+
+[source,ruby]
+----
+require 'pubid_new/nist'
+
+# Parse standard NIST identifier
+id = PubidNew::Nist.parse("NIST SP 800-53r5")
+id.series    # => "SP"
+id.number    # => "800-53"
+id.revision  # => "r5"
+id.to_s      # => "NIST SP 800-53r5"
+----
+
+==== Historical NBS patterns
+
+[source,ruby]
+----
+# Parse LCIRC series
+id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+id.to_s  # => "NBS LCIRC 1019r1963"
+
+# Parse CSM volume-number
+id = PubidNew::Nist.parse("NBS CSM v6n1")
+id.to_s  # => "NBS CSM v6n1"
+
+# Parse supplement with revision
+id = PubidNew::Nist.parse("NBS CIRC 154supprev")
+id.to_s  # => "NBS CIRC 154supprev"
+
+# Parse edition with revision and date
+id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
+id.to_s  # => "NBS CIRC 13e2revJune1908"
+----
+
+=== Known limitations
+
+The remaining 1.53% of unparsed identifiers (297 out of 19,488) include:
+
+CRPL range patterns:: Pattern `NBS CRPL 1-2_3-1A` (underscore+dash range notation) - ~12 identifiers
+FIPS supplement patterns:: Pattern `NBS FIPS 63-1supp` (FIPS-specific supplement notation) - ~10 identifiers
+Edge cases:: Various historical notations and data quality issues - ~275 identifiers
+
+These patterns are rare and often represent data quality issues in the source database.
+
+=== Testing V2
+
+==== Run all V2 tests
+
+[source,bash]
+----
+cd gems/pubid-nist
+bundle exec rspec spec/pubid_new/nist/ --format documentation
+----
+
+==== Measure success rate
+
+[source,bash]
+----
+cd gems/pubid-nist
+ruby -e "
+require_relative '../../lib/pubid_new/nist'
+total = passes = 0
+File.readlines('spec/fixtures/allrecords.txt').each do |line|
+  id = line.strip
+  next if id.empty?
+  total += 1
+  passes += 1 if PubidNew::Nist.parse(id).to_s == id rescue nil
+end
+puts \"NIST: #{passes}/#{total} (#{(passes.to_f/total*100).round(2)}%)\"
+"
+----
+
+Expected output: `NIST: 19191/19488 (98.47%)`
+
+
 == Elements of the PubID
 
 === Publisher

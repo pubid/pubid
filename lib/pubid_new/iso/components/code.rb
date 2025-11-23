@@ -18,6 +18,7 @@ module PubidNew
 
         def ==(other)
           return false unless other.is_a?(Code)
+
           number == other.number && parts == other.parts
         end
       end

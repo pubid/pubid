@@ -48,7 +48,7 @@ module PubidNew
       end
 
       rule(:copublisher) do
-        (slash >> space? >> organization).as(:copublisher)
+        slash >> space? >> organization.as(:copublisher)
       end
 
       # Document number - support letters and digits, with optional prefix P

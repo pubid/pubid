@@ -23,6 +23,7 @@ module PubidNew
 
         def ==(other)
           return false unless other.is_a?(Publisher)
+
           publisher == other.publisher && copublisher == other.copublisher
         end
       end
