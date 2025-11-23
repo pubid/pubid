@@ -48,7 +48,8 @@ module PubidNew
       rule(:typed_stage) do
         (str("FDAM") | str("FDAMD") | str("PDAM") | str("DAM") | str("DAMD") | str("DAD") |
          str("FDCOR") | str("FCOR") | str("DCOR") |
-         str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS")).as(:typed_stage)
+         str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS") |
+         str("PDTR") | str("PDTS")).as(:typed_stage)
       end
 
       # Number
@@ -149,8 +150,14 @@ module PubidNew
       rule(:root) { identifier }
 
       def self.parse(input)
-        # Normalize whitespace around colons
-        normalized = input.gsub(/\s+:/, ":")
+        # Normalize common typos and variations
+        normalized = input
+          .gsub(/IS0/, "ISO")              # Zero instead of O
+          .gsub(/—/, "/")                   # Em-dash to slash
+          .gsub(/–/, "/")                   # En-dash to slash
+          .gsub(/\s+:/, ":")                # Whitespace around colons
+          .gsub(/\/Add\./, "/Add")          # Normalize Add. to Add
+
         parser_instance.parse(normalized)
       end
 
