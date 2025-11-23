@@ -56,7 +56,12 @@ module PubidNew
 
       # Part (can be alphanumeric like A01, B02, or just digits)
       rule(:part) { dash >> alnums.as(:part) }
-      rule(:parts) { part.repeat(0).as(:parts) }
+
+      # Legacy slash-based part (e.g., ISO 31/0-1974)
+      rule(:legacy_part) { slash >> alnums.as(:part) }
+
+      # Parts can be either dash-based or slash-based (legacy)
+      rule(:parts) { (part | legacy_part).repeat(0).as(:parts) }
 
       # Edition (can be "Ed 3", "Ed.2", "ED1")
       rule(:edition) do

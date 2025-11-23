@@ -1809,7 +1809,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("1")
+        expect(parsed.edition&.value).to eq("1")
       end
 
       it "parses amendment number" do
@@ -1856,7 +1856,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("1")
+        expect(parsed.edition&.value).to eq("1")
       end
 
       it "parses amendment number" do
@@ -1903,7 +1903,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("1")
+        expect(parsed.edition&.value).to eq("1")
       end
 
       it "parses amendment number" do
@@ -1950,7 +1950,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.base_identifier.edition.number.value).to eq("1")
+        expect(parsed.base_identifier.edition&.value).to eq("1")
       end
 
       it "parses amendment number" do
@@ -2005,7 +2005,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("3")
+        expect(parsed.edition&.value).to eq("3")
       end
 
       it "parses amendment number" do
@@ -2057,7 +2057,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.base_identifier.edition.number.value).to eq("1")
+        expect(parsed.base_identifier.edition&.value).to eq("1")
       end
 
       it "parses amendment number" do
@@ -2109,7 +2109,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("2")
+        expect(parsed.edition&.value).to eq("2")
       end
 
       it "parses amendment number" do
@@ -2161,7 +2161,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("6")
+        expect(parsed.edition&.value).to eq("6")
       end
 
       it "parses amendment number" do
@@ -2210,7 +2210,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("2")
+        expect(parsed.edition&.value).to eq("2")
       end
 
       it "parses amendment number" do
@@ -2267,7 +2267,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("3")
+        expect(parsed.edition&.value).to eq("3")
       end
 
       it "parses amendment number" do
@@ -2324,7 +2324,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("2")
+        expect(parsed.edition&.value).to eq("2")
       end
 
       it "parses amendment number" do
@@ -2538,7 +2538,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Amendment do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("4")
+        expect(parsed.edition&.value).to eq("4")
       end
 
       it "parses amendment number" do

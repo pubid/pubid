@@ -1718,7 +1718,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("2")
+        expect(parsed.edition&.value).to eq("2")
       end
 
       it "parses corrigendum number" do
@@ -1836,7 +1836,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses edition" do
-        expect(parsed.base_identifier.edition.number.value).to eq("2")
+        expect(parsed.base_identifier.edition&.value).to eq("2")
       end
 
       it "parses corrigendum number" do
@@ -2009,7 +2009,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("1")
+        expect(parsed.edition&.value).to eq("1")
       end
 
       it "parses corrigendum number" do
@@ -2070,7 +2070,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses edition" do
-        expect(parsed.base_identifier.edition.number.value).to eq("1")
+        expect(parsed.base_identifier.edition&.value).to eq("1")
       end
 
       it "parses corrigendum number" do
@@ -2215,7 +2215,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("5")
+        expect(parsed.edition&.value).to eq("5")
       end
 
       it "parses amendment number" do

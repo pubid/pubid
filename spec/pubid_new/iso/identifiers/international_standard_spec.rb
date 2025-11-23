@@ -290,7 +290,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       let(:urn) { "urn:iso:std:iso:22610" }
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to be_nil
+        expect(parsed.edition&.value).to be_nil
       end
 
       it "generates clean pubid" do
@@ -318,7 +318,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       let(:urn) { "urn:iso:std:iso:22610:ed-1" }
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("1")
+        expect(parsed.edition&.value).to eq("1")
       end
 
       it "generates clean pubid" do
@@ -346,7 +346,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       let(:urn) { "urn:iso:std:iso:11553:-1:ed-2" }
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("2")
+        expect(parsed.edition&.value).to eq("2")
       end
 
       it "generates clean pubid" do
@@ -373,7 +373,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       let(:urn) { "urn:iso:std:iso-iec:30142:ed-1" }
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("1")
+        expect(parsed.edition&.value).to eq("1")
       end
 
       it "generates clean pubid" do

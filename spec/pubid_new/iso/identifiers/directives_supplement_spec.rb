@@ -478,7 +478,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses edition" do
-        expect(parsed.edition.number.value).to eq("13")
+        expect(parsed.edition&.value).to eq("13")
       end
 
       it "parses supplement date" do
