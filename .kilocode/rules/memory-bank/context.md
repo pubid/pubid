@@ -20,19 +20,21 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 7 - ISO V2 Parser Extensions & Test Fixes):**
-- ✅ Added legacy ISO/R identifier support (Recommendation format)
-- ✅ Added Add/ADD/Add. supplement types (legacy addendum)
-- ✅ Added DAD (Draft Addendum) to typed_stage
-- ✅ Added legacy slash-based parts support (ISO 31/0-1974)
-- ✅ Automated test fixes: date accessors, nil safety, base_identifier
-- ✅ Marked 464 typed_stage tests as pending (architectural difference)
-- ✅ Results: 917 passing (32.1%), 1,102 failing (38.5%), 840 pending (29.4%)
-- ✅ Progress: +235 tests (+6.1pp), -488 failures from Session 6
-- ✅ Created Session 7 continuation plan with detailed roadmap
+**Latest Session (Session 9 - ISO V2 Systematic Test Refinement):**
+- ✅ Analyzed failure patterns: 840 parse failures, 48 rendering issues identified
+- ✅ Added Addendum supplement support ("Addendum", "Add", "ADD")
+- ✅ Improved normalization: spaces around slashes, Add. variations
+- ✅ Added legacy_year pattern for ISO/R identifiers (dash-based)
+- ✅ Fixed Add/Addendum rendering (Add vs Suppl distinction)
+- ✅ Implemented edition parsing and canonical rendering (ED1 format)
+- ✅ Results: 945 passing (33.1%), 1,080 failing (37.8%), 834 pending (29.2%)
+- ✅ Progress: +17 tests (+1.0pp), -11 failures from Session 8
+- ✅ Created comprehensive failure analysis document
 
 **Previous Sessions:**
-- Session 6: Migrated all 19 ISO identifier test files (2,648 tests) from V1 to V2 API
+- Session 8: Added PDTR/PDTS stages + normalization → 928 passing (+11)
+- Session 7: Migrated 19 ISO identifier test files (2,648 tests), added legacy support
+- Session 6: Migrated all 19 ISO identifier test files from V1 to V2 API
 - Session 5: Created V1 to V2 migration plan
 - Session 4: ISO parser completed with full supplement recursion
 - Session 3: NIST parser achieved 98.47%, IEEE parser at 100%
@@ -40,24 +42,29 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Next Steps
 
-**Immediate Priorities:**
+**Immediate Priorities (Session 10):**
 
-1. **ISO parser extensions** (Session 8 Priority 1 - 2-3 hours, ~200 tests)
-   - Add PDTR, PDTS to typed_stage (Proposed Draft TR/TS)
-   - Add normalization preprocessing (IS0→ISO, —→/, etc.)
-   - Test edition parsing variations
-   - Add language code normalization
+1. **Subpart parsing** (~5 tests)
+   - Fix parser to recognize "2-61" as subpart in "ISO 80601-2-61:2019"
+   - Update builder to handle subpart attribute
 
-2. **ISO test refinement** (Session 8 Priority 2 - 1-2 hours, ~100 tests)
-   - Fix edition formatting expectations
-   - Normalize language display (E vs en)
-   - Handle supplement formatting variations
+2. **Language code handling** (~10-20 tests)
+   - Parse lowercase language codes: (en), (fr)
+   - Render consistently with V1 expectations
+
+3. **Publisher spacing issues** (~5 tests)
+   - Handle "ISO /IEC" (space before slash) in normalization
+
+4. **DAD supplement parsing** (~50 tests)
+   - Verify DAD (Draft Addendum) in supplement pattern works
+   - May be covered by existing typed_stage
 
 **Near-Term Goals:**
 
-1. Achieve 75-90% ISO test pass rate
-2. Apply migration pattern to other partial flavors
-3. Document per-class API patterns
+1. Achieve 50% ISO test pass rate (1,430/2,859 passing)
+2. Resolve high-impact rendering differences
+3. Document architectural differences (typed_stage, with_edition parameter)
+4. Apply migration pattern to other partial flavors
 
 **Long-Term Vision:**
 
@@ -68,20 +75,35 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Active Development Areas
 
-- **Active**: ISO test refinement and parser extensions
+- **Active**: ISO test refinement with systematic failure analysis
 - **Not changing**: Core completed flavors (IEC, JIS, ETSI, ITU, CCSDS)
 - **Architecture locked**: Three-layer pattern established and proven
 
 ### Known Issues
 
-- ISO: 1,102 test failures (parser gaps + rendering differences)
-- ISO: 840 pending tests (464 for typed_stage architectural difference)
+- ISO: 1,080 test failures (parser gaps + rendering differences)
+- ISO: 834 pending tests (464 for typed_stage architectural difference)
+- Subpart parsing not yet implemented
+- Language code normalization incomplete
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 7
+### Files Changed in Session 9
 
-- Parser: lib/pubid_new/iso/parser.rb (legacy_r_identifier, Add/DAD, legacy_part)
-- Tests: 17 spec files with automated Ruby script fixes
-- Commits: 3 semantic commits (legacy support, automated fixes, slash-based parts)
-- Test improvement: 682→917 passing (+235), 1,590→1,102 failing (-488)
+- Parser: lib/pubid_new/iso/parser.rb (Addendum, normalization, legacy_year)
+- Builder: lib/pubid_new/iso/builder.rb (edition parsing, Add mapping, original_abbr)
+- Supplement: lib/pubid_new/iso/identifiers/supplement.rb (Add abbreviations)
+- Edition: lib/pubid_new/components/edition.rb (canonical ED1 format)
+- Base: lib/pubid_new/iso/identifiers/base.rb (edition.to_s rendering)
+- Single: lib/pubid_new/iso/single_identifier.rb (edition_portion cleanup)
+- Commits: 3 semantic commits (parser improvements, rendering fixes, edition handling)
+- Test improvement: 928→945 passing (+17), 1,091→1,080 failing (-11)
+- Pass rate: 32.1% → 33.1% (+1.0pp)
+
+### Session 9 Key Achievements
+
+1. **Systematic approach**: Used data-driven failure analysis instead of random fixes
+2. **High-impact fixes**: Addressed rendering issues (Add vs Suppl) affecting 48 tests
+3. **Foundation improvements**: Edition handling now complete for all identifiers
+4. **Architecture refinement**: Proper use of original_abbr for supplement rendering
+5. **Documentation**: Created comprehensive failure analysis with patterns and counts
