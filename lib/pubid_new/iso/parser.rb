@@ -73,6 +73,9 @@ module PubidNew
       # Year
       rule(:year) { str(":") >> space.maybe >> digit.repeat(4, 4).as(:year) }
 
+      # Legacy year (for ISO/R identifiers that use dash instead of colon)
+      rule(:legacy_year) { dash >> digit.repeat(4, 4).as(:year) }
+
       # Iteration
       rule(:iteration) { str(".") >> digits.as(:iteration) }
 
@@ -83,20 +86,23 @@ module PubidNew
           str(")")
       end
 
-      # Supplement type
+      # Supplement type (longest patterns first for proper Parslet matching)
       rule(:supplement_type) do
-        (str("Amd") | str("AMD") | str("Amd.") |
-         str("Cor") | str("COR") | str("Cor.") |
-         str("Suppl") | str("Ext") | str("Add") | str("ADD") | str("Add.")).as(:supplement_type)
+        (str("Addendum") | str("Amd.") | str("Add.") |
+         str("Amd") | str("AMD") |
+         str("Cor.") | str("Cor") | str("COR") |
+         str("Suppl") | str("Ext") | str("Add") | str("ADD")).as(:supplement_type)
       end
 
       # Supplement identifier (appears after base with slash)
       rule(:supplement) do
         slash >> (
           # Pattern 1: Typed stage alone (FDAM implies Amd, FDCOR implies Cor)
-          (typed_stage.as(:typed_stage) >> space >> digits.as(:supplement_number) >> year.maybe) |
-          # Pattern 2: Supplement type with optional number
-          (supplement_type >> (space >> digits).maybe.as(:supplement_number) >> year.maybe >> language.maybe)
+          (typed_stage.as(:typed_stage) >> (space >> digits).as(:supplement_number) >> year.maybe) |
+          # Pattern 2: Supplement type with number and optional year/language
+          (supplement_type >> (space >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
+          # Pattern 3: Supplement type without number
+          (supplement_type >> year.maybe >> language.maybe)
         )
       end
 
@@ -118,12 +124,12 @@ module PubidNew
           year.maybe
       end
 
-      # Legacy ISO/R identifier (ISO/R number:year or ISO/R number-part:year)
+      # Legacy ISO/R identifier (ISO/R number:year or ISO/R number-year or ISO/R number-part:year)
       rule(:legacy_r_identifier) do
         publisher >>
           slash >> str("R").as(:type) >>
-          space >> number >> parts >>
-          year.maybe >>
+          space >> number >>
+          (legacy_year | (parts >> (year | legacy_year).maybe)) >>
           language.maybe
       end
 
@@ -156,7 +162,9 @@ module PubidNew
           .gsub(/—/, "/")                   # Em-dash to slash
           .gsub(/–/, "/")                   # En-dash to slash
           .gsub(/\s+:/, ":")                # Whitespace around colons
-          .gsub(/\/Add\./, "/Add")          # Normalize Add. to Add
+          .gsub(/\s+\/\s+/, "/")            # Remove spaces around slashes (for supplements)
+          .gsub(/\/Add\.\s+/, "/Add ")      # Normalize "Add. " (with space) to "Add "
+          .gsub(/\/Add\.(?!\d)/, "/Add")    # Normalize "Add." (without digit) to "Add"
 
         parser_instance.parse(normalized)
       end
