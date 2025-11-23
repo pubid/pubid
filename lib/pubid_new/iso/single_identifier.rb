@@ -70,8 +70,8 @@ module PubidNew
       def edition_portion(lang: :en)
         return nil unless edition&.number
 
-        # Format edition properly
-        " Ed #{edition.number}"
+        # Use edition's canonical format (ED1, ED2, etc.)
+        " #{edition.to_s}"
       end
     end
   end

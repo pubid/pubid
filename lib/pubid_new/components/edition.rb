@@ -5,12 +5,15 @@ module PubidNew
       attribute :year, :string
       attribute :number, :string
       attribute :original_text, :string  # Store the exact parsed edition text
-      
+
       def to_s
-        # Use original parsed format if available
-        return original_text if original_text
-        # Otherwise use canonical format
+        # Always use canonical format for rendering
         number ? "ED#{number}" : nil
+      end
+
+      # Method to get the original parsed format if needed
+      def original_format
+        original_text
       end
     end
   end

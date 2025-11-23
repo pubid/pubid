@@ -47,7 +47,7 @@ module PubidNew
           result += ":#{date.year}" if date&.year
 
           # Add edition if with_edition flag is set
-          result += " Ed #{edition.number}" if with_edition && edition&.number
+          result += " #{edition.to_s}" if with_edition && edition&.number
 
           # Add language
           if languages&.any?

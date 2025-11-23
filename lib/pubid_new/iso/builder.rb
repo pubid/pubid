@@ -99,6 +99,7 @@ module PubidNew
           number: number_data[:number],
           part: number_data[:part],
           date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
+          edition: base_data[:edition] ? build_edition(base_data[:edition]) : nil,
           stage: stage_str ? ::PubidNew::Components::Stage.new(value: stage_str) : nil,
           stage_iteration: base_data[:iteration] ? ::PubidNew::Components::Code.new(value: base_data[:iteration]&.to_s) : nil,
           languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
@@ -210,6 +211,18 @@ module PubidNew
 
         # Return the outermost supplement
         current_base
+      end
+
+      def build_edition(edition_str)
+        # Edition can be: " Ed 1", "Ed.2", "ED1", " Ed. 1", etc.
+        # Extract the number
+        number = edition_str.to_s.gsub(/[^\d]/, "")
+        return nil if number.empty?
+
+        ::PubidNew::Components::Edition.new(
+          number: number,
+          original_text: edition_str.to_s.strip
+        )
       end
 
       def find_typed_stage(klass, stage_abbr)
