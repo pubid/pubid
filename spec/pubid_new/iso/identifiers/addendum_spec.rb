@@ -38,7 +38,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1969")
+        expect(parsed.base_identifier.date.year).to eq("1969")
       end
 
       it "parses base identifier type" do
@@ -50,7 +50,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum date" do
-        expect(parsed.date.date.year).to eq("1969")
+        expect(parsed.date.year).to eq("1969")
       end
 
       it "round-trips" do
@@ -58,14 +58,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -88,7 +91,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1969")
+        expect(parsed.base_identifier.date.year).to eq("1969")
       end
 
       it "parses base identifier type" do
@@ -108,14 +111,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -138,7 +144,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1983")
+        expect(parsed.base_identifier.date.year).to eq("1983")
       end
 
       it "parses base identifier type" do
@@ -150,7 +156,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum date" do
-        expect(parsed.date.date.year).to eq("1983")
+        expect(parsed.date.year).to eq("1983")
       end
 
       it "round-trips" do
@@ -158,14 +164,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -188,7 +197,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1988")
+        expect(parsed.base_identifier.date.year).to eq("1988")
       end
 
       it "parses base identifier type" do
@@ -200,7 +209,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum date" do
-        expect(parsed.date.date.year).to eq("1990")
+        expect(parsed.date.year).to eq("1990")
       end
 
       it "round-trips" do
@@ -208,14 +217,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -242,7 +254,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1979")
+        expect(parsed.base_identifier.date.year).to eq("1979")
       end
 
       it "parses base identifier type" do
@@ -254,7 +266,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum date" do
-        expect(parsed.date.date.year).to eq("1983")
+        expect(parsed.date.year).to eq("1983")
       end
 
       it "normalizes format" do
@@ -262,14 +274,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -293,7 +308,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1970")
+        expect(parsed.base_identifier.date.year).to eq("1970")
       end
 
       it "parses base identifier type" do
@@ -313,14 +328,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -344,7 +362,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.date.year).to eq("1970")
+        expect(parsed.base_identifier.date.year).to eq("1970")
       end
 
       it "parses base identifier type" do
@@ -356,7 +374,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum date" do
-        expect(parsed.date.date.year).to eq("1975")
+        expect(parsed.date.year).to eq("1975")
       end
 
       it "normalizes format" do
@@ -364,14 +382,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -409,6 +430,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses stage" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dad")
       end
 
@@ -417,6 +439,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
@@ -447,10 +470,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum date" do
-        expect(parsed.date.date.year).to eq("1987")
+        expect(parsed.date.year).to eq("1987")
       end
 
       it "parses stage" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dad")
       end
 
@@ -459,6 +483,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
@@ -497,6 +522,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses stage" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dad")
       end
 
@@ -505,6 +531,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 

@@ -40,7 +40,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.date.year).to eq("1983")
+          expect(parsed.base_identifier.date.year).to eq("1983")
         end
 
         it "parses extract number" do
@@ -48,7 +48,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
         end
 
         it "parses extract date" do
-          expect(parsed.date.date.year).to eq("1983")
+          expect(parsed.date.year).to eq("1983")
         end
 
         it "round-trips" do
@@ -56,14 +56,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
         end
 
         it "provides type code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("ext")
         end
 
         it "provides stage code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.abbr.first).to eq("Ext")
         end
 

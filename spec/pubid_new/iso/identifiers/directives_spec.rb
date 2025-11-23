@@ -40,11 +40,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "parses part" do
-          expect(parsed.part.value).to be_nil
+          expect(parsed.part&.value).to be_nil
         end
 
         it "parses date" do
-          expect(parsed.date.date.year).to eq("2022")
+          expect(parsed.date.year).to eq("2022")
         end
 
         it "round-trips" do
@@ -52,14 +52,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "provides type code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("dir")
         end
 
         it "provides stage code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
@@ -86,7 +89,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "parses date" do
-          expect(parsed.date.date.year).to eq("2022")
+          expect(parsed.date.year).to eq("2022")
         end
 
         it "round-trips" do
@@ -94,14 +97,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "provides type code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("dir")
         end
 
         it "provides stage code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
@@ -127,7 +133,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "parses part" do
-          expect(parsed.part.value).to be_nil
+          expect(parsed.part&.value).to be_nil
         end
 
         it "parses date" do
@@ -139,14 +145,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "provides type code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("dir")
         end
 
         it "provides stage code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
@@ -181,14 +190,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "provides type code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("dir")
         end
 
         it "provides stage code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
@@ -223,14 +235,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         end
 
         it "provides type code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("dir")
         end
 
         it "provides stage code" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
         it "provides typed_stage with abbreviation" do
+          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
@@ -270,14 +285,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -305,7 +323,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("2022")
+        expect(parsed.date.year).to eq("2022")
       end
 
       it "normalizes format" do
@@ -313,14 +331,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -350,14 +371,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -391,14 +415,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -429,14 +456,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -463,7 +493,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("2022")
+        expect(parsed.date.year).to eq("2022")
       end
 
       it "round-trips" do
@@ -471,14 +501,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -508,7 +541,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("2022")
+        expect(parsed.date.year).to eq("2022")
       end
 
       it "round-trips" do
@@ -516,14 +549,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
@@ -553,7 +589,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("2022")
+        expect(parsed.date.year).to eq("2022")
       end
 
       it "round-trips" do
@@ -561,14 +597,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("dir")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 

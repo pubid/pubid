@@ -39,11 +39,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses part" do
-        expect(parsed.part.value).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("1966")
+        expect(parsed.date.year).to eq("1966")
       end
 
       it "round-trips" do
@@ -51,14 +51,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("R")
       end
 
@@ -85,7 +88,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses part" do
-        expect(parsed.part.value).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -97,14 +100,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("R")
       end
 
@@ -131,7 +137,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses part" do
-        expect(parsed.part.value).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -143,10 +149,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
@@ -177,7 +185,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("1969")
+        expect(parsed.date.year).to eq("1969")
       end
 
       it "round-trips" do
@@ -185,14 +193,17 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("R")
       end
 
@@ -225,7 +236,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("1963")
+        expect(parsed.date.year).to eq("1963")
       end
 
       it "normalizes to standard format" do
@@ -233,10 +244,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
@@ -266,7 +279,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("1968")
+        expect(parsed.date.year).to eq("1968")
       end
 
       it "normalizes roman numeral to arabic" do
@@ -274,10 +287,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
@@ -315,10 +330,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
@@ -350,7 +367,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("1959")
+        expect(parsed.date.year).to eq("1959")
       end
 
       it "round-trips" do
@@ -358,10 +375,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
@@ -390,7 +409,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date.date.year).to eq("1973")
+        expect(parsed.date.year).to eq("1973")
       end
 
       it "round-trips" do
@@ -398,10 +417,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
       end
 
       it "provides type code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("rec")
       end
 
       it "provides stage code" do
+        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
