@@ -67,6 +67,7 @@ module PubidNew
             type: type_str ? ::PubidNew::Components::Type.new(abbr: type_str) : nil,
             number: number_data[:number],
             part: number_data[:part],
+            subpart: number_data[:subpart],
             date: nil, # Date goes on supplement, not base
             stage: stage_str ? ::PubidNew::Components::Stage.new(value: stage_str) : nil,
             stage_iteration: base_data[:iteration] ? ::PubidNew::Components::Code.new(value: base_data[:iteration]&.to_s) : nil,
@@ -98,6 +99,7 @@ module PubidNew
           type: type_str && type_str != "Guide" && type_str != "GUIDE" ? ::PubidNew::Components::Type.new(abbr: type_str) : nil,
           number: number_data[:number],
           part: number_data[:part],
+          subpart: number_data[:subpart],
           date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
           edition: base_data[:edition] ? build_edition(base_data[:edition]) : nil,
           stage: stage_str ? ::PubidNew::Components::Stage.new(value: stage_str) : nil,
@@ -369,6 +371,10 @@ module PubidNew
         if parts.first
           result[:part] =
             ::PubidNew::Components::Code.new(value: parts.first)
+        end
+        if parts[1]
+          result[:subpart] =
+            ::PubidNew::Components::Code.new(value: parts[1])
         end
         result
       end

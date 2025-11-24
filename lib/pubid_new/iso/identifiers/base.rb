@@ -40,6 +40,9 @@ module PubidNew
           # Add part (with dash)
           result += "-#{part.value}" if part&.value
 
+          # Add subpart (with dash)
+          result += "-#{subpart.value}" if subpart&.value
+
           # Add stage iteration if present
           result += ".#{stage_iteration.value}" if stage_iteration&.value
 
