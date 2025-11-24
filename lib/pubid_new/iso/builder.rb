@@ -149,10 +149,15 @@ module PubidNew
           supplement_type = supplement_data[:supplement_type]&.to_s&.downcase
 
           # Extract typed_stage - parser returns nested {:typed_stage=>{:typed_stage=>"FDAM"}}
+          # OR it may return {:stage=>{:stage=>"CD"}} for patterns like "CD Amd 1"
           typed_stage_str = if supplement_data[:typed_stage].is_a?(Hash)
                               supplement_data[:typed_stage][:typed_stage]&.to_s
-                            else
+                            elsif supplement_data[:typed_stage]
                               supplement_data[:typed_stage]&.to_s
+                            elsif supplement_data[:stage].is_a?(Hash)
+                              supplement_data[:stage][:stage]&.to_s
+                            else
+                              supplement_data[:stage]&.to_s
                             end
 
           # Select appropriate supplement class
@@ -190,12 +195,13 @@ module PubidNew
           # Extract stage from typed_stage
           stage_str = extract_supplement_stage(typed_stage_str)
 
-          # Find typed_stage - prefer supplement_type for matching, then stage string
-          typed_stage = if supplement_type && supplement_type !~ /suppl/ # Don't match "suppl" generically
-                          # Try to match by supplement_type first (for Add, Addendum, etc.)
-                          find_typed_stage(supplement_class, supplement_type.capitalize)
-                        elsif stage_str
+          # Find typed_stage - prefer stage string if available, then supplement_type
+          typed_stage = if stage_str
+                          # Stage is most specific - use it first
                           find_typed_stage(supplement_class, stage_str)
+                        elsif supplement_type && supplement_type !~ /suppl/
+                          # Try to match by supplement_type (for Add, Addendum, etc.)
+                          find_typed_stage(supplement_class, supplement_type.capitalize)
                         else
                           # Default to published stage for the supplement class
                           find_published_typed_stage(supplement_class)
