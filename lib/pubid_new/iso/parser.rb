@@ -52,7 +52,10 @@ module PubidNew
         (str("FDAM") | str("FDAmd") | str("FDAMD") |
          str("PDAM") | str("PDAmd") |
          str("DAM") | str("DAmd") | str("DAMD") | str("DAD") |
-         str("FDCOR") | str("FCOR") | str("DCOR") |
+         str("FDCOR") | str("FDCor") |
+         str("FCOR") |
+         str("DCOR") | str("DCor") |
+         str("pDCOR") |
          str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS") |
          str("PDTR") | str("PDTS")).as(:typed_stage)
       end
@@ -77,8 +80,11 @@ module PubidNew
       # Use negative lookahead to avoid matching supplement keywords
       rule(:legacy_part) do
         slash >>
-          # Not followed by supplement keywords
-          (str("Amd") | str("AMD") | str("Cor") | str("COR") | str("Add") | str("Suppl") | str("Ext")).absent? >>
+          # Not followed by supplement keywords or typed stage variants
+          (str("Amd") | str("AMD") |
+           str("FDCor") | str("FDCOR") | str("DCor") | str("DCOR") | str("pDCOR") |
+           str("Cor") | str("COR") | str("Cor.") |
+           str("Add") | str("Suppl") | str("Ext")).absent? >>
           alnums.as(:part)
       end
 
@@ -118,12 +124,25 @@ module PubidNew
       # Supplement identifier (appears after base with slash)
       rule(:supplement) do
         slash >> (
-          # Pattern 1: Typed stage alone (FDAM implies Amd, FDCOR implies Cor)
-          (typed_stage.as(:typed_stage) >> (space >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
+          # Pattern 1a: Typed stage with iteration but no supplement number (pDCOR.2)
+          (typed_stage.as(:typed_stage) >>
+           iteration.as(:supplement_iteration) >>
+           year.maybe >> language.maybe) |
+          # Pattern 1b: Typed stage with supplement number and optional iteration
+          (typed_stage.as(:typed_stage) >>
+           (space >> digits).as(:supplement_number) >>
+           iteration.maybe.as(:supplement_iteration) >>
+           year.maybe >> language.maybe) |
           # Pattern 2: Stage + space + supplement type (CD Amd, PWI Amd, etc.)
-          (stage.as(:stage) >> space >> supplement_type >> (space.maybe >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
+          (stage.as(:stage) >> space >> supplement_type >>
+           (space.maybe >> digits).as(:supplement_number) >>
+           iteration.maybe.as(:supplement_iteration) >>
+           year.maybe >> language.maybe) |
           # Pattern 3: Supplement type with number and optional year/language
-          (supplement_type >> (space.maybe >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
+          (supplement_type >>
+           (space.maybe >> digits).as(:supplement_number) >>
+           iteration.maybe.as(:supplement_iteration) >>
+           year.maybe >> language.maybe) |
           # Pattern 4: Supplement type without number
           (supplement_type >> year.maybe >> language.maybe)
         )
