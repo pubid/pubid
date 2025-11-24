@@ -56,6 +56,13 @@ module PubidNew
         type_str = extract_type(base_data)
         stage_str = extract_stage(base_data)
 
+        # Handle iteration - prefer stage_iteration_prefix if stage is present
+        iteration_value = if stage_str && base_data[:stage_iteration_prefix]
+                           base_data[:stage_iteration_prefix]
+                         else
+                           base_data[:iteration]
+                         end
+
         # Select appropriate class based on type
         klass = determine_identifier_class(type_str, base_data)
 
@@ -70,7 +77,7 @@ module PubidNew
             subpart: number_data[:subpart],
             date: nil, # Date goes on supplement, not base
             stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: stage_str) : nil,
-            stage_iteration: base_data[:iteration] ? ::PubidNew::Components::Code.new(value: base_data[:iteration]&.to_s) : nil,
+            stage_iteration: iteration_value ? ::PubidNew::Components::Code.new(value: iteration_value&.to_s) : nil,
             languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
           )
 
@@ -103,7 +110,7 @@ module PubidNew
           date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
           edition: base_data[:edition] ? build_edition(base_data[:edition]) : nil,
           stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: stage_str) : nil,
-          stage_iteration: base_data[:iteration] ? ::PubidNew::Components::Code.new(value: base_data[:iteration]&.to_s) : nil,
+          stage_iteration: iteration_value ? ::PubidNew::Components::Code.new(value: iteration_value&.to_s) : nil,
           languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
         )
       end
