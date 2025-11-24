@@ -65,7 +65,7 @@ module PubidNew
             part: number_data[:part],
             subpart: number_data[:subpart],
             date: nil, # Date goes on supplement, not base
-            stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: stage_str) : nil,
+            stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: normalize_stage_abbr(stage_str)) : nil,
             stage_iteration: iteration_value ? ::PubidNew::Components::Code.new(value: iteration_value&.to_s) : nil,
             languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
           )
@@ -98,13 +98,27 @@ module PubidNew
           subpart: number_data[:subpart],
           date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
           edition: base_data[:edition] ? build_edition(base_data[:edition]) : nil,
-          stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: stage_str) : nil,
+          stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: normalize_stage_abbr(stage_str)) : nil,
           stage_iteration: iteration_value ? ::PubidNew::Components::Code.new(value: iteration_value&.to_s) : nil,
           languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
         )
       end
 
       private
+
+      # Normalize legacy stage names for rendering
+      def normalize_stage_abbr(stage_str)
+        return nil unless stage_str
+
+        # Map legacy stage names to their canonical forms
+        normalizations = {
+          "NWIP" => "NP",    # New Work Item Proposal → New Proposal
+          "PreCD" => "preCD", # Normalize case
+          "PRECD" => "preCD", # Normalize case
+        }
+
+        normalizations[stage_str] || stage_str
+      end
 
       # Merge array of hashes, collecting duplicate keys into arrays
       def merge_array_preserving_duplicates(array)
