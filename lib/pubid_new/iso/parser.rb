@@ -49,7 +49,9 @@ module PubidNew
 
       # Typed stages (combined stage+type)
       rule(:typed_stage) do
-        (str("FDAM") | str("FDAMD") | str("PDAM") | str("DAM") | str("DAMD") | str("DAD") |
+        (str("FDAM") | str("FDAmd") | str("FDAMD") |
+         str("PDAM") | str("PDAmd") |
+         str("DAM") | str("DAmd") | str("DAMD") | str("DAD") |
          str("FDCOR") | str("FCOR") | str("DCOR") |
          str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS") |
          str("PDTR") | str("PDTS")).as(:typed_stage)
@@ -112,9 +114,11 @@ module PubidNew
         slash >> (
           # Pattern 1: Typed stage alone (FDAM implies Amd, FDCOR implies Cor)
           (typed_stage.as(:typed_stage) >> (space >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
-          # Pattern 2: Supplement type with number and optional year/language
-          (supplement_type >> (space >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
-          # Pattern 3: Supplement type without number
+          # Pattern 2: Stage + space + supplement type (CD Amd, PWI Amd, etc.)
+          (stage.as(:stage) >> space >> supplement_type >> (space.maybe >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
+          # Pattern 3: Supplement type with number and optional year/language
+          (supplement_type >> (space.maybe >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
+          # Pattern 4: Supplement type without number
           (supplement_type >> year.maybe >> language.maybe)
         )
       end
