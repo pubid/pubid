@@ -74,7 +74,13 @@ module PubidNew
       end
 
       # Legacy slash-based part (e.g., ISO 31/0-1974)
-      rule(:legacy_part) { slash >> alnums.as(:part) }
+      # Use negative lookahead to avoid matching supplement keywords
+      rule(:legacy_part) do
+        slash >>
+          # Not followed by supplement keywords
+          (str("Amd") | str("AMD") | str("Cor") | str("COR") | str("Add") | str("Suppl") | str("Ext")).absent? >>
+          alnums.as(:part)
+      end
 
       # Parts can be either dash-based or slash-based (legacy)
       rule(:parts) { (part | legacy_part).repeat(0).as(:parts) }
