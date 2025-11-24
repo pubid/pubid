@@ -20,18 +20,23 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 11 - ISO V2 Stage Parsing & Component Fixes):**
-- ✅ Fixed missing stage parsing: Added DIS, FDIS, FCD, preCD/PreCD/PRECD to stage rule
-- ✅ Added UNDP to copublisher list for ISO/UNDP identifiers
-- ✅ Implemented stage iteration parsing and rendering (CD2 → "ISO/CD 14065.2:2018")
-- ✅ Fixed space before copublisher normalization ("ISO /IEC" → "ISO/IEC")
-- ✅ Fixed Stage component API: Changed from .value to .abbr throughout codebase
-- ✅ Improved sub-subpart extraction: Multi-level parts now join correctly (5-1-1 → part=5, subpart=1-1)
-- ✅ Results: 1,059 passing (37.0%), 987 failing (34.5%), 813 pending (28.4%)
-- ✅ Progress: +29 tests (+1.0pp), -29 failures from Session 10
-- ✅ Three focused commits: stage parsing (+23), stage iteration (+1), subpart extraction (+5)
+**Latest Session (Session 12 - ISO V2 API Compatibility & Supplement Patterns):**
+- ✅ **Phase 1: Quick Wins** (+10 tests, 1,069→1,079 passing)
+  - Added `.value` alias to Edition component for V1 API compatibility
+  - Added `.copublishers` convenience method to Base identifier
+  - Fixed legacy date rendering: `ISO 31/0-1974` now renders as `ISO 31-0:1974`
+  - Fixed parser part rule to not capture 4-digit years as parts
+- ✅ **Phase 2: Supplement Pattern Fixes** (+154 tests, 1,079→1,223 passing)
+  - Added lowercase typed stage variants: `DAmd`, `FDAmd`, `PDAmd`
+  - Added stage+space+supplement patterns: `CD Amd`, `PWI Amd`, `AWI Amd`, `WD Amd`, `PRF Amd`
+  - Fixed `Amd.` parsing to handle no space before number: `Amd.1`, `Amd.2`
+- ✅ **Results**: 1,223 passing (42.8%), 861 failing (30.1%), 775 pending (27.1%)
+- ✅ **Progress**: +164 tests (+5.8pp), -126 failures, -38 pending from Session 11
+- ✅ **Exceeded target**: 40% target achieved, reached 42.8%
+- ✅ Two focused commits: API compatibility, supplement patterns
 
 **Previous Sessions:**
+- Session 11: Stage parsing, UNDP copublisher, stage iterations → 1,059 passing (+29)
 - Session 10: Language codes (uppercase/lowercase) + subpart support → 1,030 passing (+85)
 - Session 9: Systematic failure analysis, Add/Addendum rendering → 945 passing (+17)
 - Session 8: Added PDTR/PDTS stages + normalization → 928 passing (+11)
@@ -44,28 +49,21 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Next Steps
 
-**Immediate Priorities (Session 12):**
+**Immediate Priorities (Session 13):**
 
-1. **Remaining parse failures** (~700 tests estimated)
+1. **Remaining parse failures** (~650 tests estimated)
    - Continue systematic failure analysis
    - Focus on high-frequency patterns
-   - Target 40% pass rate (1,144 passing)
+   - Target 45% pass rate (1,287 passing)
 
-2. **Edition API inconsistencies** (identified but not yet fixed)
-   - Tests expect `.value` but Edition has `.number`
-   - Should be straightforward fix
-
-3. **Legacy date rendering** (1 test identified)
-   - "ISO 31/0-1974" should render with colon not dash before year
-
-4. **Rendering differences** (~200 tests estimated)
+2. **Rendering differences** (~200 tests estimated)
    - Type/stage combinations
    - Continue pattern-based fixes
 
 **Near-Term Goals:**
 
-1. Achieve 40% ISO test pass rate (1,144/2,859 passing) - Target for Session 12
-2. Achieve 45% ISO test pass rate (1,287/2,859 passing) - Next milestone
+1. Achieve 45% ISO test pass rate (1,287/2,859 passing) - Target for Session 13
+2. Achieve 50% ISO test pass rate (1,430/2,859 passing) - Next milestone
 3. Resolve high-impact rendering differences
 4. Document architectural differences (typed_stage, with_edition parameter)
 5. Apply migration pattern to other partial flavors
@@ -85,28 +83,27 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Known Issues
 
-- ISO: 987 test failures (34.5%) - parser gaps + rendering differences
-- ISO: 813 pending tests (28.4%) - includes typed_stage architectural differences
-- Edition API: Tests expect .value but component uses .number
-- Legacy date rendering: Slash-based parts need colon before year
+- ISO: 861 test failures (30.1%) - parser gaps + rendering differences
+- ISO: 775 pending tests (27.1%) - includes typed_stage architectural differences
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 11
+### Files Changed in Session 12
 
-- Parser: lib/pubid_new/iso/parser.rb (added stages, UNDP, stage_iteration_prefix, space normalization)
-- Builder: lib/pubid_new/iso/builder.rb (Stage.abbr, stage iteration handling, subpart joining, removed invalid require)
-- Base: lib/pubid_new/iso/identifiers/base.rb (stage.abbr for rendering)
-- Commits: 3 semantic commits (stage parsing, stage iteration, subpart extraction)
-- Test improvement: 1,030→1,059 passing (+29), 1,016→987 failing (-29)
-- Pass rate: 36.0% → 37.0% (+1.0pp)
+- Edition component: lib/pubid_new/components/edition.rb (added .value alias)
+- Base identifier: lib/pubid_new/iso/identifiers/base.rb (added .copublishers method)
+- Parser: lib/pubid_new/iso/parser.rb (typed stages, supplement patterns, part rule fix)
+- Commits: 2 semantic commits (API compatibility, supplement patterns)
+- Test improvement: 1,059→1,223 passing (+164), 987→861 failing (-126)
+- Pass rate: 37.0% → 42.8% (+5.8pp)
 
-### Session 11 Key Achievements
+### Session 12 Key Achievements
 
-1. **Highest-impact fix**: Stage parsing affected ~23 tests (DIS, FDIS, FCD, preCD, PWI, NP, AWI, WD, CD, PRF)
-2. **Architecture fix**: Corrected Stage component API from .value to .abbr
-3. **UNDP copublisher**: Enabled ISO/UNDP identifier parsing
-4. **Stage iterations**: CD2, PreCD3 now parse and render correctly
-5. **Sub-subpart support**: Multi-level parts like 5-1-1 now extract correctly
-6. **Clean commits**: Three well-documented semantic commits tracking specific fixes
-7. **Steady progress**: +1.0pp improvement maintaining momentum from Session 10
+1. **Exceeded 40% target**: Reached 42.8% pass rate (+5.8pp improvement)
+2. **API compatibility**: Added .value and .copublishers for V1 compatibility
+3. **Legacy date fix**: Slash-based parts now render with colon before year
+4. **Supplement patterns**: Added lowercase typed stages (DAmd, FDAmd, PDAmd)
+5. **Stage+supplement**: CD Amd, PWI Amd patterns now parse correctly
+6. **Amd. without space**: Amd.1 pattern now works
+7. **Largest single improvement**: +154 tests from supplement pattern fixes
+8. **Clean architecture**: All fixes maintain core test suite (106/106 passing)
