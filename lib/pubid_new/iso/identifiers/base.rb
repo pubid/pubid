@@ -63,6 +63,15 @@ module PubidNew
           result
         end
 
+        # V1 API compatibility - tests expect .copublishers returning array of Publisher objects
+        def copublishers
+          return [] unless publisher.copublisher&.any?
+
+          publisher.copublisher.map do |cp|
+            ::PubidNew::Components::Publisher.new(body: cp)
+          end
+        end
+
         def ==(other)
           return false unless other.is_a?(Base)
 

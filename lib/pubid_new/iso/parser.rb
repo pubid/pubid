@@ -59,7 +59,17 @@ module PubidNew
       rule(:number) { digits.as(:number) }
 
       # Part (can be alphanumeric like A01, B02, or just digits)
-      rule(:part) { dash >> alnums.as(:part) }
+      # But exclude exactly 4 digits (that would be a year)
+      rule(:part) do
+        dash >> (
+          # Alphanumeric parts (containing letters) - check these first
+          (letter >> alnum.repeat(0)).as(:part) |
+          (digit.repeat(1, 3) >> letter >> alnum.repeat(0)).as(:part) |
+          # Pure digit parts (but not exactly 4 digits which is a year)
+          (digit.repeat(1, 3) >> digit.absent?).as(:part) |
+          (digit.repeat(5, nil)).as(:part)
+        )
+      end
 
       # Legacy slash-based part (e.g., ISO 31/0-1974)
       rule(:legacy_part) { slash >> alnums.as(:part) }
@@ -145,7 +155,7 @@ module PubidNew
           ((space | slash) >> type).maybe >>
           space >> number >> parts >>
           iteration.maybe >>
-          year.maybe >>
+          (legacy_year | year).maybe >>
           edition.maybe >>
           language.maybe
       end

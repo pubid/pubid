@@ -11,6 +11,11 @@ module PubidNew
         number ? "ED#{number}" : nil
       end
 
+      # V1 API compatibility - tests expect .value
+      def value
+        number
+      end
+
       # Method to get the original parsed format if needed
       def original_format
         original_text
