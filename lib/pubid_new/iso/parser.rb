@@ -49,7 +49,8 @@ module PubidNew
 
       # Typed stages (combined stage+type)
       rule(:typed_stage) do
-        (str("FDAM") | str("FDAmd") | str("FDAMD") |
+        (str("FPDAM") |
+         str("FDAM") | str("FDAmd") | str("FDAMD") |
          str("PDAM") | str("PDAmd") |
          str("DAM") | str("DAmd") | str("DAMD") | str("DAD") |
          str("FDCOR") | str("FDCor") |
@@ -130,24 +131,24 @@ module PubidNew
           # Pattern 1a: Typed stage with iteration but no supplement number (pDCOR.2)
           (typed_stage.as(:typed_stage) >>
            iteration.as(:supplement_iteration) >>
-           year.maybe >> language.maybe) |
+           year.maybe >> edition.maybe >> language.maybe) |
           # Pattern 1b: Typed stage with supplement number and optional iteration
           (typed_stage.as(:typed_stage) >>
            (space >> digits).as(:supplement_number) >>
            iteration.maybe.as(:supplement_iteration) >>
-           year.maybe >> language.maybe) |
+           year.maybe >> edition.maybe >> language.maybe) |
           # Pattern 2: Stage + space + supplement type (CD Amd, PWI Amd, etc.)
           (stage.as(:stage) >> space >> supplement_type >>
            (space.maybe >> digits).as(:supplement_number) >>
            iteration.maybe.as(:supplement_iteration) >>
-           year.maybe >> language.maybe) |
+           year.maybe >> edition.maybe >> language.maybe) |
           # Pattern 3: Supplement type with number and optional year/language
           (supplement_type >>
            (space.maybe >> digits).as(:supplement_number) >>
            iteration.maybe.as(:supplement_iteration) >>
-           year.maybe >> language.maybe) |
+           year.maybe >> edition.maybe >> language.maybe) |
           # Pattern 4: Supplement type without number
-          (supplement_type >> year.maybe >> language.maybe)
+          (supplement_type >> year.maybe >> edition.maybe >> language.maybe)
         )
       end
 

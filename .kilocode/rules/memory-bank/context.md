@@ -20,22 +20,24 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 14 - ISO V2 Corrigendum Typed Stages & Supplement Iteration):**
-- ✅ **Corrigendum Typed Stages** (+14 tests initial improvement)
-  - Added missing typed stage patterns to parser: `FDCor`, `DCor`, `pDCOR`
-  - Updated `legacy_part` negative lookahead to prevent typed stages from being parsed as parts
-  - Now handles: `ISO/IEC 14496-12/DCor 1`, `ISO/IEC 14496-12/FDCor 1`, `ISO/IEC 10646-1:1993/pDCOR 2`
-- ✅ **Supplement Iteration Support** (+66 tests additional improvement)
-  - Added iteration support for all supplement patterns (`.3` after supplement number)
-  - Handles patterns like `DCor 1.3:2002`, `FDCor 2.3`, and special `pDCOR.2` syntax
-  - Three parser patterns added: typed stage with iteration only, with number+iteration, and existing patterns
-- ✅ **Results**: 1,312 passing (45.9%), 799 failing (27.9%), 748 pending (26.2%)
-- ✅ **Progress**: +80 tests (+2.8pp), -56 failures (-2.0pp), -24 pending (-0.8pp) from Session 13
-- ✅ **Exceeded target**: Goal was 45.0% (1,287), achieved 45.9% (1,312) - **+25 tests over target**
-- ✅ Single focused commit: Corrigendum typed stages and supplement iteration
-- ✅ Clean architecture: All fixes maintain core test suite (106/106 passing)
+**Latest Session (Session 15 - ISO V2 Parser Enhancement Batch):**
+- ✅ **Typed Stage Variants** (minimal impact)
+  - Added `FCorr` variant to complement `FCor`/`FCOR`
+  - Updated `legacy_part` negative lookahead to include FCorr/FCOR
+- ✅ **Enhanced Edition Parsing**
+  - Modified edition rule to handle standalone `ED` and `ED` with optional digits
+  - Allows patterns like `ED`, `ED1`, `ED2`
+- ✅ **Enhanced Year Parsing**
+  - Added support for dash-prefixed years (`- 2024` in addition to `: 2024`)
+  - Handles both colon and dash separators with optional spaces
+- ✅ **Results**: 1,316 passing (46.0%), 797 failing (27.9%), 746 pending (26.1%)
+- ✅ **Progress**: +4 tests (+0.1pp), -2 failures, -2 pending from Session 14
+- ⚠️ **Limited Impact**: Batch approach had minimal effect because added patterns not heavily represented in test failures
+- ✅ **Clean architecture**: All fixes maintain core test suite (106/106 passing)
+- ✅ **Single commit**: Parser enhancements with semantic commit message
 
 **Previous Sessions:**
+- Session 14: Corrigendum typed stages (FDCor, DCor, pDCOR) + supplement iteration → 1,312 passing (+80)
 - Session 13: Stage normalization (NWIP→NP), legacy part fix → 1,232 passing (+9)
 - Session 12: API compatibility, supplement patterns (DAmd, FDAmd, stage+supplement) → 1,223 passing (+164)
 - Session 11: Stage parsing, UNDP copublisher, stage iterations → 1,059 passing (+29)
@@ -51,20 +53,22 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Next Steps
 
-**Immediate Priorities (Session 15):**
+**Immediate Priorities (Session 16):**
 
-1. **Remaining parse failures** (~620 tests estimated)
-   - Continue systematic failure analysis
-   - Focus on remaining supplement iteration edge cases
-   - Investigate edition with language patterns: `ED1(fr)`, `ED5`
-   - Target 48% pass rate (1,372 passing, +60 tests)
+1. **Systematic Failure Analysis** (~620 parse failures)
+   - Run comprehensive analysis of top failure patterns
+   - Identify highest-frequency error types
+   - Focus on patterns that affect 20+ tests each
+   - Target data-driven improvements instead of speculative additions
 
 2. **Rendering differences** (~180 tests estimated)
    - Multi-level supplement rendering improvements
    - Edition rendering with `with_edition` parameter
    - Continue pattern-based fixes
 
-**Near-Term Goals:**
+3. **Session 16 Target**: 48% pass rate (1,372 passing, +56 tests minimum)
+
+### Near-Term Goals:
 
 1. Achieve 48% ISO test pass rate (1,372/2,859 passing) - Target for Session 15
 2. Achieve 50% ISO test pass rate (1,430/2,859 passing) - Next major milestone
@@ -83,24 +87,22 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Known Issues
 
-- ISO: 799 test failures (27.9%) - parser gaps + rendering differences
-- ISO: 748 pending tests (26.2%) - includes typed_stage architectural differences
+- ISO: 797 test failures (27.9%) - parser gaps + rendering differences
+- ISO: 746 pending tests (26.1%) - includes typed_stage architectural differences
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 14
+### Files Changed in Session 15
 
-- Parser: lib/pubid_new/iso/parser.rb (typed stages, legacy_part, supplement iteration)
-- Commits: 1 semantic commit (corrigendum typed stages and supplement iteration)
-- Test improvement: 1,232→1,312 passing (+80), 855→799 failing (-56)
-- Pass rate: 43.1% → 45.9% (+2.8pp)
+- Parser: lib/pubid_new/iso/parser.rb (FCorr typed stage, edition enhancements, year dash support)
+- Commits: 1 semantic commit (typed stage variants and enhanced parsing patterns)
+- Test improvement: 1,312→1,316 passing (+4), 799→797 failing (-2)
+- Pass rate: 45.9% → 46.0% (+0.1pp)
 
-### Session 14 Key Achievements
+### Session 15 Key Learnings
 
-1. **Typed stage variants working**: FDCor, DCor, pDCOR now parse correctly
-2. **Supplement iteration implemented**: Handles `.3` after supplement numbers
-3. **Special pDCOR.2 syntax**: Typed stage with iteration but no supplement number
-4. **Legacy part protection extended**: All corrigendum typed stages prevented from part parsing
-5. **Exceeded session target**: 45.9% achieved vs 45.0% goal (+25 tests over target)
-6. **Strong improvement rate**: +80 tests (+2.8pp) in single session
-7. **Foundation for Session 15**: Iteration patterns working, ready for edge cases
+1. **Batch approach requires better targeting**: Adding patterns speculatively without analyzing actual test failures yields minimal results
+2. **Need data-driven decisions**: Must analyze failure patterns to identify high-impact improvements
+3. **Core stability maintained**: Despite limited progress, no regressions in working tests (106/106 passing)
+4. **Parser enhancements completed**: FCorr, enhanced edition, dash-year support now available for future use
+5. **Next session strategy**: Focus on systematic failure analysis before implementation

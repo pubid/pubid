@@ -218,6 +218,7 @@ module PubidNew
             number: ::PubidNew::Components::Code.new(value: supplement_data[:supplement_number]&.to_s&.strip),
             date: supplement_data[:year] ? ::PubidNew::Components::Date.new(year: supplement_data[:year]&.to_i) : nil,
             typed_stage: typed_stage,
+            edition: supplement_data[:edition] ? build_edition(supplement_data[:edition]) : nil,
             languages: supplement_data[:language] ? [::PubidNew::Components::Language.new(original_code: supplement_data[:language]&.to_s)] : nil,
           )
         end
