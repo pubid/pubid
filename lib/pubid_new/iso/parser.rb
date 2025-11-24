@@ -53,7 +53,7 @@ module PubidNew
          str("PDAM") | str("PDAmd") |
          str("DAM") | str("DAmd") | str("DAMD") | str("DAD") |
          str("FDCOR") | str("FDCor") |
-         str("FCOR") |
+         str("FCOR") | str("FCor") | str("FCorr") |
          str("DCOR") | str("DCor") |
          str("pDCOR") |
          str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS") |
@@ -82,7 +82,8 @@ module PubidNew
         slash >>
           # Not followed by supplement keywords or typed stage variants
           (str("Amd") | str("AMD") |
-           str("FDCor") | str("FDCOR") | str("DCor") | str("DCOR") | str("pDCOR") |
+           str("FDCor") | str("FDCOR") | str("FCor") | str("FCOR") | str("FCorr") |
+           str("DCor") | str("DCOR") | str("pDCOR") |
            str("Cor") | str("COR") | str("Cor.") |
            str("Add") | str("Suppl") | str("Ext")).absent? >>
           alnums.as(:part)
@@ -91,14 +92,16 @@ module PubidNew
       # Parts can be either dash-based or slash-based (legacy)
       rule(:parts) { (part | legacy_part).repeat(0).as(:parts) }
 
-      # Edition (can be "Ed 3", "Ed.2", "ED1")
+      # Edition (can be "Ed 3", "Ed.2", "ED1", "ED", "ED1(fr)" where language is handled separately)
       rule(:edition) do
         (space >> (str("Ed.") | str("Ed ") | str("Ed")) >> space.maybe >> digits.maybe |
-         space >> str("ED") >> digits).as(:edition)
+         space >> str("ED") >> digits.maybe).as(:edition)
       end
 
       # Year
-      rule(:year) { str(":") >> space.maybe >> digit.repeat(4, 4).as(:year) }
+      rule(:year) do
+        (str(":") | dash) >> space.maybe >> digit.repeat(4, 4).as(:year)
+      end
 
       # Legacy year (for ISO/R identifiers that use dash instead of colon)
       rule(:legacy_year) { dash >> digit.repeat(4, 4).as(:year) }
