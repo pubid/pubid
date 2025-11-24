@@ -20,19 +20,19 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 10 - ISO V2 Language & Subpart Support):**
-- ✅ Added comprehensive language code support (uppercase & lowercase)
-- ✅ Parser accepts both A-Z and a-z in language patterns: (E), (F), (en), (fr), (E/F)
-- ✅ Added language.maybe to all three supplement patterns (typed_stage, with number, without)
-- ✅ Builder preserves language codes in supplements using original_code
-- ✅ Implemented subpart parsing and rendering (ISO 80601-2-61:2019)
-- ✅ Builder extracts second part as subpart, renders with dash separator
-- ✅ Verified DAD (Draft Addendum) supplement support works correctly
-- ✅ Results: 1,030 passing (36.0%), 1,016 failing (35.5%), 813 pending (28.4%)
-- ✅ Progress: +85 tests (+2.9pp), -64 failures from Session 9
-- ✅ Two focused commits: language codes (+79 tests), subpart support (+6 tests)
+**Latest Session (Session 11 - ISO V2 Stage Parsing & Component Fixes):**
+- ✅ Fixed missing stage parsing: Added DIS, FDIS, FCD, preCD/PreCD/PRECD to stage rule
+- ✅ Added UNDP to copublisher list for ISO/UNDP identifiers
+- ✅ Implemented stage iteration parsing and rendering (CD2 → "ISO/CD 14065.2:2018")
+- ✅ Fixed space before copublisher normalization ("ISO /IEC" → "ISO/IEC")
+- ✅ Fixed Stage component API: Changed from .value to .abbr throughout codebase
+- ✅ Improved sub-subpart extraction: Multi-level parts now join correctly (5-1-1 → part=5, subpart=1-1)
+- ✅ Results: 1,059 passing (37.0%), 987 failing (34.5%), 813 pending (28.4%)
+- ✅ Progress: +29 tests (+1.0pp), -29 failures from Session 10
+- ✅ Three focused commits: stage parsing (+23), stage iteration (+1), subpart extraction (+5)
 
 **Previous Sessions:**
+- Session 10: Language codes (uppercase/lowercase) + subpart support → 1,030 passing (+85)
 - Session 9: Systematic failure analysis, Add/Addendum rendering → 945 passing (+17)
 - Session 8: Added PDTR/PDTS stages + normalization → 928 passing (+11)
 - Session 7: Migrated 19 ISO identifier test files (2,648 tests), added legacy support
@@ -44,25 +44,27 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Next Steps
 
-**Immediate Priorities (Session 11):**
+**Immediate Priorities (Session 12):**
 
-1. **Publisher spacing edge cases** (~5 tests)
-   - Handle "ISO /IEC" (space before slash) in normalization
-   - Low-impact but should be addressed
-
-2. **Remaining parse failures** (~800 tests)
-   - Analyze patterns in 1,016 remaining failures
+1. **Remaining parse failures** (~700 tests estimated)
+   - Continue systematic failure analysis
    - Focus on high-frequency patterns
-   - Systematic approach like Session 9
+   - Target 40% pass rate (1,144 passing)
 
-3. **Rendering differences** (~200 tests estimated)
-   - Language code format consistency
-   - Edition rendering variations
+2. **Edition API inconsistencies** (identified but not yet fixed)
+   - Tests expect `.value` but Edition has `.number`
+   - Should be straightforward fix
+
+3. **Legacy date rendering** (1 test identified)
+   - "ISO 31/0-1974" should render with colon not dash before year
+
+4. **Rendering differences** (~200 tests estimated)
    - Type/stage combinations
+   - Continue pattern-based fixes
 
 **Near-Term Goals:**
 
-1. Achieve 40% ISO test pass rate (1,144/2,859 passing) - ✅ ACHIEVED (36.0%)
+1. Achieve 40% ISO test pass rate (1,144/2,859 passing) - Target for Session 12
 2. Achieve 45% ISO test pass rate (1,287/2,859 passing) - Next milestone
 3. Resolve high-impact rendering differences
 4. Document architectural differences (typed_stage, with_edition parameter)
@@ -83,26 +85,28 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Known Issues
 
-- ISO: 1,016 test failures (35.5%) - parser gaps + rendering differences
+- ISO: 987 test failures (34.5%) - parser gaps + rendering differences
 - ISO: 813 pending tests (28.4%) - includes typed_stage architectural differences
-- Publisher spacing edge cases ("ISO /IEC") not implemented
+- Edition API: Tests expect .value but component uses .number
+- Legacy date rendering: Slash-based parts need colon before year
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 10
+### Files Changed in Session 11
 
-- Parser: lib/pubid_new/iso/parser.rb (language A-Za-z, language.maybe on supplements)
-- Builder: lib/pubid_new/iso/builder.rb (language on supplements, subpart extraction, removed invalid require)
-- Base: lib/pubid_new/iso/identifiers/base.rb (subpart rendering with dash)
-- Commits: 2 semantic commits (language codes, subpart support)
-- Test improvement: 945→1,030 passing (+85), 1,080→1,016 failing (-64)
-- Pass rate: 33.1% → 36.0% (+2.9pp)
+- Parser: lib/pubid_new/iso/parser.rb (added stages, UNDP, stage_iteration_prefix, space normalization)
+- Builder: lib/pubid_new/iso/builder.rb (Stage.abbr, stage iteration handling, subpart joining, removed invalid require)
+- Base: lib/pubid_new/iso/identifiers/base.rb (stage.abbr for rendering)
+- Commits: 3 semantic commits (stage parsing, stage iteration, subpart extraction)
+- Test improvement: 1,030→1,059 passing (+29), 1,016→987 failing (-29)
+- Pass rate: 36.0% → 37.0% (+1.0pp)
 
-### Session 10 Key Achievements
+### Session 11 Key Achievements
 
-1. **High-impact fixes**: Language codes affected ~79 tests, subpart ~6 tests
-2. **Comprehensive language support**: Both uppercase (E/F/R) and lowercase (en/fr/ru) codes
-3. **Supplement language handling**: Proper preservation via original_code pattern
-4. **Subpart implementation**: Complete parser→builder→rendering pipeline
-5. **Efficient session**: Achieved +2.9pp improvement in focused 90-minute session
-6. **Clean commits**: Two well-documented semantic commits tracking progress
+1. **Highest-impact fix**: Stage parsing affected ~23 tests (DIS, FDIS, FCD, preCD, PWI, NP, AWI, WD, CD, PRF)
+2. **Architecture fix**: Corrected Stage component API from .value to .abbr
+3. **UNDP copublisher**: Enabled ISO/UNDP identifier parsing
+4. **Stage iterations**: CD2, PreCD3 now parse and render correctly
+5. **Sub-subpart support**: Multi-level parts like 5-1-1 now extract correctly
+6. **Clean commits**: Three well-documented semantic commits tracking specific fixes
+7. **Steady progress**: +1.0pp improvement maintaining momentum from Session 10
