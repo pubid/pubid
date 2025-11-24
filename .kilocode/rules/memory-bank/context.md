@@ -20,23 +20,23 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 13 - ISO V2 Stage Normalization & Parser Fixes):**
-- ✅ **Phase 1: Stage Normalization** (+2 tests, 1,223→1,225 passing)
-  - Added `normalize_stage_abbr()` method in builder
-  - NWIP (New Work Item Proposal) now renders as NP (New Proposal)
-  - PreCD/PRECD now renders as preCD (lowercase 'pre')
-  - Fixes 2 rendering inconsistencies
-- ✅ **Phase 2: Legacy Part Fix** (+7 tests, 1,225→1,232 passing)
-  - Added negative lookahead in `legacy_part` parser rule
-  - Prevents supplement keywords (Cor, Amd, Add, etc.) from being parsed as parts
-  - Allows base documents without year to have supplements: `ISO 10360-1/Cor 1:2002`
-  - Preserves legacy slash-part pattern: `ISO 31/0-1974`
-- ✅ **Results**: 1,232 passing (43.1%), 855 failing (29.9%), 772 pending (27.0%)
-- ✅ **Progress**: +9 tests (+0.3pp), -6 failures, -3 pending from Session 12
-- ✅ Two focused commits: Stage normalization, legacy part fix
+**Latest Session (Session 14 - ISO V2 Corrigendum Typed Stages & Supplement Iteration):**
+- ✅ **Corrigendum Typed Stages** (+14 tests initial improvement)
+  - Added missing typed stage patterns to parser: `FDCor`, `DCor`, `pDCOR`
+  - Updated `legacy_part` negative lookahead to prevent typed stages from being parsed as parts
+  - Now handles: `ISO/IEC 14496-12/DCor 1`, `ISO/IEC 14496-12/FDCor 1`, `ISO/IEC 10646-1:1993/pDCOR 2`
+- ✅ **Supplement Iteration Support** (+66 tests additional improvement)
+  - Added iteration support for all supplement patterns (`.3` after supplement number)
+  - Handles patterns like `DCor 1.3:2002`, `FDCor 2.3`, and special `pDCOR.2` syntax
+  - Three parser patterns added: typed stage with iteration only, with number+iteration, and existing patterns
+- ✅ **Results**: 1,312 passing (45.9%), 799 failing (27.9%), 748 pending (26.2%)
+- ✅ **Progress**: +80 tests (+2.8pp), -56 failures (-2.0pp), -24 pending (-0.8pp) from Session 13
+- ✅ **Exceeded target**: Goal was 45.0% (1,287), achieved 45.9% (1,312) - **+25 tests over target**
+- ✅ Single focused commit: Corrigendum typed stages and supplement iteration
 - ✅ Clean architecture: All fixes maintain core test suite (106/106 passing)
 
 **Previous Sessions:**
+- Session 13: Stage normalization (NWIP→NP), legacy part fix → 1,232 passing (+9)
 - Session 12: API compatibility, supplement patterns (DAmd, FDAmd, stage+supplement) → 1,223 passing (+164)
 - Session 11: Stage parsing, UNDP copublisher, stage iterations → 1,059 passing (+29)
 - Session 10: Language codes (uppercase/lowercase) + subpart support → 1,030 passing (+85)
@@ -51,33 +51,29 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Next Steps
 
-**Immediate Priorities (Session 14):**
+**Immediate Priorities (Session 15):**
 
-1. **Remaining parse failures** (~640 tests estimated)
-   - Continue systematic failure analysis of corrigendum patterns
-   - Focus on typed stage variants: DCOR, FDCOR, FCOR, pDCOR
-   - Handle iteration in supplements: `FDCor 2.3`, `DCor 1.3:2002`
-   - Target 45% pass rate (1,287 passing, +55 tests)
+1. **Remaining parse failures** (~620 tests estimated)
+   - Continue systematic failure analysis
+   - Focus on remaining supplement iteration edge cases
+   - Investigate edition with language patterns: `ED1(fr)`, `ED5`
+   - Target 48% pass rate (1,372 passing, +60 tests)
 
-2. **Rendering differences** (~200 tests estimated)
-   - Edition with language: `ED1(fr)`, `ED5`
-   - Multi-level supplement rendering
+2. **Rendering differences** (~180 tests estimated)
+   - Multi-level supplement rendering improvements
+   - Edition rendering with `with_edition` parameter
    - Continue pattern-based fixes
 
 **Near-Term Goals:**
 
-1. Achieve 45% ISO test pass rate (1,287/2,859 passing) - Target for Session 14
-2. Achieve 50% ISO test pass rate (1,430/2,859 passing) - Next milestone
+1. Achieve 48% ISO test pass rate (1,372/2,859 passing) - Target for Session 15
+2. Achieve 50% ISO test pass rate (1,430/2,859 passing) - Next major milestone
 3. Resolve high-impact rendering differences
-4. Document architectural differences (typed_stage, with_edition parameter)
-5. Apply migration pattern to other partial flavors
-
-**Long-Term Vision:**
-
-1. Complete all flavor migrations to V2
-2. Deprecate V1 code (`gems/` folder)
-3. Rename `lib/pubid_new/` → `lib/pubid/`
-4. Release V2 as major version bump
+4. Complete all flavor migrations to V2 server-side VM code
+5. Apply migration pattern to remaining flavors: ETSI, ITU, CCSDS
+6. Complete V2 BSI migration
+7. Complete V2 NIST/CEN compliance
+8. Update migrator to handle multi-version migrations
 
 ### Active Development Areas
 
@@ -87,25 +83,24 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Known Issues
 
-- ISO: 855 test failures (29.9%) - parser gaps + rendering differences
-- ISO: 772 pending tests (27.0%) - includes typed_stage architectural differences
+- ISO: 799 test failures (27.9%) - parser gaps + rendering differences
+- ISO: 748 pending tests (26.2%) - includes typed_stage architectural differences
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 13
+### Files Changed in Session 14
 
-- Builder: lib/pubid_new/iso/builder.rb (stage normalization method)
-- Parser: lib/pubid_new/iso/parser.rb (legacy_part negative lookahead)
-- Commits: 2 semantic commits (stage normalization, legacy part fix)
-- Test improvement: 1,223→1,232 passing (+9), 861→855 failing (-6)
-- Pass rate: 42.8% → 43.1% (+0.3pp)
+- Parser: lib/pubid_new/iso/parser.rb (typed stages, legacy_part, supplement iteration)
+- Commits: 1 semantic commit (corrigendum typed stages and supplement iteration)
+- Test improvement: 1,232→1,312 passing (+80), 855→799 failing (-56)
+- Pass rate: 43.1% → 45.9% (+2.8pp)
 
-### Session 13 Key Achievements
+### Session 14 Key Achievements
 
-1. **Stage normalization working**: NWIP→NP and PreCD→preCD render correctly
-2. **Legacy part ambiguity resolved**: Supplements no longer mistaken for parts
-3. **Base documents without year**: Can now have supplements (common pattern)
-4. **Maintained code quality**: Core test suite (106/106) passes throughout
-5. **Incremental progress**: Small but solid improvements (+9 tests)
-6. **Clean commits**: Each fix in its own semantic commit
-7. **Foundation for Session 14**: Corrigendum patterns now accessible for fixing
+1. **Typed stage variants working**: FDCor, DCor, pDCOR now parse correctly
+2. **Supplement iteration implemented**: Handles `.3` after supplement numbers
+3. **Special pDCOR.2 syntax**: Typed stage with iteration but no supplement number
+4. **Legacy part protection extended**: All corrigendum typed stages prevented from part parsing
+5. **Exceeded session target**: 45.9% achieved vs 45.0% goal (+25 tests over target)
+6. **Strong improvement rate**: +80 tests (+2.8pp) in single session
+7. **Foundation for Session 15**: Iteration patterns working, ready for edge cases
