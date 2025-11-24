@@ -8,17 +8,6 @@ require_relative "identifiers/guide"
 require_relative "identifiers/technical_report"
 require_relative "identifiers/technical_specification"
 require_relative "identifiers/amendment"
-require_relative "identifiers/corrigendum"
-require_relative "identifiers/supplement"
-require_relative "identifiers/extract"
-require_relative "identifiers/data"
-require_relative "identifiers/pas"
-require_relative "identifiers/technology_trends_assessments"
-require_relative "identifiers/international_workshop_agreement"
-require_relative "identifiers/international_standardized_profile"
-require_relative "identifiers/directives"
-require_relative "identifiers/directives_supplement"
-require_relative "identifiers/recommendation"
 
 module PubidNew
   module Iso
@@ -379,9 +368,10 @@ module PubidNew
           result[:part] =
             ::PubidNew::Components::Code.new(value: parts.first)
         end
-        if parts[1]
+        # Subpart is everything after first part, joined with dashes
+        if parts.length > 1
           result[:subpart] =
-            ::PubidNew::Components::Code.new(value: parts[1])
+            ::PubidNew::Components::Code.new(value: parts[1..-1].join("-"))
         end
         result
       end
