@@ -69,7 +69,7 @@ module PubidNew
             part: number_data[:part],
             subpart: number_data[:subpart],
             date: nil, # Date goes on supplement, not base
-            stage: stage_str ? ::PubidNew::Components::Stage.new(value: stage_str) : nil,
+            stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: stage_str) : nil,
             stage_iteration: base_data[:iteration] ? ::PubidNew::Components::Code.new(value: base_data[:iteration]&.to_s) : nil,
             languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
           )
@@ -102,7 +102,7 @@ module PubidNew
           subpart: number_data[:subpart],
           date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
           edition: base_data[:edition] ? build_edition(base_data[:edition]) : nil,
-          stage: stage_str ? ::PubidNew::Components::Stage.new(value: stage_str) : nil,
+          stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: stage_str) : nil,
           stage_iteration: base_data[:iteration] ? ::PubidNew::Components::Code.new(value: base_data[:iteration]&.to_s) : nil,
           languages: base_data[:language] ? [::PubidNew::Components::Language.new(original_code: base_data[:language]&.to_s)] : nil,
         )

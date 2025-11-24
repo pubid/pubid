@@ -21,15 +21,15 @@ module PubidNew
           result = publisher.to_s
 
           # Add stage if present
-          if stage&.value
-            result += publisher.has_copublisher? ? " #{stage.value}" : "/#{stage.value}"
+          if stage&.abbr
+            result += publisher.has_copublisher? ? " #{stage.abbr}" : "/#{stage.abbr}"
           end
 
           # Add type if present (TR, TS, Guide, PAS, DATA, TTA, R, ISP)
           # Type should display for all non-IS types
           if type&.abbr && type.abbr != "IS"
             # Separator: space after stage or copublisher, slash otherwise
-            has_prefix = stage&.value || publisher.has_copublisher?
+            has_prefix = stage&.abbr || publisher.has_copublisher?
             sep = has_prefix ? " " : "/"
             result += "#{sep}#{type.abbr}"
           end

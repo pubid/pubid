@@ -27,7 +27,7 @@ module PubidNew
       # Publisher with copublishers
       rule(:publisher) do
         iso.as(:publisher) >>
-          (slash >> (iec | ieee | sae | astm | cie | hl7 | oecd).as(:copublisher)).repeat(
+          (slash >> (iec | ieee | sae | astm | cie | hl7 | oecd | str("UNDP")).as(:copublisher)).repeat(
             0, 3
           )
       end
@@ -41,7 +41,10 @@ module PubidNew
 
       # Stage
       rule(:stage) do
-        (str("PRF") | str("NWIP") | str("WD") | str("CD") | str("AWI") | str("NP") | str("PWI")).as(:stage)
+        (str("preCD") | str("PreCD") | str("PRECD") |
+         str("FDIS") | str("DIS") | str("FCD") |
+         str("PRF") | str("NWIP") | str("WD") | str("CD") | str("AWI") | str("NP") | str("PWI")).as(:stage) >>
+        digits.maybe.as(:stage_iteration_prefix)
       end
 
       # Typed stages (combined stage+type)
@@ -163,6 +166,7 @@ module PubidNew
           .gsub(/–/, "/")                   # En-dash to slash
           .gsub(/\s+:/, ":")                # Whitespace around colons
           .gsub(/\s+\/\s+/, "/")            # Remove spaces around slashes (for supplements)
+          .gsub(/ISO\s+\//, "ISO/")         # Remove space before copublisher slash
           .gsub(/\/Add\.\s+/, "/Add ")      # Normalize "Add. " (with space) to "Add "
           .gsub(/\/Add\.(?!\d)/, "/Add")    # Normalize "Add." (without digit) to "Add"
 
