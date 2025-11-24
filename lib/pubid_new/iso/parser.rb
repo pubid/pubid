@@ -82,7 +82,7 @@ module PubidNew
       # Language (can be single letters or multi-letter codes, with slashes or commas)
       rule(:language) do
         str("(") >>
-          (match["A-Z"].repeat(1) >> (str("/") | str(",")).maybe).repeat(1).as(:language) >>
+          (match["A-Za-z"].repeat(1) >> (str("/") | str(",")).maybe).repeat(1).as(:language) >>
           str(")")
       end
 
@@ -98,7 +98,7 @@ module PubidNew
       rule(:supplement) do
         slash >> (
           # Pattern 1: Typed stage alone (FDAM implies Amd, FDCOR implies Cor)
-          (typed_stage.as(:typed_stage) >> (space >> digits).as(:supplement_number) >> year.maybe) |
+          (typed_stage.as(:typed_stage) >> (space >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
           # Pattern 2: Supplement type with number and optional year/language
           (supplement_type >> (space >> digits).as(:supplement_number) >> year.maybe >> language.maybe) |
           # Pattern 3: Supplement type without number
