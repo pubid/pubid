@@ -20,22 +20,24 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Recent Changes
 
-**Latest Session (Session 12 - ISO V2 API Compatibility & Supplement Patterns):**
-- ✅ **Phase 1: Quick Wins** (+10 tests, 1,069→1,079 passing)
-  - Added `.value` alias to Edition component for V1 API compatibility
-  - Added `.copublishers` convenience method to Base identifier
-  - Fixed legacy date rendering: `ISO 31/0-1974` now renders as `ISO 31-0:1974`
-  - Fixed parser part rule to not capture 4-digit years as parts
-- ✅ **Phase 2: Supplement Pattern Fixes** (+154 tests, 1,079→1,223 passing)
-  - Added lowercase typed stage variants: `DAmd`, `FDAmd`, `PDAmd`
-  - Added stage+space+supplement patterns: `CD Amd`, `PWI Amd`, `AWI Amd`, `WD Amd`, `PRF Amd`
-  - Fixed `Amd.` parsing to handle no space before number: `Amd.1`, `Amd.2`
-- ✅ **Results**: 1,223 passing (42.8%), 861 failing (30.1%), 775 pending (27.1%)
-- ✅ **Progress**: +164 tests (+5.8pp), -126 failures, -38 pending from Session 11
-- ✅ **Exceeded target**: 40% target achieved, reached 42.8%
-- ✅ Two focused commits: API compatibility, supplement patterns
+**Latest Session (Session 13 - ISO V2 Stage Normalization & Parser Fixes):**
+- ✅ **Phase 1: Stage Normalization** (+2 tests, 1,223→1,225 passing)
+  - Added `normalize_stage_abbr()` method in builder
+  - NWIP (New Work Item Proposal) now renders as NP (New Proposal)
+  - PreCD/PRECD now renders as preCD (lowercase 'pre')
+  - Fixes 2 rendering inconsistencies
+- ✅ **Phase 2: Legacy Part Fix** (+7 tests, 1,225→1,232 passing)
+  - Added negative lookahead in `legacy_part` parser rule
+  - Prevents supplement keywords (Cor, Amd, Add, etc.) from being parsed as parts
+  - Allows base documents without year to have supplements: `ISO 10360-1/Cor 1:2002`
+  - Preserves legacy slash-part pattern: `ISO 31/0-1974`
+- ✅ **Results**: 1,232 passing (43.1%), 855 failing (29.9%), 772 pending (27.0%)
+- ✅ **Progress**: +9 tests (+0.3pp), -6 failures, -3 pending from Session 12
+- ✅ Two focused commits: Stage normalization, legacy part fix
+- ✅ Clean architecture: All fixes maintain core test suite (106/106 passing)
 
 **Previous Sessions:**
+- Session 12: API compatibility, supplement patterns (DAmd, FDAmd, stage+supplement) → 1,223 passing (+164)
 - Session 11: Stage parsing, UNDP copublisher, stage iterations → 1,059 passing (+29)
 - Session 10: Language codes (uppercase/lowercase) + subpart support → 1,030 passing (+85)
 - Session 9: Systematic failure analysis, Add/Addendum rendering → 945 passing (+17)
@@ -49,20 +51,22 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Next Steps
 
-**Immediate Priorities (Session 13):**
+**Immediate Priorities (Session 14):**
 
-1. **Remaining parse failures** (~650 tests estimated)
-   - Continue systematic failure analysis
-   - Focus on high-frequency patterns
-   - Target 45% pass rate (1,287 passing)
+1. **Remaining parse failures** (~640 tests estimated)
+   - Continue systematic failure analysis of corrigendum patterns
+   - Focus on typed stage variants: DCOR, FDCOR, FCOR, pDCOR
+   - Handle iteration in supplements: `FDCor 2.3`, `DCor 1.3:2002`
+   - Target 45% pass rate (1,287 passing, +55 tests)
 
 2. **Rendering differences** (~200 tests estimated)
-   - Type/stage combinations
+   - Edition with language: `ED1(fr)`, `ED5`
+   - Multi-level supplement rendering
    - Continue pattern-based fixes
 
 **Near-Term Goals:**
 
-1. Achieve 45% ISO test pass rate (1,287/2,859 passing) - Target for Session 13
+1. Achieve 45% ISO test pass rate (1,287/2,859 passing) - Target for Session 14
 2. Achieve 50% ISO test pass rate (1,430/2,859 passing) - Next milestone
 3. Resolve high-impact rendering differences
 4. Document architectural differences (typed_stage, with_edition parameter)
@@ -83,27 +87,25 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Known Issues
 
-- ISO: 861 test failures (30.1%) - parser gaps + rendering differences
-- ISO: 775 pending tests (27.1%) - includes typed_stage architectural differences
+- ISO: 855 test failures (29.9%) - parser gaps + rendering differences
+- ISO: 772 pending tests (27.0%) - includes typed_stage architectural differences
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 12
+### Files Changed in Session 13
 
-- Edition component: lib/pubid_new/components/edition.rb (added .value alias)
-- Base identifier: lib/pubid_new/iso/identifiers/base.rb (added .copublishers method)
-- Parser: lib/pubid_new/iso/parser.rb (typed stages, supplement patterns, part rule fix)
-- Commits: 2 semantic commits (API compatibility, supplement patterns)
-- Test improvement: 1,059→1,223 passing (+164), 987→861 failing (-126)
-- Pass rate: 37.0% → 42.8% (+5.8pp)
+- Builder: lib/pubid_new/iso/builder.rb (stage normalization method)
+- Parser: lib/pubid_new/iso/parser.rb (legacy_part negative lookahead)
+- Commits: 2 semantic commits (stage normalization, legacy part fix)
+- Test improvement: 1,223→1,232 passing (+9), 861→855 failing (-6)
+- Pass rate: 42.8% → 43.1% (+0.3pp)
 
-### Session 12 Key Achievements
+### Session 13 Key Achievements
 
-1. **Exceeded 40% target**: Reached 42.8% pass rate (+5.8pp improvement)
-2. **API compatibility**: Added .value and .copublishers for V1 compatibility
-3. **Legacy date fix**: Slash-based parts now render with colon before year
-4. **Supplement patterns**: Added lowercase typed stages (DAmd, FDAmd, PDAmd)
-5. **Stage+supplement**: CD Amd, PWI Amd patterns now parse correctly
-6. **Amd. without space**: Amd.1 pattern now works
-7. **Largest single improvement**: +154 tests from supplement pattern fixes
-8. **Clean architecture**: All fixes maintain core test suite (106/106 passing)
+1. **Stage normalization working**: NWIP→NP and PreCD→preCD render correctly
+2. **Legacy part ambiguity resolved**: Supplements no longer mistaken for parts
+3. **Base documents without year**: Can now have supplements (common pattern)
+4. **Maintained code quality**: Core test suite (106/106) passes throughout
+5. **Incremental progress**: Small but solid improvements (+9 tests)
+6. **Clean commits**: Each fix in its own semantic commit
+7. **Foundation for Session 14**: Corrigendum patterns now accessible for fixing
