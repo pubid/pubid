@@ -118,8 +118,10 @@ Each flavor follows similar patterns adapted to its needs.
 
 #### 2. TYPED_STAGES Pattern
 
+**NOTE**: This pattern is used by **ISO, IEC, CEN (EN), and BSI flavors ONLY**. Other flavors (NIST, IEEE, JIS, ITU, CCSDS, etc.) use different type/stage systems appropriate to their standards.
+
 ```ruby
-# ✅ CORRECT: Array of TypedStage objects
+# ✅ CORRECT: Array of TypedStage objects (ISO, IEC, CEN, BSI)
 class Amendment < SupplementIdentifier
   TYPED_STAGES = [
     TypedStage.new(abbr: ["Amd"], stage_code: "published"),
