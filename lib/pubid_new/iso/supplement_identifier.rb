@@ -10,10 +10,11 @@ module PubidNew
         [].tap do |parts|
           parts << [
             base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition),
-            "/#{typed_stage.abbreviation}",
+            "/#{with_edition ? typed_stage.canonical_abbreviation : typed_stage.abbreviation}",
           ].join('')
           # Only add space if abbreviation doesn't end with a period
-          parts << (typed_stage.abbreviation.end_with?('.') ? '' : ' ')
+          abbr_to_use = with_edition ? typed_stage.canonical_abbreviation : typed_stage.abbreviation
+          parts << (abbr_to_use.end_with?('.') ? '' : ' ')
           parts << number_portion(lang_single: lang_single)
 
           parts << ' ' + edition_portion(lang: lang) if with_edition && edition&.number

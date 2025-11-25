@@ -33,6 +33,11 @@ module PubidNew
         original_abbr || abbr.first
       end
 
+      # Returns the canonical (normalized) abbreviation, always abbr.first
+      def canonical_abbreviation
+        abbr.first
+      end
+
     end
   end
 end
