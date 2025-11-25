@@ -2,21 +2,148 @@
 
 The project is in the middle of a **V2 architecture migration** from legacy V1 code to a clean MODEL-DRIVEN implementation using Lutaml::Model.
 
-### Current State (November 2025)
+## Current Status (Session 19 Complete)
 
-**Completed Flavors (100%):**
-- ISO: 7,114/7,114 tests (full implementation with 16 identifier types)
-- IEC: 13,824/13,824 tests (22 identifier types, wrapper patterns)
-- JIS: 10,635/10,635 tests (Japanese character normalization)
-- ETSI: 24,718/24,718 tests (single parameterized class for 15 types)
-- ITU: 2,041/2,041 tests (3 sectors, multiple series)
-- CCSDS: 490/490 tests (space data systems)
+**Test Results:**
+- 1,663 passing (58.2%) - **+15 from Session 18!**
+- 819 failures (28.6%)
+- 377 pending (13.2%)
+- Total: 2,859 examples
+- Core tests: 126/126 passing ✅
 
-**Partial Implementations:**
-- NIST: Parser at 98.47% (19,191/19,488), builder complete
-- IEEE: Parser at 100% (35/35 test cases), handles complex patterns
-- BSI: ~94% estimated (enhanced parser)
-- CEN: ~94% estimated (enhanced parser)
+**Recent Progress:**
+- Session 15: +4 tests (0.1pp) ⚠️ (speculative approach)
+- Session 16: +104 tests (3.6pp) 🎉 (data-driven approach)
+- Session 17: 0 tests (analysis session)
+- Session 18: +228 tests (7.9pp) 🎊 (data-driven Pattern B fix)
+- Session 19: +15 tests (0.5pp) ✅ (pending marker removal + Guide rendering)
+
+**Milestones Achieved:**
+- ✅ 50% milestone (target: 1,430) → Achieved 1,439 (50.3%)
+- ✅ 55% milestone → Achieved 1,648 (57.6%) in Session 18
+- 🎯 60% milestone (target: 1,715) → **Only +52 tests needed!**
+
+## Session 19 Summary
+
+**What Was Done:**
+
+1. **Phase 1: Removed Pending Markers** (10 minutes)
+   - Removed 209 `pending 'typed_stage removed in V2 architecture'` lines
+   - Revealed true baseline: 1,648 passing (57.6%)
+   - Affected 17 identifier spec files
+   - Result: Clean test output showing actual pass rate
+
+2. **Phase 2: Fixed Guide Rendering** (30 minutes)
+   - Enhanced [`Guide#to_s`](lib/pubid_new/iso/identifiers/guide.rb:88) method
+   - Added all missing components: stage, part, subpart, iteration, edition, languages
+   - Fixed missing "/" separator before "Guide"
+   - Fixed missing stage prefixes (NP, CD, DIS, etc.)
+   - Result: +15 tests (137→123 failures in Guide)
+
+**Key Discoveries:**
+
+1. **typed_stage API Dominance**: ~500+ failures across all identifier types are `typed_stage` accessor calls (V2 architectural difference, not fixable)
+
+2. **CombinedIdentifier Complexity**: 45 test failures for joint identifiers (e.g., "ISO 4214:2022 | IDF/RM 254:2022")
+   - Requires new class implementation
+   - Parser changes for "|" separator
+   - IDF namespace integration
+   - Estimated 3-4 hours of work
+   - Not a quick win
+
+3. **Rendering Patterns Limited**: Most rendering issues already fixed or are typed_stage-related
+
+**Files Modified:**
+- [`lib/pubid_new/iso/identifiers/guide.rb`](lib/pubid_new/iso/identifiers/guide.rb:1): Complete to_s implementation
+- `spec/`: Removed 701 lines of pending markers across 17 files
+
+**Commit:** `3ef3e24` - "fix(iso): improve Guide rendering and remove pending markers"
+
+## Next Steps
+
+### Immediate Priority: Reach 60% Milestone (Session 20)
+
+**Target**: 1,715 passing (60.0%) - **Only +52 tests needed from 1,663!**
+
+**Time Budget**: 60-90 minutes max
+
+**Strategy**: Focus on small, high-impact attribute-level fixes
+
+### Recommended Approaches for +52 Tests
+
+**Approach A: Identify Micro-Patterns** (30-40 tests estimated)
+- Analyze remaining 819 failures for repeated small issues
+- Look for missing attribute assignments in Builder
+- Check for rendering edge cases in other identifier types
+- Examples: missing language handling, edition formatting, part rendering
+
+**Approach B: Fix Specific Identifier Classes** (20-30 tests estimated)
+- Check other identifier classes with custom to_s overrides
+- Technical Report (39 failures)
+- Technical Specification (35 failures)
+- Pas (32 failures)
+- May have similar issues to Guide
+
+**Approach C: Analyze Parse Success but Attribute Mismatch** (10-20 tests estimated)
+- Tests that parse successfully but have wrong attribute values
+- Likely Builder or component initialization issues
+- Higher success rate than parser-level fixes
+
+### Analysis Commands for Session 20
+
+```bash
+# Get attribute failure patterns (excluding typed_stage and parse failures)
+bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
+  grep "Failure/Error:" | \
+  grep -v "typed_stage" | \
+  grep -v "Failed to parse" | \
+  grep -v "undefined method \`parse'" | \
+  sort | uniq -c | sort -rn | head -20
+
+# Check specific identifier types for rendering issues
+for type in technical_report technical_specification pas; do
+  echo "=== $type ==="
+  bundle exec rspec spec/pubid_new/iso/identifiers/${type}_spec.rb 2>&1 | \
+    grep -A 5 "Failure/Error: expect(parsed.to_s)" | head -20
+done
+
+# Find attribute mismatches
+bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
+  grep -B 3 "expected:" | \
+  grep -v "typed_stage" | \
+  head -50
+```
+
+### What to Avoid
+
+❌ **Don't:**
+- Attempt CombinedIdentifier implementation (too complex, 3-4 hours)
+- Try to "fix" typed_stage API issues (architectural difference)
+- Make parser changes without clear parse failure evidence
+- Chase parse-level failures (367 tests, parser architecture work)
+
+✅ **Do:**
+- Focus on attribute-level fixes
+- Target small, repeatable patterns
+- Use data-driven analysis
+- Verify core tests (126/126) after each change
+- Make incremental commits
+
+### Success Criteria
+
+- ✅ **PASS**: Reach 1,715+ passing (60%+)
+- ⚠️ **MIXED**: +30-51 tests (progress but need one more push)
+- ❌ **FAIL**: <30 tests (strategy needs major revision)
+
+### Post-60% Strategy (Sessions 21+)
+
+Once 60% achieved:
+
+1. **65% Milestone** (1,858 passing) - ~143 more tests
+2. **Path to 70%** (2,001 passing) - Major psychological barrier
+3. **Parser Enhancement Phase** - Address parse failures systematically
+4. **CombinedIdentifier Implementation** - When ready for 3-4 hour task
+5. **80% Target** - Long-term goal for Sessions 20-30
 
 ### Recent Changes
 
@@ -174,6 +301,6 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 2. **Pattern 1 (DAD) false positive**: Already fully implemented in both parser and Addendum.TYPED_STAGES
 3. **Pattern 4 requires parser changes**: "ISO/IEC FDIS 23008-1/WD Amd 1" has never parsed
 4. **Speculative approach is counterproductive**: Builder-only fix for parser issue made things worse
-5. **Data-driven validation**: Session 16 approach 26x better than Session 15 speculation
+5. **Data-driven validation**: Session 16 approach 26x better than Session 15 specification
 6. **Next target identified**: Pattern B (stage code preservation) ~100 tests, attribute-level fix
 7. **50% within easy reach**: Only +10 tests needed, clear path via attribute fixes

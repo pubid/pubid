@@ -34,10 +34,18 @@ module PubidNew
         if typed_stage&.abbreviation && !typed_stage.abbreviation.empty?
           separator = publisher&.has_copublisher? ? " " : "/"
           pub_str += "#{separator}#{typed_stage.abbreviation}"
-        # Otherwise add type if present (e.g., TR, TS, PAS, etc.)
-        elsif type&.abbr && type.abbr != "IS"
-          separator = publisher&.has_copublisher? ? " " : "/"
-          pub_str += "#{separator}#{type.abbr}"
+        else
+          # Add stage if present (e.g., PWI, NP, AWI, WD, CD)
+          if stage&.abbr
+            separator = publisher&.has_copublisher? ? " " : "/"
+            pub_str += "#{separator}#{stage.abbr}"
+          end
+
+          # Add type if present (e.g., TR, TS, PAS)
+          if type&.abbr && type.abbr != "IS"
+            separator = (stage&.abbr || publisher&.has_copublisher?) ? " " : "/"
+            pub_str += "#{separator}#{type.abbr}"
+          end
         end
 
         pub_str
@@ -47,6 +55,7 @@ module PubidNew
         parts = []
         parts << number.value if number&.value
         parts << "-#{part.value}" if part&.value
+        parts << "-#{subpart.value}" if subpart&.value
         result = parts.join
         result += ".#{stage_iteration.value}" if stage_iteration&.value
         result += ":#{date.year}" if date&.year
