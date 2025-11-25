@@ -1,25 +1,24 @@
-# Session 23+ Continuation Plan: ISO Builder Architecture & Test Improvements
+# Session 24+ Continuation Plan: ISO Builder Architecture & Test Improvements
 
 ## Critical Context - READ THIS FIRST
 
-**Session 22 restored the clean Builder architecture** that was corrupted in previous sessions. The ISO Builder now follows the 5 core principles documented in `.kilocode/rules/memory-bank/architecture.md`.
+**Session 23 successfully fixed copublisher handling** achieving 77.5% passing tests (+238 tests in one session). The ISO Builder continues to follow the 5 core principles documented in `.kilocode/rules/memory-bank/architecture.md`.
 
 **IMPORTANT**: The clean architecture uses **TYPED_STAGE REGISTER** as the single source of truth. Builder **NEVER** makes type/stage decisions - it only casts parsed data to domain objects.
 
-## Current State (Session 22 Complete)
+## Current State (Session 23 Complete)
 
 ### Test Results
 - **Total**: 2,859 examples
-- **Passing**: 1,978 (69.1%)
-- **Failing**: 504 (17.6%)
+- **Passing**: 2,216 (77.5%)
+- **Failing**: 266 (9.3%)
 - **Pending**: 377 (13.2%)
 
-### Session 22 Progress
-- Created ISO Scheme class with registry pattern
-- Fixed Builder component namespaces
-- Added API compatibility methods (.body, .value)
-- **Impact**: +696 tests fixed through API compatibility alone
-- **Net improvement**: +291 tests from Session 20 baseline (59.0% → 69.1%)
+### Session 23 Progress
+- Fixed copublisher object construction: +122 tests (69.1% → 73.5%)
+- Merged copublishers into Publisher object: +116 tests (73.5% → 77.5%)
+- **Total impact**: +238 tests in one session!
+- **Milestones**: ✅ 70% achieved, ✅ 75% achieved, approaching 80%
 
 ### Clean Architecture Verified ✅
 1. ✅ TYPED_STAGE REGISTER is source of truth
@@ -27,6 +26,44 @@
 3. ✅ Single cast() method for conversions
 4. ✅ Composite hash returns for related values
 5. ✅ Components render themselves
+
+## Session 23 Key Learnings
+
+### Copublisher Architecture Discovery
+
+The correct data structure is:
+- **Publisher object** has `copublisher: ["IEC", "IEEE"]` (array of strings)
+- **Identifier** has both:
+  - `publisher` - ONE Publisher object containing main + copublishers
+  - `copublishers` - array of Publisher objects (for special rendering)
+
+### Build-Time Data Transformation
+
+Some transformations should happen in `build()` before the `cast()` loop:
+
+```ruby
+# In build() method - merge copublishers into publisher
+if parsed_hash[:publisher] && parsed_hash[:copublishers]
+  copublisher_strings = parsed_hash[:copublishers].map { |cp| cp[:copublisher] }
+  parsed_hash[:publisher] = {
+    publisher: parsed_hash[:publisher],
+    copublisher: copublisher_strings
+  }
+end
+```
+
+Then in cast():
+```ruby
+when :publisher, :directives_supplement_body, :supplement_publisher
+  if value.is_a?(Hash)
+    PubidNew::Iso::Components::Publisher.new(
+      publisher: value[:publisher],
+      copublisher: value[:copublisher]
+    )
+  else
+    PubidNew::Iso::Components::Publisher.new(publisher: value)
+  end
+```
 
 ## The 5 Core Principles (NEVER VIOLATE)
 
@@ -226,6 +263,19 @@ When you see "Failed to parse", it means:
 
 **Strategy**: Document failing patterns, then decide if parser enhancement is worth the effort vs. expected test gain.
 
+## Success Metrics
+
+### Session 24 Goals:
+- 🎯 **TARGET**: 2,287+ passing (80%+) through rendering + parser fixes
+- ✅ **GOOD**: 2,200-2,287 passing (77%-80%)
+- ⚠️ **MIXED**: 2,150-2,200 passing (need different approach)
+
+### Long-term Targets:
+- ✅ **70% (2,001 passing)**: ACHIEVED in Session 23
+- ✅ **75% (2,144 passing)**: EXCEEDED in Session 23 (2,216 = 77.5%)
+- 🎯 **80% (2,287 passing)**: Next major milestone (+71 tests needed)
+- **85% (2,430 passing)**: Long-term goal, may require parser architecture work
+
 ## Testing Strategy
 
 ### Always Follow This Process:
@@ -241,35 +291,23 @@ When you see "Failed to parse", it means:
 ```bash
 # 1. Baseline
 bundle exec rspec spec/pubid_new/iso/ | grep "examples,"
-# => 2859 examples, 504 failures, 377 pending
+# => 2859 examples, 266 failures, 377 pending
 
 # 2. Make focused change
 # ... edit one file with one fix
 
 # 3. Test
 bundle exec rspec spec/pubid_new/iso/ | grep "examples,"
-# => 2859 examples, 400 failures, 377 pending  (+104 tests!)
+# => 2859 examples, 240 failures, 377 pending  (+26 tests!)
 
 # 4. Commit
 git add -A
-git commit -m "fix(iso): proper copublisher object construction
+git commit -m "fix(iso): handle edition rendering in to_s
 
-Builder now creates Publisher objects instead of strings.
+Updated identifier rendering to include edition properly.
 
-Impact: +104 tests (69.1% → 72.7%)"
+Impact: +26 tests (77.5% → 78.4%)"
 ```
-
-## Success Metrics
-
-### Session 23 Goals:
-- ✅ **PASS**: 2,000+ passing (70%+) with copublisher fix
-- ⚠️ **MIXED**: 1,950-2,000 passing (need one more pattern)
-- ❌ **FAIL**: <1,950 passing (strategy needs revision)
-
-### Long-term Targets:
-- **75% (2,144 passing)**: 3-4 sessions, systematic fixes
-- **80% (2,287 passing)**: 6-8 sessions, may need parser work
-- **85% (2,430 passing)**: Major milestone, parser architecture
 
 ## Architecture Reference
 
@@ -353,6 +391,7 @@ bundle exec rspec spec/pubid_new/iso/parser_spec.rb
 
 **Clean architecture commit**: `05581a336fc770796b873e538c058a520d645b12`
 **Session 22 completion**: `fd3b590` - feat(iso): create Scheme and fix Builder architecture
+**Session 23 completion**: `57807ca` - fix(iso): merge copublishers into Publisher object
 
 ## Key Reminders
 
@@ -367,12 +406,12 @@ bundle exec rspec spec/pubid_new/iso/parser_spec.rb
 **Good Session Example**:
 ```
 1. Read memory bank files
-2. Run baseline tests (2859 examples, 504 failures)
-3. Analyze top failure pattern (copublisher)
-4. Read relevant code (Publisher component, Builder cast)
-5. Understand data structure needed
-6. Make focused fix (Builder copublisher handling)
-7. Test (2859 examples, 400 failures) +104!
+2. Run baseline tests (2859 examples, 266 failures)
+3. Analyze top failure pattern (rendering)
+4. Read relevant code (identifier to_s methods)
+5. Understand rendering issue
+6. Make focused fix (attribute rendering)
+7. Test (2859 examples, 240 failures) +26!
 8. Commit with semantic message
 9. Analyze next pattern
 10. Repeat with second fix if time permits
@@ -392,8 +431,16 @@ bundle exec rspec spec/pubid_new/iso/parser_spec.rb
 ## Final Notes
 
 - **Session 22 was successful** because it fixed infrastructure (Scheme) and API compatibility
-- **The architecture is now clean** - all future work should preserve this
-- **Copublisher fix is the next low-hanging fruit** with highest expected impact
-- **IEC migration** should wait until ISO is 75%+ and patterns are clear
+- **Session 23 was successful** because it understood copublisher data architecture
+- **The architecture is clean** - all future work should preserve this
+- **Rendering fixes are next low-hanging fruit** with expected impact of +20-40 tests
+- **IEC migration** should wait until ISO is 80%+ and patterns are clear
 
-Good luck with Session 23!
+## Session 23 Key Learnings
+
+1. **Copublisher architecture**: Single Publisher object with internal copublisher collection, plus separate copublishers array for special rendering
+2. **Build-time merging**: Some data structure transformation should happen in build() before the cast() loop
+3. **Incremental wins**: Two focused fixes gained 238 tests
+4. **Trust the architecture**: Clean Builder principles guided both fixes
+
+Good luck with Session 24!

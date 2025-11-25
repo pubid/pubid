@@ -2,113 +2,100 @@
 
 The project is in the middle of a **V2 architecture migration** from legacy V1 code to a clean MODEL-DRIVEN implementation using Lutaml::Model.
 
-## Current Status (Session 22 Complete)
+## Current Status (Session 23 Complete)
 
 **Test Results:**
-- 1,978 passing (69.1%) - **+291 from Session 20, +696 from API fixes**
-- 504 failures (17.6%)
+- 2,216 passing (77.5%) - **+238 from Session 22, +238 in one session!**
+- 266 failures (9.3%)
 - 377 pending (13.2%)
 - Total: 2,859 examples
 
-**Session 22 Achievement:**
-- Created ISO Scheme class with TYPED_STAGE registry
-- Fixed Builder component namespaces (ISO vs shared)
-- Added API compatibility methods (.body, .value)
-- Impact: +696 tests from API fixes alone 🎊
-- Net improvement: +291 tests (59.0% → 69.1%)
+**Session 23 Achievement:**
+- Fixed copublisher object construction (+122 tests)
+- Merged copublishers into Publisher object (+116 tests)
+- Impact: +238 tests in a single session! 🎊🎊
+- Progress: 69.1% → 77.5% (+8.4pp)
 
 **Milestones:**
 - ✅ 50% milestone (target: 1,430) → Achieved 1,648 (57.6%) in Session 18
 - ✅ 55% milestone → Achieved 1,648 (57.6%) in Session 18
 - ✅ 60% milestone (target: 1,715) → Achieved 1,978 (69.1%) in Session 22
 - ✅ 65% milestone (target: 1,858) → Achieved 1,978 (69.1%) in Session 22
-- 🎯 70% milestone (target: 2,001) → **Only +23 tests needed!**
+- ✅ 70% milestone (target: 2,001) → **Achieved 2,216 (77.5%) in Session 23!**
+- ✅ 75% milestone (target: 2,144) → **Achieved 2,216 (77.5%) in Session 23!**
+- 🎯 80% milestone (target: 2,287) → **Only +71 tests needed!**
 
-## Session 22 Summary
+## Session 23 Summary
 
 **What Was Done:**
 
-1. **Phase 1: Create ISO Scheme Class** (30 minutes)
-   - Implemented registry pattern following JIS architecture
-   - Added `locate_typed_stage_by_abbr()` and `locate_identifier_klass_by_type_code()`
-   - Aggregates TYPED_STAGES from all 17 identifier classes
-   - File: [`lib/pubid_new/iso/scheme.rb`](lib/pubid_new/iso/scheme.rb:1) (80 lines, new)
+1. **Phase 1: Fix Copublisher Object Construction** (30 minutes)
+   - Changed Builder to create Publisher objects instead of strings
+   - Updated `:copublishers` case in cast() method
+   - Impact: +122 tests (69.1% → 73.5%)
+   - File: [`lib/pubid_new/iso/builder.rb`](lib/pubid_new/iso/builder.rb:142)
 
-2. **Phase 2: Fix Builder Namespaces** (30 minutes)
-   - Updated requires to use correct component paths
-   - Changed cast() to use proper namespaces
-   - ISO-specific: `PubidNew::Iso::Components::{Publisher,Code}`
-   - Shared: `PubidNew::Components::{Date,Edition,Language,Locality}`
-   - File: [`lib/pubid_new/iso/builder.rb`](lib/pubid_new/iso/builder.rb:1)
-
-3. **Phase 3: Add API Compatibility** (20 minutes)
-   - Added `.body` method to ISO Publisher (returns `.publisher`)
-   - Added `.value` method to ISO Code (returns `.number`)
-   - Impact: **+696 tests fixed instantly!**
-   - Files: [`publisher.rb`](lib/pubid_new/iso/components/publisher.rb:1), [`code.rb`](lib/pubid_new/iso/components/code.rb:1)
+2. **Phase 2: Merge Copublishers into Publisher Object** (30 minutes)
+   - Added build-time merging in build() method
+   - Modified cast() to handle both string and hash values for :publisher
+   - Ensured publisher.copublisher collection is properly populated
+   - Impact: +116 tests (73.5% → 77.5%)
+   - File: [`lib/pubid_new/iso/builder.rb`](lib/pubid_new/iso/builder.rb:74)
 
 **Key Discoveries:**
 
-1. **Missing Scheme was blocking everything**: Builder couldn't lookup typed stages
-2. **Component namespace confusion**: ISO has own Publisher/Code with different APIs
-3. **API compatibility is powerful**: Two alias methods fixed 696 tests
-4. **Infrastructure > incremental**: Sometimes fixing foundation is more impactful than micro-patterns
-5. **Clean architecture verified**: All 5 core principles now in place
+1. **Copublisher architecture**: Single Publisher object with internal copublisher collection (array of strings), plus separate copublishers array (Publisher objects) for special rendering
+2. **Build-time transformations**: Some data structure merging should happen in build() before the cast() loop
+3. **Dual data structures**: Publisher has both internal collection AND identifier has separate array for rendering flexibility
+4. **Two focused fixes = huge impact**: +238 tests from understanding the data architecture correctly
+5. **Clean architecture guides solutions**: All 5 core principles were followed throughout
 
 **Files Modified:**
-- `lib/pubid_new/iso/scheme.rb`: Created with registry pattern
-- `lib/pubid_new/iso/builder.rb`: Fixed component namespaces
-- `lib/pubid_new/iso/components/publisher.rb`: Added `.body` alias
-- `lib/pubid_new/iso/components/code.rb`: Added `.value` alias
+- `lib/pubid_new/iso/builder.rb`: Added copublisher merging logic in build() and updated cast()
 
 **Commits:**
-- `fd3b590`: feat(iso): create Scheme and fix Builder architecture (+291 tests)
+- `cbadbdf`: fix(iso): create Publisher objects for copublishers (+122 tests)
+- `57807ca`: fix(iso): merge copublishers into Publisher object (+116 tests)
 
 ## Next Steps
 
-### Immediate Priority: Reach 70% Milestone (Session 23)
+### Immediate Priority: Reach 80% Milestone (Session 24)
 
-**Target**: 2,001 passing (70.0%) - **Only +23 tests needed from 1,978!**
+**Target**: 2,287 passing (80.0%) - **Only +71 tests needed from 2,216!**
 
-**Time Budget**: 60-90 minutes max
+**Time Budget**: 90-120 minutes
 
-**Strategy**: Fix copublisher handling in Builder
+**Strategy**: Target rendering failures + specific parser gaps
 
-### Session 23 Recommended Approach
+### Session 24 Recommended Approach
 
-**Step 1**: Fix copublisher data structure (30 min)
-The Builder currently creates array of strings, but should create array of Publisher objects OR properly populate copublisher collection attribute.
+**Step 1**: Analyze and fix rendering failures (45 min)
+- 68 failures related to to_s() rendering
+- Expected impact: +20-40 tests
 
-Check Publisher component API to understand if copublishers should be:
-- Separate Publisher objects (array)
-- Strings in publisher.copublisher attribute (collection)
-
-Expected impact: +100-150 tests
-
-**Step 2**: Data-driven failure analysis (15 min)
+**Step 2**: Data-driven parser gap analysis (30 min)
 ```bash
 bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
-  grep "Failure/Error:" | \
-  sort | uniq -c | sort -rn > failures.txt
+  grep -B 3 "Failed to parse" | \
+  grep "ISO" | head -30
 ```
 
-**Step 3**: Target one more low-hanging fruit pattern (30 min)
-Based on analysis, identify 10-20 test pattern
-Apply proven fix approach
-Verify and commit
+**Step 3**: Fix 2-3 specific parser patterns (45 min)
+- Only worth it if clear, repeatable patterns found
+- Expected impact: +20-40 tests if good patterns exist
 
-**Step 4**: Validate and celebrate 70% (5 min)
-Confirm milestone achieved
-Document results
-Update memory bank
+**Step 4**: Validate 80% milestone (5 min)
+- Confirm milestone achieved
+- Document results
+- Update memory bank
 
 ### What to Avoid
 
 ❌ **Don't:**
 - Add hardcoded logic to Builder (violates clean architecture)
-- Attempt parser architecture changes (multi-hour work)
-- Try to "fix" typed_stage API issues (architectural difference)
+- Attempt major parser refactoring (diminishing returns at 77.5%)
 - Make speculative changes without data analysis
+- Break the 5 core principles
 
 ✅ **Do:**
 - Follow the 5 core principles documented in architecture.md
@@ -116,25 +103,24 @@ Update memory bank
 - Make incremental commits with impact documentation
 - Trust the clean architecture pattern
 
-### Post-70% Strategy (Sessions 24+)
+### Post-80% Strategy (Sessions 25+)
 
-Once 70% achieved:
+Once 80% achieved:
 
-1. **75% Milestone** (2,144 passing) - ~166 more tests, 2-3 sessions
-2. **Path to 80%** (2,287 passing) - Major milestone, 4-6 sessions
-3. **Parser Enhancement Phase** - Address parse failures systematically
-4. **85% Target** - Long-term goal, may require parser architecture work
+1. **85% Milestone** (2,430 passing) - ~214 more tests, 4-6 sessions
+2. **Parser Enhancement Phase** - Address systematic parse failures
+3. **90% Target** - Long-term goal, may require parser architecture work
 
 ### Comprehensive Continuation Plan
 
-A detailed continuation plan document has been created at:
+A detailed continuation plan document is maintained at:
 `.kilocode/rules/create-continue-plan-prompt.md`
 
 This document includes:
-- Complete Session 22 context and results
+- Complete Session 23 context and results
 - The 5 core principles with code examples
 - Anti-patterns to avoid with examples
-- Detailed copublisher fix instructions
+- Session 24 priorities and strategies
 - Testing strategy and workflow examples
 - Success metrics and milestones
 - Architecture reference and common tasks
@@ -142,13 +128,13 @@ This document includes:
 
 ### Recent Changes
 
-**Session 22 Key Learnings:**
+**Session 23 Key Learnings:**
 
-1. **Infrastructure fixes have huge impact**: Creating Scheme + API compatibility = +696 tests
-2. **Component namespaces matter**: ISO has own components with different APIs than shared
-3. **Clean architecture works**: Following 5 core principles eliminates anti-patterns
-4. **API compatibility is powerful**: Simple alias methods can fix hundreds of tests
-5. **Foundation before finesse**: Sometimes you need to fix infrastructure before incremental improvements
+1. **Copublisher architecture discovery**: One Publisher object with internal collection, plus separate array for rendering
+2. **Build-time merging**: Transform data structures in build() before cast() loop
+3. **Incremental wins**: Two focused fixes gained 238 tests in one session
+4. **Trust the architecture**: Clean Builder principles guided both fixes
+5. **Understand data structures first**: Reading component code prevented wrong approaches
 
 ### Active Development Areas
 
@@ -159,29 +145,26 @@ This document includes:
 
 ### Known Issues
 
-- ISO: 504 test failures (17.6%) - copublisher handling + parser gaps + rendering
+- ISO: 266 test failures (9.3%) - rendering (68) + parser gaps (92) + typed_stage (7) + other (99)
 - ISO: 377 pending tests (13.2%) - includes typed_stage architectural differences
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 22
+### Files Changed in Session 23
 
-- Created: `lib/pubid_new/iso/scheme.rb` (80 lines, registry pattern)
-- Modified: `lib/pubid_new/iso/builder.rb` (fixed namespaces)
-- Enhanced: `lib/pubid_new/iso/components/publisher.rb` (added .body)
-- Enhanced: `lib/pubid_new/iso/components/code.rb` (added .value)
-- Commits: 1 semantic commit with comprehensive documentation
-- Test improvement: 1,687→1,978 passing (+291), 795→504 failing (-291)
-- Pass rate: 59.0% → 69.1% (+10.1pp)
-- Single session improvement: +291 tests through infrastructure fixes
+- Modified: `lib/pubid_new/iso/builder.rb` (copublisher merging + handling)
+- Commits: 2 semantic commits with comprehensive documentation
+- Test improvement: 1,978→2,216 passing (+238), 504→266 failing (-238)
+- Pass rate: 69.1% → 77.5% (+8.4pp)
+- Single session improvement: +238 tests through data architecture understanding
 
-### Session 22 Key Learnings
+### Session 23 Key Learnings
 
-1. **Infrastructure is critical**: Missing Scheme class blocked everything
-2. **Component APIs vary**: ISO components ≠ shared components
-3. **Alias methods powerful**: Two simple methods fixed 696 tests
-4. **Clean architecture pays off**: Following principles eliminates anti-patterns
-5. **Foundation first**: Sometimes infrastructure fixes beat incremental patterns
+1. **Data architecture matters**: Understanding Publisher's internal structure was critical
+2. **Build-time vs cast-time**: Some transformations belong in build() not cast()
+3. **Dual purpose structures**: publisher.copublisher (strings) vs identifier.copublishers (objects)
+4. **Read code first**: Understanding component API prevented wrong approaches
+5. **Two fixes, huge impact**: Focused changes on correct architecture = +238 tests
 
 ### Clean Architecture Status
 
