@@ -8,9 +8,12 @@ module PubidNew
       attribute :base_identifier, ::PubidNew::Identifier, polymorphic: true
 
       def to_s(lang: :en, lang_single: false, with_edition: false)
-        # Determine supplement abbreviation - from typed_stage or class default
+        # Determine supplement abbreviation - from typed_stage, or stage+type, or class default
         supplement_abbr = if typed_stage&.abbreviation
                             typed_stage.abbreviation
+                          elsif stage&.abbr && self.class.respond_to?(:type)
+                            # When stage present but no typed_stage, combine stage + type
+                            "#{stage.abbr} #{self.class.type[:short]}"
                           elsif self.class.respond_to?(:type)
                             self.class.type[:short]
                           else

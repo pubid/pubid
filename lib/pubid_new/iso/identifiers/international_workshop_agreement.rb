@@ -89,20 +89,28 @@ module PubidNew
         # IWA 14-1:2013
         # PRF IWA 36
         def to_s(lang: :en, lang_single: false)
-          # Determine stage abbreviation - from typed_stage or class default
+          # Determine stage abbreviation - from typed_stage or stage or class default
           stage_abbr = if typed_stage&.abbreviation
                          typed_stage.abbreviation
+                       elsif stage&.abbr
+                         # When stage present but no typed_stage, combine stage + type
+                         "#{stage.abbr} #{self.class.type[:short]}"
                        elsif self.class.respond_to?(:type)
                          self.class.type[:short]
                        else
                          "IWA"
                        end
 
-          [
+          result = [
             # The publisher is omitted because it is an IWA
             stage_abbr,
             number_portion(lang_single: lang_single),
           ].compact.join(" ")
+
+          # Add language if present
+          result << language_portion(lang_single: lang_single) if languages&.any?
+
+          result
         end
       end
     end
