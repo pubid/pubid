@@ -144,7 +144,7 @@ module PubidNew
             nil
           else
             value.map do |copublisher|
-              copublisher[:copublisher]
+              PubidNew::Iso::Components::Publisher.new(publisher: copublisher[:copublisher])
             end
           end
 
