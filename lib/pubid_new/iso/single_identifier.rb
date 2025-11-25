@@ -11,8 +11,8 @@ module PubidNew
         [].tap do |parts|
           parts << publisher_portion(lang: lang)
           parts << number_portion(lang_single: lang_single)
-          # Always render edition if present (number OR original_text)
-          parts << edition_portion(lang: lang) if edition && (edition.number || edition.original_text)
+          # Only render edition when explicitly requested
+          parts << edition_portion(lang: lang) if with_edition && edition && (edition.number || edition.original_text)
         end.compact.join(' ').tap do |s|
           s << language_portion(lang_single: lang_single) if languages&.any?
         end
