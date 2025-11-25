@@ -31,13 +31,13 @@ module PubidNew
         # If there are no copublishers, just return the main publisher and type
         return [
             publisher.body,
-            (typed_stage.abbreviation.empty? ? "" : "/#{typed_stage.abbreviation}"),
+            (typed_stage.canonical_abbreviation.empty? ? "" : "/#{typed_stage.canonical_abbreviation}"),
           ].join('') unless copublishers&.any?
 
         # If there are copublishers, join them with slashes
         [
           ([publisher] + copublishers).map(&:body).join("/"),
-          (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
+          (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
         ].join('')
       end
 
