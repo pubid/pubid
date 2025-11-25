@@ -72,6 +72,15 @@ module PubidNew
           parsed_hash[:supplement_publisher] = parsed_hash.delete(:publisher)
         end
 
+        # Merge copublishers into publisher object
+        if parsed_hash[:publisher] && parsed_hash[:copublishers]
+          copublisher_strings = parsed_hash[:copublishers].map { |cp| cp[:copublisher] }
+          parsed_hash[:publisher] = {
+            publisher: parsed_hash[:publisher],
+            copublisher:  copublisher_strings
+          }
+        end
+
         parsed_hash.each_pair do |key, value|
           realized_components = cast(key.to_sym, value)
 
@@ -137,9 +146,19 @@ module PubidNew
           # If there is a base_identifier, and it has a joint_identifier, we need to use a CombinedIdentifier.
 
         when :publisher, :directives_supplement_body, :supplement_publisher
-          PubidNew::Iso::Components::Publisher.new(publisher: value)
+          # value can be either a string OR a hash with publisher + copublisher
+          if value.is_a?(Hash)
+            PubidNew::Iso::Components::Publisher.new(
+              publisher: value[:publisher],
+              copublisher: value[:copublisher]
+            )
+          else
+            PubidNew::Iso::Components::Publisher.new(publisher: value)
+          end
 
         when :copublishers
+          # Copublishers already merged into publisher
+          # Create array of Publisher objects for identifier.copublishers attribute
           if value.nil? || value.empty?
             nil
           else
@@ -198,7 +217,7 @@ module PubidNew
           typed_stage_with_original = typed_stage.dup
           typed_stage_with_original.original_abbr = original_value.strip
 
-          ## IMPORTANT!!
+          ##
           # Always use TypedStage in an Identifier or separate Type and Stage.
           {
             stage: typed_stage_with_original.to_stage,
