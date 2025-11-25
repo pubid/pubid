@@ -1,6 +1,9 @@
-require_relative "../components/publisher"
-require_relative "../components/code"
+require_relative "components/publisher"
+require_relative "components/code"
 require_relative "../components/date"
+require_relative "../components/edition"
+require_relative "../components/language"
+require_relative "../components/locality"
 
 module PubidNew
   # Identifier that
@@ -134,14 +137,14 @@ module PubidNew
           # If there is a base_identifier, and it has a joint_identifier, we need to use a CombinedIdentifier.
 
         when :publisher, :directives_supplement_body, :supplement_publisher
-          Components::Publisher.new(body: value)
+          PubidNew::Iso::Components::Publisher.new(publisher: value)
 
         when :copublishers
           if value.nil? || value.empty?
             nil
           else
             value.map do |copublisher|
-              Components::Publisher.new(body: copublisher[:copublisher])
+              copublisher[:copublisher]
             end
           end
 
@@ -166,14 +169,14 @@ module PubidNew
 
           part = convert_roman_to_integer(part)
 
-          code_hash = { number: Components::Code.new(value: number) }
+          code_hash = { number: PubidNew::Iso::Components::Code.new(number: number) }
 
           if part
-            code_hash[:part] = Components::Code.new(value: part)
+            code_hash[:part] = PubidNew::Iso::Components::Code.new(number: part)
           end
 
           if subpart
-            code_hash[:subpart] = Components::Code.new(value: subpart)
+            code_hash[:subpart] = PubidNew::Iso::Components::Code.new(number: subpart)
           end
 
           code_hash
@@ -190,7 +193,7 @@ module PubidNew
           iteration = original_value.match(/(\d+)$/)
           normalized_value = original_value.sub(iteration.to_s, "")
           typed_stage = locate_typed_stage(normalized_value || "")
-          
+
           # Create a copy with the original abbreviation preserved
           typed_stage_with_original = typed_stage.dup
           typed_stage_with_original.original_abbr = original_value.strip
@@ -204,17 +207,17 @@ module PubidNew
           }
         when :stage_iteration
           # "1" or "2"
-          Components::Code.new(value: value.to_s)
+          PubidNew::Iso::Components::Code.new(number: value.to_s)
 
         when :date
           value = value.to_s
           # If there is month, "2005-12"
           if value.match?(/^\d{4}(-\d{2})?$/)
             year, month = value.split("-")
-            Components::Date.new(year: year, month: month || nil)
+            PubidNew::Components::Date.new(year: year, month: month || nil)
           elsif value.is_a?(Integer) || value.is_a?(String) && value.match?(/^\d{4}$/)
             # If it's just a year, "2005"
-            Components::Date.new(year: value)
+            PubidNew::Components::Date.new(year: value)
           else
             raise ArgumentError, "Invalid date format: #{value.inspect}"
           end
@@ -224,7 +227,7 @@ module PubidNew
           original_text = value.to_s
           # Extract just the digit(s) for the number field
           number = original_text.match(/\d+/)&.to_s
-          Components::Edition.new(number: number, original_text: original_text)
+          PubidNew::Components::Edition.new(number: number, original_text: original_text)
 
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
@@ -236,11 +239,11 @@ module PubidNew
             lang = lang.strip
             original_lang = lang  # Store original format before conversion
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            Components::Language.new(code: lang, original_code: original_lang)
+            PubidNew::Components::Language.new(code: lang, original_code: original_lang)
           end
 
         when :all_parts
-          Components::Locality.new(all_parts: true)
+          PubidNew::Components::Locality.new(all_parts: true)
 
         # ISO 4214:2022 | IDF/RM 254:2022
         when :joint_identifier
@@ -253,7 +256,7 @@ module PubidNew
         when :subgroup
           # Handle JTC 1 subgroup in directives (ISO/IEC JTC 1 DIR)
           # Store as a component for potential use in rendering
-          Components::Code.new(value: value.to_s)
+          PubidNew::Iso::Components::Code.new(number: value.to_s)
 
         when :supplements
           # Handle bundled supplements (+ operator)

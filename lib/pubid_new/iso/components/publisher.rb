@@ -11,6 +11,11 @@ module PubidNew
         attribute :publisher, :string, default: -> { "ISO" }
         attribute :copublisher, :string, collection: true
 
+        # Alias for compatibility with rendering code
+        def body
+          publisher
+        end
+
         def to_s
           result = publisher
           result += copublisher.map { |cp| "/#{cp}" }.join if copublisher&.any?
