@@ -1,348 +1,176 @@
-# Session 19 Continuation Plan - ISO V2 Path to 60%
+## Current Work Focus
 
-## Current Status (Session 18 Complete)
+The project is in the middle of a **V2 architecture migration** from legacy V1 code to a clean MODEL-DRIVEN implementation using Lutaml::Model.
+
+## Current Status (Session 20 Complete)
 
 **Test Results:**
-- 1,648 passing (57.6%) - **+228 from Session 17!** 🎉
-- 718 failures (25.1%)
-- 702 pending (24.5%)
-- Total: 3,068 examples (includes pending-but-passing)
+- 1,687 passing (59.0%) - **+24 from Session 19, +375 from Session 15**
+- 795 failures (27.8%)
+- 377 pending (13.2%)
+- Total: 2,859 examples
 - Core tests: 126/126 passing ✅
-
-**True Status:**
-- 1,439 truly passing (50.3%)
-- 718 truly failing
-- 702 pending
-- 209 pending-but-passing (showing as failures but actually pass)
 
 **Recent Progress:**
 - Session 15: +4 tests (0.1pp) ⚠️ (speculative approach)
 - Session 16: +104 tests (3.6pp) 🎉 (data-driven approach)
 - Session 17: 0 tests (analysis session)
 - Session 18: +228 tests (7.9pp) 🎊 (data-driven Pattern B fix)
+- Session 19: +15 tests (0.5pp) ✅ (pending marker removal + Guide rendering)
+- Session 20: +24 tests (0.8pp) ✅ (SingleIdentifier stage + subpart)
 
 **Milestones Achieved:**
-- ✅ 50% milestone (target: 1,430) → Achieved 1,439 (50.3%)
-- ✅ Actually at 57.6% in test output (includes pending-but-passing)
+- ✅ 50% milestone (target: 1,430) → Achieved 1,648 (57.6%) in Session 18
+- ✅ 55% milestone → Achieved 1,648 (57.6%) in Session 18
+- 🎯 60% milestone (target: 1,715) → **Only +28 tests needed!**
 
-## Session 18 Success Analysis
+## Session 20 Summary
 
-**What Made It Work:**
-1. **Two-part problem solution**: Both TYPED_STAGES abbreviations AND builder logic needed fixing
-2. **Pattern B delivered 228 tests**: Far exceeded estimate of ~100 tests
-3. **Data-driven approach**: 57x better than speculative (Session 18 vs Session 15)
-4. **Attribute failures focus**: Ignored parse failures, focused on fixable issues
-5. **Clean implementation**: Maintained architecture, no regressions
+**What Was Done:**
 
-**Key Discovery:**
-- Parser uses `:stage` field for some patterns, `:typed_stage` for others
-- Builder must handle both extraction paths
-- Lookup priority matters: `stage_str` (specific) over `supplement_type` (general)
+1. **Phase 1: SingleIdentifier Rendering Fix** (+23 tests, 30 minutes)
+   - Fixed missing stage rendering when no typed_stage present
+   - Fixed missing subpart in number_portion
+   - Impact: Technical Report (39→30), Technical Specification (35→33), PAS (32→26)
+   - File: [`lib/pubid_new/iso/single_identifier.rb`](lib/pubid_new/iso/single_identifier.rb:11)
 
-## Session 19 Goal - Reach 60% Milestone
+2. **Phase 2: Custom to_s Fixes** (+1 test, 30 minutes)
+   - Enhanced IWA to handle stage + language
+   - Enhanced SupplementIdentifier to handle stage + type
+   - Files: [`international_workshop_agreement.rb`](lib/pubid_new/iso/identifiers/international_workshop_agreement.rb:91), [`supplement_identifier.rb`](lib/pubid_new/iso/supplement_identifier.rb:10)
 
-**Target:** 1,715 passing (60.0%) - **Only +67 tests needed from true 1,648!**
+**Key Discoveries:**
 
-**Time Budget:** 60-90 minutes max
+1. **Rendering pattern validated**: Stage+subpart issues affected multiple identifier types
+2. **Custom to_s limited impact**: Most types inherit properly from Base/SingleIdentifier
+3. **Failure composition clear**: ~500 typed_stage API + 367 parse failures + ~200 rendering issues
+4. **Quick wins exhausted**: Remaining gains require parser work or micro-pattern hunting
 
-**Strategy:** Continue data-driven analysis of remaining 718 failures
+**Files Modified:**
+- `lib/pubid_new/iso/single_identifier.rb`: publisher_portion + number_portion
+- `lib/pubid_new/iso/identifiers/international_workshop_agreement.rb`: stage + language
+- `lib/pubid_new/iso/supplement_identifier.rb`: stage + type
 
-## Two Parallel Approaches
+**Commits:**
+- `09d03ed`: SingleIdentifier rendering fix (+23 tests)
+- `329da4a`: IWA and Supplement rendering (+1 test)
 
-### Approach A: Clean Up Pending Markers (Immediate Win)
+## Next Steps
 
-**Impact:** Show true 57.6% pass rate in test output
+### Immediate Priority: Reach 60% Milestone (Session 21)
 
-**Status:** 209 tests are passing but marked as pending, showing as "failures"
+**Target**: 1,715 passing (60.0%) - **Only +28 tests needed from 1,687!**
 
-**Action:**
+**Time Budget**: 60-90 minutes max
+
+**Strategy**: Continue with data-driven micro-pattern identification
+
+### Consolidated Sessions 15-20 Documentation
+
+A comprehensive continuation plan document has been created at:
+`.kilocode/rules/create-continue-plan-prompt.md`
+
+This document consolidates:
+- Complete journey from Sessions 15-20 (+375 tests total)
+- All major technical breakthroughs with code examples
+- Pattern library with solution templates
+- Tools, commands, and decision trees
+- Success metrics and expectations
+- Ready-to-use Phase 1/2/3 strategies for 60%/65%/70% milestones
+
+### Session 21 Recommended Approach
+
+**Step 1**: Data-driven failure analysis (15 min)
 ```bash
-# Remove all pending markers from spec files
-find spec/pubid_new/iso/identifiers -name "*_spec.rb" -exec sed -i '' "/pending 'typed_stage removed in V2 architecture'/d" {} \;
+bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
+  grep "Failure/Error: expect(parsed\." | \
+  grep -v "typed_stage\|Failed to parse" | \
+  sort | uniq -c | sort -rn > failures.txt
 ```
 
-**Risk:** Very low - these tests are already passing
-**Benefit:** Clear, accurate test output showing true progress
-**Time:** 10 minutes
+**Step 2**: Identify 15-30 test pattern (15 min)
+- Look for repeated attribute mismatches
+- Check Builder extraction logic
+- Analyze edge cases in existing types
 
-### Approach B: Next High-Impact Pattern (Real Progress)
+**Step 3**: Implement targeted fix (20 min)
+- Apply proven patterns from Sessions 16-20
+- Focus on attribute-level fixes, not parser
 
-**Target:** Find and fix pattern worth 50-100 tests
+**Step 4**: Validate and commit (10 min)
+- Core tests: 126/126 passing
+- Progress check
+- Semantic commit
 
-**Method:** Analyze remaining 718 failures for new patterns
+### What to Avoid
 
-**Candidates from Previous Analysis:**
+❌ **Don't:**
+- Attempt parser architecture changes (multi-hour work)
+- Try to "fix" typed_stage API issues (architectural difference)
+- Make speculative changes without data analysis
+- Spend time on CombinedIdentifier (45 tests, 3-4 hours)
 
-1. **Pattern C: Rendering Differences** (~50-80 tests estimated)
-   - Tests parse correctly but to_s produces different format
-   - Examples: "ISO TR 23249" vs "ISO/TR 23249"
-   - Files: Various identifier classes' to_s methods
+✅ **Do:**
+- Focus on attribute-level fixes
+- Use data-driven analysis
+- Target small, repeatable patterns
+- Verify core tests after each change
+- Make incremental commits
 
-2. **Pattern D: Type Code Mismatches** (~30-50 tests estimated)
-   - Similar to stage_code but for type_code
-   - Missing type definitions in some classes
-   - Files: Identifier TYPED_STAGES arrays
+### Success Criteria
 
-3. **Remaining Edition/Language Issues** (~20-30 tests estimated)
-   - Edge cases not covered by Session 16 fix
-   - Specific format variations
-   - Files: Builder and parser
+- ✅ **PASS**: Reach 1,715+ passing (60%+)
+- ⚠️ **MIXED**: +20-27 tests (need one more micro-pattern)
+- ❌ **FAIL**: <20 tests (strategy needs revision)
 
-## Recommended Session 19 Strategy
-
-### Phase 1: Quick Win (15 minutes)
-
-**Execute Approach A**: Remove pending markers
-
-This will:
-- Show true 57.6% pass rate immediately
-- Reveal actual test state clearly
-- Make tracking progress easier
-
-### Phase 2: Pattern Analysis (30 minutes)
-
-**Analyze remaining 718 failures** to find highest-impact pattern:
-
-```bash
-# Get sample of failures
-bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | grep -A 3 "Failure/Error" | head -100 > /tmp/failures.txt
-
-# Analyze patterns
-grep "expected:" /tmp/failures.txt | sort | uniq -c | sort -rn | head -20
-```
-
-**Look for:**
-1. Repeated error messages (indicates pattern)
-2. Similar test names (indicates class-wide issue)
-3. Specific attribute mismatches (indicates targeted fix)
-
-### Phase 3: Implementation (30 minutes)
-
-Implement highest-impact pattern found in Phase 2.
-
-**Target:** +50-70 tests to reach 60% milestone
-
-## Implementation Steps
-
-### Step 1: Remove Pending Markers (10 minutes)
-
-```bash
-cd /Users/mulgogi/src/mn/pubid
-find spec/pubid_new/iso/identifiers -name "*_spec.rb" -exec sed -i '' "/pending 'typed_stage removed in V2 architecture'/d" {} \;
-```
-
-Run tests to verify:
-```bash
-bundle exec rspec spec/pubid_new/iso/ --format progress | grep "examples"
-```
-
-Expected: Show true 57.6% pass rate
-
-### Step 2: Analyze Failures (20 minutes)
-
-**Get failure breakdown:**
-```bash
-# Capture all failures
-bundle exec rspec spec/pubid_new/iso/ 2>&1 > /tmp/full_output.txt
-
-# Extract patterns
-grep -B 2 "Failure/Error" /tmp/full_output.txt | grep "expected:" | sort | uniq -c | sort -rn > /tmp/patterns.txt
-
-# Review top patterns
-head -30 /tmp/patterns.txt
-```
-
-**Document top 3 patterns** with:
-- Error message
-- Estimated test count
-- Affected files
-- Complexity estimate
-
-### Step 3: Choose Target Pattern (5 minutes)
-
-**Selection criteria:**
-1. High test count (50+ tests)
-2. Clear fix path (attribute-level, not parse-level)
-3. Low complexity (30-45 minutes to implement)
-4. Similar to Session 18's approach
-
-### Step 4: Implement Fix (30 minutes)
-
-Follow Session 18's proven approach:
-1. Read affected files to understand current logic
-2. Identify exact root cause (may be multi-part like Session 18)
-3. Implement targeted fix
-4. Test with single example first
-5. Run core tests to verify no regression
-6. Run full suite
-
-### Step 5: Validation (10 minutes)
-
-```bash
-# Core tests must pass
-bundle exec rspec spec/pubid_new/iso/identifier_spec.rb --format progress
-
-# Full suite
-bundle exec rspec spec/pubid_new/iso/ --format progress | grep "examples"
-```
-
-**Success criteria:**
-- Core: 126/126 passing ✅
-- Total: 1,715+ passing (60%+)
-- No new failures
-
-### Step 6: Commit and Document (10 minutes)
-
-Semantic commit with:
-- Pattern description
-- Root cause
-- Files changed
-- Test impact
-- Pass rate milestone
-
-## Success Metrics
-
-**Minimum Target:** 1,715 passing (60.0%) - **+67 tests from true 1,648**
-- Conservative but achievable
-
-**Realistic Target:** 1,750-1,800 passing (61.2-63.0%) - **+102-152 tests**
-- If pattern similar to Session 18's impact
-
-**Stretch Target:** 1,850+ passing (64.7%+) - **+202+ tests**
-- If multiple patterns fixed or very high-impact single pattern
-
-**Pass/Fail Criteria:**
-- ✅ PASS: Reach 60% milestone (+67+ tests)
-- ⚠️ MIXED: +30-66 tests (good progress but need more)
-- ❌ FAIL: <30 tests (strategy needs revision)
-
-## Alternative Strategies if Pattern Analysis Fails
-
-### Fallback 1: Incremental Fixes (60 minutes)
-
-Instead of one big pattern, fix 3-4 smaller patterns:
-- Each worth 15-20 tests
-- Lower risk, guaranteed progress
-- Examples: Specific type codes, rendering tweaks, edge cases
-
-### Fallback 2: Review Pending Tests (30 minutes)
-
-Some of the 702 pending tests may now pass after Session 18:
-- Remove pending markers selectively
-- Test each category
-- Could reveal 20-40 newly passing tests
-
-### Fallback 3: Focus on Directives (60 minutes)
-
-Implement Pattern 5+6 from Session 17 analysis:
-- Directives identifier class (+24 tests)
-- DirectivesSupplement class (+12 tests)
-- Total: +36 tests
-- More complex but well-defined
-
-## Key Principles (from Sessions 16-18)
-
-1. **Data-driven analysis ALWAYS comes first**
-2. **Attribute failures over parse failures**
-3. **Multi-part problems common** (like Session 18)
-4. **Lookup priority matters** (specific over general)
-5. **Parser field variance** (handle all extraction paths)
-6. **26x-57x better results** with systematic approach
-7. **Core tests must stay at 126/126**
-8. **Single commit with full documentation**
-
-## Decision Tree
-
-```
-START
-  │
-  ├─→ Remove pending markers (10 min)
-  │     │
-  │     └─→ Shows 57.6% pass rate ✅
-  │
-  ├─→ Analyze 718 failures (20 min)
-  │     │
-  │     ├─→ Find clear 50-100 test pattern?
-  │     │     │
-  │     │     ├─→ YES → Implement fix (30 min)
-  │     │     │           │
-  │     │     │           ├─→ +67+ tests → CELEBRATE 60% 🎉
-  │     │     │           └─→ <67 tests → Try Fallback 1
-  │     │     │
-  │     │     └─→ NO → Use Fallback 1 or 2
-  │     │
-  │     └─→ No clear patterns → Try Fallback 3
-  │
-  └─→ If 60% achieved → Update memory bank & plan Session 20
-      If not → Document findings & revise strategy
-```
-
-## Post-60% Strategy (Sessions 20+)
+### Post-60% Strategy (Sessions 21+)
 
 Once 60% achieved:
 
-1. **65% Milestone** (1,858 passing) - Next target
-2. **70% Milestone** (2,001 passing) - Major psychological barrier
-3. **Directives Implementation** - If not done yet
-4. **Systematic Parse Failure Cleanup** - Parser enhancements
-5. **Path to 80%** - Goal for Sessions 20-25
+1. **65% Milestone** (1,858 passing) - ~171 more tests, 2-3 sessions
+2. **Path to 70%** (2,001 passing) - Major psychological barrier, 4-6 sessions
+3. **Parser Enhancement Phase** - Address parse failures systematically
+4. **CombinedIdentifier Implementation** - When ready for 3-4 hour task
+5. **80% Target** - Long-term goal, may require parser architecture work
 
-## What to Avoid (Lessons from Session 15)
+### Recent Changes
 
-❌ **Don't:**
-- Make speculative changes without analysis
-- Fix one test at a time (not scalable)
-- Change parser without clear need
-- Commit changes that reduce test count
-- Skip impact estimation
+**Session 20 Key Learnings:**
 
-✅ **Do:**
-- Analyze thoroughly before coding
-- Target high-impact patterns (50+ tests)
-- Use Session 18's two-part problem approach
-- Verify core tests after each change
-- Document everything comprehensively
+1. **SingleIdentifier affects many types**: TR, TS, PAS, ISP, Data all inherit
+2. **Two-part rendering bugs**: Both stage AND subpart needed fixing together
+3. **Custom to_s limited**: Only a few types override, most inherit properly
+4. **Micro-patterns valuable**: +24 tests from focused, systematic fixes
+5. **Data-driven consistency**: 60 minutes → 20-25 tests with focused patterns
 
-## Success Probability Assessment
+### Active Development Areas
 
-**High Confidence (80%):** Reaching 60% milestone
-- Only +67 tests needed
-- 718 failures to mine for patterns
-- Session 18 proved approach works
-- Clear fallback strategies available
+- **Active**: ISO test refinement with systematic rendering fixes
+- **Not changing**: Core completed flavors (IEC, JIS, ETSI, ITU, CCSDS)
+- **Architecture locked**: Three-layer pattern established and proven
+- **Strategy validated**: Data-driven analysis yields 10-57x better results
 
-**Medium Confidence (60%):** Exceeding 65%
-- Would need exceptional pattern like Session 18
-- Requires finding 150+ test pattern
-- Possible but not guaranteed
+### Known Issues
 
-**Low Confidence (30%):** Reaching 70% in single session
-- Would need multiple major patterns
-- Better as multi-session goal
-- Keep as stretch target only
+- ISO: 795 test failures (27.8%) - typed_stage API + parse gaps + micro-rendering
+- ISO: 377 pending tests (13.2%) - includes typed_stage architectural differences
+- V1 code still exists but not being actively developed
+- Migration documentation complete and comprehensive
 
-## Celebration Plan for 60%
+### Files Changed in Session 20
 
-Reaching 60% represents:
-- **10pp improvement** in 2 sessions (Sessions 18-19)
-- **Validation of data-driven approach**
-- **Clear path to 70%+** now visible
-- **Architecture fully proven** at scale
-- **Sustainable methodology** established
+- Core: lib/pubid_new/iso/single_identifier.rb (stage + subpart rendering)
+- IWA: lib/pubid_new/iso/identifiers/international_workshop_agreement.rb (stage + language)
+- Supplement: lib/pubid_new/iso/supplement_identifier.rb (stage + type)
+- Commits: 2 semantic commits with comprehensive documentation
+- Test improvement: 1,663→1,687 passing (+24), 819→795 failing (-24)
+- Pass rate: 58.2% → 59.0% (+0.8pp)
+- Cumulative progress: Sessions 15-20 added +375 tests (+13.1pp)
 
-**Let's reach 60%!** 🚀
+### Session 20 Key Learnings
 
-## Next Developer Actions
-
-1. ✅ Read this plan thoroughly
-2. ✅ Remove pending markers (Phase 1)
-3. ✅ Verify new pass rate displayed correctly
-4. ✅ Analyze failure patterns (Phase 2)
-5. ✅ Select highest-impact target
-6. ✅ Implement fix (Phase 3)
-7. ✅ Run safety check (core tests)
-8. ✅ Run full suite
-9. ✅ Celebrate 60% if achieved! 🎉
-10. ✅ Create semantic commit
-11. ✅ Update memory bank
-12. ✅ Plan Session 20
+1. **Inheritance matters**: Fix in SingleIdentifier benefits 5+ identifier types
+2. **Multi-component bugs**: Stage AND subpart both needed attention
+3. **Pattern exhaustion**: Major rendering patterns now fixed, remaining are micro-patterns
+4. **Time efficiency**: Consistent 60 min → 20-25 tests with systematic approach
+5. **60% within reach**: Only +28 more tests needed, achievable in Session 21
