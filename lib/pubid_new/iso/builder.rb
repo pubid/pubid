@@ -245,8 +245,9 @@ module PubidNew
           # value can be "Ed.2", "Ed 2", "ED1", "Edition 13", or just "Ed"
           original_text = value.to_s
           # Extract just the digit(s) for the number field
-          number = original_text.match(/\d+/)&.to_s
-          PubidNew::Components::Edition.new(number: number, original_text: original_text)
+          number_string = original_text.match(/\d+/)&.to_s
+          number_code = number_string ? PubidNew::Iso::Components::Code.new(number: number_string) : nil
+          PubidNew::Components::Edition.new(number: number_code, original_text: original_text)
 
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
