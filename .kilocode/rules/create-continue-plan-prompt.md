@@ -1,24 +1,26 @@
-# Session 24+ Continuation Plan: ISO Builder Architecture & Test Improvements
+# Session 25+ Continuation Plan: ISO Builder Architecture & Test Improvements
 
 ## Critical Context - READ THIS FIRST
 
-**Session 23 successfully fixed copublisher handling** achieving 77.5% passing tests (+238 tests in one session). The ISO Builder continues to follow the 5 core principles documented in `.kilocode/rules/memory-bank/architecture.md`.
+**Session 24 successfully fixed canonical TypedStage rendering** achieving 79.0% passing tests (+43 tests in one session). The ISO Builder continues to follow the 5 core principles documented in `.kilocode/rules/memory-bank/architecture.md`.
 
 **IMPORTANT**: The clean architecture uses **TYPED_STAGE REGISTER** as the single source of truth. Builder **NEVER** makes type/stage decisions - it only casts parsed data to domain objects.
 
-## Current State (Session 23 Complete)
+## Current State (Session 24 Complete)
 
 ### Test Results
 - **Total**: 2,859 examples
-- **Passing**: 2,216 (77.5%)
-- **Failing**: 266 (9.3%)
+- **Passing**: 2,258 (79.0%)
+- **Failing**: 224 (7.8%)
 - **Pending**: 377 (13.2%)
 
-### Session 23 Progress
-- Fixed copublisher object construction: +122 tests (69.1% → 73.5%)
-- Merged copublishers into Publisher object: +116 tests (73.5% → 77.5%)
-- **Total impact**: +238 tests in one session!
-- **Milestones**: ✅ 70% achieved, ✅ 75% achieved, approaching 80%
+### Session 24 Progress
+- Fixed TypedStage canonical abbreviation: +28 tests (77.5% → 78.4%)
+- Fixed Edition.number as Code object: +2 tests (78.4% → 78.5%)
+- Fixed SingleIdentifier canonical rendering: +9 tests (78.5% → 78.9%)
+- Fixed Edition only when with_edition: +4 tests (78.9% → 79.0%)
+- **Total impact**: +43 tests in one session!
+- **Milestones**: ✅ 75% exceeded, approaching 80% (need +29 tests)
 
 ### Clean Architecture Verified ✅
 1. ✅ TYPED_STAGE REGISTER is source of truth
@@ -27,232 +29,55 @@
 4. ✅ Composite hash returns for related values
 5. ✅ Components render themselves
 
-## Session 23 Key Learnings
+## Session 24/25 Immediate Priorities and Breakdown
 
-### Copublisher Architecture Discovery
+### Priority 1: Analyze Remaining 224 Failures (Est. 30 min)
 
-The correct data structure is:
-- **Publisher object** has `copublisher: ["IEC", "IEEE"]` (array of strings)
-- **Identifier** has both:
-  - `publisher` - ONE Publisher object containing main + copublishers
-  - `copublishers` - array of Publisher objects (for special rendering)
-
-### Build-Time Data Transformation
-
-Some transformations should happen in `build()` before the `cast()` loop:
-
-```ruby
-# In build() method - merge copublishers into publisher
-if parsed_hash[:publisher] && parsed_hash[:copublishers]
-  copublisher_strings = parsed_hash[:copublishers].map { |cp| cp[:copublisher] }
-  parsed_hash[:publisher] = {
-    publisher: parsed_hash[:publisher],
-    copublisher: copublisher_strings
-  }
-end
-```
-
-Then in cast():
-```ruby
-when :publisher, :directives_supplement_body, :supplement_publisher
-  if value.is_a?(Hash)
-    PubidNew::Iso::Components::Publisher.new(
-      publisher: value[:publisher],
-      copublisher: value[:copublisher]
-    )
-  else
-    PubidNew::Iso::Components::Publisher.new(publisher: value)
-  end
-```
-
-## The 5 Core Principles (NEVER VIOLATE)
-
-### 1. TYPED_STAGE REGISTER is SOURCE OF TRUTH
-
-```ruby
-# ✅ CORRECT
-def locate_typed_stage(typed_stage_string)
-  typed_stage_string = "" if typed_stage_string.nil?
-  @scheme.locate_typed_stage_by_abbr(typed_stage_string)
-end
-
-# ❌ WRONG - Hardcoded checks
-if data[:typed_stage]
-  ts = data[:typed_stage].to_s
-  return "TR" if ts.include?("TR")  # DON'T DO THIS!
-end
-```
-
-### 2. Builder.new(scheme)
-
-Builder must receive Scheme instance for all lookups:
-
-```ruby
-# ✅ CORRECT
-class Builder
-  def initialize(scheme)
-    @scheme = scheme
-  end
-end
-
-# Usage
-PubidNew::Iso::Builder.new(PubidNew::Iso::Scheme).build(parsed_hash)
-```
-
-### 3. Single cast() Method
-
-ALL conversions happen in ONE place:
-
-```ruby
-# ✅ CORRECT - Everything in cast()
-def cast(type, value)
-  case type
-  when :type_with_stage
-    typed_stage = locate_typed_stage(value)
-    { stage: typed_stage.to_stage, type: typed_stage.to_type, typed_stage: typed_stage }
-  when :languages
-    # ... language conversion
-  end
-end
-
-# ❌ WRONG - Logic scattered in multiple places
-def extract_type(data)  # DON'T DO THIS!
-  # ... type logic
-end
-```
-
-### 4. Composite Hash Returns
-
-When cast returns multiple related values, return a hash:
-
-```ruby
-# ✅ CORRECT
-when :type_with_stage
-  {
-    stage: typed_stage_with_original.to_stage,
-    type: typed_stage_with_original.to_type,
-    typed_stage: typed_stage_with_original
-  }
-```
-
-### 5. Components Render Themselves
-
-NO hardcoded abbreviations in identifiers:
-
-```ruby
-# ✅ CORRECT - Use component's abbreviation method
-def publisher_portion
-  [
-    publisher.body,
-    (typed_stage.abbreviation.empty? ? "" : "/#{typed_stage.abbreviation}")
-  ].join('')
-end
-
-# ❌ WRONG - Hardcoded abbreviation logic
-if stage == "FDIS"
-  "FDIS"  # DON'T DO THIS!
-end
-```
-
-## Anti-Patterns to AVOID
-
-These were the mistakes from Sessions 15-20 that corrupted the architecture:
-
-❌ **NEVER add hardcoded type/stage checks to Builder**
-❌ **NEVER create helper methods that duplicate register logic**
-❌ **NEVER make Builder handle rendering decisions**
-❌ **NEVER hardcode abbreviations in identifiers**
-❌ **NEVER check types in multiple places**
-
-## Session 23 Immediate Tasks
-
-### Priority 1: Fix Copublisher Handling (Est. 30-60 min, +100-150 tests)
-
-**Problem**: Builder creates array of strings instead of array of Publisher objects
-
-**Current failure pattern** (196 occurrences):
-```
-Failure/Error: expect(parsed.publisher.copublisher.first).to eq("IEC")
-NoMethodError: undefined method `first' for "IEC":String
-```
-
-**Root cause**: In Builder cast() method:
-```ruby
-when :copublishers
-  if value.nil? || value.empty?
-    nil
-  else
-    value.map do |copublisher|
-      copublisher[:copublisher]  # Returns string, should return Publisher object
-    end
-  end
-```
-
-**Fix needed**:
-```ruby
-when :copublishers
-  if value.nil? || value.empty?
-    nil
-  else
-    value.map do |copublisher|
-      PubidNew::Iso::Components::Publisher.new(publisher: copublisher[:copublisher])
-    end
-  end
-end
-```
-
-**But wait** - check if ISO Publisher component expects copublishers as:
-1. Separate Publisher objects (array)
-2. Strings stored in copublisher attribute (collection)
-
-Look at the Publisher component definition and the rendering code to understand the correct data structure.
-
-**Steps**:
-1. Read [`lib/pubid_new/iso/components/publisher.rb`](lib/pubid_new/iso/components/publisher.rb:1)
-2. Read identifier rendering that uses copublishers
-3. Understand if copublishers should be:
-   - Array of Publisher objects
-   - Array of strings in publisher.copublisher attribute
-4. Update Builder cast() to match expected structure
-5. Run tests: `bundle exec rspec spec/pubid_new/iso/`
-6. Commit with semantic message
-
-**Expected impact**: +100-150 tests
-
-### Priority 2: Analyze Remaining Failures (Est. 30 min)
-
-**After copublisher fix**, run data-driven analysis:
+Run comprehensive failure analysis:
 
 ```bash
 bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
   grep "Failure/Error:" | \
-  sort | uniq -c | sort -rn > failures.txt
+  sort | uniq -c | sort -rn | head -20
 ```
 
-Look for patterns in:
-1. Parser failures (Failed to parse)
-2. TypedStage API differences (architectural, may be pending)
-3. Rendering differences (attribute-level fixes)
+Current known breakdown:
+1. **Parser failures**: ~92 (require grammar changes, risky)
+2. **Addendum spec**: 81 failures (mostly parser issues)
+3. **Scattered rendering**: ~51 failures across multiple specs
 
-### Priority 3: Target Low-Hanging Fruit (Est. 60 min, +20-50 tests)
+### Priority 2: Target Quick Wins for 80% Milestone (+29 tests needed)
 
-Based on failure analysis, identify repeatable patterns that can be fixed with:
-- Minor Builder cast() additions
-- TYPED_STAGES register enhancements
-- Component API additions
+Focus on specs with 2-15 failures each:
+- `directives_spec.rb`: 4 failures
+- `guide_spec.rb`: 15 failures
+- `directives_supplement_spec.rb`: 11 failures
+- `supplement_spec.rb`: 3 failures
+- `technical_specification_spec.rb`: 2 failures
+- `international_workshop_agreement_spec.rb`: 2 failures
+
+**Strategy**: Analyze each spec's failures for fixable patterns in rendering or data structure.
+
+### Priority 3: Document Patterns for Future Work
+
+If 80% is achieved:
+- Document remaining parser patterns for future enhancement
+- Update memory bank with Session 25 results
+- Plan approach for 85% milestone
 
 **Do NOT**:
-- Attempt parser architecture changes
+- Attempt major parser refactoring (diminishing returns at 79%)
 - Add hardcoded logic to Builder
-- Make speculative fixes without data
+- Make changes without data analysis
 
-## Remaining Known Issues (504 failures)
+## Remaining Known Issues (224 failures)
 
 ### Breakdown by Type:
-1. **Copublisher handling**: ~196 failures (Priority 1 fix)
-2. **Parser gaps**: ~92 failures (identify specific patterns)
-3. **TypedStage API**: ~67 failures (may be architectural)
-4. **Rendering edge cases**: ~149 failures (attribute-level)
+1. **Parser gaps**: ~92 failures (require grammar enhancements)
+2. **Addendum spec**: 81 failures (complex patterns, low priority)
+3. **Guide rendering**: 15 failures (TypedStage API + specific patterns)
+4. **Directives**: 15 failures total (4 + 11, rendering edge cases)
+5. **Other specs**: ~21 failures (scattered patterns)
 
 ### Parser Failures
 
@@ -261,7 +86,7 @@ When you see "Failed to parse", it means:
 2. Parser rule ordering issue (specific pattern shadowed)
 3. New identifier pattern not yet implemented
 
-**Strategy**: Document failing patterns, then decide if parser enhancement is worth the effort vs. expected test gain.
+**Strategy**: At 79%, parser fixes have diminishing returns. Focus on rendering fixes that don't require grammar changes.
 
 ## Success Metrics
 
@@ -270,11 +95,16 @@ When you see "Failed to parse", it means:
 - ✅ **GOOD**: 2,200-2,287 passing (77%-80%)
 - ⚠️ **MIXED**: 2,150-2,200 passing (need different approach)
 
+### Session 25 Goals:
+- 🎯 **TARGET**: 2,287+ passing (80%+) through targeted rendering fixes
+- ✅ **GOOD**: 2,270-2,286 passing (79.4%-79.9%)
+- ⚠️ **MIXED**: <2,270 passing (need different approach)
+
 ### Long-term Targets:
 - ✅ **70% (2,001 passing)**: ACHIEVED in Session 23
 - ✅ **75% (2,144 passing)**: EXCEEDED in Session 23 (2,216 = 77.5%)
-- 🎯 **80% (2,287 passing)**: Next major milestone (+71 tests needed)
-- **85% (2,430 passing)**: Long-term goal, may require parser architecture work
+- 🎯 **80% (2,287 passing)**: Current milestone (need +29 tests)
+- **85% (2,430 passing)**: Long-term goal (+172 from current)
 
 ## Testing Strategy
 
@@ -392,6 +222,13 @@ bundle exec rspec spec/pubid_new/iso/parser_spec.rb
 **Clean architecture commit**: `05581a336fc770796b873e538c058a520d645b12`
 **Session 22 completion**: `fd3b590` - feat(iso): create Scheme and fix Builder architecture
 **Session 23 completion**: `57807ca` - fix(iso): merge copublishers into Publisher object
+**Session 24 completion**: `1002ac3` - fix(iso): only render edition when with_edition parameter is true
+
+**Session 24 commits**:
+- `1ab4e15` - fix(iso): use canonical TypedStage abbreviation when normalizing (+28 tests)
+- `b69e0b7` - fix(iso): wrap edition.number in Code object for consistency (+2 tests)
+- `b311f8c` - fix(iso): use canonical TypedStage abbreviation in SingleIdentifier (+9 tests)
+- `1002ac3` - fix(iso): only render edition when with_edition parameter is true (+4 tests)
 
 ## Key Reminders
 
@@ -432,15 +269,17 @@ bundle exec rspec spec/pubid_new/iso/parser_spec.rb
 
 - **Session 22 was successful** because it fixed infrastructure (Scheme) and API compatibility
 - **Session 23 was successful** because it understood copublisher data architecture
+- **Session 24 was successful** because it fixed TypedStage rendering with canonical abbreviations
 - **The architecture is clean** - all future work should preserve this
-- **Rendering fixes are next low-hanging fruit** with expected impact of +20-40 tests
+- **80% milestone is very close** - only +29 tests needed
 - **IEC migration** should wait until ISO is 80%+ and patterns are clear
 
-## Session 23 Key Learnings
+## Session 24 Key Learnings
 
-1. **Copublisher architecture**: Single Publisher object with internal copublisher collection, plus separate copublishers array for special rendering
-2. **Build-time merging**: Some data structure transformation should happen in build() before the cast() loop
-3. **Incremental wins**: Two focused fixes gained 238 tests
-4. **Trust the architecture**: Clean Builder principles guided both fixes
+1. **TypedStage architecture discovery**: Need both `abbreviation` (preserves parsed) and `canonical_abbreviation` (normalized) methods
+2. **Rendering normalization**: SingleIdentifier always uses canonical, SupplementIdentifier uses canonical only with `with_edition: true`
+3. **Edition control**: Only render edition when explicitly requested via `with_edition` parameter
+4. **Data-driven approach**: Focused analysis identified 4 fixable patterns that gained +43 tests
+5. **Incremental commits work**: Each of 4 commits improved tests without breaking others
 
-Good luck with Session 24!
+Good luck with Session 25!

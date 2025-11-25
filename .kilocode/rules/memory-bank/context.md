@@ -2,28 +2,79 @@
 
 The project is in the middle of a **V2 architecture migration** from legacy V1 code to a clean MODEL-DRIVEN implementation using Lutaml::Model.
 
-## Current Status (Session 23 Complete)
+## Current Status (Session 24 Complete)
 
 **Test Results:**
-- 2,216 passing (77.5%) - **+238 from Session 22, +238 in one session!**
-- 266 failures (9.3%)
+- 2,258 passing (79.0%) - **+43 from Session 23, +43 in one session!**
+- 224 failures (7.8%)
 - 377 pending (13.2%)
 - Total: 2,859 examples
 
-**Session 23 Achievement:**
-- Fixed copublisher object construction (+122 tests)
-- Merged copublishers into Publisher object (+116 tests)
-- Impact: +238 tests in a single session! 🎊🎊
-- Progress: 69.1% → 77.5% (+8.4pp)
+**Session 24 Achievement:**
+- Fixed TypedStage canonical abbreviation (+28 tests)
+- Fixed Edition.number as Code object (+2 tests)
+- Fixed SingleIdentifier canonical rendering (+9 tests)
+- Fixed Edition only when with_edition (+4 tests)
+- Impact: +43 tests in a single session! 🎊
+- Progress: 77.5% → 79.0% (+1.5pp)
 
 **Milestones:**
 - ✅ 50% milestone (target: 1,430) → Achieved 1,648 (57.6%) in Session 18
 - ✅ 55% milestone → Achieved 1,648 (57.6%) in Session 18
 - ✅ 60% milestone (target: 1,715) → Achieved 1,978 (69.1%) in Session 22
 - ✅ 65% milestone (target: 1,858) → Achieved 1,978 (69.1%) in Session 22
-- ✅ 70% milestone (target: 2,001) → **Achieved 2,216 (77.5%) in Session 23!**
-- ✅ 75% milestone (target: 2,144) → **Achieved 2,216 (77.5%) in Session 23!**
-- 🎯 80% milestone (target: 2,287) → **Only +71 tests needed!**
+- ✅ 70% milestone (target: 2,001) → Achieved 2,216 (77.5%) in Session 23
+- ✅ 75% milestone (target: 2,144) → Achieved 2,216 (77.5%) in Session 23
+- 🎯 80% milestone (target: 2,287) → **Need +29 tests from 2,258!**
+
+## Session 24 Summary
+
+**What Was Done:**
+
+1. **Phase 1: TypedStage Canonical Abbreviation** (30 minutes)
+   - Added canonical_abbreviation method to TypedStage component
+   - Updated SupplementIdentifier to use it when with_edition: true
+   - Impact: +28 tests (77.5% → 78.4%)
+   - Files: [`lib/pubid_new/components/typed_stage.rb`](lib/pubid_new/components/typed_stage.rb:36), [`lib/pubid_new/iso/supplement_identifier.rb`](lib/pubid_new/iso/supplement_identifier.rb:13)
+
+2. **Phase 2: Edition.number as Code Object** (15 minutes)
+   - Changed Builder to wrap edition.number in Code object
+   - Updated Edition component to accept polymorphic types
+   - Impact: +2 tests (78.4% → 78.5%)
+   - Files: [`lib/pubid_new/iso/builder.rb`](lib/pubid_new/iso/builder.rb:248), [`lib/pubid_new/components/edition.rb`](lib/pubid_new/components/edition.rb:6)
+
+3. **Phase 3: SingleIdentifier Canonical Rendering** (15 minutes)
+   - Updated publisher_portion to use canonical_abbreviation
+   - Ensures GUIDE→Guide, TR→TR, TS→TS normalization
+   - Impact: +9 tests (78.5% → 78.9%)
+   - File: [`lib/pubid_new/iso/single_identifier.rb`](lib/pubid_new/iso/single_identifier.rb:34)
+
+4. **Phase 4: Edition Only When Requested** (10 minutes)
+   - Fixed to_s to only include edition when with_edition: true
+   - Prevents unwanted ED1, ED2 suffixes in default output
+   - Impact: +4 tests (78.9% → 79.0%)
+   - File: [`lib/pubid_new/iso/single_identifier.rb`](lib/pubid_new/iso/single_identifier.rb:14)
+
+**Key Discoveries:**
+
+1. **TypedStage dual rendering modes**: Need both `abbreviation` (parsed) and `canonical_abbreviation` (normalized)
+2. **Rendering context matters**: SupplementIdentifier uses canonical only with `with_edition: true`, SingleIdentifier always canonical
+3. **Edition data consistency**: All numbers should be Code objects, edition.number was inconsistent
+4. **Edition rendering control**: Default to_s should not include edition, only when explicitly requested
+5. **Clean architecture guides solutions**: All 5 core principles were followed throughout
+
+**Files Modified:**
+- `lib/pubid_new/components/typed_stage.rb`: Added canonical_abbreviation method
+- `lib/pubid_new/iso/supplement_identifier.rb`: Use canonical when with_edition: true
+- `lib/pubid_new/iso/builder.rb`: Wrap edition number in Code object
+- `lib/pubid_new/components/edition.rb`: Accept polymorphic number types
+- `lib/pubid_new/iso/single_identifier.rb`: Use canonical_abbreviation + edition control
+
+**Commits:**
+- `1ab4e15`: fix(iso): use canonical TypedStage abbreviation when normalizing (+28 tests)
+- `b69e0b7`: fix(iso): wrap edition.number in Code object for consistency (+2 tests)
+- `b311f8c`: fix(iso): use canonical TypedStage abbreviation in SingleIdentifier (+9 tests)
+- `1002ac3`: fix(iso): only render edition when with_edition parameter is true (+4 tests)
 
 ## Session 23 Summary
 
@@ -59,32 +110,29 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ## Next Steps
 
-### Immediate Priority: Reach 80% Milestone (Session 24)
+### Immediate Priority: Reach 80% Milestone (Session 25)
 
-**Target**: 2,287 passing (80.0%) - **Only +71 tests needed from 2,216!**
+**Target**: 2,287 passing (80.0%) - **Only +29 tests needed from 2,258!**
 
-**Time Budget**: 90-120 minutes
+**Time Budget**: 60-90 minutes
 
-**Strategy**: Target rendering failures + specific parser gaps
+**Strategy**: Target remaining rendering failures + specific patterns
 
-### Session 24 Recommended Approach
+### Session 25 Recommended Approach
 
-**Step 1**: Analyze and fix rendering failures (45 min)
-- 68 failures related to to_s() rendering
-- Expected impact: +20-40 tests
+**Step 1**: Analyze remaining 224 failures (20 min)
+- Currently: 224 failures (parser: 92, addendum: 81, other: 51)
+- Expected approach: Focus on non-parser fixes
 
-**Step 2**: Data-driven parser gap analysis (30 min)
-```bash
-bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
-  grep -B 3 "Failed to parse" | \
-  grep "ISO" | head -30
-```
+**Step 2**: Target specs with 2-15 failures (40 min)
+- directives_spec.rb: 4 failures
+- guide_spec.rb: 15 failures
+- directives_supplement_spec.rb: 11 failures
+- supplement_spec.rb: 3 failures
+- technical_specification_spec.rb: 2 failures
+- international_workshop_agreement_spec.rb: 2 failures
 
-**Step 3**: Fix 2-3 specific parser patterns (45 min)
-- Only worth it if clear, repeatable patterns found
-- Expected impact: +20-40 tests if good patterns exist
-
-**Step 4**: Validate 80% milestone (5 min)
+**Step 3**: Validate 80% milestone (5 min)
 - Confirm milestone achieved
 - Document results
 - Update memory bank
@@ -93,7 +141,7 @@ bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
 
 ❌ **Don't:**
 - Add hardcoded logic to Builder (violates clean architecture)
-- Attempt major parser refactoring (diminishing returns at 77.5%)
+- Attempt major parser refactoring (diminishing returns at 79%)
 - Make speculative changes without data analysis
 - Break the 5 core principles
 
@@ -103,11 +151,11 @@ bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
 - Make incremental commits with impact documentation
 - Trust the clean architecture pattern
 
-### Post-80% Strategy (Sessions 25+)
+### Post-80% Strategy (Sessions 26+)
 
 Once 80% achieved:
 
-1. **85% Milestone** (2,430 passing) - ~214 more tests, 4-6 sessions
+1. **85% Milestone** (2,430 passing) - ~172 more tests, 4-6 sessions
 2. **Parser Enhancement Phase** - Address systematic parse failures
 3. **90% Target** - Long-term goal, may require parser architecture work
 
@@ -117,10 +165,10 @@ A detailed continuation plan document is maintained at:
 `.kilocode/rules/create-continue-plan-prompt.md`
 
 This document includes:
-- Complete Session 23 context and results
+- Complete Session 24 context and results
 - The 5 core principles with code examples
 - Anti-patterns to avoid with examples
-- Session 24 priorities and strategies
+- Session 25 priorities and strategies
 - Testing strategy and workflow examples
 - Success metrics and milestones
 - Architecture reference and common tasks
@@ -128,13 +176,13 @@ This document includes:
 
 ### Recent Changes
 
-**Session 23 Key Learnings:**
+**Session 24 Key Learnings:**
 
-1. **Copublisher architecture discovery**: One Publisher object with internal collection, plus separate array for rendering
-2. **Build-time merging**: Transform data structures in build() before cast() loop
-3. **Incremental wins**: Two focused fixes gained 238 tests in one session
-4. **Trust the architecture**: Clean Builder principles guided both fixes
-5. **Understand data structures first**: Reading component code prevented wrong approaches
+1. **TypedStage architecture discovery**: One TypedStage component with two rendering modes (preserves parsed vs normalized)
+2. **Context-aware rendering**: Different identifiers use canonical in different contexts
+3. **Incremental wins**: Four focused fixes gained 43 tests in one session
+4. **Trust the architecture**: Clean Builder principles guided all fixes
+5. **Edition consistency**: All numbers should be Code objects for uniform API
 
 ### Active Development Areas
 
@@ -145,26 +193,30 @@ This document includes:
 
 ### Known Issues
 
-- ISO: 266 test failures (9.3%) - rendering (68) + parser gaps (92) + typed_stage (7) + other (99)
+- ISO: 224 test failures (7.8%) - parser (92) + addendum (81) + other (51)
 - ISO: 377 pending tests (13.2%) - includes typed_stage architectural differences
 - V1 code still exists but not being actively developed
 - Migration documentation complete and comprehensive
 
-### Files Changed in Session 23
+### Files Changed in Session 24
 
-- Modified: `lib/pubid_new/iso/builder.rb` (copublisher merging + handling)
-- Commits: 2 semantic commits with comprehensive documentation
-- Test improvement: 1,978→2,216 passing (+238), 504→266 failing (-238)
-- Pass rate: 69.1% → 77.5% (+8.4pp)
-- Single session improvement: +238 tests through data architecture understanding
+- Modified: `lib/pubid_new/components/typed_stage.rb` (canonical_abbreviation method)
+- Modified: `lib/pubid_new/iso/supplement_identifier.rb` (use canonical when with_edition)
+- Modified: `lib/pubid_new/iso/builder.rb` (edition.number as Code)
+- Modified: `lib/pubid_new/components/edition.rb` (polymorphic number type)
+- Modified: `lib/pubid_new/iso/single_identifier.rb` (canonical abbreviation + edition control)
+- Commits: 4 semantic commits with comprehensive documentation
+- Test improvement: 2,215→2,258 passing (+43), 267→224 failing (-43)
+- Pass rate: 77.5% → 79.0% (+1.5pp)
+- Single session improvement: +43 tests through rendering architecture understanding
 
-### Session 23 Key Learnings
+### Session 24 Key Learnings
 
-1. **Data architecture matters**: Understanding Publisher's internal structure was critical
-2. **Build-time vs cast-time**: Some transformations belong in build() not cast()
-3. **Dual purpose structures**: publisher.copublisher (strings) vs identifier.copublishers (objects)
-4. **Read code first**: Understanding component API prevented wrong approaches
-5. **Two fixes, huge impact**: Focused changes on correct architecture = +238 tests
+1. **TypedStage dual modes**: Both `abbreviation` (parsed) and `canonical_abbreviation` (normalized) are needed
+2. **Rendering context**: SupplementIdentifier conditional, SingleIdentifier always canonical
+3. **Data consistency**: Edition.number should be Code object like all other numbers
+4. **Edition control**: Default to_s should NOT include edition unless requested
+5. **Four fixes, huge impact**: Focused changes on correct architecture = +43 tests
 
 ### Clean Architecture Status
 
