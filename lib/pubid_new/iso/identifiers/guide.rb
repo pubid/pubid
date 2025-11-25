@@ -54,7 +54,7 @@ module PubidNew
 
         Components::TypedStage.new(
           code: :dguide,
-          stage_code: :draft,
+          stage_code: :dguide,
           type_code: :guide,
           abbr: ["DGuide", "DGUIDE"], # DGUIDE is legacy
           name: "Draft Guide",
@@ -62,7 +62,7 @@ module PubidNew
         ),
         Components::TypedStage.new(
           code: :fdguide,
-          stage_code: :final_draft,
+          stage_code: :fdguide,
           type_code: :guide,
           abbr: ["FDGuide", "FD GUIDE"], # "FD GUIDE" is legacy
           name: "Final Draft Guide",
