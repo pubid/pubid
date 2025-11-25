@@ -1,224 +1,397 @@
-# frozen_string_literal: true
-
 require "parslet"
+require_relative "../parser/common_parse_rules"
+require_relative "../parser/common_parse_methods"
+require_relative "identifier"
+require_relative "supplement_identifier"
+require_relative "identifiers/directives_supplement"
 
 module PubidNew
   module Iso
     class Parser < Parslet::Parser
-      rule(:digit) { match["0-9"] }
-      rule(:digits) { digit.repeat(1) }
-      rule(:letter) { match["A-Z"] }
-      rule(:alnum) { match["A-Z0-9"] }
-      rule(:alnums) { alnum.repeat(1) }
-      rule(:space) { str(" ") }
-      rule(:dash) { str("-") | str("‑") | str("‐") }
-      rule(:slash) { str("/") }
+      include ::PubidNew::Parser::CommonParseRules
+      include ::PubidNew::Parser::CommonParseMethods
 
-      # Publishers
-      rule(:iso) { str("ISO") }
-      rule(:iec) { str("IEC") }
-      rule(:ieee) { str("IEEE") }
-      rule(:sae) { str("SAE") }
-      rule(:astm) { str("ASTM") }
-      rule(:cie) { str("CIE") }
-      rule(:hl7) { str("HL7") }
-      rule(:oecd) { str("OECD") }
+      DASH_CHARS = ["-", "‑", "‐"].freeze
 
-      # Publisher with copublishers
-      rule(:publisher) do
-        iso.as(:publisher) >>
-          (slash >> (iec | ieee | sae | astm | cie | hl7 | oecd | str("UNDP")).as(:copublisher)).repeat(
-            0, 3
-          )
+      # We need to sort by length to match longest first because that's how Parslet works
+      TYPED_STAGES = PubidNew::Iso::Scheme.typed_stages
+        .map(&:abbr).flatten.sort_by(&:length).reverse
+      TYPED_STAGES_SUPPLEMENTS = PubidNew::Iso::Scheme.supplement_typed_stages
+        .map(&:abbr).flatten.sort_by(&:length).reverse
+
+      root :identifier
+
+      rule(:identifier) do
+        directives_identifiers |
+          supplement_supplement_identifier |
+          supplement_identifier |
+          joint_identifier |
+          identifier_copublishers
       end
 
-      # Type (including legacy R for Recommendation, TTA for Technology Trends Assessment)
-      rule(:type) do
-        (str("Guide") | str("GUIDE") | str("ISP") | str("IWA") | str("TTA") |
-         str("DATA") | str("DIR") | str("SUP") |
-         str("TR") | str("TS") | str("PAS") | str("R")).as(:type)
+      # ISO 8601-1:2019
+      rule(:prefix_sole_publisher) do
+        (str("ISO") | str("IEC")).as(:publisher)
       end
 
-      # Stage
-      rule(:stage) do
-        (str("preCD") | str("PreCD") | str("PRECD") |
-         str("FDIS") | str("DIS") | str("FCD") |
-         str("PRF") | str("NWIP") | str("WD") | str("CD") | str("AWI") | str("NP") | str("PWI")).as(:stage) >>
-        digits.maybe.as(:stage_iteration_prefix)
+      # ISO/SAE PAS 22736:2021
+      rule(:prefix_with_copublishers) do
+        prefix_sole_publisher >> space? >> copublishers.maybe
       end
 
-      # Typed stages (combined stage+type)
-      rule(:typed_stage) do
-        (str("FPDAM") |
-         str("FDAM") | str("FDAmd") | str("FDAMD") |
-         str("PDAM") | str("PDAmd") |
-         str("DAM") | str("DAmd") | str("DAMD") | str("DAD") |
-         str("FDCOR") | str("FDCor") |
-         str("FCOR") | str("FCor") | str("FCorr") |
-         str("DCOR") | str("DCor") |
-         str("pDCOR") |
-         str("DTR") | str("DTS") | str("DIS") | str("FDIS") | str("FDTR") | str("FDTS") |
-         str("PDTR") | str("PDTS")).as(:typed_stage)
+      ORGANIZATIONS = %w[
+        ISO IEC IEEE CIW SAE CIE ASME ASTM OECD ISO HL7 CEI UNDP
+      ].freeze
+      rule(:copublishers) do
+        (str("/") >> space? >> array_to_str(ORGANIZATIONS).as(:copublisher)).repeat.as(:copublishers)
       end
 
-      # Number
-      rule(:number) { digits.as(:number) }
+      rule(:number_with_part) do
+        (number >> part_and_subpart.maybe).as(:number_with_part)
+      end
 
-      # Part (can be alphanumeric like A01, B02, or just digits)
-      # But exclude exactly 4 digits (that would be a year)
-      rule(:part) do
-        dash >> (
-          # Alphanumeric parts (containing letters) - check these first
-          (letter >> alnum.repeat(0)).as(:part) |
-          (digit.repeat(1, 3) >> letter >> alnum.repeat(0)).as(:part) |
-          # Pure digit parts (but not exactly 4 digits which is a year)
-          (digit.repeat(1, 3) >> digit.absent?).as(:part) |
-          (digit.repeat(5, nil)).as(:part)
+      rule(:number) do
+        match('\d').repeat(1, 5)
+      end
+
+      rule(:date) do
+        # :2005-02
+        (str(":") | dash) >>
+        (year_digits >>
+          (dash >> month_digits).maybe >>
+          (dash >> day_digits).maybe
+        ).as(:date).maybe
+      end
+
+      rule(:part_and_subpart) do
+        # Modern parts
+        # ISO 105-A01:1989
+        # ISO/IEC/IEEE 8802-1AB
+        # ISO/IEC TR 29110-5-1-1
+
+        # Legacy parts
+        # ISO 31/0-1974
+        # ISO 105/F (also known as ISO 105-F)
+        # ISO 5843/6 (also known as ISO 5843-6)
+
+        # Modern parts can have subparts using dash
+        # the "space?" needed to handle "ISO/TS 10303- 1751:2014"
+        (
+          dash >> space? >>
+          # matches a part
+          match('\w').repeat >>
+          # matches a subpart, e.g. "A01" or "1-2" (yes we treat {5}-{1-1} as part and subpart)
+          (dash >> match('\w').repeat).repeat.maybe
+        ) |
+        # Legacy parts do not have subparts
+        # the "/" to handle old style parts: "ISO 5843/6"
+        (
+          str("/") >> space? >>
+          # matches a part
+          match('\w').repeat
         )
       end
 
-      # Legacy slash-based part (e.g., ISO 31/0-1974)
-      # Use negative lookahead to avoid matching supplement keywords
-      rule(:legacy_part) do
-        slash >>
-          # Not followed by supplement keywords or typed stage variants
-          (str("Amd") | str("AMD") |
-           str("FDCor") | str("FDCOR") | str("FCor") | str("FCOR") | str("FCorr") |
-           str("DCor") | str("DCOR") | str("pDCOR") |
-           str("Cor") | str("COR") | str("Cor.") |
-           str("Add") | str("Suppl") | str("Ext")).absent? >>
-          alnums.as(:part)
+      rule(:all_parts) do
+        str("(all parts)").as(:all_parts)
       end
 
-      # Parts can be either dash-based or slash-based (legacy)
-      rule(:parts) { (part | legacy_part).repeat(0).as(:parts) }
-
-      # Edition (can be "Ed 3", "Ed.2", "ED1", "ED", "ED1(fr)" where language is handled separately)
-      rule(:edition) do
-        (space >> (str("Ed.") | str("Ed ") | str("Ed")) >> space.maybe >> digits.maybe |
-         space >> str("ED") >> digits.maybe).as(:edition)
+      rule(:type_with_stage) do
+        # "DTR"
+        # "PRF PAS"
+        # "PRF"
+        # "PAS"
+        array_to_str(TYPED_STAGES).as(:type_with_stage) >>
+          (match('\d').as(:stage_iteration) >> space).maybe
       end
 
-      # Year
-      rule(:year) do
-        (str(":") | dash) >> space.maybe >> digit.repeat(4, 4).as(:year)
-      end
-
-      # Legacy year (for ISO/R identifiers that use dash instead of colon)
-      rule(:legacy_year) { dash >> digit.repeat(4, 4).as(:year) }
-
-      # Iteration
-      rule(:iteration) { str(".") >> digits.as(:iteration) }
-
-      # Language (can be single letters or multi-letter codes, with slashes or commas)
       rule(:language) do
+        # ISO 8601-1:2019(en,fr)
+        # ISO 8601-1:2019(E/F)
         str("(") >>
-          (match["A-Za-z"].repeat(1) >> (str("/") | str(",")).maybe).repeat(1).as(:language) >>
+          (
+            # parse 2-char language codes: ru,en,fr,de,ar,es
+            (match["a-z"].repeat(1) >> str(",").maybe) |
+            # parse single language codes: R/E/F
+            (match["EFARDS"] >> str("/").maybe)
+          ).repeat.as(:languages) >>
           str(")")
       end
 
-      # Supplement type (longest patterns first for proper Parslet matching)
-      rule(:supplement_type) do
-        (str("Addendum") | str("Amd.") | str("Add.") |
-         str("Amd") | str("AMD") |
-         str("Cor.") | str("Cor") | str("COR") |
-         str("Suppl") | str("Ext") | str("Add") | str("ADD")).as(:supplement_type)
+      EDITION_STRINGS = %w[Edition Ed. ED Ed].freeze
+      rule(:edition) do
+        # Capture the entire edition text for exact reproduction
+        (array_to_str(EDITION_STRINGS) >> space? >> digits.maybe).as(:edition)
       end
 
-      # Supplement identifier (appears after base with slash)
-      rule(:supplement) do
-        slash >> (
-          # Pattern 1a: Typed stage with iteration but no supplement number (pDCOR.2)
-          (typed_stage.as(:typed_stage) >>
-           iteration.as(:supplement_iteration) >>
-           year.maybe >> edition.maybe >> language.maybe) |
-          # Pattern 1b: Typed stage with supplement number and optional iteration
-          (typed_stage.as(:typed_stage) >>
-           (space >> digits).as(:supplement_number) >>
-           iteration.maybe.as(:supplement_iteration) >>
-           year.maybe >> edition.maybe >> language.maybe) |
-          # Pattern 2: Stage + space + supplement type (CD Amd, PWI Amd, etc.)
-          (stage.as(:stage) >> space >> supplement_type >>
-           (space.maybe >> digits).as(:supplement_number) >>
-           iteration.maybe.as(:supplement_iteration) >>
-           year.maybe >> edition.maybe >> language.maybe) |
-          # Pattern 3: Supplement type with number and optional year/language
-          (supplement_type >>
-           (space.maybe >> digits).as(:supplement_number) >>
-           iteration.maybe.as(:supplement_iteration) >>
-           year.maybe >> edition.maybe >> language.maybe) |
-          # Pattern 4: Supplement type without number
-          (supplement_type >> year.maybe >> edition.maybe >> language.maybe)
-        )
+      rule(:stage_iteration) do
+        # "ISO 11243.1"
+        str(".") >> match('\d').as(:stage_iteration)
       end
 
-      # IWA pattern (can start without ISO/)
-      rule(:iwa_identifier) do
-        str("IWA").as(:type) >> space >>
-          number >> parts >>
-          year.maybe >>
-          language.maybe
+      # Modern identifiers use ':' as year identifier, e.g. "ISO 8601-1:2019"
+      # Legacy identifiers use '-' as year identifier, e.g. "ISO 31/0-1974"
+      rule(:second_part) do
+        number_with_part >>
+          stage_iteration.maybe >>
+          space? >> date.maybe
       end
 
-      # DIR SUP pattern (special directives supplement)
-      rule(:dir_sup_identifier) do
-        publisher >>
-          (slash | space) >> str("DIR").as(:type) >>
-          space >> number >> parts >>
-          space >> publisher.as(:sup_publisher) >>
-          space >> str("SUP").as(:sup_type) >>
-          year.maybe
+      rule(:third_part_edition) do
+        space? >> edition.maybe
       end
 
-      # Legacy ISO/R identifier (ISO/R number:year or ISO/R number-year or ISO/R number-part:year)
-      rule(:legacy_r_identifier) do
-        publisher >>
-          slash >> str("R").as(:type) >>
-          space >> number >>
-          (legacy_year | (parts >> (year | legacy_year).maybe)) >>
-          language.maybe
+      rule(:third_part) do
+        # End of the identifier, we can have language, edition, or all parts
+        third_part_edition >> language.maybe >> all_parts.maybe
       end
 
-      # Basic identifier (can be base or have supplements)
-      rule(:base_identifier) do
-        publisher >>
-          # Typed stage or regular stage
-          ((slash | space) >> (typed_stage | stage)).maybe >>
-          # Type comes after space or slash
-          ((space | slash) >> type).maybe >>
-          space >> number >> parts >>
-          iteration.maybe >>
-          (legacy_year | year).maybe >>
-          edition.maybe >>
-          language.maybe
+      # prefix sole or copublishers with type and stage
+      # ISO/WD TR 23642
+      # ISO/NP TS 20594-1
+      # ISO/PRF PAS 22596
+      # ISO/ASTM DTR 52905
+      # ISO/IEC WD TS 25025
+      #
+      ## SUPPORTED ABERRATION: ISO TR 16401-2
+      ## SUPPORTED ABERRATION: ISO/IEC/TS 24192-1
+      rule(:identifier_copublishers) do
+        identifier_copublishers_no_third >> third_part
       end
 
-      # Full identifier with optional supplements
-      rule(:identifier) do
-        (dir_sup_identifier | iwa_identifier | legacy_r_identifier | base_identifier).as(:base) >>
-          supplement.repeat(0, 3).as(:supplements)
+      # TODO: Support parsing Russian style identifiers
+      rule(:guide_prefix) do
+        str("Guide") | str("GUIDE") # | str("Руководство") | str("Руководства")
       end
 
-      rule(:root) { identifier }
-
-      def self.parse(input)
-        # Normalize common typos and variations
-        normalized = input
-          .gsub(/IS0/, "ISO")              # Zero instead of O
-          .gsub(/—/, "/")                   # Em-dash to slash
-          .gsub(/–/, "/")                   # En-dash to slash
-          .gsub(/\s+:/, ":")                # Whitespace around colons
-          .gsub(/\s+\/\s+/, "/")            # Remove spaces around slashes (for supplements)
-          .gsub(/ISO\s+\//, "ISO/")         # Remove space before copublisher slash
-          .gsub(/\/Add\.\s+/, "/Add ")      # Normalize "Add. " (with space) to "Add "
-          .gsub(/\/Add\.(?!\d)/, "/Add")    # Normalize "Add." (without digit) to "Add"
-
-        parser_instance.parse(normalized)
+      rule(:identifier_copublishers_no_third) do
+        # Guide ISO/CEI 51:1999
+        (guide_prefix.as(:type_with_stage_fr) >> space).maybe >>
+          # maybe prefix_with_copublishers to handle IWA
+          prefix_with_copublishers.maybe >> space? >> str("/").maybe >>
+          type_with_stage.maybe >>
+          space.maybe >>
+          second_part >> third_part_edition
       end
 
-      def self.parser_instance
-        @parser_instance ||= new
+      # For joint identifiers, we do not treat it as a supplementary identifier
+      # (hence not a base_identifier)
+      # ISO only supports IDF in joint identifiers
+      # ISO 5537|IDF 26
+      # ISO 17678|IDF 202:2010
+      # ISO/TS 4985:2023 | IDF/RM 255
+      # ISO 4214:2022 | IDF 254:2022
+      rule(:joint_identifier) do
+        identifier_copublishers_no_third.as(:base_identifier) >>
+          space? >> str("|") >> space? >>
+          scope { idf_identifier }.as(:joint_identifier)
       end
+
+      rule(:idf_identifier) do
+        Idf::Parser.new.identifier
+      end
+
+      # TODO: Do something with NSB ISO identifiers like "FprISO", "WD/ISO"
+      # Guide ISO/CEI 51:1999
+      # FprISO 105-A03
+      # FprISO/IEC 17029
+      # WD/ISO 10360-5:2000
+      # ISO 4918:2016+A1:2018
+      # rule(:nsb_iso_identifier) do
+      #       str("Fpr").as(:stage).maybe >>
+      #         # Withdrawn e.g: WD/ISO 10360-5:2000
+      #         str("WD/").maybe >>
+      #         # for French and Russian PubIDs starting with Guide type
+      #         (guide_prefix.as(:type) >> space).maybe >>
+      #         (stage.as(:stage) >> space).maybe >>
+      #         (typed_stage.as(:stage) >> space).maybe >>
+      #         (originator >> (space | str("/"))).maybe >>
+      #         (tc_document_body | std_document_body | (dir_document_body >>
+      #           (str(" + ") >> (originator >> space >> dir_document_body).as(:dir_joint_document)).maybe))
+      # end
+
+      rule(:supplement_type_with_stage) do
+        # "DAM"
+        # "NP Amd"
+        array_to_str(TYPED_STAGES_SUPPLEMENTS).as(:type_with_stage)
+      end
+
+      # ISO 8601-1:2019/Amd 2:2024
+      rule(:supplement_identifier_no_third) do
+        identifier_copublishers_no_third.as(:base_identifier) >>
+          str("/") >> supplement_type_with_stage >>
+          # digits.as(:stage_iteration).maybe >>
+          space? >> second_part
+      end
+
+      rule(:supplement_identifier) do
+        supplement_identifier_no_third >> third_part
+      end
+
+      # ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017
+      # ISO/IEC 19794-7:2014/Amd 1:2015/CD Cor 1
+      rule(:supplement_supplement_identifier) do
+        supplement_identifier_no_third.as(:base_identifier) >>
+          str("/") >> supplement_type_with_stage >>
+          # digits.as(:stage_iteration).maybe >>
+          space? >> second_part >> third_part
+      end
+
+      # ISO/IEC DIR
+      # ISO/IEC DIR 1
+      # ISO/IEC DIR 2:2022
+      rule(:directives_identifier) do
+        directives_identifier_no_third >> third_part.maybe >> space? >> date.maybe
+      end
+
+      # ISO/IEC JTC 1 DIR (JTC 1 Directives)
+      rule(:directives_publisher_subgroup) do
+        str("JTC 1").as(:subgroup)
+      end
+
+      # Special number_with_part rule for Directives to handle variants
+      # We treat the variant as `part` of the number_with_part
+      rule(:directives_number_with_part) do
+        (number >> directives_part_and_subpart.maybe).as(:number_with_part)
+      end
+
+      # ISO/IEC DIR 1 IEC (IEC version of the ISO/IEC DIR 1)
+      # ISO/IEC DIR 2 ISO:2022 (ISO version of the ISO/IEC DIR 2)
+      # But NOT: ISO/IEC DIR 1 ISO SUP:2022 (ISO is supplement publisher)
+      # "1 IEC"
+      # "2 ISO"
+      rule(:directives_part_and_subpart) do
+        # Only match ISO/IEC if NOT followed by supplement keywords
+        space >> (str("ISO") | str("IEC")) >> (space >> str("SUP")).absent?
+      end
+
+      DIRECTIVES_TYPED_STAGES = Identifiers::Directives::TYPED_STAGES.map(&:abbr).flatten.sort_by(&:length).reverse
+      rule(:directives_identifier_no_third) do
+        prefix_with_copublishers >> space >>
+          (directives_publisher_subgroup >> space).maybe >>
+          array_to_str(DIRECTIVES_TYPED_STAGES).as(:type_with_stage) >>
+          (
+            (space >> directives_number_with_part).maybe >>
+            (str(":") >> date).maybe
+          ).maybe
+      end
+
+      rule(:directives_supplement_identifier) do
+        directives_identifier_no_third.as(:base_identifier) >> space? >> directives_supplement_part
+      end
+
+      DIRECTIVES_SUPPLEMENTS_TYPED_STAGES = Identifiers::DirectivesSupplement::TYPED_STAGES.map(&:abbr).flatten.sort_by(&:length).reverse
+
+      rule(:directives_supplement_part_no_third) do
+        # ISO/IEC DIR 1 ISO SUP
+        # ISO/IEC DIR 2 ISO SUP:2022
+        # ISO/IEC DIR JTC 1 SUP:2021
+        (str("ISO") | str("IEC") | str("JTC 1")).as(:publisher) >>
+          (space >> array_to_str(DIRECTIVES_SUPPLEMENTS_TYPED_STAGES).as(:type_with_stage)) >>
+          date.maybe
+      end
+
+      rule(:directives_supplement_part) do
+        directives_supplement_part_no_third >> third_part.maybe
+      end
+
+      # ISO/IEC DIR 1 + IEC SUP:2016-05
+      # ISO/IEC DIR 1:2022 + IEC SUP:2022
+      rule(:directives_bundled_identifier) do
+        (
+          directives_identifier_no_third >>
+          (third_part >> space?).maybe >>
+          (date >> space?).maybe
+        ).as(:base_document) >>
+        (
+          str("+ ") >>
+          directives_supplement_part_no_third.as(:supplement)
+        ).repeat(1).as(:supplements)
+      end
+
+      rule(:directives_identifiers) do
+        directives_bundled_identifier |
+          directives_supplement_identifier |
+          directives_identifier
+      end
+
+      rule(:dash) do
+        DASH_CHARS.map { |char| str(char) }.reduce(:|)
+      end
+
+      #     rule(:tctype) do
+      #       # tc-types
+      #       array_to_str(TCTYPES)
+      #     end
+
+      #     rule(:sctype) do
+      #       str("SC")
+      #     end
+
+      #     rule(:wgtype) do
+      #       array_to_str(WGTYPES)
+      #     end
+
+      #     rule(:roman_numerals) do
+      #       str("CD").absent? >> array_to_str(%w[I V X L C D M]).repeat(1).as(:roman_numerals)
+      #     end
+
+      #     rule(:part_matcher) do
+      #       year_digits.absent? >>
+      #         supplements.absent? >>
+      #         staged_addenda.absent? >> ((roman_numerals >> digits.absent?) | match['[\dA-Z]'].repeat(1)).as(:part)
+      #     end
+
+      #     rule(:supplement) do
+      #       ((str("/") | space).maybe >>
+      #         (((stage.as(:typed_stage) >> space).maybe >> supplements.as(:type)) |
+      #           staged_supplement.as(:typed_stage)) >>
+      #         (space | str(".")).repeat(1).maybe >>
+      #         digits.as(:number).maybe >>
+      #         (str(".") >> digits.as(:iteration)).maybe >>
+      #         ((str(":") | dash) >> digits.as(:year)).maybe).repeat(1).as(:supplements)
+      #     end
+
+      # # Parse technical committee documents
+      # rule(:tc_document_body) do
+      #   (tctype.as(:tctype) >> str("/").maybe).repeat >> space >> digits.as(:tcnumber) >>
+      #     (str("/") >> (
+      #       ((sctype.as(:sctype) >> space >> digits.as(:scnumber) >> str("/")).maybe >>
+      #         wgtype.as(:wgtype) >> space >> digits.as(:wgnumber)) |
+      #         (sctype.as(:sctype) >> (space | str("/") >> wgtype.as(:wgtype) >> space) >> digits.as(:scnumber))
+      #     )).maybe >>
+      #     space >> str("N") >> space? >> digits.as(:number)
+      # end
+
+      # rule(:dir_supplement_edition) do
+      #   space >> (str("Edition") | str("Ed")) >> space >> digits.as(:edition)
+      # end
+
+      # rule(:dir_document_body) do
+      #   ((str("DIR") | str("Directives Part") | str("Directives, Part") | str("Directives,")).as(:type) >> space).maybe >>
+      #     (str("JTC").as(:dirtype) >> space).maybe >>
+      #     (digits.as(:number) >> (str(":") >> year).maybe).maybe >>
+      #     (space >> str("DIR").as(:jtc_dir) >> (str(":") >> year).maybe).maybe >>
+      #     (str(" -- Consolidated").maybe >> (str("").as(:mark) >> space? >>
+      #       (organization.as(:publisher) >> space?).maybe >>
+      #       array_to_str(DIR_SUPPLEMENTS) >> (str(":") >> (year >> (dash >> month_digits.as(:month)).maybe)).maybe >>
+      #       dir_supplement_edition.maybe).repeat(1).as(:supplements)).maybe >>
+      #       # parse identifiers with publisher at the end, e.g. "ISO/IEC DIR 2 ISO"
+      #     (space >> organization.as(:publisher) >> (str(":") >> year).maybe).as(:edition).maybe
+      # end
+
+      #     rule(:identifier) do
+      #       str("Fpr").as(:stage).maybe >>
+      #         # Withdrawn e.g: WD/ISO 10360-5:2000
+      #         str("WD/").maybe >>
+      #         # for French and Russian PubIDs starting with Guide type
+      #         (guide_prefix.as(:type) >> space).maybe >>
+      #         (stage.as(:stage) >> space).maybe >>
+      #         (typed_stage.as(:stage) >> space).maybe >>
+      #         (originator >> (space | str("/"))).maybe >>
+      #         (tc_document_body | std_document_body | (dir_document_body >>
+      #           (str(" + ") >> (originator >> space >> dir_document_body).as(:dir_joint_document)).maybe))
+      #     end
     end
   end
 end

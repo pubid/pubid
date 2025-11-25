@@ -5,18 +5,16 @@ module PubidNew
   module Iso
     module Identifiers
       class Directives < SingleIdentifier
-        attribute :type, ::PubidNew::Components::Type, default: -> {
-          type[:key]
-        }
-        attribute :subgroup, ::PubidNew::Components::Code
+        attribute :type, Components::Type, default: -> { type[:key] }
+        attribute :subgroup, Components::Code
 
         TYPED_STAGES = [
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :pubguide,
             stage_code: :published,
             type_code: :dir,
             abbr: ["DIR", "Directives Part", "Directives, Part", "Directives,",
-                   "Directives"],
+                  "Directives"],
             name: "Directives",
             harmonized_stages: %w[60.00 60.60],
           ),
@@ -27,20 +25,18 @@ module PubidNew
         end
 
         def publisher_portion(lang: :en)
-          # Determine stage abbreviation
-          stage_abbr = if typed_stage&.abbreviation
-                         typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"
-                       elsif self.class.respond_to?(:type)
-                         " #{self.class.type[:short]}"
-                       else
-                         " DIR"
-                       end
+          return [
+              publisher.body,
+              (subgroup ? " #{subgroup.value}" : ""),
+              (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
+            ].join('') unless copublishers&.any?
 
+          # If there are copublishers, join them with slashes
           [
-            publisher.to_s,
+            ([publisher] + copublishers).map(&:body).join("/"),
             (subgroup ? " #{subgroup.value}" : ""),
-            stage_abbr,
-          ].join
+            (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
+          ].join('')
         end
 
         # This differs from the basic number_portion in that directives may have
@@ -49,7 +45,7 @@ module PubidNew
         def number_portion(lang_single: false)
           result = [
             # Directives may not have a number
-            (number ? number.value.to_s : ""),
+            (number ? "#{number.value}" : ""),
 
             # Parts and subparts are optional
             (part ? " #{part.value}" : ""),
@@ -60,7 +56,7 @@ module PubidNew
 
             # Date is optional
             (date ? ":#{date.year}" : ""),
-          ].join
+          ].join('')
 
           # Return nil if there's nothing to render
           result.empty? ? nil : result

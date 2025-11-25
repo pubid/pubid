@@ -1,56 +1,116 @@
-# frozen_string_literal: true
-
-require_relative "base"
+require_relative "../single_identifier"
 require_relative "../../components/typed_stage"
 
 module PubidNew
   module Iso
-    module Identifiers
-      # ISO Guide
-      # Format: ISO Guide NUMBER:YEAR
-      # Format: ISO/IEC Guide NUMBER:YEAR
-      class Guide < Base
-        def to_s(lang: :en, lang_single: false, with_edition: false)
-          result = publisher.to_s
+  module Identifiers
+    class Guide < SingleIdentifier
+      attribute :type, Components::Type, default: -> { type[:key] }
 
-          # Add stage if present
-          if stage&.abbr
-            result += publisher.has_copublisher? ? " #{stage.abbr}" : "/#{stage.abbr}"
-          end
+      TYPED_STAGES = [
+        Components::TypedStage.new(
+          code: :pwiis,
+          stage_code: :pwi,
+          type_code: :guide,
+          abbr: ["PWI Guide"],
+          name: "Proposed Work Item for International Standard",
+          harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
+        ),
+        Components::TypedStage.new(
+          code: :npguide,
+          stage_code: :np,
+          type_code: :guide,
+          abbr: ["NP Guide", "NP GUIDE"], # "NP Guide" is legacy
+          name: "New Work Item Proposal for Guide",
+          harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
+        ),
 
-          # Always add "Guide" type with proper separator
-          has_prefix = stage&.abbr || publisher.has_copublisher?
-          sep = has_prefix ? " " : "/"
-          result += "#{sep}Guide"
+        Components::TypedStage.new(
+          code: :awiguide,
+          stage_code: :awi,
+          type_code: :guide,
+          abbr: ["AWI Guide", "AWI GUIDE"], # "AWI Guide" is legacy
+          name: "Approved Work Item for Guide",
+          harmonized_stages: %w[10.99 20.00],
+        ),
 
-          # Add number
-          result += " #{number.value}" if number&.value
+        Components::TypedStage.new(
+          code: :wdguide,
+          stage_code: :wd,
+          type_code: :guide,
+          abbr: ["WD Guide", "WD GUIDE"], # "WD Guide" is legacy
+          name: "Working Draft for Guide",
+          harmonized_stages: %w[20.20 20.60 20.92 20.93 20.98 20.99],
+        ),
 
-          # Add part (with dash)
-          result += "-#{part.value}" if part&.value
+        Components::TypedStage.new(
+          code: :cdguide,
+          stage_code: :cd,
+          type_code: :guide,
+          abbr: ["CD Guide", "CD GUIDE"], # "CD Guide" is legacy
+          name: "Committee Draft for Guide",
+          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
+        ),
 
-          # Add subpart (with dash)
-          result += "-#{subpart.value}" if subpart&.value
+        Components::TypedStage.new(
+          code: :dguide,
+          stage_code: :draft,
+          type_code: :guide,
+          abbr: ["DGuide", "DGUIDE"], # DGUIDE is legacy
+          name: "Draft Guide",
+          harmonized_stages: %w[40.00 40.20 40.60 40.92 40.93 40.98 40.99],
+        ),
+        Components::TypedStage.new(
+          code: :fdguide,
+          stage_code: :final_draft,
+          type_code: :guide,
+          abbr: ["FDGuide", "FD GUIDE"], # "FD GUIDE" is legacy
+          name: "Final Draft Guide",
+          harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+        ),
+        Components::TypedStage.new(
+          code: :prfguide,
+          stage_code: :prf,
+          type_code: :guide,
+          abbr: ["PRF Guide", "PRF GUIDE"], # "PRF GUIDE" is legacy
+          name: "Proof Guide",
+          harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+        ),
+        Components::TypedStage.new(
+          code: :pubguide,
+          stage_code: :published,
+          type_code: :guide,
+          abbr: ["Guide", "GUIDE"], # "GUIDE" is legacy
+          name: "Published Guide",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+      ].freeze
 
-          # Add stage iteration if present
-          result += ".#{stage_iteration.value}" if stage_iteration&.value
-
-          # Add year
-          result += ":#{date.year}" if date&.year
-
-          # Add edition if with_edition flag is set
-          result += " #{edition.to_s}" if with_edition && edition&.number
-
-          # Add language
-          if languages&.any?
-            result += "(#{languages.map do |l|
-              l.to_s(lang_single: lang_single)
-            end.join('/')})"
-          end
-
-          result
-        end
+      def self.type
+        { key: :guide, title: "Guide", short: "GUIDE" }
       end
+
+      # TODO: Support French and Russian
+      # if opts[:language] == :french
+      #   "Guide %{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
+      # elsif opts[:language] == :russian
+      #   "Руководство %{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
+      # else
+      #   if params[:stage] && params[:stage].is_a?(Pubid::Core::TypedStage)
+      #     "%{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
+      #   else
+      #     "%{publisher}%{stage} Guide %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
+      #   end
+      # end
+
+      # def to_s(lang: :en)
+      #   [
+      #     base_identifier.to_s,
+      #     "/#{typed_stage.abbreviation}",
+      #     number_portion
+      #   ].join('')
+      # end
     end
   end
+end
 end

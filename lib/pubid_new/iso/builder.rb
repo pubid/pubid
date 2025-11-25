@@ -1,422 +1,272 @@
-# frozen_string_literal: true
-
+require_relative "../components/publisher"
+require_relative "../components/code"
 require_relative "../components/date"
-require_relative "components/publisher"
-require_relative "components/code"
-require_relative "identifiers/international_standard"
-require_relative "identifiers/guide"
-require_relative "identifiers/technical_report"
-require_relative "identifiers/technical_specification"
-require_relative "identifiers/amendment"
 
 module PubidNew
+  # Identifier that
   module Iso
     class Builder
-      def self.build(parsed_data)
-        new.build(parsed_data)
+      LANG_CHAR_MAP = {
+        "R" => "ru",
+        "F" => "fr",
+        "E" => "en",
+        "A" => "ar",
+        "S" => "es",
+        "D" => "de",
+      }.freeze
+
+      def initialize(scheme)
+        @scheme = scheme
+        self
       end
 
-      def build(data)
-        # Convert array of hashes to single hash, collecting duplicate keys
-        if data.is_a?(Array)
-          data = merge_array_preserving_duplicates(data)
+      def locate_typed_stage(typed_stage_string)
+        # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
+        typed_stage_string = "" if typed_stage_string.nil?
+
+        @scheme.locate_typed_stage_by_abbr(typed_stage_string)
+      end
+
+      def locate_identifier_klass(parsed_hash)
+        # If there is a joint_identifier, we need to use a CombinedIdentifier
+        # which takes `base_identifier` and `additional_identifiers`
+        if parsed_hash[:joint_identifier]
+          return CombinedIdentifier
         end
 
-        # Check if this is a supplement identifier (has supplements array)
-        if data[:supplements]&.any?
-          return build_supplement_identifier(data)
+        # If there are supplements, we need to use a BundledIdentifier
+        # which takes `base_document` and `supplements`
+        if parsed_hash[:supplements]
+          return ::PubidNew::BundledIdentifier
         end
 
-        # Extract base data if present
-        base_data = data[:base] || data
+        # Check the `:type_with_stage` to determine the identifier class
+        # 1. :type_with_stage will be nil if:
+        # a) It is an IS.
+        # b) It is a Directive Supplements. The "SUP" keyword may be entirely missing, and hence nil. If the base type_with_stage is a directive, then if the type_with_stage is blank, it is a directive supplement.
 
-        # Convert base_data if it's an array of hashes
-        if base_data.is_a?(Array)
-          base_data = merge_array_preserving_duplicates(base_data)
+        if parsed_hash[:type_with_stage].nil? && parsed_hash[:base_identifier] && parsed_hash[:base_identifier][:type_with_stage] == "DIR"
+          # Directive Supplement without "SUP" keyword
+          parsed_hash[:type_with_stage] = "SUP"
         end
 
-        # Build publisher
-        publisher = build_publisher(base_data)
+        typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
 
-        # Build number and parts
-        number_data = build_number_data(base_data)
+        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+      end
 
-        # Determine type - typed_stage may contain type info
-        type_str = extract_type(base_data)
-        stage_str = extract_stage(base_data)
+      def build(parsed_hash)
+        # Instantiate the identifier based on the typed stage
+        identifier = locate_identifier_klass(parsed_hash).new
 
-        # Handle iteration - prefer stage_iteration_prefix if stage is present
-        iteration_value = if stage_str && base_data[:stage_iteration_prefix]
-                           base_data[:stage_iteration_prefix]
-                         else
-                           base_data[:iteration]
-                         end
+        # For French GUIDE entries: "Guide ISO/CEI 37:1995"
+        if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
+          parsed_hash[:type_with_stage] = type_with_stage_fr
+        end
 
-        # Select appropriate class based on type
-        klass = determine_identifier_class(type_str, base_data)
+        # For DirectivesSupplement, rename :publisher to :supplement_publisher
+        if identifier.is_a?(Identifiers::DirectivesSupplement) && parsed_hash[:publisher]
+          parsed_hash[:supplement_publisher] = parsed_hash.delete(:publisher)
+        end
 
-        # Special handling for DirectivesSupplement - it needs a base identifier
-        if klass == Identifiers::DirectivesSupplement
-          # Build the Directives base identifier
-          directives_base = Identifiers::Directives.new(
-            publisher: publisher,
-            type: type_str ? ::PubidNew::Components::Type.new(abbr: type_str) : nil,
-            number: number_data[:number],
-            part: number_data[:part],
-            subpart: number_data[:subpart],
-            date: nil, # Date goes on supplement, not base
-            stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: normalize_stage_abbr(stage_str)) : nil,
-            stage_iteration: iteration_value ? ::PubidNew::Components::Code.new(value: iteration_value&.to_s) : nil,
-            languages: base_data[:language] ? [::PubidNew::Components::Language.new(
-              code: normalize_language_code(base_data[:language]&.to_s),
-              original_code: base_data[:language]&.to_s
-            )] : nil,
-          )
+        parsed_hash.each_pair do |key, value|
+          realized_components = cast(key.to_sym, value)
 
-          # Extract supplement_publisher
-          supplement_publisher = nil
-          if base_data[:sup_publisher]
-            sup_pub_data = base_data[:sup_publisher]
-            sup_pub_str = if sup_pub_data.is_a?(Hash)
-                            sup_pub_data[:publisher]&.to_s
-                          else
-                            sup_pub_data.to_s
-                          end
-            supplement_publisher = Components::Publisher.new(publisher: sup_pub_str) if sup_pub_str
+          next if realized_components.nil?
+
+          if key == :joint_identifier
+            # the realized component is an Identifier class to be added to a CombinedIdentifier
+            identifier.additional_identifiers ||= []
+            identifier.additional_identifiers << realized_components
+            next
           end
 
-          # Create DirectivesSupplement with base
-          return Identifiers::DirectivesSupplement.new(
-            base_identifier: directives_base,
-            supplement_publisher: supplement_publisher,
-            date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
-          )
+          case realized_components
+          when Hash
+            realized_components.each_pair do |sub_key, sub_value|
+              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+            end
+          else
+            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+          end
         end
 
-        klass.new(
-          publisher: publisher,
-          type: type_str && type_str != "Guide" && type_str != "GUIDE" ? ::PubidNew::Components::Type.new(abbr: type_str) : nil,
-          number: number_data[:number],
-          part: number_data[:part],
-          subpart: number_data[:subpart],
-          date: base_data[:year] ? ::PubidNew::Components::Date.new(year: base_data[:year]&.to_i) : nil,
-          edition: base_data[:edition] ? build_edition(base_data[:edition]) : nil,
-          stage: stage_str ? ::PubidNew::Components::Stage.new(abbr: normalize_stage_abbr(stage_str)) : nil,
-          stage_iteration: iteration_value ? ::PubidNew::Components::Code.new(value: iteration_value&.to_s) : nil,
-          languages: base_data[:language] ? [::PubidNew::Components::Language.new(
-            code: normalize_language_code(base_data[:language]&.to_s),
-            original_code: base_data[:language]&.to_s
-          )] : nil,
-        )
+        identifier
       end
 
-      private
+      # Convert roman numeral to integer
+      def convert_roman_to_integer(roman_numeral)
+        return roman_numeral unless roman_numeral.to_s.match?(/^[IVXLCDM]+$/i)
 
-      # Normalize language code to two-letter ISO 639-1 format
-      def normalize_language_code(lang_str)
-        return nil unless lang_str
-
-        # If it's a single character, map it to two-letter code
-        if lang_str.length == 1
-          ::PubidNew::Components::Language::CHAR_MAP[lang_str.upcase]
-        else
-          # Assume it's already a two-letter code, normalize to lowercase
-          lang_str.downcase
-        end
-      end
-
-      # Normalize legacy stage names for rendering
-      def normalize_stage_abbr(stage_str)
-        return nil unless stage_str
-
-        # Map legacy stage names to their canonical forms
-        normalizations = {
-          "NWIP" => "NP",    # New Work Item Proposal → New Proposal
-          "PreCD" => "preCD", # Normalize case
-          "PRECD" => "preCD", # Normalize case
+        roman_to_int_map = {
+          "I" => 1,
+          "V" => 5,
+          "X" => 10,
+          "L" => 50,
+          "C" => 100,
+          "D" => 500,
+          "M" => 1000,
         }
 
-        normalizations[stage_str] || stage_str
+        result = 0
+        prev_value = 0
+
+        roman_numeral.to_s.upcase.chars.reverse.each do |char|
+          value = roman_to_int_map[char]
+          if value < prev_value
+        result -= value
+          else
+        result += value
+          end
+          prev_value = value
+        end
+
+        result.to_s
       end
 
-      # Merge array of hashes, collecting duplicate keys into arrays
-      def merge_array_preserving_duplicates(array)
-        array.inject({}) do |acc, h|
-          h.each do |key, value|
-            if acc.key?(key)
-              # Convert to array if not already
-              acc[key] = [acc[key]] unless acc[key].is_a?(Array)
-              acc[key] << value
-            else
-              acc[key] = value
+      def cast(type, value)
+        case type
+        when :base_identifier
+          # If it has a base identifier, we need to build a supplement
+          # We assume that the base identifier is already a valid Identifier object
+          build(value)
+
+          # If there is a base_identifier, and it has a joint_identifier, we need to use a CombinedIdentifier.
+
+        when :publisher, :directives_supplement_body, :supplement_publisher
+          Components::Publisher.new(body: value)
+
+        when :copublishers
+          if value.nil? || value.empty?
+            nil
+          else
+            value.map do |copublisher|
+              Components::Publisher.new(body: copublisher[:copublisher])
             end
           end
-          acc
-        end
-      end
 
-      def build_supplement_identifier(data)
-        # Build base identifier first
-        base_data = data[:base] || data
-        base_identifier = build(base_data)
+        when :number_with_part
+          # "1234" (no part)
+          # or "1234-1" ('1' is part)
+          # or "1234-1-2" ('1' is part, '2' is subpart)
+          # or "29110-5-1-1" ('5' is part, '1-1' is subpart)
+          # or "105/F" ('F' is part)
+          # or "5843/6" ('6' is part)
 
-        # Process supplements recursively, each wrapping the previous
-        current_base = base_identifier
+          # Split the number into parts
+          normalized_value = value.to_s.tr(Parser::DASH_CHARS.join + "/", "-")
 
-        data[:supplements].each do |supplement_data|
-          # Determine supplement type from both supplement_type and typed_stage
-          supplement_type = supplement_data[:supplement_type]&.to_s&.downcase
+          # for "1 IEC" ('IEC' is part) (in case of "ISO/IEC DIR 1 IEC")
+          normalized_value.gsub!(" ", "-")
 
-          # Extract typed_stage - parser returns nested {:typed_stage=>{:typed_stage=>"FDAM"}}
-          # OR it may return {:stage=>{:stage=>"CD"}} for patterns like "CD Amd 1"
-          typed_stage_str = if supplement_data[:typed_stage].is_a?(Hash)
-                              supplement_data[:typed_stage][:typed_stage]&.to_s
-                            elsif supplement_data[:typed_stage]
-                              supplement_data[:typed_stage]&.to_s
-                            elsif supplement_data[:stage].is_a?(Hash)
-                              supplement_data[:stage][:stage]&.to_s
-                            else
-                              supplement_data[:stage]&.to_s
-                            end
+          parts = normalized_value.split("-")
+          number = parts.shift # The first part is always the number
+          part = parts.shift # The second part is the part, if present
+          subpart = parts.any? ? parts.join("-") : nil # The remaining parts form the subpart, if present
 
-          # Select appropriate supplement class
-          supplement_class = if supplement_type
-                               case supplement_type
-                               when /amd/
-                                 Identifiers::Amendment
-                               when /cor/
-                                 Identifiers::Corrigendum
-                               when /add/ # Addendum (legacy addendum format)
-                                 Identifiers::Supplement
-                               when /suppl/
-                                 Identifiers::Supplement
-                               when /ext/
-                                 Identifiers::Extract
-                               else
-                                 Identifiers::Supplement
-                               end
-                             elsif typed_stage_str
-                               # Infer from typed_stage when supplement_type is missing
-                               case typed_stage_str.upcase
-                               when /DAM/, /AMD/
-                                 Identifiers::Amendment
-                               when /COR/
-                                 Identifiers::Corrigendum
-                               when /DAD/ # Draft Addendum
-                                 Identifiers::Supplement
-                               else
-                                 Identifiers::Supplement
-                               end
-                             else
-                               Identifiers::Supplement
-                             end
+          part = convert_roman_to_integer(part)
 
-          # Extract stage from typed_stage
-          stage_str = extract_supplement_stage(typed_stage_str)
+          code_hash = { number: Components::Code.new(value: number) }
 
-          # Find typed_stage - prefer stage string if available, then supplement_type
-          typed_stage = if stage_str
-                          # Stage is most specific - use it first
-                          find_typed_stage(supplement_class, stage_str)
-                        elsif supplement_type && supplement_type !~ /suppl/
-                          # Try to match by supplement_type (for Add, Addendum, etc.)
-                          find_typed_stage(supplement_class, supplement_type.capitalize)
-                        else
-                          # Default to published stage for the supplement class
-                          find_published_typed_stage(supplement_class)
-                        end
-
-          # Fallback to published if nothing found
-          typed_stage ||= find_published_typed_stage(supplement_class)
-
-          # Preserve original parsed abbreviation for correct rendering
-          if typed_stage && supplement_type
-            # Clone the typed_stage and set original_abbr
-            typed_stage = typed_stage.dup
-            # Capitalize first letter for canonical form (Add, Addendum, Suppl, etc.)
-            typed_stage.original_abbr = supplement_type.capitalize
+          if part
+            code_hash[:part] = Components::Code.new(value: part)
           end
 
-          # Create this supplement with current_base as its base
-          current_base = supplement_class.new(
-            base_identifier: current_base,
-            number: ::PubidNew::Components::Code.new(value: supplement_data[:supplement_number]&.to_s&.strip),
-            date: supplement_data[:year] ? ::PubidNew::Components::Date.new(year: supplement_data[:year]&.to_i) : nil,
-            typed_stage: typed_stage,
-            edition: supplement_data[:edition] ? build_edition(supplement_data[:edition]) : nil,
-            languages: supplement_data[:language] ? [::PubidNew::Components::Language.new(
-              code: normalize_language_code(supplement_data[:language]&.to_s),
-              original_code: supplement_data[:language]&.to_s
-            )] : nil,
-          )
-        end
+          if subpart
+            code_hash[:subpart] = Components::Code.new(value: subpart)
+          end
 
-        # Return the outermost supplement
-        current_base
-      end
+          code_hash
 
-      def build_edition(edition_str)
-        # Edition can be: " Ed 1", "Ed.2", "ED1", " Ed. 1", etc.
-        # Extract the number
-        number = edition_str.to_s.gsub(/[^\d]/, "")
-        return nil if number.empty?
+        when :directives_type
+          # nothing to do here, just return nil
+          nil
 
-        ::PubidNew::Components::Edition.new(
-          number: number,
-          original_text: edition_str.to_s.strip
-        )
-      end
+        when :type_with_stage
+          # "WD"
+          # "PAS"
+          # "CD TR"
+          original_value = value.to_s  # Store the original parsed value
+          iteration = original_value.match(/(\d+)$/)
+          normalized_value = original_value.sub(iteration.to_s, "")
+          typed_stage = locate_typed_stage(normalized_value || "")
+          
+          # Create a copy with the original abbreviation preserved
+          typed_stage_with_original = typed_stage.dup
+          typed_stage_with_original.original_abbr = original_value.strip
 
-      def find_typed_stage(klass, stage_abbr)
-        return nil unless klass.const_defined?(:TYPED_STAGES)
+          ## IMPORTANT!!
+          # Always use TypedStage in an Identifier or separate Type and Stage.
+          {
+            stage: typed_stage_with_original.to_stage,
+            type: typed_stage_with_original.to_type,
+            typed_stage: typed_stage_with_original,
+          }
+        when :stage_iteration
+          # "1" or "2"
+          Components::Code.new(value: value.to_s)
 
-        klass::TYPED_STAGES.find do |ts|
-          ts.abbr.any? { |a| a.upcase == stage_abbr.upcase }
-        end
-      end
-
-      def find_published_typed_stage(klass)
-        return nil unless klass.const_defined?(:TYPED_STAGES)
-
-        # Find the published stage (stage_code is "published")
-        klass::TYPED_STAGES.find do |ts|
-          ts.stage_code.to_s == "published"
-        end
-      end
-
-      def extract_supplement_stage(typed_stage)
-        return nil unless typed_stage
-
-        case typed_stage
-        when /^FDAM/
-          "FDAM"
-        when /^PDAM/
-          "PDAM"
-        when /^DAM/
-          "DAM"
-        when /^FDCOR/
-          "FDCOR"
-        when /^DCOR/
-          "DCOR"
-        else
-          typed_stage
-        end
-      end
-
-      def determine_identifier_class(type_str, data = {})
-        case type_str&.upcase
-        when "GUIDE"
-          Identifiers::Guide
-        when "TR"
-          Identifiers::TechnicalReport
-        when "TS"
-          Identifiers::TechnicalSpecification
-        when "DATA"
-          Identifiers::Data
-        when "PAS"
-          Identifiers::Pas
-        when "TTA"
-          Identifiers::TechnologyTrendsAssessments
-        when "IWA"
-          Identifiers::InternationalWorkshopAgreement
-        when "ISP"
-          Identifiers::InternationalStandardizedProfile
-        when "DIR"
-          # Check if it's a supplement to directives (has SUP fields)
-          if data[:sup_type] || data[:sup_publisher]
-            Identifiers::DirectivesSupplement
+        when :date
+          value = value.to_s
+          # If there is month, "2005-12"
+          if value.match?(/^\d{4}(-\d{2})?$/)
+            year, month = value.split("-")
+            Components::Date.new(year: year, month: month || nil)
+          elsif value.is_a?(Integer) || value.is_a?(String) && value.match?(/^\d{4}$/)
+            # If it's just a year, "2005"
+            Components::Date.new(year: value)
           else
-            Identifiers::Directives
+            raise ArgumentError, "Invalid date format: #{value.inspect}"
           end
-        when "SUP"
-          Identifiers::DirectivesSupplement
-        when "R"
-          Identifiers::Recommendation
+
+        when :edition
+          # value can be "Ed.2", "Ed 2", "ED1", "Edition 13", or just "Ed"
+          original_text = value.to_s
+          # Extract just the digit(s) for the number field
+          number = original_text.match(/\d+/)&.to_s
+          Components::Edition.new(number: number, original_text: original_text)
+
+        when :languages
+          # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
+          original_value = value.to_s
+          normalized_value = original_value.gsub("/", ",")
+
+          normalized_value.split(",").map.with_index do |lang, idx|
+            # We need to convert these into 2 char language codes
+            lang = lang.strip
+            original_lang = lang  # Store original format before conversion
+            lang = LANG_CHAR_MAP[lang] if lang.length == 1
+            Components::Language.new(code: lang, original_code: original_lang)
+          end
+
+        when :all_parts
+          Components::Locality.new(all_parts: true)
+
+        # ISO 4214:2022 | IDF/RM 254:2022
+        when :joint_identifier
+          case value[:publisher]
+          when "IDF"
+            require_relative '../idf/builder'
+            Idf::Builder.new(Idf::Scheme).build(value)
+          end
+
+        when :subgroup
+          # Handle JTC 1 subgroup in directives (ISO/IEC JTC 1 DIR)
+          # Store as a component for potential use in rendering
+          Components::Code.new(value: value.to_s)
+
+        when :supplements
+          # Handle bundled supplements (+ operator)
+          # Each supplement is a hash that needs to be built
+          value.map { |supplement_hash| build(supplement_hash[:supplement]) }
+
+        when :base_document
+          # For bundled identifiers, build the base document
+          build(value)
+
         else
-          Identifiers::InternationalStandard
+          raise ArgumentError, "Unknown parameter type: #{type}"
         end
-      end
-
-      def extract_type(data)
-        # Typed stages like "DTR" mean  "Draft TR"
-        if data[:typed_stage]
-          ts = data[:typed_stage].to_s
-          return "TR" if ts.include?("TR")
-          return "TS" if ts.include?("TS")
-        end
-
-        data[:type]&.to_s
-      end
-
-      def extract_stage(data)
-        # Typed stages like "DTR" mean type=TR, stage=Draft
-        if data[:typed_stage]
-          ts = data[:typed_stage].to_s
-          return "CD" if ts.start_with?("D") && !ts.start_with?("DIS")
-          return "DIS" if ts == "DIS"
-          return "FDIS" if ts == "FDIS"
-
-          return ts
-        end
-
-        data[:stage]&.to_s
-      end
-
-      def build_publisher(data)
-        copubs = []
-        # Handle copublisher - parser may return single hash or array
-        if data.key?(:copublisher) && data[:copublisher]
-          copub_data = data[:copublisher]
-
-          # If it's an array, iterate
-          if copub_data.is_a?(Array)
-            copub_data.each do |item|
-              if item.is_a?(Hash)
-                # Each item might have nested :copublisher key
-                val = item[:copublisher] || item
-                copubs << val.to_s if val
-              else
-                copubs << item.to_s
-              end
-            end
-          elsif copub_data.is_a?(Hash)
-            # Single hash with nested :copublisher
-            val = copub_data[:copublisher] || copub_data
-            copubs << val.to_s if val
-          else
-            # Direct string value
-            copubs << copub_data.to_s
-          end
-        end
-
-        Components::Publisher.new(
-          publisher: data[:publisher]&.to_s || "ISO",
-          copublisher: copubs.empty? ? nil : copubs,
-        )
-      end
-
-      def build_number_data(data)
-        # Extract parts if present
-        parts = []
-        if data[:parts].is_a?(Array) && data[:parts].any?
-          parts = data[:parts].map { |p| p[:part].to_s }
-        end
-
-        result = {}
-        if data[:number]
-          result[:number] =
-            ::PubidNew::Components::Code.new(value: data[:number].to_s)
-        end
-        if parts.first
-          result[:part] =
-            ::PubidNew::Components::Code.new(value: parts.first)
-        end
-        # Subpart is everything after first part, joined with dashes
-        if parts.length > 1
-          result[:subpart] =
-            ::PubidNew::Components::Code.new(value: parts[1..-1].join("-"))
-        end
-        result
       end
     end
   end

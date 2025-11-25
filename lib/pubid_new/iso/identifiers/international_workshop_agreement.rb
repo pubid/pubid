@@ -6,12 +6,10 @@ module PubidNew
     module Identifiers
       # International Workshop Agreement Identifier
       class InternationalWorkshopAgreement < SingleIdentifier
-        attribute :type, ::PubidNew::Components::Type, default: -> {
-          type[:key]
-        }
+        attribute :type, Components::Type, default: -> { type[:key] }
 
         TYPED_STAGES = [
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :npiwa,
             stage_code: :np,
             type_code: :iwa,
@@ -19,7 +17,7 @@ module PubidNew
             name: "Proposed Work Item for International Workshop Agreement",
             harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
           ),
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :npiwa,
             stage_code: :np,
             type_code: :iwa,
@@ -27,7 +25,7 @@ module PubidNew
             name: "New Work Item Proposal for International Workshop Agreement",
             harmonized_stages: %w[10.00 10.20 10.60 10.92 10.93 10.98],
           ),
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :awiiwa,
             stage_code: :awi,
             type_code: :iwa,
@@ -35,7 +33,7 @@ module PubidNew
             name: "Approved Work Item for International Workshop Agreement",
             harmonized_stages: %w[10.99 20.00],
           ),
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :wdiwa,
             stage_code: :wd,
             type_code: :iwa,
@@ -43,7 +41,7 @@ module PubidNew
             name: "Working Draft for International Workshop Agreement",
             harmonized_stages: %w[20.20 20.60 20.92 20.93 20.98 20.99],
           ),
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :cdiwa,
             stage_code: :cd,
             type_code: :iwa,
@@ -51,7 +49,7 @@ module PubidNew
             name: "Committee Draft for International Workshop Agreement",
             harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
           ),
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :diwa,
             stage_code: :diwa,
             type_code: :iwa,
@@ -60,7 +58,7 @@ module PubidNew
             harmonized_stages: %w[40.00 40.20 40.60 40.92 40.93 40.98 40.99],
           ),
 
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :prfiwa,
             stage_code: :prf,
             type_code: :iwa,
@@ -68,7 +66,7 @@ module PubidNew
             name: "Proof International Workshop Agreement",
             harmonized_stages: %w[60.00],
           ),
-          ::PubidNew::Components::TypedStage.new(
+          Components::TypedStage.new(
             code: :iwa,
             stage_code: :published,
             type_code: :iwa,
@@ -89,28 +87,11 @@ module PubidNew
         # IWA 14-1:2013
         # PRF IWA 36
         def to_s(lang: :en, lang_single: false)
-          # Determine stage abbreviation - from typed_stage or stage or class default
-          stage_abbr = if typed_stage&.abbreviation
-                         typed_stage.abbreviation
-                       elsif stage&.abbr
-                         # When stage present but no typed_stage, combine stage + type
-                         "#{stage.abbr} #{self.class.type[:short]}"
-                       elsif self.class.respond_to?(:type)
-                         self.class.type[:short]
-                       else
-                         "IWA"
-                       end
-
-          result = [
+          [
             # The publisher is omitted because it is an IWA
-            stage_abbr,
-            number_portion(lang_single: lang_single),
-          ].compact.join(" ")
-
-          # Add language if present
-          result << language_portion(lang_single: lang_single) if languages&.any?
-
-          result
+            typed_stage.abbreviation,
+            number_portion(lang_single: lang_single)
+          ].compact.join(' ')
         end
       end
     end

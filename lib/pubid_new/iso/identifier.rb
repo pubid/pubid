@@ -1,16 +1,18 @@
-# frozen_string_literal: true
-
-require_relative "parser"
-require_relative "builder"
+require_relative "../identifier"
+require_relative "../components/typed_stage"
 
 module PubidNew
+  # Identifier that
   module Iso
-    module Identifier
-      def self.parse(identifier)
-        parsed = Parser.parse(identifier)
-        Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse ISO identifier '#{identifier}': #{e.message}"
+    class Identifier < ::PubidNew::Identifier
+      def self.parse(string)
+        parsed = PubidNew::Iso::Parser.new.parse(string)
+        if parsed.nil? || parsed.empty?
+          raise PubidNew::Iso::Parser::ParseError,
+                "Invalid identifier format"
+        end
+
+        PubidNew::Iso::Builder.new(PubidNew::Iso::Scheme).build(parsed)
       end
     end
   end
