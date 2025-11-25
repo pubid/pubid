@@ -51,17 +51,14 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("is")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation of blank for :is" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
 
@@ -100,17 +97,14 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("is")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation of blank for :is" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
 
@@ -149,17 +143,14 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("is")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation of blank for :is" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
 
@@ -264,17 +255,14 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("is")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation of blank for :is" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
     end
@@ -925,7 +913,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("pwi")
           end
 
@@ -958,7 +945,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("np")
           end
 
@@ -1015,7 +1001,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("awi")
           end
 
@@ -1057,7 +1042,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("wd")
           end
 
@@ -1103,7 +1087,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("cd")
           end
 
@@ -1141,7 +1124,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("dis")
           end
 
@@ -1175,7 +1157,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("fdis")
           end
 
@@ -1213,7 +1194,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses stage" do
-            pending 'typed_stage removed in V2 architecture'
             expect(parsed.typed_stage.stage_code).to eq("prf")
           end
 
@@ -1240,7 +1220,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         let(:urn) { "urn:iso:std:iso:21420:stage-50.00.v2" }
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fdis")
         end
 
@@ -1269,7 +1248,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         let(:urn) { "urn:iso:std:iso:14065:stage-30.00.v2" }
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
@@ -1301,7 +1279,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         let(:urn) { "urn:iso:std:iso-iec:42010:stage-40.00" }
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fcd")
         end
 
@@ -1327,7 +1304,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         let(:urn) { "urn:iso:std:iso-iec:29135:stage-29.00" }
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("pcd")
         end
 
@@ -1351,7 +1327,6 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         let(:urn) { "urn:iso:std:iso:17301:-1:stage-29.00.v3" }
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("pcd")
         end
 

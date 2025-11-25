@@ -58,17 +58,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -111,17 +108,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -168,17 +162,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -217,17 +208,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -274,17 +262,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -324,17 +309,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -382,17 +364,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -440,17 +419,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -493,7 +469,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("pwi")
         end
 
@@ -502,7 +477,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -543,7 +517,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("np")
         end
 
@@ -552,7 +525,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -589,7 +561,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("awi")
         end
 
@@ -598,7 +569,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -633,7 +603,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("wd")
         end
 
@@ -642,7 +611,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -683,7 +651,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
@@ -692,7 +659,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -739,7 +705,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
@@ -748,7 +713,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -791,7 +755,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
@@ -800,7 +763,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -846,7 +808,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("dcor")
         end
 
@@ -855,7 +816,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -896,7 +856,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fdcor")
         end
 
@@ -905,7 +864,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
@@ -953,7 +911,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("cd")
       end
 
@@ -962,7 +919,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1004,7 +960,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dcor")
       end
 
@@ -1017,7 +972,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1056,7 +1010,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dcor")
       end
 
@@ -1069,7 +1022,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1109,7 +1061,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dcor")
       end
 
@@ -1122,7 +1073,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1161,7 +1111,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("fdcor")
       end
 
@@ -1174,7 +1123,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1214,7 +1162,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("fdcor")
       end
 
@@ -1227,7 +1174,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1266,7 +1212,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("fdcor")
       end
 
@@ -1279,7 +1224,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1319,7 +1263,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("fdcor")
       end
 
@@ -1332,7 +1275,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1394,17 +1336,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1461,7 +1400,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("cd")
       end
 
@@ -1470,7 +1408,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
@@ -1536,17 +1473,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1615,17 +1549,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1676,17 +1607,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1738,17 +1666,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1795,17 +1720,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1856,17 +1778,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1909,17 +1828,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -1967,17 +1883,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -2029,17 +1942,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -2090,17 +2000,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -2166,17 +2073,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
@@ -2239,17 +2143,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 

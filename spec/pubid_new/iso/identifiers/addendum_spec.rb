@@ -58,17 +58,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -111,17 +108,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -164,17 +158,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -217,17 +208,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -274,17 +262,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -328,17 +313,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -382,17 +364,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Add")
       end
 
@@ -430,7 +409,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dad")
       end
 
@@ -439,7 +417,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
@@ -474,7 +451,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dad")
       end
 
@@ -483,7 +459,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 
@@ -522,7 +497,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dad")
       end
 
@@ -531,7 +505,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("add")
       end
 

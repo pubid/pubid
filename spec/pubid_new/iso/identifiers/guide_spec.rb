@@ -52,17 +52,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
@@ -101,17 +98,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
@@ -147,17 +141,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
@@ -192,17 +183,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
@@ -242,12 +230,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -284,12 +270,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -326,12 +310,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -367,12 +349,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -408,12 +388,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -449,12 +427,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -490,12 +466,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -531,12 +505,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
         it "provides stage code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
@@ -579,17 +551,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
@@ -616,7 +585,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("np")
         end
 
@@ -625,7 +593,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -656,7 +623,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("np")
         end
 
@@ -665,7 +631,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -694,7 +659,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("awi")
         end
 
@@ -703,7 +667,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -726,7 +689,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("awi")
         end
 
@@ -735,7 +697,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -768,7 +729,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
@@ -777,7 +737,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -800,7 +759,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
@@ -809,7 +767,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -843,7 +800,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("dguide")
         end
 
@@ -852,7 +808,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -884,7 +839,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("dguide")
         end
 
@@ -893,7 +847,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -920,7 +873,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("dguide")
         end
 
@@ -929,7 +881,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -954,7 +905,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("draft")
         end
 
@@ -963,7 +913,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -987,7 +936,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("draft")
         end
 
@@ -996,7 +944,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1038,7 +985,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fdguide")
         end
 
@@ -1047,7 +993,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1078,7 +1023,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fdguide")
         end
 
@@ -1087,7 +1031,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1119,7 +1062,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fdguide")
         end
 
@@ -1128,7 +1070,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1160,7 +1101,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("fdguide")
         end
 
@@ -1169,7 +1109,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1194,7 +1133,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
@@ -1203,7 +1141,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1226,7 +1163,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
@@ -1235,7 +1171,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "provides type code" do
-          pending 'typed_stage removed in V2 architecture'
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
@@ -1266,7 +1201,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("cd")
       end
 
@@ -1279,7 +1213,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
@@ -1302,7 +1235,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "parses stage" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("dguide")
       end
 
@@ -1315,7 +1247,6 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
@@ -1358,12 +1289,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
@@ -1398,12 +1327,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       end
 
       it "provides type code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
       it "provides stage code" do
-        pending 'typed_stage removed in V2 architecture'
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
