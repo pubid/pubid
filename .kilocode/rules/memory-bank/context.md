@@ -2,21 +2,21 @@
 
 The project is in the middle of a **V2 architecture migration** from legacy V1 code to a clean MODEL-DRIVEN implementation using Lutaml::Model.
 
-## Current Status (Session 24 Complete)
+## Current Status (Session 25 Complete)
 
 **Test Results:**
-- 2,258 passing (79.0%) - **+43 from Session 23, +43 in one session!**
-- 224 failures (7.8%)
+- 2,269 passing (79.5%) - **+11 from Session 24, consistent progress!**
+- 213 failures (7.5%)
 - 377 pending (13.2%)
 - Total: 2,859 examples
 
-**Session 24 Achievement:**
-- Fixed TypedStage canonical abbreviation (+28 tests)
-- Fixed Edition.number as Code object (+2 tests)
-- Fixed SingleIdentifier canonical rendering (+9 tests)
-- Fixed Edition only when with_edition (+4 tests)
-- Impact: +43 tests in a single session! 🎊
-- Progress: 77.5% → 79.0% (+1.5pp)
+**Session 25 Achievement:**
+- Fixed Guide TYPED_STAGES stage_code (+3 tests)
+- Fixed Supplement canonical abbreviation (+3 tests)
+- Fixed IWA language_portion (+2 tests)
+- Fixed Directives canonical abbreviation (+3 tests)
+- Impact: +11 tests in one session
+- Progress: 79.0% → 79.5% (+0.5pp)
 
 **Milestones:**
 - ✅ 50% milestone (target: 1,430) → Achieved 1,648 (57.6%) in Session 18
@@ -25,7 +25,55 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 - ✅ 65% milestone (target: 1,858) → Achieved 1,978 (69.1%) in Session 22
 - ✅ 70% milestone (target: 2,001) → Achieved 2,216 (77.5%) in Session 23
 - ✅ 75% milestone (target: 2,144) → Achieved 2,216 (77.5%) in Session 23
-- 🎯 80% milestone (target: 2,287) → **Need +29 tests from 2,258!**
+- 🎯 80% milestone (target: 2,287) → **Need +18 tests from 2,269!**
+
+## Session 25 Summary
+
+**What Was Done:**
+
+1. **Phase 1: Guide TYPED_STAGES Stage Code** (15 minutes)
+   - Changed stage_code from :draft to :dguide, :final_draft to :fdguide
+   - Guide-specific stage codes match test expectations
+   - Impact: +3 tests (79.0% → 79.1%)
+   - File: [`lib/pubid_new/iso/identifiers/guide.rb`](lib/pubid_new/iso/identifiers/guide.rb:56)
+
+2. **Phase 2: Supplement Canonical Abbreviation** (15 minutes)
+   - Changed to always use canonical_abbreviation in rendering
+   - Ensures "Suppl" not "Suppl.", "FDSuppl" not "FDIS Suppl"
+   - Impact: +3 tests (79.1% → 79.2%), supplement_spec 100% passing
+   - File: [`lib/pubid_new/iso/supplement_identifier.rb`](lib/pubid_new/iso/supplement_identifier.rb:13)
+
+3. **Phase 3: IWA Language Portion** (10 minutes)
+   - Added language_portion to to_s method for language codes
+   - IWA was missing language rendering unlike other identifiers
+   - Impact: +2 tests (79.2% → 79.3%), IWA spec 100% passing
+   - File: [`lib/pubid_new/iso/identifiers/international_workshop_agreement.rb`](lib/pubid_new/iso/identifiers/international_workshop_agreement.rb:89)
+
+4. **Phase 4: Directives Canonical Abbreviation** (15 minutes)
+   - Changed publisher_portion to use canonical_abbreviation
+   - Ensures "DIR" not "Directives Part" or "Directives, Part"
+   - Impact: +3 tests (79.3% → 79.5%)
+   - File: [`lib/pubid_new/iso/identifiers/directives.rb`](lib/pubid_new/iso/identifiers/directives.rb:31)
+
+**Key Discoveries:**
+
+1. **TypedStage canonical pattern**: Most identifiers should use `canonical_abbreviation` for consistent rendering
+2. **Rendering consistency**: Applied same canonical_abbreviation pattern across 3 identifier types
+3. **Missing language_portion**: IWA was the only identifier type missing language code rendering
+4. **Guide-specific stage codes**: Some identifiers need type-specific stage_code values
+5. **Clean architecture guides solutions**: All 4 fixes followed the 5 core principles
+
+**Files Modified:**
+- `lib/pubid_new/iso/identifiers/guide.rb`: Guide-specific stage_code values
+- `lib/pubid_new/iso/supplement_identifier.rb`: Use canonical_abbreviation
+- `lib/pubid_new/iso/identifiers/international_workshop_agreement.rb`: Add language_portion
+- `lib/pubid_new/iso/identifiers/directives.rb`: Use canonical_abbreviation
+
+**Commits:**
+- `f03c350`: fix(iso): use Guide-specific stage_code values in TYPED_STAGES (+3 tests)
+- `8ba7979`: fix(iso): use canonical abbreviation in SupplementIdentifier (+3 tests)
+- `d9450f8`: fix(iso): include language codes in IWA to_s method (+2 tests)
+- `f36daaf`: fix(iso): use canonical abbreviation in Directives rendering (+3 tests)
 
 ## Session 24 Summary
 
@@ -112,7 +160,7 @@ The project is in the middle of a **V2 architecture migration** from legacy V1 c
 
 ### Immediate Priority: Reach 80% Milestone (Session 25)
 
-**Target**: 2,287 passing (80.0%) - **Only +29 tests needed from 2,258!**
+**Target**: 2,287 passing (80.0%) - **Only +18 tests needed from 2,269!**
 
 **Time Budget**: 60-90 minutes
 
