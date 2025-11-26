@@ -1,19 +1,19 @@
-## Current Status (Session 31 Complete - Phase 1 100% ACHIEVED! 🎉)
+## Current Status (Session 32 Complete - Phase 2 50% ACHIEVED! 🎉)
 
 **Test Results:**
-- 2,289 passing (80.07%) - **+2 from Session 30**
-- 143 failures (5.0%) - **-2 from Session 30**
+- 2,298 passing (80.38%) - **+9 from Session 31**
+- 134 failures (4.69%) - **-9 from Session 31**
 - 427 pending (14.9%) - Unchanged
 - Total: 2,859 examples
 
-**🎉 PHASE 1 COMPLETE! ✅**
+**🎉 PHASE 2 PRIORITY 1 COMPLETE! ✅**
 
-Session 31 completed Phase 1 of Parser Enhancement (both quick wins achieved).
+Session 32 completed Phase 2 Priority 1 of Parser Enhancement ("Consolidated ISO Supplement" format).
 
 **Accomplishments:**
-- **Fixed malformed identifier spacing** - Normalize "ISO/TS 10303- 1751:2014" (+2 tests)
-- **Phase 1 100% complete** - Both quick wins achieved (+9 tests total)
-- **Exceeded expectations** - Got +2 exactly as predicted
+- **Fixed "Consolidated ISO Supplement" format** - Parse special directives format (+9 tests)
+- **Phase 2 50% complete** - Priority 1 achieved, Priority 2 next (+6 tests to 80.5%)
+- **Exceeded expectations** - Got +9 exactly as predicted
 
 **Milestones:**
 - ✅ 50% milestone → Achieved 1,648 (57.6%) in Session 18
@@ -25,53 +25,50 @@ Session 31 completed Phase 1 of Parser Enhancement (both quick wins achieved).
 - ✅ **RENDERING COMPLETE → Achieved 2,277 (79.6%) in Session 29**
 - ✅ **80% MILESTONE → Achieved 2,287 (80.0%) in Session 30**
 - ✅ **PHASE 1 COMPLETE → Achieved 2,289 (80.07%) in Session 31**
-- 🎯 **Next: Phase 2 Special Formats** (target: 2,304, need +15 tests)
+- ✅ **PHASE 2 PRIORITY 1 → Achieved 2,298 (80.38%) in Session 32**
+- 🎯 **Next: Phase 2 Priority 2** (target: 2,304, need +6 tests for 80.5%)
 
-## Session 31 Summary - Phase 1 Complete
+## Session 32 Summary - Phase 2 Priority 1 Complete
 
 **What Was Done:**
 
-Session 31 fixed the last quick win from Phase 1 of the Parser Enhancement roadmap:
+Session 32 implemented Priority 1 of Phase 2 in the Parser Enhancement roadmap:
 
-**Fix malformed identifier spacing (Priority 3 from Session 30 plan)**
-- Issue: "ISO/TS 10303- 1751:2014" (extra space before part number)
-- Root cause: Builder's `gsub!(" ", "-")` created double dashes "10303--1751"
-- Solution: Three-part fix:
-  1. Parser: Keep `space?` to consume (not capture) whitespace
-  2. Builder: Add `.reject(&:empty?)` to filter empty strings after split
-  3. Builder: Add `&.strip` to remove whitespace from part values
-- Test expectations: Updated to expect normalized output (not preserved malformed)
+**Parse "Consolidated ISO Supplement" format (Priority 1 from Session 32 plan)**
+- Issue: "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" not parsed
+- Root cause: Parser didn't recognize "-- Consolidated " prefix
+- Solution: Modified `directives_supplement_part_no_third` rule:
+  ```ruby
+  (space? >> str("--") >> space? >> str("Consolidated") >> space).maybe >>
+  ```
+- Normalized output: "ISO/IEC DIR 1 ISO SUP"
 - Files modified:
-  - [`lib/pubid_new/iso/parser.rb`](lib/pubid_new/iso/parser.rb:82): Allow optional whitespace
-  - [`lib/pubid_new/iso/builder.rb`](lib/pubid_new/iso/builder.rb:184): Normalize by filtering and stripping
-  - [`spec/pubid_new/iso/identifiers/technical_specification_spec.rb`](spec/pubid_new/iso/identifiers/technical_specification_spec.rb:260): Update expectations
-- Result: +2 tests fixed (143 failures, was 145)
+  - [`lib/pubid_new/iso/parser.rb`](lib/pubid_new/iso/parser.rb:285): Added consolidated format support
+- Result: +9 tests fixed (134 failures, was 143)
 
 **Key Discoveries:**
 
-1. **Normalization is the correct strategy** - User clarified malformed identifiers should be normalized, not preserved
-2. **Builder was the issue** - `gsub!(" ", "-")` on "10303- 1751" created "10303--1751"
-3. **Simple solution worked** - `.reject(&:empty?)` filtered out empty strings from split
-4. **Phase 1 exactly achieved** - +2 tests as predicted in roadmap
-5. **Architecture principles maintained** - No rendering changes, only parser/builder
+1. **Special format parsing works** - Optional prefix pattern successfully handled
+2. **Normalization applied** - Consolidated format normalized to standard output
+3. **Phase 2 on track** - +9 tests as predicted in roadmap
+4. **Architecture principles maintained** - Parser-only changes, no rendering modifications
+5. **80.5% milestone very close** - Only +6 tests needed
 
 **Impact:**
-- Net improvement: +2 passing tests
-- Phase 1: 100% complete (both quick wins done)
-- Roadmap accuracy: Perfect prediction
+- Net improvement: +9 passing tests
+- Phase 2: 50% complete (Priority 1 done, Priority 2 next)
+- Roadmap accuracy: Perfect prediction continues
 
 **Files Modified:**
-- `lib/pubid_new/iso/parser.rb` - Kept `space?` for whitespace handling
-- `lib/pubid_new/iso/builder.rb` - Added `.reject(&:empty?)` and `&.strip`
-- `spec/pubid_new/iso/identifiers/technical_specification_spec.rb` - Normalized expectations
+- `lib/pubid_new/iso/parser.rb` - Added "-- Consolidated " prefix handling
 
 **Commits:**
-- `20bed56` - fix(iso): normalize malformed identifiers with extra spaces in part numbers
+- `4a608b1` - fix(iso): parse "Consolidated ISO Supplement" format in DirectivesSupplement
 
 **Next Steps:**
-1. Begin Phase 2: Special Formats (Session 32)
-2. Parse "Consolidated ISO Supplement" (+9 tests expected)
-3. Target 80.5% (2,304 passing tests)
+1. Continue Phase 2: Priority 2 (Session 33)
+2. Find +6 quick wins to reach 80.5% milestone (2,304 passing)
+3. Complete Phase 2 special formats
 
 ## Current Status Analysis
 
@@ -82,17 +79,17 @@ Session 31 fixed the last quick win from Phase 1 of the Parser Enhancement roadm
 - All 5 core principles working perfectly
 - **This achievement is locked and unchanging**
 
-**Parser Architecture: PHASE 2 READY 🎯**
-- 143 parser-related failures remaining (down from 145)
+**Parser Architecture: PHASE 2 PRIORITY 2 🎯**
+- 134 parser-related failures remaining (down from 143)
 - Breakdown:
   - ~88 failures: identifier_spec (edge cases) - Phase 4
   - 81 failures: addendum_spec (legacy "ISO/R" format) - Phase 3
-  - 9 failures: directives_supplement_spec ("Consolidated ISO Supplement") - **Phase 2 (Next)**
+  - 0 failures: directives_supplement_spec **FIXED ✅** - Phase 2 Priority 1 Done
   - 0 failures: guide_spec **FIXED ✅** - Phase 1 Done
   - 0 failures: technical_specification_spec **FIXED ✅** - Phase 1 Done
-  - ~9 failures: Other parser edge cases - Phase 2-4
-- Phase 1: 100% complete (both quick wins)
-- Phase 2: Ready to begin
+  - ~6-9 failures: Other parser edge cases - **Phase 2 Priority 2 (Next)**
+- Phase 1: 100% complete
+- Phase 2: 50% complete (Priority 1 done)
 
 **Test Infrastructure: FULLY UNDERSTOOD 📊**
 - 427 pending tests: Intentional
@@ -101,3 +98,26 @@ Session 31 fixed the last quick win from Phase 1 of the Parser Enhancement roadm
   - 2 tests: Other intentional pending
 - All categories fully documented and understood
 - No hidden issues
+
+## Parser Enhancement Roadmap Status
+
+### Phase 1: Quick Wins (Sessions 30-31) - ✅ COMPLETE
+- ✅ Fix "FD Guide" spacing issue (+7 tests) - Session 30
+- ✅ Fix malformed identifiers (+2 tests) - Session 31
+- **Result:** +9 tests, 80.07% achieved
+
+### Phase 2: Special Formats (Sessions 32-33) - 50% COMPLETE 🎯
+- ✅ Priority 1: Parse "Consolidated ISO Supplement" (+9 tests) - Session 32
+- 🎯 Priority 2: Handle Other Special Formats (+6 tests) - **Session 33 (Next)**
+- **Target:** 80.5% (2,304 passing tests)
+
+### Phase 3: Legacy Formats (Sessions 34-38) - PLANNED
+- 🎯 Handle "ISO/R" Legacy Addendum Format (+81 tests)
+- **Target:** 83.5% (2,384 passing tests)
+
+### Phase 4: Edge Cases (Sessions 39-43) - PLANNED
+- 🎯 Fix identifier_spec Edge Cases (+88 tests)
+- **Target:** 86.5% (2,474 passing tests)
+
+### Final Goal
+- 🎯 90%+ (2,574+ passing tests)
