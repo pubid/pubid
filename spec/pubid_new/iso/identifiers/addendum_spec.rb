@@ -227,8 +227,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
 
   # Test legacy format normalization
   context "legacy format normalization" do
-    describe "IS0 4037-1979/Add. 1-1983(F)" do
-      subject { "IS0 4037-1979/Add. 1-1983(F)" }
+    describe "ISO 4037-1979/Add. 1-1983(F)" do
+      subject { "ISO 4037-1979/Add. 1-1983(F)" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO 4037:1979/Add 1:1983(fr)" }
       let(:urn) { "urn:iso:std:iso:4037:sup:1983:v1" }
