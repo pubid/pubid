@@ -13,7 +13,7 @@ module PubidNew
         [
           base_identifier.to_s(lang: lang, lang_single: lang_single),
           additional_identifiers.map { |id| id.to_s(lang: lang, lang_single: lang_single) }
-        ].flatten.join(' + ')
+        ].flatten.join(' | ')
       end
     end
   end
