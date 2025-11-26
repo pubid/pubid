@@ -59,6 +59,13 @@ module PubidNew
       end
 
       def build(parsed_hash)
+        # For ISO/R legacy format, split into publisher and type
+        if parsed_hash[:iso_r_prefix]
+          parsed_hash[:publisher] = "ISO"
+          parsed_hash[:type_with_stage] = "R"
+          parsed_hash.delete(:iso_r_prefix)
+        end
+
         # Instantiate the identifier based on the typed stage
         identifier = locate_identifier_klass(parsed_hash).new
 

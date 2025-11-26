@@ -28,7 +28,7 @@ module PubidNew
           code: :pubadd,
           stage_code: :published,
           type_code: :add,
-          abbr: ["ADD", "Addendum"],
+          abbr: ["Add", "ADD", "Addendum"],
           name: "Addendum",
           harmonized_stages: %w[60.00 60.60],
         ),

@@ -6,6 +6,11 @@ module PubidNew
     class SupplementIdentifier < SingleIdentifier
       attribute :base_identifier, Identifier, polymorphic: true
 
+      # Delegate publisher to base_identifier
+      def publisher
+        base_identifier&.publisher
+      end
+
       def to_s(lang: :en, lang_single: false, with_edition: false)
         [].tap do |parts|
           parts << [

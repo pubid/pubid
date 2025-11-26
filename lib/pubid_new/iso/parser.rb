@@ -23,20 +23,42 @@ module PubidNew
 
       rule(:identifier) do
         directives_identifiers |
+          iso_r_supplement_identifier |
+          iso_r_identifier |
           supplement_supplement_identifier |
           supplement_identifier |
           joint_identifier |
           identifier_copublishers
       end
 
+      # ISO/R 947:1969 (legacy Recommendation without supplement)
+      rule(:iso_r_identifier) do
+        str("ISO/R").as(:iso_r_prefix) >> space >>
+          second_part >> third_part
+      end
+
+      # ISO/R 947:1969/Add 1:1969 (legacy Recommendation with supplement)
+      rule(:iso_r_supplement_identifier) do
+        (
+          str("ISO/R").as(:iso_r_prefix) >> space >> second_part
+        ).as(:base_identifier) >>
+          str("/") >> supplement_type_with_stage >>
+          space? >> second_part >> third_part
+      end
+
       # ISO 8601-1:2019
+      # ISO/R 947:1969 (legacy Recommendation format)
       rule(:prefix_sole_publisher) do
         (str("ISO") | str("IEC")).as(:publisher)
       end
 
       # ISO/SAE PAS 22736:2021
+      # ISO/R 947:1969 (legacy Recommendation - special handling)
       rule(:prefix_with_copublishers) do
-        prefix_sole_publisher >> space? >> copublishers.maybe
+        # Try ISO/R first (must be followed by space + number to avoid confusion with copublishers)
+        (str("ISO/R").as(:iso_r_prefix) >> space) |
+        # Otherwise normal publisher with optional copublishers
+        (prefix_sole_publisher >> space? >> copublishers.maybe)
       end
 
       ORGANIZATIONS = %w[

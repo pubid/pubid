@@ -48,6 +48,17 @@ module PubidNew
           identifiers.flat_map { |klass| klass::TYPED_STAGES }
         end
 
+        def supplement_typed_stages
+          supplement_identifiers = [
+            Identifiers::Amendment,
+            Identifiers::Corrigendum,
+            Identifiers::Supplement,
+            Identifiers::Extract,
+            Identifiers::Addendum,
+          ]
+          supplement_identifiers.flat_map { |klass| klass::TYPED_STAGES }
+        end
+
         def locate_typed_stage_by_abbr(abbr)
           # Empty abbr means International Standard (published)
           abbr = "" if abbr.nil? || abbr.to_s.strip.empty?
