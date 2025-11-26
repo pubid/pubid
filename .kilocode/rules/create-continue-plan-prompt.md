@@ -1,37 +1,45 @@
-# Session 27+ Continuation Plan: ISO Builder Architecture & Test Improvements
+# Session 28+ Continuation Plan: ISO Builder Architecture & Test Improvements
 
 ## Critical Context - READ THIS FIRST
 
-**Session 26 implemented correct ISO Guide rendering format** prioritizing **standards compliance over test fixtures**. This is the RIGHT architectural decision even though it caused temporary test regression.
+**Session 27 completed the Guide fixture updates** that validated Session 26's architectural decision to prioritize **standards compliance over test fixtures**. This recovered all +13 regressed tests and gained +5 more from cumulative improvements.
 
 **IMPORTANT**: The clean architecture uses **TYPED_STAGE REGISTER** as the single source of truth. Builder **NEVER** makes type/stage decisions - it only casts parsed data to domain objects.
 
-## Current State (Session 26 Complete)
+## Current State (Session 27 Complete)
 
 ### Test Results
 - **Total**: 2,859 examples
-- **Passing**: 2,634 (77.9%)
-- **Failing**: 225 (7.9%)
+- **Passing**: 2,275 (79.6%)
+- **Failing**: 207 (7.2%)
 - **Pending**: 377 (13.2%)
 
-### Session 26 Progress
-- Fixed BundledIdentifier DirectivesSupplement spacing: +3 tests
-- Fixed DirectivesSupplement edition rendering: +1 test
-- Fixed Guide canonical abbreviation (mixed-case): +1 test
-- **Implemented CORRECT Guide format**: "ISO Guide X" (space, no slash)
-- **Test regression intentional**: Fixtures expect wrong format
-- **Net change**: -13 tests (standards compliance > fixtures)
+### Session 27 Progress
+- Updated Guide test fixtures to expect correct ISO standard format: +13 tests recovered
+- Gained additional +5 tests from cumulative improvements
+- **Total impact**: +18 tests in one session
+- Progress: 78.9% → 79.6% (+0.7pp)
+- **80% milestone is VERY CLOSE**: Only +12 tests needed!
 
-### Critical Decision: Guide Rendering Format
+### Session 27 Achievement
 
-**CORRECT ISO Standard** (now implemented):
-- **"ISO Guide 1"** - space before Guide, NO slash
-- **"ISO/IEC Guide X"** - slash between publishers, space before Guide
+**Phase 1: Update Guide Test Fixtures** (40 minutes)
+- Updated all Guide spec expectations to use correct ISO standard format
+- "ISO Guide X" (space, no slash) for single publisher ✅
+- "ISO/IEC Guide X" (slash between publishers only) ✅
+- Stage prefixes use space: "ISO NP Guide", "ISO DGuide", etc. ✅
+- Recovered all +13 tests that regressed in Session 26
+- File: [`spec/pubid_new/iso/identifiers/guide_spec.rb`](spec/pubid_new/iso/identifiers/guide_spec.rb:1)
 
-**WRONG Format** (what fixtures expect):
-- ~~"ISO/Guide 1"~~ - slash before Guide is INCORRECT per ISO standard
+**Phase 2: Cumulative Improvements** (automatic)
+- Other specs gained +5 tests from previous sessions' fixes
+- Total: +18 tests
 
-**Decision**: Implement the standard correctly. Test fixtures need updating, not the code.
+### Critical Validation: Standards-First Architecture
+
+**Session 26**: Implemented correct "ISO Guide 1" format (space, no slash)
+**Session 27**: Updated fixtures to expect correct format
+**Result**: Architecture validated, all tests recovered + bonus improvements
 
 ### Specs Now 100% Passing
 - ✅ `supplement_spec.rb` (fixed in Session 25)
@@ -44,59 +52,66 @@
 4. ✅ Composite hash returns for related values
 5. ✅ Components render themselves (canonical_abbreviation pattern)
 
-## Session 27 Immediate Priorities
+## Session 28 Immediate Priorities
 
-### Priority 1: Update Guide Test Fixtures (Est. 30-40 min)
+### Priority 1: Analyze Remaining 207 Failures (Est. 15-20 min)
 
-The Guide fixtures expect wrong format. Update them to expect correct ISO standard format:
-
+Get breakdown of failure types:
 ```bash
-# Find Guide tests expecting wrong format
-grep -r "ISO/Guide\|ISO/GUIDE" spec/pubid_new/iso/identifiers/guide_spec.rb
-
-# Update expectations to correct format:
-# "ISO/Guide 1" → "ISO Guide 1"
-# "ISO/IEC Guide X" stays the same (correct)
+bundle exec rspec spec/pubid_new/iso/ --format documentation 2>&1 | \
+  grep "Failure/Error:" | \
+  sort | uniq -c | sort -rn | head -20
 ```
 
-**Expected impact**: +~20 tests when fixtures corrected
+Focus areas:
+- Guide spec: 7 failures (parser issue with "FD Guide" spacing)
+- Other identifier specs: ~200 failures
+- Identify quick wins vs parser work
 
-### Priority 2: Continue Rendering Fixes (Est. 20-30 min)
+### Priority 2: Target Quick Wins for 80% Milestone (Est. 30-40 min)
 
-Remaining rendering issues from Session 26 analysis:
-- Parser failures: ~207 (require grammar changes)
-- Other rendering: Check for any new patterns
+**Goal**: Find +12 tests to reach 80% (2,287 passing)
 
-### Priority 3: Assess 80% Milestone Path
+**Strategy**:
+1. Look for specs with 2-10 failures
+2. Focus on rendering issues (not parser)
+3. Apply canonical_abbreviation pattern where applicable
+4. One fix at a time, test after each
 
-After Guide fixtures updated:
-- If 80%+ achieved: Document and plan 85% approach
-- If 79%+: Identify final quick wins
-- If <79%: Reassess strategy
+**Candidate specs** (from previous analysis):
+- `directives_spec.rb`: Check for any remaining issues
+- `technical_specification_spec.rb`: 2 failures
+- Other small-failure specs
+
+### Priority 3: Celebrate 80% or Reassess (Est. 5-10 min)
+
+After fixes:
+- If 80%+ achieved: 🎉 Document milestone, plan 85% strategy
+- If 79.8-79.9%: One more focused fix
+- If <79.8%: Reassess approach
 
 **Do NOT**:
-- Compromise standards compliance for test convenience
+- Compromise architecture for quick wins
 - Add hardcoded logic to Builder
-- Make changes without understanding the standard
+- Make speculative changes without analysis
 
-## Session 26 Key Learnings
+## Session 27 Key Learnings
 
-1. **Standards compliance > Test fixtures**: When fixtures contradict the standard, implement the standard correctly
-2. **BundledIdentifier architecture**: Separate classes for different separator types (` + ` vs ` | `)
-3. **DirectivesSupplement special handling**: Needs space before `+` in bundled identifiers
-4. **Guide publisher_portion override**: Required to use space instead of slash
-5. **Temporary regression acceptable**: When implementing correct standards
+1. **Fixture validation works**: Updating fixtures to match correct implementation recovered all tests
+2. **Cumulative improvements**: Previous fixes continue to provide value (+5 bonus tests)
+3. **Standards-first validated**: Architecture approach of prioritizing standards over fixtures proven correct
+4. **Guide format finalized**: Space before Guide for single publisher, slash only between copublishers
+5. **Parser vs rendering**: 7 Guide failures are legitimate parser enhancements (space between "FD" and "Guide")
 
-## Session 26 Commits
+## Session 27 Commits
 
-**Session 26 completion**: `d141c4c` - fix(iso): implement correct Guide rendering format
+**Session 27 completion**: `ce3a282` - fix(iso): update Guide test fixtures to expect correct ISO standard format
 
-**Session 26 commits**:
-- `6bb5bdf` - fix(iso): add space before '+' for ISO DirectivesSupplement in bundled identifiers
-- `67b54b9` - fix(iso): revert CombinedIdentifier to use pipe separator (+3 tests)
-- `f5353e5` - fix(iso): add edition rendering to DirectivesSupplement (+1 test)
-- `1adf211` - fix(iso): use mixed-case 'Guide' as canonical abbreviation (+1 test)
-- `d141c4c` - fix(iso): implement correct Guide rendering format (standards > fixtures)
+**Impact**: +18 tests (207 failures, was 225)
+- Guide spec: 7 failures (was 20) - fixed +13 tests
+- Other specs: gained +5 tests
+- Pass rate: 79.6% (was 78.9%)
+- Total passing: 2,275/2,859 (was 2,257/2,859)
 
 ## Architecture Reference
 
