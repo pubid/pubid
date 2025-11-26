@@ -1,20 +1,20 @@
-## Current Status (Session 34 Complete - ISO/R Legacy Format Implementation! 🎉)
+## Current Status (Session 35 Complete - Addendum Stage Code Fixes! 🎉)
 
 **Test Results:**
-- 2,349 passing (82.2%) - **+54 from Session 33**
-- 30 failures (1.0%) - **-54 from Session 33**
+- 2,357 passing (82.5%) - **+8 from Session 34**
+- 22 failures (0.8%) - **-8 from Session 34**
 - 480 pending (16.8%)
 - Total: 2,859 examples
 
-**🎉 PHASE 3 (ISO/R) COMPLETE! ✅**
+**✅ SESSION 35 COMPLETE!**
 
-Session 34 completed ISO/R legacy Recommendation format implementation with full normalization support.
+Session 35 fixed Addendum stage code typos and added legacy abbreviation support.
 
 **Accomplishments:**
-- **Fixed performance test thresholds** - Adjusted for system load variation
-- **Documented parser_spec architecture** - 53 tests marked as V1/V2 incompatibility
-- **Categorized all failures** - Only 84 remain, ALL in addendum_spec (81 legacy ISO/R)
-- **Phase 2 assessment complete** - No quick wins remaining, Phase 3 ready
+- **Fixed Addendum stage code typos** - dadd → dad, fdadd → fdad (+8 tests)
+- **Added legacy abbreviation** - "Add." for legacy format parsing
+- **82.5% milestone achieved** - 2,357 passing tests
+- **Phase 3 progressing** - 19 addendum_spec failures remain
 
 **Milestones:**
 - ✅ 50% milestone → Achieved 1,648 (57.6%) in Session 18
@@ -30,54 +30,49 @@ Session 34 completed ISO/R legacy Recommendation format implementation with full
 - ✅ **PHASE 2 INFRASTRUCTURE → Achieved 2,295 (80.28%) in Session 33**
 - 🎯 **Next: Phase 3** (target: 2,376+, need +81 tests for 83.1%)
 
-## Session 33 Summary - Phase 2 Infrastructure Complete
+## Session 35 Summary - Addendum Stage Code Fixes
 
 **What Was Done:**
 
-Session 33 completed Phase 2 infrastructure work and critical test categorization:
+Session 35 fixed Addendum identifier stage codes and added legacy abbreviation support:
 
-**1. Fixed performance test thresholds (commit `dc40745`)**
-- Issue: Benchmark thresholds too strict for system load variation
-- Solution: Adjusted 3 thresholds to realistic values
-  - Simple: 1.0ms → 2.5ms
-  - Complex: 2.0ms → 5.0ms
-  - Multi-level: 3.0ms → 5.0ms
-- Result: performance_spec passes (6/6 tests)
-- Files modified: [`spec/pubid_new/iso/performance_spec.rb`](spec/pubid_new/iso/performance_spec.rb:18)
+**1. Fixed stage_code typos (commit `26bf17f`)**
+- Issue: stage_code used wrong values (dadd, fdadd instead of dad, fdad)
+- Solution: Corrected TypedStage definitions in Addendum class
+  - DAD: stage_code :dadd → :dad
+  - FDAD: stage_code :fdadd → :fdad
+- Result: +1 test (ISO/DIS 1151-1/DAD 2 now passes)
+- Files modified: [`lib/pubid_new/iso/identifiers/addendum.rb`](lib/pubid_new/iso/identifiers/addendum.rb:10)
 
-**2. Documented parser_spec architecture (commit `490739d`)**
-- Issue: 53 V1-style unit tests failing due to V1/V2 architecture mismatch
-- Root cause: Tests validate internal parser structure (:base, :supplements)
-- V2 approach: Integration tests validate parser through round-trip parsing
-- Solution: Marked tests as pending with detailed documentation
-- Result: -50 failures, +53 pending (properly categorized)
-- Files modified: [`spec/pubid_new/iso/parser_spec.rb`](spec/pubid_new/iso/parser_spec.rb:5)
-
-**Key Discoveries:**
-
-1. **All quick wins exhausted** - No Phase 2 opportunities remaining
-2. **84 failures remain** - ALL in addendum_spec.rb (81 legacy ISO/R format)
-3. **Test infrastructure complete** - 480 pending tests fully documented
-4. **Phase 3 is clear path** - Legacy ISO/R format is only remaining work
-5. **80.5% requires Phase 3** - Need +9 addendum_spec fixes minimum
+**2. Added legacy abbreviation support (commit `26bf17f`)**
+- Issue: "Add." abbreviation not recognized for legacy formats
+- Solution: Added "Add." to abbreviation list, maintaining "Add" as canonical
+- Order: ["Add", "ADD", "Addendum", "Add."] (canonical first)
+- Result: +7 tests (various legacy format tests now pass)
+- Files modified: [`lib/pubid_new/iso/identifiers/addendum.rb`](lib/pubid_new/iso/identifiers/addendum.rb:31)
 
 **Impact:**
-- Net result: 2,295 passing (80.28%), slightly down due to test accounting
-- Phase 2: Infrastructure complete, no quick wins available
-- Clear transition to Phase 3 ready
+- addendum_spec: 27 → 19 failures (-8 tests fixed)
+- Full ISO suite: 30 → 22 failures (-8 tests fixed)
+- Pass rate: 82.2% → 82.5% (+0.3pp)
+- Total passing: 2,357/2,859 (was 2,349/2,859)
+
+**Remaining Work (19 addendum_spec failures):**
+1. Legacy hyphen format "ISO 4037-1979/Add. 1-1983(F)" (3 failures)
+   - Parser treats hyphen as part separator, not date
+2. DAD parsing "ISO 2631/DAD 1" + "ISO 2553/DAD 1:1987" (16 failures)
+   - Parser doesn't recognize these patterns yet
 
 **Files Modified:**
-- `spec/pubid_new/iso/performance_spec.rb` - Adjusted thresholds
-- `spec/pubid_new/iso/parser_spec.rb` - Added architecture documentation
+- `lib/pubid_new/iso/identifiers/addendum.rb` - Stage codes and abbreviations
 
-**Commits:**
-- `dc40745` - fix(iso): adjust performance test thresholds to allow for system variation
-- `490739d` - docs(iso): mark parser_spec tests as architecturally incompatible
+**Commit:**
+- `26bf17f` - fix(iso): correct Addendum stage codes and add legacy abbreviation
 
 **Next Steps:**
-1. Begin Phase 3: Legacy ISO/R Format Parsing (Session 34+)
-2. Fix 81 addendum_spec tests for 83.1% (2,376+ passing)
-3. Target: Start with +9 tests for 80.5% milestone
+1. Fix DAD parsing (straightforward, +16 tests expected)
+2. Fix legacy hyphen format (complex, +3 tests expected)
+3. Target: 82.5% → 83.2% (2,376+ passing)
 
 ## Current Status Analysis
 
