@@ -28,14 +28,14 @@ module PubidNew
           return [
               publisher.body,
               (subgroup ? " #{subgroup.value}" : ""),
-              (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
+              (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
             ].join('') unless copublishers&.any?
 
           # If there are copublishers, join them with slashes
           [
             ([publisher] + copublishers).map(&:body).join("/"),
             (subgroup ? " #{subgroup.value}" : ""),
-            (typed_stage.abbreviation.empty? ? "" : " #{typed_stage.abbreviation}"),
+            (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
           ].join('')
         end
 
