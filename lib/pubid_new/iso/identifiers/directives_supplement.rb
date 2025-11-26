@@ -48,7 +48,8 @@ module PubidNew
               base_identifier.to_s(lang: lang, lang_single: lang_single),
               " #{supplement_publisher.body}",
               " SUP",  # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
-              (date ? ":#{date.year}" : "")
+              (date ? ":#{date.year}" : ""),
+              (edition ? " Edition #{edition.number.value}" : "")
             ].join('')
           else
             # Simplified rendering for bundled identifiers (just the supplement part)
