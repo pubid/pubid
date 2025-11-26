@@ -9,16 +9,16 @@ module PubidNew
 
       TYPED_STAGES = [
         Components::TypedStage.new(
-          code: :dadd,
-          stage_code: :dadd,
+          code: :dad,
+          stage_code: :dad,
           type_code: :add,
           abbr: ["DAD"],
           name: "Draft Addendum",
           harmonized_stages: %w[40.00 40.20 40.60 40.92 40.93 40.98 40.99],
         ),
         Components::TypedStage.new(
-          code: :fdadd,
-          stage_code: :fdadd,
+          code: :fdad,
+          stage_code: :fdad,
           type_code: :add,
           abbr: ["FDAD"],
           name: "Final Draft Addendum",
@@ -28,7 +28,7 @@ module PubidNew
           code: :pubadd,
           stage_code: :published,
           type_code: :add,
-          abbr: ["Add", "ADD", "Addendum"],
+          abbr: ["Add", "ADD", "Addendum", "Add."],
           name: "Addendum",
           harmonized_stages: %w[60.00 60.60],
         ),
