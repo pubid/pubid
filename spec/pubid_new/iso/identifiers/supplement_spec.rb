@@ -308,7 +308,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
       describe "ISO Guide 98:1995/DSuppl 1.2" do
         subject { "ISO Guide 98:1995/DSuppl 1.2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:pubid) { "ISO/Guide 98:1995/DSuppl 1.2" }
+        let(:pubid) { "ISO Guide 98:1995/DSuppl 1.2" }
         let(:urn) { "urn:iso:std:iso:guide:98:stage-draft:sup:1:v1" }
 
         it "parses publisher" do
