@@ -90,6 +90,22 @@ module PubidNew
         { key: :guide, title: "Guide", short: "GUIDE" }
       end
 
+      # Override publisher_portion to use space before Guide (not slash)
+      # Correct format: "ISO Guide 1" and "ISO/IEC Guide X"
+      def publisher_portion(lang: :en)
+        # If there are no copublishers, return publisher + space + Guide
+        return [
+            publisher.body,
+            (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+          ].join('') unless copublishers&.any?
+
+        # If there are copublishers, join them with slashes, then space + Guide
+        [
+          ([publisher] + copublishers).map(&:body).join("/"),
+          (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+        ].join('')
+      end
+
       # TODO: Support French and Russian
       # if opts[:language] == :french
       #   "Guide %{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
