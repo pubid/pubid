@@ -80,7 +80,7 @@ module PubidNew
           code: :pubguide,
           stage_code: :published,
           type_code: :guide,
-          abbr: ["Guide", "GUIDE"], # "GUIDE" is legacy
+          abbr: ["Guide", "GUIDE"], # "Guide" is canonical, "GUIDE" is legacy
           name: "Published Guide",
           harmonized_stages: %w[60.00 60.60],
         ),
