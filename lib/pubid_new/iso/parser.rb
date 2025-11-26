@@ -34,16 +34,30 @@ module PubidNew
       # ISO/R 947:1969 (legacy Recommendation without supplement)
       rule(:iso_r_identifier) do
         str("ISO/R").as(:iso_r_prefix) >> space >>
-          second_part >> third_part
+          iso_r_second_part >> third_part
       end
 
       # ISO/R 947:1969/Add 1:1969 (legacy Recommendation with supplement)
+      # Also handles: ISO/R 91-1970 — Addendum 1 (dash for year, em-dash + word)
       rule(:iso_r_supplement_identifier) do
         (
-          str("ISO/R").as(:iso_r_prefix) >> space >> second_part
+          str("ISO/R").as(:iso_r_prefix) >> space >> iso_r_second_part
         ).as(:base_identifier) >>
-          str("/") >> supplement_type_with_stage >>
+          iso_r_supplement_separator >>
+          supplement_type_with_stage >>
           space? >> second_part >> third_part
+      end
+
+      # ISO/R supplements can use "/" or em-dash "—" as separator
+      rule(:iso_r_supplement_separator) do
+        str("/") | (space? >> str("—") >> space?)
+      end
+
+      # Special second_part for ISO/R that treats dash as date separator only
+      rule(:iso_r_second_part) do
+        number.as(:number_with_part) >>
+          stage_iteration.maybe >>
+          space? >> date.maybe
       end
 
       # ISO 8601-1:2019
