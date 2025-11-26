@@ -79,16 +79,16 @@ module PubidNew
         (
           dash >> space? >>
           # matches a part
-          match('\w').repeat >>
+          match('\w').repeat(1) >>
           # matches a subpart, e.g. "A01" or "1-2" (yes we treat {5}-{1-1} as part and subpart)
-          (dash >> match('\w').repeat).repeat.maybe
+          (dash >> match('\w').repeat(1)).repeat.maybe
         ) |
         # Legacy parts do not have subparts
         # the "/" to handle old style parts: "ISO 5843/6"
         (
           str("/") >> space? >>
           # matches a part
-          match('\w').repeat
+          match('\w').repeat(1)
         )
       end
 

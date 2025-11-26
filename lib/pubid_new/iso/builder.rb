@@ -181,9 +181,9 @@ module PubidNew
           # for "1 IEC" ('IEC' is part) (in case of "ISO/IEC DIR 1 IEC")
           normalized_value.gsub!(" ", "-")
 
-          parts = normalized_value.split("-")
+          parts = normalized_value.split("-").reject(&:empty?)
           number = parts.shift # The first part is always the number
-          part = parts.shift # The second part is the part, if present
+          part = parts.shift&.strip # The second part is the part, if present
           subpart = parts.any? ? parts.join("-") : nil # The remaining parts form the subpart, if present
 
           part = convert_roman_to_integer(part)
