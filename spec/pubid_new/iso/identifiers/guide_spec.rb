@@ -28,7 +28,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
     describe "ISO GUIDE 2:1978" do
       subject { "ISO GUIDE 2:1978" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
-      let(:normalized) { "ISO/Guide 2:1978" }
+      let(:normalized) { "ISO Guide 2:1978" }
       let(:urn) { "urn:iso:std:iso:guide:2" }
 
       it "parses publisher" do
@@ -75,6 +75,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
     describe "ISO/Guide 1" do
       subject { "ISO/Guide 1" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:normalized) { "ISO Guide 1" }
       let(:urn) { "urn:iso:std:iso:guide:1" }
 
       it "parses publisher" do
@@ -93,8 +94,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.date).to be_nil
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+      it "normalizes format" do
+        expect(parsed.to_s).to eq(normalized)
       end
 
       it "provides type code" do
@@ -118,6 +119,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
     describe "ISO/GUIDE 1" do
       subject { "ISO/GUIDE 1" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:normalized) { "ISO Guide 1" }
       let(:urn) { "urn:iso:std:iso:guide:1" }
 
       it "parses publisher" do
@@ -136,8 +138,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.date).to be_nil
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+      it "normalizes format" do
+        expect(parsed.to_s).to eq(normalized)
       end
 
       it "provides type code" do
@@ -163,7 +165,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
     describe "ISO GUIDE 1:1972" do
       subject { "ISO GUIDE 1:1972" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
-      let(:normalized) { "ISO/Guide 1:1972" }
+      let(:normalized) { "ISO Guide 1:1972" }
       let(:urn) { "urn:iso:std:iso:guide:1" }
 
       it "parses publisher" do
@@ -574,6 +576,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/NP Guide 30" do
         subject { "ISO/NP Guide 30" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO NP Guide 30" }
         let(:urn) { "urn:iso:std:iso:guide:30:stage-00.00" }
 
         it "parses publisher" do
@@ -588,8 +591,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("np")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "normalizes format" do
+          expect(parsed.to_s).to eq(normalized)
         end
 
         it "provides type code" do
@@ -678,6 +681,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/AWI Guide 82" do
         subject { "ISO/AWI Guide 82" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO AWI Guide 82" }
         let(:urn) { "urn:iso:std:iso:guide:82:stage-10.99" }
 
         it "parses publisher" do
@@ -692,8 +696,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("awi")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "normalizes format" do
+          expect(parsed.to_s).to eq(normalized)
         end
 
         it "provides type code" do
@@ -748,6 +752,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/CD Guide 73" do
         subject { "ISO/CD Guide 73" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO CD Guide 73" }
         let(:urn) { "urn:iso:std:iso:guide:73:stage-30.00" }
 
         it "parses publisher" do
@@ -762,8 +767,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "normalizes format" do
+          expect(parsed.to_s).to eq(normalized)
         end
 
         it "provides type code" do
@@ -780,7 +785,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/DGUIDE 84:2024(en)" do
         subject { "ISO/DGUIDE 84:2024(en)" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:normalized) { "ISO/DGuide 84:2024(en)" }
+        let(:normalized) { "ISO DGuide 84:2024(en)" }
         let(:urn) { "urn:iso:std:iso:guide:84:stage-40.00:en" }
 
         it "parses publisher" do
@@ -819,7 +824,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/DGUIDE 83:2023(E)" do
         subject { "ISO/DGUIDE 83:2023(E)" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:normalized) { "ISO/DGuide 83:2023(en)" }
+        let(:normalized) { "ISO DGuide 83:2023(en)" }
         let(:urn) { "urn:iso:std:iso:guide:83:stage-40.00:en" }
 
         it "parses publisher" do
@@ -858,6 +863,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/DGuide 31(en)" do
         subject { "ISO/DGuide 31(en)" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO DGuide 31(en)" }
         let(:urn) { "urn:iso:std:iso:guide:31:stage-40.00:en" }
 
         it "parses publisher" do
@@ -876,8 +882,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("dguide")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "normalizes format" do
+          expect(parsed.to_s).to eq(normalized)
         end
 
         it "provides type code" do
@@ -893,7 +899,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/DGuide 84" do
         subject { "ISO/DGuide 84" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:pubid) { "ISO/DGuide 84" }
+        let(:normalized) { "ISO DGuide 84" }
+        let(:pubid) { "ISO DGuide 84" }
         let(:urn) { "urn:iso:std:iso:guide:84:stage-draft" }
 
         it "parses publisher" do
@@ -905,10 +912,10 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          expect(parsed.typed_stage.stage_code).to eq("draft")
+          expect(parsed.typed_stage.stage_code).to eq("dguide")
         end
 
-        it "round-trips" do
+        it "normalizes format" do
           expect(parsed.to_s).to eq(pubid)
         end
 
@@ -924,7 +931,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO DGUIDE 84" do
         subject { "ISO DGUIDE 84" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:normalized) { "ISO/DGuide 84" }
+        let(:normalized) { "ISO DGuide 84" }
         let(:urn) { "urn:iso:std:iso:guide:84:stage-draft" }
 
         it "parses publisher" do
@@ -936,7 +943,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         end
 
         it "parses stage" do
-          expect(parsed.typed_stage.stage_code).to eq("draft")
+          expect(parsed.typed_stage.stage_code).to eq("dguide")
         end
 
         it "normalizes format" do
@@ -1122,6 +1129,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/PRF Guide 99998" do
         subject { "ISO/PRF Guide 99998" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO PRF Guide 99998" }
         let(:urn) { "urn:iso:std:iso:guide:99998:stage-60.00" }
 
         it "parses publisher" do
@@ -1136,8 +1144,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "normalizes format" do
+          expect(parsed.to_s).to eq(normalized)
         end
 
         it "provides type code" do
@@ -1152,6 +1160,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
       describe "ISO/PRF Guide 35" do
         subject { "ISO/PRF Guide 35" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO PRF Guide 35" }
         let(:urn) { "urn:iso:std:iso:guide:35:stage-60.00" }
 
         it "parses publisher" do
@@ -1166,8 +1175,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "normalizes format" do
+          expect(parsed.to_s).to eq(normalized)
         end
 
         it "provides type code" do
@@ -1224,6 +1233,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
     describe "ISO/DGuide 99999.2" do
       subject { "ISO/DGuide 99999.2" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:normalized) { "ISO DGuide 99999.2" }
       let(:urn) { "urn:iso:std:iso:guide:99999:stage-40.00.v2" }
 
       it "parses publisher" do
@@ -1242,8 +1252,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.stage_iteration.value).to eq("2")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+      it "normalizes format" do
+        expect(parsed.to_s).to eq(normalized)
       end
 
       it "provides type code" do
@@ -1304,6 +1314,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
     describe "ISO/Guide 73:2009(en)" do
       subject { "ISO/Guide 73:2009(en)" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:normalized) { "ISO Guide 73:2009(en)" }
       let(:urn) { "urn:iso:std:iso:guide:73:en" }
 
       it "parses publisher" do
@@ -1322,8 +1333,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.languages.map(&:code)).to eq(%w[en])
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+      it "normalizes format" do
+        expect(parsed.to_s).to eq(normalized)
       end
 
       it "provides type code" do
