@@ -47,17 +47,19 @@ module PubidNew
 
     def to_s(lang: :en, lang_single: false)
       result = base_document.to_s(lang: lang, lang_single: lang_single)
-      
+
       supplements.each do |supplement|
-        # CEN-style supplements (AC, A) don't have base_identifier and use no spaces
-        # ISO-style supplements (ISO SUP, IEC SUP) are full identifiers with spaces
-        if supplement.respond_to?(:base_identifier) && supplement.base_identifier.nil?
-          result += "+#{supplement.to_s(lang: lang, lang_single: lang_single)}"
-        else
+        # ISO DirectivesSupplement always uses " + " (space before)
+        # CEN-style supplements (AC, A) without base_identifier use "+" (no space before)
+        # Other ISO supplements with base_identifier use " + " (space before)
+        if supplement.class.name&.include?("DirectivesSupplement") ||
+           (supplement.respond_to?(:base_identifier) && !supplement.base_identifier.nil?)
           result += " + #{supplement.to_s(lang: lang, lang_single: lang_single)}"
+        else
+          result += "+#{supplement.to_s(lang: lang, lang_single: lang_single)}"
         end
       end
-      
+
       result
     end
 
