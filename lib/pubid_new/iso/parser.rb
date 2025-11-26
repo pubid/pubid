@@ -286,6 +286,8 @@ module PubidNew
         # ISO/IEC DIR 1 ISO SUP
         # ISO/IEC DIR 2 ISO SUP:2022
         # ISO/IEC DIR JTC 1 SUP:2021
+        # ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement
+        (space? >> str("--") >> space? >> str("Consolidated") >> space).maybe >>
         (str("ISO") | str("IEC") | str("JTC 1")).as(:publisher) >>
           (space >> array_to_str(DIRECTIVES_SUPPLEMENTS_TYPED_STAGES).as(:type_with_stage)) >>
           date.maybe
