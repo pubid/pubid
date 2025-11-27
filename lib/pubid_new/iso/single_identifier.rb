@@ -95,7 +95,9 @@ module PubidNew
 
       # Generate URN according to RFC 5141
       # Format: urn:iso:std:{publisher}:{number}[:{elements}]
-      def to_urn
+      # @param include_stage [Boolean] whether to include stage in URN (default: true)
+      #   Set to false when this identifier is a base for a supplement that has its own stage
+      def to_urn(include_stage: true)
         parts = ["urn", "iso", "std"]
         
         # Publisher (lowercase, hyphen-separated)
@@ -103,8 +105,9 @@ module PubidNew
         
         # Type (for non-IS types like TR, TS, Guide)
         # IS (International Standard) is the default and doesn't appear in URN
+        # Use urn_type_code override if available (e.g., Recommendation uses 'r' instead of 'rec')
         if typed_stage.type_code && typed_stage.type_code != "is"
-          parts << typed_stage.type_code
+          parts << (respond_to?(:urn_type_code) ? urn_type_code : typed_stage.type_code)
         end
         
         # Number
@@ -113,8 +116,8 @@ module PubidNew
         # Part (with colon-dash prefix)
         parts << part_urn if part
         
-        # Stage (only for non-published documents)
-        parts << stage_urn if stage_urn
+        # Stage (only for non-published documents, and only if requested)
+        parts << stage_urn if include_stage && stage_urn
         
         # Edition
         parts << edition_urn if edition && edition.number

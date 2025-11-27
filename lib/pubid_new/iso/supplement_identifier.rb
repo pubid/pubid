@@ -32,16 +32,30 @@ module PubidNew
         parts = []
         
         # Base identifier URN (recursive - handles multi-level supplements)
-        parts << base_identifier.to_urn if base_identifier
+        # When supplement has a stage, exclude base's stage (supplement stage takes precedence)
+        if base_identifier
+          if stage_urn
+            # Supplement has a stage - get base URN without its stage
+            parts << base_identifier.to_urn(include_stage: false)
+          else
+            # Supplement doesn't have a stage - include base's stage if present
+            parts << base_identifier.to_urn
+          end
+        end
         
         # Edition (for supplements with edition)
         parts << edition_urn if edition && edition.number
         
         # Stage (for supplements with draft stages like CD Amd, FDAM, etc.)
+        # This is the supplement's own stage, which takes precedence over base's stage
         parts << stage_urn if stage_urn
         
         # Supplement type code (amd, cor, add, etc.)
-        parts << typed_stage.type_code if typed_stage
+        # Use urn_supplement_type override if available (for Addendum/Supplement -> 'sup')
+        # Otherwise use typed_stage.type_code (for Amendment -> 'amd', Corrigendum -> 'cor')
+        if typed_stage
+          parts << (respond_to?(:urn_supplement_type) ? urn_supplement_type : typed_stage.type_code)
+        end
         
         # Year (if present, otherwise use number as identifier)
         if date

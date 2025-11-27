@@ -34,6 +34,11 @@ module PubidNew
         ),
       ].freeze
 
+      # Override URN type code - Addendum uses 'sup' in URN (RFC 5141)
+      def urn_supplement_type
+        "sup"
+      end
+
       def self.type
         { key: :add, title: "Addendum", short: "ADD" }
       end

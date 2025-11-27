@@ -74,6 +74,11 @@ module PubidNew
         ),
       ].freeze
 
+      # Override URN type code - Supplement uses 'sup' in URN (RFC 5141)
+      def urn_supplement_type
+        "sup"
+      end
+
       def self.type
         { key: :suppl, title: "Supplement", short: "suppl" }
       end
