@@ -39,7 +39,10 @@ RSpec.describe PubidNew::Iso::Parser do
   # \============================================================================
 
   before(:each) do
-    pending "V1 Parser unit tests incompatible with V2 integration testing approach"
+    # Skip pending for tests marked with :skip_pending metadata
+    unless RSpec.current_example.metadata[:skip_pending]
+      pending "V1 Parser unit tests incompatible with V2 integration testing approach"
+    end
   end
 
   describe ".parse" do
@@ -378,19 +381,20 @@ RSpec.describe PubidNew::Iso::Parser do
     end
 
     context "error cases" do
-      it "raises error for invalid pattern" do
+      # These 3 tests are now PASSING with V2 parser - skip global pending
+      it "raises error for invalid pattern", :skip_pending do
         expect do
           described_class.new.parse("INVALID 12345")
         end.to raise_error(Parslet::ParseFailed)
       end
 
-      it "raises error for missing number" do
+      it "raises error for missing number", :skip_pending do
         expect do
           described_class.new.parse("ISO :2003")
         end.to raise_error(Parslet::ParseFailed)
       end
 
-      it "raises error for malformed supplement" do
+      it "raises error for malformed supplement", :skip_pending do
         expect do
           described_class.new.parse("ISO 12345:2020/INVALID")
         end.to raise_error(Parslet::ParseFailed)
