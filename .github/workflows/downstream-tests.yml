@@ -188,7 +188,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        $rubyVersion = "${{ env.RUBY_VERSION }}"
+        $rubyVersion = "${{ steps.setup-ruby.outputs.ruby-version }}"
         $target = "C:\hostedtoolcache\windows\Ruby\$rubyVersion\x64\msys64"
         if (Test-Path $target) {
           Remove-Item $target -Force -Recurse
