@@ -1,20 +1,21 @@
-## Current Status (Session 37 Complete - Regression Fixed! 🎉)
+## Current Status (Session 38 Complete - Builder Fix Success! 🎉)
 
 **Test Results:**
-- 2,357 passing (82.5%) - **Maintained from Session 35**
-- 23 failures (0.8%) - **+1 from Session 35 (acceptable)**
+- 2,360 passing (82.6%) - **+3 from Session 37**
+- 20 failures (0.7%) - **-3 from Session 37**
 - 480 pending (16.8%)
 - Total: 2,859 examples
 
-**✅ SESSION 37 COMPLETE!**
+**✅ SESSION 38 COMPLETE!**
 
-Session 37 successfully reverted Session 36's problematic parser changes and added crucial Builder infrastructure.
+Session 38 successfully implemented legacy hyphen format detection with ZERO regressions.
 
 **Accomplishments:**
-- **Fixed Addendum stage code typos** - dadd → dad, fdadd → fdad (+8 tests)
-- **Added legacy abbreviation** - "Add." for legacy format parsing
-- **82.5% milestone achieved** - 2,357 passing tests
-- **Phase 3 progressing** - 19 addendum_spec failures remain
+- **Fixed legacy year format** - Builder detects years (1900-2099) in number_with_part
+- **+3 tests gained** - addendum_spec: 19→16, iso suite: 23→20
+- **Zero regressions** - Year range check prevents false positives
+- **LOW RISK approach** - Builder-only, no parser changes
+- **Commit**: 331e008
 
 **Milestones:**
 - ✅ 50% milestone → Achieved 1,648 (57.6%) in Session 18
@@ -28,7 +29,8 @@ Session 37 successfully reverted Session 36's problematic parser changes and add
 - ✅ **PHASE 1 COMPLETE → Achieved 2,289 (80.07%) in Session 31**
 - ✅ **PHASE 2 PRIORITY 1 → Achieved 2,298 (80.38%) in Session 32**
 - ✅ **PHASE 2 INFRASTRUCTURE → Achieved 2,295 (80.28%) in Session 33**
-- 🎯 **Next: Phase 3** (target: 2,376+, need +81 tests for 83.1%)
+- ✅ **PHASE 3 STARTED → Achieved 2,360 (82.6%) in Session 38**
+- 🎯 **Next: 85% milestone** (target: 2,430+, need +70 tests)
 
 ## Session 35 Summary - Addendum Stage Code Fixes
 
