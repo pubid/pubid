@@ -190,6 +190,7 @@ module PubidNew
           # or "29110-5-1-1" ('5' is part, '1-1' is subpart)
           # or "105/F" ('F' is part)
           # or "5843/6" ('6' is part)
+          # LEGACY: "4037-1979" (number-year, year should become date)
 
           # Split the number into parts
           normalized_value = value.to_s.tr(Parser::DASH_CHARS.join + "/", "-")
@@ -201,6 +202,19 @@ module PubidNew
           number = parts.shift # The first part is always the number
           part = parts.shift&.strip # The second part is the part, if present
           subpart = parts.any? ? parts.join("-") : nil # The remaining parts form the subpart, if present
+
+          # LEGACY FORMAT FIX: If "part" is a 4-digit year (1900-2099), move it to date field
+          # This handles legacy formats like "ISO 4037-1979" where hyphen was used instead of colon
+          if part&.match?(/^\d{4}$/)
+            year_value = part.to_i
+            # Only treat as year if in reasonable year range (excludes part numbers like "1751")
+            if year_value >= 1900 && year_value <= 2099
+              return {
+                number: PubidNew::Iso::Components::Code.new(number: number),
+                date: PubidNew::Components::Date.new(year: part)
+              }
+            end
+          end
 
           part = convert_roman_to_integer(part)
 
