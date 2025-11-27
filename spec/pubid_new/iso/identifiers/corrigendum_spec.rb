@@ -69,7 +69,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -173,7 +173,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -219,7 +219,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -273,7 +273,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -320,7 +320,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -375,7 +375,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -430,7 +430,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -480,7 +480,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -528,7 +528,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -572,7 +572,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -614,7 +614,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -662,7 +662,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -716,7 +716,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -766,7 +766,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -819,7 +819,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -867,7 +867,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
           expect(parsed.typed_stage.type_code).to eq("cor")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -922,7 +922,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -975,7 +975,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1025,7 +1025,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1076,7 +1076,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1126,7 +1126,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1177,7 +1177,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1227,7 +1227,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1278,7 +1278,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1347,7 +1347,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1411,7 +1411,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.type_code).to eq("cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1484,7 +1484,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1560,7 +1560,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1618,7 +1618,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1677,7 +1677,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1731,7 +1731,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1789,7 +1789,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1839,7 +1839,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1894,7 +1894,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1953,7 +1953,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -2011,7 +2011,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -2084,7 +2084,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -2154,7 +2154,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
         expect(parsed.typed_stage.abbr.first).to eq("Cor")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end

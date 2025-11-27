@@ -25,6 +25,70 @@ module PubidNew
           parts << language_portion(lang_single: lang_single) if languages&.any?
         end.compact.join('')
       end
+
+      # Generate URN for supplement with recursive base handling
+      # Format: {base_urn}[:edition][:stage]:{supplement_type}:{year}:v{number}[:language]
+      def to_urn
+        parts = []
+        
+        # Base identifier URN (recursive - handles multi-level supplements)
+        parts << base_identifier.to_urn if base_identifier
+        
+        # Edition (for supplements with edition)
+        parts << edition_urn if edition && edition.number
+        
+        # Stage (for supplements with draft stages like CD Amd, FDAM, etc.)
+        parts << stage_urn if stage_urn
+        
+        # Supplement type code (amd, cor, add, etc.)
+        parts << typed_stage.type_code if typed_stage
+        
+        # Year (if present, otherwise use number as identifier)
+        if date
+          parts << date.year.to_s
+          # Version number with "v" prefix (can include iteration like v1.2)
+          if stage_iteration
+            parts << "v#{number.value}.#{stage_iteration.value}" if number
+          else
+            parts << "v#{number.value}" if number
+          end
+        else
+          # Without year, use number directly
+          parts << number.value if number
+          # Version with iteration if present (e.g., v1.2)
+          if stage_iteration
+            parts << "v1.#{stage_iteration.value}"
+          else
+            parts << "v1"
+          end
+        end
+        
+        # Language (if present)
+        if languages&.any?
+          parts << languages.map(&:code).join(",")
+        end
+        
+        parts.join(":")
+      end
+
+      private
+
+      def edition_urn
+        return nil unless edition && edition.number
+        "ed-#{edition.number}"
+      end
+
+      def stage_urn
+        # Only add stage for non-published supplements (e.g., CD Amd, FDAM, DAM)
+        return nil if typed_stage.stage_code == "published"
+        
+        # Get harmonized stage code from typed_stage
+        harmonized_code = typed_stage.harmonized_stages&.first
+        return nil unless harmonized_code
+        
+        # Stage without iteration (iteration goes in version number)
+        "stage-#{harmonized_code}"
+      end
     end
   end
 end

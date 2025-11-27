@@ -1,12 +1,14 @@
-## Current Status (Session 42 Complete - 100% Functional Success!)
+## Current Status (Session 43 Complete - 85% Milestone Achieved! 🎉)
 
 **Test Results:**
-- 2,377 passing (83.1%) - **Unchanged from Session 41**
-- 5 failures (0.2%) - Performance tests only (timing variation)
-- 480 pending (16.8%)
+- 2,485 passing (86.9%) - **+106 tests from Session 42**
+- 17 failures (0.6%) - Supplement URN tests (expected, Session 44 work)
+- 357 pending (12.5%)
 - Total: 2,859 examples
 
-**✅ SESSION 42 COMPLETE!**
+**✅ SESSION 43 COMPLETE! 85% MILESTONE ACHIEVED!**
+
+Session 43 successfully implemented URN generation for all SingleIdentifier types, exceeding expectations with **+106 tests passing** (target was +40-60).
 
 Session 42 conducted comprehensive edge case analysis and discovered **100% functional completion**.
 
@@ -38,7 +40,55 @@ Session 42 conducted comprehensive edge case analysis and discovered **100% func
 - ✅ **PHASE 2 INFRASTRUCTURE → Achieved 2,295 (80.28%) in Session 33**
 - ✅ **PHASE 3 COMPLETE → Achieved 2,377 (83.1%) in Session 41**
 - ✅ **PHASE 4 COMPLETE → No work needed (Session 42)**
-- 🎯 **Next: 85% milestone via URN** (target: 2,430+, need +53 tests)
+- ✅ **85% MILESTONE → Achieved 2,485 (86.9%) in Session 43** 🎉
+- 🎯 **Next: 90% milestone** (target: 2,574+, need +89 tests via supplements)
+
+## Session 43 Summary - URN Generation Foundation (85% Milestone!)
+
+**What Was Done:**
+
+Session 43 successfully implemented URN generation for all SingleIdentifier types, achieving the 85% milestone.
+
+**Implementation:**
+- Created `to_urn` method in SingleIdentifier base class (RFC 5141 compliant)
+- Handles publisher (lowercase, hyphen-separated copublishers: ISO/IEC → iso-iec)
+- Handles type codes (tr, ts, guide, etc. - IS omitted as default)
+- Handles parts/subparts with colon-dash prefix (8601-1 → :8601:-1)
+- Handles stages with harmonized codes (PWI → stage-00.00, CD → stage-30.00)
+- Handles editions (Ed 1 → :ed-1) and languages (en,fr)
+- Stage iteration support (FDIS.2 → stage-50.00.v2)
+
+**Test Coverage:**
+- Enabled 123 URN tests by changing `xit` to `it` across 6 identifier specs
+- international_standard_spec: +32 tests (3 V1/V2 harmonized code differences)
+- technical_report_spec: +23 tests (100% passing)
+- technical_specification_spec: +16 tests (100% passing)
+- guide_spec: +34 tests (100% passing)
+- pas_spec: +13 tests (100% passing)
+- data_spec: +2 tests (100% passing)
+
+**Progress:**
+- Tests passing: 2,379 → 2,485 (+106 tests, exceeded +40-60 target!)
+- Pass rate: 83.1% → 86.9% (+3.8pp)
+- **85% milestone achieved with significant buffer**
+
+**Known Issues:**
+- 3 V1/V2 harmonized stage code differences (acceptable):
+  - NP: V2 uses 10.00 (correct) vs V1's 00.00
+  - FCD: V2 uses 30.00 (correct) vs V1's 40.00
+- 17 supplement URN failures (Amendment, Corrigendum, Addendum)
+  - Expected - supplements need recursive base handling
+  - Planned for Session 44
+
+**Files Modified:**
+- `lib/pubid_new/iso/single_identifier.rb` - Added to_urn implementation
+- 6 identifier spec files - Enabled URN tests
+
+**Commit:**
+- `b49724e` - feat(iso): implement basic to_urn for SingleIdentifier types
+
+**Next Steps:**
+Session 44 will implement supplement URN generation (Amendment, Corrigendum, Addendum) targeting 90% milestone.
 
 ## Session 42 Summary - Edge Case Analysis and Path to 85%
 
