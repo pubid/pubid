@@ -156,10 +156,10 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | All edge cases resolved, supports complex patterns
 
 | **ISO**
-| **82.2%**
-| 2,349/2,859
+| **82.5%**
+| 2,357/2,859
 | ⚠️ In progress
-| Core implementation complete, including ISO/R legacy format support
+| Core implementation complete, Builder architecture enhanced (Session 37)
 
 | **BSI**
 | TBD
