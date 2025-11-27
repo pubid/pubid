@@ -14,18 +14,10 @@ module PubidNew
       DASH_CHARS = ["-", "‑", "‐"].freeze
 
       # We need to sort by length to match longest first because that's how Parslet works
-      def self.typed_stages
-        @typed_stages ||= PubidNew::Iso::Scheme.typed_stages
-          .map(&:abbr).flatten.sort_by(&:length).reverse
-      end
-
-      def self.supplement_typed_stages
-        @supplement_typed_stages ||= PubidNew::Iso::Scheme.supplement_typed_stages
-          .map(&:abbr).flatten.sort_by(&:length).reverse
-      end
-
-      TYPED_STAGES = typed_stages
-      TYPED_STAGES_SUPPLEMENTS = supplement_typed_stages
+      TYPED_STAGES = PubidNew::Iso::Scheme.typed_stages
+        .map(&:abbr).flatten.sort_by(&:length).reverse
+      TYPED_STAGES_SUPPLEMENTS = PubidNew::Iso::Scheme.supplement_typed_stages
+        .map(&:abbr).flatten.sort_by(&:length).reverse
 
       root :identifier
 
@@ -128,14 +120,11 @@ module PubidNew
           (dash >> match('\w').repeat(1)).repeat.maybe
         ) |
         # Legacy parts do not have subparts
-        # the "/" to handle old style parts: "ISO 5843/6" or "ISO 105/F"
-        # Legacy parts are followed by ":", "-", or end of number section
-        # This prevents matching supplement separators like "/Amd ", "/Cor ", "/DAD "
+        # the "/" to handle old style parts: "ISO 5843/6"
         (
           str("/") >> space? >>
-          # matches a part (1-3 word chars)
-          # Must be followed by end-of-input, ":", "-", "(" or not followed by space+word
-          match('\w').repeat(1, 3) >> (match[':\-\('].present? | space.absent?)
+          # matches a part
+          match('\w').repeat(1)
         )
       end
 
@@ -215,10 +204,8 @@ module PubidNew
         # Guide ISO/CEI 51:1999
         (guide_prefix.as(:type_with_stage_fr) >> space).maybe >>
           # maybe prefix_with_copublishers to handle IWA
-          prefix_with_copublishers.maybe >>
-          # Match "/" + type only when NOT followed by a supplement type
-          # This prevents consuming the supplement separator "/"
-          (space? >> str("/") >> (supplement_type_with_stage >> space?).absent? >> type_with_stage).maybe >>
+          prefix_with_copublishers.maybe >> space? >> str("/").maybe >>
+          type_with_stage.maybe >>
           space.maybe >>
           second_part >> third_part_edition
       end

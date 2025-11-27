@@ -110,6 +110,15 @@ module PubidNew
           end
         end
 
+        # If typed_stage, stage, or type are still nil after building,
+        # set them to the default International Standard values
+        if identifier.respond_to?(:typed_stage) && identifier.typed_stage.nil?
+          default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
+          identifier.typed_stage = default_typed_stage if identifier.respond_to?(:typed_stage=)
+          identifier.stage = default_typed_stage.to_stage if identifier.respond_to?(:stage=)
+          identifier.type = default_typed_stage.to_type if identifier.respond_to?(:type=)
+        end
+
         identifier
       end
 
