@@ -63,7 +63,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -154,7 +154,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -196,7 +196,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -239,7 +239,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -279,7 +279,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -319,7 +319,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -358,7 +358,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -397,7 +397,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -436,7 +436,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -475,7 +475,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -514,7 +514,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -564,7 +564,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.abbr.first).to eq("Guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -599,7 +599,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -637,7 +637,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -673,7 +673,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -704,7 +704,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -744,7 +744,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -775,7 +775,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -816,7 +816,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -855,7 +855,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -890,7 +890,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -923,7 +923,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -954,7 +954,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1003,7 +1003,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1041,7 +1041,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1080,7 +1080,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1119,7 +1119,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1152,7 +1152,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1183,7 +1183,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
           expect(parsed.typed_stage.type_code).to eq("guide")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -1225,7 +1225,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1260,7 +1260,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.type_code).to eq("guide")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1306,7 +1306,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -1345,7 +1345,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Guide do
         expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end

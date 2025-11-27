@@ -93,6 +93,81 @@ module PubidNew
         edition.to_s
       end
 
+      # Generate URN according to RFC 5141
+      # Format: urn:iso:std:{publisher}:{number}[:{elements}]
+      def to_urn
+        parts = ["urn", "iso", "std"]
+        
+        # Publisher (lowercase, hyphen-separated)
+        parts << publisher_urn
+        
+        # Type (for non-IS types like TR, TS, Guide)
+        # IS (International Standard) is the default and doesn't appear in URN
+        if typed_stage.type_code && typed_stage.type_code != "is"
+          parts << typed_stage.type_code
+        end
+        
+        # Number
+        parts << number.value if number
+        
+        # Part (with colon-dash prefix)
+        parts << part_urn if part
+        
+        # Stage (only for non-published documents)
+        parts << stage_urn if stage_urn
+        
+        # Edition
+        parts << edition_urn if edition && edition.number
+        
+        # Language
+        parts << language_urn if languages&.any?
+        
+        parts.join(":")
+      end
+
+      private
+
+      def publisher_urn
+        copubs = copublishers || []
+        ([publisher] + copubs).map(&:body).map(&:downcase).join("-")
+      end
+
+      def part_urn
+        # Part format: -part or -part-subpart
+        result = "-#{part.value}"
+        result += "-#{subpart.value}" if subpart
+        result
+      end
+
+      def stage_urn
+        # Only add stage for non-published documents
+        # Published IS doesn't have a stage in URN
+        return nil if typed_stage.stage_code == "published"
+        
+        # Get harmonized stage code from typed_stage
+        harmonized_code = typed_stage.harmonized_stages&.first
+        return nil unless harmonized_code
+        
+        stage_part = "stage-#{harmonized_code}"
+        
+        # Add iteration if present (e.g., stage-50.00.v2)
+        if stage_iteration
+          stage_part += ".v#{stage_iteration.value}"
+        end
+        
+        stage_part
+      end
+
+      def edition_urn
+        return nil unless edition && edition.number
+        "ed-#{edition.number}"
+      end
+
+      def language_urn
+        return nil unless languages&.any?
+        languages.map(&:code).join(",")
+      end
+
     end
   end
 end

@@ -62,7 +62,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -108,7 +108,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -154,7 +154,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.typed_stage.abbr.first).to eq("")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -189,7 +189,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.to_s).to eq("ISO 31-0:1974")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -221,7 +221,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.to_s).to eq("ISO 5843-6")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -289,7 +289,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.to_s(with_edition: true)).to eq(pubid)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
 
@@ -317,7 +317,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.to_s(with_edition: true)).to eq(pubid_with_edition)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
 
@@ -345,7 +345,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.to_s(with_edition: true)).to eq(pubid_with_edition)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
 
@@ -368,7 +368,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.to_s).to eq(pubid)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
 
@@ -399,7 +399,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.date.year).to eq("2019")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
 
@@ -430,7 +430,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         expect(parsed.date.year).to eq("2025")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
 
@@ -471,7 +471,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(pubid)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -535,7 +535,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -577,7 +577,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -613,7 +613,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -667,7 +667,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -709,7 +709,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -748,7 +748,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -792,7 +792,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -831,7 +831,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -872,7 +872,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -920,7 +920,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -952,7 +952,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -971,7 +971,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(PubidNew::Iso.parse(subject).to_s).to eq(pubid)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(PubidNew::Iso.parse(subject).to_urn).to eq(urn)
           end
 
@@ -1008,7 +1008,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -1049,7 +1049,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -1094,7 +1094,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -1131,7 +1131,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -1164,7 +1164,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -1201,7 +1201,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
             expect(parsed.to_s).to eq(subject)
           end
 
-          xit "generates urn" do
+          it "generates urn" do
             expect(parsed.to_urn).to eq(urn)
           end
 
@@ -1231,7 +1231,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -1259,7 +1259,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(pubid)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -1286,7 +1286,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -1311,7 +1311,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(pubid)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 
@@ -1334,7 +1334,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
           expect(parsed.to_s).to eq(pubid)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
 

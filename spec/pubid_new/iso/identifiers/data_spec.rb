@@ -69,7 +69,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
           expect(parsed.type.abbr).to eq("DATA")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -120,7 +120,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
           expect(parsed.type.abbr).to eq("DATA")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
