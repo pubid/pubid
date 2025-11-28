@@ -67,7 +67,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
           expect(parsed.typed_stage.abbr.first).to eq("Ext")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
