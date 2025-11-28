@@ -67,7 +67,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.abbr.first).to eq("ISP")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -113,7 +113,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.abbr.first).to eq("ISP")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -162,7 +162,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.abbr.first).to eq("ISP")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -208,7 +208,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.abbr.first).to eq("ISP")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -260,7 +260,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.abbr.first).to eq("ISP")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -307,7 +307,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.type_code).to eq("isp")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -347,7 +347,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.type_code).to eq("isp")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -383,7 +383,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.type_code).to eq("isp")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -421,7 +421,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
           expect(parsed.typed_stage.type_code).to eq("isp")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -475,13 +475,13 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
         expect(parsed.typed_stage.abbr.first).to eq("ISP")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
-  end
+end
 
-  # Test languages
+# Test languages
   context "languages" do
     describe "ISO/IEC ISP 10611-3:2003(en)" do
       subject { "ISO/IEC ISP 10611-3:2003(en)" }
@@ -579,13 +579,13 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
         expect(parsed.typed_stage.abbr.first).to eq("ISP")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
-  end
+end
 
-  # Test stage iterations
+# Test stage iterations
   context "stage iterations" do
     describe "ISO/IEC WD ISP 10613-2.2" do
       subject { "ISO/IEC WD ISP 10613-2.2" }

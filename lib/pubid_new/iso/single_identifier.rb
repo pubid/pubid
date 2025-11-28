@@ -131,6 +131,9 @@ module PubidNew
       private
 
       def publisher_urn
+        # For identifiers like IWA that don't render publisher, default to "iso"
+        return "iso" unless publisher
+        
         copubs = copublishers || []
         ([publisher] + copubs).map(&:body).map(&:downcase).join("-")
       end

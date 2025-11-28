@@ -63,7 +63,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -105,7 +105,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -150,7 +150,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -192,7 +192,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -234,7 +234,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
           expect(parsed.typed_stage.abbr.first).to eq("DIR")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -281,7 +281,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -324,7 +324,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -361,7 +361,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -402,7 +402,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -440,7 +440,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -482,7 +482,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -527,7 +527,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -572,7 +572,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Directives do
         expect(parsed.typed_stage.abbr.first).to eq("DIR")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end

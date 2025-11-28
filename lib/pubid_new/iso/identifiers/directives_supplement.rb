@@ -72,6 +72,27 @@ module PubidNew
             date_str
           ].join('')
         end
+
+        # DirectivesSupplement use urn:iso:doc scheme (not urn:iso:std)
+        # Format: urn:iso:doc:{base_urn_parts}:sup:{supplement_publisher}[:{year}][:{edition}]
+        def to_urn
+          # Start with base identifier's URN parts (it will use urn:iso:doc scheme)
+          base_urn = base_identifier.to_urn
+          
+          # Build supplement part
+          parts = [base_urn, "sup"]
+          
+          # Supplement publisher (lowercase)
+          parts << supplement_publisher.body.downcase if supplement_publisher
+          
+          # Year (if present)
+          parts << date.year if date
+          
+          # Edition (if present)
+          parts << "ed-#{edition.number}" if edition && edition.number
+          
+          parts.join(":")
+        end
       end
     end
   end
