@@ -1271,12 +1271,12 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
 
     # Test legacy stages
     context "legacy stages" do
-      # FCD is harmonized to CD stage (30.00)
+      # FCD maps to same stage as FPDAM (40.00 Enquiry/DAM)
       describe "ISO/IEC FCD 42010" do
         subject { "ISO/IEC FCD 42010" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn_pubid) { "ISO/IEC DIS 42010" }
-        let(:urn) { "urn:iso:std:iso-iec:42010:stage-30.00" }
+        let(:urn) { "urn:iso:std:iso-iec:42010:stage-40.00" }
 
         it "parses stage" do
           expect(parsed.typed_stage.stage_code).to eq("fcd")
