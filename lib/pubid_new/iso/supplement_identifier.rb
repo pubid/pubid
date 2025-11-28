@@ -28,7 +28,8 @@ module PubidNew
 
       # Generate URN for supplement with recursive base handling
       # Format: {base_urn}[:edition][:stage]:{supplement_type}:{year}:v{number}[:language]
-      def to_urn
+      # @param include_stage [Boolean] whether to include stage in base identifier URN (for multi-level supplements)
+      def to_urn(include_stage: true)
         parts = []
         
         # Base identifier URN (recursive - handles multi-level supplements)
@@ -39,7 +40,7 @@ module PubidNew
             parts << base_identifier.to_urn(include_stage: false)
           else
             # Supplement doesn't have a stage - include base's stage if present
-            parts << base_identifier.to_urn
+            parts << base_identifier.to_urn(include_stage: include_stage)
           end
         end
         
