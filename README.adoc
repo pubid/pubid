@@ -156,10 +156,10 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | All edge cases resolved, supports complex patterns
 
 | **ISO**
-| **83.1%**
-| 2,377/2,859
-| ✅ Core complete
-| 100% functional completion (Session 42), URN generation next (Phase 5)
+| **90.0%**
+| 2,573/2,859
+| ✅ URN generation
+| 100% functional + URN generation complete, remaining types in progress
 
 | **BSI**
 | TBD
@@ -549,6 +549,145 @@ Step 3: Build second supplement wrapping first
 Result: Corrigendum → Amendment → InternationalStandard
 ----
 
+==== URN generation
+
+===== General
+
+PubID V2 implements RFC 5141-compliant URN (Uniform Resource Name) generation for ISO standards. URN generation provides a standardized, machine-readable format for ISO identifiers.
+
+===== Basic usage
+
+[source,ruby]
+----
+require 'pubid_new'
+
+# Parse and generate URN
+id = PubidNew::Iso.parse("ISO/IEC 27001:2013")
+puts id.to_urn
+# => "urn:iso:std:iso-iec:27001"
+
+# With parts
+id = PubidNew::Iso.parse("ISO 8601-1:2019")
+puts id.to_urn
+# => "urn:iso:std:iso:8601:-1"
+
+# Draft stages use harmonized codes
+id = PubidNew::Iso.parse("ISO/CD 27001")
+puts id.to_urn
+# => "urn:iso:std:iso:27001:stage-30.00"
+
+# With editions
+id = PubidNew::Iso.parse("ISO 8601-1 Ed 2")
+puts id.to_urn
+# => "urn:iso:std:iso:8601:-1:ed-2"
+----
+
+===== Supplements with recursive URNs
+
+[source,ruby]
+----
+# Single-level supplement
+id = PubidNew::Iso.parse("ISO 8601-1:2019/Amd 1:2023")
+puts id.to_urn
+# => "urn:iso:std:iso:8601:-1:amd:2023:v1"
+
+# Multi-level supplement
+id = PubidNew::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
+puts id.to_urn
+# => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3:cor:2017:v1"
+
+# Draft supplements include stage
+id = PubidNew::Iso.parse("ISO/IEC DIS 23008-1/DAM 2:2021")
+puts id.to_urn
+# => "urn:iso:std:iso-iec:23008:-1:stage-40.00:amd:2021:v2"
+
+# Stage iterations
+id = PubidNew::Iso.parse("ISO 17301-1:2016/NP Amd 1.2")
+puts id.to_urn
+# => "urn:iso:std:iso:17301:-1:stage-10.00:amd:1:v1.2"
+----
+
+===== URN format specification
+
+The URN format follows RFC 5141 for ISO standards:
+
+.Base identifier URN format
+[source]
+----
+urn:iso:std:{publisher}[:{type}]:{number}[:{part}][:{stage}][:{edition}][:{language}]
+----
+
+.Supplement URN format
+[source]
+----
+{base_urn}[:{stage}]:{supplement_type}:{year}:v{number}[:{iteration}][:{language}]
+----
+
+Component specifications:
+
+`publisher`:: Lowercase, hyphen-separated (e.g., `iso-iec`, `iso-iec-ieee`)
+`type`:: Document type code (`tr`, `ts`, `guide`, `pas`, `r`, etc.) - omitted for IS
+`number`:: Document number
+`part`:: Part number with `-` prefix (e.g., `:-1`, `:-1-2` for subparts)
+`stage`:: Harmonized stage code (e.g., `stage-30.00` for CD, `stage-50.00` for FDIS)
+`edition`:: Edition with `ed-` prefix (e.g., `ed-1`, `ed-2`)
+`language`:: Language codes (e.g., `en`, `en,fr`)
+`supplement_type`:: Supplement code (`amd`, `cor`, `sup`)
+`iteration`:: Version iteration (e.g., `v1`, `v1.2`)
+
+===== Type codes in URNs
+
+[cols="1,1,1",options="header"]
+|===
+|Document Type |Abbreviation |URN Type Code
+
+|International Standard |IS |_(omitted)_
+|Technical Report |TR |tr
+|Technical Specification |TS |ts
+|Guide |Guide |guide
+|Publicly Available Specification |PAS |pas
+|Data |DATA |data
+|Recommendation |R |r
+|Amendment |Amd |amd
+|Corrigendum |Cor |cor
+|Addendum/Supplement |Add/Suppl |sup
+|Directives |DIR |dir
+|===
+
+===== Stage codes (harmonized)
+
+PubID V2 uses ISO harmonized stage codes in URNs:
+
+[cols="1,1,1",options="header"]
+|===
+|Stage |Abbreviation |Harmonized Code
+
+|Preliminary Work Item |PWI |stage-00.00
+|New Work Item Proposal |NP |stage-10.00
+|Working Draft |WD |stage-20.20
+|Committee Draft |CD |stage-30.00
+|Draft International Standard |DIS |stage-40.00
+|Final Draft International Standard |FDIS |stage-50.00
+|Publication |Published |_(omitted)_
+|===
+
+NOTE: PubID V2 uses updated harmonized stage codes. For example, NP uses `stage-10.00` (more accurate than V1's `stage-00.00`).
+
+===== Advanced features
+
+[source,ruby]
+----
+# Languages
+id = PubidNew::Iso.parse("ISO 8601-1:2019/Amd 1:2023(en,fr)")
+puts id.to_urn
+# => "urn:iso:std:iso:8601:-1:amd:2023:v1:en,fr"
+
+# Technical specifications with stages
+id = PubidNew::Iso.parse("ISO/IEC FDIS 25011")
+puts id.to_urn
+# => "urn:iso:std:iso-iec:ts:25011:stage-50.00"
+----
+
 ==== Testing
 
 Integration tests: `spec/pubid_new/iso/identifier_spec.rb`
@@ -563,7 +702,7 @@ bundle exec rspec spec/pubid_new/iso/identifier_spec.rb
 bundle exec rspec spec/pubid_new/iso/
 ----
 
-Test coverage: 160 tests (20 integration + 56 parser + 50 builder + 34 component)
+Test coverage: 2,573 passing tests (90% completion rate), including comprehensive URN generation tests
 
 === V2 architecture principles
 
