@@ -490,7 +490,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Corrigendum do
       describe "ISO 10303-111:2007/NP Cor 2" do
         subject { "ISO 10303-111:2007/NP Cor 2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:10303:-111:stage-00.00:cor:2:v1" }
+        let(:urn) { "urn:iso:std:iso:10303:-111:stage-10.00:cor:2:v1" }
 
         it "parses publisher" do
           expect(parsed.base_identifier.publisher.publisher).to eq("ISO")

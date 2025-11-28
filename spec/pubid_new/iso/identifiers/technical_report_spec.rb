@@ -422,7 +422,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalReport do
       describe "ISO/NP TR 11111" do
         subject { "ISO/NP TR 11111" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:tr:11111:stage-00.00" }
+        let(:urn) { "urn:iso:std:iso:tr:11111:stage-10.00" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -622,7 +622,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalReport do
       describe "ISO/PRF TR 14799-1" do
         subject { "ISO/PRF TR 14799-1" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:tr:14799:-1:stage-60.00" }
+        let(:urn) { "urn:iso:std:iso:tr:14799:-1:stage-50.00" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -653,7 +653,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalReport do
       describe "ISO/PRF TR 23249" do
         subject { "ISO/PRF TR 23249" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:tr:23249:stage-60.00" }
+        let(:urn) { "urn:iso:std:iso:tr:23249:stage-50.00" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -680,7 +680,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalReport do
       describe "ISO/PRF TR 31700-2" do
         subject { "ISO/PRF TR 31700-2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:tr:31700:-2:stage-60.00" }
+        let(:urn) { "urn:iso:std:iso:tr:31700:-2:stage-50.00" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -784,7 +784,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalReport do
 
   # Test legacy stages
   context "legacy stages" do
-    # ISO/IEC PDTR 20943-5
+    # ISO/IEC PDTR 20943-5 (legacy PDTR harmonized to CD stage)
     describe "ISO/IEC PDTR 20943-5" do
       subject { "ISO/IEC PDTR 20943-5" }
       let(:parsed) { PubidNew::Iso.parse(subject) }

@@ -166,7 +166,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       describe "NP IWA 21" do
         subject { "NP IWA 21" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:iwa:21:stage-00.00" }
+        let(:urn) { "urn:iso:std:iso:iwa:21:stage-10.00" }
 
         it "parses publisher" do
           expect(parsed.publisher).to be_nil
@@ -338,7 +338,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalWorkshopAgreement do
       describe "PRF IWA 36" do
         subject { "PRF IWA 36" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:iwa:36:stage-60.00" }
+        let(:urn) { "urn:iso:std:iso:iwa:36:stage-50.00" }
 
         it "parses publisher" do
           expect(parsed.publisher).to be_nil

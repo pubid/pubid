@@ -294,7 +294,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       describe "ISO/NP TS 20594-1" do
         subject { "ISO/NP TS 20594-1" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:ts:20594:-1:stage-00.00" }
+        let(:urn) { "urn:iso:std:iso:ts:20594:-1:stage-10.00" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")

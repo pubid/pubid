@@ -273,7 +273,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
       describe "ISO/IEC NP ISP 29110-4-2" do
         subject { "ISO/IEC NP ISP 29110-4-2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso-iec:isp:29110:-4-2:stage-00.00" }
+        let(:urn) { "urn:iso:std:iso-iec:isp:29110:-4-2:stage-10.00" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")

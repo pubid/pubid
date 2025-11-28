@@ -70,7 +70,7 @@ module PubidNew
           type_code: :amd,
           abbr: ["PRF Amd"],
           name: "Proof Amendment",
-          harmonized_stages: %w[60.00],
+          harmonized_stages: %w[50.00],
         ),
         Components::TypedStage.new(
           code: :pubamd,

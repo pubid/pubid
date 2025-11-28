@@ -934,7 +934,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         describe "ISO/NP 23219" do
           subject { "ISO/NP 23219" }
           let(:parsed) { PubidNew::Iso.parse(subject) }
-          let(:urn) { "urn:iso:std:iso:23219:stage-00.00" }
+          let(:urn) { "urn:iso:std:iso:23219:stage-10.00" }
 
           it "parses publisher" do
             expect(parsed.publisher.publisher).to eq("ISO")
@@ -965,7 +965,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
         describe "ISO/NWIP 19144-4" do
           subject { "ISO/NWIP 19144-4" }
           let(:pubid) { "ISO/NP 19144-4" }
-          let(:urn) { "urn:iso:std:iso:19144:-4:stage-00.00" }
+          let(:urn) { "urn:iso:std:iso:19144:-4:stage-10.00" }
 
           it "round-trips" do
             expect(PubidNew::Iso.parse(subject).to_s).to eq(pubid)
@@ -1271,12 +1271,12 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandard do
 
     # Test legacy stages
     context "legacy stages" do
-      # FCD is new DIS
+      # FCD is harmonized to CD stage (30.00)
       describe "ISO/IEC FCD 42010" do
         subject { "ISO/IEC FCD 42010" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn_pubid) { "ISO/IEC DIS 42010" }
-        let(:urn) { "urn:iso:std:iso-iec:42010:stage-40.00" }
+        let(:urn) { "urn:iso:std:iso-iec:42010:stage-30.00" }
 
         it "parses stage" do
           expect(parsed.typed_stage.stage_code).to eq("fcd")

@@ -256,7 +256,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
       describe "ISO/IEC Guide 98-3/NP Suppl 2" do
         subject { "ISO/IEC Guide 98-3/NP Suppl 2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:stage-00.00:sup:2:v1" }
+        let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:stage-10.00:sup:2:v1" }
 
         it "parses publisher" do
           expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
@@ -309,7 +309,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
         subject { "ISO Guide 98:1995/DSuppl 1.2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:pubid) { "ISO Guide 98:1995/DSuppl 1.2" }
-        let(:urn) { "urn:iso:std:iso:guide:98:stage-draft:sup:1:v1" }
+        let(:urn) { "urn:iso:std:iso:guide:98:stage-40.00:sup:1:v1" }
 
         it "parses publisher" do
           expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
@@ -360,7 +360,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
         subject { "ISO/IEC NP Guide 98:1995/DSuppl 1.2" }
         let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) do
-          "urn:iso:std:iso-iec:guide:98:stage-draft:stage-draft:sup:1:v1"
+          "urn:iso:std:iso-iec:guide:98:stage-10.00:stage-40.00:sup:1:v1"
         end
 
         it "parses publisher" do
@@ -702,7 +702,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
     describe "ISO 12345:2020/PRF Suppl 1" do
       subject { "ISO 12345:2020/PRF Suppl 1" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:12345:stage-60.00:sup:1:v1" }
+      let(:urn) { "urn:iso:std:iso:12345:stage-50.00:sup:1:v1" }
 
       it "parses publisher" do
         expect(parsed.base_identifier.publisher.publisher).to eq("ISO")

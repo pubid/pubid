@@ -22,7 +22,7 @@ module PubidNew
           type_code: :guide,
           abbr: ["NP Guide", "NP GUIDE"], # "NP Guide" is legacy
           name: "New Work Item Proposal for Guide",
-          harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
+          harmonized_stages: %w[10.00 10.20 10.60 10.92 10.93 10.98 10.99],
         ),
 
         Components::TypedStage.new(
