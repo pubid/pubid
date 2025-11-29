@@ -12,17 +12,21 @@ module PubidNew
       class Circular < Base
         attribute :revised_date, :string  # For revJune1908 notation
 
-        def publisher
+        def default_publisher
           "NBS"
         end
 
-        def series
+        def series_code
           "CIRC"
         end
 
-        def to_s
-          # Use the Base class rendering logic but override series
-          super
+        # Convenience methods for tests that expect string values
+        def publisher
+          super&.to_s || default_publisher
+        end
+
+        def series
+          super&.to_s || series_code
         end
       end
     end

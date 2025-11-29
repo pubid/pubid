@@ -1,230 +1,129 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+require_relative "identifiers/base"
+require_relative "identifiers/special_publication"
+require_relative "identifiers/federal_information_processing_standards"
+require_relative "identifiers/internal_report"
+require_relative "identifiers/handbook"
+require_relative "identifiers/technical_note"
+require_relative "identifiers/circular"
+require_relative "identifiers/circular_supplement"
+require_relative "identifiers/crpl_report"
+require_relative "identifiers/commercial_standard_emergency"
+require_relative "identifiers/commercial_standards_monthly"
 
 module PubidNew
   module Nist
-    # Scheme class representing a NIST identifier structure
-    # Single Responsibility: Data model for NIST identifiers
-    class Scheme < Lutaml::Model::Serializable
-      attribute :publisher, :string, default: -> { nil }
-      attribute :series, :string
-      attribute :first_number, :string
-      attribute :second_number, :string, default: -> { nil }
-      attribute :volume, :string, default: -> { nil }
-      attribute :part, :string, default: -> { nil }
-      attribute :revision, :string, default: -> { nil }
-      attribute :version, :string, default: -> { nil }
-      attribute :edition, :string, default: -> { nil }
-      attribute :edition_year, :string, default: -> { nil }
-      attribute :edition_month, :string, default: -> { nil }
-      attribute :edition_day, :string, default: -> { nil }
-      attribute :update, :string, default: -> { nil }
-      attribute :update_number, :string, default: -> { nil }
-      attribute :update_year, :string, default: -> { nil }
-      attribute :addendum, :string, default: -> { nil }
-      attribute :addendum_number, :string, default: -> { nil }
-      attribute :supplement, :string, default: -> { nil }
-      attribute :errata, :string, default: -> { nil }
-      attribute :index, :string, default: -> { nil }
-      attribute :insert, :string, default: -> { nil }
-      attribute :section, :string, default: -> { nil }
-      attribute :appendix, :string, default: -> { nil }
-      attribute :translation, :string, default: -> { nil }
-      attribute :draft, :string, default: -> { nil }
-
-      # Convert to string representation
-      # @return [String] the identifier string
-      def to_s
-        parts = []
-
-        # Publisher and series
-        if publisher
-          parts << publisher
-          parts << series
-        else
-          parts << series
+    # Scheme class for NIST identifier registry
+    # Single Responsibility: Identifier class registry and series-to-class mapping
+    class Scheme
+      class << self
+        # Registry of identifier classes by series code
+        # ONE CLASS PER SERIES TYPE (like ISO)
+        def series_to_class_map
+          {
+            "SP" => Identifiers::SpecialPublication,
+            "FIPS" => Identifiers::FederalInformationProcessingStandards,
+            "IR" => Identifiers::InternalReport,
+            "HB" => Identifiers::Handbook,
+            "TN" => Identifiers::TechnicalNote,
+            "CIRC" => Identifiers::Circular,
+            "CRPL" => Identifiers::CrplReport,
+            "CS" => Identifiers::Base,  # Will check for emergency pattern
+            "CSM" => Identifiers::CommercialStandardsMonthly,
+            # All other series use Base as default
+          }.freeze
         end
 
-        # Report number
-        number_part = first_number.to_s
-        number_part += "-#{second_number}" if second_number
-        parts << number_part
-
-        # Build the rest in proper order
-        result = parts.join(" ")
-
-        # Add parts in the correct order
-        result += build_volume_string if volume
-        result += build_part_string if part
-        result += build_revision_string if revision
-        result += build_version_string if version
-        result += build_edition_string if edition || edition_year
-        result += build_update_string if update || update_number
-        result += build_addendum_string if addendum || addendum_number
-        result += build_supplement_string if supplement
-        result += "-#{errata}" if errata
-        result += "index" if index
-        result += "insert" if insert
-        result += "sec#{section}" if section
-        result += "app" if appendix
-        result += " (Draft)" if draft
-        # Handle "sup" which is actually a supplement, not translation
-        if translation == "sup"
-          result += " sup"
-        elsif translation
-          result += " (#{translation})"
+        # All identifier classes
+        def identifiers
+          [
+            Identifiers::SpecialPublication,
+            Identifiers::FederalInformationProcessingStandards,
+            Identifiers::InternalReport,
+            Identifiers::Handbook,
+            Identifiers::TechnicalNote,
+            Identifiers::Circular,
+            Identifiers::CircularSupplement,
+            Identifiers::CrplReport,
+            Identifiers::CommercialStandardEmergency,
+            Identifiers::CommercialStandardsMonthly,
+            Identifiers::Base,  # Fallback for unmapped series
+          ]
         end
 
-        result
-      end
+        # Locate identifier class by series and pattern
+        # @param parsed_hash [Hash] the parsed identifier data
+        # @return [Class] the identifier class
+        def locate_identifier_klass(parsed_hash)
+          series = parsed_hash[:series]&.to_s
 
-      private
-
-      # Build volume string
-      def build_volume_string
-        if volume
-          # Check if volume has long-form prefix (from parser)
-          if volume.match?(/^Vol\./)
-            " #{volume}"
-          elsif volume.match?(/^[0-9]/)
-            # Just digits - add short prefix
-            "v#{volume}"
-          else
-            # Already has short prefix
-            volume
-          end
-        else
-          ""
-        end
-      end
-
-      # Build part string
-      def build_part_string
-        if part
-          # Check if part has long-form prefix
-          if part.match?(/^Part /)
-            " #{part}"
-          elsif part.match?(/^[0-9]/)
-            # Just digits - add short prefix
-            "pt#{part}"
-          else
-            # Already has prefix (pt, p, P)
-            part
-          end
-        else
-          ""
-        end
-      end
-
-      # Build revision string
-      def build_revision_string
-        if revision
-          # Check if revision has long-form prefix
-          if revision.match?(/^(Rev\.|Revision)/)
-            " #{revision}"
-          elsif revision.match?(/^[0-9]/)
-            # Just digits - add short prefix
-            "r#{revision}"
-          else
-            # Already has prefix (rev, r)
-            revision
-          end
-        else
-          ""
-        end
-      end
-
-      # Build version string
-      def build_version_string
-        if version
-          # Check if version has long-form prefix
-          if version.match?(/^(Ver\.|Version )/)
-            " #{version}"
-          elsif version.match?(/^[0-9]/)
-            # Just digits - add short prefix
-            "ver#{version}"
-          else
-            # Already has prefix (ver, v)
-            version
-          end
-        else
-          ""
-        end
-      end
-
-      # Build edition string
-      def build_edition_string
-        if edition_year
-          if edition_month
-            if edition_day
-              # Format: -MonDD/YYYY
-              "-#{format_month(edition_month)}#{edition_day}/#{edition_year}"
-            else
-              # Format: -MonYYYY
-              "-#{format_month(edition_month)}#{edition_year}"
+          # Handle compound series that include publisher
+          if series&.start_with?("NBS ")
+            simple_series = series.sub("NBS ", "")
+            
+            # Check for CIRC supplement
+            if simple_series == "CIRC"
+              if has_supplement?(parsed_hash)
+                return Identifiers::CircularSupplement
+              else
+                return Identifiers::Circular
+              end
             end
-          elsif edition
-            # Format: e2-1915 (edition number with year)
-            "e#{edition}-#{edition_year}"
-          else
-            # Format: -YYYY
-            "-#{edition_year}"
+            
+            # Check for CS emergency (e-prefixed numbers)
+            if simple_series == "CS"
+              first_number = parsed_hash[:first_number]&.to_s
+              if first_number&.start_with?("e")
+                return Identifiers::CommercialStandardEmergency
+              end
+            end
+            
+            # Use series mapping for other compound series
+            series = simple_series
           end
-        elsif edition
-          "e#{edition}"
-        else
-          ""
+
+          # Look up in series-to-class mapping
+          klass = series_to_class_map[series]
+          
+          # Default to Base for unmapped series
+          klass || Identifiers::Base
         end
-      end
 
-      # Build update string
-      def build_update_string
-        if update_number
-          result = "/Upd#{update_number}"
-          result += "-#{update_year}" if update_year
-          result
-        elsif update
-          "/Upd#{update}"
-        else
-          ""
+        # Check if parsed hash has supplement indicators
+        def has_supplement?(parsed_hash)
+          parsed_hash[:supplement] || 
+          parsed_hash[:supplement_date_range] ||
+          parsed_hash[:supplement_date] ||
+          parsed_hash[:supplement_slash_year] ||
+          parsed_hash[:supplement_with_rev]
         end
-      end
 
-      # Build addendum string
-      def build_addendum_string
-        if addendum_number
-          "-add-#{addendum_number}"
-        elsif addendum
-          "-add"
-        else
-          ""
+        # Check if series is valid
+        # @param series_code [String] the series code
+        # @return [Boolean] true if series is valid
+        def valid_series?(series_code)
+          VALID_SERIES.include?(series_code)
         end
-      end
-      # Build supplement string
-      def build_supplement_string
-        if supplement
-          # Check if supplement already has prefix
-          if supplement.start_with?("supp", "sup")
-            supplement
-          elsif supplement.length > 0
-            "supp#{supplement}"
-          else
-            "supp"
-          end
-        else
-          "supp"
-        end
-      end
 
-
-      # Format month from number to three-letter abbreviation
-      def format_month(month)
-        month_num = month.to_i
-        return month if month_num == 0 # Already a string
-
-        months = %w[Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec]
-        months[month_num - 1] || month
+        # All valid series codes (comprehensive list)
+        VALID_SERIES = [
+          # Major series with dedicated classes
+          "SP", "FIPS", "IR", "HB", "TN",
+          # Specialized series with dedicated classes  
+          "CIRC", "CRPL", "CS", "CSM",
+          # Other series (use Base class)
+          "GCR", "AMS", "BSS", "BMS", "BH", "MONO", "MP", 
+          "NCSTAR", "NSRDS", "CSWP", "VTS", "AI", "OWMWP",
+          "PC", "RPT", "SIBS", "TIBM", "TTB", "EAB",
+          "JPCRD", "JRES", "CIS", "HR", "IRPL", "IP", 
+          "LC", "PS", "LCIRC",
+          # Compound series
+          "BRPD-CRPL-D", "CRPL-F-A", "CRPL-F-B", "CS-E",
+          "CSRC Building Block", "CSRC Use Case", "CSRC Book",
+          "ITL Bulletin", "NIST LC", "NIST PS", "NIST DCI", 
+          "NIST Other", "NSRDS-NBS",
+        ].freeze
       end
     end
   end

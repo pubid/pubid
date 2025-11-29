@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../components/publisher"
+require_relative "../components/code"
 
 module PubidNew
   module Nist
     module Identifiers
       # Base NIST/NBS identifier class
+      # Each series type inherits from this and overrides series_code
+      # Components (volume, part, revision, etc.) are shared
       class Base < Lutaml::Model::Serializable
-        attribute :publisher, :string  # NIST, NBS
-        attribute :series, :string  # SP, FIPS, IR, CIRC, CRPL, CS, CSM
-        attribute :number, :string
-        attribute :parts, :string, collection: true
+        attribute :publisher, Components::Publisher
+        attribute :series, Components::Code  # Set by Builder from parsed data
+        attribute :number, Components::Code
+        attribute :parts, Components::Code, collection: true
         attribute :volume, :string
         attribute :revision, :string
         attribute :version, :string
@@ -20,8 +24,8 @@ module PubidNew
         attribute :edition, :string
 
         # Additional attributes for complex patterns
-        attribute :first_number, :string
-        attribute :second_number, :string
+        attribute :first_number, Components::Code
+        attribute :second_number, Components::Code
         attribute :edition_year, :string
         attribute :edition_month, :string
         attribute :edition_day, :string
@@ -55,7 +59,11 @@ module PubidNew
           # Build the number from first_number and second_number if present
           if first_number && !number
             self.number = first_number
-            self.number += "-#{second_number}" if second_number
+            if second_number
+              # Append second_number to create compound number
+              compound_value = "#{first_number.value}-#{second_number.value}"
+              self.number = Components::Code.new(number: compound_value)
+            end
           end
         end
 
@@ -104,19 +112,22 @@ module PubidNew
           # "SP 800-187" or "NIST SP 800-187" - handle compound series properly
           result = ""
 
+          # Determine effective publisher
+          effective_publisher = publisher ? publisher.to_s : default_publisher
+          
+          # Determine effective series (use parsed series or series_code method)
+          effective_series = series ? series.to_s : (respond_to?(:series_code) ? series_code : nil)
+
           # If we have a compound series that starts with NBS, use it as-is
-          if series && series.to_s.start_with?("NBS")
-            result += series
-          elsif publisher
-            # Add publisher if present
-            result += publisher + " " if publisher
-            result += series.to_s if series
-          elsif series
-            # No publisher specified, default to NIST for non-NBS series
-            result += "NIST " + series.to_s
+          if effective_series && effective_series.start_with?("NBS")
+            result += effective_series
+          elsif effective_publisher && effective_series
+            result += effective_publisher + " " + effective_series
+          elsif effective_series
+            result += "NIST " + effective_series
           end
 
-          result += " #{number}" if number
+          result += " #{number.to_s}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
           # Add edition with month/year if present - use "rev" not dash when edition has both
@@ -208,7 +219,19 @@ module PubidNew
             "FIPS" => "Fed. Inf. Proc. Stand.",
             "IR" => "Int. Rep.",
             "TN" => "Tech. Note"
-          }[series] || series
+          }[series&.to_s || series_code] || (series&.to_s || series_code)
+        end
+
+        # Default publisher for series without explicit publisher
+        # Subclasses can override
+        def default_publisher
+          "NIST"
+        end
+
+        # Series code method for subclasses to override
+        # Returns the series code for this identifier type
+        def series_code
+          series ? series.to_s : nil
         end
       end
     end

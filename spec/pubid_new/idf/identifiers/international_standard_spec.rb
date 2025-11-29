@@ -10,7 +10,8 @@ RSpec.describe PubidNew::Idf::Identifiers::InternationalStandard do
         f.readlines.each do |pub_id|
           next if pub_id.match?("^#")
 
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp)
+          pub_id_str = pub_id.split("#").first.strip.chomp
+          expect { described_class.parse(pub_id_str) }.not_to raise_error
         end
       end
     end

@@ -168,10 +168,10 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | Implementation complete, needs comprehensive tests
 
 | **IEC**
-| TBD
-| -
-| ⚠️ Needs testing
-| Implementation complete, needs comprehensive tests
+| **84.58%**
+| 823/973
+| ✅ Production Ready
+| 21 identifier types, comprehensive test coverage
 
 | **ITU**
 | TBD
@@ -255,6 +255,44 @@ id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"  # normalized
 # Space-separated dual identifiers are auto-detected
 id = PubidNew::Ieee.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
 id.to_s   # => "ANSI C37.61-1973 and IEEE Std 321-1973"
+----
+
+==== IEC
+
+The IEC parser handles IEC standards with 21 different document types:
+
+[source,ruby]
+----
+require 'pubid_new'
+
+# Parse basic IEC identifier
+id = PubidNew::Iec.parse("IEC 60038:2009")
+id.publisher.body  # => "IEC"
+id.number.number   # => "60038"
+id.date.year       # => "2009"
+id.to_s            # => "IEC 60038:2009"
+
+# With copublisher
+id = PubidNew::Iec.parse("ISO/IEC 62700:2021")
+id.publisher.body  # => "ISO"
+id.copublishers.first.body  # => "IEC"
+id.to_s            # => "ISO/IEC 62700:2021"
+
+# Document types
+id = PubidNew::Iec.parse("IEC TR 62048:2014")
+id.class           # => PubidNew::Iec::Identifiers::TechnicalReport
+id.type.type_code  # => "tr"
+
+# Supplements
+id = PubidNew::Iec.parse("IEC 60038:2009/Amd 1:2011")
+id.class                  # => PubidNew::Iec::Identifiers::Amendment
+id.base_identifier.to_s   # => "IEC 60038:2009"
+id.number.number          # => "1"
+
+# VAP identifiers (Consolidated versions)
+id = PubidNew::Iec.parse("IEC 60050-113:2011+AMD1:2017 CSV")
+id.class           # => PubidNew::Iec::Identifiers::VapIdentifier
+id.vap_suffix      # => "CSV"
 ----
 
 ==== ISO

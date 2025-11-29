@@ -21,8 +21,15 @@ require_relative "iec/identifiers/systems_reference_document"
 require_relative "iec/identifiers/technology_report"
 require_relative "iec/identifiers/societal_technology_trend_report"
 require_relative "iec/identifiers/white_paper"
+require_relative "iec/identifiers/working_document"
 require_relative "iec/identifiers/amendment"
 require_relative "iec/identifiers/corrigendum"
+
+# Wrapper identifier types
+require_relative "iec/identifiers/vap_identifier"
+require_relative "iec/identifiers/sheet_identifier"
+require_relative "iec/identifiers/consolidated_identifier"
+require_relative "iec/identifiers/fragment_identifier"
 
 module PubidNew
   module Iec
@@ -42,6 +49,7 @@ module PubidNew
       Identifiers::TechnologyReport,
       Identifiers::SocietalTechnologyTrendReport,
       Identifiers::WhitePaper,
+      Identifiers::WorkingDocument,
     ].freeze
 
     # Supplement types (can appear with / notation)

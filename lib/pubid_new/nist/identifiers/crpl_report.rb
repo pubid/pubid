@@ -14,18 +14,18 @@ module PubidNew
         attribute :range_notation, :string  # For underscore ranges like "1-2_3-1"
         attribute :prefix, :string  # For "c" or "m" prefixes
 
-        def publisher
+        def default_publisher
           "NBS"
         end
 
-        def series
+        def series_code
           "CRPL"
         end
 
         def to_s
-          result = "NBS CRPL"
+          result = "#{default_publisher} #{series_code}"
           result += " #{prefix}" if prefix
-          result += " #{number}" if number
+          result += " #{number.to_s}" if number
           result += range_notation if range_notation
           result
         end
