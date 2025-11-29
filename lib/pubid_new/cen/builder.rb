@@ -63,6 +63,13 @@ module PubidNew
         # Special case: Use adopted_european_norm for adopted identifiers
         return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]
 
+        # Check if publisher is actually a type code (CWA, HD act as publisher)
+        publisher_str = parsed_hash[:publisher].to_s
+        if %w[CWA HD].include?(publisher_str)
+          typed_stage = @scheme.locate_typed_stage_by_abbr(publisher_str)
+          return @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+        end
+
         # Use type or stage to determine class via Scheme
         type_or_stage = parsed_hash[:type_with_stage] || parsed_hash[:type] || parsed_hash[:stage] || ""
         typed_stage = @scheme.locate_typed_stage_by_abbr(type_or_stage)
@@ -84,9 +91,11 @@ module PubidNew
           Components::Publisher.new(body: value.to_s)
 
         when :copublisher
-          Components::Publisher.new(body: value.to_s)
+          # Map singular :copublisher to :copublishers array
+          { copublishers: [Components::Publisher.new(body: value.to_s)] }
 
         when :copublishers
+          # Handle array of copublishers
           Array(value).map { |v| Components::Publisher.new(body: v[:copublisher].to_s) }
 
         when :number
