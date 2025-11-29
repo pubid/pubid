@@ -1,4 +1,10 @@
 require "lutaml/model"
+require_relative "../components/publisher"
+require_relative "../components/code"
+require_relative "../components/date"
+require_relative "../components/stage"
+require_relative "../components/type"
+require_relative "../components/typed_stage"
 
 module PubidNew
   module Cen
@@ -16,19 +22,37 @@ module PubidNew
       def to_s(lang: :en, lang_single: false)
         parts = []
         
-        # Get type details
-        type_short = type.is_a?(Components::Type) ? self.class.type[:short] : type[:short]
+        # Get type short name
+        type_short = if type.is_a?(Components::Type)
+                       type.abbr
+                     elsif self.class.respond_to?(:type)
+                       self.class.type[:short]
+                     else
+                       "EN"  # Default
+                     end
         
-        # Stage prefix (prEN, FprEN) OR publisher
-        if typed_stage && typed_stage.abbr.first != type_short
-          parts << typed_stage.abbr.first
-        elsif publisher
-          parts << publisher.body
+        # For CWA/HD, they act as publisher (not EN)
+        if %w[CWA HD].include?(type_short)
+          # Stage prefix OR type as publisher
+          if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
+            parts << typed_stage.abbr.first
+          else
+            parts << type_short
+          end
+        else
+          # Stage prefix (prEN, FprEN) OR publisher
+          if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
+            parts << typed_stage.abbr.first
+          elsif stage && stage.respond_to?(:abbr)
+            parts << stage.abbr
+          elsif publisher
+            parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
+          end
         end
         
         # Copublishers - add to last part (publisher) with slash
         if copublishers && copublishers.any?
-          copub_str = copublishers.map(&:body).join("/")
+          copub_str = copublishers.map { |cp| cp.respond_to?(:body) ? cp.body : cp.to_s }.join("/")
           unless copub_str.empty?
             if parts.any?
               parts[-1] = "#{parts[-1]}/#{copub_str}"
@@ -38,24 +62,32 @@ module PubidNew
           end
         end
         
-        # Type for non-EN documents (TS, TR, CWA, etc.)
-        # But not if CWA/HD (they act as publisher)
+        # Type for non-EN documents (TS, TR) - but not CWA/HD
         if type_short != "EN" && !%w[CWA HD].include?(type_short)
           parts << type_short
         end
         
         # Number with part/subpart
         if number
-          number_str = number.value.to_s
-          number_str += "-#{part.value}" if part
-          number_str += "-#{subpart.value}" if subpart
+          number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+          if part
+            part_val = part.respond_to?(:value) ? part.value : part
+            number_str += "-#{part_val}"
+          end
+          if subpart
+            subpart_val = subpart.respond_to?(:value) ? subpart.value : subpart
+            number_str += "-#{subpart_val}"
+          end
           parts << number_str
         end
         
         result = parts.join(" ")
         
         # Date
-        result += ":#{date.year}" if date
+        if date
+          year_val = date.respond_to?(:year) ? date.year : date.to_i
+          result += ":#{year_val}"
+        end
         
         result
       end

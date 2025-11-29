@@ -81,31 +81,41 @@ module PubidNew
           }
 
         when :publisher
-          value.to_s
+          Components::Publisher.new(body: value.to_s)
 
         when :copublisher
-          value.to_s
+          Components::Publisher.new(body: value.to_s)
 
         when :copublishers
-          Array(value).map { |v| v[:copublisher].to_s }
+          Array(value).map { |v| Components::Publisher.new(body: v[:copublisher].to_s) }
 
         when :number
-          value.to_s
+          Components::Code.new(value: value.to_s)
 
         when :parts
-          Array(value).map { |p| p[:part].to_s }
+          # Extract first part as :part, rest as :subpart if needed
+          parts_array = Array(value)
+          if parts_array.any?
+            # Return hash with :part (and potentially :subpart)
+            result = { part: Components::Code.new(value: parts_array.first[:part].to_s) }
+            if parts_array.length > 1
+              result[:subpart] = Components::Code.new(value: parts_array[1][:part].to_s)
+            end
+            result
+          end
 
         when :part
-          value[:part].to_s if value.is_a?(Hash)
+          Components::Code.new(value: value[:part].to_s) if value.is_a?(Hash)
 
         when :year, :date
-          value.to_i
+          # Return as hash with :date key for proper attribute mapping
+          { date: Components::Date.new(year: value.to_i) }
 
         when :type
-          value.to_s
+          Components::Type.new(abbr: value.to_s)
 
         when :stage
-          value.to_s
+          Components::Stage.new(abbr: value.to_s)
 
         when :edition
           value.to_s
