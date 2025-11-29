@@ -84,20 +84,35 @@ The monorepo is organized as follows:
 [source]
 ----
 .
-├── gems/                    # Individual gem directories
-│   ├── pubid/              # Meta-gem that includes common gems
-│   ├── pubid-core/         # Core functionality
-│   ├── pubid-iso/          # ISO identifiers
-│   ├── pubid-iec/          # IEC identifiers
-│   ├── pubid-nist/         # NIST identifiers
-│   └── ...                 # Other pubid-* gems
+├── lib/pubid_new/          # V2 implementation (ACTIVE)
+│   ├── iso/               # ISO V2 - Production ready
+│   ├── iec/               # IEC V2 - Production ready
+│   ├── idf/               # IDF V2 - Production ready
+│   ├── ieee/              # IEEE V2 - Production ready
+│   ├── nist/              # NIST V2 - Production ready
+│   ├── cen/               # CEN V2 - In progress
+│   └── ...                # Other flavors
+├── gems/                   # V1 gems (remaining)
+│   ├── pubid/             # Meta-gem
+│   ├── pubid-core/        # Core functionality
+│   ├── pubid-bsi/         # BSI identifiers
+│   ├── pubid-cen/         # CEN identifiers (V1)
+│   └── ...                # Other V1 gems
+├── archived-gems/          # Archived V1 code
+│   ├── pubid-iso/         # ISO V1 (replaced by V2)
+│   ├── pubid-iec/         # IEC V1 (replaced by V2)
+│   ├── pubid-ieee/        # IEEE V1 (replaced by V2)
+│   └── pubid-nist/        # NIST V1 (replaced by V2)
 ├── spec/                   # Integration tests
-│   └── integration/        # Cross-gem integration tests
-├── .github/workflows/      # Shared CI/CD workflows
+│   ├── pubid_new/         # V2 tests (ACTIVE)
+│   └── integration/       # Cross-gem tests
+├── docs/                   # Documentation
+│   ├── ISO_V1_TO_V2_MIGRATION.adoc  # Migration guide
+│   └── ...                # Other documentation
+├── .github/workflows/      # CI/CD workflows
 ├── Gemfile                 # Root Gemfile for development
 ├── Rakefile               # Monorepo management tasks
 ├── .rubocop.yml           # Shared RuboCop configuration
-├── .rspec                 # Shared RSpec configuration
 └── LICENSE.txt            # Shared license
 ----
 
@@ -757,41 +772,43 @@ Test Quality:: Each class has dedicated spec file, no lowering pass thresholds, 
 [source]
 ----
 lib/pubid_new/              # V2 implementation (ACTIVE)
-├── nist/
-│   ├── parser.rb           # Parslet grammar
-│   ├── builder.rb          # Transformation
-│   └── identifiers/        # Lutaml::Model classes
-│       ├── base.rb
-│       ├── circular.rb
-│       └── ...
-├── ieee/
+├── iso/                    # Production ready (92.84%)
 │   ├── parser.rb
 │   ├── builder.rb
-│   ├── components/         # Reusable components
-│   │   ├── code.rb
-│   │   └── draft.rb
+│   ├── scheme.rb
+│   ├── components/
 │   └── identifiers/
-│       ├── base.rb
-│       ├── adopted_standard.rb
-│       ├── dual_published.rb
-│       └── ...
-└── ...
+├── iec/                    # Production ready (84.58%)
+├── idf/                    # Production ready (100%)
+├── ieee/                   # Production ready (100%)
+├── nist/                   # Production ready (100%)
+├── cen/                    # In progress (26%)
+└── ...                     # Not started
 
 spec/pubid_new/             # V2 tests (ACTIVE)
-├── nist/
-│   ├── parser_spec.rb
-│   └── identifiers/
-│       ├── base_spec.rb
-│       └── ...
-└── ieee/
-    ├── parser_spec.rb
-    └── identifiers/
-        ├── base_spec.rb
-        ├── adopted_standard_spec.rb
-        └> ...
+├── iso/                    # 2,654/2,859 tests
+├── iec/                    # 823/973 tests
+├── idf/                    # 26/26 tests
+├── ieee/                   # 35/35 tests
+├── nist/                   # 57/57 tests
+└── cen/                    # 13/50 tests
 
-gems/                       # V1 implementation (LEGACY)
-└── pubid*/
+gems/                       # V1 gems (remaining)
+├── pubid/                  # Meta-gem
+├── pubid-core/             # Core (V1)
+├── pubid-bsi/              # BSI (V1)
+├── pubid-cen/              # CEN (V1)
+├── pubid-ccsds/            # CCSDS (V1)
+├── pubid-etsi/             # ETSI (V1)
+├── pubid-itu/              # ITU (V1)
+├── pubid-jis/              # JIS (V1)
+└── pubid-plateau/          # PLATEAU (V1)
+
+archived-gems/              # Archived V1 code
+├── pubid-iso/              # ✅ Replaced by V2
+├── pubid-iec/              # ✅ Replaced by V2
+├── pubid-ieee/             # ✅ Replaced by V2
+└── pubid-nist/             # ✅ Replaced by V2
 ----
 
 === V2 migration status

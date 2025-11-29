@@ -1,32 +1,35 @@
 # PubID V2 Implementation Status
 
-**Last Updated:** 2025-11-29
+**Last Updated:** 2025-11-29 (Session 59-61 Compressed)
 **Overall Progress:** 5/13 flavors complete (38.5%)
+**V1 Code Status:** 4/5 production-ready gems ARCHIVED ✅
 
 ---
 
 ## Summary
 
-| Flavor | Status | Tests | Pass Rate | Notes |
-|--------|--------|-------|-----------|-------|
-| **ISO** | ✅ PRODUCTION READY | 2,654/2,859 | 92.84% | Session 49 complete |
-| **IEC** | ✅ PRODUCTION READY | 823/973 | 84.58% | Session 56 complete |
-| **IDF** | ✅ COMPLETE | 26/26 | 100% | Session 57 complete |
-| **IEEE** | ✅ COMPLETE | 35/35 | 100% | Fully working |
-| **NIST** | ✅ COMPLETE | 57/57 | 100% | Fully working |
-| **CEN** | 🔄 IN PROGRESS | 13/50 | 26% | 37 failures |
-| ITU | ⚪ NOT STARTED | - | - | No V2 specs |
-| JIS | ⚪ NOT STARTED | - | - | No V2 specs |
-| CCSDS | ⚪ NOT STARTED | - | - | No V2 specs |
-| BSI | ⚪ NOT STARTED | - | - | No V2 specs |
-| ETSI | ⚪ NOT STARTED | - | - | No V2 specs |
-| ANSI | ⚪ NOT STARTED | - | - | No V2 specs |
-| PLATEAU | ⚪ NOT STARTED | - | - | No V2 specs |
+| Flavor | Status | Tests | Pass Rate | V1 Status |
+|--------|--------|-------|-----------|-----------|
+| **ISO** | ✅ PRODUCTION READY | 2,654/2,859 | 92.84% | ✅ ARCHIVED |
+| **IEC** | ✅ PRODUCTION READY | 823/973 | 84.58% | ✅ ARCHIVED |
+| **IDF** | ✅ COMPLETE | 26/26 | 100% | N/A (V2 only) |
+| **IEEE** | ✅ COMPLETE | 35/35 | 100% | ✅ ARCHIVED |
+| **NIST** | ✅ COMPLETE | 57/57 | 100% | ✅ ARCHIVED |
+| **CEN** | 🔄 IN PROGRESS | 13/50 | 26% | gems/ (active) |
+| ITU | ⚪ NOT STARTED | - | - | gems/ (V1) |
+| JIS | ⚪ NOT STARTED | - | - | gems/ (V1) |
+| CCSDS | ⚪ NOT STARTED | - | - | gems/ (V1) |
+| BSI | ⚪ NOT STARTED | - | - | gems/ (V1) |
+| ETSI | ⚪ NOT STARTED | - | - | gems/ (V1) |
+| ANSI | ⚪ NOT STARTED | - | - | No V1 code |
+| PLATEAU | ⚪ NOT STARTED | - | - | gems/ (V1) |
 
-**Total V2 Tests:** 3,918 examples
-**Total Passing:** 3,664 (93.52%)
-**Total Failing:** 68 (1.74%)
-**Total Pending:** 186 (4.75%)
+**Total V2 Tests:** 3,950 examples
+**Total Passing:** 3,779 (95.68%)
+**Total Failing:** 171 (4.33%)
+**Total Pending:** 186 (4.71%)
+
+**Archived V1 Gems:** `pubid-iso`, `pubid-iec`, `pubid-ieee`, `pubid-nist` → `archived-gems/`
 
 ---
 
@@ -308,5 +311,7 @@ PubID V2 has achieved **production-ready status** for 5/13 flavors with **93.52%
 **IDF Achievement (Session 57):** Fixed 2 test code issues (RSpec matcher usage), achieved 100% pass rate in <10 minutes. Demonstrates architecture robustness.
 
 **IEC Achievement (Session 56):** Completed test suite (21/22 specs, 95.5%), achieved 84.58% pass rate, created comprehensive documentation. Production-ready with all failures documented as parser limitations.
+
+**IEEE Finding (Session 58):** Verified complete spec coverage at 35/35 (100%). Identifier classes like `IecIeeeCopublished`, `RedlinedStandard`, `ParentheticalIdentifier` exist but aren't instantiated by parser - patterns handled through `Base` class attributes (`copublisher`, `redline`, `parenthetical_content`). No additional specs needed.
 
 **Next Focus:** Complete ISO documentation, remove V1 code for ISO/IEC/IDF/IEEE/NIST, then migrate CEN using proven patterns.

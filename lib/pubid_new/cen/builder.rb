@@ -2,69 +2,165 @@
 
 require_relative "identifiers/base"
 require_relative "identifiers/european_norm"
+require_relative "identifiers/adopted_european_norm"
+require_relative "identifiers/technical_specification"
+require_relative "identifiers/technical_report"
+require_relative "identifiers/cen_workshop_agreement"
+require_relative "identifiers/guide"
+require_relative "identifiers/harmonization_document"
 
 module PubidNew
   module Cen
     class Builder
-      def self.build(parsed_data)
-        new.build(parsed_data)
+      def initialize(scheme)
+        @scheme = scheme
+      end
+
+      def self.build(parsed_data, scheme = Scheme.new)
+        new(scheme).build(parsed_data)
       end
 
       def build(data)
         data = data.inject({}) { |acc, h| acc.merge(h) } if data.is_a?(Array)
 
-        publishers = []
-        publishers << data[:publisher].to_s if data[:publisher]
-        publishers << data[:copublisher].to_s if data[:copublisher]
-
-        parts = []
-        if data[:parts]
-          parts_data = data[:parts].is_a?(Array) ? data[:parts] : [data[:parts]]
-          parts = parts_data.map { |p| p[:part].to_s }
+        # Check if this is an adopted identifier (EN ISO, EN IEC, etc.)
+        if data[:adopted_string]
+          return build_adopted_identifier(data)
         end
 
-        # Extract supplements
+        # Extract supplements before building base identifier
         supplements_data = extract_supplements(data)
 
-        # Build adopted identifier object if present
-        adopted_id_obj = build_adopted_identifier(data)
+        # Determine identifier class using Scheme
+        identifier = locate_identifier_klass(data).new
 
-        # Determine identifier class
-        klass = locate_identifier_class(publishers, data[:stage])
+        # Cast and assign each attribute
+        data.each_pair do |key, value|
+          realized_components = cast(key.to_sym, value)
+          next if realized_components.nil?
 
-        # Build base identifier
-        base_id = klass.new(
-          publisher: publishers.empty? ? nil : publishers,
-          type: data[:type]&.to_s,
-          number: data[:number].to_s,
-          parts: parts.empty? ? nil : parts,
-          year: data[:year]&.to_i,
-          stage: data[:stage]&.to_s,
-          adopted_identifier: adopted_id_obj,
-          edition: data[:edition]&.to_s
-        )
+          case realized_components
+          when Hash
+            realized_components.each_pair do |k, v|
+              identifier.send("#{k}=", v) if identifier.respond_to?("#{k}=")
+            end
+          else
+            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+          end
+        end
 
         # Wrap with consolidated if supplements present
         if supplements_data.any?
-          wrap_with_consolidated(base_id, supplements_data)
+          wrap_with_consolidated(identifier, supplements_data)
         else
-          base_id
+          identifier
         end
       end
 
       private
 
-      def locate_identifier_class(publishers, stage)
-        # Return stage-based or publisher-based class
-        return Identifiers::Base if stage  # For prEN, FprEN use Base
+      def locate_identifier_klass(parsed_hash)
+        # Special case: Use adopted_european_norm for adopted identifiers
+        return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]
 
-        # Determine class by publisher combination
-        case publishers.sort.join("/")
-        when "EN"
-          Identifiers::EuropeanNorm
+        # Use type or stage to determine class via Scheme
+        type_or_stage = parsed_hash[:type_with_stage] || parsed_hash[:type] || parsed_hash[:stage] || ""
+        typed_stage = @scheme.locate_typed_stage_by_abbr(type_or_stage)
+        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+      end
+
+      def cast(type, value)
+        case type
+        when :type_with_stage
+          # Lookup from register
+          typed_stage = @scheme.locate_typed_stage_by_abbr(value || "")
+          {
+            stage: typed_stage.to_stage,
+            type: typed_stage.to_type,
+            typed_stage: typed_stage
+          }
+
+        when :publisher
+          value.to_s
+
+        when :copublisher
+          value.to_s
+
+        when :copublishers
+          Array(value).map { |v| v[:copublisher].to_s }
+
+        when :number
+          value.to_s
+
+        when :parts
+          Array(value).map { |p| p[:part].to_s }
+
+        when :part
+          value[:part].to_s if value.is_a?(Hash)
+
+        when :year, :date
+          value.to_i
+
+        when :type
+          value.to_s
+
+        when :stage
+          value.to_s
+
+        when :edition
+          value.to_s
+
+        when :adopted_string
+          # Don't cast here, handled in build_adopted_identifier
+          nil
+
+        when :supplements
+          # Handled separately by extract_supplements
+          nil
+
         else
-          Identifiers::Base  # Fallback for CEN, CLC, CWA, HD
+          value
         end
+      end
+
+      def build_adopted_identifier(data)
+        # Parse the adopted identifier string with appropriate flavor
+        adopted_str = data[:adopted_string]&.to_s&.strip
+        return nil unless adopted_str && !adopted_str.empty?
+
+        adopted_id = if adopted_str.start_with?("ISO/IEC") || adopted_str.include?("ISO/IEC")
+          require_relative '../iso'
+          PubidNew::Iso.parse(adopted_str)
+        elsif adopted_str.start_with?("ISO")
+          require_relative '../iso'
+          PubidNew::Iso.parse(adopted_str)
+        elsif adopted_str.start_with?("IEC")
+          require_relative '../iec'
+          PubidNew::Iec.parse(adopted_str)
+        elsif adopted_str.start_with?("CISPR")
+          # CISPR might need specific handling
+          nil
+        end
+
+        # Build publishers array (EN is default for adoptions)
+        publishers = []
+        publishers << data[:publisher].to_s if data[:publisher]
+        
+        # Handle copublishers array
+        if data[:copublishers]
+          Array(data[:copublishers]).each do |copub|
+            publishers << copub[:copublisher].to_s
+          end
+        elsif data[:copublisher]
+          publishers << data[:copublisher].to_s
+        end
+        
+        publishers = ["EN"] if publishers.empty?
+
+        Identifiers::AdoptedEuropeanNorm.new(
+          publisher: publishers,
+          adopted_identifier: adopted_id
+        )
       end
 
       def wrap_with_consolidated(base_identifier, supplements_data)
@@ -112,34 +208,6 @@ module PubidNew
             year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
             separator: separator
           }
-        end
-      end
-
-      def build_adopted_string(data)
-        parts = []
-        parts << "ISO" if data[:adopted_iso]
-        parts << "IEC" if data[:adopted_iec]
-        parts << "CISPR" if data[:adopted_cispr]
-        parts.empty? ? nil : parts.join("/")
-      end
-
-      def build_adopted_identifier(data)
-        # Parse adopted_string if present
-        adopted_str = data[:adopted_string]&.to_s
-        return nil unless adopted_str && !adopted_str.empty?
-
-        # Parse with appropriate flavor parser based on prefix
-        if adopted_str.start_with?("ISO")
-          require_relative '../iso'
-          PubidNew::Iso.parse(adopted_str)
-        elsif adopted_str.start_with?("IEC")
-          require_relative '../iec'
-          PubidNew::Iec.parse(adopted_str)
-        elsif adopted_str.start_with?("CISPR")
-          # For now, return nil - CISPR might need specific handling
-          nil
-        else
-          nil
         end
       end
     end

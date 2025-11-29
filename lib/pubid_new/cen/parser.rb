@@ -25,9 +25,10 @@ module PubidNew
       rule(:iec) { str("IEC") }
       rule(:cispr) { str("CISPR") }
 
-      # Publisher (can be combined like CEN/CLC)
+      # Publisher (can be combined like EN/CLC or CEN/CLC)
       rule(:publisher) do
         (cwa | hd).as(:publisher) |
+        (en.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
         (cen.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
         (clc.as(:publisher) >> (slash >> cen.as(:copublisher)).maybe) |
         en.as(:publisher)
@@ -56,9 +57,10 @@ module PubidNew
         colon >> digit.repeat(4, 4).as(:amd_year)
       end
 
-      # Corrigendum (+AC:2009 or +AC1:2008 or +AC2:2009)
+      # Corrigendum (+AC:2009 or +AC1:2008 or +AC2:2009 or /AC1:2005)
       rule(:corrigendum) do
-        plus >> str("AC") >> digits.maybe.as(:cor_number) >>
+        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+        str("AC") >> digits.maybe.as(:cor_number) >>
         colon >> digit.repeat(4, 4).as(:cor_year)
       end
 

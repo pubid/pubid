@@ -1,9 +1,8 @@
 require "lutaml/model"
-require_relative "identifier"
 
 module PubidNew
   module Cen
-    class SingleIdentifier < Identifier
+    class SingleIdentifier < Lutaml::Model::Serializable
       attribute :publisher, Components::Publisher, default: -> { Components::Publisher.new(body: "EN") }
       attribute :copublishers, Components::Publisher, collection: true
       attribute :number, Components::Code
