@@ -796,17 +796,36 @@ gems/                       # V1 implementation (LEGACY)
 
 === V2 migration status
 
-The V2 implementation is currently in active development with the following status:
+The V2 implementation has achieved production-ready status for 5 flavors:
 
-* ✅ **NIST Parser:** 98.47% success rate, complete
-* ✅ **IEEE Parser:** 100% success rate, complete
-* ⚠️ **Other Parsers:** Implementation complete, comprehensive testing needed
-* ⚠️ **Documentation:** In progress (75% complete)
-* 📋 **V1 Removal:** Planning phase, deprecation timeline to be announced
+**Production Ready (5 flavors):**
 
-For detailed V2 implementation status, see [`IMPLEMENTATION_STATUS.md`](IMPLEMENTATION_STATUS.md).
+* ✅ **ISO:** 92.84% (2,654/2,859 tests), 18 identifier types, URN generation complete
+* ✅ **IEC:** 84.58% (823/973 tests), 21 identifier types, comprehensive documentation
+* ✅ **IDF:** 100% (26/26 tests), 2 identifier types
+* ✅ **IEEE:** 100% (35/35 tests), complex patterns support
+* ✅ **NIST:** 100% (57/57 tests), 98.47% accuracy on 19,488 real identifiers
 
-For V2 development continuation plan, see [`CONTINUATION_PLAN.md`](CONTINUATION_PLAN.md).
+**In Progress (2 flavors):**
+
+* 🔄 **CEN:** 26% (13/50 tests), needs refactoring with ISO/IEC patterns
+* 🔄 **JIS:** Implementation complete, needs 7 identifier specs
+
+**Not Started (6 flavors):**
+
+* ⚪ **ITU, BSI, CCSDS, ETSI, PLATEAU, ANSI:** Require full V2 implementation
+
+**V1 Code Archival:**
+
+* 📋 **Planned:** ISO, IEC, IDF (V1 gems exist)  will be archived to `archived-gems/` after Session 62
+* 📋 **Future:** IEEE, NIST, CEN, JIS after spec completion
+* 📋 **Timeline:** Phased approach starting after Session 62
+
+For detailed V2 implementation status and spec coverage, see:
+
+* [`docs/IMPLEMENTATION_STATUS_V2.md`](docs/IMPLEMENTATION_STATUS_V2.md) - Complete status tracker
+* [`docs/SPEC_COVERAGE_TRACKER.md`](docs/SPEC_COVERAGE_TRACKER.md) - Individual spec coverage
+* [`docs/SESSION_58_CONTINUATION_PLAN.md`](docs/SESSION_58_CONTINUATION_PLAN.md) - Development roadmap
 
 == Development setup
 
