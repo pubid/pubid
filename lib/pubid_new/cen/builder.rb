@@ -124,7 +124,12 @@ module PubidNew
           Components::Type.new(abbr: value.to_s)
 
         when :stage
-          Components::Stage.new(abbr: value.to_s)
+          # Lookup stage in TYPED_STAGES register
+          typed_stage = @scheme.locate_typed_stage_by_abbr(value.to_s)
+          {
+            stage: typed_stage.to_stage,
+            typed_stage: typed_stage
+          }
 
         when :edition
           value.to_s
@@ -199,7 +204,8 @@ module PubidNew
             Identifiers::Corrigendum.new(
               base_identifier: base_identifier,
               corrigendum_number: supp[:number],
-              corrigendum_year: supp[:year]&.to_i
+              corrigendum_year: supp[:year]&.to_i,
+              separator: supp[:separator] || "+"
             )
           end
         end

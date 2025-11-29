@@ -21,7 +21,8 @@ module PubidNew
                 # Use separator from Amendment object
                 "#{id.separator}A#{id.amendment_number}:#{id.amendment_year}"
               elsif id.is_a?(Corrigendum)
-                result = "+AC"
+                # Use separator from Corrigendum object
+                result = "#{id.separator}AC"
                 result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
                 result += ":#{id.corrigendum_year}" if id.corrigendum_year
                 result
