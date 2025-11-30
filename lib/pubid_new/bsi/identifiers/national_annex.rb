@@ -1,35 +1,29 @@
 # frozen_string_literal: true
 
-require_relative "base"
+require_relative "../single_identifier"
 
 module PubidNew
   module Bsi
     module Identifiers
-      # National Annex identifier - wraps base document with NA amendments
-      # Example: "NA+A1:2012 to BS EN 1993-5:2007"
-      class NationalAnnex < Base
-        attribute :identifiers, Base, polymorphic: true, collection: true
+      # National Annex (NA) identifier
+      class NationalAnnex < SingleIdentifier
+        TYPED_STAGES = [
+          Components::TypedStage.new(
+            code: :pubna,
+            stage_code: :published,
+            type_code: :na,
+            abbr: ["NA"],
+            name: "National Annex",
+            harmonized_stages: %w[60.00 60.60],
+          ),
+        ].freeze
 
-        def to_s
-          result = "NA"
-          
-          # Render NA supplements first
-          identifiers[1..-1].each do |supp|
-            if supp.is_a?(Amendment)
-              result += "+A#{supp.amendment_number}:#{supp.amendment_year}"
-            end
-          end
-          
-          result += " to "
-          
-          # Render base document
-          result += identifiers.first.to_s
-          
-          result
+        def self.type
+          { key: :na, title: "National Annex", short: "NA" }
         end
         
-        def publisher
-          "NA"
+        def to_s(lang: :en, lang_single: false)
+          "NA to #{super}"
         end
       end
     end

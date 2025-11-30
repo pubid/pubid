@@ -1,153 +1,92 @@
+# frozen_string_literal: true
+
+require_relative "../components/typed_stage"
+require_relative "../components/stage"
+require_relative "../components/type"
+
 module PubidNew
   module Bsi
     class Scheme
-      # Transform parsed data into structured hash
-      def self.transform(parsed)
-        result = {}
-        
-        # Handle national annex
-        if parsed[:national_annex]
-          na_data = parsed[:national_annex]
-          na_hash = { type: "NA" }
-          if na_data[:na_supplement]
-            na_hash[:supplement] = transform_supplement(na_data[:na_supplement])
-          end
-          result[:national_annex] = na_hash
-        end
+      # TYPED_STAGES_REGISTRY for native BSI types
+      TYPED_STAGES_REGISTRY = [
+        # British Standard (BS)
+        PubidNew::Components::TypedStage.new(
+          code: :pubbs,
+          stage_code: :published,
+          type_code: :bs,
+          abbr: ["BS"],
+          name: "British Standard",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+        PubidNew::Components::TypedStage.new(
+          code: :drbs,
+          stage_code: :draft,
+          type_code: :bs,
+          abbr: ["Draft BS", "DBS"],
+          name: "Draft British Standard",
+          harmonized_stages: %w[30.00 30.20 30.60 40.00 40.20 40.60],
+        ),
 
-        # Document type
-        if parsed[:type]
-          type_str = parsed[:type].to_s
-          result[:type] = normalize_type(type_str)
-        end
+        # Published Document (PD)
+        PubidNew::Components::TypedStage.new(
+          code: :pubpd,
+          stage_code: :published,
+          type_code: :pd,
+          abbr: ["PD"],
+          name: "Published Document",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Number and part
-        result[:number] = parsed[:number].to_s if parsed[:number]
-        result[:part] = parsed[:part].to_s if parsed[:part]
-        result[:second_number] = parsed[:second_number].to_s if parsed[:second_number]
+        # Publicly Available Specification (PAS)
+        PubidNew::Components::TypedStage.new(
+          code: :pubpas,
+          stage_code: :published,
+          type_code: :pas,
+          abbr: ["PAS"],
+          name: "Publicly Available Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Year and month
-        result[:year] = parsed[:year].to_s if parsed[:year]
-        result[:month] = parsed[:month].to_s if parsed[:month]
+        # National Annex (NA)
+        PubidNew::Components::TypedStage.new(
+          code: :pubna,
+          stage_code: :published,
+          type_code: :na,
+          abbr: ["NA"],
+          name: "National Annex",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+      ].freeze
 
-        # Edition (for Flex)
-        result[:edition] = parsed[:edition].to_s if parsed[:edition]
+      # Map type codes to identifier classes
+      IDENTIFIER_CLASS_MAP = {
+        bs: "Identifiers::BritishStandard",
+        pd: "Identifiers::PublishedDocument",
+        pas: "Identifiers::PubliclyAvailableSpecification",
+        na: "Identifiers::NationalAnnex",
+      }.freeze
 
-        # Supplements
-        if parsed[:supplements]
-          supplements = parsed[:supplements].is_a?(Array) ? parsed[:supplements] : [parsed[:supplements]]
-          result[:supplements] = supplements.map do |s|
-            # Extract from nested :supplement key if present
-            supp_data = s[:supplement] || s
-            transform_supplement(supp_data)
-          end.compact
-        end
+      # Default typed stage for when no match is found
+      DEFAULT_TYPED_STAGE = PubidNew::Components::TypedStage.new(
+        code: :pubbs,
+        stage_code: :published,
+        type_code: :bs,
+        abbr: ["BS"],
+        name: "British Standard",
+        harmonized_stages: %w[60.00 60.60],
+      ).freeze
 
-        # Adopted document
-        if parsed[:adopted]
-          adopted_str = parsed[:adopted].to_s
-          result[:adopted] = parse_adopted(adopted_str)
-        end
-
-        # Expert commentary
-        result[:expert_commentary] = true if parsed[:expert_commentary]
-
-        # Tracked changes
-        result[:tracked_changes] = true if parsed[:tracked_changes]
-
-        # Translation
-        if parsed[:translation]
-          trans = parsed[:translation].to_s
-          result[:translation] = trans.capitalize
-        end
-
-        # PDF marker
-        result[:pdf] = true if parsed[:pdf]
-
-        result
+      def locate_typed_stage_by_abbr(abbr)
+        abbr_str = abbr.to_s.strip
+        TYPED_STAGES_REGISTRY.find { |ts| ts.abbr.include?(abbr_str) } || DEFAULT_TYPED_STAGE
       end
 
-      private
+      def locate_identifier_klass_by_type_code(type_code)
+        class_name = IDENTIFIER_CLASS_MAP[type_code.to_sym]
+        return Identifiers::BritishStandard unless class_name
 
-      def self.normalize_type(type_str)
-        case type_str
-        when "BS", "BSI"
-          "BS"
-        when "PAS"
-          "PAS"
-        when "PD"
-          "PD"
-        when "DD"
-          "DD"
-        when "Flex", "BSI Flex"
-          "BSI Flex"
-        else
-          type_str
-        end
-      end
-
-      def self.transform_supplement(supp_data)
-        return nil unless supp_data
-
-        if supp_data[:amd_number]
-          # Extract year from nested structure if present
-          year_value = if supp_data[:amd_year]
-            supp_data[:amd_year].is_a?(Hash) ? supp_data[:amd_year][:year].to_s : supp_data[:amd_year].to_s
-          end
-          
-          {
-            type: "amendment",
-            number: supp_data[:amd_number].to_s,
-            year: year_value
-          }
-        elsif supp_data[:cor_number]
-          # Extract year from nested structure if present
-          year_value = if supp_data[:cor_year]
-            supp_data[:cor_year].is_a?(Hash) ? supp_data[:cor_year][:year].to_s : supp_data[:cor_year].to_s
-          end
-          
-          {
-            type: "corrigendum",
-            number: supp_data[:cor_number].to_s,
-            year: year_value
-          }
-        end
-      end
-
-      def self.parse_adopted(adopted_str)
-        # Try to parse as IEC first
-        begin
-          return { flavor: "iec", identifier: PubidNew::Iec.parse(adopted_str) }
-        rescue Parslet::ParseFailed, StandardError
-          # Continue to ISO
-        end
-
-        # Try ISO
-        begin
-          return { flavor: "iso", identifier: PubidNew::Iso.parse(adopted_str) }
-        rescue Parslet::ParseFailed, StandardError
-          # Continue to CEN
-        end
-
-        # Try CEN
-        begin
-          return { flavor: "cen", identifier: PubidNew::Cen.parse(adopted_str) }
-        rescue Parslet::ParseFailed, StandardError
-          # Return as string if all parsers fail
-          { flavor: "unknown", text: adopted_str }
-        end
-      end
-
-      def self.normalize_year(year_str)
-        return nil unless year_str
-        
-        year = year_str.to_i
-        if year < 100
-          # Two-digit year: 00-50 means 2000-2050, 51-99 means 1951-1999
-          year < 51 ? 2000 + year : 1900 + year
-        else
-          year
-        end
+        # Convert string to actual class
+        class_name.split("::").reduce(PubidNew::Bsi) { |mod, name| mod.const_get(name) }
       end
     end
   end
