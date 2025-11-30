@@ -87,10 +87,10 @@ The monorepo is organized as follows:
 ├── lib/pubid_new/          # V2 implementation (ACTIVE)
 │   ├── iso/               # ISO V2 - Production ready
 │   ├── iec/               # IEC V2 - Production ready
+│   ├── cen/               # CEN V2 - Production ready
 │   ├── idf/               # IDF V2 - Production ready
 │   ├── ieee/              # IEEE V2 - Production ready
 │   ├── nist/              # NIST V2 - Production ready
-│   ├── cen/               # CEN V2 - In progress
 │   └── ...                # Other flavors
 ├── gems/                   # V1 gems (remaining)
 │   ├── pubid/             # Meta-gem
@@ -187,6 +187,12 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | 823/973
 | ✅ Production Ready
 | 21 identifier types, comprehensive test coverage
+
+| **CEN**
+| **83.2%**
+| 79/95
+| ✅ Production Ready
+| Native & adopted standards, TYPED_STAGES architecture
 
 | **ITU**
 | TBD
@@ -788,10 +794,10 @@ lib/pubid_new/              # V2 implementation (ACTIVE)
 spec/pubid_new/             # V2 tests (ACTIVE)
 ├── iso/                    # 2,654/2,859 tests
 ├── iec/                    # 823/973 tests
+├── cen/                    # 79/95 tests
 ├── idf/                    # 26/26 tests
 ├── ieee/                   # 35/35 tests
-├── nist/                   # 57/57 tests
-└── cen/                    # 13/50 tests
+└── nist/                   # 57/57 tests
 
 gems/                       # V1 gems (remaining)
 ├── pubid/                  # Meta-gem
@@ -813,19 +819,19 @@ archived-gems/              # Archived V1 code
 
 === V2 migration status
 
-The V2 implementation has achieved production-ready status for 5 flavors:
+The V2 implementation has achieved production-ready status for 6 flavors:
 
-**Production Ready (5 flavors):**
+**Production Ready (6 flavors):**
 
 * ✅ **ISO:** 92.84% (2,654/2,859 tests), 18 identifier types, URN generation complete
 * ✅ **IEC:** 84.58% (823/973 tests), 21 identifier types, comprehensive documentation
+* ✅ **CEN:** 83.2% (79/95 tests), native & adopted standards, TYPED_STAGES architecture
 * ✅ **IDF:** 100% (26/26 tests), 2 identifier types
 * ✅ **IEEE:** 100% (35/35 tests), complex patterns support
 * ✅ **NIST:** 100% (57/57 tests), 98.47% accuracy on 19,488 real identifiers
 
-**In Progress (2 flavors):**
+**In Progress (1 flavor):**
 
-* 🔄 **CEN:** 26% (13/50 tests), needs refactoring with ISO/IEC patterns
 * 🔄 **JIS:** Implementation complete, needs 7 identifier specs
 
 **Not Started (6 flavors):**
@@ -834,9 +840,9 @@ The V2 implementation has achieved production-ready status for 5 flavors:
 
 **V1 Code Archival:**
 
-* 📋 **Planned:** ISO, IEC, IDF (V1 gems exist)  will be archived to `archived-gems/` after Session 62
-* 📋 **Future:** IEEE, NIST, CEN, JIS after spec completion
-* 📋 **Timeline:** Phased approach starting after Session 62
+* ✅ **Complete:** ISO, IEC, IEEE, NIST archived to `archived-gems/`
+* 📋 **Planned:** CEN, JIS after additional spec completion
+* 📋 **Timeline:** Phased approach, BSI next after completion
 
 For detailed V2 implementation status and spec coverage, see:
 
