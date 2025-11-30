@@ -195,10 +195,10 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | Native & adopted standards, TYPED_STAGES architecture
 
 | **ITU**
-| TBD
-| -
-| ⚠️ Needs testing
-| Implementation complete, needs comprehensive tests
+| **96.5%**
+| 166/172
+| ✅ Production Ready
+| Core identifiers complete, 6 combined ID limitations documented
 
 | **JIS**
 | TBD
@@ -314,6 +314,52 @@ id.number.number          # => "1"
 id = PubidNew::Iec.parse("IEC 60050-113:2011+AMD1:2017 CSV")
 id.class           # => PubidNew::Iec::Identifiers::VapIdentifier
 id.vap_suffix      # => "CSV"
+----
+
+==== ITU
+
+The ITU parser handles recommendations from all three sectors (R, T, D) with comprehensive supplement support:
+
+[source,ruby]
+----
+require 'pubid_new'
+
+# Parse ITU-T Recommendations
+id = PubidNew::Itu.parse("ITU-T G.989-1 (06/2016)")
+id.sector.sector           # => "T"
+id.series.series          # => "G"
+id.code.number            # => "989"
+id.code.parts.first       # => "1"
+id.date.year              # => "2016"
+id.date.month             # => "06"
+id.to_s                   # => "ITU-T G.989-1 (06/2016)"
+
+# Parse ITU-R Recommendations
+id = PubidNew::Itu.parse("ITU-R V.574-5")
+id.sector.sector          # => "R"
+id.series.series          # => "V"
+id.code.version           # => "5"
+id.to_s                   # => "ITU-R V.574-5"
+
+# Parse Amendments
+id = PubidNew::Itu.parse("ITU-T G.989 Amd 1 (2004)")
+id.class                  # => PubidNew::Itu::Identifiers::Amendment
+id.base.code.number       # => "989"
+id.number                 # => "1"
+id.to_s                   # => "ITU-T G.989 Amd 1 (2004)"
+
+# Parse Corrigenda
+id = PubidNew::Itu.parse("ITU-T Z.100 (1999) Cor. 1 (10/2001)")
+id.base.date.year         # => "1999"
+id.date.year              # => "2001"
+id.date.month             # => "10"
+id.to_s                   # => "ITU-T Z.100 (1999) Cor. 1 (10/2001)"
+
+# Parse Supplements (series-only)
+id = PubidNew::Itu.parse("ITU-T H Suppl. 1")
+id.series.series          # => "H"
+id.number                 # => "1"
+id.to_s                   # => "ITU-T H Suppl. 1"
 ----
 
 ==== ISO
