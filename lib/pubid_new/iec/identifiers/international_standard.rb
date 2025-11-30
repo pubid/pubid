@@ -17,6 +17,30 @@ module PubidNew
             abbr: [""],
             name: "International Standard",
             harmonized_stages: %w[60.00 60.60]
+          ),
+          PubidNew::Components::TypedStage.new(
+            code: :cd,
+            stage_code: :cd,
+            type_code: :is,
+            abbr: ["CD"],
+            name: "Committee Draft",
+            harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99]
+          ),
+          PubidNew::Components::TypedStage.new(
+            code: :cdv,
+            stage_code: :cdv,
+            type_code: :is,
+            abbr: ["CDV"],
+            name: "Committee Draft for Vote",
+            harmonized_stages: %w[40.00 40.20 40.60 40.92 40.98 40.99]
+          ),
+          PubidNew::Components::TypedStage.new(
+            code: :fdis,
+            stage_code: :fdis,
+            type_code: :is,
+            abbr: ["FDIS"],
+            name: "Final Draft International Standard",
+            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99]
           )
         ].freeze
 

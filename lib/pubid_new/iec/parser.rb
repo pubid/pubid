@@ -158,7 +158,8 @@ module PubidNew
         # "DTR"
         # "TS"
         # "Guide"
-        array_to_str(TYPED_STAGES).as(:type_with_stage) >>
+        # Also includes supplement stages like "CDCor" for standalone draft corrigenda
+        array_to_str(TYPED_STAGES + TYPED_STAGES_SUPPLEMENTS).as(:type_with_stage) >>
           (match('\d').as(:stage_iteration) >> space).maybe
       end
 
