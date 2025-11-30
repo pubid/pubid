@@ -34,6 +34,10 @@ module PubidNew
         case type
         when :publisher
           Components::Publisher.new(body: value)
+        
+        when :std_keyword
+          # Return boolean indicating if "Std" was present
+          !value.nil? && !value.empty?
 
         when :copublishers
           if value.nil? || value.empty?
