@@ -1,7 +1,7 @@
 # PubID V2 Implementation Status
 
-**Last Updated:** 2025-11-30 (Session 68 Phase 1 - ITU Started!)
-**Overall Progress:** 7/13 flavors complete, 1 in progress (61.5%)
+**Last Updated:** 2025-11-30 (Session 70 - ITU Parser Enhanced!)
+**Overall Progress:** 7/13 flavors production-ready, 1 nearly complete (61.5%)
 **V1 Code Status:** 4/7 production-ready gems ARCHIVED ✅
 
 ---
@@ -17,17 +17,17 @@
 | **IDF** | ✅ COMPLETE | 26/26 | 100% | N/A (V2 only) |
 | **IEEE** | ✅ COMPLETE | 35/35 | 100% | ✅ ARCHIVED |
 | **NIST** | ✅ COMPLETE | 57/57 | 100% | ✅ ARCHIVED |
-| **ITU** | 🟡 IN PROGRESS | 63/63 | 100% | gems/ (V1) |
+| **ITU** | ✅ PRODUCTION READY | 166/172 | 96.5% | gems/ (V1) |
 | JIS | ⚪ NOT STARTED | - | - | gems/ (V1) |
 | CCSDS | ⚪ NOT STARTED | - | - | gems/ (V1) |
 | ETSI | ⚪ NOT STARTED | - | - | gems/ (V1) |
 | ANSI | ⚪ NOT STARTED | - | - | No V1 code |
 | PLATEAU | ⚪ NOT STARTED | - | - | gems/ (V1) |
 
-**Total V2 Tests:** 4,361 examples
-**Total Passing:** 4,096 (93.9%)
-**Total Failing:** 265 (6.1%)
-**Total Pending:** 186 (4.3%)
+**Total V2 Tests:** 4,470 examples
+**Total Passing:** 4,199 (93.9%)
+**Total Failing:** 271 (6.1%)
+**Total Pending:** 186 (4.2%)
 
 **Archived V1 Gems:** `pubid-iso`, `pubid-iec`, `pubid-ieee`, `pubid-nist` → `archived-gems/`
 
@@ -173,35 +173,54 @@
 
 ---
 
-## In Progress (1 flavor)
-
-### ITU 🟡
-- **Status:** IN PROGRESS (Session 68 Phase 1 Complete)
-- **Tests:** 63/63 passing (100%)
-- **Architecture:** MODEL-DRIVEN (existing V2 structure enhanced)
-- **Features Completed:**
-  - ✅ Recommendation spec with 63 comprehensive tests
+### ITU - 96.5% ✅
+- **Status:** PRODUCTION READY
+- **Tests:** 166/172 passing (96.5%)
+- **Failures:** 6 (all combined identifiers G.780/Y.1351 - documented limitation)
+- **Architecture:** ✅ MODEL-DRIVEN with Supplement base class
+- **Features:**
+  - ✅ 4 core identifier specs complete (Recommendation, Supplement, Amendment, Corrigendum)
+  - ✅ Parser enhanced with supplement support (Amd, Cor., Suppl.)
+  - ✅ Both supplement patterns (with-base and series-only)
+  - ✅ Builder with build_supplement() method
   - ✅ Basic ITU-T/ITU-R patterns (T.4, V.574-5, SA.364-6)
   - ✅ Series and subseries support (G.989.2, M.3016.1)
-  - ✅ Date parsing with month/year (07/2003, 2014)
+  - ✅ Date parsing with month/year separation
   - ✅ Language codes (E, F, R)
-  - ✅ Parts and multi-digit series (BS.1116-3, BT.500-14)
-  - ✅ Round-trip parsing validated
-  - ✅ Date rendering bug fixed (month/year order)
+  - ✅ Parts and multi-digit series
+  - ✅ Round-trip parsing (96.5% coverage)
 - **Session 68 Achievement:**
-  - Created first comprehensive spec (63 tests)
+  - Created Recommendation spec (63 tests, 100%)
   - Fixed date rendering (month/year format)
-  - 100% pass rate on Recommendation patterns
   - Time: ~90 minutes
-- **Next Steps:**
-  - Session 69: Create additional identifier specs (Supplement, Amendment, etc.)
-  - Target: 80%+ overall pass rate with full identifier coverage
-- **ETA:** 2-3 more sessions to production-ready
-- **V1 Code:** `gems/pubid-itu/` (ready for future archival)
+- **Session 69 Achievement:**
+  - Created 3 supplement specs (109 tests)
+  - Supplement: 35 tests
+  - Amendment: 34 tests
+  - Corrigendum: 40 tests
+  - Pass rate: 36.6% (parser gaps expected)
+- **Session 70 Achievement (MAJOR):**
+  - Enhanced parser with supplement rules
+  - Added supplement_with_base and supplement_series_only patterns
+  - Added build_supplement() to builder
+  - **Progress: 63/172 (36.6%) → 166/172 (96.5%) - +103 tests!**
+  - Time: ~90 minutes
+- **Spec Results:**
+  - Recommendation: 63/63 (100%) ✅
+  - Supplement: 35/35 (100%) ✅
+  - Amendment: 31/34 (91.2%)
+  - Corrigendum: 37/40 (92.5%)
+- **Known Limitations:**
+  - 6 combined identifier failures (G.780/Y.1351 pattern)
+  - Parslet overwrites first identifier with second
+  - Requires CombinedIdentifier class for 100% (future work)
+  - Acceptable for production use
+- **Documentation:** Ready for implementation guide
+- **V1 Removal:** Ready (after documentation)
 
 ---
 
-## Not Started (6 flavors)
+## Not Started (5 flavors)
 
 ### JIS ⚪
 - **Status:** NOT STARTED
@@ -313,13 +332,16 @@ All completed flavors validate the MODEL-DRIVEN architecture:
 7. ~~**Session 66-67:** BSI implementation~~ ✅ **COMPLETE (81.4% - PRODUCTION READY!)**
 
 ### Completed ✅
-8. ~~**Session 68:** ITU Phase 1~~ ✅ **COMPLETE (Recommendation spec, 63/63 tests, 100%)**
+8. ~~**Session 68-70:** ITU implementation~~ ✅ **COMPLETE (96.5% - PRODUCTION READY!)**
+   - Session 68: Recommendation spec (63 tests, 100%)
+   - Session 69: Supplement specs (109 tests)
+   - Session 70: Parser enhancement (+103 tests to 96.5%)
 
 ### Immediate (Next Session)
-9. **Session 69-70:** ITU Phase 2 (Create additional specs - Supplement, Amendment, etc.)
+9. **Session 71:** ITU documentation (implementation guide, README examples)
 
 ### Short-term (Next 1-2 Weeks)
-10. **Sessions 71-78:** Remaining 5 flavors (JIS, CCSDS, ETSI, ANSI, PLATEAU)
+10. **Sessions 72-78:** Remaining 5 flavors (JIS, CCSDS, ETSI, ANSI, PLATEAU)
 
 ### Medium-term (Next Month)
 11. **Sessions 79-90:** Complete all remaining flavors
@@ -338,8 +360,9 @@ All completed flavors validate the MODEL-DRIVEN architecture:
 | IDF complete | 100% | ✅ 100% |
 | V1 removal (Phase 1) | Complete | ✅ 4/4 archived |
 | **6 flavors complete** | 6/13 | **✅ ACHIEVED (Session 65)** |
-| 7 flavors complete (BSI) | 7/13 | 🎯 Target: Session 66-67 |
-| All flavors complete | 13/13 | 🎯 Target: Session 90-95 |
+| **7 flavors complete (BSI)** | 7/13 | **✅ ACHIEVED (Session 67)** |
+| **8 flavors complete (ITU)** | 8/13 | **✅ ACHIEVED (Session 70)** |
+| All flavors complete | 13/13 | 🎯 Target: Session 85-90 |
 
 ---
 
@@ -370,9 +393,9 @@ All completed flavors validate the MODEL-DRIVEN architecture:
 
 ## Conclusion
 
-PubID V2 has achieved **production-ready status** for **7/13 flavors (53.8%)** with **93.8% overall pass rate**. The ISO, IEC, CEN, and BSI implementations validate the MODEL-DRIVEN architecture with TYPED_STAGES register pattern across all similar flavors.
+PubID V2 has achieved **production-ready status** for **8/13 flavors (61.5%)** with **93.9% overall pass rate**. The ISO, IEC, CEN, BSI, and ITU implementations validate the MODEL-DRIVEN architecture with clean separation of concerns.
 
-**Key Success:** ISO's clean architecture (Session 22-49) successfully replicated in IEC (Sessions 51-56), CEN (Sessions 62-65), BSI (Sessions 66-67), and IDF (Session 57), proving the pattern works universally.
+**Key Success:** ISO's clean architecture (Session 22-49) successfully replicated in IEC (Sessions 51-56), CEN (Sessions 62-65), BSI (Sessions 66-67), IDF (Session 57), and ITU (Sessions 68-70), proving the pattern works universally.
 
 **CEN Achievement (Session 65):** 🎉 **PRODUCTION READY!** Created HarmonizationDocument spec (19 tests), achieved 83.2% pass rate (+4.3pp from 78.9%). All 16 failures are acceptable (parser tests/expectations). Architecture 100% correct with clean MODEL-DRIVEN design, TYPED_STAGES register, and proper native vs adopted distinction.
 
@@ -395,7 +418,12 @@ PubID V2 has achieved **production-ready status** for **7/13 flavors (53.8%)** w
 - All 33 failures are acceptable parser limitations (AdoptedEN, NationalAnnex patterns)
 - Time: ~90 minutes total (excellent compression)
 
-**ITU Achievement (Session 68):** 🎉 **STARTED!** Created comprehensive Recommendation spec with 63 tests (all passing 100%). Fixed date rendering bug (month/year order). Clean MODEL-DRIVEN architecture working perfectly. Time: ~90 minutes.
-- **Next:** Sessions 69-70 will create additional identifier specs (Supplement, Amendment, etc.)
+**ITU Achievement (Sessions 68-70):** 🎉 **PRODUCTION READY!**
+- Session 68: Created Recommendation spec (63 tests, 100%)
+- Session 69: Created 3 supplement specs (109 tests)
+- Session 70: Enhanced parser with supplement support (+103 tests!)
+- **Final: 166/172 passing (96.5%)**
+- All 6 failures are combined identifiers (documented limitation)
+- Time: ~4.5 hours total (3 sessions)
 
-**Next Focus (Session 69+):** Complete ITU to production-ready (Sessions 69-70), then continue with remaining 5 flavors (JIS, CCSDS, ETSI, ANSI, PLATEAU). Target completion: Session 85-90.
+**Next Focus (Session 71+):** Create ITU documentation (implementation guide, README examples), then continue with remaining 5 flavors (JIS, CCSDS, ETSI, ANSI, PLATEAU). Target completion: Session 85-90.
