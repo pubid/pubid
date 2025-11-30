@@ -5,6 +5,9 @@ require_relative "components/sector"
 require_relative "components/series"
 require_relative "components/code"
 require_relative "identifiers/recommendation"
+require_relative "identifiers/supplement"
+require_relative "identifiers/amendment"
+require_relative "identifiers/corrigendum"
 
 module PubidNew
   module Itu
