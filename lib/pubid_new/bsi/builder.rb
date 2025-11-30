@@ -22,8 +22,13 @@ module PubidNew
       def build(data)
         data = data.inject({}) { |acc, h| acc.merge(h) } if data.is_a?(Array)
 
-        # Check for multi-level adoptions (most specific first)
-        if data[:adopted_string]
+        # Check for National Annex first (most specific)
+        # NationalAnnex can have adopted_string too (e.g., "NA to BS EN 1234")
+        if data[:na_prefix]
+          # Don't handle as adopted identifier, proceed normally
+          # Fall through to normal identifier building
+        elsif data[:adopted_string]
+          # Check for multi-level adoptions
           return build_adopted_identifier(data)
         end
 
@@ -59,8 +64,12 @@ module PubidNew
       private
 
       def locate_identifier_klass(parsed_hash)
+        # Special case: National Annex prefix
+        return Identifiers::NationalAnnex if parsed_hash[:na_prefix]
+        
         # Special case: Handle adopted identifiers
-        return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]&.match?(/EN/)
+        # Match "EN " followed by digit (not "EN ISO" or "EN IEC")
+        return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]&.match?(/^EN\s+\d/)
         return Identifiers::AdoptedInternationalStandard if parsed_hash[:adopted_string]
 
         # Use type to determine class via Scheme
@@ -112,6 +121,10 @@ module PubidNew
 
         when :edition
           value.to_s
+
+        when :na_prefix
+          # Don't cast, used for class selection only
+          nil
 
         when :adopted_string
           # Don't cast here, handled in build_adopted_identifier
@@ -186,8 +199,8 @@ module PubidNew
 
         # Return appropriate wrapper based on adoption type
         if adopted_id
-          # If adopted_id is already a CEN identifier (EN), use AdoptedEuropeanNorm
-          if adopted_id.is_a?(PubidNew::Cen::Identifiers::Base)
+          # If adopted_id is a CEN identifier (in Cen module), use AdoptedEuropeanNorm
+          if adopted_id.class.name.start_with?("PubidNew::Cen::")
             Identifiers::AdoptedEuropeanNorm.new(
               publisher: ["BS"],
               adopted_identifier: adopted_id

@@ -30,8 +30,15 @@ module PubidNew
       rule(:iec) { str("IEC") }
       rule(:cispr) { str("CISPR") }
 
+      # National Annex prefix (special case: "NA to BS...")
+      rule(:na_prefix) { str("NA to ").as(:na_prefix) }
+
       # Publisher/Type - longer patterns first
       rule(:publisher_or_type) do
+        na_prefix >>
+        (draft.as(:stage) |
+         pd.as(:type) |
+         bs.as(:publisher)) |
         draft.as(:stage) |
         pd.as(:type) |
         pas.as(:type) |

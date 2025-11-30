@@ -37,6 +37,10 @@ module PubidNew
         def part
           adopted_identifier&.part if adopted_identifier&.respond_to?(:part)
         end
+
+        def subpart
+          adopted_identifier&.subpart if adopted_identifier&.respond_to?(:subpart)
+        end
       end
     end
   end

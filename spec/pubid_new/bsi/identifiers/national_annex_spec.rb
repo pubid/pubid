@@ -15,7 +15,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
       end
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("NA")
+        expect(parsed.publisher.body).to eq("BS")
       end
 
       it "renders with 'NA to' prefix" do
