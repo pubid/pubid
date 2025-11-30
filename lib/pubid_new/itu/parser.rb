@@ -65,6 +65,84 @@ module PubidNew
         dash >> match["EFASCR"].as(:language)
       end
 
+      # Combined identifier (Y.1351 part after slash)
+      rule(:combined_suffix) do
+        str("/") >> series >> dot >> code
+      end
+
+      # Supplement types
+      rule(:supplement_type) do
+        (
+          str("Suppl.") | str("Suppl") |
+          str("Amd.") | str("Amd") |
+          str("Cor.") | str("Cor")
+        ).as(:supplement_type)
+      end
+
+      # Supplement number
+      rule(:supplement_number) do
+        space >> digits.as(:supplement_number)
+      end
+
+      # Supplement date (separate from base date)
+      rule(:supplement_date) do
+        space >> str("(") >>
+          (digits.as(:supplement_month) >> str("/")).maybe >>
+          digit.repeat(4, 4).as(:supplement_year) >>
+          str(")")
+      end
+
+      # Base identifier for supplements
+      rule(:base_with_series) do
+        itu_prefix >>
+          sector >>
+          space >>
+          series >> dot >>
+          code >>
+          combined_suffix.maybe >>
+          date_part.maybe
+      end
+
+      rule(:base_without_series) do
+        itu_prefix >>
+          sector >>
+          space >>
+          code >>
+          date_part.maybe
+      end
+
+      rule(:base_identifier) do
+        base_with_series | base_without_series
+      end
+
+      # Supplement with base identifier (has recommendation number)
+      rule(:supplement_with_base) do
+        base_identifier.as(:base) >>
+          space >>
+          supplement_type >>
+          supplement_number >>
+          supplement_date.maybe >>
+          language.maybe
+      end
+
+      # Supplement without base (series-only, like "ITU-T H Suppl. 1")
+      rule(:supplement_series_only) do
+        itu_prefix >>
+          sector >>
+          space >>
+          series >>
+          space >>
+          supplement_type >>
+          supplement_number >>
+          supplement_date.maybe >>
+          language.maybe
+      end
+
+      # Complete supplement identifier (try with base first, then series-only)
+      rule(:supplement_identifier) do
+        supplement_with_base | supplement_series_only
+      end
+
       # With series: ITU-R BO.600-1
       rule(:with_series) do
         itu_prefix >>
@@ -72,6 +150,7 @@ module PubidNew
           space >>
           series >> dot >>
           code >>
+          combined_suffix.maybe >>
           date_part.maybe >>
           language.maybe
       end
@@ -86,7 +165,7 @@ module PubidNew
           language.maybe
       end
 
-      rule(:identifier) { with_series | without_series }
+      rule(:identifier) { supplement_identifier | with_series | without_series }
 
       rule(:root) { identifier }
 

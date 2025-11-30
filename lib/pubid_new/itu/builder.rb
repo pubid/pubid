@@ -17,18 +17,57 @@ module PubidNew
       end
 
       def build(data)
-        # Build components
+        # Check if this is a supplement identifier
+        if data[:supplement_type]
+          return build_supplement(data)
+        end
+
+        # Build basic recommendation
         sector = Components::Sector.new(sector: data[:sector].to_s)
         series = Components::Series.new(series: data[:series].to_s) if data[:series]
         code = build_code(data) if data[:number]
         date = build_date(data) if data[:year]
 
-        # For now, default to Recommendation
         Identifiers::Recommendation.new(
           sector: sector,
           series: series,
           code: code,
           date: date,
+          language: data[:language]&.to_s
+        )
+      end
+
+      def build_supplement(data)
+        # Build the base identifier first
+        base = build(data[:base]) if data[:base]
+
+        # Determine supplement type
+        supplement_type = data[:supplement_type].to_s.gsub(".", "")
+        klass = case supplement_type
+                when "Amd"
+                  Identifiers::Amendment
+                when "Cor"
+                  Identifiers::Corrigendum
+                when "Suppl"
+                  Identifiers::Supplement
+                end
+
+        # Build supplement date (separate from base date)
+        supplement_date = if data[:supplement_year]
+                            PubidNew::Components::Date.new(
+                              year: data[:supplement_year].to_s,
+                              month: data[:supplement_month]&.to_s
+                            )
+                          end
+
+        # Build supplement with extracted components
+        klass.new(
+          sector: base&.sector || Components::Sector.new(sector: data[:sector].to_s),
+          series: base&.series || (data[:series] ? Components::Series.new(series: data[:series].to_s) : nil),
+          code: base&.code,
+          base: base,
+          number: data[:supplement_number].to_s,
+          date: supplement_date,
           language: data[:language]&.to_s
         )
       end

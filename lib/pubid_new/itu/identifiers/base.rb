@@ -33,9 +33,11 @@ module PubidNew
 
           # Add date if present
           if date
-            result += " (#{date.year}"
-            result += "/#{date.month}" if date.month
-            result += ")"
+            if date.month
+              result += " (#{date.month}/#{date.year})"
+            else
+              result += " (#{date.year})"
+            end
           end
 
           # Add language
