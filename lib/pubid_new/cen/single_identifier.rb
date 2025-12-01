@@ -22,8 +22,13 @@ module PubidNew
       def to_s(lang: :en, lang_single: false)
         parts = []
         
-        # Get type short name
-        type_short = if type.is_a?(Components::Type)
+        # Check if we have a draft stage (prEN, FprEN) - these include both stage and type
+        is_draft_stage = typed_stage && typed_stage.abbr && %w[prEN FprEN].include?(typed_stage.abbr.first)
+        
+        # Get type short name - for draft stages, extract base type
+        type_short = if is_draft_stage
+                       typed_stage.type_code.to_s.upcase  # :en => "EN"
+                     elsif type.is_a?(Components::Type)
                        type.abbr
                      elsif self.class.respond_to?(:type)
                        self.class.type[:short]
@@ -40,11 +45,9 @@ module PubidNew
             parts << type_short
           end
         else
-          # Stage prefix (prEN, FprEN) OR publisher
-          if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
+          # Draft stage prefix (prEN, FprEN) OR regular publisher
+          if is_draft_stage
             parts << typed_stage.abbr.first
-          elsif stage && stage.respond_to?(:abbr)
-            parts << stage.abbr
           elsif publisher
             parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
           end

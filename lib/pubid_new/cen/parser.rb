@@ -34,8 +34,8 @@ module PubidNew
         en.as(:publisher)
       end
 
-      # Stage (prEN, FprEN)
-      rule(:stage) { (str("FprEN") | str("prEN")).as(:stage) }
+      # Stage prefixes captured as type_with_stage for proper lookup
+      rule(:stage_prefix) { (str("FprEN") | str("prEN")).as(:type_with_stage) }
 
       # Type
       rule(:type) { (str("Guide") | str("GUIDE") | str("TR") | str("TS")).as(:type) }
@@ -83,7 +83,7 @@ module PubidNew
 
       # Identifier
       rule(:identifier) do
-        (stage | publisher) >>
+        (stage_prefix | publisher) >>
         (space >> adopted_string).maybe >>
         (space >> type | slash >> type).maybe >>
         (space >> number >> parts >>

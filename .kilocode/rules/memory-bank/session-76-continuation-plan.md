@@ -1,31 +1,31 @@
-# Session 76+ Continuation Plan: Complete All Spec Failures
+# Session 77+ Continuation Plan: Complete All Spec Failures
 
-**Created:** 2025-11-30 (Post-Session 75)  
-**Status:** BSI IMPROVED TO 94.9%, IEC/CEN/ITU NEXT  
-**Current:** 4,401 tests, ~4,197 passing (95.36%), 204 failures  
-**Timeline:** Compressed - aim to complete within 10-12 sessions  
+**Created:** 2025-11-30 (Post-Session 76)
+**Status:** IEC IMPROVED TO 86.0%, CEN/ITU NEXT
+**Current:** 4,560 tests, ~4,363 passing (95.68%), 197 failures
+**Timeline:** Compressed - aim to complete within 9-11 sessions
 
 ---
 
-## CURRENT STATE (Session 75 Complete)
+## CURRENT STATE (Session 76 Complete)
 
-### Session 75 Achievement: BSI EXCEEDED TARGET! 🎉
-- **Target:** 90.4% (160/177)
-- **Achieved:** 94.9% (168/177) - EXCEEDED by 4.5pp!
-- **AdoptedEuropeanNorm:** 26/26 (100%) ✅
-- **NationalAnnex:** 15/22 (68%) - architectural issues deferred
+### Session 76 Achievement: IEC DRAFT STAGES ADDED! 🎉
+- **Target:** 87.3% (711/814)
+- **Achieved:** 86.0% (837/973) - Added CD, CDV, FDIS stages!
+- **New tests:** +159 examples
+- **Improvements:** +166 passing tests (+3.6pp)
 
 ### Overall Metrics
-- **Total examples:** 4,401
-- **Passing:** ~4,197 (95.36%)
-- **Failing:** ~204 (4.64%)
+- **Total examples:** 4,560
+- **Passing:** ~4,363 (95.68%)
+- **Failing:** ~197 (4.32%)
 - **Pending:** 186 (ISO URN tests)
 
 ### Flavor Status
 | Flavor | Tests | Passing | Failures | Status |
 |--------|-------|---------|----------|--------|
 | ISO | 2,859 | 2,654 | 205 | 92.84% |
-| IEC | 814 | 671 | 143 | 82.4% |
+| IEC | 973 | 837 | 136 | 86.0% ✅ |
 | CEN | 95 | 79 | 16 | 83.2% |
 | BSI | 177 | 168 | 9 | 94.9% ✅ |
 | IDF | 26 | 26 | 0 | 100% ✅ |
@@ -42,43 +42,29 @@
 
 ## IMMEDIATE PRIORITIES
 
-### Session 76: IEC Draft Stages (2-3 hours)
+### Session 76: IEC Draft Stages ✅ COMPLETE
 
-**Objective:** Add FDIS, CDV, CD draft stage support to IEC parser
+**Achievement:** Added CD, CDV, FDIS draft stages successfully!
 
-**Problem:** Parser doesn't recognize ~80 draft stage patterns
+**What Was Done:**
+1. ✅ Added TypedStage objects for CD, CDV, FDIS to InternationalStandard
+2. ✅ Updated parser to include supplement typed stages in type_with_stage rule
+3. ✅ Fixed test expectations (.number vs .value for IEC Code components)
 
-**Tasks:**
-1. Analyze IEC draft stage failures (30 min)
-   ```bash
-   bundle exec rspec spec/pubid_new/iec/ --format documentation 2>&1 | \
-     grep "FDIS\|CDV\|CD" | head -50
-   ```
+**Results:**
+- Before: 671/814 (82.4%)
+- After: 837/973 (86.0%, +3.6pp)
+- New tests: +159 examples
+- Improvements: +166 passing tests
 
-2. Read IEC TYPED_STAGES (15 min)
-   - Check current stage definitions
-   - Identify missing draft patterns
+**Commit:** `e445fdc` - feat(iec): add CD, CDV, FDIS draft stages
 
-3. Add draft patterns to parser (60 min)
-   - FDIS (Final Draft International Standard)
-   - CDV (Committee Draft for Vote)
-   - CD (Committee Draft)
-   - Test incrementally
+**Time:** ~60 minutes
 
-4. Update TYPED_STAGES register (30 min)
-   - Add draft stage TypedStage entries
-   - Ensure canonical abbreviations
-
-5. Test and verify (15 min)
-   ```bash
-   bundle exec rspec spec/pubid_new/iec/
-   ```
-
-**Expected:** 711/814 (87.3%, +40 tests)
-
-**Files to modify:**
+**Files Modified:**
+- `lib/pubid_new/iec/identifiers/international_standard.rb`
 - `lib/pubid_new/iec/parser.rb`
-- `lib/pubid_new/iec/identifiers/*.rb` (TYPED_STAGES)
+- `spec/pubid_new/iec/identifiers/international_standard_spec.rb`
 
 ---
 
@@ -277,9 +263,9 @@ id = PubidNew::{Flavor}.parse("{example}")
 
 ### Minimum Success (Phases 1-2)
 - ✅ BSI ≥ 90% (achieved 94.9%)
-- ✅ IEC ≥ 85%
-- ✅ CEN ≥ 90%
-- ✅ ITU = 100%
+- ✅ IEC ≥ 85% (achieved 86.0%)
+- ⏳ CEN ≥ 90% (currently 83.2%)
+- ⏳ ITU = 100% (currently 96.5%)
 
 ### Target Success (Phase 3)
 - ✅ ISO ≥ 95%
@@ -360,15 +346,22 @@ bundle exec rspec spec/pubid_new/ --format progress
 
 ---
 
-## SESSION 76 START
+## SESSION 77 START
+
+**Priority:** CEN draft stages + ITU CombinedIdentifier
 
 Run this first:
 
 ```bash
-bundle exec rspec spec/pubid_new/iec/ --format documentation 2>&1 | \
-  grep -E "FDIS|CDV|CD" | head -50
+# Check CEN draft stage patterns
+bundle exec rspec spec/pubid_new/cen/ --format documentation 2>&1 | \
+  grep -E "prEN|EN/CD" | head -30
+
+# Check ITU combined identifier patterns
+bundle exec rspec spec/pubid_new/itu/ --format documentation 2>&1 | \
+  grep -E "G\.\d+/Y\.\d+" | head -20
 ```
 
-Then read IEC implementation files and enhance parser for draft stages.
+Then implement CEN draft stages and ITU CombinedIdentifier class.
 
-**Good luck with Session 76!** 🚀
+**Good luck with Session 77!** 🚀
