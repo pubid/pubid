@@ -93,86 +93,15 @@ module PubidNew
         edition.to_s
       end
 
-      # Generate URN according to RFC 5141
-      # Format: urn:iso:std:{publisher}:{number}[:{elements}]
-      # @param include_stage [Boolean] whether to include stage in URN (default: true)
-      #   Set to false when this identifier is a base for a supplement that has its own stage
-      def to_urn(include_stage: true)
-        parts = ["urn", "iso", "std"]
-        
-        # Publisher (lowercase, hyphen-separated)
-        parts << publisher_urn
-        
-        # Type (for non-IS types like TR, TS, Guide)
-        # IS (International Standard) is the default and doesn't appear in URN
-        # Use urn_type_code override if available (e.g., Recommendation uses 'r' instead of 'rec')
-        if typed_stage.type_code && typed_stage.type_code != "is"
-          parts << (respond_to?(:urn_type_code) ? urn_type_code : typed_stage.type_code)
-        end
-        
-        # Number
-        parts << number.value if number
-        
-        # Part (with colon-dash prefix)
-        parts << part_urn if part
-        
-        # Stage (only for non-published documents, and only if requested)
-        parts << stage_urn if include_stage && stage_urn
-        
-        # Edition
-        parts << edition_urn if edition && edition.number
-        
-        # Language
-        parts << language_urn if languages&.any?
-        
-        parts.join(":")
+      # Generate URN according to RFC 5141-bis
+      #
+      # @return [String] The generated URN in RFC 5141-bis format
+      def to_urn
+        require_relative 'urn_generator'
+        UrnGenerator.new(self).generate
       end
 
       private
-
-      def publisher_urn
-        # For identifiers like IWA that don't render publisher, default to "iso"
-        return "iso" unless publisher
-        
-        copubs = copublishers || []
-        ([publisher] + copubs).map(&:body).map(&:downcase).join("-")
-      end
-
-      def part_urn
-        # Part format: -part or -part-subpart
-        result = "-#{part.value}"
-        result += "-#{subpart.value}" if subpart
-        result
-      end
-
-      def stage_urn
-        # Only add stage for non-published documents
-        # Published IS doesn't have a stage in URN
-        return nil if typed_stage.stage_code == "published"
-        
-        # Get harmonized stage code from typed_stage
-        harmonized_code = typed_stage.harmonized_stages&.first
-        return nil unless harmonized_code
-        
-        stage_part = "stage-#{harmonized_code}"
-        
-        # Add iteration if present (e.g., stage-50.00.v2)
-        if stage_iteration
-          stage_part += ".v#{stage_iteration.value}"
-        end
-        
-        stage_part
-      end
-
-      def edition_urn
-        return nil unless edition && edition.number
-        "ed-#{edition.number}"
-      end
-
-      def language_urn
-        return nil unless languages&.any?
-        languages.map(&:code).join(",")
-      end
 
     end
   end

@@ -1,0 +1,964 @@
+= RFC 5141-bis: URN Namespace Extensions for ISO
+:docnumber: RFC-5141-BIS
+:edition: 1
+:revdate: 2025-12-01
+:copyright-year: 2025
+:language: en
+:title-main-en: URN Namespace Extensions for the International Organization for Standardization (ISO)
+:doctype: standard
+:status: draft
+:mn-document-class: ietf
+:mn-output-extensions: xml,html,pdf,txt
+
+== Introduction
+
+This document supplements RFC 5141 <<RFC5141>> "A Uniform Resource Name (URN) Namespace for the International Organization for Standardization (ISO)" published in March 2008.
+
+RFC 5141 has served the standards community well for over 16 years. However, ISO standardization practices have evolved significantly since 2008, introducing new document types, copublisher arrangements, supplement patterns, and development stages that RFC 5141 does not address.
+
+This specification, RFC 5141-bis, extends RFC 5141 to support:
+
+* Modern ISO document types (IWA enhancements, Directives, WDS stages)
+* Expanded copublisher patterns beyond the predefined list
+* Complex supplement chaining (corrigenda of amendments)
+* Base identifier stage specifications in supplement context
+* Bundled identifier patterns
+* Modern stage codes (WDS, CDTS, FDAMD, PDAM, etc.)
+* Explicit language specification guidance
+
+=== Document Purpose
+
+This document serves as a **supplement** to RFC 5141, not a replacement. All syntax and semantics defined in RFC 5141 remain valid. This specification:
+
+* Documents known limitations of RFC 5141
+* Proposes backward-compatible extensions
+* Provides guidance on explicit vs. implicit specifications
+* Defines new syntax elements for modern ISO practices
+
+=== Relationship to RFC 5141
+
+RFC 5141-bis **extends** but does not **replace** RFC 5141:
+
+* All RFC 5141 URNs remain valid
+* All RFC 5141 syntax rules apply unless explicitly extended here
+* New syntax is designed for backward compatibility
+* Implementations may support RFC 5141-bis progressively
+
+[[scope]]
+== Scope
+
+This document defines extensions to the ISO URN namespace as specified in RFC 5141 <<RFC5141>>.
+
+It addresses:
+
+. Documentation of RFC 5141 limitations identified since 2008
+. Syntax extensions for modern ISO document types and patterns
+. Guidance for explicit specification of URN components
+. Supplement chain ordering and semantics
+. Copublisher expansion mechanisms
+. New stage code support
+
+It does not address:
+
+. Changes to the fundamental URN structure
+. Non-ISO or non-IEC standard identifiers
+. Resolution mechanisms beyond RFC 5141
+
+[[terms]]
+== Terms and Definitions
+
+For the purposes of this document, the terms and definitions given in RFC 5141 <<RFC5141>> apply, along with the following:
+
+=== bundled identifier
+
+identifier that references multiple ISO documents as a cohesive unit
+
+[example]
+====
+"ISO 8601-1+8601-2:2019" references both parts together as a bundle.
+====
+
+=== supplement chain
+
+sequence of supplements (amendments, corrigenda) that modify a base document through multiple levels
+
+[example]
+====
+"ISO 8859-1:2013/Amd 1:2015/Cor 1:2016" where a corrigendum applies to an amendment.
+====
+
+=== stage iteration
+
+sequential version of a document at a specific development stage
+
+[example]
+====
+"ISO/DIS 12345.2" indicates the second iteration at the DIS (Draft International Standard) stage.
+====
+
+=== explicit specification
+
+URN component explicitly included in the URN string regardless of default values
+
+[example]
+====
+Including `:fr` for French documents even though RFC 5141 treats `:en` as default.
+====
+
+[[limitations]]
+== RFC 5141 Documented Limitations
+
+=== General
+
+This clause documents limitations of RFC 5141 as identified through 16+ years of implementation experience and evolving ISO standardization practices.
+
+=== Copublisher Limitations
+
+==== Issue Description
+
+RFC 5141 Section 2.4.1 defines a fixed set of copublisher patterns:
+
+[source,abnf]
+----
+originator = "iso" / "iso-iec" / "iso-cie" / "iso-astm" / 
+             "iso-ieee" / "iec"
+----
+
+This predefined list cannot accommodate:
+
+* New copublisher arrangements (e.g., ISO/IEC/IEEE triple copublication)
+* Organizations not anticipated in 2008
+* Dynamic copublisher combinations
+
+==== Real-World Impact
+
+Standards such as "ISO/IEC/IEEE 29148:2018" cannot be represented in RFC 5141 URN format as the triple copublisher pattern is not defined.
+
+==== Proposed Solution
+
+See <<ext-copublisher>>.
+
+=== Supplement Chain Limitations
+
+==== Issue Description
+
+RFC 5141 Section 2.4.1 defines:
+
+[source,abnf]
+----
+std-nss = "std:" docidentifier *supplement *docelement [addition]
+----
+
+The `*supplement` pattern allows multiple supplements but does not specify:
+
+* Ordering semantics for multi-level chains
+* How corrigenda apply to amendments
+* Edition placement in complex chains
+
+==== Real-World Impact
+
+The identifier "ISO 8859-1:2013/Amd 1:2015/Cor 1:2016" (a corrigendum to an amendment) has ambiguous representation in RFC 5141.
+
+==== Proposed Solution
+
+See <<ext-supplement-chains>>.
+
+=== Document Type Limitations
+
+==== Issue Description
+
+RFC 5141 Section 2.4.1 defines:
+
+[source,abnf]
+----
+type = "data" / "guide" / "isp" / "iwa" / "pas" / 
+       "r" / "tr" / "ts" / "tta"
+----
+
+Missing document types include:
+
+* DIR (Directive)
+* DIR SUP (Directive Supplement)
+* Enhanced IWA patterns
+* Future document types
+
+==== Real-World Impact
+
+ISO Directives and their supplements cannot be properly represented in URN format.
+
+==== Proposed Solution
+
+See <<ext-document-types>>.
+
+=== Stage Code Limitations
+
+==== Issue Description
+
+RFC 5141 Section 2.4.1 defines only generic `"draft"` and numeric stage codes:
+
+[source,abnf]
+----
+status = ( "draft" / "cancelled" ) / stage
+stage  = "stage-" stagecode ["." iteration]
+stagecode = DIGIT DIGIT "."  DIGIT DIGIT
+----
+
+Missing modern stage codes:
+
+* WDS (Working Draft Study)
+* CDTS (Committee Draft Technical Specification)
+* FDAMD (Final Draft Amendment)
+* PDAM (Proposed Draft Amendment)
+* And others introduced since 2008
+
+==== Real-World Impact
+
+Modern draft stages cannot be referenced unambiguously in URNs.
+
+==== Proposed Solution
+
+See <<ext-stage-codes>>.
+
+=== Base Identifier Stage Limitations
+
+==== Issue Description
+
+RFC 5141 does not support specifying the stage of a base identifier when that identifier is amended.
+
+==== Real-World Impact
+
+Cannot distinguish between:
+
+* Amendment to published ISO 1234:2020
+* Amendment to DIS version of ISO 1234
+
+==== Proposed Solution
+
+See <<ext-base-stage>>.
+
+=== Bundled Identifier Limitations
+
+==== Issue Description
+
+RFC 5141 has no syntax for bundled identifiers that reference multiple documents as a unit.
+
+==== Real-World Impact
+
+Identifiers like "ISO 8601-1+8601-2:2019" (referencing both parts together) have no URN representation.
+
+==== Proposed Solution
+
+See <<ext-bundled>>.
+
+=== Language Specification Ambiguity
+
+==== Issue Description
+
+RFC 5141 Section 2.4.1 states:
+
+[quote]
+____
+If no language element is specified, <en> is assumed.
+____
+
+This creates ambiguity:
+
+* Should non-English documents explicitly include language codes?
+* Is omission an error or an implicit default?
+
+==== Real-World Impact
+
+French-language documents (`:fr`) may be represented inconsistently across implementations.
+
+==== Proposed Solution
+
+See <<ext-language-guidance>>.
+
+=== Edition Placement Ambiguity
+
+==== Issue Description
+
+RFC 5141 does not specify edition placement in multi-level supplement chains.
+
+==== Example Ambiguity
+
+For "ISO 8859-1:ed-5/Amd 3:2016/Cor 1:2017":
+
+* Does `:ed-5` apply to the base or the amendment?
+* What is the canonical ordering?
+
+==== Proposed Solution
+
+See <<ext-supplement-chains>>.
+
+=== Iteration Syntax Limitations
+
+==== Issue Description
+
+RFC 5141 stage iteration syntax uses:
+
+[source,abnf]
+----
+iteration = "v" DIGITS
+----
+
+This conflicts with docversion which also uses `"v"` prefix, creating parsing ambiguity.
+
+==== Proposed Solution
+
+See <<ext-stage-codes>>.
+
+[[extensions]]
+== URN Namespace Extensions
+
+[[ext-copublisher]]
+=== Extended Copublisher Syntax
+
+==== Syntax Definition
+
+This specification extends the `originator` rule to support dynamic copublisher combinations:
+
+[source,abnf]
+----
+originator     = predefined-orig / extended-orig
+
+predefined-orig = "iso" / "iso-iec" / "iso-cie" / "iso-astm" / 
+                  "iso-ieee" / "iec"
+                  ; Original RFC 5141 values
+
+extended-orig  = org-id *("-" org-id)
+
+org-id         = "iso" / "iec" / "ieee" / "cie" / "astm" / 
+                 other-org
+
+other-org      = 2*8ALPHA
+                 ; Organization abbreviation, 2-8 characters
+----
+
+==== Semantics
+
+* Copublishers ordered alphabetically (ISO before IEC before IEEE)
+* Hyphen separates copublisher abbreviations
+* Maximum 4 copublishers (practical limit)
+
+==== Examples
+
+[source]
+----
+urn:iso:std:iso-iec-ieee:29148:ed-1:en
+  ISO/IEC/IEEE 29148:2018, first edition, English
+
+urn:iso:std:iso-cie:8995:-1:ed-2:en
+  ISO/CIE 8995-1:2nd edition, English
+----
+
+==== Backward Compatibility
+
+All RFC 5141 `predefined-orig` values remain valid. Existing URNs unchanged.
+
+[[ext-document-types]]
+=== Extended Document Types
+
+==== Syntax Definition
+
+[source,abnf]
+----
+type = predefined-type / extended-type
+
+predefined-type = "data" / "guide" / "isp" / "iwa" / 
+                  "pas" / "r" / "tr" / "ts" / "tta"
+                  ; Original RFC 5141 values
+
+extended-type   = "dir" / "dir-sup" / "iwa-sup" / future-type
+
+future-type     = 2*10(ALPHA / "-")
+                  ; Future document types, lowercase with hyphens
+----
+
+==== New Document Types
+
+dir:: Directive
+dir-sup:: Directive Supplement
+iwa-sup:: International Workshop Agreement Supplement
+
+==== Examples
+
+[source]
+----
+urn:iso:std:iso:dir:1:ed-16:en
+  ISO/IEC Directives, Part 1, 16th edition, English
+
+urn:iso:std:iso:dir-sup:ed-11:en
+  ISO Supplement to Directives, 11th edition
+----
+
+[[ext-stage-codes]]
+=== Extended Stage Codes
+
+==== Syntax Definition
+
+[source,abnf]
+----
+status        = ( "draft" / "cancelled" ) / stage / typed-stage
+
+stage         = "stage-" stagecode ["." iteration]
+stagecode     = DIGIT DIGIT "."  DIGIT DIGIT
+                ; RFC 5141 harmonized stage codes
+
+typed-stage   = stage-abbr ["." iteration]
+                ; Human-readable stage abbreviations
+
+stage-abbr    = wd / cd / dis / fdis / amd-stage / cor-stage / 
+                ts-stage / other-stage
+
+wd            = "WD" / "WDS"    ; Working Draft (Study)
+cd            = "CD" / "CDV"    ; Committee Draft (for Vote)
+dis           = "DIS"           ; Draft International Standard
+fdis          = "FDIS"          ; Final Draft International Standard
+
+amd-stage     = "PDAM" / "DAM" / "FDAM"
+                ; Proposed/Draft/Final Draft Amendment
+
+cor-stage     = "DCOR" / "FDCOR"
+                ; Draft/Final Draft Corrigendum
+
+ts-stage      = "CDTS" / "FDTS" / "DTS"
+                ; Committee/Final/Draft Technical Specification
+
+other-stage   = 2*8ALPHA
+                ; Future stage codes
+
+iteration     = DIGITS
+                ; Iteration number (no 'v' prefix to avoid ambiguity)
+----
+
+==== Stage Code Semantics
+
+Stage codes represent position in ISO development:
+
+* WD: Working Draft (early development)
+* CD: Committee Draft (committee review)
+* DIS: Draft International Standard (member body ballot)
+* FDIS: Final Draft International Standard (final approval)
+
+Iterations represent sequential versions at same stage:
+
+* First iteration: implied (no `.iteration`)
+* Second iteration: `.2`
+* Third iteration: `.3`
+
+==== Examples
+
+[source]
+----
+urn:iso:std:iso:12345:WD.2:ed-1:en
+  Second working draft of ISO 12345
+
+urn:iso:std:iso-iec:27001:FDIS:ed-3:en
+  Final draft of ISO/IEC 27001, 3rd edition
+
+urn:iso:std:iso:9999:PDAM:ed-1:en:amd:1
+  Proposed draft of Amendment 1 to ISO 9999
+----
+
+[[ext-supplement-chains]]
+=== Supplement Chain Ordering
+
+==== Syntax Definition
+
+No syntax changes required. This section provides semantic guidance for RFC 5141 `*supplement` production.
+
+==== Ordering Semantics
+
+Supplements appear in chronological application order:
+
+[source,abnf]
+----
+std-nss = "std:" docidentifier 
+          *supplement      ; Applied left-to-right
+          *docelement 
+          [addition]
+----
+
+For multi-level chains:
+
+1. Base identifier (with edition)
+2. First-level supplement (amendment/corrigendum)
+3. Second-level supplement (corrigendum to amendment)
+4. Subsequent levels as needed
+
+==== Edition Placement Rules
+
+* Edition applies to the identifier immediately preceding it
+* In base context: edition of base document
+* In supplement context: edition of that supplement (rare)
+
+==== Examples
+
+.Corrigendum to Amendment
+[source]
+----
+urn:iso:std:iso:8859:-1:ed-1:amd:3:ed-1:cor:1
+  ISO 8859-1:ed-1, Amendment 3:ed-1, Corrigendum 1
+
+Parsing:
+- Base: ISO 8859-1, edition 1
+- Amendment 3 to base, edition 1 of amendment
+- Corrigendum 1 to that amendment
+----
+
+.Multiple Amendments with Corrigendum
+[source]
+----
+urn:iso:std:iso:9999:ed-2:amd:1:amd:2:ed-1:cor:1
+  ISO 9999, edition 2, Amendment 1, Amendment 2 edition 1, 
+  Corrigendum 1 to Amendment 2
+
+Parsing:
+- Base: ISO 9999, edition 2
+- Amendment 1 to base
+- Amendment 2 to base (also), edition 1 of amendment
+- Corrigendum 1 to Amendment 2
+----
+
+[[ext-base-stage]]
+=== Base Identifier Stage in Supplement Context
+
+==== Syntax Definition
+
+When specifying supplements to drafts, include stage in base identifier:
+
+[source,abnf]
+----
+docidentifier = originator [":" type] ":" docnumber 
+                [":" partnumber]
+                [[":" status] ":" edition]
+                [":" docversion] 
+                [":" language]
+
+; Status can now appear even when supplements follow
+; to indicate base document stage
+----
+
+==== Semantics
+
+* Stage before supplements indicates base document stage
+* Distinguishes published vs. draft base documents
+* Stage after supplement indication applies to supplement
+
+==== Examples
+
+[source]
+----
+urn:iso:std:iso:12345:DIS:ed-1:en:amd:1
+  Amendment 1 to DIS version of ISO 12345
+
+urn:iso:std:iso:12345:ed-1:en:amd:1:PDAM
+  Proposed draft of Amendment 1 to published ISO 12345:ed-1
+----
+
+[[ext-bundled]]
+=== Bundled Identifier Syntax
+
+==== Syntax Definition
+
+[source,abnf]
+----
+docidentifier = single-doc / bundled-doc
+
+single-doc    = originator [":" type] ":" docnumber 
+                [":" partnumber]
+                [[":" status] ":" edition]
+                [":" docversion] 
+                [":" language]
+
+bundled-doc   = single-doc "+" bundle-part *("+" bundle-part)
+
+bundle-part   = partnumber / docnumber
+                ; Part number or separate document
+----
+
+==== Semantics
+
+* Plus sign (`+`) separates bundled components
+* All components share same originator, type, edition, language
+* Maximum 10 components (practical limit)
+
+==== Examples
+
+[source]
+----
+urn:iso:std:iso:8601:-1+-2:ed-1:en
+  ISO 8601-1 and ISO 8601-2 together, edition 1, English
+
+urn:iso:std:iso:9000+9001:ed-5:en
+  ISO 9000 and ISO 9001 bundled, edition 5, English
+----
+
+[[ext-language-guidance]]
+=== Explicit Language Specification Guidance
+
+==== Principle
+
+RFC 5141 states:
+
+[quote]
+____
+If no language element is specified, <en> is assumed.
+____
+
+RFC 5141-bis clarifies: **Explicit is better than implicit**.
+
+==== Guidance
+
+* **SHOULD** include language for non-English documents
+* **MAY** include `:en` for English documents (recommended)
+* **MUST** include language for multilingual documents
+
+==== Rationale
+
+Explicit specification:
+
+* Removes ambiguity
+* Supports URN persistence (assumptions may change)
+* Improves machine processing
+* Aligns with W3C/IETF best practices
+
+==== Examples
+
+.Recommended (Explicit)
+[source]
+----
+urn:iso:std:iso:9999:ed-1:fr
+  French document, explicitly specified
+
+urn:iso:std:iso:9999:ed-1:en
+  English document, explicitly specified
+----
+
+.Deprecated (Implicit)
+[source]
+----
+urn:iso:std:iso:9999:ed-1
+  Language assumed to be English (ambiguous)
+----
+
+[[compatibility]]
+== Backward Compatibility
+
+=== General Principles
+
+RFC 5141-bis maintains full backward compatibility with RFC 5141:
+
+* All RFC 5141 URNs remain valid
+* All RFC 5141 syntax productions remain valid
+* Extensions are additive, not modifications
+* Implementations may adopt extensions progressively
+
+=== Migration Path
+
+Implementations may:
+
+1. Continue supporting only RFC 5141 (valid indefinitely)
+2. Add RFC 5141-bis extensions incrementally
+3. Fully implement RFC 5141-bis
+
+=== Versioning Strategy
+
+* No URN version indicator required
+* Parse<continue>r should attempt RFC 5141-bis syntax first
+* Fall back to RFC 5141 if extended syntax not matched
+* Generate URNs using most specific syntax available
+
+[[examples]]
+== Comprehensive Examples
+
+=== Triple Copublisher
+
+[source]
+----
+Human-readable: ISO/IEC/IEEE 29148:2018
+URN:            urn:iso:std:iso-iec-ieee:29148:ed-1:en
+
+Components:
+- originator: iso-iec-ieee (extended copublisher)
+- docnumber: 29148
+- edition: 1
+- language: en (explicit)
+----
+
+=== Directive Supplement
+
+[source]
+----
+Human-readable: ISO/IEC Directives Supplement:11th edition
+URN:            urn:iso:std:iso:dir-sup:ed-11:en
+
+Components:
+- originator: iso
+- type: dir-sup (extended document type)
+- edition: 11
+- language: en (explicit)
+----
+
+=== Corrigendum to Amendment Chain
+
+[source]
+----
+Human-readable: ISO 8859-1:2013/Amd 3:2016/Cor 1:2017
+URN:            urn:iso:std:iso:8859:-1:ed-5:en:amd:3:v1:en:cor:1:v1
+
+Components:
+- docidentifier: iso:8859:-1:ed-5:en
+- first supplement: amd:3:v1:en
+- second supplement: cor:1:v1 (to amendment)
+- Corrigendum applies to Amendment 3
+----
+
+=== Stage Iteration
+
+[source]
+----
+Human-readable: ISO/DIS 12345.2 (second DIS iteration)
+URN:            urn:iso:std:iso:12345:DIS.2:ed-1:en
+
+Components:
+- docnumber: 12345
+- status: DIS.2 (typed stage with iteration, no 'v' prefix)
+- edition: 1
+- language: en (explicit)
+----
+
+=== Bundled Identifier
+
+[source]
+----
+Human-readable: ISO 8601-1+8601-2:2019
+URN:            urn:iso:std:iso:8601:-1+-2:ed-1:en
+
+Components:
+- docnumber: 8601
+- partnumber: -1+-2 (bundled parts)
+- edition: 1
+- language: en (explicit)
+----
+
+=== Amendment to Draft
+
+[source]
+----
+Human-readable: ISO/FDIS 27001:ed-3/Amd 1
+URN:            urn:iso:std:iso:27001:FDIS:ed-3:en:amd:1:PDAM
+
+Components:
+- docnumber: 27001
+- base status: FDIS (draft base document)
+- base edition: 3
+- supplement: amd:1:PDAM (proposed draft amendment to FDIS)
+----
+
+[[abnf-summary]]
+[appendix]
+== Complete ABNF Syntax Summary
+
+This appendix provides the complete ABNF syntax combining RFC 5141 and RFC 5141-bis.
+
+[source,abnf]
+----
+; Namespace Specific String
+NSS           = std-nss
+
+std-nss       = "std:" docidentifier *supplement *docelement
+                [addition]
+
+; Document Identifier (Extended)
+docidentifier = single-doc / bundled-doc
+
+single-doc    = originator [":" type] ":" docnumber 
+                [":" partnumber]
+                [[":" status] ":" edition]
+                [":" docversion] 
+                [":" language]
+
+bundled-doc   = single-doc "+" bundle-part *("+" bundle-part)
+
+bundle-part   = partnumber / docnumber
+
+; Originator (Extended)
+originator    = predefined-orig / extended-orig
+
+predefined-orig = "iso" / "iso-iec" / "iso-cie" / "iso-astm" / 
+                  "iso-ieee" / "iec"
+
+extended-orig = org-id *("-" org-id)
+
+org-id        = "iso" / "iec" / "ieee" / "cie" / "astm" / 
+                other-org
+
+other-org     = 2*8ALPHA
+
+; Document Type (Extended)
+type          = predefined-type / extended-type
+
+predefined-type = "data" / "guide" / "isp" / "iwa" / 
+                  "pas" / "r" / "tr" / "ts" / "tta"
+
+extended-type = "dir" / "dir-sup" / "iwa-sup" / future-type
+
+future-type   = 2*10(ALPHA / "-")
+
+; Document Number and Part
+docnumber     = DIGITS
+
+partnumber    = "-" 1*( DIGIT / ALPHA / "-" )
+
+; Status (Extended)
+status        = ( "draft" / "cancelled" ) / stage / typed-stage
+
+stage         = "stage-" stagecode ["." iteration]
+
+stagecode     = DIGIT DIGIT "."  DIGIT DIGIT
+
+typed-stage   = stage-abbr ["." iteration]
+
+stage-abbr    = wd / cd / dis / fdis / amd-stage / cor-stage / 
+                ts-stage / other-stage
+
+wd            = "WD" / "WDS"
+cd            = "CD" / "CDV"
+dis           = "DIS"
+fdis          = "FDIS"
+amd-stage     = "PDAM" / "DAM" / "FDAM"
+cor-stage     = "DCOR" / "FDCOR"
+ts-stage      = "CDTS" / "FDTS" / "DTS"
+other-stage   = 2*8ALPHA
+
+iteration     = DIGITS
+
+; Edition and Version (RFC 5141)
+edition       = "ed-" DIGITS
+
+docversion    = "v" (simpleversion / isoversion)
+
+simpleversion = DIGITS
+
+isoversion    = baseversion *includedsuppl
+
+baseversion   = DIGITS
+
+includedsuppl = "-" suppltype supplnumber [ "." supplversion ]
+
+; Language (RFC 5141)
+language      = monolingual / bilingual / trilingual
+
+monolingual   = "en" / "fr" / "ru" / "es" / "ar"
+
+bilingual     = "en,fr" / "en,ru" / "fr,ru"
+
+trilingual    = "en,fr,ru"
+
+; Supplement (RFC 5141)
+supplement    = ":" suppltype ":" supplnumber
+                [":" supplversion ] [":" language ]
+
+suppltype     = "amd" / "cor" / "add"
+
+supplnumber   = DIGITS
+
+supplversion  = "v" DIGITS
+
+; Document Element (RFC 5141)
+docelement    = ":" ( "clause" / "figure" / "table" / "term" ) ":"
+                elementnumber / elementrange
+                *( "," elementnumber / elementrange )
+
+elementnumber = ( ALPHA / DIGITS ) *( "."  DIGITS )
+
+elementrange  = elementnumber "-" elementnumber
+
+; Addition (RFC 5141)
+addition      = techdefined / isodefined
+
+techdefined   = ":tech" *techelement
+
+techelement   = <unspecified>
+
+isodefined    = <unspecified>
+
+; Basic Types
+DIGITS        = DIGIT *DIGIT
+
+DIGIT         = %x30-39 ; 0-9
+
+ALPHA         = %x41-5A / %x61-7A ; A-Z / a-z
+----
+
+[[security]]
+[appendix]
+== Security Considerations
+
+This specification introduces no new security considerations beyond those in RFC 5141 <<RFC5141>>.
+
+The extended syntax:
+
+* Does not affect URN resolution security
+* Does not introduce new attack vectors
+* Maintains same validation requirements
+* Follows same lexical equivalence rules
+
+Implementations should:
+
+* Validate extended syntax before processing
+* Reject malformed URNs
+* Apply length limits to prevent DoS
+* Follow RFC 5141 security guidance
+
+[[iana]]
+[appendix]
+== IANA Considerations
+
+This document requests no IANA actions. The URN namespace "iso" (NID 29) assigned in RFC 5141 remains unchanged.
+
+Registry updates should be managed by the ISO Central Secretariat as specified in RFC 5141.
+
+[[references]]
+[bibliography]
+== References
+
+* [[[RFC5141,RFC 5141]]], Goodwin, J., Apel, H., "A Uniform Resource Name (URN) Namespace for the International Organization for Standardization (ISO)", RFC 5141, March 2008
+
+* [[[RFC2141,RFC 2141]]], Moats, R., "URN Syntax", RFC 2141, May 1997
+
+* [[[RFC5234,RFC 5234]]], Crocker, D., Overell, P., "Augmented BNF for Syntax Specifications: ABNF", STD 68, RFC 5234, January 2008
+
+* [[[ISODIR-1,ISO/IEC Directives Part 1]]], "Procedures for the technical work", Edition 15, 2023
+
+* [[[ISODIR-2,ISO/IEC Directives Part 2]]], "Principles and rules for the structure and drafting of ISO and IEC documents", Edition 9, 2021
+
+[appendix]
+== Acknowledgments
+
+This specification builds upon RFC 5141 by J. Goodwin and H. Apel.
+
+The limitations documented here were identified through implementation experience by the Ribose PubID project team and the broader standards development community.
+
+Contributors include:
+- Ronald Tse (Ribose)
+- Nick Nicholas (Ribose)
+- Various members of the ISO and IEC communities
+
+[appendix]
+== Change Log
+
+=== Draft 1 (2025-12-01)
+
+* Initial draft of RFC 5141-bis
+* Documentation of RFC 5141 limitations
+* Extended copublisher syntax
+* Extended document types
+* Extended stage codes
+* Supplement chain ordering semantics
+* Base identifier stage specification
+* Bundled identifier syntax
+* Language specification guidance
+* Complete ABNF syntax summary
