@@ -1,4 +1,4 @@
-## Current Status (Session 81 Complete - RFC 5141-bis URN GENERATOR CREATED!)
+## Current Status (Session 82 Complete - RFC 5141-bis SIMPLIFIED!)
 
 **Overall V2 Status:**
 - **13/13 flavors with V2 implementations (100%!)**
@@ -7,84 +7,81 @@
 - **Perfect implementations:** 7 (IDF, IEEE, NIST, JIS, ETSI, ANSI, ITU) 🌟
 - **Near-Perfect (99%+):** 3 (ISO, CCSDS, PLATEAU) 🌟
 - **V1 Code:** 4 gems archived to `archived-gems/`
-- **RFC 5141-bis:** URN Generator architecture CREATED! ✅
+- **RFC 5141-bis:** URN Generator SIMPLIFIED to bis-only! ✅
 
-**Session 81 MAJOR ACHIEVEMENT - RFC 5141-BIS URN GENERATOR:**
-- Created 258-line UrnGenerator class with clean architecture
-- Implemented RFC 5141-bis extensions (explicit language, typed stages, extended types)
-- Fixed 4 supplement URN tests (13 → 9 failures)
-- Clean separation of URN generation from identifier logic
-- **Decision:** RFC 5141-bis ONLY (no backward compatibility needed)
+**Session 82 ACHIEVEMENT - RFC 5141-BIS SIMPLIFICATION:**
+- Simplified UrnGenerator from 325 to 290 lines (RFC 5141-bis only)
+- Removed dual-mode support (MODE_RFC5141/MODE_BIS)
+- Fixed type_code comparison bug (string vs symbol)
+- Amendment URNs: 0/49 → 21/49 passing (+42.9%)
+- Overall URNs: 185/328 passing (56.4%)
+- **Clean, single-focus implementation**
 
 **RFC 5141-bis Implementation Status:**
-- URN Generator: ✅ CREATED (Phase 1 complete)
-- Supplement tests: 9 failures remaining (76.5% → target 94%+)
-- Next: Simplify to bis-only + complete ISO URN tests (Sessions 82-84)
-- Documentation: Comprehensive specs and plans ready
-- Timeline: 6-7 sessions to RFC 5141-bis completion
+- Phase 0 (Discovery): ✅ COMPLETE (Sessions 79-81)
+- Phase 1 (Simplification): ✅ COMPLETE (Session 82)
+- Phase 2 (Core Fixes): ⏳ NEXT (Sessions 83-85, target 85-93%)
+- Phase 3 (Documentation): ⏳ PENDING (Sessions 86-87)
+- Timeline: 4-5 sessions to completion
 
-**Total Time Saved:** 20-25 sessions through discovery + analysis!
+**Total Time Saved:** 20-25 sessions through thorough discovery + analysis!
 
 ---
 
-## Session 81 Summary (RFC 5141-bis URN GENERATOR - CREATED!)
+## Session 82 Summary (RFC 5141-bis SIMPLIFICATION - COMPLETE!)
 
-**Achievement:** Implemented RFC 5141-bis URN Generator architecture
+**Achievement:** Simplified UrnGenerator to RFC 5141-bis only
 
 **What Was Done:**
-1. Created `lib/pubid_new/iso/urn_generator.rb` (258 lines)
-2. Implemented clean separation of URN generation from identifier logic
-3. Added component-based generation architecture
-4. Implemented RFC 5141-bis extensions (typed stages, explicit language)
-5. Fixed 4 supplement URN tests (13 → 9 failures)
-6. Decided on RFC 5141-bis ONLY (no backward compatibility)
+1. Removed MODE_RFC5141 and MODE_BIS constants (dual-mode eliminated)
+2. Removed `mode` parameter from `initialize()` and `to_urn()` methods
+3. Simplified all conditional logic to always use RFC 5141-bis behavior
+4. Fixed type_code comparison bug (string vs symbol, `:is` filtering)
+5. Updated identifier classes to remove mode parameter
 
-**Key Implementation Created:**
-- `lib/pubid_new/iso/urn_generator.rb` - URN generation engine
-  - Component-based architecture
-  - Typed stage code mapping (WD, CD, DIS, FDIS, PDAM, etc.)
-  - Extended document type support (DIR, DIR-SUP, IWA-SUP)
-  - Explicit language specification
-  - Published document stage filtering
-  - Dynamic copublisher handling
+**Code Changes:**
+- `lib/pubid_new/iso/urn_generator.rb`: 325 → 290 lines (-35 lines)
+- `lib/pubid_new/iso/single_identifier.rb`: Updated to_urn signature
+- `lib/pubid_new/iso/supplement_identifier.rb`: Updated to_urn signature
 
-**Major Features:**
-1. **Clean Architecture:**
-   - Separation of concerns (URN generation vs identifier logic)
-   - Single responsibility per method
-   - Extensible design for future additions
+**Test Results:**
+- **Amendment URNs:** 0/49 → 21/49 (+42.9%)
+- **Overall URNs:** 185/328 (56.4%), 143 failures, 34 pending
+- **Key fix:** International Standard (`:is`) now correctly filtered from URNs
 
-2. **RFC 5141-bis Extensions Implemented:**
-   - Explicit language specification (explicit > implicit)
-   - Typed stage codes (WD, CD, DIS, FDIS, etc.)
-   - Extended document types (DIR, DIR-SUP, IWA-SUP)
-   - Dynamic copublisher combinations
-   - Published document filtering (no stage-60.00)
+**Major Improvements:**
+1. **Cleaner Code:**
+   - Single-focus implementation (RFC 5141-bis only)
+   - No mode checking overhead
+   - Faster execution
+   - Easier to maintain
 
-3. **Test Improvements:**
-   - Supplement tests: 13 failures → 9 failures (+4 tests fixed)
-   - Pass rate: 69.2% → 76.5% (+7.3pp)
-   - Foundation for 94%+ in Session 82
+2. **Bug Fixes:**
+   - Fixed type_code string vs symbol comparison
+   - Correctly filters `:is` type from URNs
+   - Simplified component lookup
 
-**Strategic Decision:**
-- **RFC 5141-bis ONLY** - No backward compatibility needed
-- Simplify implementation (remove dual-mode support)
-- Focus exclusively on RFC 5141-bis standard
+3. **Foundation Ready:**
+   - Clean base for remaining fixes
+   - Clear separation of concerns
+   - Ready for stage handling enhancements
 
-**Time:** ~70 minutes (design + implementation + testing)
+**Time:** ~60 minutes (simplification + testing)
 
-**Status:** Phase 1 of RFC 5141-bis implementation COMPLETE! 🎉
-
-**Files Created:**
-- `lib/pubid_new/iso/urn_generator.rb` (258 lines)
-- `docs/SESSION-82-CONTINUATION-PLAN.md` (436 lines)
-- `docs/RFC-5141-BIS-IMPLEMENTATION-STATUS.md` (345 lines)
+**Status:** Phase 1 COMPLETE! Ready for Phase 2 (Core Fixes) 🎉
 
 **Files Modified:**
-- `lib/pubid_new/iso/single_identifier.rb` - Uses UrnGenerator
-- `lib/pubid_new/iso/supplement_identifier.rb` - Uses UrnGenerator
+- `lib/pubid_new/iso/urn_generator.rb` (290 lines, simplified)
+- `lib/pubid_new/iso/single_identifier.rb` (to_urn signature)
+- `lib/pubid_new/iso/supplement_identifier.rb` (to_urn signature)
 
-**Next:** Session 82 simplification + fix remaining URN tests
+**Files Created:**
+- `docs/SESSION-83-CONTINUATION-PLAN.md` (458 lines)
+- Updated `docs/RFC-5141-BIS-IMPLEMENTATION-STATUS.md` (355 lines)
+
+**Commit:** `bcb0aa4` - refactor(iso): simplify UrnGenerator to RFC 5141-bis only
+
+**Next:** Session 83 - Fix stage handling (target: 68-72% passing)
 
 ---
 
