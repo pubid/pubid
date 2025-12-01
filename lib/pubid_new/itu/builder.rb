@@ -5,6 +5,7 @@ require_relative "components/sector"
 require_relative "components/series"
 require_relative "components/code"
 require_relative "identifiers/recommendation"
+require_relative "identifiers/combined_identifier"
 require_relative "identifiers/supplement"
 require_relative "identifiers/amendment"
 require_relative "identifiers/corrigendum"
@@ -22,11 +23,34 @@ module PubidNew
           return build_supplement(data)
         end
 
-        # Build basic recommendation
+        # Build basic recommendation or combined identifier
         sector = Components::Sector.new(sector: data[:sector].to_s)
         series = Components::Series.new(series: data[:series].to_s) if data[:series]
         code = build_code(data) if data[:number]
         date = build_date(data) if data[:year]
+
+        # Check if this is a combined identifier (has combined_series and combined_number)
+        if data[:combined_series] || data[:combined_number]
+          combined_series = Components::Series.new(
+            series: data[:combined_series][:series].to_s
+          ) if data[:combined_series]
+          
+          combined_code = Components::Code.new(
+            number: data[:combined_number].to_s,
+            subseries: data[:combined_subseries]&.to_s,
+            parts: extract_parts(data[:combined_parts])
+          ) if data[:combined_number]
+
+          return Identifiers::CombinedIdentifier.new(
+            sector: sector,
+            series: series,
+            code: code,
+            combined_series: combined_series,
+            combined_code: combined_code,
+            date: date,
+            language: data[:language]&.to_s
+          )
+        end
 
         Identifiers::Recommendation.new(
           sector: sector,

@@ -67,7 +67,12 @@ module PubidNew
 
       # Combined identifier (Y.1351 part after slash)
       rule(:combined_suffix) do
-        str("/") >> series >> dot >> code
+        str("/") >>
+          series.as(:combined_series) >>
+          dot >>
+          digits.as(:combined_number) >>
+          subseries.maybe >>
+          parts
       end
 
       # Supplement types
