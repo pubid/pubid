@@ -225,7 +225,7 @@ module PubidNew
         stage_code = identifier.typed_stage.stage_code
         return nil if !stage_code || stage_code == :published
 
-        # Use typed stage abbreviations
+        # Try typed stage abbreviations first (RFC 5141-bis explicit abbreviations)
         if TYPED_STAGE_MAP.key?(stage_code)
           stage_abbr = TYPED_STAGE_MAP[stage_code]
 
@@ -237,9 +237,20 @@ module PubidNew
           return stage_abbr
         end
 
-        # For stages not in TYPED_STAGE_MAP, return nil
-        # (published documents are already filtered above)
-        nil
+        # Fallback: use harmonized stage codes for unmapped stages
+        # This handles stages like PWI, NP, AWI, PRF that don't have typed abbreviations
+        harmonized_codes = identifier.typed_stage.harmonized_stages
+        return nil unless harmonized_codes && harmonized_codes.any?
+        
+        # Use first harmonized code from the array
+        harmonized_code = harmonized_codes.first
+        
+        # Skip published documents (60.00, 60.60)
+        return nil if harmonized_code.start_with?("60.")
+
+        # Format as stage-XX.XX
+        # NOTE: Iteration for harmonized codes goes in version part (v1.2), NOT in stage code
+        "stage-#{harmonized_code}"
       end
 
       # Generate edition component
