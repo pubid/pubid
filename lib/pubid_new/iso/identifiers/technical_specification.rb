@@ -61,6 +61,7 @@ module PubidNew
 
         Components::TypedStage.new(
           code: :dts,
+          stage_code: :dts,
           type_code: :ts,
           abbr: ["DTS"],
           name: "Draft Technical Specification",
@@ -68,6 +69,7 @@ module PubidNew
         ),
         Components::TypedStage.new(
           code: :fdts,
+          stage_code: :fdts,
           type_code: :ts,
           abbr: ["FDTS"],
           name: "Final Draft Technical Specification",

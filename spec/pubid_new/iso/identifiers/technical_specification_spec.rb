@@ -259,7 +259,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       subject { "ISO/TS 10303- 1751:2014" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/TS 10303-1751:2014" }
-      let(:urn) { "urn:iso:std:iso:ts:10303:- 1751" }
+      let(:urn) { "urn:iso:std:iso:ts:10303:-1751" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -371,7 +371,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         end
 
         it "parses stage" do
-          expect(parsed.typed_stage.stage_code).to be_nil
+          expect(parsed.typed_stage.stage_code).to eq("dts")
         end
 
         it "round-trips" do
@@ -402,7 +402,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         end
 
         it "parses stage" do
-          expect(parsed.typed_stage.stage_code).to be_nil
+          expect(parsed.typed_stage.stage_code).to eq("dts")
         end
 
         it "round-trips" do
@@ -433,7 +433,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.typed_stage.stage_code).to be_nil
+        expect(parsed.typed_stage.stage_code).to eq("dts")
       end
 
       it "parses iteration" do
@@ -472,7 +472,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.typed_stage.stage_code).to be_nil
+        expect(parsed.typed_stage.stage_code).to eq("dts")
       end
 
       it "parses iteration" do
@@ -591,7 +591,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.typed_stage.stage_code).to be_nil
+        expect(parsed.typed_stage.stage_code).to eq("dts")
       end
 
       it "round-trips" do

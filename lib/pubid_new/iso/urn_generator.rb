@@ -145,6 +145,11 @@ module PubidNew
         supplement_chain.each do |supp|
           supp_gen = self.class.new(supp)
           
+          # Supplement edition (if the supplement itself has an edition)
+          if supp.edition && supp.edition.number
+            parts << "ed-#{supp.edition.number}"
+          end
+          
           # Supplement stage (for draft supplements)
           stage_comp = supp_gen.send(:stage_component)
           parts << stage_comp if stage_comp
