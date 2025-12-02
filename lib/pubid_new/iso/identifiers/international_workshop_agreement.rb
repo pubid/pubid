@@ -64,7 +64,7 @@ module PubidNew
             type_code: :iwa,
             abbr: ["PRF IWA"],
             name: "Proof International Workshop Agreement",
-            harmonized_stages: %w[60.00],
+            harmonized_stages: %w[50.00],
           ),
           Components::TypedStage.new(
             code: :iwa,

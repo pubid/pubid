@@ -14,7 +14,7 @@ module PubidNew
           type_code: :suppl,
           abbr: ["NP Suppl"],
           name: "New Work Item Proposal for Supplement",
-          harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
+          harmonized_stages: %w[10.00 10.20 10.60 10.92 10.93 10.98],
         ),
         Components::TypedStage.new(
           code: :awisuppl,
@@ -62,7 +62,7 @@ module PubidNew
           type_code: :suppl,
           abbr: ["PRF Suppl"],
           name: "Proof Supplement",
-          harmonized_stages: %w[60.00],
+          harmonized_stages: %w[50.00],
         ),
         Components::TypedStage.new(
           code: :pubsuppl,

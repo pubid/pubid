@@ -130,9 +130,45 @@ module PubidNew
           part_comp = base_gen.send(:part_component)
           parts << part_comp if part_comp
           
-          # Base edition (before any supplement editions)
+          # Collect ALL editions (base + supplements) and add them here
+          # This ensures editions come before all supplement chains
+          all_editions = []
+          
+          # Base edition first
           edition_comp = base_gen.send(:edition_component)
-          parts << edition_comp if edition_comp
+          all_editions << edition_comp if edition_comp
+          
+          # Then supplement editions
+          supplement_chain.each do |supp|
+            if supp.edition && supp.edition.number
+              all_editions << "ed-#{supp.edition.number}"
+            end
+          end
+          
+          # Add all editions to parts
+          parts.concat(all_editions)
+          
+          # Base stage logic:
+          # - Include if base is proposal stage (10.xx) and supplement has different stage
+          # - Don't include if base is approval/publication stage (50.xx, 60.xx)
+          # - Don't include if supplement has same stage as base
+          base_stage_comp = base_gen.send(:stage_component)
+          if base_stage_comp
+            # Check if any supplement has a stage
+            supplement_stages = supplement_chain.map do |supp|
+              supp_gen = self.class.new(supp)
+              supp_gen.send(:stage_component)
+            end.compact
+            
+            # Only include base stage if:
+            # 1. No supplements have a stage, OR
+            # 2. Base is proposal stage (starts with "stage-10.") AND supplements don't duplicate it
+            if supplement_stages.empty?
+              parts << base_stage_comp
+            elsif base_stage_comp.start_with?("stage-10.") && !supplement_stages.include?(base_stage_comp)
+              parts << base_stage_comp
+            end
+          end
           
           # Base language (if present)
           if base_id.languages&.any?
@@ -145,12 +181,8 @@ module PubidNew
         supplement_chain.each do |supp|
           supp_gen = self.class.new(supp)
           
-          # Supplement edition (if the supplement itself has an edition)
-          if supp.edition && supp.edition.number
-            parts << "ed-#{supp.edition.number}"
-          end
-          
           # Supplement stage (for draft supplements)
+          # Note: editions are added at base level, not here
           stage_comp = supp_gen.send(:stage_component)
           parts << stage_comp if stage_comp
           
@@ -164,8 +196,9 @@ module PubidNew
             parts << supp.date.year.to_s
             
             # Version with "v" prefix
+            # Amendments/Corrigenda keep iteration, generic Supplements don't
             if supp.number
-              if supp.stage_iteration
+              if supp.stage_iteration && !supp.is_a?(PubidNew::Iso::Identifiers::Supplement)
                 parts << "v#{supp.number.value}.#{supp.stage_iteration.value}"
               else
                 parts << "v#{supp.number.value}"
@@ -177,8 +210,9 @@ module PubidNew
               parts << supp.number.value
             end
             
-            # Always add "v1" (or with iteration) when no date
-            if supp.stage_iteration
+            # Always add "v1" when no date
+            # Amendments/Corrigenda keep iteration, generic Supplements don't
+            if supp.stage_iteration && !supp.is_a?(PubidNew::Iso::Identifiers::Supplement)
               parts << "v1.#{supp.stage_iteration.value}"
             else
               parts << "v1"
@@ -270,8 +304,11 @@ module PubidNew
         # Use first harmonized code from the array
         harmonized_code = harmonized_codes.first
         
-        # Skip published documents (60.00, 60.60)
-        return nil if harmonized_code.start_with?("60.")
+        # Skip published documents (60.00, 60.60) EXCEPT for PRF (Proof) stage
+        # PRF is at 60.00 but should still be included in URNs
+        if harmonized_code.start_with?("60.")
+          return nil unless stage_code.to_s == "prf"
+        end
 
         # Format as stage-XX.XX
         stage_part = "stage-#{harmonized_code}"

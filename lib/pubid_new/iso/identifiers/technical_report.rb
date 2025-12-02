@@ -58,7 +58,7 @@ module PubidNew
           type_code: :tr,
           abbr: ["PDTR"],
           name: "Proposed Draft Technical Report",
-          harmonized_stages: %w[40.00 40.20 40.60 40.92 40.93 40.98 40.99],
+          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
         ),
 
         Components::TypedStage.new(
