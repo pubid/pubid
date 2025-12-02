@@ -24,7 +24,8 @@ module PubidNew
           type: data[:type]&.to_s,
           edition: data[:edition]&.to_s,
           suffix: data[:suffix]&.to_s,
-          corrigenda: corrigenda.empty? ? nil : corrigenda
+          corrigenda: corrigenda.empty? ? nil : corrigenda,
+          language: data[:language]&.to_s
         )
       end
     end

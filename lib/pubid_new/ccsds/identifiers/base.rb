@@ -15,6 +15,7 @@ module PubidNew
         attribute :edition, :string
         attribute :suffix, :string  # Optional suffix like -S
         attribute :corrigenda, :integer, collection: true
+        attribute :language, :string  # Language metadata (e.g., "French", "Russian")
 
         def publisher
           "CCSDS"
@@ -32,6 +33,9 @@ module PubidNew
             corrigenda.each { |num| result += " Cor. #{num}" }
           end
 
+          # Add language metadata
+          result += " - #{language} Translated" if language
+
           result
         end
 
@@ -43,7 +47,8 @@ module PubidNew
             type == other.type &&
             edition == other.edition &&
             suffix == other.suffix &&
-            corrigenda == other.corrigenda
+            corrigenda == other.corrigenda &&
+            language == other.language
         end
       end
     end
