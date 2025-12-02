@@ -74,19 +74,27 @@ module PubidNew
         end
 
         # DirectivesSupplement use urn:iso:doc scheme (not urn:iso:std)
-        # Format: urn:iso:doc:{base_urn_parts}:sup:{supplement_publisher}[:{year}][:{edition}]
+        # Format: urn:iso:doc:{base_urn_parts}:jtc:X:sup[:{year}][:{edition}]
         def to_urn
           # Start with base identifier's URN parts (it will use urn:iso:doc scheme)
           base_urn = base_identifier.to_urn
           
-          # Build supplement part
-          parts = [base_urn, "sup"]
-          
-          # Supplement publisher (lowercase)
-          parts << supplement_publisher.body.downcase if supplement_publisher
+          # Handle JTC pattern specially
+          if supplement_publisher && supplement_publisher.body.match?(/^JTC\s+(\d+)$/i)
+            # Extract JTC number: "JTC 1" -> ["jtc", "1"]
+            jtc_parts = supplement_publisher.body.downcase.split
+            # Insert JTC parts before "sup"
+            parts = base_urn.split(":")
+            parts.concat(jtc_parts)  # Add "jtc" and "1"
+            parts << "sup"
+          else
+            # Normal supplement
+            parts = [base_urn, "sup"]
+            parts << supplement_publisher.body.downcase if supplement_publisher
+          end
           
           # Year (if present)
-          parts << date.year if date
+          parts << date.year.to_s if date
           
           # Edition (if present)
           parts << "ed-#{edition.number}" if edition && edition.number

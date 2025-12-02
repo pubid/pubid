@@ -231,7 +231,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
       subject { "ISO 4037-1979/Add. 1-1983(F)" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO 4037:1979/Add 1:1983(fr)" }
-      let(:urn) { "urn:iso:std:iso:4037:sup:1983:v1" }
+      let(:urn) { "urn:iso:std:iso:4037:sup:1983:v1:fr" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -386,7 +386,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
     describe "ISO 2631/DAD 1" do
       subject { "ISO 2631/DAD 1" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:2631:stage-draft:sup:1:v1" }
+      let(:urn) { "urn:iso:std:iso:2631:stage-40.00:sup:1:v1" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -428,7 +428,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
     describe "ISO 2553/DAD 1:1987" do
       subject { "ISO 2553/DAD 1:1987" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:2553:stage-draft:sup:1987:v1" }
+      let(:urn) { "urn:iso:std:iso:2553:stage-40.00:sup:1987:v1" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -470,7 +470,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Addendum do
     describe "ISO/DIS 1151-1/DAD 2" do
       subject { "ISO/DIS 1151-1/DAD 2" }
       let(:parsed) { PubidNew::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:1151:-1:stage-draft:stage-draft:sup:2:v1" }
+      let(:urn) { "urn:iso:std:iso:1151:-1:stage-40.00:sup:2:v1" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")

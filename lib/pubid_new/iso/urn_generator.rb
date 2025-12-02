@@ -96,76 +96,96 @@ module PubidNew
       end
 
       # Generate URN for supplement identifier
+      # Handles multi-level supplements by walking up the chain
       def generate_supplement_urn
-        # Build base URN components manually to have fine control
-        # Start with base identifier components
-        base_parts = ["urn", "iso", "std"]
+        # Walk up supplement chain to collect all supplements
+        current = identifier
+        supplement_chain = []
         
-        if identifier.base_identifier
-          base_id = identifier.base_identifier
+        while current.is_a?(SupplementIdentifier)
+          supplement_chain.unshift(current)  # Add to front (reverse order)
+          current = current.base_identifier
+        end
+        
+        # Now 'current' is the base document (not a supplement)
+        base_id = current
+        
+        # Build URN from base identifier
+        parts = ["urn", "iso", "std"]
+        
+        if base_id
+          base_gen = self.class.new(base_id)
           
           # Publisher
-          base_gen = self.class.new(base_id)
-          base_parts << base_gen.send(:originator_component)
+          parts << base_gen.send(:originator_component)
           
-          # Type
+          # Type (for non-IS types like TR, TS, Guide)
           type_comp = base_gen.send(:type_component)
-          base_parts << type_comp if type_comp
+          parts << type_comp if type_comp
           
           # Number
-          base_parts << base_id.number.value if base_id.number
+          parts << base_id.number.value if base_id.number
           
           # Part
           part_comp = base_gen.send(:part_component)
-          base_parts << part_comp if part_comp
+          parts << part_comp if part_comp
           
-          # Base stage: only include if:
-          # 1. Base has a non-published stage
-          # 2. Supplement doesn't have its own stage (supplement stage takes precedence)
-          has_supplement_stage = identifier.typed_stage &&
-                                 identifier.typed_stage.stage_code != :published
-          
-          # Let stage_component decide if stage should be included
-          # It already checks for published documents
-          unless has_supplement_stage
-            base_stage = base_gen.send(:stage_component)
-            base_parts << base_stage if base_stage
-          end
-          
-          # Base edition
+          # Base edition (before any supplement editions)
           edition_comp = base_gen.send(:edition_component)
-          base_parts << edition_comp if edition_comp
+          parts << edition_comp if edition_comp
           
-          # Base language (for base identifier, not supplement)
+          # Base language (if present)
           if base_id.languages&.any?
             lang_comp = base_id.languages.map(&:code).join(",")
-            base_parts << lang_comp
+            parts << lang_comp
           end
         end
         
-        # Now add supplement-specific parts
-        parts = base_parts
-        
-        # Edition (for supplements with their own edition)
-        if identifier.edition && identifier.edition.number
-          parts << "ed-#{identifier.edition.number}"
+        # Now flatten all supplements in order
+        supplement_chain.each do |supp|
+          supp_gen = self.class.new(supp)
+          
+          # Supplement stage (for draft supplements)
+          stage_comp = supp_gen.send(:stage_component)
+          parts << stage_comp if stage_comp
+          
+          # Supplement type code (amd, cor, sup)
+          suppl_type = supp_gen.send(:supplement_type_component)
+          parts << suppl_type if suppl_type
+          
+          # Year and version (following RFC 5141-bis supplement semantics)
+          if supp.date
+            # With date: year:vN
+            parts << supp.date.year.to_s
+            
+            # Version with "v" prefix
+            if supp.number
+              if supp.stage_iteration
+                parts << "v#{supp.number.value}.#{supp.stage_iteration.value}"
+              else
+                parts << "v#{supp.number.value}"
+              end
+            end
+          else
+            # Without date: N:v1 (number directly, then "v1")
+            if supp.number
+              parts << supp.number.value
+            end
+            
+            # Always add "v1" (or with iteration) when no date
+            if supp.stage_iteration
+              parts << "v1.#{supp.stage_iteration.value}"
+            else
+              parts << "v1"
+            end
+          end
+          
+          # Supplement language (RFC 5141-bis: explicit specification)
+          if supp.languages&.any?
+            lang_comp = supp.languages.map(&:code).join(",")
+            parts << lang_comp
+          end
         end
-        
-        # Stage (for draft supplements like FDAM, PDAM)
-        stage_comp = stage_component
-        parts << stage_comp if stage_comp
-        
-        # Supplement type code (amd, cor, sup)
-        suppl_type = supplement_type_component
-        parts << suppl_type if suppl_type
-        
-        # Year/number and version
-        year_version_parts = supplement_year_version_components
-        parts.concat(year_version_parts) if year_version_parts.any?
-        
-        # Language (for supplement itself, RFC 5141-bis: explicit specification)
-        lang_comp = language_component
-        parts << lang_comp if lang_comp
         
         parts.join(":")
       end
@@ -249,8 +269,15 @@ module PubidNew
         return nil if harmonized_code.start_with?("60.")
 
         # Format as stage-XX.XX
-        # NOTE: Iteration for harmonized codes goes in version part (v1.2), NOT in stage code
-        "stage-#{harmonized_code}"
+        stage_part = "stage-#{harmonized_code}"
+        
+        # For base identifiers (not supplements), include iteration in stage code
+        # For supplements, iteration goes in the version part (v1.2)
+        if identifier.stage_iteration && !identifier.is_a?(SupplementIdentifier)
+          stage_part += ".v#{identifier.stage_iteration.value}"
+        end
+        
+        stage_part
       end
 
       # Generate edition component

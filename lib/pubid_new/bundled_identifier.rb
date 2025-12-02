@@ -63,6 +63,51 @@ module PubidNew
       result
     end
 
+    # Generate URN for bundled identifier
+    # Flattens all components into a single URN
+    #
+    # Example: "ISO/IEC DIR 1:2022 + IEC SUP:2022"
+    #          → "urn:iso:doc:iso-iec:dir:1:2022:iec:sup:2022"
+    def to_urn
+      # Start with base document URN components
+      parts = base_document.to_urn.split(":")
+
+      # Add each supplement's components
+      supplements.each do |supplement|
+        # For DirectivesSupplement: add organization and "sup" (not "dir-sup")
+        if supplement.class.name&.include?("DirectivesSupplement")
+          # Add organization (e.g., "IEC")
+          if supplement.respond_to?(:supplement_publisher) && supplement.supplement_publisher
+            parts << supplement.supplement_publisher.body.downcase
+          end
+          
+          # Always add "sup" for DirectivesSupplement (not "dir-sup")
+          parts << "sup"
+          
+          # Add year
+          parts << supplement.date.year.to_s if supplement.date
+        else
+          # For other supplements: use typed_stage type_code
+          if supplement.typed_stage
+            type_code = supplement.typed_stage.type_code
+            parts << type_code.to_s unless type_code == :is
+          end
+
+          # Add supplement date
+          if supplement.date
+            parts << supplement.date.year.to_s
+          end
+
+          # Add supplement number if present
+          if supplement.number
+            parts << "v#{supplement.number.value}"
+          end
+        end
+      end
+
+      parts.join(":")
+    end
+
     # Support comparison for sorting
     def <=>(other)
       return nil unless other.is_a?(BundledIdentifier)
