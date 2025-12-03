@@ -70,16 +70,12 @@ module PubidNew
           parts << type_short
         end
         
-        # Number with part/subpart
+        # Number with part (which may be multi-level like "5-1-1")
         if number
           number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
           if part
             part_val = part.respond_to?(:value) ? part.value : part
             number_str += "-#{part_val}"
-          end
-          if subpart
-            subpart_val = subpart.respond_to?(:value) ? subpart.value : subpart
-            number_str += "-#{subpart_val}"
           end
           parts << number_str
         end

@@ -66,18 +66,18 @@ RSpec.describe "CEN Identifier Integration" do
     context "bundled identifiers (+ operator)" do
       it "parses single bundled corrigendum" do
         identifier = PubidNew::Cen.parse("EN 10077-1:2006+AC:2009")
-        expect(identifier).to be_a(PubidNew::BundledIdentifier)
+        expect(identifier).to be_a(PubidNew::Cen::Identifiers::ConsolidatedIdentifier)
         expect(identifier.to_s).to eq("EN 10077-1:2006+AC:2009")
-        expect(identifier.base_document).to be_a(PubidNew::Cen::Identifiers::EuropeanNorm)
-        expect(identifier.supplements.length).to eq(1)
-        expect(identifier.supplements.first).to be_a(PubidNew::Cen::Identifiers::Corrigendum)
+        expect(identifier.identifiers.first).to be_a(PubidNew::Cen::Identifiers::EuropeanNorm)
+        expect(identifier.identifiers.length).to eq(2)  # base + 1 supplement
+        expect(identifier.identifiers.last).to be_a(PubidNew::Cen::Identifiers::Corrigendum)
       end
 
       it "parses multiple bundled supplements" do
         identifier = PubidNew::Cen.parse("EN 10077-1:2006+AC:2009+AC2:2009")
-        expect(identifier).to be_a(PubidNew::BundledIdentifier)
+        expect(identifier).to be_a(PubidNew::Cen::Identifiers::ConsolidatedIdentifier)
         expect(identifier.to_s).to eq("EN 10077-1:2006+AC:2009+AC2:2009")
-        expect(identifier.supplements.length).to eq(2)
+        expect(identifier.identifiers.length).to eq(3)  # base + 2 supplements
       end
 
       it "renders bundled identifiers without spaces around +" do
@@ -91,17 +91,19 @@ RSpec.describe "CEN Identifier Integration" do
     context "slash supplements (/ operator)" do
       it "parses and renders amendment" do
         identifier = PubidNew::Cen.parse("EN 1234:1999/A1:2005")
-        expect(identifier).to be_a(PubidNew::Cen::Identifiers::Amendment)
+        expect(identifier).to be_a(PubidNew::Cen::Identifiers::ConsolidatedIdentifier)
         expect(identifier.to_s).to eq("EN 1234:1999/A1:2005")
-        expect(identifier.base_identifier).to be_a(PubidNew::Cen::Identifiers::EuropeanNorm)
-        expect(identifier.number.value).to eq("1")
+        expect(identifier.identifiers.first).to be_a(PubidNew::Cen::Identifiers::EuropeanNorm)
+        expect(identifier.identifiers.last).to be_a(PubidNew::Cen::Identifiers::Amendment)
+        expect(identifier.identifiers.last.amendment_number).to eq("1")
       end
 
       it "parses and renders corrigendum" do
         identifier = PubidNew::Cen.parse("EN 1234:1999/AC1:2005")
-        expect(identifier).to be_a(PubidNew::Cen::Identifiers::Corrigendum)
+        expect(identifier).to be_a(PubidNew::Cen::Identifiers::ConsolidatedIdentifier)
         expect(identifier.to_s).to eq("EN 1234:1999/AC1:2005")
-        expect(identifier.number.value).to eq("1")
+        expect(identifier.identifiers.last).to be_a(PubidNew::Cen::Identifiers::Corrigendum)
+        expect(identifier.identifiers.last.corrigendum_number).to eq("1")
       end
     end
 

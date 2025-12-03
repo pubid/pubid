@@ -102,22 +102,14 @@ module PubidNew
           Components::Code.new(value: value.to_s)
 
         when :parts
-          # Extract first part as :part, rest as :subpart if needed
+          # Extract first part, preserve full multi-level part string
           parts_array = Array(value)
           if parts_array.any?
-            # Get the part string and split on dash to handle "1-1" pattern
+            # Get the part string - it may contain multiple dashes like "5-1-1"
             part_str = parts_array.first[:part].to_s
-            part_components = part_str.split("-")
             
-            # Return hash with :part (and potentially :subpart)
-            result = { part: Components::Code.new(value: part_components.first) }
-            if part_components.length > 1
-              result[:subpart] = Components::Code.new(value: part_components[1])
-            elsif parts_array.length > 1
-              # If no dash in first part, use second element of parts_array
-              result[:subpart] = Components::Code.new(value: parts_array[1][:part].to_s)
-            end
-            result
+            # Store the full part value for multi-level parts
+            { part: Components::Code.new(value: part_str) }
           end
 
         when :part
