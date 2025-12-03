@@ -15,9 +15,9 @@ module PubidNew
           parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
 
           # Supplement notation
-          # Use first abbreviation from array without forcing uppercase
-          abbr = typed_stage.abbr.first
-          supp_part = "/#{abbr} #{number.to_s}"
+          # Use uppercase abbreviation without space: /AMD1, /COR1
+          abbr = typed_stage.abbr.first.upcase
+          supp_part = "/#{abbr}#{number.to_s}"
           supp_part += ":#{date.year}" if date
           parts << supp_part
 

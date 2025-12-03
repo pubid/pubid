@@ -14,13 +14,7 @@ require_relative "iec/identifiers/publicly_available_specification"
 require_relative "iec/identifiers/guide"
 require_relative "iec/identifiers/test_report_form"
 require_relative "iec/identifiers/interpretation_sheet"
-require_relative "iec/identifiers/component_specification"
-require_relative "iec/identifiers/operational_document"
-require_relative "iec/identifiers/conformity_assessment"
 require_relative "iec/identifiers/systems_reference_document"
-require_relative "iec/identifiers/technology_report"
-require_relative "iec/identifiers/societal_technology_trend_report"
-require_relative "iec/identifiers/white_paper"
 require_relative "iec/identifiers/working_document"
 require_relative "iec/identifiers/amendment"
 require_relative "iec/identifiers/corrigendum"
@@ -42,13 +36,7 @@ module PubidNew
       Identifiers::Guide,
       Identifiers::TestReportForm,
       Identifiers::InterpretationSheet,
-      Identifiers::ComponentSpecification,
-      Identifiers::OperationalDocument,
-      Identifiers::ConformityAssessment,
       Identifiers::SystemsReferenceDocument,
-      Identifiers::TechnologyReport,
-      Identifiers::SocietalTechnologyTrendReport,
-      Identifiers::WhitePaper,
       Identifiers::WorkingDocument,
     ].freeze
 
