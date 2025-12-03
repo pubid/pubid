@@ -24,6 +24,7 @@ module PubidNew
         working_programme |
           working_document |
           supplement_supplement_identifier |
+          standalone_supplement |
           supplement_identifier |
           joint_identifier |
           identifier_copublishers
@@ -296,6 +297,15 @@ module PubidNew
         # "FRAG" (fragments of amendments)
         # "FRAGC" (fragments of corrigenda)
         (array_to_str(TYPED_STAGES_SUPPLEMENTS) | str("FRAGC") | str("FRAG")).as(:type_with_stage)
+      end
+
+      # Standalone draft supplement (no base identifier)
+      # IEC/FDAM 60038-1
+      # IEC/FDCOR 12345
+      rule(:standalone_supplement) do
+        prefix_with_copublishers >> str("/") >>
+          supplement_type_with_stage >>
+          space >> second_part >> third_part
       end
 
       # IEC 60038:2009/Amd 1:2011

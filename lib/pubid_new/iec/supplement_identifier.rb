@@ -15,7 +15,9 @@ module PubidNew
           parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
 
           # Supplement notation
-          supp_part = "/#{typed_stage.abbreviation.upcase}#{number.to_s}"
+          # Use first abbreviation from array without forcing uppercase
+          abbr = typed_stage.abbr.first
+          supp_part = "/#{abbr} #{number.to_s}"
           supp_part += ":#{date.year}" if date
           parts << supp_part
 
@@ -24,8 +26,24 @@ module PubidNew
 
           result = parts.join
         else
-          # For consolidated rendering (no base shown)
-          result = "/#{typed_stage.abbreviation.upcase}#{number.to_s}"
+          # Standalone supplement (no base identifier)
+          # Render: "IEC/FDAM 60038-1"
+          parts = []
+          
+          # Publisher portion
+          if publisher
+            parts << publisher.body
+            parts << "/" + copublishers.map(&:body).join("/") if copublishers&.any?
+          end
+          
+          # Supplement type and number with part
+          abbr = typed_stage.abbr.first
+          number_str = number.to_s
+          number_str += "-#{part.to_s}" if part
+          number_str += "-#{subpart.to_s}" if subpart
+          parts << "#{abbr} #{number_str}"
+          
+          result = parts.join("/")
           result += ":#{date.year}" if date
           result += " #{edition.to_s}" if edition && edition.number
           result
