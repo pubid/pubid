@@ -34,6 +34,7 @@ module PubidNew
         attribute :adoption, :string                        # Adoption notes
         attribute :amendment_to, :string                    # Amendment to relationships
         attribute :edition_month, :string                   # Month part from Edition YYYY-MM
+        attribute :space_before_draft, :boolean, default: -> { false }  # Track space before /D
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -220,7 +221,10 @@ module PubidNew
         # Parse a single IEEE identifier
         def self.parse_single(input)
           parsed = Parser.new.parse(input)
-          Builder.new.build(parsed)
+          builder = Builder.new
+          # Pass the original input string to builder for context
+          builder.instance_variable_set(:@original_input, input)
+          builder.build(parsed)
         end
 
         def to_s
@@ -247,11 +251,14 @@ module PubidNew
             # IEC style puts year after edition
             # Month style puts year after month
             result += "-#{year}" if year && !draft_obj && !edition && !month
+            
+            # Append draft to code - with or without space based on original format
+            if draft_obj
+              result += space_before_draft ? " #{draft_obj}" : draft_obj.to_s
+            end
+            
             parts << result
           end
-
-          # Draft
-          parts << draft_obj.to_s if draft_obj
 
           # Edition - with year if present (IEC style)
           if edition

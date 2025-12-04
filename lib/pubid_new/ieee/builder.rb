@@ -252,6 +252,7 @@ module PubidNew
         month = nil
         year = nil
         day = nil
+        comma_before_month = false
 
         if draft_data.is_a?(Hash)
           if draft_data[:draft_version]
@@ -266,9 +267,23 @@ module PubidNew
           revision = extract_value(draft_data[:revision]) if draft_data[:revision]
 
           # Extract date information from draft data
-          month = extract_value(draft_data[:month]) if draft_data[:month]
+          month_slice = draft_data[:month]
+          month = extract_value(month_slice) if month_slice
           year = extract_value(draft_data[:year]) if draft_data[:year]
           day = extract_value(draft_data[:day]) if draft_data[:day]
+          
+          # Detect comma before month and space before draft by checking the original input
+          if @original_input
+            if month
+              # Look for ", Month" pattern in the original input
+              comma_before_month = @original_input.match?(/,\s+#{Regexp.escape(month)}/i)
+            end
+            
+            # Check if there's a space before /D in the original input
+            if version && @original_input.match?(/\s+\/D#{Regexp.escape(version)}/i)
+              attributes[:space_before_draft] = true
+            end
+          end
         else
           version = extract_value(draft_data)
         end
@@ -283,6 +298,7 @@ module PubidNew
             year: year,
             day: day
           )
+          draft_obj.comma_before_month = comma_before_month
           attributes[:draft_obj] = draft_obj
           attributes[:draft] = draft_obj.to_s
         end

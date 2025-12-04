@@ -16,6 +16,8 @@ module PubidNew
         attribute :year, :string
         attribute :month, :string
         attribute :day, :string
+        attribute :original_month, :string  # Store original month format
+        attribute :comma_before_month, :boolean, default: -> { false }  # Track if comma was in input
 
         # Month name to number mapping
         MONTH_NAMES = {
@@ -32,6 +34,7 @@ module PubidNew
           self.version = version
           self.revision = revision
           self.year = year
+          self.original_month = month  # Store original format
           self.month = convert_month(month)
           self.day = day
         end
@@ -52,18 +55,30 @@ module PubidNew
           result += ".#{revision}" if revision
 
           if year
-            # For display, we need to convert back to name if it was numeric
-            display_month = month
-            if display_month && MONTH_NAMES.value?(display_month)
-              # Find the first key that maps to this value
-              name_key = MONTH_NAMES.find { |k, v| v == display_month }&.first
-              display_month = name_key || month
+            # Use original month format to preserve abbreviated vs full names
+            display_month = original_month
+            
+            if display_month
+              # Use comma_before_month flag if set, otherwise detect from month format
+              use_comma_before = if defined?(@comma_before_month) && !@comma_before_month.nil?
+                                   @comma_before_month
+                                 else
+                                   # Default: Full month names have comma, abbreviated don't
+                                   display_month.length > 4 && display_month != "Sept"
+                                 end
+              
+              result += use_comma_before ? ", #{display_month}" : " #{display_month}"
+              result += " #{day}" if day
+              
+              # Abbreviated months: " Year", Full months: ", Year"
+              if display_month.length <= 4 || display_month == "Sept"
+                result += " #{year}"
+              else
+                result += ", #{year}"
+              end
+            else
+              result += " #{year}"
             end
-
-            result += ", #{display_month}" if display_month
-            result += " #{day}" if day && display_month
-            result += ", #{year}" if display_month
-            result += " #{year}" unless display_month
           end
 
           result
