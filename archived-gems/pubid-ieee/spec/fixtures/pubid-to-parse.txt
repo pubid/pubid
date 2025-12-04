@@ -1,18 +1,18 @@
 IEEE 1076-CONC-I99O
 !1873-2015 IEEE Standard for Robot Map Data Representation for Navigation!IEEE 1873-2015
-2012 NESC Handbook, Seventh Edition
-2017 NESC(R) Handbook, Premier Edition
-2017 National Electrical Safety Code(R) (NESC(R))
-2017 National Electrical Safety Code(R) (NESC(R)) - Redline
+!2012 NESC Handbook, Seventh Edition!IEEE Std 2012 NESC Handbook, Seventh Edition
+!2017 NESC(R) Handbook, Premier Edition!IEEE Std 2017 NESC(R) Handbook, Premier Edition
+!2017 National Electrical Safety Code(R) (NESC(R))!IEEE Std 2017 National Electrical Safety Code(R) (NESC(R))
+!2017 National Electrical Safety Code(R) (NESC(R)) - Redline!IEEE Std 2017 National Electrical Safety Code(R) (NESC(R)) - Redline
 !267A-1980 IEEE International System of Units Conversion!IEEE 267A-1980
-3006HistoricalData-2012 Historical Reliability Data for IEEE 3006 Standards
-52 IRE 7.S2
+!3006HistoricalData-2012 Historical Reliability Data for IEEE 3006 Standards!IEEE Std 3006HistoricalData-2012 Historical Reliability Data for IEEE 3006 Standards
+!52 IRE 7.S2!IEEE Std 52 IRE 7.S2
 !55 IRE 2.S1 (IEEE Std No 147)!55 IRE 2.S1 (IEEE Std 147)
-61 IRE 15.S1 (IEEE 182)
-61 IRE 28 S1 (IEEE 216)
-62 IRE 12.S1 (IEEE 174)
-62 IRE 7.S2 (IEEE 161)
-802.11ba Battery Life Improvement: IEEE Technology Report on Wake-Up Radio
+!61 IRE 15.S1 (IEEE 182)!IEEE Std 61 IRE 15.S1 (IEEE 182)
+!61 IRE 28 S1 (IEEE 216)!IEEE Std 61 IRE 28 S1 (IEEE 216)
+!62 IRE 12.S1 (IEEE 174)!IEEE Std 62 IRE 12.S1 (IEEE 174)
+!62 IRE 7.S2 (IEEE 161)!IEEE Std 62 IRE 7.S2 (IEEE 161)
+!802.11ba Battery Life Improvement: IEEE Technology Report on Wake-Up Radio!IEEE Std 802.11ba Battery Life Improvement: IEEE Technology Report on Wake-Up Radio
 !AIEE No 14-1925 (AESC C22-1925)!AIEE 14-1925 (AESC C22-1925)
 !AIEE No 18-1934 (ASA C55 1934)!AIEE 18-1934 (ASA C55 1934)
 !AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)!AIEE 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)
