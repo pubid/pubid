@@ -75,6 +75,99 @@ All identifiers use shared components for common attributes:
 
 **Key Design**: Components are Lutaml::Model classes with proper serialization
 
+### Advanced Rendering Styles
+
+**NOTE**: This feature is implemented for **ISO and IEC flavors ONLY**. These flavors support short/long abbreviation forms for supplements to maintain round-trip fidelity with different official formats.
+
+#### TypedStage Enhancement
+
+TypedStage components have been enhanced to support multiple abbreviation formats:
+
+```ruby
+class TypedStage
+  attribute :abbr, :string, collection: true          # Array of recognized forms
+  attribute :short_abbr, :string                      # Short form (uppercase)
+  attribute :long_abbr, :string                       # Long form (mixed case)
+  attribute :original_abbr, :string                   # Preserves parsed form
+
+  def abbreviation(format_long: true)
+    return original_abbr if original_abbr             # Preserve original
+    format_long && long_abbr ? long_abbr : short_abbr # Or use preference
+  end
+end
+```
+
+#### Format Variants
+
+**ISO Formats:**
+
+| Stage Type | Short Form | Long Form | Indicator |
+|------------|-----------|-----------|-----------|
+| Amendment | AMD, DAM, FDAM | Amd, DAmd, FDAmd | Case (uppercase vs mixed) |
+| Corrigendum | COR, DCOR, FDCOR | Cor, DCor, FDCor | Case (uppercase vs mixed) |
+| Directives | DIR | Directives, Part | Word choice |
+
+**IEC Formats:**
+
+| Stage Type | Short Form | Long Form | Indicator |
+|------------|-----------|-----------|-----------|
+| Amendment | AMD1, CDV, FDIS | Amd 1, CD, FDIS | Space (no space vs space) |
+| Corrigendum | COR1, DCOR, FDCOR | Cor 1, DCor, FDCor | Space (no space vs space) |
+
+#### Builder Auto-Detection
+
+The Builder automatically detects which format to use from the parsed abbreviation:
+
+**ISO Detection:**
+```ruby
+# Detect long form if original_abbr starts with long_abbr
+stage_format_long = ts.long_abbr && ts.original_abbr &&
+                    ts.original_abbr.start_with?(ts.long_abbr)
+```
+
+**IEC Detection:**
+```ruby
+# Detect long form if original_abbr contains space
+stage_format_long = ts.long_abbr && ts.original_abbr &&
+                    ts.original_abbr.include?(" ")
+```
+
+#### RenderingStyle Objects
+
+Identifiers store a RenderingStyle object that preserves formatting preferences:
+
+```ruby
+class RenderingStyle
+  attribute :with_language_code, :symbol    # :none, :single, :iso
+  attribute :stage_format_long, :boolean    # true/false
+  attribute :with_date, :boolean            # true/false
+end
+```
+
+#### Round-Trip Fidelity
+
+The system preserves the exact format that was parsed:
+
+```ruby
+# ISO example
+original = "ISO 8601:2019/DAmd 1"
+parsed = PubidNew::Iso.parse(original)
+parsed.to_s == original  # => true
+
+# IEC example
+original = "IEC 60050-351:2013/Amd 1:2016"
+parsed = PubidNew::Iec.parse(original)
+parsed.to_s == original  # => true
+```
+
+#### Benefits
+
+1. **Standards compliance:** Supports both official formats (short and long)
+2. **Round-trip fidelity:** Preserves original format exactly
+3. **Automatic detection:** No user configuration needed
+4. **Extensibility:** Easy to add new format variants
+5. **Consistency:** Same architectural pattern across ISO and IEC
+
 ### Class Hierarchies
 
 #### ISO Example

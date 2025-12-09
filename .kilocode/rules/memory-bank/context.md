@@ -1,4 +1,4 @@
-## Current Status (Session 99 Complete - ISO at 98.97%!)
+## Current Status (Session 100 Complete - IEC Rendering Styles!)
 
 **Overall V2 Status:**
 - **13/13 flavors with V2 implementations (100%!)**
@@ -10,10 +10,27 @@
 - **Need Validation:** 1 (NIST 57/57 basic, 19,488 fixtures) ⚠️
 - **V1 Code:** 4 gems archived to `archived-gems/`
 - **RFC 5141-bis:** URN tests at **90.14%** (265/294 active)! ✅
+- **Advanced Rendering:** ISO and IEC support short/long abbreviation forms! ✨
+
+**Session 100 ACHIEVEMENT - IEC Rendering Styles Complete!** 🎯
+- **Part A: IEC Amendment TYPED_STAGES** - Added short/long abbreviations (4 stages)
+  - SHORT: AMD, CDV, DAM, FDIS (uppercase, no space)
+  - LONG: Amd, CD, DAm, FDIS (title case, with space)
+- **Part B: IEC Corrigendum TYPED_STAGES** - Added short/long abbreviations (4 stages)
+  - SHORT: COR, CDCor, DCOR, FDCOR (uppercase, no space)
+  - LONG: Cor, CD Cor, DCor, FDCor (title case, with space)
+- **Part C: IEC RenderingStyle** - Created with 6 format variants
+- **Part D: IEC Builder detection** - Auto-detects format from parsed abbreviation
+- **IEC Fixtures:** 13,814/13,824 (99.93%) - MAINTAINED! ✅
+- **Commits:** (pending)
+- **Time:** ~60 minutes (faster than estimated!)
+- **Next:** Session 101 - Documentation updates
 
 **Session 99 ACHIEVEMENT - ISO at 98.97% (99.86% excluding intentional limits)!** 🎯
 - **Part A: Corrigendum period parsing** - Added "Cor." abbreviation support (+8 identifiers)
 - **Part B: Directives rendering system** - Updated method signatures for Session 98 rendering (+29 identifiers)
+  - Added short/long forms to Directives TYPED_STAGES (DIR vs Directives, Part)
+  - Fixed Builder to detect Directives long form (contains "Directives")
   - Fixed Directives.publisher_portion() and number_portion() signatures
   - Added custom Directives.to_s() for JTC 1 DIR:2004 spacing
   - Fixed DirectivesSupplement.to_s() and to_supplement_s() signatures

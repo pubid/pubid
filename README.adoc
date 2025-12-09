@@ -126,6 +126,66 @@ Benchmarked on 2023 MacBook Pro M3:
 
 Memory: 720 KB per 20,000 parses (minimal growth)
 
+== Advanced Rendering Styles
+
+ISO and IEC identifiers support multiple abbreviation forms for supplements to maintain round-trip fidelity with different official formats.
+
+=== Overview
+
+The rendering styles feature enables PubID to parse and render identifiers in multiple official formats while preserving the exact format that was parsed. This ensures perfect round-trip compatibility with standards organizations' documentation.
+
+**Supported formats:**
+* **ISO:** Short (AMD, DAM, COR) vs Long (Amd, DAmd, Cor) - distinguished by case
+* **IEC:** Short (AMD1, COR1) vs Long (Amd 1, Cor 1) - distinguished by spacing
+
+=== Usage Examples
+
+==== ISO Examples
+
+[source,ruby]
+----
+# ISO - Preserves long form (mixed case)
+id = PubidNew::Iso.parse("ISO 8601:2019/DAmd 1")
+id.to_s  # => "ISO 8601:2019/DAmd 1"
+
+# ISO - Preserves short form (uppercase)
+id = PubidNew::Iso.parse("ISO 8601:2019/DAM 1")
+id.to_s  # => "ISO 8601:2019/DAM 1"
+
+# Corrigendum with long form
+id = PubidNew::Iso.parse("ISO 19115:2003/Cor 1:2006")
+id.to_s  # => "ISO 19115:2003/Cor 1:2006"
+----
+
+==== IEC Examples
+
+[source,ruby]
+----
+# IEC - Preserves long form (with space)
+id = PubidNew::Iec.parse("IEC 60050-351:2013/Amd 1:2016")
+id.to_s  # => "IEC 60050-351:2013/Amd 1:2016"
+
+# IEC - Preserves short form (no space)
+id = PubidNew::Iec.parse("IEC 60050-351:2013/AMD1:2016")
+id.to_s  # => "IEC 60050-351:2013/AMD1:2016"
+----
+
+=== Key Features
+
+* ✅ **Automatic format detection** - No manual configuration required
+* ✅ **Round-trip fidelity** - Parse and render back to exact original format
+* ✅ **Standards compliance** - Supports both official ISO and IEC formats
+* ✅ **Backward compatible** - Existing code continues to work unchanged
+
+=== Documentation
+
+See link:docs/RENDERING_GUIDE.md[Advanced Rendering Styles Guide] for complete documentation including:
+
+* All supported formats for ISO and IEC
+* Detailed usage examples
+* Architecture and implementation details
+* Format comparison tables
+
 == Repository
 
 This repository is a monorepo for the PubID Ruby gems, which implement the PubID
@@ -1164,6 +1224,7 @@ spec.add_dependency "pubid-iec", "= 1.15.0"
 
 === GitHub Actions workflows
 
+====
 ==== Monorepo release workflow
 
 The main release workflow (`release.yml`) handles coordinated releases:

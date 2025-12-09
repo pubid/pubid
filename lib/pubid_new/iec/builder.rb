@@ -124,6 +124,47 @@ module PubidNew
           end
         end
 
+        # Detect rendering style from parsed abbreviation
+        if identifier.respond_to?(:rendering_style=) && identifier.respond_to?(:typed_stage) && identifier.typed_stage
+          require_relative 'rendering_style'
+          ts = identifier.typed_stage
+
+          # Detect IEC format from parsed abbreviation
+          # IEC uses space to indicate long form: "Amd 1", "Cor 1"
+          # No space indicates short form: "AMD1", "COR1"
+          stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.include?(" ")
+            true  # Long form has space: "Amd 1", "Cor 1"
+          elsif ts.short_abbr && ts.original_abbr && !ts.original_abbr.include?(" ")
+            false  # Short form: "AMD1", "COR1", "CDV", "FDIS"
+          else
+            false  # Default to short/canonical
+          end
+
+          # Detect language code format from parsed languages
+          with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
+            # Check if original_code was single-char (E, F, R, A, S, D)
+            first_lang = identifier.languages.first
+            if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
+              :single
+            else
+              :iso  # 2-char codes (en, fr, ru, ar, es, de)
+            end
+          else
+            :none
+          end
+
+          # with_date is always true for base identifiers (show the date if present)
+          # Only supplements might have undated references
+          with_date = true
+
+          # Create custom rendering style based on parsed format
+          identifier.rendering_style = RenderingStyle.new(
+            with_language_code: with_language_code,
+            stage_format_long: stage_format_long,
+            with_date: with_date
+          )
+        end
+
         # After building base identifier, apply wrappers
         identifier = wrap_with_sheet(identifier, sheet_number_data, sheet_year_data) if sheet_number_data
         identifier = wrap_with_consolidated(identifier, consolidated_supplements_data) if consolidated_supplements_data

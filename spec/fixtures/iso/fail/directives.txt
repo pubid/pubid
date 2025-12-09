@@ -15,3 +15,5 @@
 !ISO/IEC Directives, Part 2:2021!ISO/IEC DIR 2:2021
 !ISO/IEC Directives Part 1!ISO/IEC Directives, Part 1
 !ISO/IEC Directives Part 2!ISO/IEC Directives, Part 2
+!ISO/IEC Directives Part 1!ISO/IEC Directives, Part 1
+!ISO/IEC Directives Part 2!ISO/IEC Directives, Part 2
