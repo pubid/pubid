@@ -92,17 +92,19 @@ module PubidNew
 
       # Override publisher_portion to use space before Guide (not slash)
       # Correct format: "ISO Guide 1" and "ISO/IEC Guide X"
-      def publisher_portion(lang: :en)
+      def publisher_portion(lang: :en, stage_format_long: false)
+        abbr = typed_stage ? typed_stage.abbreviation(format_long: stage_format_long) : ""
+
         # If there are no copublishers, return publisher + space + Guide
         return [
             publisher.body,
-            (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+            (abbr.empty? ? "" : " #{abbr}"),
           ].join('') unless copublishers&.any?
 
         # If there are copublishers, join them with slashes, then space + Guide
         [
           ([publisher] + copublishers).map(&:body).join("/"),
-          (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+          (abbr.empty? ? "" : " #{abbr}"),
         ].join('')
       end
 

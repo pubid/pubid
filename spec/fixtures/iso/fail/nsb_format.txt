@@ -251,3 +251,103 @@ FprISO 8437-4
 FprISO 9693
 # Parse error: Parslet::ParseFailed
 FprISO/IEC 17029
+# Parse error: Parslet::ParseFailed
+FprISO 10140-4
+# Parse error: Parslet::ParseFailed
+FprISO 105-A03
+# Parse error: Parslet::ParseFailed
+FprISO 10993-1
+# Parse error: Parslet::ParseFailed
+FprISO 12402-2
+# Parse error: Parslet::ParseFailed
+FprISO 12402-3
+# Parse error: Parslet::ParseFailed
+FprISO 12402-4
+# Parse error: Parslet::ParseFailed
+FprISO 12402-5
+# Parse error: Parslet::ParseFailed
+FprISO 13679
+# Parse error: Parslet::ParseFailed
+FprISO 16119-5
+# Parse error: Parslet::ParseFailed
+FprISO 18674-5
+# Parse error: Parslet::ParseFailed
+FprISO 19432-1
+# Parse error: Parslet::ParseFailed
+FprISO 20430
+# Parse error: Parslet::ParseFailed
+FprISO 21268-4
+# Parse error: Parslet::ParseFailed
+FprISO 21420
+# Parse error: Parslet::ParseFailed
+FprISO 21853
+# Parse error: Parslet::ParseFailed
+FprISO 22125-1
+# Parse error: Parslet::ParseFailed
+FprISO 22125-2
+# Parse error: Parslet::ParseFailed
+FprISO 22291
+# Parse error: Parslet::ParseFailed
+FprISO 22868
+# Parse error: Parslet::ParseFailed
+FprISO 8437-1
+# Parse error: Parslet::ParseFailed
+FprISO 8437-2
+# Parse error: Parslet::ParseFailed
+FprISO 8437-3
+# Parse error: Parslet::ParseFailed
+FprISO 8437-4
+# Parse error: Parslet::ParseFailed
+FprISO 9693
+# Parse error: Parslet::ParseFailed
+FprISO/IEC 17029
+# Parse error: Parslet::ParseFailed
+FprISO 10140-4
+# Parse error: Parslet::ParseFailed
+FprISO 105-A03
+# Parse error: Parslet::ParseFailed
+FprISO 10993-1
+# Parse error: Parslet::ParseFailed
+FprISO 12402-2
+# Parse error: Parslet::ParseFailed
+FprISO 12402-3
+# Parse error: Parslet::ParseFailed
+FprISO 12402-4
+# Parse error: Parslet::ParseFailed
+FprISO 12402-5
+# Parse error: Parslet::ParseFailed
+FprISO 13679
+# Parse error: Parslet::ParseFailed
+FprISO 16119-5
+# Parse error: Parslet::ParseFailed
+FprISO 18674-5
+# Parse error: Parslet::ParseFailed
+FprISO 19432-1
+# Parse error: Parslet::ParseFailed
+FprISO 20430
+# Parse error: Parslet::ParseFailed
+FprISO 21268-4
+# Parse error: Parslet::ParseFailed
+FprISO 21420
+# Parse error: Parslet::ParseFailed
+FprISO 21853
+# Parse error: Parslet::ParseFailed
+FprISO 22125-1
+# Parse error: Parslet::ParseFailed
+FprISO 22125-2
+# Parse error: Parslet::ParseFailed
+FprISO 22291
+# Parse error: Parslet::ParseFailed
+FprISO 22868
+# Parse error: Parslet::ParseFailed
+FprISO 8437-1
+# Parse error: Parslet::ParseFailed
+FprISO 8437-2
+# Parse error: Parslet::ParseFailed
+FprISO 8437-3
+# Parse error: Parslet::ParseFailed
+FprISO 8437-4
+# Parse error: Parslet::ParseFailed
+FprISO 9693
+# Parse error: Parslet::ParseFailed
+FprISO/IEC 17029

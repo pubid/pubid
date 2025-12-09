@@ -1,5 +1,6 @@
 require_relative "identifier"
 require_relative "../components/typed_stage"
+require_relative "rendering_style"
 
 module PubidNew
   # Identifier that
@@ -7,18 +8,38 @@ module PubidNew
     class SingleIdentifier < Identifier
       attribute :typed_stage, Components::TypedStage
 
-      def to_s(lang: :en, lang_single: false, with_edition: false)
-        [].tap do |parts|
-          parts << publisher_portion(lang: lang)
-          parts << number_portion(lang_single: lang_single)
-          # Only render edition when explicitly requested
-          parts << edition_portion(lang: lang) if with_edition && edition && (edition.number || edition.original_text)
-        end.compact.join(' ').tap do |s|
-          s << language_portion(lang_single: lang_single) if languages&.any?
-        end
+      # Rendering style is a strategy object, not serializable data
+      attr_accessor :rendering_style
+
+      def initialize(**args)
+        super
+        # Default rendering style is RefDatedLong (long format with date, matching V1 default)
+        @rendering_style ||= RefDatedLong.new
       end
 
-      def publisher_portion(lang: :en)
+      def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+        # If format is provided, create appropriate rendering style
+        if format
+          style = RenderingStyle.from_format(format)
+          return style.render(self, with_edition: with_edition)
+        end
+
+        # If individual parameters are provided, override defaults
+        if stage_format_long || with_date || lang_single
+          # Use current style's settings as base
+          style = RenderingStyle.new(
+           with_language_code: lang_single ? :single : (rendering_style&.with_language_code || :none),
+            stage_format_long: stage_format_long.nil? ? (rendering_style&.stage_format_long || false) : stage_format_long,
+            with_date: with_date.nil? ? (rendering_style&.with_date || true) : with_date
+          )
+          return style.render(self, with_edition: with_edition)
+        end
+
+        # Otherwise use stored rendering_style
+        rendering_style.render(self, with_edition: with_edition)
+      end
+
+      def publisher_portion(lang: :en, stage_format_long: true)
         # TODO: implement language-dependent publisher portion
         # The pattern is language-dependent:
         # - the name of the type (e.g., "Guide") may appear before or after the main publisher
@@ -28,16 +49,18 @@ module PubidNew
         # English: "ISO/IEC Guide 51:1999(E/F/R)"
         # French: "Guide ISO/CEI 51:1999(F/E/R)"
 
+        abbr = typed_stage ? typed_stage.abbreviation(format_long: stage_format_long) : ""
+
         # If there are no copublishers, just return the main publisher and type
         return [
             publisher.body,
-            (typed_stage.canonical_abbreviation.empty? ? "" : "/#{typed_stage.canonical_abbreviation}"),
+            (abbr.empty? ? "" : "/#{abbr}"),
           ].join('') unless copublishers&.any?
 
         # If there are copublishers, join them with slashes
         [
           ([publisher] + copublishers).map(&:body).join("/"),
-          (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+          (abbr.empty? ? "" : " #{abbr}"),
         ].join('')
       end
 
@@ -55,7 +78,7 @@ module PubidNew
       #   ].join('')
       # end
 
-      def number_portion(lang_single: false)
+      def number_portion(lang_single: false, with_date: true)
         [
           # Directives may not have a number
           (number ? "#{number.value}" : ""),
@@ -67,8 +90,8 @@ module PubidNew
           # Stage iteration is optional
           (stage_iteration ? ".#{stage_iteration.value}" : ""),
 
-          # Date is optional
-          (date ? ":#{date.year}" : ""),
+          # Date is optional and controlled by with_date parameter
+          (date && with_date ? ":#{date.year}" : ""),
         ].join('')
       end
 

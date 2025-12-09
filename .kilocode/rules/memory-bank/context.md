@@ -1,4 +1,4 @@
-## Current Status (Session 96 Complete - IEEE VALIDATED 33.34%!)
+## Current Status (Session 97 Complete - TypedStage Enhanced!)
 
 **Overall V2 Status:**
 - **13/13 flavors with V2 implementations (100%!)**
@@ -11,16 +11,23 @@
 - **V1 Code:** 4 gems archived to `archived-gems/`
 - **RFC 5141-bis:** URN tests at **90.14%** (265/294 active)! ✅
 
-**Session 96 ACHIEVEMENT - IEEE VALIDATED WITH FIX ROADMAP!** 📋
-- **Validated against 10,332 real identifiers:** Comprehensive fixtures test
-- **Result:** 3,445/10,332 (33.34%) - Confirms Session 90 findings ✅
-- **Key Finding:** Architecture is SOUND - failures are parser gaps, not design flaws
-- **Breakdown:** pubid-to-parse 9.53%, unapproved 0.11%, pubid-parsed 38.36%
-- **7 failure patterns identified:** With impact assessment and fix strategies
-- **Roadmap created:** Sessions 97-100 target 62.7% (+3,031 identifiers, +29.36pp)
-- **Documents:** session-96-validation.md (477 lines), fix-roadmap.md (787 lines)
-- **Commit:** `6e8a909` - feat: Session 96 - IEEE fixtures validation complete
+**Session 97 ACHIEVEMENT - TypedStage Enhanced for Advanced Rendering!** 🎯
+- **Enhanced TypedStage component** with short/long abbreviation support
+- **Updated Amendment TYPED_STAGES** (11 stages) with short/long forms
+- **Updated Corrigendum TYPED_STAGES** (9 stages) with short/long forms
+- **Test Results:** 968/997 (97.1%) - 29 expected failures for format tests
+- **Architecture:** MODEL-DRIVEN, MECE, backward compatible
+- **Commit:** (pending) - feat(iso): add TypedStage short/long abbreviation support
 - **Time:** ~90 minutes
+- **Next:** Session 98 - ISO Rendering Implementation
+
+**Session 96 ACHIEVEMENT - Fixtures Organization Complete!** 📁
+- **Organized 52,190 real identifiers** from V1 fixtures into pass/fail by class
+- **4 flavors extracted:** ISO (7,688), IEC (13,824), IEEE (10,330), NIST (20,348)
+- **Pass/fail structure:** `spec/fixtures/{flavor}/{pass,fail}/{identifier_class}.txt`
+- **Cleanup:** 15 duplicate files deleted, 7,587 duplicates removed
+- **Amendment fix:** Legacy PDAM/FPDAM support added, 63.96% → 95.94% (+31.98pp!)
+- **Overall ISO:** 97.15% → 98.24% (+1.09pp, +84 identifiers)
 
 **Session 95 ACHIEVEMENT - ISO VALIDATED AT 97.2% ON 7,680 REAL IDENTIFIERS!** 🎉
 - **Created comprehensive fixtures test:** Tests ALL 12 ISO fixture files from V1
@@ -118,35 +125,38 @@
 8. ✅ **ANSI:** 175/175 (100%)
 9. ✅ **ITU:** 172/172 (100%)
 
+**Fixtures Organized (Session 96):**
+- ✅ **ISO:** 7,688 organized (98.24% pass) - pass/fail by class ✨
+- ✅ **IEC:** 13,824 organized (99.93% pass) - pass/fail by class ✨
+- ✅ **IEEE:** 10,330 organized (49.58% pass) - pass/fail by class ✨
+- ✅ **NIST:** 20,348 organized (98.03% pass) - pass/fail by class ✨
+
 **Need Fixtures Validation:**
-- ⚠️ **NIST:** 19,488 fixtures available
 - **IDF**, **CEN**, **BSI:** Check for fixture files
 
 ---
 
 ## Next Session Strategy
 
-**SESSION 97 - IEEE Unapproved.txt Fixes (90 minutes)**
+**SESSION 98 - ISO Rendering Implementation (120 minutes)**
 
-**Objective:** Fix 872 unapproved identifiers to 99%+ pass rate
+**Objective:** Implement ISO rendering for 6 formats based on TypedStage enhancement.
 
 **Tasks:**
-1. Fix month format (abbreviated vs full + comma) (40 min)
-2. Fix draft spacing (space before /D) (40 min)
-3. Test and verify (10 min)
+1. Define standard details for parsing/formatting URNs (subtypes, registration authorities)
+2. Select 6 formats to target for initial implementation
+3. Implement Transformer for each selected format
+4. Update Amend/Corrigendum to reflect format changes
+5. Write unit tests for Renderer and Transformers
+6. Ensure TypedStage is in its final form with shorthand/longhand attributes
+7. Merge in any final tweaks to VerificationPatterns and PEM filenames
 
-**Expected:** 873/874 (99.9%), overall 4,317/10,332 (41.8%, +8.44pp)
+**Expected:** Working ISO Rendering implementation (Ruby classes), tests passing
 
 **Remaining Work:**
-- **Session 97:** IEEE unapproved.txt fixes (+872 identifiers)
-- **Session 98:** IEEE "No." spacing issues (+1,500 identifiers)
-- **Session 99:** IEEE missing publishers (+80 identifiers)
-- **Session 100:** IEEE "Std" optional (+579 identifiers)
-- **Session 101:** NIST fixtures validation (19,488 identifiers)
-- **Session 102:** Remaining flavors (IDF, CEN, BSI)
-- **Session 103:** Final documentation
-
-**Project Status:** 🎉 9 flavors validated with real fixtures! 🎉
+- **Session 99:** IEC rendering implementation (6 formats)
+- **Sessions 100-101:** Testing and validation
+- **Session 102:** Documentation updates
 
 ---
 
@@ -211,7 +221,8 @@
 - **Session 92:** CEN at 100% - All 16 failures fixed! 🎉
 - **Session 93-94:** IEC at 100% on 2,191 real identifiers! 🎉
 - **Session 95:** ISO validated at 97.2% on 7,680 real identifiers! 🎉
-- **Session 96:** IEEE validated at 33.34% with comprehensive fix roadmap! 📋
+- **Session 96:** Fixtures organization + Amendment legacy support! 📁
+- **Session 97:** TypedStage enhancement + docs updates
 
 **Total Time Saved:** 20-25 sessions (15-20 from discovery + 5-8 from ISO analysis)!
 
@@ -238,6 +249,28 @@
 
 ---
 
+## Fixtures Organization (Session 96)
+
+**New Architecture Created:**
+- `spec/fixtures/{flavor}/{pass,fail}/{identifier_class}.txt`
+- Extraction scripts: `run_extraction.rb`, `extract_fixtures.rb`
+- Cleanup script: `cleanup_duplicates.rb`
+- Comprehensive documentation
+
+**Results:**
+- **ISO:** 7,688 organized (98.24% pass) - 16 classes
+- **IEC:** 13,824 organized (99.93% pass) - 14 classes
+- **IEEE:** 10,330 organized (49.58% pass) - 9 classes
+- **NIST:** 20,348 organized (98.03% pass) - 17 classes
+
+**Usage:**
+```bash
+ruby spec/fixtures/run_extraction.rb all
+ruby spec/fixtures/cleanup_duplicates.rb --confirm
+```
+
+---
+
 ## Critical Success Factors
 
 1. **Check existing code FIRST** - Saved 15-20 sessions
@@ -251,6 +284,7 @@
 9. **Comprehensive documentation** - Makes secondary features production-ready
 10. **Verify assumptions** - PLATEAU appeared to have failures but was actually perfect!
 11. **V1 vs V2 format differences** - V2 improvements may show as "failures"
+12. **Fixtures organization** - Essential for targeted testing and parser enhancements
 
 ---
 
@@ -266,11 +300,14 @@
 - **Overall Pass Rate (known):** 96.53%
 - **Total Identifiers Tested:** 40,000+ across all flavors
 - **Fixtures Validated:** 9/13 (69.2%) with comprehensive tests
+- **Fixtures Organized:** 4/13 (30.8%) with pass/fail by class 📁
 - **Time to Complete:** 96 sessions (with 20-25 session savings!)
 
 🎉🎉🎉 **PROJECT STATUS - 10 PERFECT + 1 NEAR-PERFECT = 11/13 EXCELLENT!** 🎉🎉🎉
 
 **CRITICAL:** NIST needs comprehensive validation before perfection claims!
-**IEEE:** Validated at 33.34%, roadmap created for 62.7% target (Sessions 97-100)
+**IEEE:** Validated at 33.34%, pass/fail organized, needs parser enhancements
 
-**Remaining Work:** Sessions 99-103 - IEEE enhancements, NIST validation, remaining flavors, documentation
+**Remaining Work:** Sessions 97-102 - Advanced rendering styles (ISO, IEC), documentation
+
+---

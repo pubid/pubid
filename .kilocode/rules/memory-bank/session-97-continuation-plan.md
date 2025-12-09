@@ -1,417 +1,674 @@
-# Session 97+ Continuation Plan: IEEE Fixtures Enhancement + NIST Validation
+# Session 97+ Continuation Plan: ISO/IEC Advanced Rendering Styles
 
-**Created:** 2025-12-03 (Post-Session 96)  
-**Status:** IEEE validated at 33.34%, fix roadmap ready  
-**Current:** 8/13 flavors validated with real fixtures  
-**Timeline:** COMPRESSED - Complete within 6-7 sessions (Sessions 97-103)
+**Created:** 2025-12-09 (Post-Session 96)
+**Status:** Fixtures organized, Advanced rendering system needed
+**Current:** ISO 98.24%, IEC 99.93% - both production-ready
+**Timeline:** COMPRESSED - Complete within 4-6 sessions (Sessions 97-102)
 
 ---
 
 ## Executive Summary
 
-**Session 96 Achievement:** IEEE validated at 33.34% (3,445/10,332) with comprehensive fix roadmap created!
+**Session 96 Achievement:** Fixtures organization complete for all flavors!
 
-**Key Finding:** IEEE architecture is SOUND. Failures are parser gaps and rendering inconsistencies, NOT design flaws.
+**New Requirement:** Implement V1-compatible advanced rendering styles system for ISO and IEC flavors.
 
-**Remaining Work:**
-1. **Sessions 97-100:** IEEE high-priority fixes (target 62.7%, +3,031 identifiers)
-2. **Session 101:** NIST fixtures validation (19,488 identifiers)
-3. **Session 102:** Validate remaining flavors (IDF, CEN, BSI)
-4. **Session 103:** Final documentation and project completion
+Remember ISO single-char langs include EFARDS. The same 6 ISO reference formats also apply to IEC (IEC has different stage codes), but tailor to it.
 
-**End Goal:** All 13 flavors validated with real fixture data, comprehensive documentation
+**Scope:**
+1. **Phase 1 (Sessions 97-98):** ISO rendering styles implementation (4 hours)
+2. **Phase 2 (Session 99):** IEC rendering styles implementation (2 hours)
+3. **Phase 3 (Sessions 100-101):** Testing and validation (4 hours)
+4. **Phase 4 (Session 102):** Documentation updates (2 hours)
+
+
+**End Goal:** ISO and IEC support all 6 V1 reference formats with configurable language codes and stage formats
 
 ---
 
 ## Current State (Session 96 Complete)
 
-### Fixtures Validation Status
+### Fixtures Organization ✅
 
-**✅ Validated (8/13):**
-1. IEC: 2,191/2,191 (100%)
-2. ISO: 7,465/7,680 (97.2%)
-3. CCSDS: 490/490 (100%)
-4. JIS: 10,635/10,635 (100%)
-5. ETSI: 24,718/24,718 (100%)
-6. PLATEAU: 115/115 (100%)
-7. ANSI: 175/175 (100%)
-8. ITU: 172/172 (100%)
+**Successfully extracted and organized:**
+- **ISO**: 7,688 identifiers (98.24% pass, 16 classes)
+- **IEC**: 13,824 identifiers (99.93% pass, 14 classes)
+- **IEEE**: 10,330 identifiers (49.58% pass, 9 classes)
+- **NIST**: 20,348 identifiers (98.03% pass, 17 classes)
 
-**⚠️ Validated - Needs Enhancement (1/13):**
-9. IEEE: 3,445/10,332 (33.34%) - Roadmap created
+**Total:** 52,190 identifiers organized into pass/fail by class
 
-**⏳ Need Validation (4/13):**
-- NIST: 19,488 fixtures (claimed 98.47%, needs verification)
-- IDF: Check for fixtures
-- CEN: Check for fixtures
-- BSI: Check for fixtures
+### Amendment Legacy Support ✅
+
+Fixed ISO Amendment to support legacy typed stages:
+- **PDAM** (legacy Committee Draft)
+- **FPDAM** (legacy Final Proposed Draft)
+- **AMD, Amd.** (legacy published forms)
+- Modern variants (DAmd, FDAmd) normalize to canonical
+
+**Result:** Amendment pass rate 63.96% → 95.94% (+31.98pp)
 
 ---
 
-## Phase 1: IEEE High-Priority Fixes (Sessions 97-100)
+## PHASE 1: ISO Advanced Rendering Styles (Sessions 97-98)
 
-### Session 97: Fix Unapproved.txt - Month & Draft Spacing (90 min)
+### Objective
 
-**Objective:** Fix 872 unapproved identifiers to 99%+ pass rate
+Implement 6 V1-compatible reference formats for ISO identifiers:
 
-**Current:** 1/874 (0.11%)  
-**Target:** 873/874 (99.9%)  
-**Impact:** +872 identifiers
+| Format | Language | Stage Format | Date | Example |
+|--------|----------|--------------|------|---------|
+| `:ref_num_short` | 1-char (E) | Short (DAM) | Yes | `ISO 8601:2019(E)/DAM 1` |
+| `:ref_num_long` | 2-char (en) | Long (DAmd) | Yes | `ISO 8601:2019(en)/DAmd 1` |
+| `:ref_dated` | None | Short (DAM) | Yes | `ISO 8601:2019/DAM 1` |
+| `:ref_dated_long` | None | Long (DAmd) | Yes | `ISO 8601:2019/DAmd 1` |
+| `:ref_undated` | None | Short (DAM) | No | `ISO 8601/DAM 1` |
+| `:ref_undated_long` | None | Long (DAmd) | No | `ISO 8601/DAmd 1` |
 
-#### Part A: Month Format Fix (40 min)
+### Session 97: ISO Architecture & Components (120 min)
 
-**Problem:**
-```
-Expected: "Feb 2007"
-Got:      "February, 2007"  ❌ (expanded + comma)
-```
+#### Part A: Enhance TypedStage Component (40 min)
+
+**Objective:** Add short/long abbreviation support
+
+**Tasks:**
+
+1. Read current TypedStage implementation
+2. Add `short_abbr` and `long_abbr` attributes
+3. Enhance `abbreviation()` method to accept `format` parameter
+4. Update Amendment and Corrigendum TYPED_STAGES
+
+**Files to modify:**
+- [`lib/pubid_new/components/typed_stage.rb`](lib/pubid_new/components/typed_stage.rb:1)
 
 **Implementation:**
-1. Add `abbreviated_month` attribute to Date component
-2. Store format during parsing
-3. Render based on stored format
-
-**Files to modify:**
-- `lib/pubid_new/ieee/components/date.rb`
-- `lib/pubid_new/ieee/builder.rb`
-
-#### Part B: Draft Spacing Fix (40 min)
-
-**Problem:**
-```
-Expected: "P1234/D12"
-Got:      "P1234 /D12"  ❌ (space before /)
-```
-
-**Implementation:**
-1. Remove space in draft rendering
-2. Verify parser output has no space
-
-**Files to modify:**
-- `lib/pubid_new/ieee/identifiers/base.rb`
-
-#### Part C: Test and Verify (10 min)
-
-```bash
-bundle exec rspec spec/pubid_new/ieee/fixtures_spec.rb
-```
-
-**Expected:** unapproved.txt: 873/874 (99.9%)
-
----
-
-### Session 98: Fix "No." Spacing Pattern (90 min)
-
-**Objective:** Fix 1,500+ spacing mismatches
-
-**Current:** 3,383/8,818 (38.36%) on pubid-parsed.txt  
-**Target:** 4,883/8,818 (55.4%)  
-**Impact:** +1,500 identifiers
-
-#### Problem Patterns
-
-```
-# Pattern 1: Compact format
-Expected: "AIEE No.1C-1954"
-Got:      "AIEE No. 1C-1954"  ❌
-
-# Pattern 2: Standard format
-Expected: "IEEE Std No 318-1971"
-Got:      "IEEE Std 318-1971"  ❌
-```
-
-#### Implementation (60 min)
-
-1. **Enhance parser** - Capture "No." vs "No " distinction
-2. **Update builder** - Store std_prefix format
-3. **Fix rendering** - Apply correct spacing
-
-**Files to modify:**
-- `lib/pubid_new/ieee/parser.rb`
-- `lib/pubid_new/ieee/builder.rb`
-- `lib/pubid_new/ieee/identifiers/base.rb`
-
-#### Testing (30 min)
-
-Verify both patterns work correctly.
-
----
-
-### Session 99: Add Missing Publishers (90 min)
-
-**Objective:** Support NESC, IRE, ANSI publishers
-
-**Current:** ~4,955/10,332 (after Sessions 97-98)  
-**Target:** 5,035/10,332 (48.7%)  
-**Impact:** +80 identifiers
-
-#### Publishers to Add
-
-1. **NESC** - National Electrical Safety Code (~50 identifiers)
-2. **IRE** - Institute of Radio Engineers (~20 identifiers)
-3. **ANSI** - American National Standards Institute (~10 identifiers)
-
-#### Implementation (60 min)
-
-**Enhance parser:**
 ```ruby
-rule(:publisher) do
-  str("ISO/IEC/IEEE") |
-  str("IEC/IEEE") |
-  str("NESC(R)") | str("NESC") |
-  str("IEEE") |
-  str("AIEE") |
-  str("ANSI") |
-  str("IRE")
-end
-```
+class TypedStage
+  attribute :short_abbr, :string  # DAM, COR, FDAM
+  attribute :long_abbr, :string   # DAmd, Cor, FDAmd
 
-**Add special patterns:**
-- NESC: Year-first format
-- IRE: Historical format
+  def abbreviation(format_long: true)
+    # Return original if set (preserves parsed form)
+    return original_abbr if original_abbr
 
-**Files to modify:**
-- `lib/pubid_new/ieee/parser.rb`
-- `lib/pubid_new/ieee/builder.rb`
-
-#### Testing (30 min)
-
-```bash
-bundle exec rspec spec/pubid_new/ieee/fixtures_spec.rb
-```
-
----
-
-### Session 100: Make "Std" Optional (120 min)
-
-**Objective:** Parse identifiers without "Std" prefix
-
-**Current:** ~5,035/10,332 (48.7%)  
-**Target:** 6,614/10,332 (64.0%)  
-**Impact:** +579 identifiers
-
-#### Problem Examples
-
-```
-❌ "IEEE 1076-CONC-I99O"
-❌ "267A-1980 IEEE International..."
-```
-
-#### Implementation (90 min)
-
-**Add alternative parser rules:**
-```ruby
-rule(:identifier) do
-  standard_identifier |      # IEEE Std 1234-2020
-  no_std_identifier |        # IEEE 1234-2020
-  number_first_identifier    # 1234-2020 IEEE
-end
-```
-
-**Files to modify:**
-- `lib/pubid_new/ieee/parser.rb` (major refactoring)
-- `lib/pubid_new/ieee/builder.rb`
-
-#### Integration Testing (30 min)
-
-Full fixtures test to verify no regressions.
-
-**Expected:** 6,614/10,332 (64.0%, +31pp from baseline!)
-
----
-
-## Phase 2: NIST Validation (Session 101)
-
-### Session 101: NIST Fixtures Validation (90 min)
-
-**Objective:** Validate NIST against 19,488 real identifiers
-
-**Expected:** Claimed 98.47%, need to verify with comprehensive test
-
-#### Part A: Create NIST Fixtures Test (30 min)
-
-Create `spec/pubid_new/nist/fixtures_spec.rb`:
-
-```ruby
-require "spec_helper"
-
-RSpec.describe "NIST V2 Comprehensive Fixtures Tests" do
-  let(:fixture_file) {
-    File.join(__dir__, "../../../archived-gems/pubid-nist/spec/fixtures/allrecords.txt")
-  }
-  
-  it "parses and round-trips all 19,488 NIST identifiers" do
-    # Implementation following IEEE/ISO pattern
+    # Otherwise use format preference
+    if format_long && long_abbr
+      long_abbr
+    elsif !format_long && short_abbr
+      short_abbr
+    else
+      abbr.first  # Fallback to canonical
+    end
   end
 end
 ```
 
-#### Part B: Run and Assess (40 min)
+#### Part B: Update Amendment TYPED_STAGES (40 min)
 
-```bash
-bundle exec rspec spec/pubid_new/nist/fixtures_spec.rb --format documentation
+**Objective:** Define short/long forms for all stages
+
+**Files to modify:**
+- [`lib/pubid_new/iso/identifiers/amendment.rb`](lib/pubid_new/iso/identifiers/amendment.rb:1)
+
+**Implementation:**
+```ruby
+TYPED_STAGES = [
+  Components::TypedStage.new(
+    code: :cdamd,
+    stage_code: :cd,
+    type_code: :amd,
+    abbr: ["CD Amd"],
+    short_abbr: nil,           # No short form
+    long_abbr: "CD Amd",       # Only long form
+    name: "Committee Draft for Amendment",
+    harmonized_stages: %w[30.00 ...],
+  ),
+  Components::TypedStage.new(
+    code: :damd,
+    stage_code: :damd,
+    type_code: :amd,
+    abbr: ["DAM", "DAmd"],
+    short_abbr: "DAM",         # Short form
+    long_abbr: "DAmd",         # Long form
+    name: "Draft Amendment",
+    harmonized_stages: %w[40.00 ...],
+  ),
+  # ... similar for all stages
+]
 ```
 
-**If pass rate ≥95%:** NIST validated ✅  
-**If <95%:** Analyze patterns and create fix plan
+#### Part C: Update Corrigendum TYPED_STAGES (40 min)
 
-#### Part C: Document Results (20 min)
+**Objective:** Define short/long forms for corrigenda
 
-Create `docs/session-101-nist-fixtures-validation.md`
+**Files to modify:**
+- [`lib/pubid_new/iso/identifiers/corrigendum.rb`](lib/pubid_new/iso/identifiers/corrigendum.rb:1)
+
+**Implementation:**
+```ruby
+TYPED_STAGES = [
+  Components::TypedStage.new(
+    code: :dcor,
+    short_abbr: "DCOR",
+    long_abbr: "DCor",
+    # ...
+  ),
+  Components::TypedStage.new(
+    code: :fdcor,
+    short_abbr: "FDCOR",
+    longabbr: "FDCor",
+    # ...
+  ),
+]
+```
 
 ---
 
-## Phase 3: Remaining Flavors (Session 102)
+### Session 98: ISO Rendering Implementation (120 min)
 
-### Session 102: IDF, CEN, BSI Validation (90 min)
+#### Part A: Add `to_s` Parameters (45 min)
 
-**Objective:** Validate remaining flavors with fixtures if available
+**Objective:** Support format parameter in all identifier classes
 
-#### Part A: Check for Fixtures (15 min)
+**Files to modify:**
+- [`lib/pubid_new/iso/identifier.rb`](lib/pubid_new/iso/identifier.rb:1) (base class)
+- [`lib/pubid_new/iso/single_identifier.rb`](lib/pubid_new/iso/single_identifier.rb:1)
+- [`lib/pubid_new/iso/supplement_identifier.rb`](lib/pubid_new/iso/supplement_identifier.rb:1)
 
-```bash
-ls -la archived-gems/pubid-idf/spec/fixtures/
-ls -la archived-gems/pubid-cen/spec/fixtures/
-ls -la archived-gems/pubid-bsi/spec/fixtures/
+**Current signature:**
+```ruby
+def to_s(lang: :en, lang_single: false, with_edition: false)
 ```
 
-#### Part B: Create Tests (45 min)
+**New signature:**
+```ruby
+def to_s(
+  lang: :en,
+  lang_single: false,
+  with_edition: false,
+  format: :ref_dated_long,
+  stage_format_long: nil,  # Auto-detect from format if nil
+  with_date: nil           # Auto-detect from format if nil
+)
+```
 
-For each flavor with fixtures, create `fixtures_spec.rb` following established pattern.
+#### Part B: Implement Format Resolution (30 min)
 
-#### Part C: Run and Document (30 min)
+**Objective:** Convert format symbols to rendering options
 
-- Run all newly created fixtures tests
-- Document pass rates
-- Update validation status
+**Files to create:**
+- `lib/pubid_new/iso/format_resolver.rb`
+
+**Implementation:**
+```ruby
+module PubidNew
+  module Iso
+    class FormatResolver
+      FORMATS = {
+        ref_num_short: {
+          with_language_code: :single,      # 1-char: E, F, R
+          stage_format_long: false,         # Short: DAM, COR
+          with_date: true
+        },
+        ref_num_long: {
+          with_language_code: :iso,         # 2-char: en, fr, ru
+          stage_format_long: true,          # Long: DAmd, Cor
+          with_date: true
+        },
+        ref_dated: {
+          with_language_code: :none,
+          stage_format_long: false,
+          with_date: true
+        },
+        ref_dated_long: {
+          with_language_code: :none,
+          stage_format_long: true,
+          with_date: true
+        },
+        ref_undated: {
+          with_language_code: :none,
+          stage_format_long: false,
+          with_date: false
+        },
+        ref_undated_long: {
+          with_language_code: :none,
+          stage_format_long: true,
+          with_date: false
+        }
+      }.freeze
+
+      def self.resolve(format)
+        FORMATS[format] || raise(ArgumentError, "Unknown format: #{format}")
+      end
+    end
+  end
+end
+```
+
+#### Part C: Update Rendering Logic (45 min)
+
+**Objective:** Apply format options in to_s methods
+
+**Files to modify:**
+- [`lib/pubid_new/iso/single_identifier.rb`](lib/pubid_new/iso/single_identifier.rb:1)
+- [`lib/pubid_new/iso/supplement_identifier.rb`](lib/pubid_new/iso/supplement_identifier.rb:1)
+
+**Key changes:**
+
+1. Resolve format to options
+2. Pass `stage_format_long` to `typed_stage.abbreviation(format_long: ...)`
+3. Handle `with_date` option to exclude/include year
+4. Handle `with_language_code` option (:single, :iso, :none)
 
 ---
 
-## Phase 4: Final Documentation (Session 103)
+## PHASE 2: IEC Advanced Rendering Styles (Session 99)
 
-### Session 103: Complete Documentation & Project Wrap (90 min)
+### Session 99: IEC Rendering Styles (120 min)
 
-**Objective:** Finalize all documentation and mark project complete
+#### Objective
 
-#### Part A: Update README.adoc (30 min)
+Implement same 6 reference formats for IEC identifiers, tailored to IEC stage codes.
 
-**Add Fixtures Validation Table:**
-```asciidoc
-== V2 Fixtures Validation Results
+#### Part A: IEC TypedStage Enhancement (40 min)
 
-|===
-| Flavor | Unit Tests | Fixtures Tests | Status
+**Files to modify:**
+- All IEC identifier classes with TYPED_STAGES
 
-| ISO | 2,648/2,648 | 7,465/7,680 (97.2%) | Excellent ✅
-| IEC | 2,191/2,191 | 2,191/2,191 (100%) | Perfect ✅
-| IEEE | 35/35 | ~6,614/10,332 (64.0%) | Good ✅
-| NIST | 57/57 | TBD/19,488 | Validating ⏳
-| JIS | 10,635/10,635 | 10,635/10,635 (100%) | Perfect ✅
-| ETSI | 24,718/24,718 | 24,718/24,718 (100%) | Perfect ✅
-| CCSDS | 490/490 | 490/490 (100%) | Perfect ✅
-| ITU | 172/172 | 172/172 (100%) | Perfect ✅
-| PLATEAU | 115/115 | 115/115 (100%) | Perfect ✅
-| ANSI | 175/175 | 175/175 (100%) | Perfect ✅
-| CEN | 95/95 | TBD | Validating ⏳
-| BSI | 168/177 | TBD | Validating ⏳
-| IDF | 26/26 | TBD | Validating ⏳
-|===
+**IEC-specific stages:**
+```ruby
+# Amendment
+CD: short="CDV", long="CD"
+FDIS: short="FDIS", long="FDIS" (same)
+Published: short="AMD1", long="Amd 1"
+
+# Corrigendum
+FDIS: short="FDIS", long="FDIS"
+Published: short="COR1", long="Cor 1"
 ```
 
-#### Part B: Create Fixtures Validation Report (30 min)
+#### Part B: IEC Format Resolver (30 min)
 
-Create `docs/FIXTURES_VALIDATION_REPORT.md`:
-- Executive summary
-- Methodology
-- Results by flavor
-- Format improvements in V2
-- Recommendations
+**Files to create:**
+- `lib/pubid_new/iec/format_resolver.rb`
 
-#### Part C: Archive Temporary Docs (20 min)
+**Implementation:** Same structure as ISO but with IEC-specific defaults
 
+#### Part C: IEC Rendering Update (50 min)
+
+**Files to modify:**
+- [`lib/pubid_new/iec/identifier.rb`](lib/pubid_new/iec/identifier.rb:1)
+- [`lib/pubid_new/iec/single_identifier.rb`](lib/pubid_new/iec/single_identifier.rb:1)
+- [`lib/pubid_new/iec/supplement_identifier.rb`](lib/pubid_new/iec/supplement_identifier.rb:1)
+
+---
+
+## PHASE 3: Testing and Validation (Sessions 100-101)
+
+### Session 100: ISO Format Testing (120 min)
+
+#### Objective
+
+Create comprehensive tests for all 6 ISO reference formats.
+
+#### Tasks
+
+1. **Create format spec** (60 min)
+   - Test each of 6 formats with multiple identifier types
+   - Verify language code rendering (1-char vs 2-char)
+   - Verify stage format (short vs long)
+   - Verify date inclusion/exclusion
+
+**File to create:**
+- `spec/pubid_new/iso/format_spec.rb`
+
+2. **Run fixtures tests** (30 min)
+   - Verify no regressions
+   - Test format parameter on real identifiers
+
+3. **Fix issues** (30 min)
+   - Address any test failures
+   - Refine implementation
+
+---
+
+### Session 101: IEC Format Testing (120 min)
+
+#### Objective
+
+Create comprehensive tests for all 6 IEC reference formats.
+
+#### Tasks
+
+1. **Create format spec** (60 min)
+   - Test each of 6 formats with IEC identifier types
+   - Verify IEC-specific stage rendering
+
+**File to create:**
+- `spec/pubid_new/iec/format_spec.rb`
+
+2. **Run fixtures tests** (30 min)
+3. **Fix issues** (30 min)
+
+---
+
+## PHASE 4: Documentation (Session 102)
+
+### Session 102: Documentation Updates (120 min)
+
+#### Part A: Update Memory Bank (30 min)
+
+**Files to update:**
+- `.kilocode/rules/memory-bank/context.md` - Add Session 97-101 progress
+- `.kilocode/rules/memory-bank/architecture.md` - Add rendering styles section
+
+#### Part B: Create Rendering Guide (40 min)
+
+**File to create:**
+- `docs/RENDERING_GUIDE.md`
+
+**Content:**
+- Overview of 6 reference formats
+- Examples for each format
+- Language code options
+- Stage format options
+- Usage examples
+- API reference
+
+#### Part C: Update README (30 min)
+
+**File to update:**
+- `README.adoc`
+
+**Sections to add:**
+- Advanced rendering section
+- Reference format examples
+- Link to rendering guide
+
+#### Part D: Archive Temporary Docs (20 min)
+
+**Move to old-docs/:**
 ```bash
 mkdir -p docs/old-docs/sessions
-mv docs/session-*-continuation-plan.md docs/old-docs/sessions/
-mv docs/session-*-summary.md docs/old-docs/sessions/
+mv docs/session-*-*.md docs/old-docs/sessions/
+mv docs/ieee-implementation-status.md docs/old-docs/
+mv docs/SESSION-*.md docs/old-docs/sessions/
 ```
 
-Keep:
-- `docs/V2_ARCHITECTURE.adoc`
-- `docs/FIXTURES_VALIDATION_REPORT.md`
-- `docs/URN-GENERATION-GUIDE.adoc`
+---
 
-#### Part D: Final Commit (10 min)
+## Implementation Architecture
 
-```bash
-git add -A
-git commit -m "feat: complete V2 fixtures validation and documentation
+### Core Principles
 
-- 8 flavors perfect (100% on fixtures)
-- IEEE improved to 64%+ (from 33.34%)
-- NIST validated
-- Comprehensive documentation complete
-- Project ready for release"
+1. **MECE Organization**
+   - Each format option is mutually exclusive
+   - All valid combinations are supported
+   - No overlapping functionality
+
+2. **Separation of Concerns**
+   - FormatResolver: Format symbol → Options hash
+   - TypedStage: Short/long abbreviation logic
+   - Identifier: Rendering orchestration
+   - Language: 1-char vs 2-char conversion
+
+3. **Open/Closed Principle**
+   - New formats added via FormatResolver.FORMATS hash
+   - TypedStage extensions don't modify base
+   - Identifier classes delegate to components
+
+4. **One Responsibility**
+   - FormatResolver: Only format resolution
+   - TypedStage: Only abbreviation selection
+   - Language: Only language code rendering
+   - Date: Date inclusion/exclusion logic
+
+### Component Responsibilities
+
+**FormatResolver:**
+- Maps format symbols to options
+- Validates format is supported
+- Returns options hash
+
+**TypedStage:**
+- Stores short_abbr and long_abbr
+- Returns appropriate abbreviation based on format_long
+- Preserves original_abbr when set
+
+**Identifier:**
+- Accepts format parameter
+- Resolves format to options
+- Delegates to components with options
+- Assembles final string
+
+**Language:**
+- Renders as 1-char or 2-char based on parameter
+- Preserves original_code for round-trip
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+
+**TypedStage Component:**
+```ruby
+describe Components::TypedStage do
+  let(:stage) {
+    Components::TypedStage.new(
+      abbr: ["DAM", "DAmd"],
+      short_abbr: "DAM",
+      long_abbr: "DAmd"
+    )
+  }
+
+  it "returns short abbreviation when format_long is false" do
+    expect(stage.abbreviation(format_long: false)).to eq("DAM")
+  end
+
+  it "returns long abbreviation when format_long is true" do
+    expect(stage.abbreviation(format_long: true)).to eq("DAmd")
+  end
+end
+```
+
+**FormatResolver:**
+```ruby
+describe Iso::FormatResolver do
+  it "resolves ref_num_short format" do
+    options = described_class.resolve(:ref_num_short)
+    expect(options[:with_language_code]).to eq(:single)
+    expect(options[:stage_format_long]).to eq(false)
+    expect(options[:with_date]).to eq(true)
+  end
+end
+```
+
+### Integration Tests
+
+**Format Spec:**
+```ruby
+describe "ISO Reference Formats" do
+  let(:amendment) { PubidNew::Iso.parse("ISO 8601:2019/DAM 1") }
+
+  describe ":ref_num_short" do
+    it "renders with 1-char lang + short stage + date" do
+      expect(amendment.to_s(format: :ref_num_short, lang: :en))
+        .to eq("ISO 8601:2019(E)/DAM 1")
+    end
+  end
+
+  describe ":ref_num_long" do
+    it "renders with 2-char lang + long stage + date" do
+      expect(amendment.to_s(format: :ref_num_long, lang: :en))
+        .to eq("ISO 8601:2019(en)/DAmd 1")
+    end
+  end
+
+  # ... test all 6 formats
+end
 ```
 
 ---
 
 ## Success Criteria
 
-### Session 97 (Unapproved.txt)
-- ✅ 873/874 (99.9%) on unapproved.txt
-- ✅ Overall: 4,317/10,332 (41.8%)
+### Session 97 (ISO Architecture)
+- ✅ TypedStage has short_abbr and long_abbr
+- ✅ FormatResolver implemented
+- ✅ Amendment and Corrigendum stages defined
+- ✅ Basic tests passing
 
-### Session 98 (Spacing)
-- ✅ +1,500 identifiers fixed
-- ✅ Overall: 5,817/10,332 (56.3%)
+### Session 98 (ISO Rendering)
+- ✅ All identifier classes support format parameter
+- ✅ 6 formats working correctly
+- ✅ Language code options work (1-char, 2-char, none)
+- ✅ Date inclusion/exclusion works
 
-### Session 99 (Publishers)
-- ✅ +80 identifiers fixed
-- ✅ Overall: 5,897/10,332 (57.1%)
+### Session 99 (IEC Implementation)
+- ✅ IEC FormatResolver created
+- ✅ IEC TypedStages updated
+- ✅ IEC renderers support format
+- ✅ 6 formats working for IEC
 
-### Session 100 (Std Optional)
-- ✅ +579 identifiers fixed
-- ✅ Overall: 6,476/10,332 (62.7%)
-- ✅ Stretch: 6,614/10,332 (64.0%)
+### Sessions 100-101 (Testing)
+- ✅ Comprehensive format specs created
+- ✅ No regressions in fixtures tests
+- ✅ Edge cases covered
 
-### Session 101 (NIST)
-- ✅ NIST validated (≥95% expected)
-- ✅ Results documented
-
-### Session 102 (Remaining)
-- ✅ All flavors checked
-- ✅ Validation status updated
-
-### Session 103 (Final)
+### Session 102 (Documentation)
+- ✅ RENDERING_GUIDE.md created
 - ✅ README.adoc updated
-- ✅ Fixtures validation report complete
+- ✅ Memory bank updated
 - ✅ Temporary docs archived
-- ✅ Project marked complete
+
+---
+
+## File Structure Reference
+
+### Files to Create
+
+```
+lib/pubid_new/iso/
+├── format_resolver.rb          # NEW - Format symbol to options
+
+lib/pubid_new/iec/
+├── format_resolver.rb          # NEW - IEC format resolver
+
+spec/pubid_new/iso/
+├── format_spec.rb              # NEW - 6 format tests
+
+spec/pubid_new/iec/
+├── format_spec.rb              # NEW - IEC format tests
+
+docs/
+├── RENDERING_GUIDE.md          # NEW - User documentation
+└── old-docs/                   # NEW - Archived temporary docs
+    └── sessions/
+```
+
+### Files to Modify
+
+```
+lib/pubid_new/components/
+├── typed_stage.rb              # ADD short_abbr, long_abbr, format param
+
+lib/pubid_new/iso/
+├── identifier.rb               # ADD format parameter
+├── single_identifier.rb        # APPLY format options
+├── supplement_identifier.rb    # APPLY format options
+└── identifiers/
+    ├── amendment.rb            # UPDATE TYPED_STAGES with short/long
+    └── corrigendum.rb          # UPDATE TYPED_STAGES with short/long
+
+lib/pubid_new/iec/
+├── identifier.rb               # ADD format parameter
+├── single_identifier.rb        # APPLY format options
+├── supplement_identifier.rb    # APPLY format options
+└── identifiers/
+    ├── amendment.rb            # UPDATE TYPED_STAGES
+    └── corrigendum.rb          # UPDATE TYPED_STAGES
+
+README.adoc                     # ADD advanced rendering section
+```
+
+---
+
+## Key Implementation Patterns
+
+### Format Resolution Pattern
+
+```ruby
+def to_s(format: :ref_dated_long, **opts)
+  # Resolve format to options
+  format_opts = FormatResolver.resolve(format)
+
+  # Merge with explicit opts (explicit opts override format)
+  resolved_opts = format_opts.merge(opts.compact)
+
+  # Use resolved options for rendering
+  render_with_options(resolved_opts)
+end
+```
+
+### Stage Format Pattern
+
+```ruby
+# In SupplementIdentifier
+abbr = typed_stage.abbreviation(
+  format_long: opts[:stage_format_long]
+)
+```
+
+### Language Code Pattern
+
+```ruby
+# In Language component
+def to_s(single: false)
+  single ? original_code : code
+end
+```
+
+### Date Inclusion Pattern
+
+```ruby
+# In SingleIdentifier
+parts << ":#{date.year}" if date && opts[:with_date]
+```
+
+---
+
+## Risk Management
+
+### Low Risk
+- TypedStage enhancement (well-defined interface)
+- FormatResolver (isolated component)
+- Format parameter propagation
+
+### Medium Risk
+- Extensive changes to rendering logic
+- Many identifier classes to update
+- Potential for regressions
+
+### Mitigation
+- Implement incrementally (one format at a time)
+- Test after each change
+- Keep fixtures tests running
+- Default format maintains current behavior
 
 ---
 
 ## Timeline Summary
 
-| Session | Focus | Duration | Expected Result |
-|---------|-------|----------|-----------------|
-| 97 | Unapproved.txt | 90 min | 41.8% (+8.5pp) |
-| 98 | Spacing | 90 min | 56.3% (+14.5pp) |
-| 99 | Publishers | 90 min | 57.1% (+0.8pp) |
-| 100 | Std optional | 120 min | 62.7-64% (+6pp) |
-| 101 | NIST | 90 min | Validate 19,488 |
-| 102 | Remaining | 90 min | IDF/CEN/BSI |
-| 103 | Documentation | 90 min | Complete |
-| **Total** | **All** | **660 min** | **Project done** |
-
----
-
-## Key Principles (NEVER COMPROMISE)
-
-1. **Architecture Correctness** - Always prioritize sound design over passing tests
-2. **MODEL-DRIVEN** - Identifiers contain objects, not strings
-3. **MECE Organization** - Each class handles distinct patterns
-4. **Separation of Concerns** - Parser/Builder/Identifier independent
-5. **No Hardcoding** - Use registers, components, inheritance
+| Session | Focus | Duration | Deliverables |
+|---------|-------|----------|--------------|
+| 97 | ISO Architecture | 120 min | TypedStage enhanced, TYPED_STAGES updated |
+| 98 | ISO Rendering | 120 min | All 6 formats working for ISO |
+| 99 | IEC Implementation | 120 min | All 6 formats working for IEC |
+| 100 | ISO Testing | 120 min | Comprehensive format specs |
+| 101 | IEC Testing | 120 min | IEC format validation |
+| 102 | Documentation | 120 min | Guides, README, cleanup |
+| **Total** | **All work** | **720 min (12 hours)** | **Complete** |
 
 ---
 
@@ -419,18 +676,42 @@ git commit -m "feat: complete V2 fixtures validation and documentation
 
 **Before starting:**
 1. ✅ Read this continuation plan
-2. ✅ Read [`docs/ieee-fixtures-fix-roadmap.md`](docs/ieee-fixtures-fix-roadmap.md:1)
-3. ✅ Review Session 96 validation results
+2. ✅ Read [`archived-gems/pubid-iso/lib/pubid/iso/identifier/base.rb:230-257`](archived-gems/pubid-iso/lib/pubid/iso/identifier/base.rb:230)
+3. ✅ Read [`lib/pubid_new/components/typed_stage.rb`](lib/pubid_new/components/typed_stage.rb:1)
+4. ✅ Read [`lib/pubid_new/iso/identifiers/amendment.rb`](lib/pubid_new/iso/identifiers/amendment.rb:1)
 
 **First task:**
-Fix month format and draft spacing in unapproved.txt
+Enhance TypedStage component with short_abbr and long_abbr attributes
 
-**Expected time:** 90 minutes
-
-**Expected result:** 873/874 (99.9%), +872 identifiers
+**Then:**
+Update Amendment TYPED_STAGES with short/long forms
 
 ---
 
-**Good luck with Session 97 - IEEE unapproved.txt fixes!** 🚀
+## Notes
 
-**Remember:** Architecture correctness > Test pass rate. The 33.34% → 64%+ improvement proves MODEL-DRIVEN design works!
+### Backward Compatibility
+
+- Default format: `:ref_dated_long` (current behavior)
+- Existing code continues to work unchanged
+- New formats are opt-in
+
+### Stage Format Rules
+
+**ISO Amendment:**
+- Short: DAM, FDAM, AMD (all uppercase)
+- Long: DAmd, FDAmd, Amd (mixed case)
+- No short: CD Amd, NP Amd, WD Amd (use long only)
+
+**ISO Corrigendum:**
+- Short: DCOR, FDCOR, COR (all uppercase)
+- Long: DCor, FDCor, Cor (mixed case)
+- No short: CD Cor, NP Cor, WD Cor (use long only)
+
+**IEC stages follow similar patterns** but with IEC-specific abbreviations.
+
+---
+
+**Good luck with Session 97 - ISO rendering styles enhancement!** 🚀
+
+**Remember:** Architecture correctness > Test pass rate. Fixtures organization is complete, now we're adding advanced features!

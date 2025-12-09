@@ -1,4 +1,5 @@
 require_relative "identifier"
+require_relative "rendering_style"
 
 module PubidNew
   module Iso
@@ -11,14 +12,38 @@ module PubidNew
         base_identifier&.publisher
       end
 
-      def to_s(lang: :en, lang_single: false, with_edition: false)
+      def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+        # If format is provided, create appropriate rendering style
+        if format
+          style = RenderingStyle.from_format(format)
+          lang_single = style.single_char_language?
+          stage_format_long = style.stage_format_long
+          with_date = style.with_date
+        elsif stage_format_long.nil? && with_date.nil? && !lang_single
+          # Use stored rendering_style settings
+          lang_single = rendering_style.single_char_language?
+          stage_format_long = rendering_style.stage_format_long
+          with_date = rendering_style.with_date
+        else
+          # Use provided parameters or defaults
+          stage_format_long = false if stage_format_long.nil?
+          with_date = true if with_date.nil?
+        end
+
         [].tap do |parts|
           parts << [
-            base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition),
-            "/#{typed_stage.abbreviation}",
+            base_identifier.to_s(
+              lang: lang,
+              lang_single: lang_single,
+              with_edition: with_edition,
+              format: format,
+              stage_format_long: stage_format_long,
+              with_date: with_date
+            ),
+            "/#{typed_stage.abbreviation(format_long: stage_format_long)}",
           ].join('')
           # Only add space if abbreviation doesn't end with a period
-          parts << (typed_stage.abbreviation.end_with?('.') ? '' : ' ')
+          parts << (typed_stage.abbreviation(format_long: stage_format_long).end_with?('.') ? '' : ' ')
           parts << number_portion(lang_single: lang_single)
 
           parts << ' ' + edition_portion(lang: lang) if with_edition && edition&.number

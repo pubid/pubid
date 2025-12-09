@@ -21,3 +21,15 @@ CEN/TS 15370-1:2006
 ISO/TS 80004-3:2010(F)
 # Parse error: Parslet::ParseFailed
 CEN/TS 15370-1:2006
+# Renders as: ISO/TS 80004-3:2010
+ISO/TS 80004-3:2010(F)
+# Renders as: ISO/TS 80004-3:2010
+ISO/TS 80004-3:2010(fr)
+# Parse error: Parslet::ParseFailed
+CEN/TS 15370-1:2006
+# Renders as: ISO/TS 80004-3:2010
+ISO/TS 80004-3:2010(F)
+# Renders as: ISO/TS 80004-3:2010
+ISO/TS 80004-3:2010(fr)
+# Parse error: Parslet::ParseFailed
+CEN/TS 15370-1:2006
