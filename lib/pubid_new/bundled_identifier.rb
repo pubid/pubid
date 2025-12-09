@@ -45,8 +45,8 @@ module PubidNew
       base_document&.typed_stage
     end
 
-    def to_s(lang: :en, lang_single: false)
-      result = base_document.to_s(lang: lang, lang_single: lang_single)
+    def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+      result = base_document.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)
 
       supplements.each do |supplement|
         # ISO DirectivesSupplement always uses " + " (space before)
@@ -54,9 +54,9 @@ module PubidNew
         # Other ISO supplements with base_identifier use " + " (space before)
         if supplement.class.name&.include?("DirectivesSupplement") ||
            (supplement.respond_to?(:base_identifier) && !supplement.base_identifier.nil?)
-          result += " + #{supplement.to_s(lang: lang, lang_single: lang_single)}"
+          result += " + #{supplement.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
         else
-          result += "+#{supplement.to_s(lang: lang, lang_single: lang_single)}"
+          result += "+#{supplement.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
         end
       end
 
@@ -80,10 +80,10 @@ module PubidNew
           if supplement.respond_to?(:supplement_publisher) && supplement.supplement_publisher
             parts << supplement.supplement_publisher.body.downcase
           end
-          
+
           # Always add "sup" for DirectivesSupplement (not "dir-sup")
           parts << "sup"
-          
+
           # Add year
           parts << supplement.date.year.to_s if supplement.date
         else

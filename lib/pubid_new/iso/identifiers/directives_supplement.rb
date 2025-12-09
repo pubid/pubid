@@ -41,11 +41,11 @@ module PubidNew
         #     (identifier.date ? ":#{identifier.date.year}" : "")
         # end
 
-        def to_s(lang: :en, lang_single: false)
+        def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
           if base_identifier
             # Full rendering with base identifier
             [
-              base_identifier.to_s(lang: lang, lang_single: lang_single),
+              base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date),
               " #{supplement_publisher.body}",
               " SUP",  # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
               (date ? ":#{date.year}" : ""),
@@ -58,7 +58,7 @@ module PubidNew
         end
 
         # Render just the supplement part (for use in bundled identifiers)
-        def to_supplement_s(lang: :en, lang_single: false)
+        def to_supplement_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
           date_str = if date
             month_part = date.month ? "-#{date.month}" : ""
             ":#{date.year}#{month_part}"
@@ -78,7 +78,7 @@ module PubidNew
         def to_urn
           # Start with base identifier's URN parts (it will use urn:iso:doc scheme)
           base_urn = base_identifier.to_urn
-          
+
           # Handle JTC pattern specially
           if supplement_publisher && supplement_publisher.body.match?(/^JTC\s+(\d+)$/i)
             # Extract JTC number: "JTC 1" -> ["jtc", "1"]
@@ -92,13 +92,13 @@ module PubidNew
             parts = [base_urn, "sup"]
             parts << supplement_publisher.body.downcase if supplement_publisher
           end
-          
+
           # Year (if present)
           parts << date.year.to_s if date
-          
+
           # Edition (if present)
           parts << "ed-#{edition.number}" if edition && edition.number
-          
+
           parts.join(":")
         end
       end

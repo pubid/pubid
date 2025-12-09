@@ -1,4 +1,4 @@
-## Current Status (Session 99 Complete - ISO at 98.59%!)
+## Current Status (Session 99 Complete - ISO at 98.81%!)
 
 **Overall V2 Status:**
 - **13/13 flavors with V2 implementations (100%!)**
@@ -11,16 +11,21 @@
 - **V1 Code:** 4 gems archived to `archived-gems/`
 - **RFC 5141-bis:** URN tests at **90.14%** (265/294 active)! ✅
 
-**Session 99 ACHIEVEMENT - ISO at 98.59% (99.49% excluding intentional limits)!** 🎯
-- **Fixed Corrigendum period parsing:** Added "Cor." abbreviation support
-- **ISO Fixtures:** 7,540/7,648 (98.59%) - up from 98.48% (+0.11pp, +8 identifiers)
-- **Excluding out-of-scope:** 7,540/7,579 (99.49%) - EXCEEDS 99% TARGET! ✅
+**Session 99 ACHIEVEMENT - ISO at 98.81% (99.71% excluding intentional limits)!** 🎯
+- **Part A: Fixed Corrigendum period parsing** - Added "Cor." abbreviation support (+8 identifiers)
+- **Part B: Fixed Directives rendering compatibility** - Updated method signatures for Session 98 rendering system (+17 identifiers)
+- **ISO Fixtures:** 7,557/7,648 (98.81%) - up from 98.48% (+0.33pp, +25 identifiers)
+- **Excluding out-of-scope:** 7,557/7,579 (99.71%) - EXCEEDS 99% TARGET BY 0.71pp! ✅
 - **Remaining failures breakdown:**
   - 69 intentionally out of scope (44 Cyrillic + 25 NSB format)
-  - 21 Directives (legitimate parser gaps)
-  - 18 other (16 IS + 1 Cor + 1 TS)
-- **Commit:** `11f7a8e` - feat(iso): add Cor. abbreviation support
-- **Time:** ~30 minutes
+  - 9 Directives (format variations)
+  - 5 DirectivesSupplement (format variations)
+  - 7 International Standard (edge cases)
+  - 1 Technical Specification (edge case)
+- **Perfect classes:** Amendment (100%), Corrigendum (100%), Technical Report (100%), Guide (100%), PAS (100%), IWA (100%), ISP (100%), Recommendation (100%), TTA (100%)
+- **Near-perfect:** International Standard (99.89%), Technical Specification (99.64%)
+- **Commits:** `11f7a8e` (Part A), `87741a3` (Parts A+B complete)
+- **Time:** ~60 minutes
 - **Next:** Session 100 - IEC rendering styles implementation
 
 **Session 97 ACHIEVEMENT - TypedStage Enhanced for Advanced Rendering!** 🎯

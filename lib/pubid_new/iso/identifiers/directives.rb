@@ -54,9 +54,9 @@ module PubidNew
             # Stage iteration is optional
             (stage_iteration ? ".#{stage_iteration.value}" : ""),
 
-            # Date is optional
-            (date ? ":#{date.year}" : ""),
-          ].join('')
+            # Date is optional - but don't add leading space if result is empty
+            (date && with_date ? ":#{date.year}" : ""),
+          ].join('').strip  # Strip to remove any leading/trailing spaces
 
           # Return nil if there's nothing to render
           result.empty? ? nil : result
@@ -94,15 +94,51 @@ module PubidNew
           parts.join(":")
         end
 
-        # def to_s(lang: :en, lang_single: false, with_edition: false)
-        #   [].tap do |parts|
-        #     parts << publisher_portion(lang: lang)
-        #     parts << number_portion(lang_single: lang_single)
-        #     parts << edition_portion(lang: lang) if with_edition
-        #   end.compact.join(' ').tap do |s|
-        #     s << language_portion(lang_single: lang_single) if languages&.any?
-        #   end
-        # end
+        def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+          # Handle format parameter if provided
+          if format
+            super
+          elsif stage_format_long || with_date || lang_single
+            super
+          elsif rendering_style
+            # Use rendering_style but handle special DIR cases
+            parts = []
+
+            # Publisher portion (includes JTC subgroup and DIR type)
+            parts << publisher_portion(
+              lang: lang,
+              stage_format_long: rendering_style.stage_format_long
+            )
+
+            # Number portion (may be just ":date" if no number)
+            num_part = number_portion(
+              lang_single: rendering_style.single_char_language?,
+              with_date: rendering_style.with_date
+            )
+
+            # If number portion starts with ":" (just date, no number), don't add space
+            if num_part && num_part.start_with?(":")
+              result = parts.compact.join(' ') + num_part
+            else
+              parts << num_part if num_part
+              result = parts.compact.join(' ')
+            end
+
+            # Edition portion (if requested)
+            if with_edition && edition && (edition.number || edition.original_text)
+              result << " " << edition_portion(lang: lang).to_s
+            end
+
+            # Language portion (if applicable)
+            if languages&.any? && rendering_style.with_language_code != :none
+              result << language_portion(lang_single: rendering_style.single_char_language?)
+            end
+
+            result
+          else
+            super
+          end
+        end
       end
     end
   end
