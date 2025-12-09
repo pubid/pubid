@@ -119,6 +119,42 @@ module PubidNew
           identifier.type = default_typed_stage.to_type if identifier.respond_to?(:type=)
         end
 
+        # Detect rendering style from parsed abbreviation
+        if identifier.respond_to?(:rendering_style=) && identifier.respond_to?(:typed_stage) && identifier.typed_stage
+          require_relative 'rendering_style'
+          ts = identifier.typed_stage
+
+          # Detect stage format from parsed abbreviation
+          stage_format_long = if ts.long_abbr && ts.original_abbr == ts.long_abbr
+            true  # Long form (DAmd, FDAmd, DCor, FDCor)
+          else
+            false  # Canonical form (DAM, FDAM, Cor, DCOR)
+          end
+
+          # Detect language code format from parsed languages
+          with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
+            # Check if original_code was single-char
+            first_lang = identifier.languages.first
+            if first_lang.original_code && first_lang.original_code.length == 1
+              :single
+            else
+              :iso
+            end
+          else
+            :none
+          end
+
+          # Detect with_date from parsed date
+          with_date = identifier.respond_to?(:date) && !identifier.date.nil?
+
+          # Create custom rendering style based on parsed format
+          identifier.rendering_style = RenderingStyle.new(
+            with_language_code: with_language_code,
+            stage_format_long: stage_format_long,
+            with_date: with_date
+          )
+        end
+
         identifier
       end
 

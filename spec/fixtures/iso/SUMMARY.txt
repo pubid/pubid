@@ -1,32 +1,32 @@
 Flavor: ISO
-Extracted: 2025-12-09 18:01:28
+Extracted: 2025-12-09 18:11:27
 Source: archived-gems/pubid-iso/spec/fixtures/*.txt
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total Identifiers: 7688
-Passing: 7412 (96.41%)
-Failing: 276 (3.59%)
+Passing: 7476 (97.24%)
+Failing: 212 (2.76%)
 
 BY IDENTIFIER CLASS
 ----------------------------------------------------------------------
 Class                          |   Pass |   Fail |  Total | Pass%
 ----------------------------------------------------------------------
-amendment                      |    135 |     63 |    198 | 68.18%
-corrigendum                    |     95 |     23 |    118 | 80.51%
+amendment                      |    147 |     51 |    198 | 74.24%
+corrigendum                    |     89 |     29 |    118 | 75.42%
 cyrillic                       |      0 |     44 |     44 |   0.0%
 directives                     |      0 |     21 |     21 |   0.0%
-guide                          |      6 |      8 |     14 | 42.86%
-international_standard         |   6507 |     80 |   6587 | 98.79%
+guide                          |      8 |      6 |     14 | 57.14%
+international_standard         |   6554 |     33 |   6587 |  99.5%
 international_standardized_profile |     13 |      0 |     13 | 100.0%
 international_workshop_agreement |     19 |      1 |     20 |  95.0%
 nsb_format                     |      0 |     25 |     25 |   0.0%
-pas                            |     49 |      2 |     51 | 96.08%
+pas                            |     51 |      0 |     51 | 100.0%
 recommendation                 |     44 |      1 |     45 | 97.78%
-technical_report               |    266 |      2 |    268 | 99.25%
-technical_specification        |    272 |      3 |    275 | 98.91%
-technology_trends_assessments  |      6 |      3 |      9 | 66.67%
+technical_report               |    268 |      0 |    268 | 100.0%
+technical_specification        |    274 |      1 |    275 | 99.64%
+technology_trends_assessments  |      9 |      0 |      9 | 100.0%
 
 FILES GENERATED
 ----------------------------------------------------------------------

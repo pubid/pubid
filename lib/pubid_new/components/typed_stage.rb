@@ -31,26 +31,7 @@ module PubidNew
       end
 
       def abbreviation(format_long: true)
-        # If original_abbr is set, check if it should be normalized
-        if original_abbr
-          # If original is in the abbr array, it's a variant that should normalize
-          if abbr.include?(original_abbr)
-            # Normalize variants:
-            # format_long: true → use long_abbr if available (DAmd), else canonical
-            # format_long: false → use canonical (DAM, Amd, Cor)
-            if format_long && long_abbr
-              return long_abbr
-            else
-              return abbr.first  # Canonical
-            end
-          else
-            # original_abbr is NOT in abbr array (e.g., "Amd.1" with period+number)
-            # Preserve it exactly as parsed
-            return original_abbr
-          end
-        end
-
-        # No original_abbr, use format preference
+        # Use format preference
         if format_long && long_abbr
           long_abbr
         else

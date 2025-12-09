@@ -627,3 +627,229 @@ IEC 80601-2-60:2019(en,fr)
 JCGM 200:2007(F)
 # Parse error: Parslet::ParseFailed
 JCGM 200:2008(F)
+# Renders as: ISO 11553-1
+ISO 11553-1 Ed.2
+# Renders as: ISO 14442:2006
+ISO 14442:2006 Ed 2
+# Renders as: ISO 16001:2008
+ISO 16001:2008 Ed 1
+# Renders as: ISO 16622:2002
+ISO 16622:2002 Ed 1
+# Renders as: ISO 17121:2000
+ISO 17121:2000 Ed 1
+# Renders as: ISO 22610:2006
+ISO 22610:2006 Ed
+# Renders as: ISO 293:2004
+ISO 293:2004 Ed 3
+# Renders as: ISO 9652-4:2000
+ISO 9652-4:2000 Ed 1
+# Renders as: ISO/IEC 30142
+ISO/IEC 30142 ED1
+# Renders as: ISO/NP 19144-4
+ISO/NWIP 19144-4
+# Renders as: ISO/CD 14065.2:2018
+ISO/CD2 14065:2018
+# Parse error: ArgumentError
+ISO/IEC Directives Part 1
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1:2022
+# Parse error: ArgumentError
+ISO/IEC Directives Part 2
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 2
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 2:2021
+# Parse error: ArgumentError
+ISO/IEC Directives, IEC Supplement:2022
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement
+# Parse error: ArgumentError
+ISO/IEC Directives, JTC 1 Supplement:2021
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1:2022 + IEC Supplement:2022
+# Parse error: Parslet::ParseFailed
+ISO/IEC 10646-1:1993/pDCOR.2
+# Renders as: ISO/CEI Guide 71:2001
+GUIDE ISO/CEI 71:2001(F)
+# Renders as: ISO/Guide 34:2009
+Guide ISO 34:2009
+# Renders as: ISO/CEI Guide 37:1995
+Guide ISO/CEI 37:1995
+# Renders as: ISO/CEI Guide 50
+Guide ISO/CEI 50
+# Renders as: ISO/CEI Guide 51:1999
+Guide ISO/CEI 51:1999
+# Renders as: ISO/IEC Guide 59:1994
+Guide ISO/IEC 59:1994
+# Renders as: ISO 5167-5:2016
+ISO 5167-5:2016(fr)
+# Renders as: ISO/CEI 17021-3:2017
+ISO/CEI 17021-3:2017(fr)
+# Renders as: ISO/CEI 17024:2012
+ISO/CEI 17024:2012(fr)
+# Renders as: ISO/CEI 27000:2016
+ISO/CEI 27000:2016(fr)
+# Renders as: ISO/CEI DIS 80079-20-2
+ISO/CEI DIS 80079-20-2(fr)
+# Renders as: ISO/IEEE 11073-30200:2004
+ISO/IEEE 11073-30200:2004(F)
+# Renders as: ISO 11890-1:2007
+ISO 11890-1:2007(ru)
+# Renders as: ISO 14040:2006
+ISO 14040:2006(ar)
+# Renders as: ISO 14451-1:2013
+ISO 14451-1:2013(en,fr,other)
+# Renders as: ISO 17225-1:2014
+ISO 17225-1:2014(R)
+# Renders as: ISO 17225-1:2014
+ISO 17225-1:2014(ru)
+# Renders as: ISO 1891-2:2014
+ISO 1891-2:2014(en,fr,ru,other)
+# Renders as: ISO 19109:2005
+ISO 19109:2005(E)
+# Renders as: ISO 19901-3:2014
+ISO 19901-3:2014(ru)
+# Renders as: ISO 1998-2:1976
+ISO 1998-2:1976(en,fr,ru)
+# Renders as: ISO 20251:2016
+ISO 20251:2016(F)
+# Renders as: ISO 20805:2011
+ISO 20805:2011(ru)
+# Renders as: ISO 21542:2011
+ISO 21542:2011(F)
+# Renders as: ISO 21542:2011
+ISO 21542:2011(fr)
+# Renders as: ISO 21809-2:2014
+ISO 21809-2:2014(ru)
+# Renders as: ISO 26000:2010
+ISO 26000:2010(es)
+# Renders as: ISO 31000:2009
+ISO 31000:2009(ar)
+# Renders as: ISO 3166-1:2013
+ISO 3166-1:2013(en,fr)
+# Renders as: ISO 4618:2014
+ISO 4618:2014(de)
+# Renders as: ISO 4618:2014
+ISO 4618:2014(ru)
+# Renders as: ISO 5053-1:2015
+ISO 5053-1:2015(en,fr)
+# Renders as: ISO 55000:2014
+ISO 55000:2014(es)
+# Renders as: ISO 6091:2010
+ISO 6091:2010(ru)
+# Renders as: ISO 8081:2021
+ISO 8081:2021(fr)
+# Renders as: ISO/ASTM DIS 52920
+ISO/ASTM DIS 52920(fr)
+# Renders as: ISO/DIS 12625-1
+ISO/DIS 12625-1(en,fr)
+# Renders as: ISO/DIS 16228:2015
+ISO/DIS 16228:2015(F)
+# Renders as: ISO/DIS 18218-2
+ISO/DIS 18218-2(fr)
+# Renders as: ISO/DIS 22964
+ISO/DIS 22964(fr)
+# Renders as: ISO/DIS 24478
+ISO/DIS 24478(fr)
+# Renders as: ISO/DIS 30415
+ISO/DIS 30415(fr)
+# Renders as: ISO/DIS 6789-2:2014
+ISO/DIS 6789-2:2014(F)
+# Renders as: ISO/DIS 6789-2.2
+ISO/DIS 6789-2.2(fr)
+# Renders as: ISO/DIS 80000-1
+ISO/DIS 80000-1(fr)
+# Renders as: ISO/DIS 8566-5:2016
+ISO/DIS 8566-5:2016(F)
+# Renders as: ISO/IEC 17050-1:2004
+ISO/IEC 17050-1:2004(ar)
+# Renders as: ISO/IEC 17050-1:2004
+ISO/IEC 17050-1:2004(es)
+# Renders as: ISO/IEC 2382-36:2019
+ISO/IEC 2382-36:2019(E/F)
+# Renders as: ISO/IEC 2382-37:2012
+ISO/IEC 2382-37:2012(ru)
+# Renders as: ISO/IEC/IEEE 24765:2017
+ISO/IEC/IEEE 24765:2017(en)
+# Parse error: Parslet::ParseFailed
+WD/ISO 10360-2
+# Parse error: Parslet::ParseFailed
+WD/ISO 10360-5:2000
+# Parse error: Parslet::ParseFailed
+EN 12643:2014
+# Renders as: IEC 31010:2019
+IEC 31010:2019(en,fr)
+# Renders as: IEC 80601-2-60:2019
+IEC 80601-2-60:2019(en,fr)
+# Parse error: Parslet::ParseFailed
+JCGM 200:2007(F)
+# Parse error: Parslet::ParseFailed
+JCGM 200:2008(F)
+# Renders as: ISO 11553-1
+ISO 11553-1 Ed.2
+# Renders as: ISO 14442:2006
+ISO 14442:2006 Ed 2
+# Renders as: ISO 16001:2008
+ISO 16001:2008 Ed 1
+# Renders as: ISO 16622:2002
+ISO 16622:2002 Ed 1
+# Renders as: ISO 17121:2000
+ISO 17121:2000 Ed 1
+# Renders as: ISO 22610:2006
+ISO 22610:2006 Ed
+# Renders as: ISO 293:2004
+ISO 293:2004 Ed 3
+# Renders as: ISO 9652-4:2000
+ISO 9652-4:2000 Ed 1
+# Renders as: ISO/IEC 30142
+ISO/IEC 30142 ED1
+# Renders as: ISO/NP 19144-4
+ISO/NWIP 19144-4
+# Renders as: ISO/CD 14065.2:2018
+ISO/CD2 14065:2018
+# Parse error: ArgumentError
+ISO/IEC Directives Part 1
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1:2022
+# Parse error: ArgumentError
+ISO/IEC Directives Part 2
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 2
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 2:2021
+# Parse error: ArgumentError
+ISO/IEC Directives, IEC Supplement:2022
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement
+# Parse error: ArgumentError
+ISO/IEC Directives, JTC 1 Supplement:2021
+# Parse error: ArgumentError
+ISO/IEC Directives, Part 1:2022 + IEC Supplement:2022
+# Parse error: Parslet::ParseFailed
+ISO/IEC 10646-1:1993/pDCOR.2
+# Renders as: ISO/CEI Guide 71:2001(F)
+GUIDE ISO/CEI 71:2001(F)
+# Renders as: ISO/Guide 34:2009
+Guide ISO 34:2009
+# Renders as: ISO/CEI Guide 37:1995
+Guide ISO/CEI 37:1995
+# Renders as: ISO/CEI Guide 50
+Guide ISO/CEI 50
+# Renders as: ISO/CEI Guide 51:1999
+Guide ISO/CEI 51:1999
+# Renders as: ISO/IEC Guide 59:1994
+Guide ISO/IEC 59:1994
+# Parse error: Parslet::ParseFailed
+WD/ISO 10360-2
+# Parse error: Parslet::ParseFailed
+WD/ISO 10360-5:2000
+# Parse error: Parslet::ParseFailed
+EN 12643:2014
+# Parse error: Parslet::ParseFailed
+JCGM 200:2007(F)
+# Parse error: Parslet::ParseFailed
+JCGM 200:2008(F)
