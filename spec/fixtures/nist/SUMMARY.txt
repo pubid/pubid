@@ -1,0 +1,68 @@
+Flavor: NIST
+Extracted: 2025-12-06 19:54:07
+Source: archived-gems/pubid-nist/spec/fixtures/*.txt
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total Identifiers: 20348
+Passing: 19948 (98.03%)
+Failing: 400 (1.97%)
+
+BY IDENTIFIER CLASS
+----------------------------------------------------------------------
+Class                          |   Pass |   Fail |  Total | Pass%
+----------------------------------------------------------------------
+base                           |   5224 |    105 |   5329 | 98.03%
+circular                       |    861 |      5 |    866 | 99.42%
+circular_supplement            |      0 |      2 |      2 |   0.0%
+commercial_standard_emergency  |      0 |      6 |      6 |   0.0%
+commercial_standards_monthly   |     99 |      0 |     99 | 100.0%
+crpl_report                    |     32 |      3 |     35 | 91.43%
+federal_information_processing_standards |    398 |      4 |    402 |  99.0%
+fips                           |      0 |      4 |      4 |   0.0%
+gcr                            |      0 |      6 |      6 |   0.0%
+handbook                       |    349 |      7 |    356 | 98.03%
+internal_report                |   7728 |     62 |   7790 |  99.2%
+ir                             |      0 |     30 |     30 |   0.0%
+sp                             |      0 |     58 |     58 |   0.0%
+special_publication            |   3155 |     62 |   3217 | 98.07%
+technical_note                 |   2102 |      6 |   2108 | 99.72%
+tn                             |      0 |      6 |      6 |   0.0%
+unknown                        |      0 |     34 |     34 |   0.0%
+
+FILES GENERATED
+----------------------------------------------------------------------
+Pass directory: 9 files
+  - base.txt
+  - circular.txt
+  - commercial_standards_monthly.txt
+  - crpl_report.txt
+  - federal_information_processing_standards.txt
+  - handbook.txt
+  - internal_report.txt
+  - special_publication.txt
+  - technical_note.txt
+
+Fail directory: 16 files
+  - base.txt
+  - circular.txt
+  - circular_supplement.txt
+  - commercial_standard_emergency.txt
+  - crpl_report.txt
+  - federal_information_processing_standards.txt
+  - fips.txt
+  - gcr.txt
+  - handbook.txt
+  - internal_report.txt
+  - ir.txt
+  - sp.txt
+  - special_publication.txt
+  - technical_note.txt
+  - tn.txt
+  - unknown.txt
+
+ASSESSMENT
+----------------------------------------------------------------------
+Status: EXCELLENT ✅
+Assessment: Production-ready with minor limitations.

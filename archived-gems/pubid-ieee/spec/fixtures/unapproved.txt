@@ -33,7 +33,7 @@ IEEE Unapproved Draft Std P741/D2, Apr 2007
 IEEE Unapproved Draft Std P754/D1.4.0, Apr 2007
 IEEE Unapproved Draft Std PC37.235/D4.0, Mar 2007
 IEEE Unapproved Draft Std P802.16g/D9, Apr 2007
-IEEE Unapproved Draft Std P802.3-2005/Cor2/D2.0, Mar 2007
+!IEEE Unapproved Draft Std P802.3-2005/Cor2/D2.0, Mar 2007!IEEE Unapproved Draft Std P802.3-2005/Cor 2/D2.0, Mar 2007
 IEEE Unapproved Draft Std PC57.13.1/D8.0, Jul 2006
 IEEE Unapproved Draft Std PC57.12.35/D7, Apr 2007
 IEEE Unapproved Draft Std P1484.20.1/D5, Jan 2007
@@ -84,7 +84,7 @@ IEEE Unapproved Draft Std PC57.147/D11, Aug 2007
 IEEE Unapproved Draft Std PC37.230/D6.1, Jul 2007
 IEEE Unapproved Draft Std P1542/D8, Aug 2007
 IEEE Unapproved Draft Std P802.21/D7.1, Aug 2007
-IEEE Unapproved Draft Std P802.16-2004/Cor2/D4
+!IEEE Unapproved Draft Std P802.16-2004/Cor2/D4!IEEE Unapproved Draft Std P802.16-2004/Cor 2/D4
 IEEE Unapproved Draft Std P802.16j/D1, Aug 2007
 IEEE Unapproved Draft Std P1900.1/D2.0, Aug 2007
 IEEE Unapproved Draft Std P1633/D12, Sep 2007
@@ -131,7 +131,7 @@ IEEE Unapproved Draft Std P802.3/D2.0, Oct 2007
 IEEE Unapproved Draft Std P1613a/D3.2, Nov 2007
 IEEE Unapproved Draft Std P1594/D3, Oct 2007
 IEEE Unapproved Draft Std PC57.110/D6, Nov 2007
-IEEE Unapproved Draft Std PC62.21/Cor1/D4, Oct 2007
+!IEEE Unapproved Draft Std PC62.21/Cor1/D4, Oct 2007!IEEE Unapproved Draft Std PC62.21/Cor 1/D4, Oct 2007
 IEEE Unapproved Draft Std P1363.2/D28, Aug 2007
 IEEE Unapproved Draft Std P2600/D30b, Nov 2007
 IEEE Unapproved Draft Std P16326/DFCD, Sept 2007
@@ -140,7 +140,7 @@ IEEE Unapproved Draft Std P15288/DFDIS, Nov 2007
 IEEE Unapproved Draft Std P12207/FDIS, Nov 2007
 IEEE Unapproved Draft Std PC37.12/D8, Oct 2007
 IEEE Unapproved Draft Std PC37.2/D2.2 Nov, 2007
-IEEE Unapproved Draft Std P525/Cor1/D1, Sept 2007
+!IEEE Unapproved Draft Std P525/Cor1/D1, Sept 2007!IEEE Unapproved Draft Std P525/Cor 1/D1, Sept 2007
 IEEE Unapproved Draft Std P11073-20601/D04, Dec 2007
 IEEE Unapproved Draft Std 802.20/D3.1m, Dec 2007
 IEEE Unapproved Draft Std P1599/D4.0, Dec 2007
@@ -156,7 +156,7 @@ IEEE Unapproved Draft Std P1660/D6, Dec 2007
 IEEE Unapproved Draft Std P605/D13, Nov 2007
 IEEE Unapproved Draft Std P802.1ak_Cor 1/D1.0, Dec 2007
 IEEE Unapproved Draft Std PC62.11a/D9E, Sept 2007
-IEEE Unapproved Draft Std P525_Cor1/D2, Dec 2007
+!IEEE Unapproved Draft Std P525_Cor1/D2, Dec 2007!IEEE Unapproved Draft Std P525_Cor 1/D2, Dec 2007
 IEEE Unapproved Draft Std P802.21/D8.0, Dec 2007
 IEEE Unapproved Draft Std P829_D9, Dec 2007
 IEEE Unapproved Draft Std P802.11y_D7.0, Dec 2007
@@ -233,7 +233,7 @@ IEEE Unapproved Draft Std 802.1ah-D4.2, Mar 2008
 IEEE Unapproved Draft Std P1698/D1.3, Feb 2008
 IEEE Unapproved Draft Std PC37.43/D10, Oct 2007
 IEEE Unapproved Draft Std P1776/D9b, Feb. 2008
-IEEE Unapproved Draft Std P1431-2004/Cor1_D3, Apr 2008
+!IEEE Unapproved Draft Std P1431-2004/Cor1_D3, Apr 2008!IEEE Unapproved Draft Std P1431-2004/Cor 1_D3, Apr 2008
 IEEE Unapproved Draft Std P754_D1.8.0, Apr 2008
 IEEE Unapproved Draft Std PC37.16/D13, Apr 08
 IEEE Unapproved Draft Std P802.11n/D4.00, Mar 2008
@@ -259,7 +259,7 @@ IEEE Unapproved Draft Std PC37.43/D11, Apr 2008
 IEEE Unapproved Draft Std P754_D9.0 Apr 2008
 IEEE Unapproved Draft Std PC37.12/D10, March 2008
 IEEE Unapproved Draft Std P11073-10408/D02, Apr 2008
-IEEE Unapproved Draft Std P1293-1998/Cor1-2008_D3, May 2008
+!IEEE Unapproved Draft Std P1293-1998/Cor1-2008_D3, May 2008!IEEE Unapproved Draft Std P1293-1998/Cor 1-2008_D3, May 2008
 IEEE Unapproved Draft Std PC62.92.5/D4, May 2008
 IEEE Unapproved Draft Std P1675_D7, May 2008
 IEEE Unapproved Draft Std P1624/D3 May 2008
@@ -305,7 +305,7 @@ IEEE Unapproved Draft Std PC37.60/D04, Jun, 2008
 IEEE Unapproved Draft Std P1597.1/D4.3, Jun 2008
 IEEE Unapproved Draft Std P841/D4, Jul 2008
 IEEE Unapproved Draft Std P1076/D4.3a, Jul 2008
-IEEE Unapproved Draft Std P1672-2006_Cor1/D3, Jun 2008
+!IEEE Unapproved Draft Std P1672-2006_Cor1/D3, Jun 2008!IEEE Unapproved Draft Std P1672-2006_Cor 1/D3, Jun 2008
 IEEE Unapproved Draft Std P11073-10442/D06, Jul 2008
 IEEE Unapproved Draft Std P2600.1/D37a, Aug 2008
 IEEE Unapproved Draft Std P2600.3/D37a, Aug 2008
@@ -460,7 +460,7 @@ IEEE Unapproved Draft Std P802.3av/D3.2, Apr 2009
 IEEE Unapproved Draft Std PC63.10/D8.6F, Apr 2009
 IEEE Unapproved Draft Std P802.16h/D9, Mar 2009
 IEEE Unapproved Draft Std P802.3at/D4.1, Apr 2009
-IEEE Unapproved Draft Std C37.04-1999/Cor1_DB2, Apr 2009
+!IEEE Unapproved Draft Std C37.04-1999/Cor1_DB2, Apr 2009!IEEE Unapproved Draft Std C37.04-1999/Cor 1_DB2, Apr 2009
 IEEE Unapproved Draft Std P42010/D6, Mar 2009
 IEEE Unapproved Draft Std P1613/D2.8, Apr 2009
 IEEE Unapproved Draft Std P48/D5.3, Apr 2009
@@ -477,7 +477,7 @@ IEEE Unapproved Draft Std P1613/D2.98, Apr 2009
 IEEE Unapproved Draft Std 11073-10472/D02, Apr 2009
 IEEE Unapproved Draft Std P1657/D27, Apr 2009
 IEEE Unapproved Draft Std P1665/D14, April 2009
-IEEE Unapproved Draft Std PC37.04-1999/Cor1/D3, May 2009
+!IEEE Unapproved Draft Std PC37.04-1999/Cor1/D3, May 2009!IEEE Unapproved Draft Std PC37.04-1999/Cor 1/D3, May 2009
 IEEE Unapproved Draft Std P802.11w/D10.0, May 2009
 IEEE Unapproved Draft Std P802.3at/D4.2, Jun 2009
 IEEE Unapproved Draft Std C57.15/D8.6, Jun 2009
@@ -499,7 +499,7 @@ IEEE Unapproved Draft Std PC57.12.60/D3, Apr 2009
 IEEE Unapproved Draft Std P802.3bc/D3.0, Jun 2009
 IEEE Unapproved Draft Std P802.11v/D5.0, Mar 2009
 IEEE Unapproved Draft Std PC57.12.34/D4E, Jun 2009
-IEEE Unapproved Draft Std P1137_Cor1/D2, Jun 2009
+!IEEE Unapproved Draft Std P1137_Cor1/D2, Jun 2009!IEEE Unapproved Draft Std P1137_Cor 1/D2, Jun 2009
 IEEE Unapproved Draft Std P603/D2, Jun 2009
 IEEE Unapproved Draft Std PC37.233/D3.1, Jun 2009
 IEEE Unapproved Draft Std P1142/D1.1, Apr 2009
@@ -667,7 +667,7 @@ IEEE Unapproved Draft Std P7-4.3.2_D3, Jan 2010
 IEEE Unapproved Draft Std PC57.142/D6, Jan 2010
 IEEE Unapproved Draft Std PC37.122/D15, Jan 2010
 IEEE Unapproved Draft Std PC57.113/D4, Oct 2009
-IEEE Unapproved Draft Std P671/Cor1_D2, Oct 2009
+!IEEE Unapproved Draft Std P671/Cor1_D2, Oct 2009!IEEE Unapproved Draft Std P671/Cor 1_D2, Oct 2009
 IEEE Unapproved Draft Std P11073-20601a/D13, Jan 2010
 IEEE Unapproved Draft Std P11073-10420_D7, Jan 2010
 IEEE Unapproved Draft Std P802.11p /D10.0, Jan 2010

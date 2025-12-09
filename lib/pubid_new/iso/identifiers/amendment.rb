@@ -44,15 +44,23 @@ module PubidNew
           code: :cdamd,
           stage_code: :cd,
           type_code: :amd,
-          abbr: ["CD Amd", "PDAM"],
+          abbr: ["CD Amd"],
           name: "Committee Draft for Amendment",
+          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
+        ),
+        Components::TypedStage.new(
+          code: :pdamd,
+          stage_code: :cd,
+          type_code: :amd,
+          abbr: ["PDAM"],
+          name: "Proposed Draft Amendment (Legacy)",
           harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
         ),
         Components::TypedStage.new(
           code: :damd,
           stage_code: :damd,
           type_code: :amd,
-          abbr: ["DAM", "DAmd", "FPDAM"], # "DAmd", "FPDAM" is legacy
+          abbr: ["DAM", "DAmd"],
           name: "Draft Amendment",
           harmonized_stages: %w[40.00 40.20 40.60 40.92 40.93 40.98 40.99],
         ),
@@ -60,8 +68,16 @@ module PubidNew
           code: :fdamd,
           stage_code: :fdamd,
           type_code: :amd,
-          abbr: ["FDAM", "FDAmd"], # "FDAmd" is legacy
+          abbr: ["FDAM", "FDAmd"],
           name: "Final Draft Amendment",
+          harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+        ),
+        Components::TypedStage.new(
+          code: :fpdamd,
+          stage_code: :fdamd,
+          type_code: :amd,
+          abbr: ["FPDAM"],
+          name: "Final Proposed Draft Amendment (Legacy)",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
         ),
         Components::TypedStage.new(
