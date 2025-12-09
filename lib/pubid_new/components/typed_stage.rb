@@ -34,8 +34,10 @@ module PubidNew
         # Use format preference
         if format_long && long_abbr
           long_abbr
+        elsif !format_long && short_abbr
+          short_abbr
         else
-          abbr.first  # Default to canonical
+          abbr.first  # Fallback to canonical
         end
       end
 

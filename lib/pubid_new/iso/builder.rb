@@ -125,10 +125,12 @@ module PubidNew
           ts = identifier.typed_stage
 
           # Detect stage format from parsed abbreviation
-          stage_format_long = if ts.long_abbr && ts.original_abbr == ts.long_abbr
-            true  # Long form (DAmd, FDAmd, DCor, FDCor)
+          stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.long_abbr)
+            true  # Long form (starts with Amd, DAmd, FDAmd, Cor, DCor, FDCor)
+          elsif ts.short_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.short_abbr)
+            false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR)
           else
-            false  # Canonical form (DAM, FDAM, Cor, DCOR, Amd)
+            false  # Default to short/canonical
           end
 
           # Detect language code format from parsed languages

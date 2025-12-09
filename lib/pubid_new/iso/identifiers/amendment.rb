@@ -71,7 +71,7 @@ module PubidNew
         Components::TypedStage.new(
           code: :damd,
           abbr: ["DAM", "DAmd"],
-          short_abbr: nil,
+          short_abbr: "DAM",
           long_abbr: "DAmd",
           type_code: :amd,
           stage_code: :damd,
@@ -81,7 +81,7 @@ module PubidNew
         Components::TypedStage.new(
           code: :fdamd,
           abbr: ["FDAM", "FDAmd"],
-          short_abbr: nil,
+          short_abbr: "FDAM",
           long_abbr: "FDAmd",
           type_code: :amd,
           stage_code: :fdamd,
@@ -111,8 +111,8 @@ module PubidNew
         Components::TypedStage.new(
           code: :published,
           abbr: ["Amd", "AMD", "Amd."],
-          short_abbr: nil,
-          long_abbr: nil,
+          short_abbr: "AMD",
+          long_abbr: "Amd",
           type_code: :amd,
           stage_code: :published,
           name: "Amendment",

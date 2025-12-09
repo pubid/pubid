@@ -51,7 +51,7 @@ module PubidNew
         Components::TypedStage.new(
           code: :dcor,
           abbr: ["DCor", "DCOR"],
-          short_abbr: nil,
+          short_abbr: "DCOR",
           long_abbr: "DCor",
           type_code: :cor,
           stage_code: :dcor,
@@ -59,7 +59,7 @@ module PubidNew
         Components::TypedStage.new(
           code: :fdcor,
           abbr: ["FDCor", "FDCOR", "FCOR"],
-          short_abbr: nil,
+          short_abbr: "FDCOR",
           long_abbr: "FDCor",
           type_code: :cor,
           stage_code: :fdcor,
@@ -75,8 +75,8 @@ module PubidNew
         Components::TypedStage.new(
           code: :pubcor,
           abbr: ["Cor", "COR"],
-          short_abbr: nil,
-          long_abbr: nil,
+          short_abbr: "COR",
+          long_abbr: "Cor",
           type_code: :cor,
           stage_code: :published,
         ),

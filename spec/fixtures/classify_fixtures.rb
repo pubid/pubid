@@ -8,9 +8,9 @@ require "fileutils"
 # Handles both plain identifiers and !original!rendered format
 class FixturesClassifier
   FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi].freeze
-  
+
   attr_reader :flavor, :verbose, :fixtures_dir
-  
+
   def initialize(flavor, verbose: false)
     @flavor = flavor.downcase
     @verbose = verbose
@@ -23,51 +23,51 @@ class FixturesClassifier
     }
     validate_flavor!
   end
-  
+
   def classify
     log "Classifying fixtures for #{flavor.upcase}..."
-    
+
     unless Dir.exist?(fixtures_dir)
       puts "⚠️  No fixtures directory found for #{flavor.upcase}"
       return false
     end
-    
+
     # Collect all identifiers from pass and fail
     all_identifiers = collect_all_identifiers
-    
+
     if all_identifiers.empty?
       puts "⚠️  No identifiers found for #{flavor.upcase}"
       return false
     end
-    
+
     log "Found #{all_identifiers.size} total identifier entries"
-    
+
     # Clear existing pass/fail files
     clear_output_files
-    
+
     # Classify each identifier
     all_identifiers.each do |entry|
       classify_identifier(entry)
     end
-    
+
     # Generate summary
     generate_summary
-    
+
     log "✅ Classification complete for #{flavor.upcase}"
     true
   end
-  
+
   private
-  
+
   def validate_flavor!
     unless FLAVORS.include?(flavor)
       raise ArgumentError, "Unknown flavor: #{flavor}. Valid: #{FLAVORS.join(', ')}"
     end
   end
-  
+
   def collect_all_identifiers
     identifiers = []
-    
+
     # Collect from pass directory
     Dir.glob(File.join(fixtures_dir, "pass", "*.txt")).each do |file|
       File.readlines(file).each do |line|
@@ -76,7 +76,7 @@ class FixturesClassifier
         identifiers << line
       end
     end
-    
+
     # Collect from fail directory
     Dir.glob(File.join(fixtures_dir, "fail", "*.txt")).each do |file|
       File.readlines(file).each do |line|
@@ -85,20 +85,20 @@ class FixturesClassifier
         identifiers << line
       end
     end
-    
+
     identifiers.uniq
   end
-  
+
   def clear_output_files
     FileUtils.rm_rf(File.join(fixtures_dir, "pass"))
     FileUtils.rm_rf(File.join(fixtures_dir, "fail"))
     FileUtils.mkdir_p(File.join(fixtures_dir, "pass"))
    FileUtils.mkdir_p(File.join(fixtures_dir, "fail"))
   end
-  
+
   def classify_identifier(entry)
     @stats[:total] += 1
-    
+
     if entry.start_with?("!")
       # !original!rendered format
       classify_normalized_entry(entry)
@@ -107,25 +107,32 @@ class FixturesClassifier
       classify_plain_entry(entry)
     end
   end
-  
+
   def classify_normalized_entry(entry)
     # Parse !original!rendered format
     parts = entry.split("!")
     return classify_plain_entry(entry) if parts.size != 3  # Malformed
-    
+
     original = parts[1]
     expected_rendered = parts[2]
-    
+
     begin
       parsed = parse_identifier(original)
       actual_rendered = parsed.to_s
-      
+
       if actual_rendered == expected_rendered
-        # Success - rendered as expected, keep !original!rendered in pass
+        # Rendered matches expected
         @stats[:passing] += 1
         class_name = detect_class_name(parsed, original)
         @stats[:by_class][class_name][:pass] += 1
-        append_to_file("pass", class_name, entry)
+
+        if original == expected_rendered
+          #Perfect round-trip, use plain identifier
+          append_to_file("pass", class_name, original)
+        else
+          # Successful normalization, keep !original!rendered format
+          append_to_file("pass", class_name, entry)
+        end
       else
         # Mismatch - keep in fail with updated rendered
         @stats[:failing] += 1
@@ -142,12 +149,12 @@ class FixturesClassifier
       append_to_file("fail", class_name, original)
     end
   end
-  
+
   def classify_plain_entry(id_str)
     begin
       parsed = parse_identifier(id_str)
       rendered = parsed.to_s
-      
+
       if rendered == id_str
         # Perfect round-trip
         @stats[:passing] += 1
@@ -170,7 +177,7 @@ class FixturesClassifier
       append_to_file("fail", class_name, id_str)
     end
   end
-  
+
   def parse_identifier(id_str)
     case flavor
     when "iso" then PubidNew::Iso.parse(id_str)
@@ -190,14 +197,14 @@ class FixturesClassifier
       raise "Unknown flavor: #{flavor}"
     end
   end
-  
+
   def detect_class_name(parsed, original_str)
     class_name = parsed.class.name.split("::").last
     underscore(class_name)
   rescue StandardError
     detect_class_from_string(original_str)
   end
-  
+
   def detect_class_from_string(id_str)
     case flavor
     when "iso" then detect_iso_class(id_str)
@@ -207,7 +214,7 @@ class FixturesClassifier
     else "unknown"
     end
   end
-  
+
   def detect_iso_class(id_str)
     return "nsb_format" if id_str =~ /FprISO|PrISO/
     return "cyrillic" if id_str =~ /[А-Яа-яЁё]/
@@ -222,7 +229,7 @@ class FixturesClassifier
     return "addendum" if id_str =~ /\/Add/
     "international_standard"
   end
-  
+
   def detect_iec_class(id_str)
     return "technical_report" if id_str =~ /\bTR\b/
     return "technical_specification" if id_str =~ /\bTS\b/
@@ -236,21 +243,21 @@ class FixturesClassifier
     return "consolidated_identifier" if id_str =~ /\+AMD|\+COR/
     "international_standard"
   end
-  
+
   def detect_ieee_class(id_str)
     "standard"
   end
-  
+
   def detect_nist_class(id_str)
     return "fips" if id_str =~ /\bFIPS\b/
     return "sp" if id_str =~ /\bSP\b/
     return "nist_ir" if id_str =~ /\bNISTIR\b/
     "unknown"
   end
-  
+
   def append_to_file(status, class_name, content)
     filename = File.join(fixtures_dir, status, "#{class_name}.txt")
-    
+
     unless File.exist?(filename)
       File.open(filename, "w") do |f|
         f.puts "# #{flavor.upcase} #{class_name.tr('_', ' ').split.map(&:capitalize).join(' ')} - #{status.capitalize}"
@@ -258,15 +265,15 @@ class FixturesClassifier
         f.puts
       end
     end
-    
+
     File.open(filename, "a") do |f|
       f.puts content
     end
   end
-  
+
   def generate_summary
     filename = File.join(fixtures_dir, "SUMMARY.txt")
-    
+
     File.open(filename, "w") do |f|
       f.puts "Flavor: #{flavor.upcase}"
       f.puts "Classified: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -280,14 +287,14 @@ class FixturesClassifier
       f.puts
       f.puts "BY CLASS"
       f.puts "-" * 70
-      
+
       @stats[:by_class].sort_by { |k, _| k }.each do |class_name, counts|
         total = counts[:pass] + counts[:fail]
         pass_pct = percentage(counts[:pass], total)
         f.puts "#{class_name.ljust(40)} Pass: #{counts[:pass]}/#{total} (#{pass_pct}%)"
       end
     end
-    
+
     puts
     puts "=" * 70
     puts "CLASSIFICATION COMPLETE: #{flavor.upcase}"
@@ -297,12 +304,12 @@ class FixturesClassifier
     puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing], @stats[:total])}%)"
     puts "=" * 70
   end
-  
+
   def percentage(part, whole)
     return 0 if whole.zero?
     ((part.to_f / whole) * 100).round(2)
   end
-  
+
   def underscore(camel_cased_word)
     camel_cased_word.to_s.gsub("::", "/")
                     .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
@@ -310,7 +317,7 @@ class FixturesClassifier
                     .tr("-", "_")
                     .downcase
   end
-  
+
   def log(message)
     puts message if verbose
   end
