@@ -15,6 +15,8 @@ module PubidNew
             type_code: :dir,
             abbr: ["DIR", "Directives Part", "Directives, Part", "Directives,",
                   "Directives"],
+            short_abbr: "DIR",
+            long_abbr: "Directives, Part",
             name: "Directives",
             harmonized_stages: %w[60.00 60.60],
           ),
@@ -25,17 +27,19 @@ module PubidNew
         end
 
         def publisher_portion(lang: :en, stage_format_long: true, with_language_code: :none, with_date: true)
+          abbr = typed_stage ? typed_stage.abbreviation(format_long: stage_format_long) : ""
+
           return [
               publisher.body,
               (subgroup ? " #{subgroup.value}" : ""),
-              (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+              (abbr.empty? ? "" : " #{abbr}"),
             ].join('') unless copublishers&.any?
 
           # If there are copublishers, join them with slashes
           [
             ([publisher] + copublishers).map(&:body).join("/"),
             (subgroup ? " #{subgroup.value}" : ""),
-            (typed_stage.canonical_abbreviation.empty? ? "" : " #{typed_stage.canonical_abbreviation}"),
+            (abbr.empty? ? "" : " #{abbr}"),
           ].join('')
         end
 

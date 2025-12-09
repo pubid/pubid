@@ -127,8 +127,11 @@ module PubidNew
           # Detect stage format from parsed abbreviation
           stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.long_abbr)
             true  # Long form (starts with Amd, DAmd, FDAmd, Cor, DCor, FDCor)
+          elsif ts.long_abbr && ts.original_abbr && ts.original_abbr.include?("Directives")
+            # Special case for Directives: any form with "Directives" word is long form
+            true  # "Directives Part", "Directives, Part", "Directives,"
           elsif ts.short_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.short_abbr)
-            false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR)
+            false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR, DIR)
           else
             false  # Default to short/canonical
           end
