@@ -4,6 +4,10 @@
 require "bundler/setup"
 require_relative "classify_fixtures"
 
+# Load PubidNew base classes first
+require_relative "../../lib/pubid_new/scheme"
+require_relative "../../lib/pubid_new/identifier"
+
 # Load all PubID V2 implementations
 require_relative "../../lib/pubid_new/iso"
 require_relative "../../lib/pubid_new/iec"
