@@ -3,24 +3,6 @@
 
 # Parse error: Parslet::ParseFailed
 ISO/IEC 10646-1:1993/pDCOR.2
-# Parse error: ArgumentError
-ISO/IEC Directives Part 1
-# Parse error: ArgumentError
-ISO/IEC Directives, Part 1
-# Parse error: ArgumentError
-ISO/IEC Directives, Part 1:2022
-# Parse error: ArgumentError
-ISO/IEC Directives Part 2
-# Parse error: ArgumentError
-ISO/IEC Directives, Part 2
-# Parse error: ArgumentError
-ISO/IEC Directives, Part 2:2021
-# Parse error: ArgumentError
-ISO/IEC Directives, IEC Supplement:2022
-# Parse error: ArgumentError
-ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement
-# Parse error: ArgumentError
-ISO/IEC Directives, JTC 1 Supplement:2021
 # Parse error: NameError
 ISO/IEC Directives, Part 1:2022 + IEC Supplement:2022
 # Parse error: Parslet::ParseFailed

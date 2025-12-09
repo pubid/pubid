@@ -24,7 +24,7 @@ module PubidNew
           { key: :dir, title: "Directives", short: "DIR" }
         end
 
-        def publisher_portion(lang: :en)
+        def publisher_portion(lang: :en, stage_format_long: true, with_language_code: :none, with_date: true)
           return [
               publisher.body,
               (subgroup ? " #{subgroup.value}" : ""),
@@ -42,7 +42,7 @@ module PubidNew
         # This differs from the basic number_portion in that directives may have
         # a variant (ISO or IEC) after the number rendered as a part but
         # separated by a space.
-        def number_portion(lang_single: false)
+        def number_portion(lang_single: false, with_date: true)
           result = [
             # Directives may not have a number
             (number ? "#{number.value}" : ""),
@@ -66,11 +66,11 @@ module PubidNew
         # Format: urn:iso:doc:{publisher}[:{subgroup}][:{subgroup_number}]:dir[:{number}][:{part}][:{year}]
         def to_urn
           parts = ["urn", "iso", "doc"]
-          
+
           # Publisher (lowercase, hyphen-separated)
           copubs = copublishers || []
           parts << ([publisher] + copubs).map(&:body).map(&:downcase).join("-")
-          
+
           # Subgroup (e.g., JTC) and its number if present
           if subgroup
             # Split subgroup like "JTC 1" into "jtc" and "1"
@@ -78,19 +78,19 @@ module PubidNew
             parts << subgroup_parts[0].downcase if subgroup_parts[0]
             parts << subgroup_parts[1] if subgroup_parts[1]
           end
-          
+
           # Type is always 'dir' for Directives
           parts << "dir"
-          
+
           # Number (optional for Directives, but comes after dir type)
           parts << number.value if number
-          
+
           # Part (organization variant like ISO or IEC, lowercase)
           parts << part.value.downcase if part
-          
+
           # Year (if present)
           parts << date.year if date
-          
+
           parts.join(":")
         end
 

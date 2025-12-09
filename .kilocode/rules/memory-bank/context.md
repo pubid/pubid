@@ -1,4 +1,4 @@
-## Current Status (Session 97 Complete - TypedStage Enhanced!)
+## Current Status (Session 99 Complete - ISO at 98.59%!)
 
 **Overall V2 Status:**
 - **13/13 flavors with V2 implementations (100%!)**
@@ -10,6 +10,18 @@
 - **Need Validation:** 1 (NIST 57/57 basic, 19,488 fixtures) ⚠️
 - **V1 Code:** 4 gems archived to `archived-gems/`
 - **RFC 5141-bis:** URN tests at **90.14%** (265/294 active)! ✅
+
+**Session 99 ACHIEVEMENT - ISO at 98.59% (99.49% excluding intentional limits)!** 🎯
+- **Fixed Corrigendum period parsing:** Added "Cor." abbreviation support
+- **ISO Fixtures:** 7,540/7,648 (98.59%) - up from 98.48% (+0.11pp, +8 identifiers)
+- **Excluding out-of-scope:** 7,540/7,579 (99.49%) - EXCEEDS 99% TARGET! ✅
+- **Remaining failures breakdown:**
+  - 69 intentionally out of scope (44 Cyrillic + 25 NSB format)
+  - 21 Directives (legitimate parser gaps)
+  - 18 other (16 IS + 1 Cor + 1 TS)
+- **Commit:** `11f7a8e` - feat(iso): add Cor. abbreviation support
+- **Time:** ~30 minutes
+- **Next:** Session 100 - IEC rendering styles implementation
 
 **Session 97 ACHIEVEMENT - TypedStage Enhanced for Advanced Rendering!** 🎯
 - **Enhanced TypedStage component** with short/long abbreviation support
