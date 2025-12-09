@@ -33,7 +33,7 @@ class FixturesClassifier
     end
 
     # Collect all identifiers from pass and fail
-    all_identifiers = collect_all_identifiers
+    all_identifiers = collect_all_identifiers.uniq
 
     if all_identifiers.empty?
       puts "⚠️  No identifiers found for #{flavor.upcase}"
@@ -68,32 +68,35 @@ class FixturesClassifier
   def collect_all_identifiers
     identifiers = []
 
-    # Collect from pass directory
+    # Collect from pass directory - preserve format exactly
     Dir.glob(File.join(fixtures_dir, "pass", "*.txt")).each do |file|
       File.readlines(file).each do |line|
         line = line.strip
         next if line.empty? || line.start_with?("#")
-        identifiers << line
+        identifiers << line  # Keep !...!... format if present
       end
     end
 
-    # Collect from fail directory
+    # Collect from fail directory - preserve format exactly
     Dir.glob(File.join(fixtures_dir, "fail", "*.txt")).each do |file|
       File.readlines(file).each do |line|
         line = line.strip
         next if line.empty? || line.start_with?("#")
-        identifiers << line
+        identifiers << line  # Keep !...!... format if present
       end
     end
 
-    identifiers.uniq
+    identifiers
   end
 
   def clear_output_files
-    FileUtils.rm_rf(File.join(fixtures_dir, "pass"))
-    FileUtils.rm_rf(File.join(fixtures_dir, "fail"))
+    # Remove all .txt files from pass and fail directories
+    Dir.glob(File.join(fixtures_dir, "pass", "*.txt")).each { |f| FileUtils.rm_f(f) }
+    Dir.glob(File.join(fixtures_dir, "fail", "*.txt")).each { |f| FileUtils.rm_f(f) }
+
+    # Ensure directories exist
     FileUtils.mkdir_p(File.join(fixtures_dir, "pass"))
-   FileUtils.mkdir_p(File.join(fixtures_dir, "fail"))
+    FileUtils.mkdir_p(File.join(fixtures_dir, "fail"))
   end
 
   def classify_identifier(entry)
@@ -109,7 +112,7 @@ class FixturesClassifier
   end
 
   def classify_normalized_entry(entry)
-    # Parse !original!rendered format
+    # Parse !original!expected format
     parts = entry.split("!")
     return classify_plain_entry(entry) if parts.size != 3  # Malformed
 
@@ -121,20 +124,14 @@ class FixturesClassifier
       actual_rendered = parsed.to_s
 
       if actual_rendered == expected_rendered
-        # Rendered matches expected
+        # Success! We render original → expected
+        # MOVE ENTIRE LINE to pass (shows successful normalization)
         @stats[:passing] += 1
         class_name = detect_class_name(parsed, original)
         @stats[:by_class][class_name][:pass] += 1
-
-        if original == expected_rendered
-          #Perfect round-trip, use plain identifier
-          append_to_file("pass", class_name, original)
-        else
-          # Successful normalization, keep !original!rendered format
-          append_to_file("pass", class_name, entry)
-        end
+        append_to_file("pass", class_name, entry)  # Keep full !original!expected line
       else
-        # Mismatch - keep in fail with updated rendered
+        # Failure - doesn't render as expected
         @stats[:failing] += 1
         class_name = detect_class_name(parsed, original)
         @stats[:by_class][class_name][:fail] += 1
