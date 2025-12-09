@@ -74,7 +74,7 @@ module PubidNew
         ),
         Components::TypedStage.new(
           code: :pubcor,
-          abbr: ["Cor", "COR"],
+          abbr: ["Cor", "COR", "Cor."],
           short_abbr: "COR",
           long_abbr: "Cor",
           type_code: :cor,
