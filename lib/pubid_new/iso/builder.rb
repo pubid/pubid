@@ -128,24 +128,25 @@ module PubidNew
           stage_format_long = if ts.long_abbr && ts.original_abbr == ts.long_abbr
             true  # Long form (DAmd, FDAmd, DCor, FDCor)
           else
-            false  # Canonical form (DAM, FDAM, Cor, DCOR)
+            false  # Canonical form (DAM, FDAM, Cor, DCOR, Amd)
           end
 
           # Detect language code format from parsed languages
           with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
-            # Check if original_code was single-char
+            # Check if original_code was single-char (E, F, R, A, S, D)
             first_lang = identifier.languages.first
-            if first_lang.original_code && first_lang.original_code.length == 1
+            if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
               :single
             else
-              :iso
+              :iso  # 2-char codes (en, fr, ru, ar, es, de)
             end
           else
             :none
           end
 
-          # Detect with_date from parsed date
-          with_date = identifier.respond_to?(:date) && !identifier.date.nil?
+          # with_date is always true for base identifiers (show the date if present)
+          # Only supplements might have undated references
+          with_date = true
 
           # Create custom rendering style based on parsed format
           identifier.rendering_style = RenderingStyle.new(

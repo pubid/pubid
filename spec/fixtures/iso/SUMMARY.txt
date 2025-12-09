@@ -1,20 +1,20 @@
 Flavor: ISO
-Extracted: 2025-12-09 18:11:27
+Extracted: 2025-12-09 18:28:07
 Source: archived-gems/pubid-iso/spec/fixtures/*.txt
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total Identifiers: 7688
-Passing: 7476 (97.24%)
-Failing: 212 (2.76%)
+Passing: 7516 (97.76%)
+Failing: 172 (2.24%)
 
 BY IDENTIFIER CLASS
 ----------------------------------------------------------------------
 Class                          |   Pass |   Fail |  Total | Pass%
 ----------------------------------------------------------------------
-amendment                      |    147 |     51 |    198 | 74.24%
-corrigendum                    |     89 |     29 |    118 | 75.42%
+amendment                      |    181 |     17 |    198 | 91.41%
+corrigendum                    |     95 |     23 |    118 | 80.51%
 cyrillic                       |      0 |     44 |     44 |   0.0%
 directives                     |      0 |     21 |     21 |   0.0%
 guide                          |      8 |      6 |     14 | 57.14%
@@ -46,22 +46,17 @@ Pass directory: 14 files
   - technical_specification.txt
   - technology_trends_assessments.txt
 
-Fail directory: 15 files
+Fail directory: 10 files
   - amendment.txt
-  - bundled_identifier.txt
   - corrigendum.txt
   - cyrillic.txt
   - directives.txt
-  - directives_supplement.txt
   - guide.txt
   - international_standard.txt
   - international_workshop_agreement.txt
   - nsb_format.txt
-  - pas.txt
   - recommendation.txt
-  - technical_report.txt
   - technical_specification.txt
-  - technology_trends_assessments.txt
 
 ASSESSMENT
 ----------------------------------------------------------------------
