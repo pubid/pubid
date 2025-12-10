@@ -18,9 +18,7 @@ module PubidNew
       root :identifier
 
       rule(:identifier) do
-          # supplement_supplement_identifier |
-          # supplement_identifier |
-          # joint_identifier |
+        supplement_identifier |
         identifier_publisher
       end
 
@@ -113,23 +111,23 @@ module PubidNew
           second_part
       end
 
-      # rule(:supplement_type_with_stage) do
-      #   # "DAM"
-      #   # "NP Amd"
-      #   array_to_str(TYPED_STAGES_SUPPLEMENTS).as(:type_with_stage)
-      # end
+      rule(:supplement_type_with_stage) do
+        # "AMD" or "COR"
+        array_to_str(TYPED_STAGES_SUPPLEMENTS).as(:type_with_stage)
+      end
 
       # IDF 148-1:2008 / COR 1:2009
-      # rule(:supplement_identifier_no_third) do
-      #   identifier_publisher_no_third.as(:base_identifier) >>
-      #     str("/") >> supplement_type_with_stage >>
-      #     # digits.as(:stage_iteration).maybe >>
-      #     space? >> second_part
-      # end
+      # IDF 140-1:2007 / AMD1:2012 (no space between AMD and 1)
+      rule(:supplement_identifier_no_third) do
+        identifier_publisher_no_third.as(:base_identifier) >>
+          space? >> str("/") >> space? >>
+          supplement_type_with_stage >>
+          space.maybe >> second_part
+      end
 
-      # rule(:supplement_identifier) do
-      #   supplement_identifier_no_third >> third_part
-      # end
+      rule(:supplement_identifier) do
+        supplement_identifier_no_third >> third_part
+      end
 
       # # ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017
       # # ISO/IEC 19794-7:2014/Amd 1:2015/CD Cor 1

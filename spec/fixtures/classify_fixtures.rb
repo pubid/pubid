@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "fileutils"
+require_relative "../../lib/pubid_new"
 
 # Fixtures Classification Script
 # Reads from identifiers/full/ and classifies into identifiers/pass/ and identifiers/fail/
