@@ -189,30 +189,44 @@ Example:
 
 CEN/CLC uses detailed stage codes:
 
-| Stage | Description |
-|-------|-------------|
+From: https://experts.cen.eu/media/Experts/cen-clc_projex-online_user-guide.pdf
+
+| Stage-code | Description |
+|--|--|
 | 00.60.0000 | Completion of Proposal/Preliminary stage |
 | 10.98.0000 | Decision on WI proposal - Reject |
 | 10.99.0000 | Decision on WI proposal - Accept |
 | 20.60.0979 | Circulation of 1st Working Document |
+| 30.97.0009 | End of interruption of work - split/merge |
+| 30.98.0009 | End of interruption of work - abandoned |
 | 30.99.0979 | Dispatch of ENQ draft to CCMC |
 | 40.20.0000 | Submission to enquiry |
 | 40.60.0000 | Closure of enquiry |
+| 40.97.0009 | End of interruption of work - split/merge |
+| 40.98.0009 | End of interruption of work - abandoned |
 | 43.20.0000 | Submission to COCOR |
 | 43.60.0000 | Closure of COCOR |
+| 45.97.0009 | End of interruption of work - split/merge |
+| 45.98.0009 | End of interruption of work - abandoned |
 | 45.99.0979 | Dispatch of FV draft to CCMC |
 | 50.20.0000 | Submission to Vote |
 | 50.60.0000 | Closure of Vote |
+| 50.97.0009 | End of interruption of work - split/merge |
+| 50.98.0009 | End of interruption of work - abandoned |
 | 60.55.0000 | Ratification completed (DOR) |
 | 60.60.0000 | Definitive text made available (DAV) |
 | 65.31.0000 | Announcement (DOA) |
 | 65.51.0000 | Completion of mandatory publication (DOP) |
 | 65.62.0000 | Completion of withdrawal of conflicting national standards (DOW) |
 | 90.00.0000 | Start of review/2 Year Review Enquiry |
-| 90.92.0000 | Decision - revise |
-| 90.93.0000 | Decision - confirm |
-| 90.98.0000 | Decision - withdraw |
+| 90.20.0000 | Submission to 2 Year Review Enquiry |
+| 90.60.0000 | Closure of 2 Year Review Enquiry |
+| 90.92.0000 | Decision on results of review/2YR ENQ - revise |
+| 90.93.0000 | Decision on results of review/2YR ENQ - confirm |
+| 90.98.0000 | Decision on results of review/2YR ENQ - withdraw |
+| 96.60.0009 | End of re-activation of work |
 | 99.60.0000 | Withdrawal effective |
+
 
 ---
 
