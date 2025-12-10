@@ -40,7 +40,7 @@ module PubidNew
         # If there are supplements, we need to use a BundledIdentifier
         # which takes `base_document` and `supplements`
         if parsed_hash[:supplements]
-          return ::PubidNew::BundledIdentifier
+          return BundledIdentifier
         end
 
         # Check the `:type_with_stage` to determine the identifier class

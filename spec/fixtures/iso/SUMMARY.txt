@@ -1,26 +1,28 @@
 Flavor: ISO
-Classified: 2025-12-10 12:16:57
+Classified: 2025-12-10 16:27:08
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 7544
-Pass: 7542 (99.97%)
-Fail: 2 (0.03%)
+Total: 7648
+Pass: 7572 (99.01%)
+Fail: 76 (0.99%)
 
 BY CLASS
 ----------------------------------------------------------------------
-amendment                                Pass: 166/166 (100.0%)
-corrigendum                              Pass: 95/95 (100.0%)
-data                                     Pass: 7/7 (100.0%)
-directives                               Pass: 14/16 (87.5%)
-directives_supplement                    Pass: 8/8 (100.0%)
-guide                                    Pass: 11/11 (100.0%)
-international_standard                   Pass: 6554/6554 (100.0%)
+amendment                                Pass: 178/178 (100.0%)
+bundled_identifier                       Pass: 3/3 (100.0%)
+corrigendum                              Pass: 108/108 (100.0%)
+cyrillic                                 Pass: 0/44 (0.0%)
+directives                               Pass: 16/16 (100.0%)
+directives_supplement                    Pass: 12/12 (100.0%)
+guide                                    Pass: 14/14 (100.0%)
+international_standard                   Pass: 6566/6572 (99.91%)
 international_standardized_profile       Pass: 13/13 (100.0%)
-international_workshop_agreement         Pass: 19/19 (100.0%)
+international_workshop_agreement         Pass: 20/20 (100.0%)
+nsb_format                               Pass: 0/25 (0.0%)
 pas                                      Pass: 51/51 (100.0%)
-recommendation                           Pass: 43/43 (100.0%)
-technical_report                         Pass: 273/273 (100.0%)
-technical_specification                  Pass: 279/279 (100.0%)
+recommendation                           Pass: 44/44 (100.0%)
+technical_report                         Pass: 265/265 (100.0%)
+technical_specification                  Pass: 273/274 (99.64%)
 technology_trends_assessments            Pass: 9/9 (100.0%)

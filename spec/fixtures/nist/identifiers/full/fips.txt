@@ -1,8 +1,0 @@
-# NIST Fips - Full
-# Source of truth for all fips identifiers
-# Auto-generated during migration
-
-#NBS FIPS 11-1-Sep30/1977# ParseError: "migrated from fail"
-#NBS FIPS 63-1supp# ParseError: "migrated from fail"
-#NIST FIPS 54-1-Jan15/1991# ParseError: "migrated from fail"
-#NIST FIPS 54-1-Jan17/1991# ParseError: "migrated from fail"

@@ -17,7 +17,10 @@ end
 
 require_relative "jcgm/identifier"
 require_relative "jcgm/single_identifier"
+require_relative "jcgm/supplement_identifier"
 require_relative "jcgm/identifiers/guide"
+require_relative "jcgm/identifiers/gum_guide"
+require_relative "jcgm/identifiers/amendment"
 require_relative "jcgm/builder"
 require_relative "jcgm/parser"
 require_relative "jcgm/scheme"

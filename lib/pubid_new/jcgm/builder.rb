@@ -25,7 +25,17 @@ module PubidNew
       end
 
       def locate_identifier_klass(parsed_hash)
-        # For now, all JCGM identifiers are Guides
+        # If there's a base_identifier, it's an amendment
+        if parsed_hash[:base_identifier]
+          return @scheme.locate_identifier_klass_by_type_code(:amendment)
+        end
+
+        # Check for GUM number to determine if it's a GumGuide
+        if parsed_hash[:gum_number]
+          return @scheme.locate_identifier_klass_by_type_code(:gum_guide)
+        end
+
+        # Otherwise it's a regular Guide
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
         @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
       end
@@ -60,15 +70,48 @@ module PubidNew
 
       def cast(type, value)
         case type
+        when :base_identifier
+          # Build the base identifier recursively
+          build(value)
+
         when :publisher
           PubidNew::Jcgm::Components::Publisher.new(publisher: value.to_s)
 
         when :number
           PubidNew::Components::Code.new(value: value.to_s)
 
+        when :gum_number
+          # GUM number as Code component
+          PubidNew::Components::Code.new(value: value.to_s)
+
         when :date
-          # JCGM uses year-only dates
-          PubidNew::Components::Date.new(year: value.to_s)
+          # Can be YYYY or YYYY-MM-DD
+          date_str = value.to_s
+          if date_str.include?("-")
+            # Full date: YYYY-MM-DD
+            parts = date_str.split("-")
+            PubidNew::Components::Date.new(
+              year: parts[0],
+              month: parts[1],
+              day: parts[2]
+            )
+          else
+            # Year only
+            PubidNew::Components::Date.new(year: date_str)
+          end
+
+        when :iteration
+          # Amendment number
+          PubidNew::Components::Code.new(value: value.to_s)
+
+        when :type_with_stage
+          # For amendments
+          typed_stage = locate_typed_stage(value.to_s)
+          {
+            stage: typed_stage.to_stage,
+            type: typed_stage.to_type,
+            typed_stage: typed_stage,
+          }
 
         when :languages
           # Can be: "F", "E", "E/F", "F/E"

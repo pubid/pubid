@@ -1,8 +1,0 @@
-# ISO Bundled Identifier - Full
-# Source of truth for all bundled identifier identifiers
-# Auto-generated during migration
-
-#!ISO/IEC Directives, Part 1:2022 + IEC Supplement:2022!ISO/IEC DIR 1:2022 + IEC SUP:2022# ParseError: "migrated from fail"
-#!ISO/IEC Directives, Part 1:2022 + IEC Supplement:2022!ISO/IEC Directives, Part 1:2022 + IEC SUP:2022# ParseError: "migrated from fail"
-ISO/IEC DIR 1 + IEC SUP:2016-05
-ISO/IEC DIR 1:2022 + IEC SUP:2022

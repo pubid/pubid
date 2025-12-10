@@ -318,6 +318,11 @@ module PubidNew
           # CISPR identifier object for TRF
           value
 
+        when :number
+          # Plain number for sub-org identifiers (CA, IECQ CS, IECQ OD)
+          # Just return as Code component
+          { number: Components::Code.new(value: value.to_s) }
+
         when :number_with_part
           # "60038" (no part)
           # or "60038-1" ('1' is part)

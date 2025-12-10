@@ -76,8 +76,14 @@ module PubidNew
       # IECQ 080000:2017 (special IEC publisher)
       # IECEE (IEC System for Conformity Assessment)
       # IECEx (IEC System for Certification to Standards)
+      # IEC CA (IEC Conformity Assessment)
+      # IECQ CS (IECQ Component Specifications)
+      # IECQ OD (IECQ Operational Documents)
       rule(:prefix_sole_publisher) do
         (
+          str("IECQ OD") |
+          str("IECQ CS") |
+          str("IEC CA") |
           str("CISPR") |
           str("IECEE") |
           str("IECEx") |

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "identifiers/guide"
+require_relative "identifiers/gum_guide"
+require_relative "identifiers/amendment"
 
 module PubidNew
   module Jcgm
@@ -9,11 +11,18 @@ module PubidNew
         def identifiers
           [
             Identifiers::Guide,
+            Identifiers::GumGuide,
+          ]
+        end
+
+        def supplement_identifiers
+          [
+            Identifiers::Amendment,
           ]
         end
 
         def typed_stages
-          identifiers.flat_map { |klass| klass::TYPED_STAGES }
+          (identifiers + supplement_identifiers).flat_map { |klass| klass::TYPED_STAGES }
         end
 
         def locate_typed_stage_by_abbr(abbr)
@@ -33,7 +42,10 @@ module PubidNew
         end
 
         def locate_identifier_klass_by_type_code(type_code)
-          identifier_klass = identifiers.detect do |klass|
+          # Check all identifier classes (base + supplement)
+          all_classes = identifiers + supplement_identifiers
+
+          identifier_klass = all_classes.detect do |klass|
             klass.type[:key].to_s == type_code.to_s
           end
 

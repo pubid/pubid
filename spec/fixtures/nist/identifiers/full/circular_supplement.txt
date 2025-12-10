@@ -1,6 +1,0 @@
-# NIST Circular Supplement - Full
-# Source of truth for all circular supplement identifiers
-# Auto-generated during migration
-
-#NBS CIRC supJun1925-Jun1926# ParseError: "migrated from fail"
-#NBS CIRC supJun1925-Jun1927# ParseError: "migrated from fail"

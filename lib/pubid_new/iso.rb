@@ -12,32 +12,32 @@ module PubidNew
         stage_abbr = match[2]        # "DAD" or "FDAD"
         supplement_number = match[3] # "1"
         supplement_year = match[4]   # "1987" or nil
-        
+
         # Parse the base identifier normally (without supplement)
         parser = Parser.new
         builder = Builder.new(Scheme)
         base_parsed = parser.parse(base_str)
         base_identifier = builder.build(base_parsed)
-        
+
         # Construct the Addendum supplement manually
         addendum = Identifiers::Addendum.new
         addendum.base_identifier = base_identifier
         addendum.number = Components::Code.new(number: supplement_number)
         addendum.date = PubidNew::Components::Date.new(year: supplement_year) if supplement_year
-        
+
         # Set typed_stage from register (uses TYPED_STAGES in Addendum class)
         typed_stage = Scheme.locate_typed_stage_by_abbr(stage_abbr)
         addendum.typed_stage = typed_stage
         addendum.stage = typed_stage.to_stage
         addendum.type = typed_stage.to_type
-        
+
         return addendum
       end
-      
+
       # Normal parsing for all other identifiers
       parser = Parser.new
       builder = Builder.new(Scheme)
-      
+
       parsed = parser.parse(identifier)
       builder.build(parsed)
     end
@@ -45,6 +45,7 @@ module PubidNew
 end
 
 require_relative "iso/combined_identifier"
+require_relative "iso/bundled_identifier"
 require_relative "iso/identifiers/international_standard"
 require_relative "iso/identifiers/technical_report"
 require_relative "iso/identifiers/technical_specification"

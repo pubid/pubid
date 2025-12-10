@@ -17,6 +17,7 @@ require_relative "pubid_new/bsi"
 require_relative "pubid_new/nist"
 require_relative "pubid_new/ieee"
 require_relative "pubid_new/ansi"
+require_relative "pubid_new/jcgm"
 
 module PubidNew
   class Error < StandardError; end
