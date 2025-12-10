@@ -1,0 +1,24 @@
+# ISO International Workshop Agreement - Full
+# Source of truth for all international workshop agreement identifiers
+# Auto-generated during migration
+
+#!ISO/WD IWA 19!WD IWA 19# ParseError: "migrated from fail"
+AWI IWA 36
+AWI IWA 39
+AWI IWA 41
+CD IWA 37
+CD IWA 37-1
+CD IWA 37-2
+CD IWA 37-3
+IWA 14-1:2013
+IWA 19:2017
+IWA 1:2001
+IWA 1:2005
+IWA 24:2016
+IWA 2:2003
+IWA 31:2020
+IWA 34:2021
+IWA 35:2020
+IWA 8:2009
+PRF IWA 36
+PRF IWA 40

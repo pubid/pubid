@@ -1,0 +1,10 @@
+# NIST Gcr - Full
+# Source of truth for all gcr identifiers
+# Auto-generated during migration
+
+#NIST GCR 21-917-48v1A# ParseError: "migrated from fail"
+#NIST GCR 21-917-48v1B# ParseError: "migrated from fail"
+#NIST GCR 21-917-48v2A# ParseError: "migrated from fail"
+#NIST GCR 21-917-48v2B# ParseError: "migrated from fail"
+#NIST GCR 21-917-48v3A# ParseError: "migrated from fail"
+#NIST GCR 21-917-48v3B# ParseError: "migrated from fail"

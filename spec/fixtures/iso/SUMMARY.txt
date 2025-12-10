@@ -1,68 +1,26 @@
 Flavor: ISO
-Extracted: 2025-12-09 22:32:55
-Source: archived-gems/pubid-iso/spec/fixtures/*.txt
+Classified: 2025-12-10 12:16:57
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total Identifiers: 7688
-Passing: 7554 (98.26%)
-Failing: 134 (1.74%)
+Total: 7544
+Pass: 7542 (99.97%)
+Fail: 2 (0.03%)
 
-BY IDENTIFIER CLASS
+BY CLASS
 ----------------------------------------------------------------------
-Class                          |   Pass |   Fail |  Total | Pass%
-----------------------------------------------------------------------
-amendment                      |    185 |     12 |    197 | 93.91%
-bundled_identifier             |      2 |      1 |      3 | 66.67%
-corrigendum                    |    105 |     14 |    119 | 88.24%
-cyrillic                       |      0 |     44 |     44 |   0.0%
-directives                     |     14 |      2 |     16 |  87.5%
-directives_supplement          |      8 |      4 |     12 | 66.67%
-guide                          |      8 |      6 |     14 | 57.14%
-international_standard         |   6554 |     23 |   6577 | 99.65%
-international_standardized_profile |     13 |      0 |     13 | 100.0%
-international_workshop_agreement |     19 |      1 |     20 |  95.0%
-nsb_format                     |      0 |     25 |     25 |   0.0%
-pas                            |     51 |      0 |     51 | 100.0%
-recommendation                 |     44 |      1 |     45 | 97.78%
-technical_report               |    268 |      0 |    268 | 100.0%
-technical_specification        |    274 |      1 |    275 | 99.64%
-technology_trends_assessments  |      9 |      0 |      9 | 100.0%
-
-FILES GENERATED
-----------------------------------------------------------------------
-Pass directory: 14 files
-  - amendment.txt
-  - bundled_identifier.txt
-  - corrigendum.txt
-  - directives.txt
-  - directives_supplement.txt
-  - guide.txt
-  - international_standard.txt
-  - international_standardized_profile.txt
-  - international_workshop_agreement.txt
-  - pas.txt
-  - recommendation.txt
-  - technical_report.txt
-  - technical_specification.txt
-  - technology_trends_assessments.txt
-
-Fail directory: 12 files
-  - amendment.txt
-  - bundled_identifier.txt
-  - corrigendum.txt
-  - cyrillic.txt
-  - directives.txt
-  - directives_supplement.txt
-  - guide.txt
-  - international_standard.txt
-  - international_workshop_agreement.txt
-  - nsb_format.txt
-  - recommendation.txt
-  - technical_specification.txt
-
-ASSESSMENT
-----------------------------------------------------------------------
-Status: EXCELLENT ✅
-Assessment: Production-ready with minor limitations.
+amendment                                Pass: 166/166 (100.0%)
+corrigendum                              Pass: 95/95 (100.0%)
+data                                     Pass: 7/7 (100.0%)
+directives                               Pass: 14/16 (87.5%)
+directives_supplement                    Pass: 8/8 (100.0%)
+guide                                    Pass: 11/11 (100.0%)
+international_standard                   Pass: 6554/6554 (100.0%)
+international_standardized_profile       Pass: 13/13 (100.0%)
+international_workshop_agreement         Pass: 19/19 (100.0%)
+pas                                      Pass: 51/51 (100.0%)
+recommendation                           Pass: 43/43 (100.0%)
+technical_report                         Pass: 273/273 (100.0%)
+technical_specification                  Pass: 279/279 (100.0%)
+technology_trends_assessments            Pass: 9/9 (100.0%)

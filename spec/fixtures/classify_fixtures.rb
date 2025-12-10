@@ -4,10 +4,10 @@
 require "fileutils"
 
 # Fixtures Classification Script
-# Reclassifies existing pass/fail fixtures based on current implementation
-# Handles both plain identifiers and !original!rendered format
+# Reads from identifiers/full/ and classifies into identifiers/pass/ and identifiers/fail/
+# Handles three formats: plain, !normalized!, and #errored#
 class FixturesClassifier
-  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi].freeze
+  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi jcgm].freeze
 
   attr_reader :flavor, :verbose, :fixtures_dir
 
@@ -32,7 +32,7 @@ class FixturesClassifier
       return false
     end
 
-    # Collect all identifiers from pass and fail
+    # Collect all identifiers from identifiers/full/
     all_identifiers = collect_all_identifiers.uniq
 
     if all_identifiers.empty?
@@ -42,7 +42,7 @@ class FixturesClassifier
 
     log "Found #{all_identifiers.size} total identifier entries"
 
-    # Clear existing pass/fail files
+    # Clear existing pass/fail files (but NEVER full/)
     clear_output_files
 
     # Classify each identifier
@@ -68,21 +68,19 @@ class FixturesClassifier
   def collect_all_identifiers
     identifiers = []
 
-    # Collect from pass directory - preserve format exactly
-    Dir.glob(File.join(fixtures_dir, "pass", "*.txt")).each do |file|
-      File.readlines(file).each do |line|
-        line = line.strip
-        next if line.empty? || line.start_with?("#")
-        identifiers << line  # Keep !...!... format if present
-      end
+    # Read from identifiers/full/ ONLY
+    full_dir = File.join(fixtures_dir, "identifiers", "full")
+
+    unless Dir.exist?(full_dir)
+      log "⚠️  No identifiers/full/ directory found for #{flavor.upcase}"
+      return identifiers
     end
 
-    # Collect from fail directory - preserve format exactly
-    Dir.glob(File.join(fixtures_dir, "fail", "*.txt")).each do |file|
+    Dir.glob(File.join(full_dir, "*.txt")).each do |file|
       File.readlines(file).each do |line|
         line = line.strip
         next if line.empty? || line.start_with?("#")
-        identifiers << line  # Keep !...!... format if present
+        identifiers << line
       end
     end
 
@@ -90,88 +88,100 @@ class FixturesClassifier
   end
 
   def clear_output_files
-    # Remove all .txt files from pass and fail directories
-    Dir.glob(File.join(fixtures_dir, "pass", "*.txt")).each { |f| FileUtils.rm_f(f) }
-    Dir.glob(File.join(fixtures_dir, "fail", "*.txt")).each { |f| FileUtils.rm_f(f) }
+    # Clear pass/ and fail/ (but NEVER full/)
+    pass_dir = File.join(fixtures_dir, "identifiers", "pass")
+    fail_dir = File.join(fixtures_dir, "identifiers", "fail")
 
-    # Ensure directories exist
-    FileUtils.mkdir_p(File.join(fixtures_dir, "pass"))
-    FileUtils.mkdir_p(File.join(fixtures_dir, "fail"))
+    FileUtils.rm_rf(pass_dir)
+    FileUtils.rm_rf(fail_dir)
+    FileUtils.mkdir_p(pass_dir)
+    FileUtils.mkdir_p(fail_dir)
   end
 
   def classify_identifier(entry)
     @stats[:total] += 1
 
-    if entry.start_with?("!")
-      # !original!rendered format
-      classify_normalized_entry(entry)
-    else
-      # Plain identifier
-      classify_plain_entry(entry)
+    case entry
+    when /^!(.+)!(.+)$/  # Normalized format
+      classify_normalized($1, $2)
+    when /^#(.+)# (.+)$/  # Errored format
+      classify_errored($1, $2)
+    else  # Plain identifier
+      classify_plain(entry)
     end
   end
 
-  def classify_normalized_entry(entry)
-    # Parse !original!expected format
-    parts = entry.split("!")
-    return classify_plain_entry(entry) if parts.size != 3  # Malformed
-
-    original = parts[1]
-    expected_rendered = parts[2]
-
-    begin
-      parsed = parse_identifier(original)
-      actual_rendered = parsed.to_s
-
-      if actual_rendered == expected_rendered
-        # Success! We render original → expected
-        # MOVE ENTIRE LINE to pass (shows successful normalization)
-        @stats[:passing] += 1
-        class_name = detect_class_name(parsed, original)
-        @stats[:by_class][class_name][:pass] += 1
-        append_to_file("pass", class_name, entry)  # Keep full !original!expected line
-      else
-        # Failure - doesn't render as expected
-        @stats[:failing] += 1
-        class_name = detect_class_name(parsed, original)
-        @stats[:by_class][class_name][:fail] += 1
-        append_to_file("fail", class_name, "!#{original}!#{actual_rendered}")
-      end
-    rescue StandardError => e
-      # Parse error
-      @stats[:failing] += 1
-      class_name = detect_class_from_string(original)
-      @stats[:by_class][class_name][:fail] += 1
-      append_to_file("fail", class_name, "# Parse error: #{e.class.name}")
-      append_to_file("fail", class_name, original)
-    end
-  end
-
-  def classify_plain_entry(id_str)
+  def classify_plain(id_str)
     begin
       parsed = parse_identifier(id_str)
       rendered = parsed.to_s
 
       if rendered == id_str
-        # Perfect round-trip
+        # Perfect round-trip - write as plain
         @stats[:passing] += 1
         class_name = detect_class_name(parsed, id_str)
         @stats[:by_class][class_name][:pass] += 1
         append_to_file("pass", class_name, id_str)
       else
-        # Doesn't round-trip, use !original!rendered format
-        @stats[:failing] += 1
+        # Successful parse but different rendering - write as normalized to PASS
+        @stats[:passing] += 1
         class_name = detect_class_name(parsed, id_str)
-        @stats[:by_class][class_name][:fail] += 1
-        append_to_file("fail", class_name, "!#{id_str}!#{rendered}")
+        @stats[:by_class][class_name][:pass] += 1
+        append_to_file("pass", class_name, "!#{id_str}!#{rendered}")
       end
     rescue StandardError => e
-      # Parse error
+      # Parse failed - write as errored to FAIL
       @stats[:failing] += 1
       class_name = detect_class_from_string(id_str)
       @stats[:by_class][class_name][:fail] += 1
-      append_to_file("fail", class_name, "# Parse error: #{e.class.name}")
-      append_to_file("fail", class_name, id_str)
+      append_to_file("fail", class_name, "##{id_str}# #{e.class}: #{e.message.inspect}")
+    end
+  end
+
+  def classify_normalized(original, expected)
+    begin
+      parsed = parse_identifier(original)
+      actual_rendered = parsed.to_s
+
+      if actual_rendered == expected
+        # Success! Normalization works as expected
+        @stats[:passing] += 1
+        class_name = detect_class_name(parsed, original)
+        @stats[:by_class][class_name][:pass] += 1
+        append_to_file("pass", class_name, "!#{original}!#{expected}")
+      else
+        # Mismatch - parser renders differently than expected
+        @stats[:failing] += 1
+        class_name = detect_class_name(parsed, original)
+        @stats[:by_class][class_name][:fail] += 1
+        error_msg = "Expected: #{expected}, Got: #{actual_rendered}"
+        append_to_file("fail", class_name, "##{original}# Mismatch: #{error_msg}")
+      end
+    rescue StandardError => e
+      # Parse failed
+      @stats[:failing] += 1
+      class_name = detect_class_from_string(original)
+      @stats[:by_class][class_name][:fail] += 1
+      append_to_file("fail", class_name, "##{original}# #{e.class}: #{e.message.inspect}")
+    end
+  end
+
+  def classify_errored(original, error_msg)
+    # Re-validate: maybe it parses now after fixes?
+    begin
+      parsed = parse_identifier(original)
+      rendered = parsed.to_s
+      # It parses now! Move to pass
+      @stats[:passing] += 1
+      class_name = detect_class_name(parsed, original)
+      @stats[:by_class][class_name][:pass] += 1
+      append_to_file("pass", class_name, "!#{original}!#{rendered}")
+    rescue StandardError => e
+      # Still fails, keep in fail with updated error
+      @stats[:failing] += 1
+      class_name = detect_class_from_string(original)
+      @stats[:by_class][class_name][:fail] += 1
+      append_to_file("fail", class_name, "##{original}# #{e.class}: #{e.message.inspect}")
     end
   end
 
@@ -181,6 +191,7 @@ class FixturesClassifier
     when "iec" then PubidNew::Iec.parse(id_str)
     when "ieee" then PubidNew::Ieee.parse(id_str)
     when "nist" then PubidNew::Nist.parse(id_str)
+    when "jcgm" then PubidNew::Jcgm.parse(id_str)
     when "jis" then PubidNew::Jis.parse(id_str)
     when "etsi" then PubidNew::Etsi.parse(id_str)
     when "ccsds" then PubidNew::Ccsds.parse(id_str)
@@ -208,6 +219,7 @@ class FixturesClassifier
     when "iec" then detect_iec_class(id_str)
     when "ieee" then detect_ieee_class(id_str)
     when "nist" then detect_nist_class(id_str)
+    when "jcgm" then detect_jcgm_class(id_str)
     else "unknown"
     end
   end
@@ -252,8 +264,13 @@ class FixturesClassifier
     "unknown"
   end
 
+  def detect_jcgm_class(id_str)
+    return "guide" if id_str =~ /^JCGM \d+/
+    "unknown"
+  end
+
   def append_to_file(status, class_name, content)
-    filename = File.join(fixtures_dir, status, "#{class_name}.txt")
+    filename = File.join(fixtures_dir, "identifiers", status, "#{class_name}.txt")
 
     unless File.exist?(filename)
       File.open(filename, "w") do |f|

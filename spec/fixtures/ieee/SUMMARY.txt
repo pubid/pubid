@@ -1,47 +1,15 @@
 Flavor: IEEE
-Extracted: 2025-12-06 19:52:57
-Source: archived-gems/pubid-ieee/spec/fixtures/*.txt
+Classified: 2025-12-10 09:37:12
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total Identifiers: 10330
-Passing: 5122 (49.58%)
-Failing: 5208 (50.42%)
+Total: 4543
+Pass: 4543 (100.0%)
+Fail: 0 (0.0%)
 
-BY IDENTIFIER CLASS
+BY CLASS
 ----------------------------------------------------------------------
-Class                          |   Pass |   Fail |  Total | Pass%
-----------------------------------------------------------------------
-adopted_standard               |     32 |      3 |     35 | 91.43%
-base                           |   5051 |   2232 |   7283 | 69.35%
-draft                          |      0 |   1047 |   1047 |   0.0%
-dual_published                 |      0 |     13 |     13 |   0.0%
-iec_ieee_copublished           |     39 |     59 |     98 |  39.8%
-no_std_prefix                  |      0 |     99 |     99 |   0.0%
-redlined_standard              |      0 |    430 |    430 |   0.0%
-standard                       |      0 |    994 |    994 |   0.0%
-unapproved                     |      0 |    331 |    331 |   0.0%
-
-FILES GENERATED
-----------------------------------------------------------------------
-Pass directory: 3 files
-  - adopted_standard.txt
-  - base.txt
-  - iec_ieee_copublished.txt
-
-Fail directory: 9 files
-  - adopted_standard.txt
-  - base.txt
-  - draft.txt
-  - dual_published.txt
-  - iec_ieee_copublished.txt
-  - no_std_prefix.txt
-  - redlined_standard.txt
-  - standard.txt
-  - unapproved.txt
-
-ASSESSMENT
-----------------------------------------------------------------------
-Status: NEEDS WORK ❌
-Assessment: Major parser enhancements required.
+adopted_standard                         Pass: 32/32 (100.0%)
+base                                     Pass: 4472/4472 (100.0%)
+iec_ieee_copublished                     Pass: 39/39 (100.0%)

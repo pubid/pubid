@@ -1,0 +1,13 @@
+# ISO Technology Trends Assessments - Full
+# Source of truth for all technology trends assessments identifiers
+# Auto-generated during migration
+
+ISO/TTA 1:1994
+ISO/TTA 1:1994(en)
+ISO/TTA 2
+ISO/TTA 2:1997
+ISO/TTA 2:1997(en)
+ISO/TTA 3:2001(en)
+ISO/TTA 4:2002
+ISO/TTA 5:2006
+ISO/TTA 5:2007

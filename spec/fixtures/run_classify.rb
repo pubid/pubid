@@ -13,13 +13,14 @@ require_relative "../../lib/pubid_new/iso"
 require_relative "../../lib/pubid_new/iec"
 require_relative "../../lib/pubid_new/ieee"
 require_relative "../../lib/pubid_new/nist"
+require_relative "../../lib/pubid_new/jcgm"
 
 # Get flavor from command line
 flavor = ARGV[0]&.downcase
 
 if flavor.nil? || flavor == "all"
   # Classify all flavors with V2 implementations
-  %w[iso iec ieee nist].each do |f|
+  %w[iso iec ieee nist jcgm].each do |f|
     puts
     classifier = FixturesClassifier.new(f, verbose: true)
     classifier.classify
