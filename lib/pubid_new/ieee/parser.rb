@@ -188,9 +188,36 @@ module PubidNew
       end
 
       # IEC/IEEE copublished pattern - handle all variations comprehensively
+      # BUT exclude P prefix patterns (those are joint development)
       rule(:iec_ieee_copublished) do
         str("IEC/IEEE") >>
-        (space >> match("[^\n]").repeat(1)).as(:content)
+        space >>
+        str("P").absent? >> # NOT a P prefix (would be joint development)
+        (match("[^\n]").repeat(1)).as(:content)
+      end
+
+      # Joint development patterns (ISO/IEC/IEEE in either IEEE or ISO format)
+      rule(:joint_development_ieee_format) do
+        # ISO/IEC/IEEE P26511/D8-2018 or ISO/IEEE P1003.1-2008 or IEC/IEEE P62582-1-2011
+        (str("ISO/IEC/IEEE") | str("ISO/IEEE") | str("IEC/IEEE")).as(:joint_publishers) >>
+        space >>
+        str("P") >> # P indicates IEEE-led
+        digits.as(:number) >>
+        ((dot | dash) >> digits.as(:part)).maybe >> # Optional part like .1 or -1
+        (slash >> str("D") >> digits.as(:draft_version)).maybe >> # Optional /D8
+        (dash >> year_digits.as(:year)).maybe # Optional -2018
+      end
+
+      rule(:joint_development_iso_format) do
+        # ISO/IEC/IEEE FDIS 26511:2018 (ISO-led format)
+        (str("ISO/IEC/IEEE") | str("ISO/IEEE") | str("IEC/IEEE")).as(:joint_publishers) >>
+        space >>
+        # ISO stage codes
+        (str("FDIS") | str("DIS") | str("CD") | str("WD") | str("PWI") | str("NP")).as(:iso_stage) >>
+        space >>
+        digits.as(:number) >>
+        ((dot | dash) >> digits.as(:part)).maybe >> # Optional part
+        (str(":") >> year_digits.as(:year)).maybe
       end
 
       # Number-first pattern: "1873-2015 IEEE Standard..."
@@ -243,6 +270,8 @@ module PubidNew
 
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
+        joint_development_ieee_format |
+        joint_development_iso_format |
         iec_ieee_copublished |
         number_first_identifier |
         ieee_approved_draft_identifier |

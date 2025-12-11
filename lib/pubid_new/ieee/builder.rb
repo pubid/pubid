@@ -102,11 +102,73 @@ module PubidNew
       def build_single_identifier(parsed)
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
+
+        # Handle joint development patterns from parser
+        if parsed_hash[:joint_publishers] || parsed_hash[:iso_stage]
+          return build_joint_development(parsed_hash)
+        end
+
         attributes = extract_attributes(parsed_hash)
 
         # Route to appropriate identifier class based on content
         identifier_class = determine_identifier_class(attributes)
         identifier_class.new(**attributes)
+      end
+
+      # Build joint development identifier from parsed data
+      def build_joint_development(parsed)
+        attributes = {}
+
+        # Extract publishers from joint_publishers
+        if parsed[:joint_publishers]
+          joint_pub_str = extract_value(parsed[:joint_publishers])
+          attributes[:publishers] = joint_pub_str.split("/")
+        end
+
+        # Build code with parts if present
+        code_parts = []
+        code_parts << extract_value(parsed[:part]) if parsed[:part]
+
+        code_str = extract_value(parsed[:number])
+        if code_str && !code_parts.empty?
+          code_str += "." + code_parts.join(".")
+        end
+        attributes[:code] = code_str
+
+        # Extract year
+        attributes[:year] = extract_value(parsed[:year]) if parsed[:year]
+
+        # Detect lead party based on pattern
+        if parsed[:iso_stage]
+          # ISO format - lead party is ISO
+          attributes[:lead_party] = "ISO"
+          attributes[:iso_stage] = extract_value(parsed[:iso_stage])
+
+          # Create typed_stage for ISO stage
+          stage_abbr = attributes[:iso_stage]
+          if stage_abbr
+            attributes[:typed_stage] = Ieee::Scheme.locate_typed_stage_by_abbr(stage_abbr)
+          end
+        else
+          # IEEE format - lead party is IEEE
+          attributes[:lead_party] = "IEEE"
+
+          # Extract draft version if present (e.g., D8 from /D8)
+          if parsed[:draft_version]
+            draft_ver = extract_value(parsed[:draft_version])
+            # Remove leading 'D' if present since draft_version already has it
+            draft_ver = draft_ver.sub(/^D/, "") if draft_ver
+            attributes[:ieee_draft] = "D#{draft_ver}" if draft_ver
+          end
+
+          # Mark as project (P prefix)
+          attributes[:type] = "P"
+
+          # Create typed_stage for IEEE project
+          attributes[:typed_stage] = Ieee::Scheme.locate_typed_stage_by_abbr("P")
+        end
+
+        Identifiers::JointDevelopment.new(**attributes)
       end
 
       # Determine which identifier class to use based on attributes
@@ -123,6 +185,39 @@ module PubidNew
 
         # Default to base identifier
         Identifiers::Base
+      end
+
+      # Detect lead party for joint development identifiers
+      # @param attributes [Hash] the identifier attributes
+      # @return [String] the lead party ("IEEE", "ISO", or "IEC")
+      def detect_lead_party(attributes)
+        # Rule 1: Check for P prefix in code (IEEE-led)
+        if attributes[:code]&.start_with?("P") || attributes[:type] == "P"
+          return "IEEE"
+        end
+
+        # Rule 2: Check for IEEE draft notation in original input (IEEE-led)
+        if @original_input && @original_input.match?(/\/D\d+/)
+          return "IEEE"
+        end
+
+        # Rule 3: Check for ISO stage codes (ISO-led)
+        iso_stages = %w[FDIS DIS CD WD PWI NP]
+        if attributes[:typed_stage]
+          stage_abbr = attributes[:typed_stage].abbr
+          stage_abbr = [stage_abbr] unless stage_abbr.is_a?(Array)
+          if stage_abbr.any? { |abbr| iso_stages.include?(abbr) }
+            return "ISO"
+          end
+        end
+
+        # Rule 4: Check for colon before year in original input (ISO-led)
+        if @original_input && @original_input.match?(/:\d{4}/)
+          return "ISO"
+        end
+
+        # Rule 5: Default to first publisher
+        attributes[:publisher] || "IEEE"
       end
 
       # Merge an array of parsed hashes into a single hash

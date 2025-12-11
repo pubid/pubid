@@ -10,6 +10,7 @@ require_relative "ieee/identifiers/adopted_standard"
 require_relative "ieee/identifiers/dual_published"
 require_relative "ieee/identifiers/redlined_standard"
 require_relative "ieee/identifiers/iec_ieee_copublished"
+require_relative "ieee/identifiers/joint_development"
 
 module PubidNew
   module Ieee
