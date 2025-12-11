@@ -203,9 +203,10 @@ module PubidNew
             # Check if adoption_part looks like an identifier (contains publisher or type keywords)
             # BUT exclude revision/amendment/supersedes notes
             # AND exclude multi-part adoptions (containing commas)
+            # AND exclude Pattern 4 relationship types
             if main_part && adoption_part &&
                !adoption_part.include?(",") &&  # Skip multi-part adoptions
-               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Supersedes|Supercedes|Notebooks|Standard Newspaper)/i) &&
+               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|incorporates|Incorporating|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Supersedes|Supercedes|Notebooks|Standard Newspaper)/i) &&
                (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
                 adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
                 adoption_part.match?(/\bStd\s+\d+/))

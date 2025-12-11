@@ -174,6 +174,75 @@ module PubidNew
         str(" - Redline").as(:redline)
       end
 
+      # Relationship type keywords for Pattern 4 identifiers
+      rule(:relationship_revision_of) { str("Revision of ") | str("Revison of ") }
+      rule(:relationship_amendment_to) { str("Amendment to ") }
+      rule(:relationship_corrigendum_to) { str("Corrigendum to ") }
+      rule(:relationship_incorporates) { str("incorporates ") | str("Incorporating ") }
+      rule(:relationship_adoption_of) { str("Adoption of ") }
+      rule(:relationship_supplement_to) { str("Supplement to ") }
+      rule(:relationship_draft_amendment) { str("Draft Amendment to ") | str("DRAFT Amendment to ") }
+      rule(:relationship_draft_revision) { str("Draft Revision of ") }
+
+      # Combined relationship type (longest match first)
+      rule(:relationship_type) do
+        (
+          relationship_draft_amendment.as(:draft_amendment_to) |
+          relationship_draft_revision.as(:draft_revision_of) |
+          relationship_revision_of.as(:revision_of) |
+          relationship_amendment_to.as(:amendment_to) |
+          relationship_corrigendum_to.as(:corrigendum_to) |
+          relationship_incorporates.as(:incorporates) |
+          relationship_adoption_of.as(:adoption_of) |
+          relationship_supplement_to.as(:supplement_to)
+        )
+      end
+
+      # Identifier string (for parsing list of related identifiers)
+      # Captures text until delimiter: comma, closing paren, "and", " / ", "as amended by"
+      # Uses absent? to ensure we stop at these delimiters
+      rule(:identifier_string) do
+        (
+          str(", and ").absent? >>
+          str(" and ").absent? >>
+          str(", ").absent? >>
+          str(" as amended by ").absent? >>
+          str(" / ").absent? >>
+          str(")").absent? >>
+          match(".")
+        ).repeat(1)
+      end
+
+      # Identifier list (comma and "and" separated)
+      rule(:identifier_list) do
+        identifier_string.as(:id) >>
+        (
+          (str(", and ") | str(" and ") | str(", ")) >>
+          identifier_string.as(:id)
+        ).repeat
+      end
+
+      # "as amended by" clause with identifier list
+      rule(:as_amended_by_clause) do
+        str(" as amended by ") >> identifier_list.as(:amendments)
+      end
+
+      # Relationship clause (handles all relationship types)
+      rule(:relationship_clause) do
+        space.maybe >> str("(") >>
+        relationship_type.as(:relationship_type) >>
+        identifier_list.as(:related_ids) >>
+        as_amended_by_clause.maybe >>
+        # Handle multiple relationships separated by " / "
+        (
+          str(" / ") >>
+          relationship_type.as(:relationship_type) >>
+          identifier_list.as(:related_ids) >>
+          as_amended_by_clause.maybe
+        ).repeat.as(:additional_rels) >>
+        str(")")
+      end
+
       # Additional parameters (inside parentheses)
       rule(:additional_parameters) do
         (space.maybe >> str("(") >>  # Make space before '(' optional
@@ -198,6 +267,11 @@ module PubidNew
           match("[^)]").repeat(1).as(:parenthetical_content)
          ) >>
          str(")").maybe).as(:parameters)
+      end
+
+      # Parenthetical - try relationship_clause first, then fall back to additional_parameters
+      rule(:parenthetical) do
+        relationship_clause | additional_parameters
       end
 
       # IEC/IEEE copublished pattern - handle all variations comprehensively
@@ -257,7 +331,7 @@ module PubidNew
         draft.maybe >>
         # ALSO accept month/year after draft (some patterns like /DX, Month YEAR)
         ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
-        additional_parameters.maybe
+        parenthetical.maybe
       end
 
       # IEEE Draft P pattern: "IEEE Draft P802.11..." OR "Draft P802.11..." (IEEE prefix optional)
@@ -270,7 +344,7 @@ module PubidNew
         # Enhanced: Accept month/year after draft number
         (space >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         draft.maybe >>
-        additional_parameters.maybe
+        parenthetical.maybe
       end
 
       # IEEE Approved Draft pattern: "IEEE Approved Draft Std P..."
@@ -283,7 +357,7 @@ module PubidNew
         number >>
         (part_subpart_year | edition).maybe >>
         draft.maybe >>
-        additional_parameters.maybe
+        parenthetical.maybe
       end
 
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
@@ -307,7 +381,7 @@ module PubidNew
         # Enhanced: Accept both comma and space before month/year
         ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         edition.maybe >>
-        additional_parameters.maybe >>
+        parenthetical.maybe >>
         redline.maybe)
       end
 

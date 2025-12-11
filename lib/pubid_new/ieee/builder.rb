@@ -110,6 +110,11 @@ module PubidNew
 
         attributes = extract_attributes(parsed_hash)
 
+        # Handle relationships if present (Pattern 4)
+        if parsed_hash[:relationship_type] || parsed_hash[:relationship_clause]
+          attributes[:relationships] = build_relationships(parsed_hash)
+        end
+
         # Route to appropriate identifier class based on content
         identifier_class = determine_identifier_class(attributes)
         identifier_class.new(**attributes)
@@ -511,6 +516,95 @@ module PubidNew
           attributes[:amendment_to] = extract_value(param_data[:amendment_to]) if param_data[:amendment_to]
           attributes[:adoption] = extract_value(param_data[:adoption]) if param_data[:adoption]
           attributes[:note] = extract_value(param_data[:note]) if param_data[:note]
+        end
+      end
+
+      # Build relationships from parsed relationship clause (Pattern 4)
+      # @param parsed_hash [Hash] the parsed data containing relationship information
+      # @return [Array<Components::Relationship>] array of Relationship objects
+      def build_relationships(parsed_hash)
+        return [] unless parsed_hash[:relationship_type] || parsed_hash[:relationship_clause]
+
+        require_relative "./components/relationship"
+        relationships = []
+
+        # Main relationship
+        if parsed_hash[:relationship_type]
+          rel_type = extract_relationship_type(parsed_hash[:relationship_type])
+          related = parse_identifier_list(parsed_hash[:related_ids])
+          amendments = parse_identifier_list(parsed_hash[:amendments]) if parsed_hash[:amendments]
+
+          relationships << Components::Relationship.new(
+            relationship_type: rel_type,
+            related_identifiers: related,
+            intermediate_amendments: amendments
+          )
+        end
+
+        # Additional relationships (separated by " / ")
+        if parsed_hash[:additional_rels]
+          additional = parsed_hash[:additional_rels]
+          additional = [additional] unless additional.is_a?(Array)
+
+          additional.each do |rel_data|
+            rel_type = extract_relationship_type(rel_data[:relationship_type])
+            related = parse_identifier_list(rel_data[:related_ids])
+            amendments = parse_identifier_list(rel_data[:amendments]) if rel_data[:amendments]
+
+            relationships << Components::Relationship.new(
+              relationship_type: rel_type,
+              related_identifiers: related,
+              intermediate_amendments: amendments
+            )
+          end
+        end
+
+        relationships
+      end
+
+      # Extract relationship type from parsed hash
+      # @param type_hash [Hash] hash with relationship type key
+      # @return [String] the relationship type constant name
+      def extract_relationship_type(type_hash)
+        return nil unless type_hash.is_a?(Hash)
+        # type_hash has key like :revision_of, :amendment_to, etc.
+        type_hash.keys.first.to_s
+      end
+
+      # Parse a list of identifier strings into identifier objects
+      # @param list_data [Hash, Array, nil] the parsed identifier list data
+      # @return [Array<Identifiers::Base>] array of parsed identifier objects
+      def parse_identifier_list(list_data)
+        return [] unless list_data
+
+        # Extract identifier strings from parsed data
+        id_strings = extract_identifier_strings(list_data)
+
+        # Recursively parse each identifier string
+        id_strings.map do |id_str|
+          begin
+            # Use Identifiers::Base.parse for recursive parsing
+            Identifiers::Base.parse(id_str)
+          rescue Parslet::ParseFailed => e
+            # If parsing fails, create minimal identifier with just the string
+            # This maintains graceful degradation
+            Identifiers::Base.new(parenthetical_content: id_str)
+          end
+        end
+      end
+
+      # Extract identifier strings from parsed list data
+      # @param list_data [Hash, Array] the parsed list data
+      # @return [Array<String>] array of identifier strings
+      def extract_identifier_strings(list_data)
+        if list_data.is_a?(Array)
+          # Array of id hashes: [{id: "..."}, {id: "..."}]
+          list_data.map { |item| item[:id].to_s.strip }
+        elsif list_data.is_a?(Hash) && list_data[:id]
+          # Single id hash: {id: "..."}
+          [list_data[:id].to_s.strip]
+        else
+          []
         end
       end
     end
