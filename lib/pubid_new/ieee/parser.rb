@@ -174,7 +174,8 @@ module PubidNew
           (str("Revision to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
           # Handle "Revison to IEEE Std ..." with optional space after Std
           (str("Revison to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
-          # Amendment patterns
+          # Amendment patterns (case-insensitive DRAFT)
+          ((str("DRAFT") | str("Draft") | str("draft")) >> str(" Amendment to ") >> match("[^)]").repeat(1).as(:draft_amendment_to)) |
           (str("Amendment to IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:amendment_to)) |
           # Adoption patterns
           (str("Adoption of ") >> match("[^)]").repeat(1).as(:adoption)) |
@@ -205,7 +206,8 @@ module PubidNew
         digits.as(:number) >>
         ((dot | dash) >> digits.as(:part)).maybe >> # Optional part like .1 or -1
         (slash >> str("D") >> digits.as(:draft_version)).maybe >> # Optional /D8
-        (dash >> year_digits.as(:year)).maybe # Optional -2018
+        ((dash >> year_digits.as(:year)) | # Either -YEAR
+         (space >> month_name.as(:month) >> space >> year_digits.as(:year))).maybe # Or Month YEAR
       end
 
       rule(:joint_development_iso_format) do
@@ -231,26 +233,28 @@ module PubidNew
         match("[^\n]").repeat(0).as(:title)
       end
 
-      # IEEE P pattern (without Std): "IEEE P1003.1..."
+      # IEEE P pattern (without Std): "IEEE P1003.1..." OR just "P1003.1..." (prefix optional)
       rule(:ieee_p_identifier) do
-        str("IEEE").as(:publisher) >>
-        space >>
+        (str("IEEE").as(:publisher) >> space).maybe >> # Make IEEE prefix optional
         str("P") >>
         number >>
         (part_subpart_year | edition).maybe >>
+        # Add month/year support directly here (critical for standalone P{NUM} Month YEAR)
+        (space >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         corrigendum.maybe >>
         draft.maybe >>
         additional_parameters.maybe
       end
 
-      # IEEE Draft P pattern: "IEEE Draft P802.11..."
+      # IEEE Draft P pattern: "IEEE Draft P802.11..." OR "Draft P802.11..." (IEEE prefix optional)
       rule(:ieee_draft_p_identifier) do
-        str("IEEE").as(:publisher) >>
-        space >>
+        (str("IEEE").as(:publisher) >> space).maybe >> # Make IEEE prefix optional
         str("Draft") >> space >>
         str("P") >>
         number >>
         (part_subpart_year | edition).maybe >>
+        # Enhanced: Accept month/year after draft number
+        (space >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         draft.maybe >>
         additional_parameters.maybe
       end
@@ -286,13 +290,21 @@ module PubidNew
         corrigendum.maybe >>
         amendment.maybe >>
         draft.maybe >>
-        (comma >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
+        # Enhanced: Accept both comma and space before month/year
+        ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         edition.maybe >>
         additional_parameters.maybe >>
         redline.maybe)
       end
 
       root(:identifier)
+
+      # Class method to parse with preprocessing
+      def self.parse(string)
+        # Strip .pdf extension if present (Pattern 3: File Extensions)
+        cleaned = string.sub(/\.pdf$/i, '')
+        new.parse(cleaned)
+      end
     end
   end
 end

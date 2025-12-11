@@ -227,7 +227,7 @@ module PubidNew
 
         # Parse a single IEEE identifier
         def self.parse_single(input)
-          parsed = Parser.new.parse(input)
+          parsed = Parser.parse(input)  # Use class method for preprocessing
           builder = Builder.new(Base)
           # Pass the original input string to builder for context
           builder.instance_variable_set(:@original_input, input)
