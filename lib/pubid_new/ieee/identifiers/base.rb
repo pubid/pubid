@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../components/typed_stage"
 
 module PubidNew
   module Ieee
@@ -35,12 +36,18 @@ module PubidNew
         attribute :amendment_to, :string                    # Amendment to relationships
         attribute :edition_month, :string                   # Month part from Edition YYYY-MM
         attribute :space_before_draft, :boolean, default: -> { false }  # Track space before /D
+        attribute :typed_stage, Components::TypedStage      # TYPED_STAGE integration
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
 
         def initialize(**args)
           super()
+
+          # Handle typed_stage if provided
+          if args[:typed_stage]
+            self.typed_stage = args[:typed_stage]
+          end
 
           # Handle code as component object
           if args[:code].is_a?(String)
@@ -221,7 +228,7 @@ module PubidNew
         # Parse a single IEEE identifier
         def self.parse_single(input)
           parsed = Parser.new.parse(input)
-          builder = Builder.new
+          builder = Builder.new(Base)
           # Pass the original input string to builder for context
           builder.instance_variable_set(:@original_input, input)
           builder.build(parsed)
@@ -241,23 +248,39 @@ module PubidNew
           # Draft status
           parts << draft_status if draft_status
 
-          # Type (only add if present)
-          parts << type if type && !type.to_s.strip.empty?
+          # Type - only render for IEEE/AIEE publishers, and only for non-projects
+          # Must come BEFORE code
+          should_render_type = publisher&.match?(/^(IEEE|AIEE)/)
 
-          # Code - with year only if no edition, no draft, AND no month
+          if should_render_type && !typed_stage&.project_status && type && !type.to_s.strip.empty? && type != "P"
+            # Non-project with explicit type (Std, No, etc.)
+            type_str = type.dup
+            # Remove P prefix if somehow present
+            type_str = type_str.sub(/^P/, "") if type_str.start_with?("P")
+            parts << type_str unless type_str.strip.empty?
+          end
+
+          # Code - with P prefix for projects (concatenated, not separated)
           if code_obj
             result = code_obj.to_s
-            # Only attach year to code if there's no edition (IEEE style), no month, and no draft
-            # IEC style puts year after edition
-            # Month style puts year after month
+
+            # Prepend P if this is a project AND code doesn't already have P
+            if typed_stage&.project_status && should_render_type && !result.start_with?("P")
+              result = "P#{result}"
+            end
+
+            # Only attach year to code if there's no edition, no month, and no draft
             result += "-#{year}" if year && !draft_obj && !edition && !month
-            
+
             # Append draft to code - with or without space based on original format
             if draft_obj
               result += space_before_draft ? " #{draft_obj}" : draft_obj.to_s
             end
-            
+
             parts << result
+          elsif should_render_type && typed_stage&.project_status
+            # No code but is a project - add standalone P
+            parts << "P"
           end
 
           # Edition - with year if present (IEC style)

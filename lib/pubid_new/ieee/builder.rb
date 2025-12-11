@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "scheme"
+
 module PubidNew
   module Ieee
     # Builder class for constructing IEEE identifier scheme from parsed data
@@ -163,6 +165,18 @@ module PubidNew
 
         # Create code string with parts
         code_str = extract_value(parsed[:number])
+
+        # Extract type and draft_status for typed_stage lookup
+        type_value = extract_value(parsed[:type])
+        draft_status_value = extract_value(parsed[:draft_status])
+
+        # Handle case where parser captured number without "P" prefix
+        # Check original input to see if there was a P before the number
+        if !type_value && @original_input && @original_input.match?(/IEEE\s+P\d/)
+          # Extract P as type since it was in the original but parser stripped it
+          type_value = "P"
+        end
+
         if code_str && !code_parts.empty?
           code_str += "." + code_parts.join(".")
         end
@@ -179,8 +193,16 @@ module PubidNew
           attributes[:edition_month] = extract_value(parsed[:edition_month])
         end
 
-        attributes[:type] = extract_value(parsed[:type])
-        attributes[:draft_status] = extract_value(parsed[:draft_status])
+        # Set type attribute for backward compatibility (after P extraction)
+        attributes[:type] = type_value if type_value
+
+        # Lookup typed_stage from registry
+        typed_stage_abbr = determine_stage_abbr(type_value, draft_status_value, parsed)
+        if typed_stage_abbr
+          attributes[:typed_stage] = Ieee::Scheme.locate_typed_stage_by_abbr(typed_stage_abbr)
+        end
+
+        attributes[:draft_status] = draft_status_value
 
         # Optional attributes (excluding part/subpart since they're in code)
         extract_optional(parsed, attributes, :edition)
@@ -209,6 +231,50 @@ module PubidNew
         attributes[:redline] = true if parsed[:redline]
 
         attributes
+      end
+
+      # Determine stage abbreviation for TYPED_STAGE lookup
+      # @param type_value [String] the type value (e.g., "Std", "P")
+      # @param draft_status_value [String] the draft status (e.g., "Unapproved")
+      # @param parsed [Hash] the full parsed data
+      # @return [String, nil] the abbreviation to use for stage lookup
+      def determine_stage_abbr(type_value, draft_status_value, parsed)
+        # Check for specific draft notation (D1, D2, etc.)
+        if parsed[:draft]
+          draft_data = parsed[:draft]
+          draft_data = draft_data.is_a?(Array) ? draft_data.inject({}) { |r, e| r.merge(e) } : draft_data
+
+          if draft_data.is_a?(Hash) && draft_data[:draft_version]
+            dv = draft_data[:draft_version]
+            version = dv.is_a?(Array) ? dv.map { |v| extract_value(v) }.join : extract_value(dv)
+
+            # Construct draft notation like "D1", "D2", etc.
+            if version
+              draft_abbr = "D#{version}"
+              # Check if this specific draft stage is in registry
+              stage = Ieee::Scheme.locate_typed_stage_by_abbr(draft_abbr)
+              return draft_abbr if stage && stage.abbr.include?(draft_abbr)
+            end
+          end
+        end
+
+        # Check type value for known abbreviations
+        if type_value
+          # Remove leading "P" and check if it exists in registry
+          if type_value.start_with?("P")
+            # Could be just "P" prefix or "P" as type indicator
+            # If the type is literally "P" followed by numbers, it's a project identifier
+            # Return "P" to get the generic project typed_stage
+            return "P"
+          elsif type_value == "Std"
+            return "Std"
+          elsif type_value.match?(/^No\.?$/)
+            return type_value
+          end
+        end
+
+        # Default to "Std" for published standards
+        "Std"
       end
 
       # Extract a simple value from parsed data
@@ -271,14 +337,14 @@ module PubidNew
           month = extract_value(month_slice) if month_slice
           year = extract_value(draft_data[:year]) if draft_data[:year]
           day = extract_value(draft_data[:day]) if draft_data[:day]
-          
+
           # Detect comma before month and space before draft by checking the original input
           if @original_input
             if month
               # Look for ", Month" pattern in the original input
               comma_before_month = @original_input.match?(/,\s+#{Regexp.escape(month)}/i)
             end
-            
+
             # Check if there's a space before /D in the original input
             if version && @original_input.match?(/\s+\/D#{Regexp.escape(version)}/i)
               attributes[:space_before_draft] = true
