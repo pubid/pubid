@@ -193,9 +193,61 @@ module PubidNew
         (space >> match("[^\n]").repeat(1)).as(:content)
       end
 
+      # Number-first pattern: "1873-2015 IEEE Standard..."
+      rule(:number_first_identifier) do
+        number >>
+        (dash >> year_digits.as(:year)).maybe >>
+        space >>
+        (publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >>
+        space >>
+        (type_word.as(:type) >> space?).maybe >>
+        match("[^\n]").repeat(0).as(:title)
+      end
+
+      # IEEE P pattern (without Std): "IEEE P1003.1..."
+      rule(:ieee_p_identifier) do
+        str("IEEE").as(:publisher) >>
+        space >>
+        str("P") >>
+        number >>
+        (part_subpart_year | edition).maybe >>
+        corrigendum.maybe >>
+        draft.maybe >>
+        additional_parameters.maybe
+      end
+
+      # IEEE Draft P pattern: "IEEE Draft P802.11..."
+      rule(:ieee_draft_p_identifier) do
+        str("IEEE").as(:publisher) >>
+        space >>
+        str("Draft") >> space >>
+        str("P") >>
+        number >>
+        (part_subpart_year | edition).maybe >>
+        draft.maybe >>
+        additional_parameters.maybe
+      end
+
+      # IEEE Approved Draft pattern: "IEEE Approved Draft Std P..."
+      rule(:ieee_approved_draft_identifier) do
+        str("IEEE").as(:publisher) >>
+        space >>
+        str("Approved") >> space >>
+        (str("Draft Std") | str("Std")).as(:type) >> space >>
+        str("P").maybe >>
+        number >>
+        (part_subpart_year | edition).maybe >>
+        draft.maybe >>
+        additional_parameters.maybe
+      end
+
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
         iec_ieee_copublished |
+        number_first_identifier |
+        ieee_approved_draft_identifier |
+        ieee_draft_p_identifier |
+        ieee_p_identifier |
         ((publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >>
         space >> (draft_status.as(:draft_status)).maybe >>
         (str("Draft Std").as(:type) >> space?).maybe >>
