@@ -97,9 +97,18 @@ module PubidNew
       end
 
       rule(:draft_version) do
-        # D1, D2, DD3, D3Q, D2009-d, etc.
-        str("D") >> str("IS").absent? >> str("-").maybe >>
-        (match("[0-9A-Za-z]").repeat(1) >> str("-d").maybe).as(:draft_version)
+        # Enhanced to handle multiple draft notation patterns
+        str("D") >> str("IS").absent? >> # Avoid matching "DIS" (ISO stage)
+        (
+          # Pattern: D.XX (decimal) - e.g., D.19
+          (dot >> digits) |
+          # Pattern: DX+X (plus sign) - e.g., D1+1
+          (digits >> str("+") >> digits) |
+          # Pattern: DXXXXeYY or DXXXX.eYY (complex) - e.g., D2012.e27
+          (digits >> dot.maybe >> str("e") >> digits) |
+          # Pattern: D-X or DX or DX-d (original patterns)
+          (str("-").maybe >> match("[0-9A-Za-z]").repeat(1) >> str("-d").maybe)
+        ).as(:draft_version)
       end
 
       rule(:draft_date) do
@@ -141,9 +150,12 @@ module PubidNew
 
       # Corrigendum
       rule(:corrigendum) do
-        ((str("_") | slash | dash) >> str("Cor") >> (dash | dot.maybe >> space?) >>
+        # Enhanced: Accept space as separator, make separators more flexible
+        ((str("_") | slash | dash | space) >>
+         str("Cor") >>
+         (dash | dot | space).maybe >> # More flexible separator after "Cor"
          digits.as(:cor_number) >>
-         ((dash | str(":")) >> year_digits.as(:cor_year)).maybe).as(:corrigendum)
+         ((dash | str(":") | space) >> year_digits.as(:cor_year)).maybe).as(:corrigendum)
       end
 
       # Amendment
@@ -239,10 +251,12 @@ module PubidNew
         str("P") >>
         number >>
         (part_subpart_year | edition).maybe >>
-        # Add month/year support directly here (critical for standalone P{NUM} Month YEAR)
-        (space >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
+        # Enhanced: Accept both comma and space before month/year
+        ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         corrigendum.maybe >>
         draft.maybe >>
+        # ALSO accept month/year after draft (some patterns like /DX, Month YEAR)
+        ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         additional_parameters.maybe
       end
 
@@ -303,6 +317,11 @@ module PubidNew
       def self.parse(string)
         # Strip .pdf extension if present (Pattern 3: File Extensions)
         cleaned = string.sub(/\.pdf$/i, '')
+
+        # Pattern 3: Replace underscore before ISO stage codes with slash
+        # These are joint development drafts that use underscore instead of slash
+        cleaned = cleaned.gsub(/_(FDIS|CDV|CD|DIS|WD|PWI|NP)/, '/\1')
+
         new.parse(cleaned)
       end
     end
