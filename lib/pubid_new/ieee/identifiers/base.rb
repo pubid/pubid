@@ -2,6 +2,7 @@
 
 require "lutaml/model"
 require_relative "../components/typed_stage"
+require_relative "../components/relationship"
 
 module PubidNew
   module Ieee
@@ -37,6 +38,7 @@ module PubidNew
         attribute :edition_month, :string                   # Month part from Edition YYYY-MM
         attribute :space_before_draft, :boolean, default: -> { false }  # Track space before /D
         attribute :typed_stage, Components::TypedStage      # TYPED_STAGE integration
+        attribute :relationships, Components::Relationship, collection: true  # Relationship metadata
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -307,6 +309,10 @@ module PubidNew
           # Add parenthetical content if present
           if parenthetical_content
             result += " (#{parenthetical_content})"
+          elsif relationships && !relationships.empty?
+            # Render relationships (multiple separated by /)
+            relationship_str = relationships.map(&:to_s).join(" / ")
+            result += " (#{relationship_str})"
           elsif revision_of
             result += " (Revision of IEEE Std #{revision_of})"
           elsif amendment_to

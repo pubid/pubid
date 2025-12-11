@@ -51,6 +51,92 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
     end
 
+    context "relationships" do
+      let(:related_id) do
+        PubidNew::Ieee::Identifiers::Base.new(
+          publisher: "IEEE",
+          type: "Std",
+          code: "802.11",
+          year: "2012"
+        )
+      end
+
+      it "renders single relationship with one identifier" do
+        relationship = PubidNew::Ieee::Components::Relationship.new(
+          relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
+          related_identifiers: [related_id]
+        )
+
+        id = PubidNew::Ieee::Identifiers::Base.new(
+          publisher: "IEEE",
+          type: "Std",
+          code: "802.11",
+          year: "2016",
+          relationships: [relationship]
+        )
+
+        expect(id.to_s).to eq("IEEE Std 802.11-2016 (Revision of IEEE Std 802.11-2012)")
+      end
+
+      it "renders multiple relationships separated by /" do
+        rev_rel = PubidNew::Ieee::Components::Relationship.new(
+          relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
+          related_identifiers: [related_id]
+        )
+
+        inc_rel = PubidNew::Ieee::Components::Relationship.new(
+          relationship_type: PubidNew::Ieee::Components::Relationship::INCORPORATES,
+          related_identifiers: [PubidNew::Ieee::Identifiers::Base.new(
+            publisher: "IEEE",
+            type: "Std",
+            code: "802.11a",
+            year: "1999"
+          )]
+        )
+
+        id = PubidNew::Ieee::Identifiers::Base.new(
+          publisher: "IEEE",
+          type: "Std",
+          code: "802.11",
+          year: "2016",
+          relationships: [rev_rel, inc_rel]
+        )
+
+        expect(id.to_s).to eq("IEEE Std 802.11-2016 (Revision of IEEE Std 802.11-2012 / incorporates IEEE Std 802.11a-1999)")
+      end
+
+      it "renders relationship with multiple identifiers" do
+        id1 = PubidNew::Ieee::Identifiers::Base.new(
+          publisher: "IEEE",
+          type: "Std",
+          code: "1232",
+          year: "1995"
+        )
+
+        id2 = PubidNew::Ieee::Identifiers::Base.new(
+          publisher: "IEEE",
+          type: "Std",
+          code: "1232.1",
+          year: "1997"
+        )
+
+        relationship = PubidNew::Ieee::Components::Relationship.new(
+          relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
+          related_identifiers: [id1, id2]
+        )
+
+        id = PubidNew::Ieee::Identifiers::Base.new(
+          publisher: "IEEE",
+          type: "Std",
+          code: "1232",
+          year: "2002",
+          relationships: [relationship]
+        )
+
+        expect(id.to_s).to eq("IEEE Std 1232-2002 (Revision of IEEE Std 1232-1995 and IEEE Std 1232.1-1997)")
+      end
+    end
+
     context "round-trip parsing" do
       it "preserves exact rendering" do
         test_cases = [
