@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "scheme"
+require_relative "nesc/builder"
 
 module PubidNew
   module Ieee
@@ -25,6 +26,12 @@ module PubidNew
         # Handle IEC/IEEE copublished patterns
         if parsed[:content]
           return build_iec_ieee_copublished(parsed)
+        end
+
+        # Handle NESC identifiers (National Electrical Safety Code)
+        if parsed[:nesc]
+          nesc_builder = Nesc::Builder.new
+          return nesc_builder.build(parsed[:nesc])
         end
 
         # Handle single identifier

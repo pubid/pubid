@@ -2,6 +2,8 @@
 
 require "parslet"
 
+require_relative "nesc/parser"
+
 module PubidNew
   module Ieee
     # Parser class for IEEE identifiers
@@ -395,8 +397,25 @@ module PubidNew
         parenthetical.maybe
       end
 
+      # NESC (National Electrical Safety Code) patterns
+      # Detect NESC patterns and delegate to NESC parser
+      rule(:nesc_identifier) do
+        # Lookahead for NESC patterns - do not consume input
+        (
+          # C2-YYYY pattern
+          (str("C2-") >> year_digits) |
+          # YYYY NESC pattern
+          (year_digits >> space >> (str("NESC") | str("National Electrical Safety Code"))) |
+          # Draft NESC pattern
+          (str("Draft") >> space >> (str("NESC") | str("National Electrical Safety Code")))
+        ).present? >>
+        # Delegate to NESC parser if pattern detected
+        Nesc::Parser.new.nesc_identifier.as(:nesc)
+      end
+
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
+        nesc_identifier |
         joint_development_ieee_format |
         joint_development_iso_format |
         iec_ieee_copublished |
