@@ -42,6 +42,7 @@ IEEE P1048/D6+1, May 2012
 !IEEE P1062/D.30, September 2015!IEEE P1062/D.30, September, 2015
 !IEEE P1149.1/D2012.e27, September 2012!IEEE P1149.1/D2012.e27, September, 2012
 !IEEE P1149.1/D2012.e29, November 2012!IEEE P1149.1/D2012.e29, November, 2012
+!IEEE P1377/D11, March 2012 - (Approved Draft)!IEEE P1377/D11, March, 2012
 IEEE P1609.12/D7, June 2012 (Approved Draft)
 IEEE P1680.2/D7, May 2012 (Approved Draft)
 IEEE P1680.3/D7, May 2012 (Approved Draft)
@@ -62,8 +63,10 @@ IEEE P802.1AC/D2.1, June 2012 (Approved Draft)
 !IEEE P802.1AEbn/D0.8 (DRAFT Amendment to IEEE Std 802.1AE-2006)!IEEE P802.1AEbn/D0.8 (Draft Amendment to IEEE Std 802.1AE-2006)
 !IEEE P802.1AEbw/D1.0, June 2012 (DRAFT Amendment to IEEE Std 802.1AE2006)!IEEE P802.1AEbw/D1.0, June 2012 (Draft Amendment to IEEE Std 802.1AE2006)
 !IEEE P802.1AEbw/D1.1, October 2012 (DRAFT Amendment to IEEE Std 802.1AE2006)!IEEE P802.1AEbw/D1.1, October, 2012 (Draft Amendment to IEEE Std 802.1AE2006)
+!IEEE P802.1BR/D3.3, February 2012 - (Approved Draft)!IEEE P802.1BR/D3.3, February, 2012
 !IEEE P802.1Qbb/D2.2 (DRAFT Amendment to IEEE Std 802.1Q -2005)!IEEE P802.1Qbb/D2.2 (Draft Amendment to IEEE Std (IEEE Std 802.1Q -2005))
 !IEEE P802.1Qbb/D2.3, May 2010 (DRAFT Amendment to IEEE Std 802.1Q -2005)!IEEE P802.1Qbb/D2.3, May 2010 (Draft Amendment to IEEE Std (IEEE Std 802.1Q -2005))
+!IEEE P802.1Qbg/D2.2, February 2012 - (Approved Draft)!IEEE P802.1Qbg/D2.2, February, 2012
 !IEEE P802.1Qcp/D2.1, January 2018 (DRAFT amendment to IEEE Std 802.1Q-2017)!IEEE P802.1Qcp/D2.1, January, 2018 (DRAFT amendment to IEEE Std 802.1Q-2017)
 !IEEE P802.1Qcp/D2.2, March 2018 (DRAFT amendment to IEEE Std 802.1Q-2018)!IEEE P802.1Qcp/D2.2, March, 2018 (DRAFT amendment to IEEE Std 802.1Q-2018)
 !IEEE P802.1Qcy/D2.1, February 2018 (Draft Amendment to IEEE Std 802.1Q-2018)!IEEE P802.1Qcy/D2.1, February, 2018 (Draft Amendment to IEEE Std 802.1Q-2018)
@@ -118,7 +121,6 @@ IEEE Std 771-1998 (R2009)
 !IEEE Std 802.3-2005 (Revision of IEEE Std 802.3-2002 including all approved amendments)!IEEE Std 802.3-2005 (Revision of IEEE Std (IEEE Std 802.3-2002 including all approved amendments))
 !IEEE Std 802.3af-2003 (Amendment to IEEE Std 802.3-2002, including IEEE Std 802.3ae-2002)!IEEE Std 802.3af-2003 (Amendment to IEEE Std 802.3-2002 and IEEE Std (including IEEE Std 802.3ae-2002))
 !IEEE Std 802.3i-1990 (Supplement to ISO/IEC 8802-3:1990 - ANSI/IEEE Std 802.3-1990 Edition)!IEEE Std 802.3i-1990 (Supplement to IEEE Std (ISO/IEC 8802-3:1990 - ANSI/IEEE Std 802.3-1990 Edition))
-!IEEE Std 802.3u-1995 (Supplement to ISO/IEC 8802-3: 1993; ANSI/IEEE Std 802.3, 1993 Edition)!IEEE Std 802.3u-1995 (Supplement to IEEE Std (ISO/IEC 8802-3: 1993; ANSI/IEEE Std 802.3) and IEEE Std (1993 Edition))
 !IEEE Std 802.5j-1993,!IEEE Std 802.5j-1993
 !IEEE Std C135.61-1997(R2006)!IEEE Std C135.61-1997 (R2006)
 !IEEE Std C135.63-1998(R2006)!IEEE Std C135.63-1998 (R2006)

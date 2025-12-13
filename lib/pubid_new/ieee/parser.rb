@@ -290,6 +290,16 @@ module PubidNew
         str(")")
       end
 
+      # Title portion separated by colon (Category 8)
+      rule(:title_portion) do
+        str(":") >> space >> match('[^\n]').repeat(1).as(:title)
+      end
+
+      # Approved Draft suffix (Category 7)
+      rule(:approved_draft_suffix) do
+        (space >> str("- (Approved Draft)")) | (space >> str("(Approved Draft)"))
+      end
+
       # Additional parameters (inside parentheses)
       rule(:additional_parameters) do
         (space.maybe >> str("(") >>  # Make space before '(' optional
@@ -446,7 +456,9 @@ module PubidNew
         ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         edition.maybe >>
         parenthetical.maybe >>
-        redline.maybe)
+        redline.maybe >>
+        title_portion.maybe >>
+        approved_draft_suffix.maybe)
       end
 
       root(:identifier)
