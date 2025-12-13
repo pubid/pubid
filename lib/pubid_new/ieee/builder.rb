@@ -2,6 +2,8 @@
 
 require_relative "scheme"
 require_relative "nesc/builder"
+require_relative "aiee/builder"
+require_relative "ire/builder"
 
 module PubidNew
   module Ieee
@@ -32,6 +34,18 @@ module PubidNew
         if parsed[:nesc]
           nesc_builder = Nesc::Builder.new
           return nesc_builder.build(parsed[:nesc])
+        end
+
+        # Handle AIEE identifiers (American Institute of Electrical Engineers)
+        if parsed[:aiee]
+          aiee_builder = Aiee::Builder.new
+          return aiee_builder.build(parsed[:aiee])
+        end
+
+        # Handle IRE identifiers (Institute of Radio Engineers)
+        if parsed[:ire]
+          ire_builder = Ire::Builder.new
+          return ire_builder.build(parsed[:ire])
         end
 
         # Handle single identifier

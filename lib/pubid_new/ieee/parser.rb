@@ -3,6 +3,8 @@
 require "parslet"
 
 require_relative "nesc/parser"
+require_relative "aiee/parser"
+require_relative "ire/parser"
 
 module PubidNew
   module Ieee
@@ -417,6 +419,35 @@ module PubidNew
         parenthetical.maybe
       end
 
+      # AIEE (American Institute of Electrical Engineers) patterns
+      # Detect AIEE patterns and delegate to AIEE parser
+      rule(:aiee_identifier) do
+        # Lookahead for AIEE patterns - do not consume input
+        (
+          # IEEE-AIEE transitional pattern
+          (str("IEEE-AIEE") >> space >> (str("No.") | str("Standard") | str("Trans."))) |
+          # AIEE pattern
+          (str("AIEE") >> space >> (str("No.") | str("Standard") | str("Trans.")))
+        ).present? >>
+        # Delegate to AIEE parser if pattern detected
+        Aiee::Parser.new.aiee_identifier.as(:aiee)
+      end
+
+      # IRE (Institute of Radio Engineers) patterns
+      # Detect IRE patterns and delegate to IRE parser
+      rule(:ire_identifier) do
+        # Lookahead for IRE patterns - do not consume input
+        (
+          # Year-first pattern: "52 IRE 7.S2" or "60 IRE 28 PS7"
+          ((match('[1-6]') >> digit >> space >> str("IRE")) |  # 2-digit year format
+           (str("19") >> digit.repeat(2, 2) >> space >> str("IRE"))) |
+          # IEEE-IRE transitional pattern
+          (str("IEEE-IRE") >> space)
+        ).present? >>
+        # Delegate to IRE parser if pattern detected
+        Ire::Parser.new.ire_identifier.as(:ire)
+      end
+
       # NESC (National Electrical Safety Code) patterns
       # Detect NESC patterns and delegate to NESC parser
       rule(:nesc_identifier) do
@@ -435,6 +466,8 @@ module PubidNew
 
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
+        aiee_identifier |
+        ire_identifier |
         nesc_identifier |
         joint_development_ieee_format |
         joint_development_iso_format |

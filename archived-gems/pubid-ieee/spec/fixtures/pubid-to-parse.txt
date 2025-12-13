@@ -6,7 +6,7 @@ IEEE 1076-CONC-I99O
 !2017 National Electrical Safety Code(R) (NESC(R)) - Redline!IEEE Std 2017 National Electrical Safety Code(R) (NESC(R)) - Redline
 !267A-1980 IEEE International System of Units Conversion!IEEE 267A-1980
 !3006HistoricalData-2012 Historical Reliability Data for IEEE 3006 Standards!IEEE Std 3006HistoricalData-2012 Historical Reliability Data for IEEE 3006 Standards
-!52 IRE 7.S2!IEEE Std 52 IRE 7.S2
+!T!IEEE Std 52 IRE 7.S2
 !55 IRE 2.S1 (IEEE Std No 147)!55 IRE 2.S1 (IEEE Std 147)
 !61 IRE 15.S1 (IEEE 182)!IEEE Std 61 IRE 15.S1 (IEEE 182)
 !61 IRE 28 S1 (IEEE 216)!IEEE Std 61 IRE 28 S1 (IEEE 216)

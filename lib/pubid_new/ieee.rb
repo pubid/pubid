@@ -16,6 +16,8 @@ require_relative "ieee/identifiers/nesc/standard"
 require_relative "ieee/identifiers/nesc/handbook"
 require_relative "ieee/identifiers/nesc/draft"
 require_relative "ieee/identifiers/nesc/redline"
+require_relative "ieee/aiee/identifier"
+require_relative "ieee/ire/identifier"
 
 module PubidNew
   module Ieee

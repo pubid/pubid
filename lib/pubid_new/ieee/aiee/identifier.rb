@@ -1,0 +1,90 @@
+# frozen_string_literal: true
+
+require "lutaml/model"
+require_relative "../components/code"
+
+module PubidNew
+  module Ieee
+    module Aiee
+      # Base class for AIEE identifiers
+      # AIEE (American Institute of Electrical Engineers): 1884-1963
+      class Identifier < Lutaml::Model::Serializable
+        attribute :publisher, :string, default: -> { "AIEE" }
+        attribute :type, :string  # "No.", "No", "Standard", "Trans."
+        attribute :number, Components::Code
+        attribute :year, :integer
+        attribute :month, :string
+        attribute :separator, :string  # "," or "." for long form dates
+        attribute :original_format, :string  # "short" or "long" (preserves parsed format)
+
+        def initialize(**args)
+          super()
+
+          # Handle number as string or Code object
+          if args[:number].is_a?(String)
+            self.number = Components::Code.parse(args[:number])
+          elsif args[:number]
+            self.number = args[:number]
+          end
+
+          # Set other attributes
+          args.each do |key, value|
+            next if key == :number
+            send("#{key}=", value) if respond_to?("#{key}=")
+          end
+        end
+
+        # Parse AIEE identifier string
+        def self.parse(input)
+          require_relative "parser"
+          require_relative "builder"
+
+          parsed = Parser.new.parse(input)
+          builder = Builder.new
+          builder.build(parsed)
+        end
+
+        def to_s(date_format: nil)
+          result = [publisher]
+          result << type if type
+          result << number.to_s if number
+
+          base = result.join(" ")
+
+          # Determine which format to use
+          # Priority: explicit parameter > original_format > default (long if month/separator, short otherwise)
+          format = date_format&.to_s || original_format
+
+          if !format
+            # Auto-detect from parsed attributes
+            format = (month || separator) ? "long" : "short"
+          end
+
+          # Date formatting based on format parameter
+          if year
+            case format
+            when "short", :short
+              # Short form: dash + year
+              base += "-#{year}"
+            when "long", :long
+              # Long form: separator + optional month + year
+              sep = separator || ","  # Default to comma for long form
+              base += "#{sep} #{month ? month + ' ' : ''}#{year}"
+            else
+              # Preserve original format (backward compatibility)
+              if separator
+                base += "#{separator} #{month ? month + ' ' : ''}#{year}"
+              elsif month
+                base += ", #{month} #{year}"
+              else
+                base += "-#{year}"
+              end
+            end
+          end
+
+          base
+        end
+      end
+    end
+  end
+end

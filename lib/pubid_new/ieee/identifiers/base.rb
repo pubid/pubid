@@ -207,8 +207,8 @@ module PubidNew
             if main_part && adoption_part &&
                !adoption_part.include?(",") &&  # Skip multi-part adoptions
                !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|incorporates|Incorporating|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Supersedes|Supercedes|Notebooks|Standard Newspaper)/i) &&
-               (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
-                adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
+               (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
+                adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
                 adoption_part.match?(/\bStd\s+\d+/))
               # Parse the main IEEE identifier
               ieee_id = parse_single(main_part)

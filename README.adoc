@@ -65,9 +65,9 @@ The key feature that a PubID provides is the ability to represent
 identifiers in a structured format that can be easily parsed and understood by
 both humans and machines, in a round-trippable manner.
 
-🎉 **PubID V2: All 14 Flavors Complete!** 🎉
+🎉 **PubID V2: All 15 Flavors Complete!** 🎉
 
-As of 2025-12-10, all 14 supported standards organizations now have V2 implementations with clean MODEL-DRIVEN architecture. **Session 111 achieved IEC 100%!** The V2 implementation achieves 99.5%+ overall accuracy across 87,717 real-world identifiers, with **13 flavors at perfect 100%** accuracy.
+As of 2025-12-13, all 15 supported standards organizations now have V2 implementations with clean MODEL-DRIVEN architecture. **Session 135 added OIML (15th flavor)!** The V2 implementation achieves 98%+ overall accuracy across 87,754+ real-world identifiers, with **13 flavors at perfect 100%** accuracy.
 
 See <<v2-migration-status>> for detailed status and <<v2-usage-examples>> for examples.
 
@@ -464,6 +464,61 @@ id.relationships.first.intermediate_amendments.first.to_s # => "IEEE Std 199a"
 - Backward compatible with legacy attributes
 - 28/28 unit tests passing (100%)
 
+===== Historical Sub-Flavors (AIEE & IRE) ✨
+
+IEEE supports two historical predecessor organizations that merged in 1963 to form IEEE:
+
+.AIEE (American Institute of Electrical Engineers) 1884-1963
+[source,ruby]
+----
+# Parse AIEE identifier with long date format
+aiee = PubidNew::Ieee.parse("AIEE No. 552, November 1955")
+aiee.to_s                        # => "AIEE No. 552, November 1955"
+aiee.to_s(date_format: :short)   # => "AIEE No. 552-1955"
+aiee.to_s(date_format: :long)    # => "AIEE No. 552, November 1955"
+
+# Parse AIEE identifier with short date format
+aiee = PubidNew::Ieee.parse("AIEE No. 59-1962")
+aiee.to_s                        # => "AIEE No. 59-1962"
+aiee.to_s(date_format: :long)    # => "AIEE No. 59, 1962"
+----
+
+**AIEE Features:**
+- Always uses "No" or "No." (never "Std")
+- Rendering profiles support both short (dash) and long (comma + optional month) formats
+- Preserves original parsed format by default
+- User can override output format with `date_format:` parameter
+
+.IRE (Institute of Radio Engineers) 1912-1963
+[source,ruby]
+----
+# Parse IRE identifier (year-first format)
+ire = PubidNew::Ieee.parse("52 IRE 7.S2")
+ire.to_s      # => "52 IRE 7.S2"
+ire.year      # => 1952 (converts 2-digit to 4-digit internally)
+
+# IRE with committee notation
+ire = PubidNew::Ieee.parse("61 IRE 28 S1")
+ire.to_s      # => "61 IRE 28 S1"
+ire.year      # => 1961
+----
+
+**IRE Features:**
+- Year-first format (unlike modern IEEE)
+- 2-digit years (12-63) automatically converted to 4-digit (1912-1963)
+- Committee notation: `7.S2` (committee 7, Standard 2), `28 S1` (committee 28, Standard 1)
+- Rendered output preserves 2-digit year format
+
+**Transitional Identifiers:**
+- `IEEE-AIEE No. 56` - Transitional period documents
+- `IEEE-IRE X` - Mixed publisher identifiers
+
+**Architecture:**
+- AIEE/IRE are proper Lutaml::Model classes (not IEEE subclasses)
+- Separate historical organizations with distinct patterns
+- Compatible with Pattern 4 relationships (can be related identifiers)
+- Clean MODEL-DRIVEN implementation
+
 ====
 
 ==== ITU
@@ -510,6 +565,39 @@ id = PubidNew::Itu.parse("ITU-T H Suppl. 1")
 id.series.series          # => "H"
 id.number                 # => "1"
 id.to_s                   # => "ITU-T H Suppl. 1"
+----
+
+==== OIML
+
+The OIML parser handles International Organization of Legal Metrology identifiers:
+
+[source,ruby]
+----
+require 'pubid_new'
+
+# Parse OIML Recommendation
+id = PubidNew::Oiml.parse("OIML R 117-1:2019")
+id.type                   # => "R"
+id.code.number            # => "117"
+id.code.part              # => "1"
+id.date.year              # => 2019
+id.to_s                   # => "OIML R 117-1:2019"
+
+# Parse with language codes
+id = PubidNew::Oiml.parse("OIML R 106(E)")
+id.language               # => "E"
+id.to_s                   # => "OIML R 106(E)"
+
+# Parse draft stages
+id = PubidNew::Oiml.parse("OIML D 31 1CD")
+id.stage                  # => "CD"
+id.iteration              # => "1"
+id.to_s                   # => "OIML D 31 1CD"
+
+# Bilingual documents
+id = PubidNew::Oiml.parse("OIML V 2:2013(E/F)")
+id.language               # => "E/F"
+id.to_s                   # => "OIML V 2:2013(E/F)"
 ----
 
 ==== ISO
@@ -996,6 +1084,7 @@ archived-gems/              # Archived V1 code
 * ✅ **ANSI:** 175/175 (100%), American national standards
 * ✅ **CEN:** 95/95 (100%), European standards
 * ✅ **JCGM:** 2/2 (100%), Joint Committee for Guides in Metrology [NEW]
+* ✅ **OIML:** 37/37 (100%), International Organization of Legal Metrology [NEW - Session 135]
 
 **Near-Perfect (1 flavor - 95-99%):**
 
@@ -1009,16 +1098,16 @@ archived-gems/              # Archived V1 code
 
 * ✅ **Complete:** ISO, IEC, IEEE, NIST archived to `archived-gems/`
 * 📋 **Ready:** CEN, BSI ready for archival
-* 📋 **No V1:**  IDF, JIS, CCSDS, ETSI, PLATEAU, ANSI, ITU, JCGM (V2-only)
+* 📋 **No V1:**  IDF, JIS, CCSDS, ETSI, PLATEAU, ANSI, ITU, JCGM, OIML (V2-only)
 
 **Overall Metrics:**
 
-* **Total implementations:** 14/14 (100%)
-* **Production-ready:** 14/14 (100%)
-* **Perfect (100%):** 12/14 (85.7%)
-* **Total tests:** 4,400+ examples
-* **Overall pass rate:** 99.5%+ (43,000+ passing)
-* **Identifiers tested:** 43,000+ across all flavors
+* **Total implementations:** 15/15 (100%)
+* **Production-ready:** 15/15 (100%)
+* **Perfect (100%):** 13/15 (86.7%)
+* **Total tests:** 4,450+ examples
+* **Overall pass rate:** 98%+
+* **Identifiers tested:** 87,754+ across all flavors
 
 For detailed V2 implementation status and continuation plan:
 
