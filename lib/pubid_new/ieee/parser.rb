@@ -27,6 +27,33 @@ module PubidNew
         (str("19") | str("20")) >> digit.repeat(2, 2) >> digits.absent?
       end
 
+      # Month patterns - numeric format (01-12)
+      rule(:month_numeric) do
+        (str("0") >> match("[1-9]")) | # 01-09
+        (str("1") >> match("[0-2]"))   # 10-12
+      end
+
+      # Comprehensive date parsing
+      # Format 1: "September 2018" or "Sept 2018" (text month + year)
+      rule(:date_with_month_text) do
+        month_name.as(:month) >> space >> year_digits.as(:year)
+      end
+
+      # Format 2: "2018-09" (year-numeric month)
+      rule(:date_with_month_numeric) do
+        year_digits.as(:year) >> dash >> month_numeric.as(:month)
+      end
+
+      # Format 3: Just year "2018"
+      rule(:date_year_only) do
+        year_digits.as(:year)
+      end
+
+      # Combined date rule - longest match first
+      rule(:date_standalone) do
+        date_with_month_text | date_with_month_numeric | date_year_only
+      end
+
       # Month patterns
       rule(:month_name) do
         str("January") | str("February") | str("March") | str("April") |
@@ -48,7 +75,13 @@ module PubidNew
       end
 
       rule(:copublisher) do
-        slash >> space? >> organization.as(:copublisher)
+        (
+          # Three-way copublisher strings (treat as single unit, longest first)
+          str("/ISO/IEC").as(:copublisher) |
+          str("/IEC/ISO").as(:copublisher) |
+          # Two-way copublishers (original pattern)
+          (slash >> space? >> organization.as(:copublisher))
+        )
       end
 
       # Document number - support letters and digits, with optional prefix P
@@ -82,9 +115,9 @@ module PubidNew
          (dot >> digits).maybe).as(:subpart)
       end
 
-      # Year component
+      # Year component - updated to use comprehensive date parsing
       rule(:year) do
-        (dot | dash) >> year_digits.as(:year) >> str("(E)").maybe
+        (dot | dash) >> date_standalone >> str("(E)").maybe
       end
 
       # Draft patterns
@@ -100,7 +133,9 @@ module PubidNew
         # Enhanced to handle multiple draft notation patterns
         str("D") >> str("IS").absent? >> # Avoid matching "DIS" (ISO stage)
         (
-          # Pattern: D.XX (decimal) - e.g., D.19
+          # Pattern: D3.1 (decimal with 1-2 digits on each side) - MOST COMMON, put first
+          (match('[0-9]').repeat(1, 2) >> dot >> match('[0-9]').repeat(1, 2)) |
+          # Pattern: D.XX (decimal starting with dot) - e.g., D.19
           (dot >> digits) |
           # Pattern: DX+X (plus sign) - e.g., D1+1
           (digits >> str("+") >> digits) |
@@ -322,7 +357,7 @@ module PubidNew
       # IEEE P pattern (without Std): "IEEE P1003.1..." OR just "P1003.1..." (prefix optional)
       rule(:ieee_p_identifier) do
         (str("IEEE").as(:publisher) >> space).maybe >> # Make IEEE prefix optional
-        str("P") >>
+        str("P") >> space.maybe >> # Make space after P optional
         number >>
         (part_subpart_year | edition).maybe >>
         # Enhanced: Accept both comma and space before month/year
@@ -369,8 +404,8 @@ module PubidNew
         ieee_approved_draft_identifier |
         ieee_draft_p_identifier |
         ieee_p_identifier |
-        ((publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >>
-        space >> (draft_status.as(:draft_status)).maybe >>
+        (((publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >> space).maybe >> # Make publisher optional
+        (draft_status.as(:draft_status)).maybe >>
         (str("Draft Std").as(:type) >> space?).maybe >>
         (type_word.as(:type) >> (space >> str("No") >> space).maybe >> space?).maybe >>
         number >>
