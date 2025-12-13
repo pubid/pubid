@@ -7,6 +7,7 @@ module PubidNew
       attribute :publisher, :string
       attribute :code, Oiml::Components::Code
       attribute :date, PubidNew::Components::Date
+      attribute :edition, :string
       attribute :stage, :string
       attribute :iteration, :string
       attribute :language, :string
@@ -19,8 +20,13 @@ module PubidNew
       def to_s
         result = "#{publisher} #{type_string} #{code}"
 
-        # Add date if present
-        result += ":#{date.year}" if date
+        # Add edition if present (before or instead of date)
+        if edition
+          result += " #{edition_portion}"
+        elsif date
+          # Add date if present and no edition
+          result += ":#{date.year}"
+        end
 
         # Add draft stage if present (iteration + stage)
         if stage || iteration
@@ -35,10 +41,27 @@ module PubidNew
         result
       end
 
+      def edition_portion
+        # Handle both "6th Edition 2015" and "Edition 2013" formats
+        if edition && date
+          # "6th Edition 2015"
+          "#{edition} Edition #{date.year} (#{language})" if language
+        elsif date
+          # "Edition 2013"
+          "Edition #{date.year} (#{language})" if language
+        else
+          edition
+        end
+      end
+
       # Subclasses override this
       def type_string
         raise NotImplementedError, "Subclasses must implement type_string"
       end
+
+      private
+
+      # Subclasses override this
     end
   end
 end
