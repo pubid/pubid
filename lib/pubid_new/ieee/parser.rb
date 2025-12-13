@@ -72,8 +72,13 @@ module PubidNew
         str("NSF") | str("ASHRAE") | str("NCTA") | str("AESC")
       end
 
+      # Complex organization prefixes (Category 5: ANSI Complex)
+      rule(:complex_org_prefix) do
+        str("ANSI/IEEE-ANS") | str("ANSI/IEEE") | str("ANSI")
+      end
+
       rule(:publisher) do
-        organization.as(:publisher)
+        complex_org_prefix.as(:publisher) | organization.as(:publisher)
       end
 
       rule(:copublisher) do
@@ -201,9 +206,14 @@ module PubidNew
          (dash >> year_digits.as(:amd_year)).maybe).as(:amendment)
       end
 
-      # Reaffirmed
+      # Reaffirmed - enhanced to support (R1992) format
       rule(:reaffirmed) do
-        (str("Reaffirmed ") >> year_digits.as(:year)).as(:reaffirmed)
+        (
+          # Format: "Reaffirmed 1992"
+          (str("Reaffirmed ") >> year_digits.as(:year)) |
+          # Format: "(R1992)" - parentheses with R prefix
+          (str("(R") >> year_digits.as(:year) >> str(")"))
+        ).as(:reaffirmed)
       end
 
       # Redline
@@ -449,6 +459,15 @@ module PubidNew
         # Pattern 3: Replace underscore before ISO stage codes with slash
         # These are joint development drafts that use underscore instead of slash
         cleaned = cleaned.gsub(/_(FDIS|CDV|CD|DIS|WD|PWI|NP)/, '/\1')
+
+        # NEW: Handle HTML entities (Category 9)
+        cleaned = cleaned.gsub('&amp;amp;', '&').gsub('&amp;', '&')
+
+        # NEW: Fix common typos (Category 9)
+        cleaned = cleaned.gsub(/^EEE /, 'IEEE ')
+
+        # NEW: Remove trailing commas/colons (Category 9)
+        cleaned = cleaned.gsub(/[,:]\s*$/, '')
 
         new.parse(cleaned)
       end
