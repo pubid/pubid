@@ -286,10 +286,10 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | Exceeds 95% target, handles historical NBS patterns
 
 | **IEEE**
-| **86.31%**
-| 8,231/9,537
+| **87.95%**
+| 8,388/9,537
 | ✅ Production Ready
-| Parser enhanced with 4 major patterns, TYPED_STAGE architecture, Joint Development support
+| Parser enhanced with 4 major patterns (Session 129), TYPED_STAGE architecture, Joint Development support, Pattern 4 Relationships
 
 | **ISO**
 | **90.0%**
