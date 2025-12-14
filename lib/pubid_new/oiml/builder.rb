@@ -17,6 +17,53 @@ module PubidNew
       }.freeze
 
       def build(parsed_hash)
+        # Check for supplements first (have base_identifier)
+        if parsed_hash[:base_identifier]
+          return build_supplement(parsed_hash)
+        end
+
+        # Build base document
+        build_base_document(parsed_hash)
+      end
+
+      private
+
+      def build_supplement(parsed_hash)
+        # Determine supplement type
+        supplement_class = if parsed_hash[:annex_letter] || parsed_hash[:annex_marker]
+          Identifiers::Annex
+        else
+          Identifiers::Amendment
+        end
+
+        supplement = supplement_class.new
+
+        # Recursively parse base identifier
+        if parsed_hash[:base_identifier]
+          supplement.base_identifier = build(parsed_hash[:base_identifier])
+        end
+
+        # Extract year from edition_format if present, otherwise from year directly
+        year_value = if parsed_hash[:edition_format].is_a?(Hash)
+          parsed_hash[:edition_format][:year]
+        else
+          parsed_hash[:year]
+        end
+
+        # Set supplement-specific attributes
+        supplement.year = year_value.to_s if year_value
+        supplement.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
+        supplement.letter = parsed_hash[:annex_letter].to_s if parsed_hash[:annex_letter]
+
+        # Track if supplement itself was parsed with Edition format
+        if parsed_hash[:edition_format]
+          supplement.parsed_format = "long"
+        end
+
+        supplement
+      end
+
+      def build_base_document(parsed_hash)
         # Determine identifier class from type
         type = parsed_hash[:type].to_s
         class_name = TYPE_CLASS_MAP[type] || "Recommendation"  # Default to R
@@ -36,9 +83,32 @@ module PubidNew
         # Handle other attributes
         identifier.publisher = parsed_hash[:publisher].to_s if parsed_hash[:publisher]
 
+        # Handle edition attribute
+        identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
+
         # Handle year -> date conversion
-        if parsed_hash[:year]
-          identifier.date = PubidNew::Components::Date.new(year: parsed_hash[:year].to_s)
+        # Year could be in edition_format hash or directly
+        year_value = nil
+        if parsed_hash[:edition_format].is_a?(Hash)
+          year_value = parsed_hash[:edition_format][:year]
+          # Also extract edition if present
+          identifier.edition = parsed_hash[:edition_format][:edition].to_s if parsed_hash[:edition_format][:edition]
+        elsif parsed_hash[:year]
+          year_value = parsed_hash[:year]
+        end
+
+        if year_value
+          identifier.date = PubidNew::Components::Date.new(year: year_value.to_s)
+        end
+
+        # Determine parsed format for round-trip fidelity
+        # If edition_format was captured, it means "Edition" text was present
+        if parsed_hash[:edition_format]
+          identifier.parsed_format = "long"
+        elsif parsed_hash[:space_before_lang]
+          identifier.parsed_format = "short_with_space"
+        else
+          identifier.parsed_format = "short"
         end
 
         # Handle stage attributes
@@ -46,9 +116,19 @@ module PubidNew
         identifier.iteration = parsed_hash[:iteration].to_s if parsed_hash[:iteration]
 
         # Handle language
-        identifier.language = parsed_hash[:language].to_s if parsed_hash[:language]
+        identifier.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
 
         identifier
+      end
+
+      def extract_language(lang_data)
+        # Handle both direct string and nested hash from parser
+        case lang_data
+        when Hash
+          lang_data[:language].to_s
+        else
+          lang_data.to_s
+        end
       end
     end
   end

@@ -11,21 +11,39 @@ module PubidNew
       attribute :stage, :string
       attribute :iteration, :string
       attribute :language, :string
+      attribute :parsed_format, :string, default: -> { "short" }  # Track parsed format
 
       # Type is determined by the subclass
       def type
         type_string
       end
 
-      def to_s
+      def to_s(format: nil)
+        # Use parsed format if not explicitly overridden
+        format ||= (parsed_format == "long" ? :long : :short)
+
         result = "#{publisher} #{type_string} #{code}"
 
-        # Add edition if present (before or instead of date)
-        if edition
-          result += " #{edition_portion}"
+        # Track if we're using Edition format for language spacing
+        using_edition_format = false
+
+        # Add edition/date portion
+        if edition && date
+          # Has edition number: "6th Edition 2015"
+          result += " #{edition} Edition #{date.year}"
+          using_edition_format = true
+        elsif edition
+          # Edition without year (shouldn't happen but handle it)
+          result += " #{edition}"
+          using_edition_format = true
         elsif date
-          # Add date if present and no edition
-          result += ":#{date.year}"
+          # Date without edition number
+          if format == :long
+            result += " Edition #{date.year}"
+            using_edition_format = true
+          else
+            result += ":#{date.year}"
+          end
         end
 
         # Add draft stage if present (iteration + stage)
@@ -35,20 +53,25 @@ module PubidNew
           result += stage.to_s if stage
         end
 
-        # Add language portion if present
-        result += "(#{language})" if language
+        # Add language portion - depends on format
+        if language
+          if using_edition_format || parsed_format == "short_with_space"
+            result += " (#{language})"
+          else
+            result += "(#{language})"
+          end
+        end
 
         result
       end
 
       def edition_portion
-        # Handle both "6th Edition 2015" and "Edition 2013" formats
+        # Deprecated - kept for compatibility
+        # Use to_s(format: :long) instead
         if edition && date
-          # "6th Edition 2015"
-          "#{edition} Edition #{date.year} (#{language})" if language
+          "#{edition} Edition #{date.year}"
         elsif date
-          # "Edition 2013"
-          "Edition #{date.year} (#{language})" if language
+          "Edition #{date.year}"
         else
           edition
         end

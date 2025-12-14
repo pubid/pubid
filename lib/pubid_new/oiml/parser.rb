@@ -18,14 +18,9 @@ module PubidNew
       rule(:rparen) { str(")") }
       rule(:slash) { str("/") }
 
-      # Main identifier pattern
+      # Main identifier pattern - check supplements first
       rule(:identifier) do
-        publisher >>
-        doc_type >>
-        full_number >>
-        date.maybe >>
-        draft_stage.maybe >>
-        language_portion.maybe
+        amendment_identifier | annex_letter_identifier | annex_identifier | base_identifier
       end
 
       # Publisher - always "OIML"
@@ -49,8 +44,28 @@ module PubidNew
         )
       end
 
-      # Date - year after colon
-      rule(:date) { colon >> year_digits.as(:year) }
+      # Edition number - ordinal numbers
+      rule(:edition_number) do
+        (
+          str("6th") | str("5th") | str("4th") | str("3rd") |
+          str("2nd") | str("1st") |
+          (digits >> (str("th") | str("nd") | str("rd") | str("st")))
+        ).as(:edition)
+      end
+
+      # Edition text - uppercase or lowercase
+      rule(:edition_text) { str("Edition") | str("edition") }
+
+      # Edition portion - handles "6th Edition 2015" or "Edition 2013" or ", edition 1992"
+      rule(:edition_portion) do
+        (
+          (str(", ") | space) >>
+          edition_number.maybe >> space.maybe >> edition_text >> space >> year_digits.as(:year)
+        ).as(:edition_format)  # Wrap entire match to capture that Edition was used
+      end
+
+      # Date - year after colon OR edition portion
+      rule(:date) { edition_portion | (colon >> year_digits.as(:year)) }
 
       # Draft stage - WD or CD with optional iteration
       rule(:stage_iteration) do
@@ -85,8 +100,62 @@ module PubidNew
         ).as(:language)
       end
 
-      rule(:language_portion) do
+      rule(:language_with_space) do
+        space >> lparen >> language_code >> rparen >> str("").as(:space_before_lang)
+      end
+
+      rule(:language_without_space) do
         lparen >> language_code >> rparen
+      end
+
+      rule(:language_portion) do
+        language_with_space | language_without_space
+      end
+
+      # Amendment identifier - "Amendment (YYYY) to BASE"
+      rule(:amendment_identifier) do
+        str("Amendment") >> space >> lparen >> year_digits.as(:year) >> rparen >>
+        space >> str("to") >> space >>
+        base_without_language.as(:base_identifier) >>
+        language_portion.maybe.as(:language)
+      end
+
+      # Annex identifier - "BASE Annexes Edition YYYY" or "BASE Annexes:YYYY"
+      rule(:annex_identifier) do
+        base_without_language.as(:base_identifier) >>
+        space >> str("Annexes").as(:annex_marker) >>
+        (
+          (space >> edition_text >> space >> year_digits.as(:year)).as(:edition_format) |
+          (colon >> year_digits.as(:year))
+        ) >>
+        language_portion.maybe.as(:language)
+      end
+
+      # Annex with letter - "BASE Annex A Edition YYYY"
+      rule(:annex_letter_identifier) do
+        base_without_language.as(:base_identifier) >>
+        space >> str("Annex") >> space >> match("[A-Z]").as(:annex_letter) >>
+        (space >> edition_text >> space >> year_digits.as(:year) | colon >> year_digits.as(:year)).maybe >>
+        language_portion.maybe.as(:language)
+      end
+
+      # Base identifier without language (for use in supplements)
+      rule(:base_without_language) do
+        publisher >>
+        doc_type >>
+        full_number >>
+        date.maybe >>
+        draft_stage.maybe
+      end
+
+      # Base identifier for recursion and standalone parsing
+      rule(:base_identifier) do
+        publisher >>
+        doc_type >>
+        full_number >>
+        date.maybe >>
+        draft_stage.maybe >>
+        language_portion.maybe
       end
     end
   end

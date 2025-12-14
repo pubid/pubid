@@ -149,6 +149,124 @@ RSpec.describe PubidNew::Oiml do
       end
     end
 
+    context "edition identifiers" do
+      it "parses OIML E 5 6th Edition 2015 (E)" do
+        result = described_class.parse("OIML E 5 6th Edition 2015 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::ExpertReport)
+        expect(result.code.number).to eq("5")
+        expect(result.edition).to eq("6th")
+        expect(result.date.year).to eq("2015")
+        expect(result.language).to eq("E")
+        expect(result.to_s).to eq("OIML E 5 6th Edition 2015 (E)")
+      end
+
+      it "parses OIML B 22 Edition 2023 (E)" do
+        result = described_class.parse("OIML B 22 Edition 2023 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::BasicPublication)
+        expect(result.code.number).to eq("22")
+        expect(result.edition).to be_nil
+        expect(result.date.year).to eq("2023")
+        expect(result.language).to eq("E")
+        expect(result.to_s).to eq("OIML B 22 Edition 2023 (E)")
+      end
+
+      it "parses OIML R 144-1 Edition 2013 (E)" do
+        result = described_class.parse("OIML R 144-1 Edition 2013 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Recommendation)
+        expect(result.code.number).to eq("144")
+        expect(result.code.part).to eq("1")
+        expect(result.date.year).to eq("2013")
+        expect(result.to_s).to eq("OIML R 144-1 Edition 2013 (E)")
+      end
+
+      it "parses OIML R 76-1, edition 1992 (E)" do
+        result = described_class.parse("OIML R 76-1, edition 1992 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Recommendation)
+        expect(result.code.part).to eq("1")
+        expect(result.date.year).to eq("1992")
+        expect(result.to_s).to eq("OIML R 76-1 Edition 1992 (E)")  # Normalized
+      end
+
+      it "supports long/short rendering" do
+        result = described_class.parse("OIML R 138:2007 (E)")
+
+        expect(result.to_s(format: :short)).to eq("OIML R 138:2007 (E)")
+        expect(result.to_s(format: :long)).to eq("OIML R 138 Edition 2007 (E)")
+      end
+    end
+
+    context "amendment identifiers" do
+      it "parses Amendment (2009) to OIML R 138 Edition 2007 (E)" do
+        result = described_class.parse("Amendment (2009) to OIML R 138 Edition 2007 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Amendment)
+        expect(result.year).to eq("2009")
+        expect(result.base_identifier).to be_a(PubidNew::Oiml::Identifiers::Recommendation)
+        expect(result.base_identifier.code.number).to eq("138")
+        expect(result.base_identifier.date.year).to eq("2007")
+        expect(result.language).to eq("E")
+        expect(result.to_s).to eq("Amendment (2009) to OIML R 138 Edition 2007 (E)")
+      end
+
+      it "parses Amendment (2009) to OIML R 138:2007 (E)" do
+        result = described_class.parse("Amendment (2009) to OIML R 138:2007 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Amendment)
+        expect(result.year).to eq("2009")
+        expect(result.base_identifier.code.number).to eq("138")
+        expect(result.base_identifier.date.year).to eq("2007")
+        expect(result.to_s(format: :short)).to eq("Amendment (2009) to OIML R 138:2007 (E)")
+        expect(result.to_s(format: :long)).to eq("Amendment (2009) to OIML R 138 Edition 2007 (E)")
+      end
+
+      it "parses Amendment (2004) to OIML D 2 Edition 1999 (E)" do
+        result = described_class.parse("Amendment (2004) to OIML D 2 Edition 1999 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Amendment)
+        expect(result.year).to eq("2004")
+        expect(result.base_identifier).to be_a(PubidNew::Oiml::Identifiers::Document)
+        expect(result.base_identifier.code.number).to eq("2")
+        expect(result.to_s).to eq("Amendment (2004) to OIML D 2 Edition 1999 (E)")
+      end
+    end
+
+    context "annex identifiers" do
+      it "parses OIML R 60 Annexes Edition 2021 (E)" do
+        result = described_class.parse("OIML R 60 Annexes Edition 2021 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Annex)
+        expect(result.base_identifier.code.number).to eq("60")
+        expect(result.year).to eq("2021")
+        expect(result.letter).to be_nil
+        expect(result.language).to eq("E")
+        expect(result.to_s(format: :long)).to eq("OIML R 60 Annexes Edition 2021 (E)")
+      end
+
+      it "parses OIML R 60 Annexes:2021 (E)" do
+        result = described_class.parse("OIML R 60 Annexes:2021 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Annex)
+        expect(result.base_identifier.code.number).to eq("60")
+        expect(result.year).to eq("2021")
+        expect(result.to_s(format: :short)).to eq("OIML R 60 Annexes:2021 (E)")
+        expect(result.to_s(format: :long)).to eq("OIML R 60 Annexes Edition 2021 (E)")
+      end
+
+      it "parses OIML R 60 Annex A Edition 2013 (E)" do
+        result = described_class.parse("OIML R 60 Annex A Edition 2013 (E)")
+
+        expect(result).to be_a(PubidNew::Oiml::Identifiers::Annex)
+        expect(result.base_identifier.code.number).to eq("60")
+        expect(result.letter).to eq("A")
+        expect(result.year).to eq("2013")
+        expect(result.to_s).to eq("OIML R 60 Annex A Edition 2013 (E)")
+      end
+    end
+
     context "round-trip tests" do
       [
         "OIML B 18:2018",
@@ -187,7 +305,25 @@ RSpec.describe PubidNew::Oiml do
         "OIML R 201 1WD",
         "OIML R 91-1 3.1CD",
         "OIML S 6:2011(en)",
-        "OIML E 5:2015(en)"
+        "OIML E 5:2015(en)",
+        "OIML E 5 6th Edition 2015 (E)",
+        "OIML B 22 Edition 2023 (E)",
+        "OIML R 144-1 Edition 2013 (E)",
+        "Amendment (2009) to OIML R 138 Edition 2007 (E)",
+        "Amendment (2009) to OIML R 138:2007 (E)",
+        "OIML R 138 Edition 2007 (E)",
+        "OIML R 60 Annexes Edition 2021 (E)",
+        "OIML R 60 Annexes:2021 (E)",
+        "OIML D 12 Edition 1986 (E)",
+        "OIML R 15 Edition 1974 (E)",
+        "OIML R 4 Edition 1972 (E)",
+        "OIML R 6 Edition 1989 (E)",
+        "OIML R 134-2 Edition 2004 (E)",
+        "OIML R 76-2 Edition 1993 (E)",
+        "OIML R 60 Annex A Edition 2013 (E)",
+        "OIML D 2 Edition 1999 (E)",
+        "Amendment (2004) to OIML D 2 Edition 1999 (E)",
+        "Amendment (2004) to OIML D 2:1999 (E)"
       ].each do |identifier_string|
         it "round-trips #{identifier_string}" do
           result = described_class.parse(identifier_string)
