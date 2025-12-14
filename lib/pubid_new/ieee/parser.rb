@@ -79,6 +79,19 @@ module PubidNew
         str("ANSI/IEEE-ANS") | str("ANSI/IEEE") | str("ANSI")
       end
 
+      # Characteristic IEEE number patterns (without prefix)
+      # These patterns are distinctly IEEE even without "IEEE Std" prefix
+      rule(:characteristic_ieee_number) do
+        (
+          # C37.xxx series (power systems) - C followed by 2 digits, dot, more digits
+          str("C") >> digit.repeat(2, 2) >> dot >> digits >> match("[a-z]").repeat.maybe |
+          # 802.xxx series (networking) - 802 followed by dot, digits, optional letter suffix
+          str("802") >> dot >> digits >> match("[a-z]").repeat.maybe |
+          # P followed by digits (draft projects)
+          str("P") >> digits.repeat(1)
+        )
+      end
+
       rule(:publisher) do
         complex_org_prefix.as(:publisher) | organization.as(:publisher)
       end
@@ -464,6 +477,22 @@ module PubidNew
         Nesc::Parser.new.nesc_identifier.as(:nesc)
       end
 
+      # No-prefix IEEE identifier (characteristic patterns without "IEEE Std")
+      # These are patterns that are distinctly IEEE even without explicit publisher
+      rule(:no_prefix_ieee) do
+        characteristic_ieee_number.as(:number) >>
+        # Optional suffix (like -a, -b)
+        (dash >> match("[A-Za-z]")).maybe.as(:suffix) >>
+        # Optional year
+        (dash >> year_digits).maybe.as(:year) >>
+        # Optional draft notation
+        draft.maybe >>
+        # Optional language portion
+        (str("(E)") | str("(F)")).maybe >>
+        # Optional parenthetical content
+        parenthetical.maybe
+      end
+
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
         aiee_identifier |
@@ -491,7 +520,8 @@ module PubidNew
         parenthetical.maybe >>
         redline.maybe >>
         title_portion.maybe >>
-        approved_draft_suffix.maybe)
+        approved_draft_suffix.maybe) |
+        no_prefix_ieee  # NEW: Try no-prefix patterns last (lowest priority)
       end
 
       root(:identifier)
