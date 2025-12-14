@@ -124,6 +124,12 @@ module PubidNew
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
 
+        # Handle corrigendum supplements (check for base_identifier + cor_number)
+        # This enables recursive base identifier parsing like ISO/IEC Amendment
+        if parsed_hash[:base_identifier] && parsed_hash[:cor_number]
+          return build_corrigendum_supplement(parsed_hash)
+        end
+
         # Handle joint development patterns from parser
         if parsed_hash[:joint_publishers] || parsed_hash[:iso_stage]
           return build_joint_development(parsed_hash)
@@ -139,6 +145,83 @@ module PubidNew
         # Route to appropriate identifier class based on content
         identifier_class = determine_identifier_class(attributes)
         identifier_class.new(**attributes)
+      end
+
+      # Build corrigendum supplement with recursive base parsing
+      # @param parsed_hash [Hash] parsed data with base and supplement info
+      # @return [Identifiers::Corrigendum] corrigendum identifier
+      def build_corrigendum_supplement(parsed_hash)
+        # Reconstruct base identifier string from parsed components
+        base_parts = []
+        base_data = parsed_hash[:base_identifier]
+
+        # Extract publisher
+        if base_data[:publishers]
+          pub_data = base_data[:publishers]
+          publisher_str = extract_value(pub_data[:publisher])
+
+          if pub_data[:copublishers] && !pub_data[:copublishers].empty?
+            copubs = pub_data[:copublishers]
+            copubs = [copubs] unless copubs.is_a?(Array)
+            copub_strs = copubs.map { |cp| extract_value(cp[:copublisher]) }.compact
+            publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
+          end
+
+          base_parts << publisher_str
+        end
+
+        # Extract type
+        if base_data[:type]
+          base_parts << extract_value(base_data[:type])
+        end
+
+        # Extract number with parts and year
+        # Build the complete code string: "802.1AC-2016" or "535-2013" or "C37.41-2016"
+        number_str = extract_value(base_data[:number])
+
+        # Add part if present (e.g., ".1AC" or ".41")
+        if base_data[:part]
+          part_val = extract_value(base_data[:part])
+          # Determine separator: dot for most cases, dash for some
+          separator = number_str.match?(/^[A-Z]/) ? "." : "."  # Letter prefix uses dot
+          number_str += separator + part_val
+        end
+
+        # Add subpart if present
+        if base_data[:subpart]
+          subparts = base_data[:subpart]
+          subparts = [subparts] unless subparts.is_a?(Array)
+          subparts.each do |sp|
+            subpart_val = extract_value(sp)
+            number_str += ".#{subpart_val}" if subpart_val
+          end
+        end
+
+        # Add year with dash (e.g., "-2016")
+        if base_data[:year]
+          year_val = extract_value(base_data[:year])
+          number_str += "-#{year_val}"
+        end
+
+        base_parts << number_str
+
+        # Build base string and recursively parse it
+        base_string = base_parts.join(" ")
+
+        # Recursively parse base identifier using Base.parse
+        base_identifier = Identifiers::Base.parse(base_string)
+
+        # Extract corrigendum attributes
+        cor_number = extract_value(parsed_hash[:cor_number])
+        cor_year = extract_value(parsed_hash[:cor_year])
+
+        # Create Corrigendum with parsed base
+        require_relative "identifiers/corrigendum"
+        Identifiers::Corrigendum.new(
+          base_identifier: base_identifier,
+          cor_number: cor_number,
+          cor_year: cor_year
+        )
       end
 
       # Build joint development identifier from parsed data
@@ -199,6 +282,12 @@ module PubidNew
 
       # Determine which identifier class to use based on attributes
       def determine_identifier_class(attributes)
+        # Check for corrigendum supplements
+        if attributes[:cor_number]
+          require_relative "identifiers/corrigendum"
+          return Identifiers::Corrigendum
+        end
+
         # Check for adopted standards (parenthetical adoptions)
         if attributes[:adoption] || (attributes[:parameters] && attributes[:parameters][:adoption])
           return Identifiers::AdoptedStandard
@@ -301,6 +390,25 @@ module PubidNew
         if code_str && !code_parts.empty?
           code_str += "." + code_parts.join(".")
         end
+
+        # Year detection: If code_str ends with year-like pattern (dash + 4 digits, 1884-2099)
+        # and there's no year attribute yet, treat it as a year
+        # Examples: "535-2013", "802.1AC-2016", "C37.41-2016"
+        # AIEE established in 1884, so years range from 1884 to 2099
+        # ONLY apply this when there are NO code_parts (meaning parser didn't capture parts separately)
+        # This prevents breaking legitimate dual-published identifiers
+        if code_str && !parsed[:year] && code_parts.empty?
+          # Match ending with dash followed by 4 digits only (not dot, to preserve 802.1AC patterns)
+          if match = code_str.match(/^(.+)\-(\d{4})$/)
+            potential_year = match[2].to_i
+            if potential_year >= 1884 && potential_year <= 2099
+              # This is a year - extract it
+              code_str = match[1]  # Remove year from code
+              parsed[:year] = match[2]  # Add to parsed for extraction below
+            end
+          end
+        end
+
         attributes[:code] = code_str
 
         # Extract year - check for edition_month parsed separately

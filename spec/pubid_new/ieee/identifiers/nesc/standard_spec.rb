@@ -63,7 +63,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Nesc::Standard do
 
     context "C2-YYYY typo variation (Electric vs Electrical)" do
       let(:input) { "C2-2002 National Electric Safety Code" }
-      let(: parsed) { PubidNew::Ieee.parse(input) }
+      let(:parsed) { PubidNew::Ieee.parse(input) }
 
       it "parses as NESC::Standard" do
         expect(parsed).to be_a(described_class)

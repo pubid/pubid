@@ -70,8 +70,8 @@ module PubidNew
       # Organizations
       rule(:organization) do
         str("IEEE") | str("AIEE") | str("ANSI") | str("ASA") |
-        str("IEC") | str("ISO") | str("ASTM") | str("NACE") |
-        str("NSF") | str("ASHRAE") | str("NCTA") | str("AESC")
+        str("IEC") | str("ISO") | str("ASTM") | str("CSA") | str("ASME") |
+        str("NACE") | str("NSF") | str("ASHRAE") | str("NCTA") | str("AESC")
       end
 
       # Complex organization prefixes (Category 5: ANSI Complex)
@@ -108,13 +108,14 @@ module PubidNew
 
       # Document number - support letters and digits, with optional prefix P
       # Complex multi-part numbers like P11073-10404-10419 should be fully captured
-      # But simple cases like "623" should not consume the dash before year
+      # But simple cases like "623-1976" should not consume the dash before year
       rule(:number) do
         (str("P").maybe >>
-         (digits | upper).repeat(1) >>
+         (digits | upper).repeat(1) >> # The first component must be at least one digit
          # Only consume dash+digits if followed by another dash+digits (multi-part pattern)
+         # OR if the digits don't look like a year (not 4 digits starting with 19/20)
          # This prevents consuming "623-1976" as a number but allows "P11073-10404-10419"
-         (dash >> digits >> (dash >> digits).repeat).maybe >>
+         (dash >> digits >> year_digits.absent? >> (dash >> digits).repeat).maybe >>
          lower.maybe).as(:number)
       end
 
@@ -211,6 +212,7 @@ module PubidNew
         ((str("_") | slash | dash | space) >>
          str("Cor") >>
          (dash | dot | space).maybe >> # More flexible separator after "Cor"
+         space? >>  # Add space handling after separator
          digits.as(:cor_number) >>
          ((dash | str(":") | space) >> year_digits.as(:cor_year)).maybe).as(:corrigendum)
       end
@@ -245,12 +247,16 @@ module PubidNew
       rule(:relationship_supplement_to) { str("Supplement to ") }
       rule(:relationship_draft_amendment) { str("Draft Amendment to ") | str("DRAFT Amendment to ") }
       rule(:relationship_draft_revision) { str("Draft Revision of ") }
+      rule(:relationship_reaffirmation) { str("Reaffirmation of ") }
+      rule(:relationship_redesignation) { str("Redesignation of ") }
 
       # Combined relationship type (longest match first)
       rule(:relationship_type) do
         (
           relationship_draft_amendment.as(:draft_amendment_to) |
           relationship_draft_revision.as(:draft_revision_of) |
+          relationship_reaffirmation.as(:reaffirmation_of) |
+          relationship_redesignation.as(:redesignation_of) |
           relationship_revision_of.as(:revision_of) |
           relationship_amendment_to.as(:amendment_to) |
           relationship_corrigendum_to.as(:corrigendum_to) |
@@ -295,9 +301,9 @@ module PubidNew
         relationship_type.as(:relationship_type) >>
         identifier_list.as(:related_ids) >>
         as_amended_by_clause.maybe >>
-        # Handle multiple relationships separated by " / "
+        # Handle multiple relationships separated by " / " OR "; "
         (
-          str(" / ") >>
+          (str(" / ") | str("; ")) >>  # Support both separators
           relationship_type.as(:relationship_type) >>
           identifier_list.as(:related_ids) >>
           as_amended_by_clause.maybe
@@ -406,6 +412,21 @@ module PubidNew
         parenthetical.maybe
       end
 
+      # ANSI P pattern: "ANSI PN42.34-D9a, 2015" OR "ANSI P1234/D5"
+      rule(:ansi_p_identifier) do
+        str("ANSI").as(:publisher) >> space >>
+        str("P") >> space.maybe >> # Make space after P optional
+        number >>
+        (part_subpart_year | edition).maybe >>
+        # Enhanced: Accept both comma and space before month/year
+        ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
+        corrigendum.maybe >>
+        draft.maybe >>
+        # ALSO accept month/year after draft
+        ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
+        parenthetical.maybe
+      end
+
       # IEEE Draft P pattern: "IEEE Draft P802.11..." OR "Draft P802.11..." (IEEE prefix optional)
       rule(:ieee_draft_p_identifier) do
         (str("IEEE").as(:publisher) >> space).maybe >> # Make IEEE prefix optional
@@ -493,11 +514,34 @@ module PubidNew
         parenthetical.maybe
       end
 
+      # Corrigendum identifier with recursive base parsing
+      # Captures base identifier for recursive parsing, then corrigendum supplement
+      # Example: IEEE Std 535-2013/Cor. 1-2017
+      rule(:corrigendum_identifier) do
+        # Match a complete base identifier (reuse existing patterns)
+        # Try standard patterns that would match "IEEE Std 535-2013"
+        (
+          ((publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >> space).maybe >>
+          (type_word.as(:type) >> space?).maybe >>
+          number >>
+          part_subpart_year.maybe  # This captures the full identifier before /Cor
+        ).as(:base_identifier) >>
+        # Now match the corrigendum portion
+        (slash | dash | space) >>
+        str("Cor") >>
+        (dash | dot | space).maybe >>
+        space? >>
+        digits.as(:cor_number) >>
+        ((dash | str(":") | space) >> year_digits.as(:cor_year)).maybe >>
+        parenthetical.maybe
+      end
+
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
         aiee_identifier |
         ire_identifier |
         nesc_identifier |
+        corrigendum_identifier |  # NEW: Try corrigendum before generic patterns
         joint_development_ieee_format |
         joint_development_iso_format |
         iec_ieee_copublished |
@@ -505,6 +549,7 @@ module PubidNew
         ieee_approved_draft_identifier |
         ieee_draft_p_identifier |
         ieee_p_identifier |
+        ansi_p_identifier |  # NEW: ANSI P prefix support
         (((publisher >> (copublisher.repeat).as(:copublishers)).as(:publishers) >> space).maybe >> # Make publisher optional
         (draft_status.as(:draft_status)).maybe >>
         (str("Draft Std").as(:type) >> space?).maybe >>
@@ -526,7 +571,6 @@ module PubidNew
 
       root(:identifier)
 
-      # Class method to parse with preprocessing
       def self.parse(string)
         # Strip .pdf extension if present (Pattern 3: File Extensions)
         cleaned = string.sub(/\.pdf$/i, '')
@@ -539,14 +583,39 @@ module PubidNew
         # No valid IEEE identifier pattern needs more than 1 space
         cleaned = cleaned.gsub(/\s+/, ' ')
 
-        # NEW: Handle HTML entities (Category 9)
-        cleaned = cleaned.gsub('&amp;amp;', '&').gsub('&amp;', '&')
+        # NEW Phase 1: Handle HTML entities comprehensively
+        cleaned = cleaned.gsub('&x2122;', '™')    # Trademark symbol
+        cleaned = cleaned.gsub('&x2019;', "'")     # Smart apostrophe
+        cleaned = cleaned.gsub('&amp;amp;', '&')   # Double-encoded ampersand
+        cleaned = cleaned.gsub('&amp;', '&')       # Single-encoded ampersand
+
+        # NEW Phase 1: Fix number spacing issues (e.g., "C57.1 2.25" → "C57.12.25")
+        # This handles cases where a space appears in the middle of a number
+        cleaned = cleaned.gsub(/(\d+\.\d+)\s+(\d+\.)/, '\1\2')
+
+        # NEW Phase 1: Fix year spacing issues (e.g., "1 996" → "1996")
+        # Remove spaces within 4-digit years
+        cleaned = cleaned.gsub(/\b(1|2)\s+(\d{3})\b/, '\1\2')
+
+        # NEW Phase 1 (Session 141): Remove literal trademark symbol
+        # "C57.110™-2018" → "C57.110-2018"
+        cleaned = cleaned.gsub(/™/, '')
+
+        # NEW Phase 1 (Session 141): Fix specific year typo
+        # "19969" → "1969" (very specific pattern, won't affect other text)
+        cleaned = cleaned.gsub(/\b19969\b/, '1969')
+
+        # NEW Phase 1 (Session 141): Fix comma typo in 802.3 series numbers
+        # "802.3ch-2020,802.3ca-2020" → "802.3ch-2020, 802.3ca-2020"
+        # Very specific: 4 digits, comma, 3 digits (likely 802.3xx typo)
+        cleaned = cleaned.gsub(/(\d{4}),(\d{3})/, '\1, \2')
 
         # NEW: Fix common typos (Category 9)
         cleaned = cleaned.gsub(/^EEE /, 'IEEE ')
 
-        # NEW: Remove trailing commas/colons (Category 9)
-        cleaned = cleaned.gsub(/[,:]\s*$/, '')
+        # NEW Phase 1: Remove trailing commas/colons and text
+        cleaned = cleaned.gsub(/,\s*Standard\s*$/, '')  # ", Standard" at end
+        cleaned = cleaned.gsub(/[,:]\s*$/, '')           # Trailing comma/colon
 
         new.parse(cleaned)
       end

@@ -31,6 +31,8 @@ module PubidNew
         SUPPLEMENT_TO = "supplement_to"
         DRAFT_AMENDMENT_TO = "draft_amendment_to"
         DRAFT_REVISION_OF = "draft_revision_of"
+        REAFFIRMATION_OF = "reaffirmation_of"
+        REDESIGNATION_OF = "redesignation_of"
 
         # All valid relationship types
         VALID_TYPES = [
@@ -42,7 +44,9 @@ module PubidNew
           ADOPTION_OF,
           SUPPLEMENT_TO,
           DRAFT_AMENDMENT_TO,
-          DRAFT_REVISION_OF
+          DRAFT_REVISION_OF,
+          REAFFIRMATION_OF,
+          REDESIGNATION_OF
         ].freeze
 
         # Attributes
@@ -61,6 +65,11 @@ module PubidNew
 
           # Let Lutaml handle relationship_type
           super
+
+          # Normalize INCORPORATING to INCORPORATES for consistent rendering
+          if relationship_type == INCORPORATING
+            self.relationship_type = INCORPORATES
+          end
 
           # Validate after initialization
           validate_relationship_type if relationship_type
@@ -103,6 +112,8 @@ module PubidNew
           when SUPPLEMENT_TO then "Supplement to"
           when DRAFT_AMENDMENT_TO then "Draft Amendment to"
           when DRAFT_REVISION_OF then "Draft Revision of"
+          when REAFFIRMATION_OF then "Reaffirmation of"
+          when REDESIGNATION_OF then "Redesignation of"
           else relationship_type
           end
         end

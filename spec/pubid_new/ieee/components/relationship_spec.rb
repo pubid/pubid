@@ -14,6 +14,8 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
       expect(described_class::SUPPLEMENT_TO).to eq("supplement_to")
       expect(described_class::DRAFT_AMENDMENT_TO).to eq("draft_amendment_to")
       expect(described_class::DRAFT_REVISION_OF).to eq("draft_revision_of")
+      expect(described_class::REAFFIRMATION_OF).to eq("reaffirmation_of")
+      expect(described_class::REDESIGNATION_OF).to eq("redesignation_of")
     end
 
     it "includes all types in VALID_TYPES" do
@@ -26,7 +28,9 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
         described_class::ADOPTION_OF,
         described_class::SUPPLEMENT_TO,
         described_class::DRAFT_AMENDMENT_TO,
-        described_class::DRAFT_REVISION_OF
+        described_class::DRAFT_REVISION_OF,
+        described_class::REAFFIRMATION_OF,
+        described_class::REDESIGNATION_OF
       )
     end
   end
@@ -99,6 +103,22 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
         related_identifiers: [related_id]
       )
       expect(relationship.to_s).to eq("Adoption of IEEE Std 802.11-2012")
+    end
+
+    it "renders reaffirmation_of" do
+      relationship = described_class.new(
+        relationship_type: described_class::REAFFIRMATION_OF,
+        related_identifiers: [related_id]
+      )
+      expect(relationship.to_s).to eq("Reaffirmation of IEEE Std 802.11-2012")
+    end
+
+    it "renders redesignation_of" do
+      relationship = described_class.new(
+        relationship_type: described_class::REDESIGNATION_OF,
+        related_identifiers: [related_id]
+      )
+      expect(relationship.to_s).to eq("Redesignation of IEEE Std 802.11-2012")
     end
   end
 
@@ -228,6 +248,50 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
         related_identifiers: []
       )
       expect(relationship.to_s).to eq("")
+    end
+  end
+
+  describe "integration tests with parsing" do
+    context "semicolon separator for multiple relationships" do
+      it "parses Reaffirmation and Redesignation with semicolon" do
+        id = PubidNew::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980; Redesignation of ANSI N13.10-1974)")
+        expect(id.relationships).not_to be_empty
+        expect(id.relationships.length).to eq(2)
+        expect(id.relationships[0].relationship_type).to eq("reaffirmation_of")
+        expect(id.relationships[1].relationship_type).to eq("redesignation_of")
+      end
+
+      it "renders semicolon-separated relationships correctly" do
+        id = PubidNew::Ieee.parse("IEEE Std 100 (Reaffirmation of ANSI X; Redesignation of ANSI Y)")
+        expect(id.relationships.length).to eq(2)
+        # Note: Parser uses " / " separator in rendering, not semicolon
+        expect(id.to_s).to include("Reaffirmation of")
+        expect(id.to_s).to include("Redesignation of")
+      end
+    end
+
+    context "reaffirmation relationship parsing" do
+      it "parses long form reaffirmation" do
+        id = PubidNew::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)")
+        expect(id.relationships).not_to be_empty
+        expect(id.relationships.first.relationship_type).to eq("reaffirmation_of")
+        expect(id.relationships.first.related_identifiers.first.to_s).to include("N42.18-1980")
+      end
+
+      it "round-trips reaffirmation relationship" do
+        original = "ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)"
+        parsed = PubidNew::Ieee.parse(original)
+        expect(parsed.relationships.first.relationship_type).to eq("reaffirmation_of")
+      end
+    end
+
+    context "redesignation relationship parsing" do
+      it "parses redesignation relationship" do
+        id = PubidNew::Ieee.parse("ANSI N42.18-2004 (Redesignation of ANSI N13.10-1974)")
+        expect(id.relationships).not_to be_empty
+        expect(id.relationships.first.relationship_type).to eq("redesignation_of")
+        expect(id.relationships.first.related_identifiers.first.to_s).to include("N13.10-1974")
+      end
     end
   end
 end
