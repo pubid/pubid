@@ -535,6 +535,10 @@ module PubidNew
         # These are joint development drafts that use underscore instead of slash
         cleaned = cleaned.gsub(/_(FDIS|CDV|CD|DIS|WD|PWI|NP)/, '/\1')
 
+        # NEW: Normalize multiple spaces to single space
+        # No valid IEEE identifier pattern needs more than 1 space
+        cleaned = cleaned.gsub(/\s+/, ' ')
+
         # NEW: Handle HTML entities (Category 9)
         cleaned = cleaned.gsub('&amp;amp;', '&').gsub('&amp;', '&')
 
