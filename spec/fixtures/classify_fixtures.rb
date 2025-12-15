@@ -8,7 +8,7 @@ require_relative "../../lib/pubid_new"
 # Reads from identifiers/full/ and classifies into identifiers/pass/ and identifiers/fail/
 # Handles three formats: plain, !normalized!, and #errored#
 class FixturesClassifier
-  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi jcgm].freeze
+  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi jcgm astm].freeze
 
   attr_reader :flavor, :verbose, :fixtures_dir
 
@@ -201,6 +201,7 @@ class FixturesClassifier
     when "cen" then PubidNew::Cen.parse(id_str)
     when "bsi" then PubidNew::Bsi.parse(id_str)
     when "idf" then PubidNew::Idf.parse(id_str)
+    when "astm" then PubidNew::Astm.parse(id_str)
     else
       raise "Unknown flavor: #{flavor}"
     end
@@ -220,6 +221,7 @@ class FixturesClassifier
     when "ieee" then detect_ieee_class(id_str)
     when "nist" then detect_nist_class(id_str)
     when "jcgm" then detect_jcgm_class(id_str)
+    when "astm" then detect_astm_class(id_str)
     else "unknown"
     end
   end
@@ -267,6 +269,17 @@ class FixturesClassifier
   def detect_jcgm_class(id_str)
     return "guide" if id_str =~ /^JCGM \d+/
     "unknown"
+  end
+
+  def detect_astm_class(id_str)
+    return "research_report" if id_str =~ /\bRR:/
+    return "manual" if id_str =~ /\bMNL/
+    return "monograph" if id_str =~ /\bMONO/
+    return "data_series" if id_str =~ /\bDS\d/
+    return "work_in_progress" if id_str =~ /\bWK/
+    return "adjunct" if id_str =~ /\bADJ/
+    return "technical_report" if id_str =~ /\bTR\d|ISO\/ASTMTR/
+    "standard"
   end
 
   def append_to_file(status, class_name, content)

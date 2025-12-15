@@ -1,0 +1,123 @@
+# frozen_string_literal: true
+
+module PubidNew
+  module Astm
+    class Builder
+      def build(parsed_hash)
+        # Determine identifier class based on type
+        identifier_class = determine_identifier_class(parsed_hash)
+        identifier = identifier_class.new
+
+        # Build code component if present
+        if parsed_hash[:letter] || parsed_hash[:number]
+          identifier.code = build_code(parsed_hash)
+        end
+
+        # Set publisher
+        identifier.publisher = parsed_hash[:publisher].to_s if parsed_hash[:publisher]
+        identifier.publisher ||= "ASTM"
+
+        # Set year (convert 2-digit to 4-digit)
+        if parsed_hash[:year]
+          identifier.year = convert_year(parsed_hash[:year].to_s)
+        end
+
+        # Set format suffix with dash prefix
+        if parsed_hash[:format_suffix]
+          identifier.format_suffix = "-#{parsed_hash[:format_suffix]}"
+        end
+
+        # Type-specific attributes
+        build_type_specific_attributes(identifier, parsed_hash)
+
+        identifier
+      end
+
+      private
+
+      def determine_identifier_class(parsed_hash)
+        type = parsed_hash[:type]&.to_s
+
+        case type
+        when "RR"
+          Identifiers::ResearchReport
+        when "MNL"
+          Identifiers::Manual
+        when "MONO"
+          Identifiers::Monograph
+        when "DS"
+          Identifiers::DataSeries
+        when "WK"
+          Identifiers::WorkInProgress
+        when "ADJ"
+          Identifiers::Adjunct
+        when "TR"
+          Identifiers::TechnicalReport
+        else
+          # Default to Standard (A-G prefix)
+          Identifiers::Standard
+        end
+      end
+
+      def build_code(parsed_hash)
+        code = Components::Code.new
+        code.letter = parsed_hash[:letter].to_s if parsed_hash[:letter]
+        code.number = parsed_hash[:number].to_s if parsed_hash[:number]
+        code.suffix = parsed_hash[:suffix].to_s if parsed_hash[:suffix]
+        code.subseries = parsed_hash[:subseries].to_s if parsed_hash[:subseries]
+        code.dual_m = true if parsed_hash[:dual_m]
+        code
+      end
+
+      def build_type_specific_attributes(identifier, parsed_hash)
+        # Research Report
+        if identifier.is_a?(Identifiers::ResearchReport)
+          identifier.committee = parsed_hash[:committee].to_s if parsed_hash[:committee]
+        end
+
+        # Manual
+        if identifier.is_a?(Identifiers::Manual)
+          identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
+          identifier.supplement = true if parsed_hash[:supplement]
+          identifier.tp_designation = parsed_hash[:tp_designation].to_s if parsed_hash[:tp_designation]
+        end
+
+        # Monograph
+        if identifier.is_a?(Identifiers::Monograph)
+          identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
+        end
+
+        # Data Series
+        if identifier.is_a?(Identifiers::DataSeries)
+          identifier.hol_suffix = true if parsed_hash[:hol_suffix]
+        end
+
+        # Adjunct
+        if identifier.is_a?(Identifiers::Adjunct)
+          identifier.designation = parsed_hash[:designation].to_s if parsed_hash[:designation]
+          identifier.ea_suffix = true if parsed_hash[:ea_suffix]
+          identifier.dvd_suffix = true if parsed_hash[:dvd_suffix]
+        end
+
+        # Standard-specific
+        if identifier.is_a?(Identifiers::Standard)
+          identifier.sub_year = parsed_hash[:sub_year].to_s if parsed_hash[:sub_year]
+          identifier.reapproval = parsed_hash[:reapproval].to_s if parsed_hash[:reapproval]
+          identifier.editorial = parsed_hash[:editorial].to_s if parsed_hash[:editorial]
+        end
+      end
+
+      def convert_year(year_str)
+        return year_str if year_str.length == 4
+
+        # 2-digit year conversion
+        year_int = year_str.to_i
+        if year_int <= 24
+          "20#{year_str}"
+        else
+          "19#{year_str}"
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,30 @@
+# ASME
+# Rules: "ASME Y14.43-2011 (R2020)":
+# - "Y" is "designator"
+# - "14.43" is the "code"
+# - "2011" is the designation year
+# - "(R2020)" is the reaffirmed year
+
+# ASME Standards
+ASME PTC 19.3-2024
+ASME BPVC.III.A-2023
+ASME BPVC.XI.1-2023
+ASME BPVC.III.1.NB-2023
+ASME BPVC.III.5-2023
+ASME HST-6-2020
+ASME PCC-1–2022
+ASME B46.1
+ASME PCC-2
+ASME B1.13M
+ASME Y14.41-2019
+ASME B18.3-2012 (R2017)
+ASME Y14.100
+ASME Y14.43-2011 (R2020)
+
+# ASME Standards (drafts)
+ASME B18.3-20XX [Draft Proposed Revision of ASME B18.3-2012 (R2017)]
+ASME Y14.43-20XX [Revision of ASME Y14.43-2011 (R2020)]
+ASME B30.3-20XX (Proposed revision of ASME B30.1-2020)
+ASME B73.1-20XX (Revision of ASME B73.1-2020)
+ASME PCC-1–20XX (Revision of ASME PCC-1–2022)
+ASME Y14.41-202X (Revision of ASME Y14.41-2019)

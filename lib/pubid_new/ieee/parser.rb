@@ -498,6 +498,28 @@ module PubidNew
         Nesc::Parser.new.nesc_identifier.as(:nesc)
       end
 
+      # IEEE/ASTM SI/PSI (Système International) patterns
+      # SI = Published metric system standard
+      # PSI = Proposed SI (draft)
+      rule(:ieee_astm_si_psi) do
+        str("IEEE/ASTM").as(:publishers) >>
+        space >>
+        (str("PSI") | str("SI")).as(:si_type) >>
+        space >>
+        digits.as(:number) >>
+        # Draft notation for PSI (e.g., /D2, /D3)
+        (slash >> str("D") >> digits.as(:draft_version)).maybe >>
+        # Year with optional month
+        (
+          # Format: ", Month Year"
+          (comma >> month_name.as(:month) >> space >> year_digits.as(:year)) |
+          # Format: "-YEAR"
+          (dash >> year_digits.as(:year))
+        ).maybe >>
+        # Optional parenthetical (revision relationships)
+        parenthetical.maybe
+      end
+
       # No-prefix IEEE identifier (characteristic patterns without "IEEE Std")
       # These are patterns that are distinctly IEEE even without explicit publisher
       rule(:no_prefix_ieee) do

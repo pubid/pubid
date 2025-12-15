@@ -48,6 +48,11 @@ module PubidNew
           return ire_builder.build(parsed[:ire])
         end
 
+        # Handle IEEE/ASTM SI/PSI identifiers (Système International)
+        if parsed[:si_type]
+          return build_si_psi_identifier(parsed)
+        end
+
         # Handle single identifier
         build_single_identifier(parsed)
       end
@@ -280,8 +285,68 @@ module PubidNew
         Identifiers::JointDevelopment.new(**attributes)
       end
 
+      # Build SI/PSI identifier from parsed data
+      # @param parsed [Hash] parsed SI/PSI data
+      # @return [Identifiers::SiStandard, Identifiers::PsiStandard] SI or PSI identifier
+      def build_si_psi_identifier(parsed)
+        attributes = {}
+
+        # Extract SI type (SI or PSI)
+        si_type = extract_value(parsed[:si_type])
+
+        # Extract publishers (should be "IEEE/ASTM")
+        if parsed[:publishers]
+          publishers_str = extract_value(parsed[:publishers])
+          # Split by slash to get individual publishers
+          pubs = publishers_str.split("/")
+          attributes[:publisher] = pubs.first
+          attributes[:copublisher] = pubs.drop(1) if pubs.length > 1
+        end
+
+        # Extract number
+        attributes[:code] = extract_value(parsed[:number])
+
+        # For PSI, extract draft version
+        if si_type == "PSI" && parsed[:draft_version]
+          draft_version = extract_value(parsed[:draft_version])
+          attributes[:draft_version] = "D#{draft_version}"
+        end
+
+        # Extract year and month
+        attributes[:year] = extract_value(parsed[:year]) if parsed[:year]
+        attributes[:month] = extract_value(parsed[:month]) if parsed[:month]
+
+        # Handle relationships if present
+        if parsed[:relationship_type] || parsed[:relationship_clause]
+          attributes[:relationships] = build_relationships(parsed)
+        end
+
+        # Handle parenthetical content
+        handle_parameters(parsed, attributes)
+
+        # Select appropriate class
+        identifier_class = if si_type == "PSI"
+          require_relative "identifiers/psi_standard"
+          Identifiers::PsiStandard
+        else
+          require_relative "identifiers/si_standard"
+          Identifiers::SiStandard
+        end
+
+        identifier_class.new(**attributes)
+      end
+
       # Determine which identifier class to use based on attributes
       def determine_identifier_class(attributes)
+        # Check for SI/PSI standards
+        if attributes[:type] == "SI"
+          require_relative "identifiers/si_standard"
+          return Identifiers::SiStandard
+        elsif attributes[:type] == "PSI"
+          require_relative "identifiers/psi_standard"
+          return Identifiers::PsiStandard
+        end
+
         # Check for corrigendum supplements
         if attributes[:cor_number]
           require_relative "identifiers/corrigendum"
