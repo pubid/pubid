@@ -25,10 +25,13 @@ module PubidNew
       # Year patterns (2-digit)
       rule(:year_2digit) { digit.repeat(2, 2).as(:year) }
 
-      # Reapproval notation
+      # Reapproval notation (may have comment after)
       rule(:reapproval) do
         str("(") >> digit.repeat(4, 4).as(:reapproval) >> str(")")
       end
+
+      # Comment portion (anything after #)
+      rule(:comment) { space.maybe >> str("#") >> match("[^#]").repeat }
 
       # Editorial notation
       rule(:editorial) { str("e") >> digits.as(:editorial) }
@@ -39,6 +42,9 @@ module PubidNew
       # Format suffix
       rule(:format_suffix) { dash >> str("EB").as(:format_suffix) }
 
+      # Format suffix without dash (for use after supplement which ends with dash)
+      rule(:format_suffix_no_dash) { str("EB").as(:format_suffix) }
+
       # Edition notations
       rule(:edition) do
         (
@@ -48,7 +54,7 @@ module PubidNew
         ).as(:edition)
       end
 
-      # Supplement notation
+      # Supplement notation (ends with dash)
       rule(:supplement) { dash >> str("SUP") >> dash }
 
       # ========================================
@@ -72,8 +78,10 @@ module PubidNew
         (str("TP").as(:tp_designation)).maybe >>
         digits.as(:number) >>
         (dash >> edition).maybe >>
-        supplement.maybe.as(:supplement) >>
-        format_suffix.maybe
+        (
+          supplement >> format_suffix_no_dash.maybe |
+          format_suffix.maybe
+        )
       end
 
       # ========================================
@@ -91,14 +99,20 @@ module PubidNew
       # Data Series
       # ========================================
       rule(:data_series_suffix) { match("[A-Z]").as(:suffix) }
-      rule(:data_series_subseries) do
+      # Subseries can be: -S4 OR S4 (when following a letter suffix)
+      rule(:data_series_subseries_with_dash) do
         dash >> str("S") >> digits.as(:subseries)
+      end
+      rule(:data_series_subseries_no_dash) do
+        digits.as(:subseries)  # Directly after letter suffix
       end
       rule(:data_series_code) do
         digits.as(:number) >>
-        data_series_suffix.maybe >>
-        data_series_subseries.maybe >>
-        (str("HOL").as(:hol_suffix)).maybe
+        (
+          str("HOL").as(:hol_suffix) |
+          (data_series_suffix >> data_series_subseries_no_dash.maybe) |
+          data_series_subseries_with_dash
+        ).maybe
       end
 
       rule(:data_series) do
@@ -134,14 +148,16 @@ module PubidNew
       rule(:technical_report_iso_astm) do
         str("ISO/ASTMTR").as(:type) >>
         digits.as(:number) >>
-        format_suffix.maybe
+        format_suffix.maybe >>
+        comment.maybe
       end
 
       rule(:technical_report_simple) do
         publisher.maybe >>
         str("TR").as(:type) >>
         digits.as(:number) >>
-        format_suffix.maybe
+        format_suffix.maybe >>
+        comment.maybe
       end
 
       rule(:technical_report) do
@@ -149,7 +165,7 @@ module PubidNew
       end
 
       # ========================================
-      # Standard (DEFAULT - handles A-G prefix)
+      # Standard (DEFAULT - handles A-G prefix AND digit-only E-standards)
       # ========================================
 
       # Dual unit pattern: F1862/F1862M
@@ -160,21 +176,28 @@ module PubidNew
         str("M").as(:dual_m)
       end
 
-      rule(:standard_code) do
+      rule(:standard_code_with_letter) do
         standard_letter >>
         digits.as(:number) >>
         dual_unit.maybe
       end
 
+      # Digit-only E-standards (like 52303, 51607, 51608, 51261, 51707)
+      # These are E-standards where the "E" prefix is implicit/omitted
+      rule(:standard_code_digit_only) do
+        digits.as(:number)  # Accept digit-only, builder will add implicit E
+      end
+
       rule(:standard) do
         publisher.maybe >>
-        standard_code >>
+        (standard_code_with_letter | standard_code_digit_only) >>
         (
           dash >> year_2digit >>
           sub_year.maybe >>
           reapproval.maybe >>
           editorial.maybe
-        ).maybe
+        ).maybe >>
+        comment.maybe
       end
 
       # ========================================
