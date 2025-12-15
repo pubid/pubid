@@ -134,6 +134,16 @@ module PubidNew
       # ========================================
       # Adjunct
       # ========================================
+      # SEMANTIC NOTE: Adjunct identifiers reference a base standard
+      # Structure: ADJ + base_standard_code + adjunct_designation
+      # Examples:
+      #   ADJF3504-EA: Adjunct to F3504, EA = Excel file format
+      #   ADJC033501: Adjunct "01" to C335
+      #   ADJC0450A: Adjunct format "A" to C450
+      #   ADJE11211T: Adjunct "11T" to E112
+      #   ADJDQCALC: Adjunct with text designation (not to numbered standard)
+      # Adjunct formats: EA (Excel), E-PDF, A1A2 (arbitrary identifiers)
+      # One standard can have multiple adjuncts
       rule(:adjunct) do
         publisher.maybe >>
         str("ADJ").as(:type) >>
@@ -168,6 +178,20 @@ module PubidNew
       # Standard (DEFAULT - handles A-G prefix AND digit-only E-standards)
       # ========================================
 
+      # SEMANTIC NOTE: 5xxxx digit-only standards are ISO/ASTM dual-published
+      # Examples:
+      #   ASTM 52303-24e1: ASTM's version (e1 = edition 1, not "E" prefix)
+      #   ISO/ASTM 52303:2024: ISO's published version of the same document
+      # These should semantically be IsoDualPublishedIdentifier or similar
+      # Parser currently accepts them as digit-only standards
+
+      # NOTE: Reference Radiographs (RR) are a separate document type not yet implemented
+      # Examples:
+      #   RRE341903: Reference radiograph for standard E3419
+      #   RRE015501: Reference radiograph, volume 1
+      #   RRE2669CS: Adjunct to E2669 reference radiograph
+      # These require separate ReferenceRadiograph identifier class
+
       # Dual unit pattern: F1862/F1862M
       rule(:dual_unit) do
         slash >>
@@ -182,10 +206,10 @@ module PubidNew
         dual_unit.maybe
       end
 
-      # Digit-only E-standards (like 52303, 51607, 51608, 51261, 51707)
-      # These are E-standards where the "E" prefix is implicit/omitted
+      # Digit-only standards (primarily 5xxxx ISO/ASTM dual-published)
+      # Parsed as digit-only, semantic meaning is dual-published with ISO
       rule(:standard_code_digit_only) do
-        digits.as(:number)  # Accept digit-only, builder will add implicit E
+        digits.as(:number)  # Accept digit-only, no implicit E prefix
       end
 
       rule(:standard) do

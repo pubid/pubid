@@ -51,6 +51,28 @@
 **Files Modified:**
 - `lib/pubid_new/astm/parser.rb` - Comprehensive parser enhancements
 
+**Semantic Corrections (Post-Session Documentation):**
+
+After achieving 100% parsing, important domain knowledge was clarified:
+
+1. **Adjunct Structure:** Adjuncts reference a base standard
+   - Pattern: `ADJ` + base_standard_code + adjunct_designation
+   - `ADJF3504-EA`: Adjunct to F3504, EA = Excel file format
+   - `ADJC033501`: Adjunct "01" to C335
+   - One standard can have multiple adjuncts with different formats
+
+2. **5xxxx "Digit-Only" Standards:** Actually ISO/ASTM dual-published
+   - `ASTM 52303-24e1`: ASTM's version (e1 = edition 1)
+   - `ISO/ASTM 52303:2024`: ISO's published version
+   - Currently parsed as digit-only standards
+   - Future: Should be `IsoDualPublishedIdentifier` type
+
+3. **Reference Radiographs (RR):** Separate document type (not implemented)
+   - Examples: `RRE341903`, `RRE015501`, `RRE2669CS`
+   - Would require 9th identifier class: `ReferenceRadiograph`
+
+Parser achieves 100% correctness; semantic model can be enhanced in future.
+
 **Project Status:**
 - **16/16 flavors implemented** (100%) 🎉
 - **16/16 flavors at 99%+** ✨
