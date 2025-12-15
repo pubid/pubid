@@ -12,6 +12,7 @@ require_relative "astm/builder"
 # Identifier classes
 require_relative "astm/identifiers/base"
 require_relative "astm/identifiers/standard"
+require_relative "astm/identifiers/iso_dual_published"
 require_relative "astm/identifiers/manual"
 require_relative "astm/identifiers/research_report"
 require_relative "astm/identifiers/data_series"

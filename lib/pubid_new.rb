@@ -20,6 +20,7 @@ require_relative "pubid_new/ansi"
 require_relative "pubid_new/jcgm"
 require_relative "pubid_new/oiml"
 require_relative "pubid_new/astm"
+require_relative "pubid_new/asme"
 
 module PubidNew
   class Error < StandardError; end

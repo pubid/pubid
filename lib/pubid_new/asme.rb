@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+require "parslet"
+require "lutaml/model"
+require_relative "identifier"
+require_relative "asme/identifier"
+require_relative "asme/components/code"
+require_relative "asme/single_identifier"
+require_relative "asme/parser"
+require_relative "asme/builder"
+
+# Identifier classes
+require_relative "asme/identifiers/base"
+require_relative "asme/identifiers/standard"
+
+module PubidNew
+  module Asme
+    def self.parse(str)
+      Identifier.parse(str)
+    end
+  end
+end

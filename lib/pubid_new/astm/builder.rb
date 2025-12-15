@@ -38,6 +38,21 @@ module PubidNew
       def determine_identifier_class(parsed_hash)
         type = parsed_hash[:type]&.to_s
 
+        # Check for ISO/ASTM dual-published standards (5xxxx series)
+        # These are digit-only identifiers starting with "5"
+        if type.nil? || type.empty?
+          # No explicit type, check if it's a digit-only number
+          if parsed_hash[:number] && !parsed_hash[:letter]
+            number_str = parsed_hash[:number].to_s
+            # If starts with "5", likely ISO/ASTM dual-published
+            if number_str.start_with?("5")
+              return Identifiers::IsoDualPublished
+            end
+            # Other digit-only numbers are still Standard
+            return Identifiers::Standard
+          end
+        end
+
         case type
         when "RR"
           Identifiers::ResearchReport

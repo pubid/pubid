@@ -1,5 +1,5 @@
 Flavor: ASTM
-Classified: 2025-12-15 19:40:23
+Classified: 2025-12-15 20:34:17
 ======================================================================
 
 OVERALL STATISTICS
@@ -12,9 +12,10 @@ BY CLASS
 ----------------------------------------------------------------------
 adjunct                                  Pass: 4/4 (100.0%)
 data_series                              Pass: 33/33 (100.0%)
+iso_dual_published                       Pass: 5/5 (100.0%)
 manual                                   Pass: 74/74 (100.0%)
 monograph                                Pass: 11/11 (100.0%)
 research_report                          Pass: 59/59 (100.0%)
-standard                                 Pass: 59/59 (100.0%)
+standard                                 Pass: 54/54 (100.0%)
 technical_report                         Pass: 5/5 (100.0%)
 work_in_progress                         Pass: 3/3 (100.0%)

@@ -11,6 +11,8 @@
 
 Implement IsoDualPublishedIdentifier as a proper semantic type for ASTM standards that are dual-published with ISO (5xxxx series).
 
+Then finish ASME identifiers!
+
 **Current Issue:**
 - Standards like `ASTM 52303-24e1` are parsed as generic digit-only standards
 - These are actually ASTM's version of ISO/ASTM dual-published documents

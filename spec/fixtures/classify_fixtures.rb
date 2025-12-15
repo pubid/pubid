@@ -8,7 +8,7 @@ require_relative "../../lib/pubid_new"
 # Reads from identifiers/full/ and classifies into identifiers/pass/ and identifiers/fail/
 # Handles three formats: plain, !normalized!, and #errored#
 class FixturesClassifier
-  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi jcgm astm].freeze
+  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi jcgm astm asme].freeze
 
   attr_reader :flavor, :verbose, :fixtures_dir
 
@@ -202,6 +202,7 @@ class FixturesClassifier
     when "bsi" then PubidNew::Bsi.parse(id_str)
     when "idf" then PubidNew::Idf.parse(id_str)
     when "astm" then PubidNew::Astm.parse(id_str)
+    when "asme" then PubidNew::Asme.parse(id_str)
     else
       raise "Unknown flavor: #{flavor}"
     end
