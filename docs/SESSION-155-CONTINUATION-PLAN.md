@@ -1,36 +1,26 @@
-# Session 155+ Continuation Plan: API & CSA to 100%
+# Session 155 COMPRESSED: API & CSA to 100% in One Session
 
 **Created:** 2025-12-16 (Post-Session 154)
-**Status:** API at 91.63%, CSA at 50.32% - Target 100% for both
-**Timeline:** COMPRESSED - 3-4 sessions (6-8 hours total)
+**Status:** API at 91.63%, CSA at 50.32%
+**Timeline:** ULTRA-COMPRESSED - 1 session (2.5-3 hours total)
+**Strategy:** Aggressive, data-driven pattern implementation
 
 ---
 
 ## Executive Summary
 
-**Session 154 Achievement:** API 91.63% & CSA 50.32% - Both exceeded initial targets! ✅
+**Current Status:**
+- **API:** 197/215 (91.63%) → Need +18 for 100%
+- **CSA:** 471/936 (50.32%) → Need +465 for 100%
 
-**Remaining Work:**
-- **API:** 197/215 (91.63%) → Need +18 for 100% (1 complex case remaining)
-- **CSA:** 471/936 (50.32%) → Need +465 for 100% (428 failures to address)
-
-**Strategy:** Systematic pattern analysis and implementation in compressed timeline
+**Compressed Strategy:** API first (fast win), then systematic CSA pattern blitz
 
 ---
 
-## SESSION 155: API to 100% (60 minutes)
+## PART A: API to 100% (30-45 minutes)
 
-### Current Status
-- **Passing:** 197/215 (91.63%)
-- **Failing:** 18 identifiers
-- **Known failure:** `API COS 1-07/RP 75, 4th edition` (combined identifier)
+### Step 1: Extract & Analyze All Failures (10 min)
 
-### Objective
-Achieve 100% API validation by addressing the final 18 identifiers.
-
-### Part A: Extract All Failures (10 min)
-
-**Action:**
 ```bash
 cat > /tmp/api_all_failures.rb << 'EOF'
 require 'parslet'
@@ -40,146 +30,114 @@ fixtures = File.readlines('/Users/mulgogi/src/mn/pubid/spec/fixtures/api/identif
 
 puts "All API failures:"
 puts "="*60
-
+failures = []
 fixtures.each do |id|
   begin
     PubidNew::Api.parse(id)
-  rescue => e
+  rescue
+    failures << id
     puts id
   end
 end
+puts "="*60
+puts "Total: #{failures.count}"
 EOF
 ruby /tmp/api_all_failures.rb
 ```
 
-### Part B: Pattern Analysis (20 min)
+### Step 2: Group by Pattern (5 min)
 
-Group failures by pattern type:
-1. Combined identifiers (e.g., `COS 1-07/RP 75`)
-2. Edition notation (e.g., `4th edition`)
-3. Other specialized patterns
+Manually categorize the 18 failures into patterns. Most likely:
+1. Combined identifiers (slash notation)
+2. Edition notation
+3. Other
 
-### Part C: Implementation (30 min)
+### Step 3: Implement (20-30 min)
 
-**Priority 1: Combined identifiers** (if multiple exist)
-- Pattern: `TYPE1 NUM1/TYPE2 NUM2`
-- Add combined_identifier rule to parser
-- Expected gain: Most of the 18 failures
+Update [`lib/pubid_new/api/parser.rb`](lib/pubid_new/api/parser.rb:1):
 
-**Priority 2: Edition notation**
-- Pattern: `, Nth edition`
-- Add edition rule after number
-- Expected gain: Any edition-specific failures
+**Quick implementation strategy:**
+- If most failures are one pattern type → implement that pattern
+- If mixed → implement combined identifier rule (handles slash notation)
+- Test after implementation
 
-**Target:** 215/215 (100%)
+**Expected:** 215/215 (100%) ✅
 
 ---
 
-## SESSION 156-157: CSA Pattern Analysis & Enhancement (180 minutes)
+## PART B: CSA Pattern Blitz to 100% (105-135 minutes)
 
-### Current Status
-- **Passing:** 471/936 (50.32%)
-- **Failing:** 465 identifiers
-- **Gap to 100%:** 465 identifiers
+### Step 1: Extract & Categorize ALL 465 Failures (15 min)
 
-### Session 156: Comprehensive Failure Analysis (90 min)
-
-**Part A: Extract All Failures (10 min)**
 ```bash
-cat > /tmp/csa_all_failures.rb << 'EOF'
+cat > /tmp/csa_pattern_analysis.rb << 'EOF'
 require 'parslet'
 require_relative '/Users/mulgogi/src/mn/pubid/lib/pubid_new/csa'
 
 fixtures = File.readlines('/Users/mulgogi/src/mn/pubid/spec/fixtures/csa/identifiers/full/identifiers.txt').map(&:strip).reject(&:empty?)
 
-File.open('/tmp/csa_all_failures.txt', 'w') do |f|
-  fixtures.each do |id|
-    begin
-      PubidNew::Csa.parse(id)
-    rescue
-      f.puts id
-    end
+failures = []
+fixtures.each { |id| failures << id unless (PubidNew::Csa.parse(id) rescue nil) }
+
+# Pattern analysis
+patterns = Hash.new(0)
+failures.each do |id|
+  case id
+  when /\(R\d{4}\)/
+    patterns["Reaffirmation (RXXXX)"] += 1
+  when /NO\.\s+\d+/
+    patterns["NO. keyword"] += 1
+  when /PACKAGE/
+    patterns["PACKAGE keyword"] += 1
+  when /\(R\d{2}\)/
+    patterns["Reaffirmation 2-digit (RXX)"] += 1
+  when /\d{4}\)/
+    patterns["Missing open paren"] += 1
+  else
+    patterns["Other"] += 1
   end
 end
-puts "Failures written to /tmp/csa_all_failures.txt"
+
+puts "="*60
+puts "CSA Pattern Frequency Analysis"
+puts "="*60
+patterns.sort_by { |k,v| -v }.each { |k,v| puts "#{k}: #{v}" }
+puts "="*60
+puts "Total failures: #{failures.count}"
 EOF
-ruby /tmp/csa_all_failures.rb
+ruby /tmp/csa_pattern_analysis.rb
 ```
 
-**Part B: Pattern Categorization (40 min)**
+### Step 2: Prioritize Top 3-5 Patterns (5 min)
 
-Group 465 failures into categories:
-1. **Reaffirmation patterns** - Count appearances
-2. **Amendment without slash** - Different notation
-3. **Special keywords** - PACKAGE variants, etc.
-4. **NO. keyword variants** - Different formats
-5. **Year format edge cases** - Unusual year patterns
-6. **Combined identifier variants** - Multi-part standards
-7. **Other specialized** - Unique cases
+Based on output, identify patterns appearing 50+ times each.
+Document expected gain per pattern.
 
-**Part C: Prioritize Patterns (20 min)**
+### Step 3: Implement Pattern Batch 1 (30 min)
 
-Sort by:
-- Frequency (patterns appearing 20+ times)
-- Complexity (easy vs hard)
-- Impact (high-value quick wins)
+**Focus on highest-frequency patterns only.**
 
-**Part D: Create Implementation Roadmap (20 min)**
+Update [`lib/pubid_new/csa/parser.rb`](lib/pubid_new/csa/parser.rb:1):
 
-Document:
-- Top 10 patterns by frequency
-- Expected gain per pattern
-- Implementation difficulty estimate
-- Recommended order
-
-### Session 157: CSA Implementation Phase 1 (90 min)
-
-**Objective:** Implement top 5 highest-impact patterns
-
-**Part A: Pattern 1 Implementation (20 min)**
-- Implement most frequent pattern
-- Test improvement
-- Document gain
-
-**Part B: Pattern 2 Implementation (20 min)**
-- Implement second pattern
-- Test cumulative improvement
-
-**Part C: Pattern 3 Implementation (20 min)**
-- Implement third pattern
-- Verify no regressions
-
-**Part D: Pattern 4-5 Implementation (30 min)**
-- Implement patterns 4-5 together if related
-- Test final improvement
-- Document results
+Implement top 2-3 patterns:
+- Most likely: Enhanced reaffirmation handling
+- Most likely: NO. keyword variants
+- Test after each: `ruby /tmp/count_csa.rb`
 
 **Target:** 70%+ (656+/936)
 
----
+### Step 4: Implement Pattern Batch 2 (30 min)
 
-## SESSION 158: CSA Implementation Phase 2 (90 minutes)
+Implement next 2-3 patterns based on Session step 3 results.
 
-**Objective:** Continue pattern implementation toward 90%+
+**Target:** 85%+ (796+/936)
 
-**Based on Session 157 results:**
-- Implement patterns 6-10
-- Focus on medium-frequency patterns
-- Address edge cases discovered
+### Step 5: Final Pattern Sweep (30-40 min)
 
-**Target:** 90%+ (842+/936)
-
----
-
-## SESSION 159: CSA Final Push to 100% (90 minutes)
-
-**Objective:** Address remaining edge cases
-
-**Strategy:**
-- Handle rare patterns (1-5 occurrences each)
-- Fix data quality issues
-- Implement specialized cases
-- Validate round-trip on all identifiers
+Handle remaining patterns systematically:
+- Group similar patterns
+- Implement in batches
+- Test frequently
 
 **Target:** 100% (936/936)
 
@@ -187,81 +145,66 @@ Document:
 
 ## Implementation Status Tracker
 
-### API Enhancement Progress
+### Single Session Progress
 
-| Session | Focus | Baseline | Target | Achievement | Status |
-|---------|-------|----------|--------|-------------|--------|
-| 154 | MPMS, Part, MPMP | 193/215 | 197/215 | 91.63% | ✅ Complete |
-| 155 | Combined IDs, Edition | 197/215 | 215/215 |100% | ⏳ Planned |
+| Phase | Focus | Time | Baseline | Target | Status |
+|-------|-------|------|----------|--------|--------|
+| A | API failures | 30-45m | 197/215 | 215/215 | ⏳ |
+| B1 | CSA analysis | 15m | 471/936 | - | ⏳ |
+| B2 | CSA batch 1 | 30m | 471/936 | 656+/936 | ⏳ |
+| B3 | CSA batch 2 | 30m | 656+/936 | 796+/936 | ⏳ |
+| B4 | CSA final | 30-40m | 796+/936 | 936/936 | ⏳ |
 
-### CSA Enhancement Progress
-
-| Session | Focus | Baseline | Target | Achievement | Status |
-|---------|-------|----------|--------|-------------|--------|
-| 154 | Amendment slash, CONSOLIDATED | 446/936 | 471/936 | 50.32% | ✅ Complete |
-| 156 | Pattern analysis | 471/936 | - | - | ⏳ Planned |
-| 157 | Top 5 patterns | 471/936 | 656+/936 | 70%+ | ⏳ Planned |
-| 158 | Patterns 6-10 | 656+/936 | 842+/936 | 90%+ | ⏳ Planned |
-| 159 | Final push | 842+/936 | 936/936 | 100% | ⏳ Planned |
+**Total Time:** 135-160 minutes (2.25-2.75 hours)
 
 ---
 
 ## Success Criteria
 
-### API (Session 155)
-- ✅ All 215 identifiers parsing successfully
-- ✅ Perfect round-trip fidelity
-- ✅ Architecture maintained (MODEL-DRIVEN, MECE)
-- ✅ No regressions
+### API
+- ✅ 215/215 (100%)
+- ✅ All patterns working
+- ✅ Round-trip fidelity
 
-### CSA (Sessions 156-159)
-- ✅ All 936 identifiers parsing successfully
-- ✅ Perfect round-trip fidelity
+### CSA
+- ✅ 936/936 (100%)
 - ✅ Systematic pattern coverage
-- ✅ Architecture maintained
+- ✅ Architecture maintained (MODEL-DRIVEN, MECE)
 
 ---
 
-## Key Architectural Principles
+## Key Principles
 
-**MAINTAIN throughout:**
-1. **MODEL-DRIVEN** - Objects not strings
-2. **MECE** - Mutually exclusive, collectively exhaustive
-3. **Three-layer** - Parser/Builder/Identifier independence
-4. **Parser-first** - Only parser changes for pattern support
-5. **Round-trip fidelity** - Perfect preservation
-6. **Incremental testing** - Test after each pattern
+**Throughout ALL work:**
+1. **Data-driven** - Let pattern frequencies guide implementation order
+2. **Test frequently** - After each batch implementation
+3. **Parser-only** - No architecture changes
+4. **Incremental** - One pattern at a time
+5. **Document** - Track what worked
 
 ---
 
 ## Files to Modify
 
-### API (Session 155)
-- `lib/pubid_new/api/parser.rb` - Combined identifiers, edition notation
-
-### CSA (Sessions 156-159)
-- `lib/pubid_new/csa/parser.rb` - Multiple pattern enhancements
-- `lib/pubid_new/csa/builder.rb` - If needed for new patterns
-- `lib/pubid_new/csa/identifier.rb` - Preprocessing if needed
+1. `lib/pubid_new/api/parser.rb` - API patterns
+2. `lib/pubid_new/csa/parser.rb` - CSA patterns (primary work)
+3. `lib/pubid_new/csa/identifier.rb` - If preprocessing needed
 
 ---
 
-## Timeline Summary
+## Contingency Plan
 
-| Sessions | Focus | Duration | Deliverables |
-|----------|-------|----------|--------------|
-| 155 | API to 100% | 60 min | API complete |
-| 156 | CSA analysis | 90 min | Pattern roadmap |
-| 157 | CSA Phase 1 | 90 min | CSA 70%+ |
-| 158 | CSA Phase 2 | 90 min | CSA 90%+ |
-| 159 | CSA final | 90 min | CSA 100% |
-| **Total** | **Both 100%** | **420 min (7h)** | **Complete** |
+**If stuck at 90-95% CSA after 2.5 hours:**
+- Document remaining patterns
+- Commit progress
+- Note edge cases for future
+- **Acceptable:** 90%+ is excellent progress
+
+**Primary Goal:** API 100% + CSA 80%+
+**Stretch Goal:** Both 100%
 
 ---
 
 **Created:** 2025-12-16
-**Sessions Covered:** 155-159
-**Status:** Ready for execution
-**Estimated Time:** 7 hours compressed timeline
-
-**End Goal:** API 100% + CSA 100% = Both flavors perfect! 🎉
+**Timeline:** Single compressed session (2.5-3 hours)
+**End Goal:** API 215/215 + CSA 936/936 = Both perfect! 🎉
