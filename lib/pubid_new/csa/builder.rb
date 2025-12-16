@@ -13,7 +13,6 @@ module PubidNew
           # TODO: Implement combined identifier support
           return build_single(parsed_hash[:first])
         end
-
         build_single(parsed_hash)
       end
 
@@ -32,6 +31,15 @@ module PubidNew
           identifier.no_number = data[:no_number].to_s
         end
 
+        # Determine year format from markers
+        year_format = if data[:dash_format]
+                        "dash"
+                      elsif data[:colon_format]
+                        "colon"
+                      else
+                        "colon"  # default
+                      end
+
         # Year (2-digit needs conversion to 4-digit)
         if data[:year]
           year_str = data[:year].to_s
@@ -42,6 +50,7 @@ module PubidNew
           else
             identifier.year = year_str
           end
+          identifier.year_format = year_format
         end
 
         # French edition flag

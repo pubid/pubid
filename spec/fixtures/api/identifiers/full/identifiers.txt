@@ -1,3 +1,22 @@
+# https://www.apiwebstore.org/standards#firstResult=150&numberOfResults=50
+
+# curl 'https://platform.cloud.coveo.com/rest/search/v2?organizationId=americanpetroleuminstituteproductionafn6944o' \
+# -X 'POST' \
+# -H 'Content-Type: application/json' \
+# -H 'Accept: */*' \
+# -H 'Authorization: Bearer xx4ad653a7-23e9-4d24-9a39-b6a0742d799d' \
+# -H 'Sec-Fetch-Site: cross-site' \
+# -H 'Accept-Language: en-US,en;q=0.9' \
+# -H 'Accept-Encoding: gzip, deflate, br' \
+# -H 'Sec-Fetch-Mode: cors' \
+# -H 'Origin: https://www.apiwebstore.org' \
+# -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+# -H 'Content-Length: 3222' \
+# -H 'Referer: https://www.apiwebstore.org/' \
+# -H 'Sec-Fetch-Dest: empty' \
+# -H 'Priority: u=3, i' \
+# --data-raw '{"locale":"en-US","debug":false,"tab":"default","referrer":"default","timezone":"Asia/Hong_Kong","visitorId":"b57e6e22-6932-41b7-9d86-da26ee047118","actionsHistory":[{"name":"Query","time":"\"2025-12-16T08:28:55.903Z\""},{"name":"Query","time":"\"2025-12-16T04:09:32.952Z\""},{"name":"Query","time":"\"2025-12-16T04:08:32.560Z\""},{"name":"Query","time":"\"2025-12-16T03:58:19.124Z\""}],"fieldsToInclude":["author","language","urihash","objecttype","collection","source","permanentid","description","mostrecenttext","price","edition","productcode","category","filesize","publisheddate","type","isaddendaerrataavailable","otherlanguagesavailable","status","ismostrecent","addendaerratatext","historicaleditionstext","otherlanguagestext","ispreviousedition","segment","committee","subcommittee","industrysegment","industrysubjectmatter","isdatasheet","historicaltext","producttype","programs","term","reporttype","reportyear"],"pipeline":"API Webstore","q":"","enableQuerySyntax":false,"searchHub":"Webstore","sortCriteria":"relevancy","analytics":{"clientId":"b57e6e22-6932-41b7-9d86-da26ee047118","clientTimestamp":"2025-12-16T08:28:55.915Z","documentReferrer":"default","originContext":"Search","actionCause":"interfaceLoad","customData":{"coveoHeadlessVersion":"2.27.0"}},"enableDidYouMean":true,"facets":[{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":"automatic","type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"producttype","facetId":"producttype"},{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":"automatic","type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"segment","facetId":"segment"},{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":{"type":"alphanumeric","order":"descending"},"type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"year","facetId":"year"},{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":"automatic","type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"industrysegment","facetId":"industrysegment"},{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":"automatic","type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"industrysubjectmatter","facetId":"industrysubjectmatter"},{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":"automatic","type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"programs","facetId":"programs"},{"filterFacetCount":true,"injectionDepth":1000,"numberOfValues":5,"sortCriteria":"automatic","type":"specific","currentValues":[],"freezeCurrentValues":false,"isFieldExpanded":false,"preventAutoSelect":false,"field":"supportedlanguages","facetId":"supportedlanguages"}],"numberOfResults":50,"firstResult":150,"facetOptions":{"freezeFacetOrder":false}}'
+
 API BULL 11L2
 API BULL 5100
 API MPMP CH 10.10

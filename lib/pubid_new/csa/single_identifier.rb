@@ -8,6 +8,7 @@ module PubidNew
       attribute :code, Components::Code
       attribute :no_number, :string
       attribute :year, :string
+      attribute :year_format, :string  # "colon" or "dash"
       attribute :french, :boolean
       attribute :reaffirmation, :string
     end

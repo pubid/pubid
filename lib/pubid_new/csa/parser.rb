@@ -35,19 +35,19 @@ module PubidNew
       # Number after NO. keyword
       rule(:no_number) { match("[0-9]").repeat(1).as(:no_number) }
 
-      # Year format with optional F prefix
-      rule(:year_prefix) { str("F").as(:french).maybe }
-      rule(:year_2digit) { digit.repeat(2, 2).as(:year) }
-      rule(:year_4digit) { digit.repeat(4, 4).as(:year) }
+      # Year format with optional F or M prefix
+      rule(:year_prefix) { (str("F") | str("M")).as(:year_prefix).maybe }
+      rule(:year_2digit) { digit.repeat(2, 2) }
+      rule(:year_4digit) { digit.repeat(4, 4) }
 
-      # Year with colon (modern format)
+      # Year with colon (modern format) - mark as colon_year
       rule(:colon_year) do
-        colon >> year_prefix >> year_2digit
+        colon >> year_prefix >> year_2digit.as(:year) >> str("").as(:colon_format)
       end
 
-      # Year with dash (older format)
+      # Year with dash (older format) - mark as dash_year
       rule(:dash_year) do
-        dash >> year_2digit
+        dash >> year_prefix >> year_2digit.as(:year) >> str("").as(:dash_format)
       end
 
       # Reaffirmation notation
@@ -72,9 +72,9 @@ module PubidNew
         ).repeat
       end
 
-      # SERIES keyword
+      # SERIES keyword - can have space before colon
       rule(:series_keyword) do
-        space >> str("SERIES")
+        (space >> str("SERIES") >> (space.maybe >> colon | colon)).as(:series)
       end
 
       # Basic CSA identifier

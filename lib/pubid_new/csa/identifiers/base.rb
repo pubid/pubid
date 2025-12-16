@@ -10,7 +10,7 @@ module PubidNew
           parts = []
           parts << "CSA"
 
-          # Code and year together (no space before colon)
+          # Code and year together
           code_part = code.to_s if code
 
           # NO. keyword
@@ -20,10 +20,12 @@ module PubidNew
 
           parts << code_part if code_part
 
-          # Year with colon (attached to code, no space)
+          # Year with proper format (colon or dash)
           if year
-            year_part = ":"
-            year_part += "F" if french
+            # Use dash if year_format is dash, otherwise colon
+            separator = (year_format == "dash") ? "-" : ":"
+            year_part = separator
+            year_part += "F" if french && year_format != "dash"
             # Convert 4-digit year back to 2-digit
             year_str = year.to_s
             if year_str.length == 4 && year_str.start_with?("20")
