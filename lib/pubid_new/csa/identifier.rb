@@ -21,6 +21,8 @@ module PubidNew
 
         # Normalize CAN/CSA- to CSA (global replacement for combined identifiers)
         normalized = input.gsub(/CAN\/CSA-/, "CSA ")
+        # Normalize CAN3- to CSA (historical prefix)
+        normalized = normalized.gsub(/CAN3-/, "CSA ")
 
         tree = Parser.new.parse(normalized)
         result = Builder.new.build(tree)

@@ -23,11 +23,13 @@ module PubidNew
 
       # Code pattern: letter + dotted numbers (e.g., B149.1, C22.2, A123.17)
       # Can also have dash-number-letter suffix (e.g., for NO. numbers like 60950-1A)
+      # Can have letter suffixes like HB, CIICHB, SP at the end
       rule(:code_pattern) do
         (
           letter >> match("[0-9]").repeat(1) >>
           (dot >> match("[0-9]").repeat(1)).repeat >>
-          (dash >> match("[0-9]").repeat(1) >> letter).maybe
+          (dash >> match("[0-9]").repeat(1) >> letter).maybe >>
+          letter.repeat(2, 6).maybe  # Allow HB, CIICHB, SP, etc.
         ).as(:code)
       end
 
@@ -35,10 +37,11 @@ module PubidNew
       rule(:no_keyword) { space >> str("NO") >> dot >> space }
 
       # Number after NO. keyword - can have letter suffix like "60950-1A"
-      # and optional year after
+      # can have SP suffix, and optional year after
       rule(:no_number) do
         match("[0-9]").repeat(1) >>
         (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
+        letter.repeat(2, 6).maybe >>  # Allow SP suffix
         (dash >> year_2digit.as(:no_year)).maybe
       end
 
@@ -83,9 +86,14 @@ module PubidNew
         ).repeat
       end
 
-      # SERIES keyword - can have space before colon
+      # Series prefix: 2-3 letters before SERIES keyword (e.g., MH, RV)
+      rule(:series_prefix) do
+        letter.repeat(2, 3).as(:series_prefix)
+      end
+
+      # SERIES keyword - just the word, don't consume the delimiter
       rule(:series_keyword) do
-        (space >> str("SERIES") >> (space.maybe >> colon | colon)).as(:series)
+        str("SERIES")
       end
 
       # ISO/IEC adopted standards pattern: CSA ISO/IEC TR 19758:04 (R2024)
@@ -104,8 +112,14 @@ module PubidNew
         publisher >>
         code_pattern >>
         no_portion.maybe >>
-        (colon_year | dash_year).maybe >>
-        series_keyword.maybe
+        (
+          # Option 1: series with prefix (space + prefix + space + keyword + year)
+          (space >> series_prefix >> space >> series_keyword >> (colon_year | dash_year)) |
+          # Option 2: series without prefix (space + keyword + year)
+          (space >> series_keyword >> (colon_year | dash_year)) |
+          # Option 3: just year (no series)
+          (colon_year | dash_year)
+        ).maybe
       end
 
       # Combined CSA standards with slash
