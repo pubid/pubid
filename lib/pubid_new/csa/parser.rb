@@ -69,6 +69,15 @@ module PubidNew
         space >> str("(R") >> year_4digit.as(:reaffirmation) >> str(")")
       end
 
+      # Amendment notation (e.g., /A1:15, /A2:22, /Amd 1)
+      rule(:amendment_slash) do
+        slash >>
+        (str("Amd") >> space).maybe >>
+        str("A").maybe >>
+        digits.as(:amendment_number) >>
+        (colon >> year_2digit.as(:amendment_year)).maybe
+      end
+
       # Package keywords
       rule(:package_keyword) do
         (
@@ -119,7 +128,8 @@ module PubidNew
           (space >> series_keyword >> (colon_year | dash_year)) |
           # Option 3: just year (no series)
           (colon_year | dash_year)
-        ).maybe
+        ).maybe >>
+        amendment_slash.maybe  # Add amendment support here
       end
 
       # Combined CSA standards with slash
@@ -154,6 +164,15 @@ module PubidNew
       end
 
       root(:identifier)
+
+      # Preprocessing to normalize input
+      def parse(input)
+        # Remove CONSOLIDATED notation
+        normalized = input.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")
+        # Clean up extra spaces
+        normalized = normalized.gsub(/\s+/, " ").strip
+        super(normalized)
+      end
     end
   end
 end

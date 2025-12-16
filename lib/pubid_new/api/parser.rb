@@ -45,6 +45,11 @@ module PubidNew
         (dash >> match("[0-9A-Z]").repeat(1).as(:part)).maybe
       end
 
+      # Digits with optional letter suffix (for MPMS sections: 6.4A, 3.1A)
+      rule(:digits_with_letter) do
+        digits >> letter.maybe
+      end
+
       # Year (4-digit)
       rule(:year) { digit.repeat(4, 4).as(:year) }
 
@@ -59,13 +64,18 @@ module PubidNew
         space >> str("(R") >> year >> str(")")
       end
 
+      # Part notation (e.g., ", Part 2")
+      rule(:part_notation) do
+        str(", Part ") >> digits.as(:part_number)
+      end
+
       # MPMS identifier (special format with CH)
       rule(:mpms_identifier) do
         publisher >>
         str("MPMS").as(:type) >>
         chapter_notation >>
-        (dot >> digits.as(:section)).maybe >>
-        (dot >> digits.as(:subsection)).maybe >>
+        (dot >> digits_with_letter.as(:section)).maybe >>
+        (dot >> digits_with_letter.as(:subsection)).maybe >>
         (date_dash | date_colon).maybe
       end
 
@@ -74,6 +84,7 @@ module PubidNew
         publisher >>
         doc_type >> space >>
         number_with_part >>
+        part_notation.maybe >>
         (date_dash | date_colon).maybe >>
         reaffirmation.maybe
       end
@@ -82,6 +93,7 @@ module PubidNew
       rule(:typeless_identifier) do
         publisher >>
         number_with_part >>
+        part_notation.maybe >>
         (date_dash | date_colon).maybe >>
         reaffirmation.maybe
       end
@@ -92,6 +104,13 @@ module PubidNew
       end
 
       root(:identifier)
+
+      # Preprocessing to normalize common typos
+      def parse(input)
+        # Normalize MPMP typo to MPMS
+        normalized = input.gsub("API MPMP", "API MPMS")
+        super(normalized)
+      end
     end
   end
 end
