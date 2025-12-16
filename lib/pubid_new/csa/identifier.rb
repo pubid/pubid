@@ -14,11 +14,23 @@ module PubidNew
         # Filter out non-standards
         return nil if input.match?(/^CSA (Communities|Group|Learning|OnDemand|Update)/)
 
-        # Normalize CAN/CSA- to CSA
-        normalized = input.gsub(/^CAN\/CSA-/, "CSA ")
+        # Detect year format before normalization
+        # CAN/CSA- standards use dash format: CAN/CSA-C22.2-05
+        # Modern CSA standards use colon format: CSA B149:20
+        has_dash_year = input.match?(/-\d{2}\b/)
+
+        # Normalize CAN/CSA- to CSA (global replacement for combined identifiers)
+        normalized = input.gsub(/CAN\/CSA-/, "CSA ")
 
         tree = Parser.new.parse(normalized)
-        Builder.new.build(tree)
+        result = Builder.new.build(tree)
+
+        # Set year format if detected as dash and not already set
+        if result && has_dash_year && result.year_format.nil?
+          result.year_format = "dash"
+        end
+
+        result
       rescue Parslet::ParseFailed => e
         raise e
       end

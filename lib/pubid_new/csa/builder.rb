@@ -40,7 +40,7 @@ module PubidNew
                         "colon"  # default
                       end
 
-        # Year (2-digit needs conversion to 4-digit)
+        # Year (2-digit needs conversion to 4-digit, 4-digit stays as-is)
         if data[:year]
           year_str = data[:year].to_s
           if year_str.length == 2
@@ -48,6 +48,7 @@ module PubidNew
             year_int = year_str.to_i
             identifier.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
           else
+            # Keep 4-digit years as-is
             identifier.year = year_str
           end
           identifier.year_format = year_format

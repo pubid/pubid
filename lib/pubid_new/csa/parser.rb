@@ -22,18 +22,29 @@ module PubidNew
       rule(:publisher) { str("CSA") >> space }
 
       # Code pattern: letter + dotted numbers (e.g., B149.1, C22.2, A123.17)
+      # Can also have dash-number-letter suffix (e.g., for NO. numbers like 60950-1A)
       rule(:code_pattern) do
         (
           letter >> match("[0-9]").repeat(1) >>
-          (dot >> match("[0-9]").repeat(1)).repeat
+          (dot >> match("[0-9]").repeat(1)).repeat >>
+          (dash >> match("[0-9]").repeat(1) >> letter).maybe
         ).as(:code)
       end
 
       # NO. keyword (for C22.2 NO. 286 pattern)
       rule(:no_keyword) { space >> str("NO") >> dot >> space }
 
-      # Number after NO. keyword
-      rule(:no_number) { match("[0-9]").repeat(1).as(:no_number) }
+      # Number after NO. keyword - can have letter suffix like "60950-1A"
+      # and optional year after
+      rule(:no_number) do
+        match("[0-9]").repeat(1) >>
+        (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
+        (dash >> year_2digit.as(:no_year)).maybe
+      end
+
+      rule(:no_portion) do
+        no_keyword >> no_number.as(:no_number)
+      end
 
       # Year format with optional F or M prefix
       rule(:year_prefix) { (str("F") | str("M")).as(:year_prefix).maybe }
@@ -42,12 +53,12 @@ module PubidNew
 
       # Year with colon (modern format) - mark as colon_year
       rule(:colon_year) do
-        colon >> year_prefix >> year_2digit.as(:year) >> str("").as(:colon_format)
+        colon >> year_prefix >> (year_4digit | year_2digit).as(:year) >> str("").as(:colon_format)
       end
 
       # Year with dash (older format) - mark as dash_year
       rule(:dash_year) do
-        dash >> year_prefix >> year_2digit.as(:year) >> str("").as(:dash_format)
+        dash >> year_prefix >> (year_4digit | year_2digit).as(:year) >> str("").as(:dash_format)
       end
 
       # Reaffirmation notation
@@ -77,11 +88,22 @@ module PubidNew
         (space >> str("SERIES") >> (space.maybe >> colon | colon)).as(:series)
       end
 
+      # ISO/IEC adopted standards pattern: CSA ISO/IEC TR 19758:04 (R2024)
+      rule(:iso_iec_adoption) do
+        publisher >>
+        str("ISO/IEC") >> space >>
+        (str("TR") | str("TS")).as(:iso_type) >> space >>
+        match("[0-9-]").repeat(1).as(:iso_number) >>
+        colon >> year_2digit.as(:year) >>
+        (slash >> str("A") >> digit.as(:iso_amendment)).maybe >>
+        reaffirmation.maybe
+      end
+
       # Basic CSA identifier
       rule(:csa_code) do
         publisher >>
         code_pattern >>
-        (no_keyword >> no_number).maybe >>
+        no_portion.maybe >>
         (colon_year | dash_year).maybe >>
         series_keyword.maybe
       end
@@ -91,6 +113,7 @@ module PubidNew
         csa_code.as(:first) >>
         slash >>
         csa_code.as(:second) >>
+        (slash >> csa_code.as(:third)).maybe >>  # Allow triple combined
         reaffirmation.maybe >>
         package_portion.maybe
       end
@@ -100,6 +123,7 @@ module PubidNew
         csa_code.as(:first) >>
         comma >> space >>
         csa_code.as(:second) >>
+        reaffirmation.maybe >>
         (space >> ampersand >> package_portion).maybe
       end
 
@@ -112,7 +136,7 @@ module PubidNew
 
       # Main identifier
       rule(:identifier) do
-        combined_slash | combined_comma | single_identifier
+        iso_iec_adoption | combined_slash | combined_comma | single_identifier
       end
 
       root(:identifier)
