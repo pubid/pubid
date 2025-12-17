@@ -69,9 +69,9 @@ EN 61375-2-3:2016/AC2:2017
 EN 61375-2-3:2015/AC:2016-11
 
 # Adopted with Corrigenda (`EN {adopted identifier}/AC:{year}` notation)
-EN ISO 13485:2016/AC:2016 (first corrigendum)
-EN ISO 13485:2016/AC:2017 (second corrigendum)
-EN ISO 13485:2016/AC:2018 (third corrigendum)
+EN ISO 13485:2016/AC:2016# (first corrigendum)
+EN ISO 13485:2016/AC:2017# (second corrigendum)
+EN ISO 13485:2016/AC:2018# (third corrigendum)
 
 # ENs with bundled amendments (+A notation)
 EN 196-3:2005+A1:2008

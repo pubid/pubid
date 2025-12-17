@@ -13,8 +13,8 @@ module PubidNew
     # are objects that contain other identifier objects, not string prefixes.
     class WrapperIdentifier < Lutaml::Model::Serializable
       # The wrapped identifier (recursively parsed)
-      # Don't specify type - can be any CSA identifier object
-      attribute :wrapped_identifier, :string  # Actually holds object, but no type constraint
+      # Use attr_accessor since it can be any identifier object (CSA, ISO, IEC, etc.)
+      attr_accessor :wrapped_identifier
 
       # Reaffirmation year (common across wrappers)
       attribute :reaffirmation, :string

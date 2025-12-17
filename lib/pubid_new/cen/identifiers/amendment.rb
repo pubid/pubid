@@ -11,13 +11,16 @@ module PubidNew
         attribute :base_identifier, Base, polymorphic: true
         attribute :amendment_number, :string
         attribute :amendment_year, :integer
-        attribute :separator, :string, default: -> { "+" }  # "/" or "+"
 
         def to_s
           if base_identifier
-            "#{base_identifier.to_s}#{separator}A#{amendment_number}:#{amendment_year}"
+            result = "#{base_identifier.to_s}/A#{amendment_number}"
+            result += ":#{amendment_year}" if amendment_year
+            result
           else
-            "#{separator}A#{amendment_number}:#{amendment_year}"
+            result = "/A#{amendment_number}"
+            result += ":#{amendment_year}" if amendment_year
+            result
           end
         end
 

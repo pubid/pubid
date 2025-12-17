@@ -9,6 +9,7 @@ module PubidNew
         attribute :base, Standard
         attribute :bundled_with, Standard, collection: true
         attribute :reaffirmation, :string
+        attribute :year_format, :string  # Add for compatibility with identifier.rb
 
         def to_s
           parts = [base.to_s]

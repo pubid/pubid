@@ -1,6 +1,45 @@
 # frozen_string_literal: true
 
 require_relative "pubid_new/version"
+require_relative "pubid_new/scheme"
+
+module PubidNew
+  # Registry for tracking all loaded flavors
+  class Registry
+    @flavors = {}
+
+    class << self
+      attr_reader :flavors
+
+      # Register a flavor with the registry
+      # @param name [String, Symbol] Flavor name (e.g., :iso, :iec)
+      # @param flavor_module [Module] The flavor module (e.g., PubidNew::Iso)
+      def register(name, flavor_module)
+        @flavors[name.to_s.downcase] = flavor_module
+      end
+
+      # Get all registered flavor names
+      # @return [Array<String>] Array of flavor names
+      def flavor_names
+        @flavors.keys.sort
+      end
+
+      # Get flavor module by name
+      # @param name [String, Symbol] Flavor name
+      # @return [Module, nil] The flavor module or nil if not found
+      def get(name)
+        @flavors[name.to_s.downcase]
+      end
+
+      # Check if a flavor is registered
+      # @param name [String, Symbol] Flavor name
+      # @return [Boolean]
+      def registered?(name)
+        @flavors.key?(name.to_s.downcase)
+      end
+    end
+  end
+end
 
 # Require all flavor modules
 require_relative "pubid_new/iso"

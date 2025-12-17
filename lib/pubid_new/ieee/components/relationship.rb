@@ -33,6 +33,8 @@ module PubidNew
         DRAFT_REVISION_OF = "draft_revision_of"
         REAFFIRMATION_OF = "reaffirmation_of"
         REDESIGNATION_OF = "redesignation_of"
+        SUPERSEDES = "supersedes"
+        PREVIOUSLY_DESIGNATED_AS = "previously_designated_as"
 
         # All valid relationship types
         VALID_TYPES = [
@@ -46,7 +48,9 @@ module PubidNew
           DRAFT_AMENDMENT_TO,
           DRAFT_REVISION_OF,
           REAFFIRMATION_OF,
-          REDESIGNATION_OF
+          REDESIGNATION_OF,
+          SUPERSEDES,
+          PREVIOUSLY_DESIGNATED_AS
         ].freeze
 
         # Attributes
@@ -55,13 +59,14 @@ module PubidNew
         # Use regular Ruby attributes to avoid circular dependency
         # related_identifiers: Array of Base identifiers
         # intermediate_amendments: Array of Base identifiers (for "as amended by" clause)
-        attr_accessor :related_identifiers, :intermediate_amendments
+        attr_accessor :related_identifiers, :intermediate_amendments, :approved_amendments_flag
 
         # Validation
         def initialize(**args)
           # Extract our non-Lutaml attributes before calling super
           @related_identifiers = args.delete(:related_identifiers)
           @intermediate_amendments = args.delete(:intermediate_amendments)
+          @approved_amendments_flag = args.delete(:approved_amendments_flag)
 
           # Let Lutaml handle relationship_type
           super
@@ -94,6 +99,9 @@ module PubidNew
           if intermediate_amendments && !intermediate_amendments.empty?
             amendments = format_identifier_list(intermediate_amendments)
             "#{prefix} #{ids} as amended by #{amendments}"
+          elsif approved_amendments_flag
+            # "and its approved amendments" clause (no specific list)
+            "#{prefix} #{ids} and its approved amendments"
           else
             "#{prefix} #{ids}"
           end
@@ -114,6 +122,8 @@ module PubidNew
           when DRAFT_REVISION_OF then "Draft Revision of"
           when REAFFIRMATION_OF then "Reaffirmation of"
           when REDESIGNATION_OF then "Redesignation of"
+          when SUPERSEDES then "Supersedes"
+          when PREVIOUSLY_DESIGNATED_AS then "Previously designated as"
           else relationship_type
           end
         end

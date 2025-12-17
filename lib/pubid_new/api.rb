@@ -8,4 +8,7 @@ module PubidNew
       Identifier.parse(input)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:api, Api)
 end

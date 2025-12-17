@@ -15,4 +15,7 @@ module PubidNew
       Builder.build(data)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:bsi, Bsi)
 end

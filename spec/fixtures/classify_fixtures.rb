@@ -9,16 +9,6 @@ require_relative "../../lib/pubid_new"
 # Reads from identifiers/full/ and classifies into identifiers/pass/ and identifiers/fail/
 # Handles three formats: plain, !normalized!, and #errored#
 class FixturesClassifier
-  FLAVORS = %w[
-    iso
-    iec
-    jcgm
-    nist
-    ieee
-    asme
-    csa
-  ].freeze
-
   attr_reader :flavor, :verbose, :fixtures_dir
 
   def initialize(flavor, verbose: false)
@@ -70,8 +60,8 @@ class FixturesClassifier
   private
 
   def validate_flavor!
-    unless FLAVORS.include?(flavor)
-      raise ArgumentError, "Unknown flavor: #{flavor}. Valid: #{FLAVORS.join(', ')}"
+    unless PubidNew::Registry.registered?(flavor)
+      raise ArgumentError, "Unknown flavor: #{flavor}. Valid: #{PubidNew::Registry.flavor_names.join(', ')}"
     end
   end
 
@@ -195,25 +185,11 @@ class FixturesClassifier
   end
 
   def parse_identifier(id_str)
-    case flavor
-    when "iso" then PubidNew::Iso.parse(id_str)
-    when "iec" then PubidNew::Iec.parse(id_str)
-    when "ieee" then PubidNew::Ieee.parse(id_str)
-    when "nist" then PubidNew::Nist.parse(id_str)
-    when "jcgm" then PubidNew::Jcgm.parse(id_str)
-    when "jis" then PubidNew::Jis.parse(id_str)
-    when "etsi" then PubidNew::Etsi.parse(id_str)
-    when "ccsds" then PubidNew::Ccsds.parse(id_str)
-    when "itu" then PubidNew::Itu.parse(id_str)
-    when "plateau" then PubidNew::Plateau.parse(id_str)
-    when "ansi" then PubidNew::Ansi.parse(id_str)
-    when "cen" then PubidNew::Cen.parse(id_str)
-    when "bsi" then PubidNew::Bsi.parse(id_str)
-    when "idf" then PubidNew::Idf.parse(id_str)
-    when "astm" then PubidNew::Astm.parse(id_str)
-    when "asme" then PubidNew::Asme.parse(id_str)
+    flavor_module = PubidNew::Registry.get(flavor)
+    if flavor_module && flavor_module.respond_to?(:parse)
+      flavor_module.parse(id_str)
     else
-      raise "Unknown flavor: #{flavor}"
+      raise "Unknown or unsupported flavor: #{flavor}"
     end
   end
 
@@ -232,6 +208,11 @@ class FixturesClassifier
     when "nist" then detect_nist_class(id_str)
     when "jcgm" then detect_jcgm_class(id_str)
     when "astm" then detect_astm_class(id_str)
+    when "asme" then detect_asme_class(id_str)
+    when "api" then detect_api_class(id_str)
+    when "oiml" then detect_oiml_class(id_str)
+    when "idf" then detect_idf_class(id_str)
+    when "csa" then detect_csa_class(id_str)
     else "unknown"
     end
   end
@@ -289,6 +270,52 @@ class FixturesClassifier
     return "work_in_progress" if id_str =~ /\bWK/
     return "adjunct" if id_str =~ /\bADJ/
     return "technical_report" if id_str =~ /\bTR\d|ISO\/ASTMTR/
+    "standard"
+  end
+
+  def detect_asme_class(id_str)
+    return "joint_published" if id_str =~ /CSA\/ASME|API\/ASME|ISO\/ASME/
+    "standard"
+  end
+
+  def detect_api_class(id_str)
+    return "bull" if id_str =~ /\bBULL\b/
+    return "mpms" if id_str =~ /\bMPMS\b/
+    return "rp" if id_str =~ /\bRP\b/
+    return "spec" if id_str =~ /\bSPEC\b/
+    return "std" if id_str =~ /\bSTD\b/
+    return "tr" if id_str =~ /\bTR\b/
+    "publication"
+  end
+
+  def detect_oiml_class(id_str)
+    return "basic_publication" if id_str =~ /\bB \d/
+    return "document" if id_str =~ /\bD \d/
+    return "expert_report" if id_str =~ /\bE \d/
+    return "guide" if id_str =~ /\bG \d/
+    return "recommendation" if id_str =~ /\bR \d/
+    return "seminar_report" if id_str =~ /\bS \d/
+    return "vocabulary" if id_str =~ /\bV \d|VIML/
+    return "amendment" if id_str =~ /Amendment/
+    return "annex" if id_str =~ /Annex/
+    "unknown"
+  end
+
+  def detect_idf_class(id_str)
+    return "international_standard" if id_str =~ /^IDF \d/
+    return "reviewed_method" if id_str =~ /\(RM\)/
+    return "amendment" if id_str =~ /Amendment/
+    return "corrigendum" if id_str =~ /Corrigendum/
+    "unknown"
+  end
+
+  def detect_csa_class(id_str)
+    return "series" if id_str =~ /SERIES/
+    return "bundled" if id_str =~ /\+/
+    return "combined" if id_str =~ /\//
+    return "package" if id_str =~ /PACKAGE/
+    return "canadian_adopted" if id_str =~ /^CAN\//
+    return "csa_adopted" if id_str =~ /CSA ISO|CSA IEC|CSA CISPR/
     "standard"
   end
 

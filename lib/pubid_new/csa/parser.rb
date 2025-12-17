@@ -25,13 +25,20 @@ module PubidNew
       # Code pattern: letter + dotted numbers (e.g., B149.1, C22.2, A123.17)
       # Can also have dash-number-letter suffix (e.g., for NO. numbers like 60950-1A)
       # Can have letter suffixes like HB, CIICHB, SP at the end
+      # Can have multiple dash-number sequences (e.g., C13256-1-01)
+      # NEW: Also support pure dotted numbers (e.g., 12.4, 2.15)
       rule(:code_pattern) do
         (
-          letter >> match("[0-9]").repeat(1) >>
-          (dot >> match("[0-9]").repeat(1)).repeat >>
-          (dash >> match("[0-9]").repeat(1) >> letter).maybe >>
-          letter.repeat(2, 6).maybe  # Allow HB, CIICHB, SP, etc.
-        ).as(:code)
+          # Pattern 1: Pure dotted numbers (NEW) - e.g., 12.4, 2.15, 3.11
+          (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1) >>
+           (dash >> match("[0-9]").repeat(1)).repeat >>  # Allow multiple dash sequences
+           letter.repeat(2, 6).maybe).as(:code) |
+          # Pattern 2: Letter + numbers (original) - e.g., B149.1, C22.2
+          (letter >> match("[0-9]").repeat(1) >>
+           (dot >> match("[0-9]").repeat(1)).repeat >>
+           (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>  # Allow multiple dash-number sequences
+           letter.repeat(2, 6).maybe).as(:code)  # Allow HB, CIICHB, SP, etc.
+        )
       end
 
       # NO. keyword (for C22.2 NO. 286 pattern)
@@ -105,7 +112,7 @@ module PubidNew
         ).repeat
       end
 
-      # Series prefix: 2-3 letters before SERIAL keyword (e.g., MH, RV)
+      # Series prefix: 2-3 letters before SERIES keyword (e.g., MH, RV)
       rule(:series_prefix) do
         letter.repeat(2, 3).as(:series_prefix)
       end
@@ -113,6 +120,22 @@ module PubidNew
       # SERIES keyword - just the word, don't consume the delimiter
       rule(:series_keyword) do
         str("SERIES")
+      end
+
+      # Series identifier - SERIES as PRIMARY type (not modifier)
+      # Pattern: CSA [PREFIX] SERIES code:year
+      # Examples: CSA MH SERIES 3.14:20, CSA SERIES Z1000:22
+      rule(:series_identifier) do
+        publisher >>
+        (series_prefix >> space).maybe >>
+        series_keyword.as(:series_type) >> space >>
+        # Allow either standard code_pattern OR numeric-only codes (e.g., 3.14, 1)
+        (
+          code_pattern |
+          (match("[0-9]").repeat(1) >> (dot >> match("[0-9]").repeat(1)).repeat).as(:code)
+        ) >>
+        (colon_year | dash_year) >>
+        reaffirmation.maybe
       end
 
       # ISO/IEC adopted standards pattern: CSA ISO/IEC TR 19758:04 (R2024)
@@ -252,7 +275,7 @@ module PubidNew
 
       # Main identifier
       rule(:identifier) do
-        iso_iec_adoption | bundled_identifier | combined_slash | combined_comma | single_identifier | code_only_identifier
+        iso_iec_adoption | series_identifier | bundled_identifier | combined_slash | combined_comma | single_identifier | code_only_identifier
       end
 
       root(:identifier)
@@ -262,23 +285,31 @@ module PubidNew
         # Skip comment lines
         raise Parslet::ParseFailed.new("Comment line") if input.strip.start_with?("#")
 
+        # Remove CONSOLIDATED notation FIRST (before other processing)
+        normalized = input.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")
+        normalized = normalized.gsub(/\s*\bCONSOLIDATED\b\s*/, " ")
+
+        # Fix missing space before reaffirmation: 94(R04) -> 94 (R04)
+        normalized = normalized.gsub(/(\d{2})\(R(\d{2,4})\)/, '\1 (R\2)')
+
+        # Normalize CEI/IEC to IEC (CEI is French name for IEC)
+        normalized = normalized.gsub(/CEI\/IEC/, "IEC")
+        normalized = normalized.gsub(/\bCEI\b/, "IEC")
+
         # Track original publisher prefix
-        publisher_prefix = if input.start_with?("CAN/CSA-")
+        publisher_prefix = if normalized.start_with?("CAN/CSA-")
                             "CAN/CSA-"
-                          elsif input.start_with?("CAN3-")
+                          elsif normalized.start_with?("CAN3-")
                             "CAN3-"
-                          elsif input.start_with?("CSA ")
+                          elsif normalized.start_with?("CSA ")
                             "CSA"
                           else
                             nil
                           end
 
         # Normalize CAN/CSA- and CAN3- to CSA (preserving space before code)
-        normalized = input.gsub("CAN/CSA-", "CSA ")
+        normalized = normalized.gsub("CAN/CSA-", "CSA ")
         normalized = normalized.gsub("CAN3-", "CSA ")
-
-        # Remove CONSOLIDATED notation
-        normalized = normalized.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")
 
         # Clean up extra spaces
         normalized = normalized.gsub(/\s+/, " ").strip

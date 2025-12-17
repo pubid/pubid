@@ -223,13 +223,18 @@ module PubidNew
          (dash >> year_digits.as(:amd_year)).maybe).as(:amendment)
       end
 
-      # Reaffirmed - enhanced to support (R1992) format
+      # Interpretation notation (/INT)
+      rule(:interpretation) do
+        (slash >> str("INT")).as(:interpretation)
+      end
+
+      # Reaffirmed - enhanced to support (R1992) format without space
       rule(:reaffirmed) do
         (
           # Format: "Reaffirmed 1992"
           (str("Reaffirmed ") >> year_digits.as(:year)) |
-          # Format: "(R1992)" - parentheses with R prefix
-          (str("(R") >> year_digits.as(:year) >> str(")"))
+          # Format: "(R1992)" - parentheses with R prefix (with or without space before)
+          (space.maybe >> str("(R") >> year_digits.as(:year) >> str(")"))
         ).as(:reaffirmed)
       end
 
@@ -238,25 +243,34 @@ module PubidNew
         str(" - Redline").as(:redline)
       end
 
+      # Book nickname (e.g., "[The Orange Book]", "[IEEE Gold Book]")
+      rule(:book_nickname) do
+        space >> str("[") >> match("[^\\]]").repeat(1).as(:nickname) >> str("]")
+      end
+
       # Relationship type keywords for Pattern 4 identifiers
       rule(:relationship_revision_of) { str("Revision of ") | str("Revison of ") }
       rule(:relationship_amendment_to) { str("Amendment to ") }
-      rule(:relationship_corrigendum_to) { str("Corrigendum to ") }
-      rule(:relationship_incorporates) { str("incorporates ") | str("Incorporating ") }
+      rule(:relationship_corrigendum_to) { str("Corrigendum to ") | str("Corrigenda to ") }
+      rule(:relationship_incorporates) { str("incorporates ") | str("Incorporating ") | str("Incorporates ") }
       rule(:relationship_adoption_of) { str("Adoption of ") }
       rule(:relationship_supplement_to) { str("Supplement to ") }
       rule(:relationship_draft_amendment) { str("Draft Amendment to ") | str("DRAFT Amendment to ") }
       rule(:relationship_draft_revision) { str("Draft Revision of ") }
       rule(:relationship_reaffirmation) { str("Reaffirmation of ") }
-      rule(:relationship_redesignation) { str("Redesignation of ") }
+      rule(:relationship_redesignation) { str("Redesignation of ") | str("redesignated as ") }
+      rule(:relationship_supersedes) { str("Supersedes ") | str("Supercedes ") }
+      rule(:relationship_previously_designated) { str("Previously designated as ") }
 
       # Combined relationship type (longest match first)
       rule(:relationship_type) do
         (
           relationship_draft_amendment.as(:draft_amendment_to) |
           relationship_draft_revision.as(:draft_revision_of) |
+          relationship_previously_designated.as(:previously_designated_as) |
           relationship_reaffirmation.as(:reaffirmation_of) |
           relationship_redesignation.as(:redesignation_of) |
+          relationship_supersedes.as(:supersedes) |
           relationship_revision_of.as(:revision_of) |
           relationship_amendment_to.as(:amendment_to) |
           relationship_corrigendum_to.as(:corrigendum_to) |
@@ -292,7 +306,14 @@ module PubidNew
 
       # "as amended by" clause with identifier list
       rule(:as_amended_by_clause) do
-        str(" as amended by ") >> identifier_list.as(:amendments)
+        (
+          # Variant 1: "as amended by IEEE's X, Y, Z"
+          str(" as amended by IEEE's ") >> identifier_list.as(:amendments) |
+          # Variant 2: "as amended by X, Y, Z" (standard)
+          str(" as amended by ") >> identifier_list.as(:amendments) |
+          # Variant 3: "and its approved amendments" (no specific list)
+          str(" and its approved amendments").as(:approved_amendments)
+        )
       end
 
       # Relationship clause (handles all relationship types)
@@ -364,14 +385,20 @@ module PubidNew
       # Joint development patterns (ISO/IEC/IEEE in either IEEE or ISO format)
       rule(:joint_development_ieee_format) do
         # ISO/IEC/IEEE P26511/D8-2018 or ISO/IEEE P1003.1-2008 or IEC/IEEE P62582-1-2011
+        # ALSO handle: IEC/IEEE P60780-323, CDV1 2014 (comma before stage code)
         (str("ISO/IEC/IEEE") | str("ISO/IEEE") | str("IEC/IEEE")).as(:joint_publishers) >>
         space >>
         str("P") >> # P indicates IEEE-led
         digits.as(:number) >>
         ((dot | dash) >> digits.as(:part)).maybe >> # Optional part like .1 or -1
-        (slash >> str("D") >> digits.as(:draft_version)).maybe >> # Optional /D8
+        (
+          # Variant 1: /D8 notation (original)
+          (slash >> str("D") >> digits.as(:draft_version)) |
+          # Variant 2: , CDV1 notation (comma before stage code)
+          (comma >> (str("CDV") | str("FDIS") | str("CD") | str("DIS")).as(:iec_stage) >> digits.maybe.as(:stage_iteration))
+        ).maybe >>
         ((dash >> year_digits.as(:year)) | # Either -YEAR
-         (space >> month_name.as(:month) >> space >> year_digits.as(:year))).maybe # Or Month YEAR
+         (comma.maybe >> space >> month_name.as(:month) >> space.maybe >> year_digits.as(:year))).maybe # Or Month YEAR (with optional comma)
       end
 
       rule(:joint_development_iso_format) do
@@ -558,11 +585,39 @@ module PubidNew
         parenthetical.maybe
       end
 
+      # CSA dual published pattern: IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17
+      rule(:csa_dual_published) do
+        # IEEE portion (full identifier)
+        (
+          publisher >> space >>
+          (type_word.as(:type) >> space?).maybe >>
+          number >>
+          (part_subpart_year | edition).maybe
+        ).as(:ieee_portion) >>
+        # CSA portion with slash separator
+        slash >>
+        str("CSA") >> space >>
+        # CSA number formats (various patterns observed)
+        (
+          # Format 1: C22.2 No. 293.1-17 (with NO.)
+          (str("C") >> digit.repeat(2) >> dot >> digit >> space >> str("No") >> dot >> space >>
+           match("[0-9.]").repeat(1) >> (dash | str(":")) >> digit.repeat(2)) |
+          # Format 2: C293.2-17 (without NO., dash year)
+          (str("C") >> match("[0-9.]").repeat(1) >> dash >> digit.repeat(2)) |
+          # Format 3: C22.2 No. 293.3:19 (with NO., colon year)
+          (str("C") >> digit.repeat(2) >> dot >> digit >> space >> str("No") >> dot >> space >>
+           match("[0-9.]").repeat(1) >> str(":") >> digit.repeat(2)) |
+          # Format 4: C293.4:19 (without NO., colon year)
+          (str("C") >> match("[0-9.]").repeat(1) >> str(":") >> digit.repeat(2))
+        ).as(:csa_portion)
+      end
+
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
         aiee_identifier |
         ire_identifier |
         nesc_identifier |
+        csa_dual_published |  # NEW: Try CSA dual published before generic patterns
         corrigendum_identifier |  # NEW: Try corrigendum before generic patterns
         joint_development_ieee_format |
         joint_development_iso_format |
@@ -580,11 +635,13 @@ module PubidNew
         (part_subpart_year | edition).maybe >>
         corrigendum.maybe >>
         amendment.maybe >>
+        interpretation.maybe >>  # NEW: Add /INT support
         draft.maybe >>
         # Enhanced: Accept both comma and space before month/year
         ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
         edition.maybe >>
-        parenthetical.maybe >>
+        parenthetical.maybe >>  # REVERT: Back to single parenthetical
+        book_nickname.maybe >>  # NEW: Add book nickname support
         redline.maybe >>
         title_portion.maybe >>
         approved_draft_suffix.maybe) |
@@ -627,10 +684,19 @@ module PubidNew
         # "19969" → "1969" (very specific pattern, won't affect other text)
         cleaned = cleaned.gsub(/\b19969\b/, '1969')
 
-        # NEW Phase 1 (Session 141): Fix comma typo in 802.3 series numbers
+        # NEW Session 169: Fix comma typo in 802.3 series numbers
         # "802.3ch-2020,802.3ca-2020" → "802.3ch-2020, 802.3ca-2020"
         # Very specific: 4 digits, comma, 3 digits (likely 802.3xx typo)
         cleaned = cleaned.gsub(/(\d{4}),(\d{3})/, '\1, \2')
+
+        # NEW Session 169: Fix /lNT typo (lowercase L as 1)
+        # "1003.1/2003.l/lNT" → "1003.1/2003.1/INT"
+        cleaned = cleaned.gsub(/\/lNT\b/, '/INT')
+        cleaned = cleaned.gsub(/\.l\//, '.1/')  # Also fix .l/ -> .1/
+
+        # NEW Session 169: Fix I99O typo (letter I and O instead of digits)
+        # "IEEE 1076-CONC-I99O" → "IEEE 1076-CONC-1990"
+        cleaned = cleaned.gsub(/\bI99O\b/, '1990')
 
         # NEW: Fix common typos (Category 9)
         cleaned = cleaned.gsub(/^EEE /, 'IEEE ')

@@ -1,0 +1,21 @@
+Flavor: API
+Classified: 2025-12-17 17:36:55
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 193
+Pass: 193 (100.0%)
+Fail: 0 (0.0%)
+
+BY CLASS
+----------------------------------------------------------------------
+bulletin                                 Pass: 5/5 (100.0%)
+continuous_operations_standard           Pass: 3/3 (100.0%)
+mpms                                     Pass: 30/30 (100.0%)
+publication                              Pass: 10/10 (100.0%)
+recommended_practice                     Pass: 56/56 (100.0%)
+specification                            Pass: 22/22 (100.0%)
+standard                                 Pass: 40/40 (100.0%)
+technical_report                         Pass: 19/19 (100.0%)
+typeless_standard                        Pass: 8/8 (100.0%)

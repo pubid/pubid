@@ -42,6 +42,8 @@ module PubidNew
       builder.build(parsed)
     end
   end
+
+  Registry.register(:iso, Iso)
 end
 
 require_relative "iso/combined_identifier"

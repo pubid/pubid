@@ -39,6 +39,8 @@ module PubidNew
         attribute :space_before_draft, :boolean, default: -> { false }  # Track space before /D
         attribute :typed_stage, Components::TypedStage      # TYPED_STAGE integration
         attribute :relationships, Components::Relationship, collection: true  # Relationship metadata
+        attribute :nickname, :string                        # Book nickname (e.g., "[The Orange Book]")
+        attribute :interpretation, :boolean, default: -> { false }  # /INT notation
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -120,6 +122,44 @@ module PubidNew
             return parse_single(input)
           end
 
+          # Check for semicolon-separated dual identifiers (IEC-first patterns)
+          # Pattern: "IEC 61523-3 First edition 2004-09; IEEE 1497"
+          if input.include?("; ")
+            parts = input.split("; ")
+            if parts.length == 2
+              # Try to parse both parts
+              begin
+                first = parse_single(parts[0].strip)
+                second = parse_single(parts[1].strip)
+
+                return Identifiers::DualPublished.new(
+                  first_identifier: first,
+                  second_identifier: second
+                )
+              rescue Parslet::ParseFailed
+                # If parsing fails, continue with normal flow
+              end
+            end
+          end
+
+          # PREPROCESS: Handle (R####) (Revision of...) pattern
+          # Convert to single parenthetical: (Reaffirmed ####, Revision of...)
+          # This allows parser to capture both in one parenthetical
+          if input.match(/\(R(\d{4})\)\s*\(Revision of ([^)]+)\)/)
+            year = $1
+            revision_of = $2
+            # Replace the two parentheticals with reaffirmed info extracted
+            # Parse normally but capture year first
+            input_modified = input.sub(/\(R(\d{4})\)\s*\(Revision of ([^)]+)\)/, "(Revision of \\2)")
+
+            # Parse the modified input
+            result = parse_single(input_modified)
+            # Add reaffirmed attribute
+            result.instance_variable_set(:@reaffirmed, year) if result.respond_to?(:reaffirmed=)
+            result.reaffirmed = year if result.respond_to?(:reaffirmed=)
+            return result
+          end
+
           # Check for space-separated dual identifiers (e.g., "IEC 62014-5 IEEE Std 1734-2011")
           # This must be checked before " and " pattern
           # Look for pattern where a second publisher appears after the first complete identifier
@@ -179,16 +219,35 @@ module PubidNew
 
           # Check for dual published patterns with " and "
           if input.include?(" and ")
-            parts = input.split(" and ")
-            if parts.length == 2
-              # Parse each part separately
-              first = parse_single(parts[0].strip)
-              second = parse_single(parts[1].strip)
+            # DON'T split if " and " is inside parentheses (likely a relationship clause)
+            # Check if parentheses are balanced and " and " is inside them
+            paren_count = 0
+            and_outside_parens = false
 
-              return Identifiers::DualPublished.new(
-                first_identifier: first,
-                second_identifier: second
-              )
+            input.each_char.with_index do |char, i|
+              paren_count += 1 if char == '('
+              paren_count -= 1 if char == ')'
+
+              # Check if " and " starts at this position and we're outside parens
+              if paren_count == 0 && input[i..i+4] == " and "
+                and_outside_parens = true
+                break
+              end
+            end
+
+            # Only split if " and " is outside parentheses
+            if and_outside_parens
+              parts = input.split(" and ")
+              if parts.length == 2
+                # Parse each part separately
+                first = parse_single(parts[0].strip)
+                second = parse_single(parts[1].strip)
+
+                return Identifiers::DualPublished.new(
+                  first_identifier: first,
+                  second_identifier: second
+                )
+              end
             end
           end
 
@@ -206,7 +265,7 @@ module PubidNew
             # AND exclude Pattern 4 relationship types
             if main_part && adoption_part &&
                !adoption_part.include?(",") &&  # Skip multi-part adoptions
-               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|Supersedes|Supercedes|Notebooks|Standard Newspaper)/i) &&
+               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Incorporates|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|redesignated as|Supersedes|Supercedes|Previously designated as|Notebooks|Standard Newspaper)/i) &&
                (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
                 adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
                 adoption_part.match?(/\bStd\s+\d+/))
@@ -280,6 +339,9 @@ module PubidNew
               result += space_before_draft ? " #{draft_obj}" : draft_obj.to_s
             end
 
+            # Append interpretation notation (/INT)
+            result += "/INT" if interpretation
+
             parts << result
           elsif should_render_type && typed_stage&.project_status
             # No code but is a project - add standalone P
@@ -308,22 +370,37 @@ module PubidNew
           end
 
           # Add parenthetical content if present
+          # Handle multiple parenthetical clauses (reaffirmed + relationships/revision)
+          parentheticals = []
+
+          # Reaffirmed as first parenthetical if present (and not in attributes hash)
+          if respond_to?(:reaffirmed) && reaffirmed && !reaffirmed.to_s.strip.empty?
+            parentheticals << "(R#{reaffirmed})"
+          end
+
+          # Then add relationships/revision/amendment as second parenthetical
           if parenthetical_content
-            result += " (#{parenthetical_content})"
+            parentheticals << "(#{parenthetical_content})"
           elsif relationships && !relationships.empty?
             # Render relationships (multiple separated by /)
             relationship_str = relationships.map(&:to_s).join(" / ")
-            result += " (#{relationship_str})"
+            parentheticals << "(#{relationship_str})"
           elsif revision_of
-            result += " (Revision of IEEE Std #{revision_of})"
+            parentheticals << "(Revision of IEEE Std #{revision_of})"
           elsif amendment_to
-            result += " (Amendment to IEEE Std #{amendment_to})"
+            parentheticals << "(Amendment to IEEE Std #{amendment_to})"
           elsif adoption
-            result += " (Adoption of #{adoption})"
-          elsif note
+            parentheticals << "(Adoption of #{adoption})"
+          elsif note && !note.to_s.strip.empty?
             # Only add note if it doesn't duplicate other content
-            result += " (#{note})" unless note.to_s.strip.empty?
+            parentheticals << "(#{note})"
           end
+
+          # Append all parentheticals with space separation
+          result += " " + parentheticals.join(" ") unless parentheticals.empty?
+
+          # Book nickname - outside parentheses in square brackets
+          result += " [#{nickname}]" if nickname && !nickname.to_s.strip.empty?
 
           # Redline suffix
           result += " - Redline" if redline

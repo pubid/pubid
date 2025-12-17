@@ -19,4 +19,7 @@ module PubidNew
       Identifier.parse(str)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:asme, Asme)
 end

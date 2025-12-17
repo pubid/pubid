@@ -2,6 +2,7 @@
 
 require "lutaml/model"
 require_relative "cen/identifier"
+require_relative "cen/identifiers/fragment"
 
 module PubidNew
   module Cen
@@ -9,4 +10,7 @@ module PubidNew
       Cen::Identifier.parse(identifier)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:cen, Cen)
 end

@@ -9,4 +9,7 @@ module PubidNew
       Identifier.parse(identifier)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:ccsds, Ccsds)
 end

@@ -23,12 +23,25 @@ module PubidNew
       def build(data)
         data = data.inject({}) { |acc, h| acc.merge(h) } if data.is_a?(Array)
 
+        # Store data for access in cast method
+        @data = data
+
+        # Check if this is a fragment identifier (AMD + FRAG)
+        if data[:fragment_number]
+          return build_fragment_identifier(data)
+        end
+
         # Check if this is an adopted identifier (EN ISO, EN IEC, etc.)
         if data[:adopted_string]
           return build_adopted_identifier(data)
         end
 
-        # Extract supplements before building base identifier
+        # Check if this is a standalone amendment/corrigendum (slash separator)
+        if has_slash_supplements?(data)
+          return build_standalone_supplement(data)
+        end
+
+        # Extract supplements before building base identifier (only plus/bundled)
         supplements_data = extract_supplements(data)
 
         # Determine identifier class using Scheme
@@ -49,7 +62,7 @@ module PubidNew
           end
         end
 
-        # Wrap with consolidated if supplements present
+        # Wrap with consolidated if supplements present (plus/bundled only)
         if supplements_data.any?
           wrap_with_consolidated(identifier, supplements_data)
         else
@@ -58,6 +71,43 @@ module PubidNew
       end
 
       private
+
+      def build_fragment_identifier(data)
+        require_relative "identifiers/fragment"
+        require_relative "identifiers/amendment"
+
+        # Build base identifier first (without amendment/fragment)
+        base_data = data.dup
+        base_data.delete(:amendment_number)
+        base_data.delete(:fragment_number)
+
+        base_identifier = locate_identifier_klass(base_data).new
+        base_data.each_pair do |key, value|
+          realized_components = cast(key.to_sym, value)
+          next if realized_components.nil?
+
+          case realized_components
+          when Hash
+            realized_components.each_pair do |k, v|
+              base_identifier.send("#{k}=", v) if base_identifier.respond_to?("#{k}=")
+            end
+          else
+            base_identifier.send("#{key}=", realized_components) if base_identifier.respond_to?("#{key}=")
+          end
+        end
+
+        # Build Amendment identifier wrapping the base
+        amendment = Identifiers::Amendment.new(
+          base_identifier: base_identifier,
+          amendment_number: data[:amendment_number].to_s
+        )
+
+        # Build Fragment wrapping the amendment
+        Identifiers::Fragment.new(
+          base_identifier: amendment,
+          fragment_number: data[:fragment_number].to_s
+        )
+      end
 
       def locate_identifier_klass(parsed_hash)
         # Special case: Use adopted_european_norm for adopted identifiers
@@ -107,7 +157,7 @@ module PubidNew
           if parts_array.any?
             # Get the part string - it may contain multiple dashes like "5-1-1"
             part_str = parts_array.first[:part].to_s
-            
+
             # Store the full part value for multi-level parts
             { part: Components::Code.new(value: part_str) }
           end
@@ -116,8 +166,15 @@ module PubidNew
           Components::Code.new(value: value[:part].to_s) if value.is_a?(Hash)
 
         when :year, :date
-          # Return as hash with :date key for proper attribute mapping
-          { date: Components::Date.new(year: value.to_i) }
+          # Check if month is present in the data and include it
+          month_val = @data[:month]&.to_s
+          date_attrs = { year: value.to_s }
+          date_attrs[:month] = month_val if month_val && !month_val.empty?
+          { date: Components::Date.new(**date_attrs) }
+
+        when :month
+          # Month is handled together with year, so skip it here
+          nil
 
         when :type
           Components::Type.new(abbr: value.to_s)
@@ -168,7 +225,7 @@ module PubidNew
         # Build publishers array (EN is default for adoptions)
         publishers = []
         publishers << data[:publisher].to_s if data[:publisher]
-        
+
         # Handle copublishers array
         if data[:copublishers]
           Array(data[:copublishers]).each do |copub|
@@ -177,7 +234,7 @@ module PubidNew
         elsif data[:copublisher]
           publishers << data[:copublisher].to_s
         end
-        
+
         publishers = ["EN"] if publishers.empty?
 
         Identifiers::AdoptedEuropeanNorm.new(
@@ -196,16 +253,16 @@ module PubidNew
             Identifiers::Amendment.new(
               base_identifier: base_identifier,
               amendment_number: supp[:number],
-              amendment_year: supp[:year]&.to_i,
-              separator: supp[:separator] || "+"
+              amendment_year: supp[:year]&.to_i
             )
           else
-            Identifiers::Corrigendum.new(
+            corr_attrs = {
               base_identifier: base_identifier,
               corrigendum_number: supp[:number],
-              corrigendum_year: supp[:year]&.to_i,
-              separator: supp[:separator] || "+"
-            )
+              corrigendum_year: supp[:year]&.to_i
+            }
+            corr_attrs[:corrigendum_month] = supp[:month] if supp[:month]
+            Identifiers::Corrigendum.new(**corr_attrs)
           end
         end
 
@@ -220,18 +277,85 @@ module PubidNew
         supps_array = data[:supplements]
         return [] if supps_array.empty?
 
-        supps_array.map do |s|
+        # Only extract supplements with PLUS separator (bundled)
+        # Slash-separated supplements are standalone identifiers, not bundled
+        supps_array.select do |s|
+          supp_data = s.is_a?(Hash) && s[:supplement] ? s[:supplement] : s
+          # Only include if it has plus separator
+          supp_data[:amd_sep_plus]
+        end.map do |s|
           supp_data = s.is_a?(Hash) && s[:supplement] ? s[:supplement] : s
 
-          # Determine separator - slash vs plus
-          separator = supp_data[:amd_sep_slash] ? "/" : "+"
+          # Extract year and month if present
+          year_val = (supp_data[:amd_year] || supp_data[:year])&.to_s
+          month_val = supp_data[:month]&.to_s
 
           {
             type: supp_data[:amd_number] ? :amendment : :corrigendum,
             number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
-            year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
-            separator: separator
+            year: year_val,
+            month: month_val
           }
+        end
+      end
+
+      def has_slash_supplements?(data)
+        return false unless data[:supplements]
+
+        supps_array = data[:supplements]
+        return false if supps_array.empty?
+
+        # Check if any supplement has slash separator
+        supps_array.any? do |s|
+          supp_data = s.is_a?(Hash) && s[:supplement] ? s[:supplement] : s
+          supp_data[:amd_sep_slash]
+        end
+      end
+
+      def build_standalone_supplement(data)
+        require_relative "identifiers/amendment"
+        require_relative "identifiers/corrigendum"
+
+        # Build base identifier first (without supplements)
+        base_data = data.dup
+        base_data.delete(:supplements)
+        base_identifier = locate_identifier_klass(base_data).new
+
+        base_data.each_pair do |key, value|
+          realized_components = cast(key.to_sym, value)
+          next if realized_components.nil?
+
+          case realized_components
+          when Hash
+            realized_components.each_pair do |k, v|
+              base_identifier.send("#{k}=", v) if base_identifier.respond_to?("#{k}=")
+            end
+          else
+            base_identifier.send("#{key}=", realized_components) if base_identifier.respond_to?("#{key}=")
+          end
+        end
+
+        # Get the first supplement (slash means only one supplement)
+        supp_array = data[:supplements]
+        supp_data = supp_array.first
+        supp_data = supp_data[:supplement] if supp_data.is_a?(Hash) && supp_data[:supplement]
+
+        # Build appropriate supplement identifier
+        if supp_data[:amd_number]
+          Identifiers::Amendment.new(
+            base_identifier: base_identifier,
+            amendment_number: supp_data[:amd_number].to_s,
+            amendment_year: supp_data[:amd_year]&.to_i
+          )
+        else
+          corr_attrs = {
+            base_identifier: base_identifier,
+            corrigendum_number: supp_data[:cor_number]&.to_s,
+            corrigendum_year: (supp_data[:cor_year] || supp_data[:year])&.to_i
+          }
+          month_val = supp_data[:month]&.to_s
+          corr_attrs[:corrigendum_month] = month_val if month_val && !month_val.empty?
+          Identifiers::Corrigendum.new(**corr_attrs)
         end
       end
     end

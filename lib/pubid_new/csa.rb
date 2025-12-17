@@ -2,13 +2,23 @@
 
 require_relative "csa/identifier"
 require_relative "csa/wrapper_identifier"
+require_relative "csa/composite_identifier"
 require_relative "csa/identifiers/base"
 require_relative "csa/identifiers/standard"
 require_relative "csa/identifiers/combined"
 require_relative "csa/identifiers/bundled"
 require_relative "csa/identifiers/canadian_adopted"
+require_relative "csa/identifiers/csa_adopted"
+require_relative "csa/identifiers/package"
+require_relative "csa/identifiers/series"
 
 module PubidNew
   module Csa
+    def self.parse(identifier_string)
+      Identifier.parse(identifier_string)
+    end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:csa, Csa)
 end

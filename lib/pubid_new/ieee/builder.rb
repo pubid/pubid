@@ -20,6 +20,11 @@ module PubidNew
       # @param parsed [Hash, Array] the parsed identifier data
       # @return [Scheme] the constructed scheme object
       def build(parsed)
+        # Handle CSA dual published patterns
+        if parsed[:ieee_portion] && parsed[:csa_portion]
+          return build_csa_dual_published(parsed)
+        end
+
         # Handle dual published patterns
         if parsed[:first] && parsed[:second]
           return build_dual_published(parsed)
@@ -121,6 +126,23 @@ module PubidNew
         Identifiers::DualPublished.new(
           first_identifier: first_id,
           second_identifier: second_id
+        )
+      end
+
+      # Build CSA dual published identifier
+      # @param parsed [Hash] parsed CSA dual published data
+      # @return [Identifiers::CsaDualPublished] CSA dual published identifier
+      def build_csa_dual_published(parsed)
+        # Build IEEE portion
+        ieee_id = build_single_identifier(parsed[:ieee_portion])
+
+        # Extract CSA portion as string (it's complex, just store as string for now)
+        csa_string = extract_value(parsed[:csa_portion])
+
+        require_relative "identifiers/csa_dual_published"
+        Identifiers::CsaDualPublished.new(
+          ieee_identifier: ieee_id,
+          csa_portion: csa_string
         )
       end
 
@@ -521,6 +543,14 @@ module PubidNew
         # Handle additional parameters
         handle_parameters(parsed, attributes)
 
+        # Book nickname
+        if parsed[:nickname]
+          attributes[:nickname] = extract_value(parsed[:nickname])
+        end
+
+        # Interpretation
+        attributes[:interpretation] = true if parsed[:interpretation]
+
         # Redline
         attributes[:redline] = true if parsed[:redline]
 
@@ -726,12 +756,25 @@ module PubidNew
         if parsed_hash[:relationship_type]
           rel_type = extract_relationship_type(parsed_hash[:relationship_type])
           related = parse_identifier_list(parsed_hash[:related_ids])
-          amendments = parse_identifier_list(parsed_hash[:amendments]) if parsed_hash[:amendments]
+
+          # Handle "as amended by" clause
+          amendments = nil
+          approved_flag = false
+
+          if parsed_hash[:amendments]
+            # Check if it's the "and its approved amendments" flag
+            if parsed_hash[:amendments].is_a?(Hash) && parsed_hash[:amendments][:approved_amendments]
+              approved_flag = true
+            else
+              amendments = parse_identifier_list(parsed_hash[:amendments])
+            end
+          end
 
           relationships << Components::Relationship.new(
             relationship_type: rel_type,
             related_identifiers: related,
-            intermediate_amendments: amendments
+            intermediate_amendments: amendments,
+            approved_amendments_flag: approved_flag
           )
         end
 
@@ -743,12 +786,24 @@ module PubidNew
           additional.each do |rel_data|
             rel_type = extract_relationship_type(rel_data[:relationship_type])
             related = parse_identifier_list(rel_data[:related_ids])
-            amendments = parse_identifier_list(rel_data[:amendments]) if rel_data[:amendments]
+
+            # Handle "as amended by" clause for additional relationships
+            amendments = nil
+            approved_flag = false
+
+            if rel_data[:amendments]
+              if rel_data[:amendments].is_a?(Hash) && rel_data[:amendments][:approved_amendments]
+                approved_flag = true
+              else
+                amendments = parse_identifier_list(rel_data[:amendments])
+              end
+            end
 
             relationships << Components::Relationship.new(
               relationship_type: rel_type,
               related_identifiers: related,
-              intermediate_amendments: amendments
+              intermediate_amendments: amendments,
+              approved_amendments_flag: approved_flag
             )
           end
         end

@@ -11,17 +11,25 @@ module PubidNew
         attribute :base_identifier, Base, polymorphic: true
         attribute :corrigendum_number, :string
         attribute :corrigendum_year, :integer
-        attribute :separator, :string, default: -> { "+" }  # "/" or "+"
+        attribute :corrigendum_month, :string
 
         def to_s
           if base_identifier
             result = base_identifier.to_s
-            result += "#{separator}AC"
+            result += "/AC"
             result += corrigendum_number if corrigendum_number && !corrigendum_number.empty?
-            result += ":#{corrigendum_year}" if corrigendum_year
+            if corrigendum_year
+              result += ":#{corrigendum_year}"
+              result += "-#{corrigendum_month}" if corrigendum_month && !corrigendum_month.empty?
+            end
             result
           else
-            "#{separator}AC#{corrigendum_number}:#{corrigendum_year}"
+            result = "/AC#{corrigendum_number}"
+            if corrigendum_year
+              result += ":#{corrigendum_year}"
+              result += "-#{corrigendum_month}" if corrigendum_month && !corrigendum_month.empty?
+            end
+            result
           end
         end
 

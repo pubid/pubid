@@ -59,6 +59,9 @@ module PubidNew
       Builder.new(Scheme).build(parsed)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:iec, Iec)
 end
 
 require_relative "iec/builder"

@@ -16,18 +16,24 @@ module PubidNew
               # First identifier renders normally
               id.to_s
             else
-              # Supplements render with appropriate prefix
+              # Supplements render with "+" prefix (bundled/consolidated format)
               if id.is_a?(Amendment)
-                # Use separator from Amendment object
-                "#{id.separator}A#{id.amendment_number}:#{id.amendment_year}"
+                # Only render the amendment portion, not the full id.to_s
+                result = "+A#{id.amendment_number}"
+                result += ":#{id.amendment_year}" if id.amendment_year
+                result
               elsif id.is_a?(Corrigendum)
-                # Use separator from Corrigendum object
-                result = "#{id.separator}AC"
+                # Only render the corrigendum portion
+                result = "+AC"
                 result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
-                result += ":#{id.corrigendum_year}" if id.corrigendum_year
+                if id.corrigendum_year
+                  result += ":#{id.corrigendum_year}"
+                  result += "-#{id.corrigendum_month}" if id.corrigendum_month && !id.corrigendum_month.empty?
+                end
                 result
               else
-                id.to_s
+                # Other identifiers (should not happen in typical bundles) render with +
+                "+#{id.to_s}"
               end
             end
           end.compact.join

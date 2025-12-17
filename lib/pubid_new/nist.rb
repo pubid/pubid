@@ -37,4 +37,7 @@ module PubidNew
       @configuration ||= Configuration.new
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:nist, Nist)
 end

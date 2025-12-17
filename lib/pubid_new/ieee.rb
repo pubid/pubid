@@ -28,4 +28,7 @@ module PubidNew
       end
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:ieee, Ieee)
 end

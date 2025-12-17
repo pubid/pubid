@@ -14,17 +14,19 @@ module PubidNew
         # Filter out non-standards
         return nil if input.match?(/^CSA (Communities|Group|Learning|OnDemand|Update)/)
 
+        # Preprocessing: normalize CEI to IEC (French name)
+        input = input.gsub(/CEI\/IEC/, "IEC").gsub(/\bCEI\b/, "IEC")
+
         # Detect CAN/ wrapper (Canadian adoption)
         if input.start_with?("CAN/")
           # This is a Canadian adoption - parse as wrapper
           # Remove CAN/ prefix
           wrapped_input = input.sub(/^CAN\//, "")
 
-          # Extract reaffirmation FIRST (before parsing wrapped identifier)
+          # Extract reaffirmation FIRST (before any other processing)
           reaffirm_year = nil
           if wrapped_input =~ /\(R(\d{4})\)/
             reaffirm_year = $1
-            # Remove from wrapped_input so it doesn't get parsed twice
             wrapped_input = wrapped_input.sub(/\s*\(R\d{4}\)/, "")
           end
 
@@ -60,6 +62,66 @@ module PubidNew
           result = Identifiers::CanadianAdopted.new
           result.wrapped_identifier = wrapped_identifier
           result.reaffirmation = reaffirm_year if reaffirm_year
+
+          return result
+        end
+
+        # Detect CSA adoption of international standards
+        # Examples: CSA ISO/IEC TR 12785-3:15, CSA CISPR 16-1-1:18, CSA IEC 60601-1:08
+        if input.match?(/^CSA (ISO\/IEC|CISPR|IEC|CEI|ISO)\s/)
+          # This is CSA adoption of international standard
+          # Extract the wrapped standard portion
+          wrapped_input = input.sub(/^CSA\s+/, "")
+
+          # Extract reaffirmation FIRST (before parsing)
+          reaffirm_year = nil
+          if wrapped_input =~ /\(R(\d{4})\)/
+            reaffirm_year = $1
+            wrapped_input = wrapped_input.sub(/\s*\(R\d{4}\)/, "")
+          end
+
+          # Convert 2-digit years to 4-digit for external parser
+          # :15 → :2015, :04 → :2004
+          if wrapped_input =~ /:(\d{2})\b/
+            short_year_str = $1  # Keep as string "04", "15", etc.
+            short_year_int = short_year_str.to_i
+            # Determine century: 00-49 → 2000s, 50-99 → 1900s
+            full_year = short_year_int < 50 ? "20#{short_year_str}" : "19#{short_year_str}"
+            wrapped_input = wrapped_input.sub(/:#{short_year_str}\b/, ":#{full_year}")
+          end
+
+          # Parse with appropriate flavor parser
+          wrapped_identifier = parse_external_standard(wrapped_input)
+          return nil unless wrapped_identifier
+
+          # Create CsaAdoptedIdentifier wrapper
+          require_relative "identifiers/csa_adopted"
+          result = Identifiers::CsaAdopted.new
+          result.wrapped_identifier = wrapped_identifier
+          result.reaffirmation = reaffirm_year if reaffirm_year
+
+          return result
+        end
+
+        # Detect package identifiers
+        # Examples: CSA Z662:23 PACKAGE INCLUDES: +1 (PDF & ESA)
+        #           CSA B149.1:20 PACKAGE (PDF + PRINT)
+        if input.match?(/\sPACKAGE\s/i)
+          # Extract base identifier and package portion
+          parts = input.split(/\s+PACKAGE\s+/i, 2)
+          base_input = parts[0]
+          package_portion = parts[1] || ""
+
+          # Parse base identifier recursively
+          base_identifier = parse(base_input)
+          return nil unless base_identifier
+
+          # Create PackageIdentifier
+          require_relative "identifiers/package"
+          result = Identifiers::Package.new
+          result.base_identifier = base_identifier
+          result.package_materials = package_portion.strip
+          result.package_keyword = "PACKAGE"
 
           return result
         end
@@ -123,6 +185,31 @@ module PubidNew
         if obj.respond_to?(:base) && obj.base
           set_publisher_prefix(obj.base, prefix)
         end
+      end
+
+      def self.parse_external_standard(input)
+        # Ensure full PubidNew is loaded (handles Scheme and all flavors)
+        require_relative "../../pubid_new" unless defined?(PubidNew::Iso) && defined?(PubidNew::Iec)
+
+        # Try ISO/IEC first (most common)
+        if input.match?(/^(ISO\/IEC|ISO|IEC|CEI)\s/)
+          begin
+            return PubidNew::Iso.parse(input)
+          rescue StandardError
+            return nil
+          end
+        end
+
+        # Try CISPR (uses IEC parser)
+        if input.match?(/^CISPR\s/)
+          begin
+            return PubidNew::Iec.parse(input)
+          rescue StandardError
+            return nil
+          end
+        end
+
+        nil
       end
     end
   end

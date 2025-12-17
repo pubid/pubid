@@ -9,6 +9,11 @@ module PubidNew
   module Csa
     class Builder
       def build(parsed_hash)
+        # Handle series identifiers (SERIES as primary type)
+        if parsed_hash.key?(:series_type)
+          return build_series(parsed_hash)
+        end
+
         # Handle bundled identifiers (with + notation)
         if parsed_hash.key?(:bundled_first)
           return build_bundled(parsed_hash)
@@ -23,6 +28,64 @@ module PubidNew
       end
 
       private
+
+      def build_series(parsed_hash)
+        require_relative "identifiers/series"
+        series = Identifiers::Series.new
+
+        # Publisher prefix
+        if parsed_hash[:publisher_prefix]
+          series.publisher_prefix = parsed_hash[:publisher_prefix].to_s
+        end
+
+        # Series prefix (MH, RV, etc.)
+        if parsed_hash[:series_prefix]
+          series.series_prefix = parsed_hash[:series_prefix].to_s
+        end
+
+        # Code
+        if parsed_hash[:code]
+          series.code = Components::Code.new(value: parsed_hash[:code].to_s)
+        end
+
+        # Year format and year
+        year_format = if parsed_hash[:dash_format]
+                        "dash"
+                      elsif parsed_hash[:colon_format]
+                        "colon"
+                      else
+                        "colon"  # default
+                      end
+
+        if parsed_hash[:year]
+          year_str = parsed_hash[:year].to_s
+          if year_str.length == 2
+            # Convert 2-digit year to 4-digit (20XX for CSA)
+            year_int = year_str.to_i
+            series.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+          else
+            series.year = year_str
+          end
+          series.year_format = year_format
+        end
+
+        # Year prefix (F or M)
+        if parsed_hash[:year_prefix]
+          series.year_prefix = parsed_hash[:year_prefix].to_s
+        end
+
+        # Reaffirmation
+        if parsed_hash[:reaffirmation]
+          reaffirm_data = parsed_hash[:reaffirmation]
+          if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
+            series.reaffirmation = reaffirm_data[:year].to_s
+          else
+            series.reaffirmation = reaffirm_data.to_s
+          end
+        end
+
+        series
+      end
 
       def build_bundled(parsed_hash)
         bundled = Identifiers::Bundled.new

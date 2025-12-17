@@ -8,63 +8,63 @@ CAN1-4.7-M85 (R1996)
 CGA 4.9-1969
 
 # https://portal.cganet.com/publicationlist/
-curl 'https://portal.cganet.com/Publications/abpr' \
--X 'GET' \
--H 'Accept: */*' \
--H 'Sec-Fetch-Site: same-origin' \
--H 'Sec-Fetch-Dest: empty' \
--H 'Accept-Language: en-US,en;q=0.9' \
--H 'Sec-Fetch-Mode: cors' \
--H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
--H 'Accept-Encoding: gzip, deflate, br' \
--H 'Referer: https://portal.cganet.com/publicationlist/' \
--H 'Priority: u=3, i'
+# curl 'https://portal.cganet.com/Publications/abpr' \
+# -X 'GET' \
+# -H 'Accept: */*' \
+# -H 'Sec-Fetch-Site: same-origin' \
+# -H 'Sec-Fetch-Dest: empty' \
+# -H 'Accept-Language: en-US,en;q=0.9' \
+# -H 'Sec-Fetch-Mode: cors' \
+# -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+# -H 'Accept-Encoding: gzip, deflate, br' \
+# -H 'Referer: https://portal.cganet.com/publicationlist/' \
+# -H 'Priority: u=3, i'#
 
-curl 'https://portal.cganet.com/Publications/abpr' \
--X 'GET' \
--H 'Accept: */*' \
--H 'Sec-Fetch-Site: same-origin' \
--H 'Sec-Fetch-Dest: empty' \
--H 'Accept-Language: en-US,en;q=0.9' \
--H 'Sec-Fetch-Mode: cors' \
--H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
--H 'Accept-Encoding: gzip, deflate, br' \
--H 'Referer: https://portal.cganet.com/publicationlist/' \
--H 'Priority: u=3, i'
+# curl 'https://portal.cganet.com/Publications/abpr' \
+# -X 'GET' \
+# -H 'Accept: */*' \
+# -H 'Sec-Fetch-Site: same-origin' \
+# -H 'Sec-Fetch-Dest: empty' \
+# -H 'Accept-Language: en-US,en;q=0.9' \
+# -H 'Sec-Fetch-Mode: cors' \
+# -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+# -H 'Accept-Encoding: gzip, deflate, br' \
+# -H 'Referer: https://portal.cganet.com/publicationlist/' \
+# -H 'Priority: u=3, i'#
 
-curl 'https://portal.cganet.com/Publications/tags' \
--X 'GET' \
--H 'Accept: */*' \
--H 'Sec-Fetch-Site: same-origin' \
--H 'Sec-Fetch-Dest: empty' \
--H 'Accept-Language: en-US,en;q=0.9' \
--H 'Sec-Fetch-Mode: cors' \
--H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
--H 'Accept-Encoding: gzip, deflate, br' \
--H 'Referer: https://portal.cganet.com/publicationlist/' \
--H 'Priority: u=3, i'
+# curl 'https://portal.cganet.com/Publications/tags' \
+# -X 'GET' \
+# -H 'Accept: */*' \
+# -H 'Sec-Fetch-Site: same-origin' \
+# -H 'Sec-Fetch-Dest: empty' \
+# -H 'Accept-Language: en-US,en;q=0.9' \
+# -H 'Sec-Fetch-Mode: cors' \
+# -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+# -H 'Accept-Encoding: gzip, deflate, br' \
+# -H 'Referer: https://portal.cganet.com/publicationlist/' \
+# -H 'Priority: u=3, i'#
 
-curl 'https://portal.cganet.com/Publications/standards' \
--X 'GET' \
--H 'Accept: */*' \
--H 'Sec-Fetch-Site: same-origin' \
--H 'Sec-Fetch-Dest: empty' \
--H 'Accept-Language: en-US,en;q=0.9' \
--H 'Sec-Fetch-Mode: cors' \
--H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
--H 'Accept-Encoding: gzip, deflate, br' \
--H 'Referer: https://portal.cganet.com/publicationlist/' \
--H 'Priority: u=3, i'
+# curl 'https://portal.cganet.com/Publications/standards' \
+# -X 'GET' \
+# -H 'Accept: */*' \
+# -H 'Sec-Fetch-Site: same-origin' \
+# -H 'Sec-Fetch-Dest: empty' \
+# -H 'Accept-Language: en-US,en;q=0.9' \
+# -H 'Sec-Fetch-Mode: cors' \
+# -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+# -H 'Accept-Encoding: gzip, deflate, br' \
+# -H 'Referer: https://portal.cganet.com/publicationlist/' \
+# -H 'Priority: u=3, i'#
 
-# Individual:
-curl 'https://portal.cganet.com/publications/details/G-6.1' \
--X 'GET' \
--H 'Accept: */*' \
--H 'Sec-Fetch-Site: same-origin' \
--H 'Sec-Fetch-Dest: empty' \
--H 'Accept-Language: en-US,en;q=0.9' \
--H 'Sec-Fetch-Mode: cors' \
--H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
--H 'Accept-Encoding: gzip, deflate, br' \
--H 'Referer: https://portal.cganet.com/publication/G-6.1/details' \
--H 'Priority: u=3, i'
+# # Individual:
+# curl 'https://portal.cganet.com/publications/details/G-6.1' \
+# -X 'GET' \
+# -H 'Accept: */*' \
+# -H 'Sec-Fetch-Site: same-origin' \
+# -H 'Sec-Fetch-Dest: empty' \
+# -H 'Accept-Language: en-US,en;q=0.9' \
+# -H 'Sec-Fetch-Mode: cors' \
+# -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+# -H 'Accept-Encoding: gzip, deflate, br' \
+# -H 'Referer: https://portal.cganet.com/publication/G-6.1/details' \
+# -H 'Priority: u=3, i'
