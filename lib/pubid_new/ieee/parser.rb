@@ -701,6 +701,21 @@ module PubidNew
         # NEW: Fix common typos (Category 9)
         cleaned = cleaned.gsub(/^EEE /, 'IEEE ')
 
+        # NEW Session 170: Additional safe typo fixes
+        # Fix "I EEE" (space between I and EEE)
+        cleaned = cleaned.gsub(/^I EEE /, 'IEEE ')
+
+        # Fix "lEEE" (lowercase L instead of I)
+        cleaned = cleaned.gsub(/^lEEE /, 'IEEE ')
+
+        # Fix missing closing parenthesis at end only (very conservative)
+        # Only if there's exactly one more opening than closing paren
+        open_count = cleaned.count('(')
+        close_count = cleaned.count(')')
+        if open_count == close_count + 1 && !cleaned.end_with?(')')
+          cleaned = cleaned + ')'
+        end
+
         # NEW Phase 1: Remove trailing commas/colons and text
         cleaned = cleaned.gsub(/,\s*Standard\s*$/, '')  # ", Standard" at end
         cleaned = cleaned.gsub(/[,:]\s*$/, '')           # Trailing comma/colon

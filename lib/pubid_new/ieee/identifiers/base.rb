@@ -160,6 +160,22 @@ module PubidNew
             return result
           end
 
+          # PREPROCESS: Handle (Reaffirmed ####) (Revision of...) pattern (full word format)
+          # Pattern: "ANSI/IEEE Std 101-1987 (Reaffirmed 2010) (Revision of IEEE Std 101-1972)"
+          if input.match(/\(Reaffirmed\s+(\d{4})\)\s*\(Revision of ([^)]+)\)/)
+            year = $1
+            revision_of = $2
+            # Replace the two parentheticals
+            input_modified = input.sub(/\(Reaffirmed\s+(\d{4})\)\s*\(Revision of ([^)]+)\)/, "(Revision of \\2)")
+
+            # Parse the modified input
+            result = parse_single(input_modified)
+            # Add reaffirmed attribute
+            result.instance_variable_set(:@reaffirmed, year) if result.respond_to?(:reaffirmed=)
+            result.reaffirmed = year if result.respond_to?(:reaffirmed=)
+            return result
+          end
+
           # Check for space-separated dual identifiers (e.g., "IEC 62014-5 IEEE Std 1734-2011")
           # This must be checked before " and " pattern
           # Look for pattern where a second publisher appears after the first complete identifier
@@ -247,6 +263,30 @@ module PubidNew
                   first_identifier: first,
                   second_identifier: second
                 )
+              end
+            end
+          end
+
+          # Special case: AIEE identifiers with ASA parenthetical references
+          # Pattern: "AIEE No 18-1934 (ASA C55 1934)"
+          if input.match?(/^AIEE\s+/) && input.include?("(") && input.include?("ASA")
+            main_part = input.split("(").first.strip
+            adoption_match = input.match(/\((ASA[^)]+)\)/)
+
+            if adoption_match
+              adoption_part = adoption_match.captures.first
+              # Parse the main AIEE identifier
+              begin
+                aiee_id = parse_single(main_part)
+                # Parse the ASA identifier
+                asa_id = parse_single(adoption_part)
+
+                return Identifiers::AdoptedStandard.new(
+                  ieee_identifier: aiee_id,
+                  adopted_identifier: asa_id
+                )
+              rescue Parslet::ParseFailed
+                # If parsing fails, fall through to regular processing
               end
             end
           end
