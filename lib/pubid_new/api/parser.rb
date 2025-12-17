@@ -69,6 +69,14 @@ module PubidNew
         str(", Part ") >> digits.as(:part_number)
       end
 
+      # Edition notation (e.g., ", 4th edition")
+      rule(:edition_notation) do
+        str(", ") >>
+        digits.as(:edition_number) >>
+        (str("st") | str("nd") | str("rd") | str("th")) >>
+        str(" edition")
+      end
+
       # MPMS identifier (special format with CH)
       rule(:mpms_identifier) do
         publisher >>
@@ -98,9 +106,25 @@ module PubidNew
         reaffirmation.maybe
       end
 
-      # Main identifier (try MPMS first, then typed, then typeless)
+      # Second identifier in combined (no API prefix, just type + number)
+      rule(:second_identifier) do
+        doc_type >> space >>
+        number_with_part >>
+        part_notation.maybe >>
+        (date_dash | date_colon).maybe
+      end
+
+      # Combined identifier (two identifiers separated by slash)
+      rule(:combined_identifier) do
+        (mpms_identifier | typed_identifier | typeless_identifier).as(:first) >>
+        slash >>
+        second_identifier.as(:second) >>
+        edition_notation.maybe
+      end
+
+      # Main identifier (try combined first, then MPMS, then typed, then typeless)
       rule(:identifier) do
-        mpms_identifier | typed_identifier | typeless_identifier
+        combined_identifier | mpms_identifier | typed_identifier | typeless_identifier
       end
 
       root(:identifier)

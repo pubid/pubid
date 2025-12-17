@@ -13,6 +13,7 @@ module PubidNew
       rule(:comma) { str(",") }
       rule(:dot) { str(".") }
       rule(:ampersand) { str("&") }
+      rule(:plus) { str(" + ") }
       rule(:digit) { match("[0-9]") }
       rule(:digits) { digit.repeat(1) }
       rule(:letter) { match("[A-Z]") }
@@ -41,6 +42,15 @@ module PubidNew
       rule(:no_number) do
         match("[0-9]").repeat(1) >>
         (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
+        letter.repeat(2, 6).maybe >>  # Allow SP suffix
+        (dash >> year_2digit.as(:no_year)).maybe
+      end
+
+      # Number after NO. keyword - can have dots or dashes (e.g., "144.1-16")
+      # can have letter suffix like "60950-1A", SP suffix, and optional year after
+      rule(:no_number) do
+        match("[0-9]").repeat(1) >>
+        ((dash | dot) >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
         letter.repeat(2, 6).maybe >>  # Allow SP suffix
         (dash >> year_2digit.as(:no_year)).maybe
       end
@@ -95,7 +105,7 @@ module PubidNew
         ).repeat
       end
 
-      # Series prefix: 2-3 letters before SERIES keyword (e.g., MH, RV)
+      # Series prefix: 2-3 letters before SERIAL keyword (e.g., MH, RV)
       rule(:series_prefix) do
         letter.repeat(2, 3).as(:series_prefix)
       end
@@ -123,21 +133,84 @@ module PubidNew
         no_portion.maybe >>
         (
           # Option 1: series with prefix (space + prefix + space + keyword + year)
-          (space >> series_prefix >> space >> series_keyword >> (colon_year | dash_year)) |
+          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
           # Option 2: series without prefix (space + keyword + year)
-          (space >> series_keyword >> (colon_year | dash_year)) |
+          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
           # Option 3: just year (no series)
           (colon_year | dash_year)
         ).maybe >>
         amendment_slash.maybe  # Add amendment support here
       end
 
+      # Base CSA code without amendment (for combined identifiers)
+      rule(:base_csa_code) do
+        publisher >>
+        code_pattern >>
+        no_portion.maybe >>
+        (
+          # Option 1: series with prefix
+          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+          # Option 2: series without prefix
+          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+          # Option 3: just year
+          (colon_year | dash_year)
+        ).maybe
+      end
+
+      # Continuation code (no CSA publisher prefix, for combined identifiers)
+      rule(:continuation_code) do
+        code_pattern >>
+        no_portion.maybe >>
+        (
+          # Option 1: series with prefix
+          (space >> series_prefix >> space >> series_keyword >> (colon_year | dash_year)) |
+          # Option 2: series without prefix
+          (space >> series_keyword >> (colon_year | dash_year)) |
+          # Option 3: just year
+          (colon_year | dash_year)
+        ).maybe >>
+        amendment_slash.maybe
+      end
+
+      # Continuation code (optional CSA publisher prefix, for combined identifiers)
+      rule(:continuation_code) do
+        (publisher.as(:has_publisher)).maybe >>
+        code_pattern >>
+        no_portion.maybe >>
+        (
+          # Option 1: series with prefix
+          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+          # Option 2: series without prefix
+          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+          # Option 3: just year
+          (colon_year | dash_year)
+        ).maybe >>
+        amendment_slash.maybe
+      end
+
+      # Bundled portion - code that follows + (base is implied, no CSA prefix)
+      # Example: "A2:22" in "CSA C22.2 NO. 60601-1:14 + A2:22"
+      rule(:bundled_portion) do
+        code_pattern >>
+        no_portion.maybe >>
+        (colon_year | dash_year).maybe
+      end
+
+      # Bundled identifier with + notation (consolidated documents)
+      rule(:bundled_identifier) do
+        csa_code.as(:base) >>
+        plus >>
+        bundled_portion.as(:bundled_first) >>
+        (plus >> bundled_portion).repeat.as(:bundled_rest) >>
+        reaffirmation.maybe
+      end
+
       # Combined CSA standards with slash
       rule(:combined_slash) do
-        csa_code.as(:first) >>
+        base_csa_code.as(:first) >>
         slash >>
-        csa_code.as(:second) >>
-        (slash >> csa_code.as(:third)).maybe >>  # Allow triple combined
+        continuation_code.as(:second) >>
+        (slash >> continuation_code.as(:third)).maybe >>
         reaffirmation.maybe >>
         package_portion.maybe
       end
@@ -148,30 +221,108 @@ module PubidNew
         comma >> space >>
         csa_code.as(:second) >>
         reaffirmation.maybe >>
-        (space >> ampersand >> package_portion).maybe
+        (
+          (space >> ampersand >> package_portion) |
+          package_portion
+        ).as(:package_portion).maybe >>
+        str("").as(:comma_separator)  # Mark as comma-based
       end
 
       # Single identifier with optional package
       rule(:single_identifier) do
         csa_code >>
         reaffirmation.maybe >>
-        package_portion.maybe
+        package_portion.as(:package_portion).maybe
+      end
+
+      # Code-only identifier (no CSA prefix) - try this last
+      rule(:code_only_identifier) do
+        code_pattern >>
+        no_portion.maybe >>
+        (
+          # Option 1: series with prefix
+          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+          # Option 2: series without prefix
+          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+          # Option 3: just year
+          (colon_year | dash_year)
+        ).maybe >>
+        (space >> str("PACKAGE")).as(:package_portion).maybe
       end
 
       # Main identifier
       rule(:identifier) do
-        iso_iec_adoption | combined_slash | combined_comma | single_identifier
+        iso_iec_adoption | bundled_identifier | combined_slash | combined_comma | single_identifier | code_only_identifier
       end
 
       root(:identifier)
 
       # Preprocessing to normalize input
       def parse(input)
+        # Skip comment lines
+        raise Parslet::ParseFailed.new("Comment line") if input.strip.start_with?("#")
+
+        # Track original publisher prefix
+        publisher_prefix = if input.start_with?("CAN/CSA-")
+                            "CAN/CSA-"
+                          elsif input.start_with?("CAN3-")
+                            "CAN3-"
+                          elsif input.start_with?("CSA ")
+                            "CSA"
+                          else
+                            nil
+                          end
+
+        # Normalize CAN/CSA- and CAN3- to CSA (preserving space before code)
+        normalized = input.gsub("CAN/CSA-", "CSA ")
+        normalized = normalized.gsub("CAN3-", "CSA ")
+
         # Remove CONSOLIDATED notation
-        normalized = input.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")
+        normalized = normalized.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")
+
         # Clean up extra spaces
         normalized = normalized.gsub(/\s+/, " ").strip
-        super(normalized)
+
+        # Parse and inject publisher_prefix into result
+        result = super(normalized)
+
+        # Inject publisher_prefix if we have one
+        if publisher_prefix && result.is_a?(Hash)
+          inject_publisher_prefix(result, publisher_prefix)
+        end
+
+        result
+      end
+
+      private
+
+      def inject_publisher_prefix(hash, prefix)
+        # For combined identifiers
+        if hash[:first]
+          hash[:first][:publisher_prefix] = prefix
+        end
+        if hash[:second]
+          # For combined_comma (has comma_separator), both first and second are full csa_code
+          # For combined_slash (no comma_separator), second is continuation that may have has_publisher
+          if hash[:comma_separator] || hash[:second][:has_publisher]
+            hash[:second][:publisher_prefix] = prefix
+          end
+        end
+        if hash[:third]
+          hash[:third][:publisher_prefix] = prefix if hash[:third][:has_publisher]
+        end
+
+        # For bundled identifiers
+        if hash[:base]
+          inject_publisher_prefix(hash[:base], prefix)
+        end
+
+        # For single identifiers (no :first, no :base, just raw attributes)
+        if !hash[:first] && !hash[:base] && !hash[:bundled_first]
+          hash[:publisher_prefix] = prefix
+        end
+
+        hash
       end
     end
   end
