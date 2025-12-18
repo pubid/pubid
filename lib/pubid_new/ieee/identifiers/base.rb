@@ -176,6 +176,33 @@ module PubidNew
             return result
           end
 
+          # NEW Session 174: Check for IRE dual published pattern
+          # Pattern after preprocessing: "IEEE Std 218-1956 (R1980) (56 IRE 28.S2)"
+          # First parenthetical: (Rxxx) reaffirmed
+          # Second parenthetical: IRE identifier
+          if input.match(/\(R\d{4}\)\s*\((\d+\s+IRE[^)]+)\)/)
+            main_part = input.split(" (R").first.strip  # Get "IEEE Std 218-1956"
+            reaffirmed_year = input.match(/\(R(\d{4})\)/)[1]
+            ire_part = input.match(/\((\d+\s+IRE[^)]+)\)/)[1]
+
+            begin
+              # Parse main identifier
+              ieee_id = parse_single(main_part)
+              # Add reaffirmed year
+              ieee_id.reaffirmed = reaffirmed_year if ieee_id.respond_to?(:reaffirmed=)
+
+              # Parse IRE identifier
+              ire_id = parse_single(ire_part)
+
+              return Identifiers::DualPublished.new(
+                first_identifier: ieee_id,
+                second_identifier: ire_id
+              )
+            rescue Parslet::ParseFailed
+              # If parsing fails, fall through to regular processing
+            end
+          end
+
           # Check for space-separated dual identifiers (e.g., "IEC 62014-5 IEEE Std 1734-2011")
           # This must be checked before " and " pattern
           # Look for pattern where a second publisher appears after the first complete identifier
