@@ -60,9 +60,15 @@ module PubidNew
 
       # Month patterns
       rule(:month_name) do
+        # Period-suffixed abbreviations (longest first)
+        str("Sept.") | str("Oct.") | str("Nov.") | str("Dec.") |
+        str("Jan.") | str("Feb.") | str("Mar.") | str("Apr.") |
+        str("Jun.") | str("Jul.") | str("Aug.") |
+        # Full month names
         str("January") | str("February") | str("March") | str("April") |
         str("May") | str("June") | str("July") | str("August") |
         str("September") | str("October") | str("November") | str("December") |
+        # Non-period abbreviations
         str("Jan") | str("Feb") | str("Mar") | str("Apr") | str("Jun") |
         str("Jul") | str("Aug") | str("Sep") | str("Sept") | str("Oct") | str("Nov") | str("Dec")
       end
@@ -261,6 +267,7 @@ module PubidNew
       rule(:relationship_redesignation) { str("Redesignation of ") | str("redesignated as ") }
       rule(:relationship_supersedes) { str("Supersedes ") | str("Supercedes ") }
       rule(:relationship_previously_designated) { str("Previously designated as ") }
+      rule(:relationship_includes) { str("Includes ") }  # NEW Session 171
 
       # Combined relationship type (longest match first)
       rule(:relationship_type) do
@@ -271,6 +278,7 @@ module PubidNew
           relationship_reaffirmation.as(:reaffirmation_of) |
           relationship_redesignation.as(:redesignation_of) |
           relationship_supersedes.as(:supersedes) |
+          relationship_includes.as(:includes) |  # NEW Session 171
           relationship_revision_of.as(:revision_of) |
           relationship_amendment_to.as(:amendment_to) |
           relationship_corrigendum_to.as(:corrigendum_to) |
@@ -486,9 +494,11 @@ module PubidNew
         # Lookahead for AIEE patterns - do not consume input
         (
           # IEEE-AIEE transitional pattern
-          (str("IEEE-AIEE") >> space >> (str("No.") | str("Standard") | str("Trans."))) |
+          (str("IEEE-AIEE") >> space >> (str("No.") | str("Nos") | str("No") | str("Standard") | str("Trans."))) |
+          # A.I.E.E. pattern (with dots)
+          (str("A.I.E.E.") >> space >> (str("No.") | str("Nos") | str("No"))) |
           # AIEE pattern
-          (str("AIEE") >> space >> (str("No.") | str("Standard") | str("Trans.")))
+          (str("AIEE") >> space >> (str("No.") | str("Nos") | str("No") | str("Standard") | str("Trans.")))
         ).present? >>
         # Delegate to AIEE parser if pattern detected
         Aiee::Parser.new.aiee_identifier.as(:aiee)
@@ -617,6 +627,7 @@ module PubidNew
         aiee_identifier |
         ire_identifier |
         nesc_identifier |
+        ieee_astm_si_psi |  # NEW Session 171: Add IEEE/ASTM SI/PSI support
         csa_dual_published |  # NEW: Try CSA dual published before generic patterns
         corrigendum_identifier |  # NEW: Try corrigendum before generic patterns
         joint_development_ieee_format |
@@ -662,9 +673,26 @@ module PubidNew
         # No valid IEEE identifier pattern needs more than 1 space
         cleaned = cleaned.gsub(/\s+/, ' ')
 
+        # NEW Session 171: CONSERVATIVE data quality fixes for TODO.IEEE-MUST-DO.txt
+        # Only fix clear typos: space before dash + 4-digit year, OR dash + space + 4-digit year
+        # Do NOT touch " - " (space-dash-space) which is valid formatting
+        cleaned = cleaned.gsub(/(\d)\s+-(\d{4})\b/, '\1-\2')  # "C37.101 -2006" → "C37.101-2006"
+        cleaned = cleaned.gsub(/(\d)-\s+(\d{4})\b/, '\1-\2')  # "C62.35- 2010" → "C62.35-2010"
+
+        # NEW Session 171: HTML entity for en dash (&#x2013;)
+        # ONLY convert if not already followed by a dash (avoid creating --)
+        cleaned = cleaned.gsub(/&#x2013;(?!-)/, '-')  # En dash → regular hyphen (if not followed by dash)
+        cleaned = cleaned.gsub(/&#x2013;-/, '-')      # En-dash-dash → single dash
+
+        # NEW Session 171: Remove wrong ! prefix
+        cleaned = cleaned.gsub(/^!IEEE /, 'IEEE ')
+
+        # NEW Session 171: Fix "IEEE/ ASTM" spacing (extra space after slash)
+        cleaned = cleaned.gsub('IEEE/ ASTM', 'IEEE/ASTM')
+
         # NEW Phase 1: Handle HTML entities comprehensively
-        cleaned = cleaned.gsub('&x2122;', '™')    # Trademark symbol
-        cleaned = cleaned.gsub('&x2019;', "'")     # Smart apostrophe
+        cleaned = cleaned.gsub('&#x2122;', '™')    # Trademark symbol
+        cleaned = cleaned.gsub('&#x2019;', "'")     # Smart apostrophe
         cleaned = cleaned.gsub('&amp;amp;', '&')   # Double-encoded ampersand
         cleaned = cleaned.gsub('&amp;', '&')       # Single-encoded ampersand
 
@@ -719,6 +747,54 @@ module PubidNew
         # NEW Phase 1: Remove trailing commas/colons and text
         cleaned = cleaned.gsub(/,\s*Standard\s*$/, '')  # ", Standard" at end
         cleaned = cleaned.gsub(/[,:]\s*$/, '')           # Trailing comma/colon
+
+        # === SESSION 173: TODO.IEEE-MUST-DO.txt Preprocessing Enhancements ===
+
+        # Part A: Simple Normalizations (Lines 13, 16, 32-35, 36, 39-41 from TODO)
+
+        # 1. Missing dash before year: "802.16g 2007" → "802.16g-2007"
+        # But be careful not to affect month names (already have space)
+        # Only apply if: digit + space + 4-digit year (and not after a month name)
+        cleaned = cleaned.gsub(/(\d)\s+(\d{4})(?=\s*\(|\s*$)/, '\1-\2')
+
+        # 2. Space-dash-space before year: "802.1ag - 2007" → "802.1ag-2007"
+        # This is distinct from " - " in titles, targets space-dash-space-year pattern
+        cleaned = cleaned.gsub(/\s+-\s+(\d{4})\b/, '-\1')
+
+        # 3. Add missing "Std" after IEEE: "IEEE 1070-1995" → "IEEE Std 1070-1995"
+        # Only at start of string, IEEE + space + digit
+        cleaned = cleaned.gsub(/^IEEE\s+(?!Std\b)(\d)/, 'IEEE Std \1')
+
+        # 4. Space before slash in dual published: "262-1973 /ANSI" → "262-1973/ANSI"
+        cleaned = cleaned.gsub(/\s+\//, '/')
+
+        # 5. Comma before Edition: ", 1998 Edition" → "-1998"
+        # Normalize to standard year format for parser
+        cleaned = cleaned.gsub(/,\s+(\d{4})\s+Edition/, '-\1')
+
+        # 6. ISO/IEC spacing: "ISO/IEC15802" → "ISO/IEC 15802"
+        # Add space between publisher prefix and number
+        cleaned = cleaned.gsub(/(ISO\/IEC)(\d)/, '\1 \2')
+
+        # Part B: Publisher Order (Line 38 from TODO)
+
+        # Fix wrong publisher order: "IEEE Std ANSI/IEEE" → "ANSI/IEEE Std"
+        # This handles cases where IEEE Std appears before ANSI/IEEE publisher
+        cleaned = cleaned.gsub(/^IEEE\s+Std\s+(ANSI\/IEEE)/, '\1 Std')
+
+        # Part C: Dual Published Formats (Lines 8, 19 from TODO)
+
+        # 1. Semicolon to parenthetical for dual published (MultiLabeledIdentifier)
+        # "IEEE Std 120-1955; ASME PTC 19.6-1955" → "IEEE Std 120-1955 (ASME PTC 19.6-1955)"
+        # Only if semicolon + space + organization abbreviation (capital letters)
+        if cleaned.match?(/;\s+[A-Z]{2,}/)
+          cleaned = cleaned.sub(/;\s+([A-Z][^;]+)$/, ' (\1)')
+        end
+
+        # 2. Comma-separated dual to "and IEEE Std" (CombinedIdentifier)
+        # "IEEE Std 960-1989, Std 1177-1989" → "IEEE Std 960-1989 and IEEE Std 1177-1989"
+        # Pattern: year + comma + space + "Std" + space + number
+        cleaned = cleaned.gsub(/(\d{4}),\s+Std\s/, '\1 and IEEE Std ')
 
         new.parse(cleaned)
       end
