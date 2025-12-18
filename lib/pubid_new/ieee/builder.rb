@@ -309,8 +309,11 @@ module PubidNew
 
       # Build SI/PSI identifier from parsed data
       # @param parsed [Hash] parsed SI/PSI data
-      # @return [Identifiers::SiStandard, Identifiers::PsiStandard] SI or PSI identifier
+      # @return [Identifiers::SiStandard] SI or PSI identifier (both use same class)
       def build_si_psi_identifier(parsed)
+        require_relative "identifiers/si_standard"
+        require_relative "components/draft"
+
         attributes = {}
 
         # Extract SI type (SI or PSI)
@@ -328,10 +331,18 @@ module PubidNew
         # Extract number
         attributes[:code] = extract_value(parsed[:number])
 
-        # For PSI, extract draft version
-        if si_type == "PSI" && parsed[:draft_version]
-          draft_version = extract_value(parsed[:draft_version])
-          attributes[:draft_version] = "D#{draft_version}"
+        # For PSI (draft), create proper Draft component object
+        if si_type == "PSI"
+          if parsed[:draft_version]
+            draft_version = extract_value(parsed[:draft_version])
+            # Create Draft component (Lutaml::Model object)
+            attributes[:draft_obj] = Components::Draft.new(version: draft_version)
+          end
+          # Set PSI typed_stage (draft stage)
+          attributes[:typed_stage] = Identifiers::SiStandard::TYPED_STAGES.find { |ts| ts.abbr.include?("PSI") }
+        else
+          # Set SI typed_stage (published stage)
+          attributes[:typed_stage] = Identifiers::SiStandard::TYPED_STAGES.find { |ts| ts.abbr.include?("SI") }
         end
 
         # Extract year and month
@@ -346,27 +357,16 @@ module PubidNew
         # Handle parenthetical content
         handle_parameters(parsed, attributes)
 
-        # Select appropriate class
-        identifier_class = if si_type == "PSI"
-          require_relative "identifiers/psi_standard"
-          Identifiers::PsiStandard
-        else
-          require_relative "identifiers/si_standard"
-          Identifiers::SiStandard
-        end
-
-        identifier_class.new(**attributes)
+        # BOTH SI and PSI use SiStandard class - just different typed_stages
+        Identifiers::SiStandard.new(**attributes)
       end
 
       # Determine which identifier class to use based on attributes
       def determine_identifier_class(attributes)
-        # Check for SI/PSI standards
-        if attributes[:type] == "SI"
+        # Check for SI standards (handles both SI and PSI via typed_stage)
+        if attributes[:type] == "SI" || attributes[:type] == "PSI"
           require_relative "identifiers/si_standard"
           return Identifiers::SiStandard
-        elsif attributes[:type] == "PSI"
-          require_relative "identifiers/psi_standard"
-          return Identifiers::PsiStandard
         end
 
         # Check for corrigendum supplements

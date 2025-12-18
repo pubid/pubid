@@ -38,6 +38,7 @@ module PubidNew
         rule(:aiee_prefix) do
           (
             str("IEEE-AIEE") |  # Transitional period (1963-1965)
+            str("A.I.E.E.") |   # NEW Session 171: With dots variant
             str("AIEE")
           ).as(:publisher)
         end
@@ -45,8 +46,9 @@ module PubidNew
         # Document types
         rule(:aiee_type) do
           (
+            str("Nos") |          # NEW Session 171: Plural variant (e.g., "Nos 72 and 73")
             str("No.") |          # AIEE No. 56
-            str("No") >> space.absent? |  # AIEE No 18 (without dot, followed by space)
+            str("No") |           # AIEE No 18 (can be followed by space)
             str("Standard") |     # AIEE Standard 56
             str("Trans.")         # AIEE Trans. PAS-84
           ).as(:type)
@@ -58,20 +60,32 @@ module PubidNew
             # Transaction format: PAS-84, PGI-7
             (upper.repeat(2, 3) >> dash >> digits) |
 
-            # Complex with letter suffix: 27A, 22A (WITHOUT dash to year)
-            (digits >> upper) |
+            # Complex with letter suffix: 27A, 22A, 1E - allow space before dash
+            # But don't match if it's actually "Nos 72 and 73" pattern
+            (digits >> upper >> (space >> str("and")).absent?) |
 
             # Simple number: 56, 123, 18, 552
-            digits
+            digits >>
+
+            # Handle "Nos X and Y" pattern - we only capture first number
+            (space >> str("and") >> space >> digits).absent?
           ).as(:number)
         end
 
         # Date formats
-        # Long form: ", 1956" or ", November 1955" or ". December 1958"
+        # Long form: ", 1956" or ", November 1955" or ". December 1958" or " -1957" (with space)
+        # NEW: Also support "May-1928" (month dash year, no comma)
         rule(:date_long) do
-          space? >> (str(",") | dot).as(:separator) >> space? >>
-          (month_name.as(:month) >> space).maybe >>
-          year.as(:year)
+          space? >>
+          (
+            # Format 1: ", Month Year" or ". Month Year"
+            ((str(",") | dot).as(:separator) >> space? >>
+             (month_name.as(:month) >> space).maybe >> year.as(:year)) |
+            # Format 2: " -Year" (space dash year)
+            ((space >> dash).as(:separator) >> space? >> year.as(:year)) |
+            # Format 3: "Month-Year" (NEW - month dash year, no comma/dot/space prefix)
+            (month_name.as(:month) >> dash >> year.as(:year))
+          )
         end
 
         # Short form: "-1962" (directly after number)

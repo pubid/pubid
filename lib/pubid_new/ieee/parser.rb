@@ -747,6 +747,7 @@ module PubidNew
         # NEW Phase 1: Remove trailing commas/colons and text
         cleaned = cleaned.gsub(/,\s*Standard\s*$/, '')  # ", Standard" at end
         cleaned = cleaned.gsub(/[,:]\s*$/, '')           # Trailing comma/colon
+        cleaned = cleaned.gsub(/,\s+and\s+IEEE\s+Std\s/, ' and ')  # Handle "IEEE Std and Std" case
 
         # === SESSION 173: TODO.IEEE-MUST-DO.txt Preprocessing Enhancements ===
 
@@ -795,6 +796,31 @@ module PubidNew
         # "IEEE Std 960-1989, Std 1177-1989" → "IEEE Std 960-1989 and IEEE Std 1177-1989"
         # Pattern: year + comma + space + "Std" + space + number
         cleaned = cleaned.gsub(/(\d{4}),\s+Std\s/, '\1 and IEEE Std ')
+
+        # === SESSION 174: Additional TODO.IEEE-MUST-DO.txt Preprocessing ===
+
+        # Part A: Edition Abbreviation Normalization (Lines 10-11)
+        # Pattern: ", 1999 Edn. (Reaff 2003)" → "-1999 (R2003)"
+        # Normalize both the Edition abbreviation and the Reaffirmed format
+        cleaned = cleaned.gsub(/,\s+(\d{4})\s+Edn\.\s+\(Reaff\s+(\d{4})\)/, '-\1 (R\2)')
+        # Also handle without initial comma (might occur in relationships)
+        cleaned = cleaned.gsub(/(\d{4})\s+Edn\.\s+\(Reaff\s+(\d{4})\)/, '\1 (R\2)')
+
+        # Part B: IRE Parenthetical Split (Line 9)
+        # Pattern: "(Reaffirmed 1980, 56 IRE 28.S2)" → "(R1980) (56 IRE 28.S2)"
+        # Split nested reaffirmation + IRE reference into two parentheticals
+        cleaned = cleaned.gsub(/\(Reaffirmed\s+(\d{4}),\s+(\d+\s+IRE[^)]+)\)/, '(R\1) (\2)')
+
+        # Part C: Slash to Parenthetical (Line 37)
+        # Pattern: "number-year/ANSI identifier" → "number-year (ANSI identifier)"
+        # Only convert if slash is followed by ANSI and NOT a relationship keyword
+        # Look ahead to ensure we're at end of main identifier (before paren or end of string)
+        cleaned = cleaned.gsub(%r{(\d{4})/ANSI\s+([^(]+)(?=\s*\(|$)}, '\1 (ANSI \2)')
+
+        # Part D: ISO/IEC TR Spacing (Line 40)
+        # Pattern: "ISO/IEC TR11802" → "ISO/IEC TR 11802"
+        # Add space after TR when directly followed by digit
+        cleaned = cleaned.gsub(/(ISO\/IEC\s+TR)(\d)/, '\1 \2')
 
         new.parse(cleaned)
       end

@@ -267,6 +267,39 @@ module PubidNew
             end
           end
 
+          # NEW Session 171: Check for dual published patterns with " & " (ampersand)
+          if input.include?(" & ")
+            # DON'T split if " & " is inside parentheses
+            paren_count = 0
+            ampersand_outside_parens = false
+
+            input.each_char.with_index do |char, i|
+              paren_count += 1 if char == '('
+              paren_count -= 1 if char == ')'
+
+              # Check if " & " starts at this position and we're outside parens
+              if paren_count == 0 && input[i..i+2] == " & "
+                ampersand_outside_parens = true
+                break
+              end
+            end
+
+            # Only split if " & " is outside parentheses
+            if ampersand_outside_parens
+              parts = input.split(" & ")
+              if parts.length == 2
+                # Parse each part separately
+                first = parse_single(parts[0].strip)
+                second = parse_single(parts[1].strip)
+
+                return Identifiers::DualPublished.new(
+                  first_identifier: first,
+                  second_identifier: second
+                )
+              end
+            end
+          end
+
           # Special case: AIEE identifiers with ASA parenthetical references
           # Pattern: "AIEE No 18-1934 (ASA C55 1934)"
           if input.match?(/^AIEE\s+/) && input.include?("(") && input.include?("ASA")
@@ -305,7 +338,7 @@ module PubidNew
             # AND exclude Pattern 4 relationship types
             if main_part && adoption_part &&
                !adoption_part.include?(",") &&  # Skip multi-part adoptions
-               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Incorporates|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|redesignated as|Supersedes|Supercedes|Previously designated as|Notebooks|Standard Newspaper)/i) &&
+               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Incorporates|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|redesignated as|Supersedes|Supercedes|Includes|Previously designated as|Notebooks|Standard Newspaper)/i) &&
                (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
                 adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
                 adoption_part.match?(/\bStd\s+\d+/))

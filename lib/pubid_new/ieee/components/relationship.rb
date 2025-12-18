@@ -35,6 +35,7 @@ module PubidNew
         REDESIGNATION_OF = "redesignation_of"
         SUPERSEDES = "supersedes"
         PREVIOUSLY_DESIGNATED_AS = "previously_designated_as"
+        INCLUDES = "includes"  # NEW Session 171: For "Includes IEEE Std X" pattern
 
         # All valid relationship types
         VALID_TYPES = [
@@ -50,7 +51,8 @@ module PubidNew
           REAFFIRMATION_OF,
           REDESIGNATION_OF,
           SUPERSEDES,
-          PREVIOUSLY_DESIGNATED_AS
+          PREVIOUSLY_DESIGNATED_AS,
+          INCLUDES  # NEW Session 171
         ].freeze
 
         # Attributes
@@ -124,6 +126,7 @@ module PubidNew
           when REDESIGNATION_OF then "Redesignation of"
           when SUPERSEDES then "Supersedes"
           when PREVIOUSLY_DESIGNATED_AS then "Previously designated as"
+          when INCLUDES then "Includes"  # NEW Session 171
           else relationship_type
           end
         end
