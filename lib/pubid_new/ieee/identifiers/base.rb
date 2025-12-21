@@ -266,6 +266,7 @@ module PubidNew
             # Check if parentheses are balanced and " and " is inside them
             paren_count = 0
             and_outside_parens = false
+            and_position = nil
 
             input.each_char.with_index do |char, i|
               paren_count += 1 if char == '('
@@ -274,23 +275,25 @@ module PubidNew
               # Check if " and " starts at this position and we're outside parens
               if paren_count == 0 && input[i..i+4] == " and "
                 and_outside_parens = true
+                and_position = i
                 break
               end
             end
 
             # Only split if " and " is outside parentheses
-            if and_outside_parens
-              parts = input.split(" and ")
-              if parts.length == 2
-                # Parse each part separately
-                first = parse_single(parts[0].strip)
-                second = parse_single(parts[1].strip)
+            if and_outside_parens && and_position
+              # Split at the found position only (not at all " and " occurrences)
+              first_part = input[0...and_position].strip
+              second_part = input[and_position+5..-1].strip
 
-                return Identifiers::DualPublished.new(
-                  first_identifier: first,
-                  second_identifier: second
-                )
-              end
+              # Parse each part separately
+              first = parse_single(first_part)
+              second = parse_single(second_part)
+
+              return Identifiers::DualPublished.new(
+                first_identifier: first,
+                second_identifier: second
+              )
             end
           end
 

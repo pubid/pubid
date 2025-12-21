@@ -1,12 +1,12 @@
 Flavor: IEEE
-Classified: 2025-12-21 11:41:42
+Classified: 2025-12-21 14:54:42
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total: 9552
-Pass: 8612 (90.16%)
-Fail: 940 (9.84%)
+Pass: 8613 (90.17%)
+Fail: 939 (9.83%)
 
 BY CLASS
 ----------------------------------------------------------------------
@@ -15,11 +15,11 @@ base                                     Pass: 7738/7738 (100.0%)
 corrigendum                              Pass: 190/190 (100.0%)
 csa_dual_published                       Pass: 4/4 (100.0%)
 draft                                    Pass: 1/1 (100.0%)
-dual_published                           Pass: 30/30 (100.0%)
+dual_published                           Pass: 31/31 (100.0%)
 handbook                                 Pass: 2/2 (100.0%)
 identifier                               Pass: 66/66 (100.0%)
 iec_ieee_copublished                     Pass: 50/50 (100.0%)
 joint_development                        Pass: 5/5 (100.0%)
 redlined_standard                        Pass: 442/442 (100.0%)
 si_standard                              Pass: 7/7 (100.0%)
-standard                                 Pass: 1/941 (0.11%)
+standard                                 Pass: 1/940 (0.11%)
