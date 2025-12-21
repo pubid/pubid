@@ -25,6 +25,12 @@ module PubidNew
           return build_csa_dual_published(parsed)
         end
 
+        # Handle combined AIEE identifiers (from "Nos X and Y" preprocessing)
+        if parsed[:first_aiee] && parsed[:second_aiee]
+          return build_combined_aiee(parsed)
+        end
+
+
         # Handle dual published patterns
         if parsed[:first] && parsed[:second]
           return build_dual_published(parsed)
@@ -856,6 +862,23 @@ module PubidNew
           []
         end
       end
+      # Build combined AIEE identifier from "and"-separated identifiers
+      # @param parsed [Hash] parsed combined AIEE data
+      # @return [Identifiers::CombinedAiee] combined AIEE identifier
+      def build_combined_aiee(parsed)
+        # Build each AIEE identifier using AIEE builder
+        aiee_builder = Aiee::Builder.new
+        first_id = aiee_builder.build(parsed[:first_aiee])
+        second_id = aiee_builder.build(parsed[:second_aiee])
+
+        # Create a simple combined identifier (reuse DualPublished pattern)
+        Identifiers::DualPublished.new(
+          first_identifier: first_id,
+          second_identifier: second_id,
+          separator: " and "
+        )
+      end
+
     end
   end
 end

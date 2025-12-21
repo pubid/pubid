@@ -488,6 +488,17 @@ module PubidNew
         parenthetical.maybe
       end
 
+      # Combined AIEE identifier pattern: "AIEE No 72-1932 and AIEE No 73-1932"
+      # Handles "and"-separated AIEE identifiers (from "Nos X and Y" preprocessing)
+      rule(:combined_aiee_identifier) do
+        # First AIEE identifier
+        Aiee::Parser.new.aiee_identifier.as(:first_aiee) >>
+        # "and" separator
+        space >> str("and") >> space >>
+        # Second AIEE identifier
+        Aiee::Parser.new.aiee_identifier.as(:second_aiee)
+      end
+
       # AIEE (American Institute of Electrical Engineers) patterns
       # Detect AIEE patterns and delegate to AIEE parser
       rule(:aiee_identifier) do
@@ -588,10 +599,10 @@ module PubidNew
         # Now match the corrigendum portion
         (slash | dash | space) >>
         str("Cor") >>
-        (dash | dot | space).maybe >>
+        (dash | dot | space).maybe >> # More flexible separator after "Cor"
         space? >>
         digits.as(:cor_number) >>
-        ((dash | str(":") | space) >> year_digits.as(:cor_year)).maybe >>
+        ((dash | str(":") | space) >> year_digits.as(:cor_year)).maybe >> # Optional cor year suffix
         parenthetical.maybe
       end
 
@@ -624,7 +635,9 @@ module PubidNew
 
       # Basic IEEE identifier (no dual PubIDs or complex revisions yet)
       rule(:identifier) do
+        combined_aiee_identifier |
         aiee_identifier |
+        combined_aiee_identifier |
         ire_identifier |
         nesc_identifier |
         ieee_astm_si_psi |  # NEW Session 171: Add IEEE/ASTM SI/PSI support
@@ -821,6 +834,20 @@ module PubidNew
         # Pattern: "ISO/IEC TR11802" → "ISO/IEC TR 11802"
         # Add space after TR when directly followed by digit
         cleaned = cleaned.gsub(/(ISO\/IEC\s+TR)(\d)/, '\1 \2')
+        # === SESSION 178: AIEE Dual Numbers Expansion (Line 45) ===
+        
+        # Part E: AIEE "Nos X and Y" Expansion
+        # Pattern: "AIEE Nos 72 and 73 - 1932" → "AIEE No 72-1932 and AIEE No 73-1932"
+        # Expands dual AIEE numbers to separate identifiers with shared year
+        if cleaned.match?(/AIEE\s+Nos\s+(\d+)\s+and\s+(\d+)\s+-\s+(\d{4})/)
+          cleaned = cleaned.sub(/AIEE\s+Nos\s+(\d+)\s+and\s+(\d+)\s+-\s+(\d{4})/) do
+            first_num = $1
+            second_num = $2
+            year = $3
+            "AIEE No #{first_num}-#{year} and AIEE No #{second_num}-#{year}"
+          end
+        end
+
 
         new.parse(cleaned)
       end
