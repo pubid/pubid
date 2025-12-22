@@ -31,11 +31,16 @@ module PubidNew
         cleaned = cleaned.gsub(/ver(\d+)e(\d{4})/, 'ver\1 e\2')
         cleaned = cleaned.gsub(/ver(\d+)v(\d+)/, 'ver\1 v\2')
 
+        # Fix dotted version: separate from number "268v1.1" → "268 v1.1"
+        cleaned = cleaned.gsub(/(\d)(v\d+\.\d+)/, '\1 \2')
+
         # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
         cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')
 
-        # Fix update at end: "500-300-upd" → "500-300 -upd"
-        cleaned = cleaned.gsub(/(\d+)-upd$/, '\1 -upd')
+        # Fix update patterns: ensure space before -upd or /upd (not just at end)
+        cleaned = cleaned.gsub(/(\d+)-upd/, '\1 -upd')    # Match anywhere, not just end
+        cleaned = cleaned.gsub(/(\d+)\/upd/, '\1 /upd')   # Slash variant
+        cleaned = cleaned.gsub(/([a-z]\d+)\/upd/, '\1 /upd')  # After revision: r1/upd
 
         # Fix pd spacing: "800-140Br1 2pd" → "800-140B r1 2pd", " 3pd" → " 3 pd"
         cleaned = cleaned.gsub(/\s+(\d+)pd$/, ' \1 pd')
@@ -158,8 +163,18 @@ module PubidNew
       # Suffix letter only if NOT followed by digit (prevents consuming 'e2', 'r1', etc.)
       # AND not followed by special keywords like 'sec', 'index', 'insert', 'errata'
       rule(:number_suffix) do
-        match("[a-zA-Z]") >>
-        (str("ec") | str("ndex") | str("nsert") | str("rrata") | str("pp") | str("s") | str("t") | str("hi") | str("iet") | str("ort")).absent? >>
+        match("[a-zA-Z]") >> (
+          # Match suffixes
+          str("ec") |
+          str("ndex") |
+          str("nsert") |
+          str("rrata") |
+          str("pp") |
+          str("s") |
+          str("t") |
+          str("hi") |
+          str("iet") |
+          str("ort")).absent? >>
         digits.maybe
       end
 
@@ -285,8 +300,13 @@ module PubidNew
 
       # Revision
       rule(:revision) do
-        ((str(" rev ") | str("rev") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
-          (digits >> lower_letter.maybe).maybe).as(:revision)
+        (
+          # Revision with year: rev2013
+          (str("rev") >> digits.as(:revision_year)) |
+          # Revision with optional digits AND optional letter: r1a, ra, r1
+          ((str(" rev ") | str("rev") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
+            (digits.maybe >> lower_letter.maybe).as(:revision))
+        )
       end
 
       # Version - V1 SP PARSER COMPATIBLE
@@ -298,8 +318,8 @@ module PubidNew
           # Verbose forms with space: " Ver. ", " Version " - require dots
           ((str(" Ver. ") | str(" Version ")) >>
             (digits >> dot >> digits >> (dot >> digits).maybe).as(:version)) |
-          # Short form "v" with mandatory dots (v1.0, v1.0.2) - LAST to avoid volume
-          (str("v") >> (digits >> dot >> digits >> (dot >> digits).maybe).as(:version))
+          # Short form "v" with mandatory dots (v1.0, v1.0.2) - allow optional space before
+          (space.maybe >> str("v") >> (digits >> dot >> digits >> (dot >> digits).maybe).as(:version))
         )
       end
 
@@ -307,7 +327,7 @@ module PubidNew
       # Format: /Upd{N}-{YYYY}{MM} where MM is optional
       # Examples: /Upd1-2015, /Upd3-202102
       rule(:update) do
-        (str("/Upd") | str("/upd") | str("-upd")) >>
+        (str("/Upd") | str("/upd") | space.maybe >> str("-upd")) >>
         (
           digits.as(:update_number) >>
           (dash >>
@@ -405,7 +425,9 @@ module PubidNew
           # CRITICAL: new_stage BEFORE language_code to avoid "ipd" being treated as translation
           new_stage |
           section | index | insert | appendix | pd_suffix |
-          edition | revision | version | volume | part | update | addendum |
+          edition | revision |
+          version |  # MOVED BEFORE volume - try dotted versions (v1.1) before simple volumes (v1)
+          volume | part | update | addendum |
           supplement | errata | language_code
         )
       end
