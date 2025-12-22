@@ -22,8 +22,7 @@ module PubidNew
     # @param identifier [String] the identifier string to parse
     # @return [Identifiers::Base] the parsed identifier
     def self.parse(identifier)
-      parser = Parser.new
-      parsed = parser.parse(identifier)
+      parsed = Parser.parse(identifier)
 
       # Use Scheme and Builder for clean architecture
       # ONE CLASS PER SERIES TYPE (like ISO)

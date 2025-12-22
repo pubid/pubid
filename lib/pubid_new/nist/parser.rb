@@ -7,6 +7,67 @@ module PubidNew
     # Parser class for NIST identifiers
     # Single Responsibility: Parsing NIST identifier syntax
     class Parser < Parslet::Parser
+      # Class-level parse method with preprocessing
+      # Handles data quality normalization before parsing
+      def self.parse(input)
+        # Normalize input
+        cleaned = input.to_s.strip
+
+        # Fix lowercase publisher at start
+        cleaned = cleaned.sub(/^nbs\b/i, 'NBS')
+        cleaned = cleaned.sub(/^nist\b/i, 'NIST')
+
+        # Fix Roman numerals: "1011-I-2" → keep as is, but fix spaces: "1011-I-2 0" → "1011-I-2.0"
+        cleaned = cleaned.gsub(/([-\d]+[IVX]+[-\d]+)\s+(\d+)/, '\1.\2')
+
+        # Fix rev without space before year: "260-126rev2013" → "260-126 rev2013"
+        cleaned = cleaned.gsub(/(\d)rev(\d{4})/, '\1 rev\2')
+
+        # Fix Pt pattern: "800-57Pt3r1" → "800-57 pt3 r1"
+        cleaned = cleaned.gsub(/(\d)Pt(\d+)(r\d+)/, '\1 pt\2 \3')
+
+        # Fix version patterns: "ver1e2006" → "ver1 e2006", "ver2v1" → "ver2 v1"
+        cleaned = cleaned.gsub(/(\d)ver(\d)/, '\1 ver\2')
+        cleaned = cleaned.gsub(/ver(\d+)e(\d{4})/, 'ver\1 e\2')
+        cleaned = cleaned.gsub(/ver(\d+)v(\d+)/, 'ver\1 v\2')
+
+        # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
+        cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')
+
+        # Fix update at end: "500-300-upd" → "500-300 -upd"
+        cleaned = cleaned.gsub(/(\d+)-upd$/, '\1 -upd')
+
+        # Fix pd spacing: "800-140Br1 2pd" → "800-140B r1 2pd", " 3pd" → " 3 pd"
+        cleaned = cleaned.gsub(/\s+(\d+)pd$/, ' \1 pd')
+
+        # Fix "Suppl" with space: "955 Suppl" → "955Suppl"
+        cleaned = cleaned.gsub(/(\d+)\s+Suppl\b/, '\1Suppl')
+
+        # Fix number with space (when not handled above): "984 4" → "984_4"
+        cleaned = cleaned.gsub(/(\d{3,})\s+(\d{1,2})$/, '\1_\2')
+
+        # Detect format before parsing
+        format = detect_format(input.to_s)
+
+        # Use Parslet parser instance
+        result = new.parse(cleaned)
+
+        # Add format to result
+        result.is_a?(Hash) ? result.merge(parsed_format: format) : result
+      end
+
+      # Detect format from input string
+      # :mr if contains dots (machine-readable: NIST.SP.800-53)
+      # :short otherwise (default: NIST SP 800-53)
+      def self.detect_format(input)
+        # Check if it has dot separators between publisher/series/number
+        if input.match?(/^[A-Z]+\.[A-Z]+\.\d/)
+          :mr
+        else
+          :short
+        end
+      end
+
       # Basic building blocks
       rule(:space) { str(" ") }
       rule(:dot) { str(".") }
@@ -30,6 +91,34 @@ module PubidNew
         str("Jun") | str("Jul") | str("Aug") | str("Sep") | str("Oct") | str("Nov") | str("Dec")
       end
 
+      # Language codes for translations - 2-4 letter codes
+      rule(:language_code) do
+        (str("es") | str("pt") | str("chi") | str("viet") | str("port") | str("esp") |
+         match("[a-z]").repeat(2, 4)).as(:translation)
+      end
+
+      # Stage ID: i (initial), f (final), 1-9 (numbered iterations)
+      rule(:stage_id) do
+        (str("i") | str("I") | str("f") | str("F") |
+         str("1") | str("2") | str("3") | str("4") | str("5") |
+         str("6") | str("7") | str("8") | str("9"))
+      end
+
+      # Stage type: pd (public draft), wd (work-in-progress), prd (preliminary)
+      rule(:stage_type) do
+        (str("pd") | str("PD") | str("wd") | str("WD") | str("prd") | str("PRD"))
+      end
+
+      # Old style stage: (IPD), (FPD), (2PD) - parenthetical at document start
+      rule(:old_stage) do
+        str("(") >> (stage_id.as(:stage_id) >> stage_type.as(:stage_type)).as(:stage) >> str(")")
+      end
+
+      # New style stage: " ipd", ".ipd" - inline at document end
+      rule(:new_stage) do
+        (space | dot) >> (stage_id.as(:stage_id) >> stage_type.as(:stage_type)).as(:stage)
+      end
+
       # Publisher
       rule(:publisher) do
         (str("NBS") | str("NIST")).as(:publisher)
@@ -43,8 +132,9 @@ module PubidNew
           str("NBS CS-E") | str("CSRC Building Block") | str("CSRC Use Case") | str("CSRC Book") |
           str("ITL Bulletin") | str("NIST LC") | str("NIST PS") | str("NIST DCI") | str("NIST Other") |
           str("NSRDS-NBS") |
-          # NBS specific patterns that conflict with simple series (shorter ones)
-          str("NBS LCIRC") | str("NBS CSM") | str("NBS CIRC") | str("NBS CRPL") | str("NBS CS") |
+          # NBS and NIST specific patterns that conflict with simple series (shorter ones)
+          str("NIST LCIRC") | str("NBS LCIRC") | str("NBS RPT") | # Added NIST LCIRC and NBS RPT
+          str("NBS CSM") | str("NBS CIRC") | str("NBS CRPL") | str("NBS CS") |
           str("NBS CIS") | str("NBS HR") | str("NBS IRPL") | str("NBS IP") | str("NBS LC") | str("NBS PS") |
           str("NBS BH")
         ).as(:series)
@@ -69,7 +159,7 @@ module PubidNew
       # AND not followed by special keywords like 'sec', 'index', 'insert', 'errata'
       rule(:number_suffix) do
         match("[a-zA-Z]") >>
-        (str("ec") | str("ndex") | str("nsert") | str("rrata") | str("pp")).absent? >>
+        (str("ec") | str("ndex") | str("nsert") | str("rrata") | str("pp") | str("s") | str("t") | str("hi") | str("iet") | str("ort")).absent? >>
         digits.maybe
       end
 
@@ -83,6 +173,10 @@ module PubidNew
       # Supplements should be handled as separate parts
       rule(:first_number) do
         (
+          # Roman numeral patterns: 1011-I, 1011-II, 1011-III
+          (digits >> dash >> (str("III") | str("II") | str("IV") | str("I") | str("V") | str("VI") | str("VII") | str("VIII") | str("IX") | str("X")) >> dash >> digits) |
+          # GB series pattern: 1190GB-1, 1190GB-4A
+          (digits >> str("GB") >> dash >> digits >> upper_letter.maybe) |
           # Volume-number format for CSM series: v6n1, v7n12
           (str("v") >> digits >> str("n") >> digits) |
           # Regular number with supplement and revision suffix: "154supprev"
@@ -107,6 +201,8 @@ module PubidNew
           (digits >> str("supp") >> digits.maybe) |
           # Regular number with supplement suffix followed by month/year for date range
           (digits >> str("sup") >> month_abbrev >> digits) |
+          # Regular number with "sp" suffix (e.g., "1088sp") - NEW for LCIRC patterns
+          (digits >> str("sp")) |
           # Regular number with optional suffix (original) - includes letters like "A"
           digits_with_suffix
         ).as(:first_number)
@@ -123,6 +219,8 @@ module PubidNew
           (digits >> str("pt") >> digits) |
           # Special patterns like "NCNR", "PERMIS", "BFRL"
           str("NCNR") | str("PERMIS") | str("BFRL") |
+          # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
+          upper_letter.repeat(1, 3) |
           # Regular number with optional suffix
           digits_with_suffix
         ).as(:second_number)
@@ -131,6 +229,14 @@ module PubidNew
       # Edition with different formats
       rule(:edition) do
         (
+          # Date format with dash-month-day-slash-year: "11-1-Sep30/1977", "54-1-Jan15/1991"
+          # This is actually a date pattern, not edition - treat the last part as a special date
+          (dash >> digits.as(:part) >> dash >> month_abbrev.as(:date_month) >>
+            digits.as(:date_day) >> slash >> digits.as(:date_year)).absent? >>
+          # Edition with complex revision patterns: r1a, r2b
+          ((str("r") | str(" R")) >> match("[0-9]").repeat(1, 2).as(:edition) >> lower_letter.as(:edition_letter)) |
+          # Edition with revision and year: rev2013, rev2020
+          (str("rev") >> digits.as(:edition_year)) |
           # Edition with revision and date: e2revJune1908, e3revJan1925
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >>
            str("rev") >> match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year)) |
@@ -141,7 +247,7 @@ module PubidNew
           # Edition with dash and year/month: -2018, -Jan2018, -June1908, -April1909
           (dash >> (
             (match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year)) |
-            digits.as(:edition_year) |
+           digits.as(:edition_year) |
             (match("[A-Za-z]").repeat(3, 3).as(:edition_month) >> match("[0-9]").repeat(2, 2).as(:edition_day) >>
               slash >> digits.as(:edition_year))
           )) |
@@ -166,7 +272,7 @@ module PubidNew
 
       # Volume
       rule(:volume) do
-        (str("v") | str(" Vol. ")) >> (digits >> (str("a-l") | str("m-z")).maybe >> upper_letter.repeat).as(:volume)
+        (str("v") | str(" Vol. ")) >> (digits >> (str("a-l") | str("m-z")).maybe >> upper_letter.repeat(0, 2)).as(:volume)
       end
 
       # Part - enhanced to support patterns like p1adde1 (part 1 addition edition 1)
@@ -183,16 +289,32 @@ module PubidNew
           (digits >> lower_letter.maybe).maybe).as(:revision)
       end
 
-      # Version - enhanced for dot-separated versions
+      # Version - V1 SP PARSER COMPATIBLE
+      # Supports: ver1.0.2, ver2, " Ver. 2.0", " Version 1.0", v1.0.2
       rule(:version) do
-        ((str("ver") | str(" Ver. ") | str(" Version ") | str("v")) >>
-          (digits >> (dot >> digits).repeat).maybe).as(:version)
+        (
+          # Verbose "ver" form - with or without dots
+          (str("ver") >> (digits >> (dot >> digits).repeat).as(:version)) |
+          # Verbose forms with space: " Ver. ", " Version " - require dots
+          ((str(" Ver. ") | str(" Version ")) >>
+            (digits >> dot >> digits >> (dot >> digits).maybe).as(:version)) |
+          # Short form "v" with mandatory dots (v1.0, v1.0.2) - LAST to avoid volume
+          (str("v") >> (digits >> dot >> digits >> (dot >> digits).maybe).as(:version))
+        )
       end
 
-      # Update
+      # Update - V1 COMPATIBLE
+      # Format: /Upd{N}-{YYYY}{MM} where MM is optional
+      # Examples: /Upd1-2015, /Upd3-202102
       rule(:update) do
-        ((str("/Upd") | str("/upd") | str("-upd")) >>
-          (digits.as(:update_number) >> (dash >> digits.as(:update_year)).maybe)).as(:update)
+        (str("/Upd") | str("/upd") | str("-upd")) >>
+        (
+          digits.as(:update_number) >>
+          (dash >>
+            match("[0-9]").repeat(4, 4).as(:update_year) >>
+            match("[0-9]").repeat(2, 2).as(:update_month).maybe
+          ).maybe
+        ).as(:update)
       end
 
       # Addendum
@@ -247,33 +369,55 @@ module PubidNew
         str("sec") >> digits.as(:section).maybe
       end
 
-      # Translation (3-letter language code)
+      # Translation (3-letter language code) - V1 COMPATIBLE
+      # Supports: (spa), " spa", ".spa" (MR format)
       rule(:translation) do
-        ((str("(") >> letter.repeat(3, 3).as(:translation) >> str(")")) |
-          ((dot | space) >> letter.repeat(3, 3).as(:translation)))
+        (
+          # Parenthetical format: (spa), (por), (ind)
+          (str("(") >> match('\w').repeat(3, 3).as(:translation) >> str(")")) |
+          # Space-prefix format: " spa"
+          (space >> match('\w').repeat(3, 3).as(:translation)) |
+          # Dot-prefix format: ".spa" (machine-readable)
+          (dot >> match('\w').repeat(3, 3).as(:translation))
+        )
+      end
+
+      # Public draft suffix - for patterns like 2pd, 3pd
+      rule(:pd_suffix) do
+        (space >> digits >> str("pd")).as(:public_draft)
       end
 
       # Draft stage - enhanced to support suffix pattern
       rule(:draft) do
-        (space >> str("(Draft)") | dash >> str("draft")).as(:draft)
+        (space >> str("(Draft)") | dash >> str("draft") | pd_suffix).as(:draft)
+      end
+
+      # Special date format with slash for FIPS (part of number, not edition)
+      rule(:fips_date) do
+        (dash >> digits.as(:fips_part) >> dash >> month_abbrev.as(:fips_month) >>
+          digits.as(:fips_day) >> slash >> digits.as(:fips_year))
       end
 
       # All possible parts (order matters!)
       rule(:parts) do
         (
           # Put more specific patterns first
-          section | index | insert | appendix |
+          # CRITICAL: new_stage BEFORE language_code to avoid "ipd" being treated as translation
+          new_stage |
+          section | index | insert | appendix | pd_suffix |
           edition | revision | version | volume | part | update | addendum |
-          supplement | errata
+          supplement | errata | language_code
         )
       end
 
       # Dot-separated machine-readable format: NIST.SP.800-116 or #NIST.2024-01-15.123
+      # Enhanced to support parts after number like NIST.SP.1011-I-2.0
       rule(:mr_identifier) do
         hash_prefix.maybe >>
         publisher >> dot >>
         simple_series >> dot >>
         report_number >>
+        (dot >> (digits | upper_letter)).repeat(0, 3) >>  # Support additional dot-separated parts
         (dash >> str("upd") >> digits.maybe).maybe >>
         parts.repeat >> draft.maybe
       end
@@ -285,18 +429,23 @@ module PubidNew
         (
           # Compound series (includes publisher in series name)
           compound_series >> (space | dot) >>
-          report_number.maybe >> parts.repeat >> draft.maybe >> translation.maybe
+          old_stage.maybe >>  # Old style stage after series
+          report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
         ) |
         (
           # Publisher + simple series - require space/dot between publisher and series
           publisher >> (space | dot) >>
-          simple_series >> (space | dot) >>
-          report_number.maybe >> parts.repeat >> draft.maybe >> translation.maybe
+          simple_series >>
+          old_stage.maybe >>  # Old style stage after series
+          (space | dot) >>
+          report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
         ) |
         (
           # Simple series only (no publisher)
-          simple_series >> (space | dot) >>
-          report_number.maybe >> parts.repeat >> draft.maybe >> translation.maybe
+          simple_series >>
+          old_stage.maybe >>  # Old style stage after series
+          (space | dot) >>
+          report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
         )
       end
 

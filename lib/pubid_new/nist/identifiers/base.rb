@@ -3,17 +3,31 @@
 require "lutaml/model"
 require_relative "../components/publisher"
 require_relative "../components/code"
+require_relative "../components/stage"
+require_relative "../components/edition"
+require_relative "../components/version"
+require_relative "../components/update"
+require_relative "../components/translation"
 
 module PubidNew
   module Nist
     module Identifiers
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
-      # Components (volume, part, revision, etc.) are shared
       class Base < Lutaml::Model::Serializable
         attribute :publisher, Components::Publisher
         attribute :series, Components::Code  # Set by Builder from parsed data
         attribute :number, Components::Code
+
+        # V2 COMPONENTS (Lutaml::Model objects)
+        attribute :stage, Components::Stage
+        attribute :edition_component, Components::Edition
+        attribute :version_component, Components::Version
+        attribute :update_component, Components::Update
+        attribute :translation_component, Components::Translation
+        attribute :parsed_format, :string  # :mr, :short, :long, :abbrev
+
+        # Original attributes (keep for backward compatibility)
         attribute :parts, Components::Code, collection: true
         attribute :volume, :string
         attribute :revision, :string
@@ -68,12 +82,12 @@ module PubidNew
         end
 
         # Generate identifier string in specified format
-        # @param format [:full, :abbreviated, :short, :mr] output format
+        # @param format [:full, :long, :abbreviated, :short, :mr] output format
         def to_s(format = :short)
           case format
-          when :full
+          when :full, :long
             to_full_style
-          when :abbreviated
+          when :abbreviated, :abbrev
             to_abbreviated_style
           when :short
             to_short_style
@@ -88,23 +102,54 @@ module PubidNew
 
         def to_full_style
           # "National Institute of Standards and Technology Special Publication 800-27, Revision A"
-          result = publisher == "NBS" ? "National Bureau of Standards" : "National Institute of Standards and Technology"
+          result = publisher_full_name
           result += " #{series_full_name}" if series
-          result += " #{number}" if number
+          result += " #{number.value}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
           result += " Vol. #{volume}" if volume
-          result += ", Revision #{revision}" if revision
-          result += " Ver. #{version}" if version
+          result += ", Revision #{revision.sub(/^r/, '')}" if revision
+
+          # V2: Use version_component
+          result += " #{version_component.to_s(:long)}" if version_component
+
+          # V2: Use edition_component
+          result += " #{edition_component.to_s(:long)}" if edition_component
+
+          # V2: Use update_component
+          result += " #{update_component.to_s(:long)}" if update_component
+
+          # V2: Use stage
+          result += " #{stage.to_s(:long)}" if stage
+
+          # V2: Use translation_component (already includes space)
+          result += "#{translation_component.to_s(:long)}" if translation_component
+
           result
         end
 
         def to_abbreviated_style
           # "Natl. Inst. Stand. Technol. Spec. Publ. 800-57 Part 1, Revision 4"
-          result = publisher == "NBS" ? "Natl. Bur. Stand." : "Natl. Inst. Stand. Technol."
+          result = publisher_abbreviated_name
           result += " #{series_abbreviated_name}" if series
           result += " #{number}" if number
           result += " Part #{parts.first}" if parts&.any?
           result += ", Revision #{revision}" if revision
+
+          # V2: Use version_component
+          result += " #{version_component.to_s(:abbrev)}" if version_component
+
+          # V2: Use edition_component
+          result += " #{edition_component.to_s(:abbrev)}" if edition_component
+
+          # V2: Use update_component
+          result += " #{update_component.to_s(:abbrev)}" if update_component
+
+          # V2: Use stage
+          result += " #{stage.to_s(:abbrev)}" if stage
+
+          # V2: Use translation_component
+          result += ", #{translation_component.to_s(:abbrev)}" if translation_component
+
           result
         end
 
@@ -114,7 +159,7 @@ module PubidNew
 
           # Determine effective publisher
           effective_publisher = publisher ? publisher.to_s : default_publisher
-          
+
           # Determine effective series (use parsed series or series_code method)
           effective_series = series ? series.to_s : (respond_to?(:series_code) ? series_code : nil)
 
@@ -154,18 +199,23 @@ module PubidNew
           # Add revision
           if revision
             # Check if revision already has prefix
-            if revision.match?(/^(Rev\.|Revision)/)
-              result += " #{revision}"
+            if revision.match?(/^(Rev\.|Revision|r)/)
+              result += "#{revision}"
             elsif revision.match?(/^[0-9]/)
-              # Just digits - add short prefix
-              result += " Rev. #{revision}"
+              # Just digits - add short prefix with no space
+              result += "r#{revision}"
             else
-              # Already has prefix (rev, r)
-              result += " #{revision}"
+              # Already has some prefix - use as-is with no space
+              result += "#{revision}"
             end
           end
 
-          result += " Ver. #{version}" if version
+          # V2: Use version_component if available, else use version string
+          if version_component
+            result += " #{version_component.to_s(:short)}"
+          elsif version
+            result += " Ver. #{version}"
+          end
 
           # Add supplement with date range support - FIX: proper spacing
           if supplement_date_range_start && supplement_date_range_end
@@ -185,22 +235,59 @@ module PubidNew
           result += "sec#{section}" if section
           result += "app" if appendix
 
-          result += "-upd#{update}" if update
+          # V2: Use update_component if available, else use update string
+          if update_component
+            result += "#{update_component.to_s(:short)}"
+          elsif update
+            result += "-upd#{update}"
+          end
 
           # Add draft suffix
           result += "-draft" if draft && draft.to_s.include?("draft") && !draft.to_s.include?("Draft)")
+
+          # V2: Add stage component (at end, before translation)
+          if stage
+            result += " #{stage.to_s(:short)}"
+          end
+
+          # V2: Use translation_component if available, else use translation string
+          # Note: translation_component.to_s already includes the space prefix
+          if translation_component
+            result += "#{translation_component.to_s(:short)}"
+          elsif translation
+            result += " #{translation}"
+          end
 
           result
         end
 
         def to_mr_style
-          # "NIST.SP.800-116r1" (machine-readable with dots)
-          result = (publisher || "NIST")
+          # "NIST.SP.800-116r1.ipd" (machine-readable with dots)
+          result = (publisher || "NIST").to_s
           result += ".#{series}" if series
           result += ".#{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
-          result += "r#{revision}" if revision
-          result += "-upd#{update}" if update
+          # Fix: Don't add "r" prefix if revision already has it
+          if revision
+            if revision.to_s.start_with?("r", "R")
+              result += "#{revision}"
+            else
+              result += "r#{revision}"
+            end
+          end
+
+          # V2: Use version_component
+          result += "#{version_component.to_s(:mr)}" if version_component
+
+          # V2: Use update_component
+          result += "#{update_component.to_s(:mr)}" if update_component
+
+          # V2: Use stage
+          result += ".#{stage.to_s(:mr)}" if stage
+
+          # V2: Use translation_component
+          result += "#{translation_component.to_s(:mr)}" if translation_component
+
           result
         end
 
@@ -222,16 +309,32 @@ module PubidNew
           }[series&.to_s || series_code] || (series&.to_s || series_code)
         end
 
+        def publisher_full_name
+          case publisher.to_s
+          when "NBS"
+            "National Bureau of Standards"
+          when "NIST"
+            "National Institute of Standards and Technology"
+          else
+            publisher.to_s
+          end
+        end
+
+        def publisher_abbreviated_name
+          case publisher.to_s
+          when "NBS"
+            "Natl. Bur. Stand."
+          when "NIST"
+            "Natl. Inst. Stand. Technol."
+          else
+            publisher.to_s
+          end
+        end
+
         # Default publisher for series without explicit publisher
         # Subclasses can override
         def default_publisher
           "NIST"
-        end
-
-        # Series code method for subclasses to override
-        # Returns the series code for this identifier type
-        def series_code
-          series ? series.to_s : nil
         end
       end
     end
