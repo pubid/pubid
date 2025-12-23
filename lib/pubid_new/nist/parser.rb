@@ -29,6 +29,9 @@ module PubidNew
         # Fix LCIRC revision with slash and year: "145r6/1925" → "145 r6/1925"
         cleaned = cleaned.gsub(/(\d)(r\d+\/\d{4})/, '\1 \2')
 
+        # Fix LCIRC revision with just year (no slash): "1128r1995" → "1128 r1995"
+        cleaned = cleaned.gsub(/(\d)(r\d{4})/, '\1 \2')
+
         # Fix LCIRC supplement with slash and year: "118supp3/1926" → "118 supp3/1926"
         cleaned = cleaned.gsub(/(\d)(supp\d+\/\d{4})/, '\1 \2')
 
@@ -45,6 +48,12 @@ module PubidNew
 
         # Fix volume ranges: "535v2a-l" → "535 v2a-l", "535v2m-z" → "535 v2m-z"
         cleaned = cleaned.gsub(/(\d)(v\d+[a-z]-[a-z])/, '\1 \2')
+
+        # CRITICAL: Fix revision attached to number BEFORE update patterns!
+        # "8115r1-upd" → "8115 r1-upd" so that later "r1-upd" → "r1 -upd" works
+        # But preserve r6/1925 format (don't add space before slash/year)
+        # And preserve 300-8r1/upd format (don't separate r1/upd)
+        cleaned = cleaned.gsub(/(\d)(r\d+)(?=-|$)/, '\1 \2')
 
         # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
         cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')
@@ -338,11 +347,14 @@ module PubidNew
           # Revision with slash and year: r6/1925, r11/1924 (NEW for LCIRC patterns)
           (space.maybe >> (str("r") | str("rev")) >> digits.as(:revision) >>
            slash >> digits.as(:revision_year)) |
+          # Revision with 4-digit year directly: r1995 (NEW for LCIRC patterns)
+          ((str(" r") | str("r")) >> match("[0-9]").repeat(4, 4).as(:revision_year)) |
           # Revision with year: rev2013
           (str("rev") >> digits.as(:revision_year)) |
-          # Revision with optional digits AND optional letter: r1a, ra, r1
-          ((str(" rev ") | str("rev") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
-            (digits.maybe >> lower_letter.maybe).as(:revision))
+          # Revision with digits AND/OR letters: r1a, ra, r1
+          # Enhanced to accept letter-only revisions and space before r
+          ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
+            (digits >> lower_letter.maybe | lower_letter.repeat(1)).as(:revision))
         )
       end
 
