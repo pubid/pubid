@@ -64,11 +64,18 @@ module PubidNew
         cleaned = cleaned.gsub(/(\d+)\/upd(\d*)/, '\1 /upd\2')   # /upd or /upd1
         cleaned = cleaned.gsub(/([a-z]\d+)-upd/, '\1 -upd')      # r1-upd → r1 -upd
         cleaned = cleaned.gsub(/([a-z]\d+)\/upd/, '\1 /upd')     # After revision: r1/upd → r1 /upd
-        cleaned = cleaned.gsub(/-upd\b/, ' -upd')                # Ensure space before -upd at word boundary
 
-        # Fix supplement patterns: ensure space before supplement
+        # Fix supplement patterns: ensure space before supplement (1st variant)
         # "118supp3" already handled at line 32-33, but add "sup" variant
         cleaned = cleaned.gsub(/(\d)(sup\d)/, '\1 \2')           # 100-2sup1 → 100-2 sup1
+        # Fix supplement patterns: ensure space before supplement (2nd variant)
+        cleaned = cleaned.gsub(/(\d)(sup+)(\d)/, '\1 \2\3')     # 100-2sup+1 → 100-2 sup+1
+        # Fix supplement patterns: ensure space before supplement (3rd variant)
+        cleaned = cleaned.gsub(/(\d)(sup\+)(\d)/, '\1 \2\3')     # 100-2sup+1 → 100-2 sup+1
+        # Fix supplement patterns: ensure space before supplement (4th variant)
+        cleaned = cleaned.gsub(/(\d)(sup\d+)/, '\1 \2')         # 100-2sup1 → 100-2 sup1
+        # Fix supplement patterns: ensure space before supplement (5th variant)
+        cleaned = cleaned.gsub(/(\d)(sup\d+\b)/, '\1 \2')     # 100-2sup1 → 100-2 sup1
 
         # Fix revision letter patterns: ensure space before revision with letter
         cleaned = cleaned.gsub(/(\d)(r\d+[a-z])/, '\1 \2')       # 800-22r1a → 800-22 r1a
@@ -170,10 +177,11 @@ module PubidNew
           # Longest patterns first to avoid partial matches
           str("NBS BRPD-CRPL-D") | str("NBS CRPL-F-A") | str("NBS CRPL-F-B") |
           str("NBS CS-E") | str("CSRC Building Block") | str("CSRC Use Case") | str("CSRC Book") |
-          str("ITL Bulletin") | str("NIST LC") | str("NIST PS") | str("NIST DCI") | str("NIST Other") |
-          str("NSRDS-NBS") |
-          # NBS and NIST specific patterns that conflict with simple series (shorter ones)
-          str("NIST LCIRC") | str("NBS LCIRC") | str("NBS RPT") | # Added NIST LCIRC and NBS RPT
+          str("ITL Bulletin") | str("NSRDS-NBS") |
+          # NBS and NIST specific patterns that conflict with simple series
+          # CRITICAL: Put longer patterns before shorter to avoid partial matches!
+          str("NIST LCIRC") | str("NBS LCIRC") | str("NBS RPT") |
+          str("NIST LC") | str("NIST PS") | str("NIST DCI") | str("NIST Other") |
           str("NBS CSM") | str("NBS CIRC") | str("NBS CRPL") | str("NBS CS") |
           str("NBS CIS") | str("NBS HR") | str("NBS IRPL") | str("NBS IP") | str("NBS LC") | str("NBS PS") |
           str("NBS BH")
@@ -396,6 +404,7 @@ module PubidNew
       # Supplement - enhanced to support date patterns, year patterns, and combined with revision
       # Examples: suppJan1924, supp3/1926, supp1925, supJun1925-Jun1927 (date ranges), supprev
       rule(:supplement) do
+        space.maybe >>
         (str("supp") | str("sup")) >>
         (
           # Supplement followed by revision: supprev
