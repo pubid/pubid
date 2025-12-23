@@ -90,6 +90,12 @@ module PubidNew
         # Fix "Suppl" with space: "955 Suppl" → "955Suppl"
         cleaned = cleaned.gsub(/(\d+)\s+Suppl\b/, '\1Suppl')
 
+        # Fix number with dot (anywhere but avoid versions and Roman numerals):
+        # Match: "SP 984.4" → "SP 984_4", "TN.1648.2009" → "TN.1648_2009"
+        # Skip: "v1.1" (version), "I-2.0" (Roman numeral), dotted MR format separators
+        # Look for: 3+ digits, dot, 1-4 digits, then space or end
+        cleaned = cleaned.gsub(/(\d{3,})\.(\d{1,4})(?=\s|$)/, '\1_\2')
+
         # Fix number with space (when not handled above): "984 4" → "984_4"
         cleaned = cleaned.gsub(/(\d{3,})\s+(\d{1,2})$/, '\1_\2')
 
@@ -238,6 +244,8 @@ module PubidNew
           (month_abbrev >> dash >> month_abbrev >> digits) |
           # Roman numeral patterns: 1011-I-2.0, 1011-II-1.0 (ENHANCED to accept optional dots)
           (digits >> dash >> (str("III") | str("II") | str("IV") | str("I") | str("V") | str("VI") | str("VII") | str("VIII") | str("IX") | str("X")) >> dash >> digits >> (dot >> digits).maybe) |
+          # Numbers with underscore (from dot conversion): 984_4, 1648_2009
+          (digits >> str("_") >> digits) |
           # GB series pattern: 1190GB-1, 1190GB-4A
           (digits >> str("GB") >> dash >> digits >> upper_letter.maybe) |
           # Volume-number format for CSM series: v6n1, v7n12
