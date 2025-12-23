@@ -17,22 +17,34 @@ module PubidNew
         cleaned = cleaned.sub(/^nbs\b/i, 'NBS')
         cleaned = cleaned.sub(/^nist\b/i, 'NIST')
 
+        # Fix lowercase series (ir, sp, tn, etc.)
+        cleaned = cleaned.sub(/\b(ir|sp|tn|hb|fips|ams|vts)\b/i) { |m| m.upcase }
+
         # Fix Roman numerals: "1011-I-2" → keep as is, but fix spaces: "1011-I-2 0" → "1011-I-2.0"
         cleaned = cleaned.gsub(/([-\d]+[IVX]+[-\d]+)\s+(\d+)/, '\1.\2')
 
         # Fix rev without space before year: "260-126rev2013" → "260-126 rev2013"
         cleaned = cleaned.gsub(/(\d)rev(\d{4})/, '\1 rev\2')
 
+        # Fix LCIRC revision with slash and year: "145r6/1925" → "145 r6/1925"
+        cleaned = cleaned.gsub(/(\d)(r\d+\/\d{4})/, '\1 \2')
+
+        # Fix LCIRC supplement with slash and year: "118supp3/1926" → "118 supp3/1926"
+        cleaned = cleaned.gsub(/(\d)(supp\d+\/\d{4})/, '\1 \2')
+
         # Fix Pt pattern: "800-57Pt3r1" → "800-57 pt3 r1"
         cleaned = cleaned.gsub(/(\d)Pt(\d+)(r\d+)/, '\1 pt\2 \3')
 
         # Fix version patterns: "ver1e2006" → "ver1 e2006", "ver2v1" → "ver2 v1"
-        cleaned = cleaned.gsub(/(\d)ver(\d)/, '\1 ver\2')
+        cleaned = cleaned.gsub(/(\d)ver(\d)/, '\1 ver \2')
         cleaned = cleaned.gsub(/ver(\d+)e(\d{4})/, 'ver\1 e\2')
         cleaned = cleaned.gsub(/ver(\d+)v(\d+)/, 'ver\1 v\2')
 
         # Fix dotted version: separate from number "268v1.1" → "268 v1.1"
         cleaned = cleaned.gsub(/(\d)(v\d+\.\d+)/, '\1 \2')
+
+        # Fix volume ranges: "535v2a-l" → "535 v2a-l", "535v2m-z" → "535 v2m-z"
+        cleaned = cleaned.gsub(/(\d)(v\d+[a-z]-[a-z])/, '\1 \2')
 
         # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
         cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')
@@ -54,7 +66,7 @@ module PubidNew
         # Detect format before parsing
         format = detect_format(input.to_s)
 
-        # Use Parslet parser instance
+        # Use_parslet parser instance
         result = new.parse(cleaned)
 
         # Add format to result
@@ -148,10 +160,11 @@ module PubidNew
       # Simple series (no publisher prefix)
       rule(:simple_series) do
         (
-          str("AMS") | str("BSS") | str("BMS") | str("BH") |
+          str("AMS") | str("VTS") |  # NEW - Added for NIST AMS and VTS series
+          str("BSS") | str("BMS") | str("BH") |
           str("FIPS") | str("GCR") | str("HB") | str("MONO") |
           str("MP") | str("NCSTAR") | str("NSRDS") | str("IR") |
-          str("SP") | str("TN") | str("CSWP") | str("VTS") |
+          str("SP") | str("TN") | str("CSWP") |
           str("AI") | str("CIRC") | str("CS") | str("CSM") |
           str("CRPL") | str("OWMWP") | str("PC") | str("RPT") |
           str("SIBS") | str("TIBM") | str("TTB") | str("EAB") |
@@ -188,8 +201,12 @@ module PubidNew
       # Supplements should be handled as separate parts
       rule(:first_number) do
         (
-          # Roman numeral patterns: 1011-I, 1011-II, 1011-III
-          (digits >> dash >> (str("III") | str("II") | str("IV") | str("I") | str("V") | str("VI") | str("VII") | str("VIII") | str("IX") | str("X")) >> dash >> digits) |
+          # Special text patterns - MOST SPECIFIC FIRST (NEW for RPT patterns)
+          str("ADHOC") | (str("div") >> digits) |
+          # Month ranges for RPT: Apr-Jun1948 (NEW)
+          (month_abbrev >> dash >> month_abbrev >> digits) |
+          # Roman numeral patterns: 1011-I-2.0, 1011-II-1.0 (ENHANCED to accept optional dots)
+          (digits >> dash >> (str("III") | str("II") | str("IV") | str("I") | str("V") | str("VI") | str("VII") | str("VIII") | str("IX") | str("X")) >> dash >> digits >> (dot >> digits).maybe) |
           # GB series pattern: 1190GB-1, 1190GB-4A
           (digits >> str("GB") >> dash >> digits >> upper_letter.maybe) |
           # Volume-number format for CSM series: v6n1, v7n12
@@ -287,7 +304,10 @@ module PubidNew
 
       # Volume
       rule(:volume) do
-        (str("v") | str(" Vol. ")) >> (digits >> (str("a-l") | str("m-z")).maybe >> upper_letter.repeat(0, 2)).as(:volume)
+        (space.maybe >> (str("v") | str(" Vol. "))) >>
+        (digits >>
+         (str("a-l") | str("m-z")).maybe >>  # NEW - Support volume ranges like v2a-l, v2m-z
+         upper_letter.repeat(0, 2)).as(:volume)
       end
 
       # Part - enhanced to support patterns like p1adde1 (part 1 addition edition 1)
@@ -301,6 +321,9 @@ module PubidNew
       # Revision
       rule(:revision) do
         (
+          # Revision with slash and year: r6/1925, r11/1924 (NEW for LCIRC patterns)
+          (space.maybe >> (str("r") | str("rev")) >> digits.as(:revision) >>
+           slash >> digits.as(:revision_year)) |
           # Revision with year: rev2013
           (str("rev") >> digits.as(:revision_year)) |
           # Revision with optional digits AND optional letter: r1a, ra, r1
@@ -310,16 +333,16 @@ module PubidNew
       end
 
       # Version - V1 SP PARSER COMPATIBLE
-      # Supports: ver1.0.2, ver2, " Ver. 2.0", " Version 1.0", v1.0.2
+      # Supports: ver1.0.2, ver2, " Ver. 2.0", " Version 1.0", v1.0.2, -v1.0
       rule(:version) do
         (
-          # Verbose "ver" form - with or without dots
-          (str("ver") >> (digits >> (dot >> digits).repeat).as(:version)) |
+          # Verbose "ver" form - with or without dots (space.maybe before AND after "ver")
+          (space.maybe >> str("ver") >> space.maybe >> (digits >> (dot >> digits).repeat).as(:version)) |
           # Verbose forms with space: " Ver. ", " Version " - require dots
           ((str(" Ver. ") | str(" Version ")) >>
             (digits >> dot >> digits >> (dot >> digits).maybe).as(:version)) |
-          # Short form "v" with mandatory dots (v1.0, v1.0.2) - allow optional space before
-          (space.maybe >> str("v") >> (digits >> dot >> digits >> (dot >> digits).maybe).as(:version))
+          # Short form "v" with mandatory dots (v1.0, v1.0.2) - allow optional dash or space before
+          ((dash | space).maybe >> str("v") >> (digits >> dot >> digits >> (dot >> digits).maybe).as(:version))
         )
       end
 
