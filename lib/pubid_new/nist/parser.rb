@@ -50,9 +50,23 @@ module PubidNew
         cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')
 
         # Fix update patterns: ensure space before -upd or /upd (not just at end)
-        cleaned = cleaned.gsub(/(\d+)-upd/, '\1 -upd')    # Match anywhere, not just end
-        cleaned = cleaned.gsub(/(\d+)\/upd/, '\1 /upd')   # Slash variant
-        cleaned = cleaned.gsub(/([a-z]\d+)\/upd/, '\1 /upd')  # After revision: r1/upd
+        # Enhanced to handle optional digits after upd: -upd, -upd1, /upd, /upd1
+        cleaned = cleaned.gsub(/(\d+)-upd(\d*)/, '\1 -upd\2')    # -upd or -upd1
+        cleaned = cleaned.gsub(/(\d+)\/upd(\d*)/, '\1 /upd\2')   # /upd or /upd1
+        cleaned = cleaned.gsub(/([a-z]\d+)-upd/, '\1 -upd')      # r1-upd → r1 -upd
+        cleaned = cleaned.gsub(/([a-z]\d+)\/upd/, '\1 /upd')     # After revision: r1/upd → r1 /upd
+        cleaned = cleaned.gsub(/-upd\b/, ' -upd')                # Ensure space before -upd at word boundary
+
+        # Fix supplement patterns: ensure space before supplement
+        # "118supp3" already handled at line 32-33, but add "sup" variant
+        cleaned = cleaned.gsub(/(\d)(sup\d)/, '\1 \2')           # 100-2sup1 → 100-2 sup1
+
+        # Fix revision letter patterns: ensure space before revision with letter
+        cleaned = cleaned.gsub(/(\d)(r\d+[a-z])/, '\1 \2')       # 800-22r1a → 800-22 r1a
+        cleaned = cleaned.gsub(/(\d)(r[a-z]+\b)/, '\1 \2')       # 800-27ra → 800-27 ra (one or more letters)
+
+        # Fix complex part patterns in MR format: ensure space before part
+        cleaned = cleaned.gsub(/(\d)([pP]\d+)/, '\1 \2')         # .467p1adde1 → .467 p1adde1
 
         # Fix pd spacing: "800-140Br1 2pd" → "800-140B r1 2pd", " 3pd" → " 3 pd"
         cleaned = cleaned.gsub(/\s+(\d+)pd$/, ' \1 pd')
@@ -348,11 +362,12 @@ module PubidNew
 
       # Update - V1 COMPATIBLE
       # Format: /Upd{N}-{YYYY}{MM} where MM is optional
-      # Examples: /Upd1-2015, /Upd3-202102
+      # Examples: /Upd1-2015, /Upd3-202102, -upd, /upd (after preprocessing)
+      # Update number is optional (e.g., "500-300-upd" has no number)
       rule(:update) do
-        (str("/Upd") | str("/upd") | space.maybe >> str("-upd")) >>
+        (str("/Upd") | space >> (str("/upd") | str("-upd"))) >>
         (
-          digits.as(:update_number) >>
+          digits.as(:update_number).maybe >>
           (dash >>
             match("[0-9]").repeat(4, 4).as(:update_year) >>
             match("[0-9]").repeat(2, 2).as(:update_month).maybe
