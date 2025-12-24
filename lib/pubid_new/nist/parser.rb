@@ -52,6 +52,10 @@ module PubidNew
         # CRITICAL: Now separate dotted versions from preceding digits: "268v1.1" → "268 v1.1" (NEW)
         cleaned = cleaned.gsub(/(\d)(v\d+\.\d+)/, '\1 \2')
 
+        # NEW: Separate version from number AND convert spaces to dots in one step
+        cleaned = cleaned.gsub(/(\d)(v\d+)\s+(\d+)$/, '\1 \2.\3')               # Two-part: "268v1 1" → "268 v1.1"
+        cleaned = cleaned.gsub(/(\d)(v\d+)\s+(\d+)\s+(\d+)$/, '\1 \2.\3.\4')    # Three-part: "63v1 0 1" → "63 v1.0.1"
+
         # Fix volume ranges: "535v2a-l" → "535 v2a-l", "535v2m-z" → "535 v2m-z"
         cleaned = cleaned.gsub(/(\d)(v\d+[a-z]-[a-z])/, '\1 \2')
 
