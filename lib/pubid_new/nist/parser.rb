@@ -23,14 +23,17 @@ module PubidNew
         # Fix Roman numerals: "1011-I-2" → keep as is, but fix spaces: "1011-I-2 0" → "1011-I-2.0"
         cleaned = cleaned.gsub(/([-\d]+[IVX]+[-\d]+)\s+(\d+)/, '\1.\2')
 
-        # Fix rev without space before year: "260-126rev2013" → "260-126 rev2013"
-        cleaned = cleaned.gsub(/(\d)rev(\d{4})/, '\1 rev\2')
+        # Fix rev without space: "126rev2013" → "126 rev2013" (separate number from rev+year)
+        cleaned = cleaned.gsub(/(\d)(rev\d{4})/, '\1 \2')
 
         # Fix LCIRC revision with slash and year: "145r6/1925" → "145 r6/1925"
         cleaned = cleaned.gsub(/(\d)(r\d+\/\d{4})/, '\1 \2')
 
         # Fix LCIRC revision with just year (no slash): "1128r1995" → "1128 r1995"
         cleaned = cleaned.gsub(/(\d)(r\d{4})/, '\1 \2')
+
+        # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
+        cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
 
         # Fix LCIRC supplement with slash and year: "118supp3/1926" → "118 supp3/1926"
         cleaned = cleaned.gsub(/(\d)(supp\d+\/\d{4})/, '\1 \2')
@@ -46,6 +49,9 @@ module PubidNew
         # Fix dotted version: separate from number "268v1.1" → "268 v1.1"
         cleaned = cleaned.gsub(/(\d)(v\d+\.\d+)/, '\1 \2')
 
+        # CRITICAL: Now separate dotted versions from preceding digits: "268v1.1" → "268 v1.1" (NEW)
+        cleaned = cleaned.gsub(/(\d)(v\d+\.\d+)/, '\1 \2')
+
         # Fix volume ranges: "535v2a-l" → "535 v2a-l", "535v2m-z" → "535 v2m-z"
         cleaned = cleaned.gsub(/(\d)(v\d+[a-z]-[a-z])/, '\1 \2')
 
@@ -56,7 +62,9 @@ module PubidNew
         cleaned = cleaned.gsub(/(\d)(r\d+)(?=-|$)/, '\1 \2')
 
         # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
-        cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')
+        # ENHANCED to handle multiple spaces: "v1 0 1" → "v1.0.1", "v1 0 2" → "v1.0.2"
+        cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)\s+(\d+)/, '\1.\2.\3')  # Three parts
+        cleaned = cleaned.gsub(/([v\d]+[-A-Z]*)\s+(\d+)/, '\1.\2')             # Two parts
 
         # Fix update patterns: ensure space before -upd or /upd (not just at end)
         # Enhanced to handle optional digits after upd: -upd, -upd1, /upd, /upd1
@@ -81,8 +89,17 @@ module PubidNew
         cleaned = cleaned.gsub(/(\d)(r\d+[a-z])/, '\1 \2')       # 800-22r1a → 800-22 r1a
         cleaned = cleaned.gsub(/(\d)(r[a-z]+\b)/, '\1 \2')       # 800-27ra → 800-27 ra (one or more letters)
 
+        # Fix number with letter suffix followed by standalone 'r': "56ar" → "56a r" (NEW)
+        cleaned = cleaned.gsub(/(\d[a-z])r\b/, '\1 r')
+
+        # Fix revision followed by language code: "r1es" → "r1 es", "r1pt" → "r1 pt" (NEW)
+        cleaned = cleaned.gsub(/(r\d+)(es|pt|chi|viet|port|esp)\b/, '\1 \2')
+
+        # Fix uppercase P for part: "428P1" → "428 p1", "647P2" → "647 p2" (NEW)
+        cleaned = cleaned.gsub(/(\d)P(\d)/, '\1 p\2')
+
         # Fix complex part patterns in MR format: ensure space before part
-        cleaned = cleaned.gsub(/(\d)([pP]\d+)/, '\1 \2')         # .467p1adde1 → .467 p1adde1
+        cleaned = cleaned.gsub(/(\d)([pP]\d+)/, '\1 \2')         # .467p1adde1 → .467 p1adde1, 800-57p1 → 800-57 p1
 
         # Fix pd spacing: "800-140Br1 2pd" → "800-140B r1 2pd", " 3pd" → " 3 pd"
         cleaned = cleaned.gsub(/\s+(\d+)pd$/, ' \1 pd')
@@ -90,14 +107,18 @@ module PubidNew
         # Fix "Suppl" with space: "955 Suppl" → "955Suppl"
         cleaned = cleaned.gsub(/(\d+)\s+Suppl\b/, '\1Suppl')
 
-        # Fix number with dot (anywhere but avoid versions and Roman numerals):
-        # Match: "SP 984.4" → "SP 984_4", "TN.1648.2009" → "TN.1648_2009"
-        # Skip: "v1.1" (version), "I-2.0" (Roman numeral), dotted MR format separators
-        # Look for: 3+ digits, dot, 1-4 digits, then space or end
-        cleaned = cleaned.gsub(/(\d{3,})\.(\d{1,4})(?=\s|$)/, '\1_\2')
+        # Fix verbose "Version" format: " Version 2" → " ver 2"
+        cleaned = cleaned.gsub(/\s+Version\s+(\d+)/, ' ver \1')
 
-        # Fix number with space (when not handled above): "984 4" → "984_4"
-        cleaned = cleaned.gsub(/(\d{3,})\s+(\d{1,2})$/, '\1_\2')
+        # Fix verbose "Revision" format: " Revision (r)" → " r"
+        cleaned = cleaned.gsub(/\s+Revision\s+\(r\)/, ' r')
+
+        # REMOVED: Incorrect dot preprocessing that treated dots as number separators
+        # This was semantically wrong - dots are PART separators in NIST!
+        # DELETE: cleaned = cleaned.gsub(/(\d{3,})\.(\d{1,4})(?=\s|$)/, '\1_\2')
+
+        # REMOVED: Incorrect space-to-underscore that treated as single number
+        # DELETE: cleaned = cleaned.gsub(/(\d{3,})\s+(\d{1,2})$/, '\1_\2')
 
         # Detect format before parsing
         format = detect_format(input.to_s)
@@ -244,8 +265,6 @@ module PubidNew
           (month_abbrev >> dash >> month_abbrev >> digits) |
           # Roman numeral patterns: 1011-I-2.0, 1011-II-1.0 (ENHANCED to accept optional dots)
           (digits >> dash >> (str("III") | str("II") | str("IV") | str("I") | str("V") | str("VI") | str("VII") | str("VIII") | str("IX") | str("X")) >> dash >> digits >> (dot >> digits).maybe) |
-          # Numbers with underscore (from dot conversion): 984_4, 1648_2009
-          (digits >> str("_") >> digits) |
           # GB series pattern: 1190GB-1, 1190GB-4A
           (digits >> str("GB") >> dash >> digits >> upper_letter.maybe) |
           # Volume-number format for CSM series: v6n1, v7n12
@@ -326,19 +345,27 @@ module PubidNew
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >> str("rev").as(:edition_has_rev).maybe) |
           # Edition with e prefix: e2, e3 (1-3 digits, NOT 4)
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition)) |
+          # Edition with revision and year: rev2013, rev2020 - ENHANCED to accept leading space
+          (space.maybe >> str("rev") >> digits.as(:edition_year)) |
           # Revision-based edition: revJune1908, revJan1925
           (str("rev") >> match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year))
         )
       end
 
-      # CRPL range pattern (e.g., 1-2_3-1) - matches after first dash
+      # CRPL range pattern (e.g., 1-2_3-1, 1-2_3-1A with suffix) - matches after first dash
       rule(:crpl_range) do
-        (digits >> str("_") >> digits >> dash >> digits).as(:crpl_range)
+        (digits >> str("_") >> digits >> dash >> digits >> upper_letter.maybe).as(:crpl_range)
       end
 
-      # Full report number - support CRPL ranges
+      # Full report number - support dot-separated parts AND CRPL ranges
       rule(:report_number) do
-        first_number >> (dash >> (crpl_range | second_number)).maybe
+        first_number >>
+        (
+          # Dot-separated part (e.g., 984.4 = number 984, part 4)
+          (dot >> second_number) |
+          # Dash-separated (traditional)
+          (dash >> (crpl_range | second_number))
+        ).maybe
       end
 
       # Volume
@@ -349,10 +376,13 @@ module PubidNew
          upper_letter.repeat(0, 2)).as(:volume)
       end
 
-      # Part - enhanced to support patterns like p1adde1 (part 1 addition edition 1)
+      # Part - enhanced to support patterns like p1adde1 AND pt3r1 (part with revision)
       rule(:part) do
-        (str("pt") | str("p") | str("P") | str(" Part ")) >>
+        (space.maybe >> (str("pt") | str("p") | str("P")) | str(" Part ")) >>
           (digits >>
+           # NEW: Revision after part number: pt3r1, p1r1 (space.maybe for preprocessing)
+           (space.maybe >> str("r") >> digits).maybe >>
+           # Existing: Addendum with optional edition: add, adde1
            (str("add") >> (str("e") >> digits).maybe).maybe >>
            (dash >> digits).maybe).as(:part)
       end
@@ -360,13 +390,15 @@ module PubidNew
       # Revision
       rule(:revision) do
         (
+          # NEW: Revision with month and year: rJun1992, r Jun1992 - LONGEST MATCH FIRST
+          ((str("r") | str("rev")) >> space.maybe >> month_abbrev.as(:revision_month) >> digits.as(:revision_year)) |
           # Revision with slash and year: r6/1925, r11/1924 (NEW for LCIRC patterns)
           (space.maybe >> (str("r") | str("rev")) >> digits.as(:revision) >>
            slash >> digits.as(:revision_year)) |
-          # Revision with 4-digit year directly: r1995 (NEW for LCIRC patterns)
-          ((str(" r") | str("r")) >> match("[0-9]").repeat(4, 4).as(:revision_year)) |
-          # Revision with year: rev2013
-          (str("rev") >> digits.as(:revision_year)) |
+          # Revision with 4-digit year directly: r1995, r 1995 (allow space before year)
+          ((str(" r") | str("r")) >> space.maybe >> match("[0-9]").repeat(4, 4).as(:revision_year)) |
+          # Revision with year: rev2013, rev 2013 (allow space before year)
+          (str("rev") >> space.maybe >> digits.as(:revision_year)) |
           # Revision with digits AND/OR letters: r1a, ra, r1
           # Enhanced to accept letter-only revisions and space before r
           ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
@@ -506,6 +538,8 @@ module PubidNew
         publisher >> dot >>
         simple_series >> dot >>
         report_number >>
+        # Edition with underscore separator (MR format: 1648_2009)
+        (str("_") >> digits.as(:edition_year)).maybe >>
         (dot >> (digits | upper_letter)).repeat(0, 3) >>  # Support additional dot-separated parts
         (dash >> str("upd") >> digits.maybe).maybe >>
         parts.repeat >> draft.maybe
