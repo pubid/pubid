@@ -304,6 +304,8 @@ module PubidNew
 
       # Second number (after dash) - allow pt suffix, letter suffixes, and CRPL patterns
       rule(:second_number) do
+        # Explicitly exclude month abbreviations at start (so -Feb1985 goes to edition, not second_number)
+        month_abbrev.absent? >>
         (
           # CRPL range with underscore (e.g., "2_3-1A")
           (digits >> str("_") >> digits >> dash >> digits >> upper_letter.maybe) |
@@ -315,8 +317,8 @@ module PubidNew
           str("NCNR") | str("PERMIS") | str("BFRL") |
           # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
           upper_letter.repeat(1, 3) |
-          # Regular number with optional suffix
-          digits_with_suffix
+          # Regular number with optional suffix - but NOT if part of FIPS date (digit-dash-month-digit-slash)
+          (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?)
         ).as(:second_number)
       end
 
@@ -338,6 +340,9 @@ module PubidNew
           (str("e") >> match("[0-9]").repeat(4, 4).as(:edition_year) >> match("[0-9]").repeat(2, 2).as(:edition_month).maybe) |
           # Edition number with dash and year: e2-1915, e3-2020
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >> dash >> digits.as(:edition_year)) |
+          # NEW: Edition with dash-month-year (FIPS format): -Feb1985, -Aug1988, -Dec1985
+          # MUST be BEFORE dash-year to match month first (longest match principle)
+          (dash >> month_abbrev.as(:edition_month) >> digits.as(:edition_year)) |
           # Edition with dash and year/month: -2018, -Jan2018, -June1908, -April1909
           (dash >> (
             (match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year)) |
