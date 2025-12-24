@@ -167,8 +167,8 @@ module PubidNew
 
       # Language codes for translations - 2-4 letter codes
       rule(:language_code) do
-        (str("es") | str("pt") | str("chi") | str("viet") | str("port") | str("esp") |
-         match("[a-z]").repeat(2, 4)).as(:translation)
+        (space.maybe >> (str("es") | str("pt") | str("chi") | str("viet") | str("port") | str("esp") |
+         match("[a-z]").repeat(2, 4))).as(:translation)
       end
 
       # Stage ID: i (initial), f (final), 1-9 (numbered iterations)
@@ -402,7 +402,10 @@ module PubidNew
           # Revision with digits AND/OR letters: r1a, ra, r1
           # Enhanced to accept letter-only revisions and space before r
           ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
-            (digits >> lower_letter.maybe | lower_letter.repeat(1)).as(:revision))
+            (digits >> lower_letter.maybe | lower_letter.repeat(1)).as(:revision)) |
+          # NEW: Standalone 'r' - MUST BE LAST to avoid consuming from other patterns
+          # Matches " r" at end of input (after preprocessing: "800-56a r", "800-27 r")
+          (str(" r") >> any.absent?).as(:revision_standalone)
         )
       end
 
