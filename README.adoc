@@ -1511,3 +1511,33 @@ See `docs/DEVELOPING_NEW_FLAVORS.md` for flavor implementation guide.
 Copyright Ribose. All rights reserved.
 
 This project is licensed under the BSD 2-Clause License. See link:LICENSE.txt[LICENSE.txt] for details.
+
+==== CIE: 16th Flavor ✨
+
+**Status:** ✅ 321/343 (93.59%) - Commission Internationale de l'Éclairage
+
+CIE (International Commission on Illumination) is the global authority on light, lighting, color, and color spaces.
+
+**Features:**
+- 11 identifier types (MECE organization)
+- Dual-style system (legacy pre-2001 vs current 2001+)
+- Three language formats
+- 93.59% validation on 343 identifiers
+
+[source,ruby]
+----
+require 'pubid_new/cie'
+
+# Legacy style (dash separator)
+cie = PubidNew::Cie.parse("CIE 032-1977")
+cie.to_s  # => "CIE 032-1977"
+
+# Current style (colon separator)
+cie = PubidNew::Cie.parse("CIE 145:2002")
+cie.to_s  # => "CIE 145:2002"
+
+# Joint with ISO
+cie = PubidNew::Cie.parse("CIE ISO 11664-1:2019")
+cie.copublisher  # => "ISO"
+cie.to_s         # => "CIE ISO 11664-1:2019"
+----
