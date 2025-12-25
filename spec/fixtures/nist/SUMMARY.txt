@@ -1,25 +1,24 @@
 Flavor: NIST
-Classified: 2025-12-24 19:29:33
+Classified: 2025-12-24 20:53:31
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total: 19827
-Pass: 19791 (99.82%)
-Fail: 36 (0.18%)
+Pass: 19820 (99.96%)
+Fail: 7 (0.04%)
 
 BY CLASS
 ----------------------------------------------------------------------
 base                                     Pass: 5324/5324 (100.0%)
-circular                                 Pass: 865/865 (100.0%)
+circular                                 Pass: 866/866 (100.0%)
 circular_supplement                      Pass: 2/2 (100.0%)
 commercial_standard_emergency            Pass: 6/6 (100.0%)
 commercial_standards_monthly             Pass: 99/99 (100.0%)
 crpl_report                              Pass: 36/36 (100.0%)
-federal_information_processing_standards Pass: 339/339 (100.0%)
-fips                                     Pass: 0/28 (0.0%)
+federal_information_processing_standards Pass: 367/367 (100.0%)
 handbook                                 Pass: 357/357 (100.0%)
 internal_report                          Pass: 7817/7817 (100.0%)
 special_publication                      Pass: 2831/2831 (100.0%)
 technical_note                           Pass: 2115/2115 (100.0%)
-unknown                                  Pass: 0/8 (0.0%)
+unknown                                  Pass: 0/7 (0.0%)
