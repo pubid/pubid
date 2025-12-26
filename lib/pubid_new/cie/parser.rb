@@ -182,28 +182,37 @@ module PubidNew
 
       # Identical with ISO (parenthetical reference)
       # Patterns:
-      # "CIE S 006.1/1998 (ISO 16508:1999)" - slash-year
-      # "CIE S 008/E:2001 (ISO 8995-1:2002(E))" - language then colon-year
+      # "CIE S 006.1/1998 (ISO 16508:1999)" - iteration with dot
+      # "CIE S 014-4/E2007" - part with dash + language without colon (NEW)
+      # "CIE S 008/E:2001 (ISO 8995-1:2002(E))" - language with colon year
       rule(:identical_with_iso) do
         str("CIE") >> space >>
         s_prefix.maybe.as(:s_prefix) >>
         digits.as(:number) >>
-        # Can have iteration: .1
-        (dot >> digits.as(:iteration)).maybe >>
-        # Slash handling - can be:
-        #   /E:2001 (language E with colon year)
-        #   /1998 (slash-year legacy format)
+        # Can have iteration (.1) OR part (-4)
+        (
+          (dot >> digits.as(:iteration)) |
+          (dash >> digits.as(:part))
+        ).maybe >>
+        # Slash handling - three mutually exclusive patterns:
         (slash >>
           (
-            # Language code followed by colon year: /E:2001
-            (upper.as(:lang_code) >> colon >> year_digits.as(:year)) |
-            # Just legacy year: /1998
+            # /E:2001 - language code WITH colon year
+            (upper.as(:lang_code) >> colon.as(:lang_colon) >> year_digits.as(:year)) |
+            # /E2007 - language code WITHOUT colon + year (NEW)
+            (upper.as(:lang_code) >> year_digits.as(:year)) |
+            # /1998 - just legacy slash-year (no language)
             year_digits.as(:slash_year)
           )
         ).maybe >>
-        # ISO reference - MUST have this
+        # ISO reference - handle nested parentheses for language codes
         space >> str("(ISO") >> space >>
-        match("[^)]").repeat(1).as(:iso_reference) >>
+        # Match ISO identifier: digits, colons, dashes, slashes, dots
+        # Plus optional language code in parentheses like (E), (F)
+        (
+          match("[0-9A-Z:/.\\-]").repeat(1) >>  # Main ISO identifier
+          (str("(") >> match("[A-Z]").repeat(1) >> str(")")).maybe  # Optional (E), (F), etc.
+        ).as(:iso_reference) >>
         str(")")
       end
 

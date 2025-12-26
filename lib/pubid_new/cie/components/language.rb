@@ -6,19 +6,22 @@ module PubidNew
   module Cie
     module Components
       # Language component for CIE identifiers
-      # Handles three distinct language formats:
+      # Handles four distinct language formats:
       # 1. Slash-prefix: /E, /F, /G (legacy)
-      # 2. Parenthetical: (DE), (ES), (en)
-      # 3. Translation year: (RU-2021)
+      # 2. Slash with colon and year: /E:2001 (NEW)
+      # 3. Parenthetical: (DE), (ES), (en)
+      # 4. Translation year: (RU-2021)
       class Language < Lutaml::Model::Serializable
         attribute :code, :string              # "E", "DE", "RU", "en"
-        attribute :format, :string            # "slash", "paren", "paren_year"
+        attribute :format, :string            # "slash", "slash_colon", "paren", "paren_year"
         attribute :translation_year, :string  # "2021" in "(RU-2021)"
 
         def to_s
           case format
           when "slash"
             "/#{code}"                          # /E, /F, /G
+          when "slash_colon"
+            "/#{code}"                          # /E (colon and year handled by Identical)
           when "paren"
             "(#{code})"                         # (DE), (ES), (en)
           when "paren_year"

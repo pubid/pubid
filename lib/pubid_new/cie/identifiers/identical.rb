@@ -9,7 +9,10 @@ module PubidNew
     module Identifiers
       # Identical identifier for CIE
       # Represents CIE identifiers with ISO reference
-      # Example: CIE S 006.1/1998 (ISO 16508:1999)
+      # Examples:
+      #   CIE S 006.1/1998 (ISO 16508:1999) - iteration with dot
+      #   CIE S 014-4/E2007 - part with dash + language
+      #   CIE S 008/E:2001 (ISO 8995-1:2002(E)) - language with colon year
       class Identical < Lutaml::Model::Serializable
         attribute :s_prefix, :boolean, default: -> { false }
         attribute :code, Components::Code
@@ -30,24 +33,28 @@ module PubidNew
 
           result = parts.join(" ")
 
-          # Language (slash format) before date
-          if language && language.format == "slash"
-            result += "/#{language.code}"
-          end
-
-          # Date - handle three formats
-          if year
-            if date_separator == "slash"
-              # Legacy slash-year format: /1998
-              result += "/#{year}"
+          # Language + Year combined for slash formats before ISO reference
+          if language && (language.format == "slash_colon" || (language.format == "slash" && year && date_separator != "slash"))
+            # Render /E:YYYY or /EYYYY (language with year, no separate date separator)
+            if language.format == "slash_colon"
+              result += "/#{language.code}:#{year}"  # /E:2001
             else
-              separator = date_separator == "colon" ? ":" : "-"
-              result += "#{separator}#{year}"
+              result += "/#{language.code}#{year}"   # /E2007 (no colon)
             end
+          elsif language && language.format == "slash"
+            # Language without year: /E
+            result += "/#{language.code}"
+          elsif year && date_separator == "slash"
+            # Legacy slash-year format without language: /1998
+            result += "/#{year}"
+          elsif year
+            # Standard date with separator (colon or dash)
+            separator = date_separator == "colon" ? ":" : "-"
+            result += "#{separator}#{year}"
           end
 
           # Language (parenthetical) after date
-          if language && language.format != "slash"
+          if language && language.format != "slash" && language.format != "slash_colon"
             result += language.to_s
           end
 
