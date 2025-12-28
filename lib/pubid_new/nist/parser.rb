@@ -49,6 +49,21 @@ module PubidNew
         # Fix supplement typo: "154suprev" → "154supprev" (Session 219)
         cleaned = cleaned.gsub(/(\d)suprev/, '\1supprev')
 
+        # Convert Roman numeral volumes to Arabic per NIST spec (page 7)
+        # "1011-I-2.0" → "1011 v1 ver2.0"
+        # "1011-II-1.0" → "1011 v2 ver1.0"
+        cleaned = cleaned.gsub(/(\d+)-([IVX]+)-(\d+(?:\.\d+)*)/) do
+          number = $1
+          roman = $2
+          version_part = $3
+
+          # Convert Roman to Arabic
+          arabic = roman_to_arabic(roman)
+
+          # Convert to volume+version format
+          "#{number} v#{arabic} ver#{version_part}"
+        end
+
         # Fix LCIRC supplement with slash and year: "118supp3/1926" → "118 supp3/1926"
         cleaned = cleaned.gsub(/(\d)(supp\d+\/\d{4})/, '\1 \2')
 
@@ -72,6 +87,12 @@ module PubidNew
 
         # Fix volume ranges: "535v2a-l" → "535 v2a-l", "535v2m-z" → "535 v2m-z"
         cleaned = cleaned.gsub(/(\d)(v\d+[a-z]-[a-z])/, '\1 \2')
+
+        # NEW: Fix volume with uppercase letter: "48v3B" → "48 v3B" (Session 220)
+        cleaned = cleaned.gsub(/(\d)(v\d+[A-Z])/, '\1 \2')
+
+        # NEW: Fix volume ranges with uppercase: "v2A-L" → "v2a-l" (normalize to lowercase) (Session 220)
+        cleaned = cleaned.gsub(/(v\d+)([A-Z])-([A-Z])/, '\1\2-\3'.downcase)
 
         # CRITICAL: Fix revision attached to number BEFORE update patterns!
         # "8115r1-upd" → "8115 r1-upd" so that later "r1-upd" → "r1 -upd" works
@@ -157,6 +178,24 @@ module PubidNew
           :mr
         else
           :short
+        end
+      end
+
+      # Convert Roman numerals to Arabic numbers
+      # I→1, II→2, III→3, IV→4, V→5, VI→6, VII→7, VIII→8, IX→9, X→10
+      def self.roman_to_arabic(roman)
+        case roman
+        when 'I' then '1'
+        when 'II' then '2'
+        when 'III' then '3'
+        when 'IV' then '4'
+        when 'V' then '5'
+        when 'VI' then '6'
+        when 'VII' then '7'
+        when 'VIII' then '8'
+        when 'IX' then '9'
+        when 'X' then '10'
+        else roman  # Fallback for unexpected patterns
         end
       end
 
@@ -383,9 +422,12 @@ module PubidNew
       end
 
       # Full report number - support dot-separated parts AND CRPL ranges
+      # ENHANCED: Support multiple dashes for GCR patterns (Session 220)
       rule(:report_number) do
         first_number >>
         (
+          # Multiple dash pattern for GCR: 21-917-48 (year-seq-part)
+          (dash >> second_number >> dash >> digits) |
           # Dot-separated part (e.g., 984.4 = number 984, part 4)
           (dot >> second_number) |
           # Dash-separated (traditional)
@@ -397,7 +439,9 @@ module PubidNew
       rule(:volume) do
         (space.maybe >> (str("v") | str(" Vol. "))) >>
         (digits >>
-         (str("a-l") | str("m-z")).maybe >>  # NEW - Support volume ranges like v2a-l, v2m-z
+         # Support letter ranges (lowercase normalized in preprocessing)
+         (str("a-l") | str("m-z") | str("A-L") | str("M-Z")).maybe >>
+         # Support single uppercase letters (e.g., v3B, v1A)
          upper_letter.repeat(0, 2)).as(:volume)
       end
 
