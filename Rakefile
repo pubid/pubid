@@ -554,43 +554,38 @@ namespace :validation do
     require_relative "spec/fixtures/classify_fixtures"
     require_relative "lib/pubid_new"
 
-    # All V2 flavors (16 total)
-    v2_flavors = %w[iso iec ieee nist jcgm idf oiml cie ansi ccsds etsi itu jis plateau cen bsi]
-
+    # All V2 flavors with SUMMARY.txt
     results = []
 
-    v2_flavors.each do |flavor|
-      fixtures_dir = File.join("spec/fixtures", flavor)
-      pass_dir = File.join(fixtures_dir, "identifiers/pass")
-      fail_dir = File.join(fixtures_dir, "identifiers/fail")
+    Dir.glob("spec/fixtures/*/SUMMARY.txt").sort.each do |summary_file|
+      flavor = File.basename(File.dirname(summary_file))
 
-      # Skip if directories don't exist
-      next unless Dir.exist?(pass_dir) || Dir.exist?(fail_dir)
+      # Read SUMMARY.txt to extract stats
+      content = File.read(summary_file)
 
-      # Count from all files in pass/ and fail/ directories
-      pass_count = 0
-      fail_count = 0
-
-      if Dir.exist?(pass_dir)
-        Dir.glob(File.join(pass_dir, "*.txt")).each do |file|
-          pass_count += File.readlines(file).count { |line| !line.strip.empty? && !line.start_with?("#") }
-        end
+      if content =~ /Total: (\d+)/
+        total = $1.to_i
+      else
+        next
       end
 
-      if Dir.exist?(fail_dir)
-        Dir.glob(File.join(fail_dir, "*.txt")).each do |file|
-          fail_count += File.readlines(file).count { |line| !line.strip.empty? && !line.start_with?("#") }
-        end
+      if content =~ /Pass: (\d+) \(([\d.]+)%\)/
+        pass = $1.to_i
+        percentage = $2.to_f
+      else
+        next
       end
 
-      total = pass_count + fail_count
-      next if total.zero?
+      if content =~ /Fail: (\d+)/
+        fail = $1.to_i
+      else
+        fail = total - pass
+      end
 
-      percentage = ((pass_count.to_f / total) * 100).round(2)
       results << {
         flavor: flavor,
-        pass: pass_count,
-        fail: fail_count,
+        pass: pass,
+        fail: fail,
         total: total,
         percentage: percentage
       }
@@ -644,7 +639,10 @@ namespace :validation do
          "#{overall_pct}%".rjust(15)
     puts "=" * 85
     puts
-    puts "Flavors validated: #{results.length}/16"
+    puts "Flavors validated: #{results.length}"
+    puts "Perfect (100%): #{results.count { |r| r[:percentage] == 100.0 }}"
+    puts "Excellent (99%+): #{results.count { |r| r[:percentage] >= 99.0 && r[:percentage] < 100.0 }}"
+    puts "Good (90%+): #{results.count { |r| r[:percentage] >= 90.0 && r[:percentage] < 99.0 }}"
     puts
     puts "Legend:"
     puts "  🎉 Perfect:   100%     - All identifiers validated"

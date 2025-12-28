@@ -1,0 +1,21 @@
+Flavor: CIE
+Classified: 2025-12-28 18:40:55
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 341
+Pass: 341 (100.0%)
+Fail: 0 (0.0%)
+
+BY CLASS
+----------------------------------------------------------------------
+bundle                                   Pass: 1/1 (100.0%)
+conference                               Pass: 43/43 (100.0%)
+corrigendum                              Pass: 2/2 (100.0%)
+dual_published                           Pass: 1/1 (100.0%)
+identical                                Pass: 16/16 (100.0%)
+joint_published                          Pass: 22/22 (100.0%)
+standard                                 Pass: 252/252 (100.0%)
+supplement                               Pass: 3/3 (100.0%)
+tutorial_bundle                          Pass: 1/1 (100.0%)
