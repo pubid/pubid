@@ -534,6 +534,134 @@ end
 # Default task
 task default: ["test:all", "test:integration"]
 
+# Validation tasks for V2 implementations
+namespace :validation do
+  desc "Run classification for all V2 flavors"
+  task :classify_all do
+    puts "Running classification for all V2 flavors..."
+    puts
+    sh "cd spec/fixtures && ruby run_classify.rb all"
+  end
+
+  desc "Run classification for a specific flavor"
+  task :classify, [:flavor] do |t, args|
+    flavor = args[:flavor] || raise("Usage: rake validation:classify[flavor]")
+    sh "cd spec/fixtures && ruby run_classify.rb #{flavor}"
+  end
+
+  desc "Show validation summary for all flavors"
+  task :report do
+    require_relative "spec/fixtures/classify_fixtures"
+    require_relative "lib/pubid_new"
+
+    # All V2 flavors (16 total)
+    v2_flavors = %w[iso iec ieee nist jcgm idf oiml cie ansi ccsds etsi itu jis plateau cen bsi]
+
+    results = []
+
+    v2_flavors.each do |flavor|
+      fixtures_dir = File.join("spec/fixtures", flavor)
+      pass_dir = File.join(fixtures_dir, "identifiers/pass")
+      fail_dir = File.join(fixtures_dir, "identifiers/fail")
+
+      # Skip if directories don't exist
+      next unless Dir.exist?(pass_dir) || Dir.exist?(fail_dir)
+
+      # Count from all files in pass/ and fail/ directories
+      pass_count = 0
+      fail_count = 0
+
+      if Dir.exist?(pass_dir)
+        Dir.glob(File.join(pass_dir, "*.txt")).each do |file|
+          pass_count += File.readlines(file).count { |line| !line.strip.empty? && !line.start_with?("#") }
+        end
+      end
+
+      if Dir.exist?(fail_dir)
+        Dir.glob(File.join(fail_dir, "*.txt")).each do |file|
+          fail_count += File.readlines(file).count { |line| !line.strip.empty? && !line.start_with?("#") }
+        end
+      end
+
+      total = pass_count + fail_count
+      next if total.zero?
+
+      percentage = ((pass_count.to_f / total) * 100).round(2)
+      results << {
+        flavor: flavor,
+        pass: pass_count,
+        fail: fail_count,
+        total: total,
+        percentage: percentage
+      }
+    end
+
+    # Sort by percentage descending, then by flavor name
+    results.sort_by! { |r| [-r[:percentage], r[:flavor]] }
+
+    # Display pretty report
+    puts
+    puts "=" * 85
+    puts " " * 22 + "PubID V2 Validation Report"
+    puts "=" * 85
+    puts
+    puts "Flavor".ljust(12) + "Pass".rjust(10) + "Fail".rjust(8) + "Total".rjust(10) + "Percentage".rjust(15) + "  Status"
+    puts "-" * 85
+
+    results.each do |r|
+      status = if r[:percentage] == 100.0
+        "🎉 Perfect"
+      elsif r[:percentage] >= 99.0
+        "✨ Excellent"
+      elsif r[:percentage] >= 95.0
+        "✅ Very Good"
+      elsif r[:percentage] >= 90.0
+        "👍 Good"
+      elsif r[:percentage] >= 85.0
+        "📈 Enhanced"
+      else
+        "⚠️  Partial"
+      end
+
+      puts r[:flavor].upcase.ljust(12) +
+           r[:pass].to_s.rjust(10) +
+           r[:fail].to_s.rjust(8) +
+           r[:total].to_s.rjust(10) +
+           "#{r[:percentage]}%".rjust(15) +
+           "  #{status}"
+    end
+
+    puts "-" * 85
+    total_pass = results.sum { |r| r[:pass] }
+    total_fail = results.sum { |r| r[:fail] }
+    total_all = results.sum { |r| r[:total] }
+    overall_pct = ((total_pass.to_f / total_all) * 100).round(2)
+
+    puts "TOTAL".ljust(12) +
+         total_pass.to_s.rjust(10) +
+         total_fail.to_s.rjust(8) +
+         total_all.to_s.rjust(10) +
+         "#{overall_pct}%".rjust(15)
+    puts "=" * 85
+    puts
+    puts "Flavors validated: #{results.length}/16"
+    puts
+    puts "Legend:"
+    puts "  🎉 Perfect:   100%     - All identifiers validated"
+    puts "  ✨ Excellent: 99-100%  - Production excellent quality"
+    puts "  ✅ Very Good: 95-99%   - Production ready"
+    puts "  👍 Good:      90-95%   - High quality"
+    puts "  📈 Enhanced:  85-90%   - Enhanced implementation"
+    puts "  ⚠️  Partial:   <85%     - Needs enhancement"
+    puts
+    puts "Commands:"
+    puts "  rake validation:classify_all     - Classify all flavors"
+    puts "  rake validation:classify[flavor] - Classify specific flavor"
+    puts "  rake validation:report           - Show this report"
+    puts
+  end
+end
+
 # Convenience tasks
 task test: "test:all"
 task build: "build:all"
