@@ -40,6 +40,14 @@ module PubidNew
         current_date | legacy_date
       end
 
+      # Legacy format: NUMBER-YEAR (e.g., 001-1980)
+      # This is BEFORE 2001, using dash as year separator (NOT part)
+      # Can optionally have trailing language like "(RU-2020)"
+      rule(:legacy_code_with_year) do
+        str("CIE") >> space >> digits.as(:number) >> dash >> year_digits.as(:year) >>
+        (language_paren_year | str("")).as(:trailing_lang)
+      end
+
       # Code patterns
       # Pattern 1: "006.1" - iteration (leading zero + dot)
       rule(:code_with_iteration) do
@@ -58,14 +66,19 @@ module PubidNew
       end
 
       # Pattern 2: "170-1" - part with dash (current style)
+      # NOTE: Part must be 1-3 digits, and NOT followed by a 4-digit year
       rule(:code_with_part_dash) do
-        digits.as(:number) >> dash >> digits.as(:part) >>
+        digits.as(:number) >> dash >> match("[0-9]").repeat(1, 3).as(:part) >>
+        str("").as(:dash_sep) >>  # Marker for dash separator
+        # Negative lookahead: don't consume if followed by 4-digit year
+        (str("19") | str("20")).absent? >>
         (dot | dash).absent?  # Don't consume dot or date dash
       end
 
       # Pattern 3: "170/1" - part with slash (legacy style)
       rule(:code_with_part_slash) do
         digits.as(:number) >> slash >> digits.as(:part) >>
+        str("").as(:slash_sep) >>  # Marker for slash separator
         dot.absent?  # Don't consume iteration dot
       end
 
@@ -96,8 +109,9 @@ module PubidNew
       end
 
       # Format 3: (RU-2021) - with translation year
+      # NOTE: The space before parenthesis is OPTIONAL (e.g., "2003 (RU-2021)" or "2003(RU-2021)")
       rule(:language_paren_year) do
-        (space >> str("(") >> upper.repeat(2).as(:lang_code) >>
+        (space.maybe >> str("(") >> upper.repeat(2).as(:lang_code) >>
         dash >> year_digits.as(:trans_year) >> str(")")).as(:language_paren_year)
       end
 
@@ -115,9 +129,9 @@ module PubidNew
         str("x")
       end
 
-      # Stage codes (DIS, DS)
+      # Stage codes (DIS, DS, FDIS, etc.)
       rule(:stage_code) do
-        (str("DIS") | str("DS")) >> space
+        (str("FDIS") | str("DIS") | str("DS")) >> space
       end
 
       # Document type (TR for Technical Report)
@@ -125,14 +139,38 @@ module PubidNew
         str("TR")  # Don't consume trailing space
       end
 
-      # Standard identifier (most common)
+      # DIS stage with supplement pattern (e.g., DIS 025-SP1/E:2019)
+      rule(:dis_with_supplement) do
+        str("CIE") >> space >>
+        stage_code.as(:stage) >>
+        s_prefix.maybe.as(:s_prefix) >>
+        digits.as(:base_number) >>
+        dash >> str("SP") >> digits.as(:supplement_number) >>
+        (dot >> digits.as(:supplement_part)).maybe >>
+        slash >> upper.as(:lang_code) >> colon.as(:lang_colon) >> year_digits.as(:year)
+      end
+
+      # Standard identifier (most common) - language can come AFTER date
       rule(:standard_identifier) do
         str("CIE") >> space >>
         stage_code.maybe.as(:stage) >>
         s_prefix.maybe.as(:s_prefix) >>
         code >>
-        language.maybe >>
-        date.maybe
+        # Language can come BEFORE date, AFTER date, or both
+        (
+          (language >> date).as(:lang_before) |
+          (date >> language.maybe).as(:date_then_lang) |
+          date
+        )
+      end
+
+      # Standard identifier without ISO reference but with language-year (CIE S 014-4/E:2007)
+      rule(:standard_with_language_year) do
+        str("CIE") >> space >>
+        stage_code.maybe.as(:stage) >>
+        s_prefix.maybe.as(:s_prefix) >>
+        code >>
+        slash >> upper.as(:lang_code) >> colon >> year_digits.as(:year)
       end
 
       # Conference identifier (x-prefix)
@@ -183,7 +221,7 @@ module PubidNew
       # Identical with ISO (parenthetical reference)
       # Patterns:
       # "CIE S 006.1/1998 (ISO 16508:1999)" - iteration with dot
-      # "CIE S 014-4/E2007" - part with dash + language without colon (NEW)
+      # "CIE S 014-4/E2007" - part with dash + language without colon (needs colon insertion)
       # "CIE S 008/E:2001 (ISO 8995-1:2002(E))" - language with colon year
       rule(:identical_with_iso) do
         str("CIE") >> space >>
@@ -199,7 +237,7 @@ module PubidNew
           (
             # /E:2001 - language code WITH colon year
             (upper.as(:lang_code) >> colon.as(:lang_colon) >> year_digits.as(:year)) |
-            # /E2007 - language code WITHOUT colon + year (NEW)
+            # /E2007 - language code WITHOUT colon + year (needs colon insertion)
             (upper.as(:lang_code) >> year_digits.as(:year)) |
             # /1998 - just legacy slash-year (no language)
             year_digits.as(:slash_year)
@@ -276,9 +314,12 @@ module PubidNew
         joint_with_iso |
         joint_with_iec |
         identical_with_iso |
+        dis_with_supplement |
         dual_with_iec |
         corrigendum_identifier |
         supplement_identifier |
+        standard_with_language_year |
+        legacy_code_with_year |  # Before standard to catch 001-1980 pattern
         conference_identifier |
         standard_identifier
       end
@@ -288,8 +329,14 @@ module PubidNew
         # Minimal preprocessing for data quality
         cleaned = string.strip
 
-        # Fix common issues
-        cleaned = cleaned.gsub(/\s+/, " ")  # Normalize spaces
+        # Remove comments (text after #)
+        cleaned = cleaned.gsub(/\s*#.*$/, "")
+
+        # Normalize spaces
+        cleaned = cleaned.gsub(/\s+/, " ")
+
+        # Insert missing colon before year in language patterns like /E2007 -> /E:2007
+        cleaned = cleaned.gsub(%r{/(E|F|G|DE|ES|CN|RU|FR)(?=\d{4})}, '/\1:')
 
         new.parse(cleaned)
       end

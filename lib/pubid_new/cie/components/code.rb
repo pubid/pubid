@@ -12,6 +12,7 @@ module PubidNew
         attribute :part, :string          # "1", "2", "3"
         attribute :iteration, :string     # "1" in "006.1"
         attribute :style, :string         # "legacy" or "current"
+        attribute :part_separator, :string # "slash" or "dash" (preserves original)
 
         def to_s
           result = number
@@ -23,11 +24,19 @@ module PubidNew
           # Handle iteration only (e.g., "006.1", "13.3")
           elsif iteration
             result += ".#{iteration}"
-          # Handle part only (separator depends on style)
+          # Handle part only (separator depends on part_separator or style)
           elsif part
-            # Legacy: slash "/" (e.g., "170/1")
-            # Current: dash "-" (e.g., "170-1")
-            separator = style == "legacy" ? "/" : "-"
+            # Use part_separator if explicitly set (preserves original)
+            # Otherwise fall back to style-based separator
+            separator = if part_separator == "slash"
+              "/"
+            elsif part_separator == "dash"
+              "-"
+            else
+              # Legacy: slash "/" (e.g., "170/1")
+              # Current: dash "-" (e.g., "170-1")
+              style == "legacy" ? "/" : "-"
+            end
             result += "#{separator}#{part}"
           end
 
@@ -45,10 +54,10 @@ module PubidNew
           # Detect part with separator
           elsif code_str.include?("/")
             parts = code_str.split("/")
-            new(number: parts[0], part: parts[1], style: "legacy")
+            new(number: parts[0], part: parts[1], style: "legacy", part_separator: "slash")
           elsif code_str.include?("-")
             parts = code_str.split("-", 2)  # Limit to 2 parts
-            new(number: parts[0], part: parts[1], style: "current")
+            new(number: parts[0], part: parts[1], style: "current", part_separator: "dash")
           # Simple number
           else
             new(number: code_str, style: style)

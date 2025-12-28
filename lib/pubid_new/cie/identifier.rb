@@ -17,7 +17,7 @@ module PubidNew
 
         parsed = Parser.parse(input)
         builder = Builder.new
-        builder.build(parsed)
+        builder.build(parsed, original_string: input)
       end
     end
   end
