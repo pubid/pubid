@@ -239,14 +239,14 @@ module PubidNew
           lang_code = extract_value(lang_data[:lang_code])
           lang_format = "slash"
         elsif parsed_hash[:lang_code]
-          # Direct lang_code from identical_with_iso pattern
-          # Could be /E:2001 (with colon) or /E2007 (without colon, normalized to /E:2007)
+          # Direct lang_code from identical_with_iso or standard_with_language_year patterns
+          # Could be /E:2001 (with colon) or /E2007 (without colon)
           lang_code = extract_value(parsed_hash[:lang_code])
           # Check if colon was present in the pattern
           if parsed_hash[:lang_colon]
-            lang_format = "slash_colon"  # /E:YYYY format
+            lang_format = "slash_colon"  # /E:YYYY format (with colon)
           else
-            lang_format = "slash"  # /EYYYY format (no colon)
+            lang_format = "slash_no_colon"  # /EYYYY format (without colon)
           end
         end
 

@@ -33,19 +33,27 @@ module PubidNew
           # Build initial result from parts
           result = parts.join(" ")
 
-          # Language (slash format) - appended to result before date
+          # Language (slash formats) - appended to result before/with date
           if language && language.format == "slash"
             result += "/#{language.code}"
+          elsif language && language.format == "slash_no_colon"
+            # /E2007 format (no colon before year)
+            result += "/#{language.code}#{year}"
+            return result  # Year already added
+          elsif language && language.format == "slash_colon"
+            # /E:2007 format (colon before year)
+            result += "/#{language.code}:#{year}"
+            return result  # Year already added
           end
 
-          # Date with separator
+          # Date with separator (for non-slash-year formats)
           if year
             separator = date_separator == "colon" ? ":" : "-"
             result += "#{separator}#{year}"
           end
 
           # Language (parenthetical formats) - comes after date
-          if language && language.format != "slash"
+          if language && !["slash", "slash_no_colon", "slash_colon"].include?(language.format)
             result += language.to_s
           end
 

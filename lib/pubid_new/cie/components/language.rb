@@ -15,13 +15,16 @@ module PubidNew
         attribute :code, :string              # "E", "DE", "RU", "en"
         attribute :format, :string            # "slash", "slash_colon", "paren", "paren_year"
         attribute :translation_year, :string  # "2021" in "(RU-2021)"
+        attribute :has_colon, :boolean, default: -> { true }  # For slash format: /E vs /E:
 
         def to_s
           case format
           when "slash"
-            "/#{code}"                          # /E, /F, /G
+            "/#{code}"                          # /E, /F, /G (no year)
           when "slash_colon"
-            "/#{code}"                          # /E (colon and year handled by Identical)
+            "/#{code}"                          # /E (colon and year handled by identifier)
+          when "slash_no_colon"
+            "/#{code}"                          # /E (no colon, year handled by identifier)
           when "paren"
             "(#{code})"                         # (DE), (ES), (en)
           when "paren_year"
