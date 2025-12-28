@@ -240,13 +240,14 @@ module PubidNew
           lang_format = "slash"
         elsif parsed_hash[:lang_code]
           # Direct lang_code from identical_with_iso or standard_with_language_year patterns
-          # Could be /E:2001 (with colon) or /E2007 (without colon)
+          # Format: /E:2001 (with colon)
           lang_code = extract_value(parsed_hash[:lang_code])
           # Check if colon was present in the pattern
           if parsed_hash[:lang_colon]
-            lang_format = "slash_colon"  # /E:YYYY format (with colon)
+            lang_format = "slash_colon"  # /E:YYYY format
           else
-            lang_format = "slash_no_colon"  # /EYYYY format (without colon)
+            # This shouldn't happen with preprocessing, but default to slash
+            lang_format = "slash"
           end
         end
 

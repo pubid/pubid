@@ -165,15 +165,12 @@ module PubidNew
       end
 
       # Standard identifier without ISO reference but with language-year (CIE S 014-4/E:2007)
-      # Also supports /E2007 format (without colon)
       rule(:standard_with_language_year) do
         str("CIE") >> space >>
         stage_code.maybe.as(:stage) >>
         s_prefix.maybe.as(:s_prefix) >>
         code >>
-        slash >> upper.as(:lang_code) >>
-        (colon.as(:lang_colon)).maybe >>  # Colon is optional, track if present
-        year_digits.as(:year)
+        slash >> upper.as(:lang_code) >> colon.as(:lang_colon) >> year_digits.as(:year)
       end
 
       # Conference identifier (x-prefix)
@@ -338,7 +335,9 @@ module PubidNew
         # Normalize spaces
         cleaned = cleaned.gsub(/\s+/, " ")
 
-        # NOTE: Do NOT insert colon - we support both /E2007 and /E:2007 formats
+        # Insert missing colon before year in language patterns like /E2007 -> /E:2007
+        # This is a data quality fix - correct format always has colon
+        cleaned = cleaned.gsub(%r{/(E|F|G|DE|ES|CN|RU|FR)(\d{4})}, '/\1:\2')
 
         new.parse(cleaned)
       end
