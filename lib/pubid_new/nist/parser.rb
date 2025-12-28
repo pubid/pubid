@@ -39,6 +39,9 @@ module PubidNew
         # This handles NBS IR 80-2073 2 and NBS IR 80-2073 3 as volume identifiers
         cleaned = cleaned.gsub(/(\d{2}-\d{4})\s+(\d)$/, '\1 v\2')
 
+        # Normalize lowercase letter suffix after dash to uppercase: "6529-a" → "6529-A" (Session 219)
+        cleaned = cleaned.gsub(/(\d)-([a-z])$/, '\1-\2'.upcase)
+
         # Fix draft with number: "8270-draft2" → "8270-draft 2" (Session 219)
         # Space after draft, not before, so dash-draft pattern still matches
         cleaned = cleaned.gsub(/(\d)-draft(\d)/, '\1-draft \2')
