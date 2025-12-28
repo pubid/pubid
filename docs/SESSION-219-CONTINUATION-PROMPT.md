@@ -29,13 +29,15 @@ Total: 89,980 identifiers, 88,933 passing (98.84%)
 **Fix NIST to 100%** (19,820/19,827 → 19,824+/19,827, +4 identifiers)
 
 **7 Unknown Failures:**
-1. `NBS IR 80-2073 2` - Space before supplement (preprocessing)
-2. `NBS IR 80-2073 3` - Space before supplement (preprocessing)
-3. `NIST IR 4743rJun1992` - Missing space before month (preprocessing)
-4. `NIST IR 6529-a` - Letter suffix (parser support)
-5. `NISTPUB 0413171251` - Data quality (normalization)
-6. `NBS.CIRC.154suprev` - Data quality (normalization)
-7. `NIST CSWP 9NIST.HB.135e2022-upd1` - Data quality (normalization)
+1. `NBS IR 80-2073 2` - Space before supplement (preprocessing). This is to be normalized as `NBS IR 80-2073 vol2`.
+2. `NBS IR 80-2073 3` - Space before supplement (preprocessing). This is to be normalized as `NBS IR 80-2073 vol3`.
+3. `NIST IR 4743rJun1992` - Missing space before month (preprocessing). This means "NIST IR 4743 rev Jun 1992".
+4. `NIST IR 6529-a` - Using letter not number for "Part A" (normalize to "NIST IR 6529A") (parser support)
+5. `NISTPUB 0413171251` - Data quality (normalization) (This is a mistaken identity of "NIST TN 1648" with completely wrong number)
+6. `NBS.CIRC.154suprev` - This is machine readable form for "Revised Supplement To NBS Circular C154", so we build it using our existing patterns, but mark as normalization.
+7. `NIST CSWP 9`
+8. `NIST.HB.135e2022-upd1`
+9. We need to fix all in the file TODO.NIST-MUST-FIX.md
 
 **Timeline:** 60 minutes
 

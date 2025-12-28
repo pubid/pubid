@@ -35,6 +35,17 @@ module PubidNew
         # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
         cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
 
+        # Fix space before volume number: "80-2073 2" → "80-2073 v2" (Session 219)
+        # This handles NBS IR 80-2073 2 and NBS IR 80-2073 3 as volume identifiers
+        cleaned = cleaned.gsub(/(\d{2}-\d{4})\s+(\d)$/, '\1 v\2')
+
+        # Fix draft with number: "8270-draft2" → "8270-draft 2" (Session 219)
+        # Space after draft, not before, so dash-draft pattern still matches
+        cleaned = cleaned.gsub(/(\d)-draft(\d)/, '\1-draft \2')
+
+        # Fix supplement typo: "154suprev" → "154supprev" (Session 219)
+        cleaned = cleaned.gsub(/(\d)suprev/, '\1supprev')
+
         # Fix LCIRC supplement with slash and year: "118supp3/1926" → "118 supp3/1926"
         cleaned = cleaned.gsub(/(\d)(supp\d+\/\d{4})/, '\1 \2')
 
@@ -317,6 +328,8 @@ module PubidNew
           str("NCNR") | str("PERMIS") | str("BFRL") |
           # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
           upper_letter.repeat(1, 3) |
+          # Lowercase letter suffix (e.g., "a", "b") - Session 219
+          lower_letter.repeat(1, 2) |
           # Regular number with optional suffix - but NOT if part of FIPS date (digit-dash-month-digit-slash)
           (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?)
         ).as(:second_number)
@@ -400,7 +413,8 @@ module PubidNew
       rule(:revision) do
         (
           # NEW: Revision with month and year: rJun1992, r Jun1992 - LONGEST MATCH FIRST
-          ((str("r") | str("rev")) >> space.maybe >> month_abbrev.as(:revision_month) >> digits.as(:revision_year)) |
+          # Enhanced to support leading space (Session 219)
+          (space.maybe >> (str("r") | str("rev")) >> space.maybe >> month_abbrev.as(:revision_month) >> digits.as(:revision_year)) |
           # Revision with slash and year: r6/1925, r11/1924 (NEW for LCIRC patterns)
           (space.maybe >> (str("r") | str("rev")) >> digits.as(:revision) >>
            slash >> digits.as(:revision_year)) |
@@ -518,9 +532,11 @@ module PubidNew
         (space >> digits >> str("pd")).as(:public_draft)
       end
 
-      # Draft stage - enhanced to support suffix pattern
+      # Draft stage - enhanced to support suffix pattern and number after draft
       rule(:draft) do
-        (space >> str("(Draft)") | dash >> str("draft") | pd_suffix).as(:draft)
+        (space >> str("(Draft)") |
+         dash >> str("draft") >> digits.maybe |  # Session 219: support "draft2" (no space)
+         pd_suffix).as(:draft)
       end
 
       # Special date format with slash for FIPS (part of number, not edition)
@@ -553,6 +569,8 @@ module PubidNew
         # Edition with underscore separator (MR format: 1648_2009)
         (str("_") >> digits.as(:edition_year)).maybe >>
         (dot >> (digits | upper_letter)).repeat(0, 3) >>  # Support additional dot-separated parts
+        # Support letter suffix before update (e.g., 8286C-upd1) - Session 219
+        upper_letter.maybe >>
         (dash >> str("upd") >> digits.maybe).maybe >>
         parts.repeat >> draft.maybe
       end
