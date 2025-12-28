@@ -49,6 +49,10 @@ module PubidNew
         # Fix supplement typo: "154suprev" → "154supprev" (Session 219)
         cleaned = cleaned.gsub(/(\d)suprev/, '\1supprev')
 
+        # Fix letter suffix + revision before draft: "140Cr1-draft2" → "140C r1-draft2" (Session 221)
+        # Must be BEFORE general draft preprocessing at line 47
+        cleaned = cleaned.gsub(/(\d{2,})([A-Z])(r\d+)([-\s]draft\d*)/, '\1\2 \3\4')
+
         # Convert Roman numeral volumes to Arabic per NIST spec (page 7)
         # "1011-I-2.0" → "1011 v1 ver2.0"
         # "1011-II-1.0" → "1011 v2 ver1.0"
@@ -582,7 +586,7 @@ module PubidNew
       # Draft stage - enhanced to support suffix pattern and number after draft
       rule(:draft) do
         (space >> str("(Draft)") |
-         dash >> str("draft") >> digits.maybe |  # Session 219: support "draft2" (no space)
+         dash >> str("draft") >> space.maybe >> digits.maybe |  # Session 219/221: support "draft2" and "draft 2"
          pd_suffix).as(:draft)
       end
 
