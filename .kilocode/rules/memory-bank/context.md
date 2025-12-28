@@ -10,7 +10,7 @@
 **What Was Accomplished:**
 
 1. **Preprocessing Fixes** ✅
-   - Space in IR volume numbers: `80-2073 2` → `80-2073-2` (fixed 2 identifiers)
+   - Space before volume number: `80-2073 2` → `80-2073 v2` (NIST volume format per spec)
    - Month in revision: `4743rJun1992` → `4743 rJun1992` (already working)
    - Supplement typo: `154suprev` → `154supprev`
 
