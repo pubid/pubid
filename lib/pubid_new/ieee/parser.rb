@@ -835,7 +835,7 @@ module PubidNew
         # Add space after TR when directly followed by digit
         cleaned = cleaned.gsub(/(ISO\/IEC\s+TR)(\d)/, '\1 \2')
         # === SESSION 178: AIEE Dual Numbers Expansion (Line 45) ===
-        
+
         # Part E: AIEE "Nos X and Y" Expansion
         # Pattern: "AIEE Nos 72 and 73 - 1932" → "AIEE No 72-1932 and AIEE No 73-1932"
         # Expands dual AIEE numbers to separate identifiers with shared year
@@ -847,6 +847,55 @@ module PubidNew
             "AIEE No #{first_num}-#{year} and AIEE No #{second_num}-#{year}"
           end
         end
+
+        # === SESSION 222: TODO.IEEE-MUST-FIX-IDs.txt Comprehensive Fixes ===
+
+        # Part A: Typo Fixes
+        # 1. "Stad" -> "Std" (typo)
+        cleaned = cleaned.gsub(/\bStad\b/, 'Std')
+
+        # 2. Lowercase "std" -> "Std" when after IEEE/ANSI publishers
+        cleaned = cleaned.gsub(/\b(IEEE|ANSI|AIEE)\s+std\b/, '\1 Std')
+
+        # Part B: Symbol Normalization
+        # 3. Additional (TM) patterns - strip them out
+        cleaned = cleaned.gsub(/\(TM\)/, '')
+
+        # Part C: Year-first format normalization
+        # 4. Pattern "62704-4/D4, 2020" -> "IEEE P62704-4/D4, 2020"
+        # Only if starts with digits-dash-digits/D pattern
+        if cleaned.match?(/^(\d+[-\.]\d+)\/D\d+/)
+          cleaned = "IEEE P#{cleaned}"
+        end
+
+        # Part D: Suffix Normalization
+        # 5. "/Preprint" -> remove (data quality - not standard suffix)
+        cleaned = cleaned.gsub(/\/Preprint\b/, '')
+
+        # Part E: Relationship Text Normalization
+        # 6. "Proposed Revision of" -> "Revision of"
+        cleaned = cleaned.gsub(/Proposed Revision of/, 'Revision of')
+
+        # 7. "ammended" typo -> "amended"
+        cleaned = cleaned.gsub(/\bammended\b/i, 'amended')
+
+        # Part F: Trailing Characters After Special Patterns
+        # 8. Remove trailing periods after /INT, /Cor, etc.
+        cleaned = cleaned.gsub(/(\/INT|\/Cor\s+\d+-\d{4})\./, '\1')
+
+        # Part G: Conformance Pattern Spacing
+        # 9. Fix spacing in "/Conformance" patterns
+        # "1904.1(TM)/Conformance02" -> "1904.1 /Conformance02" (space before slash)
+        cleaned = cleaned.gsub(/(\d)\/Conformance(\d+)/, '\1 /Conformance\2')
+
+        # Part H: Edition Text After /INT
+        # 10. Handle ", Month YYYY Edition" after /INT by converting to month-year format
+        # "1003.1/INT, March 1994 Edition" -> "1003.1/INT, March 1994"
+        cleaned = cleaned.gsub(/(\/INT),\s+([A-Z][a-z]+)\s+(\d{4})\s+Edition/, '\1, \2 \3')
+
+        # Part I: Handle "Ed." abbreviation
+        # 11. "Dec. 1994 Ed." -> "Dec. 1994"
+        cleaned = cleaned.gsub(/\s+Ed\.\s*$/, '')
 
 
         new.parse(cleaned)
