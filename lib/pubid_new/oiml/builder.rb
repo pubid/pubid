@@ -17,6 +17,11 @@ module PubidNew
       }.freeze
 
       def build(parsed_hash)
+        # Check for short amendment format (has amd_marker)
+        if parsed_hash[:amd_marker]
+          return build_short_amendment(parsed_hash)
+        end
+
         # Check for supplements first (have base_identifier)
         if parsed_hash[:base_identifier]
           return build_supplement(parsed_hash)
@@ -27,6 +32,45 @@ module PubidNew
       end
 
       private
+
+      def build_short_amendment(parsed_hash)
+        # Build base identifier from the code and type
+        base_hash = {
+          publisher: parsed_hash[:publisher],
+          type: parsed_hash[:type]
+        }
+
+        # Copy number/part/subpart from base_code
+        if parsed_hash[:base_code]
+          base_hash[:number] = parsed_hash[:base_code][:number]
+          base_hash[:part] = parsed_hash[:base_code][:part] if parsed_hash[:base_code][:part]
+          base_hash[:subpart] = parsed_hash[:base_code][:subpart] if parsed_hash[:base_code][:subpart]
+        end
+
+        # Build the base document
+        base_identifier = build_base_document(base_hash)
+
+        # Create amendment
+        amendment = Identifiers::Amendment.new
+        amendment.base_identifier = base_identifier
+
+        # Extract year from edition_format if present, otherwise from year directly
+        year_value = if parsed_hash[:edition_format].is_a?(Hash)
+          parsed_hash[:edition_format][:year]
+        else
+          parsed_hash[:year]
+        end
+
+        amendment.year = year_value.to_s if year_value
+        amendment.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
+
+        # Track if amendment itself was parsed with Edition format
+        if parsed_hash[:edition_format]
+          amendment.parsed_format = "long"
+        end
+
+        amendment
+      end
 
       def build_supplement(parsed_hash)
         # Determine supplement type

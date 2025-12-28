@@ -1,21 +1,21 @@
 Flavor: OIML
-Classified: 2025-12-28 18:27:10
+Classified: 2025-12-28 19:00:06
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total: 59
-Pass: 56 (94.92%)
-Fail: 3 (5.08%)
+Pass: 59 (100.0%)
+Fail: 0 (0.0%)
 
 BY CLASS
 ----------------------------------------------------------------------
-amendment                                Pass: 2/2 (100.0%)
+amendment                                Pass: 4/4 (100.0%)
 annex                                    Pass: 3/3 (100.0%)
 basic_publication                        Pass: 2/2 (100.0%)
-document                                 Pass: 9/11 (81.82%)
+document                                 Pass: 9/9 (100.0%)
 expert_report                            Pass: 2/2 (100.0%)
 guide                                    Pass: 3/3 (100.0%)
-recommendation                           Pass: 28/29 (96.55%)
+recommendation                           Pass: 29/29 (100.0%)
 seminar_report                           Pass: 1/1 (100.0%)
 vocabulary                               Pass: 6/6 (100.0%)

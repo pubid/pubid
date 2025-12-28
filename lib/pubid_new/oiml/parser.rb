@@ -20,7 +20,7 @@ module PubidNew
 
       # Main identifier pattern - check supplements first
       rule(:identifier) do
-        amendment_identifier | annex_letter_identifier | annex_identifier | base_identifier
+        amendment_identifier | amendment_short | annex_letter_identifier | annex_identifier | base_identifier
       end
 
       # Publisher - always "OIML"
@@ -60,12 +60,12 @@ module PubidNew
       rule(:edition_portion) do
         (
           (str(", ") | space) >>
-          edition_number.maybe >> space.maybe >> edition_text >> space >> year_digits.as(:year)
+          edition_number.maybe >> space.maybe >> edition_text >> space.maybe >> year_digits.as(:year)
         ).as(:edition_format)  # Wrap entire match to capture that Edition was used
       end
 
-      # Date - year after colon OR edition portion
-      rule(:date) { edition_portion | (colon >> year_digits.as(:year)) }
+      # Date - year after colon OR edition portion (with optional space before year)
+      rule(:date) { edition_portion | (colon >> space.maybe >> year_digits.as(:year)) }
 
       # Draft stage - WD or CD with optional iteration
       rule(:stage_iteration) do
@@ -117,6 +117,19 @@ module PubidNew
         str("Amendment") >> space >> lparen >> year_digits.as(:year) >> rparen >>
         space >> str("to") >> space >>
         base_without_language.as(:base_identifier) >>
+        language_portion.maybe.as(:language)
+      end
+
+      # Short amendment forms - "OIML TYPE NUMBER Amendment Edition YYYY" or "Amendment: YYYY"
+      rule(:amendment_short) do
+        publisher >>
+        doc_type >>
+        full_number.as(:base_code) >>
+        space >> str("Amendment").as(:amd_marker) >>
+        (
+          (space >> edition_text >> space.maybe >> year_digits.as(:year)).as(:edition_format) |
+          (colon >> space.maybe >> year_digits.as(:year))
+        ) >>
         language_portion.maybe.as(:language)
       end
 
