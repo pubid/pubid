@@ -77,7 +77,8 @@ module PubidNew
       rule(:organization) do
         str("IEEE") | str("AIEE") | str("ANSI") | str("ASA") |
         str("IEC") | str("ISO") | str("ASTM") | str("CSA") | str("ASME") |
-        str("NACE") | str("NSF") | str("ASHRAE") | str("NCTA") | str("AESC")
+        str("NACE") | str("NSF") | str("ASHRAE") | str("NCTA") | str("AESC") |
+        str("EIA")  # NEW Session 224: Add EIA support
       end
 
       # Complex organization prefixes (Category 5: ANSI Complex)
@@ -762,6 +763,23 @@ module PubidNew
         cleaned = cleaned.gsub(/[,:]\s*$/, '')           # Trailing comma/colon
         cleaned = cleaned.gsub(/,\s+and\s+IEEE\s+Std\s/, ' and ')  # Handle "IEEE Std and Std" case
 
+        # Enhanced: Fix unbalanced parentheses comprehensively
+        # Handle three cases: missing closing, extra opening, nested unbalanced
+        open_count = cleaned.count('(')
+        close_count = cleaned.count(')')
+
+        if open_count > close_count
+          # More opening than closing - add closing parens at end
+          # This handles both simple missing and nested unbalanced cases
+          missing = open_count - close_count
+          cleaned = cleaned + (')' * missing)
+        elsif close_count > open_count
+          # More closing than opening - remove extra closing from end
+          # Very conservative: only remove trailing excess closing parens
+          extra = close_count - open_count
+          cleaned = cleaned.sub(/\){#{extra}}$/, '')
+        end
+
         # === SESSION 173: TODO.IEEE-MUST-DO.txt Preprocessing Enhancements ===
 
         # Part A: Simple Normalizations (Lines 13, 16, 32-35, 36, 39-41 from TODO)
@@ -896,6 +914,33 @@ module PubidNew
         # Part I: Handle "Ed." abbreviation
         # 11. "Dec. 1994 Ed." -> "Dec. 1994"
         cleaned = cleaned.gsub(/\s+Ed\.\s*$/, '')
+
+
+        # === SESSION 224: TODO.IEEE-MUST-FIX-IDs.txt Quick Wins ===
+
+        # Part A: Period After Std Normalization
+        # 1. "IEEE Std." -> "IEEE Std" (remove period after Std/Stad)
+        cleaned = cleaned.gsub(/\bStd\.\s+/, 'Std ')
+        cleaned = cleaned.gsub(/\bStad\.\s+/, 'Std ')
+
+        # Part B: Redline Suffix Removal
+        # 2. "C37.101-2006 (...) - Redline" -> "C37.101-2006 (...)"
+        # Remove " - Redline" pattern at end or before additional content
+        cleaned = cleaned.gsub(/\s+-\s+Redline\b.*$/, '')
+
+        # Part C: Title Portion Removal (Enhanced)
+        # 3. "C37.20.3-2001 - IEEE Standard for..." -> "C37.20.3-2001"
+        # Already partially handled by line 118, but make more comprehensive
+        # Remove any " - {Title text}" pattern after year
+        cleaned = cleaned.gsub(/(\d{4})(\s+\([^)]+\))?\s+-\s+IEEE\s+Standard\s+for.*$/, '\1\2')
+
+        # Part D: Additional Space Normalization
+        # 4. Make space-around-dash normalization more comprehensive
+        # Current patterns (692-693) only handle digit-dash-year
+        # Add general space-before-dash when near year patterns
+        # "C37.101 -2006" -> "C37.101-2006" (already at line 692)
+        # "C62.35- 2010" -> "C62.35-2010" (already at line 693)
+        # These are already handled, no additional code needed
 
 
         new.parse(cleaned)

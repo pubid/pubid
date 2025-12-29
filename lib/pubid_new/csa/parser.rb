@@ -26,14 +26,16 @@ module PubidNew
       # Can also have dash-number-letter suffix (e.g., for NO. numbers like 60950-1A)
       # Can have letter suffixes like HB, CIICHB, SP at the end
       # Can have multiple dash-number sequences (e.g., C13256-1-01)
-      # NEW: Also support pure dotted numbers (e.g., 12.4, 2.15)
+      # NEW: Also support pure numbers with HB suffix (e.g., 15189HB)
       rule(:code_pattern) do
         (
-          # Pattern 1: Pure dotted numbers (NEW) - e.g., 12.4, 2.15, 3.11
+          # Pattern 1: Pure dotted numbers - e.g., 12.4, 2.15, 3.11
           (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1) >>
            (dash >> match("[0-9]").repeat(1)).repeat >>  # Allow multiple dash sequences
            letter.repeat(2, 6).maybe).as(:code) |
-          # Pattern 2: Letter + numbers (original) - e.g., B149.1, C22.2
+          # Pattern 2: Pure numbers with HB suffix - e.g., 15189HB (NEW)
+          (match("[0-9]").repeat(1) >> letter.repeat(2, 6)).as(:code) |
+          # Pattern 3: Letter + numbers (original) - e.g., B149.1, C22.2, B149HB, C22.1CIICHB
           (letter >> match("[0-9]").repeat(1) >>
            (dot >> match("[0-9]").repeat(1)).repeat >>
            (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>  # Allow multiple dash-number sequences
