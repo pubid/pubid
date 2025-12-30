@@ -64,7 +64,7 @@ module PubidNew
           separator = (year_format == "dash") ? "-" : ":"
           year_part = separator
           year_part += year_prefix if year_prefix  # Add M or F prefix
-          year_part += "F" if french && year_format != "dash"
+          year_part += "F" if french && year_format != "dash" && !year_prefix  # Only add F if no prefix
 
           # Convert 4-digit year back to 2-digit
           year_str = year.to_s
