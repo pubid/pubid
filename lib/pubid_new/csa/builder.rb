@@ -14,6 +14,11 @@ module PubidNew
           return build_series(parsed_hash)
         end
 
+        # Handle package identifiers (with package_portion marker)
+        if parsed_hash.key?(:package_portion)
+          return build_package(parsed_hash)
+        end
+
         # Handle bundled identifiers (with + notation)
         if parsed_hash.key?(:bundled_first)
           return build_bundled(parsed_hash)
@@ -28,6 +33,23 @@ module PubidNew
       end
 
       private
+
+      def build_package(parsed_hash)
+        require_relative "identifiers/package"
+        package = Identifiers::Package.new
+
+        # Build base identifier (without package_portion)
+        base_data = parsed_hash.dup
+        base_data.delete(:package_portion)
+        package.base_identifier = build_single(base_data)
+
+        # Set package materials
+        if parsed_hash[:package_portion]
+          package.package_materials = parsed_hash[:package_portion].to_s
+        end
+
+        package
+      end
 
       def build_series(parsed_hash)
         require_relative "identifiers/series"
@@ -143,7 +165,9 @@ module PubidNew
       end
 
       def build_single(data)
-        identifier = Identifiers::Standard.new
+        # Select appropriate identifier class based on MECE criteria
+        identifier_class = select_identifier_class(data)
+        identifier = identifier_class.new
 
         # Publisher prefix (CAN/CSA-, CAN3-, or CSA)
         # For code_only identifiers (no prefix in original), set to empty string
@@ -161,9 +185,22 @@ module PubidNew
           identifier.has_publisher = true
         end
 
-        # Code
+        # Code - with dash-year extraction if needed
         if data[:code]
-          identifier.code = Components::Code.new(value: data[:code].to_s)
+          code_value = data[:code].to_s
+
+          # Extract year from code if it ends with -NN (2-digit year) and no separate year parsed
+          # Pattern: "C22.1-15" should become code="C22.1", year="2015"
+          if !data[:year] && code_value =~ /^(.+)-(\d{2})$/
+            # Split code and year
+            identifier.code = Components::Code.new(value: $1)
+            # Convert 2-digit year to 4-digit
+            year_2digit = $2
+            identifier.year = "20#{year_2digit}"
+            identifier.year_format = "dash"
+          else
+            identifier.code = Components::Code.new(value: code_value)
+          end
         end
 
         # NO. number
@@ -191,7 +228,8 @@ module PubidNew
                       end
 
         # Year (2-digit needs conversion to 4-digit, 4-digit stays as-is)
-        if data[:year]
+        # Only set if not already set by code extraction above
+        if data[:year] && !identifier.year
           year_str = data[:year].to_s
           if year_str.length == 2
             # Convert 2-digit year to 4-digit (20XX for CSA)
@@ -207,6 +245,10 @@ module PubidNew
         # Year prefix (F or M)
         if data[:year_prefix]
           identifier.year_prefix = data[:year_prefix].to_s
+          # If year prefix is F, set french flag
+          if data[:year_prefix].to_s == "F"
+            identifier.french = true
+          end
         end
 
         # French edition flag
@@ -230,6 +272,33 @@ module PubidNew
         end
 
         identifier
+      end
+
+      def select_identifier_class(data)
+        # Priority order (MECE - mutually exclusive, collectively exhaustive):
+
+        # 1. Check for Series type (series_type means SERIES as primary type from series_identifier rule)
+        # NOTE: Do NOT check :series flag here - that's a modifier, not a primary type
+        if data[:series_type]
+          require_relative "identifiers/series"
+          return Identifiers::Series
+        end
+
+        # 2. Check for CAN/CSA- or CAN3- prefix → CanadianAdopted
+        if data[:publisher_prefix] &&
+           (data[:publisher_prefix].to_s == "CAN/CSA-" || data[:publisher_prefix].to_s == "CAN3-")
+          require_relative "identifiers/canadian_adopted"
+          return Identifiers::CanadianAdopted
+        end
+
+        # 3. Check for ISO/IEC prefix → CsaAdopted
+        if data[:iso_type]
+          require_relative "identifiers/csa_adopted"
+          return Identifiers::CsaAdopted
+        end
+
+        # 4. Default: Standard
+        Identifiers::Standard
       end
     end
   end
