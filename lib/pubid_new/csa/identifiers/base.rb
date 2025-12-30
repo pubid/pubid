@@ -63,8 +63,14 @@ module PubidNew
                    elsif needs_space
                      parts.join(" ")
                    else
-                     # No space after dash-ending prefix
-                     parts[0] + parts[1..-1].join(" ")
+                     # No space after dash-ending prefix - join first two parts directly
+                     # If there are more parts after code, they should still have spaces
+                     if parts.length == 2
+                       parts.join("")
+                     else
+                       # More than 2 parts shouldn't happen in current design
+                       parts.join("")
+                     end
                    end
 
           # Reaffirmation

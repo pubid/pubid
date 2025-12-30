@@ -11,6 +11,7 @@ require_relative "csa/identifiers/canadian_adopted"
 require_relative "csa/identifiers/csa_adopted"
 require_relative "csa/identifiers/package"
 require_relative "csa/identifiers/series"
+require_relative "csa/identifiers/cec"
 
 module PubidNew
   module Csa

@@ -25,7 +25,8 @@ module PubidNew
                 # Use dash if year_format is dash, otherwise colon
                 separator = (bundled.year_format == "dash") ? "-" : ":"
                 bundled_part += separator
-                bundled_part += "F" if bundled.french && bundled.year_format != "dash"
+                bundled_part += bundled.year_prefix if bundled.year_prefix  # Add M or F prefix
+                bundled_part += "F" if bundled.french && bundled.year_format != "dash" && !bundled.year_prefix  # Only add F if no prefix
                 # Convert 4-digit year back to 2-digit
                 year_str = bundled.year.to_s
                 if year_str.length == 4 && year_str.start_with?("20")

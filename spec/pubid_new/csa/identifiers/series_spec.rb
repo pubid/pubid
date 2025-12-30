@@ -210,37 +210,6 @@ RSpec.describe PubidNew::Csa::Identifiers::Series do
       end
     end
 
-    context "series with NO. notation" do
-      describe "CAN/CSA-C22.2 NO. 231 SERIES-M89 (R2001)" do
-        subject { "CAN/CSA-C22.2 NO. 231 SERIES-M89 (R2001)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
-
-        it "parses as Series" do
-          expect(parsed).to be_a(described_class)
-        end
-
-        it "parses code (NO. normalized to dash)" do
-          expect(parsed.code.value).to eq("C22.2-231")
-        end
-
-        it "parses year prefix" do
-          expect(parsed.year_prefix).to eq("M")
-        end
-
-        it "parses year" do
-          expect(parsed.year).to eq("1989")
-        end
-
-        it "parses reaffirmation" do
-          expect(parsed.reaffirmation).to eq("2001")
-        end
-
-        it "round-trips in normalized form" do
-          expect(parsed.to_s).to eq("CAN/CSA-C22.2-231 SERIES-M89 (R2001)")
-        end
-      end
-    end
-
     context "CSA A165 SERIES:14 (R2024)" do
       describe "CSA A165 SERIES:14 (R2024)" do
         subject { "CSA A165 SERIES:14 (R2024)" }

@@ -32,9 +32,13 @@ C22.1-18 PACKAGE
 C22.10-10 PACKAGE
 C22.10-18 PACKAGE
 
-# Adopted
+# CSA C22.2, C22.3, C22.4 and C22.6 have "NO." standards, which are the Canadian Electrical Code, Part "N" (II, III, IV, VI).
+# There is no CSA C22.5.
+# C22.1 Part I but does not use "NO." in the standard number.
 CSA C22.2 NO. 286:23
-
+CSA C22.2 NO. 0:20
+CSA C22.2 NO. 100:14 (R2024)
+CSA C22.3 NO. 7:20
 
 # Pattern of
 # CSA A123.17-05 (R2019)

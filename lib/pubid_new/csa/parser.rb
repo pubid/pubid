@@ -44,6 +44,23 @@ module PubidNew
         )
       end
 
+      # NO. notation - "Number" designation within a series (e.g., C22.2 NO. 1)
+      rule(:no_notation) do
+        space >> (str("NO.") | str("No.")).as(:no_notation) >> space
+      end
+
+      # Number after NO. - can be complex (e.g., 60601-1-9, 144.1, 1)
+      rule(:no_number) do
+        (
+          # Multi-part with dashes (e.g., 60601-1-9)
+          (match("[0-9]").repeat(1) >> (dash >> match("[0-9]").repeat(1)).repeat(1)) |
+          # Dotted number (e.g., 144.1)
+          (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1)) |
+          # Simple number (e.g., 1, 286)
+          match("[0-9]").repeat(1)
+        ).as(:no_number)
+      end
+
       # Year format with optional F or M prefix
       rule(:year_prefix) { (str("F") | str("M")).as(:year_prefix).maybe }
       rule(:year_2digit) { digit.repeat(2, 2) }
@@ -116,6 +133,21 @@ module PubidNew
         reaffirmation.maybe
       end
 
+      # CEC (Canadian Electrical Code) identifier
+      # Pattern: CSA C22.{2,3,4,6} NO. {number}:{year}
+      # Examples: CSA C22.2 NO. 286:23, CSA C22.3 NO. 7:20
+      # The "NO." notation is a semantic component and must be preserved
+      rule(:cec_identifier) do
+        publisher >>
+        (
+          str("C22.2") | str("C22.3") | str("C22.4") | str("C22.6")
+        ).as(:cec_part) >>
+        no_notation >>
+        no_number >>
+        (colon_year | dash_year) >>
+        reaffirmation.maybe
+      end
+
       # ISO/IEC adopted standards pattern: CSA ISO/IEC TR 19758:04 (R2024)
       rule(:iso_iec_adoption) do
         publisher >>
@@ -132,11 +164,13 @@ module PubidNew
         publisher >>
         code_pattern >>
         (
-          # Option 1: series with prefix (space + prefix + space + keyword + year)
+          # Option 1: NO. notation (e.g., C22.2 NO. 1:20)
+          (no_notation >> no_number >> (colon_year | dash_year)) |
+          # Option 2: series with prefix (space + prefix + space + keyword + year)
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 2: series without prefix (space + keyword + year)
+          # Option 3: series without prefix (space + keyword + year)
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: just year (no series)
+          # Option 4: just year (no series, no NO.)
           (colon_year | dash_year)
         ) >>
         amendment_slash.maybe  # Add amendment support here
@@ -147,27 +181,15 @@ module PubidNew
         publisher >>
         code_pattern >>
         (
-          # Option 1: series with prefix
+          # Option 1: NO. notation
+          (no_notation >> no_number >> (colon_year | dash_year)) |
+          # Option 2: series with prefix
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 2: series without prefix
+          # Option 3: series without prefix
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: just year
+          # Option 4: just year
           (colon_year | dash_year)
         )
-      end
-
-      # Continuation code (no CSA publisher prefix, for combined identifiers)
-      rule(:continuation_code) do
-        code_pattern >>
-        (
-          # Option 1: series with prefix
-          (space >> series_prefix >> space >> series_keyword >> (colon_year | dash_year)) |
-          # Option 2: series without prefix
-          (space >> series_keyword >> (colon_year | dash_year)) |
-          # Option 3: just year
-          (colon_year | dash_year)
-        ) >>
-        amendment_slash.maybe
       end
 
       # Continuation code (optional CSA publisher prefix, for combined identifiers)
@@ -175,11 +197,13 @@ module PubidNew
         (publisher.as(:has_publisher)).maybe >>
         code_pattern >>
         (
-          # Option 1: series with prefix
+          # Option 1: NO. notation
+          (no_notation >> no_number >> (colon_year | dash_year)) |
+          # Option 2: series with prefix
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 2: series without prefix
+          # Option 3: series without prefix
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: just year
+          # Option 4: just year
           (colon_year | dash_year)
         ) >>
         amendment_slash.maybe
@@ -189,7 +213,12 @@ module PubidNew
       # Example: "A2:22" in "CSA C22.2 NO. 60601-1:14 + A2:22"
       rule(:bundled_portion) do
         code_pattern >>
-        (colon_year | dash_year).maybe
+        (
+          # Option 1: NO. notation
+          (no_notation >> no_number >> (colon_year | dash_year).maybe) |
+          # Option 2: just year or no year
+          (colon_year | dash_year).maybe
+        )
       end
 
       # Bundled identifier with + notation (consolidated documents)
@@ -226,9 +255,7 @@ module PubidNew
 
       # Single identifier with optional package
       rule(:single_identifier) do
-        csa_code >>
-        reaffirmation.maybe >>
-        package_portion.as(:package_portion).maybe
+        csa_code >> reaffirmation.maybe >> package_portion.as(:package_portion).maybe
       end
 
       # Code-only identifier (no CSA prefix) - try this last
@@ -247,7 +274,7 @@ module PubidNew
 
       # Main identifier
       rule(:identifier) do
-        iso_iec_adoption | series_identifier | bundled_identifier | combined_slash | combined_comma | single_identifier | code_only_identifier
+        iso_iec_adoption | series_identifier | cec_identifier | bundled_identifier | combined_slash | combined_comma | single_identifier | code_only_identifier
       end
 
       root(:identifier)
@@ -264,13 +291,7 @@ module PubidNew
         # Fix missing space before reaffirmation: 94(R04) -> 94 (R04)
         normalized = normalized.gsub(/(\d{2})\(R(\d{2,4})\)/, '\1 (R\2)')
 
-        # Normalize NO. patterns away by converting to dash-number format
-        # Handle year patterns carefully to avoid ambiguity
-        # "C22.2 NO. 286:23" → "C22.2-286:23" (colon year)
-        # "C22.2 NO. 1-04" → "C22.2-1 -04" (dash year, space prevents code from consuming it)
-        # "C22.2 NO. 144.1-16" → "C22.2-144.1 -16" (decimal number with dash year)
-        normalized = normalized.gsub(/\s+NO\.\s+(\S+?)(-\d{2}\b)/, '-\1 \2')  # With dash year
-        normalized = normalized.gsub(/\s+NO\.\s+/, '-')  # Without year (or colon year)
+        # DO NOT normalize NO., let it be parsed as a separate identifier component
 
         # Normalize CEI/IEC to IEC (CEI is French name for IEC)
         normalized = normalized.gsub(/CEI\/IEC/, "IEC")

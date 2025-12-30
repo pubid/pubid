@@ -14,6 +14,11 @@ module PubidNew
           return build_series(parsed_hash)
         end
 
+        # Handle CEC identifiers (C22.x NO. patterns)
+        if parsed_hash.key?(:cec_part)
+          return build_cec(parsed_hash)
+        end
+
         # Handle package identifiers (with package_portion marker)
         if parsed_hash.key?(:package_portion)
           return build_package(parsed_hash)
@@ -112,6 +117,78 @@ module PubidNew
         end
 
         series
+      end
+
+      def build_cec(parsed_hash)
+        require_relative "identifiers/cec"
+        cec = Identifiers::Cec.new
+
+        # Publisher prefix (if set)
+        if parsed_hash[:publisher_prefix]
+          cec.publisher_prefix = parsed_hash[:publisher_prefix].to_s
+        end
+
+        # CEC part (C22.2, C22.3, etc.)
+        if parsed_hash[:cec_part]
+          cec.cec_part = Components::Code.new(value: parsed_hash[:cec_part].to_s)
+        end
+
+        # NO. number
+        if parsed_hash[:no_number]
+          cec.no_number = Components::Code.new(value: parsed_hash[:no_number].to_s)
+        end
+
+        # Year format and year
+        year_format = if parsed_hash[:dash_format]
+                        "dash"
+                      elsif parsed_hash[:colon_format]
+                        "colon"
+                      else
+                        "colon"  # default
+                      end
+
+        if parsed_hash[:year]
+          year_str = parsed_hash[:year].to_s
+          if year_str.length == 2
+            # Convert 2-digit year to 4-digit
+            # M prefix means 1900s, otherwise 2000s
+            year_int = year_str.to_i
+            if parsed_hash[:year_prefix] && parsed_hash[:year_prefix].to_s == "M"
+              cec.year = (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
+            else
+              cec.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+            end
+          else
+            cec.year = year_str
+          end
+          cec.year_format = year_format
+        end
+
+        # Year prefix (F or M)
+        if parsed_hash[:year_prefix]
+          cec.year_prefix = parsed_hash[:year_prefix].to_s
+          # If year prefix is F, set french flag
+          if parsed_hash[:year_prefix].to_s == "F"
+            cec.french = true
+          end
+        end
+
+        # French flag
+        if parsed_hash[:french]
+          cec.french = true
+        end
+
+        # Reaffirmation
+        if parsed_hash[:reaffirmation]
+          reaffirm_data = parsed_hash[:reaffirmation]
+          if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
+            cec.reaffirmation = reaffirm_data[:year].to_s
+          else
+            cec.reaffirmation = reaffirm_data.to_s
+          end
+        end
+
+        cec
       end
 
       def build_bundled(parsed_hash)
@@ -281,25 +358,26 @@ module PubidNew
 
       def select_identifier_class(data)
         # Priority order (MECE - mutually exclusive, collectively exhaustive):
+        # Wrappers first, then type-based classification
 
-        # 1. Check for Series type (series_type means SERIES as primary type from series_identifier rule)
-        # NOTE: Do NOT check :series flag here - that's a modifier, not a primary type
-        if data[:series_type]
-          require_relative "identifiers/series"
-          return Identifiers::Series
-        end
-
-        # 2. Check for CAN/CSA- or CAN3- prefix → CanadianAdopted
+        # 1. Check for CAN/CSA- or CAN3- prefix → CanadianAdopted (wrapper)
         if data[:publisher_prefix] &&
            (data[:publisher_prefix].to_s == "CAN/CSA-" || data[:publisher_prefix].to_s == "CAN3-")
           require_relative "identifiers/canadian_adopted"
           return Identifiers::CanadianAdopted
         end
 
-        # 3. Check for ISO/IEC prefix → CsaAdopted
+        # 2. Check for ISO/IEC prefix → CsaAdopted (wrapper)
         if data[:iso_type]
           require_relative "identifiers/csa_adopted"
           return Identifiers::CsaAdopted
+        end
+
+        # 3. Check for Series type (series_type means SERIES as primary type from series_identifier rule)
+        # NOTE: Do NOT check :series flag here - that's a modifier, not a primary type
+        if data[:series_type]
+          require_relative "identifiers/series"
+          return Identifiers::Series
         end
 
         # 4. Default: Standard

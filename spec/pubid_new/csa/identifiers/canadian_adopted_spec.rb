@@ -47,8 +47,20 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
         subject { "CAN/CSA-C22.2 NO. 1010.2.031-94(R04)" }
         let(:parsed) { PubidNew::Csa.parse(subject) }
 
-        it "parses code (NO. normalized to dash)" do
-          expect(parsed.wrapped_identifier.code.value).to eq("C22.2-1010.2.031")
+        it "parses as CanadianAdopted" do
+          expect(parsed).to be_a(described_class)
+        end
+
+        it "wraps CecIdentifier" do
+          expect(parsed.wrapped_identifier).to be_a(PubidNew::Csa::Identifiers::Cec)
+        end
+
+        it "parses CEC part" do
+          expect(parsed.wrapped_identifier.cec_part.value).to eq("C22.2")
+        end
+
+        it "parses NO. number" do
+          expect(parsed.wrapped_identifier.no_number.value).to eq("1010.2.031")
         end
 
         it "parses year" do
@@ -59,8 +71,8 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
           expect(parsed.reaffirmation).to eq("2004")
         end
 
-        it "round-trips in normalized form" do
-          expect(parsed.to_s).to eq("CAN/CSA-C22.2-1010.2.031-94(R04)")
+        it "round-trips correctly" do
+          expect(parsed.to_s).to eq(subject)
         end
       end
     end
@@ -167,16 +179,28 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
         subject { "CAN/CSA-C22.2 NO. 60079-11:14" }
         let(:parsed) { PubidNew::Csa.parse(subject) }
 
-        it "parses code (NO. normalized to dash)" do
-          expect(parsed.wrapped_identifier.code.value).to eq("C22.2-60079-11")
+        it "parses as CanadianAdopted" do
+          expect(parsed).to be_a(described_class)
+        end
+
+        it "wraps CecIdentifier" do
+          expect(parsed.wrapped_identifier).to be_a(PubidNew::Csa::Identifiers::Cec)
+        end
+
+        it "parses CEC part" do
+          expect(parsed.wrapped_identifier.cec_part.value).to eq("C22.2")
+        end
+
+        it "parses NO. number" do
+          expect(parsed.wrapped_identifier.no_number.value).to eq("60079-11")
         end
 
         it "parses year" do
           expect(parsed.wrapped_identifier.year).to eq("2014")
         end
 
-        it "round-trips in normalized form" do
-          expect(parsed.to_s).to eq("CAN/CSA-C22.2-60079-11:14")
+        it "round-trips correctly" do
+          expect(parsed.to_s).to eq(subject)
         end
       end
 
@@ -184,16 +208,32 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
         subject { "CAN/CSA-C22.2 NO. 60601-1-9:15 (R2024)" }
         let(:parsed) { PubidNew::Csa.parse(subject) }
 
-        it "parses code (NO. normalized with multiple dashes)" do
-          expect(parsed.wrapped_identifier.code.value).to eq("C22.2-60601-1-9")
+        it "parses as CanadianAdopted" do
+          expect(parsed).to be_a(described_class)
+        end
+
+        it "wraps CecIdentifier" do
+          expect(parsed.wrapped_identifier).to be_a(PubidNew::Csa::Identifiers::Cec)
+        end
+
+        it "parses CEC part" do
+          expect(parsed.wrapped_identifier.cec_part.value).to eq("C22.2")
+        end
+
+        it "parses NO. number" do
+          expect(parsed.wrapped_identifier.no_number.value).to eq("60601-1-9")
+        end
+
+        it "parses year" do
+          expect(parsed.wrapped_identifier.year).to eq("2015")
         end
 
         it "parses reaffirmation" do
           expect(parsed.reaffirmation).to eq("2024")
         end
 
-        it "round-trips in normalized form" do
-          expect(parsed.to_s).to eq("CAN/CSA-C22.2-60601-1-9:15 (R2024)")
+        it "round-trips correctly" do
+          expect(parsed.to_s).to eq(subject)
         end
       end
     end
