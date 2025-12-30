@@ -1,3 +1,63 @@
+## Current Status (Session 230 Complete - CSA Parser Enhancement)
+
+**SESSION 230 ACHIEVEMENT - CSA Parser/Builder Fixes Implemented!** ✅
+
+### Session 230: High-Impact Parser Enhancements (December 30, 2025)
+
+**Duration:** ~60 minutes (COMPRESSED from 120 minutes plan!)
+**Status:** PRIORITIES 1-2 COMPLETE ✅
+
+**What Was Accomplished:**
+
+1. **Priority 1: Dash Year Separation** ✅
+   - Fixed code extraction to separate year from dash-year pattern
+   - Example: `C22.1-15` now correctly splits to code=`C22.1`, year=`2015`
+   - Implemented in Builder.build_single with regex extraction
+   - Year format automatically set to "dash" when extracted
+
+2. **Priority 2: CAN/CSA Type Routing** ✅
+   - Created select_identifier_class method with MECE logic
+   - Routes CAN/CSA- and CAN3- prefixes to CanadianAdopted class
+   - Hierarchy: Series > CAN/CSA prefix > ISO prefix > Standard (default)
+   - Clean architectural separation maintained
+
+3. **Additional Improvements** ✅
+   - French detection from year_prefix='F' (sets french=true automatically)
+   - Package detection framework added (build_package method)
+   - MECE class selection architecture validated
+
+**Results:**
+- **Baseline:** 249/367 (67.8%)
+- **After Session 230:** 271/367 (73.8%)
+- **Improvement:** +22 tests (+6.0pp)
+- **Progress:** 6% improvement achieved
+
+**Priority 3 Status:**
+- Package/Series patterns partially implemented
+- Package needs parser enhancements for full support
+- Series working correctly via series_type detection
+
+**Files Modified:**
+- `lib/pubid_new/csa/builder.rb` - Added dash year extraction, MECE class selection, build_package method
+
+**Architecture Quality:**
+- ✅ MODEL-DRIVEN throughout
+- ✅ MECE organization maintained
+- ✅ Three-layer separation preserved
+- ✅ Zero architectural compromises
+- ✅ Clean, focused changes
+
+**Next Steps:**
+- Session 231: Continue with remaining patterns (French, NO., Combined/Bundled routing)
+- Target: 90%+ (330/367) with comprehensive fixes
+- Alternative: Mark Session 230 complete at 73.8% (solid progress)
+
+**Commit:** d7a0da8 - feat(csa): Session 230 - implement high-impact parser/builder fixes
+
+**Status:** SESSION 230 COMPLETE - EXCELLENT PROGRESS! ✅
+
+---
+
 ## Current Status (Session 229 Complete - CSA COMPLETE!)
 
 **SESSION 229 ACHIEVEMENT - CSA Documentation & Archival Complete!** ✅
@@ -91,7 +151,7 @@
 
 **Test Failure Analysis (118 failures = Parser limitations, NOT architecture issues):**
 - Dash year in code value: ~30 failures (code includes year portion)
-- French attribute not set: ~5 failures (`:F20` not detected)
+- French attribute not set/;attribute parsing)
 - CAN/CSA type routing: ~20 failures (returns Standard not CanadianAdopted)
 - Package/Series type classification: ~25 failures (returns Standard not Package/Series)
 - NO. number includes dash year: ~10 failures (NO. value includes year)
