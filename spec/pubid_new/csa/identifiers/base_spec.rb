@@ -132,20 +132,16 @@ RSpec.describe PubidNew::Csa::Identifiers::Base do
         subject { "CSA C22.2 NO. 286:23" }
         let(:parsed) { PubidNew::Csa.parse(subject) }
 
-        it "parses base code" do
-          expect(parsed.code.value).to eq("C22.2")
-        end
-
-        it "parses NO. number" do
-          expect(parsed.no_number).to eq("286")
+        it "parses code (NO. normalized to dash)" do
+          expect(parsed.code.value).to eq("C22.2-286")
         end
 
         it "parses year" do
           expect(parsed.year).to eq("2023")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "round-trips in normalized form" do
+          expect(parsed.to_s).to eq("CSA C22.2-286:23")
         end
       end
 
@@ -157,16 +153,12 @@ RSpec.describe PubidNew::Csa::Identifiers::Base do
           expect(parsed).to be_a(PubidNew::Csa::Identifiers::CanadianAdopted)
         end
 
-        it "parses base code" do
-          expect(parsed.wrapped_identifier.code.value).to eq("C22.2")
+        it "parses code (NO. normalized to dash)" do
+          expect(parsed.wrapped_identifier.code.value).to eq("C22.2-60601-1")
         end
 
-        it "parses NO. number with dash" do
-          expect(parsed.wrapped_identifier.no_number).to eq("60601-1")
-        end
-
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "round-trips in normalized form" do
+          expect(parsed.to_s).to eq("CAN/CSA-C22.2-60601-1:14")
         end
       end
     end
@@ -214,16 +206,16 @@ RSpec.describe PubidNew::Csa::Identifiers::Base do
         subject { "CSA C22.2 NO. 1-04 (R2009)" }
         let(:parsed) { PubidNew::Csa.parse(subject) }
 
-        it "parses reaffirmation with NO. notation" do
+        it "parses code (NO. normalized to dash)" do
+          expect(parsed.code.value).to eq("C22.2-1")
+        end
+
+        it "parses reaffirmation year" do
           expect(parsed.reaffirmation).to eq("2009")
         end
 
-        it "parses NO. number" do
-          expect(parsed.no_number).to eq("1")
-        end
-
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "round-trips in normalized form" do
+          expect(parsed.to_s).to eq("CSA C22.2-1-04 (R2009)")
         end
       end
     end

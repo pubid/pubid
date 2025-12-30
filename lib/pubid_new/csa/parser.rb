@@ -35,37 +35,13 @@ module PubidNew
            letter.repeat(2, 6).maybe).as(:code) |
           # Pattern 2: Pure numbers with HB suffix - e.g., 15189HB (NEW)
           (match("[0-9]").repeat(1) >> letter.repeat(2, 6)).as(:code) |
-          # Pattern 3: Letter + numbers (original) - e.g., B149.1, C22.2, B149HB, C22.1CIICHB
+          # Pattern 3: Letter + numbers with dots then dashes - e.g., C22.2-144, B149.1
           (letter >> match("[0-9]").repeat(1) >>
-           (dot >> match("[0-9]").repeat(1)).repeat >>
-           (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>  # Allow multiple dash-number sequences
+           (dot >> match("[0-9]").repeat(1)).repeat >>  # Dot sections first
+           # Dash sections after - but don't consume 2-digit years (require 3+ digits OR letter suffix)
+           (dash >> (match("[0-9]").repeat(3) | (match("[0-9]").repeat(1, 2) >> letter.repeat(1)))).repeat >>
            letter.repeat(2, 6).maybe).as(:code)  # Allow HB, CIICHB, SP, etc.
         )
-      end
-
-      # NO. keyword (for C22.2 NO. 286 pattern)
-      rule(:no_keyword) { space >> str("NO") >> dot >> space }
-
-      # Number after NO. keyword - can have letter suffix like "60950-1A"
-      # can have SP suffix, and optional year after
-      rule(:no_number) do
-        match("[0-9]").repeat(1) >>
-        (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
-        letter.repeat(2, 6).maybe >>  # Allow SP suffix
-        (dash >> year_2digit.as(:no_year)).maybe
-      end
-
-      # Number after NO. keyword - can have dots or dashes (e.g., "144.1-16")
-      # can have letter suffix like "60950-1A", SP suffix, and optional year after
-      rule(:no_number) do
-        match("[0-9]").repeat(1) >>
-        ((dash | dot) >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
-        letter.repeat(2, 6).maybe >>  # Allow SP suffix
-        (dash >> year_2digit.as(:no_year)).maybe
-      end
-
-      rule(:no_portion) do
-        no_keyword >> no_number.as(:no_number)
       end
 
       # Year format with optional F or M prefix
@@ -155,7 +131,6 @@ module PubidNew
       rule(:csa_code) do
         publisher >>
         code_pattern >>
-        no_portion.maybe >>
         (
           # Option 1: series with prefix (space + prefix + space + keyword + year)
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
@@ -163,7 +138,7 @@ module PubidNew
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
           # Option 3: just year (no series)
           (colon_year | dash_year)
-        ).maybe >>
+        ) >>
         amendment_slash.maybe  # Add amendment support here
       end
 
@@ -171,7 +146,6 @@ module PubidNew
       rule(:base_csa_code) do
         publisher >>
         code_pattern >>
-        no_portion.maybe >>
         (
           # Option 1: series with prefix
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
@@ -179,13 +153,12 @@ module PubidNew
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
           # Option 3: just year
           (colon_year | dash_year)
-        ).maybe
+        )
       end
 
       # Continuation code (no CSA publisher prefix, for combined identifiers)
       rule(:continuation_code) do
         code_pattern >>
-        no_portion.maybe >>
         (
           # Option 1: series with prefix
           (space >> series_prefix >> space >> series_keyword >> (colon_year | dash_year)) |
@@ -193,7 +166,7 @@ module PubidNew
           (space >> series_keyword >> (colon_year | dash_year)) |
           # Option 3: just year
           (colon_year | dash_year)
-        ).maybe >>
+        ) >>
         amendment_slash.maybe
       end
 
@@ -201,7 +174,6 @@ module PubidNew
       rule(:continuation_code) do
         (publisher.as(:has_publisher)).maybe >>
         code_pattern >>
-        no_portion.maybe >>
         (
           # Option 1: series with prefix
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
@@ -209,7 +181,7 @@ module PubidNew
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
           # Option 3: just year
           (colon_year | dash_year)
-        ).maybe >>
+        ) >>
         amendment_slash.maybe
       end
 
@@ -217,7 +189,6 @@ module PubidNew
       # Example: "A2:22" in "CSA C22.2 NO. 60601-1:14 + A2:22"
       rule(:bundled_portion) do
         code_pattern >>
-        no_portion.maybe >>
         (colon_year | dash_year).maybe
       end
 
@@ -263,7 +234,6 @@ module PubidNew
       # Code-only identifier (no CSA prefix) - try this last
       rule(:code_only_identifier) do
         code_pattern >>
-        no_portion.maybe >>
         (
           # Option 1: series with prefix
           (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
@@ -271,7 +241,7 @@ module PubidNew
           (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
           # Option 3: just year
           (colon_year | dash_year)
-        ).maybe >>
+        ) >>
         (space >> str("PACKAGE")).as(:package_portion).maybe
       end
 
@@ -293,6 +263,14 @@ module PubidNew
 
         # Fix missing space before reaffirmation: 94(R04) -> 94 (R04)
         normalized = normalized.gsub(/(\d{2})\(R(\d{2,4})\)/, '\1 (R\2)')
+
+        # Normalize NO. patterns away by converting to dash-number format
+        # Handle year patterns carefully to avoid ambiguity
+        # "C22.2 NO. 286:23" → "C22.2-286:23" (colon year)
+        # "C22.2 NO. 1-04" → "C22.2-1 -04" (dash year, space prevents code from consuming it)
+        # "C22.2 NO. 144.1-16" → "C22.2-144.1 -16" (decimal number with dash year)
+        normalized = normalized.gsub(/\s+NO\.\s+(\S+?)(-\d{2}\b)/, '-\1 \2')  # With dash year
+        normalized = normalized.gsub(/\s+NO\.\s+/, '-')  # Without year (or colon year)
 
         # Normalize CEI/IEC to IEC (CEI is French name for IEC)
         normalized = normalized.gsub(/CEI\/IEC/, "IEC")

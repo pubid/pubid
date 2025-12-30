@@ -66,6 +66,37 @@ module PubidNew
           return result
         end
 
+        # Detect CAN3- wrapper (historical Canadian adoption)
+        if input.start_with?("CAN3-")
+          # This is a historical Canadian adoption - parse as wrapper
+          # Remove CAN3- prefix
+          wrapped_input = input.sub(/^CAN3-/, "CSA ")
+
+          # Extract reaffirmation FIRST (before any other processing)
+          reaffirm_year = nil
+          if wrapped_input =~ /\(R(\d{4})\)/
+            reaffirm_year = $1
+            wrapped_input = wrapped_input.sub(/\s*\(R\d{4}\)/, "")
+          end
+
+          # Parse the wrapped identifier recursively
+          wrapped_identifier = parse(wrapped_input)
+          return nil unless wrapped_identifier
+
+          # Set CAN3- as publisher prefix on wrapped identifier
+          if wrapped_identifier.respond_to?(:publisher_prefix=)
+            wrapped_identifier.publisher_prefix = "CAN3-"
+          end
+
+          # Create CanadianAdoptedIdentifier wrapper
+          require_relative "identifiers/canadian_adopted"
+          result = Identifiers::CanadianAdopted.new
+          result.wrapped_identifier = wrapped_identifier
+          result.reaffirmation = reaffirm_year if reaffirm_year
+
+          return result
+        end
+
         # Detect CSA adoption of international standards
         # Examples: CSA ISO/IEC TR 12785-3:15, CSA CISPR 16-1-1:18, CSA IEC 60601-1:08
         if input.match?(/^CSA (ISO\/IEC|CISPR|IEC|CEI|ISO)\s/)

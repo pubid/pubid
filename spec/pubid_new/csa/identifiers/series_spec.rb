@@ -219,12 +219,8 @@ RSpec.describe PubidNew::Csa::Identifiers::Series do
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses base code" do
-          expect(parsed.code.value).to eq("C22.2")
-        end
-
-        it "parses NO. number" do
-          expect(parsed.no_number).to eq("231")
+        it "parses code (NO. normalized to dash)" do
+          expect(parsed.code.value).to eq("C22.2-231")
         end
 
         it "parses year prefix" do
@@ -239,8 +235,8 @@ RSpec.describe PubidNew::Csa::Identifiers::Series do
           expect(parsed.reaffirmation).to eq("2001")
         end
 
-        it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+        it "round-trips in normalized form" do
+          expect(parsed.to_s).to eq("CAN/CSA-C22.2-231 SERIES-M89 (R2001)")
         end
       end
     end

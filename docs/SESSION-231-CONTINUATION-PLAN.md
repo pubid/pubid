@@ -1,273 +1,292 @@
-# Session 231+ Continuation Plan: CSA Parser Enhancement to 90%+
+# Session 231+ Continuation Plan: CSA NO. Normalization Fix & Parser Enhancement
 
-**Created:** 2025-12-30 (Post-Session 230)
-**Current:** 271/367 (73.8%)
-**Target:** 330+/367 (90%+)
-**Gap:** +59 tests needed
-**Timeline:** 2-3 sessions (3-4 hours compressed)
+**Created:** 2025-12-30 (Post-Session 230 incomplete)
+**Status:** NO. normalization attempted, regressions need fixing
+**Timeline:** 2-3 sessions (3-4 hours) to recover and enhance
 
 ---
 
-## Session 230 Achievement Summary
+## Executive Summary
 
-**Completed Priorities:**
-- ✅ Priority 1: Dash year separation (+13 tests)
-- ✅ Priority 2: CAN/CSA type routing (+9 tests)
-- ⚠️ Priority 3: Package implementation (partial, needs parser work)
+**Session 230 Achievement:** Implemented 3 high-impact patterns (+22 tests, 73.8%)
 
-**Results:** 249/367 → 271/367 (+22 tests, +6.0pp)
+**Session 231 Attempt:** Implemented NO. normalization but caused regressions
+- NO. tests: 12/12 passing ✅
+- Overall: 207/366 (56.6%) - REGRESSED from 271/366 baseline
+- Root cause: Overly greedy code_pattern consuming year dashes
 
-**Files Modified:**
-- `lib/pubid_new/csa/builder.rb` - Added dash year extraction, MECE class selection, build_package
+**Current Status:**
+- NO. normalization preprocessing: ✅ Working
+- Parser code_pattern: ❌ Too greedy (intermixed dots/dashes)
+- Builder year extraction: ✅ Already implemented
+- Test expectations: ⚠️ Mix of old and new
 
----
-
-## Remaining Work Analysis (96 failures)
-
-### Category 1: French Attribute Detection (~5 failures, MEDIUM IMPACT)
-
-**Problem:** `year_prefix='F'` parsed but french attribute not consistently set
-
-**Examples:**
-- `CSA B149.1:F20` → Should have french=true (WORKING NOW via Session 230 fix)
-- Some edge cases may remain
-
-**Fix Location:** Already implemented in Session 230, verify working
-
-**Expected Gain:** +5 tests (already counted in Session 230 results)
+**Recovery Strategy:**
+1. Revert greedy code_pattern changes
+2. Keep NO. normalization preprocessing
+3. Rely on Builder year extraction (already working)
+4. Update all test expectations consistently
 
 ---
 
-### Category 2: NO. Number Year Separation (~10 failures, MEDIUM IMPACT)
+## Session 231: Regression Fix (60 minutes)
 
-**Problem:** `C22.2 NO. 286:23` includes year in NO. number value
+### Objective
+Recover from regressions while keeping NO. normalization benefits.
 
-**Root Cause:** Parser's `no_number` rule doesn't separate year from number
+### Part A: Revert Problematic Parser Changes (15 min)
 
-**Fix Location:** `lib/pubid_new/csa/parser.rb` (no_number rule, line 60)
+**Files to modify:**
+- `lib/pubid_new/csa/parser.rb`
 
-**Strategy:**
-1. Parser: Detect `:NN` or `-NN` suffix in NO. number
-2. Parser: Capture year separately as `no_year`
-3. Builder: Extract NO. year and set identifier.year
+**Changes to revert:**
+1. ❌ Remove `space.maybe` from dash_year rule (line ~51)
+2. ❌ Revert code_pattern to original Pattern 3 (lines ~30-42)
 
-**Expected Gain:** +10 tests (73.8% → 76.5%)
+**Original Pattern 3 (restore this):**
+```ruby
+# Pattern 3: Letter + numbers (original) - e.g., B149.1, C22.2, B149HB
+(letter >> match("[0-9]").repeat(1) >>
+ (dot >> match("[0-9]").repeat(1)).repeat >>
+ (dash >> match("[0-9]").repeat(1) >> letter.maybe).repeat >>
+ letter.repeat(2, 6).maybe).as(:code)
+```
 
----
+**Keep these changes:**
+- ✅ NO. normalization in parse() method
+- ✅ Removed no_keyword, no_number, no_portion rules
+- ✅ Removed no_number handling in Builder
 
-### Category 3: Package/Series Parser Patterns (~30 failures, HIGH IMPACT)
+### Part B: Update Builder for Normalized Codes (20 min)
 
-**Problem:** Parser doesn't handle all Package and Series patterns
+**File:** `lib/pubid_new/csa/builder.rb`
 
-**Examples:**
-- `CSA C22.1:24 Code & Handbook Package` → Parser fails
-- `CSA B108:23 PACKAGE` → Parser fails
-- Some SERIES patterns not routing correctly
+The Builder already has year extraction logic (lines 188-203). This will handle normalized codes like "C22.2-286" correctly:
+- Code ending with `-NN` (2-digit) extracts year automatically
+- Sets `year_format = "dash"`
 
-**Root Cause:**
-- Package patterns like "Code & Handbook Package" not in parser grammar
-- Some SERIES patterns need series_type detection in parser
+**No changes needed** - existing logic will work!
 
-**Fix Location:** `lib/pubid_new/csa/parser.rb` (package_portion rule)
+### Part C: Update Test Expectations Consistently (20 min)
 
-**Strategy:**
-1. Enhance `package_portion` rule to capture full package text
-2. Ensure `package_portion` marked in parsed hash
-3. Builder already has build_package method (Session 230)
-4. Test all Package patterns
+**Files to update:**
+1. `spec/pubid_new/csa/identifiers/base_spec.rb`
+2. `spec/pubid_new/csa/identifiers/bundled_spec.rb`
+3. `spec/pubid_new/csa/identifiers/canadian_adopted_spec.rb`
+4. `spec/pubid_new/csa/identifiers/series_spec.rb`
 
-**Expected Gain:** +20 tests (76.5% → 82.0%)
+**Update pattern:**
+All NO. tests should expect:
+- Code includes full number: "C22.2-286" not "C22.2"
+- No `no_number` attribute
+- Round-trip produces normalized form (without "NO.")
 
----
+**Example:**
+```ruby
+describe "CSA C22.2 NO. 286:23" do
+  it "parses code (NO. normalized)" do
+    expect(parsed.code.value).to eq("C22.2-286")
+  end
 
-### Category 4: Combined/Bundled Type Routing (~15 failures, MEDIUM IMPACT)
+  it "round-trips normalized" do
+    expect(parsed.to_s).to eq("CSA C22.2-286:23")
+  end
+end
+```
 
-**Problem:** Combined (slash) and Bundled (plus) not always routing correctly
+### Part D: Validation (5 min)
 
-**Examples:**
-- `CSA A:20 + B:20` → Should be Bundled
-- `CSA A:05/B:05` → Should be Combined
+**Run tests:**
+```bash
+bundle exec rspec spec/pubid_new/csa/ --format progress
+```
 
-**Root Cause:** Builder routing already exists but may have edge cases
-
-**Fix Location:** `lib/pubid_new/csa/builder.rb` (build method)
-
-**Strategy:**
-1. Verify bundled_first and first/second detection
-2. Check separator detection (comma vs slash)
-3. Test all combined/bundled patterns
-
-**Expected Gain:** +15 tests (82.0% → 86.1%)
-
----
-
-### Category 5: Round-Trip Rendering Variations (~13 failures, LOW PRIORITY)
-
-**Problem:** Minor rendering format differences
-
-**Examples:**
-- Spacing variations
-- Separator normalization
-- Format preservation
-
-**Root Cause:** Rendering logic in identifier `to_s` methods
-
-**Fix Location:** Various identifier classes
-
-**Strategy:**
-1. Preserve format markers from parser
-2. Use markers in rendering
-3. Test round-trip fidelity
-
-**Expected Gain:** +13 tests (86.1% → 89.6%)
+**Expected results:**
+- Baseline recovery: 271/366 (73.8%)
+- NO. tests: All passing with normalized form
+- Zero regressions from original baseline
 
 ---
 
-### Category 6: Edge Cases (~13 failures, VARIES)
+## Session 232: Complete Remaining Patterns (90 minutes)
 
-**Problem:** Remaining miscellaneous failures
+### Objective
+Implement remaining medium-impact patterns from Session 230 plan.
 
-**Examples:**
-- Series with NO. notation edge cases
-- Complex reaffirmation patterns
-- Other parser limitations
+### Priority 4: COMPLETED ✅
+Dash year separation already handled by Builder year extraction.
 
-**Strategy:** Address incrementally as discovered
+### Priority 5: Package Parser Patterns (40 min)
 
-**Expected Gain:** +6 tests (89.6% → 91.2%)
+**Current problem:** Package patterns not parsing
 
----
+**File:** `lib/pubid_new/csa/parser.rb`
 
-## Implementation Roadmap
+**Enhancement needed:**
+```ruby
+rule(:package_portion) do
+  space >>
+  (
+    # Full keyword chain with separators
+    package_keyword >>
+    (
+      (comma >> space >> package_keyword) |
+      (space >> ampersand >> space >> package_keyword)
+    ).repeat
+  ).as(:package_portion)
+end
+```
 
-### Session 231: Medium-Impact Fixes (90 min)
+**Expected gain:** +20 tests (291/366, 79.4%)
 
-**Priority 4: NO. Number Year Separation** (30 min)
-- Parser: Enhance `no_number` rule to capture year
-- Builder: Extract NO. year in `build_single`
-- Test: Verify NO. patterns with year
+### Priority 6: Combined/Bundled Routing (20 min)
 
-**Priority 5: Package Parser Patterns** (40 min)
-- Parser: Enhance `package_portion` rule
-- Parser: Better package keyword capture
-- Test: All Package spec patterns
+**Verify:** Builder routing working for edge cases
 
-**Priority 6: Combined/Bundled Verification** (20 min)
-- Review builder routing logic
-- Test edge cases
-- Fix any missed patterns
+**Test:**
+```bash
+bundle exec rspec spec/pubid_new/csa/identifiers/bundled_spec.rb
+bundle exec rspec spec/pubid_new/csa/identifiers/combined_spec.rb
+```
 
-**Expected Result:** 301/367 (82.0%) - Major progress!
+### Priority 7: French Rendering Fix (15 min)
 
----
+**Current issue:** "CSA B149.1:F20" renders as "CSA B149.1:FF20"
 
-### Session 232: Final Polish (60 min)
+**File:** Need to check identifier rendering logic
 
-**Priority 7: Round-Trip Rendering** (30 min)
-- Preserve format markers
-- Fix rendering inconsistencies
-- Test round-trip fidelity
+**Investigation:**
+```bash
+ruby -e "require './lib/pubid_new'; id = PubidNew::Csa.parse('CSA B149.1:F20'); puts id.to_s"
+```
 
-**Priority 8: Edge Case Cleanup** (30 min)
-- Address remaining failures
-- Document known limitations
-- Finalize architecture
+### Validation (15 min)
 
-**Expected Result:** 330+/367 (90%+) - TARGET ACHIEVED!
-
----
-
-## Success Criteria
-
-### Minimum (Session 231)
-- ✅ CSA at 82%+ (301/367)
-- ✅ NO. separation working
-- ✅ Package patterns working
-- ✅ No architecture compromises
-
-### Target (Session 232)
-- ✅ CSA at 90%+ (330/367)
-- ✅ All major patterns working
-- ✅ Round-trip fidelity high
-- ✅ Production excellent quality
-
-### Stretch (Optional)
-- ✅ CSA at 96%+ (354/367)
-- ✅ Near-perfect round-trip
-- ✅ All patterns documented
+**Expected final:**
+- Tests: 301/366 (82.2%)
+- Improvement: +30 from baseline
+- Session 230: +22, Session 232: +8
 
 ---
 
-## Architectural Principles (NEVER COMPROMISE)
+## Session 233: Round-Trip & Edge Cases (60 minutes)
 
-1. **MODEL-DRIVEN** - Objects not strings
-2. **MECE** - 8 mutually exclusive identifier types
-3. **Three-layer** - Parser/Builder/Identifier independence
-4. **Component pattern** - Proper Lutaml::Model usage
-5. **Separation of concerns** - Each layer ONE job
+### Objective
+Polish rendering and handle edge cases for 90%+ target.
 
----
+### Issues to Address
 
-## Files to Modify
+**1. CAN/CSA- with dash year (multiple failures)**
+Pattern: "CAN/CSA-A123.1-05"
+Issue: Parser failing to parse
 
-### Session 231
-- `lib/pubid_new/csa/parser.rb` - NO. year separation, package patterns
-- `lib/pubid_new/csa/builder.rb` - NO. year extraction, verify routing
-- Spec files - Update expectations if needed
+**2. Letter suffix patterns**
+Pattern: "CSA C22.1HB-18"
+Issue: Parser changes broke HB suffix with dash year
 
-### Session 232
-- Various identifier `to_s` methods - Format preservation
-- Documentation updates
+**3. Year prefix rendering**
+Pattern: ":F20" rendering as ":FF20"
+Issue: Year prefix being doubled
 
----
-
-## Risk Mitigation
-
-### High Risk Areas
-
-**1. Parser Regression**
-- Risk: Changing parser breaks working patterns
-- Mitigation: Test after each change
-- Validation: Run full suite after each category
-
-**2. Builder Complexity**
-- Risk: Class selection becomes unmaintainable
-- Mitigation: Keep MECE, document decisions
-- Validation: Clear non-overlapping criteria
-
-**3. Round-Trip Fidelity**
-- Risk: Format normalization loses information
-- Mitigation: Preserve markers from parser
-- Validation: Round-trip tests
+### Expected Outcome
+- Tests: 330/366 (90.2%)
+- All core patterns working
+- Clean architecture maintained
 
 ---
 
-## Timeline Summary
+## Implementation Status Tracker
 
-| Session | Focus | Duration | Gain | Cumulative |
-|---------|-------|----------|------|------------|
-| 230 | Dash year, CAN/CSA | 60 min | +22 | 73.8% ✅ |
-| 231 | NO., Package, routing | 90 min | +30 | 82.0% |
-| 232 | Rendering, polish | 60 min | +29 | 90.0% |
-| **Total** | **All fixes** | **210 min** | **+81** | **90%+** |
+### Session 230 (COMPLETE) ✅
+- [x] Dash year separation in code
+- [x] CAN/CSA type routing
+- [x] Package detection framework
+- [x] Result: 271/366 (73.8%)
+
+### Session 231 (INCOMPLETE - Regressions) ⚠️
+- [x] NO. normalization preprocessing
+- [x] Remove NO. parser rules
+- [x] Remove NO. builder handling
+- [x] Update NO. test expectations (partial)
+- [❌] Code pattern changes (TOO GREEDY)
+- [❌] dash_year space handling (CAUSED AMBIGUITY)
+- Status: 207/366 (56.6%) - REGRESSED
+
+### Session 231 Recovery (PENDING)
+- [ ] Revert greedy code_pattern to original
+- [ ] Revert dash_year space changes
+- [ ] Update all NO. test expectations
+- [ ] Validate baseline recovery
+- Target: 271/366 (73.8%) restored
+
+### Session 232 (PENDING)
+- [ ] Package parser patterns
+- [ ] Combined/Bundled verification
+- [ ] French rendering fix
+- Target: 301/366 (82.2%)
+
+### Session 233 (PENDING)
+- [ ] CAN/CSA- dash year fix
+- [ ] HB suffix dash year fix
+- [ ] Year prefix doubling fix
+- Target: 330/366 (90.2%)
 
 ---
 
-## Next Steps (Session 231)
+## Architecture Principles (NEVER COMPROMISE)
 
-1. Read this plan
-2. Implement Priority 4 (NO. separation)
-3. Test and validate
-4. Implement Priority 5 (Package patterns)
-5. Test and validate
-6. Implement Priority 6 (Combined/Bundled)
-7. Test and validate
-8. Document results
+1. **NO. Normalization Strategy:**
+   - ✅ Preprocessing normalization (clean input)
+   - ✅ Builder year extraction (handle "-NN" pattern)
+   - ❌ Parser special handling (avoid complexity)
+
+2. **Code Pattern Matching:**
+   - ✅ Keep patterns focused and specific
+   - ❌ Avoid greedy patterns that consume years
+   - ✅ Use Builder intelligence, not parser magic
+
+3. **Test Expectations:**
+   - ✅ Tests reflect actual behavior
+   - ❌ Never lower standards to pass tests
+   - ✅ Normalized form is correct form
+
+---
+
+## Key Learnings
+
+**Session 231 Mistakes:**
+1. ❌ Made code_pattern too greedy (intermixed dots/dashes)
+2. ❌ Added ambiguity with space in dash_year
+3. ❌ Didn't test incrementally after each change
+
+**Recovery Approach:**
+1. ✅ Revert parser to known-good state
+2. ✅ Keep preprocessing simplification
+3. ✅ Trust existing Builder intelligence
+4. ✅ Test after each incremental change
+
+---
+
+## Files Modified
+
+### Session 231 (to be partially reverted)
+- `lib/pubid_new/csa/parser.rb` - NO. normalization ✅, code_pattern ❌, dash_year ❌
+- `lib/pubid_new/csa/builder.rb` - Removed no_number ✅
+- `spec/pubid_new/csa/identifiers/standard_spec.rb` - Updated NO. tests ✅
+
+### Session 231 Recovery (planned)
+- `lib/pubid_new/csa/parser.rb` - Revert code_pattern and dash_year
+- `spec/pubid_new/csa/identifiers/base_spec.rb` - Update NO. tests
+- `spec/pubid_new/csa/identifiers/bundled_spec.rb` - Update NO. tests
+- `spec/pubid_new/csa/identifiers/canadian_adopted_spec.rb` - Update NO. tests
+- `spec/pubid_new/csa/identifiers/series_spec.rb` - Update NO. tests
 
 ---
 
 **Created:** 2025-12-30
-**Status:** Ready for Session 231
-**Recommendation:** Execute Session 231 immediately for 82%+ target
+**Sessions:** 231 Recovery, 232 Enhancement, 233 Polish
+**Timeline:** 3 sessions, 3.5 hours
+**Target:** 90%+ (330/366)
+**Status:** Ready for recovery execution
 
-**End Goal:** CSA at 90%+ with clean architecture! 🚀
+**Architecture Quality:** MODEL-DRIVEN, MECE, Zero compromises ✅

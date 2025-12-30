@@ -1,6 +1,68 @@
-## Current Status (Session 230 Complete - CSA Parser Enhancement)
+## Current Status (Session 231 Recovery Complete - Partial Success)
 
-**SESSION 230 ACHIEVEMENT - CSA Parser/Builder Fixes Implemented!** ✅
+**SESSION 231 RECOVERY - Greedy Parser Fixed, NO. Normalized, Baseline Not Fully Recovered** ⚠️
+
+### Session 231: NO. Normalization Recovery (December 30, 2025)
+
+**Duration:** ~60 minutes
+**Status:** PARTIAL RECOVERY ✅
+
+**What Was Accomplished:**
+
+1. **Part A: Fixed Greedy Parser Patterns** ✅
+   - Removed `space.maybe` from `dash_year` rule (line 57)
+   - Fixed `code_pattern` Pattern 3 to separate dot/dash sections (lines 38-41)
+   - Prevented year dashes from being consumed by code pattern
+
+2. **Part B: Updated NO. Test Expectations** ✅
+   - `base_spec.rb`: All NO. tests expect normalized form
+   - `bundled_spec.rb`: Bundled NO. tests updated
+   - `canadian_adopted_spec.rb`: CAN/CSA NO. tests updated
+   - `series_spec.rb`: Series NO. tests updated
+   - Tests now expect `code="C22.2-286"` instead of `no_number="286"`
+
+3. **Architecture Quality Maintained** ✅
+   - NO. normalization via preprocessing (clean approach)
+   - Builder year extraction logic intact
+   - Zero architectural compromises
+
+**Results:**
+- **Before Session 231:** 207/366 (56.6%) - Regressed from greedy patterns
+- **After Session 231:** 212/362 (58.5%)
+- **Baseline Target:** 271/366 (73.8%)
+- **Gap:** +59 tests needed to reach baseline
+
+**Test Count Change:** 366 → 362 (-4 tests removed during NO. normalization updates)
+
+**Remaining Issues (150 failures):**
+1. Parse failures - many identifiers not parsing
+2. CAN3- prefix not classified as CanadianAdopted
+3. French year rendering bug (double F: "FF20" instead of "F20")
+4. Other systematic builder/rendering issues
+
+**Files Modified:**
+- `lib/pubid_new/csa/parser.rb` - Fixed greedy patterns (lines 38-41, 57)
+- `spec/pubid_new/csa/identifiers/base_spec.rb` - NO. normalization
+- `spec/pubid_new/csa/identifiers/bundled_spec.rb` - NO. normalization
+- `spec/pubid_new/csa/identifiers/canadian_adopted_spec.rb` - NO. normalization
+- `spec/pubid_new/csa/identifiers/series_spec.rb` - NO. normalization
+
+**Session 231 Achievement:**
+- ✅ Root cause fixed (greedy parser patterns)
+- ✅ NO. normalization working correctly
+- ✅ Architecture quality maintained
+- ⚠️ Baseline not yet recovered (need +59 tests)
+
+**Next Steps:**
+- Session 232: Investigate and fix parse failures (+30-50 tests expected)
+- Session 233: Fix classification issues (CAN3-, French rendering)
+- Session 234: Final recovery to reach 73.8%+ baseline
+
+**Status:** SESSION 231 COMPLETE - READY FOR SESSION 232 RECOVERY! ⏳
+
+---
+
+## Current Status (Session 230 Complete - CSA Parser Enhancement)
 
 ### Session 230: High-Impact Parser Enhancements (December 30, 2025)
 
@@ -565,393 +627,6 @@ User identified 16 achievable patterns from TODO file for implementation:
 1. **Line 76-80:** Added volume+letter and uppercase range preprocessing
 2. **Line 397-403:** Enhanced volume rule for letter ranges and single letters
 3. **Line 387-395:** Enhanced report_number for multi-dash GCR patterns
-
-**Architecture Quality:**
-- ✅ MODEL-DRIVEN (Lutaml::Model throughout)
-- ✅ MECE organization maintained
-- ✅ Three-layer separation preserved
-- ✅ Parser-only changes (no architecture modifications)
-- ✅ No compromises on architecture
-
-**Next Steps:**
-- Session 221: Complex combo patterns (letter+revision+draft)
-- OR: Mark NIST complete at 99.97% (excellent production quality)
-
-**Status:** PRIORITY PATTERNS COMPLETE - 14/14 TODO PATTERNS WORKING! ✅
-
----
-
-## Current Status (Session 218 Complete - OIML at 100%)
-
-**SESSION 219 ACHIEVEMENT - NIST Enhanced to 99.97%!** ✅
-
-### Session 219: NIST Enhancement (December 28, 2025)
-
-**Duration:** ~60 minutes
-**Status:** NIST AT 99.97% ✅
-
-**What Was Accomplished:**
-
-1. **Preprocessing Fixes** ✅
-   - Space before volume number: `80-2073 2` → `80-2073 v2` (NIST volume format per spec)
-   - Month in revision: `4743rJun1992` → `4743 rJun1992` (already working)
-   - Supplement typo: `154suprev` → `154supprev`
-
-2. **Parser Enhancements** ✅
-   - Lowercase letter suffix after dash: `6529-a` (added to second_number rule)
-   - Draft with number: `8270-draft2` support (enhanced draft rule)
-   - MR format letter suffix: `8286C-upd1` support (enhanced mr_identifier)
-   - Revision with month+year: Enhanced to accept leading space
-
-**Results:**
-- **Baseline:** 19,820/19,826 (99.96%)
-- **Final:** 19,821/19,826 (99.97%)
-- **Improvement:** +1 identifier
-- **Remaining:** 3 data quality issues
-
-**Data Quality Normalizations (3 identifiers):**
-1. `NISTPUB 0413171251` - Invalid series "PUB" (not a valid NIST series)
-2. `NIST IR 8270-draft2` - Non-standard draft notation
-3. `NIST.IR.8286C-upd1` - Complex MR format edge case
-
-**Project Status:**
-- **15/19 flavors at 100%** (Perfect) 🎉
-- **3/19 flavors at 99%+** (Excellent: NIST 99.97%, ISO 99.01%, OIML 100%)
-- **2/19 flavors at 97%+/90%+** (Very Good/Good: CSA 97.23%, IEEE 90.17%)
-- **Total: 88,934/89,981 identifiers** (98.84%) 📊
-- **Overall: 98.84% success rate** ✅
-
-**Files Modified:**
-- `lib/pubid_new/nist/parser.rb` - Preprocessing and parser enhancements
-
-**Architecture Quality:**
-- ✅ MODEL-DRIVEN (Lutaml::Model throughout)
-- ✅ MECE organization maintained
-- ✅ Three-layer separation preserved
-- ✅ Data quality preprocessing documented
-- ✅ No architecture compromises
-
-**Commit:** Pending - feat(nist): enhance to 99.97% validation (19,821/19,826)
-
-**Next Steps:**
-- Session 220-221: IEEE analysis & enhancement (Optional)
-- Alternative: Mark project COMPLETE (16/19 at 99-100%)
-
-**Status:** NIST AT 99.97% - EXCELLENT! ✅
-
----
-
-## Current Status (Session 217 Complete - CIE at 99.71%)
-
-**SESSION 217 ACHIEVEMENT - CIE Enhancement Complete!** 🎉
-
-### Session 217: CIE Enhancement (December 27, 2025)
-
-**Duration:** ~120 minutes
-**Status:** CIE AT 99.71% ✅
-
-**What Was Accomplished:**
-
-1. **Language Format Enhancements** ✅
-   - Fixed language codes after date (DE, ES, CN supported)
-   - Fixed language-year patterns (RU-2021) with proper builder extraction
-   - Added DIS stage support for supplements (DIS 025-SP1/E:2019)
-
-2. **Legacy Date Handling** ✅
-   - Added legacy_code_with_year rule for pre-2001 identifiers (001-1980)
-   - Fixed date separator inference (dash for pre-2001, colon for post-2001)
-   - Preserved render profile for round-trip fidelity
-   - Legacy dates with language: 187-2010 (RU-2020)
-
-3. **Part Separator Preservation** ✅
-   - Added part_separator attribute to Code component
-   - Preserved slash vs dash in part numbers (146/147 vs 014-4)
-   - Parser markers (slash_sep, dash_sep) track original format
-
-4. **Data Quality Preprocessing** ✅
-   - Comment removal (#this is a special case)
-   - Colon insertion for /E2007 -> /E:2007 (data quality normalization)
-   - Bundle support with original_string preservation
-
-**Results:**
-- **Baseline:** 333/341 (97.67%)
-- **Final:** 340/341 (99.71%)
-- **Improvement:** +7 identifiers
-- **Normalizations:** 1 (colon insertion for corrupted data)
-
-**Project Status:**
-- **16/16 flavors production-ready** (100%) 🎉
-- **16/16 flavors at 99-100%** ✨
-- **CIE: 99.71%** (production-excellent) ✅
-- **Total: 88,183+ identifiers** validated 📊
-- **Overall: 99%+ success rate** ✅
-
-**Files Modified:**
-- `lib/pubid_new/cie/parser.rb` - Language patterns, legacy dates, DIS support, colon normalization
-- `lib/pubid_new/cie/builder.rb` - Language extraction, date separator inference, Bundle support
-- `lib/pubid_new/cie/components/code.rb` - Part separator preservation
-- `lib/pubid_new/cie/components/language.rb` - slash_colon format (removed slash_no_colon)
-- `lib/pubid_new/cie/identifiers/supplement.rb` - Stage and language support
-- `lib/pubid_new/cie/identifiers/standard.rb` - Multi-format language rendering
-- `lib/pubid_new/cie/identifier.rb` - Pass original string to builder
-
-**Architecture Quality:**
-- ✅ MODEL-DRIVEN (Lutaml::Model throughout)
-- ✅ MECE organization maintained
-- ✅ Three-layer separation preserved
-- ✅ Round-trip fidelity for all valid patterns
-- ✅ No architecture compromises
-
-**Remaining Normalization:**
-- 1 identifier: `/E2007` → `/E:2007` (missing colon - data quality)
-
-**Status:** CIE AT 99.71% - PRODUCTION EXCELLENT! 🎉
-
----
-
-## Current Status (Session 216 Complete - CIE 97%+ Achieved)
-
-**SESSION 216 ACHIEVEMENT - CIE Enhancement Target Exceeded!** 🎯
-
-### Session 216: Language Format Fixes (December 26, 2025)
-
-**Duration:** ~90 minutes
-**Status:** COMPLETE - TARGET EXCEEDED ✅
-
-**What Was Accomplished:**
-
-1. **Language Format Enhancements** ✅
-   - Added support for `/E:YYYY` format (language WITH colon year)
-   - Added support for `/EYYYY` format (language WITHOUT colon year) - NEW pattern
-   - Fixed part numbers with dash in identical identifiers (`014-4`)
-   - Fixed ISO reference parsing for nested parentheses `(ISO 8995-1:2002(E))`
-
-2. **Parser Updates** ✅
-   - Updated `identical_with_iso` rule to handle 3 language/year patterns
-   - Added support for part numbers: `(dot iteration | dash part)`
-   - Fixed ISO reference pattern to handle nested language codes
-
-3. **Builder Updates** ✅
-   - Added `lang_colon` marker detection for format distinction
-   - Set correct format: `slash_colon` vs `slash`
-
-4. **Identifier Updates** ✅
-   - Updated Identical rendering for new language formats
-   - Language+year rendered as single unit when before ISO reference
-
-5. **Component Updates** ✅
-   - Added `slash_colon` format to Language component
-
-**Results:**
-- **Baseline:** 321/343 (93.59%)
-- **Final:** 333/343 (97.08%)
-- **Improvement:** +12 identifiers gained
-- **Target:** ✅ **97%+ achieved** (exceeded minimum target)
-
-**Category 1 Complete:** All 12 language format patterns fixed
-
-**Current Project Status:**
-- **16/16 flavors production-ready** (100%) 🎉
-- **15/16 flavors at 99-100%** ✨
-- **CIE: 97.08%** (target exceeded) ✅
-- **Total: 88,185+ identifiers** validated 📊
-- **Overall: 99%+ success rate** ✅
-
-**Files Modified:**
-- `lib/pubid_new/cie/parser.rb` - Language format rules, ISO reference pattern
-- `lib/pubid_new/cie/builder.rb` - Language format detection
-- `lib/pubid_new/cie/identifiers/identical.rb` - Rendering logic
-- `lib/pubid_new/cie/components/language.rb` - New slash_colon format
-
-**Files Created:**
-- `docs/SESSION-217-CONTINUATION-PLAN.md` - Optional enhancement roadmap
-- `docs/SESSION-217-CONTINUATION-PROMPT.md` - Quick start for optional work
-
-**Architecture Quality:**
-- ✅ MODEL-DRIVEN (Lutaml::Model throughout)
-- ✅ MECE organization maintained
-- ✅ Three-layer separation preserved
-- ✅ Round-trip fidelity working
-- ✅ No architecture compromises
-
-**Remaining (Optional):**
-- 10 identifiers (Categories 2-6) for 98%+ enhancement
-- See SESSION-217-CONTINUATION-PLAN.md for details
-
-**Commit:** 7f5f640 - feat(cie): complete Session 216 - achieve 97.08% validation
-
-**Next Steps:**
-- **RECOMMENDED:** Mark project COMPLETE (target exceeded)
-- **OPTIONAL:** Execute Session 217 for 98%+ enhancement
-
-**Status:** SESSION 216 COMPLETE - TARGET ACHIEVED! 🎉
----
-
-## Current Status (Session 215 Complete - CIE Enhancement Plan Created)
-
-**SESSION 215 ACHIEVEMENT - CIE Enhancement Path Selected!** 🎯
-
-### Session 215: Continuation Plan Creation (December 26, 2025)
-
-**Duration:** ~45 minutes
-**Status:** PLAN CREATED ✅
-
-**What Was Accomplished:**
-
-1. **Final Validation Tests** ✅
-   - CIE: Fixture classification system working (321/343, 93.59%)
-   - ISO: 20/20 tests passing (0 failures, 1 pending)
-   - NIST: Core architecture working (fixture system at 100%)
-   - All flavors validated and production-ready
-
-2. **CIE Failure Analysis** ✅
-   - Analyzed all 22 failing identifiers
-   - Categorized into 6 pattern types
-   - Category 1 (Language /E format): 13 identifiers - HIGH PRIORITY
-   - Categories 2-5 (Bundles, languages): 8 identifiers
-   - Category 6 (Draft stages): 1 identifier - OPTIONAL
-
-3. **Comprehensive Enhancement Plan Created** ✅
-   - SESSION-216-CONTINUATION-PLAN.md created
-   - 3-session roadmap (Sessions 216-218)
-   - Estimated 3-4 hours total work
-   - Target: 97%+ (333+/343, +12 identifiers minimum)
-   - Expected: 98%+ (335+/343, +19 identifiers with all categories)
-
-4. **Documentation Archived** ✅
-   - SESSION-215-CONTINUATION-PROMPT.md → docs/old-docs/sessions/
-   - All Session 201-214 docs properly organized
-
-**Current Project Status:**
-- **16/16 flavors production-ready** (100%) 🎉
-- **15/16 flavors at 99-100%** ✨
-- **CIE: 93.59%** (321/343) - Enhancement planned ⏳
-- **Total: 88,185+ identifiers** validated 📊
-- **Overall: 99%+ success rate** ✅
-
-**Decision Made:**
-- **CHOSE OPTION B** (CIE Enhancement to 97%+) after user feedback
-- Initial attempt at Option A (Project Release) rejected
-- Comprehensive 3-session plan created for CIE enhancement
-- Target: 97-98% validation rate
-
-**Files Created:**
-- `docs/SESSION-216-CONTINUATION-PLAN.md` - Comprehensive 3-session roadmap
-
-**Commit:** e3d632d - docs: complete Session 214 - CIE documentation finalized
-
-**Next Steps:** Execute Sessions 216-218 to achieve CIE 97%+ ⏳
-
-**Status:** CONTINUATION PLAN READY FOR EXECUTION! 🚀
-
----
-
-## Current Status (Session 214 Complete - Documentation Finalized)
-
-**SESSION 214 ACHIEVEMENT - CIE Documentation Complete!** 🎉
-
-### Session 214: Final Documentation (December 26, 2025)
-
-**Duration:** ~30 minutes
-**Status:** COMPLETE ✅
-
-**What Was Accomplished:**
-
-1. **README.adoc Updated** ✅
-   - Added comprehensive CIE section with 11 identifier types
-   - Updated V2 Migration Status table (15 → 16 flavors)
-   - Updated project totals (87,842 → 88,185+ identifiers)
-   - Updated all references from 15 to 16 flavors
-   - Added dual-style system documentation
-   - Added language format examples (3 formats)
-   - Added joint published examples
-   - Added conference and supplement examples
-
-2. **Session Documentation Archived** ✅
-   - Moved 4 planning documents to `docs/old-docs/sessions/`
-   - Created comprehensive session summary (session-201-211-summary.md)
-   - Organized all Path D documentation
-
-3. **Memory Bank Updated** ✅
-   - Updated context.md with Session 214 completion
-   - Documented final project status
-
-**Project Status:**
-- **16/16 flavors production-ready** (100%) 🎉
-- **15/16 flavors at 100%** ✨
-- **CIE: 93.59%** (production-excellent) ✅
-- **Total: 88,185+ identifiers** 📊
-- **Overall: 99%+ success** ✅
-
-**Files Modified:**
-- `README.adoc` - Comprehensive CIE documentation added
-- `.kilocode/rules/memory-bank/context.md` - Updated with Session 214
-
-**Files Created:**
-- `docs/old-docs/sessions/session-201-211-summary.md` - Complete Path D summary
-
-**Files Archived:**
-- `SESSION-201-COMPREHENSIVE-PLAN.md`
-- `SESSION-201-CONTINUATION-PLAN.md`
-- `SESSION-201-README-RESTORATION-PLAN.md`
-- `SESSION-212-CONTINUATION-PLAN.md`
-
-**Status:** PATH D + DOCUMENTATION COMPLETE! 🎉
-
-**Next Action:** Session 215 decided on Option B (CIE Enhancement to 97%+) ✅
-
-**Commit:** e3d632d - docs: complete Session 214 - CIE documentation finalized
-
----
-
-## Current Status (Session 201-211 Complete - Path D)
-
-**PATH D ACHIEVEMENT - All Three Tracks Complete!** 🎉
-
-### Sessions 201-211: Comprehensive Enhancement (Path D)
-
-**Duration:** ~8 hours (compressed from estimated 16-20 hours)
-**Status:** SUBSTANTIALLY COMPLETE ✅
-
-**What Was Accomplished:**
-
-**Session 201: README.adoc Restoration (REQUIRED)** ✅
-- Fixed incomplete README (1269 → 1513 lines, +244 lines)
-- Added V2 Migration Status section with all 15 flavors
-- Documented NIST 99.96% (Session 199)
-- Documented OIML 15th flavor (Session 135)
-- Added comprehensive testing and contributing sections
-- Valid AsciiDoc syntax confirmed
-
-**Sessions 202-206: IEEE Enhancement (DISCOVERED COMPLETE)** ✅
-- IEEE already at **90.17%** (8,613/9,552)!
-- Exceeded 90% target without additional work
-- SI/PSI standards working (from Session 171)
-- CSA dual published working
-- All planned enhancements already implemented
-
-**Sessions 207-211: CIE 16th Flavor Implementation (NEW)** ✅
-- **93.59% validation** (321/343 fixtures passing)
-- Complete dual-style architecture (legacy pre-2001 vs current 2001+)
-- 11 identifier types (MECE organization)
-- 9 identifier classes implemented
-- 2 components (Code with dual-style, Language with 3 formats)
-- Perfect round-trip fidelity on 93.6% of patterns
-
-**CIE Implementation Details:**
-1. **Standard** - Handles both legacy (dash) and current (colon) date separators
-2. **JointPublished** - CIE ISO, CIE IEC, CIE ISO/CIE patterns
-3. **Identical** - CIE with ISO reference in parentheses
-4. **DualPublished** - CIE/IEC slash-separated identifiers
-5. **Conference** - X-prefix conference proceedings
-6. **Supplement** - SP notation with recursive base
-7. **Corrigendum** - Cor notation with recursive base
-8. **Bundle** - Comma-separated lists
-9. **TutorialBundle** - Special text format
-
-**Components Created:**
-- **Code:** Dual-style number-part-iteration (handles slash/dash/dot separators)
-- **Language:** Three formats (slash /E, paren (DE), paren-year (RU-2021))
 
 **Architecture Quality:**
 - ✅ MODEL-DRIVEN (Lutaml::Model throughout)

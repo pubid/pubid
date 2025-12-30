@@ -185,18 +185,16 @@ RSpec.describe PubidNew::Csa::Identifiers::Bundled do
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses base NO. notation" do
-          expect(parsed.base.code.value).to eq("C22.2")
-          expect(parsed.base.no_number).to eq("1")
+        it "parses base code (NO. normalized)" do
+          expect(parsed.base.code.value).to eq("C22.2-1")
         end
 
-        it "parses bundled NO. notation" do
-          expect(parsed.bundled_with.first.code.value).to eq("C22.2")
-          expect(parsed.bundled_with.first.no_number).to eq("2")
+        it "parses bundled code (NO. normalized)" do
+          expect(parsed.bundled_with.first.code.value).to eq("C22.2-2")
         end
 
-        it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+        it "round-trips in normalized form" do
+          expect(parsed.to_s).to eq("CSA C22.2-1:20 + C22.2-2:20")
         end
       end
     end

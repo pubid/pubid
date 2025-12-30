@@ -82,9 +82,14 @@ module PubidNew
         if parsed_hash[:year]
           year_str = parsed_hash[:year].to_s
           if year_str.length == 2
-            # Convert 2-digit year to 4-digit (20XX for CSA)
+            # Convert 2-digit year to 4-digit
+            # M prefix means 1900s (metric/old standards), otherwise 2000s
             year_int = year_str.to_i
-            series.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+            if parsed_hash[:year_prefix] && parsed_hash[:year_prefix].to_s == "M"
+              series.year = (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
+            else
+              series.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+            end
           else
             series.year = year_str
           end
@@ -203,11 +208,6 @@ module PubidNew
           end
         end
 
-        # NO. number
-        if data[:no_number]
-          identifier.no_number = data[:no_number].to_s
-        end
-
         # Series prefix (MH, RV, etc.)
         if data[:series_prefix]
           identifier.series_prefix = data[:series_prefix].to_s
@@ -232,9 +232,14 @@ module PubidNew
         if data[:year] && !identifier.year
           year_str = data[:year].to_s
           if year_str.length == 2
-            # Convert 2-digit year to 4-digit (20XX for CSA)
+            # Convert 2-digit year to 4-digit
+            # M prefix means 1900s (metric/old standards), otherwise 2000s
             year_int = year_str.to_i
-            identifier.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+            if data[:year_prefix] && data[:year_prefix].to_s == "M"
+              identifier.year = (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
+            else
+              identifier.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+            end
           else
             # Keep 4-digit years as-is
             identifier.year = year_str
