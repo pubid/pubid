@@ -160,8 +160,15 @@ module PubidNew
           # Determine effective publisher
           effective_publisher = publisher ? publisher.to_s : default_publisher
 
-          # Determine effective series (use parsed series or series_code method)
-          effective_series = series ? series.to_s : (respond_to?(:series_code) ? series_code : nil)
+          # Determine effective series - PREFER series_code if subclass defines it
+          # This allows normalization (e.g., LCIRC → LC in LetterCircular)
+          if respond_to?(:series_code) && series_code
+            effective_series = series_code
+          elsif series
+            effective_series = series.to_s
+          else
+            effective_series = nil
+          end
 
           # If we have a compound series that starts with NBS, use it as-is
           if effective_series && effective_series.start_with?("NBS")
