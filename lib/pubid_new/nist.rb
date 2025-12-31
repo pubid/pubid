@@ -19,6 +19,13 @@ require_relative "nist/identifiers/circular_supplement"
 require_relative "nist/identifiers/commercial_standard_emergency"
 require_relative "nist/identifiers/commercial_standards_monthly"
 
+require_relative "nist/identifiers/grant_contractor_report"
+require_relative "nist/identifiers/ncstar"
+require_relative "nist/identifiers/owmwp"
+require_relative "nist/identifiers/nsrds"
+require_relative "nist/identifiers/letter_circular"
+require_relative "nist/identifiers/commercial_standard"
+
 module PubidNew
   module Nist
     # Parse a NIST identifier string

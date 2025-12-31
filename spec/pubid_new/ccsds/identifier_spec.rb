@@ -43,16 +43,18 @@ RSpec.describe PubidNew::Ccsds do
       it "parses CCSDS 131.2-O-1-S Cor. 1" do
         result = described_class.parse("CCSDS 131.2-O-1-S Cor. 1")
 
-        expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
-        expect(result.corrigenda).to eq([1])
+        expect(result).to be_a(PubidNew::Ccsds::Identifiers::Corrigendum)
+        expect(result.cor_number).to eq(1)
+        expect(result.base_identifier).to be_a(PubidNew::Ccsds::Identifiers::Base)
         expect(result.to_s).to eq("CCSDS 131.2-O-1-S Cor. 1")
       end
 
       it "parses CCSDS 912.1-B-2-S Cor. 1" do
         result = described_class.parse("CCSDS 912.1-B-2-S Cor. 1")
 
-        expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
-        expect(result.corrigenda).to eq([1])
+        expect(result).to be_a(PubidNew::Ccsds::Identifiers::Corrigendum)
+        expect(result.cor_number).to eq(1)
+        expect(result.base_identifier).to be_a(PubidNew::Ccsds::Identifiers::Base)
         expect(result.to_s).to eq("CCSDS 912.1-B-2-S Cor. 1")
       end
     end
