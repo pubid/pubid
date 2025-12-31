@@ -1,22 +1,35 @@
+# frozen_string_literal: true
+
+require_relative "identifiers/handbook"
+require_relative "identifiers/technical_report"
+
 module PubidNew
   module Plateau
     class Builder
-      attr_reader :scheme_class
-
-      def initialize(scheme_class)
-        @scheme_class = scheme_class
+      def self.build(parsed)
+        new.build(parsed)
       end
 
       def build(parsed)
+        # Determine which class to use based on type
+        klass = case parsed[:type].to_s
+                when "Handbook"
+                  Identifiers::Handbook
+                when "Technical Report"
+                  Identifiers::TechnicalReport
+                else
+                  raise "Unknown PLATEAU type: #{parsed[:type]}"
+                end
+
+        # Build parameters common to all types
         params = {
-          type: parsed[:type].to_s,
           number: parsed[:number].to_s.to_i
         }
 
         params[:annex] = parsed[:annex].to_s.to_i if parsed[:annex]
         params[:edition] = parsed[:edition].to_s if parsed[:edition]
 
-        scheme_class.new(**params)
+        klass.new(**params)
       end
     end
   end

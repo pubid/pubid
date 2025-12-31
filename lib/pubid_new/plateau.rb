@@ -9,8 +9,7 @@ module PubidNew
       def parse(input)
         parser = Parser.new
         parsed = parser.parse(input)
-        builder = Builder.new(Scheme)
-        builder.build(parsed)
+        Builder.build(parsed)
       end
     end
   end
