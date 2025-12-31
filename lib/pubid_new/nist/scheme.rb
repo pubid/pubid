@@ -11,6 +11,15 @@ require_relative "identifiers/circular_supplement"
 require_relative "identifiers/crpl_report"
 require_relative "identifiers/commercial_standard_emergency"
 require_relative "identifiers/commercial_standards_monthly"
+require_relative "identifiers/report"
+require_relative "identifiers/monograph"
+require_relative "identifiers/miscellaneous_publication"
+require_relative "identifiers/grant_contractor_report"
+require_relative "identifiers/ncstar"
+require_relative "identifiers/owmwp"
+require_relative "identifiers/nsrds"
+require_relative "identifiers/letter_circular"
+require_relative "identifiers/commercial_standard"
 
 module PubidNew
   module Nist
@@ -29,7 +38,16 @@ module PubidNew
             "TN" => Identifiers::TechnicalNote,
             "CIRC" => Identifiers::Circular,
             "CRPL" => Identifiers::CrplReport,
-            "CS" => Identifiers::Base,  # Will check for emergency pattern
+            "RPT" => Identifiers::Report,
+            "MONO" => Identifiers::Monograph,
+            "MP" => Identifiers::MiscellaneousPublication,
+            "GCR" => Identifiers::GrantContractorReport,
+            "NCSTAR" => Identifiers::Ncstar,
+            "OWMWP" => Identifiers::Owmwp,
+            "NSRDS" => Identifiers::Nsrds,
+            "LC" => Identifiers::LetterCircular,
+            "LCIRC" => Identifiers::LetterCircular,  # Alias
+            "CS" => Identifiers::CommercialStandard,
             "CSM" => Identifiers::CommercialStandardsMonthly,
             # All other series use Base as default
           }.freeze
@@ -46,6 +64,15 @@ module PubidNew
             Identifiers::Circular,
             Identifiers::CircularSupplement,
             Identifiers::CrplReport,
+            Identifiers::Report,
+            Identifiers::Monograph,
+            Identifiers::MiscellaneousPublication,
+            Identifiers::GrantContractorReport,
+            Identifiers::Ncstar,
+            Identifiers::Owmwp,
+            Identifiers::Nsrds,
+            Identifiers::LetterCircular,
+            Identifiers::CommercialStandard,
             Identifiers::CommercialStandardEmergency,
             Identifiers::CommercialStandardsMonthly,
             Identifiers::Base,  # Fallback for unmapped series
@@ -61,7 +88,7 @@ module PubidNew
           # Handle compound series that include publisher
           if series&.start_with?("NBS ")
             simple_series = series.sub("NBS ", "")
-            
+
             # Check for CIRC supplement
             if simple_series == "CIRC"
               if has_supplement?(parsed_hash)
@@ -70,7 +97,7 @@ module PubidNew
                 return Identifiers::Circular
               end
             end
-            
+
             # Check for CS emergency (e-prefixed numbers)
             if simple_series == "CS"
               first_number = parsed_hash[:first_number]&.to_s
@@ -78,21 +105,21 @@ module PubidNew
                 return Identifiers::CommercialStandardEmergency
               end
             end
-            
+
             # Use series mapping for other compound series
             series = simple_series
           end
 
           # Look up in series-to-class mapping
           klass = series_to_class_map[series]
-          
+
           # Default to Base for unmapped series
           klass || Identifiers::Base
         end
 
         # Check if parsed hash has supplement indicators
         def has_supplement?(parsed_hash)
-          parsed_hash[:supplement] || 
+          parsed_hash[:supplement] ||
           parsed_hash[:supplement_date_range] ||
           parsed_hash[:supplement_date] ||
           parsed_hash[:supplement_slash_year] ||
@@ -110,18 +137,18 @@ module PubidNew
         VALID_SERIES = [
           # Major series with dedicated classes
           "SP", "FIPS", "IR", "HB", "TN",
-          # Specialized series with dedicated classes  
+          # Specialized series with dedicated classes
           "CIRC", "CRPL", "CS", "CSM",
           # Other series (use Base class)
-          "GCR", "AMS", "BSS", "BMS", "BH", "MONO", "MP", 
+          "GCR", "AMS", "BSS", "BMS", "BH", "MONO", "MP",
           "NCSTAR", "NSRDS", "CSWP", "VTS", "AI", "OWMWP",
           "PC", "RPT", "SIBS", "TIBM", "TTB", "EAB",
-          "JPCRD", "JRES", "CIS", "HR", "IRPL", "IP", 
+          "JPCRD", "JRES", "CIS", "HR", "IRPL", "IP",
           "LC", "PS", "LCIRC",
           # Compound series
           "BRPD-CRPL-D", "CRPL-F-A", "CRPL-F-B", "CS-E",
           "CSRC Building Block", "CSRC Use Case", "CSRC Book",
-          "ITL Bulletin", "NIST LC", "NIST PS", "NIST DCI", 
+          "ITL Bulletin", "NIST LC", "NIST PS", "NIST DCI",
           "NIST Other", "NSRDS-NBS",
         ].freeze
       end
