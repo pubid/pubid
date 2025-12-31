@@ -35,12 +35,18 @@ module PubidNew
         # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
         cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
 
+        # CRITICAL: Normalize lowercase letter suffix to uppercase
+        # Fix dash-letter pattern: "6529-a" → "6529-A" (FIXED - was incorrect)
+        cleaned = cleaned.gsub(/(\d)-([a-z])$/) { "#{$1}-#{$2.upcase}" }
+
+        # Fix direct letter suffix (no dash): "378g" → "378G", "1000a" → "1000A"
+        # MUST come after dash pattern to avoid conflicts
+        # Only match single letter at end, not part of words like "index", "sec", etc.
+        cleaned = cleaned.gsub(/(\d)([a-z])$/) { "#{$1}#{$2.upcase}" }
+
         # Fix space before volume number: "80-2073 2" → "80-2073 v2" (Session 219)
         # This handles NBS IR 80-2073 2 and NBS IR 80-2073 3 as volume identifiers
         cleaned = cleaned.gsub(/(\d{2}-\d{4})\s+(\d)$/, '\1 v\2')
-
-        # Normalize lowercase letter suffix after dash to uppercase: "6529-a" → "6529-A" (Session 219)
-        cleaned = cleaned.gsub(/(\d)-([a-z])$/, '\1-\2'.upcase)
 
         # Fix draft with number: "8270-draft2" → "8270-draft 2" (Session 219)
         # Space after draft, not before, so dash-draft pattern still matches
@@ -141,8 +147,18 @@ module PubidNew
         # Fix uppercase P for part: "428P1" → "428 p1", "647P2" → "647 p2" (NEW)
         cleaned = cleaned.gsub(/(\d)P(\d)/, '\1 p\2')
 
+        # Normalize part notation: "p1" → "pt1", "n1" → "pt1" for consistency
+        # This handles patterns like "61p1" → "61pt1" and "467n1" → "467pt1"
+        # MUST come AFTER uppercase P normalization
+        cleaned = cleaned.gsub(/\b([pn])(\d+)/, 'pt\2')
+
         # Fix complex part patterns in MR format: ensure space before part
         cleaned = cleaned.gsub(/(\d)([pP]\d+)/, '\1 \2')         # .467p1adde1 → .467 p1adde1, 800-57p1 → 800-57 p1
+
+        # Extract volume from number: "17-917v3" → "17-917 v3", "1-1v1" → "1-1 v1"
+        # Pattern: digits-digits followed by v and digits (GCR, NCSTAR patterns)
+        # MUST be specific to avoid breaking existing "v1.1" patterns
+        cleaned = cleaned.gsub(/(\d+-\d+)(v\d+)(?![.\d])/, '\1 \2')  # Negative lookahead for dots
 
         # Fix pd spacing: "800-140Br1 2pd" → "800-140B r1 2pd", " 3pd" → " 3 pd"
         cleaned = cleaned.gsub(/\s+(\d+)pd$/, ' \1 pd')
