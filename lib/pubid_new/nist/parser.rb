@@ -345,7 +345,8 @@ module PubidNew
           # GB series pattern: 1190GB-1, 1190GB-4A
           (digits >> str("GB") >> dash >> digits >> upper_letter.maybe) |
           # Volume-number format for CSM series: v6n1, v7n12
-          (str("v") >> digits >> str("n") >> digits) |
+          # CHANGED: Capture volume and issue_number separately for proper semantics
+          (str("v") >> digits.as(:volume_number) >> str("n") >> digits.as(:issue_number)) |
           # Regular number with supplement and revision suffix: "154supprev"
           (digits >> str("supprev")) |
           # Regular number with edition, revision, and date: "13e2revJune1908"

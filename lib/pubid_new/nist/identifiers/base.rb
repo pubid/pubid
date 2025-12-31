@@ -8,6 +8,7 @@ require_relative "../components/edition"
 require_relative "../components/version"
 require_relative "../components/update"
 require_relative "../components/translation"
+require_relative "../components/issue_number"
 
 module PubidNew
   module Nist
@@ -25,6 +26,7 @@ module PubidNew
         attribute :version_component, Components::Version
         attribute :update_component, Components::Update
         attribute :translation_component, Components::Translation
+        attribute :issue_number, Components::IssueNumber
         attribute :parsed_format, :string  # :mr, :short, :long, :abbrev
 
         # Original attributes (keep for backward compatibility)
@@ -106,7 +108,14 @@ module PubidNew
           result += " #{series_full_name}" if series
           result += " #{number.value}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
-          result += " Vol. #{volume}" if volume
+
+          # Render volume and issue number in long form: "Vol. 6, No. 12"
+          if volume && issue_number
+            result += " Vol. #{volume}, #{issue_number.to_s(:long)}"
+          elsif volume
+            result += " Vol. #{volume}"
+          end
+
           result += ", Revision #{revision.sub(/^r/, '')}" if revision
 
           # V2: Use version_component
@@ -200,8 +209,13 @@ module PubidNew
             result += "-#{expanded_year}"
           end
 
-          # Add volume
-          result += " Vol. #{volume}" if volume
+          # Render volume and issue number in short form: "v6n12"
+          # This comes AFTER edition handling
+          if volume && issue_number
+            result += " v#{volume}#{issue_number.to_s(:short)}"
+          elsif volume
+            result += " Vol. #{volume}"
+          end
 
           # Add revision
           if revision

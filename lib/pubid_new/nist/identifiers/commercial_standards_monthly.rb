@@ -18,7 +18,16 @@ module PubidNew
         end
 
         def to_s
-          "NBS CSM #{number}"
+          # Handle v#n# format (e.g., v6n1 for Volume 6, Number 1)
+          if volume && issue_number
+            "NBS CSM v#{volume}#{issue_number.to_s(:short)}"
+          # Handle simple number format
+          elsif number
+            "NBS CSM #{number}"
+          # Fallback
+          else
+            "NBS CSM"
+          end
         end
       end
     end

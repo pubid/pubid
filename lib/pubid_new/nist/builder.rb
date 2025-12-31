@@ -8,6 +8,7 @@ require_relative "components/edition"
 require_relative "components/version"
 require_relative "components/update"
 require_relative "components/translation"
+require_relative "components/issue_number"
 
 module PubidNew
   module Nist
@@ -83,7 +84,10 @@ module PubidNew
 
         # Build compound number from first_number and second_number
         if first_num && !identifier.number
-          if second_num
+          # Skip if this is a v#n# pattern (volume + issue_number, no number)
+          if identifier.volume && identifier.issue_number
+            # Don't build number - this is CSM v#n# format
+          elsif second_num
             compound_value = "#{first_num.value}-#{second_num.value}"
             identifier.number = Components::Code.new(number: compound_value)
           else
@@ -141,13 +145,32 @@ module PubidNew
             Components::Code.new(number: str_value)
           end
 
+        when :volume_number
+          # Volume from v#n# pattern - return as string for volume attribute
+          return nil if value.nil? || value.to_s.strip.empty?
+          value.to_s
+
+        when :issue_number
+          # Issue number from v#n# pattern - return as IssueNumber component
+          return nil if value.nil? || value.to_s.strip.empty?
+          { issue_number: Components::IssueNumber.new(number: value.to_s) }
+
         when :first_number, :second_number
           return nil if value.nil? || value.to_s.strip.empty?
+
+          # Handle v#n# pattern (CSM series) - comes as hash from parser
+          if value.is_a?(Hash) && value[:volume_number] && value[:issue_number]
+            return {
+              volume: value[:volume_number].to_s,
+              issue_number: Components::IssueNumber.new(number: value[:issue_number].to_s)
+            }
+          end
 
           str_value = value.to_s
 
           # Handle special patterns embedded in first_number
           if type == :first_number
+
             # Pattern: "154supprev" - supplement with revision
             if str_value =~ /^(\d+)supprev$/
               return {
