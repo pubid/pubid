@@ -64,8 +64,9 @@ RSpec.describe PubidNew::Etsi do
       it "parses ETSI ETR 310/C1 ed.1 (1996-10)" do
         result = described_class.parse("ETSI ETR 310/C1 ed.1 (1996-10)")
 
-        expect(result).to be_a(PubidNew::Etsi::Identifiers::Base)
-        expect(result.corrigenda).to eq([1])
+        expect(result).to be_a(PubidNew::Etsi::Identifiers::Corrigendum)
+        expect(result.number).to eq(1)
+        expect(result.base).to be_a(PubidNew::Etsi::Identifiers::Base)
         expect(result.to_s).to eq("ETSI ETR 310/C1 ed.1 (1996-10)")
       end
     end
@@ -74,8 +75,9 @@ RSpec.describe PubidNew::Etsi do
       it "parses ETSI ETS 300 097-1/A1 ed.1 (1994-11)" do
         result = described_class.parse("ETSI ETS 300 097-1/A1 ed.1 (1994-11)")
 
-        expect(result).to be_a(PubidNew::Etsi::Identifiers::Base)
-        expect(result.amendments).to eq([1])
+        expect(result).to be_a(PubidNew::Etsi::Identifiers::Amendment)
+        expect(result.number).to eq(1)
+        expect(result.base).to be_a(PubidNew::Etsi::Identifiers::Base)
         expect(result.to_s).to eq("ETSI ETS 300 097-1/A1 ed.1 (1994-11)")
       end
     end

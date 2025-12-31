@@ -14,8 +14,6 @@ module PubidNew
         attribute :code, PubidNew::Etsi::Components::Code
         attribute :version, PubidNew::Etsi::Components::Version
         attribute :date, PubidNew::Components::Date
-        attribute :amendments, :integer, collection: true  # For /A1, /A2, etc.
-        attribute :corrigenda, :integer, collection: true  # For /C1, /C2, etc.
 
         def publisher
           "ETSI"
@@ -23,17 +21,6 @@ module PubidNew
 
         def to_s
           result = "#{publisher} #{type} #{code}"
-
-          # Add amendments
-          if amendments&.any?
-            amendments.each { |num| result += "/A#{num}" }
-          end
-
-          # Add corrigenda
-          if corrigenda&.any?
-            corrigenda.each { |num| result += "/C#{num}" }
-          end
-
           result += " #{version} (#{date.year}-#{date.month.to_s.rjust(2, '0')})"
           result
         end
@@ -44,9 +31,7 @@ module PubidNew
           type == other.type &&
             code == other.code &&
             version == other.version &&
-            date == other.date &&
-            amendments == other.amendments &&
-            corrigenda == other.corrigenda
+            date == other.date
         end
       end
     end
