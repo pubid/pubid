@@ -33,6 +33,8 @@ module PubidNew
         attribute :parts, Components::Code, collection: true
         attribute :volume, :string
         attribute :revision, :string
+        attribute :revision_year, :string  # NEW: Year for revision (e.g., r6/1925, r1963, rJun1992)
+        attribute :revision_month, :string  # NEW: Month for revision (e.g., rJun1992)
         attribute :version, :string
         attribute :update, :string
         attribute :year, :integer
@@ -228,6 +230,20 @@ module PubidNew
             else
               # Already has some prefix - use as-is with no space
               result += "#{revision}"
+            end
+          end
+
+          # NEW: Add revision year/month if present (e.g., r6/1925, r1963, rJun1992)
+          if revision_year
+            # If we have month, render as rMonthYear (e.g., rJun1992)
+            if revision_month
+              result += "r#{revision_month}#{revision_year}"
+            # If revision already rendered, add /year (e.g., r6/1925)
+            elsif revision
+              result += "/#{revision_year}"
+            # If only year, render as rYear (e.g., r1963)
+            else
+              result += "r#{revision_year}"
             end
           end
 

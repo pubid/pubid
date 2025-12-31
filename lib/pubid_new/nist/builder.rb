@@ -190,7 +190,43 @@ module PubidNew
           end
 
           # Extract revision suffix from number (e.g., "53r5" → "53" + revision "5")
-          if str_value =~ /^(.+?)(r\d+[a-z]?)$/i
+          # ENHANCED: Also extract revision with slash-year (e.g., "53r5/1917" → "53" + "r5" + "/1917")
+          # ENHANCED: Also extract revision with 4-digit year (e.g., "1019r1963" → "1019" + "r1963")
+          # ENHANCED: Also extract revision with month+year (e.g., "4743rJun1992" → "4743" + "rJun1992")
+          if str_value =~ /^(.+?)(r\d+\/\d{4})$/i
+            # Pattern: r6/1925 (revision with slash-year)
+            number_part = $1
+            revision_with_year = $2  # e.g., "r6/1925"
+            # Extract revision and year
+            if revision_with_year =~ /^r(\d+)\/(\d{4})$/
+              return {
+                type => Components::Code.new(number: number_part),
+                revision: $1,  # Just the revision number
+                revision_year: $2  # The year part
+              }
+            end
+          elsif str_value =~ /^(.+?)(r\d{4})$/i
+            # Pattern: r1963 (revision as 4-digit year)
+            number_part = $1
+            revision_year = $2.sub(/^r/, "")  # Strip 'r' prefix
+            return {
+              type => Components::Code.new(number: number_part),
+              revision_year: revision_year
+            }
+          elsif str_value =~ /^(.+?)(r[A-Za-z]{3,9}\d{4})$/
+            # Pattern: rJun1992 (revision with month and year)
+            number_part = $1
+            revision_with_date = $2  # e.g., "rJun1992"
+            # Extract month and year
+            if revision_with_date =~ /^r([A-Za-z]{3,9})(\d{4})$/
+              return {
+                type => Components::Code.new(number: number_part),
+                revision_month: $1,
+                revision_year: $2
+              }
+            end
+          elsif str_value =~ /^(.+?)(r\d+[a-z]?)$/i
+            # Pattern: r5, r1a (simple revision)
             number_part = $1
             revision_part = $2
             return {
@@ -278,6 +314,11 @@ module PubidNew
           return nil if str_value.empty?
 
           str_value
+
+        when :revision_year, :revision_month
+          # Preserve revision year and month from parser
+          return nil if value.nil? || value.to_s.strip.empty?
+          value.to_s.strip
 
         when :supplement
           handle_supplement_cast(value)
