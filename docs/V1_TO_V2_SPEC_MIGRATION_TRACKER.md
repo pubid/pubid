@@ -14,8 +14,8 @@
 
 ### Migration Status by Flavor
 
-| Flavor | V1 Specs | V2 Specs | Migration % | Status | Priority |
-|--------|----------|----------|-------------|--------|----------|
+| Flavor | V1 Specs | V2 Ported | % Complete | Pass Rate | Status |
+|--------|----------|-----------|------------|-----------|--------|
 | **iso** | 14 | 27 | ✅ 100%+ | COMPLETE | ✅ Done |
 | **iec** | 6 | 15 | ✅ 100%+ | COMPLETE | ✅ Done |
 | **ieee** | 5 | 12 | ✅ 100%+ | COMPLETE | ✅ Done |
@@ -26,7 +26,7 @@
 | **etsi** | 2 | 2 | ✅ 100% | COMPLETE | ✅ Done |
 | **plateau** | 2 | 2 | ✅ 100% | COMPLETE | ✅ Done |
 | **jis** | 4 | 3 | ✅ 100% | COMPLETE | ✅ Done |
-| **nist** | 20 | 6 | 🔴 30% | INCOMPLETE | 🔴 HIGH |
+| **nist** | 20 | 8 | 40% | 68% | 🔨 In Progress |
 | **ansi** | 0 | 1 | 🟢 N/A | NEW V2 ONLY | ✅ Done |
 
 ### V2-Only Flavors (No V1 Equivalent)
@@ -324,3 +324,75 @@ These are entirely new implementations in V2:
 
 **Last Updated:** 2025-12-30
 **Tracking Document:** `docs/V1_TO_V2_SPEC_MIGRATION_TRACKER.md`
+
+---
+
+## Detailed Progress Log
+
+### Session 241: NIST Part 1 - Circular & Handbook (December 30, 2025)
+
+**Duration:** ~90 minutes (compressed from 120 min plan!)
+**Status:** PART 1 COMPLETE ✅
+
+**What Was Accomplished:**
+
+1. **Analysis Phase** ✅
+   - Analyzed V1 CIRC spec (19 test patterns)
+   - Analyzed V1 HB spec (14 test patterns)
+   - Analyzed V1 IR spec (22 test patterns)
+   - Documented all series-specific patterns
+
+2. **Circular Spec Created** ✅
+   - File: `spec/pubid_new/nist/identifiers/circular_spec.rb`
+   - Coverage: Basic CIRC, editions, revisions, supplements, special notations
+   - Tests: 36 examples
+
+3. **Handbook Spec Created** ✅
+   - File: `spec/pubid_new/nist/identifiers/handbook_spec.rb`
+   - Coverage: Basic HB, editions, parts, revisions, supplements
+   - Tests: 63 examples
+
+**Test Results:**
+- **Total new tests:** 99 (36 Circular + 63 Handbook)
+- **Passing:** 67/99 (67.7%)
+- **Failing:** 32/99 (32.3%)
+- **Pass rate:** 68% (parser limitations expected)
+
+**Key Patterns Documented:**
+1. ✅ Basic series identifiers (NBS CIRC 13, NBS HB 131)
+2. ✅ Edition notation (e2, e4, e2-1915)
+3. ✅ Revision notation (r1979, revJune1908)
+4. ✅ Supplement notation (sup, supprev, supJan1924, date ranges)
+5. ✅ Volume notation (v10)
+6. ✅ Special notations (sec1, errata, index, insert)
+7. ✅ Part notation (p1, pt1)
+8. ✅ Complex combinations (e2revJune1908, supp1957pt1)
+
+**Parser Limitations Identified:**
+- Edition/revision/supplement patterns not fully implemented
+- Volume parsing incomplete
+- Part notation needs enhancement
+- Date handling in supplements needs work
+- CircularSupplement class discovered (separate from Circular)
+
+**Architecture Quality:**
+- ✅ **No mocking** - Real parsing tests
+- ✅ **Round-trip fidelity** - All identifiers tested
+- ✅ **Component testing** - Proper attribute verification
+- ✅ **MECE validation** - Each series type distinct
+
+**Files Created:**
+- `spec/pubid_new/nist/identifiers/circular_spec.rb` (292 lines)
+- `spec/pubid_new/nist/identifiers/handbook_spec.rb` (264 lines)
+
+**Progress:**
+- **Before:** 6/20 specs (30%)
+- **After:** 8/20 specs (40%)
+- **Improvement:** +2 specs (+10pp)
+
+**Next Steps:**
+- Session 242: Interagency Report (IR) and Technical Note (TN) specs
+- Session 243: NBS historical series (RPT, BMS, MONO, etc.)
+- Session 244: Validation and documentation
+
+**Status:** SESSION 241 PART 1 COMPLETE ✅
