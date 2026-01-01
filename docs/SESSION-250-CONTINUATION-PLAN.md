@@ -17,9 +17,10 @@
 - ⏳ **Documentation:** README.adoc updates needed
 
 **Remaining Work:**
-1. PLATEAU Standard + Annex implementation (Session 250) - 2 hours
-2. Final documentation updates (Session 251) - 1-2 hours
-3. Project completion validation (Session 252) - Optional
+1. make sure we migrate all specs from archived-gems/pubid-nist/spec/nist_pubid/identifier/base_spec.rb , and can normalize "NIST.SP.800-207-draft2" to "NIST SP 800-207 2pd".
+2. PLATEAU Standard + Annex implementation (Session 250) - 2 hours
+3. Final documentation updates (Session 251) - 1-2 hours
+4. Project completion validation (Session 252) - 1-2 hours
 
 ---
 
@@ -98,15 +99,10 @@ Create `lib/pubid_new/plateau/supplement_identifier.rb` if not exists, then crea
 
 **Architecture decision based on pattern analysis:**
 
-**Option A: Annex as Supplement** (like ISO/IEC Annex patterns)
+**Annex as Supplement** (like ISO/IEC Annex patterns)
 - Extends SupplementIdentifier
 - Has base_identifier attribute
 - Renders as "BASE_ID Annex X"
-
-**Option B: Annex as Base Type** (standalone document)
-- Extends SingleIdentifier
-- Independent identifier
-- Renders as "PLATEAU Annex X"
 
 Implement based on actual pattern analysis.
 
@@ -245,7 +241,7 @@ This summary can be referenced in future sessions since context.md is corrupted.
 
 ---
 
-## SESSION 252 (OPTIONAL): Project Validation
+## SESSION 252: Project Validation
 
 ### Objective
 Comprehensive testing and final validation.

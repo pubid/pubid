@@ -2,6 +2,7 @@
 
 require_relative "identifiers/handbook"
 require_relative "identifiers/technical_report"
+require_relative "identifiers/annex"
 
 module PubidNew
   module Plateau
@@ -11,6 +12,11 @@ module PubidNew
       end
 
       def build(parsed)
+        # Check for annex supplement first
+        if parsed[:base_identifier] && parsed[:annex_letter]
+          return build_annex(parsed)
+        end
+
         # Determine which class to use based on type
         klass = case parsed[:type].to_s
                 when "Handbook"
@@ -30,6 +36,18 @@ module PubidNew
         params[:edition] = parsed[:edition].to_s if parsed[:edition]
 
         klass.new(**params)
+      end
+
+      private
+
+      def build_annex(parsed)
+        # Recursively parse base identifier
+        base = build(parsed[:base_identifier])
+
+        Identifiers::Annex.new(
+          base_identifier: base,
+          letter: parsed[:annex_letter].to_s
+        )
       end
     end
   end
