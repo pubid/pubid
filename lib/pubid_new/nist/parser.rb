@@ -516,10 +516,11 @@ module PubidNew
           ((str(" r") | str("r")) >> space.maybe >> match("[0-9]").repeat(4, 4).as(:revision_year)) |
           # Revision with year: rev2013, rev 2013 (allow space before year)
           (str("rev") >> space.maybe >> digits.as(:revision_year)) |
-          # Revision with digits AND/OR letters: r1a, ra, r1
+          # Revision with digits AND/OR letters: r1a, r1A, ra, r1
           # Enhanced to accept letter-only revisions and space before r
+          # ENHANCED: Accept BOTH lowercase and uppercase letters in suffix
           ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
-            (digits >> lower_letter.maybe | lower_letter.repeat(1)).as(:revision)) |
+            (digits >> match("[a-zA-Z]").maybe | match("[a-zA-Z]").repeat(1)).as(:revision)) |
           # NEW: Standalone 'r' - MUST BE LAST to avoid consuming from other patterns
           # Matches " r" at end of input (after preprocessing: "800-56a r", "800-27 r")
           (str(" r") >> any.absent?).as(:revision_standalone)
@@ -627,9 +628,10 @@ module PubidNew
       end
 
       # Draft stage - enhanced to support suffix pattern and number after draft
+      # ENHANCED: Make digits mandatory when space present to match "draft 2" pattern
       rule(:draft) do
         (space >> str("(Draft)") |
-         dash >> str("draft") >> space.maybe >> digits.maybe |  # Session 219/221: support "draft2" and "draft 2"
+         dash >> str("draft") >> (space >> digits | digits).maybe |  # Match "-draft 2" OR "-draft2"
          pd_suffix).as(:draft)
       end
 
