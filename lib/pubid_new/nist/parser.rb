@@ -34,6 +34,15 @@ module PubidNew
 
         # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
         cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
+        # NEW FIX 1: Revision with 1-2 digits + lowercase letter: "800-22r1a" → "800-22 r1A"
+        # Capture parts separately to avoid interpolation issues
+        cleaned = cleaned.gsub(/(\d)(r)(\d{1,2})([a-z])\b/) do
+          num = $1
+          r_prefix = $2
+          rev_num = $3
+          letter = $4.upcase
+          "#{num} #{r_prefix}#{rev_num}#{letter}"
+        end
 
         # CRITICAL: Normalize lowercase letter suffix to uppercase
         # Fix dash-letter pattern: "6529-a" → "6529-A" (FIXED - was incorrect)
@@ -51,6 +60,10 @@ module PubidNew
         # Fix draft with number: "8270-draft2" → "8270-draft 2" (Session 219)
         # Space after draft, not before, so dash-draft pattern still matches
         cleaned = cleaned.gsub(/(\d)-draft(\d)/, '\1-draft \2')
+
+        # NEW FIX 2: Draft without dash: "8270draft2" → "8270-draft 2"
+        # More lenient pattern to catch missing dash before draft
+        cleaned = cleaned.gsub(/(\d)draft(\d)/, '\1-draft \2')
 
         # Fix supplement typo: "154suprev" → "154supprev" (Session 219)
         cleaned = cleaned.gsub(/(\d)suprev/, '\1supprev')
@@ -108,7 +121,15 @@ module PubidNew
         # "8115r1-upd" → "8115 r1-upd" so that later "r1-upd" → "r1 -upd" works
         # But preserve r6/1925 format (don't add space before slash/year)
         # And preserve 300-8r1/upd format (don't separate r1/upd)
-        cleaned = cleaned.gsub(/(\d)(r\d+)(?=-|$)/, '\1 \2')
+        # ENHANCED: Also handle r1a (revision with letter suffix) - "800-22r1a" → "800-22 r1A"
+        cleaned = cleaned.gsub(/(\d)(r\d+)([a-z]?)(?=-|[A-Z]|$)/) do
+          num = $1
+          rev = $2
+          letter = $3
+          # Uppercase the trailing letter if present
+          letter_fixed = letter.empty? ? "" : letter.upcase
+          "#{num} #{rev}#{letter_fixed}"
+        end
 
         # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
         # ENHANCED to handle multiple spaces: "v1 0 1" → "v1.0.1", "v1 0 2" → "v1.0.2"
@@ -121,6 +142,11 @@ module PubidNew
         cleaned = cleaned.gsub(/(\d+)\/upd(\d*)/, '\1 /upd\2')   # /upd or /upd1
         cleaned = cleaned.gsub(/([a-z]\d+)-upd/, '\1 -upd')      # r1-upd → r1 -upd
         cleaned = cleaned.gsub(/([a-z]\d+)\/upd/, '\1 /upd')     # After revision: r1/upd → r1 /upd
+
+        # NEW FIX 3: MR format with letter suffix before update: "8286C-upd1" → "8286C -upd1"
+        # Must handle uppercase letters before -upd in MR format
+        cleaned = cleaned.gsub(/(\d+[A-Z])-upd(\d*)/, '\1 -upd\2')  # Letter suffix + update
+        cleaned = cleaned.gsub(/(\d+[A-Z])\/upd(\d*)/, '\1 /upd\2') # Letter suffix + /upd variant
 
         # Fix supplement patterns: ensure space before supplement (1st variant)
         # "118supp3" already handled at line 32-33, but add "sup" variant
