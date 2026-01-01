@@ -1278,9 +1278,10 @@ As of Session 211 (2025-12-26), **all 16 flavors are production-ready** with 99%
 
 === Implementation Summary
 
-**Session 199: NIST 99.96%** ✨ - Fixed 29 FIPS month-year patterns
+**Sessions 199, 249: NIST 99.98%** ✨ - FIPS month-year + revision year preservation
 **Sessions 135-136: OIML 15th Flavor** ✨ - Complete implementation with supplements
 **Sessions 207-211: CIE 16th Flavor** ✨ - Complete implementation with dual-style system
+**Session 250: PLATEAU Annex** ✨ - Annex supplement with proper MECE architecture
 **Overall: 88,185+ identifiers validated** across all flavors
 
 === Detailed Status
@@ -1290,9 +1291,9 @@ As of Session 211 (2025-12-26), **all 16 flavors are production-ready** with 99%
 |Flavor |Total IDs |Pass |Rate |Status |Key Features
 
 |**NIST** ✨
-|19,827
-|19,820
-|**99.96%**
+|19,826
+|19,822
+|**99.98%**
 |✅ Perfect
 |29 FIPS patterns fixed (Session 199), all series, NBS historical
 
@@ -1371,7 +1372,7 @@ As of Session 211 (2025-12-26), **all 16 flavors are production-ready** with 99%
 |115
 |100%
 |✅ Perfect
-|Japanese urban planning standards
+|3 types (Handbook, TechnicalReport, Annex), Session 250
 
 |**ANSI**
 |175
@@ -1427,9 +1428,9 @@ As of Session 211 (2025-12-26), **all 16 flavors are production-ready** with 99%
 [[v2-usage-examples]]
 === V2 Usage Examples
 
-==== NIST: 99.96% ✨
+==== NIST: 99.98% ✨
 
-NIST parser handles all series withFIPS month-year patterns (Session 199):
+NIST parser handles all series withFIPS month-year patterns (Sessions 199, 249):
 
 [source,ruby]
 ----
@@ -1471,6 +1472,49 @@ amd = PubidNew::Oiml.parse("Amendment (2009) to OIML R 138 Edition 2007 (E)")
 amd.base_identifier.to_s  # => "OIML R 138 Edition 2007 (E)"
 amd.year                  # => "2009"
 ----
+
+
+==== PLATEAU: 100% ✨
+
+- **Status:** ✅ 14/14 (100%) - Session 250
+- **Features:** 3 identifier types - Handbook, Technical Report, Annex supplements
+- **Architecture:** Complete V2 with SupplementIdentifier pattern
+
+.PLATEAU Document Types (MECE)
+[cols="1,2,3"]
+|===
+|Type |Description |Example
+
+|Handbook |PLATEAU handbook documents |PLATEAU Handbook #00 第1.0版
+|Technical Report |Technical reports |PLATEAU Technical Report #01
+|Annex |Annexes to documents (supplement) |PLATEAU Handbook #00 第1.0版 Annex A
+|===
+
+.PLATEAU Annex Supplements ✨
+[source,ruby]
+----
+# Session 250 enhancement: Annex as proper supplement
+annex = PubidNew::Plateau.parse("PLATEAU Handbook #00 第1.0版 Annex A")
+annex.class                       # => PubidNew::Plateau::Identifiers::Annex
+annex.letter                      # => "A"
+annex.base_identifier.number      # => 0
+annex.base_identifier.edition     # => "1.0"
+annex.to_s                        # => "PLATEAU Handbook #00 第1.0版 Annex A"
+
+# Works with Technical Reports too
+annex = PubidNew::Plateau.parse("PLATEAU Technical Report #01 Annex B")
+annex.base_identifier.class       # => TechnicalReport
+----
+
+**Note:** PLATEAU uses two different annex concepts:
+
+1. **Annex number** (attribute): `#03-1` where `-1` is part of base identifier
+2. **Annex supplement** (class): `{BASE} Annex A` where Annex is separate document
+
+**Architecture:**
+- SupplementIdentifier pattern with recursive base parsing
+- Annex can attach to both Handbook and TechnicalReport
+- Perfect round-trip fidelity maintained
 
 == Testing
 
