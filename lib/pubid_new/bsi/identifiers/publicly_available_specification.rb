@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../single_identifier"
+require_relative "../single_identifier.rb"
 
 module PubidNew
   module Bsi
@@ -8,7 +8,7 @@ module PubidNew
       # Publicly Available Specification (PAS) identifier
       class PubliclyAvailableSpecification < SingleIdentifier
         TYPED_STAGES = [
-          Components::TypedStage.new(
+          PubidNew::Components::TypedStage.new(
             code: :pubpas,
             stage_code: :published,
             type_code: :pas,

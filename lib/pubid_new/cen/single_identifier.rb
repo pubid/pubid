@@ -21,10 +21,10 @@ module PubidNew
 
       def to_s(lang: :en, lang_single: false)
         parts = []
-        
+
         # Check if we have a draft stage (prEN, FprEN) - these include both stage and type
         is_draft_stage = typed_stage && typed_stage.abbr && %w[prEN FprEN].include?(typed_stage.abbr.first)
-        
+
         # Get type short name - for draft stages, extract base type
         type_short = if is_draft_stage
                        typed_stage.type_code.to_s.upcase  # :en => "EN"
@@ -35,7 +35,10 @@ module PubidNew
                      else
                        "EN"  # Default
                      end
-        
+
+        # Track if we should use slash before type
+        use_slash_before_type = false
+
         # For CWA/HD, they act as publisher (not EN)
         if %w[CWA HD].include?(type_short)
           # Stage prefix OR type as publisher
@@ -50,9 +53,10 @@ module PubidNew
             parts << typed_stage.abbr.first
           elsif publisher
             parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
+            use_slash_before_type = true  # When publisher present, use slash before type
           end
         end
-        
+
         # Copublishers - add to last part (publisher) with slash
         if copublishers && copublishers.any?
           copub_str = copublishers.map { |cp| cp.respond_to?(:body) ? cp.body : cp.to_s }.join("/")
@@ -64,12 +68,20 @@ module PubidNew
             end
           end
         end
-        
-        # Type for non-EN documents (TS, TR) - but not CWA/HD
-        if type_short != "EN" && !%w[CWA HD].include?(type_short)
-          parts << type_short
+
+        # Type for non-EN documents (TS, TR) - but not CWA/HD or Guide
+        if type_short != "EN" && !%w[CWA HD Guide].include?(type_short)
+          if use_slash_before_type && parts.any?
+            # Use slash separator for publisher/type combination (TS, TR only)
+            parts << "/#{type_short}"
+          else
+            parts << type_short
+          end
+        elsif type_short == "Guide"
+          # Guide uses SPACE separator, not slash
+          parts << "Guide"
         end
-        
+
         # Number with part (which may be multi-level like "5-1-1")
         if number
           number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
@@ -79,29 +91,36 @@ module PubidNew
           end
           parts << number_str
         end
-        
-        result = parts.join(" ")
-        
+
+        # Join parts - but handle slash prefix for type
+        result = ""
+        parts.each_with_index do |part, idx|
+          if idx > 0 && !part.start_with?("/")
+            result += " "
+          end
+          result += part
+        end
+
         # Date
         if date
           year_val = date.respond_to?(:year) ? date.year : date.to_i
           result += ":#{year_val}"
         end
-        
+
         result
       end
 
       def <=>(other)
         return nil unless other.is_a?(SingleIdentifier)
-        
+
         # Compare by number first
         num_cmp = number.to_s <=> other.number.to_s
         return num_cmp unless num_cmp.zero?
-        
+
         # Then by part
         part_cmp = (part || Components::Code.new(value: "0")).to_s <=> (other.part || Components::Code.new(value: "0")).to_s
         return part_cmp unless part_cmp.zero?
-        
+
         # Then by date
         if date && other.date
           date.to_s <=> other.date.to_s

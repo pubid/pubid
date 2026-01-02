@@ -14,9 +14,9 @@ module PubidNew
       #   Update.new(number: 3, year: 2015).to_s(:short)           # => "/Upd3-2015"
       #   Update.new(number: 1, year: 2021, month: 2).to_s(:mr)    # => ".u1-202102"
       class Update < Lutaml::Model::Serializable
-        attribute :number, :integer  # Update number (default 1)
-        attribute :year, :integer    # Year (4 digits)
-        attribute :month, :integer   # Month (1-12, optional)
+        attribute :number, :string   # Update number as string
+        attribute :year, :string     # Year (4 digits as string)
+        attribute :month, :string    # Month (01-12 as string, optional)
 
         # Render update in specified format
         # @param format [:short, :mr, :long] The output format
@@ -52,7 +52,7 @@ module PubidNew
 
         # Build long format: "Update 1-2021 February" or "Update 3-2015"
         def build_long_format
-          month_str = month ? " #{Date::MONTHNAMES[month]}" : ""
+          month_str = month ? " #{Date::MONTHNAMES[month.to_i]}" : ""
           "Update #{number}-#{year}#{month_str}"
         end
 

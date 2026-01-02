@@ -8,7 +8,7 @@ module PubidNew
       # British Standard (BS) identifier
       class BritishStandard < SingleIdentifier
         TYPED_STAGES = [
-          Components::TypedStage.new(
+          PubidNew::Components::TypedStage.new(
             code: :pubbs,
             stage_code: :published,
             type_code: :bs,
@@ -16,7 +16,7 @@ module PubidNew
             name: "British Standard",
             harmonized_stages: %w[60.00 60.60],
           ),
-          Components::TypedStage.new(
+          PubidNew::Components::TypedStage.new(
             code: :drbs,
             stage_code: :draft,
             type_code: :bs,

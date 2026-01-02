@@ -9,14 +9,19 @@ module PubidNew
       # Handles number codes like series, part, volume, etc.
       class Code < Lutaml::Model::Serializable
         attribute :number, :string
+        attribute :part, :string
+        attribute :subpart, :string
 
         def to_s
-          number
+          result = number.to_s
+          result += "pt#{part}" if part
+          result += ".#{subpart}" if subpart
+          result
         end
 
         # Alias for compatibility
         def value
-          number
+          to_s
         end
       end
     end

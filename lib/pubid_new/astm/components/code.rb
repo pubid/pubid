@@ -13,14 +13,20 @@ module PubidNew
         attribute :dual_m, :boolean      # M suffix for metric (dual unit)
 
         def to_s
-          return number.to_s unless letter
-
-          parts = [letter, number]
-          parts << suffix if suffix
-          result = parts.join
-          result += "-S#{subseries}" if subseries
-          result += "M" if dual_m
-          result
+          if letter
+            parts = [letter, number]
+            parts << suffix if suffix
+            result = parts.join
+            result += "-S#{subseries}" if subseries
+            result += "M" if dual_m
+            result
+          else
+            # No letter (e.g., DataSeries, ISO/ASTM dual)
+            result = number.to_s
+            result += suffix if suffix
+            result += "-S#{subseries}" if subseries
+            result
+          end
         end
       end
     end

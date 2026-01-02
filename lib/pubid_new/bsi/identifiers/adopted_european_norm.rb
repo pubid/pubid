@@ -10,10 +10,23 @@ module PubidNew
       # Example: "BS EN ISO 8601:2019" where EN ISO 8601:2019 is a CEN AdoptedEuropeanNorm wrapping ISO
       class AdoptedEuropeanNorm < BritishStandard
         attribute :adopted_identifier, Base, polymorphic: true  # CEN object
+        attribute :edition, :string
 
         def to_s
-          result = publisher.is_a?(Array) ? publisher.join("/") : "BS"
+          # Get the BSI prefix (BS, PD, DD)
+          prefix = if publisher.respond_to?(:body)
+                     publisher.body
+                   elsif publisher.is_a?(Array)
+                     publisher.join("/")
+                   elsif publisher.is_a?(String)
+                     publisher
+                   else
+                     "BS"
+                   end
+
+          result = prefix
           result += " #{adopted_identifier}" if adopted_identifier
+          result += " ED#{edition}" if edition
           result
         end
 

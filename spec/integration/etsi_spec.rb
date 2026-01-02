@@ -45,17 +45,20 @@ RSpec.describe "ETSI Integration" do
   end
 
   describe "parsing all fixtures" do
-    it "parses all identifiers from pubids.txt" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-etsi/spec/fixtures/pubids.txt")
+    it "parses all identifiers from fixtures" do
+      fixture_dir = File.join(__dir__, "../../spec/fixtures/etsi/identifiers/full")
 
-      File.readlines(fixture_file).each do |line|
-        line = line.strip
-        next if line.empty? || line.start_with?("#")
+      # Read all fixture files from full directory
+      Dir.glob(File.join(fixture_dir, "*.txt")).each do |fixture_file|
+        File.readlines(fixture_file).each do |line|
+          line = line.strip
+          next if line.empty? || line.start_with?("#")
 
-        expect {
-          identifier = PubidNew::Etsi.parse(line)
-          expect(identifier.to_s).to eq(line)
-        }.not_to raise_error, "Failed to parse: #{line}"
+          expect {
+            identifier = PubidNew::Etsi.parse(line)
+            expect(identifier.to_s).to eq(line)
+          }.not_to raise_error, "Failed to parse: #{line}"
+        end
       end
     end
   end

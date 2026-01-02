@@ -55,7 +55,7 @@ module PubidNew
       end
 
       # Supplement notation (ends with dash)
-      rule(:supplement) { dash >> str("SUP") >> dash }
+      rule(:supplement) { dash >> str("SUP").as(:supplement) >> dash }
 
       # ========================================
       # Research Report - MOST SPECIFIC (has colon)

@@ -11,7 +11,10 @@ module PubidNew
         attribute :base_identifier, Base, polymorphic: true
 
         def to_s
-          "#{base_identifier.to_s} ExComm"
+          base_str = base_identifier.to_s
+          # Ensure ExComm appears only once at the end - strip any existing suffix
+          base_str = base_str.sub(/ ExComm$/, "")
+          "#{base_str} ExComm"
         end
 
         def publisher

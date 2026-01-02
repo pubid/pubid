@@ -3,23 +3,17 @@
 module PubidNew
   module Astm
     module Identifiers
-      class Adjunct < Base
+      class Adjunct < SingleIdentifier
         attribute :designation, :string      # D2148, F3504, G0088, C062702
         attribute :ea_suffix, :boolean       # -EA
         attribute :dvd_suffix, :boolean      # DVD
 
         def to_s
-          parts = []
-          parts << publisher if publisher
-
-          result = parts.join(" ")
-          result += " " if publisher && !result.end_with?(" ")
-
-          result += "ADJ"
-          result += designation if designation
-          result += "-EA" if ea_suffix
-          result += "DVD" if dvd_suffix
-          result
+          result = []
+          # Only include publisher for simple adjuncts (no EA or DVD suffix)
+          result << publisher if publisher && !ea_suffix && !dvd_suffix
+          result << "ADJ#{designation}#{ea_suffix ? "-EA" : ""}#{dvd_suffix ? "DVD" : ""}"
+          result.compact.join(" ")
         end
       end
     end

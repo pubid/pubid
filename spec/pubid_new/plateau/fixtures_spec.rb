@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe "PLATEAU Fixture Round-trip Tests" do
-  let(:fixtures) { File.readlines("gems/pubid-plateau/spec/fixtures/pubids.txt").map(&:strip) }
+  let(:fixtures) { File.readlines("spec/fixtures/plateau/identifiers/full/technical_document.txt").map(&:strip) }
 
   describe "PLATEAU identifiers" do
     it "round-trips all PLATEAU identifiers" do

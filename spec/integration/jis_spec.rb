@@ -97,7 +97,7 @@ RSpec.describe "JIS Integration" do
 
   describe "parsing all fixtures" do
     it "parses all identifiers from jis-pubids.txt" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-jis/spec/fixtures/jis-pubids.txt")
+      fixture_file = File.join(__dir__, "../fixtures/jis/identifiers/full/international_standard.txt")
 
       File.readlines(fixture_file).each do |line|
         line = line.strip

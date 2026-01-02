@@ -26,7 +26,7 @@ RSpec.describe "ITU Integration" do
 
   describe "parsing all fixtures" do
     it "parses all ITU-R identifiers" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-itu/spec/fixtures/itu-r.txt")
+      fixture_file = File.join(__dir__, "../fixtures/itu/identifiers/full/recommendation.txt")
 
       File.readlines(fixture_file).each do |line|
         line = line.strip

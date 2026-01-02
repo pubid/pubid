@@ -60,6 +60,7 @@ require_relative "pubid_new/oiml"
 require_relative "pubid_new/asme"
 require_relative "pubid_new/csa"
 require_relative "pubid_new/cie"
+require_relative "pubid_new/astm"
 
 module PubidNew
 end

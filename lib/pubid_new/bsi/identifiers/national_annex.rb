@@ -6,9 +6,13 @@ module PubidNew
   module Bsi
     module Identifiers
       # National Annex (NA) identifier
+      # Can have own supplements: "NA+A1:2012 to BASE"
       class NationalAnnex < SingleIdentifier
+        attribute :na_supplements, Base, polymorphic: true, collection: true  # Supplements on the NA itself
+        attribute :base_doc, Base, polymorphic: true  # The identifier after "to"
+
         TYPED_STAGES = [
-          Components::TypedStage.new(
+          PubidNew::Components::TypedStage.new(
             code: :pubna,
             stage_code: :published,
             type_code: :na,
@@ -21,9 +25,32 @@ module PubidNew
         def self.type
           { key: :na, title: "National Annex", short: "NA" }
         end
-        
+
         def to_s(lang: :en, lang_single: false)
-          "NA to #{super}"
+          result = "NA"
+
+          # Add NA supplements if present
+          if na_supplements && na_supplements.any?
+            na_supplements.each do |supp|
+              if supp.is_a?(Amendment)
+                result += "+A#{supp.amendment_number}:#{supp.amendment_year}"
+              elsif supp.is_a?(Corrigendum)
+                result += "+C#{supp.corrigendum_number}:#{supp.corrigendum_year}"
+              end
+            end
+          end
+
+          result += " to "
+
+          # Render the base identifier (what this NA is for)
+          if base_doc
+            result += base_doc.to_s
+          else
+            # Fallback to parent rendering
+            result += super
+          end
+
+          result
         end
       end
     end

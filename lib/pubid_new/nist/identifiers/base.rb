@@ -36,10 +36,10 @@ module PubidNew
         attribute :revision_year, :string  # NEW: Year for revision (e.g., r6/1925, r1963, rJun1992)
         attribute :revision_month, :string  # NEW: Month for revision (e.g., rJun1992)
         attribute :version, :string
-        attribute :update, :string
+        attribute :update, Components::Update  # Changed from :string to Components::Update
         attribute :year, :integer
         attribute :month, :integer
-        attribute :edition, :string
+        attribute :edition, Components::Edition  # Changed from :string to Components::Edition
 
         # Additional attributes for complex patterns
         attribute :first_number, Components::Code
@@ -272,6 +272,11 @@ module PubidNew
           result += "insert" if insert
           result += "sec#{section}" if section
           result += "app" if appendix
+
+          # Add addendum - render as " Add." suffix
+          if addendum || addendum_number
+            result += " Add."
+          end
 
           # V2: Use update_component if available, else use update string
           if update_component

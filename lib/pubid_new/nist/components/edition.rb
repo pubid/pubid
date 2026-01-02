@@ -15,7 +15,7 @@ module PubidNew
       #   Edition.new(year: 1977, month: 9, day: 30).to_s(:short) # => "19770930"
       class Edition < Lutaml::Model::Serializable
         attribute :number, :integer   # Edition number
-        attribute :year, :integer     # Year (4 digits)
+        attribute :year, :string     # Year (4 digits as string)
         attribute :month, :integer    # Month (1-12)
         attribute :day, :integer      # Day (1-31)
 
@@ -38,30 +38,30 @@ module PubidNew
         # Build short format: "2-2020", "198503", "19770930"
         def build_short_format
           result = number ? [number.to_s] : []
-          
+
           if day
-            result << Date.new(year, month, day).strftime("%Y%m%d")
+            result << Date.new(year.to_i, month, day).strftime("%Y%m%d")
           elsif month
-            result << Date.new(year, month).strftime("%Y%m")
+            result << Date.new(year.to_i, month).strftime("%Y%m")
           elsif year
             result << year.to_s
           end
-          
+
           result.join("-")
         end
 
         # Build long format: "Edition 2 (2020)", "(March 2019)", "(September 30, 1977)"
         def build_long_format
           result = number ? ["Edition #{number}"] : []
-          
+
           if day
-            result << Date.new(year, month, day).strftime("(%B %d, %Y)")
+            result << Date.new(year.to_i, month, day).strftime("(%B %d, %Y)")
           elsif month
-            result << Date.new(year, month).strftime("(%B %Y)")
+            result << Date.new(year.to_i, month).strftime("(%B %Y)")
           elsif year
             result << "(#{year})"
           end
-          
+
           result.join(" ")
         end
       end

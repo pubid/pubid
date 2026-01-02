@@ -10,10 +10,33 @@ module PubidNew
       # Example: "BS IEC 62600:2020" where IEC 62600:2020 is an IEC identifier object
       class AdoptedInternationalStandard < BritishStandard
         attribute :adopted_identifier, Base, polymorphic: true  # ISO/IEC object
+        attribute :edition, :string
+        attribute :translation_lang, :string
+        attribute :translation_upper, :string
 
         def to_s
-          result = publisher.is_a?(Array) ? publisher.join("/") : "BS"
+          # Get the BSI prefix (BS, PD, DD)
+          prefix = if publisher.respond_to?(:body)
+                     publisher.body
+                   elsif publisher.is_a?(Array)
+                     publisher.join("/")
+                   elsif publisher.is_a?(String)
+                     publisher
+                   else
+                     "BS"
+                   end
+
+          result = prefix
           result += " #{adopted_identifier}" if adopted_identifier
+          result += " ED#{edition}" if edition
+
+          # Translation
+          if translation_lang
+            result += " (#{translation_lang})"
+          elsif translation_upper
+            result += " (#{translation_upper})"
+          end
+
           result
         end
 

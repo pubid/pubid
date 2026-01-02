@@ -14,8 +14,13 @@ module PubidNew
         end
 
         # Set publisher
-        identifier.publisher = parsed_hash[:publisher].to_s if parsed_hash[:publisher]
-        identifier.publisher ||= "ASTM"
+        # Special case: handle "ISO/ASTMTR" type - split into publisher "ISO/ASTM" and type "TR"
+        if parsed_hash[:type]&.to_s == "ISO/ASTMTR"
+          identifier.publisher = "ISO/ASTM"
+        else
+          identifier.publisher = parsed_hash[:publisher].to_s if parsed_hash[:publisher]
+          identifier.publisher ||= "ASTM"
+        end
 
         # Set year (convert 2-digit to 4-digit)
         if parsed_hash[:year]
@@ -68,6 +73,8 @@ module PubidNew
           Identifiers::Adjunct
         when "TR"
           Identifiers::TechnicalReport
+        when "ISO/ASTMTR"  # Handle ISO/ASTM Technical Report
+          Identifiers::TechnicalReport
         else
           # Default to Standard (A-G prefix)
           Identifiers::Standard
@@ -76,7 +83,11 @@ module PubidNew
 
       def build_code(parsed_hash)
         code = Components::Code.new
-        code.letter = parsed_hash[:letter].to_s if parsed_hash[:letter]
+        # Special case: for "TR" type with "ISO/ASTM" publisher, don't set letter
+        # as the "TR" is part of the type/identifier format, not the code letter
+        if parsed_hash[:letter] && !(parsed_hash[:type]&.to_s == "TR" && parsed_hash[:publisher]&.to_s&.start_with?("ISO/ASTM"))
+          code.letter = parsed_hash[:letter].to_s
+        end
         code.number = parsed_hash[:number].to_s if parsed_hash[:number]
         code.suffix = parsed_hash[:suffix].to_s if parsed_hash[:suffix]
         code.subseries = parsed_hash[:subseries].to_s if parsed_hash[:subseries]

@@ -56,6 +56,26 @@ module PubidNew
           name: "National Annex",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Draft Document (DD)
+        PubidNew::Components::TypedStage.new(
+          code: :pubdd,
+          stage_code: :published,
+          type_code: :dd,
+          abbr: ["DD"],
+          name: "Draft Document",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # Flex Document
+        PubidNew::Components::TypedStage.new(
+          code: :pubflex,
+          stage_code: :published,
+          type_code: :flex,
+          abbr: ["Flex", "BSI Flex"],
+          name: "BSI Flex",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -64,6 +84,8 @@ module PubidNew
         pd: "Identifiers::PublishedDocument",
         pas: "Identifiers::PubliclyAvailableSpecification",
         na: "Identifiers::NationalAnnex",
+        dd: "Identifiers::DraftDocument",
+        flex: "Identifiers::Flex",
       }.freeze
 
       # Default typed stage for when no match is found
