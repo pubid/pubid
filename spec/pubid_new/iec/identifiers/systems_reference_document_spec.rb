@@ -194,11 +194,11 @@ RSpec.describe PubidNew::Iec::Identifiers::SystemsReferenceDocument do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq("ISO SRD 12345:2020")
       end
 
       it "renders publisher portion with copublisher and SRD" do
-        expect(parsed.publisher_portion).to eq("ISO/IEC SRD")
+        expect(parsed.publisher_portion).to eq("ISO SRD")
       end
     end
   end
@@ -230,7 +230,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SystemsReferenceDocument do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq("IEC SRD 62582:2022")
       end
     end
   end
