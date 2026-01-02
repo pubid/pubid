@@ -306,7 +306,7 @@ module PubidNew
         # ========== END V2 COMPONENTS ==========
 
         when :volume, :part, :revision, :section, :appendix, :translation,
-             :draft, :errata, :index, :insert, :edition, :version
+             :errata, :index, :insert, :edition, :version
           return nil if value.nil?
           return nil if value.is_a?(Array) && value.empty?
 
@@ -369,6 +369,24 @@ module PubidNew
         when :public_draft
           return nil if value.nil?
           value.to_s
+
+        when :draft
+          # Extract draft number from "-draft N" pattern for pd rendering
+          return nil if value.nil?
+
+          str_value = value.to_s.strip
+          return nil if str_value.empty?
+
+          # Pattern: " -draft 2" or "-draft 2" → extract "2" for pd rendering
+          if str_value =~ /^\s*-draft\s+(\d+)$/
+            { draft_number: $1 }
+          # Pattern: " 2pd" → already in pd format
+          elsif str_value =~ /^\s*(\d+)pd$/
+            { public_draft: $1 }
+          # Other patterns (parenthetical, simple -draft)
+          else
+            str_value
+          end
 
         when :update
           handle_update_cast(value)

@@ -57,13 +57,13 @@ module PubidNew
         # This handles NBS IR 80-2073 2 and NBS IR 80-2073 3 as volume identifiers
         cleaned = cleaned.gsub(/(\d{2}-\d{4})\s+(\d)$/, '\1 v\2')
 
-        # Fix draft with number: "8270-draft2" → "8270-draft 2" (Session 219)
-        # Space after draft, not before, so dash-draft pattern still matches
-        cleaned = cleaned.gsub(/(\d)-draft(\d)/, '\1-draft \2')
+        # Fix draft with number: "8270-draft2" → "8270 -draft 2" (Session 253)
+        # Space BEFORE dash AND after draft to separate it from report_number
+        cleaned = cleaned.gsub(/(\d)-draft(\d)/, '\1 -draft \2')
 
-        # NEW FIX 2: Draft without dash: "8270draft2" → "8270-draft 2"
+        # NEW FIX 2: Draft without dash: "8270draft2" → "8270 -draft 2"
         # More lenient pattern to catch missing dash before draft
-        cleaned = cleaned.gsub(/(\d)draft(\d)/, '\1-draft \2')
+        cleaned = cleaned.gsub(/(\d)draft(\d)/, '\1 -draft \2')
 
         # Fix supplement typo: "154suprev" → "154supprev" (Session 219)
         cleaned = cleaned.gsub(/(\d)suprev/, '\1supprev')
@@ -343,6 +343,7 @@ module PubidNew
           str("ndex") |
           str("nsert") |
           str("rrata") |
+          str("raft") |  # NEW: Exclude "draft" from number suffix matching
           str("pp") |
           str("s") |
           str("t") |
@@ -406,6 +407,8 @@ module PubidNew
       rule(:second_number) do
         # Explicitly exclude month abbreviations at start (so -Feb1985 goes to edition, not second_number)
         month_abbrev.absent? >>
+        # NEW: Exclude "draft" keyword
+        str("draft").absent? >>
         (
           # CRPL range with underscore (e.g., "2_3-1A")
           (digits >> str("_") >> digits >> dash >> digits >> upper_letter.maybe) |
@@ -628,10 +631,10 @@ module PubidNew
       end
 
       # Draft stage - enhanced to support suffix pattern and number after draft
-      # ENHANCED: Make digits mandatory when space present to match "draft 2" pattern
+      # ENHANCED: Accept optional space before dash to match after report_number
       rule(:draft) do
         (space >> str("(Draft)") |
-         dash >> str("draft") >> (space >> digits | digits).maybe |  # Match "-draft 2" OR "-draft2"
+         space.maybe >> dash >> str("draft") >> (space >> digits |  digits).maybe |  # Match " -draft 2" OR "-draft2"
          pd_suffix).as(:draft)
       end
 

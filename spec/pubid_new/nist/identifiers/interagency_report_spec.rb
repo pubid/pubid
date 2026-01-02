@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
+RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
   subject { described_class }
 
   describe ".parse" do
@@ -9,7 +9,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 73-212" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -34,7 +34,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 84-2946" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -55,7 +55,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 80-2073.3" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -72,7 +72,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NISTIR 8115" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -85,7 +85,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS.IR.73-212" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -100,7 +100,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 73-197r" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -117,7 +117,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 6945r" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -136,7 +136,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NISTIR 8115r1/upd" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -159,7 +159,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NISTIR 8170-upd" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -176,7 +176,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 4743rJun1992" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -195,7 +195,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 4335rNov1990" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -213,7 +213,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 4335r11/90" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -231,7 +231,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST.IR.8170-upd" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -244,7 +244,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NISTIR 8211-upd" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -259,7 +259,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 8115chi" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -276,7 +276,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 8118r1es" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -294,7 +294,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST.IR.8115viet" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -311,7 +311,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST.IR.8178port" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -328,7 +328,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 8115(esp)" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -345,7 +345,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NISTIR 8259Aes" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -365,7 +365,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 6529-a" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -382,7 +382,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 5443-A" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -399,7 +399,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 7297-B" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -416,7 +416,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 6099a" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -433,7 +433,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 7103b" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -450,7 +450,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 7356-CAS" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -469,7 +469,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 5672-2018" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -486,7 +486,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 6969-2018" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -503,7 +503,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NIST IR 8200-2018" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -522,7 +522,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 73-285p1" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -539,7 +539,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 79-1591-1" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -556,7 +556,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 80-2111-1" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -569,7 +569,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 80-2111-11" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -586,7 +586,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 84-2857-1" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 
@@ -599,7 +599,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InternalReport do
         subject { "NBS IR 74-577-1" }
         let(:parsed) { PubidNew::Nist.parse(subject) }
 
-        it "parses as InternalReport" do
+        it "parses as InteragencyReport" do
           expect(parsed).to be_a(described_class)
         end
 

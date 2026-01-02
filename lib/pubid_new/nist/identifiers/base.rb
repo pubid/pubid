@@ -65,6 +65,7 @@ module PubidNew
         attribute :translation, :string
         attribute :draft, :string
         attribute :part, :string
+        attribute :draft_number, :string  # NEW: For -draft N → N pd rendering
 
         def initialize(**attributes)
           super()
@@ -279,8 +280,12 @@ module PubidNew
             result += "-upd#{update}"
           end
 
-          # Add draft suffix
-          result += "-draft" if draft && draft.to_s.include?("draft") && !draft.to_s.include?("Draft)")
+          # Add draft - render as {N}pd if draft_number present
+          if draft_number
+            result += " #{draft_number}pd"
+          elsif draft && draft.to_s.include?("draft") && !draft.to_s.include?("Draft)")
+            result += "-draft"
+          end
 
           # V2: Add stage component (at end, before translation)
           if stage
@@ -332,7 +337,7 @@ module PubidNew
           {
             "SP" => "Special Publication",
             "FIPS" => "Federal Information Processing Standards",
-            "IR" => "Internal Report",
+            "IR" => "Interagency Report",
             "TN" => "Technical Note"
           }[series] || series
         end
@@ -341,7 +346,7 @@ module PubidNew
           {
             "SP" => "Spec. Publ.",
             "FIPS" => "Fed. Inf. Proc. Stand.",
-            "IR" => "Int. Rep.",
+            "IR" => "Interag. Rep.",
             "TN" => "Tech. Note"
           }[series&.to_s || series_code] || (series&.to_s || series_code)
         end

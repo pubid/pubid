@@ -33,7 +33,7 @@ module PubidNew
           {
             "SP" => Identifiers::SpecialPublication,
             "FIPS" => Identifiers::FederalInformationProcessingStandards,
-            "IR" => Identifiers::InternalReport,
+            "IR" => Identifiers::InteragencyReport,
             "HB" => Identifiers::Handbook,
             "TN" => Identifiers::TechnicalNote,
             "CIRC" => Identifiers::Circular,
@@ -58,7 +58,7 @@ module PubidNew
           [
             Identifiers::SpecialPublication,
             Identifiers::FederalInformationProcessingStandards,
-            Identifiers::InternalReport,
+            Identifiers::InteragencyReport,
             Identifiers::Handbook,
             Identifiers::TechnicalNote,
             Identifiers::Circular,
