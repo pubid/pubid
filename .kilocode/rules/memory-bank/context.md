@@ -1,3 +1,66 @@
+## Current Status (Session 252 Complete)
+
+**SESSION 252 ACHIEVEMENT - BSI/CEN Integration Tests Complete!** ✅
+
+### Session 252: BSI/CEN Test Fixes (January 2, 2026)
+
+**Duration:** ~60 minutes
+**Status:** ALL TESTS PASSING (65/65, 100%) ✅
+
+**What Was Accomplished:**
+
+1. **CEN Guide Slash Separator** (3 tests) ✅
+   - Fixed `lib/pubid_new/cen/single_identifier.rb`
+   - Guide uses space separator, not slash
+   - "CEN/CLC Guide 25:2023" now renders correctly
+
+2. **ExComm Duplication** (1 test) ✅
+   - Fixed `lib/pubid_new/bsi/identifiers/expert_commentary.rb`
+   - Strip existing ExComm suffix before adding
+   - "BS 7273-4:2015+A1:2021 ExComm" no longer duplicates
+
+3. **Edition Preservation** (2 tests) ✅
+   - Fixed `lib/pubid_new/bsi/builder.rb`
+   - Only extract edition when wrapping with BSI prefix
+   - Bare IDs preserve edition internally ("IEC 60384-23:2023 ED3")
+   - Wrapped IDs extract and render edition ("BS EN ISO/IEC 80079-34:2020 ED2")
+
+4. **SPANISH TRANSLATION Parsing** (1 test) ✅
+   - Fixed `lib/pubid_new/bsi/parser.rb`
+   - Made corrigendum year optional (handles "+C1")
+   - Enhanced translation rule for all-caps format
+   - "PAS 9017:2020+C1 SPANISH TRANSLATION" now parses
+
+5. **National Annex Supplements** (3 tests) ✅
+   - Fixed `lib/pubid_new/bsi/builder.rb`, `lib/pubid_new/bsi/parser.rb`
+   - Access NA supplements from correct nested path
+   - Separate NA supplements from base identifier supplements
+   - Short year expansion working (A1:15 → A1:2015)
+
+**Test Results:**
+- **BSI:** 47/47 (100%)
+- **CEN:** 18/18 (100%)
+- **Total:** 65/65 (100%)
+
+**Architecture Quality:**
+- ✅ MODEL-DRIVEN: Supplements as proper objects
+- ✅ MECE: NA supplements separate from base supplements
+- ✅ Three-layer: Parser/Builder/Identifier independence
+- ✅ Component reuse: Shared Amendment/Corrigendum
+- ✅ Wrapper pattern: NationalAnnex wraps adopted identifier
+
+**Files Modified:**
+- `lib/pubid_new/cen/single_identifier.rb` - Guide space separator
+- `lib/pubid_new/bsi/identifiers/expert_commentary.rb` - ExComm deduplication
+- `lib/pubid_new/bsi/builder.rb` - Edition extraction, NA supplements path
+- `lib/pubid_new/bsi/parser.rb` - Optional corrigendum year, translation rule
+
+**Commit:** 717c293 - fix(bsi/cen): Session 252 - fix remaining 9 test failures to achieve 40/40 (100%)
+
+**Status:** SESSION 252 COMPLETE - BSI/CEN INTEGRATION 100%! 🎉
+
+---
+
 ## Current Status (Session 251 Complete)
 
 **SESSION 251 ACHIEVEMENT - Documentation Complete!** ✅

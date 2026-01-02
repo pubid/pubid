@@ -1,71 +1,73 @@
-# Session 253 Quick Start: NIST IR Corrections
+# Session 253 Continuation Prompt
 
-**Read Full Plan:** [`docs/SESSION-253-CONTINUATION-PLAN.md`](SESSION-253-CONTINUATION-PLAN.md:1)
-
----
-
-## Critical Issues
-
-**Issue 1:** Class name wrong - `InternalReport` should be `InteragencyReport`  
-**Issue 2:** `NIST IR 8270-draft2` fails to parse  
-**Issue 3:** Should render as `NIST IR 8270 2pd`
+**Quick Start:** Update official documentation to reflect BSI/CEN V2 completion
 
 ---
 
-## Quick Fix (90 minutes)
+## Current Status
 
-### Part A: Rename Class (20 min)
-
-1. **Rename class** in [`lib/pubid_new/nist/identifiers/internal_report.rb`](lib/pubid_new/nist/identifiers/internal_report.rb:13)
-   - Line 13: `class InternalReport` → `class InteragencyReport`
-   - Line 8: Update comment "Internal Report" → "Interagency Report"
-
-2. **Update registry** in [`lib/pubid_new/nist/scheme.rb`](lib/pubid_new/nist/scheme.rb:6)
-   - Line 6: `require_relative "identifiers/internal_report"` stays same (filename)
-   - Line 36: `"IR" => Identifiers::InternalReport,` → `"IR" => Identifiers::InteragencyReport,`
-   - Line 61: `Identifiers::InternalReport,` → `Identifiers::InteragencyReport,`
-
-### Part B: Fix Draft Parsing (30 min)
-
-**Update** [`lib/pubid_new/nist/parser.rb`](lib/pubid_new/nist/parser.rb:632) line 632:
-
-```ruby
-# Draft stage - enhanced for -draft{N} → {N}pd
-rule(:draft) do
-  (
-    space >> str("(Draft)") |
-    dash >> str("draft") >> space >> digits.as(:draft_number) |
-    dash >> str("draft") |
-    pd_suffix
-  ).as(:draft)
-end
-```
-
-### Part C: Fix Rendering (30 min)
-
-**Update** [`lib/pubid_new/nist/identifiers/base.rb`](lib/pubid_new/nist/identifiers/base.rb:1) to_s method:
-
-Add draft rendering logic to convert `-draft 2` → ` 2pd`
-
-### Part D: Builder Casting (10 min)
-
-**Update** [`lib/pubid_new/nist/builder.rb`](lib/pubid_new/nist/builder.rb:1) cast method:
-
-Add when clause for `:draft` and `:draft_number`
+- **Session 252:** Complete - 65/65 tests passing (100%) ✅
+- **BSI:** 47/47 tests (100%)
+- **CEN:** 18/18 tests (100%)
+- **Architecture:** MODEL-DRIVEN, MECE, Three-layer complete
 
 ---
 
-## Test
+## Immediate Tasks (60 minutes)
 
-```bash
-bundle exec rspec spec/pubid_new/nist/
-cd spec/fixtures && ruby run_classify.rb nist
-```
+### 1. Update README.adoc (30 min)
 
-**Expected:** `NIST IR 8270-draft2` → `NIST IR 8270 2pd` ✅
+Add BSI and CEN sections with:
+- Document types tables
+- Adoption patterns
+- Code examples
+- Special features
+
+See: `.kilocode/rules/memory-bank/session-252-continuation-plan.md` for templates
+
+### 2. Update Memory Bank (15 min)
+
+**File:** `.kilocode/rules/memory-bank/context.md`
+
+Add Session 252 completion at top with:
+- 9 fixes implemented
+- 65/65 tests passing
+- Architecture maintained
+- Commit reference
+
+### 3. Archive Documentation (15 min)
+
+**Move to** `docs/old-docs/sessions/`:
+- `docs/SESSION-252-CONTINUATION-PROMPT.md`
+
+**Create:**
+- `docs/old-docs/sessions/session-252-summary.md`
 
 ---
 
-**Created:** 2026-01-02  
-**Timeline:** 90 minutes  
-**Status:** Ready to execute!
+## Session 252 Achievements
+
+**Fixes:**
+1. CEN Guide slash separator (3 tests)
+2. ExComm duplication (1 test)
+3. Edition preservation (2 tests)
+4. SPANISH TRANSLATION parsing (1 test)
+5. NA supplements separation (3 tests)
+
+**Files Modified:**
+- `lib/pubid_new/cen/single_identifier.rb`
+- `lib/pubid_new/bsi/identifiers/expert_commentary.rb`
+- `lib/pubid_new/bsi/builder.rb`
+- `lib/pubid_new/bsi/parser.rb`
+
+**Commit:** `717c293`
+
+---
+
+## Detailed Plan
+
+See: `docs/SESSION-253-CONTINUATION-PLAN.md`
+
+---
+
+**Goal:** Complete BSI/CEN documentation and archive session docs! 📚
