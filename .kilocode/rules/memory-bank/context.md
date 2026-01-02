@@ -1,3 +1,61 @@
+## Current Status (Session 253 Complete)
+
+**SESSION 253 CRITICAL LEARNING - Analysis Complete, Architectural Fixes Needed!** ⚠️
+
+### Session 253: ISO V2 Fixture Round-Trip Analysis (January 2, 2026)
+
+**Duration:** ~90 minutes
+**Status:** ANALYSIS COMPLETE ✅
+
+**What Was Accomplished:**
+
+1. **Identified Root Cause** ✅
+   - V2 fails to round-trip V1 fixture files exactly
+   - 5 architectural issues discovered (not hallucinated test expectations)
+   - Created comprehensive analysis document
+
+2. **Critical Learning** ✅
+   - `with_edition: true` is about EDITION DISPLAY, not language normalization
+   - Language normalization is controlled by `format: :ref_num_long`
+   - V1 fixtures contain OFFICIAL formats that must round-trip exactly
+
+3. **Documented 5 Architectural Issues** ✅
+   - TypedStage dot preservation: `Amd.1` → `Amd 1` (wrong)
+   - French Guide ordering: `GUIDE ISO/CEI` → `ISO/CEI Guide` (wrong)
+   - NSB parsing: `FprISO` not recognized (0% pass rate)
+   - Multilingual publishers: `ISO/CEI` French for IEC
+   - Directives format: Always long form (should preserve short)
+
+**Files Created:**
+- `docs/SESSION-254-FIXTURE-ROUNDTRIP-ANALYSIS.md` (150 lines)
+- `.kilocode/rules/memory-bank/session-254-continuation-plan.md` (200 lines)
+
+**Current Fixture Pass Rates:**
+- iso-pubid-french.txt: 37.5% (❌ needs fixing)
+- iso-pubid-languages.txt: 83.33% (❌ needs fixing)
+- iso-pubid-nsb.txt: 0% (❌ critical)
+- iso-pubid-russian.txt: 0% (❌ critical)
+- iso-pubid-directives.txt: <95% (❌ needs fixing)
+
+**Architecture Quality:**
+- ✅ Proper analysis performed
+- ✅ V1 implementation examined
+- ✅ Architectural solutions designed
+- ✅ No brute-force fixes attempted
+- ⚠️ **Implementation required in Sessions 254-258**
+
+**Next Steps:**
+- Session 254: TypedStage dot preservation (2 hours)
+- Session 255: French Guide ordering (2 hours)
+- Session 256: NSB parsing (2 hours)
+- Session 257: Final fixes (2 hours)
+- Session 258: Documentation & validation (2 hours)
+- **Total:** 10 hours estimated
+
+**Status:** SESSION 253 COMPLETE - READY FOR SYSTEMATIC FIXES IN SESSION 254+! 📋
+
+---
+
 ## Current Status (Session 252 Complete)
 
 **SESSION 252 ACHIEVEMENT - BSI/CEN Integration Tests Complete!** ✅
