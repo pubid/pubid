@@ -677,6 +677,37 @@ module PubidNew
         )
       end
 
+      # CIRC Supplement identifier - split into base + supplement
+      # Examples:
+      # - "NBS CIRC 101e2supp" → base="NBS CIRC 101e2", supplement
+      # - "NBS CIRC 25supp-1924" → base="NBS CIRC 25", supplement_year="1924"
+      # - "NBS CIRC 24suppJan1924" → base="NBS CIRC 24", supplement_edition="Jan1924"
+      # - "NBS CIRC suppJun1925-Jun1926" → date range supplement (no base)
+      rule(:circ_supplement_identifier) do
+        (str("NBS CIRC") | str("NBS LCIRC")).as(:series) >> space >>
+        (
+          # Date range supplement (no base, no number)
+          (str("supp") >> month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
+           dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
+          # With base identifier + supplement
+          (
+            # Capture base portion (everything before "supp")
+            (
+              # Number with edition: "101e2"
+              (digits >> str("e") >> digits) |
+              # Just number: "25", "24"
+              digits
+            ).as(:base_portion) >>
+            # Supplement marker with optional metadata
+            str("supp") >>
+            (
+              # Month and year: Jan1924
+              (month_abbrev.as(:supplement_month) >> digits.as(:supplement_year)).as(:supplement_edition)
+            )
+          )
+        )
+      end
+
       # Dot-separated machine-readable format: NIST.SP.800-116 or #NIST.2024-01-15.123
       # Enhanced to support parts after number like NIST.SP.1011-I-2.0
       rule(:mr_identifier) do
@@ -696,6 +727,7 @@ module PubidNew
       # Main identifier structure
       # Try compound series first (longest match), then publisher + simple series
       rule(:identifier) do
+        circ_supplement_identifier |
         mr_identifier |
         (
           # Compound series (includes publisher in series name)
@@ -717,6 +749,30 @@ module PubidNew
           old_stage.maybe >>  # Old style stage after series
           (space | dot) >>
           report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
+        )
+      end
+
+      # CIRC Supplement identifier - split into base + supplement
+      # Must be complete rule with all patterns
+      rule(:circ_supplement_identifier) do
+        (str("NBS CIRC") | str("NBS LCIRC")).as(:series) >> space >>
+        (
+          # Date range supplement (no base number)
+          (str("supp") >> month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
+           dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
+          # With base identifier + supplement
+          (
+            # Capture base portion (everything before "supp")
+            (digits >> str("e") >> digits | digits).as(:base_portion) >>
+            # Supplement marker
+            str("supp") >>
+            # Optional supplement metadata
+            (
+              (month_abbrev >> digits).as(:supplement_month_year) |
+              (dash >> digits.as(:supplement_year)) |
+              str("").as(:supplement_empty)
+            )
+          )
         )
       end
 

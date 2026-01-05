@@ -40,6 +40,11 @@ module PubidNew
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
 
+        # NEW: Check for CIRC supplement pattern
+        if parsed_hash[:supplement_date_range] || parsed_hash[:base_portion]
+          return build_circular_supplement(parsed_hash)
+        end
+
         # Locate the appropriate identifier class via Scheme
         identifier = @scheme.locate_identifier_klass(parsed_hash).new
 
@@ -92,7 +97,7 @@ module PubidNew
           if identifier.volume && identifier.issue_number
             # Don't build number - this is CSM v#n# format
           elsif second_num
-            # Check for special CIRC patterns first
+            # Check for special patterns first
             if first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
                second_num.value.to_s.match?(/^\d{4}$/)
               # Pattern: "11e2-1915" parsed as first="11e2", second="1915"
@@ -142,6 +147,57 @@ module PubidNew
         end
 
         identifier
+      end
+
+      # Build CircularSupplement with base_identifier wrapping
+      # @param parsed_hash [Hash] the parsed supplement data
+      # @return [Identifiers::CircularSupplement] the supplement identifier
+      def build_circular_supplement(parsed_hash)
+        supplement = Identifiers::CircularSupplement.new
+
+        # Handle date range supplement (no base)
+        if parsed_hash[:supplement_date_range].is_a?(Hash)
+          range = parsed_hash[:supplement_date_range]
+          month_start = range[:supp_month_start]&.to_s
+          year_start = range[:supp_year_start]&.to_s
+          month_end = range[:supp_month_end]&.to_s
+          year_end = range[:supp_year_end]&.to_s
+
+          supplement.supplement_date_range_start = "#{month_start}#{year_start}" if month_start && year_start
+          supplement.supplement_date_range_end = "#{month_end}#{year_end}" if month_end && year_end
+
+          return supplement
+        end
+
+        # Build base identifier from base_portion
+        if parsed_hash[:base_portion]
+          base_str = parsed_hash[:base_portion].to_s
+          # Reconstruct parse hash for base identifier
+          base_hash = {
+            series: parsed_hash[:series],
+            first_number: base_str,
+            parsed_format: parsed_hash[:parsed_format]
+          }
+
+          # Recursively build base identifier
+          # This will go through normal build() process which extracts edition from "101e2"
+          supplement.base_identifier = build(base_hash)
+        end
+
+        # Build supplement edition from captured data
+        if parsed_hash[:supplement_month_year]
+          # Parse month+year format like "Jan1924"
+          month_year = parsed_hash[:supplement_month_year].to_s
+          supplement.edition = Components::Edition.new(type: "s", id: month_year)
+        elsif parsed_hash[:supplement_year]
+          # Just year: 1924
+          supplement.edition = Components::Edition.new(type: "s", id: parsed_hash[:supplement_year].to_s)
+        elsif parsed_hash[:supplement_empty]
+          # Empty supplement - no edition
+          # supplement.edition remains nil
+        end
+
+        supplement
       end
 
       private
@@ -288,6 +344,17 @@ module PubidNew
             elsif str_value =~ /^e(\d+)$/ && !str_value.match?(/e\d+-/)
               edition_id = $1
               return {
+                edition: Components::Edition.new(type: "e", id: edition_id)
+              }
+            # NEW: Regular number with edition "101e2" - number with edition suffix (no supp)
+            # Creates: number="101", Edition(type: "e", id: "2")
+            # Renders: "NBS CIRC 101e2"
+            # CRITICAL: Only extract if NO second_number (otherwise compound logic handles it)
+            elsif str_value =~ /^(\d+)e(\d+)$/ && !parsed_hash[:second_number]
+              number_part = $1
+              edition_id = $2
+              return {
+                first_number: Components::Code.new(number: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id)
               }
             # Pattern: "13e2rev1908" - edition with revision year-only (NO month)

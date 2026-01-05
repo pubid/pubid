@@ -134,12 +134,18 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
       describe "NBS CIRC 25supp-1924" do
         subject { "NBS CIRC 25supp-1924" }
 
-        it "parses as Circular" do
-          expect(parsed).to be_a(described_class)
+        it "parses as CircularSupplement" do
+          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses supplement" do
-          expect(parsed.supplement).not_to be_nil
+        it "parses base identifier" do
+          expect(parsed.base_identifier).to be_a(PubidNew::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier.number.value).to eq("25")
+        end
+
+        it "parses supplement edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.id).to eq("1924")
         end
 
         it "round-trips correctly" do
@@ -150,18 +156,20 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
       describe "NBS CIRC 101e2supp" do
         subject { "NBS CIRC 101e2supp" }
 
-        it "parses as Circular" do
-          expect(parsed).to be_a(described_class)
+        it "parses as CircularSupplement" do
+          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
-          expect(parsed.edition.type).to eq("e")
-          expect(parsed.edition.id).to eq("2")
+        it "parses base identifier with edition" do
+          expect(parsed.base_identifier).to be_a(PubidNew::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier.number.value).to eq("101")
+          expect(parsed.base_identifier.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.base_identifier.edition.type).to eq("e")
+          expect(parsed.base_identifier.edition.id).to eq("2")
         end
 
-        it "parses supplement" do
-          expect(parsed.supplement).not_to be_nil
+        it "has no supplement edition (base has edition)" do
+          expect(parsed.edition).to be_nil
         end
 
         it "round-trips correctly" do
@@ -188,15 +196,21 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
       describe "NBS CIRC 24suppJan1924" do
         subject { "NBS CIRC 24suppJan1924" }
 
-        it "parses as Circular" do
-          expect(parsed).to be_a(described_class)
+        it "parses as CircularSupplement" do
+          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses supplement with date" do
-          expect(parsed.supplement).to eq("Jan1924")
+        it "parses base identifier" do
+          expect(parsed.base_identifier).to be_a(PubidNew::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier.number.value).to eq("24")
         end
 
-        it "renders with canonical format" do
+        it "parses supplement edition with month+year" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.id).to eq("Jan1924")
+        end
+
+        it "renders correctly" do
           expect(parsed.to_s).to eq("NBS CIRC 24suppJan1924")
         end
       end
@@ -214,7 +228,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
           expect(parsed.supplement_date_range_end).to eq("Jun1926")
         end
 
-        it "round-trips correctly", pending: "Parser doesn't yet handle supplement date range rendering" do
+        it "round-trips correctly" do
           expect(parsed.to_s).to eq(subject)
         end
       end
