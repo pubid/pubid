@@ -11,7 +11,7 @@ module PubidNew
       end
 
       def build(parsed_hash)
-        identifier = Identifiers::AmericanNationalStandard.new
+        identifier = Identifiers::Standard.new
 
         parsed_hash.each_pair do |key, value|
           realized_components = cast(key.to_sym, value)
@@ -34,7 +34,7 @@ module PubidNew
         case type
         when :publisher
           Components::Publisher.new(body: value)
-        
+
         when :std_keyword
           # Return boolean indicating if "Std" was present
           !value.nil? && !value.empty?

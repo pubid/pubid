@@ -20,35 +20,29 @@ module PubidNew
         attribute :series, Components::Code  # Set by Builder from parsed data
         attribute :number, Components::Code
 
-        # V2 COMPONENTS (Lutaml::Model objects)
+        # V2 COMPONENTS (Lutaml::Model objects) - PROPER SEPARATION
+        attribute :edition, Components::Edition  # Edition (type + id): e2, e2021, r5, -3
         attribute :stage, Components::Stage
-        attribute :edition_component, Components::Edition
         attribute :version_component, Components::Version
         attribute :update_component, Components::Update
         attribute :translation_component, Components::Translation
         attribute :issue_number, Components::IssueNumber
         attribute :parsed_format, :string  # :mr, :short, :long, :abbrev
 
-        # Original attributes (keep for backward compatibility)
+        # LEGACY attributes (keep for backward compatibility during migration)
         attribute :parts, Components::Code, collection: true
         attribute :volume, :string
         attribute :revision, :string
-        attribute :revision_year, :string  # NEW: Year for revision (e.g., r6/1925, r1963, rJun1992)
-        attribute :revision_month, :string  # NEW: Month for revision (e.g., rJun1992)
+        attribute :revision_year, :string  # Year for revision (e.g., r6/1925, r1963, rJun1992)
+        attribute :revision_month, :string  # Month for revision (e.g., rJun1992)
         attribute :version, :string
-        attribute :update, Components::Update  # Changed from :string to Components::Update
+        attribute :update, Components::Update
         attribute :year, :integer
         attribute :month, :integer
-        attribute :edition, Components::Edition  # Changed from :string to Components::Edition
 
         # Additional attributes for complex patterns
         attribute :first_number, Components::Code
         attribute :second_number, Components::Code
-        attribute :edition_year, :string
-        attribute :edition_month, :string
-        attribute :edition_day, :string
-        attribute :edition_has_e_prefix, :string
-        attribute :edition_has_rev, :string
         attribute :update_number, :string
         attribute :update_year, :string
         attribute :addendum, :string
@@ -65,7 +59,7 @@ module PubidNew
         attribute :translation, :string
         attribute :draft, :string
         attribute :part, :string
-        attribute :draft_number, :string  # NEW: For -draft N → N pd rendering
+        attribute :draft_number, :string  # For -draft N → N pd rendering
 
         def initialize(**attributes)
           super()
@@ -119,13 +113,13 @@ module PubidNew
             result += " Vol. #{volume}"
           end
 
+          # NEW: Use edition component properly
+          result += " #{edition.to_s(:long)}" if edition
+
           result += ", Revision #{revision.sub(/^r/, '')}" if revision
 
           # V2: Use version_component
           result += " #{version_component.to_s(:long)}" if version_component
-
-          # V2: Use edition_component
-          result += " #{edition_component.to_s(:long)}" if edition_component
 
           # V2: Use update_component
           result += " #{update_component.to_s(:long)}" if update_component
@@ -145,13 +139,14 @@ module PubidNew
           result += " #{series_abbreviated_name}" if series
           result += " #{number}" if number
           result += " Part #{parts.first}" if parts&.any?
+
+          # NEW: Use edition component properly
+          result += " #{edition.to_s(:abbrev)}" if edition
+
           result += ", Revision #{revision}" if revision
 
           # V2: Use version_component
           result += " #{version_component.to_s(:abbrev)}" if version_component
-
-          # V2: Use edition_component
-          result += " #{edition_component.to_s(:abbrev)}" if edition_component
 
           # V2: Use update_component
           result += " #{update_component.to_s(:abbrev)}" if update_component
@@ -194,30 +189,18 @@ module PubidNew
           result += " #{number.to_s}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-          # Add edition with month/year if present - use "rev" not dash when edition has both
-          if edition && edition_month && edition_year
-            result += "e#{edition}rev#{edition_month}#{edition_year}"
-          elsif edition
-            result += "e#{edition}"
+          # NEW: Render standalone volume (not part of v#n#)
+          if volume && !issue_number
+            result += "v#{volume}"
+          elsif volume && issue_number
+            # Render volume and issue number in short form: "v6n12"
+            result += "v#{volume}n#{issue_number.number}"
           end
 
-          # Add edition year/month without edition number - fix year rendering to use 4 digits
-          if !edition && edition_month && edition_year
-            # Expand 2-digit years to 4-digit (e.g., 43 -> 1943)
-            expanded_year = edition_year.length == 2 ? "19#{edition_year}" : edition_year
-            result += "-#{edition_month}#{expanded_year}"
-          elsif !edition && edition_year
-            # Expand 2-digit years to 4-digit
-            expanded_year = edition_year.length == 2 ? "19#{edition_year}" : edition_year
-            result += "-#{expanded_year}"
-          end
-
-          # Render volume and issue number in short form: "v6n12"
-          # This comes AFTER edition handling
-          if volume && issue_number
-            result += " v#{volume}#{issue_number.to_s(:short)}"
-          elsif volume
-            result += " Vol. #{volume}"
+          # NEW: Use edition component properly (e2, e2021, r5, -3)
+          # Add space before edition if no number (bare edition case like "e2")
+          if edition
+            result += (number ? "" : " ") + edition.to_s
           end
 
           # Add revision
@@ -234,20 +217,6 @@ module PubidNew
             end
           end
 
-          # NEW: Add revision year/month if present (e.g., r6/1925, r1963, rJun1992)
-          if revision_year
-            # If we have month, render as rMonthYear (e.g., rJun1992)
-            if revision_month
-              result += "r#{revision_month}#{revision_year}"
-            # If revision already rendered, add /year (e.g., r6/1925)
-            elsif revision
-              result += "/#{revision_year}"
-            # If only year, render as rYear (e.g., r1963)
-            else
-              result += "r#{revision_year}"
-            end
-          end
-
           # V2: Use version_component if available, else use version string
           if version_component
             result += " #{version_component.to_s(:short)}"
@@ -261,7 +230,14 @@ module PubidNew
           elsif supplement_has_revision
             result += "supprev"
           elsif supplement && !supplement.empty?
-            result += "supp#{supplement}"
+            # Smart dash logic:
+            # - If supplement starts with letter (month like "Jan1924"), NO dash
+            # - If supplement is digits only (year like "1924"), WITH dash
+            if supplement.match?(/^[A-Z]/)
+              result += "supp#{supplement}"
+            else
+              result += "supp-#{supplement}"
+            end
           elsif supplement
             result += "supp"
           end
@@ -314,6 +290,10 @@ module PubidNew
           result += ".#{series}" if series
           result += ".#{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
+
+          # NEW: Use edition component
+          result += edition.to_s if edition
+
           # Fix: Don't add "r" prefix if revision already has it
           if revision
             if revision.to_s.start_with?("r", "R")

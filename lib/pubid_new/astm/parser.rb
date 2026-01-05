@@ -34,7 +34,7 @@ module PubidNew
       rule(:comment) { space.maybe >> str("#") >> match("[^#]").repeat }
 
       # Editorial notation
-      rule(:editorial) { str("e") >> digits.as(:editorial) }
+      rule(:edition) { str("e") >> digits.as(:edition) }
 
       # Sub-year notation (a, b, c)
       rule(:sub_year) { match("[a-c]").as(:sub_year) }
@@ -219,7 +219,7 @@ module PubidNew
           dash >> year_2digit >>
           sub_year.maybe >>
           reapproval.maybe >>
-          editorial.maybe
+          edition.maybe
         ).maybe >>
         comment.maybe
       end

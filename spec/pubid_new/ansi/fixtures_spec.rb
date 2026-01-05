@@ -59,7 +59,7 @@ RSpec.describe "ANSI Fixture Round-trip Tests" do
 
       # Report success rate (80%+ = production ready)
       pass_rate = (successes.to_f / fixtures.size * 100).round(2)
-      
+
       if pass_rate >= 80.0
         puts "\n✅ PRODUCTION READY: #{pass_rate}% pass rate"
       elsif pass_rate >= 70.0

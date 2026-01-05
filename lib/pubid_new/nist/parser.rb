@@ -24,13 +24,15 @@ module PubidNew
         cleaned = cleaned.gsub(/([-\d]+[IVX]+[-\d]+)\s+(\d+)/, '\1.\2')
 
         # Fix rev without space: "126rev2013" → "126 rev2013" (separate number from rev+year)
-        cleaned = cleaned.gsub(/(\d)(rev\d{4})/, '\1 \2')
+        # BUT preserve edition+revision patterns: "e2rev1908" stays as-is
+        cleaned = cleaned.gsub(/(?<!e)(\d)(rev\d{4})/, '\1 \2')
 
         # Fix LCIRC revision with slash and year: "145r6/1925" → "145 r6/1925"
         cleaned = cleaned.gsub(/(\d)(r\d+\/\d{4})/, '\1 \2')
 
         # Fix LCIRC revision with just year (no slash): "1128r1995" → "1128 r1995"
-        cleaned = cleaned.gsub(/(\d)(r\d{4})/, '\1 \2')
+        # BUT preserve edition+revision patterns: "13e2rev1908" stays as-is
+        cleaned = cleaned.gsub(/(?<!e\d)(r\d{4})/, ' \1')
 
         # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
         cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
@@ -162,7 +164,7 @@ module PubidNew
 
         # Fix revision letter patterns: ensure space before revision with letter
         cleaned = cleaned.gsub(/(\d)(r\d+[a-z])/, '\1 \2')       # 800-22r1a → 800-22 r1a
-        cleaned = cleaned.gsub(/(\d)(r[a-z]+\b)/, '\1 \2')       # 800-27ra → 800-27 ra (one or more letters)
+        cleaned = cleaned.gsub(/(\d)(r[a-z]+\b)/, "\1 \2")       # 800-27ra → 800-27 ra (one or more letters)
 
         # Fix number with letter suffix followed by standalone 'r': "56ar" → "56a r" (NEW)
         cleaned = cleaned.gsub(/(\d[a-z])r\b/, '\1 r')
@@ -376,7 +378,9 @@ module PubidNew
           (str("v") >> digits.as(:volume_number) >> str("n") >> digits.as(:issue_number)) |
           # Regular number with supplement and revision suffix: "154supprev"
           (digits >> str("supprev")) |
-          # Regular number with edition, revision, and date: "13e2revJune1908"
+          # Regular number with edition and revision year-only: "13e2rev1908"
+          (digits >> str("e") >> digits >> str("rev") >> digits) |
+          # Regular number with edition, revision, and month-date: "13e2revJune1908"
           (digits >> str("e") >> digits >> str("rev") >> month_abbrev >> digits) |
           # Regular number with eN suffix and optional supplement (e.g., "101e2supp") - most specific
           (digits >> str("e") >> digits >> str("supp") >> digits.maybe) |
@@ -386,7 +390,7 @@ module PubidNew
           (str("e") >> digits >> str("supp") >> digits.maybe) |
           # Regular number with eN suffix (e.g., "101e2")
           (digits >> str("e") >> digits) |
-          # Edition prefix followed by digits (e.g., "e104") - but NOT if followed by dash+digits (that's edition+year)
+          # NEW: Bare edition (just "e2" without number prefix)
           (str("e") >> digits >> (dash >> digits).absent?) |
           # Letter prefix with digits (e.g., "c4" for CRPL)
           (lower_letter >> digits) |
@@ -427,41 +431,56 @@ module PubidNew
         ).as(:second_number)
       end
 
-      # Edition with different formats
+      # Edition component per NIST spec: <edition-type><edition-id>
+      # Type: "e" (edition), "r" (revision), "-" (historical)
+      # ID: number (1-9) or year (yyyy)
+      # Examples: e2, e2021, r5, -3
       rule(:edition) do
         (
-          # Date format with dash-month-day-slash-year: "11-1-Sep30/1977", "54-1-Jan15/1991"
-          # This is actually a date pattern, not edition - treat the last part as a special date
-          (dash >> digits.as(:part) >> dash >> month_abbrev.as(:date_month) >>
-            digits.as(:date_day) >> slash >> digits.as(:date_year)).absent? >>
-          # Edition with complex revision patterns: r1a, r2b
+          # Edition with "e" prefix: e2, e3, e2021 (1-4 digits for ID)
+          (str("e") >> digits.as(:edition_id)).as(:edition_e) |
+          # Revision with "r" prefix: r1, r5, r2021
+          (str("r") >> digits.as(:edition_id)).as(:edition_r) |
+          # Historical with "-" prefix: -2, -3 (ONLY if followed by non-digit or end)
+          # This avoids consuming date patterns like "-1908"
+          # Historical precedent uses small numbers (1-9), dates use 4-digit years
+          (dash >> match("[1-9]").as(:edition_id) >> digit.absent?).as(:edition_historical)
+        )
+      end
+
+      # Date component per NIST spec: -{YYYY} or -{YYYYMM} or -{YYYYMMDD}
+      # Separate from Edition - both can coexist
+      # Examples: -1908, -190806, -19770930
+      rule(:date) do
+        (
+          # Date with month and day: -19770930 (YYYYMMDD)
+          (dash >> match("[0-9]").repeat(4, 4).as(:date_year) >>
+           match("[0-9]").repeat(2, 2).as(:date_month) >>
+           match("[0-9]").repeat(2, 2).as(:date_day)) |
+          # Date with month: -190806 (YYYYMM)
+          (dash >> match("[0-9]").repeat(4, 4).as(:date_year) >>
+           match("[0-9]").repeat(2, 2).as(:date_month)) |
+          # Date with year only: -1908 (YYYY)
+          (dash >> match("[0-9]").repeat(4, 4).as(:date_year)) |
+          # Legacy month format: -June1908, -Jan1925 (normalize to YYYYMM)
+          (dash >> month_abbrev.as(:date_month) >> digits.as(:date_year))
+        ).as(:date)
+      end
+
+      # LEGACY EDITION PATTERNS (for backward compatibility during migration)
+      # These will be gradually replaced as we migrate to proper Edition/Date components
+      rule(:legacy_edition) do
+        (
+          # Complex revision patterns: r1a, r2b
           ((str("r") | str(" R")) >> match("[0-9]").repeat(1, 2).as(:edition) >> lower_letter.as(:edition_letter)) |
           # Edition with revision and year: rev2013, rev2020
           (str("rev") >> digits.as(:edition_year)) |
-          # Edition with revision and date: e2revJune1908, e3revJan1925
+          # Edition with revision and date: e2revJune1908 (will migrate to e2 + date)
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >>
            str("rev") >> match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year)) |
-          # Edition with year and month: e201801, e2018 (4-digit year)
+          # Edition with year and month: e201801 (ambiguous - could be e2018 or year 2018 month 01)
           (str("e") >> match("[0-9]").repeat(4, 4).as(:edition_year) >> match("[0-9]").repeat(2, 2).as(:edition_month).maybe) |
-          # Edition number with dash and year: e2-1915, e3-2020
-          ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >> dash >> digits.as(:edition_year)) |
-          # NEW: Edition with dash-month-year (FIPS format): -Feb1985, -Aug1988, -Dec1985
-          # MUST be BEFORE dash-year to match month first (longest match principle)
-          (dash >> month_abbrev.as(:edition_month) >> digits.as(:edition_year)) |
-          # Edition with dash and year/month: -2018, -Jan2018, -June1908, -April1909
-          (dash >> (
-            (match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year)) |
-           digits.as(:edition_year) |
-            (match("[A-Za-z]").repeat(3, 3).as(:edition_month) >> match("[0-9]").repeat(2, 2).as(:edition_day) >>
-              slash >> digits.as(:edition_year))
-          )) |
-          # Edition with e prefix and revision suffix: e2rev (edition 2 with revision)
-          ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >> str("rev").as(:edition_has_rev).maybe) |
-          # Edition with e prefix: e2, e3 (1-3 digits, NOT 4)
-          ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition)) |
-          # Edition with revision and year: rev2013, rev2020 - ENHANCED to accept leading space
-          (space.maybe >> str("rev") >> digits.as(:edition_year)) |
-          # Revision-based edition: revJune1908, revJan1925
+          # Revision-based edition: revJune1908, revJan1925 (normalize to date)
           (str("rev") >> match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year))
         )
       end
@@ -651,7 +670,7 @@ module PubidNew
           # CRITICAL: new_stage BEFORE language_code to avoid "ipd" being treated as translation
           new_stage |
           section | index | insert | appendix | pd_suffix |
-          edition | revision |
+          edition | date | legacy_edition | revision |
           version |  # MOVED BEFORE volume - try dotted versions (v1.1) before simple volumes (v1)
           volume | part | update | addendum |
           supplement | errata | language_code

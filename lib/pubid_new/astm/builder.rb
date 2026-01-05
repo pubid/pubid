@@ -129,7 +129,7 @@ module PubidNew
         if identifier.is_a?(Identifiers::Standard)
           identifier.sub_year = parsed_hash[:sub_year].to_s if parsed_hash[:sub_year]
           identifier.reapproval = parsed_hash[:reapproval].to_s if parsed_hash[:reapproval]
-          identifier.editorial = parsed_hash[:editorial].to_s if parsed_hash[:editorial]
+          identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
         end
       end
 

@@ -7,6 +7,11 @@ RSpec.describe PubidNew::Ccsds do
         result = described_class.parse("CCSDS 120.0-G-4")
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.number).to eq("120")
+        expect(result.part).to eq("0")
+        expect(result.type).to eq("G")
+        expect(result.edition).to eq("4")
+
         expect(result.to_s).to eq("CCSDS 120.0-G-4")
       end
 
@@ -14,6 +19,11 @@ RSpec.describe PubidNew::Ccsds do
         result = described_class.parse("CCSDS A20.1-Y-1")
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.number).to eq("A20")
+        expect(result.part).to eq("1")
+        expect(result.type).to eq("Y")
+        expect(result.edition).to eq("1")
+
         expect(result.to_s).to eq("CCSDS A20.1-Y-1")
       end
 
@@ -21,6 +31,12 @@ RSpec.describe PubidNew::Ccsds do
         result = described_class.parse("CCSDS 100.0-G-1-S")
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.number).to eq("100")
+        expect(result.part).to eq("0")
+        expect(result.type).to eq("G")
+        expect(result.edition).to eq("1")
+        expect(result.suffix).to eq("S")
+
         expect(result.to_s).to eq("CCSDS 100.0-G-1-S")
       end
 
@@ -28,6 +44,12 @@ RSpec.describe PubidNew::Ccsds do
         result = described_class.parse("CCSDS 401.0-B-S")
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.number).to eq("401")
+        expect(result.part).to eq("0")
+        expect(result.type).to eq("B")
+        expect(result.edition).to be_nil
+        expect(result.suffix).to eq("S")
+
         expect(result.to_s).to eq("CCSDS 401.0-B-S")
       end
 
@@ -35,6 +57,12 @@ RSpec.describe PubidNew::Ccsds do
         result = described_class.parse("CCSDS A01.2-Y-4.1-S")
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.number).to eq("A01")
+        expect(result.part).to eq("2")
+        expect(result.type).to eq("Y")
+        expect(result.edition).to eq("4.1")
+        expect(result.suffix).to eq("S")
+
         expect(result.to_s).to eq("CCSDS A01.2-Y-4.1-S")
       end
     end
@@ -45,7 +73,14 @@ RSpec.describe PubidNew::Ccsds do
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Corrigendum)
         expect(result.cor_number).to eq(1)
+
         expect(result.base_identifier).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.base_identifier.number).to eq("131")
+        expect(result.base_identifier.part).to eq("2")
+        expect(result.base_identifier.type).to eq("O")
+        expect(result.base_identifier.edition).to eq("1")
+        expect(result.base_identifier.suffix).to eq("S")
+
         expect(result.to_s).to eq("CCSDS 131.2-O-1-S Cor. 1")
       end
 
@@ -54,7 +89,14 @@ RSpec.describe PubidNew::Ccsds do
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Corrigendum)
         expect(result.cor_number).to eq(1)
+
         expect(result.base_identifier).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.base_identifier.number).to eq("912")
+        expect(result.base_identifier.part).to eq("1")
+        expect(result.base_identifier.type).to eq("B")
+        expect(result.base_identifier.edition).to eq("2")
+        expect(result.base_identifier.suffix).to eq("S")
+
         expect(result.to_s).to eq("CCSDS 912.1-B-2-S Cor. 1")
       end
     end
@@ -64,7 +106,12 @@ RSpec.describe PubidNew::Ccsds do
         result = described_class.parse("CCSDS 551.1-O-2 - Russian Translated")
 
         expect(result).to be_a(PubidNew::Ccsds::Identifiers::Base)
+        expect(result.number).to eq("551")
+        expect(result.part).to eq("1")
+        expect(result.type).to eq("O")
+        expect(result.edition).to eq("2")
         expect(result.language).to eq("Russian")
+
         expect(result.to_s).to eq("CCSDS 551.1-O-2 - Russian Translated")
       end
     end

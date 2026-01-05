@@ -13,8 +13,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     it_behaves_like "converts pubid to different formats"
   end
 
-  context "NBS CIRC 25sup-1924" do
-    let(:original_pubid) { "NBS CIRC 25sup-1924" }
+  context "NBS CIRC 25supp-1924" do
+    let(:original_pubid) { "NBS CIRC 25supp-1924" }
     let(:short_pubid) { "NBS CIRC 25sup" }
 
     it_behaves_like "converts pubid to different formats"

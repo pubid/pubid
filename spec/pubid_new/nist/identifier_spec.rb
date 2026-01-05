@@ -47,19 +47,20 @@ RSpec.describe "PubidNew::Nist identifier parsing" do
     context "edition with revision and date" do
       it "parses and renders edition with revision and month-year" do
         id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
-        expect(id.to_s).to eq("NBS CIRC 13e2revJune1908")
+        # Canonical format uses DOT separator, not "rev"
+        expect(id.to_s).to eq("NBS CIRC 13e2.June1908")
       end
 
       it "parses and renders edition with revision year only" do
         id = PubidNew::Nist.parse("NBS CIRC 13e2rev1908")
-        # Edition year without month renders with dash, not "rev"
-        expect(id.to_s).to eq("NBS CIRC 13e2-1908")
+        # Canonical format uses DOT separator
+        expect(id.to_s).to eq("NBS CIRC 13e2.1908")
       end
 
-      it "uses 'rev' prefix not dash for revision rendering" do
+      it "uses dot separator not 'rev' prefix for canonical rendering" do
         id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
-        expect(id.to_s).to include("rev")
-        expect(id.to_s).not_to include("e2-")
+        expect(id.to_s).to include("e2.")
+        expect(id.to_s).not_to include("rev")
       end
     end
 
@@ -102,7 +103,8 @@ RSpec.describe "PubidNew::Nist identifier parsing" do
           { input: "NBS LCIRC 1019r1963", expected: "NBS LC 1019r1963" },
           { input: "NBS CSM v6n1", expected: "NBS CSM v6n1" },
           { input: "NBS CIRC 154supprev", expected: "NBS CIRC 154supprev" },
-          { input: "NBS CIRC 13e2revJune1908", expected: "NBS CIRC 13e2revJune1908" }
+          # Canonical format uses DOT separator, not "rev"
+          { input: "NBS CIRC 13e2revJune1908", expected: "NBS CIRC 13e2.June1908" }
         ]
 
         test_cases.each do |test_case|

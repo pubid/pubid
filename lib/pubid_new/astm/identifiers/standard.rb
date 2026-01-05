@@ -6,7 +6,7 @@ module PubidNew
       class Standard < Base
         attribute :sub_year, :string        # a, b, c
         attribute :reapproval, :string      # (2023)
-        attribute :editorial, :string       # e1
+        attribute :edition, :string       # e1
 
         def to_s
           parts = []
@@ -36,8 +36,8 @@ module PubidNew
           # Append reapproval
           result += "(#{reapproval})" if reapproval
 
-          # Append editorial
-          result += "e#{editorial}" if editorial
+          # Append edition
+          result += "e#{edition}" if edition
 
           result
         end
