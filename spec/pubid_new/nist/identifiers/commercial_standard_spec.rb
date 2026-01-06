@@ -93,12 +93,12 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandard do
           expect(parsed).to be_a(PubidNew::Nist::Identifiers::CommercialStandardEmergency)
         end
 
-        it "renders as CS-E format" do
-          expect(parsed.to_s).to eq("NBS CS-E 104-43")
+        it "renders as CS-E with edition year format" do
+          expect(parsed.to_s).to eq("NBS CS-E 104e1943")
         end
 
-        it "parses emergency number" do
-          expect(parsed.number.value).to eq("104-43")
+        it "parses emergency number with edition year" do
+          expect(parsed.number.value).to eq("104")
         end
       end
 
@@ -125,11 +125,11 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandard do
           expect(parsed).to be_a(PubidNew::Nist::Identifiers::CommercialStandardsMonthly)
         end
 
-        it "renders as CSM with part notation" do
-          expect(parsed.to_s).to eq("NBS CSM v6pt1")
+        it "renders as CSM with volume and issue notation" do
+          expect(parsed.to_s).to eq("NBS CSM v6n1")
         end
 
-        it "parses volume and number" do
+        it "parses volume and issue number" do
           expect(parsed.number.value).to include("v6")
         end
       end
@@ -142,8 +142,8 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandard do
           expect(parsed).to be_a(PubidNew::Nist::Identifiers::CommercialStandardsMonthly)
         end
 
-        it "normalizes to CSM" do
-          expect(parsed.to_s).to eq("NBS CSM v5pt2")
+        it "normalizes to CSM with volume and issue notation" do
+          expect(parsed.to_s).to eq("NBS CSM v5n2")
         end
       end
     end
