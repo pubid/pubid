@@ -49,7 +49,7 @@ module PubidNew
 
         private
 
-        # Build short format: "e2", "e2.June1908", "e2.1908", "r1963", "-April1909"
+        # Build short format: "e2", "e2.June1908", "e2.1908", "e2.50", "r1963", "-April1909"
         def build_short_format
           result = "#{type}#{id}"
 
@@ -59,7 +59,8 @@ module PubidNew
             if type == "-" && additional_text.match?(/^[A-Z][a-z]+\d{4}$/)
               result = "-#{additional_text}"
             else
-              # Regular editions use DOT separator for additional text
+              # For ALL years (2-digit or 4-digit) and month+year, use DOT separator
+              # Examples: e2.50, e2.1915, e2.June1908
               result += ".#{additional_text}"
             end
           end

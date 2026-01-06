@@ -167,8 +167,8 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandard do
           expect(parsed.edition.id).to eq("2")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "renders with expanded 4-digit year" do
+          expect(parsed.to_s).to eq("NBS CS 123e2.1950")
         end
       end
 

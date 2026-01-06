@@ -99,13 +99,16 @@ module PubidNew
           elsif second_num
             # Check for special patterns first
             if first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
-               second_num.value.to_s.match?(/^\d{4}$/)
-              # Pattern: "11e2-1915" parsed as first="11e2", second="1915"
+               second_num.value.to_s.match?(/^\d{2,4}$/)
+              # Pattern: "11e2-1915" OR "123e2-50" parsed as first="11e2"|"123e2", second="1915"|"50"
               # Extract number and edition from first_num
               match_data = first_num.value.to_s.match(/^(\d+)e(\d+)$/)
               number_part = match_data[1]
               edition_id = match_data[2]
               year_part = second_num.value.to_s
+
+              # Expand 2-digit year to 4-digit (50 → 1950)
+              year_part = "19#{year_part}" if year_part.length == 2
 
               identifier.number = Components::Code.new(number: number_part)
               identifier.edition = Components::Edition.new(type: "e", id: edition_id, additional_text: year_part)
@@ -349,6 +352,17 @@ module PubidNew
               emergency_num = str_value.sub(/^e/, "")
               return {
                 first_number: Components::Code.new(number: emergency_num)
+              }
+            # NEW: Bare edition pattern like "100e1" (CS series without year)
+            # ONLY when NO second_number present (to avoid conflict with "123e2-50")
+            # Creates: number="100", Edition(type: "e", id: "1")
+            # Renders: "NBS CS 100e1"
+            elsif str_value =~ /^(\d+)e(\d+)$/ && !parsed_hash[:second_number]
+              number_part = $1
+              edition_id = $2
+              return {
+                first_number: Components::Code.new(number: number_part),
+                edition: Components::Edition.new(type: "e", id: edition_id)
               }
             # NEW: Bare edition pattern "e2" - just edition without number prefix
             # Creates: Edition(type: "e", id: "2")
