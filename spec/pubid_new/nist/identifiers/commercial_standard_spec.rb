@@ -162,7 +162,9 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses edition" do
-          expect(parsed.edition).not_to be_nil
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("2")
         end
 
         it "round-trips" do
@@ -179,7 +181,9 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses edition notation" do
-          expect(parsed.edition).not_to be_nil
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("1")
         end
 
         it "round-trips" do

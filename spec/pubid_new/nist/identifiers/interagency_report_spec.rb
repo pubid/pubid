@@ -108,8 +108,10 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
           expect(parsed.to_s).to eq("NBS IR 73-197r1")
         end
 
-        it "parses revision" do
-          expect(parsed.revision).to eq("1")
+        it "parses revision as edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1")
         end
       end
 
@@ -125,8 +127,10 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
           expect(parsed.to_s).to eq("NIST IR 6945r1")
         end
 
-        it "parses revision" do
-          expect(parsed.revision).to eq("1")
+        it "parses revision as edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1")
         end
       end
     end
@@ -144,8 +148,10 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
           expect(parsed.to_s).to eq("NIST IR 8115r1/Upd1-202103")
         end
 
-        it "parses revision" do
-          expect(parsed.revision).to eq("1")
+        it "parses revision as edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1")
         end
 
         it "parses update" do
@@ -285,7 +291,9 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses revision and language" do
-          expect(parsed.revision).to eq("1")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1")
           expect(parsed.translation.language).to eq("spa")
         end
       end
@@ -478,7 +486,9 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses edition year" do
-          expect(parsed.edition.year).to eq("2018")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("2018")
         end
       end
 
@@ -495,7 +505,9 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses edition year" do
-          expect(parsed.edition.year).to eq("2018")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("2018")
         end
       end
 
@@ -512,7 +524,9 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses edition year" do
-          expect(parsed.edition.year).to eq("2018")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("2018")
         end
       end
     end

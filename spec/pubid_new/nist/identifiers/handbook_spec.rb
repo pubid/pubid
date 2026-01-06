@@ -62,11 +62,10 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition" do
-          expect(parsed.edition).to eq("2")
-        end
-
-        it "parses edition year" do
-          expect(parsed.edition_year).to eq("1955")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("2")
+          expect(parsed.edition.additional_text).to eq("1955")
         end
 
         it "round-trips" do
@@ -83,7 +82,9 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition" do
-          expect(parsed.edition).to eq("4")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("4")
         end
 
         it "round-trips" do
@@ -99,8 +100,10 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses year" do
-          expect(parsed.edition_year).to eq("1979")
+        it "parses edition year" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("1979")
         end
 
         it "round-trips" do
@@ -123,7 +126,9 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition year" do
-          expect(parsed.edition_year).to eq("1990")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("1990")
         end
 
         it "round-trips" do
@@ -144,7 +149,9 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition year" do
-          expect(parsed.edition_year).to eq("1969")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("1969")
         end
 
         it "round-trips" do
@@ -166,8 +173,10 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
           expect(parsed.number.value).to eq("105-3")
         end
 
-        it "parses revision year" do
-          expect(parsed.revision).to eq("1979")
+        it "parses revision as edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1979")
         end
 
         it "round-trips" do
@@ -183,8 +192,10 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses revision year" do
-          expect(parsed.revision).to eq("1977")
+        it "parses revision as edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1977")
         end
 
         it "round-trips" do
@@ -200,8 +211,10 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses revision year" do
-          expect(parsed.revision).to eq("1990")
+        it "parses revision as edition" do
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("r")
+          expect(parsed.edition.id).to eq("1990")
         end
 
         it "round-trips" do

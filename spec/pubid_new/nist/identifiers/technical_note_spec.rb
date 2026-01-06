@@ -100,7 +100,9 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses edition year" do
-          expect(parsed.edition.year).to eq("1993")
+          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("1993")
         end
       end
     end
