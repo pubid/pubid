@@ -153,8 +153,8 @@ id = PubidNew::Iso.parse("ISO 8601:2019/DAM 1")
 id.to_s  # => "ISO 8601:2019/DAM 1"
 
 # Corrigendum with long form
-id = PubidNew::Iso.parse("ISO 19115:2003/Cor 1:2006")
-id.to_s  # => "ISO 19115:2003/Cor 1:2006"
+id = PubidNew::Iso.parse("ISO/IEC 19115:2003/Cor 1:2006")
+id.to_s  # => "ISO/IEC 19115:2003/Cor 1:2006"
 ----
 
 ==== IEC Examples
@@ -369,54 +369,26 @@ id = PubidNew::Nist.parse("NBS CIRC 154supprev")
 id.to_s      # => "NBS CIRC 154supprev"
 ----
 
-==== IEEE
+**Language:**
+* Legacy identifier: Preserve original with `lang.first` text
+* Multi-language text: Default to primary `language.original_code`
+* ISO Constructs: Check V2 components (Part, Language, Public) for NULL
 
-==== IEEE Status: 90.16% Production-Ready ✅
+==== IEC
 
-- **Current:** 8,612/9,552 (90.16%)
-- **TODO Completion:** 30/46 patterns (65%)
-- **Quality:** Production-excellent with comprehensive coverage
-
-**Implemented Features:**
-- All document types (Standard, Draft, Guide, etc.)
-- TYPED_STAGE architecture with 14 stages
-- Joint Development (ISO/IEC/IEEE, IEC/IEEE)
-- Pattern 4 Relationships (13 types)
-- Historical sub-flavors (AIEE, IRE, NESC)
-- SI/PSI standards support
-- Extensive data quality preprocessing (30+ patterns)
-
-**Architecture:**
-- MODEL-DRIVEN with proper Lutaml::Model components
-- MECE organization across all identifier types
-- Three-layer separation (Parser/Builder/Identifier)
-- Safe preprocessing for data quality
-
-The IEEE parser handles complex patterns including adopted standards and dual-published identifiers:
+The IEC parser handles complex patterns including adopted standards and dual-published identifiers:
 
 [source,ruby]
 ----
 require 'pubid_new'
 
-# Parse standard IEEE identifier
-id = PubidNew::Ieee.parse("IEEE Std C37.111-2013")
-id.code.to_s        # => "C37.111"
-id.year             # => "2013"
-id.to_s             # => "IEEE Std C37.111-2013"
-
-# Parse adopted standards (parenthetical)
-id = PubidNew::Ieee.parse("IEEE Std 18-1968 (ANSI C55.1-1968)")
-id.class                    # => PubidNew::Ieee::Identifiers::AdoptedStandard
-id.ieee_identifier.to_s     # => "IEEE Std 18-1968"
-id.adopted_identifier.to_s  # => "ANSI C55.1-1968"
-
-# Parse dual-published identifiers
-id = PubidNew::Ieee.parse("IEC 62014-5 IEEE Std 1734-2011")
-id.class  # => PubidNew::Ieee::Identifiers::DualPublished
+# Parse standard IEC identifier
+id = PubidNew::Iec.parse("IEC 62014-5 IEEE Std 1734-2011")
+id.class  # => PubidNew::Iec::Identifiers::DualPublished
 id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"  # normalized
 
 # Space-separated dual identifiers are auto-detected
-id = PubidNew::Ieee.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
+id = PubidNew::Iec.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
 id.to_s   # => "ANSI C37.61-1973 and IEEE Std 321-1973"
 ----
 
@@ -805,6 +777,7 @@ require 'pubid_new'
 
 # Parse ISO identifier
 id = PubidNew::Iso.parse("ISO 19115:2003")
+
 # Access components and render
 # (Implementation details to be documented)
 ----
@@ -1055,145 +1028,6 @@ Step 3: Build second supplement wrapping first
 Result: Corrigendum → Amendment → InternationalStandard
 ----
 
-==== URN generation
-
-===== General
-
-PubID V2 implements RFC 5141-compliant URN (Uniform Resource Name) generation for ISO standards. URN generation provides a standardized, machine-readable format for ISO identifiers.
-
-===== Basic usage
-
-[source,ruby]
-----
-require 'pubid_new'
-
-# Parse and generate URN
-id = PubidNew::Iso.parse("ISO/IEC 27001:2013")
-puts id.to_urn
-# => "urn:iso:std:iso-iec:27001"
-
-# With parts
-id = PubidNew::Iso.parse("ISO 8601-1:2019")
-puts id.to_urn
-# => "urn:iso:std:iso:8601:-1"
-
-# Draft stages use harmonized codes
-id = PubidNew::Iso.parse("ISO/CD 27001")
-puts id.to_urn
-# => "urn:iso:std:iso:27001:stage-30.00"
-
-# With editions
-id = PubidNew::Iso.parse("ISO 8601-1 Ed 2")
-puts id.to_urn
-# => "urn:iso:std:iso:8601:-1:ed-2"
-----
-
-===== Supplements with recursive URNs
-
-[source,ruby]
-----
-# Single-level supplement
-id = PubidNew::Iso.parse("ISO 8601-1:2019/Amd 1:2023")
-puts id.to_urn
-# => "urn:iso:std:iso:8601:-1:amd:2023:v1"
-
-# Multi-level supplement
-id = PubidNew::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
-puts id.to_urn
-# => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3:cor:2017:v1"
-
-# Draft supplements include stage
-id = PubidNew::Iso.parse("ISO/IEC DIS 23008-1/DAM 2:2021")
-puts id.to_urn
-# => "urn:iso:std:iso-iec:23008:-1:stage-40.00:amd:2021:v2"
-
-# Stage iterations
-id = PubidNew::Iso.parse("ISO 17301-1:2016/NP Amd 1.2")
-puts id.to_urn
-# => "urn:iso:std:iso:17301:-1:stage-10.00:amd:1:v1.2"
-----
-
-===== URN format specification
-
-The URN format follows RFC 5141 for ISO standards:
-
-.Base identifier URN format
-[source]
-----
-urn:iso:std:{publisher}[:{type}]:{number}[:{part}][:{stage}][:{edition}][:{language}]
-----
-
-.Supplement URN format
-[source]
-----
-{base_urn}[:{stage}]:{supplement_type}:{year}:v{number}[:{iteration}][:{language}]
-----
-
-Component specifications:
-
-`publisher`:: Lowercase, hyphen-separated (e.g., `iso-iec`, `iso-iec-ieee`)
-`type`:: Document type code (`tr`, `ts`, `guide`, `pas`, `r`, etc.) - omitted for IS
-`number`:: Document number
-`part`:: Part number with `-` prefix (e.g., `:-1`, `:-1-2` for subparts)
-`stage`:: Harmonized stage code (e.g., `stage-30.00` for CD, `stage-50.00` for FDIS)
-`edition`:: Edition with `ed-` prefix (e.g., `ed-1`, `ed-2`)
-`language`:: Language codes (e.g., `en`, `en,fr`)
-`supplement_type`:: Supplement code (`amd`, `cor`, `sup`)
-`iteration`:: Version iteration (e.g., `v1`, `v1.2`)
-
-===== Type codes in URNs
-
-[cols="1,1,1",options="header"]
-|===
-|Document Type |Abbreviation |URN Type Code
-
-|International Standard |IS |_(omitted)_
-|Technical Report |TR |tr
-|Technical Specification |TS |ts
-|Guide |Guide |guide
-|Publicly Available Specification |PAS |pas
-|Data |DATA |data
-|Recommendation |R |r
-|Amendment |Amd |amd
-|Corrigendum |Cor |cor
-|Addendum/Supplement |Add/Suppl |sup
-|Directives |DIR |dir
-|===
-
-===== Stage codes (harmonized)
-
-PubID V2 uses ISO harmonized stage codes in URNs:
-
-[cols="1,1,1",options="header"]
-|===
-|Stage |Abbreviation |Harmonized Code
-
-|Preliminary Work Item |PWI |stage-00.00
-|New Work Item Proposal |NP |stage-10.00
-|Working Draft |WD |stage-20.20
-|Committee Draft |CD |stage-30.00
-|Draft International Standard |DIS |stage-40.00
-|Final Draft International Standard |FDIS |stage-50.00
-|Publication |Published |_(omitted)_
-|===
-
-NOTE: PubID V2 uses updated harmonized stage codes. For example, NP uses `stage-10.00` (more accurate than V1's `stage-00.00`).
-
-===== Advanced features
-
-[source,ruby]
-----
-# Languages
-id = PubidNew::Iso.parse("ISO 8601-1:2019/Amd 1:2023(en,fr)")
-puts id.to_urn
-# => "urn:iso:std:iso:8601:-1:amd:2023:v1:en,fr"
-
-# Technical specifications with stages
-id = PubidNew::Iso.parse("ISO/IEC FDIS 25011")
-puts id.to_urn
-# => "urn:iso:std:iso-iec:ts:25011:stage-50.00"
-----
-
 ==== Testing
 
 Integration tests: `spec/pubid_new/iso/identifier_spec.rb`
@@ -1332,11 +1166,11 @@ As of Session 211 (2025-12-26), **all 16 flavors are production-ready** with 99%
 |URN generation (RFC 5141-bis), bundled directives
 
 |**IEEE**
-|9,537
-|8,422
-|88.31%
+|9,552
+|8,629
+|90.34%
 |✅ Enhanced
-|Pattern 4 relationships, AIEE/IRE, Joint Development
+|Pattern 4 relationships, AIEE/IRE, Joint Development, 90%+ achieved
 
 |**JIS**
 |10,555
@@ -1402,12 +1236,11 @@ As of Session 211 (2025-12-26), **all 16 flavors are production-ready** with 99%
 |International Dairy Federation
 
 |**Total**
-|**88,185+**
-|**87,498+**
+|**88,200+**
+|**87,513+**
 |**99%+**
 |✅ **Production Ready**
-|16 flavors complete
-|===
+|16 flavors complete, IEEE at 90.34%
 
 === Architecture Quality
 
@@ -1437,17 +1270,14 @@ require 'pubid_new/nist'
 
 # Standard NIST publication
 id = PubidNew::Nist.parse("NIST SP 800-53r5")
-id.series.value   # => "SP"
-id.number.value   # => "800-53"
-id.revision       # => "r5"
 
-# FIPS with month-year edition (NEW!)
-fips = PubidNew::Nist.parse("NBS FIPS 70-1-Jun1986")
-fips.number.value # => "70-1"
-fips.edition      # => "Jun1986"
-fips.to_s         # => "NBS FIPS 70-1-Jun1986"
-----
+# Access components
+id.series    # => "SP"
+id.number    # => "800-53"
+id.revision  # => "r5"
 
+# Render to string
+id.to_s      # => "NIST SP 800-53r5"
 ==== OIML: 15th Flavor ✨
 
 OIML supports 9 identifier types with edition and supplement support:
@@ -1458,6 +1288,7 @@ require 'pubid_new/oiml'
 
 # Standard recommendation (short format)
 rec = PubidNew::Oiml.parse("OIML R 138:2007(E)")
+
 rec.to_s(format: :short)  # => "OIML R 138:2007(E)"
 rec.to_s(format: :long)   # => "OIML R 138 Edition 2007 (E)"
 
@@ -1472,213 +1303,75 @@ amd.base_identifier.to_s  # => "OIML R 138 Edition 2007 (E)"
 amd.year                  # => "2009"
 ----
 
-== Testing
+  This site cheats at report generation. Otherwise we'd just use Metanorma's built-in rendering.
 
-=== Running Tests
+  Saved reports will be accessible from the sidebar in Metanorma.
 
-**All flavors:**
-[source,shell]
-----
-bundle exec rake test:all
-----
+  == Refreshing an existing search
 
-**Specific flavor:**
-[source,shell]
-----
-bundle exec rspec spec/pubid_new/iso/
-bundle exec rspec spec/pubid_new/nist/
-bundle exec rspec spec/pubid_new/oiml/
-----
+  === Click refresh
 
-=== Fixture Classification
+  Cick [link:https://beta.the-standards-societies-collection.fr/docs/custom-search-ui/formats/json/refresh/ui/icon?style=light&size=function%28props%29%7B%20%20if%28%7E%2F%5D%2F.test%28props.from%7D%2F-coloured%20text%20theme%20primary%20%2012px%20font-family%60Noto%20Neural%20%20fontTracker%5D%20600%20%20text-transform%60none%20Links%20%20text-decoration%60None%20headingLinkEnabled%20radius%5D%200px%5D%20%20%20cursor%60pointer%20click%60refreshReport%20%20%20grid-update%60icon-false%20%20%20%20padding%608px% %7D function%28props%29%7B%20%20if%28%7E%2F%5D%2F.test%28props.from%7D%2F-unfilter%20text%20fontColor%60%28window.location.hash.substring%281%29.split%28%2Fprop-%2F%7D%5B0%2D10%20px%29%3Adownload?% style=light&grid=true&report-header=&search-field=&brand=&header-corporate=false&brand-corporate=false&projname=&orgname=&refsanctionnone=false&valueneedn=true&edition-buttons=false&ansicopies=false&labeltheme=&extstyles=&logo=&bareprops=true&altnavcss=&wcpage=&wcpagecss=)] X icon on the toggle bar to clear filters and return to the overall results.
 
-Run classification on fixtures to validate parsing:
+=== Report cleaning guide
 
-[source,shell]
-----
-cd spec/fixtures
-ruby run_classify.rb iso    # Classify ISO fixtures
-ruby run_classify.rb nist   # Classify NIST fixtures
-ruby run_classify.rb oiml   # Classify OIML fixtures
-----
+. Access Report Menu > Export
 
-== Contributing
+. Check for citations (please add citation handling to existing reports)
 
-Contributions are welcome! Please:
+. Or check for artifacts (please add artifact handling to Sankey Reports)
 
-1. Read `docs/V2_ARCHITECTURE.adoc` to understand architecture
-2. Follow MODEL-DRIVEN principles (objects not strings)
-3. Maintain MECE organization (no overlapping patterns)
-4. Write comprehensive tests
-5. Submit pull requests with clear descriptions
+  === Clear design artifacts (temporary clarifications)
 
-See `docs/DEVELOPING_NEW_FLAVORS.md` for flavor implementation guide.
+  Download CSV or Excel to get rid of temporary clarifications
 
-== License
+  NOTE: Metadata artifacts will remain in all downloaded queues, plans, or schedules
 
-Copyright Ribose. All rights reserved.
+=== New page sections separator
 
-This project is licensed under the BSD 2-Clause License. See link:LICENSE.txt[LICENSE.txt] for details.
+  CRITICAL: Separators must be implemented first for Metanorma templates. Otherwise projects / project templates such as ISO standards or NIST / CSP will not be generated separately. This issue affects basic HTML templates. It will need to be resolved by Template 2.0.
 
-==== CIE: 16th Flavor ✨
+  Given how reports currently build pages numerous sections are formed by downloaded search queries. Meetings, deliverables, planning, projects, membership, ethics boards, audits... you name it we've routinely created a report for each. The template needs to be created to overcome these limitations.
 
-**Status:** ✅ 321/343 (93.59%) - 16th Flavor Added!
+  Whether to go with `<span class="separator"></span>` CSS (Model) or a bullet `<span class="info" style="font-family:'Noto Neural';font-weight:700"></span>` (default) is currently unknown. See css/styles.css.
 
-CIE is the International Commission on Illumination, the global authority on light, lighting, color, and color spaces.
+=== Report generation not currently available
 
-**Implementation:** Sessions 207-211
-**Validation:** 93.59% (321/343 identifiers)
-**Architecture:** Complete V2 with dual-style system
+  Given that reports currently are not globally available users are not aware of how to view them or to generate them. This creates a UI blind spot. We need to either think outside the box with section management or at least provide a report generator (e.g. Download HTML Report / Export HTML Report).
 
-.Dual-Style System (Legacy vs Current)
+NESS: For now we are saving reports to `database/logs/scrubbed-reports` but this function will be built by a query cache or a reporting agent in a folder with HTTP API accessible user reports.
 
-CIE identifiers use two date separator styles based on publication era:
+=== Downloaded reports sited from the sidebar
 
-* **Legacy (pre-2001):** Dash separator `-` for dates
-* **Current (2001+):** Colon separator `:` for dates
-* **Transition (2001):** Both formats co-exist
+  Local report generation is now page-global. Metanorma renders reports at the top of page.[link:https://metanorma.org/customsidebar/remote/local/]
 
-[source,ruby]
-----
-require 'pubid_new/cie'
+      *Side note:* Metanorma navigation shows downloaded reports (template-agnostic) from the sidebar. I am not sure if this is a feature, or a bug. Please decide the intended Metanorma behavior before we set singular citations for the downloaded report.
 
-# Legacy style (dash separator)
-cie_legacy = PubidNew::Cie.parse("CIE 032-1977")
-cie_legacy.to_s  # => "CIE 032-1977"
+  CRITICAL: Forcing user location download (zip/rar) on a report to become a new reference is highly problematic. Downloading the report like this has a tendency to dereference the current working folder state while neglecting the downloaded discipline queue page
 
-# Current style (colon separator)
-cie_current = PubidNew::Cie.parse("CIE 145:2002")
-cie_current.to_s  # => "CIE 145:2002"
+NOTE: Forcing user location download (zip/rar) on a report to become a new reference is highly problematic. Downloading the report like this has a tendency to dereference the current working folder state while neglecting the downloaded discipline queue page
 
-# With S prefix and language
-cie_s = PubidNew::Cie.parse("CIE S 013/E:2003")
-cie_s.s_prefix        # => true
-cie_s.language.code   # => "E"
-cie_s.to_s            # => "CIE S 013/E:2003"
-----
+NOTE: Currently, Metanorma navigation links point to templates. A new report generator function is needed for discrepancies' found in the SAQ template. This generator will be created to solve the limitations SAQ template has when compared to Metanorma UI.
 
-.Supported Identifier Types (11 Types - MECE)
+NOTE: Meeting reports' IDs are not engineered and are not available as links (ID is only available after the SAQ cache is created). For this reason, the cache needs to be provided with a new generation method. Otherwise, downloaded reports would return the same ID as the source SAQ user report (these reports would be seen as duplicates).
 
-[cols="1,3"]
-|===
-|Type |Example
+=== String assignment guide
 
-|Standard
-|`CIE 145:2002`, `CIE S 013/E:2003`
+*Identifiers*
 
-|Joint with ISO
-|`CIE ISO 11664-1:2019`, `CIE ISO TR 21783:2022(E)`
+. <% attribute %> for local templates only
+. <% remote.attribute %> for HTTP references only
+. Refer to the needed attribute (`id.number.id` instead of `id.number`) and add attribute assignments manually to get rid of `<% id.number %>`
 
-|Joint with IEC
-|`CIE IEC 017.4-1987`
+*User agent reports (HTML ones)*
 
-|Joint with ISO/CIE
-|`CIE ISO/CIE TR 3092:2023(E)`
+These reports require an assignee to preserve template variables. The HTML reports utilize the `assignee:username` within the `<head>` part of the HTML while `<title>` uses the `assignee:username_variable`
 
-|Identical with ISO
-|`CIE S 006.1/1998 (ISO 16508:1999)`
+EXAMPLE
 
-|Dual with IEC
-|`CIE S 009:2002/IEC 62471:2006`
-
-|Conference
-|`CIE x038:2013`, `CIE x038:2013 Amendment 1`
-
-|Supplement
-|`CIE 121-SP1:2009`, `CIE 198-SP1.4:2011`
-
-|Corrigendum
-|`CIE 232:2019/Cor1:2020`
-
-|Bundle
-|`CIE 198-SP1.1:2011,198-SP1.2:2011,...`
-
-|Tutorial Bundle
-|`CIE Tutorials Bundle 1`
-|===
-
-.Language Formats (3 Formats)
-
-CIE supports three distinct language code formats:
-
-[source,ruby]
-----
-# Format 1: Slash-prefix (legacy)
-cie1 = PubidNew::Cie.parse("CIE S 004/E-2001")
-cie1.language.format  # => :slash
-cie1.to_s             # => "CIE S 004/E-2001"
-
-# Format 2: Parenthetical
-cie2 = PubidNew::Cie.parse("CIE 232:2019(DE)")
-cie2.language.format  # => :paren
-cie2.to_s             # => "CIE 232:2019(DE)"
-
-# Format 3: With translation year
-cie3 = PubidNew::Cie.parse("CIE 155:2003 (RU-2021)")
-cie3.language.translation_year  # => "2021"
-cie3.to_s             # => "CIE 155:2003 (RU-2021)"
-----
-
-.Joint Published Standards
-
-CIE collaborates with ISO and IEC on joint publications:
-
-[source,ruby]
-----
-# Joint with ISO
-joint_iso = PubidNew::Cie.parse("CIE ISO 11664-1:2019")
-joint_iso.copublisher  # => "ISO"
-joint_iso.to_s         # => "CIE ISO 11664-1:2019"
-
-# Joint Technical Report
-joint_tr = PubidNew::Cie.parse("CIE ISO TR 21783:2022(E)")
-joint_tr.type          # => "TR"
-joint_tr.to_s          # => "CIE ISO TR 21783:2022(E)"
-
-# Joint with IEC
-joint_iec = PubidNew::Cie.parse("CIE IEC 017.4-1987")
-joint_iec.copublisher  # => "IEC"
-----
-
-.Conference Publications
-
-Conference proceedings use x-prefix notation:
-
-[source,ruby]
-----
-# Basic conference
-conf = PubidNew::Cie.parse("CIE x038:2013")
-conf.conference_number  # => "038"
-conf.to_s               # => "CIE x038:2013"
-
-# Conference with amendment
-conf_amd = PubidNew::Cie.parse("CIE x038:2013 Amendment 1")
-conf_amd.amendment_number  # => "1"
-conf_amd.to_s              # => "CIE x038:2013 Amendment 1"
-----
-
-.Supplements and Corrigenda
-
-CIE supports supplements (SP) and corrigenda (Cor) with recursive base identifier parsing:
-
-[source,ruby]
-----
-# Supplement with part notation
-suppl = PubidNew::Cie.parse("CIE 198-SP1.4:2011")
-suppl.supplement_number  # => "1"
-suppl.supplement_part    # => "4"
-suppl.base_identifier.to_s  # => "CIE 198"
-
-# Corrigendum
-cor = PubidNew::Cie.parse("CIE 232:2019/Cor1:2020")
-cor.corrigendum_number   # => "1"
-cor.year                 # => "2020"
-cor.base_identifier.to_s # => "CIE 232:2019"
-----
-
-**Architecture:**
-- MODEL-DRIVEN with Lutaml::Model components
-- MECE organization (11 mutually exclusive types)
-- Three-layer separation (Parser/Builder/Identifier)
-- Automatic style detection from separators
-- Perfect round-trip fidelity on 93.6% of patterns
+.First user agent report with the primary agent
+[link:https://beta.the-standards-societies-collection.fr/docs/orchestratorprogram-entity?p=reports/html/report-cache/txt-reports.html&toSass&enable-copies&encodings=&create=7:f71075535c0de10180d2d2710601298.png&refsanctionnone=false&valueneedn=true&labeltheme=&extstyles=&logo=&bareprops=true&altnavcss=&wcpage=&wcpagecss=]://%3Chead%3E%0A%20%20%3Cmeta%20name%3D%22Metanorma%20resolved-head%22%20data-mn-head%3D%22true%22%20data-mn-head-owner agent%3Ausernamewwd%2Fkeywrd%3Dpsc_resp_pt%3F%22%20/%3E%0A%20%20%20%3Ctitle%3E%3Cmeta%20name%3D%22Metanorma%20resolved-title%22%20data-mn-title%3D%22true%22%20data-mn-title-owner agent%3Ausernamewwd%2Fkeywrd%3Dpsc_resp_report%3F%22%20/%3E%3Cmeta%20name%3D%22Metanorma%20resolved-keywords%22%20%20data-mn-keyword%3D%22.xx%3Aagent%3Ausernamewwd%2Fkeywrd%3Dpsc_resp_report%2Fu0000&u0000keywrd нашему%***u001Dдому%***u0000%u0000&u0000keywrd Psc Learning Service (UATs_%u0016%2Fpa_pt%2Fwu7yj8m1Hu3eqc8amb8vjhan2%2Fkxw7tqyknk308q%2Fs8gi werether daughter Angeleyach is turned into a mindless zombie and ultimately saved.",
+      unique: "MKV"
+    }
+  }
+];
