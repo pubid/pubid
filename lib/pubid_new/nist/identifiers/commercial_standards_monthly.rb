@@ -18,13 +18,12 @@ module PubidNew
         end
 
         def to_s
-          # Handle v#n# format (e.g., v6n1 for Volume 6, Number 1)
-          # Render as v6pt1 (using "pt" instead of "n" for CSM)
-          if volume && issue_number
+          # CSM uses part notation: Code already renders number="v6" part="1" as "v6pt1"
+          if number
+            "NBS CSM #{number.to_s}"
+          # Legacy: Handle old volume+issue_number format
+          elsif volume && issue_number
             "NBS CSM v#{volume}pt#{issue_number.number}"
-          # Handle simple number format
-          elsif number
-            "NBS CSM #{number}"
           # Fallback
           else
             "NBS CSM"

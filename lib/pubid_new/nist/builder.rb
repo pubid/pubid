@@ -93,8 +93,9 @@ module PubidNew
 
         # Build compound number from first_number and second_number
         if first_num && !identifier.number
-          # Skip if this is a v#n# pattern (volume + issue_number, no number)
+          # Skip if this is a v#n# pattern - now handled as Part component
           if identifier.volume && identifier.issue_number
+            # V#n# pattern handled as Part in first_number cast
           elsif second_num
             # Check for special patterns first
             if first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
@@ -144,12 +145,6 @@ module PubidNew
         # Apply extracted revision if not already set
         if extracted_revision && !identifier.revision
           identifier.revision = extracted_revision
-        end
-
-        # Special case: CSM with v#n# needs synthetic number for backward compat
-        if identifier.is_a?(Identifiers::CommercialStandardsMonthly) &&
-           identifier.volume && identifier.issue_number && !identifier.number
-          identifier.number = Components::Code.new(number: "v#{identifier.volume}n#{identifier.issue_number.number}")
         end
 
         identifier
@@ -263,10 +258,12 @@ module PubidNew
           return nil if value.nil? || value.to_s.strip.empty?
 
           # Handle v#n# pattern (CSM series) - comes as hash from parser
+          # Treat volume as number prefix "v6", issue as part "1"
           if value.is_a?(Hash) && value[:volume_number] && value[:issue_number]
+            volume_num = value[:volume_number].to_s
+            issue_num = value[:issue_number].to_s
             return {
-              volume: value[:volume_number].to_s,
-              issue_number: Components::IssueNumber.new(number: value[:issue_number].to_s)
+              first_number: Components::Code.new(number: "v#{volume_num}", part: issue_num)
             }
           end
 
