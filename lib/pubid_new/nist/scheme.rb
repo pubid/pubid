@@ -98,16 +98,27 @@ module PubidNew
               end
             end
 
-            # Check for CS emergency (e-prefixed numbers)
-            if simple_series == "CS"
-              first_number = parsed_hash[:first_number]&.to_s
-              if first_number&.start_with?("e")
-                return Identifiers::CommercialStandardEmergency
-              end
-            end
-
             # Use series mapping for other compound series
             series = simple_series
+          end
+
+          # Check for CS variants (works for both compound "NBS CS" and simple "CS")
+          if series == "CS"
+            first_num = parsed_hash[:first_number]
+
+            # Check for CSM (monthly) - v#n# pattern inside first_number hash
+            if first_num.is_a?(Hash) && first_num[:volume_number] && first_num[:issue_number]
+              return Identifiers::CommercialStandardsMonthly
+            end
+
+            # Check for CS-E (emergency) - e-prefix with 3+ digits
+            # Handle Parslet::Slice by converting to string
+            first_num_str = first_num.respond_to?(:to_str) ? first_num.to_str : first_num.to_s
+
+            # Match e104 or e104 (when "e104-43" is split into first+second)
+            if first_num_str =~ /^e\d{3,}/
+              return Identifiers::CommercialStandardEmergency
+            end
           end
 
           # Look up in series-to-class mapping

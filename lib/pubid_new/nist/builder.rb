@@ -95,7 +95,6 @@ module PubidNew
         if first_num && !identifier.number
           # Skip if this is a v#n# pattern (volume + issue_number, no number)
           if identifier.volume && identifier.issue_number
-            # Don't build number - this is CSM v#n# format
           elsif second_num
             # Check for special patterns first
             if first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
@@ -145,6 +144,12 @@ module PubidNew
         # Apply extracted revision if not already set
         if extracted_revision && !identifier.revision
           identifier.revision = extracted_revision
+        end
+
+        # Special case: CSM with v#n# needs synthetic number for backward compat
+        if identifier.is_a?(Identifiers::CommercialStandardsMonthly) &&
+           identifier.volume && identifier.issue_number && !identifier.number
+          identifier.number = Components::Code.new(number: "v#{identifier.volume}n#{identifier.issue_number.number}")
         end
 
         identifier
@@ -339,23 +344,22 @@ module PubidNew
               return {
                 edition: Components::Edition.new(type: "-", additional_text: "#{month_part}#{year_part}")
               }
+            # NEW: CS Emergency pattern "e104" or "e104-43" → extract number
+            # This must come BEFORE bare edition check to avoid conflict
+            # CS emergency always has 3+ digit number (e104, not e2)
+            elsif str_value =~ /^e(\d{3,})(-\d+)?$/
+              # Extract emergency number: e104 → 104, e104-43 → 104-43
+              emergency_num = str_value.sub(/^e/, "")
+              return {
+                first_number: Components::Code.new(number: emergency_num)
+              }
             # NEW: Bare edition pattern "e2" - just edition without number prefix
             # Creates: Edition(type: "e", id: "2")
             # Renders: "NBS CIRC e2"
-            elsif str_value =~ /^e(\d+)$/ && !str_value.match?(/e\d+-/)
+            # Only matches single or double digit (e1, e2, not e104 which is emergency)
+            elsif str_value =~ /^e(\d{1,2})$/
               edition_id = $1
               return {
-                edition: Components::Edition.new(type: "e", id: edition_id)
-              }
-            # NEW: Regular number with edition "101e2" - number with edition suffix (no supp)
-            # Creates: number="101", Edition(type: "e", id: "2")
-            # Renders: "NBS CIRC 101e2"
-            # CRITICAL: Only extract if NO second_number (otherwise compound logic handles it)
-            elsif str_value =~ /^(\d+)e(\d+)$/ && !parsed_hash[:second_number]
-              number_part = $1
-              edition_id = $2
-              return {
-                first_number: Components::Code.new(number: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id)
               }
             # Pattern: "13e2rev1908" - edition with revision year-only (NO month)
