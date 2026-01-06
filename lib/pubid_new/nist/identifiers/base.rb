@@ -22,6 +22,7 @@ module PubidNew
 
         # V2 COMPONENTS (Lutaml::Model objects) - PROPER SEPARATION
         attribute :edition, Components::Edition  # Edition (type + id): e2, e2021, r5, -3
+        attribute :edition_component, Components::Edition  # V2 edition component (alias)
         attribute :stage, Components::Stage
         attribute :version_component, Components::Version
         attribute :update_component, Components::Update
@@ -35,6 +36,7 @@ module PubidNew
         attribute :revision, :string
         attribute :revision_year, :string  # Year for revision (e.g., r6/1925, r1963, rJun1992)
         attribute :revision_month, :string  # Month for revision (e.g., rJun1992)
+        attribute :edition_year, :string  # Legacy edition year for backward compatibility
         attribute :version, :string
         attribute :update, Components::Update
         attribute :year, :integer

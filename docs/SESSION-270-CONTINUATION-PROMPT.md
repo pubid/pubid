@@ -22,6 +22,9 @@
 
 **Your Task:**
 Implement missing edition patterns in NIST parser following the "date IS edition" rule.
+Also, there is only one of revision + edition. If there is a revision ID (which
+will become an Edition(id:, type: "r")), then place the remaining content as
+edition additional_text.
 
 **Critical Architecture (DO NOT COMPROMISE):**
 - **Date IS Edition** - When no edition type, date becomes edition

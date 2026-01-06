@@ -120,8 +120,9 @@ module PubidNew
             elsif identifier.is_a?(Identifiers::TechnicalNote) &&
                   second_num.value.to_s.match?(/^(19|20)\d{2}$/)
               # SPECIAL CASE FOR TN: second_num is edition year
+              # Following "date IS edition" rule: -1993 becomes Edition(type: "e", id: "1993")
               identifier.number = first_num
-              edition_obj = Components::Edition.new(year: second_num.value.to_s.to_i)
+              edition_obj = Components::Edition.new(type: "e", id: second_num.value.to_s)
               identifier.edition_component = edition_obj
               identifier.edition = edition_obj
               identifier.edition_year = second_num.value.to_s
