@@ -1,25 +1,28 @@
 Flavor: BSI
-Classified: 2026-01-07 16:41:31
+Classified: 2026-01-07 17:49:18
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total: 1463
-Pass: 747 (51.06%)
-Fail: 716 (48.94%)
+Pass: 1008 (68.9%)
+Fail: 455 (31.1%)
 
 BY CLASS
 ----------------------------------------------------------------------
 adopted_european_norm                    Pass: 197/197 (100.0%)
-adopted_international_standard           Pass: 84/84 (100.0%)
+adopted_international_standard           Pass: 78/78 (100.0%)
 british_standard                         Pass: 162/162 (100.0%)
 cen_workshop_agreement                   Pass: 2/2 (100.0%)
-consolidated_identifier                  Pass: 50/50 (100.0%)
+consolidated_identifier                  Pass: 63/63 (100.0%)
 draft_document                           Pass: 13/13 (100.0%)
 flex                                     Pass: 23/23 (100.0%)
+handbook                                 Pass: 1/1 (100.0%)
 national_annex                           Pass: 19/19 (100.0%)
 nil_class                                Pass: 47/47 (100.0%)
+practice_guide                           Pass: 1/1 (100.0%)
 publicly_available_specification         Pass: 56/56 (100.0%)
 published_document                       Pass: 73/73 (100.0%)
-unknown                                  Pass: 0/716 (0.0%)
+specialized_standard                     Pass: 252/252 (100.0%)
+unknown                                  Pass: 0/455 (0.0%)
 value_added_publication                  Pass: 21/21 (100.0%)

@@ -12,6 +12,7 @@ require_relative "identifiers/draft_document"
 require_relative "identifiers/handbook"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
+require_relative "identifiers/specialized_standard"
 require_relative "components/publisher"
 
 module PubidNew
@@ -205,6 +206,9 @@ module PubidNew
         # Special case: National Annex prefix
         return Identifiers::NationalAnnex if parsed_hash[:na_prefix]
 
+        # Special case: Specialized prefix (BS A, BS AU, BS 2A, etc.)
+        return Identifiers::SpecializedStandard if parsed_hash[:prefix]
+
         # Special case: Handle adopted identifiers
         # Match "EN " followed by digit (not "EN ISO" or "EN IEC")
         return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]&.match?(/^EN\s+\d/)
@@ -229,6 +233,10 @@ module PubidNew
 
         when :publisher
           Components::Publisher.new(body: value.to_s)
+
+        when :prefix
+          # Specialized prefix (A, AU, C, M, 2A, etc.)
+          value.to_s
 
         when :number
           Components::Code.new(value: value.to_s)

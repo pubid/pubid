@@ -106,6 +106,16 @@ module PubidNew
           name: "British Industrial Practice",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Specialized British Standard (with letter prefix)
+        PubidNew::Components::TypedStage.new(
+          code: :pubspecialized,
+          stage_code: :published,
+          type_code: :specialized,
+          abbr: ["BS A", "BS AU", "BS C", "BS M", "BS S", "BS L", "BS TA", "BS MA", "BS PL", "BS QC", "BS G", "BS HC", "BS F", "BS X", "BS B"],
+          name: "Specialized British Standard",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -119,6 +129,7 @@ module PubidNew
         handbook: "Identifiers::Handbook",
         pp: "Identifiers::PracticeGuide",
         bip: "Identifiers::BritishIndustrialPractice",
+        specialized: "Identifiers::SpecializedStandard",
       }.freeze
 
       # Default typed stage for when no match is found

@@ -16,6 +16,31 @@ module PubidNew
       # BSI publisher
       rule(:bs) { str("BS") | str("BSI") }
 
+      # Specialized prefixes - Multi-letter BEFORE single-letter (longest match first)
+      rule(:multi_letter_prefix) do
+        # 4-character prefixes
+        str("2HC") | str("2HR") | str("2SP") | str("2TA") |
+        str("3HR") | str("3TA") |
+        # 3-character prefixes
+        str("2A") | str("2B") | str("2C") | str("2F") | str("2G") |
+        str("2L") | str("2M") | str("2S") |
+        str("3B") | str("3F") | str("3G") | str("3J") | str("3L") | str("3S") |
+        str("4F") | str("4L") | str("4S") |
+        str("5S") | str("7S")
+      end
+
+      rule(:single_letter_prefix) do
+        # Two-letter prefixes BEFORE single-letter
+        str("AU") | str("HC") | str("MA") | str("PL") | str("QC") | str("TA") |
+        # Single-letter prefixes
+        str("A") | str("B") | str("C") | str("F") | str("G") |
+        str("L") | str("M") | str("S") | str("X")
+      end
+
+      rule(:specialized_prefix) do
+        (multi_letter_prefix | single_letter_prefix).as(:prefix)
+      end
+
       # Flex documents (BSI Flex or just Flex) - BSI is already normalized to BS
       rule(:flex) { str("BSI Flex") | str("BS Flex") | str("Flex") }
 
@@ -68,6 +93,7 @@ module PubidNew
         pas.as(:type) |
         pp.as(:type) |
         na.as(:type) |
+        (bs.as(:publisher) >> space >> specialized_prefix) |
         bs.as(:publisher)
       end
 
