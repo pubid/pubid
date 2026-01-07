@@ -9,6 +9,8 @@ require_relative "../components/version"
 require_relative "../components/update"
 require_relative "../components/translation"
 require_relative "../components/issue_number"
+require_relative "../components/volume"
+require_relative "../components/part"
 
 module PubidNew
   module Nist
@@ -23,6 +25,8 @@ module PubidNew
         # V2 COMPONENTS (Lutaml::Model objects) - PROPER SEPARATION
         attribute :edition, Components::Edition  # Edition (type + id): e2, e2021, r5, -3
         attribute :edition_component, Components::Edition  # V2 edition component (alias)
+        attribute :volume, Components::Volume  # Volume component (v6)
+        attribute :part, Components::Part  # Part component (n1 or pt1)
         attribute :stage, Components::Stage
         attribute :version_component, Components::Version
         attribute :update_component, Components::Update
@@ -32,7 +36,6 @@ module PubidNew
 
         # LEGACY attributes (keep for backward compatibility during migration)
         attribute :parts, Components::Code, collection: true
-        attribute :volume, :string
         attribute :revision, :string
         attribute :revision_year, :string  # Year for revision (e.g., r6/1925, r1963, rJun1992)
         attribute :revision_month, :string  # Month for revision (e.g., rJun1992)
@@ -60,7 +63,6 @@ module PubidNew
         attribute :appendix, :string
         attribute :translation, :string
         attribute :draft, :string
-        attribute :part, :string
         attribute :draft_number, :string  # For -draft N → N pd rendering
 
         def initialize(**attributes)
@@ -191,32 +193,27 @@ module PubidNew
           result += " #{number.to_s}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-          # NEW: Render standalone volume (not part of v#n#)
-          if volume && !issue_number
-            result += "v#{volume}"
+          # NEW: Use Volume and Part components (v6n1 notation for CSM, pt1 for SP)
+          if volume.is_a?(Components::Volume) && part.is_a?(Components::Part)
+            # CSM series: v#n# notation
+            result += " #{volume}#{part.to_s}"
+          elsif part.is_a?(Components::Part)
+            # SP and other series: use Part.type to determine format
+            result += "#{part.to_s}"
+          # Legacy: Render standalone volume (not part of v#n#)
+          elsif volume && !issue_number && !part
+            vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
+            result += vol_str
           elsif volume && issue_number
             # Render volume and issue number in short form: "v6n12"
-            result += "v#{volume}n#{issue_number.number}"
+            vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
+            result += "#{vol_str}n#{issue_number.number}"
           end
 
           # NEW: Use edition component properly (e2, e2021, r5, -3)
           # Add space before edition if no number (bare edition case like "e2")
           if edition
             result += (number ? "" : " ") + edition.to_s
-          end
-
-          # Add revision
-          if revision
-            # Check if revision already has prefix
-            if revision.match?(/^(Rev\.|Revision|r)/)
-              result += "#{revision}"
-            elsif revision.match?(/^[0-9]/)
-              # Just digits - add short prefix with no space
-              result += "r#{revision}"
-            else
-              # Already has some prefix - use as-is with no space
-              result += "#{revision}"
-            end
           end
 
           # V2: Use version_component if available, else use version string
@@ -295,15 +292,6 @@ module PubidNew
 
           # NEW: Use edition component
           result += edition.to_s if edition
-
-          # Fix: Don't add "r" prefix if revision already has it
-          if revision
-            if revision.to_s.start_with?("r", "R")
-              result += "#{revision}"
-            else
-              result += "r#{revision}"
-            end
-          end
 
           # V2: Use version_component
           result += "#{version_component.to_s(:mr)}" if version_component

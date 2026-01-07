@@ -172,6 +172,21 @@ module PubidNew
         # Fix revision followed by language code: "r1es" → "r1 es", "r1pt" → "r1 pt" (NEW)
         cleaned = cleaned.gsub(/(r\d+)(es|pt|chi|viet|port|esp)\b/, '\1 \2')
 
+        # ENHANCEMENT 1: Edition year normalization (-YYYY → eYYYY)
+        # Per NIST spec, trailing -YYYY should normalize to eYYYY format
+        # Pattern: number followed by dash and 4-digit year at end
+        # Examples: "330-2019" → "330e2019", "304a-2017" → "304Ae2017"
+        # Must be at end or before space to avoid breaking number-number patterns like "800-53"
+        cleaned = cleaned.gsub(/(\d[A-Z]?)-(\d{4})(?=\s|$)/, '\1e\2')
+
+        # ENHANCEMENT 2: Version normalization (v1.1 → ver1.1, Ver. 2.0 → ver2.0)
+        # Normalize short v format to verbose ver format per NIST spec
+        # Already handled in version rule, but normalize in preprocessing for consistency
+        # Handle Ver. with period: "Ver. 2.0" → "ver2.0" (remove period and space)
+        cleaned = cleaned.gsub(/\bVer\.\s+(\d+(?:\.\d+)*)/, 'ver\1')
+        # Handle verbose "v" to "ver": "v1.1" → "ver1.1" (only with dots - versions have dots)
+        cleaned = cleaned.gsub(/\bv(\d+\.\d+(?:\.\d+)*)/, 'ver\1')
+
         # Fix uppercase P for part: "428P1" → "428 p1", "647P2" → "647 p2" (NEW)
         cleaned = cleaned.gsub(/(\d)P(\d)/, '\1 p\2')
 

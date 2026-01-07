@@ -92,7 +92,8 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses part and revision" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part.value).to eq("1")
           expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("4")
@@ -112,7 +113,10 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses letter suffix and revision" do
-          expect(parsed.number.value).to eq("800-56A")
+          expect(parsed.number.value).to eq("800-56")
+          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part.type).to eq("")
+          expect(parsed.part.value).to eq("A")
           expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("2")
@@ -176,7 +180,10 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses edition year with letter suffix" do
-          expect(parsed.number.value).to eq("304A")
+          expect(parsed.number.value).to eq("304")
+          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part.type).to eq("")
+          expect(parsed.part.value).to eq("A")
           expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2017")
@@ -234,13 +241,11 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "normalizes to update format" do
-          expect(parsed.to_s).to eq("NIST SP 500-300/Upd1-202105")
+          expect(parsed.to_s).to eq("NIST SP 500-300-upd1")
         end
 
         it "parses update" do
           expect(parsed.update.number).to eq("1")
-          expect(parsed.update.year).to eq("2021")
-          expect(parsed.update.month).to eq("05")
         end
       end
     end

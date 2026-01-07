@@ -8,6 +8,8 @@ require_relative "components/version"
 require_relative "components/update"
 require_relative "components/translation"
 require_relative "components/issue_number"
+require_relative "components/volume"
+require_relative "components/part"
 
 module PubidNew
   module Nist
@@ -52,7 +54,6 @@ module PubidNew
         first_num = nil
         second_num = nil
         extracted_revision = nil
-        extracted_part = nil  # NEW: Track extracted part
 
         # Cast and assign all attributes
         parsed_hash.each_pair do |key, value|
@@ -79,10 +80,6 @@ module PubidNew
               # Track revision extraction
               elsif sub_key == :revision
                 extracted_revision = sub_value
-              # Handle part_extracted - save for later assignment to number.part
-              elsif sub_key == :part_extracted
-                extracted_part = sub_value.to_s
-                next  # Don't try to assign part_extracted as attribute
               end
               identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
             end
@@ -140,14 +137,10 @@ module PubidNew
           end
         end
 
-        # Assign extracted part to number if present
-        if extracted_part && identifier.number
-          identifier.number.part = extracted_part
-        end
-
         # Apply extracted revision if not already set
-        if extracted_revision && !identifier.revision
-          identifier.revision = extracted_revision
+        if extracted_revision && !identifier.edition
+          # Convert extracted revision to Edition component
+          identifier.edition = Components::Edition.new(type: "r", id: extracted_revision.to_s)
         end
 
         identifier
@@ -248,25 +241,26 @@ module PubidNew
           end
 
         when :volume_number
-          # Volume from v#n# pattern - return as string for volume attribute
+          # Volume from v#n# pattern - return Volume component
           return nil if value.nil? || value.to_s.strip.empty?
-          value.to_s
+          { volume: Components::Volume.new(value: value.to_s) }
 
         when :issue_number
-          # Issue number from v#n# pattern - return as IssueNumber component
+          # Issue number from v#n# pattern - return Part component
           return nil if value.nil? || value.to_s.strip.empty?
-          { issue_number: Components::IssueNumber.new(number: value.to_s) }
+          { part: Components::Part.new(type: "n", value: value.to_s) }
 
         when :first_number, :second_number
           return nil if value.nil? || value.to_s.strip.empty?
 
           # Handle v#n# pattern (CSM series) - comes as hash from parser
-          # Treat volume as number prefix "v6", issue as part "1"
+          # Return Volume and Part components separately
           if value.is_a?(Hash) && value[:volume_number] && value[:issue_number]
             volume_num = value[:volume_number].to_s
             issue_num = value[:issue_number].to_s
             return {
-              first_number: Components::Code.new(number: "v#{volume_num}", part: issue_num)
+              volume: Components::Volume.new(value: volume_num),
+              part: Components::Part.new(type: "n", value: issue_num)
             }
           end
 
@@ -440,13 +434,45 @@ module PubidNew
                 edition: Components::Edition.new(type: "e", id: edition_id),
                 supplement: ""
               }
-            end
+          end
+          elsif type == :second_number && value.is_a?(Hash) && value[:first_number]
+            # Handle second_number as a hash with first_number context
+            # e.g., for pattern 800-57pt1r4
+            number_part = value[:first_number].to_s
+            part_value = value[:part_value]&.to_s
+            revision_value = value[:revision_value]&.to_s
+            return {
+              first_number: Components::Code.new(number: number_part),
+              part: Components::Part.new(value: part_value),
+              edition: Components::Edition.new(type: "r", id: revision_value)
+            }
           end
 
           # Extract revision suffix from number (e.g., "53r5" → "53" + Edition(r, 5))
           # ENHANCED: Also extract revision with slash-year (e.g., "53r5/1917" → "53" + Edition)
           # ENHANCED: Also extract revision with 4-digit year (e.g., "1019r1963" → "1019" + Edition)
           # ENHANCED: Also extract revision with month+year (e.g., "4743rJun1992" → "4743" + Edition)
+
+          # NEW: Extract part suffix from number (e.g., "800-57pt1" → "800-57" + Part(1))
+          # This handles SP series part notation
+          # IMPORTANT: Handle combined part+revision first (e.g., "800-57pt1r4")
+          if str_value =~ /^(.+?)pt(\d+)r(\d+[a-z]?)$/
+            number_part = $1
+            part_value = $2
+            revision_value = $3
+            return {
+              type => Components::Code.new(number: number_part),
+              part: Components::Part.new(type: "pt", value: part_value),
+              edition: Components::Edition.new(type: "r", id: revision_value)
+            }
+          elsif str_value =~ /^(.+?)pt(\d+)$/
+            number_part = $1
+            part_value = $2
+            return {
+              type => Components::Code.new(number: number_part),
+              part: Components::Part.new(type: "pt", value: part_value)
+            }
+          end
 
           # NEW: Extract volume suffix from number (e.g., "539v10" → "539" + volume="10")
           # This handles CIRC volume notation
@@ -459,16 +485,18 @@ module PubidNew
             }
           end
 
+          # REVISION PATTERNS - These must come BEFORE letter suffix to avoid conflicts
           if str_value =~ /^(.+?)(r\d+\/\d{4})$/i
             # Pattern: r6/1925 (revision with slash-year)
             number_part = $1
             revision_with_year = $2  # e.g., "r6/1925"
             # Extract revision and year
             if revision_with_year =~ /^r(\d+)\/(\d{4})$/
+              revision_id = $1
+              year_part = $2
               return {
                 type => Components::Code.new(number: number_part),
-                revision: $1,  # Just the revision number
-                revision_year: $2  # The year part
+                edition: Components::Edition.new(type: "r", id: revision_id, additional_text: year_part)
               }
             end
           elsif str_value =~ /^(.+?)(r\d{4})$/i
@@ -485,10 +513,11 @@ module PubidNew
             revision_with_date = $2  # e.g., "rJun1992"
             # Extract month and year
             if revision_with_date =~ /^r([A-Za-z]{3,9})(\d{4})$/
+              month_part = $1
+              year_part = $2
               return {
                 type => Components::Code.new(number: number_part),
-                revision_month: $1,
-                revision_year: $2
+                edition: Components::Edition.new(type: "r", id: "#{month_part}#{year_part}")
               }
             end
           elsif str_value =~ /^(.+?)(r\d+[a-z]?)$/i
@@ -498,6 +527,39 @@ module PubidNew
             return {
               type => Components::Code.new(number: number_part),
               edition: Components::Edition.new(type: "r", id: revision_value)
+            }
+          elsif str_value =~ /^(.+?)(r)$/i
+            # Pattern: bare r with no digits (e.g., "800-90r")
+            number_part = $1
+            return {
+              type => Components::Code.new(number: number_part),
+              edition: Components::Edition.new(type: "r", id: "1")
+            }
+          end
+
+          # NEW: Extract UPPERCASE letter suffix as Part component (e.g., "800-56A" → "800-56" + Part)
+          # IMPORTANT: These patterns come AFTER revision patterns to avoid conflicts
+          # Letter suffixes are UPPERCASE letters A-Z only (no lowercase to avoid revision markers)
+
+          # Pattern: UPPERCASE letter + revision (e.g., "800-56Ar2" → number + Part("", "A") + Edition(r, 2))
+          # NO /i flag - only match uppercase letters!
+          if str_value =~ /^(.+?)([A-Z])(r\d+[a-z]?)$/
+            number_part = $1
+            letter_part = $2
+            revision_part = $3.sub(/^r/, "")
+            return {
+              type => Components::Code.new(number: number_part),
+              part: Components::Part.new(type: "", value: letter_part),
+              edition: Components::Edition.new(type: "r", id: revision_part)
+            }
+          # Pattern: bare UPPERCASE letter suffix (e.g., "800-56A" → number + Part("", "A"))
+          # Only matches uppercase letters - won't match revision markers
+          elsif str_value =~ /^(.+?)([A-Z])$/
+            number_part = $1
+            letter_part = $2
+            return {
+              type => Components::Code.new(number: number_part),
+              part: Components::Part.new(type: "", value: letter_part)
             }
           end
 
@@ -578,7 +640,7 @@ module PubidNew
 
         # ========== END V2 COMPONENTS ==========
 
-        when :volume, :revision, :section, :appendix, :translation,
+        when :volume, :section, :appendix, :translation,
              :errata, :index, :insert, :version
           return nil if value.nil?
           return nil if value.is_a?(Array) && value.empty?
@@ -587,6 +649,27 @@ module PubidNew
           return nil if str_value.empty?
 
           str_value
+
+        when :revision
+          # Revision MUST be Edition component with type "r"
+          return nil if value.nil? || value.to_s.strip.empty?
+
+          str_value = value.to_s.strip
+
+          # Handle bare "r" → normalize to "r1"
+          revision_id = if str_value.empty? || str_value == "r" || str_value == "R"
+            "1"
+          # Handle "r4", "R5", "4" etc.
+          elsif str_value =~ /^[rR]?(\d+[a-z]?)$/
+            $1
+          else
+            str_value
+          end
+
+          # Return Edition component
+          {
+            edition: Components::Edition.new(type: "r", id: revision_id)
+          }
 
         when :revision_year, :revision_month
           # When revision_year comes from parser as separate element (e.g., "1019 r1963")
@@ -752,25 +835,25 @@ module PubidNew
           }
 
         when :part
-          # Special handling for :part - extract part number and addendum
+          # Part component - handle part number with optional addendum
           return nil if value.nil? || value.to_s.strip.empty?
 
           str_value = value.to_s.strip
 
-          # Pattern: "1adde1" → part="1", addendum=true
+          # Pattern: "1adde1" → Part(value: "1"), addendum=true
           if str_value =~ /^(\d+)add/
             {
-              part_extracted: $1,
+              part: Components::Part.new(type: "pt", value: $1),
               addendum: "true"
             }
           else
-            # Just a part number
-            { part_extracted: str_value }
+            # Just a part number - return Part component with pt type
+            { part: Components::Part.new(type: "pt", value: str_value) }
           end
 
         when :part_extracted
-          # This is processed - assign to number.part
-          value.to_s
+          # Legacy - this is now handled by :part
+          nil
 
         when :edition_letter
           return nil if value.nil? || value.to_s.strip.empty?

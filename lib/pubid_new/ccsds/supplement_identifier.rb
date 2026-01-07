@@ -1,16 +1,13 @@
 # frozen_string_literal: true
 
+require_relative "identifiers/base"
+
 module PubidNew
   module Ccsds
     # Base class for CCSDS supplements (corrigenda, amendments, etc.)
-    # This is a plain Ruby class, not Lutaml::Model, since CCSDS
-    # uses simple string-based attributes
-    class SupplementIdentifier
-      attr_accessor :base_identifier
-
-      def initialize(base_identifier: nil)
-        @base_identifier = base_identifier
-      end
+    # Following ISO pattern: inherits from Base and uses Lutaml::Model
+    class SupplementIdentifier < Identifiers::Base
+      attribute :base_identifier, Identifiers::Base, polymorphic: true
 
       # Delegate methods to base_identifier for convenient access
       def publisher

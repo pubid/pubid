@@ -6,12 +6,7 @@ module PubidNew
   module Ccsds
     module Identifiers
       class Corrigendum < SupplementIdentifier
-        attr_accessor :cor_number
-
-        def initialize(base_identifier: nil, cor_number: nil)
-          super(base_identifier: base_identifier)
-          @cor_number = cor_number
-        end
+        attribute :cor_number, :integer
 
         def to_s
           base_str = base_identifier.to_s

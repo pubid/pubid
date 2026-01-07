@@ -10,11 +10,6 @@ module PubidNew
         attribute :base, PubidNew::Etsi::Identifiers::Base
         attribute :number, :integer
 
-        def initialize(base:, number:)
-          @base = base
-          @number = number
-        end
-
         # Inherit attributes from base
         def type
           base.type
