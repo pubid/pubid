@@ -1,157 +1,193 @@
-# Session 288 Quick Start: BSI Single Letter Prefixes Implementation
+# Session 289+ Quick Start: BSI Remaining Classes Implementation
 
-**Status:** Session 287 complete - Project marked complete, BSI enhancement OPTIONAL
-**Next:** Implement single letter prefixes (+200 IDs, 51% → 65%)
-
----
-
-## Quick Context
-
-**Session 287 Achievement:**
-- ✅ Project marked COMPLETE
-- ✅ 18/18 flavors production-ready
-- ✅ BSI baseline: 747/1,463 (51.06%)
-
-**Session 288 Objective:**
-Implement single and multi-letter prefix patterns for specialized BSI standards.
-
-**Target:** +200 identifiers (51.06% → 64.74%)
+**Status:** Session 288 complete - SpecializedStandard implemented, 62.13% achieved
+**Next:** Implement 3 classes (Range, Supplement, Addendum) to reach 65%+
 
 ---
 
-## Session 288 Tasks (150 minutes)
+## Updated Context (Post-Session 288)
 
-### Part A: Create SpecializedStandard Class (30 min)
+**Session 288 Achievement:**
+- ✅ SpecializedStandard with 35+ letter prefixes
+- ✅ 1,008/1,622 identifiers passing (62.13%)
+- ✅ Exceeded initial target (was 51% → now 62%)
 
-**File:** `lib/pubid_new/bsi/identifiers/specialized_standard.rb`
+**New Fixture Structure:**
+- **Total:** 1,622 identifiers (reorganized by class)
+- **Currently Passing:** 1,008 (62.13%)
+- **For 65% target:** Need 1,054 (+46 identifiers)
+- **For 68% target:** Need 1,103 (+95 identifiers)
 
-**Pattern Examples:**
+**Fixture Organization:** 31 class-based files in `spec/fixtures/bsi/identifiers/full/`
+
+---
+
+## Class Implementation Status
+
+### ✅ Currently Implemented (1,008 IDs)
+
+1. **BritishStandard** (585) - Core BS documents
+2. **SpecializedStandard** (294) - NEW in Session 288 (A, AU, C, M, etc.)
+3. **PublishedDocument** (169) - PD documents
+4. **DraftDocument** (111) - DD documents
+5. **ConsolidatedIdentifier** (98) - Bundle with +A/+C
+6. **PubliclyAvailableSpecification** (59) - PAS documents
+7. **ValueAddedPublication** (35) - PDF/TC/BOOK wrappers
+8. **ExpertCommentary** (29) - ExComm suffix
+9. **Flex** (28) - BSI Flex with v-editions
+10. **NationalAnnex** (21) - NA wrappers
+11. **Handbook** (16) - Handbook documents
+12. **PracticeGuide** (~10) - PP documents
+
+### ⏳ High Priority Classes (For 65% - Need 3 of these)
+
+**Class 1: RangeIdentifier** (40 IDs) - **QUICK WIN**
+- File: `range.txt`
+- Patterns: "and", "to", "TO", "&", ";"
+- Examples: `BS SP 10 & 11:1949`, `BS SP 115 to 117:1956`
+- Effort: 60 min
+- **Impact: +40 IDs alone gets us to 64.6%!**
+
+**Class 2: SupplementDocument** (32 IDs)
+- File: `supplement.txt`
+- Patterns: "Supplement No. X:YEAR", "Supplement X:YEAR"
+- Examples: `BS 449-1 Supplement No. 1:1959`, `Supplement No. 1 (1970) to BS 1831:1969`
+- Effort: 45 min
+- **Impact: With Range = 64.6% + 2.0% = 66.6%** ✅
+
+**Class 3: AddendumDocument** (29 IDs)
+- File: `addendum.txt`
+- Patterns: "Addendum No. X:YEAR", "Addendum X:YEAR"
+- Examples: `BS 978-2:Addendum No. 1:1959`
+- Effort: 30 min
+- **Impact: Optional (already at 66.6%)**
+
+---
+
+## Session 289 Recommendation: RangeIdentifier Only (60 min)
+
+**Fastest path to 65%:** Implement RangeIdentifier alone.
+
+### Part A: Create RangeIdentifier Class (20 min)
+
+```ruby
+# lib/pubid_new/bsi/identifiers/range_identifier.rb
+class RangeIdentifier < Lutaml::Model::Serializable
+  attribute :identifiers, SingleIdentifier, collection: true
+  attribute :connector, :string  # "and", "to", "&", ";"
+
+  def to_s
+    # Render based on connector type
+  end
+end
 ```
-BS A 16:1939        # Aircraft - General
-BS AU 177a:1980     # Automotive
-BS C 10:1958        # Aircraft
-BS M 38:1971        # Methods - Aircraft
-BS 2A 241:2005+A2:2011  # Multi-letter prefix
+
+### Part B: Update Parser (25 min)
+
+```ruby
+# Add connector rules
+rule(:range_connector) do
+  str(" and ") | str(" to ") | str(" TO ") |
+  str(" & ") | str("; ")
+end
+
+rule(:range_identifier) do
+  identifier.as(:first) >>
+  range_connector.as(:connector) >>
+  identifier.as(:second)
+  # Handle chains with .repeat for multiple connectors
+end
 ```
 
-**Implementation:** Class with `prefix` attribute, inherits from SingleIdentifier
+### Part C: Test (15 min)
 
----
-
-### Part B: Update Parser (30 min)
-
-**File:** `lib/pubid_new/bsi/parser.rb`
-
-**Add Rules:**
-- `specialized_prefix` - Captures single/multi-letter prefixes
-- Update `publisher_or_type` to include prefix pattern
-- Prefix after BS publisher, before number
-
-**All Prefixes to Support:**
-- Single: A, AU, B, C, F, G, HC, L, M, MA, PL, QC, S, TA, X
-- Multi: 2A, 2B, 2C, 2F, 2G, 2HC, 2HR, 2L, 2M, 2S, 2SP, 2TA, 3B, 3F, 3G, 3HR, 3J, 3L, 3S, 3TA, 4F, 4L, 4S, 5S, 7S
-
----
-
-### Part C: Update Builder (15 min)
-
-**File:** `lib/pubid_new/bsi/builder.rb`
-
-**Changes:**
-- Add `require_relative` for SpecializedStandard
-- Update `locate_identifier_klass` to check for prefix
-- Cast prefix to string attribute
-
----
-
-### Part D: Update Scheme (15 min)
-
-**File:** `lib/pubid_new/bsi/scheme.rb`
-
-**Changes:**
-- Add TypedStage for specialized standards
-- Add to IDENTIFIER_CLASS_MAP: `specialized: "Identifiers::SpecializedStandard"`
-
----
-
-### Part E: Testing (30 min)
-
-**Commands:**
 ```bash
-# Run classification
 cd spec/fixtures && ruby run_classify.rb bsi
-
-# Check improvement
-# Expected: 747 → 947 (+200)
-# Expected: 51.06% → 64.74%
-```
-
-**Validate:**
-- All specialized prefix patterns parsing
-- No regressions in existing 747 passing tests
-- Round-trip fidelity maintained
-
----
-
-## <br> Key Architecture Principles
-
-**CRITICAL:**
-1. **MODEL-DRIVEN** - SpecializedStandard is proper class with prefix attribute
-2. **Single responsibility** - Prefix is just one attribute, reuses rest from SingleIdentifier
-3. **Open/Closed** - Easy to add new prefixes (just add to parser pattern)
-4. **MECE** - Specialized standards are distinct from regular BS
-5. **Component reuse** - Uses same Code, Date, Publisher components
-
----
-
-## Files to Read First
-
-**Essential:**
-1. `docs/SESSION-288-CONTINUATION-PLAN.md` - Full plan
-2. `.kilocode/rules/memory-bank/architecture.md` - BSI architecture
-3. `lib/pubid_new/bsi/single_identifier.rb` - Base class to inherit from
-
-**Reference:**
-- `lib/pubid_new/bsi/identifiers/british_standard.rb` - Similar pattern
-- `lib/pubid_new/bsi/identifiers/handbook.rb` - Recent prefix implementation
-
----
-
-## Expected Results
-
-**Baseline:** 747/1,463 (51.06%)
-**Target:** 947/1,463 (64.74%)
-**Improvement:** +200 identifiers (+13.68pp)
-
-**Test Impact:**
-- Specialized prefix tests: +200 new passing
-- Other categories: 0 regressions
-- Architecture: Clean, extensible, MODEL-DRIVEN
-
----
-
-## Git Strategy
-
-**After Session 288:**
-```bash
-git add -A
-git commit -m "feat(bsi): add SpecializedStandard for letter prefix patterns
-
-Session 288: Single/Multi-Letter Prefix Implementation
-- Created SpecializedStandard class with prefix attribute
-- Added 35+ letter prefix patterns to parser
-- Updated Scheme with specialized TypedStage
-- BSI: 747 → 947 (+200 IDs, 51.06% → 64.74%)
-
-Architecture: MODEL-DRIVEN, prefix as attribute, inherits SingleIdentifier
-Status: Session 288 complete"
+# Expected: 1,008 → 1,048 (64.61%)
+# Or higher if patterns match multiple categories
 ```
 
 ---
 
-**Created:** 2026-01-07
-**Session:** 288
-**Duration:** 150 minutes
-**Priority:** OPTIONAL (project already complete)
+## Session 290: Supplement Classes (75 min) - SECURE 65%+
 
-**Ready to begin if requested!** 🚀
+**Only proceed if Session 289 didn't reach 65%**
+
+Implement SupplementDocument and AddendumDocument for guaranteed 65%+ achievement.
+
+---
+
+## Alternative: Sessions 289-290 Combined (135 min)
+
+Implement all 3 classes in one longer session:
+- RangeIdentifier (60 min)
+- SupplementDocument (45 min)
+- AddendumDocument (30 min)
+
+**Result:** 1,008 → 1,103+ (68%+) - **Far exceeds 65% target**
+
+---
+
+## Success Metrics
+
+**Minimum (65%):** Implement RangeIdentifier only
+- ✅ 1,048+/1,622 (64.6-65%+)
+- ✅ 1 new class (60 minutes)
+
+**Target (68%):** Implement Range + Supplement + Addendum
+- ✅ 1,103+/1,622 (68%+)
+- ✅ 3 new classes (135 minutes total)
+
+**Stretch (70%+):** Add ElectronicBook, DetailedSpecification, etc.
+- ✅ 1,135+/1,622 (70%+)
+- ✅ 6+ new classes (additional 180 minutes)
+
+---
+
+## Key Architectural Principles
+
+**MAINTAIN:**
+1. **MODEL-DRIVEN** - Each class is proper Lutaml::Model
+2. **MECE** - Range/Supplement/Addendum are mutually exclusive
+3. **Wrapper Pattern** - Supplement/Addendum wrap base identifiers
+4. **Component Reuse** - Use existing Code, Date components
+5. **Parser Separation** - Connectors in parser, not business logic
+
+---
+
+## Files to Create
+
+**Session 289:**
+1. `lib/pubid_new/bsi/identifiers/range_identifier.rb`
+
+**Session 290:**
+2. `lib/pubid_new/bsi/identifiers/supplement_document.rb`
+3. `lib/pubid_new/bsi/identifiers/addendum_document.rb`
+
+## Files to Modify
+
+**Both Sessions:**
+- `lib/pubid_new/bsi/parser.rb`
+- `lib/pubid_new/bsi/builder.rb`
+- `lib/pubid_new/bsi/scheme.rb`
+
+---
+
+## Next Immediate Steps (Session 289)
+
+1. Read updated continuation plan
+2. Create RangeIdentifier class
+3. Add connector patterns to parser
+4. Update builder to construct range identifiers
+5. Test and validate (expect 64-65%+)
+6. Commit progress
+7. CELEBRATE 65% if achieved! 🎉
+
+---
+
+**Created:** 2026-01-07 (Updated post-Session 288)
+**Current:** 1,008/1,622 (62.13%)
+**Target:** 1,054/1,622 (65%+) - Only +46 IDs needed!
+**Available:** +101 IDs in top 3 classes
+
+**Recommendation:** RangeIdentifier alone likely achieves 65%! (60 min effort)

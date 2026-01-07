@@ -207,7 +207,7 @@ module PubidNew
 
       # VAP suffix for consolidated/version types
       # CSV = Consolidated version (with Supplements)
-      # CMV = Compiled Maintenance Version
+      # CMV = Commented Version
       # RLV = Redline Version (shows changes)
       # SER = Serial version
       # EXV = Example version
