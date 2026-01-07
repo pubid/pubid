@@ -76,6 +76,36 @@ module PubidNew
           name: "BSI Flex",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Handbook
+        PubidNew::Components::TypedStage.new(
+          code: :pubhandbook,
+          stage_code: :published,
+          type_code: :handbook,
+          abbr: ["Handbook"],
+          name: "BSI Handbook",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # Practice Guide (PP)
+        PubidNew::Components::TypedStage.new(
+          code: :pubpp,
+          stage_code: :published,
+          type_code: :pp,
+          abbr: ["PP"],
+          name: "Published Practice",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # British Industrial Practice (BIP)
+        PubidNew::Components::TypedStage.new(
+          code: :pubbip,
+          stage_code: :published,
+          type_code: :bip,
+          abbr: ["BIP"],
+          name: "British Industrial Practice",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -86,6 +116,9 @@ module PubidNew
         na: "Identifiers::NationalAnnex",
         dd: "Identifiers::DraftDocument",
         flex: "Identifiers::Flex",
+        handbook: "Identifiers::Handbook",
+        pp: "Identifiers::PracticeGuide",
+        bip: "Identifiers::BritishIndustrialPractice",
       }.freeze
 
       # Default typed stage for when no match is found

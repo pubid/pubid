@@ -12,7 +12,7 @@ module PubidNew
         attribute :adopted_identifier, Base, polymorphic: true  # CEN object
         attribute :edition, :string
 
-        def to_s
+        def to_s(lang: :en, lang_single: false)
           # Get the BSI prefix (BS, PD, DD)
           prefix = if publisher.respond_to?(:body)
                      publisher.body

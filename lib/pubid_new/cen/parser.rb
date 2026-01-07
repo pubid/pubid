@@ -19,6 +19,9 @@ module PubidNew
       rule(:clc) { str("CLC") }
       rule(:cwa) { str("CWA") }
       rule(:hd) { str("HD") }
+      rule(:es) { str("ES") }
+      rule(:cr) { str("CR") }
+      rule(:env) { str("ENV") }
 
       # Adopted organizations (ISO, IEC)
       rule(:iso) { str("ISO") }
@@ -27,7 +30,7 @@ module PubidNew
 
       # Publisher (can be combined like EN/CLC or CEN/CLC)
       rule(:publisher) do
-        (cwa | hd).as(:publisher) |
+        (cwa | hd | es | cr | env).as(:publisher) |
         (en.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
         (cen.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
         (clc.as(:publisher) >> (slash >> cen.as(:copublisher)).maybe) |

@@ -92,6 +92,36 @@ module PubidNew
           name: "Harmonization Document",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # European Specification (ES)
+        PubidNew::Components::TypedStage.new(
+          code: :pubes,
+          stage_code: :published,
+          type_code: :es,
+          abbr: ["ES"],
+          name: "European Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # CEN Report (CR)
+        PubidNew::Components::TypedStage.new(
+          code: :pubcr,
+          stage_code: :published,
+          type_code: :cr,
+          abbr: ["CR"],
+          name: "CEN Report",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # European Prestandard (ENV)
+        PubidNew::Components::TypedStage.new(
+          code: :pubenv,
+          stage_code: :published,
+          type_code: :env,
+          abbr: ["ENV"],
+          name: "European Prestandard",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -102,6 +132,9 @@ module PubidNew
         cwa: "Identifiers::CenWorkshopAgreement",
         guide: "Identifiers::Guide",
         hd: "Identifiers::HarmonizationDocument",
+        es: "Identifiers::EuropeanSpecification",
+        cr: "Identifiers::CenReport",
+        env: "Identifiers::EuropeanPrestandard",
       }.freeze
 
       # Default typed stage for when no match is found

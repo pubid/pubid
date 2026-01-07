@@ -9,9 +9,10 @@ require_relative "identifiers/adopted_european_norm"
 require_relative "identifiers/adopted_international_standard"
 require_relative "identifiers/flex"
 require_relative "identifiers/draft_document"
+require_relative "identifiers/handbook"
+require_relative "identifiers/practice_guide"
+require_relative "identifiers/british_industrial_practice"
 require_relative "components/publisher"
-require_relative "components/code"
-require_relative "components/date"
 
 module PubidNew
   module Bsi
@@ -32,6 +33,11 @@ module PubidNew
 
         # Extract supplements before processing
         supplements_data = extract_supplements(data)
+
+        # Check for Value-Added Publication wrapper first
+        if data[:pdf_format] || data[:tc_format] || data[:book_format]
+          return build_value_added_publication(data, supplements_data)
+        end
 
         # Check for National Annex first (most specific)
         # NationalAnnex can have:
@@ -84,6 +90,33 @@ module PubidNew
       def wrap_with_expert_commentary(base_id)
         require_relative "identifiers/expert_commentary"
         Identifiers::ExpertCommentary.new(base_identifier: base_id)
+      end
+
+      def build_value_added_publication(data, supplements_data)
+        require_relative "identifiers/value_added_publication"
+
+        # Determine format type
+        format = if data[:pdf_format]
+                   "PDF"
+                 elsif data[:tc_format]
+                   "TC"
+                 elsif data[:book_format]
+                   "BOOK"
+                 end
+
+        # Remove VAP format flags from data before building base
+        base_data = data.dup
+        base_data.delete(:pdf_format)
+        base_data.delete(:tc_format)
+        base_data.delete(:book_format)
+
+        # Build base identifier (it will handle supplements via supplements_data)
+        base_id = build(base_data)
+
+        Identifiers::ValueAddedPublication.new(
+          base_identifier: base_id,
+          format: format
+        )
       end
 
       def build_national_annex(data, supplements_data)
@@ -242,11 +275,9 @@ module PubidNew
         when :expert_commentary
           true
 
-        when :tracked_changes
-          true
-
-        when :pdf
-          true
+        when :pdf_format, :tc_format, :book_format
+          # Don't cast, used for VAP wrapper construction
+          nil
 
         when :translation_lang
           # Extract just the language name (e.g., "German", "Italian")
@@ -335,8 +366,11 @@ module PubidNew
           require_relative '../iec'
           adopted_id = PubidNew::Iec.parse(adopted_str_clean)
 
-        # Check for EN patterns (double-level: BS EN or DD/PD CEN)
-        elsif adopted_str_clean.start_with?("EN") || adopted_str_clean.start_with?("CEN") || adopted_str_clean.start_with?("CLC")
+        # Check for EN patterns (double-level: BS EN or DD/PD CEN) or CEN types
+        elsif adopted_str_clean.start_with?("EN") || adopted_str_clean.start_with?("CEN") || adopted_str_clean.start_with?("CLC") ||
+              adopted_str_clean.start_with?("CR") || adopted_str_clean.start_with?("ES") ||
+              adopted_str_clean.start_with?("ENV") || adopted_str_clean.start_with?("HD") ||
+              adopted_str_clean.start_with?("CWA")
           require_relative '../cen'
           adopted_id = PubidNew::Cen.parse(adopted_str_clean)
         # Check for CISPR

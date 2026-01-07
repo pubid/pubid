@@ -24,6 +24,9 @@ module PubidNew
       rule(:pd) { str("PD") }
       rule(:pas) { str("PAS") }
       rule(:na) { str("NA") }
+      rule(:handbook) { str("Handbook") }
+      rule(:pp) { str("PP") }
+      rule(:bip) { str("BIP") }
 
       # Stage prefixes
       rule(:draft) { str("Draft BS") | str("DBS") }
@@ -57,10 +60,13 @@ module PubidNew
          pd.as(:type) |
          bs.as(:publisher)) |
         flex.as(:flex_type) |
+        handbook.as(:type) |
+        bip.as(:type) |
         draft.as(:stage) |
         dd.as(:type) |
         pd.as(:type) |
         pas.as(:type) |
+        pp.as(:type) |
         na.as(:type) |
         bs.as(:publisher)
       end
@@ -131,8 +137,10 @@ module PubidNew
 
       # Adopted standard as opaque string
       # Captures: "EN ISO 8601:2019", "EN IEC 62600:2020", "ISO 8601:2019", "IEC 62600:2020", "EN 10077-1:2006"
+      # Also CEN types: "CR 13933:2000", "ES 59008:2000", "ENV 41112:1991", "HD 60269-3", "CWA 13620-5:1999"
       rule(:adopted_org_prefix) do
-        str("EN") | str("ISO") | str("IEC") | str("CISPR") | str("CEN") | str("CLC")
+        str("EN") | str("ISO") | str("IEC") | str("CISPR") | str("CEN") | str("CLC") |
+        str("CR") | str("ES") | str("ENV") | str("HD") | str("CWA")
       end
 
       rule(:adopted_string) do
@@ -145,14 +153,23 @@ module PubidNew
         adopted_org_prefix >> (supplement.absent? >> expert_commentary.absent? >> tracked_changes.absent? >> pdf_suffix.absent? >> translation.absent? >> match("[^\n]")).repeat(0)
       end
 
+      # Value-Added Publication suffixes (wrapper pattern, not attributes)
+      rule(:vap_suffix) do
+        (
+          space >> str("PDF").as(:pdf_format) |
+          space >> str("BOOK").as(:book_format) |
+          space >> dash >> space >> str("TC").as(:tc_format)
+        )
+      end
+
       # Identifier patterns - try most specific first
       rule(:identifier) do
         # Bare adopted identifier (ISO, IEC without BSI prefix)
         bare_adopted.as(:adopted_string) |
         # Flex with v-style edition before date
         (flex.as(:flex_type) >> space >> number >> parts >> flex_edition.maybe >> (year >> month.maybe).maybe >> supplements) |
-        # Regular BSI identifier - edition comes after supplements for adopted
-        (publisher_or_type >>
+        # Regular BSI identifier - VAP suffix at the end
+        publisher_or_type >>
         (space >> adopted_string).maybe >>
         (space >> number >> parts >> collection_number.maybe >>
         (year >> month.maybe).maybe >>
@@ -160,9 +177,8 @@ module PubidNew
         supplements >>
         edition.maybe >>
         expert_commentary.maybe >>
-        tracked_changes.maybe >>
-        pdf_suffix.maybe >>
-        translation.maybe)
+        translation.maybe >>
+        vap_suffix.maybe
       end
 
       rule(:root) { identifier }

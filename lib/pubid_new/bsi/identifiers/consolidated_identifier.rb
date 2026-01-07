@@ -10,7 +10,7 @@ module PubidNew
       class ConsolidatedIdentifier < Base
         attribute :identifiers, Base, polymorphic: true, collection: true
 
-        def to_s
+        def to_s(lang: :en, lang_single: false)
           base_id = identifiers.first
 
           # Render base without suffixes (will add them after supplements)
@@ -52,8 +52,6 @@ module PubidNew
           elsif base_id.respond_to?(:translation_upper) && base_id.translation_upper
             result += " (#{base_id.translation_upper})"
           end
-
-          result += " PDF" if base_id.respond_to?(:pdf) && base_id.pdf
 
           result
         end

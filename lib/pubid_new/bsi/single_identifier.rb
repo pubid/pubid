@@ -22,9 +22,6 @@ module PubidNew
       attribute :typed_stage, PubidNew::Components::TypedStage
       attribute :edition, :string
       attribute :month, :integer
-      attribute :expert_commentary, :boolean, default: -> { false }
-      attribute :tracked_changes, :boolean, default: -> { false }
-      attribute :pdf, :boolean, default: -> { false }
       attribute :translation_lang, :string
       attribute :translation_upper, :string
 
@@ -87,18 +84,12 @@ module PubidNew
         # Edition
         result += " v#{edition}" if edition
 
-        # Tracked Changes
-        result += " - TC" if tracked_changes
-
         # Translation
         if translation_lang
           result += " (#{translation_lang})"
         elsif translation_upper
           result += " (#{translation_upper})"
         end
-
-        # PDF
-        result += " PDF" if pdf
 
         result
       end

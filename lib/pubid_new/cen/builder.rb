@@ -33,6 +33,10 @@ module PubidNew
 
         # Check if this is an adopted identifier (EN ISO, EN IEC, etc.)
         if data[:adopted_string]
+          # Special case: ENV can adopt ISO/IEC standards
+          if data[:publisher]&.to_s == "ENV"
+            return build_env_adopted_identifier(data)
+          end
           return build_adopted_identifier(data)
         end
 
@@ -113,9 +117,9 @@ module PubidNew
         # Special case: Use adopted_european_norm for adopted identifiers
         return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]
 
-        # Check if publisher is actually a type code (CWA, HD act as publisher)
+        # Check if publisher is actually a type code (CWA, HD, ES, CR, ENV act as publisher)
         publisher_str = parsed_hash[:publisher].to_s
-        if %w[CWA HD].include?(publisher_str)
+        if %w[CWA HD ES CR ENV].include?(publisher_str)
           typed_stage = @scheme.locate_typed_stage_by_abbr(publisher_str)
           return @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
         end
@@ -239,6 +243,29 @@ module PubidNew
 
         Identifiers::AdoptedEuropeanNorm.new(
           publisher: publishers,
+          adopted_identifier: adopted_id
+        )
+      end
+
+      def build_env_adopted_identifier(data)
+        require_relative "identifiers/european_prestandard"
+
+        # Parse the adopted identifier string
+        adopted_str = data[:adopted_string]&.to_s&.strip
+        return nil unless adopted_str && !adopted_str.empty?
+
+        adopted_id = if adopted_str.start_with?("ISO/IEC") || adopted_str.include?("ISO/IEC")
+          require_relative '../iso'
+          PubidNew::Iso.parse(adopted_str)
+        elsif adopted_str.start_with?("ISO")
+          require_relative '../iso'
+          PubidNew::Iso.parse(adopted_str)
+        elsif adopted_str.start_with?("IEC")
+          require_relative '../iec'
+          PubidNew::Iec.parse(adopted_str)
+        end
+
+        Identifiers::EuropeanPrestandard.new(
           adopted_identifier: adopted_id
         )
       end
