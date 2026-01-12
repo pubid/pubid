@@ -681,22 +681,44 @@ module PubidNew
           # Revision MUST be Edition component with type "r"
           return nil if value.nil? || value.to_s.strip.empty?
 
-          str_value = value.to_s.strip
+          # Handle new structure with :revision_prefix and :revision_id (format preservation)
+          if value.is_a?(Hash) && value[:revision_prefix] && value[:revision_id]
+            prefix = value[:revision_prefix].to_s
+            id = value[:revision_id].to_s.strip
 
-          # Handle bare "r" → normalize to "r1"
-          revision_id = if str_value.empty? || str_value == "r" || str_value == "R"
-                          "1"
-                        # Handle "r4", "R5", "4" etc.
-                        elsif str_value =~ /^[rR]?(\d+[a-z]?)$/
-                          $1
-                        else
-                          str_value
-                        end
+            # Normalize bare "r" → "r1"
+            revision_id = if id.empty? || id == "r" || id == "R"
+                            "1"
+                          # Handle "r4", "R5", "4" etc. (but prefix already has the r/rev/etc.)
+                          elsif id =~ /^(\d+[a-z]?)$/
+                            $1
+                          else
+                            id
+                          end
 
-          # Return Edition component
-          {
-            edition: Components::Edition.new(type: "r", id: revision_id),
-          }
+            # Return Edition component with original_prefix for format preservation
+            {
+              edition: Components::Edition.new(type: "r", id: revision_id, original_prefix: prefix),
+            }
+          else
+            # Legacy handling: revision as simple string value
+            str_value = value.to_s.strip
+
+            # Handle bare "r" → normalize to "r1"
+            revision_id = if str_value.empty? || str_value == "r" || str_value == "R"
+                            "1"
+                          # Handle "r4", "R5", "4" etc.
+                          elsif str_value =~ /^[rR]?(\d+[a-z]?)$/
+                            $1
+                          else
+                            str_value
+                          end
+
+            # Return Edition component (no original_prefix available)
+            {
+              edition: Components::Edition.new(type: "r", id: revision_id),
+            }
+          end
 
         when :revision_year, :revision_month
           # When revision_year comes from parser as separate element (e.g., "1019 r1963")

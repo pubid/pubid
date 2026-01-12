@@ -264,6 +264,57 @@ Based on fixture analysis:
 ### Next Steps
 Version normalization is working correctly per V2 design. No changes needed.
 
+## Task 6 Results: Revision Format Preservation
+
+### Status: FIX COMPLETE
+
+### Issue
+**Original Problem:** "Rev. 5" format was being rendered as "r5" (format not preserved)
+**Root Cause:** Edition component didn't track or use the original format prefix
+
+### Fix Applied
+
+**1. Edition Component Enhancement (`lib/pubid_new/nist/components/edition.rb`)**
+- Added `original_prefix` attribute to track the original revision prefix
+- Updated `build_short_format` to use original prefix when available
+- Preserves formats: " Rev. ", " rev ", " r", "r", etc.
+
+**2. Parser Enhancement (`lib/pubid_new/nist/parser.rb:571`)**
+- Modified revision rule to capture both prefix and ID separately
+- Pattern: `(revision_prefix).as(:revision_prefix) >> (revision_id).as(:revision_id)).as(:revision)`
+- This allows the builder to access both the prefix and the ID
+
+**3. Builder Enhancement (`lib/pubid_new/nist/builder.rb:680-721`)**
+- Updated `:revision` handling to extract prefix and ID from new structure
+- Passes `original_prefix` to Edition component when available
+- Maintains backward compatibility with legacy string format
+
+**Tests Added:** `spec/pubid_new/nist/revision_format_preservation_spec.rb` (6 examples, 0 failures)
+
+### Test Results
+✅ **ALL PASSING:**
+- `NIST SP 800-53 Rev. 5` → `NIST SP 800-53 Rev. 5` (format preserved!)
+- `NIST SP 800-53 r5` → `NIST SP 800-53 r5` (format preserved!)
+- `NIST SP 800-53 Rev. 5A` → `NIST SP 800-53 Rev. 5A` (letter suffix preserved)
+- `NIST SP 800-53 r5A` → `NIST SP 800-53 r5A` (letter suffix preserved)
+- Round-trip fidelity maintained for all preserved formats
+
+### Design Decision
+Format preservation is implemented via:
+1. **Original prefix tracking** - stores how the revision was originally formatted
+2. **Conditional rendering** - uses original prefix if available, falls back to default
+3. **Backward compatibility** - legacy patterns still work
+
+This approach preserves the original format while maintaining the MODEL-DRIVEN architecture.
+
+### Pattern Coverage
+Based on fixture analysis:
+- Revision patterns: ~200-300 patterns in fixtures
+- All revision prefix formats now preserved: " Rev. ", " rev ", " r", "r"
+
+### Next Steps
+Revision format preservation is complete. The fix prevents "Rev. 5" from being rendered as "r5".
+
 ## Next Steps
 
 ### Task 4-7: Parser Enhancements (Edition Year, Version Normalization)

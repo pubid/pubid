@@ -26,10 +26,12 @@ module PubidNew
       #   Edition.new(type: "e", id: "2", additional_text: "1908").to_s     # => "e2.1908"
       #   Edition.new(type: "r", id: "1963").to_s                           # => "r1963"
       #   Edition.new(type: "r", id: "5").to_s                              # => "r5"
+      #   Edition.new(type: "r", id: "5", original_prefix: " Rev. ").to_s    # => "Rev. 5"
       class Edition < Lutaml::Model::Serializable
         attribute :type, :string            # "-", "e", or "r"
         attribute :id, :string              # Edition ID (number or year)
         attribute :additional_text, :string # Text after "rev" (WITHOUT "rev" prefix)
+        attribute :original_prefix, :string # Original format prefix for preservation (e.g., " Rev. ", " rev ", " r")
 
         # Render edition in specified format
         # @param format [:short, :mr, :long, :abbrev] The output format
@@ -50,7 +52,13 @@ module PubidNew
         private
 
         # Build short format: "e2", "e2.June1908", "e2.1908", "e2.50", "r1963", "-April1909"
+        # If original_prefix is set, preserves original format (e.g., "Rev. 5" not "r5")
         def build_short_format
+          # For revision type, use original prefix if available (format preservation)
+          if type == "r" && original_prefix && !original_prefix.empty?
+            return "#{original_prefix}#{id}"
+          end
+
           result = "#{type}#{id}"
 
           if additional_text && !additional_text.empty?

@@ -567,8 +567,9 @@ module PubidNew
           # Revision with digits AND/OR letters: r1a, r1A, ra, r1
           # Enhanced to accept letter-only revisions and space before r
           # ENHANCED: Accept BOTH lowercase and uppercase letters in suffix
-          ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")) >>
-            (digits >> match("[a-zA-Z]").maybe | match("[a-zA-Z]").repeat(1)).as(:revision)) |
+          # ENHANCED: Capture original format prefix for format preservation (e.g., " Rev. 5")
+          ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")).as(:revision_prefix) >>
+            (digits >> match("[a-zA-Z]").maybe | match("[a-zA-Z]").repeat(1)).as(:revision_id)).as(:revision) |
           # NEW: Standalone 'r' - MUST BE LAST to avoid consuming from other patterns
           # Matches " r" at end of input (after preprocessing: "800-56a r", "800-27 r")
           (str(" r") >> any.absent?).as(:revision_standalone)
