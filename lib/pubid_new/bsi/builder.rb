@@ -14,6 +14,7 @@ require_relative "identifiers/index"
 require_relative "identifiers/method"
 require_relative "identifiers/section"
 require_relative "identifiers/disc"
+require_relative "identifiers/detailed_specification"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
 require_relative "identifiers/aerospace_standard"
@@ -52,6 +53,11 @@ module PubidNew
         # Check for Section identifier
         if data[:section_identifier]
           return build_section(data[:section_identifier])
+        end
+
+        # Check for Detailed Specification identifier
+        if data[:detailed_specification]
+          return build_detailed_specification(data[:detailed_specification])
         end
 
         # Check for DISC identifier
@@ -235,6 +241,32 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Section.new(attrs)
+      end
+
+      def build_detailed_specification(data)
+        # Extract values from the parsed data
+        # Format: "BS {number} N{code}:year" or "BS {number} C{range}:year"
+        publisher_val = data[:publisher].to_s if data[:publisher]
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract detailed_spec_suffix information
+        detailed_spec_data = data[:detailed_spec_suffix]
+        spec_code = nil
+        if detailed_spec_data.is_a?(Hash) && detailed_spec_data[:spec_code]
+          spec_code = detailed_spec_data[:spec_code].to_s
+        end
+
+        # Build attributes hash
+        attrs = {
+          number: Components::Code.new(value: number_val),
+        }
+        attrs[:spec_code] = Components::Code.new(value: spec_code) if spec_code
+        attrs[:publisher] = Components::Publisher.new(body: publisher_val) if publisher_val
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::DetailedSpecification.new(attrs)
       end
 
       def build_disc(data)
@@ -803,6 +835,17 @@ module PubidNew
         when :section_suffix
           # Don't cast, handled by build_section
           nil
+
+        when :detailed_specification
+          # Don't cast, handled by build_detailed_specification
+          nil
+
+        when :detailed_spec_suffix
+          # Don't cast, handled by build_detailed_specification
+          nil
+
+        when :spec_code
+          Components::Code.new(value: value.to_s)
 
         else
           value

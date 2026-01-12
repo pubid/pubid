@@ -101,6 +101,19 @@ module PubidNew
       # Section ID - can be numeric (0-7) or alphanumeric (B2, C1, D1, etc.)
       rule(:section_id) { match["0-9A-Za-z"].repeat(1) }
 
+      # Detailed Specification suffix - N or C notation
+      # Formats: "BS 9074 N002:1974", "BS 9210 N0009-1:1978", "BS 9300 C155-168:1971"
+      # N notation: N<number> or N<number>-<part>
+      # C notation: C<start>-<end> (range)
+      rule(:detailed_spec_suffix) do
+        space >> (
+          # C notation with range: C155-168
+          (str("C") >> match["0-9"].repeat(1, 3) >> dash >> match["0-9"].repeat(1, 3)).as(:spec_code) |
+          # N notation with optional part: N002 or N0009-1
+          (str("N") >> match["0-9"].repeat(1, 4) >> (dash >> match["0-9"].repeat(1)).maybe).as(:spec_code)
+        )
+      end
+
       # DISC identifier - "DISC PD <number>[-<part>]:<year>"
       rule(:disc_prefix) { str("DISC PD ") }
 
@@ -437,6 +450,8 @@ module PubidNew
         (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
         # Section identifier - must be before regular identifier
         (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
+        # Detailed Specification identifier - must be before regular identifier
+        (bs.as(:publisher) >> space >> number >> detailed_spec_suffix.as(:detailed_spec_suffix) >> year).as(:detailed_specification) |
         # DISC identifier - "DISC PD <number>[-<part>]:<year>"
         (disc_prefix >> number >> parts.maybe >> year).as(:disc_identifier) |
         # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)

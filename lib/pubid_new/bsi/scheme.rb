@@ -156,6 +156,16 @@ module PubidNew
           name: "DISC",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Detailed Specification (with N or C notation)
+        PubidNew::Components::TypedStage.new(
+          code: :pubdetailed_spec,
+          stage_code: :published,
+          type_code: :detailed_specification,
+          abbr: ["DETAILED SPEC"],
+          name: "Detailed Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -175,6 +185,7 @@ module PubidNew
         section: "Identifiers::Section",
         disc: "Identifiers::Disc",
         bundled: "Identifiers::BundledIdentifier",
+        detailed_specification: "Identifiers::DetailedSpecification",
       }.freeze
 
       # Default typed stage for when no match is found
