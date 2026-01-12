@@ -71,6 +71,11 @@ module PubidNew
           return build_disc(data[:disc_identifier])
         end
 
+        # Check for Aerospace identifier with letter suffix edition
+        if data[:aerospace_identifier]
+          return build_aerospace_identifier(data[:aerospace_identifier])
+        end
+
         # Check for SupplementDocument first
         if data[:supplement_document]
           return build_supplement_document(data[:supplement_document])
@@ -300,6 +305,69 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Disc.new(attrs)
+      end
+
+      def build_aerospace_identifier(data)
+        # Extract values from the parsed data
+        # Format: "BS AU {number}{letter_edition}[-{part}{letter_edition}]:{year}"
+        prefix_val = data[:prefix][:prefix] if data[:prefix].is_a?(Hash)
+        prefix_val ||= data[:prefix].to_s if data[:prefix]
+
+        # Extract number and letter edition
+        number_val = data[:number].to_s if data[:number]
+
+        # Letter edition is a sibling of number in the AST
+        edition_val = nil
+        if data[:letter_edition].is_a?(Hash)
+          edition_val = data[:letter_edition][:letter_edition].to_s
+        end
+
+        # Extract part directly (from :part key) or from :part_with_letter_edition
+        part_val = nil
+        part_edition_val = nil
+
+        # First check for direct :part key (when part_with_letter_edition is used in parser)
+        if data[:part]
+          if data[:part].is_a?(Hash)
+            part_val = data[:part][:part].to_s if data[:part][:part]
+            part_edition_val = data[:part][:letter_edition].to_s if data[:part][:letter_edition]
+          else
+            part_val = data[:part].to_s
+          end
+        end
+
+        # Also check for :part_with_letter_edition key (for alternative patterns)
+        if !part_val && data[:part_with_letter_edition]
+          if data[:part_with_letter_edition].is_a?(Hash)
+            part_val = data[:part_with_letter_edition][:part].to_s if data[:part_with_letter_edition][:part]
+            part_edition_val = data[:part_with_letter_edition][:letter_edition].to_s if data[:part_with_letter_edition][:letter_edition]
+          end
+        end
+
+        # Extract iteration (optional, may be empty)
+        iteration_val = nil
+        if data[:iteration] && data[:iteration][:iteration] && !data[:iteration][:iteration].empty?
+          iteration_val = data[:iteration][:iteration].to_s
+        end
+
+        # Extract year
+        year_val = data[:year].to_i if data[:year]
+
+        # Use part edition if present, otherwise use number edition
+        final_edition = part_edition_val || edition_val
+
+        # Build attributes hash
+        attrs = {
+          prefix: prefix_val,
+          number: Components::Code.new(value: number_val),
+        }
+        attrs[:part] = Components::Code.new(value: part_val) if part_val
+        attrs[:iteration] = iteration_val if iteration_val
+        attrs[:edition] = final_edition if final_edition
+        attrs[:publisher] = Components::Publisher.new(body: "BS")
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::AerospaceStandard.new(attrs)
       end
 
       def build_bundled_identifier(data)

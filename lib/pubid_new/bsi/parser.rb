@@ -184,6 +184,21 @@ module PubidNew
       rule(:part) { dash >> match["0-9A-Za-z.& "].repeat(1).as(:part) }
       rule(:parts) { part.repeat(0).as(:parts) }
 
+      # Part with optional letter suffix edition for aerospace standards (e.g., "200-1a" or "50-1.1.1a")
+      # Must match before the regular part rule
+      rule(:part_with_letter_edition) do
+        # Part number (digits, dots) followed by single letter edition
+        (dash >> match["0-9."].repeat(1).as(:part) >> letter_edition.as(:letter_edition)) |
+        # Just part number (no edition)
+        (dash >> match["0-9."].repeat(1).as(:part))
+      end
+
+      # Number with optional letter suffix edition for aerospace standards (e.g., "145e" or "159G")
+      rule(:number_with_letter_edition) do
+        (match["0-9"].repeat(1).as(:number) >> letter_edition.as(:letter_edition)) |
+        (match["0-9"].repeat(1).as(:number))
+      end
+
       # Space-separated alphanumeric part (for bundled patterns like "9113 N001")
       rule(:space_separated_part) { space >> (match["A-Z"].repeat(1) >> match["0-9"].repeat(1)).as(:part) }
 
@@ -204,6 +219,10 @@ module PubidNew
 
       # Edition for IEC/ISO standards (ED2, ED3, etc.) - space before ED, uppercase
       rule(:edition) { space >> str("ED") >> digits.as(:edition) }
+
+      # Letter suffix edition for aerospace/specialized standards (e.g., BS AU 145e:2018)
+      # Single letter (a-z or A-Z) that comes immediately after number or part
+      rule(:letter_edition) { match["a-zA-Z"].as(:letter_edition) }
 
       # Amendment (+A1:2008 or /A2:2019 or +A1:15 for short year)
       rule(:amendment) do
@@ -466,6 +485,11 @@ module PubidNew
         (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
         # Detailed Specification identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> detailed_spec_suffix.as(:detailed_spec_suffix) >> year).as(:detailed_specification) |
+        # Aerospace/Specialized identifier with letter suffix edition (e.g., BS AU 145e:2018)
+        # Must be before DISC and regular identifiers
+        (bs.as(:publisher) >> space >> (single_letter_prefix | multi_letter_prefix).as(:prefix) >> space >>
+         number_with_letter_edition >> part_with_letter_edition.maybe >> iteration.as(:iteration).maybe >>
+         year).as(:aerospace_identifier) |
         # DISC identifier - "DISC PD <number>[-<part>]:<year>"
         (disc_prefix >> number >> parts.maybe >> year).as(:disc_identifier) |
         # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
