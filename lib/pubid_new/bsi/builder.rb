@@ -22,6 +22,7 @@ require_relative "identifiers/supplement_document"
 require_relative "identifiers/addendum_document"
 require_relative "identifiers/bundled_identifier"
 require_relative "identifiers/committee_document"
+require_relative "identifiers/technical_specification"
 require_relative "identifiers/standalone_amendment"
 require_relative "components/publisher"
 

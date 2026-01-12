@@ -176,6 +176,16 @@ module PubidNew
           name: "Amendment",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Technical Specification
+        PubidNew::Components::TypedStage.new(
+          code: :pubts,
+          stage_code: :published,
+          type_code: :ts,
+          abbr: ["TS"],
+          name: "Technical Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -197,6 +207,7 @@ module PubidNew
         bundled: "Identifiers::BundledIdentifier",
         detailed_specification: "Identifiers::DetailedSpecification",
         standalone_amendment: "Identifiers::StandaloneAmendment",
+        ts: "Identifiers::TechnicalSpecification",
       }.freeze
 
       # Default typed stage for when no match is found

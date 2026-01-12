@@ -55,6 +55,7 @@ module PubidNew
       rule(:pd) { str("PD") }
       rule(:pas) { str("PAS") }
       rule(:na) { str("NA") }
+      rule(:ts) { str("TS") }
       rule(:handbook) { str("Handbook") | str("HB") }
       rule(:pp) { str("PP") }
       rule(:bip) { str("BIP") }
@@ -169,6 +170,7 @@ module PubidNew
         flex.as(:flex_type) |
         handbook.as(:type) |
         bip.as(:type) |
+        ts.as(:type) |
         draft.as(:stage) |
         dd.as(:type) |
         pd.as(:type) |
