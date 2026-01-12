@@ -116,6 +116,16 @@ module PubidNew
           name: "Aerospace/Specialized British Standard",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Index
+        PubidNew::Components::TypedStage.new(
+          code: :pubindex,
+          stage_code: :published,
+          type_code: :index,
+          abbr: ["Index"],
+          name: "BSI Index",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -130,6 +140,7 @@ module PubidNew
         pp: "Identifiers::PracticeGuide",
         bip: "Identifiers::BritishIndustrialPractice",
         aerospace: "Identifiers::AerospaceStandard",
+        index: "Identifiers::Index",
         bundled: "Identifiers::BundledIdentifier",
       }.freeze
 

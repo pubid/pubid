@@ -1,12 +1,12 @@
 Flavor: BSI
-Classified: 2026-01-12 10:14:08
+Classified: 2026-01-12 10:28:41
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total: 1579
-Pass: 1325 (83.91%)
-Fail: 254 (16.09%)
+Pass: 1338 (84.74%)
+Fail: 241 (15.26%)
 
 BY CLASS
 ----------------------------------------------------------------------
@@ -21,11 +21,12 @@ draft_document                           Pass: 13/13 (100.0%)
 expert_commentary                        Pass: 25/25 (100.0%)
 flex                                     Pass: 23/23 (100.0%)
 handbook                                 Pass: 13/13 (100.0%)
+index                                    Pass: 13/13 (100.0%)
 national_annex                           Pass: 18/18 (100.0%)
 nil_class                                Pass: 49/49 (100.0%)
 practice_guide                           Pass: 3/3 (100.0%)
 publicly_available_specification         Pass: 56/56 (100.0%)
 published_document                       Pass: 76/76 (100.0%)
 supplement_document                      Pass: 18/18 (100.0%)
-unknown                                  Pass: 0/254 (0.0%)
+unknown                                  Pass: 0/241 (0.0%)
 value_added_publication                  Pass: 6/6 (100.0%)

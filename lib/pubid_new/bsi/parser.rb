@@ -59,6 +59,19 @@ module PubidNew
       rule(:pp) { str("PP") }
       rule(:bip) { str("BIP") }
 
+      # Index suffix - handles three formats:
+      # 1. Colon format: BS 5000:Index:1981
+      # 2. Space format: BS 185 Index:1964
+      # 3. Issue format: BS 5000 Index Issue 4:1980
+      rule(:index_suffix) do
+        # Issue format: " Index Issue N" (must be before colon format to match correctly)
+        space >> str("Index") >> space >> str("Issue") >> space >> digits.as(:issue_number) |
+        # Colon format: ":Index"
+        colon.as(:colon_sep) >> str("Index") |
+        # Space format: " Index"
+        space >> str("Index")
+      end
+
       # Stage prefixes
       rule(:draft) { str("Draft BS") | str("DBS") }
 
@@ -386,6 +399,8 @@ module PubidNew
 
       # Identifier patterns - try most specific first
       rule(:identifier) do
+        # Index identifier - must be before regular identifier
+        (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
         # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
         supplement_document_reverse.as(:supplement_document) |
         # Supplement Document - forward format (BS NUMBER:Supplement No. N:YEAR)

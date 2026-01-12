@@ -10,6 +10,7 @@ require_relative "identifiers/adopted_international_standard"
 require_relative "identifiers/flex"
 require_relative "identifiers/draft_document"
 require_relative "identifiers/handbook"
+require_relative "identifiers/index"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
 require_relative "identifiers/aerospace_standard"
@@ -34,6 +35,11 @@ module PubidNew
 
         # Store original data to check if BSI prefix was present
         @original_data = data.dup
+
+        # Check for Index identifier first
+        if data[:index_identifier]
+          return build_index(data[:index_identifier])
+        end
 
         # Check for SupplementDocument first
         if data[:supplement_document]
@@ -105,6 +111,37 @@ module PubidNew
       end
 
       private
+
+      def build_index(data)
+        # Extract values from the parsed data
+        publisher_val = data[:publisher].to_s if data[:publisher]
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract index_suffix information
+        index_suffix_data = data[:index_suffix]
+        format = "space"  # default
+        issue_number = nil
+
+        if index_suffix_data.is_a?(Hash)
+          if index_suffix_data[:colon_sep]
+            format = "colon"
+          elsif index_suffix_data[:issue_number]
+            issue_number = index_suffix_data[:issue_number].to_s
+          end
+        end
+
+        # Build attributes hash (conditional arguments must be handled separately)
+        attrs = {
+          number: Components::Code.new(value: number_val),
+          issue_number: issue_number,
+          original_format: format
+        }
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::Index.new(attrs)
+      end
 
       def build_bundled_identifier(data)
         if data[:bundled_parts]
@@ -621,6 +658,14 @@ module PubidNew
         when :iteration
           # For bracket notation like 1000[9]
           value.to_s
+
+        when :index_identifier
+          # Don't cast, handled by build_index
+          nil
+
+        when :index_suffix
+          # Don't cast, handled by build_index
+          nil
 
         else
           value
