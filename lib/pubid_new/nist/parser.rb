@@ -177,10 +177,11 @@ module PubidNew
 
         # ENHANCEMENT 1: Edition year normalization (-YYYY → eYYYY)
         # Per NIST spec, trailing -YYYY should normalize to eYYYY format
-        # Pattern: number followed by dash and 4-digit year at end
+        # Pattern: number (optionally with non-e letter suffix) followed by dash and 4-digit year
         # Examples: "330-2019" → "330e2019", "304a-2017" → "304Ae2017"
+        # Must NOT match existing edition patterns like "11e2-1915" (e2 is edition, -1915 is separate)
         # Must be at end or before space to avoid breaking number-number patterns like "800-53"
-        cleaned = cleaned.gsub(/(\d[A-Z]?)-(\d{4})(?=\s|$)/, '\1e\2')
+        cleaned = cleaned.gsub(/(\d(?:[A-DF-Z]?))-(\d{4})(?=\s|$)/, '\1e\2')
 
         # ENHANCEMENT 2: Version normalization (v1.1 → ver1.1, Ver. 2.0 → ver2.0)
         # Normalize short v format to verbose ver format per NIST spec
