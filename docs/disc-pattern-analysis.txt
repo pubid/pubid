@@ -1,0 +1,86 @@
+# DISC Pattern Analysis
+# Generated: 2026-01-12
+# Context: BSI V2 Wave 4 Implementation
+
+## Summary
+- Total patterns found: 10 (including 1 duplicate)
+- Unique patterns: 9
+- Format variants: 2
+- Base prefix: "DISC PD "
+
+## Format Variants
+
+### Format 1: DISC with part number (7 unique patterns)
+Format: DISC PD {number}-{part}:{year}
+
+Patterns:
+1. DISC PD 2000-2:1997
+2. DISC PD 1999-3:2001
+3. DISC PD 1999-2:2001
+4. DISC PD 1999-1:2001
+5. DISC PD 1999-3:1999
+6. DISC PD 2000-2:1997 (duplicate of line 3)
+7. DISC PD 1999-1:1998
+
+Part numbers observed: 1, 2, 3
+Number patterns: 2000, 1999
+Date range: 1997-2001
+
+### Format 2: DISC without part number (3 unique patterns)
+Format: DISC PD {number}:{year}
+
+Patterns:
+1. DISC PD 3004:1998
+2. DISC PD 0008:1996
+3. DISC PD 0005:1995
+
+Number patterns: 3004, 0008, 0005
+Date range: 1995-1998
+
+## Component Analysis
+
+### Publisher
+- Fixed: "DISC"
+- Full name: "Delivering Information Solutions to Customers Code of Practice"
+
+### Type
+- Fixed: "PD" (Published Document?)
+
+### Document Number
+- Varies: 4-digit number (e.g., 2000, 1999, 3004, 0008, 0005)
+- Can be standalone or followed by part
+
+### Part (optional)
+- Format: -{number}
+- Observed values: 1, 2, 3
+- Always separated by hyphen from document number
+
+### Date
+- Format: :{year}
+- Always present
+- 4-digit year (1995-2001)
+
+## Implementation Notes
+
+### Parsing Requirements
+1. Parse "DISC PD " prefix
+2. Parse document number (4 digits)
+3. Parse optional part number (preceded by hyphen)
+4. Parse year (preceded by colon)
+
+### Format Handling
+- Part number is optional
+- Date is required
+- Publisher is fixed ("DISC")
+- Type is fixed ("PD")
+
+### Edge Cases
+- No edge cases identified
+- All patterns follow consistent structure
+- One duplicate pattern in fixture (line 10 duplicates line 3)
+
+## Class Implementation
+
+Target class: `Pubid::Bsi::Identifiers::Disc`
+
+Base pattern: `DISC PD {number}[-{part}]:{year}`
