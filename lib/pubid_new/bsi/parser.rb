@@ -72,6 +72,22 @@ module PubidNew
         space >> str("Index")
       end
 
+      # Method suffix - handles three formats:
+      # 1. Basic (singular): BS 2782-1:Method 131B:1983
+      # 2. Range (plural): BS 2782-4:Methods 451F to 451J:1978
+      # 3. And (plural): BS 2782-8:Methods 823A and 823B:1978
+      rule(:method_suffix) do
+        # Range format (plural): ":Methods X to Y" (must be first to match the "to" keyword)
+        colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("to") >> space >> method_code.as(:method_to) |
+        # And format (plural): ":Methods X and Y"
+        colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("and") >> space >> method_code.as(:method_and) |
+        # Basic format (singular): ":Method X"
+        colon >> str("Method") >> space >> method_code.as(:method_code)
+      end
+
+      # Method code - alphanumeric like "131B", "451F", "823A", "1006"
+      rule(:method_code) { match["0-9A-Z"].repeat(1) }
+
       # Stage prefixes
       rule(:draft) { str("Draft BS") | str("DBS") }
 
@@ -401,6 +417,8 @@ module PubidNew
       rule(:identifier) do
         # Index identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
+        # Method identifier - must be before regular identifier
+        (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
         # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
         supplement_document_reverse.as(:supplement_document) |
         # Supplement Document - forward format (BS NUMBER:Supplement No. N:YEAR)

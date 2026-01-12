@@ -11,6 +11,7 @@ require_relative "identifiers/flex"
 require_relative "identifiers/draft_document"
 require_relative "identifiers/handbook"
 require_relative "identifiers/index"
+require_relative "identifiers/method"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
 require_relative "identifiers/aerospace_standard"
@@ -39,6 +40,11 @@ module PubidNew
         # Check for Index identifier first
         if data[:index_identifier]
           return build_index(data[:index_identifier])
+        end
+
+        # Check for Method identifier
+        if data[:method_identifier]
+          return build_method(data[:method_identifier])
         end
 
         # Check for SupplementDocument first
@@ -141,6 +147,52 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Index.new(attrs)
+      end
+
+      def build_method(data)
+        # Extract values from the parsed data
+        publisher_val = data[:publisher].to_s if data[:publisher]
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract part from parts array (e.g., [{part: "1"}] -> "1")
+        part_val = nil
+        if data[:parts] && data[:parts].is_a?(Array) && !data[:parts].empty?
+          # Parts come as [{part: "1"}], so we need to extract the :part key
+          first_part = data[:parts][0]
+          if first_part.is_a?(Hash) && first_part[:part]
+            part_val = first_part[:part].to_s
+          end
+        end
+
+        # Extract method_suffix information
+        method_suffix_data = data[:method_suffix]
+        method_code = nil
+        method_to = nil
+        method_and = nil
+        is_plural = false
+
+        if method_suffix_data.is_a?(Hash)
+          method_code = method_suffix_data[:method_code].to_s if method_suffix_data[:method_code]
+          method_to = method_suffix_data[:method_to].to_s if method_suffix_data[:method_to]
+          method_and = method_suffix_data[:method_and].to_s if method_suffix_data[:method_and]
+          # is_plural is true when we have method_to or method_and
+          is_plural = !method_to.nil? || !method_and.nil?
+        end
+
+        # Build attributes hash
+        attrs = {
+          number: Components::Code.new(value: number_val),
+          method_code: method_code,
+          method_to: method_to,
+          method_and: method_and,
+          is_plural: is_plural
+        }
+        attrs[:part] = Components::Code.new(value: part_val) if part_val
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::Method.new(attrs)
       end
 
       def build_bundled_identifier(data)
@@ -665,6 +717,14 @@ module PubidNew
 
         when :index_suffix
           # Don't cast, handled by build_index
+          nil
+
+        when :method_identifier
+          # Don't cast, handled by build_method
+          nil
+
+        when :method_suffix
+          # Don't cast, handled by build_method
           nil
 
         else
