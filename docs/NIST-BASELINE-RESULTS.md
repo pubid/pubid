@@ -227,6 +227,43 @@ Based on fixture analysis:
 ### Next Steps
 The edition year normalization fix prevents incorrect transformation of patterns like `11e2-1915`. The remaining limitation (edition number being lost) requires a separate parser enhancement that's beyond the scope of this fix.
 
+## Task 5 Results: Version Normalization
+
+### Status: WORKING AS DESIGNED
+
+### V2 Normalization Patterns (Verified)
+**Location:** `lib/pubid_new/nist/parser.rb:186-191`
+
+**Patterns Verified:**
+- `vX.Y` → `verX.Y` (short v format normalized to verbose)
+- `Ver. X.Y` → `verX.Y` (capital Ver with period normalized)
+- Already-normalized `verX.Y` preserved
+
+**Tests Added:** `spec/pubid_new/nist/version_normalization_spec.rb` (7 examples, 0 failures)
+
+### Test Results
+✅ **ALL PASSING:**
+- `NIST SP 500-268v1.1` → `NIST SP 500-268 ver1.1` (short v → ver)
+- `NIST SP 800-60 Ver. 2.0` → `NIST SP 800-60 ver2.0` (Ver. → ver)
+- `NIST SP 800-53ver1.1` → `NIST SP 800-53 ver1.1` (already normalized)
+- `NIST SP 800-60ver2.0` → `NIST SP 800-60 ver2.0` (already normalized)
+- Round-trip fidelity maintained for normalized versions
+- V2 format is more consistent (lowercase ver, no periods)
+
+### Design Decision
+V2's version normalization patterns are **MORE correct than V1** and must be preserved:
+- Consistent `verX.Y` format across all versions
+- No ambiguity between "v" (version) and other uses
+- Standardized spacing (space before ver)
+
+### Pattern Coverage
+Based on fixture analysis:
+- Version patterns: ~50-100 patterns in fixtures
+- All version patterns now normalize consistently
+
+### Next Steps
+Version normalization is working correctly per V2 design. No changes needed.
+
 ## Next Steps
 
 ### Task 4-7: Parser Enhancements (Edition Year, Version Normalization)
