@@ -1,0 +1,29 @@
+Index patterns analysis:
+- Total patterns: 13
+
+Base format variations:
+1. Standard colon format: BS <number>:Index:<year>
+   Examples: BS 5000:Index:1981, BS 185:Index:1973, BS 4999:Index:1977
+   Count: 3 occurrences
+
+2. Space variant format: BS <number> Index:<year>
+   Examples: BS 185 Index:1964, 1965, 1969, 1962, 1963
+   Count: 5 occurrences
+
+3. Issue format: BS <number> Index Issue <n>:<year>
+   Examples:
+   - BS 5000 Index Issue 4:1980
+   - BS 5000 Index Issue 3:1978
+   - BS 4999 Index Issue 3:1976
+   - BS 5000 Index Issue 2:1973
+   - BS 4999 Index Issue 1:1972
+   Count: 5 occurrences
+
+Special notes:
+- All patterns have "Index" as the type indicator
+- Issue format uses "Index Issue <n>" where n is the issue number (1-4)
+- Standard format uses colon after document number (BS 5000:Index)
+- Space variant replaces colon with space after document number (BS 5000 Index)
+- Year format is consistent: 4-digit year with colon before it
+- Multiple years for same document (e.g., BS 185 appears in 6 different years)
+- Issue numbers appear to be sequential starting from 1
