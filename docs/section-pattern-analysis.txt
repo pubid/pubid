@@ -1,0 +1,22 @@
+Section patterns analysis:
+- Total patterns: 11
+- Format variants:
+  1. DD 51:Section {0-7}:1977 (8 occurrences)
+     - Prefix: DD (Development Draft)
+     - Base number: 51
+     - Separator: colon (:)
+     - Section: numeric 0-7
+     - Year: 1977
+  2. BS 3224 Section {B2/C1/D1}:{1970/1963/1960} (3 occurrences)
+     - Prefix: BS (British Standard)
+     - Base number: 3224
+     - Separator: space before "Section", colon after section
+     - Section: alphanumeric (B2, C1, D1)
+     - Year: 1960, 1963, 1970
+- Special notes:
+  - Two distinct separator patterns: colon-based vs space+colon
+  - Section identifiers support both numeric and alphanumeric values
+  - Found in DD (Development Draft) and BS (British Standard) document types
+  - "Section" keyword is explicitly stated in identifiers
+  - Years are 4-digit format
+  - No Section class exists yet in lib/pubid_new/bsi/identifiers/
