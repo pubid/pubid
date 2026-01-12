@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../../components/code"
+
 module PubidNew
   module Bsi
     module Components

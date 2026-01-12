@@ -40,7 +40,7 @@ module PubidNew
         use_slash_before_type = false
 
         # For CWA/HD, they act as publisher (not EN)
-        if %w[CWA HD].include?(type_short)
+        if %w[CWA HD CR].include?(type_short)
           # Stage prefix OR type as publisher
           if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
             parts << typed_stage.abbr.first
@@ -70,7 +70,7 @@ module PubidNew
         end
 
         # Type for non-EN documents (TS, TR) - but not CWA/HD or Guide
-        if type_short != "EN" && !%w[CWA HD Guide].include?(type_short)
+        if type_short != "EN" && !%w[CWA HD CR Guide].include?(type_short)
           if use_slash_before_type && parts.any?
             # Use slash separator for publisher/type combination (TS, TR only)
             parts << "/#{type_short}"

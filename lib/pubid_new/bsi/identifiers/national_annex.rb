@@ -26,6 +26,23 @@ module PubidNew
           { key: :na, title: "National Annex", short: "NA" }
         end
 
+        # Delegation methods to access wrapped base_doc attributes
+        def number
+          base_doc&.number || super
+        end
+
+        def date
+          base_doc&.date || super
+        end
+
+        def part
+          base_doc&.part || super
+        end
+
+        def subpart
+          base_doc&.subpart || super
+        end
+
         def to_s(lang: :en, lang_single: false)
           result = "NA"
 

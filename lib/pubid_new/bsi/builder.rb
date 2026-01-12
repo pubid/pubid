@@ -12,7 +12,10 @@ require_relative "identifiers/draft_document"
 require_relative "identifiers/handbook"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
-require_relative "identifiers/specialized_standard"
+require_relative "identifiers/aerospace_standard"
+require_relative "identifiers/supplement_document"
+require_relative "identifiers/addendum_document"
+require_relative "identifiers/bundled_identifier"
 require_relative "components/publisher"
 
 module PubidNew
@@ -31,6 +34,21 @@ module PubidNew
 
         # Store original data to check if BSI prefix was present
         @original_data = data.dup
+
+        # Check for SupplementDocument first
+        if data[:supplement_document]
+          return build_supplement_document(data[:supplement_document])
+        end
+
+        # Check for AddendumDocument
+        if data[:addendum_document]
+          return build_addendum_document(data[:addendum_document])
+        end
+
+        # Check for BundledIdentifier
+        if data[:bundled_parts] || data[:bundled_list]
+          return build_bundled_identifier(data)
+        end
 
         # Extract supplements before processing
         supplements_data = extract_supplements(data)
@@ -88,9 +106,277 @@ module PubidNew
 
       private
 
+      def build_bundled_identifier(data)
+        if data[:bundled_parts]
+          # Parts/Sections format: "BS 4048:Parts 1 and 2:1966"
+          parts_data = data[:bundled_parts]
+          base_number = parts_data[:number].to_s
+          bundle_type = parts_data[:bundle_type].to_s
+          part1 = parts_data[:part1].to_s
+          part2 = parts_data[:part2].to_s
+          year_val = parts_data[:year].to_i if parts_data[:year]
+
+          # Build base identifier
+          base_id = SingleIdentifier.new(
+            publisher: Components::Publisher.new(body: "BS"),
+            number: Components::Code.new(value: base_number)
+          )
+
+          # Build identifiers for each part
+          id1 = SingleIdentifier.new(
+            publisher: Components::Publisher.new(body: "BS"),
+            number: Components::Code.new(value: base_number),
+            part: Components::Code.new(value: part1)
+          )
+
+          id2 = SingleIdentifier.new(
+            publisher: Components::Publisher.new(body: "BS"),
+            number: Components::Code.new(value: base_number),
+            part: Components::Code.new(value: part2)
+          )
+
+          Identifiers::BundledIdentifier.new(
+            identifiers: [base_id, id1, id2],
+            bundle_type: bundle_type,
+            common_year: year_val ? Components::Date.new(year: year_val) : nil
+          )
+
+        elsif data[:bundled_list]
+          # List format: "BS SP 10 & 11:1949" or "BS 2SP 68 to BS 2SP 71:1973"
+          # bundled_list is an ARRAY of hashes
+          list_array = data[:bundled_list]
+
+          # First element has publisher/prefix/bundle_item
+          first_elem = list_array[0]
+          publisher_val = first_elem[:publisher]&.to_s || "BS"
+          prefix_val = first_elem[:prefix]&.to_s
+
+          items = []
+          separators = []
+
+          # Process first item
+          if first_elem[:bundle_item]
+            items << build_bundle_item(first_elem[:bundle_item], publisher_val, prefix_val)
+          end
+
+          # Process remaining elements (may be separator+item or just year)
+          list_array[1..-1].each do |elem|
+            if elem[:year]
+              # Year element - will be extracted separately
+              next
+            elsif elem[:bundle_item]
+              # This element has separator + bundle_item
+              # Preserve separator case for "TO" vs "to"
+              sep = if elem[:sep_and]
+                      " and "
+                    elsif elem[:sep_to]
+                      # Check if separator includes uppercase TO
+                      to_case = elem[:sep_to][:to_case]&.to_s
+                      to_case == "TO" ? " TO " : " to "
+                    elsif elem[:sep_ampersand]
+                      " & "
+                    elsif elem[:sep_semicolon]
+                      "; "
+                    elsif elem[:sep_comma]
+                      ","
+                    else
+                      " and "
+                    end
+              separators << sep
+              items << build_bundle_item(elem[:bundle_item], publisher_val, prefix_val)
+            end
+          end
+
+          # Extract year from last element if present
+          year_elem = list_array.find { |e| e[:year] }
+          year_val = year_elem[:year].to_i if year_elem
+
+          Identifiers::BundledIdentifier.new(
+            identifiers: items,
+            separators: separators,
+            common_year: year_val ? Components::Date.new(year: year_val) : nil
+          )
+        end
+      end
+
+      def build_bundle_item(item_data, default_publisher, default_prefix)
+        # Extract values based on what's present
+        if item_data.is_a?(Hash)
+          # Check if publisher/prefix were EXPLICITLY present in parse
+          has_explicit_publisher = item_data.key?(:publisher)
+          has_explicit_prefix = item_data.key?(:prefix)
+
+          publisher_val = item_data[:publisher]&.to_s || default_publisher
+          prefix_val = item_data[:prefix]&.to_s || default_prefix
+          number_val = if item_data[:number].is_a?(Hash)
+                         item_data[:number][:number]&.to_s
+                       else
+                         item_data[:number]&.to_s
+                       end
+
+          # Handle both dash-separated parts and space-separated parts
+          parts_val = item_data[:parts]
+          space_separated_part_val = item_data[:part]
+        else
+          # Simple string (alphanumeric like "N001" or just number)
+          has_explicit_publisher = false
+          has_explicit_prefix = false
+          publisher_val = default_publisher
+          prefix_val = default_prefix
+          number_val = item_data.to_s
+          parts_val = nil
+          space_separated_part_val = nil
+        end
+
+        id = SingleIdentifier.new(
+          publisher: Components::Publisher.new(body: publisher_val)
+        )
+        id.prefix = prefix_val if prefix_val && !prefix_val.empty?
+        id.number = Components::Code.new(value: number_val) if number_val
+
+        # Store explicit flags for rendering (use instance variables since it's metadata)
+        # Track both publisher and prefix explicitly
+        id.instance_variable_set(:@explicit_prefix, has_explicit_publisher || has_explicit_prefix)
+        id.instance_variable_set(:@explicit_publisher, has_explicit_publisher)
+
+        # Handle dash-separated parts (from parts array)
+        if parts_val.is_a?(Hash) && parts_val[:parts].is_a?(Array)
+          parts_array = parts_val[:parts]
+          if parts_array.any?
+            part_str = parts_array.first[:part].to_s
+            id.part = Components::Code.new(value: part_str)
+          end
+        # Handle space-separated part (direct part attribute)
+        elsif space_separated_part_val
+          id.part = Components::Code.new(value: space_separated_part_val.to_s)
+          # Mark this part as space-separated for rendering
+          id.instance_variable_set(:@space_separated_part, true)
+        end
+
+        id
+      end
+
       def wrap_with_expert_commentary(base_id)
         require_relative "identifiers/expert_commentary"
-        Identifiers::ExpertCommentary.new(base_identifier: base_id)
+
+        # Determine format from original data
+        # Check for expert_commentary_full first (highest priority)
+        format = if @original_data[:expert_commentary_full]
+                   "full"
+                 elsif @original_data[:expert_commentary_topic]
+                   "abbr_with_topic"
+                 elsif @original_data[:expert_commentary]
+                   "abbr"
+                 else
+                   "abbr"  # Default
+                 end
+
+        topic = @original_data[:expert_commentary_topic]&.to_s
+
+        Identifiers::ExpertCommentary.new(
+          base_identifier: base_id,
+          format: format,
+          topic: topic
+        )
+      end
+
+      def build_supplement_document(data)
+        # Handle nested hash from parser (when using .as with alternatives)
+        data = data[:supplement_document] if data[:supplement_document].is_a?(Hash)
+
+        # Extract values from nested hashes (parser returns {:number => {:number => "1000"}})
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        iteration_val = data[:iteration][:iteration][0][:iteration] if data[:iteration].is_a?(Hash) && data[:iteration][:iteration].is_a?(Array) && data[:iteration][:iteration].any?
+        iteration_val = nil if iteration_val.respond_to?(:empty?) && iteration_val.empty?
+        parts_val = data[:parts][:parts] if data[:parts].is_a?(Hash)
+        flex_prefix_val = data[:flex_prefix].to_s if data[:flex_prefix]
+
+        # Check if this is reverse format: "Supplement No. N (YEAR) to BS NUMBER:YEAR"
+        if data[:supplement_number] && data[:supplement_year] && data[:publisher] && number_val && data[:base_year]
+          # Reverse format
+          reverse_format = true
+          base_year = data[:base_year]
+        else
+          reverse_format = false
+          base_year = data[:year]
+        end
+
+        # Build base identifier
+        base_data = {
+          publisher: data[:publisher],
+          number: number_val,
+          iteration: iteration_val,
+          parts: parts_val,
+          flex_prefix: flex_prefix_val,
+          year: base_year
+        }
+
+        base_id = build(base_data)
+
+        # Determine supplement type (with or without "No.")
+        # Check if supp_no_prefix is "No." string or if it's nil/absent
+        if data[:supp_no_prefix] == "No."
+          supplement_type = "No."
+        elsif data[:supp_no_prefix]
+          supplement_type = data[:supp_no_prefix].to_s
+        else
+          supplement_type = ""
+        end
+
+        Identifiers::SupplementDocument.new(
+          base_identifier: base_id,
+          supplement_number: data[:supplement_number].to_s,
+          supplement_year: data[:supplement_year].to_i,
+          supplement_type: supplement_type,
+          reverse_format: reverse_format,
+          separator: data[:supp_sep].to_s
+        )
+      end
+
+      def build_addendum_document(data)
+        # Extract values from nested hashes (parser returns {:number => {:number => "1000"}})
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        iteration_val = data[:iteration][:iteration][0][:iteration] if data[:iteration].is_a?(Hash) && data[:iteration][:iteration].is_a?(Array) && data[:iteration][:iteration].any?
+        iteration_val = nil if iteration_val.respond_to?(:empty?) && iteration_val.empty?
+        parts_val = data[:parts][:parts] if data[:parts].is_a?(Hash)
+        flex_prefix_val = data[:flex_prefix].to_s if data[:flex_prefix]
+
+        # Build base identifier
+        base_data = {
+          publisher: data[:publisher],
+          number: number_val,
+          iteration: iteration_val,
+          parts: parts_val,
+          flex_prefix: flex_prefix_val,
+          year: data[:base_year]
+        }
+
+        base_id = build(base_data)
+
+        # Determine addendum type (with or without "No.")
+        if data[:add_no_prefix] == "No."
+          addendum_type = "No."
+        elsif data[:add_no_prefix]
+          addendum_type = data[:add_no_prefix].to_s
+        else
+          addendum_type = ""
+        end
+
+        # Determine separator - use colon when add_sep is nil and base_year is present
+        add_sep = data[:add_sep]
+        if add_sep.nil? && data[:base_year]
+          add_sep = ":"
+        elsif add_sep.nil?
+          add_sep = ":"
+        end
+
+        Identifiers::AddendumDocument.new(
+          base_identifier: base_id,
+          addendum_number: data[:addendum_number].to_s,
+          addendum_year: data[:addendum_year].to_i,
+          addendum_type: addendum_type,
+          separator: add_sep.to_s
+        )
       end
 
       def build_value_added_publication(data, supplements_data)
@@ -206,8 +492,8 @@ module PubidNew
         # Special case: National Annex prefix
         return Identifiers::NationalAnnex if parsed_hash[:na_prefix]
 
-        # Special case: Specialized prefix (BS A, BS AU, BS 2A, etc.)
-        return Identifiers::SpecializedStandard if parsed_hash[:prefix]
+        # Special case: Aerospace/Specialized prefix (BS A, BS AU, BS 2A, etc.)
+        return Identifiers::AerospaceStandard if parsed_hash[:prefix]
 
         # Special case: Handle adopted identifiers
         # Match "EN " followed by digit (not "EN ISO" or "EN IEC")
@@ -228,7 +514,8 @@ module PubidNew
           {
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,
-            typed_stage: typed_stage
+            typed_stage: typed_stage,
+            original_abbr: value.to_s  # Preserve original abbreviation
           }
 
         when :publisher
@@ -236,7 +523,11 @@ module PubidNew
 
         when :prefix
           # Specialized prefix (A, AU, C, M, 2A, etc.)
-          value.to_s
+          value&.to_s
+
+        when :flex_prefix
+          # Flex type prefix (CECC, E9111, M, etc.)
+          value&.to_s
 
         when :number
           Components::Code.new(value: value.to_s)
@@ -259,8 +550,12 @@ module PubidNew
           Components::Code.new(value: value[:part].to_s) if value.is_a?(Hash)
 
         when :year, :date
-          # Return as hash with :date key for proper attribute mapping
-          { date: Components::Date.new(year: value.to_i) }
+          # Only create date if value is present
+          if value.nil?
+            nil
+          else
+            { date: Components::Date.new(year: value.to_i) }
+          end
 
         when :month
           value.to_i
@@ -273,15 +568,39 @@ module PubidNew
           nil
 
         when :adopted_string
-          # Don't cast here, handled in build_adopted_identifier
-          nil
+          # Handle both string and nested hash formats
+          # Parser may return: "EN ISO 13485 Expert Commentary" (string)
+          # or: {:adopted_string_content=>" EN ISO 13485 Expert Commentary"} (hash)
+          if value.is_a?(Hash) && value[:adopted_string_content]
+            value[:adopted_string_content].to_s.strip
+          else
+            value.to_s.strip
+          end
 
         when :supplements
           # Handled separately by extract_supplements
           nil
 
         when :expert_commentary
+          # Handle nested hash from parser
+          # Parser returns: {:expert_commentary_topic=>"Fire"} or {:expert_commentary_full=>"Expert Commentary"}
+          if value.is_a?(Hash)
+            if value[:expert_commentary_topic]
+              @original_data[:expert_commentary_topic] = value[:expert_commentary_topic].to_s
+            end
+            if value[:expert_commentary_full]
+              @original_data[:expert_commentary_full] = value[:expert_commentary_full].to_s
+            end
+          end
           true
+
+        when :expert_commentary_full
+          # Don't cast, used for format detection
+          nil
+
+        when :expert_commentary_topic
+          # Don't cast, used for format detection
+          nil
 
         when :pdf_format, :tc_format, :book_format
           # Don't cast, used for VAP wrapper construction
@@ -299,6 +618,10 @@ module PubidNew
           # For collections like PAS 2035/2030
           Components::Code.new(value: value.to_s)
 
+        when :iteration
+          # For bracket notation like 1000[9]
+          value.to_s
+
         else
           value
         end
@@ -311,6 +634,37 @@ module PubidNew
         # Check if this is a bare adopted identifier (no BSI/BS/PD prefix)
         # If data has no publisher/type/na_prefix/flex_type, it's a bare adopted identifier
         is_bare = !data[:publisher] && !data[:type] && !data[:na_prefix] && !data[:flex_type] && !data[:stage]
+
+        # Extract ExComm suffix before parsing (it should be preserved in data[:expert_commentary])
+        # Remove it from adopted_string so ISO/IEC parsers don't choke on it
+        # Handle all three formats: "Expert Commentary", "ExComm", "ExComm (Fire)"
+        if adopted_str.end_with?("Expert Commentary")
+          adopted_str = adopted_str.sub(/Expert Commentary$/, "")
+          data[:expert_commentary_full] = "Expert Commentary"
+          data[:expert_commentary] = true unless data.key?(:expert_commentary)
+          # Update @original_data so wrap_with_expert_commentary can access it
+          @original_data[:expert_commentary_full] = "Expert Commentary"
+          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+        elsif adopted_str.end_with?("ExComm (")
+          adopted_str = adopted_str.sub(/ExComm \(.*\)$/, "")
+          data[:expert_commentary_full] = "Expert Commentary"
+          data[:expert_commentary] = true unless data.key?(:expert_commentary)
+          @original_data[:expert_commentary_full] = "Expert Commentary"
+          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+        elsif adopted_str.include?("ExComm (")
+          # Extract topic from "ExComm (Fire)"
+          topic_match = adopted_str.match(/ExComm\s*\(([^)]+)\)/)
+          adopted_str = adopted_str.sub(/ExComm\s*\(.*\)$/, "")
+          data[:expert_commentary_topic] = topic_match[1] if topic_match
+          data[:expert_commentary] = true unless data.key?(:expert_commentary)
+          @original_data[:expert_commentary_topic] = topic_match[1] if topic_match
+          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+        elsif adopted_str.match?(/ExComm\s*$/)
+          # Abbreviated form "ExComm" at the end
+          adopted_str = adopted_str.sub(/ExComm\s*$/, "")
+          data[:expert_commentary] = true unless data.key?(:expert_commentary)
+          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+        end
 
         # Only extract edition if NOT bare - bare identifiers should preserve edition internally
         edition_match = is_bare ? nil : adopted_str.match(/\s+ED(\d+)\s*$/)
@@ -393,7 +747,7 @@ module PubidNew
         # Return appropriate wrapper based on adoption type
         if adopted_id
           # If adopted_id is a CEN identifier (in Cen module), use AdoptedEuropeanNorm
-          if adopted_id.class.name.start_with?("PubidNew::Cen::")
+          identifier = if adopted_id.class.name.start_with?("PubidNew::Cen::")
             Identifiers::AdoptedEuropeanNorm.new(
               publisher: Components::Publisher.new(body: bsi_prefix),
               adopted_identifier: adopted_id,
@@ -411,6 +765,11 @@ module PubidNew
               translation_upper: data[:translation_upper]&.to_s
             )
           end
+
+          # Wrap with ExpertCommentary if needed
+          identifier = wrap_with_expert_commentary(identifier) if data[:expert_commentary]
+
+          identifier
         end
       end
 

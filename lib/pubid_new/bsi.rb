@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
+require_relative "../pubid_new"
 require_relative "bsi/scheme"
 require_relative "bsi/parser"
 require_relative "bsi/builder"
 require_relative "bsi/identifier"
 
 module PubidNew
- module Bsi
+  module Bsi
     def self.parse(string)
       Identifier.parse(string)
     end

@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require "lutaml/model"
+
 module PubidNew
   module Components
     # Resource type component (a set of defined resource types)

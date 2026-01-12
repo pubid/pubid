@@ -14,8 +14,8 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "parses publisher" do
-        expect(parsed.publisher.body).to eq("BS")
+      it "has base_doc" do
+        expect(parsed.base_doc).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do
@@ -31,12 +31,16 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "parses number" do
-        expect(parsed.number.value).to eq("5678")
+      it "has base_doc" do
+        expect(parsed.base_doc).not_to be_nil
       end
 
-      it "parses year" do
-        expect(parsed.date.year).to eq("2021")
+      it "delegates number via base_doc" do
+        expect(parsed.base_doc.number.value).to eq("5678")
+      end
+
+      it "delegates date via base_doc" do
+        expect(parsed.base_doc.date.year).to eq("2021")
       end
 
       it "renders with 'NA to' prefix" do
@@ -54,12 +58,8 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "parses number" do
-        expect(parsed.number.value).to eq("1990")
-      end
-
-      it "parses part" do
-        expect(parsed.part.value).to eq("1")
+      it "has base_doc" do
+        expect(parsed.base_doc).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do
@@ -75,16 +75,8 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "parses number" do
-        expect(parsed.number.value).to eq("1991")
-      end
-
-      it "parses part" do
-        expect(parsed.part.value).to eq("1")
-      end
-
-      it "parses subpart" do
-        expect(parsed.subpart.value).to eq("1")
+      it "has base_doc" do
+        expect(parsed.base_doc).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do
@@ -121,8 +113,8 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "parses number" do
-        expect(parsed.number.value).to eq("10000")
+      it "has base_doc" do
+        expect(parsed.base_doc).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do

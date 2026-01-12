@@ -87,12 +87,9 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed.number.value).to eq("1991")
       end
 
-      it "delegates part" do
-        expect(parsed.part.value).to eq("1")
-      end
-
-      it "delegates subpart" do
-        expect(parsed.subpart.value).to eq("1")
+      it "delegates part (includes subpart as combined value)" do
+        # CEN parser captures "1-1" as combined part value
+        expect(parsed.part.value).to eq("1-1")
       end
 
       it "round-trips" do

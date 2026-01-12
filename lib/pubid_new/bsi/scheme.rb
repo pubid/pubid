@@ -82,7 +82,7 @@ module PubidNew
           code: :pubhandbook,
           stage_code: :published,
           type_code: :handbook,
-          abbr: ["Handbook"],
+          abbr: ["Handbook", "HB"],
           name: "BSI Handbook",
           harmonized_stages: %w[60.00 60.60],
         ),
@@ -107,13 +107,13 @@ module PubidNew
           harmonized_stages: %w[60.00 60.60],
         ),
 
-        # Specialized British Standard (with letter prefix)
+        # Aerospace/Specialized British Standard (with letter prefix)
         PubidNew::Components::TypedStage.new(
-          code: :pubspecialized,
+          code: :pubaerospace,
           stage_code: :published,
-          type_code: :specialized,
+          type_code: :aerospace,
           abbr: ["BS A", "BS AU", "BS C", "BS M", "BS S", "BS L", "BS TA", "BS MA", "BS PL", "BS QC", "BS G", "BS HC", "BS F", "BS X", "BS B"],
-          name: "Specialized British Standard",
+          name: "Aerospace/Specialized British Standard",
           harmonized_stages: %w[60.00 60.60],
         ),
       ].freeze
@@ -129,7 +129,8 @@ module PubidNew
         handbook: "Identifiers::Handbook",
         pp: "Identifiers::PracticeGuide",
         bip: "Identifiers::BritishIndustrialPractice",
-        specialized: "Identifiers::SpecializedStandard",
+        aerospace: "Identifiers::AerospaceStandard",
+        bundled: "Identifiers::BundledIdentifier",
       }.freeze
 
       # Default typed stage for when no match is found

@@ -8,6 +8,7 @@ require_relative "identifiers/technical_report"
 require_relative "identifiers/cen_workshop_agreement"
 require_relative "identifiers/guide"
 require_relative "identifiers/harmonization_document"
+require_relative "identifiers/cen_report"
 
 module PubidNew
   module Cen

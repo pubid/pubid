@@ -12,7 +12,10 @@ module PubidNew
   module Bsi
     class SingleIdentifier < Lutaml::Model::Serializable
       attribute :publisher, Bsi::Components::Publisher, default: -> { Bsi::Components::Publisher.new(body: "BS") }
+      attribute :prefix, :string  # Specialized prefix (A, AU, C, M, 2A, etc.)
+      attribute :flex_prefix, :string  # Flex type prefix (CECC, E9111, M, etc.)
       attribute :number, Bsi::Components::Code
+      attribute :iteration, :string  # For bracket notation like 1000[9]
       attribute :part, Bsi::Components::Code
       attribute :subpart, Bsi::Components::Code
       attribute :second_number, Bsi::Components::Code  # For collections like PAS 2035/2030
@@ -26,30 +29,23 @@ module PubidNew
       attribute :translation_upper, :string
 
       def to_s(lang: :en, lang_single: false)
+        # Build string representation
         parts = []
 
-        # Get type short name
-        type_short = if type.is_a?(Bsi::Components::Type)
-                       type.abbr
-                     elsif self.class.respond_to?(:type)
-                       self.class.type[:short]
-                     else
-                       "BS"  # Default
-                     end
-
-        # Stage prefix (Draft BS) OR type as publisher
-        if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
-          # Use full typed_stage abbreviation for stages
-          parts << typed_stage.abbr.first
-        elsif stage && stage.respond_to?(:abbr)
-          parts << stage.abbr
-        elsif type.is_a?(Bsi::Components::Type) && type.abbr != "BS"
-          parts << type.abbr
+        # For supplement/addendum base identifiers, flex_prefix replaces publisher+prefix
+        if flex_prefix
+          # Flex prefix is the full prefix including BS (e.g., "BS CECC" becomes "BS" + space + "CECC")
+          parts << publisher.to_s if publisher
+          parts << flex_prefix
         else
-          parts << type_short
+          # Standard publisher
+          parts << publisher.to_s if publisher
+
+          # Prefix if present (specialized prefix like A, AU, C, etc.)
+          parts << "#{prefix}" if prefix
         end
 
-        # Number with part/subpart or collection
+        # Number with iteration, part, and subpart
         if number
           number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
 
@@ -59,15 +55,27 @@ module PubidNew
             number_str += "/#{second_val}"
           end
 
-          # Part and subpart
+          # Part and subpart - check if space-separated
+          space_separated = instance_variable_get(:@space_separated_part)
           if part
             part_val = part.respond_to?(:value) ? part.value : part
-            number_str += "-#{part_val}"
+            # Trim part value to remove leading/trailing spaces from parser
+            part_str = part_val.to_s.strip
+            # Use space for space-separated parts, dash otherwise
+            separator = space_separated ? " " : "-"
+            number_str += "#{separator}#{part_str}"
           end
           if subpart
             subpart_val = subpart.respond_to?(:value) ? subpart.value : subpart
-            number_str += "-#{subpart_val}"
+            subpart_str = subpart_val.to_s.strip
+            number_str += "-#{subpart_str}"
           end
+
+          # Iteration (bracket notation like 1000[9])
+          if iteration && !iteration.empty?
+            number_str += "[#{iteration}]"
+          end
+
           parts << number_str
         end
 

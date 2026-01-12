@@ -65,9 +65,6 @@ The key feature that a PubID provides is the ability to represent
 identifiers in a structured format that can be easily parsed and understood by
 both humans and machines, in a round-trippable manner.
 
-🎉 **PubID V2: All 18 Flavors Complete!** 🎉
-
-As of 2026-01-07, all 18 supported standards organizations now have V2 implementations with clean MODEL-DRIVEN architecture. **Session 285 added comprehensive BSI/CEN enhancements and SAE as the 18th flavor!** The V2 implementation achieves 99%+ overall accuracy across 88,200+ real-world identifiers, with **14 flavors at perfect 100%** accuracy.
 
 See <<v2-migration-status>> for detailed status and <<v2-usage-examples>> for examples.
 
@@ -103,28 +100,6 @@ See link:docs/RFC-5141-BIS-COMPLIANCE-REPORT.md[RFC 5141-bis Compliance Report] 
 
 See link:docs/V2_ARCHITECTURE.adoc[V2 Architecture Guide] for architectural details including URN generation design.
 
-=== Performance
-
-Benchmarked on 2023 MacBook Pro M3:
-
-[cols="2,1,1"]
-|===
-|Operation |Time |Throughput
-
-|Simple identifier URN
-|0.20ms
-|5,000/sec
-
-|Complex identifier URN
-|0.46ms
-|2,174/sec
-
-|Multi-level supplement URN
-|0.74ms
-|1,351/sec
-|===
-
-Memory: 720 KB per 20,000 parses (minimal growth)
 
 == Advanced Rendering Styles
 
@@ -772,9 +747,9 @@ All 731 ASME identifiers are normative (from official ASME sources). Current par
 
 ==== BSI (British Standards Institution)
 
-Status: ✅ 47/47 integration tests (100%), 747/1,463 fixtures (51.06% baseline)
+Status: ✅ 47/47 integration tests (100%), 1,044/1,579 fixtures (66.12%)
 Architecture: Complete V2 with VALUE-ADDED PUBLICATION wrapper pattern
-Features: Adopted standards, consolidated identifiers, value-added publications, new document types
+Features: Adopted standards, consolidated identifiers, value-added publications, aerospace standards, new document types
 
 .BSI Value-Added Publications ✨
 
@@ -825,6 +800,10 @@ BSI supports multiple document type prefixes:
 |Publicly Available Specification
 |`PAS 3002:2018+C1:2018`
 
+|**Aerospace Prefixes** ✨
+|**Aerospace/Specialized Standards (27 prefixes)**
+|**`BS A 109:2024`, `BS 2A 293:2005`, `BS SP 113:1954`**
+
 |**Handbook** ✨
 |**BSI Handbook**
 |**`Handbook 17:1963`**
@@ -837,6 +816,8 @@ BSI supports multiple document type prefixes:
 |**British Industrial Practice**
 |**`BIP 2225:2022`**
 |===
+
+**New in Session 289:** AerospaceStandard identifier type handling 27 aerospace/specialized prefixes (A, AU, B, C, F, G, HC, L, M, MA, PL, SP, TA, X, 2A-2X, 3A-3TA, 4F-4S, 5S, 7S) with proper TYPED_STAGES integration.
 
 **New in Session 285:** Handbook, PP (Practice Guide), and BIP (British Industrial Practice) identifier types with proper TYPED_STAGES integration.
 

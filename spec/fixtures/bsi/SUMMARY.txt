@@ -1,28 +1,31 @@
 Flavor: BSI
-Classified: 2026-01-07 17:49:18
+Classified: 2026-01-12 10:14:08
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 1463
-Pass: 1008 (68.9%)
-Fail: 455 (31.1%)
+Total: 1579
+Pass: 1325 (83.91%)
+Fail: 254 (16.09%)
 
 BY CLASS
 ----------------------------------------------------------------------
-adopted_european_norm                    Pass: 197/197 (100.0%)
-adopted_international_standard           Pass: 78/78 (100.0%)
-british_standard                         Pass: 162/162 (100.0%)
-cen_workshop_agreement                   Pass: 2/2 (100.0%)
-consolidated_identifier                  Pass: 63/63 (100.0%)
+addendum_document                        Pass: 22/22 (100.0%)
+adopted_european_norm                    Pass: 247/247 (100.0%)
+adopted_international_standard           Pass: 81/81 (100.0%)
+aerospace_standard                       Pass: 307/307 (100.0%)
+british_standard                         Pass: 311/311 (100.0%)
+bundled_identifier                       Pass: 27/27 (100.0%)
+consolidated_identifier                  Pass: 30/30 (100.0%)
 draft_document                           Pass: 13/13 (100.0%)
+expert_commentary                        Pass: 25/25 (100.0%)
 flex                                     Pass: 23/23 (100.0%)
-handbook                                 Pass: 1/1 (100.0%)
-national_annex                           Pass: 19/19 (100.0%)
-nil_class                                Pass: 47/47 (100.0%)
-practice_guide                           Pass: 1/1 (100.0%)
+handbook                                 Pass: 13/13 (100.0%)
+national_annex                           Pass: 18/18 (100.0%)
+nil_class                                Pass: 49/49 (100.0%)
+practice_guide                           Pass: 3/3 (100.0%)
 publicly_available_specification         Pass: 56/56 (100.0%)
-published_document                       Pass: 73/73 (100.0%)
-specialized_standard                     Pass: 252/252 (100.0%)
-unknown                                  Pass: 0/455 (0.0%)
-value_added_publication                  Pass: 21/21 (100.0%)
+published_document                       Pass: 76/76 (100.0%)
+supplement_document                      Pass: 18/18 (100.0%)
+unknown                                  Pass: 0/254 (0.0%)
+value_added_publication                  Pass: 6/6 (100.0%)
