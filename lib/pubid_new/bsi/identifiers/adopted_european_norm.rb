@@ -9,7 +9,7 @@ module PubidNew
       # Example: "BS EN 10077-1:2006" where EN 10077-1:2006 is a CEN identifier object
       # Example: "BS EN ISO 8601:2019" where EN ISO 8601:2019 is a CEN AdoptedEuropeanNorm wrapping ISO
       class AdoptedEuropeanNorm < BritishStandard
-        attribute :adopted_identifier, Base, polymorphic: true  # CEN object
+        attribute :adopted_identifier, Base, polymorphic: true # CEN object
         attribute :edition, :string
 
         def to_s(lang: :en, lang_single: false)
@@ -36,23 +36,23 @@ module PubidNew
         end
 
         def year
-          adopted_identifier&.year if adopted_identifier&.respond_to?(:year)
+          adopted_identifier&.year if adopted_identifier.respond_to?(:year)
         end
 
         def date
-          adopted_identifier&.date if adopted_identifier&.respond_to?(:date)
+          adopted_identifier&.date if adopted_identifier.respond_to?(:date)
         end
 
         def parts
-          adopted_identifier&.parts if adopted_identifier&.respond_to?(:parts)
+          adopted_identifier&.parts if adopted_identifier.respond_to?(:parts)
         end
 
         def part
-          adopted_identifier&.part if adopted_identifier&.respond_to?(:part)
+          adopted_identifier&.part if adopted_identifier.respond_to?(:part)
         end
 
         def subpart
-          adopted_identifier&.subpart if adopted_identifier&.respond_to?(:subpart)
+          adopted_identifier&.subpart if adopted_identifier.respond_to?(:subpart)
         end
       end
     end

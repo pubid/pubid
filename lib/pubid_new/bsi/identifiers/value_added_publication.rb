@@ -8,7 +8,7 @@ module PubidNew
       # Value-Added Publication Identifier
       # Wraps base identifier with format suffix (PDF, TC, BOOK)
       # Similar to IEC VapIdentifier and BSI ExpertCommentary
-      # 
+      #
       # Examples:
       #   PD 5500:2018+A3:2020 PDF
       #   PAS 96:2017 - TC

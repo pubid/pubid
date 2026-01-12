@@ -13,7 +13,7 @@ module PubidNew
       #   21/30445138 DC
       #   24/30300822 DC
       class CommitteeDocument < SingleIdentifier
-        attribute :document_number, :string  # The 8-digit document number
+        attribute :document_number, :string # The 8-digit document number
 
         # TYPED_STAGES for committee documents (draft by default)
         TYPED_STAGES = [
@@ -42,12 +42,10 @@ module PubidNew
                          date.to_s[-2, 2]
                        end
                      else
-                       "00"  # Default if no date
+                       "00" # Default if no date
                      end
 
-          result = "#{year_str}/#{document_number} DC"
-
-          result
+          "#{year_str}/#{document_number} DC"
         end
       end
     end

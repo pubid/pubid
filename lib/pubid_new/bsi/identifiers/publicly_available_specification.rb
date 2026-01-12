@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../single_identifier.rb"
+require_relative "../single_identifier"
 
 module PubidNew
   module Bsi

@@ -47,7 +47,7 @@ module PubidNew
 
           # Date with colon separator
           if date
-            result += ":#{date.to_s}"
+            result += ":#{date}"
           end
 
           result

@@ -15,7 +15,7 @@ module PubidNew
       #   BS ISO 9001+BS ISO 14001
       class Set < Base
         attribute :identifiers, Base, collection: true, polymorphic: true
-        attribute :separators, :string, collection: true  # Should all be " + "
+        attribute :separators, :string, collection: true # Should all be " + "
 
         def to_s(lang: :en, lang_single: false)
           return "" if identifiers.nil? || identifiers.empty?
@@ -32,7 +32,7 @@ module PubidNew
             end
           end
 
-          parts.join("")
+          parts.join
         end
 
         def <=>(other)

@@ -21,14 +21,14 @@ module PubidNew
                      base_str = base_id.to_s
                      # Remove known suffixes
                      base_str = base_str.sub(/ ExComm$/, "")
-                                       .sub(/ - TC$/, "")
-                                       .sub(/ PDF$/, "")
-                                       .sub(/ \([A-Z][a-z]+\)$/, "")
+                       .sub(/ - TC$/, "")
+                       .sub(/ PDF$/, "")
+                       .sub(/ \([A-Z][a-z]+\)$/, "")
                      base_str
                    end
 
           # Add supplements
-          identifiers[1..-1].each do |id|
+          identifiers[1..].each do |id|
             if id.is_a?(Amendment)
               sep = id.respond_to?(:separator) && id.separator ? id.separator : "+"
               result += "#{sep}A#{id.amendment_number}:#{id.amendment_year}"
@@ -66,23 +66,23 @@ module PubidNew
         end
 
         def year
-          identifiers&.first&.year if identifiers&.first&.respond_to?(:year)
+          identifiers&.first&.year if identifiers&.first.respond_to?(:year)
         end
 
         def date
-          identifiers&.first&.date if identifiers&.first&.respond_to?(:date)
+          identifiers&.first&.date if identifiers&.first.respond_to?(:date)
         end
 
         def parts
-          identifiers&.first&.parts if identifiers&.first&.respond_to?(:parts)
+          identifiers&.first&.parts if identifiers&.first.respond_to?(:parts)
         end
 
         def part
-          identifiers&.first&.part if identifiers&.first&.respond_to?(:part)
+          identifiers&.first&.part if identifiers&.first.respond_to?(:part)
         end
 
         def type
-          identifiers&.first&.type if identifiers&.first&.respond_to?(:type)
+          identifiers&.first&.type if identifiers&.first.respond_to?(:type)
         end
       end
     end

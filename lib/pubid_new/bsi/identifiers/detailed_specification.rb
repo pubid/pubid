@@ -52,7 +52,7 @@ module PubidNew
                        else
                          spec_code
                        end
-            result = "#{parts.join(" ")} #{code_val}"
+            result = "#{parts.join(' ')} #{code_val}"
           else
             result = parts.join(" ")
           end

@@ -13,13 +13,13 @@ module PubidNew
         attribute :number, Bsi::Components::Code
         attribute :part, Bsi::Components::Code
         attribute :date, Bsi::Components::Date
-        attribute :original_abbr, :string  # Preserve "Handbook" or "HB"
+        attribute :original_abbr, :string # Preserve "Handbook" or "HB"
 
         def self.type
           {
             short: "HB",
             full: "Handbook",
-            names: ["Handbook", "HB"]
+            names: ["Handbook", "HB"],
           }
         end
 

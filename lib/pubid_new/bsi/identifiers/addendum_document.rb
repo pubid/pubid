@@ -16,8 +16,12 @@ module PubidNew
         attribute :base_identifier, Base, polymorphic: true
         attribute :addendum_number, :string
         attribute :addendum_year, :integer
-        attribute :addendum_type, :string, default: -> { "No." }  # "No." or empty for "Addendum N"
-        attribute :separator, :string, default: -> { ":" }  # Separator before Addendum (":" or " ")
+        attribute :addendum_type, :string, default: -> {
+          "No."
+        } # "No." or empty for "Addendum N"
+        attribute :separator, :string, default: -> {
+          ":"
+        } # Separator before Addendum (":" or " ")
 
         def to_s(lang: :en, lang_single: false)
           result = base_identifier.to_s(lang: lang, lang_single: lang_single)
@@ -39,13 +43,13 @@ module PubidNew
           result += "Addendum"
 
           # Add space after "Addendum" if there's a type prefix (like "No.")
-          if !addendum_type.empty?
-            result += " #{addendum_type}"
-            result += " "
-          else
+          if addendum_type.empty?
             # No type prefix, but still need space before number
-            result += " "
+          else
+            result += " #{addendum_type}"
           end
+          result += " "
+          result += " "
 
           result += addendum_number.to_s
           result += ":#{addendum_year}" if addendum_year

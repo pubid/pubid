@@ -16,7 +16,7 @@ module PubidNew
         def self.type
           {
             short: "BIP",
-            full: "British Industrial Practice"
+            full: "British Industrial Practice",
           }
         end
 

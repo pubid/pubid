@@ -10,8 +10,8 @@ module PubidNew
       # - Colon format (DD): "DD 51:Section 0:1977"
       # - Space format (BS): "BS 3224 Section B2:1970"
       class Section < SingleIdentifier
-        attribute :section_id, :string  # Section identifier (0-7 or B2, C1, D1, etc.)
-        attribute :section_format, :string  # Preserve ":Section" or " Section" separator
+        attribute :section_id, :string # Section identifier (0-7 or B2, C1, D1, etc.)
+        attribute :section_format, :string # Preserve ":Section" or " Section" separator
 
         TYPED_STAGES = [
           PubidNew::Components::TypedStage.new(
@@ -44,11 +44,11 @@ module PubidNew
           result = parts.join(" ")
 
           # Section suffix with colon or space format
-          if section_format == "colon"
-            result += ":Section #{section_id}"
-          else
-            result += " Section #{section_id}"
-          end
+          result += if section_format == "colon"
+                      ":Section #{section_id}"
+                    else
+                      " Section #{section_id}"
+                    end
 
           # Date
           if date

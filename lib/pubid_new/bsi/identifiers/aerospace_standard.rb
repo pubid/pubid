@@ -56,12 +56,13 @@ module PubidNew
         ].freeze
 
         def self.type
-          { key: :aerospace, title: "Aerospace/Specialized Standard", short: "BS" }
+          { key: :aerospace, title: "Aerospace/Specialized Standard",
+            short: "BS" }
         end
 
         def to_s(lang: :en, lang_single: false)
           parts = []
-          parts << "BS"  # Always BS for aerospace
+          parts << "BS" # Always BS for aerospace
           parts << prefix if prefix
 
           # Number with part/subpart and letter suffix edition
@@ -86,7 +87,7 @@ module PubidNew
           # Letter suffix edition (for aerospace/specialized standards)
           # Append directly to number/part without space or v prefix
           # e.g., BS AU 145e:2018, BS AU 200-1a:1984
-          if edition && edition.match?(/^[a-zA-Z]$/)
+          if edition&.match?(/^[a-zA-Z]$/)
             result += edition
           end
 

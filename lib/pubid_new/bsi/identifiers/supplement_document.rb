@@ -14,9 +14,13 @@ module PubidNew
         attribute :base_identifier, Base, polymorphic: true
         attribute :supplement_number, :string
         attribute :supplement_year, :integer
-        attribute :supplement_type, :string, default: -> { "No." }  # "No." or empty for "Supplement N"
-        attribute :reverse_format, :boolean, default: false  # true for "Supplement No. N (YEAR) to BS..."
-        attribute :separator, :string, default: -> { ":" }  # Separator before Supplement (":" or " ")
+        attribute :supplement_type, :string, default: -> {
+          "No."
+        } # "No." or empty for "Supplement N"
+        attribute :reverse_format, :boolean, default: false # true for "Supplement No. N (YEAR) to BS..."
+        attribute :separator, :string, default: -> {
+          ":"
+        } # Separator before Supplement (":" or " ")
 
         def to_s
           base_str = base_identifier.to_s

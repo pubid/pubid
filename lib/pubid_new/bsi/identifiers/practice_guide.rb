@@ -16,7 +16,7 @@ module PubidNew
         def self.type
           {
             short: "PP",
-            full: "Published Practice"
+            full: "Published Practice",
           }
         end
 

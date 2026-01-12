@@ -42,15 +42,13 @@ module PubidNew
           result = parts.join(" ")
 
           # Index suffix with colon or space format
-          if issue_number
-            result += " Index Issue #{issue_number}"
-          else
-            result += if index_format == "colon"
-                       ":Index"
-                     else
-                       " Index"
-                     end
-          end
+          result += if issue_number
+                      " Index Issue #{issue_number}"
+                    elsif index_format == "colon"
+                      ":Index"
+                    else
+                      " Index"
+                    end
 
           # Date
           if date

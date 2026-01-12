@@ -8,8 +8,8 @@ module PubidNew
       # National Annex (NA) identifier
       # Can have own supplements: "NA+A1:2012 to BASE"
       class NationalAnnex < SingleIdentifier
-        attribute :na_supplements, Base, polymorphic: true, collection: true  # Supplements on the NA itself
-        attribute :base_doc, Base, polymorphic: true  # The identifier after "to"
+        attribute :na_supplements, Base, polymorphic: true, collection: true # Supplements on the NA itself
+        attribute :base_doc, Base, polymorphic: true # The identifier after "to"
 
         TYPED_STAGES = [
           PubidNew::Components::TypedStage.new(
@@ -47,7 +47,7 @@ module PubidNew
           result = "NA"
 
           # Add NA supplements if present
-          if na_supplements && na_supplements.any?
+          if na_supplements&.any?
             na_supplements.each do |supp|
               if supp.is_a?(Amendment)
                 result += "+A#{supp.amendment_number}:#{supp.amendment_year}"
@@ -60,12 +60,12 @@ module PubidNew
           result += " to "
 
           # Render the base identifier (what this NA is for)
-          if base_doc
-            result += base_doc.to_s
-          else
-            # Fallback to parent rendering
-            result += super
-          end
+          result += if base_doc
+                      base_doc.to_s
+                    else
+                      # Fallback to parent rendering
+                      super
+                    end
 
           result
         end
