@@ -22,15 +22,17 @@ module PubidNew
         attribute :year_start, :string        # Date range start year
         attribute :month_end, :string         # Date range end month
         attribute :year_end, :string          # Date range end year
-        attribute :has_revision, :boolean, default: -> { false }  # "supprev" pattern
-        attribute :suffix, :string            # General suffix for other patterns
+        attribute :has_revision, :boolean, default: -> {
+          false
+        } # "supprev" pattern
+        attribute :suffix, :string # General suffix for other patterns
 
         # Render supplement in specified format
         # @param format [:short, :mr, :long] The output format
         # @return [String] The formatted supplement representation
         def to_s(format = :short)
           return "" if number.nil? && year.nil? && !has_revision && suffix.nil? &&
-                      month_start.nil? && year_start.nil? && month_end.nil? && year_end.nil?
+            month_start.nil? && year_start.nil? && month_end.nil? && year_end.nil?
 
           case format
           when :short, :mr
@@ -46,49 +48,72 @@ module PubidNew
 
         # Build short format: "supp2", "supp-1925", "supp3/1926", "suppJan1924", "supprev"
         def build_short_format
-          if has_revision
-            "supprev"
-          elsif suffix
-            "supp#{suffix}"
-          elsif month_start && year_start && month_end && year_end
-            # Date range: "suppJan1924-Jan1926"
-            "supp#{month_start}#{year_start}-#{month_end}#{year_end}"
-          elsif month && year
-            # Month and year: "suppJan1924"
-            "supp#{month}#{year}"
-          elsif number && year
-            # Number with slash and year: "supp3/1926"
-            "supp#{number}/#{year}"
-          elsif year
-            # Just year with dash: "supp-1925"
-            "supp-#{year}"
-          elsif number
-            # Just number: "supp2"
-            "supp#{number}"
-          else
-            ""
-          end
+          return "supprev" if has_revision
+          return "supp#{suffix}" if suffix
+          return build_date_range_format if date_range?
+          return build_month_year_format if month && year
+          return build_number_year_format if number && year
+          return build_year_format if year
+          return build_number_format if number
+
+          ""
         end
 
         # Build long format: "Supplement 2", "Supplement 1925", etc.
         def build_long_format
-          if has_revision
-            "Supplement with Revision"
-          elsif suffix
-            "Supplement #{suffix}"
-          elsif month_start && year_start && month_end && year_end
-            "Supplement #{month_start} #{year_start}-#{month_end} #{year_end}"
-          elsif month && year
-            "Supplement #{month} #{year}"
-          elsif number && year
-            "Supplement #{number}/#{year}"
-          elsif year
-            "Supplement #{year}"
-          elsif number
-            "Supplement #{number}"
-          else
-            ""
-          end
+          return "Supplement with Revision" if has_revision
+          return "Supplement #{suffix}" if suffix
+          return build_long_date_range_format if date_range?
+          return build_long_month_year_format if month && year
+          return build_long_number_year_format if number && year
+          return build_long_year_format if year
+          return build_long_number_format if number
+
+          ""
+        end
+
+        def date_range?
+          month_start && year_start && month_end && year_end
+        end
+
+        def build_date_range_format
+          "supp#{month_start}#{year_start}-#{month_end}#{year_end}"
+        end
+
+        def build_month_year_format
+          "supp#{month}#{year}"
+        end
+
+        def build_number_year_format
+          "supp#{number}/#{year}"
+        end
+
+        def build_year_format
+          "supp-#{year}"
+        end
+
+        def build_number_format
+          "supp#{number}"
+        end
+
+        def build_long_date_range_format
+          "Supplement #{month_start} #{year_start}-#{month_end} #{year_end}"
+        end
+
+        def build_long_month_year_format
+          "Supplement #{month} #{year}"
+        end
+
+        def build_long_number_year_format
+          "Supplement #{number}/#{year}"
+        end
+
+        def build_long_year_format
+          "Supplement #{year}"
+        end
+
+        def build_long_number_format
+          "Supplement #{number}"
         end
       end
     end
