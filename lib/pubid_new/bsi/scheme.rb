@@ -146,6 +146,16 @@ module PubidNew
           name: "BSI Section",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # DISC (Delivering Information Solutions to Customers)
+        PubidNew::Components::TypedStage.new(
+          code: :pubdisc,
+          stage_code: :published,
+          type_code: :disc,
+          abbr: ["DISC"],
+          name: "DISC",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -163,6 +173,7 @@ module PubidNew
         index: "Identifiers::Index",
         method: "Identifiers::Method",
         section: "Identifiers::Section",
+        disc: "Identifiers::Disc",
         bundled: "Identifiers::BundledIdentifier",
       }.freeze
 

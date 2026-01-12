@@ -101,6 +101,9 @@ module PubidNew
       # Section ID - can be numeric (0-7) or alphanumeric (B2, C1, D1, etc.)
       rule(:section_id) { match["0-9A-Za-z"].repeat(1) }
 
+      # DISC identifier - "DISC PD <number>[-<part>]:<year>"
+      rule(:disc_prefix) { str("DISC PD ") }
+
       # Stage prefixes
       rule(:draft) { str("Draft BS") | str("DBS") }
 
@@ -434,6 +437,8 @@ module PubidNew
         (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
         # Section identifier - must be before regular identifier
         (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
+        # DISC identifier - "DISC PD <number>[-<part>]:<year>"
+        (disc_prefix >> number >> parts.maybe >> year).as(:disc_identifier) |
         # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
         supplement_document_reverse.as(:supplement_document) |
         # Supplement Document - forward format (BS NUMBER:Supplement No. N:YEAR)

@@ -13,6 +13,7 @@ require_relative "identifiers/handbook"
 require_relative "identifiers/index"
 require_relative "identifiers/method"
 require_relative "identifiers/section"
+require_relative "identifiers/disc"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
 require_relative "identifiers/aerospace_standard"
@@ -51,6 +52,11 @@ module PubidNew
         # Check for Section identifier
         if data[:section_identifier]
           return build_section(data[:section_identifier])
+        end
+
+        # Check for DISC identifier
+        if data[:disc_identifier]
+          return build_disc(data[:disc_identifier])
         end
 
         # Check for SupplementDocument first
@@ -229,6 +235,33 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Section.new(attrs)
+      end
+
+      def build_disc(data)
+        # Extract values from the parsed data
+        # DISC format: "DISC PD {number}[-{part}]:{year}"
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract part from parts array (if present)
+        part_val = nil
+        if data[:parts] && data[:parts].any?
+          parts_array = Array(data[:parts])
+          if parts_array.first && parts_array.first[:part]
+            part_val = parts_array.first[:part].to_s
+          end
+        end
+
+        # Build attributes hash
+        attrs = {
+          number: Components::Code.new(value: number_val),
+        }
+        attrs[:part] = Components::Code.new(value: part_val) if part_val
+        attrs[:publisher] = Components::Publisher.new(body: "DISC")
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::Disc.new(attrs)
       end
 
       def build_bundled_identifier(data)
