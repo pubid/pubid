@@ -11,6 +11,7 @@ require_relative "../components/translation"
 require_relative "../components/issue_number"
 require_relative "../components/volume"
 require_relative "../components/part"
+require_relative "../components/supplement"
 
 module PubidNew
   module Nist
