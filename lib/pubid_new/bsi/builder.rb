@@ -136,7 +136,7 @@ module PubidNew
         attrs = {
           number: Components::Code.new(value: number_val),
           issue_number: issue_number,
-          original_format: format
+          index_format: format
         }
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
