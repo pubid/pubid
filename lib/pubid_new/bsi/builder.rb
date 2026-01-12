@@ -26,6 +26,8 @@ require_relative "identifiers/technical_specification"
 require_relative "identifiers/supplementary_index"
 require_relative "identifiers/explanatory_supplement"
 require_relative "identifiers/standalone_amendment"
+require_relative "identifiers/test_method"
+require_relative "identifiers/set"
 require_relative "components/publisher"
 
 module PubidNew
@@ -75,6 +77,11 @@ module PubidNew
           return build_method(data[:method_identifier])
         end
 
+        # Check for Test Method identifier
+        if data[:test_method_identifier]
+          return build_test_method(data[:test_method_identifier])
+        end
+
         # Check for Section identifier
         if data[:section_identifier]
           return build_section(data[:section_identifier])
@@ -108,6 +115,11 @@ module PubidNew
         # Check for BundledIdentifier
         if data[:bundled_parts] || data[:bundled_list]
           return build_bundled_identifier(data)
+        end
+
+        # Check for Set identifier
+        if data[:set]
+          return build_set(data[:set])
         end
 
         # Extract supplements before processing
@@ -282,6 +294,36 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Method.new(attrs)
+      end
+
+      def build_test_method(data)
+        # Extract values from the parsed data
+        # Format: BS {number}:{test_series}:{test_id}:{year}
+        publisher_val = data[:publisher].to_s if data[:publisher]
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract test_method_suffix information
+        test_method_suffix_data = data[:test_method_suffix]
+        test_series = nil
+        test_id = nil
+
+        if test_method_suffix_data.is_a?(Hash)
+          test_series = test_method_suffix_data[:test_series].to_s if test_method_suffix_data[:test_series]
+          test_id = test_method_suffix_data[:test_id].to_s if test_method_suffix_data[:test_id]
+        end
+
+        # Build attributes hash
+        attrs = {
+          number: Components::Code.new(value: number_val),
+          test_series: test_series,
+          test_id: test_id,
+        }
+        attrs[:publisher] = Components::Publisher.new(body: publisher_val) if publisher_val
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::TestMethod.new(attrs)
       end
 
       def build_section(data)
@@ -521,6 +563,71 @@ module PubidNew
             common_year: year_val ? Components::Date.new(year: year_val) : nil
           )
         end
+      end
+
+      def build_set(data)
+        # data is a hash with :set key containing an array of set items
+        # The parser returns: {set: [{set_item: {...}}, {set_item: {...}}, ...]}
+        # Extract the array from the hash
+        items_array = data[:set] || data
+        items_array = [items_array] unless items_array.is_a?(Array)
+
+        identifiers = []
+
+        items_array.each_with_index do |item, i|
+          # Extract the actual item data from :set_item key
+          item_data = item[:set_item] || item
+
+          # Build string identifier for recursive parsing
+          # Note: item_data values are Parslet::Slice objects, need to convert to string
+          id_str = ""
+
+          # Publisher (BS)
+          if item_data[:publisher]
+            id_str += "#{item_data[:publisher].to_s} "
+          end
+
+          # Adopted org (ISO, IEC, etc.)
+          if item_data[:adopted_org]
+            id_str += "#{item_data[:adopted_org].to_s} "
+          end
+
+          # Number
+          if item_data[:number]
+            number_val = if item_data[:number].is_a?(Hash)
+                           item_data[:number][:number].to_s if item_data[:number][:number]
+                         else
+                           item_data[:number].to_s
+                         end
+            id_str += number_val.to_s if number_val
+          end
+
+          # Add part if present (parts is an array from the parser)
+          if item_data[:parts] && item_data[:parts].is_a?(Hash) && item_data[:parts][:parts]
+            parts_array = item_data[:parts][:parts]
+            if parts_array.is_a?(Array) && parts_array.any?
+              part_val = parts_array.first[:part]
+              id_str += "-#{part_val}"
+            end
+          end
+
+          # Add year if present
+          if item_data[:year]
+            id_str += ":#{item_data[:year].to_s}"
+          end
+
+          # Skip if empty string
+          next if id_str.strip.empty?
+
+          # Recursively parse this identifier
+          parsed_id = PubidNew::Bsi.parse(id_str)
+          identifiers << parsed_id if parsed_id
+        end
+
+        Identifiers::Set.new(
+          identifiers: identifiers,
+          separators: [" + "] * [0, identifiers.length - 1].max
+        )
       end
 
       def build_bundle_item(item_data, default_publisher, default_prefix)

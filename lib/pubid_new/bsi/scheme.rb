@@ -208,6 +208,11 @@ module PubidNew
         detailed_specification: "Identifiers::DetailedSpecification",
         standalone_amendment: "Identifiers::StandaloneAmendment",
         ts: "Identifiers::TechnicalSpecification",
+        committee_document: "Identifiers::CommitteeDocument",
+        explanatory_supplement: "Identifiers::ExplanatorySupplement",
+        supplementary_index: "Identifiers::SupplementaryIndex",
+        test_method: "Identifiers::TestMethod",
+        set: "Identifiers::Set",
       }.freeze
 
       # Default typed stage for when no match is found

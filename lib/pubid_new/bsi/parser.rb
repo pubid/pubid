@@ -101,6 +101,38 @@ module PubidNew
       # Method code - alphanumeric like "131B", "451F", "823A", "1006"
       rule(:method_code) { match["0-9A-Z"].repeat(1) }
 
+      # Test Method suffix - format: ":TEST:TESTID"
+      # Examples: BS 1006:B01C:LFS1:1982
+      rule(:test_method_suffix) do
+        colon >> match["0-9A-Z"].repeat(1).as(:test_series) >> colon >> match["0-9A-Z"].repeat(1).as(:test_id)
+      end
+
+      # Set separator - plus sign with optional spaces
+      # Handles: " + ", "+", " +", "+ "
+      rule(:set_separator) { space.maybe >> str("+") >> space.maybe }
+
+      # Set pattern - capture identifiers separated by +
+      # We'll parse each part separately in the builder
+      # Use a different approach to avoid key collision
+      rule(:set_item) do
+        # Wrap the item in a unique key to avoid merging
+        (bs.as(:publisher) >> space >>
+         (adopted_org_prefix.as(:adopted_org) >> space).maybe >>
+         number >> parts.maybe >>
+         year.maybe).as(:set_item)
+      end
+
+      # Parse a sequence of set items separated by +
+      rule(:set_items) do
+        # First item
+        set_item >> (set_separator >> set_item).repeat(1)
+      end
+
+      rule(:set_identifier) do
+        # Use as() on the whole sequence to capture the set structure
+        set_items.as(:set)
+      end
+
       # Section suffix - handles two formats:
       # 1. Colon format (DD): "DD 51:Section 0:1977"
       # 2. Space format (BS): "BS 3224 Section B2:1970"
@@ -507,6 +539,8 @@ module PubidNew
         (bs.as(:publisher) >> space >> number >> parts >> explanatory_supplement_suffix.as(:explanatory_supplement_suffix) >> year).as(:explanatory_supplement_identifier) |
         # Method identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
+        # Test Method identifier - BS {number}:{test_series}:{test_id}:{year}
+        (bs.as(:publisher) >> space >> number >> test_method_suffix.as(:test_method_suffix) >> year).as(:test_method_identifier) |
         # Section identifier - must be before regular identifier
         (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
         # Detailed Specification identifier - must be before regular identifier
@@ -524,6 +558,9 @@ module PubidNew
         supplement_document_forward |
         # Addendum Document (BS NUMBER:Addendum No. N:YEAR)
         addendum_document |
+        # Set identifier - multiple identifiers joined by +
+        # Must be BEFORE bare_adopted and regular identifier with adopted_string
+        set_identifier.as(:set) |
         # Bundled Identifiers (must be before regular identifiers)
         bundled_identifier |
         # Bare adopted identifier (ISO, IEC without BSI prefix) - check BEFORE adopted_string
