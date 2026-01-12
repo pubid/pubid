@@ -166,6 +166,16 @@ module PubidNew
           name: "Detailed Specification",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Standalone Amendment
+        PubidNew::Components::TypedStage.new(
+          code: :standalone_amendment,
+          stage_code: :published,
+          type_code: :amendment,
+          abbr: ["AMD"],
+          name: "Amendment",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -186,6 +196,7 @@ module PubidNew
         disc: "Identifiers::Disc",
         bundled: "Identifiers::BundledIdentifier",
         detailed_specification: "Identifiers::DetailedSpecification",
+        standalone_amendment: "Identifiers::StandaloneAmendment",
       }.freeze
 
       # Default typed stage for when no match is found

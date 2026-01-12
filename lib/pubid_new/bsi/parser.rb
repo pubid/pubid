@@ -114,6 +114,18 @@ module PubidNew
         )
       end
 
+      # Standalone Amendment identifier
+      # Formats: "AMD 11015", "(AMD 10971)", "AMD Corrigendum 14716"
+      rule(:standalone_amendment) do
+        # Parenthesized format: "(AMD 10971)" or "(AMD Corrigendum 14716)"
+        (str("(") >> str("AMD") >> space >> str("Corrigendum").as(:corrigendum) >> space >> digits.as(:amendment_number) >> str(")")).as(:parenthesized_amd) |
+        (str("(") >> str("AMD") >> space >> digits.as(:amendment_number) >> str(")")).as(:parenthesized_amd) |
+        # Regular format with corrigendum: "AMD Corrigendum 14716"
+        (str("AMD") >> space >> str("Corrigendum").as(:corrigendum) >> space >> digits.as(:amendment_number)).as(:standalone_amendment) |
+        # Basic format: "AMD 11015"
+        (str("AMD") >> space >> digits.as(:amendment_number)).as(:standalone_amendment)
+      end
+
       # DISC identifier - "DISC PD <number>[-<part>]:<year>"
       rule(:disc_prefix) { str("DISC PD ") }
 
@@ -444,6 +456,8 @@ module PubidNew
 
       # Identifier patterns - try most specific first
       rule(:identifier) do
+        # Standalone Amendment - must be first as it starts with "AMD"
+        standalone_amendment |
         # Index identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
         # Method identifier - must be before regular identifier

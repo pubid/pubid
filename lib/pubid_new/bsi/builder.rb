@@ -21,6 +21,7 @@ require_relative "identifiers/aerospace_standard"
 require_relative "identifiers/supplement_document"
 require_relative "identifiers/addendum_document"
 require_relative "identifiers/bundled_identifier"
+require_relative "identifiers/standalone_amendment"
 require_relative "components/publisher"
 
 module PubidNew
@@ -39,6 +40,11 @@ module PubidNew
 
         # Store original data to check if BSI prefix was present
         @original_data = data.dup
+
+        # Check for StandaloneAmendment first (very specific pattern)
+        if data[:standalone_amendment] || data[:parenthesized_amd]
+          return build_standalone_amendment(data)
+        end
 
         # Check for Index identifier first
         if data[:index_identifier]
@@ -569,6 +575,26 @@ module PubidNew
         )
       end
 
+      def build_standalone_amendment(data)
+        # Extract from either standalone_amendment or parenthesized_amd key
+        amd_data = data[:standalone_amendment] || data[:parenthesized_amd]
+
+        # Handle nested hash if needed
+        amd_data = amd_data[:standalone_amendment] || amd_data[:parenthesized_amd] if amd_data.is_a?(Hash) && (amd_data[:standalone_amendment] || amd_data[:parenthesized_amd])
+
+        amendment_number = amd_data[:amendment_number].to_s if amd_data[:amendment_number]
+        corrigendum = !amd_data[:corrigendum].nil?
+        parenthesized = !data[:parenthesized_amd].nil?
+
+        attrs = {
+          amendment_number: Components::Code.new(value: amendment_number),
+          corrigendum: corrigendum,
+          parenthesized: parenthesized
+        }
+
+        Identifiers::StandaloneAmendment.new(attrs)
+      end
+
       def build_value_added_publication(data, supplements_data)
         require_relative "identifiers/value_added_publication"
 
@@ -846,6 +872,20 @@ module PubidNew
 
         when :spec_code
           Components::Code.new(value: value.to_s)
+
+        when :amendment_number
+          Components::Code.new(value: value.to_s)
+
+        when :corrigendum
+          !value.nil?
+
+        when :parenthesized_amd
+          # Don't cast, used for format detection
+          nil
+
+        when :standalone_amendment
+          # Don't cast, handled by build_standalone_amendment
+          nil
 
         else
           value
