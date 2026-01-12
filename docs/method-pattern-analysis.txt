@@ -1,0 +1,18 @@
+Method patterns analysis:
+- Total patterns: 14
+- Basic format: BS <part>:Method <code>:<year>
+  - Examples: BS 2782-1:Method 131B:1983, BS 2782-11:Method 1108A:1989
+  - Count: 12 instances
+- Range format: BS <part>:Methods <code> to <code>:<year>
+  - Example: BS 2782-4:Methods 451F to 451J:1978
+  - Count: 1 instance
+- And format: BS <part>:Methods <code> and <code>:<year>
+  - Example: BS 2782-8:Methods 823A and 823B:1978
+  - Count: 1 instance
+- Special notes:
+  - Uses "Method" (singular) for single method codes
+  - Uses "Methods" (plural) for multiple method codes (range/and)
+  - Part numbers include: 2782-1, 2782-10, 2782-11, 2782-3, 2782-4, 2782-6, 2782-7, 2782-8
+  - Codes can be numeric (e.g., 1006) or alphanumeric with letter suffixes (e.g., 131B, 140D, 1108A, 451F)
+  - Years range from 1976 to 1997
+  - Similar structure to Amendment but with "Method/Methods" keyword instead of "AMD"
