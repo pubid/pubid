@@ -88,6 +88,19 @@ module PubidNew
       # Method code - alphanumeric like "131B", "451F", "823A", "1006"
       rule(:method_code) { match["0-9A-Z"].repeat(1) }
 
+      # Section suffix - handles two formats:
+      # 1. Colon format (DD): "DD 51:Section 0:1977"
+      # 2. Space format (BS): "BS 3224 Section B2:1970"
+      rule(:section_suffix) do
+        # Colon format: ":Section N" (DD format)
+        colon.as(:colon_sep) >> str("Section") >> space >> section_id.as(:section_id) |
+        # Space format: " Section N" (BS format)
+        space >> str("Section") >> space >> section_id.as(:section_id)
+      end
+
+      # Section ID - can be numeric (0-7) or alphanumeric (B2, C1, D1, etc.)
+      rule(:section_id) { match["0-9A-Za-z"].repeat(1) }
+
       # Stage prefixes
       rule(:draft) { str("Draft BS") | str("DBS") }
 
@@ -419,6 +432,8 @@ module PubidNew
         (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
         # Method identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
+        # Section identifier - must be before regular identifier
+        (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
         # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
         supplement_document_reverse.as(:supplement_document) |
         # Supplement Document - forward format (BS NUMBER:Supplement No. N:YEAR)

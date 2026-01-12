@@ -12,6 +12,7 @@ require_relative "identifiers/draft_document"
 require_relative "identifiers/handbook"
 require_relative "identifiers/index"
 require_relative "identifiers/method"
+require_relative "identifiers/section"
 require_relative "identifiers/practice_guide"
 require_relative "identifiers/british_industrial_practice"
 require_relative "identifiers/aerospace_standard"
@@ -45,6 +46,11 @@ module PubidNew
         # Check for Method identifier
         if data[:method_identifier]
           return build_method(data[:method_identifier])
+        end
+
+        # Check for Section identifier
+        if data[:section_identifier]
+          return build_section(data[:section_identifier])
         end
 
         # Check for SupplementDocument first
@@ -193,6 +199,36 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Method.new(attrs)
+      end
+
+      def build_section(data)
+        # Extract values from the parsed data
+        # Publisher can come from :publisher (BS) or :type (DD, PD, etc.)
+        publisher_val = data[:publisher]&.to_s || data[:type]&.to_s
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract section_suffix information
+        section_suffix_data = data[:section_suffix]
+        section_id = nil
+        format = "space"  # default
+
+        if section_suffix_data.is_a?(Hash)
+          section_id = section_suffix_data[:section_id].to_s if section_suffix_data[:section_id]
+          format = "colon" if section_suffix_data[:colon_sep]
+        end
+
+        # Build attributes hash (conditional arguments must be handled separately)
+        attrs = {
+          number: Components::Code.new(value: number_val),
+          section_id: section_id,
+          section_format: format
+        }
+        attrs[:publisher] = Components::Publisher.new(body: publisher_val) if publisher_val
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::Section.new(attrs)
       end
 
       def build_bundled_identifier(data)
@@ -725,6 +761,14 @@ module PubidNew
 
         when :method_suffix
           # Don't cast, handled by build_method
+          nil
+
+        when :section_identifier
+          # Don't cast, handled by build_section
+          nil
+
+        when :section_suffix
+          # Don't cast, handled by build_section
           nil
 
         else

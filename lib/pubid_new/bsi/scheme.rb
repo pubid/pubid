@@ -136,6 +136,16 @@ module PubidNew
           name: "BSI Method",
           harmonized_stages: %w[60.00 60.60],
         ),
+
+        # Section
+        PubidNew::Components::TypedStage.new(
+          code: :pubsection,
+          stage_code: :published,
+          type_code: :section,
+          abbr: ["Section"],
+          name: "BSI Section",
+          harmonized_stages: %w[60.00 60.60],
+        ),
       ].freeze
 
       # Map type codes to identifier classes
@@ -152,6 +162,7 @@ module PubidNew
         aerospace: "Identifiers::AerospaceStandard",
         index: "Identifiers::Index",
         method: "Identifiers::Method",
+        section: "Identifiers::Section",
         bundled: "Identifiers::BundledIdentifier",
       }.freeze
 
