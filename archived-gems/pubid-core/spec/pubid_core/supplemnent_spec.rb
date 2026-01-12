@@ -40,11 +40,13 @@ RSpec.describe Pubid::Core::Supplement do
     end
 
     let(:first_supplement) do
-      described_class.new(number: first_supplement_version, year: first_supplement_year)
+      described_class.new(number: first_supplement_version,
+                          year: first_supplement_year)
     end
 
     let(:second_supplement) do
-      described_class.new(number: second_supplement_version, year: second_supplement_year)
+      described_class.new(number: second_supplement_version,
+                          year: second_supplement_year)
     end
 
     let(:first_supplement_year) { nil }

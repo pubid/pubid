@@ -9,7 +9,7 @@ module PubidNew
       # Format: PLATEAU Handbook #NN[-annex] [第X.Y版]
       # Example: PLATEAU Handbook #00 第1.0版
       class Handbook < Base
-        attribute :edition, :string, default: -> { nil }
+        attribute :edition, :string, default: -> {}
 
         def type_string
           "Handbook"

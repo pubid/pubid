@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe PubidNew::Astm::Identifier::Manual do
-# ========================================
+  # ========================================
   # Manual (75 IDs, 26%)
   # ========================================
   context "Manual identifiers" do
@@ -35,5 +35,4 @@ RSpec.describe PubidNew::Astm::Identifier::Manual do
       expect(parsed.to_s).to eq("ASTM MNL20-2ND-SUP-EB")
     end
   end
-
 end

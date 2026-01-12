@@ -9,7 +9,9 @@ require_relative "../components/typed_stage"
 module PubidNew
   module Cen
     class SingleIdentifier < Lutaml::Model::Serializable
-      attribute :publisher, Components::Publisher, default: -> { Components::Publisher.new(body: "EN") }
+      attribute :publisher, Components::Publisher, default: -> {
+        Components::Publisher.new(body: "EN")
+      }
       attribute :copublishers, Components::Publisher, collection: true
       attribute :number, Components::Code
       attribute :part, Components::Code
@@ -23,17 +25,18 @@ module PubidNew
         parts = []
 
         # Check if we have a draft stage (prEN, FprEN) - these include both stage and type
-        is_draft_stage = typed_stage && typed_stage.abbr && %w[prEN FprEN].include?(typed_stage.abbr.first)
+        is_draft_stage = typed_stage && typed_stage.abbr && %w[prEN
+                                                               FprEN].include?(typed_stage.abbr.first)
 
         # Get type short name - for draft stages, extract base type
         type_short = if is_draft_stage
-                       typed_stage.type_code.to_s.upcase  # :en => "EN"
+                       typed_stage.type_code.to_s.upcase # :en => "EN"
                      elsif type.is_a?(Components::Type)
                        type.abbr
                      elsif self.class.respond_to?(:type)
                        self.class.type[:short]
                      else
-                       "EN"  # Default
+                       "EN" # Default
                      end
 
         # Track if we should use slash before type
@@ -47,19 +50,19 @@ module PubidNew
           else
             parts << type_short
           end
-        else
+        elsif is_draft_stage
           # Draft stage prefix (prEN, FprEN) OR regular publisher
-          if is_draft_stage
-            parts << typed_stage.abbr.first
-          elsif publisher
-            parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
-            use_slash_before_type = true  # When publisher present, use slash before type
-          end
+          parts << typed_stage.abbr.first
+        elsif publisher
+          parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
+          use_slash_before_type = true # When publisher present, use slash before type
         end
 
         # Copublishers - add to last part (publisher) with slash
         if copublishers && copublishers.any?
-          copub_str = copublishers.map { |cp| cp.respond_to?(:body) ? cp.body : cp.to_s }.join("/")
+          copub_str = copublishers.map do |cp|
+            cp.respond_to?(:body) ? cp.body : cp.to_s
+          end.join("/")
           unless copub_str.empty?
             if parts.any?
               parts[-1] = "#{parts[-1]}/#{copub_str}"

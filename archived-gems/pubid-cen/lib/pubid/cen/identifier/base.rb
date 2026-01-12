@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Cen
   module Identifier
@@ -30,7 +30,7 @@ module Pubid::Cen
           if identifier_params[:supplement]
             return transform_supplement(
               identifier_params[:supplement],
-              identifier_params.dup.tap { |h| h.delete(:supplement) }
+              identifier_params.dup.tap { |h| h.delete(:supplement) },
             )
           end
 

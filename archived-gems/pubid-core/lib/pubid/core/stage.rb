@@ -13,15 +13,20 @@ module Pubid::Core
         @harmonized_code = if harmonized_code.is_a?(HarmonizedStageCode)
                              harmonized_code
                            else
-                             HarmonizedStageCode.new(harmonized_code, config: config)
+                             HarmonizedStageCode.new(harmonized_code,
+                                                     config: config)
                            end
         @abbr ||= lookup_abbr(@harmonized_code.stages)
       end
 
       if abbr
-        raise Errors::StageInvalidError, "#{abbr} is not valid stage" unless config.stages["abbreviations"].key?(abbr.to_s)
+        unless config.stages["abbreviations"].key?(abbr.to_s)
+          raise Errors::StageInvalidError,
+                "#{abbr} is not valid stage"
+        end
 
-        @harmonized_code ||= HarmonizedStageCode.new(lookup_code(abbr), config: config)
+        @harmonized_code ||= HarmonizedStageCode.new(lookup_code(abbr),
+                                                     config: config)
       end
     end
 
@@ -36,8 +41,8 @@ module Pubid::Core
         when Array
           if lookup_code.is_a?(Array)
             return abbr if codes == lookup_code
-          else
-            return abbr if codes.include?(lookup_code)
+          elsif codes.include?(lookup_code)
+            return abbr
           end
           # codes.each do |code|
           #   return abbr if code == lookup_code
@@ -81,6 +86,7 @@ module Pubid::Core
         return false
         # other = self.class.parse(other, config: config)
       end
+
       other&.harmonized_code == harmonized_code
     end
 

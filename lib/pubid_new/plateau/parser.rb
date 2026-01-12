@@ -25,8 +25,8 @@ module PubidNew
       # Edition: 第1.0版, 第2.3版, etc. (only for Handbook)
       rule(:edition_part) do
         str("第") >>
-        (digits >> str(".") >> digits).as(:edition) >>
-        str("版")
+          (digits >> str(".") >> digits).as(:edition) >>
+          str("版")
       end
 
       rule(:edition) { space >> edition_part }
@@ -40,12 +40,12 @@ module PubidNew
       # Full identifier patterns
       rule(:handbook) do
         publisher >> space >> doc_type >> space >>
-        number >> annex.maybe >> edition.maybe
+          number >> annex.maybe >> edition.maybe
       end
 
       rule(:technical_report) do
         publisher >> space >> doc_type >> space >>
-        number >> annex.maybe
+          number >> annex.maybe
       end
 
       # Annex identifier (supplement)

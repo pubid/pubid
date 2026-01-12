@@ -11,25 +11,23 @@ RSpec.describe "ANSI Fixture Round-trip Tests" do
       successes = 0
 
       fixtures.each do |identifier|
-        begin
-          parsed = PubidNew::Ansi.parse(identifier)
-          rendered = parsed.to_s
+        parsed = PubidNew::Ansi.parse(identifier)
+        rendered = parsed.to_s
 
-          if rendered == identifier
-            successes += 1
-          else
-            failures << {
-              original: identifier,
-              rendered: rendered,
-              class: parsed.class.name
-            }
-          end
-        rescue => e
+        if rendered == identifier
+          successes += 1
+        else
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            rendered: rendered,
+            class: parsed.class.name,
           }
         end
+      rescue StandardError => e
+        failures << {
+          original: identifier,
+          error: "#{e.class}: #{e.message}",
+        }
       end
 
       puts "\n" + "=" * 80

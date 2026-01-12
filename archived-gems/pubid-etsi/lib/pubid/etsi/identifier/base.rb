@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Etsi
   module Identifier
@@ -12,15 +12,20 @@ module Pubid::Etsi
         { key: :etsi }
       end
 
-      def initialize(type:, published:, publisher: "ETSI", version: nil, part: nil, **opts)
+      def initialize(type:, published:, publisher: "ETSI", version: nil,
+part: nil, **opts)
         super(**opts.merge(publisher: publisher))
         @published = published
         @version = version
         @part = part
         if type
-          unless Identifier.config.type_names.map { |_, v| v[:short] }.include?(type)
-            raise Pubid::Core::Errors::WrongTypeError, "Type '#{type}' is not available"
+          unless Identifier.config.type_names.map do |_, v|
+            v[:short]
+          end.include?(type)
+            raise Pubid::Core::Errors::WrongTypeError,
+                  "Type '#{type}' is not available"
           end
+
           @type = type
         end
       end
@@ -43,7 +48,10 @@ module Pubid::Etsi
           end.inject({}, :merge)
 
           %i(amendment corrigendum).each do |type|
-            return transform_supplements(type, identifier_params) if identifier_params[type]
+            if identifier_params[type]
+              return transform_supplements(type,
+                                           identifier_params)
+            end
           end
           Identifier.create(**identifier_params)
         end

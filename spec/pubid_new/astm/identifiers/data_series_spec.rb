@@ -3,10 +3,10 @@
 require "spec_helper"
 
 RSpec.describe PubidNew::Astm::Identifier::DataSeries do
-context "Data Series identifiers" do
-  # ========================================
-  # Data Series (33 IDs, 11%)
-  # ========================================
+  context "Data Series identifiers" do
+    # ========================================
+    # Data Series (33 IDs, 11%)
+    # ========================================
     let(:parsed) { PubidNew::Astm.parse(subject) }
 
     it "parses simple data series" do
@@ -33,5 +33,4 @@ context "Data Series identifiers" do
       expect(parsed.to_s).to eq("ASTM DS51HOL-EB")
     end
   end
-
 end

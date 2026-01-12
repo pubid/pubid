@@ -34,15 +34,15 @@ module PubidNew
           if parsed_hash[:code]
             code_str = parsed_hash[:code].to_s
             identifier.code = PubidNew::Ieee::Components::Code.new(
-              prefix: code_str[0],  # "C" from "C2"
-              number: code_str[1..-1]  # "2" from "C2"
+              prefix: code_str[0], # "C" from "C2"
+              number: code_str[1..-1], # "2" from "C2"
             )
           end
 
           # Set year (required for all NESC identifiers)
           if parsed_hash[:year]
             identifier.year = PubidNew::Components::Date.new(
-              year: parsed_hash[:year].to_s.to_i
+              year: parsed_hash[:year].to_s.to_i,
             )
           end
 

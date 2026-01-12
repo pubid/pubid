@@ -98,7 +98,6 @@ module Pubid::Iec
       let(:pubid) { "100/3644" }
       let(:urn) { "urn:iec:working-document:100:3644" }
 
-
       it_behaves_like "converts pubid to urn"
       it_behaves_like "converts pubid to pubid"
     end

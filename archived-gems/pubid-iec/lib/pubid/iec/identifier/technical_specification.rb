@@ -39,10 +39,10 @@ module Pubid::Iec
           abbr: "DTS",
           name: "Draft Technical Specification",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
-      def_delegators 'Pubid::Iec::Identifier::TechnicalSpecification', :type
+      def_delegators "Pubid::Iec::Identifier::TechnicalSpecification", :type
 
       def self.type
         { key: :ts, title: "Technical Specification", short: "TS" }

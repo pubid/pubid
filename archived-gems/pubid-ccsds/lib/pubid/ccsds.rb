@@ -5,10 +5,10 @@ require "yaml"
 
 module Pubid
   module Ccsds
-    UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__), "../../update_codes.yaml"))
+    UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__),
+                                            "../../update_codes.yaml"))
   end
 end
-
 
 require "pubid-core"
 

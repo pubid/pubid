@@ -30,7 +30,6 @@ module PubidNew
           return build_combined_aiee(parsed)
         end
 
-
         # Handle dual published patterns
         if parsed[:first] && parsed[:second]
           return build_dual_published(parsed)
@@ -82,15 +81,15 @@ module PubidNew
 
         if content
           # Extract copublished number (everything before IEC: or comma or parenthesis)
-          if content.include?("IEC:")
-            copublished_number = content.split(" IEC:").first.strip
-          elsif content.include?(", ")
-            copublished_number = content.split(", ").first.strip
-          elsif content.include?(" (")
-            copublished_number = content.split(" (").first.strip
-          else
-            copublished_number = content.strip
-          end
+          copublished_number = if content.include?("IEC:")
+                                 content.split(" IEC:").first.strip
+                               elsif content.include?(", ")
+                                 content.split(", ").first.strip
+                               elsif content.include?(" (")
+                                 content.split(" (").first.strip
+                               else
+                                 content.strip
+                               end
 
           # Extract draft info if present
           if copublished_number.include?("/D")
@@ -120,7 +119,7 @@ module PubidNew
           copublished_number: copublished_number,
           draft_info: draft_info,
           iec_year: iec_year,
-          date_info: date_info
+          date_info: date_info,
         )
       end
 
@@ -131,7 +130,7 @@ module PubidNew
 
         Identifiers::DualPublished.new(
           first_identifier: first_id,
-          second_identifier: second_id
+          second_identifier: second_id,
         )
       end
 
@@ -148,7 +147,7 @@ module PubidNew
         require_relative "identifiers/csa_dual_published"
         Identifiers::CsaDualPublished.new(
           ieee_identifier: ieee_id,
-          csa_portion: csa_string
+          csa_portion: csa_string,
         )
       end
 
@@ -196,7 +195,9 @@ module PubidNew
           if pub_data[:copublishers] && !pub_data[:copublishers].empty?
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            copub_strs = copubs.map { |cp| extract_value(cp[:copublisher]) }.compact
+            copub_strs = copubs.map do |cp|
+              extract_value(cp[:copublisher])
+            end.compact
             publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
           end
 
@@ -216,7 +217,7 @@ module PubidNew
         if base_data[:part]
           part_val = extract_value(base_data[:part])
           # Determine separator: dot for most cases, dash for some
-          separator = number_str.match?(/^[A-Z]/) ? "." : "."  # Letter prefix uses dot
+          separator = number_str.match?(/^[A-Z]/) ? "." : "." # Letter prefix uses dot
           number_str += separator + part_val
         end
 
@@ -253,7 +254,7 @@ module PubidNew
         Identifiers::Corrigendum.new(
           base_identifier: base_identifier,
           cor_number: cor_number,
-          cor_year: cor_year
+          cor_year: cor_year,
         )
       end
 
@@ -289,7 +290,8 @@ module PubidNew
           # Create typed_stage for ISO stage
           stage_abbr = attributes[:iso_stage]
           if stage_abbr
-            attributes[:typed_stage] = Ieee::Scheme.locate_typed_stage_by_abbr(stage_abbr)
+            attributes[:typed_stage] =
+              Ieee::Scheme.locate_typed_stage_by_abbr(stage_abbr)
           end
         else
           # IEEE format - lead party is IEEE
@@ -307,7 +309,8 @@ module PubidNew
           attributes[:type] = "P"
 
           # Create typed_stage for IEEE project
-          attributes[:typed_stage] = Ieee::Scheme.locate_typed_stage_by_abbr("P")
+          attributes[:typed_stage] =
+            Ieee::Scheme.locate_typed_stage_by_abbr("P")
         end
 
         Identifiers::JointDevelopment.new(**attributes)
@@ -342,13 +345,18 @@ module PubidNew
           if parsed[:draft_version]
             draft_version = extract_value(parsed[:draft_version])
             # Create Draft component (Lutaml::Model object)
-            attributes[:draft_obj] = Components::Draft.new(version: draft_version)
+            attributes[:draft_obj] =
+              Components::Draft.new(version: draft_version)
           end
           # Set PSI typed_stage (draft stage)
-          attributes[:typed_stage] = Identifiers::SiStandard::TYPED_STAGES.find { |ts| ts.abbr.include?("PSI") }
+          attributes[:typed_stage] = Identifiers::SiStandard::TYPED_STAGES.find do |ts|
+            ts.abbr.include?("PSI")
+          end
         else
           # Set SI typed_stage (published stage)
-          attributes[:typed_stage] = Identifiers::SiStandard::TYPED_STAGES.find { |ts| ts.abbr.include?("SI") }
+          attributes[:typed_stage] = Identifiers::SiStandard::TYPED_STAGES.find do |ts|
+            ts.abbr.include?("SI")
+          end
         end
 
         # Extract year and month
@@ -370,7 +378,7 @@ module PubidNew
       # Determine which identifier class to use based on attributes
       def determine_identifier_class(attributes)
         # Check for SI standards (handles both SI and PSI via typed_stage)
-        if attributes[:type] == "SI" || attributes[:type] == "PSI"
+        if ["SI", "PSI"].include?(attributes[:type])
           require_relative "identifiers/si_standard"
           return Identifiers::SiStandard
         end
@@ -451,7 +459,9 @@ module PubidNew
           if pub_data[:copublishers]
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            attributes[:copublisher] = copubs.map { |cp| extract_value(cp[:copublisher]) }.compact
+            attributes[:copublisher] = copubs.map do |cp|
+              extract_value(cp[:copublisher])
+            end.compact
           end
         elsif parsed[:publisher]
           attributes[:publisher] = extract_value(parsed[:publisher])
@@ -490,15 +500,13 @@ module PubidNew
         # AIEE established in 1884, so years range from 1884 to 2099
         # ONLY apply this when there are NO code_parts (meaning parser didn't capture parts separately)
         # This prevents breaking legitimate dual-published identifiers
-        if code_str && !parsed[:year] && code_parts.empty?
-          # Match ending with dash followed by 4 digits only (not dot, to preserve 802.1AC patterns)
-          if match = code_str.match(/^(.+)\-(\d{4})$/)
-            potential_year = match[2].to_i
-            if potential_year >= 1884 && potential_year <= 2099
-              # This is a year - extract it
-              code_str = match[1]  # Remove year from code
-              parsed[:year] = match[2]  # Add to parsed for extraction below
-            end
+        # Match ending with dash followed by 4 digits only (not dot, to preserve 802.1AC patterns)
+        if code_str && !parsed[:year] && code_parts.empty? && (match = code_str.match(/^(.+)-(\d{4})$/))
+          potential_year = match[2].to_i
+          if potential_year >= 1884 && potential_year <= 2099
+            # This is a year - extract it
+            code_str = match[1] # Remove year from code
+            parsed[:year] = match[2] # Add to parsed for extraction below
           end
         end
 
@@ -519,9 +527,11 @@ module PubidNew
         attributes[:type] = type_value if type_value
 
         # Lookup typed_stage from registry
-        typed_stage_abbr = determine_stage_abbr(type_value, draft_status_value, parsed)
+        typed_stage_abbr = determine_stage_abbr(type_value, draft_status_value,
+                                                parsed)
         if typed_stage_abbr
-          attributes[:typed_stage] = Ieee::Scheme.locate_typed_stage_by_abbr(typed_stage_abbr)
+          attributes[:typed_stage] =
+            Ieee::Scheme.locate_typed_stage_by_abbr(typed_stage_abbr)
         end
 
         attributes[:draft_status] = draft_status_value
@@ -531,7 +541,10 @@ module PubidNew
         extract_optional(parsed, attributes, :revision)
 
         # Month/day - always extract if present (but not if already extracted from year)
-        extract_optional(parsed, attributes, :month) unless attributes[:edition_month]
+        unless attributes[:edition_month]
+          extract_optional(parsed, attributes,
+                           :month)
+        end
         extract_optional(parsed, attributes, :day)
 
         # Handle draft (can be complex)
@@ -568,15 +581,27 @@ module PubidNew
       # @param draft_status_value [String] the draft status (e.g., "Unapproved")
       # @param parsed [Hash] the full parsed data
       # @return [String, nil] the abbreviation to use for stage lookup
-      def determine_stage_abbr(type_value, draft_status_value, parsed)
+      def determine_stage_abbr(type_value, _draft_status_value, parsed)
         # Check for specific draft notation (D1, D2, etc.)
         if parsed[:draft]
           draft_data = parsed[:draft]
-          draft_data = draft_data.is_a?(Array) ? draft_data.inject({}) { |r, e| r.merge(e) } : draft_data
+          draft_data = if draft_data.is_a?(Array)
+                         draft_data.inject({}) do |r, e|
+                           r.merge(e)
+                         end
+                       else
+                         draft_data
+                       end
 
           if draft_data.is_a?(Hash) && draft_data[:draft_version]
             dv = draft_data[:draft_version]
-            version = dv.is_a?(Array) ? dv.map { |v| extract_value(v) }.join : extract_value(dv)
+            version = if dv.is_a?(Array)
+                        dv.map do |v|
+                          extract_value(v)
+                        end.join
+                      else
+                        extract_value(dv)
+                      end
 
             # Construct draft notation like "D1", "D2", etc.
             if version
@@ -653,11 +678,11 @@ module PubidNew
         if draft_data.is_a?(Hash)
           if draft_data[:draft_version]
             dv = draft_data[:draft_version]
-            if dv.is_a?(Array)
-              version = dv.map { |v| extract_value(v) }.join
-            else
-              version = extract_value(dv)
-            end
+            version = if dv.is_a?(Array)
+                        dv.map { |v| extract_value(v) }.join
+                      else
+                        extract_value(dv)
+                      end
           end
 
           revision = extract_value(draft_data[:revision]) if draft_data[:revision]
@@ -692,7 +717,7 @@ module PubidNew
             revision: revision,
             month: month,
             year: year,
-            day: day
+            day: day,
           )
           draft_obj.comma_before_month = comma_before_month
           attributes[:draft_obj] = draft_obj
@@ -705,7 +730,10 @@ module PubidNew
         if parsed[:corrigendum].is_a?(Hash)
           cor_data = parsed[:corrigendum]
           attributes[:cor_number] = extract_value(cor_data[:cor_number])
-          attributes[:cor_year] = extract_value(cor_data[:cor_year]) if cor_data[:cor_year]
+          if cor_data[:cor_year]
+            attributes[:cor_year] =
+              extract_value(cor_data[:cor_year])
+          end
         elsif parsed[:corrigendum]
           attributes[:corrigendum] = extract_value(parsed[:corrigendum])
         end
@@ -716,7 +744,10 @@ module PubidNew
         if parsed[:amendment].is_a?(Hash)
           amd_data = parsed[:amendment]
           attributes[:amd_number] = extract_value(amd_data[:amd_number])
-          attributes[:amd_year] = extract_value(amd_data[:amd_year]) if amd_data[:amd_year]
+          if amd_data[:amd_year]
+            attributes[:amd_year] =
+              extract_value(amd_data[:amd_year])
+          end
         elsif parsed[:amendment]
           attributes[:amendment] = extract_value(parsed[:amendment])
         end
@@ -739,13 +770,26 @@ module PubidNew
 
           # Handle parenthetical content (for multi-part adoptions like "ANSI Y32.21-1976, NCTA 006-0975")
           if param_data[:parenthetical_content]
-            attributes[:parenthetical_content] = extract_value(param_data[:parenthetical_content])
+            attributes[:parenthetical_content] =
+              extract_value(param_data[:parenthetical_content])
           end
 
-          attributes[:revision_of] = extract_value(param_data[:revision_of]) if param_data[:revision_of]
-          attributes[:amendment_to] = extract_value(param_data[:amendment_to]) if param_data[:amendment_to]
-          attributes[:adoption] = extract_value(param_data[:adoption]) if param_data[:adoption]
-          attributes[:note] = extract_value(param_data[:note]) if param_data[:note]
+          if param_data[:revision_of]
+            attributes[:revision_of] =
+              extract_value(param_data[:revision_of])
+          end
+          if param_data[:amendment_to]
+            attributes[:amendment_to] =
+              extract_value(param_data[:amendment_to])
+          end
+          if param_data[:adoption]
+            attributes[:adoption] =
+              extract_value(param_data[:adoption])
+          end
+          if param_data[:note]
+            attributes[:note] =
+              extract_value(param_data[:note])
+          end
         end
       end
 
@@ -780,7 +824,7 @@ module PubidNew
             relationship_type: rel_type,
             related_identifiers: related,
             intermediate_amendments: amendments,
-            approved_amendments_flag: approved_flag
+            approved_amendments_flag: approved_flag,
           )
         end
 
@@ -809,7 +853,7 @@ module PubidNew
               relationship_type: rel_type,
               related_identifiers: related,
               intermediate_amendments: amendments,
-              approved_amendments_flag: approved_flag
+              approved_amendments_flag: approved_flag,
             )
           end
         end
@@ -822,6 +866,7 @@ module PubidNew
       # @return [String] the relationship type constant name
       def extract_relationship_type(type_hash)
         return nil unless type_hash.is_a?(Hash)
+
         # type_hash has key like :revision_of, :amendment_to, etc.
         type_hash.keys.first.to_s
       end
@@ -837,14 +882,12 @@ module PubidNew
 
         # Recursively parse each identifier string
         id_strings.map do |id_str|
-          begin
-            # Use Identifiers::Base.parse for recursive parsing
-            Identifiers::Base.parse(id_str)
-          rescue Parslet::ParseFailed => e
-            # If parsing fails, create minimal identifier with just the string
-            # This maintains graceful degradation
-            Identifiers::Base.new(parenthetical_content: id_str)
-          end
+          # Use Identifiers::Base.parse for recursive parsing
+          Identifiers::Base.parse(id_str)
+        rescue Parslet::ParseFailed
+          # If parsing fails, create minimal identifier with just the string
+          # This maintains graceful degradation
+          Identifiers::Base.new(parenthetical_content: id_str)
         end
       end
 
@@ -862,6 +905,7 @@ module PubidNew
           []
         end
       end
+
       # Build combined AIEE identifier from "and"-separated identifiers
       # @param parsed [Hash] parsed combined AIEE data
       # @return [Identifiers::CombinedAiee] combined AIEE identifier
@@ -875,10 +919,9 @@ module PubidNew
         Identifiers::DualPublished.new(
           first_identifier: first_id,
           second_identifier: second_id,
-          separator: " and "
+          separator: " and ",
         )
       end
-
     end
   end
 end

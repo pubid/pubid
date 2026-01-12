@@ -64,7 +64,7 @@ module PubidNew
           case type_str
           when "draft"
             require_relative "identifiers/base"
-            Identifiers::Base  # For now, use Base for drafts
+            Identifiers::Base # For now, use Base for drafts
           when "standard"
             require_relative "identifiers/base"
             Identifiers::Base

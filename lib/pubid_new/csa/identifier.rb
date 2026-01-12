@@ -32,12 +32,10 @@ module PubidNew
 
           # Detect and preserve original format (CSA- vs CSA)
           original_prefix = if wrapped_input.start_with?("CSA-")
-                             "CSA-"
-                           elsif wrapped_input.start_with?("CSA ")
-                             "CSA"
-                           else
-                             nil
-                           end
+                              "CSA-"
+                            elsif wrapped_input.start_with?("CSA ")
+                              "CSA"
+                            end
 
           # Normalize CSA- to CSA  (with space) for parsing
           wrapped_input = wrapped_input.sub(/^CSA-/, "CSA ")
@@ -114,11 +112,12 @@ module PubidNew
           # Convert 2-digit years to 4-digit for external parser
           # :15 → :2015, :04 → :2004
           if wrapped_input =~ /:(\d{2})\b/
-            short_year_str = $1  # Keep as string "04", "15", etc.
+            short_year_str = $1 # Keep as string "04", "15", etc.
             short_year_int = short_year_str.to_i
             # Determine century: 00-49 → 2000s, 50-99 → 1900s
             full_year = short_year_int < 50 ? "20#{short_year_str}" : "19#{short_year_str}"
-            wrapped_input = wrapped_input.sub(/:#{short_year_str}\b/, ":#{full_year}")
+            wrapped_input = wrapped_input.sub(/:#{short_year_str}\b/,
+                                              ":#{full_year}")
           end
 
           # Parse with appropriate flavor parser
@@ -160,14 +159,12 @@ module PubidNew
         # Legacy handling for CAN/CSA- and CAN3- (will be migrated to proper classes later)
         # Detect original publisher prefix before normalization
         publisher_prefix = if input.start_with?("CAN/CSA-")
-                            "CAN/CSA-"
-                          elsif input.start_with?("CAN3-")
-                            "CAN3-"
-                          elsif input.start_with?("CSA ")
-                            "CSA"
-                          else
-                            nil
-                          end
+                             "CAN/CSA-"
+                           elsif input.start_with?("CAN3-")
+                             "CAN3-"
+                           elsif input.start_with?("CSA ")
+                             "CSA"
+                           end
 
         # Detect year format before normalization
         # CAN/CSA- standards use dash format: CAN/CSA-C22.2-05
@@ -202,14 +199,14 @@ module PubidNew
         obj.publisher_prefix = prefix if obj.respond_to?(:publisher_prefix=)
 
         # Set on combined identifier parts
-        if obj.respond_to?(:first) && obj.first
-          obj.first.publisher_prefix = prefix if obj.first.respond_to?(:publisher_prefix=)
+        if obj.respond_to?(:first) && obj.first && obj.first.respond_to?(:publisher_prefix=)
+          obj.first.publisher_prefix = prefix
         end
-        if obj.respond_to?(:second) && obj.second && obj.second.respond_to?(:has_publisher) && obj.second.has_publisher
-          obj.second.publisher_prefix = prefix if obj.second.respond_to?(:publisher_prefix=)
+        if obj.respond_to?(:second) && obj.second && obj.second.respond_to?(:has_publisher) && obj.second.has_publisher && obj.second.respond_to?(:publisher_prefix=)
+          obj.second.publisher_prefix = prefix
         end
-        if obj.respond_to?(:third) && obj.third && obj.third.respond_to?(:has_publisher) && obj.third.has_publisher
-          obj.third.publisher_prefix = prefix if obj.third.respond_to?(:publisher_prefix=)
+        if obj.respond_to?(:third) && obj.third && obj.third.respond_to?(:has_publisher) && obj.third.has_publisher && obj.third.respond_to?(:publisher_prefix=)
+          obj.third.publisher_prefix = prefix
         end
 
         # Set on bundled identifier base

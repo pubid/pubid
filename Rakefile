@@ -16,8 +16,8 @@ def gem_to_namespace(gem_name)
 end
 
 # Helper to run command in gem directory
-def in_gem_dir(gem_name, &block)
-  Dir.chdir("gems/#{gem_name}", &block)
+def in_gem_dir(gem_name, &)
+  Dir.chdir("gems/#{gem_name}", &)
 end
 
 # Define tasks for each gem
@@ -245,7 +245,7 @@ namespace :release do
 
   desc "Show release status for the monorepo"
   task :status do
-    master_version = IO.read('VERSION').strip
+    master_version = IO.read("VERSION").strip
 
     puts "Release Status Summary"
     puts "======================"
@@ -282,7 +282,7 @@ namespace :release do
               all_synced = false
               sync_issues << "#{gem_name}: #{gem_version} (expected #{master_version})"
             end
-          rescue StandardError => e
+          rescue StandardError
             all_synced = false
             sync_issues << "#{gem_name}: Error reading version"
           end
@@ -347,7 +347,7 @@ namespace :release do
 end
 
 def get_master_version
-  IO.read('VERSION').strip
+  IO.read("VERSION").strip
 end
 
 namespace :version do
@@ -433,7 +433,7 @@ namespace :version do
 
   desc "Sync master version to all gem version files and dependencies"
   task :sync do
-    master_version = IO.read('VERSION').strip
+    master_version = IO.read("VERSION").strip
     puts "Syncing master version #{master_version} to all gems..."
 
     # Update version files
@@ -500,7 +500,7 @@ namespace :version do
   end
 
   desc "Bump version and sync to all gems"
-  task :bump, [:type] do |t, args|
+  task :bump, [:type] do |_t, args|
     bump_type = args[:type] || "patch"
     unless %w[major minor patch].include?(bump_type)
       puts "Error: bump type must be major, minor, or patch"
@@ -544,7 +544,7 @@ namespace :validation do
   end
 
   desc "Run classification for a specific flavor"
-  task :classify, [:flavor] do |t, args|
+  task :classify, [:flavor] do |_t, args|
     flavor = args[:flavor] || raise("Usage: rake validation:classify[flavor]")
     sh "cd spec/fixtures && ruby run_classify.rb #{flavor}"
   end
@@ -576,18 +576,18 @@ namespace :validation do
         next
       end
 
-      if content =~ /Fail: (\d+)/
-        fail = $1.to_i
-      else
-        fail = total - pass
-      end
+      fail = if content =~ /Fail: (\d+)/
+               $1.to_i
+             else
+               total - pass
+             end
 
       results << {
         flavor: flavor,
         pass: pass,
         fail: fail,
         total: total,
-        percentage: percentage
+        percentage: percentage,
       }
     end
 
@@ -605,25 +605,25 @@ namespace :validation do
 
     results.each do |r|
       status = if r[:percentage] == 100.0
-        "🎉 Perfect"
-      elsif r[:percentage] >= 99.0
-        "✨ Excellent"
-      elsif r[:percentage] >= 95.0
-        "✅ Very Good"
-      elsif r[:percentage] >= 90.0
-        "👍 Good"
-      elsif r[:percentage] >= 85.0
-        "📈 Enhanced"
-      else
-        "⚠️  Partial"
-      end
+                 "🎉 Perfect"
+               elsif r[:percentage] >= 99.0
+                 "✨ Excellent"
+               elsif r[:percentage] >= 95.0
+                 "✅ Very Good"
+               elsif r[:percentage] >= 90.0
+                 "👍 Good"
+               elsif r[:percentage] >= 85.0
+                 "📈 Enhanced"
+               else
+                 "⚠️  Partial"
+               end
 
       puts r[:flavor].upcase.ljust(12) +
-           r[:pass].to_s.rjust(10) +
-           r[:fail].to_s.rjust(8) +
-           r[:total].to_s.rjust(10) +
-           "#{r[:percentage]}%".rjust(15) +
-           "  #{status}"
+        r[:pass].to_s.rjust(10) +
+        r[:fail].to_s.rjust(8) +
+        r[:total].to_s.rjust(10) +
+        "#{r[:percentage]}%".rjust(15) +
+        "  #{status}"
     end
 
     puts "-" * 85
@@ -633,16 +633,20 @@ namespace :validation do
     overall_pct = ((total_pass.to_f / total_all) * 100).round(2)
 
     puts "TOTAL".ljust(12) +
-         total_pass.to_s.rjust(10) +
-         total_fail.to_s.rjust(8) +
-         total_all.to_s.rjust(10) +
-         "#{overall_pct}%".rjust(15)
+      total_pass.to_s.rjust(10) +
+      total_fail.to_s.rjust(8) +
+      total_all.to_s.rjust(10) +
+      "#{overall_pct}%".rjust(15)
     puts "=" * 85
     puts
     puts "Flavors validated: #{results.length}"
     puts "Perfect (100%): #{results.count { |r| r[:percentage] == 100.0 }}"
-    puts "Excellent (99%+): #{results.count { |r| r[:percentage] >= 99.0 && r[:percentage] < 100.0 }}"
-    puts "Good (90%+): #{results.count { |r| r[:percentage] >= 90.0 && r[:percentage] < 99.0 }}"
+    puts "Excellent (99%+): #{results.count do |r|
+      r[:percentage] >= 99.0 && r[:percentage] < 100.0
+    end}"
+    puts "Good (90%+): #{results.count do |r|
+      r[:percentage] >= 90.0 && r[:percentage] < 99.0
+    end}"
     puts
     puts "Legend:"
     puts "  🎉 Perfect:   100%     - All identifiers validated"

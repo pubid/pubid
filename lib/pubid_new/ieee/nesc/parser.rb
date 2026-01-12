@@ -25,7 +25,7 @@ module PubidNew
 
         rule(:space) { str(" ") }
         rule(:comma) { str(",") }
-        rule(:digit) { match('[0-9]') }
+        rule(:digit) { match("[0-9]") }
         rule(:year) { digit.repeat(4, 4) }
         rule(:dash) { str("-") }
 
@@ -37,8 +37,8 @@ module PubidNew
         # NESC name variations
         rule(:nesc_full_name) do
           str("National Electrical Safety Code(R)") |
-          str("National Electrical Safety Code") |
-          str("National Electric Safety Code")  # Typo variation
+            str("National Electrical Safety Code") |
+            str("National Electric Safety Code") # Typo variation
         end
 
         rule(:nesc_abbr) do
@@ -94,11 +94,11 @@ module PubidNew
         #           "C2-2012 National Electrical Safety Code"
         rule(:c2_standard) do
           c2_code >>
-          dash >>
-          year.as(:year) >>
-          (comma.maybe >> space).maybe >>
-          nesc_full_name >>
-          (space >> str("(") >> nesc_abbr >> str(")")).maybe
+            dash >>
+            year.as(:year) >>
+            (comma.maybe >> space).maybe >>
+            nesc_full_name >>
+            (space >> str("(") >> nesc_abbr >> str(")")).maybe
         end
 
         # Pattern 2: YYYY NESC format (year-first)
@@ -107,16 +107,16 @@ module PubidNew
         #           "2012 NESC Handbook"
         rule(:year_first) do
           year.as(:year) >>
-          space >>
-          (
-            # Full name with optional (NESC) suffix
-            (nesc_full_name >> registered >>
-             (space >> str("(") >> nesc_abbr >> registered >> str(")")).maybe) |
-            # Just NESC abbreviation
-            (nesc_abbr >> registered)
-          ) >>
-          (space >> variant).maybe >>
-          (comma >> space >> edition).maybe
+            space >>
+            (
+              # Full name with optional (NESC) suffix
+              (nesc_full_name >> registered >>
+               (space >> str("(") >> nesc_abbr >> registered >> str(")")).maybe) |
+              # Just NESC abbreviation
+              (nesc_abbr >> registered)
+            ) >>
+            (space >> variant).maybe >>
+            (comma >> space >> edition).maybe
         end
 
         # Pattern 3: Draft format
@@ -124,10 +124,10 @@ module PubidNew
         #           "Draft NESC, June 2011"
         rule(:draft_nesc) do
           str("Draft").as(:draft) >>
-          space >>
-          nesc_name >>
-          comma >> space >>
-          month >> space >> year.as(:year)
+            space >>
+            nesc_name >>
+            comma >> space >>
+            month >> space >> year.as(:year)
         end
 
         # Main identifier rule - try patterns in order

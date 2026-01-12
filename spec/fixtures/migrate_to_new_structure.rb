@@ -64,6 +64,7 @@ class FixturesMigrator
         File.readlines(file).each do |line|
           line = line.strip
           next if line.empty? || line.start_with?("#")
+
           identifiers << { class: class_name, content: line }
           count += 1
         end
@@ -87,7 +88,8 @@ class FixturesMigrator
             identifiers << { class: class_name, content: line }
           else
             # Convert to errored format
-            identifiers << { class: class_name, content: "##{line}# ParseError: \"migrated from fail\"" }
+            identifiers << { class: class_name,
+                             content: "##{line}# ParseError: \"migrated from fail\"" }
           end
           count += 1
         end
@@ -105,14 +107,17 @@ class FixturesMigrator
 
     log "Writing to full/ directory..."
     by_class.each do |class_name, ids|
-      filename = File.join(@fixtures_dir, "identifiers", "full", "#{class_name}.txt")
+      filename = File.join(@fixtures_dir, "identifiers", "full",
+                           "#{class_name}.txt")
 
       # Sort and get unique contents
       unique_contents = ids.map { |id| id[:content] }.uniq.sort
 
       File.open(filename, "w") do |f|
-        f.puts "# #{@flavor.upcase} #{class_name.tr('_', ' ').split.map(&:capitalize).join(' ')} - Full"
-        f.puts "# Source of truth for all #{class_name.tr('_', ' ')} identifiers"
+        f.puts "# #{@flavor.upcase} #{class_name.tr('_',
+                                                    ' ').split.map(&:capitalize).join(' ')} - Full"
+        f.puts "# Source of truth for all #{class_name.tr('_',
+                                                          ' ')} identifiers"
         f.puts "# Auto-generated during migration"
         f.puts
 
@@ -126,7 +131,7 @@ class FixturesMigrator
   end
 
   def backup_old_structure
-    timestamp = Time.now.strftime('%Y%m%d_%H%M%S')
+    timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
 
     pass_dir = File.join(@fixtures_dir, "pass")
     if Dir.exist?(pass_dir)
@@ -160,7 +165,8 @@ class FixturesMigrator
 
   def validate_flavor!
     unless FLAVORS.include?(@flavor)
-      raise ArgumentError, "Unknown flavor: #{@flavor}. Valid: #{FLAVORS.join(', ')}"
+      raise ArgumentError,
+            "Unknown flavor: #{@flavor}. Valid: #{FLAVORS.join(', ')}"
     end
   end
 

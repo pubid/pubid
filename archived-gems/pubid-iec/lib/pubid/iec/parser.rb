@@ -8,11 +8,13 @@ module Pubid::Iec
     end
 
     rule(:stage) do
-      array_to_str(Identifier.config.typed_stages.map { |_, v| v[:abbr] } + Identifier.config.stages["abbreviations"].keys)
+      array_to_str(Identifier.config.typed_stages.map { |_, v|
+ v[:abbr] } + Identifier.config.stages["abbreviations"].keys)
     end
 
     rule(:type) do
-      array_to_str(Identifier.config.types.map { |type| type.type[:short] }.flatten.compact).as(:type)
+      array_to_str(Identifier.config.types.map { |type|
+ type.type[:short] }.flatten.compact).as(:type)
     end
 
     rule(:part) do
@@ -89,9 +91,9 @@ module Pubid::Iec
     end
 
     rule(:language) do
-      str("(") >> (
+      str("(") >> 
         (match["a-z"].repeat(1).as(:language) >> str("-").maybe).repeat(1)
-      ) >> str(")")
+       >> str(")")
     end
 
     rule(:identifier) do

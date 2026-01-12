@@ -16,7 +16,7 @@ module PubidNew
             type_code: :pas,
             abbr: ["DPAS"],
             name: "Draft Publicly Available Specification",
-            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99]
+            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
           ),
           PubidNew::Components::TypedStage.new(
             code: :cdpas,
@@ -24,7 +24,7 @@ module PubidNew
             type_code: :pas,
             abbr: ["CDPAS"],
             name: "Draft circulated as DPAS",
-            harmonized_stages: %w[50.20]
+            harmonized_stages: %w[50.20],
           ),
           PubidNew::Components::TypedStage.new(
             code: :pas,
@@ -32,8 +32,8 @@ module PubidNew
             type_code: :pas,
             abbr: ["PAS"],
             name: "Publicly Available Specification",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         # Project stages specific to PAS
@@ -41,8 +41,8 @@ module PubidNew
           PRVDPAS: {
             abbr: "PRVDPAS",
             name: "Preparation of RVDPAS",
-            harmonized_stages: %w[50.60]
-          }
+            harmonized_stages: %w[50.60],
+          },
         }.freeze
 
         def self.type

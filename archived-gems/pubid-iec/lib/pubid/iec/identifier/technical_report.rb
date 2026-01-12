@@ -1,7 +1,7 @@
 module Pubid::Iec
   module Identifier
     class TechnicalReport < Base
-      def_delegators 'Pubid::Iec::Identifier::TechnicalReport', :type
+      def_delegators "Pubid::Iec::Identifier::TechnicalReport", :type
 
       PROJECT_STAGES = {
         adtr: {
@@ -27,13 +27,13 @@ module Pubid::Iec
         prvdtr: {
           abbr: "PRVDTR",
           name: "Preparation of RVDTR",
-          harmonized_stages: %w[50.60]
+          harmonized_stages: %w[50.60],
         },
         tdtr: {
           abbr: "TDTR",
           name: "Translation of DTR",
-          harmonized_stages: %w[50.00]
-        }
+          harmonized_stages: %w[50.00],
+        },
       }.freeze
 
       TYPED_STAGES = {
@@ -41,7 +41,7 @@ module Pubid::Iec
           abbr: "DTR",
           name: "Draft Technical Report",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
       def self.type

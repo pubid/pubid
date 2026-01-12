@@ -7,7 +7,8 @@ module Pubid::Core
     # @param number [Integer]
     # @param year [Integer]
     def initialize(number:, year: nil)
-      @number, @year = number&.to_i, year&.to_i
+      @number = number&.to_i
+      @year = year&.to_i
     end
 
     def <=>(other)
@@ -19,19 +20,19 @@ module Pubid::Core
     end
 
     def render_pubid_number
-        if @year
-          "#{@number}:#{@year}"
-        else
-          "#{@number}"
-        end
+      if @year
+        "#{@number}:#{@year}"
+      else
+        "#{@number}"
+      end
     end
 
     def render_urn_number
-        if @year
-          ":#{@year}:v#{@number}"
-        else
-          ":#{@number}:v1"
-        end
+      if @year
+        ":#{@year}:v#{@number}"
+      else
+        ":#{@number}:v1"
+      end
     end
 
     def to_h

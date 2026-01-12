@@ -1,7 +1,7 @@
 module Pubid::Iec
   module Identifier
     class Guide < Base
-      def_delegators 'Pubid::Iec::Identifier::Guide', :type
+      def_delegators "Pubid::Iec::Identifier::Guide", :type
 
       TYPED_STAGES = {
         dguide: {
@@ -13,7 +13,7 @@ module Pubid::Iec
           abbr: "FDGuide",
           name: "Final Draft Guide",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
       def self.type

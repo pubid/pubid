@@ -31,7 +31,7 @@
 #   git subtree add --prefix=<repo_name> remote-<repo_name>/<branch_name>
 # Add the new repository to the list of repositories in this script if it isn't already there.
 
-require 'fileutils'
+require "fileutils"
 
 branch = `git rev-parse --abbrev-ref HEAD`.strip || "main"
 

@@ -22,7 +22,9 @@ module PubidNew
         end
 
         def typed_stages
-          (identifiers + supplement_identifiers).flat_map { |klass| klass::TYPED_STAGES }
+          (identifiers + supplement_identifiers).flat_map do |klass|
+            klass::TYPED_STAGES
+          end
         end
 
         def locate_typed_stage_by_abbr(abbr)

@@ -1,7 +1,7 @@
 module Pubid::Cen
   module Identifier
     class Corrigendum < Base
-      def_delegators 'Pubid::Cen::Identifier::Corrigendum', :type
+      def_delegators "Pubid::Cen::Identifier::Corrigendum", :type
       attr_accessor :base
 
       def initialize(base: nil, **opts)

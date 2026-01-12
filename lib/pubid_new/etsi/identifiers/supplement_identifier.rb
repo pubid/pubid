@@ -29,7 +29,9 @@ module PubidNew
 
         # Render as: ETSI TYPE CODE/SUPPLEMENT VERSION (DATE)
         def to_s
-          "#{base.publisher} #{base.type} #{base.code}/#{supplement_notation} #{base.version} (#{base.date.year}-#{base.date.month.to_s.rjust(2, '0')})"
+          "#{base.publisher} #{base.type} #{base.code}/#{supplement_notation} #{base.version} (#{base.date.year}-#{base.date.month.to_s.rjust(
+            2, '0'
+          )})"
         end
 
         def supplement_notation

@@ -11,7 +11,7 @@ module PubidNew
           parts << publisher_portion(lang: lang)
           parts << number_portion(lang_single: lang_single)
           parts << edition_portion(lang: lang) if with_edition
-        end.compact.join(' ').tap do |s|
+        end.compact.join(" ").tap do |s|
           s << language_portion(lang_single: lang_single) if languages&.any?
         end
       end
@@ -20,23 +20,23 @@ module PubidNew
         # IEC identifiers can have copublishers (e.g., IEC/IEEE, ISO/IEC)
 
         # Build publisher string
-        if copublishers&.any?
-          # Has copublishers: "IEC/IEEE" or "ISO/IEC"
-          pub_string = ([publisher] + copublishers).map(&:body).join("/")
-        else
-          # No copublishers: just "IEC"
-          pub_string = publisher.body
-        end
+        pub_string = if copublishers&.any?
+                       # Has copublishers: "IEC/IEEE" or "ISO/IEC"
+                       ([publisher] + copublishers).map(&:body).join("/")
+                     else
+                       # No copublishers: just "IEC"
+                       publisher.body
+                     end
 
         # Add type abbreviation if present
         if typed_stage && !typed_stage.abbreviation.empty?
           abbr = typed_stage.abbreviation
           # For copublishers or empty abbr, use space; otherwise use slash
-          if copublishers&.any? || abbr == ""
-            pub_string += (abbr == "" ? "" : " #{abbr}")
-          else
-            pub_string += "/#{abbr}"
-          end
+          pub_string += if copublishers&.any? || abbr == ""
+                          (abbr == "" ? "" : " #{abbr}")
+                        else
+                          "/#{abbr}"
+                        end
         end
 
         pub_string
@@ -44,24 +44,24 @@ module PubidNew
 
       def number_portion(lang_single: false)
         [
-          (number ? "#{number.to_s}" : ""),
-          (part ? "-#{part.to_s}" : ""),
-          (subpart ? "-#{subpart.to_s}" : ""),
-          (stage_iteration ? ".#{stage_iteration.to_s}" : ""),
+          (number ? "#{number}" : ""),
+          (part ? "-#{part}" : ""),
+          (subpart ? "-#{subpart}" : ""),
+          (stage_iteration ? ".#{stage_iteration}" : ""),
           (date ? ":#{date.year}" : ""),
-        ].join('')
+        ].join("")
       end
 
       def language_portion(lang_single: false)
-        return '' unless languages&.any?
+        return "" unless languages&.any?
 
         [
           "(",
           languages.map do |lang|
             lang.to_s(lang_single: lang_single)
-          end.join(lang_single ? '/' : ','),
-          ")"
-        ].join('')
+          end.join(lang_single ? "/" : ","),
+          ")",
+        ].join("")
       end
 
       def edition_portion(lang: :en)
@@ -69,7 +69,6 @@ module PubidNew
 
         "ED#{edition.number}"
       end
-
     end
   end
 end

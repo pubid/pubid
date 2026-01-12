@@ -84,7 +84,10 @@ module Pubid::Cen
       end
 
       context "incorporated supplements" do
-        let(:params) { { incorporated_supplements: [Identifier.create(type: type, number: 1, year: 1999)] } }
+        let(:params) do
+          { incorporated_supplements: [Identifier.create(type: type, number: 1,
+                                                         year: 1999)] }
+        end
 
         context "amendment" do
           let(:type) { :amd }
@@ -104,7 +107,10 @@ module Pubid::Cen
       end
 
       context "supplement" do
-        let(:params) { { type: type, number: supplement_number, year: 1999, base: Identifier.create(number: number) } }
+        let(:params) do
+          { type: type, number: supplement_number, year: 1999,
+            base: Identifier.create(number: number) }
+        end
         let(:supplement_number) { 1 }
 
         context "amendment" do

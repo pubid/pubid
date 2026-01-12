@@ -3,7 +3,7 @@ module Pubid::Iec::Renderer
     def render_identifier(params)
       type_prefix = params[:stage].nil? || params[:stage].to_s.empty? ? "ISH" : ""
 
-      "%{base}/%{stage}#{type_prefix}%{number}%{year}" % params
+      "%<base>s/%<stage>s#{type_prefix}%<number>s%<year>s" % params
     end
 
     def render_stage(stage, _opts, _params)

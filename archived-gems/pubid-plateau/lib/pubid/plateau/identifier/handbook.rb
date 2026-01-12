@@ -1,7 +1,7 @@
 module Pubid::Plateau
   module Identifier
     class Handbook < Base
-      def_delegators 'Pubid::Plateau::Identifier::Handbook', :type
+      def_delegators "Pubid::Plateau::Identifier::Handbook", :type
 
       def self.get_renderer_class
         Renderer::Handbook

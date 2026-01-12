@@ -9,13 +9,14 @@ module PubidNew
       class SheetIdentifier < Identifier
         attribute :base_identifier, Identifier, polymorphic: true
         attribute :sheet_number, :string
-        attribute :year, :string, default: -> { nil }
+        attribute :year, :string, default: -> {}
 
         def to_s(lang: :en, lang_single: false, with_edition: false)
           parts = []
 
           # Render base identifier
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
+          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
+                                        with_edition: with_edition)
 
           # Add sheet notation /N
           parts << "/#{sheet_number}"

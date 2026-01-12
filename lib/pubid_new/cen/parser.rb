@@ -31,17 +31,19 @@ module PubidNew
       # Publisher (can be combined like EN/CLC or CEN/CLC)
       rule(:publisher) do
         (cwa | hd | es | cr | env).as(:publisher) |
-        (en.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
-        (cen.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
-        (clc.as(:publisher) >> (slash >> cen.as(:copublisher)).maybe) |
-        en.as(:publisher)
+          (en.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
+          (cen.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
+          (clc.as(:publisher) >> (slash >> cen.as(:copublisher)).maybe) |
+          en.as(:publisher)
       end
 
       # Stage prefixes captured as type_with_stage for proper lookup
       rule(:stage_prefix) { (str("FprEN") | str("prEN")).as(:type_with_stage) }
 
       # Type
-      rule(:type) { (str("Guide") | str("GUIDE") | str("TR") | str("TS")).as(:type) }
+      rule(:type) do
+        (str("Guide") | str("GUIDE") | str("TR") | str("TS")).as(:type)
+      end
 
       # Number
       rule(:number) { digits.as(:number) }
@@ -71,15 +73,15 @@ module PubidNew
       # Amendment (+A1:2008 or +A11:2020 or /A2:2019 or /A1 without year)
       rule(:amendment) do
         (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-        str("A") >> digits.as(:amd_number) >>
-        (colon >> digit.repeat(4, 4).as(:amd_year)).maybe
+          str("A") >> digits.as(:amd_number) >>
+          (colon >> digit.repeat(4, 4).as(:amd_year)).maybe
       end
 
       # Corrigendum (+AC:2009 or +AC1:2008 or +AC2:2009 or /AC1:2005 or /AC:2016-11 with month)
       rule(:corrigendum) do
         (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-        str("AC") >> digits.maybe.as(:cor_number) >>
-        (year_with_month | (colon >> digit.repeat(4, 4).as(:year))).maybe
+          str("AC") >> digits.maybe.as(:cor_number) >>
+          (year_with_month | (colon >> digit.repeat(4, 4).as(:year))).maybe
       end
 
       # Supplements (amendments and corrigenda)
@@ -92,11 +94,9 @@ module PubidNew
       # Fragment identifier (EN 60038 AMD1 FRAG2)
       rule(:fragment_identifier) do
         (stage_prefix | publisher) >>
-        space >> number >> parts >>
-
-        space >> str("AMD") >> digits.as(:amendment_number) >>
-
-        space >> str("FRAG") >> digits.as(:fragment_number)
+          space >> number >> parts >>
+          space >> str("AMD") >> digits.as(:amendment_number) >>
+          space >> str("FRAG") >> digits.as(:fragment_number)
       end
 
       # Adopted standard as opaque string - must start with org name
@@ -112,13 +112,13 @@ module PubidNew
       # Identifier
       rule(:identifier) do
         fragment_identifier |
-        (stage_prefix | publisher) >>
-        (space >> adopted_string).maybe >>
-        (space >> type | slash >> type).maybe >>
-        (space >> number >> parts >>
-        year.maybe).maybe >>
-        supplements >>
-        edition.maybe
+          (stage_prefix | publisher) >>
+            (space >> adopted_string).maybe >>
+            (space >> type | slash >> type).maybe >>
+            (space >> number >> parts >>
+            year.maybe).maybe >>
+            supplements >>
+            edition.maybe
       end
 
       rule(:root) { identifier }
@@ -135,8 +135,8 @@ module PubidNew
 
         # Normalize dash to slash in publisher combinations
         normalized = normalized.gsub("CEN-CLC", "CEN/CLC")
-                           .gsub("CLC-CEN", "CLC/CEN")
-                           .gsub("GUIDE", "Guide")
+          .gsub("CLC-CEN", "CLC/CEN")
+          .gsub("GUIDE", "Guide")
         new.parse(normalized)
       end
     end

@@ -1,9 +1,10 @@
 module Pubid::Jis
   class Parser < Pubid::Core::Parser
-
     rule(:type) do
       str("/").maybe >>
-        array_to_str(Identifier.config.types.map { |type| type.type[:short] }.compact).as(:type)
+        array_to_str(Identifier.config.types.map { |type|
+          type.type[:short]
+        }.compact).as(:type)
     end
 
     rule(:space) do

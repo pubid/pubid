@@ -3,7 +3,7 @@ require_relative "../renderer/addendum"
 module Pubid::Iso
   module Identifier
     class Addendum < Supplement
-      def_delegators 'Pubid::Iso::Identifier::Addendum', :type
+      def_delegators "Pubid::Iso::Identifier::Addendum", :type
 
       TYPED_STAGES = {
         dad: {

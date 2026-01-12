@@ -21,13 +21,13 @@ module PubidNew
         # Publisher portion
         parts << identifier.publisher_portion(
           lang: :en,
-          stage_format_long: stage_format_long
+          stage_format_long: stage_format_long,
         )
 
         # Number portion
         parts << identifier.number_portion(
           lang_single: single_char_language?,
-          with_date: with_date
+          with_date: with_date,
         )
 
         # Edition portion (if requested)
@@ -35,7 +35,7 @@ module PubidNew
           parts << identifier.edition_portion(lang: :en)
         end
 
-        result = parts.compact.join(' ')
+        result = parts.compact.join(" ")
 
         # Language portion (if applicable)
         if identifier.languages&.any? && with_language_code != :none

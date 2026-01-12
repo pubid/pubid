@@ -19,7 +19,7 @@ module PubidNew
         attribute :year, :string
         attribute :date_separator, :string
         attribute :language, Components::Language
-        attribute :iso_reference, :string   # The ISO identifier in parentheses
+        attribute :iso_reference, :string # The ISO identifier in parentheses
         attribute :style, :string
 
         def to_s
@@ -36,11 +36,11 @@ module PubidNew
           # Language + Year combined for slash formats before ISO reference
           if language && (language.format == "slash_colon" || (language.format == "slash" && year && date_separator != "slash"))
             # Render /E:YYYY or /EYYYY (language with year, no separate date separator)
-            if language.format == "slash_colon"
-              result += "/#{language.code}:#{year}"  # /E:2001
-            else
-              result += "/#{language.code}#{year}"   # /E2007 (no colon)
-            end
+            result += if language.format == "slash_colon"
+                        "/#{language.code}:#{year}" # /E:2001
+                      else
+                        "/#{language.code}#{year}" # /E2007 (no colon)
+                      end
           elsif language && language.format == "slash"
             # Language without year: /E
             result += "/#{language.code}"

@@ -33,7 +33,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
           "NIST SP 800-53r5",
           "NIST FIPS 140-3",
           "NBS BMS 131",
-          "NBS RPT 1000"
+          "NBS RPT 1000",
         ]
 
         test_cases.each do |test_case|

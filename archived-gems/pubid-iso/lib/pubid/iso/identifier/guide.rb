@@ -3,7 +3,7 @@ require_relative "../renderer/guide"
 module Pubid::Iso
   module Identifier
     class Guide < Base
-      def_delegators 'Pubid::Iso::Identifier::Guide', :type
+      def_delegators "Pubid::Iso::Identifier::Guide", :type
 
       TYPED_STAGES = {
         dguide: {

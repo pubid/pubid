@@ -25,11 +25,12 @@ module PubidNew
           { key: :amendment, title: "Amendment", short: "Amd" }
         end
 
-        def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+        def to_s(lang: :en, lang_single: false, with_edition: false,
+format: nil, stage_format_long: nil, with_date: nil)
           result = base_identifier.to_s if base_identifier
           result += "/Amd"
           result += " #{iteration.value}" if iteration
-          result += ":#{date.to_s}" if date
+          result += ":#{date}" if date
           result
         end
       end

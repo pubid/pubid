@@ -81,7 +81,9 @@ RSpec.describe "IEEE identifiers" do
   end
 
   describe "fixture file parsing" do
-    let(:fixture_file) { File.join(__dir__, "../../gems/pubid-ieee/spec/fixtures/pubid-parsed.txt") }
+    let(:fixture_file) do
+      File.join(__dir__, "../../gems/pubid-ieee/spec/fixtures/pubid-parsed.txt")
+    end
 
     it "parses all identifiers from fixture file", :slow do
       total = 0
@@ -103,7 +105,7 @@ RSpec.describe "IEEE identifiers" do
           expect(output).to be_a(String)
           expect(output).not_to be_empty
           passed += 1
-        rescue => e
+        rescue StandardError
           failed << "Line #{index + 1}: #{identifier}"
         end
       end

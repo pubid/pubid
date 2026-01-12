@@ -3,7 +3,7 @@ require_relative "../renderer/combined_bundle"
 module Pubid::Cen
   module Identifier
     class CombinedBundle < Base
-      def_delegators 'Pubid::Cen::Identifier::CombinedBundle', :type
+      def_delegators "Pubid::Cen::Identifier::CombinedBundle", :type
 
       attribute :base_document, :string
       attribute :amendments, :string, collection: true

@@ -49,14 +49,13 @@ module Pubid::Iec::Renderer
                TDTR: 50.00,
                TDTS: 50.00,
                TPUB: 60.00,
-               WPUB: 95.99
-    }.freeze
+               WPUB: 95.99 }.freeze
 
     def render_identifier(params)
-      "urn:iec:std:%{publisher}%{copublisher}%{type}:%{number}"\
-      "%{part}%{conjuction_part}%{year}%{stage}%{vap}"\
-      "%{urn_stage}%{corrigendum_stage}%{iteration}%{version}%{part_version}"\
-      "%{edition}%{amendments}%{corrigendums}%{fragment}" % params
+      "urn:iec:std:%<publisher>s%<copublisher>s%<type>s:%<number>s"\
+      "%<part>s%<conjuction_part>s%<year>s%<stage>s%<vap>s"\
+      "%<urn_stage>s%<corrigendum_stage>s%<iteration>s%<version>s%<part_version>s"\
+      "%<edition>s%<amendments>s%<corrigendums>s%<fragment>s" % params
     end
 
     def render_number(number, _opts, _params)
@@ -81,13 +80,15 @@ module Pubid::Iec::Renderer
 
     def render_conjuction_part(conjuction_parts, _opts, _params)
       if conjuction_parts.is_a?(Array)
-        conjuction_parts.map(&:to_i).sort.map { |conjuction_part| ",#{conjuction_part}" }.join
+        conjuction_parts.map(&:to_i).sort.map do |conjuction_part|
+          ",#{conjuction_part}"
+        end.join
       else
         ",#{conjuction_parts}"
       end
     end
 
-    def render_stage(stage, _opts, params)
+    def render_stage(stage, _opts, _params)
       ":stage-#{sprintf('%s', stage.to_s(:urn))}"
     end
 
@@ -106,6 +107,5 @@ module Pubid::Iec::Renderer
     def render_language(language, _opts, _params)
       ":" + (language.is_a?(Array) ? language.join("-") : language)
     end
-
   end
 end

@@ -16,19 +16,19 @@ module PubidNew
 
         def to_s
           parts = ["API", "MPMS"]
-          
+
           # Add chapter
           parts << "CH #{chapter}" if chapter
-          
+
           # Add section/subsection
           if section
             parts << ".#{section}"
             parts << ".#{subsection}" if subsection
           end
-          
+
           # Add year
           parts << "-#{year}" if year
-          
+
           parts.join(" ").gsub(" .", ".")
         end
 

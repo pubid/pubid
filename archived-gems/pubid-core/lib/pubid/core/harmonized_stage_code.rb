@@ -23,7 +23,7 @@ module Pubid::Core
                   config.typed_stages[stage_or_code][:harmonized_stages]
                 # when stage is stage name
                 elsif config.stages["stage_codes"]&.key?(stage_or_code.to_s)
-                  ["#{config.stages["stage_codes"][stage_or_code.to_s]}.#{config.stages["substage_codes"][substage.to_s]}"]
+                  ["#{config.stages['stage_codes'][stage_or_code.to_s]}.#{config.stages['substage_codes'][substage.to_s]}"]
                 else
                   # stage is number
                   ["#{stage_or_code}.#{substage}"]
@@ -32,7 +32,9 @@ module Pubid::Core
     end
 
     def harmonized_typed_stages
-      @harmonized_typed_stages ||= config.typed_stages.values.map { |v| v[:harmonized_stages] }.flatten
+      @harmonized_typed_stages ||= config.typed_stages.values.map do |v|
+        v[:harmonized_stages]
+      end.flatten
     end
 
     def validate_stages
@@ -49,11 +51,16 @@ module Pubid::Core
 
     def to_s
       if fuzzy?
-        return "draft" if @stages.all? { |s| config.stages["draft_codes"].include?(s) || config.stages["canceled_codes"].include?(s) }
+        return "draft" if @stages.all? do |s|
+          config.stages["draft_codes"].include?(s) || config.stages["canceled_codes"].include?(s)
+        end
 
-        return "published" if @stages.all? { |s| config.stages["published_codes"].include?(s) }
+        return "published" if @stages.all? do |s|
+          config.stages["published_codes"].include?(s)
+        end
 
-        raise Errors::HarmonizedStageRenderingError, "cannot render fuzzy stages"
+        raise Errors::HarmonizedStageRenderingError,
+              "cannot render fuzzy stages"
       else
         @stages.first
       end
@@ -68,7 +75,10 @@ module Pubid::Core
     end
 
     def stage
-      raise Errors::HarmonizedStageRenderingError, "cannot render stage for fuzzy stages" if fuzzy?
+      if fuzzy?
+        raise Errors::HarmonizedStageRenderingError,
+              "cannot render stage for fuzzy stages"
+      end
 
       return nil if @stages.empty?
 
@@ -76,7 +86,10 @@ module Pubid::Core
     end
 
     def substage
-      raise Errors::HarmonizedStageRenderingError, "cannot render substage for fuzzy stages" if fuzzy?
+      if fuzzy?
+        raise Errors::HarmonizedStageRenderingError,
+              "cannot render substage for fuzzy stages"
+      end
 
       @stages.first.split(".").last
     end

@@ -1,8 +1,7 @@
-
 module Pubid::Nist
   module Identifier
     class Addendum < Base
-      def_delegators 'Pubid::Nist::Identifier::Addendum', :type
+      def_delegators "Pubid::Nist::Identifier::Addendum", :type
 
       attr_accessor :base
 

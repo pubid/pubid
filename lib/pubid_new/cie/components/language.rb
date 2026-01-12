@@ -25,9 +25,9 @@ module PubidNew
           when "paren"
             "(#{code})"                         # (DE), (ES), (en)
           when "paren_year"
-            " (#{code}-#{translation_year})"   # (RU-2021)
+            " (#{code}-#{translation_year})" # (RU-2021)
           else
-            "(#{code})"  # Default to paren
+            "(#{code})" # Default to paren
           end
         end
 
@@ -41,7 +41,8 @@ module PubidNew
           # Detect paren with year
           elsif lang_str.match?(/\(([A-Z]{2})-(\d{4})\)/)
             match = lang_str.match(/\(([A-Z]{2})-(\d{4})\)/)
-            new(code: match[1], translation_year: match[2], format: "paren_year")
+            new(code: match[1], translation_year: match[2],
+                format: "paren_year")
           # Detect simple paren
           elsif lang_str.match?(/\(([A-Za-z]{2,3})\)/)
             match = lang_str.match(/\(([A-Za-z]{2,3})\)/)

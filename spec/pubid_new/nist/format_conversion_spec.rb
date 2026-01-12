@@ -8,7 +8,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
       [
         "NIST SP 800-53r5 ipd",      # short with inline stage
         "NIST.SP.800-53r5.ipd",      # mr format
-        "NIST SP(IPD) 800-53r5"      # old style parenthetical
+        "NIST SP(IPD) 800-53r5", # old style parenthetical
       ]
     end
 
@@ -64,7 +64,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
         "NIST SP 1262 spa",          # short with space
         "NIST.SP.1262.spa",          # mr format
         "NIST SP 1262(spa)",         # parenthetical
-        "NIST SP 1262es"             # Transform es → spa
+        "NIST SP 1262es", # Transform es → spa
       ]
     end
 
@@ -124,23 +124,23 @@ RSpec.describe "NIST Format Cross-Conversion" do
         "NIST SP 1262 spa",
         "NIST SP 800-189 ipd spa",
         "NIST.SP.800-53r5.ipd",
-        "NIST.SP.1262.spa"
+        "NIST.SP.1262.spa",
       ]
     end
 
     it "preserves format on round-trip" do
       test_cases.each do |input|
         parsed = PubidNew::Nist.parse(input)
-        
+
         # Determine original format
         format = input.include?(".") ? :mr : :short
-        
+
         # Render in original format
         output = parsed.to_s(format)
-        
+
         # Re-parse
         reparsed = PubidNew::Nist.parse(output)
-        
+
         # Should render identically
         expect(reparsed.to_s(format)).to eq(output)
       end

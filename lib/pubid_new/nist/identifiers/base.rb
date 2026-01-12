@@ -19,13 +19,13 @@ module PubidNew
       # Each series type inherits from this and overrides series_code
       class Base < Lutaml::Model::Serializable
         attribute :publisher, Components::Publisher
-        attribute :series, Components::Code  # Set by Builder from parsed data
+        attribute :series, Components::Code # Set by Builder from parsed data
         attribute :number, Components::Code
 
         # V2 COMPONENTS (Lutaml::Model objects) - PROPER SEPARATION
-        attribute :edition, Components::Edition  # Edition (type + id): e2, e2021, r5, -3
-        attribute :edition_component, Components::Edition  # V2 edition component (alias)
-        attribute :volume, Components::Volume  # Volume component (v6)
+        attribute :edition, Components::Edition # Edition (type + id): e2, e2021, r5, -3
+        attribute :edition_component, Components::Edition # V2 edition component (alias)
+        attribute :volume, Components::Volume # Volume component (v6)
         attribute :part, Components::Part  # Part component (n1 or pt1)
         attribute :stage, Components::Stage
         attribute :version_component, Components::Version
@@ -37,9 +37,9 @@ module PubidNew
         # LEGACY attributes (keep for backward compatibility during migration)
         attribute :parts, Components::Code, collection: true
         attribute :revision, :string
-        attribute :revision_year, :string  # Year for revision (e.g., r6/1925, r1963, rJun1992)
-        attribute :revision_month, :string  # Month for revision (e.g., rJun1992)
-        attribute :edition_year, :string  # Legacy edition year for backward compatibility
+        attribute :revision_year, :string # Year for revision (e.g., r6/1925, r1963, rJun1992)
+        attribute :revision_month, :string # Month for revision (e.g., rJun1992)
+        attribute :edition_year, :string # Legacy edition year for backward compatibility
         attribute :version, :string
         attribute :update, Components::Update
         attribute :year, :integer
@@ -53,7 +53,7 @@ module PubidNew
         attribute :addendum, :string
         attribute :addendum_number, :string
         attribute :supplement, :string
-        attribute :supplement_date_range_start, :string  # For date ranges like Jan1924-Jan1926
+        attribute :supplement_date_range_start, :string # For date ranges like Jan1924-Jan1926
         attribute :supplement_date_range_end, :string
         attribute :supplement_has_revision, :boolean, default: -> { false }
         attribute :errata, :string
@@ -63,7 +63,7 @@ module PubidNew
         attribute :appendix, :string
         attribute :translation, :string
         attribute :draft, :string
-        attribute :draft_number, :string  # For -draft N → N pd rendering
+        attribute :draft_number, :string # For -draft N → N pd rendering
 
         def initialize(**attributes)
           super()
@@ -173,13 +173,11 @@ module PubidNew
 
           # Determine effective series - PREFER series_code if subclass defines it
           # This allows normalization (e.g., LCIRC → LC in LetterCircular)
-          if respond_to?(:series_code) && series_code
-            effective_series = series_code
-          elsif series
-            effective_series = series.to_s
-          else
-            effective_series = nil
-          end
+          effective_series = if respond_to?(:series_code) && series_code
+                               series_code
+                             elsif series
+                               series.to_s
+                             end
 
           # If we have a compound series that starts with NBS, use it as-is
           if effective_series && effective_series.start_with?("NBS")
@@ -190,16 +188,16 @@ module PubidNew
             result += "NIST " + effective_series
           end
 
-          result += " #{number.to_s}" if number
+          result += " #{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
           # NEW: Use Volume and Part components (v6n1 notation for CSM, pt1 for SP)
           if volume.is_a?(Components::Volume) && part.is_a?(Components::Part)
             # CSM series: v#n# notation
-            result += " #{volume}#{part.to_s}"
+            result += " #{volume}#{part}"
           elsif part.is_a?(Components::Part)
             # SP and other series: use Part.type to determine format
-            result += "#{part.to_s}"
+            result += "#{part}"
           # Legacy: Render standalone volume (not part of v#n#)
           elsif volume && !issue_number && !part
             vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
@@ -232,11 +230,11 @@ module PubidNew
             # Smart dash logic:
             # - If supplement starts with letter (month like "Jan1924"), NO dash
             # - If supplement is digits only (year like "1924"), WITH dash
-            if supplement.match?(/^[A-Z]/)
-              result += "supp#{supplement}"
-            else
-              result += "supp-#{supplement}"
-            end
+            result += if supplement.match?(/^[A-Z]/)
+                        "supp#{supplement}"
+                      else
+                        "supp-#{supplement}"
+                      end
           elsif supplement
             result += "supp"
           end
@@ -313,7 +311,7 @@ module PubidNew
             "SP" => "Special Publication",
             "FIPS" => "Federal Information Processing Standards",
             "IR" => "Interagency Report",
-            "TN" => "Technical Note"
+            "TN" => "Technical Note",
           }[series] || series
         end
 
@@ -322,7 +320,7 @@ module PubidNew
             "SP" => "Spec. Publ.",
             "FIPS" => "Fed. Inf. Proc. Stand.",
             "IR" => "Interag. Rep.",
-            "TN" => "Tech. Note"
+            "TN" => "Tech. Note",
           }[series&.to_s || series_code] || (series&.to_s || series_code)
         end
 

@@ -1,11 +1,12 @@
-
 module Pubid::Iso
   RSpec.describe Identifier do
     # subject { described_class.parse(original || pubid) }
     let(:original) { nil }
 
     describe "creating new recommendation identifier" do
-      subject { described_class.create(**{ number: number, type: :r }.merge(params)) }
+      subject do
+        described_class.create(**{ number: number, type: :r }.merge(params))
+      end
       let(:number) { 123 }
       let(:params) { {} }
 

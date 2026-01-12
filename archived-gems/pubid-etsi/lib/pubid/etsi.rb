@@ -5,7 +5,6 @@ require "yaml"
 
 module Pubid
   module Etsi
-
   end
 end
 
@@ -84,7 +83,7 @@ config.type_names = {
   gts: {
     long: "GSM Technical Specification",
     short: "GTS",
-  }
+  },
 }
 Pubid::Etsi::Identifier.set_config(config)
 

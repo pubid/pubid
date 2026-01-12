@@ -3,7 +3,6 @@
 require "spec_helper"
 
 RSpec.describe PubidNew::Astm::Identifier::Adjunct do
-
   # ========================================
   # Adjunct (4 IDs, 1%)
   # ========================================

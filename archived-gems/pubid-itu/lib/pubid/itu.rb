@@ -60,5 +60,6 @@ config.types = [Pubid::Itu::Identifier::Base,
                 Pubid::Itu::Identifier::Appendix,
                 Pubid::Itu::Identifier::Contribution]
 config.type_names = {}.freeze
-config.series = YAML.load_file(File.join(File.dirname(__FILE__), "../../series.yaml"))
+config.series = YAML.load_file(File.join(File.dirname(__FILE__),
+                                         "../../series.yaml"))
 Pubid::Itu::Identifier.set_config(config)

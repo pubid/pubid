@@ -93,7 +93,7 @@ RSpec.describe PubidNew::Etsi do
         "ETSI GR mWT 028 V1.1.1 (2023-04)",
         "ETSI GS ECI 001-5-2 V1.1.1 (2017-07)",
         "ETSI ETR 310/C1 ed.1 (1996-10)",
-        "ETSI ETS 300 097-1/A1 ed.1 (1994-11)"
+        "ETSI ETS 300 097-1/A1 ed.1 (1994-11)",
       ].each do |identifier|
         it "round-trips #{identifier}" do
           result = described_class.parse(identifier)

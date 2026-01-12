@@ -8,7 +8,7 @@ module PubidNew
       # AdoptedEuropeanNorm wraps ISO/IEC identifiers
       # Example: "EN ISO 8601:2019" where ISO 8601:2019 is an ISO identifier object
       class AdoptedEuropeanNorm < EuropeanNorm
-        attribute :adopted_identifier, Base, polymorphic: true  # ISO/IEC/IEEE object
+        attribute :adopted_identifier, Base, polymorphic: true # ISO/IEC/IEEE object
 
         def to_s
           result = publisher.is_a?(Array) ? publisher.join("/") : publisher.join("/")

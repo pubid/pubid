@@ -10,7 +10,7 @@ module PubidNew
       # - "NBS CIRC 13e2revJune1908" = Circular 13, edition 2, revised June 1908
       # - "NBS CIRC 13" = Circular 13
       class Circular < Base
-        attribute :revised_date, :string  # For revJune1908 notation
+        attribute :revised_date, :string # For revJune1908 notation
 
         def default_publisher
           "NBS"

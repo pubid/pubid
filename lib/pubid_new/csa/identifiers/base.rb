@@ -43,17 +43,17 @@ module PubidNew
           # Year with proper format (colon or dash)
           if year
             # Use dash if year_format is dash, otherwise colon
-            separator = (year_format == "dash") ? "-" : ":"
+            separator = year_format == "dash" ? "-" : ":"
             year_part = separator
-            year_part += year_prefix if year_prefix  # Add M or F prefix
-            year_part += "F" if french && year_format != "dash" && !year_prefix  # Only add F if no prefix
+            year_part += year_prefix if year_prefix # Add M or F prefix
+            year_part += "F" if french && year_format != "dash" && !year_prefix # Only add F if no prefix
             # Convert 4-digit year back to 2-digit
             year_str = year.to_s
-            if year_str.length == 4 && year_str.start_with?("20")
-              year_part += year_str[2..3]
-            else
-              year_part += year_str
-            end
+            year_part += if year_str.length == 4 && year_str.start_with?("20")
+                           year_str[2..3]
+                         else
+                           year_str
+                         end
             parts[-1] += year_part
           end
 
@@ -62,15 +62,13 @@ module PubidNew
                      parts.join(" ")
                    elsif needs_space
                      parts.join(" ")
-                   else
+                   elsif parts.length == 2
                      # No space after dash-ending prefix - join first two parts directly
                      # If there are more parts after code, they should still have spaces
-                     if parts.length == 2
-                       parts.join("")
-                     else
-                       # More than 2 parts shouldn't happen in current design
-                       parts.join("")
-                     end
+                     parts.join("")
+                   else
+                     # More than 2 parts shouldn't happen in current design
+                     parts.join("")
                    end
 
           # Reaffirmation

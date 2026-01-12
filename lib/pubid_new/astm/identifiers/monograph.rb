@@ -4,7 +4,7 @@ module PubidNew
   module Astm
     module Identifiers
       class Monograph < Base
-        attribute :edition, :string          # 2ND, 4TH
+        attribute :edition, :string # 2ND, 4TH
 
         def to_s
           parts = []

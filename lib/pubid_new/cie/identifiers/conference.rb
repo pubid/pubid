@@ -11,22 +11,22 @@ module PubidNew
       class Conference < Lutaml::Model::Serializable
         attribute :conference_number, :string
         attribute :year, :string
-        attribute :date_separator, :string  # "dash" or "colon"
+        attribute :date_separator, :string # "dash" or "colon"
         attribute :amendment_number, :string
         attribute :style, :string
-        
+
         def to_s
           result = "CIE x#{conference_number}"
-          
+
           # Date with separator
           if year
             separator = date_separator == "colon" ? ":" : "-"
             result += "#{separator}#{year}"
           end
-          
+
           # Amendment if present
           result += " Amendment #{amendment_number}" if amendment_number
-          
+
           result
         end
       end

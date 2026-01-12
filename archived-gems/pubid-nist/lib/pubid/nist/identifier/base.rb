@@ -3,7 +3,8 @@
 require "json"
 require "forwardable"
 
-UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__), "../../../../update_codes.yaml"))
+UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__),
+                                        "../../../../update_codes.yaml"))
 
 module Pubid::Nist
   module Identifier
@@ -13,7 +14,7 @@ module Pubid::Nist
       attr_accessor :revision, :volume, :version, :supplement, :errata,
                     :index, :insert, :section, :appendix, :translation
 
-      def initialize(publisher: "NIST", series:, number: nil, stage: nil, supplement: nil,
+      def initialize(series:, publisher: "NIST", number: nil, stage: nil, supplement: nil,
                      edition_month: nil, edition_year: nil, edition_day: nil, update: nil,
                      edition: nil, revision: nil, revision_month: nil, revision_year: nil, **opts)
         @publisher = publisher.is_a?(Publisher) ? publisher : Publisher.new(publisher: publisher.to_s)
@@ -35,6 +36,7 @@ module Pubid::Nist
         @update = update
         opts.each { |key, value| send("#{key}=", value.to_s) }
       end
+
       def parse_revision_date(revision_month, revision_year)
         date = Date.parse("01/#{revision_month}/#{revision_year}")
         "#{Date::MONTHNAMES[date.month]}#{date.year}"
@@ -71,7 +73,7 @@ module Pubid::Nist
         document.instance_variables.each do |var|
           val = document.instance_variable_get(var)
           current_val = instance_variable_get(var)
-          if [:@series, :@publisher].include?(var) ||
+          if %i[@series @publisher].include?(var) ||
               (val && current_val.nil?) ||
               (val && current_val.to_s.length < val.to_s.length)
             instance_variable_set(var, val)
@@ -82,16 +84,28 @@ module Pubid::Nist
       end
 
       def self.update_old_code(code)
-        UPDATE_CODES.map {|k ,v| k.match?(/^\/.*\/$/) ? [[k, v], [k.gsub(" ", "\."), v]] : [[k, v], [k.gsub(" ", "."), v]] }
-                    .inject([]) { |a, v| a + v}.each do |from, to|
-          code = code.gsub(from.match?(/^\/.*\/$/) ? Regexp.new(from[1..-2]) : from, to)
+        UPDATE_CODES.map do |k, v|
+          if k.match?(/^\/.*\/$/)
+            [[k, v],
+             [k.gsub(" ", "\."),
+              v]]
+          else
+            [[k, v], [k.gsub(" ", "."), v]]
+          end
+        end
+          .inject([]) { |a, v| a + v }.each do |from, to|
+          code = code.gsub(
+            from.match?(/^\/.*\/$/) ? Regexp.new(from[1..-2]) : from, to
+          )
         end
         code
       end
 
       # @param without_edition [Boolean] render pubid without rendering edition
       def to_s(format = :short, without_edition: false)
-        self.class.get_renderer_class.new(to_h(deep: false)).render(format: format, without_edition: without_edition)
+        self.class.get_renderer_class.new(to_h(deep: false)).render(
+          format: format, without_edition: without_edition,
+        )
       end
 
       def to_json(*args)
@@ -101,12 +115,12 @@ module Pubid::Nist
             abbrev: to_s(:abbrev),
             long: to_s(:long),
             mr: to_s(:mr),
-          }
+          },
         }
 
         instance_variables.each do |var|
           val = instance_variable_get(var)
-          result[var.to_s.gsub('@', '')] = val unless val.nil?
+          result[var.to_s.gsub("@", "")] = val unless val.nil?
         end
         result.to_json(*args)
       end
@@ -129,7 +143,7 @@ module Pubid::Nist
 
           if identifier_params[:addendum]
             return Addendum.new(base: new(
-              **identifier_params.dup.tap { |h| h.delete(:addendum) }
+              **identifier_params.dup.tap { |h| h.delete(:addendum) },
             ), **identifier_params[:addendum])
           end
 

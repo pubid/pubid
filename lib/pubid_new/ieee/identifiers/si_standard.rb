@@ -14,13 +14,13 @@ module PubidNew
           Components::TypedStage.new(
             abbr: ["SI"],
             type_code: "SI",
-            stage_code: "published"
+            stage_code: "published",
           ),
           Components::TypedStage.new(
             abbr: ["PSI"],
             type_code: "SI",
-            stage_code: "draft"
-          )
+            stage_code: "draft",
+          ),
         ].freeze
 
         # SI standards always have IEEE/ASTM publisher
@@ -37,11 +37,11 @@ module PubidNew
           parts << "IEEE/ASTM"
 
           # Type (SI or PSI based on typed_stage)
-          if typed_stage && typed_stage.abbr.include?("PSI")
-            parts << "PSI"
-          else
-            parts << "SI"
-          end
+          parts << if typed_stage && typed_stage.abbr.include?("PSI")
+                     "PSI"
+                   else
+                     "SI"
+                   end
 
           # Code (number) with draft version for PSI
           code_part = code.to_s

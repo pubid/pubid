@@ -34,19 +34,20 @@ module Pubid::Iso
     end.flatten - STAGED_SUPPLEMENTS + %w[PDTR PDTS]).sort_by(&:length).reverse
 
     TCTYPES = ["TC", "JTC", "PC", "IT", "CAB", "CASCO", "COPOLCO",
-      "COUNCIL", "CPSG", "CS", "DEVCO", "GA", "GAAB", "INFCO",
-      "ISOlutions", "ITN", "REMCO", "TMB", "TMBG", "WMO",
-      "DMT", "JCG", "SGPM", "ATMG", "CCCC", "CCCC-TG", "JDMT",
-      "JSAG", "JSCTF-TF", "JTCG", "JTCG-TF", "SAG_Acc", "SAG_CRMI",
-      "SAG_CRMI_CG", "SAG_ESG", "SAG_ESG_CG", "SAG_MRS", "SAG SF", "SAG SF_CG",
-      "SMCC", "STMG", "MENA STAR"].freeze
+               "COUNCIL", "CPSG", "CS", "DEVCO", "GA", "GAAB", "INFCO",
+               "ISOlutions", "ITN", "REMCO", "TMB", "TMBG", "WMO",
+               "DMT", "JCG", "SGPM", "ATMG", "CCCC", "CCCC-TG", "JDMT",
+               "JSAG", "JSCTF-TF", "JTCG", "JTCG-TF", "SAG_Acc", "SAG_CRMI",
+               "SAG_CRMI_CG", "SAG_ESG", "SAG_ESG_CG", "SAG_MRS", "SAG SF", "SAG SF_CG",
+               "SMCC", "STMG", "MENA STAR"].freeze
 
     WGTYPES = ["AG", "AHG", "AhG", "WG", "JWG", "QC", "TF",
-      "PPC", "CAG", "WG SGDG", "WG SR", "STAR", "STTF", "TIG",
-      "CPAG", "CSC", "ITSAG", "CSC/FIN", "CSC/NOM", "CSC/OVE",
-      "CSC/SP", "CSC/FIN", "JAG"].freeze
+               "PPC", "CAG", "WG SGDG", "WG SR", "STAR", "STTF", "TIG",
+               "CPAG", "CSC", "ITSAG", "CSC/FIN", "CSC/NOM", "CSC/OVE",
+               "CSC/SP", "CSC/FIN", "JAG"].freeze
 
-    ORGANIZATIONS = %w[IEC IEEE CIW SAE CIE ASME ASTM OECD ISO HL7 CEI UNDP].freeze
+    ORGANIZATIONS = %w[IEC IEEE CIW SAE CIE ASME ASTM OECD ISO HL7 CEI 
+UNDP].freeze
     rule(:dash) do
       str("-") | str("‑") | str("‐")
     end
@@ -90,10 +91,12 @@ module Pubid::Iso
     end
 
     rule(:roman_numerals) do
-      str("CD").absent? >> array_to_str(%w[I V X L C D M]).repeat(1).as(:roman_numerals)
+      str("CD").absent? >> array_to_str(%w[I V X L C D 
+M]).repeat(1).as(:roman_numerals)
     end
 
-    rule(:year_digits) { (str("19") | str("20")) >> match('\d').repeat(2, 2) >> digits.absent? }
+    rule(:year_digits) {
+ (str("19") | str("20")) >> match('\d').repeat(2, 2) >> digits.absent? }
 
     rule(:part_matcher) do
       year_digits.absent? >>
@@ -141,13 +144,13 @@ module Pubid::Iso
     end
 
     rule(:language) do
-      str("(") >> (
+      str("(") >> 
         ( # parse ru,en,fr
           (match["a-z"].repeat(1) >> str(",").maybe) |
           # parse R/E/F
           ((str("E") | str("F") | str("A") | str("R")) >> str("/").maybe)
         ).repeat.as(:language)
-      ) >> str(")")
+       >> str(")")
     end
 
     rule(:guide_prefix) do
@@ -183,7 +186,7 @@ module Pubid::Iso
           array_to_str(DIR_SUPPLEMENTS) >> (str(":") >> (year >> (dash >> month_digits.as(:month)).maybe)).maybe >>
           dir_supplement_edition.maybe).repeat(1).as(:supplements)).maybe >>
           # parse identifiers with publisher at the end, e.g. "ISO/IEC DIR 2 ISO"
-          (space >> organization.as(:publisher) >> (str(":") >> year).maybe).as(:edition).maybe
+        (space >> organization.as(:publisher) >> (str(":") >> year).maybe).as(:edition).maybe
     end
 
     rule(:std_document_body) do

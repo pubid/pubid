@@ -1,6 +1,8 @@
 module Pubid::Core
   RSpec.describe HarmonizedStageCode do
-    subject { described_class.new(stage, substage, config: DummyTestIdentifier.config) }
+    subject do
+      described_class.new(stage, substage, config: DummyTestIdentifier.config)
+    end
     let(:stage) { nil }
     let(:substage) { nil }
 
@@ -17,7 +19,9 @@ module Pubid::Core
         let(:substage) { :wrong_substage }
 
         it "raises error" do
-          expect { subject.to_s }.to raise_exception(Errors::HarmonizedStageCodeInvalidError)
+          expect do
+            subject.to_s
+          end.to raise_exception(Errors::HarmonizedStageCodeInvalidError)
         end
       end
     end
@@ -44,7 +48,10 @@ module Pubid::Core
 
         invalid_codes.each do |code_string|
           it "invalid stage code #{code_string} should raise an error" do
-            expect { described_class.new(*code_string.split("."), config: DummyTestIdentifier.config) }.to raise_exception(Errors::HarmonizedStageCodeInvalidError)
+            expect do
+              described_class.new(*code_string.split("."),
+                                  config: DummyTestIdentifier.config)
+            end.to raise_exception(Errors::HarmonizedStageCodeInvalidError)
           end
         end
       end
@@ -67,7 +74,8 @@ module Pubid::Core
       let(:stage) { %w[20.00 20.20] }
 
       it "returns true when compare with stage included in fuzzy stage" do
-        expect(subject == HarmonizedStageCode.new("20.20", config: DummyTestIdentifier.config)).to be_truthy
+        expect(subject == HarmonizedStageCode.new("20.20",
+                                                  config: DummyTestIdentifier.config)).to be_truthy
       end
 
       it "returns true for #fuzzy?" do

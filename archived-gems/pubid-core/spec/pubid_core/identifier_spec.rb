@@ -32,7 +32,10 @@ module Pubid::Core
     end
 
     describe "#resolve_identifier" do
-      subject { described_class.resolve_identifier({ number: 1, publisher: "ISO", type: type, stage: typed_stage }) }
+      subject do
+        described_class.resolve_identifier({ number: 1, publisher: "ISO", type: type,
+                                             stage: typed_stage })
+      end
       let(:type) { nil }
       let(:typed_stage) { nil }
 

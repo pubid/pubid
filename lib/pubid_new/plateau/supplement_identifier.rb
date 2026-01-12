@@ -9,7 +9,7 @@ module PubidNew
     # Supplements reference a base identifier
     class SupplementIdentifier < Lutaml::Model::Serializable
       attribute :base_identifier, Identifiers::Base
-      attribute :letter, :string, default: -> { nil }
+      attribute :letter, :string, default: -> {}
 
       def publisher
         "PLATEAU"

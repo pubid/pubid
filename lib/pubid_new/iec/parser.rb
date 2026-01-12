@@ -48,9 +48,9 @@ module PubidNew
       # Working programme numbers can be digits or TC names
       rule(:wp_number) do
         # TC-style: SYCSMARTENERGY-1, SyCLVDC-125
-        (match('[A-Za-z]').repeat(1) >> match('[A-Za-z\d]').repeat >> (dash >> match('\d').repeat(1)).maybe).as(:number_with_part) |
-        # Regular numeric: 100-36
-        number_with_part
+        (match("[A-Za-z]").repeat(1) >> match('[A-Za-z\d]').repeat >> (dash >> match('\d').repeat(1)).maybe).as(:number_with_part) |
+          # Regular numeric: 100-36
+          number_with_part
       end
 
       # Working Document format: TC/number/stage
@@ -60,14 +60,14 @@ module PubidNew
         # TC patterns: digits (100), letters (ACEA), letters/letters (CIS/D), or complex (JTC1-SC41)
         (
           # Try specific patterns first
-          (str("JTC1-SC") >> match('\d').repeat(1)) |  # JTC1-SC41
-          (match('[A-Z]').repeat(1) >> str("/") >> match('[A-Z]').repeat(1)) |  # CIS/D
-          match('[A-Za-z\d]').repeat(1)  # Simple: 100, 86B, ACEA, SyCSmartEnergy
+          (str("JTC1-SC") >> match('\d').repeat(1)) | # JTC1-SC41
+          (match("[A-Z]").repeat(1) >> str("/") >> match("[A-Z]").repeat(1)) | # CIS/D
+          match('[A-Za-z\d]').repeat(1) # Simple: 100, 86B, ACEA, SyCSmartEnergy
         ).as(:technical_committee) >>
           str("/") >>
-          (match('[A-Za-z\d]').repeat(1)).as(:wd_number) >>
-          (str("(") >> match('[A-Z]').as(:wd_language) >> str(")")).maybe >>
-          (str("/") >> match('[A-Z]').repeat(1).as(:wd_stage)).maybe
+          match('[A-Za-z\d]').repeat(1).as(:wd_number) >>
+          (str("(") >> match("[A-Z]").as(:wd_language) >> str(")")).maybe >>
+          (str("/") >> match("[A-Z]").repeat(1).as(:wd_stage)).maybe
       end
 
       # IEC 60038:2009
@@ -117,25 +117,26 @@ module PubidNew
       rule(:number) do
         # Special case for VIM publication
         str("VIM") |
-        # Special case for SYMBOL publication
-        str("SYMBOL") |
-        # IECEx TRF version notation: 62784v1a_ds, 62784v1A
-        (match('\d').repeat(1, 6) >> str("v") >> match('\d').repeat(1) >> match('[a-zA-Z]').repeat >> (str("_") >> match('[a-zA-Z]').repeat).maybe) |
-        # Can be 5-6 digits for TRF: 60065, 610091
-        # Can have letter suffix: 60065N, 610091A
-        # Can have letter + underscore + letters: 61215F_SE
-        (match('\d').repeat(1, 6) >> (
-          match('[A-Z]') >> (str("_") >> match('[A-Z]').repeat).maybe
-        ).maybe)
+          # Special case for SYMBOL publication
+          str("SYMBOL") |
+          # IECEx TRF version notation: 62784v1a_ds, 62784v1A
+          (match('\d').repeat(1,
+                              6) >> str("v") >> match('\d').repeat(1) >> match("[a-zA-Z]").repeat >> (str("_") >> match("[a-zA-Z]").repeat).maybe) |
+          # Can be 5-6 digits for TRF: 60065, 610091
+          # Can have letter suffix: 60065N, 610091A
+          # Can have letter + underscore + letters: 61215F_SE
+          (match('\d').repeat(1, 6) >> (
+            match("[A-Z]") >> (str("_") >> match("[A-Z]").repeat).maybe
+          ).maybe)
       end
 
       rule(:date) do
         # :2005-02 or optional for DB without date
         (str(":") | dash) >>
-        (year_digits >>
-          (dash >> month_digits).maybe >>
-          (dash >> day_digits).maybe
-        ).as(:date)
+          (year_digits >>
+            (dash >> month_digits).maybe >>
+            (dash >> day_digits).maybe
+          ).as(:date)
       end
 
       rule(:part_and_subpart) do
@@ -335,7 +336,6 @@ module PubidNew
       rule(:dash) do
         DASH_CHARS.map { |char| str(char) }.reduce(:|)
       end
-
     end
   end
 end

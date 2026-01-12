@@ -3,7 +3,7 @@ module Pubid::Ccsds::Renderer
     TYPE = "".freeze
 
     def render_identifier(params)
-      "%{publisher} %{series}%{number}%{part}%{book_color}%{edition}%{retired}" % params
+      "%<publisher>s %<series>s%<number>s%<part>s%<book_color>s%<edition>s%<retired>s" % params
     end
 
     def render_part(part, _opts, _params)
@@ -22,7 +22,7 @@ module Pubid::Ccsds::Renderer
       "-S" if retired
     end
 
-    def render_language(language, opts, _params)
+    def render_language(language, _opts, _params)
       " - #{language} Translated"
     end
   end

@@ -1,7 +1,7 @@
 module Pubid::Iso
   module Identifier
     class InternationalStandard < Base
-      def_delegators 'Pubid::Iso::Identifier::InternationalStandard', :type
+      def_delegators "Pubid::Iso::Identifier::InternationalStandard", :type
 
       TYPED_STAGES = {
         dp: {
@@ -43,7 +43,8 @@ module Pubid::Iso
 
       def initialize(stage: nil, iteration: nil, **opts)
         if iteration && stage.nil?
-          raise Errors::IsStageIterationError, "IS stage document cannot have iteration"
+          raise Errors::IsStageIterationError,
+                "IS stage document cannot have iteration"
         end
 
         super

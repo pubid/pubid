@@ -8,7 +8,7 @@ module PubidNew
       attribute :publisher, :string, default: -> { "ASTM" }
       attribute :code, Components::Code
       attribute :year, :string
-      attribute :format_suffix, :string  # -EB for eBook
+      attribute :format_suffix, :string # -EB for eBook
 
       def to_s
         parts = []

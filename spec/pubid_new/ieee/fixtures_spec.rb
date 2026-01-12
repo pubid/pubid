@@ -1,10 +1,18 @@
 require "spec_helper"
 
 RSpec.describe "IEEE Fixture Round-trip Tests" do
-  let(:pubid_to_parse_fixtures) { File.readlines("archived-gems/pubid-ieee/spec/fixtures/pubid-to-parse.txt").map(&:strip) }
-  let(:unapproved_fixtures) { File.readlines("archived-gems/pubid-ieee/spec/fixtures/unapproved.txt").map(&:strip) }
-  let(:pubid_parsed_fixtures) { File.readlines("archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt").map(&:strip) }
-  let(:all_fixtures) { pubid_to_parse_fixtures + unapproved_fixtures + pubid_parsed_fixtures }
+  let(:pubid_to_parse_fixtures) do
+    File.readlines("archived-gems/pubid-ieee/spec/fixtures/pubid-to-parse.txt").map(&:strip)
+  end
+  let(:unapproved_fixtures) do
+    File.readlines("archived-gems/pubid-ieee/spec/fixtures/unapproved.txt").map(&:strip)
+  end
+  let(:pubid_parsed_fixtures) do
+    File.readlines("archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt").map(&:strip)
+  end
+  let(:all_fixtures) do
+    pubid_to_parse_fixtures + unapproved_fixtures + pubid_parsed_fixtures
+  end
 
   describe "pubid-to-parse.txt fixtures" do
     it "round-trips pubid-to-parse identifiers" do
@@ -24,13 +32,13 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end
@@ -78,13 +86,13 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end
@@ -132,13 +140,13 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end
@@ -186,13 +194,13 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end

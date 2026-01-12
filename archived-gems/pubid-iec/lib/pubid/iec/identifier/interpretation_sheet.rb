@@ -1,7 +1,7 @@
 module Pubid::Iec
   module Identifier
     class InterpretationSheet < Base
-      def_delegators 'Pubid::Iec::Identifier::InterpretationSheet', :type
+      def_delegators "Pubid::Iec::Identifier::InterpretationSheet", :type
 
       TYPED_STAGES = {
         cdish: {
@@ -13,7 +13,7 @@ module Pubid::Iec
           abbr: "DISH",
           name: "Draft Interpretation Sheet",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
       PROJECT_STAGES = {

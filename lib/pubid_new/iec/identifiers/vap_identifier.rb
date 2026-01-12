@@ -10,29 +10,30 @@ module PubidNew
       class VapIdentifier < Identifier
         attribute :base_identifier, Identifier, polymorphic: true
         attribute :vap_suffix, Components::VapSuffix
-        attribute :edition, ::PubidNew::Components::Edition, default: -> { nil }
+        attribute :edition, ::PubidNew::Components::Edition, default: -> {}
 
         # VAP types mapping
         TYPE_MAP = {
           "CSV" => "Consolidated version (with Supplements)",
           "CMV" => "Compiled Maintenance Version",
           "RLV" => "Redline Version (shows changes)",
-          "SER" => "Serial version"
+          "SER" => "Serial version",
         }.freeze
 
         def to_s(lang: :en, lang_single: false, with_edition: false)
           parts = []
 
           # Render base identifier WITHOUT edition (edition goes at VAP level)
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: false)
+          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
+                                        with_edition: false)
 
           # Add VAP suffix with space
           if vap_suffix
-            parts << " #{vap_suffix.to_s}"
+            parts << " #{vap_suffix}"
           end
 
           # Add edition after VAP suffix if present
-          parts << " #{edition.to_s}" if edition && edition.number
+          parts << " #{edition}" if edition && edition.number
 
           parts.compact.join
         end

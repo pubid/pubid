@@ -1,8 +1,15 @@
 require "spec_helper"
 
 RSpec.describe "IEC V2 Fixtures Tests" do
-  let(:fixture_file) { File.join(__dir__, "../../../archived-gems/pubid-iec/spec/fixtures/iec-pubid.txt") }
-  let(:fixture_ids) { File.readlines(fixture_file).map(&:strip).reject { |line| line.empty? || line.start_with?("#") } }
+  let(:fixture_file) do
+    File.join(__dir__,
+              "../../../archived-gems/pubid-iec/spec/fixtures/iec-pubid.txt")
+  end
+  let(:fixture_ids) do
+    File.readlines(fixture_file).map(&:strip).reject do |line|
+      line.empty? || line.start_with?("#")
+    end
+  end
 
   describe "IEC fixtures (iec-pubid.txt)" do
     it "has identifiers to test" do
@@ -15,16 +22,14 @@ RSpec.describe "IEC V2 Fixtures Tests" do
       failures = []
 
       fixture_ids.each do |id_str|
-        begin
-          parsed = PubidNew::Iec.parse(id_str)
-          if parsed.to_s == id_str
-            successes += 1
-          else
-            failures << "Round-trip mismatch: '#{id_str}' -> '#{parsed.to_s}'"
-          end
-        rescue StandardError => e
-          failures << "Parse error: '#{id_str}' (#{e.class.name})"
+        parsed = PubidNew::Iec.parse(id_str)
+        if parsed.to_s == id_str
+          successes += 1
+        else
+          failures << "Round-trip mismatch: '#{id_str}' -> '#{parsed}'"
         end
+      rescue StandardError => e
+        failures << "Parse error: '#{id_str}' (#{e.class.name})"
       end
 
       total = fixture_ids.count
@@ -43,7 +48,8 @@ RSpec.describe "IEC V2 Fixtures Tests" do
         failures.first(30).each { |f| puts "  #{f}" }
       end
 
-      expect(pass_rate).to be >= 80.0, "Expected at least 80% pass rate on REAL fixtures, got #{pass_rate}%"
+      expect(pass_rate).to be >= 80.0,
+                           "Expected at least 80% pass rate on REAL fixtures, got #{pass_rate}%"
     end
   end
 end

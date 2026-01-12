@@ -17,7 +17,9 @@ module Pubid::Iso
       end
 
       context "when have joint document" do
-        let(:params) { { joint_document: { publisher: "IDF", number: number } } }
+        let(:params) do
+          { joint_document: { publisher: "IDF", number: number } }
+        end
 
         it "renders correct identifier" do
           expect(subject.to_s).to eq("ISO #{number}|IDF #{number}")
@@ -29,8 +31,7 @@ module Pubid::Iso
               joint_document: { publisher: "", year: 2022,
                                 base: { publisher: "IEC", type: :dir },
                                 type: :sup },
-              type: :dir
-            }
+              type: :dir }
           end
 
           it "renders identifier with joint document" do
@@ -117,7 +118,9 @@ module Pubid::Iso
 
         context "when have harmonized code and abbr" do
           context "at stage PRF" do
-            let(:stage) { Identifier.build_stage(harmonized_code: "50.00", abbr: :PRF) }
+            let(:stage) do
+              Identifier.build_stage(harmonized_code: "50.00", abbr: :PRF)
+            end
 
             it "renders separate stage for PubID" do
               expect(subject.to_s(with_prf: true)).to eq("ISO/PRF #{number}")
@@ -230,7 +233,9 @@ module Pubid::Iso
           let(:stage) { :fdis }
 
           it "raises an error" do
-            expect { subject }.to raise_exception(Pubid::Core::Errors::StageInvalidError)
+            expect do
+              subject
+            end.to raise_exception(Pubid::Core::Errors::StageInvalidError)
           end
         end
       end
@@ -292,7 +297,9 @@ module Pubid::Iso
           let(:type) { :tr }
 
           it "raises the error" do
-            expect { subject }.to raise_exception(Errors::IterationWithoutStageError)
+            expect do
+              subject
+            end.to raise_exception(Errors::IterationWithoutStageError)
           end
         end
       end
@@ -313,7 +320,7 @@ module Pubid::Iso
         end
 
         context "when PRF stage" do
-          let(:params) { { type: :dir, stage: "PRF" }}
+          let(:params) { { type: :dir, stage: "PRF" } }
 
           it "render DIR document" do
             expect(subject.to_s).to eq("ISO DIR #{number}")
@@ -346,7 +353,8 @@ module Pubid::Iso
 
         context "JTC type" do
           let(:params) do
-            { number: "1", copublisher: "IEC", dirtype: "JTC", jtc_dir: true, type: :dir }
+            { number: "1", copublisher: "IEC", dirtype: "JTC", jtc_dir: true,
+              type: :dir }
           end
           let(:number) { nil }
 
@@ -386,7 +394,10 @@ module Pubid::Iso
       end
 
       describe "when document have Extract type" do
-        let(:params) { { type: :ext, year: 1999, number: 1, base: described_class.create(number: number) } }
+        let(:params) do
+          { type: :ext, year: 1999, number: 1,
+            base: described_class.create(number: number) }
+        end
 
         it "render Extract document" do
           expect(subject.to_s).to eq("ISO #{number}/Ext 1:1999")
@@ -397,7 +408,8 @@ module Pubid::Iso
         subject do
           described_class.create(
             type: :amd, number: 1, year: 2021, stage: :damd,
-            base: described_class.create(number: number, year: 2019, language: "en"))
+            base: described_class.create(number: number, year: 2019, language: "en")
+          )
             .to_s(format: format)
         end
         let(:number) { 123 }

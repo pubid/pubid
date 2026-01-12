@@ -3,7 +3,7 @@ module Pubid::Bsi
     class ExpertCommentary < Base
       attr_accessor :base
 
-      def_delegators 'Pubid::Bsi::Identifier::ExpertCommentary', :type
+      def_delegators "Pubid::Bsi::Identifier::ExpertCommentary", :type
 
       def initialize(base: nil, **opts)
         super(**opts)

@@ -8,7 +8,7 @@ module PubidNew
     module Components
       # Stage component for NIST draft identifiers
       # Combines id (i/f/1-9) with type (pd/wd/prd)
-      # 
+      #
       # Examples:
       #   Stage.new(id: "i", type: "pd").to_s(:short) # => "ipd"
       #   Stage.new(id: "f", type: "pd").to_s(:long)  # => "(Final Public Draft)"
@@ -18,7 +18,8 @@ module PubidNew
 
         # Load stages from V1 YAML config
         STAGES = YAML.load_file(
-          File.join(File.dirname(__FILE__), "../../../../archived-gems/pubid-nist/stages.yaml")
+          File.join(File.dirname(__FILE__),
+                    "../../../../archived-gems/pubid-nist/stages.yaml"),
         ).freeze
 
         # Render stage in specified format
@@ -39,10 +40,10 @@ module PubidNew
 
         # Validate stage id and type against YAML config
         def validate!
-          unless STAGES['id'].key?(id.to_s)
+          unless STAGES["id"].key?(id.to_s)
             raise ArgumentError, "Invalid stage id: #{id.inspect}"
           end
-          unless STAGES['type'].key?(type.to_s)
+          unless STAGES["type"].key?(type.to_s)
             raise ArgumentError, "Invalid stage type: #{type.inspect}"
           end
         end

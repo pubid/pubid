@@ -16,7 +16,7 @@ module PubidNew
             type_code: :ts,
             abbr: ["DTS"],
             name: "Draft Technical Specification",
-            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99]
+            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
           ),
           PubidNew::Components::TypedStage.new(
             code: :ts,
@@ -24,8 +24,8 @@ module PubidNew
             type_code: :ts,
             abbr: ["TS"],
             name: "Technical Specification",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         # Project stages specific to Technical Specifications
@@ -34,33 +34,33 @@ module PubidNew
           adts: {
             abbr: "ADTS",
             name: "Approved for DTS",
-            harmonized_stages: %w[40.99]
+            harmonized_stages: %w[40.99],
           },
           cdts: {
             abbr: "CDTS",
             name: "Draft circulated as DTS",
-            harmonized_stages: %w[50.20]
+            harmonized_stages: %w[50.20],
           },
           dtsm: {
             abbr: "DTSM",
             name: "Rejected DTS to be discussed at meeting",
-            harmonized_stages: %w[50.92]
+            harmonized_stages: %w[50.92],
           },
           ndts: {
             abbr: "NDTS",
             name: "DTS rejected",
-            harmonized_stages: %w[50.92]
+            harmonized_stages: %w[50.92],
           },
           prvdts: {
             abbr: "PRVDTS",
             name: "Preparation of RVDTS",
-            harmonized_stages: %w[50.60]
+            harmonized_stages: %w[50.60],
           },
           tdts: {
             abbr: "TDTS",
             name: "Translation of DTS",
-            harmonized_stages: %w[50.00]
-          }
+            harmonized_stages: %w[50.00],
+          },
         }.freeze
 
         def self.type

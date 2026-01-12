@@ -16,23 +16,23 @@ module PubidNew
         attribute :cor_number, :string
         attribute :cor_year, :string
         attribute :style, :string
-        
+
         def to_s
           # Build base identifier string
           result = "CIE #{base_number}"
-          
+
           # Add supplement notation if base is a supplement
           if base_supplement
             result += "-SP#{base_supplement}"
             result += ".#{base_supplement_part}" if base_supplement_part
           end
-          
+
           # Add base year with colon
           result += ":#{base_year}" if base_year
-          
+
           # Add corrigendum with slash and colon
           result += "/Cor#{cor_number}:#{cor_year}"
-          
+
           result
         end
       end

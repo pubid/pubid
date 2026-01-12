@@ -1,9 +1,9 @@
 module Pubid::Iec::Renderer
   class TrfPubid < Pubid
     def render_identifier(params)
-      "%{publisher}%{copublisher} TRF%{trf_publisher} %{number}%{part}%{conjuction_part}"\
-      "%{part_version}%{version}%{trf_version}%{decision_sheet}%{trf_series}%{test_type}"\
-      "%{year}%{vap}" % params
+      "%<publisher>s%<copublisher>s TRF%<trf_publisher>s %<number>s%<part>s%<conjuction_part>s"\
+      "%<part_version>s%<version>s%<trf_version>s%<decision_sheet>s%<trf_series>s%<test_type>s"\
+      "%<year>s%<vap>s" % params
     end
 
     def render_vap(vap, _opts, _params)
@@ -22,7 +22,9 @@ module Pubid::Iec::Renderer
                            end
 
       if conjuction_parts.is_a?(Array)
-        conjuction_parts.map(&:to_i).sort.map { |conjuction_part| "#{conjunction_symbol}#{conjuction_part}" }.join
+        conjuction_parts.map(&:to_i).sort.map do |conjuction_part|
+          "#{conjunction_symbol}#{conjuction_part}"
+        end.join
       else
         "#{conjunction_symbol}#{conjuction_parts}"
       end
@@ -36,7 +38,7 @@ module Pubid::Iec::Renderer
       "_#{test_type}"
     end
 
-    def render_trf_series(trf_series, _opts, _params)
+    def render_trf_series(_trf_series, _opts, _params)
       "_SE"
     end
   end

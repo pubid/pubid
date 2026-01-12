@@ -10,7 +10,9 @@ module Pubid::Iso::Renderer
           joint_params = params[:joint_document].to_h(deep: false)
           res += ":#{joint_params[:base].publisher.downcase}:sup:%<year>s" % joint_params
         else
-          joint_params = prerender_params(params[:joint_document].to_h(deep: false), {})
+          joint_params = prerender_params(
+            params[:joint_document].to_h(deep: false), {}
+          )
           joint_params.default = ""
           res += (":%<publisher>s%<copublisher>s%<dirtype>s%<number>s%<supplement>s" % joint_params)
         end

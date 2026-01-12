@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "parslet/rig/rspec"
 
 RSpec.describe Pubid::Nist::Identifier::Base do
@@ -959,9 +960,10 @@ RSpec.describe Pubid::Nist::Identifier::Base do
         documents.each do |doc|
           expect do
             described_class.parse(doc[:finalPubId])
-          rescue Exception => failure
+          rescue Exception => e
             if doc[:finalPubId] != "parse error"
-              raise Pubid::Nist::Errors::ParseError, "cannot parse #{doc[:finalPubId]}, #{failure}"
+              raise Pubid::Nist::Errors::ParseError,
+                    "cannot parse #{doc[:finalPubId]}, #{e}"
             end
           end.not_to raise_error
         end
@@ -982,11 +984,12 @@ RSpec.describe Pubid::Nist::Identifier::Base do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
           next if pub_id.match?("^#")
+
           expect do
             described_class.parse(pub_id.split("#").first.strip.chomp)
-          rescue Exception => failure
+          rescue Exception => e
             raise Pubid::Nist::Errors::ParseError,
-                  "couldn't parse #{pub_id}\n#{failure.message}"
+                  "couldn't parse #{pub_id}\n#{e.message}"
           end.not_to raise_error
         end
       end

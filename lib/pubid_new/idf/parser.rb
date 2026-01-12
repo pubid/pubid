@@ -19,7 +19,7 @@ module PubidNew
 
       rule(:identifier) do
         supplement_identifier |
-        identifier_publisher
+          identifier_publisher
       end
 
       # IDF 125A:1988
@@ -141,7 +141,6 @@ module PubidNew
       rule(:dash) do
         str("-") | str("‑") | str("‐")
       end
-
     end
   end
 end

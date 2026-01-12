@@ -71,8 +71,8 @@ module PubidNew
       rule(:prefix_with_copublishers) do
         # Try ISO/R first (must be followed by space + number to avoid confusion with copublishers)
         (str("ISO/R").as(:iso_r_prefix) >> space) |
-        # Otherwise normal publisher with optional copublishers
-        (prefix_sole_publisher >> space? >> copublishers.maybe)
+          # Otherwise normal publisher with optional copublishers
+          (prefix_sole_publisher >> space? >> copublishers.maybe)
       end
 
       ORGANIZATIONS = %w[
@@ -93,10 +93,10 @@ module PubidNew
       rule(:date) do
         # :2005-02
         (str(":") | dash) >>
-        (year_digits >>
-          (dash >> month_digits).maybe >>
-          (dash >> day_digits).maybe
-        ).as(:date).maybe
+          (year_digits >>
+            (dash >> month_digits).maybe >>
+            (dash >> day_digits).maybe
+          ).as(:date).maybe
       end
 
       rule(:part_and_subpart) do
@@ -119,13 +119,13 @@ module PubidNew
           # matches a subpart, e.g. "A01" or "1-2" (yes we treat {5}-{1-1} as part and subpart)
           (dash >> match('\w').repeat(1)).repeat.maybe
         ) |
-        # Legacy parts do not have subparts
-        # the "/" to handle old style parts: "ISO 5843/6"
-        (
-          str("/") >> space? >>
-          # matches a part
-          match('\w').repeat(1)
-        )
+          # Legacy parts do not have subparts
+          # the "/" to handle old style parts: "ISO 5843/6"
+          (
+            str("/") >> space? >>
+            # matches a part
+            match('\w').repeat(1)
+          )
       end
 
       rule(:all_parts) do
@@ -324,7 +324,7 @@ module PubidNew
         # ISO/IEC DIR JTC 1 SUP:2021
         # ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement
         (space? >> str("--") >> space? >> str("Consolidated") >> space).maybe >>
-        (str("ISO") | str("IEC") | str("JTC 1")).as(:publisher) >>
+          (str("ISO") | str("IEC") | str("JTC 1")).as(:publisher) >>
           (space >> array_to_str(DIRECTIVES_SUPPLEMENTS_TYPED_STAGES).as(:type_with_stage)) >>
           date.maybe
       end
@@ -341,10 +341,10 @@ module PubidNew
           (third_part >> space?).maybe >>
           (date >> space?).maybe
         ).as(:base_document) >>
-        (
-          str("+ ") >>
-          directives_supplement_part_no_third.as(:supplement)
-        ).repeat(1).as(:supplements)
+          (
+            str("+ ") >>
+            directives_supplement_part_no_third.as(:supplement)
+          ).repeat(1).as(:supplements)
       end
 
       rule(:directives_identifiers) do

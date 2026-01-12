@@ -42,41 +42,39 @@ module PubidNew
                      parts.join(" ")
                    elsif needs_space
                      parts.join(" ")
-                   else
+                   elsif parts.length <= 2
                      # No space after dash-ending prefix (CAN/CSA-, CAN3-)
                      # Join first two parts directly, rest with spaces
-                     if parts.length <= 2
-                       parts.join("")
-                     else
-                       parts[0] + parts[1..-1].join(" ")
-                     end
+                     parts.join("")
+                   else
+                     parts[0] + parts[1..-1].join(" ")
                    end
 
           # Year with proper format (colon or dash)
           if year
             # Use dash if year_format is dash, otherwise colon
-            separator = (year_format == "dash") ? "-" : ":"
+            separator = year_format == "dash" ? "-" : ":"
             year_part = separator
 
             # Convert 4-digit year back to 2-digit for display
             year_str = year.to_s
             display_year = if year_str.length == 4 && year_str.start_with?("20")
-                            year_str[2..3]
-                          elsif year_str.length == 4 && year_str.start_with?("19")
-                            year_str[2..3]
-                          else
-                            year_str
-                          end
+                             year_str[2..3]
+                           elsif year_str.length == 4 && year_str.start_with?("19")
+                             year_str[2..3]
+                           else
+                             year_str
+                           end
 
             # Add prefix if present
-            if year_prefix
-              year_part += year_prefix + display_year
-            elsif french && year_format != "dash"
-              # Only add F if no prefix already set
-              year_part += "F" + display_year
-            else
-              year_part += display_year
-            end
+            year_part += if year_prefix
+                           year_prefix + display_year
+                         elsif french && year_format != "dash"
+                           # Only add F if no prefix already set
+                           "F" + display_year
+                         else
+                           display_year
+                         end
 
             result += year_part
           end

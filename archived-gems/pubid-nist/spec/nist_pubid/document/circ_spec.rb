@@ -61,12 +61,12 @@ RSpec.describe Pubid::Nist::Identifier::Base do
 
   context "NBS CIRC 25insert" do
     let(:original_pubid) { "NBS CIRC 25insert" }
-    let(:short_pubid) { "NBS CIRC 25ins"}
+    let(:short_pubid) { "NBS CIRC 25ins" }
     it_behaves_like "converts pubid to different formats"
   end
 
   context "NBS CIRC 25ins" do
-    let(:short_pubid) { "NBS CIRC 25ins"}
+    let(:short_pubid) { "NBS CIRC 25ins" }
 
     it_behaves_like "converts pubid to different formats"
   end
@@ -116,7 +116,6 @@ RSpec.describe Pubid::Nist::Identifier::Base do
   context "NBS CIRC 15-April1909" do
     let(:original_pubid) { "NBS CIRC 15-April1909" }
     let(:short_pubid) { "NBS CIRC 15e190904" }
-
 
     it_behaves_like "converts pubid to different formats"
   end

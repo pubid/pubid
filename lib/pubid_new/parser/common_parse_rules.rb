@@ -23,7 +23,8 @@ module PubidNew
           rule(:words) { match("[A-Za-z]").repeat(1) }
           rule(:words?) { words.maybe }
           rule(:year_digits) do
-            (str("19") | str("20")) >> match('\d').repeat(2, 2) >> digits.absent?
+            (str("19") | str("20")) >> match('\d').repeat(2,
+                                                          2) >> digits.absent?
           end
 
           rule(:month_digits) do

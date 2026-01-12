@@ -60,10 +60,10 @@ module PubidNew
           # Set lead_party if not provided - default to first publisher
           if args[:lead_party]
             self.lead_party = args[:lead_party]
-          elsif self.publishers && !self.publishers.empty?
+          elsif publishers && !publishers.empty?
             # Lead party defaults to first publisher if not explicitly set
             # Builder should override this with detected lead party
-            self.lead_party = self.publishers.first
+            self.lead_party = publishers.first
           end
         end
 
@@ -76,7 +76,7 @@ module PubidNew
           when "ISO", "IEC"
             :iso
           else
-            :ieee  # default to IEEE format
+            :ieee # default to IEEE format
           end
         end
 
@@ -136,7 +136,7 @@ module PubidNew
           parts << publishers.join("/") if publishers && !publishers.empty?
 
           # Build code part
-          code_str = code.to_s.gsub(/^P/, "")  # Remove any existing P first
+          code_str = code.to_s.gsub(/^P/, "") # Remove any existing P first
 
           # Add P prefix for projects (IEEE format always shows P for drafts)
           if typed_stage&.project_status || type == "P"

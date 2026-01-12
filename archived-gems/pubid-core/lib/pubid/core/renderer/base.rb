@@ -29,10 +29,10 @@ module Pubid::Core::Renderer
       render_identifier(@prerendered_params)
     end
 
-
     def prerender_params(params, opts)
       params.map do |key, value|
         next unless value
+
         if respond_to?("render_#{key}")
           [key, send("render_#{key}", value, opts, params)]
         else
@@ -55,13 +55,17 @@ module Pubid::Core::Renderer
       supplement = case supplement_params[:typed_stage].type.type
                    when :amd
                      render_amendments(
-                       [Pubid::Iso::Amendment.new(**supplement_params.slice(:number, :year, :typed_stage, :edition, :iteration))],
+                       [Pubid::Iso::Amendment.new(**supplement_params.slice(
+                         :number, :year, :typed_stage, :edition, :iteration
+                       ))],
                        args,
                        nil,
                      )
                    when :cor
                      render_corrigendums(
-                       [Pubid::Iso::Corrigendum.new(**supplement_params.slice(:number, :year, :typed_stage, :edition, :iteration))],
+                       [Pubid::Iso::Corrigendum.new(**supplement_params.slice(
+                         :number, :year, :typed_stage, :edition, :iteration
+                       ))],
                        args,
                        nil,
                      )
@@ -69,7 +73,8 @@ module Pubid::Core::Renderer
                    end
 
       if supplement_params[:base].language
-        base + supplement + render_language(supplement_params[:base].language, args, nil)
+        base + supplement + render_language(supplement_params[:base].language,
+                                            args, nil)
       else
         base + supplement
       end
@@ -79,7 +84,8 @@ module Pubid::Core::Renderer
     # @param with_date [Boolean] include year in output
     # @param with_language_code [:iso,:single] render document language as 2-letter ISO 639-1 language code or single code
     def render(with_date: true, with_language_code: :iso, **args)
-      render_base_identifier(**args.merge({ with_date: with_date, with_language_code: with_language_code})) + @prerendered_params[:language].to_s
+      render_base_identifier(**args.merge({ with_date: with_date,
+                                            with_language_code: with_language_code })) + @prerendered_params[:language].to_s
     end
 
     def render_identifier(params)
@@ -92,7 +98,7 @@ module Pubid::Core::Renderer
       case params[:copublisher]
       when Array
         ([publisher] + params[:copublisher].map(&:to_s).sort.map(&:to_s)).map do |pub|
-          pub.gsub('-', '/')
+          pub.gsub("-", "/")
         end.join("/")
       else
         [publisher, params[:copublisher]].join("/")
@@ -107,8 +113,7 @@ module Pubid::Core::Renderer
       corrigendums.sort.map(&:render_pubid).join("+")
     end
 
-
-    def render_part(part, opts, _params)
+    def render_part(part, _opts, _params)
       "-#{part}"
     end
 

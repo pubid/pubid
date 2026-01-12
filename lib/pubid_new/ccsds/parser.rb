@@ -41,12 +41,12 @@ module PubidNew
       # Language metadata (e.g., " - French Translated", " - Russian Translated")
       rule(:language_metadata) do
         space >> dash >> space >>
-        (
-          (str("French") | str("Russian") | str("English") |
-           str("German") | str("Spanish") | str("Italian") |
-           str("Portuguese") | str("Chinese") | str("Japanese")).as(:language) >>
-          (space >> str("Translated")).maybe
-        )
+          (
+            (str("French") | str("Russian") | str("English") |
+             str("German") | str("Spanish") | str("Italian") |
+             str("Portuguese") | str("Chinese") | str("Japanese")).as(:language) >>
+            (space >> str("Translated")).maybe
+          )
       end
 
       # Main identifier

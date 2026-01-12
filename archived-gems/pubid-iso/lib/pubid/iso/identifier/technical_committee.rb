@@ -3,7 +3,7 @@ require_relative "../renderer/technical_committee"
 module Pubid::Iso
   module Identifier
     class TechnicalCommittee < Base
-      def_delegators 'Pubid::Iso::Identifier::TechnicalCommittee', :type
+      def_delegators "Pubid::Iso::Identifier::TechnicalCommittee", :type
 
       TYPED_STAGES = {}.freeze
 

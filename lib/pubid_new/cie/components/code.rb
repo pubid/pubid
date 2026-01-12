@@ -29,14 +29,14 @@ module PubidNew
             # Use part_separator if explicitly set (preserves original)
             # Otherwise fall back to style-based separator
             separator = if part_separator == "slash"
-              "/"
-            elsif part_separator == "dash"
-              "-"
-            else
-              # Legacy: slash "/" (e.g., "170/1")
-              # Current: dash "-" (e.g., "170-1")
-              style == "legacy" ? "/" : "-"
-            end
+                          "/"
+                        elsif part_separator == "dash"
+                          "-"
+                        else
+                          # Legacy: slash "/" (e.g., "170/1")
+                          # Current: dash "-" (e.g., "170-1")
+                          style == "legacy" ? "/" : "-"
+                        end
             result += "#{separator}#{part}"
           end
 
@@ -54,10 +54,12 @@ module PubidNew
           # Detect part with separator
           elsif code_str.include?("/")
             parts = code_str.split("/")
-            new(number: parts[0], part: parts[1], style: "legacy", part_separator: "slash")
+            new(number: parts[0], part: parts[1], style: "legacy",
+                part_separator: "slash")
           elsif code_str.include?("-")
-            parts = code_str.split("-", 2)  # Limit to 2 parts
-            new(number: parts[0], part: parts[1], style: "current", part_separator: "dash")
+            parts = code_str.split("-", 2) # Limit to 2 parts
+            new(number: parts[0], part: parts[1], style: "current",
+                part_separator: "dash")
           # Simple number
           else
             new(number: code_str, style: style)

@@ -112,7 +112,8 @@ module PubidNew
           code: :pubaerospace,
           stage_code: :published,
           type_code: :aerospace,
-          abbr: ["BS A", "BS AU", "BS C", "BS M", "BS S", "BS L", "BS TA", "BS MA", "BS PL", "BS QC", "BS G", "BS HC", "BS F", "BS X", "BS B"],
+          abbr: ["BS A", "BS AU", "BS C", "BS M", "BS S", "BS L", "BS TA",
+                 "BS MA", "BS PL", "BS QC", "BS G", "BS HC", "BS F", "BS X", "BS B"],
           name: "Aerospace/Specialized British Standard",
           harmonized_stages: %w[60.00 60.60],
         ),
@@ -227,7 +228,9 @@ module PubidNew
 
       def locate_typed_stage_by_abbr(abbr)
         abbr_str = abbr.to_s.strip
-        TYPED_STAGES_REGISTRY.find { |ts| ts.abbr.include?(abbr_str) } || DEFAULT_TYPED_STAGE
+        TYPED_STAGES_REGISTRY.find do |ts|
+          ts.abbr.include?(abbr_str)
+        end || DEFAULT_TYPED_STAGE
       end
 
       def locate_identifier_klass_by_type_code(type_code)
@@ -235,7 +238,9 @@ module PubidNew
         return Identifiers::BritishStandard unless class_name
 
         # Convert string to actual class
-        class_name.split("::").reduce(PubidNew::Bsi) { |mod, name| mod.const_get(name) }
+        class_name.split("::").reduce(PubidNew::Bsi) do |mod, name|
+          mod.const_get(name)
+        end
       end
     end
   end

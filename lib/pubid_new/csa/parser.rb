@@ -31,16 +31,17 @@ module PubidNew
         (
           # Pattern 1: Pure dotted numbers - e.g., 12.4, 2.15, 3.11
           (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1) >>
-           (dash >> match("[0-9]").repeat(1)).repeat >>  # Allow multiple dash sequences
+           (dash >> match("[0-9]").repeat(1)).repeat >> # Allow multiple dash sequences
            letter.repeat(2, 6).maybe).as(:code) |
           # Pattern 2: Pure numbers with HB suffix - e.g., 15189HB (NEW)
           (match("[0-9]").repeat(1) >> letter.repeat(2, 6)).as(:code) |
           # Pattern 3: Letter + numbers with dots then dashes - e.g., C22.2-144, B149.1
           (letter >> match("[0-9]").repeat(1) >>
-           (dot >> match("[0-9]").repeat(1)).repeat >>  # Dot sections first
+           (dot >> match("[0-9]").repeat(1)).repeat >> # Dot sections first
            # Dash sections after - but don't consume 2-digit years (require 3+ digits OR letter suffix)
-           (dash >> (match("[0-9]").repeat(3) | (match("[0-9]").repeat(1, 2) >> letter.repeat(1)))).repeat >>
-           letter.repeat(2, 6).maybe).as(:code)  # Allow HB, CIICHB, SP, etc.
+           (dash >> (match("[0-9]").repeat(3) | (match("[0-9]").repeat(1,
+                                                                       2) >> letter.repeat(1)))).repeat >>
+           letter.repeat(2, 6).maybe).as(:code) # Allow HB, CIICHB, SP, etc.
         )
       end
 
@@ -84,10 +85,10 @@ module PubidNew
       # Amendment notation (e.g., /A1:15, /A2:22, /Amd 1)
       rule(:amendment_slash) do
         slash >>
-        (str("Amd") >> space).maybe >>
-        str("A").maybe >>
-        digits.as(:amendment_number) >>
-        (colon >> year_2digit.as(:amendment_year)).maybe
+          (str("Amd") >> space).maybe >>
+          str("A").maybe >>
+          digits.as(:amendment_number) >>
+          (colon >> year_2digit.as(:amendment_year)).maybe
       end
 
       # Package keywords
@@ -100,11 +101,11 @@ module PubidNew
       # Package portion: "Code, Handbook & Training Package"
       rule(:package_portion) do
         space >>
-        package_keyword >>
-        (
-          (comma >> space >> package_keyword) |
-          (space >> ampersand >> space >> package_keyword)
-        ).repeat
+          package_keyword >>
+          (
+            (comma >> space >> package_keyword) |
+            (space >> ampersand >> space >> package_keyword)
+          ).repeat
       end
 
       # Series prefix: 2-3 letters before SERIES keyword (e.g., MH, RV)
@@ -122,15 +123,15 @@ module PubidNew
       # Examples: CSA MH SERIES 3.14:20, CSA SERIES Z1000:22
       rule(:series_identifier) do
         publisher >>
-        (series_prefix >> space).maybe >>
-        series_keyword.as(:series_type) >> space >>
-        # Allow either standard code_pattern OR numeric-only codes (e.g., 3.14, 1)
-        (
-          code_pattern |
-          (match("[0-9]").repeat(1) >> (dot >> match("[0-9]").repeat(1)).repeat).as(:code)
-        ) >>
-        (colon_year | dash_year) >>
-        reaffirmation.maybe
+          (series_prefix >> space).maybe >>
+          series_keyword.as(:series_type) >> space >>
+          # Allow either standard code_pattern OR numeric-only codes (e.g., 3.14, 1)
+          (
+            code_pattern |
+            (match("[0-9]").repeat(1) >> (dot >> match("[0-9]").repeat(1)).repeat).as(:code)
+          ) >>
+          (colon_year | dash_year) >>
+          reaffirmation.maybe
       end
 
       # CEC (Canadian Electrical Code) identifier
@@ -139,118 +140,118 @@ module PubidNew
       # The "NO." notation is a semantic component and must be preserved
       rule(:cec_identifier) do
         publisher >>
-        (
-          str("C22.2") | str("C22.3") | str("C22.4") | str("C22.6")
-        ).as(:cec_part) >>
-        no_notation >>
-        no_number >>
-        (colon_year | dash_year) >>
-        reaffirmation.maybe
+          (
+            str("C22.2") | str("C22.3") | str("C22.4") | str("C22.6")
+          ).as(:cec_part) >>
+          no_notation >>
+          no_number >>
+          (colon_year | dash_year) >>
+          reaffirmation.maybe
       end
 
       # ISO/IEC adopted standards pattern: CSA ISO/IEC TR 19758:04 (R2024)
       rule(:iso_iec_adoption) do
         publisher >>
-        str("ISO/IEC") >> space >>
-        (str("TR") | str("TS")).as(:iso_type) >> space >>
-        match("[0-9-]").repeat(1).as(:iso_number) >>
-        colon >> year_2digit.as(:year) >>
-        (slash >> str("A") >> digit.as(:iso_amendment)).maybe >>
-        reaffirmation.maybe
+          str("ISO/IEC") >> space >>
+          (str("TR") | str("TS")).as(:iso_type) >> space >>
+          match("[0-9-]").repeat(1).as(:iso_number) >>
+          colon >> year_2digit.as(:year) >>
+          (slash >> str("A") >> digit.as(:iso_amendment)).maybe >>
+          reaffirmation.maybe
       end
 
       # Basic CSA identifier
       rule(:csa_code) do
         publisher >>
-        code_pattern >>
-        (
-          # Option 1: NO. notation (e.g., C22.2 NO. 1:20)
-          (no_notation >> no_number >> (colon_year | dash_year)) |
-          # Option 2: series with prefix (space + prefix + space + keyword + year)
-          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: series without prefix (space + keyword + year)
-          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 4: just year (no series, no NO.)
-          (colon_year | dash_year)
-        ) >>
-        amendment_slash.maybe  # Add amendment support here
+          code_pattern >>
+          (
+            # Option 1: NO. notation (e.g., C22.2 NO. 1:20)
+            (no_notation >> no_number >> (colon_year | dash_year)) |
+            # Option 2: series with prefix (space + prefix + space + keyword + year)
+            (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 3: series without prefix (space + keyword + year)
+            (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 4: just year (no series, no NO.)
+            (colon_year | dash_year)
+          ) >>
+          amendment_slash.maybe # Add amendment support here
       end
 
       # Base CSA code without amendment (for combined identifiers)
       rule(:base_csa_code) do
         publisher >>
-        code_pattern >>
-        (
-          # Option 1: NO. notation
-          (no_notation >> no_number >> (colon_year | dash_year)) |
-          # Option 2: series with prefix
-          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: series without prefix
-          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 4: just year
-          (colon_year | dash_year)
-        )
+          code_pattern >>
+          (
+            # Option 1: NO. notation
+            (no_notation >> no_number >> (colon_year | dash_year)) |
+            # Option 2: series with prefix
+            (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 3: series without prefix
+            (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 4: just year
+            (colon_year | dash_year)
+          )
       end
 
       # Continuation code (optional CSA publisher prefix, for combined identifiers)
       rule(:continuation_code) do
-        (publisher.as(:has_publisher)).maybe >>
-        code_pattern >>
-        (
-          # Option 1: NO. notation
-          (no_notation >> no_number >> (colon_year | dash_year)) |
-          # Option 2: series with prefix
-          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: series without prefix
-          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 4: just year
-          (colon_year | dash_year)
-        ) >>
-        amendment_slash.maybe
+        publisher.as(:has_publisher).maybe >>
+          code_pattern >>
+          (
+            # Option 1: NO. notation
+            (no_notation >> no_number >> (colon_year | dash_year)) |
+            # Option 2: series with prefix
+            (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 3: series without prefix
+            (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 4: just year
+            (colon_year | dash_year)
+          ) >>
+          amendment_slash.maybe
       end
 
       # Bundled portion - code that follows + (base is implied, no CSA prefix)
       # Example: "A2:22" in "CSA C22.2 NO. 60601-1:14 + A2:22"
       rule(:bundled_portion) do
         code_pattern >>
-        (
-          # Option 1: NO. notation
-          (no_notation >> no_number >> (colon_year | dash_year).maybe) |
-          # Option 2: just year or no year
-          (colon_year | dash_year).maybe
-        )
+          (
+            # Option 1: NO. notation
+            (no_notation >> no_number >> (colon_year | dash_year).maybe) |
+            # Option 2: just year or no year
+            (colon_year | dash_year).maybe
+          )
       end
 
       # Bundled identifier with + notation (consolidated documents)
       rule(:bundled_identifier) do
         csa_code.as(:base) >>
-        plus >>
-        bundled_portion.as(:bundled_first) >>
-        (plus >> bundled_portion).repeat.as(:bundled_rest) >>
-        reaffirmation.maybe
+          plus >>
+          bundled_portion.as(:bundled_first) >>
+          (plus >> bundled_portion).repeat.as(:bundled_rest) >>
+          reaffirmation.maybe
       end
 
       # Combined CSA standards with slash
       rule(:combined_slash) do
         base_csa_code.as(:first) >>
-        slash >>
-        continuation_code.as(:second) >>
-        (slash >> continuation_code.as(:third)).maybe >>
-        reaffirmation.maybe >>
-        package_portion.maybe
+          slash >>
+          continuation_code.as(:second) >>
+          (slash >> continuation_code.as(:third)).maybe >>
+          reaffirmation.maybe >>
+          package_portion.maybe
       end
 
       # Combined with comma (CSA B149.1:25, CSA B149.2:25)
       rule(:combined_comma) do
         csa_code.as(:first) >>
-        comma >> space >>
-        csa_code.as(:second) >>
-        reaffirmation.maybe >>
-        (
-          (space >> ampersand >> package_portion) |
-          package_portion
-        ).as(:package_portion).maybe >>
-        str("").as(:comma_separator)  # Mark as comma-based
+          comma >> space >>
+          csa_code.as(:second) >>
+          reaffirmation.maybe >>
+          (
+            (space >> ampersand >> package_portion) |
+            package_portion
+          ).as(:package_portion).maybe >>
+          str("").as(:comma_separator) # Mark as comma-based
       end
 
       # Single identifier with optional package
@@ -261,15 +262,15 @@ module PubidNew
       # Code-only identifier (no CSA prefix) - try this last
       rule(:code_only_identifier) do
         code_pattern >>
-        (
-          # Option 1: series with prefix
-          (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 2: series without prefix
-          (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
-          # Option 3: just year
-          (colon_year | dash_year)
-        ) >>
-        (space >> str("PACKAGE")).as(:package_portion).maybe
+          (
+            # Option 1: series with prefix
+            (space >> series_prefix >> space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 2: series without prefix
+            (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
+            # Option 3: just year
+            (colon_year | dash_year)
+          ) >>
+          (space >> str("PACKAGE")).as(:package_portion).maybe
       end
 
       # Main identifier
@@ -299,14 +300,12 @@ module PubidNew
 
         # Track original publisher prefix
         publisher_prefix = if normalized.start_with?("CAN/CSA-")
-                            "CAN/CSA-"
-                          elsif normalized.start_with?("CAN3-")
-                            "CAN3-"
-                          elsif normalized.start_with?("CSA ")
-                            "CSA"
-                          else
-                            nil
-                          end
+                             "CAN/CSA-"
+                           elsif normalized.start_with?("CAN3-")
+                             "CAN3-"
+                           elsif normalized.start_with?("CSA ")
+                             "CSA"
+                           end
 
         # Normalize CAN/CSA- and CAN3- to CSA (preserving space before code)
         normalized = normalized.gsub("CAN/CSA-", "CSA ")
@@ -333,15 +332,14 @@ module PubidNew
         if hash[:first]
           hash[:first][:publisher_prefix] = prefix
         end
-        if hash[:second]
-          # For combined_comma (has comma_separator), both first and second are full csa_code
-          # For combined_slash (no comma_separator), second is continuation that may have has_publisher
-          if hash[:comma_separator] || hash[:second][:has_publisher]
-            hash[:second][:publisher_prefix] = prefix
-          end
+        # For combined_comma (has comma_separator), both first and second are full csa_code
+        # For combined_slash (no comma_separator), second is continuation that may have has_publisher
+        if hash[:second] && (hash[:comma_separator] || hash[:second][:has_publisher])
+          hash[:second][:publisher_prefix] = prefix
         end
-        if hash[:third]
-          hash[:third][:publisher_prefix] = prefix if hash[:third][:has_publisher]
+        if hash[:third] && hash[:third][:has_publisher]
+          hash[:third][:publisher_prefix] =
+            prefix
         end
 
         # For bundled identifiers

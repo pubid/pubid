@@ -6,7 +6,6 @@ require "pubid-core"
 
 module Pubid
   module Nist
-
   end
 end
 
@@ -19,7 +18,7 @@ require_relative "nist/parser"
 require_relative "nist/renderer/base"
 require_relative "nist/renderer/addendum"
 
-Dir[File.join(__dir__, 'nist/parsers', '*.rb')].each do |file|
+Dir[File.join(__dir__, "nist/parsers", "*.rb")].each do |file|
   require file
 end
 
@@ -39,7 +38,8 @@ require_relative "nist/edition"
 require_relative "nist/identifier/addendum"
 
 config = Pubid::Core::Configuration.new
-config.stages = YAML.load_file(File.join(File.dirname(__FILE__), "../../stages.yaml"))
+config.stages = YAML.load_file(File.join(File.dirname(__FILE__),
+                                         "../../stages.yaml"))
 config.default_type = Pubid::Nist::Identifier::Base
 config.types = [Pubid::Nist::Identifier::Addendum]
 Pubid::Nist::Identifier.set_config(config)

@@ -1,7 +1,7 @@
 module Pubid::Bsi
   module Identifier
     class Collection < Base
-      def_delegators 'Pubid::Bsi::Identifier::Collection', :type
+      def_delegators "Pubid::Bsi::Identifier::Collection", :type
 
       attr_accessor :identifiers
 

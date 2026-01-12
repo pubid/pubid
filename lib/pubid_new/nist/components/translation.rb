@@ -13,7 +13,7 @@ module PubidNew
       #   Translation.new(code: "por").to_s(:mr)    # => ".por"
       #   Translation.new(code: "ind").to_s(:short) # => " ind"
       class Translation < Lutaml::Model::Serializable
-        attribute :code, :string  # 3-letter ISO 639-2 code: spa, por, ind, etc.
+        attribute :code, :string # 3-letter ISO 639-2 code: spa, por, ind, etc.
 
         # Render translation in specified format
         # @param format [:short, :mr, :long] The output format

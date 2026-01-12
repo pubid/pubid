@@ -94,7 +94,9 @@ module Pubid::Iso
     end
 
     context "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" do
-      let(:original) { "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" }
+      let(:original) do
+        "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement"
+      end
       let(:pubid) { "ISO/IEC DIR 1 ISO SUP" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
 

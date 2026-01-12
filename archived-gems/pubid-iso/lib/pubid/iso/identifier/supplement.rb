@@ -28,7 +28,8 @@ module Pubid::Iso
       end
 
       def self.type
-        { key: :sup, title: "Supplement", values: %w[Supplement Suppl SUP], short: "SUP" }
+        { key: :sup, title: "Supplement", values: %w[Supplement Suppl SUP],
+          short: "SUP" }
       end
 
       def self.get_renderer_class

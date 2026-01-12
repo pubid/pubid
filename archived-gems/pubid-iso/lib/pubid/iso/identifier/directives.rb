@@ -4,7 +4,7 @@ require_relative "../renderer/urn-dir"
 module Pubid::Iso
   module Identifier
     class Directives < Base
-      def_delegators 'Pubid::Iso::Identifier::Directives', :type
+      def_delegators "Pubid::Iso::Identifier::Directives", :type
 
       TYPED_STAGES = {}.freeze
 
@@ -27,7 +27,7 @@ module Pubid::Iso
         Renderer::UrnDir.new(to_h(deep: false)).render
       end
 
-      def render_joint_document(joint_document)
+      def render_joint_document(_joint_document)
         # remove "DIR" for short joint document format
         "#{@joint_document}".sub(" DIR", "")
       end

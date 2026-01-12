@@ -12,40 +12,41 @@ module PubidNew
         # With edition: "IEC 60050-102:2007/AMD1:2017 ED1"
         if base_identifier
           parts = []
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
+          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
+                                        with_edition: with_edition)
 
           # Supplement notation
           # Use uppercase abbreviation without space: /AMD1, /COR1
           abbr = typed_stage.abbr.first.upcase
-          supp_part = "/#{abbr}#{number.to_s}"
+          supp_part = "/#{abbr}#{number}"
           supp_part += ":#{date.year}" if date
           parts << supp_part
 
           # Add edition if present
-          parts << " #{edition.to_s}" if edition && edition.number
+          parts << " #{edition}" if edition && edition.number
 
-          result = parts.join
+          parts.join
         else
           # Standalone supplement (no base identifier)
           # Render: "IEC/FDAM 60038-1"
           parts = []
-          
+
           # Publisher portion
           if publisher
             parts << publisher.body
             parts << "/" + copublishers.map(&:body).join("/") if copublishers&.any?
           end
-          
+
           # Supplement type and number with part
           abbr = typed_stage.abbr.first
           number_str = number.to_s
-          number_str += "-#{part.to_s}" if part
-          number_str += "-#{subpart.to_s}" if subpart
+          number_str += "-#{part}" if part
+          number_str += "-#{subpart}" if subpart
           parts << "#{abbr} #{number_str}"
-          
+
           result = parts.join("/")
           result += ":#{date.year}" if date
-          result += " #{edition.to_s}" if edition && edition.number
+          result += " #{edition}" if edition && edition.number
           result
         end
       end

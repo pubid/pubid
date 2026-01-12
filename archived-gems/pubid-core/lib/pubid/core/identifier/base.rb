@@ -23,11 +23,10 @@ module Pubid::Core
       def initialize(publisher:, number:, copublisher: nil, part: nil,
                      year: nil, edition: nil, language: nil, amendments: nil,
                      corrigendums: nil, stage: nil, all_parts: false)
-
         if amendments
           @amendments = amendments.map do |amendment|
             if amendment.is_a?(Hash)
-              self.class.get_transformer_class.new.apply(:amendments => [amendment])[:amendments].first
+              self.class.get_transformer_class.new.apply(amendments: [amendment])[:amendments].first
             else
               amendment
             end
@@ -37,7 +36,7 @@ module Pubid::Core
         if corrigendums
           @corrigendums = corrigendums.map do |corrigendum|
             if corrigendum.is_a?(Hash)
-              self.class.get_transformer_class.new.apply(:corrigendums => [corrigendum])[:corrigendums].first
+              self.class.get_transformer_class.new.apply(corrigendums: [corrigendum])[:corrigendums].first
             else
               corrigendum
             end
@@ -68,13 +67,12 @@ module Pubid::Core
 
           [var.to_s.gsub("@", "").to_sym,
            if value.is_a?(Array)
-             value.map { |v| (v.respond_to?(:to_h) && deep) ? v.to_h : v }
+             value.map { |v| v.respond_to?(:to_h) && deep ? v.to_h : v }
            elsif value.nil?
              nil
            else
-             (value.respond_to?(:to_h) && deep) ? value.to_h : value
-           end
-          ]
+             value.respond_to?(:to_h) && deep ? value.to_h : value
+           end]
         end.to_h
 
         if add_type && respond_to?(:type) && type[:short]
@@ -98,7 +96,8 @@ module Pubid::Core
         when Hash
           to_h == other
         else
-          raise Errors::WrongTypeError, "cannot compare with #{other.class} type"
+          raise Errors::WrongTypeError,
+                "cannot compare with #{other.class} type"
         end
       end
 
@@ -108,12 +107,14 @@ module Pubid::Core
       end
 
       def exclude(*args)
-        nested_exclusions, top_level_exclusions = args.partition { |arg| arg.is_a?(Hash) }
+        nested_exclusions, top_level_exclusions = args.partition do |arg|
+          arg.is_a?(Hash)
+        end
 
         nested_exclusions = nested_exclusions.reduce({}, :merge)
 
         excluded_hash = to_h(add_type: false)
-          .reject { |k, v| top_level_exclusions.include?(k) }
+          .reject { |k, _v| top_level_exclusions.include?(k) }
           .each_with_object({}) do |(k, v), memo|
             memo[k] = if v.is_a?(Hash) && nested_exclusions.key?(k)
                         v.reject { |key, _| nested_exclusions[k].include?(key) }
@@ -173,11 +174,13 @@ module Pubid::Core
       # @return [Boolean] true if another identifier is newer edition
       def new_edition_of?(other)
         if exclude(:year, :edition) != other.exclude(:year, :edition)
-          raise Errors::AnotherDocumentError, "cannot compare edition with #{other}"
+          raise Errors::AnotherDocumentError,
+                "cannot compare edition with #{other}"
         end
 
         if year.nil? || other.year.nil?
-          raise Errors::CannotCompareError, "cannot compare identifier without edition year"
+          raise Errors::CannotCompareError,
+                "cannot compare identifier without edition year"
         end
 
         if year == other.year && (edition || other.edition)
@@ -204,11 +207,15 @@ module Pubid::Core
         #   eg. "ISO 1234", { }
         # @return [Pubid::Core::Identifier] identifier
         def parse(code_or_params)
-          params = code_or_params.is_a?(String) ?
-                     get_parser_class.new.parse(update_old_code(code_or_params)) : code_or_params
+          params = if code_or_params.is_a?(String)
+                     get_parser_class.new.parse(update_old_code(code_or_params))
+                   else
+                     code_or_params
+                   end
           transform(params.is_a?(Array) ? array_to_hash(params) : params)
-        rescue Parslet::ParseFailed => failure
-          raise Errors::ParseError, "#{failure.message}\ncause: #{failure.parse_failure_cause.ascii_tree}"
+        rescue Parslet::ParseFailed => e
+          raise Errors::ParseError,
+                "#{e.message}\ncause: #{e.parse_failure_cause.ascii_tree}"
         end
 
         # Converts array of hashes into single hash
@@ -233,8 +240,8 @@ module Pubid::Core
           # transformation only applied to rules matching the whole hash
 
           identifier_params = params.map do |k, v|
-                                get_transformer_class.new.apply(k => v).to_a.first
-                              end.to_h
+            get_transformer_class.new.apply(k => v).to_a.first
+          end.to_h
 
           new(**identifier_params)
         end
@@ -276,7 +283,9 @@ module Pubid::Core
           return code unless get_update_codes
 
           get_update_codes.each do |from, to|
-            code = code.gsub(from.match?(/^\/.*\/$/) ? Regexp.new(from[1..-2]) : /^#{Regexp.escape(from)}$/, to)
+            code = code.gsub(
+              from.match?(/^\/.*\/$/) ? Regexp.new(from[1..-2]) : /^#{Regexp.escape(from)}$/, to
+            )
           end
           code
         end
@@ -326,7 +335,7 @@ module Pubid::Core
 
           get_identifier.build_typed_stage(harmonized_code:
                                        get_identifier.build_harmonized_stage_code(typed_stage[1][:harmonized_stages]),
-                                     abbr: typed_stage.first)
+                                           abbr: typed_stage.first)
         end
 
         # Resolve typed stage using stage harmonized stage code
@@ -335,7 +344,8 @@ module Pubid::Core
         def resolve_typed_stage(harmonized_code)
           self::TYPED_STAGES.each do |k, v|
             if (v[:harmonized_stages] & harmonized_code.stages) == harmonized_code.stages
-              return get_identifier.build_typed_stage(abbr: k, harmonized_code: harmonized_code)
+              return get_identifier.build_typed_stage(abbr: k,
+                                                      harmonized_code: harmonized_code)
             end
           end
           nil

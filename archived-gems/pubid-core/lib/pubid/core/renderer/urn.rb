@@ -1,8 +1,7 @@
 module Pubid::Core::Renderer
   class Urn < Base
-
     def render_base(params)
-      "urn:iso:std:%{publisher}%{copublisher}%{type}:%{number}%{part}" % params
+      "urn:iso:std:%<publisher>s%<copublisher>s%<type>s:%<number>s%<part>s" % params
     end
 
     def render_identifier(params)
@@ -40,7 +39,6 @@ module Pubid::Core::Renderer
     def render_language(language, _opts, _params)
       ":#{language}"
     end
-
 
     def render_corrigendum_stage(stage, opts, params)
       render_stage(stage, opts, params)

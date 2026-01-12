@@ -45,17 +45,16 @@ module PubidNew
 
         # Check for ISO/ASTM dual-published standards (5xxxx series)
         # These are digit-only identifiers starting with "5"
-        if type.nil? || type.empty?
-          # No explicit type, check if it's a digit-only number
-          if parsed_hash[:number] && !parsed_hash[:letter]
-            number_str = parsed_hash[:number].to_s
-            # If starts with "5", likely ISO/ASTM dual-published
-            if number_str.start_with?("5")
-              return Identifiers::IsoDualPublished
-            end
-            # Other digit-only numbers are still Standard
-            return Identifiers::Standard
+        # No explicit type, check if it's a digit-only number
+        if (type.nil? || type.empty?) && parsed_hash[:number] && !parsed_hash[:letter]
+          number_str = parsed_hash[:number].to_s
+          # If starts with "5", likely ISO/ASTM dual-published
+          if number_str.start_with?("5")
+            return Identifiers::IsoDualPublished
           end
+
+          # Other digit-only numbers are still Standard
+          return Identifiers::Standard
         end
 
         case type
@@ -73,7 +72,7 @@ module PubidNew
           Identifiers::Adjunct
         when "TR"
           Identifiers::TechnicalReport
-        when "ISO/ASTMTR"  # Handle ISO/ASTM Technical Report
+        when "ISO/ASTMTR" # Handle ISO/ASTM Technical Report
           Identifiers::TechnicalReport
         else
           # Default to Standard (A-G prefix)
@@ -97,8 +96,8 @@ module PubidNew
 
       def build_type_specific_attributes(identifier, parsed_hash)
         # Research Report
-        if identifier.is_a?(Identifiers::ResearchReport)
-          identifier.committee = parsed_hash[:committee].to_s if parsed_hash[:committee]
+        if identifier.is_a?(Identifiers::ResearchReport) && parsed_hash[:committee]
+          identifier.committee = parsed_hash[:committee].to_s
         end
 
         # Manual
@@ -109,13 +108,13 @@ module PubidNew
         end
 
         # Monograph
-        if identifier.is_a?(Identifiers::Monograph)
-          identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
+        if identifier.is_a?(Identifiers::Monograph) && parsed_hash[:edition]
+          identifier.edition = parsed_hash[:edition].to_s
         end
 
         # Data Series
-        if identifier.is_a?(Identifiers::DataSeries)
-          identifier.hol_suffix = true if parsed_hash[:hol_suffix]
+        if identifier.is_a?(Identifiers::DataSeries) && parsed_hash[:hol_suffix]
+          identifier.hol_suffix = true
         end
 
         # Adjunct

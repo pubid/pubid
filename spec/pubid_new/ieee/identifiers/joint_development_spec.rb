@@ -81,7 +81,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::JointDevelopment do
       it "IEEE format can be converted to ISO format" do
         ieee_id = PubidNew::Ieee.parse("ISO/IEC/IEEE P26511/D3-2018")
         iso_format = ieee_id.to_s(format: :iso)
-        
+
         expect(iso_format).to include("ISO/IEC/IEEE")
         expect(iso_format).to include("26511")
         expect(iso_format).to include(":2018")
@@ -91,7 +91,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::JointDevelopment do
       it "ISO format can be converted to IEEE format" do
         iso_id = PubidNew::Ieee.parse("ISO/IEC/IEEE FDIS 26511:2018")
         ieee_format = iso_id.to_s(format: :ieee)
-        
+
         expect(ieee_format).to include("ISO/IEC/IEEE")
         expect(ieee_format).to include("P26511")
         expect(ieee_format).to include("-2018")
@@ -116,21 +116,21 @@ RSpec.describe PubidNew::Ieee::Identifiers::JointDevelopment do
     it "maintains NO equivalence between IEEE and ISO stages" do
       # As per IEEE staff guidance: CD ≠ Unapproved Draft
       # They can coexist but are not equivalent
-      
+
       ieee_id = PubidNew::Ieee.parse("ISO/IEC/IEEE P26511/D3-2018")
       iso_id = PubidNew::Ieee.parse("ISO/IEC/IEEE CD 26511:2018")
-      
+
       # Different identifiers, different stages, NO automatic mapping
       expect(ieee_id.typed_stage).not_to eq(iso_id.typed_stage) if ieee_id.typed_stage && iso_id.typed_stage
     end
 
     it "preserves semantic meaning within each system" do
       ieee_id = PubidNew::Ieee.parse("ISO/IEC/IEEE P26511/D8-2018")
-      
+
       # IEEE format preserves P (project) and D8 (draft 8)
       expect(ieee_id.to_s(format: :ieee)).to include("P26511")
       expect(ieee_id.to_s(format: :ieee)).to include("/D8")
-      
+
       # ISO format removes IEEE-specific notation
       iso_format = ieee_id.to_s(format: :iso)
       expect(iso_format).not_to include("/D")

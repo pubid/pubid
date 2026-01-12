@@ -1,8 +1,12 @@
 require "spec_helper"
 
 RSpec.describe "CCSDS Fixture Round-trip Tests" do
-  let(:active_fixtures) { File.readlines("gems/pubid-ccsds/spec/fixtures/active-publications.txt").map(&:strip) }
-  let(:historical_fixtures) { File.readlines("gems/pubid-ccsds/spec/fixtures/historical-publications.txt").map(&:strip) }
+  let(:active_fixtures) do
+    File.readlines("gems/pubid-ccsds/spec/fixtures/active-publications.txt").map(&:strip)
+  end
+  let(:historical_fixtures) do
+    File.readlines("gems/pubid-ccsds/spec/fixtures/historical-publications.txt").map(&:strip)
+  end
   let(:all_fixtures) { active_fixtures + historical_fixtures }
 
   describe "Active publications" do
@@ -23,13 +27,13 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end
@@ -77,13 +81,13 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end
@@ -131,13 +135,13 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end

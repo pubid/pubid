@@ -6,7 +6,7 @@ module PubidNew
   module Jis
     class Parser < Parslet::Parser
       # Japanese character normalization
-      rule(:jp_dash) { str("ｰ") }  # Full-width dash
+      rule(:jp_dash) { str("ｰ") } # Full-width dash
       rule(:jp_space) { str("　") }  # Full-width space
       rule(:jp_colon) { str("：") }  # Full-width colon
       rule(:jp_lparen) { str("（") }

@@ -53,7 +53,7 @@ module Pubid::Iso
       # @see Parser
       def initialize(publisher: "ISO", number: nil, stage: nil, iteration: nil,
                      joint_document: nil, tctype: nil, sctype: nil, wgtype: nil, tcnumber: nil,
-                     scnumber: nil, wgnumber:nil,
+                     scnumber: nil, wgnumber: nil,
                      dir: nil, dirtype: nil, year: nil, amendments: nil,
                      corrigendums: nil, type: nil, base: nil, supplements: nil,
                      part: nil, addendum: nil, edition: nil, jtc_dir: nil, month: nil, **opts)
@@ -63,7 +63,7 @@ module Pubid::Iso
         if supplements
           @supplements = supplements.map do |supplement|
             if supplement.is_a?(Hash)
-              self.class.get_transformer_class.new.apply(:supplements => [supplement])[:supplements].first
+              self.class.get_transformer_class.new.apply(supplements: [supplement])[:supplements].first
             else
               supplement
             end
@@ -73,16 +73,17 @@ module Pubid::Iso
         if stage
           @stage = resolve_stage(stage)
         elsif iteration && !is_a?(Supplement)
-          raise Errors::IterationWithoutStageError, "Document without stage cannot have iteration"
+          raise Errors::IterationWithoutStageError,
+                "Document without stage cannot have iteration"
         end
 
         @iteration = iteration.to_i if iteration
         if joint_document
-          if joint_document.is_a?(Hash)
-            @joint_document = Identifier.create(**joint_document)
-          else
-            @joint_document = joint_document
-          end
+          @joint_document = if joint_document.is_a?(Hash)
+                              Identifier.create(**joint_document)
+                            else
+                              joint_document
+                            end
         end
         if tctype
           @tctype = tctype.is_a?(Array) ? tctype.map(&:to_s) : tctype.to_s
@@ -98,11 +99,11 @@ module Pubid::Iso
           @jtc_dir = jtc_dir
         end
         if base
-          if base.is_a?(Hash)
-            @base = Identifier.create(**base)
-          else
-            @base = base
-          end
+          @base = if base.is_a?(Hash)
+                    Identifier.create(**base)
+                  else
+                    base
+                  end
         end
         @part = part.to_s if part
         @addendum = addendum if addendum
@@ -118,7 +119,9 @@ module Pubid::Iso
         end
 
         def supplement_by_type(supplements, type)
-          supplements.select { |supplement| supplement.type[:key] == type }.first
+          supplements.select do |supplement|
+            supplement.type[:key] == type
+          end.first
         end
 
         def transform_supplements(supplements_params, base_params) # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength,Metrics/PerceivedComplexity
@@ -131,12 +134,17 @@ module Pubid::Iso
           # update corrigendum base to amendment
           elsif supplements_has_type?(supplements, :cor) &&
               (supplements_has_type?(supplements, :amd) ||
-                supplements_has_type?(supplements, :sup)) && supplements.count == 2
+                supplements_has_type?(supplements,
+                                      :sup)) && supplements.count == 2
 
             supplement = supplement_by_type(supplements, :cor)
-            supplement.base = supplement_by_type(supplements, :amd) || supplement_by_type(supplements, :sup)
+            supplement.base = supplement_by_type(supplements,
+                                                 :amd) || supplement_by_type(
+                                                   supplements, :sup
+                                                 )
           else
-            raise Errors::SupplementRenderingError, "don't know how to render provided supplements"
+            raise Errors::SupplementRenderingError,
+                  "don't know how to render provided supplements"
           end
 
           supplement.all_parts = all_parts if all_parts
@@ -158,7 +166,9 @@ module Pubid::Iso
         def transform(params) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
           transformer = get_transformer_class.new
           params = transformer.apply(root: params)
-          identifier_params = params.map { |k, v| transformer.apply(k => v) }.inject({}, :merge)
+          identifier_params = params.map do |k, v|
+            transformer.apply(k => v)
+          end.inject({}, :merge)
 
           # return supplement if supplements applied
           if identifier_params[:supplements].is_a?(Array)
@@ -272,7 +282,8 @@ module Pubid::Iso
       #   :ref_undated -- reference undated: no language code + short form (DAM) + undated
       #   :ref_undated_long -- reference undated long: 1 letter language code + long form (DAmd) + undated
       # @return [String] pubid identifier
-      def to_s(lang: nil, with_edition: false, with_prf: false, format: :ref_dated_long)
+      def to_s(lang: nil, with_edition: false, with_prf: false,
+format: :ref_dated_long)
         options = resolve_format(format)
         options[:with_edition] = with_edition
         options[:with_prf] = with_prf

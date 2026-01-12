@@ -81,7 +81,7 @@ module PubidNew
                       elsif parsed_hash[:colon_format]
                         "colon"
                       else
-                        "colon"  # default
+                        "colon" # default
                       end
 
         if parsed_hash[:year]
@@ -109,11 +109,11 @@ module PubidNew
         # Reaffirmation
         if parsed_hash[:reaffirmation]
           reaffirm_data = parsed_hash[:reaffirmation]
-          if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
-            series.reaffirmation = reaffirm_data[:year].to_s
-          else
-            series.reaffirmation = reaffirm_data.to_s
-          end
+          series.reaffirmation = if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
+                                   reaffirm_data[:year].to_s
+                                 else
+                                   reaffirm_data.to_s
+                                 end
         end
 
         series
@@ -144,7 +144,7 @@ module PubidNew
                       elsif parsed_hash[:colon_format]
                         "colon"
                       else
-                        "colon"  # default
+                        "colon" # default
                       end
 
         if parsed_hash[:year]
@@ -153,11 +153,11 @@ module PubidNew
             # Convert 2-digit year to 4-digit
             # M prefix means 1900s, otherwise 2000s
             year_int = year_str.to_i
-            if parsed_hash[:year_prefix] && parsed_hash[:year_prefix].to_s == "M"
-              cec.year = (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
-            else
-              cec.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
-            end
+            cec.year = if parsed_hash[:year_prefix] && parsed_hash[:year_prefix].to_s == "M"
+                         (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
+                       else
+                         (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+                       end
           else
             cec.year = year_str
           end
@@ -181,11 +181,11 @@ module PubidNew
         # Reaffirmation
         if parsed_hash[:reaffirmation]
           reaffirm_data = parsed_hash[:reaffirmation]
-          if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
-            cec.reaffirmation = reaffirm_data[:year].to_s
-          else
-            cec.reaffirmation = reaffirm_data.to_s
-          end
+          cec.reaffirmation = if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
+                                reaffirm_data[:year].to_s
+                              else
+                                reaffirm_data.to_s
+                              end
         end
 
         cec
@@ -225,13 +225,13 @@ module PubidNew
         combined.third = build_single(parsed_hash[:third]) if parsed_hash[:third]
 
         # Detect separator from parser marker
-        if parsed_hash[:comma_separator]
-          # Combined comma: "CSA X, CSA Y"
-          combined.separator = ", "
-        else
-          # Combined slash: "CSA X/Y" (default)
-          combined.separator = "/"
-        end
+        combined.separator = if parsed_hash[:comma_separator]
+                               # Combined comma: "CSA X, CSA Y"
+                               ", "
+                             else
+                               # Combined slash: "CSA X/Y" (default)
+                               "/"
+                             end
 
         # Handle reaffirmation
         if parsed_hash[:reaffirmation]
@@ -301,7 +301,7 @@ module PubidNew
                       elsif data[:colon_format]
                         "colon"
                       else
-                        "colon"  # default
+                        "colon" # default
                       end
 
         # Year (2-digit needs conversion to 4-digit, 4-digit stays as-is)
@@ -312,11 +312,11 @@ module PubidNew
             # Convert 2-digit year to 4-digit
             # M prefix means 1900s (metric/old standards), otherwise 2000s
             year_int = year_str.to_i
-            if data[:year_prefix] && data[:year_prefix].to_s == "M"
-              identifier.year = (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
-            else
-              identifier.year = (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
-            end
+            identifier.year = if data[:year_prefix] && data[:year_prefix].to_s == "M"
+                                (year_int >= 0 && year_int <= 99 ? "19#{year_str}" : year_str)
+                              else
+                                (year_int >= 0 && year_int <= 99 ? "20#{year_str}" : year_str)
+                              end
           else
             # Keep 4-digit years as-is
             identifier.year = year_str
@@ -341,11 +341,11 @@ module PubidNew
         # Reaffirmation - extract year from nested hash
         if data[:reaffirmation]
           reaffirm_data = data[:reaffirmation]
-          if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
-            identifier.reaffirmation = reaffirm_data[:year].to_s
-          else
-            identifier.reaffirmation = reaffirm_data.to_s
-          end
+          identifier.reaffirmation = if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
+                                       reaffirm_data[:year].to_s
+                                     else
+                                       reaffirm_data.to_s
+                                     end
         end
 
         # Package portion
@@ -362,7 +362,7 @@ module PubidNew
 
         # 1. Check for CAN/CSA- or CAN3- prefix → CanadianAdopted (wrapper)
         if data[:publisher_prefix] &&
-           (data[:publisher_prefix].to_s == "CAN/CSA-" || data[:publisher_prefix].to_s == "CAN3-")
+            ["CAN/CSA-", "CAN3-"].include?(data[:publisher_prefix].to_s)
           require_relative "identifiers/canadian_adopted"
           return Identifiers::CanadianAdopted
         end

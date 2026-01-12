@@ -11,7 +11,8 @@ module PubidNew
         parsed = Parser.parse(input)
         Builder.build(parsed)
       rescue Parslet::ParseFailed => e
-        raise Errors::ParseError, "Failed to parse SAE identifier: #{input}\n#{e.message}"
+        raise Errors::ParseError,
+              "Failed to parse SAE identifier: #{input}\n#{e.message}"
       end
     end
   end

@@ -13,29 +13,29 @@ module PubidNew
 
         def to_s
           result = base ? base.to_s : "#{publisher}-#{sector}"
-          
+
           # Add series if no base
           if !base && series
             result += " #{series}"
           end
-          
+
           result += " Suppl. #{number}"
-          
+
           # Add date if present
           if date
-            if date.month
-              result += " (#{date.month}/#{date.year})"
-            else
-              result += " (#{date.year})"
-            end
+            result += if date.month
+                        " (#{date.month}/#{date.year})"
+                      else
+                        " (#{date.year})"
+                      end
           end
-          
+
           result
         end
 
         def ==(other)
           return false unless other.is_a?(Supplement)
-          
+
           base == other.base &&
             number == other.number &&
             date == other.date

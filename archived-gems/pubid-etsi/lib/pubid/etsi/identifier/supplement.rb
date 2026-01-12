@@ -9,7 +9,7 @@ module Pubid::Etsi
       end
 
       def to_h(**args)
-        @base.to_h(**args).merge(self.type[:key] => super)
+        @base.to_h(**args).merge(type[:key] => super)
       end
     end
   end

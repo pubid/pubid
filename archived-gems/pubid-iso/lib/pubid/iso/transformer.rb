@@ -62,7 +62,7 @@ module Pubid::Iso
       { type: russian_type&.downcase&.to_sym || convert_type(context[:type]) }
     end
 
-    rule(tctype: subtree(:tctype))  do |context|
+    rule(tctype: subtree(:tctype)) do |context|
       context[:type] = :tc
       context
     end

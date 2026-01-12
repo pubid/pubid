@@ -1,7 +1,7 @@
 module Pubid::Bsi
   module Identifier
     class DraftDocument < Base
-      def_delegators 'Pubid::Bsi::Identifier::DraftDocument', :type
+      def_delegators "Pubid::Bsi::Identifier::DraftDocument", :type
 
       def self.type
         { key: :dd, title: "Draft Document", short: "DD" }

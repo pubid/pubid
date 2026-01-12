@@ -7,7 +7,7 @@ module PubidNew
       # Single Responsibility: Represents a single amendment with number and year
       class Amendment < Lutaml::Model::Serializable
         attribute :number, :string
-        attribute :year, :string, default: -> { nil }
+        attribute :year, :string, default: -> {}
 
         def to_s
           result = "AMD#{number}"
@@ -23,13 +23,13 @@ module PubidNew
         attribute :amendments, Amendment, collection: true
 
         def to_s
-          amendments.map { |amd| "+#{amd.to_s}" }.join
+          amendments.map { |amd| "+#{amd}" }.join
         end
 
         # Parse consolidated amendment string like "+AMD1:2020+AMD2:2022"
         # Each amendment has number and optional year
         def self.parse(string)
-          amendment_parts = string.split('+').reject(&:empty?)
+          amendment_parts = string.split("+").reject(&:empty?)
 
           amendments = amendment_parts.map do |part|
             # Parse "AMD1:2020" format
@@ -37,8 +37,6 @@ module PubidNew
               Amendment.new(number: $1, year: $2)
             elsif part =~ /AMD(\d+)/
               Amendment.new(number: $1)
-            else
-              nil
             end
           end.compact
 

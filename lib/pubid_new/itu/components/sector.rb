@@ -8,7 +8,7 @@ module PubidNew
       # ITU Sector component
       # Values: R (Radio), T (Telecommunications), D (Development)
       class Sector < Lutaml::Model::Serializable
-        attribute :sector, :string  # R, T, or D
+        attribute :sector, :string # R, T, or D
 
         VALID_SECTORS = %w[R T D].freeze
 
@@ -16,6 +16,7 @@ module PubidNew
           unless VALID_SECTORS.include?(sector.to_s.upcase)
             raise ArgumentError, "Invalid sector: #{sector}. Must be R, T, or D"
           end
+
           @sector = sector.to_s.upcase
         end
 
@@ -25,6 +26,7 @@ module PubidNew
 
         def ==(other)
           return false unless other.is_a?(Sector)
+
           sector == other.sector
         end
       end

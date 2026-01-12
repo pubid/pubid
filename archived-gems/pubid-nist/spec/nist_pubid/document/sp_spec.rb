@@ -417,7 +417,6 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     it "has correct iteration" do
       expect(subject.stage.to_s).to eq("ipd")
     end
-
   end
 
   context "NIST SP 1800-19 (Draft)" do

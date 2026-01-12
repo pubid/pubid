@@ -101,53 +101,53 @@ module PubidNew
         # Walk up supplement chain to collect all supplements
         current = identifier
         supplement_chain = []
-        
+
         while current.is_a?(SupplementIdentifier)
-          supplement_chain.unshift(current)  # Add to front (reverse order)
+          supplement_chain.unshift(current) # Add to front (reverse order)
           current = current.base_identifier
         end
-        
+
         # Now 'current' is the base document (not a supplement)
         base_id = current
-        
+
         # Build URN from base identifier
         parts = ["urn", "iso", "std"]
-        
+
         if base_id
           base_gen = self.class.new(base_id)
-          
+
           # Publisher
           parts << base_gen.send(:originator_component)
-          
+
           # Type (for non-IS types like TR, TS, Guide)
           type_comp = base_gen.send(:type_component)
           parts << type_comp if type_comp
-          
+
           # Number
           parts << base_id.number.value if base_id.number
-          
+
           # Part
           part_comp = base_gen.send(:part_component)
           parts << part_comp if part_comp
-          
+
           # Collect ALL editions (base + supplements) and add them here
           # This ensures editions come before all supplement chains
           all_editions = []
-          
+
           # Base edition first
           edition_comp = base_gen.send(:edition_component)
           all_editions << edition_comp if edition_comp
-          
+
           # Then supplement editions
           supplement_chain.each do |supp|
             if supp.edition && supp.edition.number
               all_editions << "ed-#{supp.edition.number}"
             end
           end
-          
+
           # Add all editions to parts
           parts.concat(all_editions)
-          
+
           # Base stage logic:
           # - Include if base is proposal stage (10.xx) and supplement has different stage
           # - Don't include if base is approval/publication stage (50.xx, 60.xx)
@@ -159,7 +159,7 @@ module PubidNew
               supp_gen = self.class.new(supp)
               supp_gen.send(:stage_component)
             end.compact
-            
+
             # Only include base stage if:
             # 1. No supplements have a stage, OR
             # 2. Base is proposal stage (starts with "stage-10.") AND supplements don't duplicate it
@@ -169,32 +169,32 @@ module PubidNew
               parts << base_stage_comp
             end
           end
-          
+
           # Base language (if present)
           if base_id.languages&.any?
             lang_comp = base_id.languages.map(&:code).join(",")
             parts << lang_comp
           end
         end
-        
+
         # Now flatten all supplements in order
         supplement_chain.each do |supp|
           supp_gen = self.class.new(supp)
-          
+
           # Supplement stage (for draft supplements)
           # Note: editions are added at base level, not here
           stage_comp = supp_gen.send(:stage_component)
           parts << stage_comp if stage_comp
-          
+
           # Supplement type code (amd, cor, sup)
           suppl_type = supp_gen.send(:supplement_type_component)
           parts << suppl_type if suppl_type
-          
+
           # Year and version (following RFC 5141-bis supplement semantics)
           if supp.date
             # With date: year:vN
             parts << supp.date.year.to_s
-            
+
             # Version with "v" prefix
             # Amendments/Corrigenda keep iteration, generic Supplements don't
             if supp.number
@@ -209,7 +209,7 @@ module PubidNew
             if supp.number
               parts << supp.number.value
             end
-            
+
             # Always add "v1" when no date
             # Amendments/Corrigenda keep iteration, generic Supplements don't
             if supp.stage_iteration && !supp.is_a?(PubidNew::Iso::Identifiers::Supplement)
@@ -218,14 +218,14 @@ module PubidNew
               parts << "v1"
             end
           end
-          
+
           # Supplement language (RFC 5141-bis: explicit specification)
           if supp.languages&.any?
             lang_comp = supp.languages.map(&:code).join(",")
             parts << lang_comp
           end
         end
-        
+
         parts.join(":")
       end
 
@@ -280,7 +280,7 @@ module PubidNew
       # RFC 5141-bis: supports typed stage codes (WD, CD, DIS, FDIS, etc.)
       def stage_component
         return nil unless identifier.typed_stage
-        
+
         stage_code = identifier.typed_stage.stage_code
         return nil if !stage_code || stage_code == :published
 
@@ -300,31 +300,32 @@ module PubidNew
         # This handles stages like PWI, NP, AWI, PRF that don't have typed abbreviations
         harmonized_codes = identifier.typed_stage.harmonized_stages
         return nil unless harmonized_codes && harmonized_codes.any?
-        
+
         # Use first harmonized code from the array
         harmonized_code = harmonized_codes.first
-        
+
         # Skip published documents (60.00, 60.60) EXCEPT for PRF (Proof) stage
         # PRF is at 60.00 but should still be included in URNs
-        if harmonized_code.start_with?("60.")
-          return nil unless stage_code.to_s == "prf"
+        if harmonized_code.start_with?("60.") && !(stage_code.to_s == "prf")
+          return nil
         end
 
         # Format as stage-XX.XX
         stage_part = "stage-#{harmonized_code}"
-        
+
         # For base identifiers (not supplements), include iteration in stage code
         # For supplements, iteration goes in the version part (v1.2)
         if identifier.stage_iteration && !identifier.is_a?(SupplementIdentifier)
           stage_part += ".v#{identifier.stage_iteration.value}"
         end
-        
+
         stage_part
       end
 
       # Generate edition component
       def edition_component
         return nil unless identifier.edition && identifier.edition.number
+
         "ed-#{identifier.edition.number}"
       end
 
@@ -361,11 +362,11 @@ module PubidNew
 
           # Version number with "v" prefix
           if identifier.number
-            if identifier.stage_iteration
-              parts << "v#{identifier.number.value}.#{identifier.stage_iteration.value}"
-            else
-              parts << "v#{identifier.number.value}"
-            end
+            parts << if identifier.stage_iteration
+                       "v#{identifier.number.value}.#{identifier.stage_iteration.value}"
+                     else
+                       "v#{identifier.number.value}"
+                     end
           end
         else
           # Without year: number directly or "v1"
@@ -374,11 +375,11 @@ module PubidNew
           end
 
           # Version with iteration if present
-          if identifier.stage_iteration
-            parts << "v1.#{identifier.stage_iteration.value}"
-          else
-            parts << "v1"
-          end
+          parts << if identifier.stage_iteration
+                     "v1.#{identifier.stage_iteration.value}"
+                   else
+                     "v1"
+                   end
         end
 
         parts

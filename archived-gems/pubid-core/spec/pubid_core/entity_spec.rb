@@ -2,8 +2,9 @@ module Pubid::Core
   class TestEntity < Entity
     attr_accessor :type, :number
 
-    def initialize(type:,number:)
-      @number, @type = number, type
+    def initialize(type:, number:)
+      @number = number
+      @type = type
     end
   end
 

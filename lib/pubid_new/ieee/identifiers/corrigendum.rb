@@ -19,8 +19,8 @@ module PubidNew
           Components::TypedStage.new(
             abbr: ["Cor"],
             type_code: "corrigendum",
-            stage_code: "published"
-          )
+            stage_code: "published",
+          ),
         ].freeze
 
         def to_s
@@ -29,7 +29,7 @@ module PubidNew
           # Format: BASE/Cor NUMBER-YEAR or BASE/Cor. NUMBER-YEAR
           result = base_identifier.to_s
           result += "/Cor"
-          result += ". " if cor_number  # Add period and space for formal format
+          result += ". " if cor_number # Add period and space for formal format
           result += cor_number if cor_number
           result += "-#{cor_year}" if cor_year
           result

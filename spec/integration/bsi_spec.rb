@@ -37,7 +37,7 @@ RSpec.describe "BSI Integration Tests" do
 
     # Adopted BS-wrapped documents
     ["BS ISO/IEC 30134-1:2016"],
-    ["BS ISO/PRF PAS 5643", "BS ISO/PRF PAS 5643"],  # v2 preserves PRF correctly
+    ["BS ISO/PRF PAS 5643", "BS ISO/PRF PAS 5643"], # v2 preserves PRF correctly
     ["BS ISO/DIS 22000:2017"],
     ["BS ISO/DIS 9004.1:2017"],
     ["BS ISO/FDIS 22301:2012"],
@@ -70,20 +70,23 @@ RSpec.describe "BSI Integration Tests" do
     # National Annexes
     ["NA to BS EN 1999-1-2:2007"],
     ["NA+A1:2012 to BS EN 1993-5:2007"],
-    ["NA+A1:15 to BS EN 1993-1-4:2006+A1:2015", "NA+A1:2015 to BS EN 1993-1-4:2006+A1:2015"],
-    ["NA+A2:18 to BS EN 1991-1-3:2003+A1:2015", "NA+A2:2018 to BS EN 1991-1-3:2003+A1:2015"],
+    ["NA+A1:15 to BS EN 1993-1-4:2006+A1:2015",
+     "NA+A1:2015 to BS EN 1993-1-4:2006+A1:2015"],
+    ["NA+A2:18 to BS EN 1991-1-3:2003+A1:2015",
+     "NA+A2:2018 to BS EN 1991-1-3:2003+A1:2015"],
 
     # Translations
     ["BS 25999-1:2006 (German)"],
     ["PAS 99:2006 (Italian Translation)", "PAS 99:2006 (Italian)"],
     ["PAS 9017:2020+C1 SPANISH TRANSLATION", "PAS 9017:2020+C1 (Spanish)"],
-    ["BS ISO/IEC 17799:2005 (French version)", "BS ISO/IEC 17799:2005 (French)"],
+    ["BS ISO/IEC 17799:2005 (French version)",
+     "BS ISO/IEC 17799:2005 (French)"],
 
     # PDF
     ["PD 5500:2018+A3:2020 PDF"],
 
     # Collections
-    ["PAS 2035/2030:2019+A1:2022"]
+    ["PAS 2035/2030:2019+A1:2022"],
   ]
 
   test_cases.each do |test_input, expected_output|

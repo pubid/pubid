@@ -14,10 +14,10 @@ module PubidNew
       # Base class for all IEEE identifiers
       class Base < Lutaml::Model::Serializable
         attribute :publisher, :string, default: -> { "IEEE" }
-        attribute :copublisher, :string, collection: true  # IEC, ISO, ANSI, etc.
-        attribute :code, :string                            # Will store code as object in initialize
+        attribute :copublisher, :string, collection: true # IEC, ISO, ANSI, etc.
+        attribute :code, :string # Will store code as object in initialize
         attribute :year, :string
-        attribute :type, :string, default: -> { "Std" }    # Std, Draft Std
+        attribute :type, :string, default: -> { "Std" } # Std, Draft Std
         attribute :draft_status, :string                    # Unapproved, Approved, Active Unapproved
         attribute :draft, :string                           # Will store draft as object
         attribute :edition, :string                         # Edition 1.0
@@ -30,17 +30,21 @@ module PubidNew
         attribute :incorporates, Base, collection: true     # Incorporated documents
         attribute :supersedes, Base, collection: true       # Superseded documents
         attribute :supplement_to, Base                      # For supplements
-        attribute :iso_identifier, :string                   # For IEC/IEEE formats
+        attribute :iso_identifier, :string # For IEC/IEEE formats
         attribute :parenthetical_content, :string           # Raw parenthetical content
         attribute :note, :string                            # Parenthetical notes
         attribute :adoption, :string                        # Adoption notes
         attribute :amendment_to, :string                    # Amendment to relationships
         attribute :edition_month, :string                   # Month part from Edition YYYY-MM
-        attribute :space_before_draft, :boolean, default: -> { false }  # Track space before /D
-        attribute :typed_stage, Components::TypedStage      # TYPED_STAGE integration
-        attribute :relationships, Components::Relationship, collection: true  # Relationship metadata
-        attribute :nickname, :string                        # Book nickname (e.g., "[The Orange Book]")
-        attribute :interpretation, :boolean, default: -> { false }  # /INT notation
+        attribute :space_before_draft, :boolean, default: -> {
+          false
+        } # Track space before /D
+        attribute :typed_stage, Components::TypedStage # TYPED_STAGE integration
+        attribute :relationships, Components::Relationship, collection: true # Relationship metadata
+        attribute :nickname, :string # Book nickname (e.g., "[The Orange Book]")
+        attribute :interpretation, :boolean, default: -> {
+          false
+        } # /INT notation
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -72,15 +76,16 @@ module PubidNew
             require_relative "../components/draft"
             if args[:draft].is_a?(String)
               # Try to parse the string to extract version/revision
-              if args[:draft].match(/^D(\d+)(?:\.(\d+))?/)
+              if args[:draft] =~ /^D(\d+)(?:\.(\d+))?/
                 version = $1
                 revision = $2
-                self.draft_obj = Components::Draft.new(version: version, revision: revision)
+                self.draft_obj = Components::Draft.new(version: version,
+                                                       revision: revision)
               else
                 # Simple case - treat as version
                 self.draft_obj = Components::Draft.new(version: args[:draft])
               end
-              self.draft = self.draft_obj.to_s
+              self.draft = draft_obj.to_s
             else
               self.draft_obj = args[:draft]
               self.draft = args[:draft].to_s if args[:draft].respond_to?(:to_s)
@@ -89,7 +94,8 @@ module PubidNew
 
           # Set other attributes
           args.each do |key, value|
-            next if key == :code || key == :draft
+            next if %i[code draft].include?(key)
+
             send("#{key}=", value) if respond_to?("#{key}=")
           end
         end
@@ -106,6 +112,7 @@ module PubidNew
         # Expose numeric month from draft if available
         def draft_month
           return nil unless draft_obj&.respond_to?(:numeric_month)
+
           draft_obj.numeric_month
         end
 
@@ -134,7 +141,7 @@ module PubidNew
 
                 return Identifiers::DualPublished.new(
                   first_identifier: first,
-                  second_identifier: second
+                  second_identifier: second,
                 )
               rescue Parslet::ParseFailed
                 # If parsing fails, continue with normal flow
@@ -145,33 +152,43 @@ module PubidNew
           # PREPROCESS: Handle (R####) (Revision of...) pattern
           # Convert to single parenthetical: (Reaffirmed ####, Revision of...)
           # This allows parser to capture both in one parenthetical
-          if input.match(/\(R(\d{4})\)\s*\(Revision of ([^)]+)\)/)
+          if input =~ /\(R(\d{4})\)\s*\(Revision of ([^)]+)\)/
             year = $1
-            revision_of = $2
+            $2
             # Replace the two parentheticals with reaffirmed info extracted
             # Parse normally but capture year first
-            input_modified = input.sub(/\(R(\d{4})\)\s*\(Revision of ([^)]+)\)/, "(Revision of \\2)")
+            input_modified = input.sub(
+              /\(R(\d{4})\)\s*\(Revision of ([^)]+)\)/, "(Revision of \\2)"
+            )
 
             # Parse the modified input
             result = parse_single(input_modified)
             # Add reaffirmed attribute
-            result.instance_variable_set(:@reaffirmed, year) if result.respond_to?(:reaffirmed=)
+            if result.respond_to?(:reaffirmed=)
+              result.instance_variable_set(:@reaffirmed,
+                                           year)
+            end
             result.reaffirmed = year if result.respond_to?(:reaffirmed=)
             return result
           end
 
           # PREPROCESS: Handle (Reaffirmed ####) (Revision of...) pattern (full word format)
           # Pattern: "ANSI/IEEE Std 101-1987 (Reaffirmed 2010) (Revision of IEEE Std 101-1972)"
-          if input.match(/\(Reaffirmed\s+(\d{4})\)\s*\(Revision of ([^)]+)\)/)
+          if input =~ /\(Reaffirmed\s+(\d{4})\)\s*\(Revision of ([^)]+)\)/
             year = $1
-            revision_of = $2
+            $2
             # Replace the two parentheticals
-            input_modified = input.sub(/\(Reaffirmed\s+(\d{4})\)\s*\(Revision of ([^)]+)\)/, "(Revision of \\2)")
+            input_modified = input.sub(
+              /\(Reaffirmed\s+(\d{4})\)\s*\(Revision of ([^)]+)\)/, "(Revision of \\2)"
+            )
 
             # Parse the modified input
             result = parse_single(input_modified)
             # Add reaffirmed attribute
-            result.instance_variable_set(:@reaffirmed, year) if result.respond_to?(:reaffirmed=)
+            if result.respond_to?(:reaffirmed=)
+              result.instance_variable_set(:@reaffirmed,
+                                           year)
+            end
             result.reaffirmed = year if result.respond_to?(:reaffirmed=)
             return result
           end
@@ -180,8 +197,8 @@ module PubidNew
           # Pattern after preprocessing: "IEEE Std 218-1956 (R1980) (56 IRE 28.S2)"
           # First parenthetical: (Rxxx) reaffirmed
           # Second parenthetical: IRE identifier
-          if input.match(/\(R\d{4}\)\s*\((\d+\s+IRE[^)]+)\)/)
-            main_part = input.split(" (R").first.strip  # Get "IEEE Std 218-1956"
+          if /\(R\d{4}\)\s*\((\d+\s+IRE[^)]+)\)/.match?(input)
+            main_part = input.split(" (R").first.strip # Get "IEEE Std 218-1956"
             reaffirmed_year = input.match(/\(R(\d{4})\)/)[1]
             ire_part = input.match(/\((\d+\s+IRE[^)]+)\)/)[1]
 
@@ -196,7 +213,7 @@ module PubidNew
 
               return Identifiers::DualPublished.new(
                 first_identifier: ieee_id,
-                second_identifier: ire_id
+                second_identifier: ire_id,
               )
             rescue Parslet::ParseFailed
               # If parsing fails, fall through to regular processing
@@ -207,7 +224,8 @@ module PubidNew
           # This must be checked before " and " pattern
           # Look for pattern where a second publisher appears after the first complete identifier
           # Publishers: IEEE, AIEE, ANSI, ASA, IEC, ISO, ASTM, NACE, NSF, ASHRAE, NCTA, AESC
-          publishers = %w[IEEE AIEE ANSI ASA IEC ISO ASTM NACE NSF ASHRAE NCTA AESC]
+          publishers = %w[IEEE AIEE ANSI ASA IEC ISO ASTM NACE NSF ASHRAE NCTA
+                          AESC]
 
           # Find all positions where publishers appear
           publisher_positions = []
@@ -215,7 +233,8 @@ module PubidNew
             # Look for publisher at word boundaries (preceded by space or start of string)
             regex = /(?:^|\s)(#{Regexp.escape(pub)})(?:\s|\/)/
             input.scan(regex) do
-              publisher_positions << { pos: Regexp.last_match.begin(1), publisher: pub }
+              publisher_positions << { pos: Regexp.last_match.begin(1),
+                                       publisher: pub }
             end
           end
 
@@ -230,7 +249,7 @@ module PubidNew
             second_pub = publisher_positions[1]
 
             # Get the substring between the two publishers
-            between = input[first_pub[:pos]..second_pub[:pos]-1]
+            between = input[first_pub[:pos]..second_pub[:pos] - 1]
 
             # If there's no slash and no " and ", this might be space-separated dual
             if !between.include?("/") && !between.include?(" and ")
@@ -252,7 +271,7 @@ module PubidNew
                 # Only treat as dual if both parse successfully
                 return Identifiers::DualPublished.new(
                   first_identifier: first,
-                  second_identifier: second
+                  second_identifier: second,
                 )
               rescue Parslet::ParseFailed
                 # If parsing fails, continue with normal flow
@@ -269,11 +288,11 @@ module PubidNew
             and_position = nil
 
             input.each_char.with_index do |char, i|
-              paren_count += 1 if char == '('
-              paren_count -= 1 if char == ')'
+              paren_count += 1 if char == "("
+              paren_count -= 1 if char == ")"
 
               # Check if " and " starts at this position and we're outside parens
-              if paren_count == 0 && input[i..i+4] == " and "
+              if paren_count == 0 && input[i..i + 4] == " and "
                 and_outside_parens = true
                 and_position = i
                 break
@@ -284,7 +303,7 @@ module PubidNew
             if and_outside_parens && and_position
               # Split at the found position only (not at all " and " occurrences)
               first_part = input[0...and_position].strip
-              second_part = input[and_position+5..-1].strip
+              second_part = input[and_position + 5..-1].strip
 
               # Parse each part separately
               first = parse_single(first_part)
@@ -292,7 +311,7 @@ module PubidNew
 
               return Identifiers::DualPublished.new(
                 first_identifier: first,
-                second_identifier: second
+                second_identifier: second,
               )
             end
           end
@@ -304,11 +323,11 @@ module PubidNew
             ampersand_outside_parens = false
 
             input.each_char.with_index do |char, i|
-              paren_count += 1 if char == '('
-              paren_count -= 1 if char == ')'
+              paren_count += 1 if char == "("
+              paren_count -= 1 if char == ")"
 
               # Check if " & " starts at this position and we're outside parens
-              if paren_count == 0 && input[i..i+2] == " & "
+              if paren_count == 0 && input[i..i + 2] == " & "
                 ampersand_outside_parens = true
                 break
               end
@@ -324,7 +343,7 @@ module PubidNew
 
                 return Identifiers::DualPublished.new(
                   first_identifier: first,
-                  second_identifier: second
+                  second_identifier: second,
                 )
               end
             end
@@ -346,7 +365,7 @@ module PubidNew
 
                 return Identifiers::AdoptedStandard.new(
                   ieee_identifier: aiee_id,
-                  adopted_identifier: asa_id
+                  adopted_identifier: asa_id,
                 )
               rescue Parslet::ParseFailed
                 # If parsing fails, fall through to regular processing
@@ -367,11 +386,11 @@ module PubidNew
             # AND exclude multi-part adoptions (containing commas)
             # AND exclude Pattern 4 relationship types
             if main_part && adoption_part &&
-               !adoption_part.include?(",") &&  # Skip multi-part adoptions
-               !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Incorporates|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|redesignated as|Supersedes|Supercedes|Includes|Previously designated as|Notebooks|Standard Newspaper)/i) &&
-               (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
-                adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
-                adoption_part.match?(/\bStd\s+\d+/))
+                !adoption_part.include?(",") && # Skip multi-part adoptions
+                !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Incorporates|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|redesignated as|Supersedes|Supercedes|Includes|Previously designated as|Notebooks|Standard Newspaper)/i) &&
+                (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
+                 adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
+                 adoption_part.match?(/\bStd\s+\d+/))
               # Parse the main IEEE identifier
               ieee_id = parse_single(main_part)
 
@@ -380,7 +399,7 @@ module PubidNew
 
               return Identifiers::AdoptedStandard.new(
                 ieee_identifier: ieee_id,
-                adopted_identifier: adopted_id
+                adopted_identifier: adopted_id,
               )
             end
             # If it doesn't look like an identifier, let the parser handle it as additional_parameters
@@ -392,7 +411,7 @@ module PubidNew
 
         # Parse a single IEEE identifier
         def self.parse_single(input)
-          parsed = Parser.parse(input)  # Use class method for preprocessing
+          parsed = Parser.parse(input) # Use class method for preprocessing
           builder = Builder.new(Base)
           # Pass the original input string to builder for context
           builder.instance_variable_set(:@original_input, input)
@@ -469,7 +488,7 @@ module PubidNew
             # Format: ", Month Day, Year" or ", Month Year"
             result += ", #{month}"
             result += " #{day}" if day
-            result += " #{year}" if year && !edition  # Don't duplicate year if already in edition
+            result += " #{year}" if year && !edition # Don't duplicate year if already in edition
           end
 
           # Add parenthetical content if present

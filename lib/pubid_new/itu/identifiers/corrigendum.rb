@@ -11,29 +11,29 @@ module PubidNew
       class Corrigendum < Supplement
         def to_s
           result = base ? base.to_s : "#{publisher}-#{sector}"
-          
+
           # Add series if no base
           if !base && series
             result += " #{series}"
           end
-          
+
           result += " Cor. #{number}"
-          
+
           # Add date if present
           if date
-            if date.month
-              result += " (#{date.month}/#{date.year})"
-            else
-              result += " (#{date.year})"
-            end
+            result += if date.month
+                        " (#{date.month}/#{date.year})"
+                      else
+                        " (#{date.year})"
+                      end
           end
-          
+
           result
         end
 
         def ==(other)
           return false unless other.is_a?(Corrigendum)
-          
+
           base == other.base &&
             number == other.number &&
             date == other.date

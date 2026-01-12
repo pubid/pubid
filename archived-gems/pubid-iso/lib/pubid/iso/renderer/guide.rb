@@ -4,15 +4,13 @@ module Pubid::Iso::Renderer
   class Guide < Base
     def render_identifier(params, opts)
       if opts[:language] == :french
-        "Guide %{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
+        "Guide %<publisher>s%<stage>s %<number>s%<part>s%<iteration>s%<year>s%<amendments>s%<corrigendums>s%<edition>s" % params
       elsif opts[:language] == :russian
-        "Руководство %{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
+        "Руководство %<publisher>s%<stage>s %<number>s%<part>s%<iteration>s%<year>s%<amendments>s%<corrigendums>s%<edition>s" % params
+      elsif params[:stage] && params[:stage].is_a?(Pubid::Core::TypedStage)
+        "%<publisher>s%<stage>s %<number>s%<part>s%<iteration>s%<year>s%<amendments>s%<corrigendums>s%<edition>s" % params
       else
-        if params[:stage] && params[:stage].is_a?(Pubid::Core::TypedStage)
-          "%{publisher}%{stage} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
-        else
-          "%{publisher}%{stage} Guide %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{edition}" % params
-        end
+        "%<publisher>s%<stage>s Guide %<number>s%<part>s%<iteration>s%<year>s%<amendments>s%<corrigendums>s%<edition>s" % params
       end
     end
   end

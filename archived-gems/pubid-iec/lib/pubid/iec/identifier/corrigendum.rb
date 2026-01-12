@@ -4,7 +4,7 @@ require_relative "../renderer/urn_corrigendum"
 module Pubid::Iec
   module Identifier
     class Corrigendum < Supplement
-      def_delegators 'Pubid::Iec::Identifier::Corrigendum', :type
+      def_delegators "Pubid::Iec::Identifier::Corrigendum", :type
 
       TYPED_STAGES = {
         cdcor: {
@@ -21,7 +21,7 @@ module Pubid::Iec
           abbr: "FDCOR",
           name: "Final Draft Corrigendum",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
       def self.type

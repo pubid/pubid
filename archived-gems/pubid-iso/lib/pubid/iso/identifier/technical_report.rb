@@ -3,7 +3,7 @@ require_relative "../renderer/technical_report"
 module Pubid::Iso
   module Identifier
     class TechnicalReport < Base
-      def_delegators 'Pubid::Iso::Identifier::TechnicalReport', :type
+      def_delegators "Pubid::Iso::Identifier::TechnicalReport", :type
 
       TYPED_STAGES = {
         dtr: {

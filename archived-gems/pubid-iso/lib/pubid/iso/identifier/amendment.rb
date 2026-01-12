@@ -29,7 +29,10 @@ module Pubid::Iso
       end
 
       def urn
-        raise Errors::NoEditionError, "Base document must have edition" unless base_has_edition?
+        unless base_has_edition?
+          raise Errors::NoEditionError,
+                "Base document must have edition"
+        end
 
         Renderer::UrnAmendment.new(to_h(deep: false)).render
       end

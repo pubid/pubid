@@ -6,7 +6,7 @@ module Pubid::Nist
           parts.repeat >> draft.maybe >> stage.maybe >> translation.maybe
       end
 
-      rule(:month_letters) { match('[A-Za-z]').repeat(3, 3) }
+      rule(:month_letters) { match("[A-Za-z]").repeat(3, 3) }
       rule(:number_suffix) { match("[aA-Z]") }
 
       rule(:parts) do
@@ -72,7 +72,7 @@ module Pubid::Nist
       end
 
       rule(:revision) do
-        str("r") >> ((digits >> match("[a-z]").maybe).maybe).as(:revision)
+        str("r") >> (digits >> match("[a-z]").maybe).maybe.as(:revision)
       end
 
       rule(:volume) do

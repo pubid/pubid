@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Ccsds
   module Identifier
@@ -10,7 +10,8 @@ module Pubid::Ccsds
       attribute :book_color, :string
 
       def self.type
-        { key: :ccsds, title: "The Consultative Committee for Space Data Systems" }
+        { key: :ccsds,
+          title: "The Consultative Committee for Space Data Systems" }
       end
 
       def initialize(publisher: "CCSDS", book_color: nil, part: nil,
@@ -28,9 +29,10 @@ module Pubid::Ccsds
           Identifier.create(
             type: type,
             base: transform(
-              **identifier_params.dup.tap { |h| h.delete(type) }),
+              **identifier_params.dup.tap { |h| h.delete(type) },
+            ),
             **identifier_params[type],
-            )
+          )
         end
 
         # Use Identifier#create to resolve identifier's type class
@@ -40,7 +42,10 @@ module Pubid::Ccsds
           end.inject({}, :merge)
 
           %i(corrigendum).each do |type|
-            return transform_supplements(type, identifier_params) if identifier_params[type]
+            if identifier_params[type]
+              return transform_supplements(type,
+                                           identifier_params)
+            end
           end
           Identifier.create(**identifier_params)
         end

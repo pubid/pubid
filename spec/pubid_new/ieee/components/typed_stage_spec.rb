@@ -13,7 +13,7 @@ RSpec.describe PubidNew::Ieee::Components::TypedStage do
         stage_code: "published",
         type_code: "standard",
         approval_status: "published",
-        project_status: false
+        project_status: false,
       )
     end
 
@@ -25,7 +25,7 @@ RSpec.describe PubidNew::Ieee::Components::TypedStage do
         ieee_draft_equivalent: "D4-D6",
         iso_stage_equivalent: "DIS",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       )
     end
 
@@ -37,7 +37,7 @@ RSpec.describe PubidNew::Ieee::Components::TypedStage do
         ieee_draft_equivalent: "D8",
         iso_stage_equivalent: "FDIS",
         approval_status: "approved",
-        project_status: true
+        project_status: true,
       )
     end
 

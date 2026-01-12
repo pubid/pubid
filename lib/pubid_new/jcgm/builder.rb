@@ -50,10 +50,16 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+              if identifier.respond_to?("#{sub_key}=")
+                identifier.send("#{sub_key}=",
+                                sub_value)
+              end
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
@@ -93,7 +99,7 @@ module PubidNew
             PubidNew::Components::Date.new(
               year: parts[0],
               month: parts[1],
-              day: parts[2]
+              day: parts[2],
             )
           else
             # Year only
@@ -125,11 +131,10 @@ module PubidNew
             original_lang = lang
             # Convert single-char to 2-char code
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            PubidNew::Components::Language.new(code: lang, original_code: original_lang)
+            PubidNew::Components::Language.new(code: lang,
+                                               original_code: original_lang)
           end
 
-        else
-          nil
         end
       end
     end

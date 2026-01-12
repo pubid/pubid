@@ -9,7 +9,7 @@ module PubidNew
         attribute :base, Standard
         attribute :bundled_with, Standard, collection: true
         attribute :reaffirmation, :string
-        attribute :year_format, :string  # Add for compatibility with identifier.rb
+        attribute :year_format, :string # Add for compatibility with identifier.rb
 
         def to_s
           parts = [base.to_s]
@@ -23,17 +23,17 @@ module PubidNew
 
               if bundled.year
                 # Use dash if year_format is dash, otherwise colon
-                separator = (bundled.year_format == "dash") ? "-" : ":"
+                separator = bundled.year_format == "dash" ? "-" : ":"
                 bundled_part += separator
-                bundled_part += bundled.year_prefix if bundled.year_prefix  # Add M or F prefix
-                bundled_part += "F" if bundled.french && bundled.year_format != "dash" && !bundled.year_prefix  # Only add F if no prefix
+                bundled_part += bundled.year_prefix if bundled.year_prefix # Add M or F prefix
+                bundled_part += "F" if bundled.french && bundled.year_format != "dash" && !bundled.year_prefix # Only add F if no prefix
                 # Convert 4-digit year back to 2-digit
                 year_str = bundled.year.to_s
-                if year_str.length == 4 && year_str.start_with?("20")
-                  bundled_part += year_str[2..3]
-                else
-                  bundled_part += year_str
-                end
+                bundled_part += if year_str.length == 4 && year_str.start_with?("20")
+                                  year_str[2..3]
+                                else
+                                  year_str
+                                end
               end
 
               parts << bundled_part

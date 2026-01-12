@@ -188,7 +188,7 @@ RSpec.describe PubidNew::Oiml do
         expect(result).to be_a(PubidNew::Oiml::Identifiers::Recommendation)
         expect(result.code.part).to eq("1")
         expect(result.date.year).to eq("1992")
-        expect(result.to_s).to eq("OIML R 76-1 Edition 1992 (E)")  # Normalized
+        expect(result.to_s).to eq("OIML R 76-1 Edition 1992 (E)") # Normalized
       end
 
       it "supports long/short rendering" do
@@ -323,7 +323,7 @@ RSpec.describe PubidNew::Oiml do
         "OIML R 60 Annex A Edition 2013 (E)",
         "OIML D 2 Edition 1999 (E)",
         "Amendment (2004) to OIML D 2 Edition 1999 (E)",
-        "Amendment (2004) to OIML D 2:1999 (E)"
+        "Amendment (2004) to OIML D 2:1999 (E)",
       ].each do |identifier_string|
         it "round-trips #{identifier_string}" do
           result = described_class.parse(identifier_string)

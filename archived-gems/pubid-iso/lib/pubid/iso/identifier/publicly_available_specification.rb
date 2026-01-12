@@ -3,7 +3,8 @@ require_relative "../renderer/publicly_available_specification"
 module Pubid::Iso
   module Identifier
     class PubliclyAvailableSpecification < Base
-      def_delegators 'Pubid::Iso::Identifier::PubliclyAvailableSpecification', :type
+      def_delegators "Pubid::Iso::Identifier::PubliclyAvailableSpecification",
+                     :type
 
       TYPED_STAGES = {
         dpas: {

@@ -1,7 +1,7 @@
 module Pubid::Iec
   module Identifier
     class SystemsReferenceDocument < Base
-      def_delegators 'Pubid::Iec::Identifier::SystemsReferenceDocument', :type
+      def_delegators "Pubid::Iec::Identifier::SystemsReferenceDocument", :type
 
       def self.type
         { key: :srd, title: "Systems Reference Document", short: "SRD" }

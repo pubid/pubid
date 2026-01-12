@@ -85,7 +85,6 @@ module PubidNew
         def self.type
           { key: :cor, title: "Corrigendum", short: "COR" }
         end
-
       end
     end
   end

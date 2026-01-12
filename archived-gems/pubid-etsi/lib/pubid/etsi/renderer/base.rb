@@ -3,7 +3,7 @@ module Pubid::Etsi::Renderer
     TYPE = "".freeze
 
     def render_identifier(params)
-      "%{publisher} %{type} %{number}%{part}%{amendment}%{corrigendum}%{version}%{edition}%{published}" % params
+      "%<publisher>s %<type>s %<number>s%<part>s%<amendment>s%<corrigendum>s%<version>s%<edition>s%<published>s" % params
     end
 
     def render_version(version, _opts, _params)
@@ -20,7 +20,7 @@ module Pubid::Etsi::Renderer
 
     def render_part(part, _opts, _params)
       if part.is_a?(Array)
-        "-#{part.join("-")}"
+        "-#{part.join('-')}"
       else
         "-#{part}"
       end

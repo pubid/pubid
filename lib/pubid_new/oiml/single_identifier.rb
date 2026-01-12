@@ -11,7 +11,9 @@ module PubidNew
       attribute :stage, :string
       attribute :iteration, :string
       attribute :language, :string
-      attribute :parsed_format, :string, default: -> { "short" }  # Track parsed format
+      attribute :parsed_format, :string, default: -> {
+        "short"
+      } # Track parsed format
 
       # Type is determined by the subclass
       def type
@@ -55,11 +57,11 @@ module PubidNew
 
         # Add language portion - depends on format
         if language
-          if using_edition_format || parsed_format == "short_with_space"
-            result += " (#{language})"
-          else
-            result += "(#{language})"
-          end
+          result += if using_edition_format || parsed_format == "short_with_space"
+                      " (#{language})"
+                    else
+                      "(#{language})"
+                    end
         end
 
         result
@@ -81,8 +83,6 @@ module PubidNew
       def type_string
         raise NotImplementedError, "Subclasses must implement type_string"
       end
-
-      private
 
       # Subclasses override this
     end

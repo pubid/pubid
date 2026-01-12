@@ -1,17 +1,17 @@
 module Pubid::Ccsds
   module Identifier
     class Corrigendum < Base
-      def_delegators 'Pubid::Ccsds::Identifier::Corrigendum', :type
+      def_delegators "Pubid::Ccsds::Identifier::Corrigendum", :type
 
       attr_accessor :base
 
       def initialize(base: nil, **opts)
         super(**opts)
-        if base.is_a?(Hash)
-          @base = Identifier.create(**base)
-        else
-          @base = base
-        end
+        @base = if base.is_a?(Hash)
+                  Identifier.create(**base)
+                else
+                  base
+                end
       end
 
       def self.type

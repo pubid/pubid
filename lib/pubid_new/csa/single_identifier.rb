@@ -16,7 +16,7 @@ module PubidNew
       attribute :series_prefix, :string   # MH, RV, etc.
       attribute :series, :boolean         # Track if SERIES keyword present
       attribute :package, :string         # Package portion (Code, Handbook, etc.)
-      attribute :publisher_prefix, :string  # Original prefix: "CAN/CSA-", "CSA", "CAN3-"
+      attribute :publisher_prefix, :string # Original prefix: "CAN/CSA-", "CSA", "CAN3-"
     end
   end
 end

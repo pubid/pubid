@@ -11,10 +11,10 @@ module PubidNew
       class Base < Lutaml::Model::Serializable
         attribute :number, :string
         attribute :part, :string
-        attribute :type, :string  # B, G, M, R, Y, O, etc.
+        attribute :type, :string # B, G, M, R, Y, O, etc.
         attribute :edition, :string
-        attribute :suffix, :string  # Optional suffix like -S
-        attribute :language, :string  # Language metadata (e.g., "French", "Russian")
+        attribute :suffix, :string # Optional suffix like -S
+        attribute :language, :string # Language metadata (e.g., "French", "Russian")
 
         def publisher
           "CCSDS"

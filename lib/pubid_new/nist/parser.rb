@@ -14,11 +14,13 @@ module PubidNew
         cleaned = input.to_s.strip
 
         # Fix lowercase publisher at start
-        cleaned = cleaned.sub(/^nbs\b/i, 'NBS')
-        cleaned = cleaned.sub(/^nist\b/i, 'NIST')
+        cleaned = cleaned.sub(/^nbs\b/i, "NBS")
+        cleaned = cleaned.sub(/^nist\b/i, "NIST")
 
         # Fix lowercase series (ir, sp, tn, etc.)
-        cleaned = cleaned.sub(/\b(ir|sp|tn|hb|fips|ams|vts)\b/i) { |m| m.upcase }
+        cleaned = cleaned.sub(/\b(ir|sp|tn|hb|fips|ams|vts)\b/i) do |m|
+          m.upcase
+        end
 
         # Fix Roman numerals: "1011-I-2" → keep as is, but fix spaces: "1011-I-2 0" → "1011-I-2.0"
         cleaned = cleaned.gsub(/([-\d]+[IVX]+[-\d]+)\s+(\d+)/, '\1.\2')
@@ -72,7 +74,8 @@ module PubidNew
 
         # Fix letter suffix + revision before draft: "140Cr1-draft2" → "140C r1-draft2" (Session 221)
         # Must be BEFORE general draft preprocessing at line 47
-        cleaned = cleaned.gsub(/(\d{2,})([A-Z])(r\d+)([-\s]draft\d*)/, '\1\2 \3\4')
+        cleaned = cleaned.gsub(/(\d{2,})([A-Z])(r\d+)([-\s]draft\d*)/,
+                               '\1\2 \3\4')
 
         # Convert Roman numeral volumes to Arabic per NIST spec (page 7)
         # "1011-I-2.0" → "1011 v1 ver2.0"
@@ -152,15 +155,15 @@ module PubidNew
 
         # Fix supplement patterns: ensure space before supplement (1st variant)
         # "118supp3" already handled at line 32-33, but add "sup" variant
-        cleaned = cleaned.gsub(/(\d)(sup\d)/, '\1 \2')           # 100-2sup1 → 100-2 sup1
+        cleaned = cleaned.gsub(/(\d)(sup\d)/, '\1 \2') # 100-2sup1 → 100-2 sup1
         # Fix supplement patterns: ensure space before supplement (2nd variant)
-        cleaned = cleaned.gsub(/(\d)(sup+)(\d)/, '\1 \2\3')     # 100-2sup+1 → 100-2 sup+1
+        cleaned = cleaned.gsub(/(\d)(sup+)(\d)/, '\1 \2\3') # 100-2sup+1 → 100-2 sup+1
         # Fix supplement patterns: ensure space before supplement (3rd variant)
-        cleaned = cleaned.gsub(/(\d)(sup\+)(\d)/, '\1 \2\3')     # 100-2sup+1 → 100-2 sup+1
+        cleaned = cleaned.gsub(/(\d)(sup\+)(\d)/, '\1 \2\3') # 100-2sup+1 → 100-2 sup+1
         # Fix supplement patterns: ensure space before supplement (4th variant)
-        cleaned = cleaned.gsub(/(\d)(sup\d+)/, '\1 \2')         # 100-2sup1 → 100-2 sup1
+        cleaned = cleaned.gsub(/(\d)(sup\d+)/, '\1 \2') # 100-2sup1 → 100-2 sup1
         # Fix supplement patterns: ensure space before supplement (5th variant)
-        cleaned = cleaned.gsub(/(\d)(sup\d+\b)/, '\1 \2')     # 100-2sup1 → 100-2 sup1
+        cleaned = cleaned.gsub(/(\d)(sup\d+\b)/, '\1 \2') # 100-2sup1 → 100-2 sup1
 
         # Fix revision letter patterns: ensure space before revision with letter
         cleaned = cleaned.gsub(/(\d)(r\d+[a-z])/, '\1 \2')       # 800-22r1a → 800-22 r1a
@@ -196,12 +199,12 @@ module PubidNew
         cleaned = cleaned.gsub(/\b([pn])(\d+)/, 'pt\2')
 
         # Fix complex part patterns in MR format: ensure space before part
-        cleaned = cleaned.gsub(/(\d)([pP]\d+)/, '\1 \2')         # .467p1adde1 → .467 p1adde1, 800-57p1 → 800-57 p1
+        cleaned = cleaned.gsub(/(\d)([pP]\d+)/, '\1 \2') # .467p1adde1 → .467 p1adde1, 800-57p1 → 800-57 p1
 
         # Extract volume from number: "17-917v3" → "17-917 v3", "1-1v1" → "1-1 v1"
         # Pattern: digits-digits followed by v and digits (GCR, NCSTAR patterns)
         # MUST be specific to avoid breaking existing "v1.1" patterns
-        cleaned = cleaned.gsub(/(\d+-\d+)(v\d+)(?![.\d])/, '\1 \2')  # Negative lookahead for dots
+        cleaned = cleaned.gsub(/(\d+-\d+)(v\d+)(?![.\d])/, '\1 \2') # Negative lookahead for dots
 
         # Fix pd spacing: "800-140Br1 2pd" → "800-140B r1 2pd", " 3pd" → " 3 pd"
         cleaned = cleaned.gsub(/\s+(\d+)pd$/, ' \1 pd')
@@ -213,7 +216,7 @@ module PubidNew
         cleaned = cleaned.gsub(/\s+Version\s+(\d+)/, ' ver \1')
 
         # Fix verbose "Revision" format: " Revision (r)" → " r"
-        cleaned = cleaned.gsub(/\s+Revision\s+\(r\)/, ' r')
+        cleaned = cleaned.gsub(/\s+Revision\s+\(r\)/, " r")
 
         # REMOVED: Incorrect dot preprocessing that treated dots as number separators
         # This was semantically wrong - dots are PART separators in NIST!
@@ -248,17 +251,17 @@ module PubidNew
       # I→1, II→2, III→3, IV→4, V→5, VI→6, VII→7, VIII→8, IX→9, X→10
       def self.roman_to_arabic(roman)
         case roman
-        when 'I' then '1'
-        when 'II' then '2'
-        when 'III' then '3'
-        when 'IV' then '4'
-        when 'V' then '5'
-        when 'VI' then '6'
-        when 'VII' then '7'
-        when 'VIII' then '8'
-        when 'IX' then '9'
-        when 'X' then '10'
-        else roman  # Fallback for unexpected patterns
+        when "I" then "1"
+        when "II" then "2"
+        when "III" then "3"
+        when "IV" then "4"
+        when "V" then "5"
+        when "VI" then "6"
+        when "VII" then "7"
+        when "VIII" then "8"
+        when "IX" then "9"
+        when "X" then "10"
+        else roman # Fallback for unexpected patterns
         end
       end
 
@@ -279,10 +282,10 @@ module PubidNew
       # Month abbreviations
       rule(:month_abbrev) do
         str("January") | str("February") | str("March") | str("April") |
-        str("May") | str("June") | str("July") | str("August") |
-        str("September") | str("October") | str("November") | str("December") |
-        str("Jan") | str("Feb") | str("Mar") | str("Apr") |
-        str("Jun") | str("Jul") | str("Aug") | str("Sep") | str("Oct") | str("Nov") | str("Dec")
+          str("May") | str("June") | str("July") | str("August") |
+          str("September") | str("October") | str("November") | str("December") |
+          str("Jan") | str("Feb") | str("Mar") | str("Apr") |
+          str("Jun") | str("Jul") | str("Aug") | str("Sep") | str("Oct") | str("Nov") | str("Dec")
       end
 
       # Language codes for translations - 2-4 letter codes
@@ -338,7 +341,7 @@ module PubidNew
       # Simple series (no publisher prefix)
       rule(:simple_series) do
         (
-          str("AMS") | str("VTS") |  # NEW - Added for NIST AMS and VTS series
+          str("AMS") | str("VTS") | # NEW - Added for NIST AMS and VTS series
           str("BSS") | str("BMS") | str("BH") |
           str("FIPS") | str("GCR") | str("HB") | str("MONO") |
           str("MP") | str("NCSTAR") | str("NSRDS") | str("IR") |
@@ -360,14 +363,14 @@ module PubidNew
           str("ndex") |
           str("nsert") |
           str("rrata") |
-          str("raft") |  # NEW: Exclude "draft" from number suffix matching
+          str("raft") | # NEW: Exclude "draft" from number suffix matching
           str("pp") |
           str("s") |
           str("t") |
           str("hi") |
           str("iet") |
           str("ort")).absent? >>
-        digits.maybe
+          digits.maybe
       end
 
       rule(:digits_with_suffix) do
@@ -426,24 +429,24 @@ module PubidNew
       rule(:second_number) do
         # Explicitly exclude month abbreviations at start (so -Feb1985 goes to edition, not second_number)
         month_abbrev.absent? >>
-        # NEW: Exclude "draft" keyword
-        str("draft").absent? >>
-        (
-          # CRPL range with underscore (e.g., "2_3-1A")
-          (digits >> str("_") >> digits >> dash >> digits >> upper_letter.maybe) |
-          # Letter followed by dash and digits (e.g., "m-5")
-          (lower_letter >> dash >> digits) |
-          # Number with pt suffix (e.g., "57pt1")
-          (digits >> str("pt") >> digits) |
-          # Special patterns like "NCNR", "PERMIS", "BFRL"
-          str("NCNR") | str("PERMIS") | str("BFRL") |
-          # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
-          upper_letter.repeat(1, 3) |
-          # Lowercase letter suffix (e.g., "a", "b") - Session 219
-          lower_letter.repeat(1, 2) |
-          # Regular number with optional suffix - but NOT if part of FIPS date (digit-dash-month-digit-slash)
-          (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?)
-        ).as(:second_number)
+          # NEW: Exclude "draft" keyword
+          str("draft").absent? >>
+          (
+            # CRPL range with underscore (e.g., "2_3-1A")
+            (digits >> str("_") >> digits >> dash >> digits >> upper_letter.maybe) |
+            # Letter followed by dash and digits (e.g., "m-5")
+            (lower_letter >> dash >> digits) |
+            # Number with pt suffix (e.g., "57pt1")
+            (digits >> str("pt") >> digits) |
+            # Special patterns like "NCNR", "PERMIS", "BFRL"
+            str("NCNR") | str("PERMIS") | str("BFRL") |
+            # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
+            upper_letter.repeat(1, 3) |
+            # Lowercase letter suffix (e.g., "a", "b") - Session 219
+            lower_letter.repeat(1, 2) |
+            # Regular number with optional suffix - but NOT if part of FIPS date (digit-dash-month-digit-slash)
+            (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?)
+          ).as(:second_number)
       end
 
       # Edition component per NIST spec: <edition-type><edition-id>
@@ -487,16 +490,22 @@ module PubidNew
       rule(:legacy_edition) do
         (
           # Complex revision patterns: r1a, r2b
-          ((str("r") | str(" R")) >> match("[0-9]").repeat(1, 2).as(:edition) >> lower_letter.as(:edition_letter)) |
+          ((str("r") | str(" R")) >> match("[0-9]").repeat(1,
+                                                           2).as(:edition) >> lower_letter.as(:edition_letter)) |
           # Edition with revision and year: rev2013, rev2020
           (str("rev") >> digits.as(:edition_year)) |
           # Edition with revision and date: e2revJune1908 (will migrate to e2 + date)
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >>
-           str("rev") >> match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year)) |
+           str("rev") >> match("[A-Za-z]").repeat(3,
+                                                  9).as(:edition_month) >> digits.as(:edition_year)) |
           # Edition with year and month: e201801 (ambiguous - could be e2018 or year 2018 month 01)
-          (str("e") >> match("[0-9]").repeat(4, 4).as(:edition_year) >> match("[0-9]").repeat(2, 2).as(:edition_month).maybe) |
+          (str("e") >> match("[0-9]").repeat(4,
+                                             4).as(:edition_year) >> match("[0-9]").repeat(
+                                               2, 2
+                                             ).as(:edition_month).maybe) |
           # Revision-based edition: revJune1908, revJan1925 (normalize to date)
-          (str("rev") >> match("[A-Za-z]").repeat(3, 9).as(:edition_month) >> digits.as(:edition_year))
+          (str("rev") >> match("[A-Za-z]").repeat(3,
+                                                  9).as(:edition_month) >> digits.as(:edition_year))
         )
       end
 
@@ -509,24 +518,24 @@ module PubidNew
       # ENHANCED: Support multiple dashes for GCR patterns (Session 220)
       rule(:report_number) do
         first_number >>
-        (
-          # Multiple dash pattern for GCR: 21-917-48 (year-seq-part)
-          (dash >> second_number >> dash >> digits) |
-          # Dot-separated part (e.g., 984.4 = number 984, part 4)
-          (dot >> second_number) |
-          # Dash-separated (traditional)
-          (dash >> (crpl_range | second_number))
-        ).maybe
+          (
+            # Multiple dash pattern for GCR: 21-917-48 (year-seq-part)
+            (dash >> second_number >> dash >> digits) |
+            # Dot-separated part (e.g., 984.4 = number 984, part 4)
+            (dot >> second_number) |
+            # Dash-separated (traditional)
+            (dash >> (crpl_range | second_number))
+          ).maybe
       end
 
       # Volume
       rule(:volume) do
         (space.maybe >> (str("v") | str(" Vol. "))) >>
-        (digits >>
-         # Support letter ranges (lowercase normalized in preprocessing)
-         (str("a-l") | str("m-z") | str("A-L") | str("M-Z")).maybe >>
-         # Support single uppercase letters (e.g., v3B, v1A)
-         upper_letter.repeat(0, 2)).as(:volume)
+          (digits >>
+           # Support letter ranges (lowercase normalized in preprocessing)
+           (str("a-l") | str("m-z") | str("A-L") | str("M-Z")).maybe >>
+           # Support single uppercase letters (e.g., v3B, v1A)
+           upper_letter.repeat(0, 2)).as(:volume)
       end
 
       # Part - enhanced to support patterns like p1adde1 AND pt3r1 (part with revision)
@@ -550,7 +559,8 @@ module PubidNew
           (space.maybe >> (str("r") | str("rev")) >> digits.as(:revision) >>
            slash >> digits.as(:revision_year)) |
           # Revision with 4-digit year directly: r1995, r 1995 (allow space before year)
-          ((str(" r") | str("r")) >> space.maybe >> match("[0-9]").repeat(4, 4).as(:revision_year)) |
+          ((str(" r") | str("r")) >> space.maybe >> match("[0-9]").repeat(4,
+                                                                          4).as(:revision_year)) |
           # Revision with year: rev2013, rev 2013 (allow space before year)
           (str("rev") >> space.maybe >> digits.as(:revision_year)) |
           # Revision with digits AND/OR letters: r1a, r1A, ra, r1
@@ -584,13 +594,13 @@ module PubidNew
       # Update number is optional (e.g., "500-300-upd" has no number)
       rule(:update) do
         (str("/Upd") | space >> (str("/upd") | str("-upd"))) >>
-        (
-          digits.as(:update_number).maybe >>
-          (dash >>
-            match("[0-9]").repeat(4, 4).as(:update_year) >>
-            match("[0-9]").repeat(2, 2).as(:update_month).maybe
-          ).maybe
-        ).as(:update)
+          (
+            digits.as(:update_number).maybe >>
+            (dash >>
+              match("[0-9]").repeat(4, 4).as(:update_year) >>
+              match("[0-9]").repeat(2, 2).as(:update_month).maybe
+            ).maybe
+          ).as(:update)
       end
 
       # Addendum
@@ -603,22 +613,22 @@ module PubidNew
       # Examples: suppJan1924, supp3/1926, supp1925, supJun1925-Jun1927 (date ranges), supprev
       rule(:supplement) do
         space.maybe >>
-        (str("supp") | str("sup")) >>
-        (
-          # Supplement followed by revision: supprev
-          (str("rev")).as(:supplement_with_rev) |
-          # Date range pattern: Jan1924-Jan1926
-          (month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
-           dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
-          # Month and year: Jan1924
-          (month_abbrev.as(:supp_month) >> digits.as(:supp_year)).as(:supplement_date) |
-          # Number with slash and year: 3/1926
-          (digits.as(:supp_number) >> slash >> digits.as(:supp_year)).as(:supplement_slash_year) |
-          # Just year: 1925
-          digits.as(:supp_year) |
-          # General suffix (other patterns)
-          match("[A-Za-z0-9]").repeat(1).as(:supplement_suffix)
-        ).maybe
+          (str("supp") | str("sup")) >>
+          (
+            # Supplement followed by revision: supprev
+            str("rev").as(:supplement_with_rev) |
+            # Date range pattern: Jan1924-Jan1926
+            (month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
+             dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
+            # Month and year: Jan1924
+            (month_abbrev.as(:supp_month) >> digits.as(:supp_year)).as(:supplement_date) |
+            # Number with slash and year: 3/1926
+            (digits.as(:supp_number) >> slash >> digits.as(:supp_year)).as(:supplement_slash_year) |
+            # Just year: 1925
+            digits.as(:supp_year) |
+            # General suffix (other patterns)
+            match("[A-Za-z0-9]").repeat(1).as(:supplement_suffix)
+          ).maybe
       end
 
       # Errata
@@ -668,7 +678,7 @@ module PubidNew
       # ENHANCED: Accept optional space before dash to match after report_number
       rule(:draft) do
         (space >> str("(Draft)") |
-         space.maybe >> dash >> str("draft") >> (space >> digits |  digits).maybe |  # Match " -draft 2" OR "-draft2"
+         space.maybe >> dash >> str("draft") >> (space >> digits | digits).maybe | # Match " -draft 2" OR "-draft2"
          pd_suffix).as(:draft)
       end
 
@@ -686,7 +696,7 @@ module PubidNew
           new_stage |
           section | index | insert | appendix | pd_suffix |
           edition | date | legacy_edition | revision |
-          version |  # MOVED BEFORE volume - try dotted versions (v1.1) before simple volumes (v1)
+          version | # MOVED BEFORE volume - try dotted versions (v1.1) before simple volumes (v1)
           volume | part | update | addendum |
           supplement | errata | language_code
         )
@@ -700,95 +710,95 @@ module PubidNew
       # - "NBS CIRC suppJun1925-Jun1926" → date range supplement (no base)
       rule(:circ_supplement_identifier) do
         (str("NBS CIRC") | str("NBS LCIRC")).as(:series) >> space >>
-        (
-          # Date range supplement (no base, no number)
-          (str("supp") >> month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
-           dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
-          # With base identifier + supplement
           (
-            # Capture base portion (everything before "supp")
+            # Date range supplement (no base, no number)
+            (str("supp") >> month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
+             dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
+            # With base identifier + supplement
             (
-              # Number with edition: "101e2"
-              (digits >> str("e") >> digits) |
-              # Just number: "25", "24"
-              digits
-            ).as(:base_portion) >>
-            # Supplement marker with optional metadata
-            str("supp") >>
-            (
-              # Month and year: Jan1924
-              (month_abbrev.as(:supplement_month) >> digits.as(:supplement_year)).as(:supplement_edition)
+              # Capture base portion (everything before "supp")
+              (
+                # Number with edition: "101e2"
+                (digits >> str("e") >> digits) |
+                # Just number: "25", "24"
+                digits
+              ).as(:base_portion) >>
+              # Supplement marker with optional metadata
+              str("supp") >>
+
+                # Month and year: Jan1924
+                (month_abbrev.as(:supplement_month) >> digits.as(:supplement_year)).as(:supplement_edition)
+
             )
           )
-        )
       end
 
       # Dot-separated machine-readable format: NIST.SP.800-116 or #NIST.2024-01-15.123
       # Enhanced to support parts after number like NIST.SP.1011-I-2.0
       rule(:mr_identifier) do
         hash_prefix.maybe >>
-        publisher >> dot >>
-        simple_series >> dot >>
-        report_number >>
-        # Edition with underscore separator (MR format: 1648_2009)
-        (str("_") >> digits.as(:edition_year)).maybe >>
-        (dot >> (digits | upper_letter)).repeat(0, 3) >>  # Support additional dot-separated parts
-        # Support letter suffix before update (e.g., 8286C-upd1) - Session 219
-        upper_letter.maybe >>
-        (dash >> str("upd") >> digits.maybe).maybe >>
-        parts.repeat >> draft.maybe
+          publisher >> dot >>
+          simple_series >> dot >>
+          report_number >>
+          # Edition with underscore separator (MR format: 1648_2009)
+          (str("_") >> digits.as(:edition_year)).maybe >>
+          (dot >> (digits | upper_letter)).repeat(0, 3) >> # Support additional dot-separated parts
+          # Support letter suffix before update (e.g., 8286C-upd1) - Session 219
+          upper_letter.maybe >>
+          (dash >> str("upd") >> digits.maybe).maybe >>
+          parts.repeat >> draft.maybe
       end
 
       # Main identifier structure
       # Try compound series first (longest match), then publisher + simple series
       rule(:identifier) do
         circ_supplement_identifier |
-        mr_identifier |
-        (
-          # Compound series (includes publisher in series name)
-          compound_series >> (space | dot) >>
-          old_stage.maybe >>  # Old style stage after series
-          report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
-        ) |
-        (
-          # Publisher + simple series - require space/dot between publisher and series
-          publisher >> (space | dot) >>
-          simple_series >>
-          old_stage.maybe >>  # Old style stage after series
-          (space | dot) >>
-          report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
-        ) |
-        (
-          # Simple series only (no publisher)
-          simple_series >>
-          old_stage.maybe >>  # Old style stage after series
-          (space | dot) >>
-          report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
-        )
+          mr_identifier |
+          (
+            # Compound series (includes publisher in series name)
+            compound_series >> (space | dot) >>
+            old_stage.maybe >> # Old style stage after series
+            report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
+          ) |
+          (
+            # Publisher + simple series - require space/dot between publisher and series
+            publisher >> (space | dot) >>
+            simple_series >>
+            old_stage.maybe >> # Old style stage after series
+            (space | dot) >>
+            report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
+          ) |
+          (
+            # Simple series only (no publisher)
+            simple_series >>
+            old_stage.maybe >> # Old style stage after series
+            (space | dot) >>
+            report_number.maybe >> fips_date.maybe >> parts.repeat >> draft.maybe >> translation.maybe >> new_stage.maybe
+          )
       end
 
       # CIRC Supplement identifier - split into base + supplement
       # Must be complete rule with all patterns
       rule(:circ_supplement_identifier) do
         (str("NBS CIRC") | str("NBS LCIRC")).as(:series) >> space >>
-        (
-          # Date range supplement (no base number)
-          (str("supp") >> month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
-           dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
-          # With base identifier + supplement
           (
-            # Capture base portion (everything before "supp")
-            (digits >> str("e") >> digits | digits).as(:base_portion) >>
-            # Supplement marker
-            str("supp") >>
-            # Optional supplement metadata
+            # Date range supplement (no base number)
+            (str("supp") >> month_abbrev.as(:supp_month_start) >> digits.as(:supp_year_start) >>
+             dash >> month_abbrev.as(:supp_month_end) >> digits.as(:supp_year_end)).as(:supplement_date_range) |
+            # With base identifier + supplement
             (
-              (month_abbrev >> digits).as(:supplement_month_year) |
-              (dash >> digits.as(:supplement_year)) |
-              str("").as(:supplement_empty)
+              # Capture base portion (everything before "supp")
+              (digits >> str("e") >> digits | digits).as(:base_portion) >>
+              # Supplement marker
+              str("supp") >>
+              # Optional supplement metadata
+              (
+                (month_abbrev >> digits).as(:supplement_month_year) |
+                (dash >> digits.as(:supplement_year)) |
+                str("").as(:supplement_empty)
+              )
             )
           )
-        )
       end
 
       root(:identifier)

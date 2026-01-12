@@ -52,6 +52,7 @@ module PubidNew
         # @return [String] IEEE format abbreviation
         def to_ieee_format
           return abbr.first unless project_status
+
           ieee_draft_equivalent || "P"
         end
 
@@ -76,7 +77,7 @@ module PubidNew
         # Check if board-approved
         # @return [Boolean] true if approved or published
         def approved?
-          approval_status == "approved" || approval_status == "published"
+          ["approved", "published"].include?(approval_status)
         end
 
         # Get display name for stage

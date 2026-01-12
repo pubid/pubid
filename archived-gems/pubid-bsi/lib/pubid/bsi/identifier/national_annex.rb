@@ -3,10 +3,9 @@ module Pubid::Bsi
     class NationalAnnex < Base
       attr_accessor :base
 
-      def_delegators 'Pubid::Bsi::Identifier::NationalAnnex', :type
+      def_delegators "Pubid::Bsi::Identifier::NationalAnnex", :type
 
       def initialize(base: nil, **opts)
-
         super(**opts)
         @base = base
       end

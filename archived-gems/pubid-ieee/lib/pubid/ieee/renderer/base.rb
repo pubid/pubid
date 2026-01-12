@@ -2,21 +2,19 @@ module Pubid::Ieee::Renderer
   class Base < Pubid::Core::Renderer::Base
     def render_identifier(params)
       if params[:iso_identifier].to_s != "" && params[:number] != ""
-        " (%{publisher}%{stage}%{draft_status}%{type}%{number}%{iteration}%{part}%{subpart}%{month}%{year}%{corrigendum_comment}"\
-        "%{corrigendum}%{draft}%{edition})%{alternative}%{supersedes}%{reaffirmed}%{incorporates}%{supplement}"\
-        "%{revision}%{iso_amendment}%{amendment}%{edition}%{includes}%{redline}%{adoption}" % params
+        " (%<publisher>s%<stage>s%<draft_status>s%<type>s%<number>s%<iteration>s%<part>s%<subpart>s%<month>s%<year>s%<corrigendum_comment>s"\
+        "%<corrigendum>s%<draft>s%<edition>s)%<alternative>s%<supersedes>s%<reaffirmed>s%<incorporates>s%<supplement>s"\
+        "%<revision>s%<iso_amendment>s%<amendment>s%<edition>s%<includes>s%<redline>s%<adoption>s" % params
+      elsif params[:day].empty? && params[:month].empty?
+        # if only year - edition and draft after year
+        "%<publisher>s%<draft_status>s%<type>s%<number>s%<part>s%<subpart>s%<stage>s"\
+        "%<year>s%<edition>s%<corrigendum_comment>s%<corrigendum>s%<draft>s%<alternative>s%<supersedes>s%<reaffirmed>s%<incorporates>s%<supplement>s"\
+        "%<revision>s%<iso_amendment>s%<amendment>s%<includes>s%<redline>s%<adoption>s" % params
       else
-        if params[:day].empty? && params[:month].empty?
-          # if only year - edition and draft after year
-          "%{publisher}%{draft_status}%{type}%{number}%{part}%{subpart}%{stage}"\
-          "%{year}%{edition}%{corrigendum_comment}%{corrigendum}%{draft}%{alternative}%{supersedes}%{reaffirmed}%{incorporates}%{supplement}"\
-          "%{revision}%{iso_amendment}%{amendment}%{includes}%{redline}%{adoption}" % params
-        else
-          # if year and month - edition and draft before
-          "%{publisher}%{draft_status}%{type}%{number}%{part}%{subpart}%{edition}%{stage}"\
-          "%{corrigendum_comment}%{corrigendum}%{draft}%{month}%{day}%{year}%{alternative}%{supersedes}%{reaffirmed}%{incorporates}%{supplement}"\
-          "%{revision}%{iso_amendment}%{amendment}%{includes}%{redline}%{adoption}" % params
-        end
+        # if year and month - edition and draft before
+        "%<publisher>s%<draft_status>s%<type>s%<number>s%<part>s%<subpart>s%<edition>s%<stage>s"\
+        "%<corrigendum_comment>s%<corrigendum>s%<draft>s%<month>s%<day>s%<year>s%<alternative>s%<supersedes>s%<reaffirmed>s%<incorporates>s%<supplement>s"\
+        "%<revision>s%<iso_amendment>s%<amendment>s%<includes>s%<redline>s%<adoption>s" % params
       end
     end
 
@@ -31,7 +29,7 @@ module Pubid::Ieee::Renderer
 
     def render_type(type, opts, params)
       result = if params[:publisher] == "IEEE" ||
-                 (params[:copublisher].is_a?(Array) && params[:copublisher].include?("IEEE") || params[:copublisher] == "IEEE")
+          (params[:copublisher].is_a?(Array) && params[:copublisher].include?("IEEE") || params[:copublisher] == "IEEE")
                  type.to_s(opts[:format])
                else
                  type.to_s(:alternative)
@@ -41,22 +39,22 @@ module Pubid::Ieee::Renderer
     end
 
     def render_part(part, _opts, _params)
-      (part =~ /^[-.]/ ? "" : "-") + part
+      (/^[-.]/.match?(part) ? "" : "-") + part
     end
 
-    def render_day(day, _opts, params)
+    def render_day(day, _opts, _params)
       # month = Date.parse(params[:month]).month
       # " %s-%s-%02d" % [params[:year], month, day]
       " #{day}"
     end
 
-    def render_month(month, _opts, params)
+    def render_month(month, _opts, _params)
       # return if params[:day]
 
       ", #{Date::MONTHNAMES[month]}"
     end
 
-    def render_corrigendum_comment(corrigendum_comment, _opts, params)
+    def render_corrigendum_comment(_corrigendum_comment, _opts, params)
       "/Cor 1-#{params[:year]}" if params[:year]
     end
 
@@ -109,7 +107,9 @@ module Pubid::Ieee::Renderer
 
     def render_alternative(alternative, _opts, _params)
       if alternative.is_a?(Array)
-        " (#{alternative.map { |a| Pubid::Ieee::Identifier::Base.new(**Pubid::Ieee::Identifier.convert_parser_parameters(**a)) }.join(', ')})"
+        " (#{alternative.map do |a|
+          Pubid::Ieee::Identifier::Base.new(**Pubid::Ieee::Identifier.convert_parser_parameters(**a))
+        end.join(', ')})"
       else
         " (#{Pubid::Ieee::Identifier::Base.new(**Pubid::Ieee::Identifier.convert_parser_parameters(**alternative))})"
       end
@@ -143,7 +143,6 @@ module Pubid::Ieee::Renderer
       " - Redline"
     end
 
-
     def render_amendment(amendment, _opts, _params)
       return " (Amendment to #{amendment})" unless amendment.is_a?(Array)
 
@@ -157,7 +156,7 @@ module Pubid::Ieee::Renderer
       "#{result})"
     end
 
-    def render_corrigendum(corrigendum, _opts, params)
+    def render_corrigendum(corrigendum, _opts, _params)
       # if corrigendum.nil?
       #   (params[:year] && corrigendum_comment && "/Cor 1-#{params[:year]}") || ""
       # else
@@ -206,7 +205,7 @@ module Pubid::Ieee::Renderer
         (iso_amendment[:year] ? "-#{iso_amendment[:year]}" : "")
     end
 
-    def render_adoption(adoption, opts, _params)
+    def render_adoption(adoption, _opts, _params)
       " (Adoption of #{Pubid::Ieee::Identifier::Base.transform(**adoption)})"
     end
 

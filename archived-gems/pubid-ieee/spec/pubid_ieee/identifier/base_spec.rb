@@ -3,7 +3,9 @@ module Pubid::Ieee
     RSpec.describe Base do
       describe "#to_s" do
         context "with trademark" do
-          subject { described_class.new(number: number).to_s(with_trademark: true) }
+          subject do
+            described_class.new(number: number).to_s(with_trademark: true)
+          end
 
           context "when 802" do
             let(:number) { 802 }

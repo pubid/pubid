@@ -149,7 +149,9 @@ module PubidNew
 
       def locate_typed_stage_by_abbr(abbr)
         abbr_str = abbr.to_s.strip
-        TYPED_STAGES_REGISTRY.find { |ts| ts.abbr.include?(abbr_str) } || DEFAULT_TYPED_STAGE
+        TYPED_STAGES_REGISTRY.find do |ts|
+          ts.abbr.include?(abbr_str)
+        end || DEFAULT_TYPED_STAGE
       end
 
       def locate_identifier_klass_by_type_code(type_code)
@@ -157,7 +159,9 @@ module PubidNew
         return Identifiers::EuropeanNorm unless class_name
 
         # Convert string to actual class
-        class_name.split("::").reduce(PubidNew::Cen) { |mod, name| mod.const_get(name) }
+        class_name.split("::").reduce(PubidNew::Cen) do |mod, name|
+          mod.const_get(name)
+        end
       end
     end
   end

@@ -2,7 +2,10 @@ module Pubid::Nist
   module Identifier
     RSpec.describe Base do
       describe "creating new identifier" do
-        subject { described_class.create(**{ number: number, series: series }.merge(params)) }
+        subject do
+          described_class.create(**{ number: number,
+                                     series: series }.merge(params))
+        end
         let(:number) { 123 }
         let(:params) { {} }
         let(:series) { "SP" }
@@ -14,10 +17,12 @@ module Pubid::Nist
         context "White Paper series" do
           let(:series) { "CSWP" }
           let(:number) { 999 }
-          let(:params) { { edition_year: "2013",
-                           edition_month: "01",
-                           edition_day: "01",
-                           stage: { id: "i", type: "pd" } } }
+          let(:params) do
+            { edition_year: "2013",
+              edition_month: "01",
+              edition_day: "01",
+              stage: { id: "i", type: "pd" } }
+          end
 
           it "returns correct short identifier" do
             expect(subject.to_s).to eq("NIST CSWP 999e20130101 ipd")

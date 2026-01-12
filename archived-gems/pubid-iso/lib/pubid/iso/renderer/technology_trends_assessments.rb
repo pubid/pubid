@@ -2,7 +2,6 @@ require_relative "base"
 
 module Pubid::Iso::Renderer
   class TechnologyTrendsAssessments < Base
-
     TYPE = "TTA".freeze
 
     def omit_post_publisher_symbol?(_typed_stage, _stage, _opts)

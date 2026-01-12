@@ -6,7 +6,8 @@ module Pubid::Etsi
     end
 
     rule(:part) do
-      (dash.ignore >> (digits | match("[A-Z]").repeat(3, 3))).as(:part).repeat(1)
+      (dash.ignore >> (digits | match("[A-Z]").repeat(3,
+                                                      3))).as(:part).repeat(1)
     end
 
     rule(:type) do

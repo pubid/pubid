@@ -22,7 +22,8 @@ module Pubid::Core
           context[:amendments] =
             [self.class.get_amendment_class.new(
               number: context[:amendments][:number],
-              year: context[:amendments][:year])]
+              year: context[:amendments][:year],
+            )]
 
         end
         context
@@ -37,7 +38,8 @@ module Pubid::Core
           context[:corrigendums] =
             [self.class.get_corrigendum_class.new(
               number: context[:corrigendums][:number],
-              year: context[:corrigendums][:year])]
+              year: context[:corrigendums][:year],
+            )]
         end
         context
       end

@@ -7,7 +7,7 @@ module Pubid::Nist
       end
 
       rule(:volume) do
-        str("v") >> (digits >> match('[A-Z]').repeat).as(:volume)
+        str("v") >> (digits >> match("[A-Z]").repeat).as(:volume)
       end
     end
   end

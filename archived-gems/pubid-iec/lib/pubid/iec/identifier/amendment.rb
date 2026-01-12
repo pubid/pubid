@@ -4,7 +4,7 @@ require_relative "../renderer/urn_amendment"
 module Pubid::Iec
   module Identifier
     class Amendment < Supplement
-      def_delegators 'Pubid::Iec::Identifier::Amendment', :type
+      def_delegators "Pubid::Iec::Identifier::Amendment", :type
 
       TYPED_STAGES = {
         cdam: {
@@ -21,7 +21,7 @@ module Pubid::Iec
           abbr: "FDAM",
           name: "Final Draft Ammendment",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
       def self.type

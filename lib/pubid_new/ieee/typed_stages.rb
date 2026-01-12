@@ -20,7 +20,7 @@ module PubidNew
         stage_code: "published",
         type_code: "standard",
         approval_status: "published",
-        project_status: false
+        project_status: false,
       ),
 
       # IEEE Draft Stages (P prefix, unapproved)
@@ -32,7 +32,7 @@ module PubidNew
         ieee_draft_equivalent: "D1",
         iso_stage_equivalent: "WD",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       # D2, D3 - Committee draft stages
@@ -43,7 +43,7 @@ module PubidNew
         ieee_draft_equivalent: "D2-D3",
         iso_stage_equivalent: "CD",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       # D4, D5, D6 - Draft standard stages
@@ -54,7 +54,7 @@ module PubidNew
         ieee_draft_equivalent: "D4-D6",
         iso_stage_equivalent: "DIS",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       # IEEE Draft Stages (P prefix, approved but unpublished)
@@ -66,7 +66,7 @@ module PubidNew
         ieee_draft_equivalent: "D7-D9",
         iso_stage_equivalent: "FDIS",
         approval_status: "approved",
-        project_status: true
+        project_status: true,
       ),
 
       # ISO Stages (for joint development with ISO/IEC/IEEE)
@@ -78,7 +78,7 @@ module PubidNew
         ieee_draft_equivalent: "P",
         iso_stage_equivalent: "PWI",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       Components::TypedStage.new(
@@ -88,7 +88,7 @@ module PubidNew
         ieee_draft_equivalent: "P",
         iso_stage_equivalent: "NP",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       Components::TypedStage.new(
@@ -98,7 +98,7 @@ module PubidNew
         ieee_draft_equivalent: "D1",
         iso_stage_equivalent: "WD",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       Components::TypedStage.new(
@@ -108,7 +108,7 @@ module PubidNew
         ieee_draft_equivalent: "D2-D3",
         iso_stage_equivalent: "CD",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       Components::TypedStage.new(
@@ -118,7 +118,7 @@ module PubidNew
         ieee_draft_equivalent: "D5",
         iso_stage_equivalent: "DIS",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       Components::TypedStage.new(
@@ -128,7 +128,7 @@ module PubidNew
         ieee_draft_equivalent: "D8",
         iso_stage_equivalent: "FDIS",
         approval_status: "approved",
-        project_status: true
+        project_status: true,
       ),
 
       # Historical stages (AIEE, IRE)
@@ -138,7 +138,7 @@ module PubidNew
         stage_code: "published",
         type_code: "standard",
         approval_status: "published",
-        project_status: false
+        project_status: false,
       ),
 
       # Generic "P" prefix for drafts (when specific D number not known)
@@ -148,7 +148,7 @@ module PubidNew
         type_code: "draft",
         ieee_draft_equivalent: "P",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
 
       # Draft without specific version (legacy)
@@ -157,7 +157,7 @@ module PubidNew
         stage_code: "draft",
         type_code: "draft",
         approval_status: "unapproved",
-        project_status: true
+        project_status: true,
       ),
     ].freeze
 

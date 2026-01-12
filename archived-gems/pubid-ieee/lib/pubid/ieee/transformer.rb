@@ -19,7 +19,8 @@ module Pubid::Ieee
     rule(iso_identifier: subtree(:iso_identifier)) do |data|
       # apply transformer to :iso_identifier => :month
       if data[:iso_identifier].key?(:month)
-        data[:iso_identifier][:month] = update_month(data[:iso_identifier][:month])
+        data[:iso_identifier][:month] =
+          update_month(data[:iso_identifier][:month])
       end
       # keep identifier in ISO format if it have ISO format Amendment in "supplements"
       if (data[:iso_identifier][:publisher] == "IEEE" ||
@@ -27,7 +28,8 @@ module Pubid::Ieee
           data[:iso_identifier][:copublisher] == "IEEE")) && !data[:iso_identifier].key?(:supplements) &&
           !data[:iso_identifier].key?(:type)
         if data[:iso_identifier].key?(:stage)
-          data[:iso_identifier][:draft] = { version: data[:iso_identifier][:stage] }
+          data[:iso_identifier][:draft] =
+            { version: data[:iso_identifier][:stage] }
           data[:iso_identifier][:stage] = nil
         end
         data[:iso_identifier]
@@ -58,7 +60,8 @@ module Pubid::Ieee
 
     rule(stage: simple(:stage), iteration: simple(:iteration),
          part: simple(:part)) do |data|
-      { draft: { version: data[:stage] }, iteration: data[:iteration] }.merge(part: data[:part])
+      { draft: { version: data[:stage] },
+        iteration: data[:iteration] }.merge(part: data[:part])
     end
 
     def self.update_year(year)
@@ -86,11 +89,11 @@ module Pubid::Ieee
 
     rule(type: simple(:type)) do
       { type: case type
-        when "Standard"
-          :std
-        else
-          type
-        end }
+              when "Standard"
+                :std
+              else
+                type
+              end }
     end
   end
 end

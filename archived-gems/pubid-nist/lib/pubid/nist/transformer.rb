@@ -2,7 +2,8 @@ module Pubid::Nist
   class Transformer < Parslet::Transform
     rule(first_report_number: subtree(:first_report_number)) do |context|
       { number:
-          context.values_at(:first_report_number, :second_report_number).compact.join("-").upcase }
+          context.values_at(:first_report_number,
+                            :second_report_number).compact.join("-").upcase }
     end
 
     rule(report_number: subtree(:report_number)) do |context|
@@ -44,8 +45,8 @@ module Pubid::Nist
       end
     end
 
-    rule(draft: subtree(:draft)) do |context|
-      { stage: { id: "i", type: "prd"} }
+    rule(draft: subtree(:draft)) do |_context|
+      { stage: { id: "i", type: "prd" } }
     end
 
     # Handle edition with revision date (e.g., e2revJune1908)
@@ -54,7 +55,7 @@ module Pubid::Nist
       {
         edition: context[:edition].to_s,
         revision_month: context[:revision_month].to_s,
-        revision_year: context[:revision_year].to_s
+        revision_year: context[:revision_year].to_s,
       }
     end
   end

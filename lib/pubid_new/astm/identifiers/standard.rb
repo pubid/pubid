@@ -6,7 +6,7 @@ module PubidNew
       class Standard < Base
         attribute :sub_year, :string        # a, b, c
         attribute :reapproval, :string      # (2023)
-        attribute :edition, :string       # e1
+        attribute :edition, :string # e1
 
         def to_s
           parts = []

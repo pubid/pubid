@@ -16,8 +16,10 @@ module PubidNew
         attribute :year, :string
         attribute :month, :string
         attribute :day, :string
-        attribute :original_month, :string  # Store original month format
-        attribute :comma_before_month, :boolean, default: -> { false }  # Track if comma was in input
+        attribute :original_month, :string # Store original month format
+        attribute :comma_before_month, :boolean, default: -> {
+          false
+        } # Track if comma was in input
 
         # Month name to number mapping
         MONTH_NAMES = {
@@ -29,12 +31,13 @@ module PubidNew
           "Oct" => "10", "Nov" => "11", "Dec" => "12"
         }.freeze
 
-        def initialize(version: nil, revision: nil, year: nil, month: nil, day: nil)
+        def initialize(version: nil, revision: nil, year: nil, month: nil,
+day: nil)
           super()
           self.version = version
           self.revision = revision
           self.year = year
-          self.original_month = month  # Store original format
+          self.original_month = month # Store original format
           self.month = convert_month(month)
           self.day = day
         end
@@ -42,6 +45,7 @@ module PubidNew
         # Convert month name to numeric value
         def convert_month(month_name)
           return nil unless month_name
+
           MONTH_NAMES[month_name] || month_name
         end
 
@@ -57,7 +61,7 @@ module PubidNew
           if year
             # Use original month format to preserve abbreviated vs full names
             display_month = original_month
-            
+
             if display_month
               # Use comma_before_month flag if set, otherwise detect from month format
               use_comma_before = if defined?(@comma_before_month) && !@comma_before_month.nil?
@@ -66,16 +70,16 @@ module PubidNew
                                    # Default: Full month names have comma, abbreviated don't
                                    display_month.length > 4 && display_month != "Sept"
                                  end
-              
+
               result += use_comma_before ? ", #{display_month}" : " #{display_month}"
               result += " #{day}" if day
-              
+
               # Abbreviated months: " Year", Full months: ", Year"
-              if display_month.length <= 4 || display_month == "Sept"
-                result += " #{year}"
-              else
-                result += ", #{year}"
-              end
+              result += if display_month.length <= 4 || display_month == "Sept"
+                          " #{year}"
+                        else
+                          ", #{year}"
+                        end
             else
               result += " #{year}"
             end

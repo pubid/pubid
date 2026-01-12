@@ -11,7 +11,7 @@ module PubidNew
       class TutorialBundle < Lutaml::Model::Serializable
         attribute :bundle_number, :string
         attribute :style, :string
-        
+
         def to_s
           "CIE Tutorials Bundle #{bundle_number}"
         end

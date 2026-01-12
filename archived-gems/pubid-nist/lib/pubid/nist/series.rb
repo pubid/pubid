@@ -1,11 +1,15 @@
-SERIES = YAML.load_file(File.join(File.dirname(__FILE__), "../../../series.yaml"))
+SERIES = YAML.load_file(File.join(File.dirname(__FILE__),
+                                  "../../../series.yaml"))
 
 module Pubid::Nist
   class Series
     attr_accessor :series, :parsed
 
     def initialize(series:, parsed: nil)
-      raise Errors::SerieInvalidError, "#{series} is not valid series" unless SERIES["long"].key?(series)
+      unless SERIES["long"].key?(series)
+        raise Errors::SerieInvalidError,
+              "#{series} is not valid series"
+      end
 
       @series = series
       @parsed = parsed

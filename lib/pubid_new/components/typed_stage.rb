@@ -9,7 +9,7 @@ module PubidNew
       attribute :stage_code, :string
       attribute :abbr, :string, collection: true
       attribute :harmonized_stages, :string, collection: true
-      attribute :original_abbr, :string  # Store the actual parsed abbreviation
+      attribute :original_abbr, :string # Store the actual parsed abbreviation
       attribute :short_abbr, :string  # Short form: DAM, COR, FDAM
       attribute :long_abbr, :string   # Long form: DAmd, Cor, FDAmd
 
@@ -18,7 +18,7 @@ module PubidNew
           name: name,
           stage_code: stage_code,
           abbr: abbr.first,
-          harmonized_stages: harmonized_stages
+          harmonized_stages: harmonized_stages,
         )
       end
 
@@ -26,7 +26,7 @@ module PubidNew
         Type.new(
           name: name,
           type_code: type_code,
-          abbr: abbr.first
+          abbr: abbr.first,
         )
       end
 
@@ -37,7 +37,7 @@ module PubidNew
         elsif !format_long && short_abbr
           short_abbr
         else
-          abbr.first  # Fallback to canonical
+          abbr.first # Fallback to canonical
         end
       end
 
@@ -45,7 +45,6 @@ module PubidNew
       def canonical_abbreviation
         abbr.first
       end
-
     end
   end
 end

@@ -283,7 +283,8 @@ module Pubid::Iso
 
       it_behaves_like "converts pubid to urn"
       it_behaves_like "converts pubid to pubid"
-      it_behaves_like "converts urn to pubid", "ISO/IEC 13818-1 ED5/Amd 3:2016/Cor 1:2017"
+      it_behaves_like "converts urn to pubid",
+                      "ISO/IEC 13818-1 ED5/Amd 3:2016/Cor 1:2017"
 
       it "should have type :cor" do
         expect(subject.type[:key]).to eq(:cor)
@@ -485,7 +486,8 @@ module Pubid::Iso
       it_behaves_like "converts pubid to urn"
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to french pubid"
-      it_behaves_like "converts urn to pubid", "ISO/IEC 17025 ED1/Cor 1:2006(fr)"
+      it_behaves_like "converts urn to pubid",
+                      "ISO/IEC 17025 ED1/Cor 1:2006(fr)"
 
       it "converts to pubid without date" do
         expect(subject.to_s(format: :ref_undated_long)).to eq(pubid_without_date)
@@ -631,9 +633,12 @@ module Pubid::Iso
 
     context "ISO/IEC FDIS 23008-1/WD Amd 1" do
       let(:pubid) { "ISO/IEC FDIS 23008-1/WD Amd 1" }
-      let(:urn) { "urn:iso:std:iso-iec:23008:-1:stage-draft:ed-2:stage-draft:amd:1:v1" }
+      let(:urn) do
+        "urn:iso:std:iso-iec:23008:-1:stage-draft:ed-2:stage-draft:amd:1:v1"
+      end
 
-      it_behaves_like "converts urn to pubid", "ISO/IEC DIS 23008-1 ED2/WD Amd 1"
+      it_behaves_like "converts urn to pubid",
+                      "ISO/IEC DIS 23008-1 ED2/WD Amd 1"
     end
 
     # Confirms usage of short typed-stage abbreviation for Amd at DIS stages
@@ -691,7 +696,8 @@ module Pubid::Iso
     context "ISO/IEC 14496-10 ED1/FPDAM 1(en)" do
       let(:urn) { "urn:iso:std:iso-iec:14496:-10:ed-1:stage-draft:amd:1:v1:en" }
 
-      it_behaves_like "converts urn to pubid", "ISO/IEC 14496-10 ED1/WD Amd 1(en)"
+      it_behaves_like "converts urn to pubid",
+                      "ISO/IEC 14496-10 ED1/WD Amd 1(en)"
     end
 
     context "ISO/IEC 27006:2015/PDAM 1" do
@@ -730,7 +736,7 @@ module Pubid::Iso
     context "ISO/DPAS 5643:2021(E)" do
       let(:original) { "ISO/DPAS 5643:2021(E)" }
       let(:pubid) { "ISO/DPAS 5643:2021(en)" }
-      let(:urn) { "urn:iso:std:iso:pas:5643:stage-draft:en"}
+      let(:urn) { "urn:iso:std:iso:pas:5643:stage-draft:en" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -739,7 +745,7 @@ module Pubid::Iso
 
     context "ISO/PRF PAS 5643" do
       let(:pubid) { "ISO/PRF PAS 5643" }
-      let(:urn) { "urn:iso:std:iso:pas:5643:stage-draft"}
+      let(:urn) { "urn:iso:std:iso:pas:5643:stage-draft" }
 
       it "return typed_stage_abbrev" do
         expect(subject.typed_stage_abbrev).to eq("PRF PAS")
@@ -1035,7 +1041,9 @@ module Pubid::Iso
 
     context "ISO/IEC Guide 98-3 ED1/Suppl 1:2008/Cor 1:2009" do
       let(:pubid) { "ISO/IEC Guide 98-3 ED1/Suppl 1:2008/Cor 1:2009" }
-      let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:ed-1:sup:2008:v1:cor:2009:v1" }
+      let(:urn) do
+        "urn:iso:std:iso-iec:guide:98:-3:ed-1:sup:2008:v1:cor:2009:v1"
+      end
 
       it_behaves_like "converts pubid to urn"
       it_behaves_like "converts urn to pubid"
@@ -1053,7 +1061,6 @@ module Pubid::Iso
         expect(subject.typed_stage_name).to eq("Proof of a new International Workshop Agreement")
       end
 
-
       it_behaves_like "converts pubid to pubid with prf"
       it_behaves_like "converts pubid to urn"
       it_behaves_like "converts urn to pubid", "DIWA 36"
@@ -1066,12 +1073,15 @@ module Pubid::Iso
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
-      it_behaves_like "converts urn to pubid", "ISO/IEC Guide 98-3/Suppl 1:2008(en)"
+      it_behaves_like "converts urn to pubid",
+                      "ISO/IEC Guide 98-3/Suppl 1:2008(en)"
     end
 
     context "ISO/IEC NP Guide 98:1995/DSuppl 1.2" do
       let(:pubid) { "ISO/IEC NP Guide 98:1995/DSuppl 1.2" }
-      let(:urn) { "urn:iso:std:iso-iec:guide:98:stage-draft:stage-draft:sup:1:v1" }
+      let(:urn) do
+        "urn:iso:std:iso-iec:guide:98:stage-draft:stage-draft:sup:1:v1"
+      end
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -1122,7 +1132,8 @@ module Pubid::Iso
       let(:urn) { "urn:iso:std:iso-iec-ieee:8802:-22:ed-1:amd:2017:v2:en" }
 
       it_behaves_like "converts pubid to urn"
-      it_behaves_like "converts urn to pubid", "ISO/IEC/IEEE 8802-22 ED1/Amd 2:2017(en)"
+      it_behaves_like "converts urn to pubid",
+                      "ISO/IEC/IEEE 8802-22 ED1/Amd 2:2017(en)"
     end
 
     context "ISO/CD2 14065:2018" do
@@ -1290,15 +1301,19 @@ module Pubid::Iso
 
     context "ISO/IEC preCD 29135" do
       let(:original) { "ISO/IEC preCD 29135" }
-      let(:pubid) { "ISO/IEC PreCD 29135" } # @TODO urn: cannot render fuzzy stages
-
+      # @TODO urn: cannot render fuzzy stages
+      let(:pubid) do
+        "ISO/IEC PreCD 29135"
+      end
       it_behaves_like "converts pubid to pubid"
     end
 
     context "ISO/PreCD3 17301-1" do
       let(:original) { "ISO/PreCD3 17301-1" }
-      let(:pubid) { "ISO/PreCD 17301-1.3" } # @TODO urn: cannot render fuzzy stages
-
+      # @TODO urn: cannot render fuzzy stages
+      let(:pubid) do
+        "ISO/PreCD 17301-1.3"
+      end
       it_behaves_like "converts pubid to pubid"
     end
 
@@ -1316,7 +1331,8 @@ module Pubid::Iso
         context "60.60" do
           let(:urn) { "urn:iso:std:iec:60086:-3:stage-60.60" }
           it_behaves_like "converts urn to pubid", "IEC/IS 60086-3"
-          it_behaves_like "converts urn to urn", "urn:iso:std:iec:60086:-3:stage-published"
+          it_behaves_like "converts urn to urn",
+                          "urn:iso:std:iec:60086:-3:stage-published"
         end
 
         context "95.99" do
@@ -1328,38 +1344,47 @@ module Pubid::Iso
 
       context "Suppliment" do
         context "60.00" do
-          let(:urn) { "urn:iso:std:iso:10033:-1:ed-1:stage-60.00:amd:1:v1"}
+          let(:urn) { "urn:iso:std:iso:10033:-1:ed-1:stage-60.00:amd:1:v1" }
           it_behaves_like "converts urn to pubid", "ISO 10033-1 ED1/IS Amd 1"
-          it_behaves_like "converts urn to urn", "urn:iso:std:iso:10033:-1:ed-1:stage-published:amd:1:v1"
+          it_behaves_like "converts urn to urn",
+                          "urn:iso:std:iso:10033:-1:ed-1:stage-published:amd:1:v1"
         end
 
         context "60.60" do
           let(:urn) { "urn:iso:std:iec:60086:-3:ed-4:stage-60.60:cor:2023:v1" }
-          it_behaves_like "converts urn to pubid", "IEC 60086-3 ED4/IS Cor 1:2023"
-          it_behaves_like "converts urn to urn", "urn:iso:std:iec:60086:-3:ed-4:stage-published:cor:2023:v1"
+          it_behaves_like "converts urn to pubid",
+                          "IEC 60086-3 ED4/IS Cor 1:2023"
+          it_behaves_like "converts urn to urn",
+                          "urn:iso:std:iec:60086:-3:ed-4:stage-published:cor:2023:v1"
         end
 
         context "90.92" do
           let(:urn) { "urn:iso:std:iso:11930:ed-2:stage-90.92:amd:2022:v1" }
-          it_behaves_like "converts urn to pubid", "ISO 11930 ED2/WDR Amd 1:2022"
+          it_behaves_like "converts urn to pubid",
+                          "ISO 11930 ED2/WDR Amd 1:2022"
           it_behaves_like "converts urn to urn"
         end
 
         context "90.93" do
           let(:urn) { "urn:iso:std:iso:12085:ed-1:stage-90.93:cor:1998:v1" }
-          it_behaves_like "converts urn to pubid", "ISO 12085 ED1/WDA Cor 1:1998"
+          it_behaves_like "converts urn to pubid",
+                          "ISO 12085 ED1/WDA Cor 1:1998"
           it_behaves_like "converts urn to urn"
         end
 
         context "95.99 Cor" do
-          let(:urn) { "urn:iso:std:iec:60601:-1-11:ed-1:stage-95.99:cor:2011:v1" }
-          it_behaves_like "converts urn to pubid", "IEC 60601-1-11 ED1/WDAR Cor 1:2011"
+          let(:urn) do
+            "urn:iso:std:iec:60601:-1-11:ed-1:stage-95.99:cor:2011:v1"
+          end
+          it_behaves_like "converts urn to pubid",
+                          "IEC 60601-1-11 ED1/WDAR Cor 1:2011"
           it_behaves_like "converts urn to urn"
         end
 
         context "95.99" do
           let(:urn) { "urn:iso:std:iso:1151:-2:ed-2:stage-95.99:sup:1987:v1" }
-          it_behaves_like "converts urn to pubid", "ISO 1151-2 ED2/WDAR Suppl 1:1987"
+          it_behaves_like "converts urn to pubid",
+                          "ISO 1151-2 ED2/WDAR Suppl 1:1987"
           it_behaves_like "converts urn to urn"
         end
       end
@@ -1368,7 +1393,8 @@ module Pubid::Iso
         context "95.99" do
           let(:urn) { "urn:iso:std:iso:1101:ed-1:stage-95.99:ext:1983:v1" }
           it_behaves_like "converts urn to pubid", "ISO 1101 ED1/Ext 1:1983"
-          it_behaves_like "converts urn to urn", "urn:iso:std:iso:1101:ed-1:ext:1983:v1"
+          it_behaves_like "converts urn to urn",
+                          "urn:iso:std:iso:1101:ed-1:ext:1983:v1"
         end
       end
     end
@@ -1384,9 +1410,13 @@ module Pubid::Iso
       end
 
       context "Corrigendum" do
-        let(:original) { "ISO/IEC Guide 98 ED1/Suppl 1:2008/Cor 1:2009 (all parts)" }
+        let(:original) do
+          "ISO/IEC Guide 98 ED1/Suppl 1:2008/Cor 1:2009 (all parts)"
+        end
         let(:pubid) { "ISO/IEC Guide 98/Suppl 1:2008/Cor 1:2009 (all parts)" }
-        let(:urn) { "urn:iso:std:iso-iec:guide:98:ed-1:sup:2008:v1:cor:2009:v1:ser" }
+        let(:urn) do
+          "urn:iso:std:iso-iec:guide:98:ed-1:sup:2008:v1:cor:2009:v1:ser"
+        end
 
         it_behaves_like "converts pubid to pubid"
         it_behaves_like "converts pubid to urn"
@@ -1400,7 +1430,8 @@ module Pubid::Iso
 
         it_behaves_like "converts pubid to pubid"
         it_behaves_like "converts pubid to urn"
-        it_behaves_like "converts urn to pubid", "ISO/IEC 14496 ED2/WD Amd 1 (all parts)"
+        it_behaves_like "converts urn to pubid",
+                        "ISO/IEC 14496 ED2/WD Amd 1 (all parts)"
       end
 
       context "Supplement" do

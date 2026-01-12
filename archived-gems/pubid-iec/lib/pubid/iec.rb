@@ -3,7 +3,8 @@ require "yaml"
 
 module Pubid
   module Iec
-    UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__), "../../update_codes.yaml"))
+    UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__),
+                                            "../../update_codes.yaml"))
   end
 end
 
@@ -47,7 +48,8 @@ require_relative "iec/working_document"
 require_relative "iec/configuration"
 
 config = Pubid::Iec::Configuration.new
-config.stages = YAML.load_file(File.join(File.dirname(__FILE__), "../../stages.yaml"))
+config.stages = YAML.load_file(File.join(File.dirname(__FILE__),
+                                         "../../stages.yaml"))
 config.stage_class = Pubid::Iec::Stage
 config.default_type = Pubid::Iec::Identifier::InternationalStandard
 config.types = [Pubid::Iec::Identifier::InternationalStandard,

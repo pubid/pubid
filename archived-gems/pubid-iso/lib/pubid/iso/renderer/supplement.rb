@@ -49,12 +49,12 @@ module Pubid::Iso::Renderer
       "#{space}#{number}"
     end
 
-    def render_stage(stage, opts, params)
+    def render_stage(stage, _opts, params)
       # do not render stage when already has typed stage
       stage unless params[:typed_stage]
     end
 
-    def render_publisher(publisher, opts, params)
+    def render_publisher(publisher, _opts, _params)
       " #{publisher}" unless publisher.empty?
     end
 

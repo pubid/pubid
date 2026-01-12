@@ -35,7 +35,8 @@ module Pubid::Core
           let(:params) do
             { publisher: "ISO",
               number: 1234,
-              amendments: [{ number: 1, year: 2000 }, { number: 2, year: 2000 }] }
+              amendments: [{ number: 1, year: 2000 },
+                           { number: 2, year: 2000 }] }
           end
 
           it "asigns amendments" do
@@ -64,8 +65,7 @@ module Pubid::Core
           let(:params) do
             { publisher: "ISO", number: 1234, corrigendums:
               [Pubid::Core::Corrigendum.new(number: 1, year: 2000),
-               Pubid::Core::Corrigendum.new(number: 2, year: 2000)]
-            }
+               Pubid::Core::Corrigendum.new(number: 2, year: 2000)] }
           end
 
           it "asigns corrigendums" do
@@ -79,7 +79,8 @@ module Pubid::Core
           let(:params) do
             { publisher: "ISO",
               number: 1234,
-              corrigendums: [{ number: 1, year: 2000 }, { number: 2, year: 2000 }] }
+              corrigendums: [{ number: 1, year: 2000 },
+                             { number: 2, year: 2000 }] }
           end
 
           it "asigns corrigendums" do
@@ -108,7 +109,10 @@ module Pubid::Core
 
       context "when apply amendments" do
         context "when several amendments" do
-          let(:params) { { publisher: "ISO", number: 1234, amendments: [{ number: 1, year: 2000 }, { number: 2, year: 2000 }] } }
+          let(:params) do
+            { publisher: "ISO", number: 1234,
+              amendments: [{ number: 1, year: 2000 }, { number: 2, year: 2000 }] }
+          end
 
           it "asigns amendments" do
             expect(subject.amendments)
@@ -116,7 +120,6 @@ module Pubid::Core
                       Pubid::Core::Amendment.new(number: 2, year: 2000)])
           end
         end
-
       end
     end
 
@@ -139,33 +142,53 @@ module Pubid::Core
       subject { described_class.transform(parsed_data) }
 
       context "when have corrigendum" do
-        let(:parsed_data) { { publisher: "ISO", number: 1234, corrigendums: [{ number: 1, year: 2016 }] } }
+        let(:parsed_data) do
+          { publisher: "ISO", number: 1234,
+            corrigendums: [{ number: 1, year: 2016 }] }
+        end
 
         it "transform parsed data" do
-          expect(subject.corrigendums).to eq([Pubid::Core::Corrigendum.new(number: 1, year: 2016)])
+          expect(subject.corrigendums).to eq([Pubid::Core::Corrigendum.new(
+            number: 1, year: 2016,
+          )])
         end
 
         context "when only one corrigendum" do
-          let(:parsed_data) { { publisher: "ISO", number: 1234, corrigendums: { :number=>"1", :year=>"2016" } } }
+          let(:parsed_data) do
+            { publisher: "ISO", number: 1234,
+              corrigendums: { number: "1", year: "2016" } }
+          end
 
           it "transform parsed data" do
-            expect(subject.corrigendums).to eq([Pubid::Core::Corrigendum.new(number: 1, year: 2016)])
+            expect(subject.corrigendums).to eq([Pubid::Core::Corrigendum.new(
+              number: 1, year: 2016,
+            )])
           end
         end
       end
 
       context "when have amendment" do
-        let(:parsed_data) { { publisher: "ISO", number: 1234, amendments: [{ number: 1, year: 2016 }] } }
+        let(:parsed_data) do
+          { publisher: "ISO", number: 1234,
+            amendments: [{ number: 1, year: 2016 }] }
+        end
 
         it "transform parsed data" do
-          expect(subject.amendments).to eq([Pubid::Core::Amendment.new(number: 1, year: 2016)])
+          expect(subject.amendments).to eq([Pubid::Core::Amendment.new(
+            number: 1, year: 2016,
+          )])
         end
 
         context "when only one amendment" do
-          let(:parsed_data) { { publisher: "ISO", number: 1234, amendments: { :number=>"1", :year=>"2016" } } }
+          let(:parsed_data) do
+            { publisher: "ISO", number: 1234,
+              amendments: { number: "1", year: "2016" } }
+          end
 
           it "transform parsed data" do
-            expect(subject.amendments).to eq([Pubid::Core::Amendment.new(number: 1, year: 2016)])
+            expect(subject.amendments).to eq([Pubid::Core::Amendment.new(
+              number: 1, year: 2016,
+            )])
           end
         end
       end
@@ -175,15 +198,23 @@ module Pubid::Core
       subject { described_class.new(publisher: "ISO", number: 1) }
 
       context "when equal identifiers" do
-        it { expect(subject).to eq(described_class.new(publisher: "ISO", number: 1)) }
+        it {
+          expect(subject).to eq(described_class.new(publisher: "ISO",
+                                                    number: 1))
+        }
       end
 
       context "when different identifiers" do
-        it { expect(subject).not_to eq(described_class.new(publisher: "ISO", number: 2)) }
+        it {
+          expect(subject).not_to eq(described_class.new(publisher: "ISO",
+                                                        number: 2))
+        }
       end
 
       context "different years" do
-        let(:first) { described_class.new(publisher: "ISO", number: 1, year: 1999) }
+        let(:first) do
+          described_class.new(publisher: "ISO", number: 1, year: 1999)
+        end
         let(:second) { described_class.new(publisher: "ISO", number: 1) }
 
         it { expect(first).not_to eq(second) }
@@ -217,11 +248,17 @@ module Pubid::Core
         subject { DummyTechnicalReportType.new(publisher: "ISO", number: 1) }
 
         context "when equal identifiers" do
-          it { expect(subject).to eq(DummyTechnicalReportType.new(publisher: "ISO", number: 1)) }
+          it {
+            expect(subject).to eq(DummyTechnicalReportType.new(publisher: "ISO",
+                                                               number: 1))
+          }
         end
 
         context "when different identifiers" do
-          it { expect(subject).not_to eq(DummyTechnicalReportType.new(publisher: "ISO", number: 2)) }
+          it {
+            expect(subject).not_to eq(DummyTechnicalReportType.new(publisher: "ISO",
+                                                                   number: 2))
+          }
         end
       end
 
@@ -232,15 +269,23 @@ module Pubid::Core
 
     describe "#resolve_typed_stage" do
       context "when harmonized code is matching" do
-        let(:harmonized_code) { DummyTestIdentifier.build_harmonized_stage_code("40.00")}
+        let(:harmonized_code) do
+          DummyTestIdentifier.build_harmonized_stage_code("40.00")
+        end
 
-        it { expect(DummyTechnicalReportType.resolve_typed_stage(harmonized_code).abbr).to eq(:dtr) }
+        it {
+          expect(DummyTechnicalReportType.resolve_typed_stage(harmonized_code).abbr).to eq(:dtr)
+        }
       end
 
       context "when harmonized code is not matching" do
-        let(:harmonized_code) { DummyTestIdentifier.build_harmonized_stage_code("20.20")}
+        let(:harmonized_code) do
+          DummyTestIdentifier.build_harmonized_stage_code("20.20")
+        end
 
-        it { expect(DummyTechnicalReportType.resolve_typed_stage(harmonized_code)).to eq(nil) }
+        it {
+          expect(DummyTechnicalReportType.resolve_typed_stage(harmonized_code)).to eq(nil)
+        }
       end
     end
 
@@ -251,7 +296,9 @@ module Pubid::Core
         it do
           expect(DummyTechnicalReportType.find_typed_stage(typed_stage)).to eq(
             # [:dtr, TestIdentifier.build_stage(harmonized_code: %w[40.00])])
-            DummyTestIdentifier.build_typed_stage(abbr: :dtr, harmonized_code: %w[40.00]))
+            DummyTestIdentifier.build_typed_stage(abbr: :dtr,
+                                                  harmonized_code: %w[40.00]),
+          )
         end
       end
 
@@ -260,7 +307,9 @@ module Pubid::Core
 
         it do
           expect(DummyTechnicalReportType.find_typed_stage(typed_stage)).to eq(
-            DummyTestIdentifier.build_typed_stage(harmonized_code: %w[40.00], abbr: :dtr))
+            DummyTestIdentifier.build_typed_stage(harmonized_code: %w[40.00],
+                                                  abbr: :dtr),
+          )
         end
       end
     end
@@ -273,32 +322,48 @@ module Pubid::Core
     end
 
     describe "has_typed_stage?" do
-      it { expect(DummyTechnicalReportType.has_typed_stage?("DTR")).to be_truthy }
-      it { expect(DummyTechnicalReportType.has_typed_stage?("DTS")).to be_falsey }
+      it {
+        expect(DummyTechnicalReportType.has_typed_stage?("DTR")).to be_truthy
+      }
+      it {
+        expect(DummyTechnicalReportType.has_typed_stage?("DTS")).to be_falsey
+      }
     end
 
     describe "#typed_stage_abbrev" do
       context "when no stage" do
-        subject { DummyTestIdentifier.create(type: :tr, number: 1, publisher: "ISO").typed_stage_abbrev }
+        subject do
+          DummyTestIdentifier.create(type: :tr, number: 1,
+                                     publisher: "ISO").typed_stage_abbrev
+        end
 
         it { expect(subject).to eq("TR") }
       end
 
       context "when stage" do
-        subject { DummyTestIdentifier.create(type: :tr, number: 1, publisher: "ISO", stage: "WD").typed_stage_abbrev }
+        subject do
+          DummyTestIdentifier.create(type: :tr, number: 1, publisher: "ISO",
+                                     stage: "WD").typed_stage_abbrev
+        end
 
         it { expect(subject).to eq("WD TR") }
       end
 
       context "when typed stage" do
-        subject { DummyTestIdentifier.create(type: :tr, number: 1, publisher: "ISO", stage: :dtr).typed_stage_abbrev }
+        subject do
+          DummyTestIdentifier.create(type: :tr, number: 1, publisher: "ISO",
+                                     stage: :dtr).typed_stage_abbrev
+        end
 
         it { expect(subject).to eq("DTR") }
       end
     end
 
     describe "#typed_stage_name" do
-      subject { DummyTestIdentifier.create(type: :tr, number: 1, publisher: "ISO").typed_stage_name }
+      subject do
+        DummyTestIdentifier.create(type: :tr, number: 1,
+                                   publisher: "ISO").typed_stage_name
+      end
 
       it { expect(subject).to eq("Technical Report") }
 
@@ -313,7 +378,10 @@ module Pubid::Core
     end
 
     describe "#resolve_stage" do
-      subject { DummyTechnicalReportType.new(publisher: "ISO", number: 1).resolve_stage(stage) }
+      subject do
+        DummyTechnicalReportType.new(publisher: "ISO",
+                                     number: 1).resolve_stage(stage)
+      end
 
       context "when stage is a Stage class" do
         context "stage have abbreviation" do
@@ -325,10 +393,14 @@ module Pubid::Core
         end
 
         context "stage have harmonized code but don't have abbreviation" do
-          let(:stage) { DummyTestIdentifier.build_stage(harmonized_code: "40.00") }
+          let(:stage) do
+            DummyTestIdentifier.build_stage(harmonized_code: "40.00")
+          end
 
           it "returns stage with resolved typed stage" do
-            expect(subject).to eq(DummyTestIdentifier.build_typed_stage(harmonized_code: %w[40.00], abbr: :dtr))
+            expect(subject).to eq(DummyTestIdentifier.build_typed_stage(
+                                    harmonized_code: %w[40.00], abbr: :dtr,
+                                  ))
           end
         end
       end
@@ -337,7 +409,9 @@ module Pubid::Core
         let(:stage) { "DTR" }
 
         it "returns typed stage and according abbreviation" do
-          expect(subject).to eq(DummyTestIdentifier.build_typed_stage(harmonized_code: %w[40.00], abbr: :dtr))
+          expect(subject).to eq(DummyTestIdentifier.build_typed_stage(
+                                  harmonized_code: %w[40.00], abbr: :dtr,
+                                ))
         end
       end
 
@@ -353,7 +427,9 @@ module Pubid::Core
         let(:stage) { "40.00" }
 
         it "returns stage and according typed stage abbreviation" do
-          expect(subject).to eq(DummyTestIdentifier.build_typed_stage(harmonized_code: %w[40.00], abbr: :dtr))
+          expect(subject).to eq(DummyTestIdentifier.build_typed_stage(
+                                  harmonized_code: %w[40.00], abbr: :dtr,
+                                ))
         end
 
         context "harmonized code for stage" do
@@ -369,7 +445,9 @@ module Pubid::Core
         let(:stage) { "WRONG_STAGE" }
 
         it "raises an error" do
-          expect { subject }.to raise_exception(Pubid::Core::Errors::StageInvalidError)
+          expect do
+            subject
+          end.to raise_exception(Pubid::Core::Errors::StageInvalidError)
         end
       end
     end
@@ -382,13 +460,17 @@ module Pubid::Core
       it { expect(subject).to eq(params) }
 
       context "with typed_stage" do
-        let(:params) { { type: "TR", number: "1", publisher: "ISO", stage: :dtr } }
+        let(:params) do
+          { type: "TR", number: "1", publisher: "ISO", stage: :dtr }
+        end
 
         it { expect(subject).to eq(params) }
       end
 
       context "with stage" do
-        let(:params) { { type: "TR", number: "1", publisher: "ISO", stage: "WD" } }
+        let(:params) do
+          { type: "TR", number: "1", publisher: "ISO", stage: "WD" }
+        end
 
         it { expect(subject).to eq(params) }
       end
@@ -397,8 +479,7 @@ module Pubid::Core
         let(:params) do
           { type: "TR", number: "1", publisher: "ISO",
             amendments: [Pubid::Core::Amendment.new(number: 1, year: 2000),
-                         Pubid::Core::Amendment.new(number: 2, year: 2000)]
-          }
+                         Pubid::Core::Amendment.new(number: 2, year: 2000)] }
         end
 
         it "returns amendments as hashes" do
@@ -422,19 +503,24 @@ module Pubid::Core
       end
 
       context "when created using type class" do
-        subject { DummyTechnicalReportType.new(**params.dup.tap { |h| h.delete(:type) }).to_h }
+        subject do
+          DummyTechnicalReportType.new(**params.dup.tap do |h|
+            h.delete(:type)
+          end).to_h
+        end
 
         it { expect(subject).to eq(params) }
       end
     end
-
 
     describe "#to_yaml" do
       subject { DummyTestIdentifier.create(**params).to_yaml }
 
       let(:params) { { type: "TR", number: "1", publisher: "ISO" } }
 
-      it { expect(subject).to eq("---\n:publisher: ISO\n:number: '1'\n:type: TR\n") }
+      it {
+        expect(subject).to eq("---\n:publisher: ISO\n:number: '1'\n:type: TR\n")
+      }
     end
 
     describe "#exclude" do
@@ -442,22 +528,31 @@ module Pubid::Core
 
       let(:params) { { number: "1", publisher: "ISO", year: 1999 } }
 
-      it { expect(subject.exclude(:year).to_h).to eq(number: "1", publisher: "ISO")}
+      it {
+        expect(subject.exclude(:year).to_h).to eq(number: "1", publisher: "ISO")
+      }
 
-      it { expect(subject.exclude(:year, base: [:year]).to_h).to eq(number: "1", publisher: "ISO") }
+      it {
+        expect(subject.exclude(:year,
+                               base: [:year]).to_h).to eq(number: "1",
+                                                          publisher: "ISO")
+      }
 
       context "when identifier is supplement" do
-        let(:params) { { publisher: "ISO", number: "1", year: 1999, type: :amd, base: { number: 1, year: 2000 } } }
+        let(:params) do
+          { publisher: "ISO", number: "1", year: 1999, type: :amd,
+            base: { number: 1, year: 2000 } }
+        end
 
         it do
           expect(subject.exclude(:year, base: [:year]).to_h).to eq(
-            publisher: "ISO", number: "1", type: "Amd", base: { number: 1 }
+            publisher: "ISO", number: "1", type: "Amd", base: { number: 1 },
           )
         end
 
         it do
           expect(subject.exclude(base: [:year]).to_h).to eq(
-            publisher: "ISO", number: "1", type: "Amd", year: 1999, base: { number: 1 }
+            publisher: "ISO", number: "1", type: "Amd", year: 1999, base: { number: 1 },
           )
         end
       end
@@ -502,8 +597,13 @@ module Pubid::Core
       end
 
       context "when provided edition number" do
-        let(:params) { { number: 1, publisher: "ISO", year: year, edition: edition } }
-        let(:other_params) { { number: 1, publisher: "ISO", year: other_year, edition: other_edition } }
+        let(:params) do
+          { number: 1, publisher: "ISO", year: year, edition: edition }
+        end
+        let(:other_params) do
+          { number: 1, publisher: "ISO", year: other_year,
+            edition: other_edition }
+        end
         let(:edition) { 2 }
 
         context "when other edition number higher" do
@@ -549,9 +649,16 @@ module Pubid::Core
       end
 
       context "when comparing supplements' editions" do
-        let(:params) { { type: :amd, publisher: "ISO", number: 1, year: year, base: base } }
-        let(:base) { described_class.new(number: 1, publisher: "ISO", year: year) }
-        let(:other_params) { { type: :amd, publisher: "ISO", number: 1, year: other_year, base: base } }
+        let(:params) do
+          { type: :amd, publisher: "ISO", number: 1, year: year, base: base }
+        end
+        let(:base) do
+          described_class.new(number: 1, publisher: "ISO", year: year)
+        end
+        let(:other_params) do
+          { type: :amd, publisher: "ISO", number: 1, year: other_year,
+            base: base }
+        end
 
         context "when other supplement is older edition" do
           let(:other_year) { 1998 }

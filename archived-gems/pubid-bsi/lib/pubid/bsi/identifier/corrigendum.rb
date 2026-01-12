@@ -1,7 +1,7 @@
 module Pubid::Bsi
   module Identifier
     class Corrigendum < Base
-      def_delegators 'Pubid::Bsi::Identifier::Corrigendum', :type
+      def_delegators "Pubid::Bsi::Identifier::Corrigendum", :type
 
       def self.type
         { key: :cor, title: "corrigendum" }

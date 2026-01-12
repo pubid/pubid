@@ -9,8 +9,12 @@ RSpec.describe PubidNew::Nist::Parser do
       end
 
       it "parses LCIRC with revision year" do
-        expect { PubidNew::Nist.parse("NBS LCIRC 1019r1963") }.not_to raise_error
-        expect { PubidNew::Nist.parse("NBS LCIRC 1035r1985") }.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+        end.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS LCIRC 1035r1985")
+        end.not_to raise_error
       end
     end
 
@@ -24,12 +28,18 @@ RSpec.describe PubidNew::Nist::Parser do
 
     context "supplement with revision" do
       it "parses supprev notation" do
-        expect { PubidNew::Nist.parse("NBS CIRC 154supprev") }.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS CIRC 154supprev")
+        end.not_to raise_error
       end
 
       it "parses supplement with date" do
-        expect { PubidNew::Nist.parse("NBS CIRC 25suppJan1924") }.not_to raise_error
-        expect { PubidNew::Nist.parse("NBS CIRC 25suppJune1924") }.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS CIRC 25suppJan1924")
+        end.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS CIRC 25suppJune1924")
+        end.not_to raise_error
       end
 
       it "parses supplement with edition" do
@@ -39,12 +49,18 @@ RSpec.describe PubidNew::Nist::Parser do
 
     context "edition with revision and date" do
       it "parses edition with revision and month-year" do
-        expect { PubidNew::Nist.parse("NBS CIRC 13e2revJune1908") }.not_to raise_error
-        expect { PubidNew::Nist.parse("NBS CIRC 13e2revJuly1908") }.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
+        end.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS CIRC 13e2revJuly1908")
+        end.not_to raise_error
       end
 
       it "parses edition with revision year only" do
-        expect { PubidNew::Nist.parse("NBS CIRC 13e2rev1908") }.not_to raise_error
+        expect do
+          PubidNew::Nist.parse("NBS CIRC 13e2rev1908")
+        end.not_to raise_error
       end
 
       it "parses edition with supplement" do

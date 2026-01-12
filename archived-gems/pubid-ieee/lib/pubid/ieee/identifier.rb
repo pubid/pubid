@@ -9,7 +9,8 @@ module Pubid::Ieee
 
       def convert_parser_parameters(type_status: nil, parameters: nil,
                                          organizations: { publisher: "IEEE" }, **args)
-        res = [organizations, type_status, parameters].inject({}) do |result, data|
+        res = [organizations, type_status,
+               parameters].inject({}) do |result, data|
           result.merge(
             case data
             when Hash
@@ -20,7 +21,7 @@ module Pubid::Ieee
               merge_parameters(data)
             else
               {}
-            end
+            end,
           )
         end
         res.merge(args)
@@ -32,11 +33,16 @@ module Pubid::Ieee
         result = {}
         params.each do |item|
           item.each do |key, value|
-            if result.key?(key)
-              result[key] = result[key].is_a?(Array) ? result[key] << value : [result[key], value]
-            else
-              result[key] = value
-            end
+            result[key] = if result.key?(key)
+                            if result[key].is_a?(Array)
+                              result[key] << value
+                            else
+                              [result[key],
+                               value]
+                            end
+                          else
+                            value
+                          end
           end
         end
         result

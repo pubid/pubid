@@ -15,26 +15,24 @@ module PubidNew
             if idx == 0
               # First identifier renders normally
               id.to_s
-            else
+            elsif id.is_a?(Amendment)
               # Supplements render with "+" prefix (bundled/consolidated format)
-              if id.is_a?(Amendment)
-                # Only render the amendment portion, not the full id.to_s
-                result = "+A#{id.amendment_number}"
-                result += ":#{id.amendment_year}" if id.amendment_year
-                result
-              elsif id.is_a?(Corrigendum)
-                # Only render the corrigendum portion
-                result = "+AC"
-                result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
-                if id.corrigendum_year
-                  result += ":#{id.corrigendum_year}"
-                  result += "-#{id.corrigendum_month}" if id.corrigendum_month && !id.corrigendum_month.empty?
-                end
-                result
-              else
-                # Other identifiers (should not happen in typical bundles) render with +
-                "+#{id.to_s}"
+              result = "+A#{id.amendment_number}"
+              result += ":#{id.amendment_year}" if id.amendment_year
+              result
+            # Only render the amendment portion, not the full id.to_s
+            elsif id.is_a?(Corrigendum)
+              # Only render the corrigendum portion
+              result = "+AC"
+              result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
+              if id.corrigendum_year
+                result += ":#{id.corrigendum_year}"
+                result += "-#{id.corrigendum_month}" if id.corrigendum_month && !id.corrigendum_month.empty?
               end
+              result
+            else
+              # Other identifiers (should not happen in typical bundles) render with +
+              "+#{id}"
             end
           end.compact.join
         end

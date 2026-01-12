@@ -3,7 +3,7 @@ require_relative "../renderer/recommendation"
 module Pubid::Iso
   module Identifier
     class Recommendation < Base
-      def_delegators 'Pubid::Iso::Identifier::Recommendation', :type
+      def_delegators "Pubid::Iso::Identifier::Recommendation", :type
 
       TYPED_STAGES = {}.freeze
 

@@ -44,7 +44,7 @@ module PubidNew
     SUPPLEMENT_IDENTIFIER_TYPES = [
       Identifiers::Amendment,
       Identifiers::Corrigendum,
-      Identifiers::InterpretationSheet,  # ISH can act as supplement (/ISH1:1996)
+      Identifiers::InterpretationSheet, # ISH can act as supplement (/ISH1:1996)
     ].freeze
 
     # Create the Scheme registry with all identifier types

@@ -1,7 +1,7 @@
 module Pubid::Cen
   module Identifier
     class Amendment < Base
-      def_delegators 'Pubid::Cen::Identifier::Amendment', :type
+      def_delegators "Pubid::Cen::Identifier::Amendment", :type
       attr_accessor :base
 
       def initialize(base: nil, **opts)

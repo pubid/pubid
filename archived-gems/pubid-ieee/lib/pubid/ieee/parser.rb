@@ -16,7 +16,9 @@ module Pubid::Ieee
     rule(:words_digits) { match('[\dA-Za-z]').repeat(1) }
     rule(:words) { match("[A-Za-z]").repeat(1) }
     rule(:words?) { words.maybe }
-    rule(:year_digits) { (str("19") | str("20")) >> match('\d').repeat(2, 2) >> digits.absent? }
+    rule(:year_digits) do
+      (str("19") | str("20")) >> match('\d').repeat(2, 2) >> digits.absent?
+    end
 
     rule(:month_digits) do
       match('\d').repeat(2, 2)
@@ -52,17 +54,16 @@ module Pubid::Ieee
         ((space | dash) >> str("Edition ") >> (digits >> dot >> digits).as(:edition) >> (str(" - ") | space) >>
         year_digits.as(:year) >> (dash >>
           month_digits.as(:month)).maybe) |
-        #, February 2018 (E)
+        # , February 2018 (E)
         (comma_month_year >> str("(E)")) |
         # (comma_month_year >> space? >> str("(E)")) |
         # comma_month_year |
         # First edition 2002-11-01
         space >> str("First").as(:edition) >>
-        str(" edition ") >>
+          str(" edition ") >>
           year_digits.as(:year) >> dash >>
           month_digits.as(:month) >> (dash >>
           day_digits.as(:day)).maybe
-
     end
 
     rule(:draft_status) do
@@ -84,10 +85,12 @@ module Pubid::Ieee
     rule(:draft_version) do
       # for D1D2
       (str("D") >> digits.as(:version)).repeat(2) |
-      # for DD3, D3Q
-      # don't parse "DIS" as draft
-      # "-d" suffix for IEEE Unapproved Draft Std P336/D2009-d, Jul 2009
-      (str("D") >> str("IS").absent? >> str("-").maybe >> (words_digits >> str("-d").maybe).as(:version)).repeat(1, 1)
+        # for DD3, D3Q
+        # don't parse "DIS" as draft
+        # "-d" suffix for IEEE Unapproved Draft Std P336/D2009-d, Jul 2009
+        (str("D") >> str("IS").absent? >> str("-").maybe >> (words_digits >> str("-d").maybe).as(:version)).repeat(
+          1, 1
+        )
     end
 
     rule(:draft) do
@@ -149,7 +152,7 @@ module Pubid::Ieee
         (
           (str("(") >> (identifier_no_params.as(:alternative) >> str(", ").maybe).repeat(1) >> str(")") |
             str("(") >> (iso_identifier >> iso_parameters).as(:alternative) >> str(")")
-            )
+          )
         )
     end
 
@@ -217,7 +220,7 @@ module Pubid::Ieee
     rule(:additional_parameters) do
       (space? >> str("(") >> (
         (reaffirmed | revision | amendment | supersedes |
-          corrigendum_comment| incorporates | supplement | includes | adoption) >>
+          corrigendum_comment | incorporates | supplement | includes | adoption) >>
           ((str("/") | str(",")) >> space?).maybe).repeat >> str(")").maybe
       ).repeat >> redline.maybe
     end
@@ -299,11 +302,13 @@ module Pubid::Ieee
     end
 
     rule(:identifier_with_org_no_params) do
-      iso_identifier | parameters(organizations >> space?, skip_parameters: true)
+      iso_identifier | parameters(organizations >> space?,
+                                  skip_parameters: true)
     end
 
     rule(:identifier_no_params) do
-      parameters((organizations >> space).maybe, skip_parameters: true, without_dual_pubids: true)
+      parameters((organizations >> space).maybe, skip_parameters: true,
+                                                 without_dual_pubids: true)
     end
 
     rule(:iso_part) do
@@ -337,15 +342,15 @@ module Pubid::Ieee
     rule(:iso_part_stage_iteration_matcher) do
       # consumes "/"
       iso_part_stage_iteration |
-      iso_stage_part_iteration |
-      iso_part_iteration# |
+        iso_stage_part_iteration |
+        iso_part_iteration # |
       # iso_stage_iteration
     end
 
     rule(:iso_identifier) do
       # Pubid::Iso::Parser.new.identifier.as(:iso_identifier)
-        # Withdrawn e.g: WD/ISO 10360-5:2000
-        # for French and Russian PubIDs starting with Guide type
+      # Withdrawn e.g: WD/ISO 10360-5:2000
+      # for French and Russian PubIDs starting with Guide type
       ((iso_parser.guide_prefix.as(:type) >> str(" ")).maybe >>
       (iso_parser.typed_stage.as(:stage) >> str(" ")).maybe >>
         iso_parser.originator >> ((str(" ") | str("/")) >>
@@ -365,7 +370,7 @@ module Pubid::Ieee
       iso_amendment.maybe >>
       corrigendum.maybe >>
       iso_parser.supplement.maybe >>
-        (edition | iso_parser.edition ).maybe >>
+        (edition | iso_parser.edition).maybe >>
         iso_parser.language.maybe).as(:iso_identifier)
     end
 
@@ -376,7 +381,7 @@ module Pubid::Ieee
     end
 
     rule(:identifier_before_edition) do
-      ((str(" Edition")).absent? >> any).repeat(1)
+      (str(" Edition").absent? >> any).repeat(1)
     end
 
     rule(:identifier) do
@@ -405,7 +410,7 @@ module Pubid::Ieee
 
     rule(:identifier_without_dual_pubids) do
       (iso_identifier >> iso_parameters) |
-      parameters((organizations >> space).maybe, without_dual_pubids: true)
+        parameters((organizations >> space).maybe, without_dual_pubids: true)
     end
 
     rule(:identifier_without_parameters) do

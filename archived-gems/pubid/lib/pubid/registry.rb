@@ -23,7 +23,8 @@ module Pubid
           next
         end
 
-        raise Pubid::Core::Errors::ParseError, "cannot find module to parse #{args}"
+        raise Pubid::Core::Errors::ParseError,
+              "cannot find module to parse #{args}"
       end
     end
   end

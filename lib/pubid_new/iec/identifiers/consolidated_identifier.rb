@@ -14,17 +14,17 @@ module PubidNew
           identifiers.map.with_index do |id, idx|
             if idx == 0
               # First identifier renders normally
-              id.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
-            else
+              id.to_s(lang: lang, lang_single: lang_single,
+                      with_edition: with_edition)
+            elsif id.is_a?(Amendment)
               # Subsequent identifiers render with + prefix
               # For amendments, just show +AMDn:year part
-              if id.is_a?(Amendment)
-                "+AMD#{id.number}:#{id.date.year}"
-              elsif id.is_a?(Corrigendum)
-                "+COR#{id.number}:#{id.date.year}"
-              else
-                "+#{id.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)}"
-              end
+              "+AMD#{id.number}:#{id.date.year}"
+            elsif id.is_a?(Corrigendum)
+              "+COR#{id.number}:#{id.date.year}"
+            else
+              "+#{id.to_s(lang: lang, lang_single: lang_single,
+                          with_edition: with_edition)}"
             end
           end.join
         end

@@ -10,7 +10,7 @@ module PubidNew
           PubidNew::Components::TypedStage.new(
             abbr: [""],
             type_code: :guide,
-            stage_code: :published
+            stage_code: :published,
           ),
         ].freeze
 

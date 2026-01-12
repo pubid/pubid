@@ -38,9 +38,9 @@ RSpec.describe PubidNew::Ieee::Parser do
       it "recognizes ASME in parser organization list" do
         # Test that ASME can be parsed as publisher
         # (Even though typically seen in equivalence patterns)
-        expect {
+        expect do
           PubidNew::Ieee.parse("ASME PTC 19.6-1955")
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 
@@ -53,9 +53,9 @@ RSpec.describe PubidNew::Ieee::Parser do
 
       it "recognizes ASA in parser organization list" do
         # Test that ASA can be parsed as publisher
-        expect {
+        expect do
           PubidNew::Ieee.parse("ASA C55-1934")
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 

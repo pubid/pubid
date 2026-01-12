@@ -2,7 +2,6 @@ require_relative "base"
 
 module Pubid::Iso::Renderer
   class Recommendation < Base
-
     TYPE = "R".freeze
 
     def omit_post_publisher_symbol?(_typed_stage, _stage, _opts)

@@ -8,16 +8,17 @@ module PubidNew
       class VapSuffix < Lutaml::Model::Serializable
         # VAP suffix codes as defined by IEC
         CODES = {
-          'CMV' => 'Common Modifications and Variations',
-          'RLV' => 'Relevant',
-          'SER' => 'Serial'
+          "CMV" => "Common Modifications and Variations",
+          "RLV" => "Relevant",
+          "SER" => "Serial",
         }.freeze
 
         attribute :code, :string
 
         def validate!
           unless CODES.key?(code)
-            raise ArgumentError, "Unknown VAP suffix code: #{code}. Valid codes: #{CODES.keys.join(', ')}"
+            raise ArgumentError,
+                  "Unknown VAP suffix code: #{code}. Valid codes: #{CODES.keys.join(', ')}"
           end
         end
 

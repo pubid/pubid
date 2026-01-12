@@ -8,21 +8,23 @@ module PubidNew
       attribute :base_identifier, Oiml::Identifier
       attribute :year, :string
       attribute :language, :string
-      attribute :parsed_format, :string, default: -> { "short" }  # Track supplement's parsed format
+      attribute :parsed_format, :string, default: -> {
+        "short"
+      } # Track supplement's parsed format
 
       def to_s(format: :short)
         # Determine base format: explicit parameter takes priority, else use parsed format
         base_format = if format && format != :short
-          format  # Use explicit override
-        elsif base_identifier.respond_to?(:parsed_format) && base_identifier.parsed_format == "long"
-          :long
-        else
-          :short
-        end
+                        format # Use explicit override
+                      elsif base_identifier.respond_to?(:parsed_format) && base_identifier.parsed_format == "long"
+                        :long
+                      else
+                        :short
+                      end
 
         # Render base with determined format (preserves Edition vs colon)
         base_str = base_identifier.to_s(format: base_format)
-        base_str = base_str.sub(/\s*\([^)]+\)\s*$/, '').strip  # Remove language from base
+        base_str = base_str.sub(/\s*\([^)]+\)\s*$/, "").strip # Remove language from base
 
         result = "#{supplement_type} (#{year}) to #{base_str}"
 

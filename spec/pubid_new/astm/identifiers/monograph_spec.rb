@@ -3,7 +3,6 @@
 require "spec_helper"
 
 RSpec.describe PubidNew::Astm::Identifier::Monograph do
-
   # ========================================
   # Monograph (10 IDs, 3%)
   # ========================================

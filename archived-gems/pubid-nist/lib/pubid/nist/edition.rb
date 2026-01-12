@@ -11,7 +11,6 @@ module Pubid::Nist
     end
 
     def to_s(format: :short)
-
       if format == :long
         result = (@number && ["Edition #{@number}"]) || []
         if @day

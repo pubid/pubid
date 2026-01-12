@@ -2,7 +2,9 @@ module Pubid::Plateau
   RSpec.describe Identifier do
     describe "creating new identifier" do
       # type: "EN", number: 1234, part: 4, version: "1.2.3", date: "1999-01"
-      let(:base) { described_class.create(**{ type: type, number: number }.merge(params)) }
+      let(:base) do
+        described_class.create(**{ type: type, number: number }.merge(params))
+      end
       subject { base }
       let(:number) { 1 }
       let(:params) { { annex: 1, edition: 1.2 } }

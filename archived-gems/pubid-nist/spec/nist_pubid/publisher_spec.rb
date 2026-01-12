@@ -16,11 +16,13 @@ module Pubid::Nist
 
       it "parses long code" do
         expect(described_class.parse(
-          "National Institute of Standards and Technology SP 800-85Ar4")
+          "National Institute of Standards and Technology SP 800-85Ar4",
+        )
             .to_s(:short))
           .to eq("NIST")
         expect(described_class.parse(
-          "National Bureau of Standards SP 800-85Ar4")
+          "National Bureau of Standards SP 800-85Ar4",
+        )
                               .to_s(:short))
           .to eq("NBS")
       end

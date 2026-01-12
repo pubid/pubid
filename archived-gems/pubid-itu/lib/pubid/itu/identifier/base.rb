@@ -23,7 +23,6 @@ module Pubid::Itu
       def initialize(publisher: "ITU", series: nil, sector: nil, part: nil,
                      date: nil, amendment: nil, subseries: nil, number: nil,
                      second_number: nil, annex: nil, range: nil, **opts)
-
         super(**opts.merge(publisher: publisher, number: number))
         @series = series
         @sector = sector
@@ -57,13 +56,16 @@ module Pubid::Itu
             Identifier.create(
               type: type,
               base: transform(
-                **identifier_params.dup.tap { |h| h.delete(type) }),
+                **identifier_params.dup.tap { |h| h.delete(type) },
+              ),
               **identifier_params[type],
             )
           else
             Identifier.create(
               type: type,
-              base: transform(**identifier_params.dup.tap { |h| h.delete(type) })
+              base: transform(**identifier_params.dup.tap do |h|
+                h.delete(type)
+              end),
             )
           end
         end
@@ -74,8 +76,12 @@ module Pubid::Itu
             get_transformer_class.new.apply(k => v)
           end.inject({}, :merge)
 
-          %i(supplement amendment corrigendum annex addendum appendix).each do |type|
-            return transform_supplements(type, identifier_params) if identifier_params[type]
+          %i(supplement amendment corrigendum annex addendum
+             appendix).each do |type|
+            if identifier_params[type]
+              return transform_supplements(type,
+                                           identifier_params)
+            end
           end
           Identifier.create(**identifier_params)
         end

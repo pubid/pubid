@@ -15,18 +15,21 @@ module Pubid::Bsi
       { supplement:
           case context[:supplement][:type]
           when "A"
-            Identifier::Amendment.new(**context[:supplement].dup.tap { |h| h.delete(:type) })
+            Identifier::Amendment.new(**context[:supplement].dup.tap do |h|
+              h.delete(:type)
+            end)
           when "C"
-            Identifier::Corrigendum.new(**context[:supplement].dup.tap { |h| h.delete(:type) })
-          end
-       }
+            Identifier::Corrigendum.new(**context[:supplement].dup.tap do |h|
+              h.delete(:type)
+            end)
+          end }
     end
 
     rule(adopted: subtree(:adopted)) do |context|
       { adopted: Pubid::Iec::Identifier.parse(context[:adopted].to_s) }
     rescue Pubid::Core::Errors::ParseError
       begin
-      { adopted: Pubid::Iso::Identifier.parse(context[:adopted].to_s) }
+        { adopted: Pubid::Iso::Identifier.parse(context[:adopted].to_s) }
       rescue Pubid::Core::Errors::ParseError
         { adopted: Pubid::Cen::Identifier.parse(context[:adopted].to_s) }
       end

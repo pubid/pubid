@@ -13,7 +13,8 @@ module Pubid::Jis
 
       # @param month [Integer] document's month
       # @param edition [String] document's edition version, e.g. "3.0", "1.0"
-      def initialize(publisher: "JIS", series: nil, part: nil, all_parts: false, **opts)
+      def initialize(publisher: "JIS", series: nil, part: nil,
+all_parts: false, **opts)
         super(**opts.merge(publisher: publisher))
         @series = series if series
         @part = part if part
@@ -26,8 +27,10 @@ module Pubid::Jis
 
       def ==(other)
         if all_parts? || other.all_parts?
-          return to_h.reject { |k, _| [:year, :part, :all_parts].include?(k) } ==
-            other.to_h.reject { |k, _| [:year, :part, :all_parts].include?(k) }
+          return to_h.reject do |k, _|
+            %i[year part all_parts].include?(k)
+          end ==
+              other.to_h.reject { |k, _| %i[year part all_parts].include?(k) }
         end
 
         super
@@ -50,11 +53,13 @@ module Pubid::Jis
 
           return supplements.first if supplements.count == 1
 
-          raise Errors::SupplementParsingError, "more than one or none supplements provided"
+          raise Errors::SupplementParsingError,
+                "more than one or none supplements provided"
         end
 
         def transform_explanation(params, base_params)
-          Identifier.create(type: :explanation, base: Identifier.create(**base_params), **params)
+          Identifier.create(type: :explanation,
+                            base: Identifier.create(**base_params), **params)
         end
 
         # Use Identifier#create to resolve identifier's type class
@@ -66,14 +71,14 @@ module Pubid::Jis
           if identifier_params[:supplements]
             return transform_supplements(
               identifier_params[:supplements],
-              identifier_params.dup.tap { |h| h.delete(:supplements) }
+              identifier_params.dup.tap { |h| h.delete(:supplements) },
             )
           end
 
           if identifier_params[:explanation]
             return transform_explanation(
               identifier_params[:explanation].is_a?(Hash) ? identifier_params[:explanation] : {},
-              identifier_params.dup.tap { |h| h.delete(:explanation) }
+              identifier_params.dup.tap { |h| h.delete(:explanation) },
             )
           end
 

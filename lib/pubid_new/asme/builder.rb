@@ -99,11 +99,11 @@ module PubidNew
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:ssc_code]
             # BPVC.SSC.XI.II.V.IX pattern
             ssc_sections = bpvc_data[:subdivision][:ssc_sections]
-            if ssc_sections.is_a?(Array)
-              sections_str = ssc_sections.map(&:to_s).join(".")
-            else
-              sections_str = ssc_sections.to_s
-            end
+            sections_str = if ssc_sections.is_a?(Array)
+                             ssc_sections.map(&:to_s).join(".")
+                           else
+                             ssc_sections.to_s
+                           end
             designator_str = "BPVC.SSC.#{sections_str}"
             number_str = ""
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:case_code]
@@ -125,7 +125,9 @@ module PubidNew
             sub_subsection = bpvc_data[:subdivision][:sub_subsection]&.to_s || ""
             lang_suffix = bpvc_data[:subdivision][:lang_suffix]&.to_s || ""
 
-            parts = [section, subsection, sub_subsection].reject { |p| p.nil? || p.empty? }
+            parts = [section, subsection, sub_subsection].reject do |p|
+              p.nil? || p.empty?
+            end
             designator_str = "BPVC.#{parts.join('.')}"
             designator_str += "_#{lang_suffix}" if !lang_suffix.empty?
             number_str = ""
@@ -135,7 +137,8 @@ module PubidNew
             number_str = ""
           end
 
-          return Components::Code.new(designator: designator_str, number: number_str)
+          return Components::Code.new(designator: designator_str,
+                                      number: number_str)
         end
 
         # For joint published, handle special cases

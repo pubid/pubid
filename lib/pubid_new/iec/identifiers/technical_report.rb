@@ -16,7 +16,7 @@ module PubidNew
             type_code: :tr,
             abbr: ["DTR"],
             name: "Draft Technical Report",
-            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99]
+            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
           ),
           PubidNew::Components::TypedStage.new(
             code: :tr,
@@ -24,8 +24,8 @@ module PubidNew
             type_code: :tr,
             abbr: ["TR"],
             name: "Technical Report",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         # Project stages specific to Technical Reports
@@ -34,33 +34,33 @@ module PubidNew
           adtr: {
             abbr: "ADTR",
             name: "Approved for DTR",
-            harmonized_stages: %w[40.99]
+            harmonized_stages: %w[40.99],
           },
           cdtr: {
             abbr: "CDTR",
             name: "Draft circulated as DTR",
-            harmonized_stages: %w[50.20]
+            harmonized_stages: %w[50.20],
           },
           dtrm: {
             abbr: "DTRM",
             name: "Rejected DTR to be discussed at meeting",
-            harmonized_stages: %w[50.92]
+            harmonized_stages: %w[50.92],
           },
           ndtr: {
             abbr: "NDTR",
             name: "DTR rejected",
-            harmonized_stages: %w[50.92]
+            harmonized_stages: %w[50.92],
           },
           prvdtr: {
             abbr: "PRVDTR",
             name: "Preparation of RVDTR",
-            harmonized_stages: %w[50.60]
+            harmonized_stages: %w[50.60],
           },
           tdtr: {
             abbr: "TDTR",
             name: "Translation of DTR",
-            harmonized_stages: %w[50.00]
-          }
+            harmonized_stages: %w[50.00],
+          },
         }.freeze
 
         def self.type

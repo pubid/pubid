@@ -4,7 +4,7 @@ require_relative "../renderer/urn-corrigendum"
 module Pubid::Iso
   module Identifier
     class Corrigendum < Supplement
-      def_delegators 'Pubid::Iso::Identifier::Corrigendum', :type
+      def_delegators "Pubid::Iso::Identifier::Corrigendum", :type
 
       TYPED_STAGES = {
         dcor: {
@@ -30,7 +30,10 @@ module Pubid::Iso
       end
 
       def urn
-        raise Errors::NoEditionError, "Base document must have edition" unless base_has_edition?
+        unless base_has_edition?
+          raise Errors::NoEditionError,
+                "Base document must have edition"
+        end
 
         Renderer::UrnCorrigendum.new(to_h(deep: false)).render
       end

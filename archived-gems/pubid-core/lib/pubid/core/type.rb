@@ -11,7 +11,10 @@ module Pubid::Core
       end
       type = type.to_s.downcase.to_sym unless type.is_a?(Symbol)
 
-      raise Errors::WrongTypeError, "#{type} type is not available" unless @config.type_names.key?(type)
+      unless @config.type_names.key?(type)
+        raise Errors::WrongTypeError,
+              "#{type} type is not available"
+      end
 
       @type = type
     end

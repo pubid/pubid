@@ -11,14 +11,16 @@ require_relative "../components/typed_stage"
 module PubidNew
   module Bsi
     class SingleIdentifier < Lutaml::Model::Serializable
-      attribute :publisher, Bsi::Components::Publisher, default: -> { Bsi::Components::Publisher.new(body: "BS") }
-      attribute :prefix, :string  # Specialized prefix (A, AU, C, M, 2A, etc.)
-      attribute :flex_prefix, :string  # Flex type prefix (CECC, E9111, M, etc.)
+      attribute :publisher, Bsi::Components::Publisher, default: -> {
+        Bsi::Components::Publisher.new(body: "BS")
+      }
+      attribute :prefix, :string # Specialized prefix (A, AU, C, M, 2A, etc.)
+      attribute :flex_prefix, :string # Flex type prefix (CECC, E9111, M, etc.)
       attribute :number, Bsi::Components::Code
-      attribute :iteration, :string  # For bracket notation like 1000[9]
+      attribute :iteration, :string # For bracket notation like 1000[9]
       attribute :part, Bsi::Components::Code
       attribute :subpart, Bsi::Components::Code
-      attribute :second_number, Bsi::Components::Code  # For collections like PAS 2035/2030
+      attribute :second_number, Bsi::Components::Code # For collections like PAS 2035/2030
       attribute :date, Bsi::Components::Date
       attribute :stage, PubidNew::Components::Stage
       attribute :type, Bsi::Components::Type
@@ -33,16 +35,15 @@ module PubidNew
         parts = []
 
         # For supplement/addendum base identifiers, flex_prefix replaces publisher+prefix
+        parts << publisher.to_s if publisher
         if flex_prefix
           # Flex prefix is the full prefix including BS (e.g., "BS CECC" becomes "BS" + space + "CECC")
-          parts << publisher.to_s if publisher
           parts << flex_prefix
-        else
+        elsif prefix
           # Standard publisher
-          parts << publisher.to_s if publisher
 
           # Prefix if present (specialized prefix like A, AU, C, etc.)
-          parts << "#{prefix}" if prefix
+          parts << prefix.to_s
         end
 
         # Number with iteration, part, and subpart

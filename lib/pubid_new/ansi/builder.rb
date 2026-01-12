@@ -20,10 +20,16 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+              if identifier.respond_to?("#{sub_key}=")
+                identifier.send("#{sub_key}=",
+                                sub_value)
+              end
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
@@ -54,9 +60,9 @@ module PubidNew
           original_value = value.to_s
 
           # Split by dash to separate main number from parts
-          main_and_parts = original_value.split('-')
-          main_number = main_and_parts[0]  # X3.4, C63.4, 9899, 802.3
-          part_number = main_and_parts[1]   # 1986, 2014, 2012, or nil
+          main_and_parts = original_value.split("-")
+          main_number = main_and_parts[0] # X3.4, C63.4, 9899, 802.3
+          part_number = main_and_parts[1] # 1986, 2014, 2012, or nil
 
           {
             number: Components::Code.new(value: main_number),

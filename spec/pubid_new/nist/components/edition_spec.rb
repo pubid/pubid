@@ -42,21 +42,24 @@ RSpec.describe PubidNew::Nist::Components::Edition do
 
     context "with additional text" do
       it "creates edition with month and year" do
-        edition = described_class.new(type: "e", id: "2", additional_text: "June1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "June1908")
         expect(edition.type).to eq("e")
         expect(edition.id).to eq("2")
         expect(edition.additional_text).to eq("June1908")
       end
 
       it "creates edition with year only additional text" do
-        edition = described_class.new(type: "e", id: "2", additional_text: "1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "1908")
         expect(edition.type).to eq("e")
         expect(edition.id).to eq("2")
         expect(edition.additional_text).to eq("1908")
       end
 
       it "creates revision with additional text" do
-        edition = described_class.new(type: "r", id: "5", additional_text: "March1920")
+        edition = described_class.new(type: "r", id: "5",
+                                      additional_text: "March1920")
         expect(edition.type).to eq("r")
         expect(edition.id).to eq("5")
         expect(edition.additional_text).to eq("March1920")
@@ -96,22 +99,26 @@ RSpec.describe PubidNew::Nist::Components::Edition do
 
     context "edition with additional text" do
       it "renders edition with month and year using DOT separator" do
-        edition = described_class.new(type: "e", id: "2", additional_text: "June1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "June1908")
         expect(edition.to_s).to eq("e2.June1908")
       end
 
       it "renders edition with year only using DOT separator" do
-        edition = described_class.new(type: "e", id: "2", additional_text: "1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "1908")
         expect(edition.to_s).to eq("e2.1908")
       end
 
       it "renders revision with additional text using DOT separator" do
-        edition = described_class.new(type: "r", id: "5", additional_text: "March1920")
+        edition = described_class.new(type: "r", id: "5",
+                                      additional_text: "March1920")
         expect(edition.to_s).to eq("r5.March1920")
       end
 
       it "never includes 'rev' in output" do
-        edition = described_class.new(type: "e", id: "2", additional_text: "June1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "June1908")
         expect(edition.to_s).not_to include("rev")
         expect(edition.to_s).to include(".")
       end
@@ -125,7 +132,8 @@ RSpec.describe PubidNew::Nist::Components::Edition do
     end
 
     it "renders edition with additional text in mr format" do
-      edition = described_class.new(type: "e", id: "2", additional_text: "June1908")
+      edition = described_class.new(type: "e", id: "2",
+                                    additional_text: "June1908")
       expect(edition.to_s(:mr)).to eq("e2.June1908")
     end
 
@@ -163,7 +171,8 @@ RSpec.describe PubidNew::Nist::Components::Edition do
 
     context "with additional text" do
       it "renders edition with additional text" do
-        edition = described_class.new(type: "e", id: "2", additional_text: "June1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "June1908")
         # Long format doesn't change additional text handling
         expect(edition.to_s(:long)).to eq("Edition 2")
       end
@@ -272,9 +281,10 @@ RSpec.describe PubidNew::Nist::Components::Edition do
       [
         { month: "Jan", expected: "e2.Jan1908" },
         { month: "February", expected: "e2.February1908" },
-        { month: "Mar", expected: "e2.Mar1908" }
+        { month: "Mar", expected: "e2.Mar1908" },
       ].each do |test_case|
-        edition = described_class.new(type: "e", id: "2", additional_text: "#{test_case[:month]}1908")
+        edition = described_class.new(type: "e", id: "2",
+                                      additional_text: "#{test_case[:month]}1908")
         expect(edition.to_s).to eq(test_case[:expected])
       end
     end

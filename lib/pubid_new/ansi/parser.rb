@@ -43,14 +43,14 @@ module PubidNew
         (
           # Letter prefix with multiple dots and optional letter suffix
           # C37.06.1, C57.12.10, C63.25.1, N323A, N42.49A
-          (match['A-Z'].repeat(1) >>
+          (match["A-Z"].repeat(1) >>
            digits >>
-           (str(".") >> digits).repeat(0, 3) >>  # Allow up to 3 additional dot-separated parts
-           match['A-Z'].maybe >>                  # Optional letter suffix (A, B, etc.)
+           (str(".") >> digits).repeat(0, 3) >> # Allow up to 3 additional dot-separated parts
+           match["A-Z"].maybe >>                  # Optional letter suffix (A, B, etc.)
            (str("-") >> digits).maybe) |          # Optional dash-year part
           # Just digits with optional dots and letter suffix: 9899, 802.3-2012, 802.1b-1995
           (digits >>
-           (str(".") >> digits >> match['a-z'].maybe).repeat(0, 2) >>  # Dots with optional lowercase letter
+           (str(".") >> digits >> match["a-z"].maybe).repeat(0, 2) >> # Dots with optional lowercase letter
            (str("-") >> digits).maybe)
         ).as(:number_with_part)
       end

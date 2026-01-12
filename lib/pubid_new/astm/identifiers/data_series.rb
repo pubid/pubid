@@ -4,7 +4,7 @@ module PubidNew
   module Astm
     module Identifiers
       class DataSeries < Base
-        attribute :hol_suffix, :boolean      # HOL suffix
+        attribute :hol_suffix, :boolean # HOL suffix
 
         def to_s
           parts = []

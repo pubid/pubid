@@ -5,7 +5,7 @@ module Pubid::Jis
     class Amendment < Base
       attribute :base, :string
 
-      def_delegators 'Pubid::Jis::Identifier::Amendment', :type
+      def_delegators "Pubid::Jis::Identifier::Amendment", :type
 
       def initialize(base: nil, **opts)
         super(**opts)

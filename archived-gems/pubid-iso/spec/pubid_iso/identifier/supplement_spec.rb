@@ -4,7 +4,9 @@ module Pubid::Iso
       context "when create supplement identifier" do
         let(:base) { Identifier.create(**{ number: number }.merge(params)) }
 
-        subject { described_class.new(number: 1, base: base, **supplement_params) }
+        subject do
+          described_class.new(number: 1, base: base, **supplement_params)
+        end
         let(:params) { { year: year } }
         let(:number) { 123 }
 

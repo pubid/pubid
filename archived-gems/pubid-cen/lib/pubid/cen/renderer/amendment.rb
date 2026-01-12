@@ -5,9 +5,9 @@ module Pubid::Cen
     class Amendment < Pubid::Core::Renderer::Base
       def render_identifier(params)
         if params[:base].is_a?(Identifier::Base)
-          "%{base}/A%{number}%{year}" % params
+          "%<base>s/A%<number>s%<year>s" % params
         else
-          "+A%{number}%{year}" % params
+          "+A%<number>s%<year>s" % params
         end
       end
     end

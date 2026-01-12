@@ -3,7 +3,7 @@ module Pubid::Plateau::Renderer
     TYPE = "".freeze
 
     def render_identifier(params)
-      "%{publisher} #{self::class::TYPE} #%{number}%{annex}%{edition}" % params
+      "%<publisher>s #{self::class::TYPE} #%<number>s%<annex>s%<edition>s" % params
     end
 
     def render_number(number, _opts, _params)

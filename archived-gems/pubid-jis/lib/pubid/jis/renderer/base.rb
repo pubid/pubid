@@ -7,7 +7,7 @@ module Pubid::Jis::Renderer
     end
 
     def render_identifier(params)
-      "%{publisher}%{series} %{number}%{part}%{year}%{all_parts}" % params
+      "%<publisher>s%<series>s %<number>s%<part>s%<year>s%<all_parts>s" % params
     end
 
     def render_publisher(publisher, opts, params)
@@ -18,7 +18,7 @@ module Pubid::Jis::Renderer
       opts[:with_publisher] ? " #{series}" : series
     end
 
-    def render_part(part, opts, _params)
+    def render_part(part, _opts, _params)
       return "-#{part.join('-')}" if part.is_a?(Array)
 
       "-#{part}"

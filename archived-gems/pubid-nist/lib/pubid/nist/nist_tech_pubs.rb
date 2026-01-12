@@ -11,7 +11,6 @@ module Pubid::Nist
     @converted_id = @converted_doi = {}
 
     class << self
-
       attr_accessor :documents, :converted_id, :converted_doi
 
       def fetch
@@ -44,13 +43,13 @@ module Pubid::Nist
 
       def parse_docid(doc)
         id = doc.at("publisher_item/item_number", "publisher_item/identifier")
-               &.text&.sub(%r{^/}, "")
-        if id == "NBS BH 10"
-          # XXX: "doi" attribute is missing for doi_data
-          doi = "NBS.BH.10"
-        else
-          doi = doc.at("doi_data/doi").text.gsub("10.6028/", "")
-        end
+          &.text&.sub(%r{^/}, "")
+        doi = if id == "NBS BH 10"
+                # XXX: "doi" attribute is missing for doi_data
+                "NBS.BH.10"
+              else
+                doc.at("doi_data/doi").text.gsub("10.6028/", "")
+              end
 
         title = doc.at("titles/title").text
         title += " #{doc.at('titles/subtitle').text}" if doc.at("titles/subtitle")
@@ -58,8 +57,10 @@ module Pubid::Nist
         when "10.6028/NBS.CIRC.12e2revjune" then id.sub!("13e", "12e")
         when "10.6028/NBS.CIRC.36e2" then id.sub!("46e", "36e")
         when "10.6028/NBS.HB.67suppJune1967" then id.sub!("1965", "1967")
-        when "10.6028/NBS.HB.105-1r1990" then id.sub!("105-1-1990", "105-1r1990")
-        when "10.6028/NIST.HB.150-10-1995" then id.sub!(/150-10$/, "150-10-1995")
+        when "10.6028/NBS.HB.105-1r1990" then id.sub!("105-1-1990",
+                                                      "105-1r1990")
+        when "10.6028/NIST.HB.150-10-1995" then id.sub!(/150-10$/,
+                                                        "150-10-1995")
         end
 
         { id: id || doi, doi: doi, title: title }

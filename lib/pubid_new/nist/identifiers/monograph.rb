@@ -31,7 +31,7 @@ module PubidNew
         def to_mr_style
           # "NBS.MN.158" or "NIST.MN.178"
           result = (publisher || default_publisher).to_s
-          result += ".MN"  # MR format uses MN not MONO
+          result += ".MN" # MR format uses MN not MONO
           result += ".#{number}" if number
           result += "pt#{number.part}" if number&.part
           result += "v#{volume}" if volume

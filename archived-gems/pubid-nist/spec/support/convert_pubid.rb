@@ -18,6 +18,7 @@ end
 
 shared_examples "converts pubid to short pubid without edition" do
   it "converts into Short PubID without edition" do
-    expect(subject.to_s(:short, without_edition: true)).to eq(short_pubid_without_edition)
+    expect(subject.to_s(:short,
+                        without_edition: true)).to eq(short_pubid_without_edition)
   end
 end

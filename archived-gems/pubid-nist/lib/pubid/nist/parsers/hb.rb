@@ -14,7 +14,7 @@ module Pubid::Nist
         digits.as(:first_report_number) >> volume.maybe >>
           (str("e") >> digits.as(:edition) >> (str("-") >> digits).maybe |
             str("-") >> year_digits.as(:edition_year) |
-            str("-") >> digits.as(:second_report_number) >> str("-") >>  year_digits.as(:edition_year) |
+            str("-") >> digits.as(:second_report_number) >> str("-") >> year_digits.as(:edition_year) |
             str("-") >> digits_with_suffix.as(:second_report_number)
           ).maybe
       end

@@ -2,7 +2,6 @@ require_relative "base"
 
 module Pubid::Iso::Renderer
   class InternationalWorkshopAgreement < Base
-
     TYPE = "IWA".freeze
 
     def omit_post_publisher_symbol?(_typed_stage, _stage, _opts)
@@ -11,8 +10,14 @@ module Pubid::Iso::Renderer
     end
 
     def render_identifier(params, opts)
-      stage = params.key?(:stage) ? postrender_stage(params[:stage], opts, params) : ""
-      "#{stage}#{render_type_prefix(params, opts)} %{number}%{part}%{iteration}%{year}%{amendments}%{corrigendums}%{addendum}%{edition}" % params
+      stage = if params.key?(:stage)
+                postrender_stage(params[:stage], opts,
+                                 params)
+              else
+                ""
+              end
+      "#{stage}#{render_type_prefix(params,
+                                    opts)} %<number>s%<part>s%<iteration>s%<year>s%<amendments>s%<corrigendums>s%<addendum>s%<edition>s" % params
     end
   end
 end

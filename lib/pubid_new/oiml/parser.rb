@@ -61,17 +61,19 @@ module PubidNew
         (
           (str(", ") | space) >>
           edition_number.maybe >> space.maybe >> edition_text >> space.maybe >> year_digits.as(:year)
-        ).as(:edition_format)  # Wrap entire match to capture that Edition was used
+        ).as(:edition_format) # Wrap entire match to capture that Edition was used
       end
 
       # Date - year after colon OR edition portion (with optional space before year)
-      rule(:date) { edition_portion | (colon >> space.maybe >> year_digits.as(:year)) }
+      rule(:date) do
+        edition_portion | (colon >> space.maybe >> year_digits.as(:year))
+      end
 
       # Draft stage - WD or CD with optional iteration
       rule(:stage_iteration) do
         (
-          digits >> str(".") >> digits |  # 3.1
-          digits                           # 1, 2, 3
+          digits >> str(".") >> digits | # 3.1
+          digits # 1, 2, 3
         ).as(:iteration)
       end
 
@@ -85,11 +87,11 @@ module PubidNew
 
       # Language codes
       rule(:lang_single) do
-        match("[EFRX]")  # Single letter: E, F, R, X
+        match("[EFRX]") # Single letter: E, F, R, X
       end
 
       rule(:lang_multi) do
-        match("[a-z]").repeat(2, 2)  # Two letters: en, fr, etc.
+        match("[a-z]").repeat(2, 2) # Two letters: en, fr, etc.
       end
 
       rule(:language_code) do
@@ -115,60 +117,60 @@ module PubidNew
       # Amendment identifier - "Amendment (YYYY) to BASE"
       rule(:amendment_identifier) do
         str("Amendment") >> space >> lparen >> year_digits.as(:year) >> rparen >>
-        space >> str("to") >> space >>
-        base_without_language.as(:base_identifier) >>
-        language_portion.maybe.as(:language)
+          space >> str("to") >> space >>
+          base_without_language.as(:base_identifier) >>
+          language_portion.maybe.as(:language)
       end
 
       # Short amendment forms - "OIML TYPE NUMBER Amendment Edition YYYY" or "Amendment: YYYY"
       rule(:amendment_short) do
         publisher >>
-        doc_type >>
-        full_number.as(:base_code) >>
-        space >> str("Amendment").as(:amd_marker) >>
-        (
-          (space >> edition_text >> space.maybe >> year_digits.as(:year)).as(:edition_format) |
-          (colon >> space.maybe >> year_digits.as(:year))
-        ) >>
-        language_portion.maybe.as(:language)
+          doc_type >>
+          full_number.as(:base_code) >>
+          space >> str("Amendment").as(:amd_marker) >>
+          (
+            (space >> edition_text >> space.maybe >> year_digits.as(:year)).as(:edition_format) |
+            (colon >> space.maybe >> year_digits.as(:year))
+          ) >>
+          language_portion.maybe.as(:language)
       end
 
       # Annex identifier - "BASE Annexes Edition YYYY" or "BASE Annexes:YYYY"
       rule(:annex_identifier) do
         base_without_language.as(:base_identifier) >>
-        space >> str("Annexes").as(:annex_marker) >>
-        (
-          (space >> edition_text >> space >> year_digits.as(:year)).as(:edition_format) |
-          (colon >> year_digits.as(:year))
-        ) >>
-        language_portion.maybe.as(:language)
+          space >> str("Annexes").as(:annex_marker) >>
+          (
+            (space >> edition_text >> space >> year_digits.as(:year)).as(:edition_format) |
+            (colon >> year_digits.as(:year))
+          ) >>
+          language_portion.maybe.as(:language)
       end
 
       # Annex with letter - "BASE Annex A Edition YYYY"
       rule(:annex_letter_identifier) do
         base_without_language.as(:base_identifier) >>
-        space >> str("Annex") >> space >> match("[A-Z]").as(:annex_letter) >>
-        (space >> edition_text >> space >> year_digits.as(:year) | colon >> year_digits.as(:year)).maybe >>
-        language_portion.maybe.as(:language)
+          space >> str("Annex") >> space >> match("[A-Z]").as(:annex_letter) >>
+          (space >> edition_text >> space >> year_digits.as(:year) | colon >> year_digits.as(:year)).maybe >>
+          language_portion.maybe.as(:language)
       end
 
       # Base identifier without language (for use in supplements)
       rule(:base_without_language) do
         publisher >>
-        doc_type >>
-        full_number >>
-        date.maybe >>
-        draft_stage.maybe
+          doc_type >>
+          full_number >>
+          date.maybe >>
+          draft_stage.maybe
       end
 
       # Base identifier for recursion and standalone parsing
       rule(:base_identifier) do
         publisher >>
-        doc_type >>
-        full_number >>
-        date.maybe >>
-        draft_stage.maybe >>
-        language_portion.maybe
+          doc_type >>
+          full_number >>
+          date.maybe >>
+          draft_stage.maybe >>
+          language_portion.maybe
       end
     end
   end

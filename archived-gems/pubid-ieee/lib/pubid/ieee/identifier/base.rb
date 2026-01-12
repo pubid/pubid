@@ -23,8 +23,7 @@ module Pubid::Ieee
                      incorporates: nil, supplement: nil, proposal: nil,
                      iso_amendment: nil, iteration: nil, includes: nil, adoption: nil,
                      year: nil, day: nil, **opts)
-
-        super(**opts.merge(number: number, publisher: publisher))#.merge(amendments: amendments, corrigendums: corrigendums))
+        super(**opts.merge(number: number, publisher: publisher)) # .merge(amendments: amendments, corrigendums: corrigendums))
 
         @edition = edition if edition
 
@@ -32,14 +31,14 @@ module Pubid::Ieee
         @revision = revision
         if iso_identifier
           @iso_identifier = Pubid::Iso::Identifier.parse(iso_identifier)
-        elsif draft# && type != :p
+        elsif draft # && type != :p
           @type = Type.new(:draft)
         elsif type
-          if type.is_a?(Symbol)
-            @type = Type.new(type)
-          else
-            @type = Type.parse(type)
-          end
+          @type = if type.is_a?(Symbol)
+                    Type.new(type)
+                  else
+                    Type.parse(type)
+                  end
         else
           @type = Type.new
         end
@@ -75,7 +74,9 @@ module Pubid::Ieee
 
       # convert parameters comes from parser to
       def set_values(hash)
-        hash.each { |key, value| send("#{key}=", value.is_a?(Parslet::Slice) && value.to_s || value) }
+        hash.each do |key, value|
+          send("#{key}=", value.is_a?(Parslet::Slice) && value.to_s || value)
+        end
       end
 
       def self.add_missing_bracket(code)
@@ -84,11 +85,12 @@ module Pubid::Ieee
 
       def self.update_old_code(code)
         UPDATE_CODES.each do |from, to|
-          code = code.gsub(from.match?(/^\/.*\/$/) ? Regexp.new(from[1..-2]) : /^#{Regexp.escape(from)}$/, to)
+          code = code.gsub(
+            from.match?(/^\/.*\/$/) ? Regexp.new(from[1..-2]) : /^#{Regexp.escape(from)}$/, to
+          )
         end
         code
       end
-
 
       def self.transform_parameters(params)
         return params if params == ""
@@ -112,7 +114,9 @@ module Pubid::Ieee
             v = Identifier.merge_parameters(v) if k == :draft
             # apply transformer for each separate item when array provided
             if v.is_a?(Array)
-              get_transformer_class.new.apply(k => v.map { |vv| transform_parameters(vv) })
+              get_transformer_class.new.apply(k => v.map do |vv|
+                transform_parameters(vv)
+              end)
             else
               get_transformer_class.new.apply(k => transform_parameters(v))
             end
@@ -148,7 +152,12 @@ module Pubid::Ieee
       # @param [:short, :full] format
       def to_s(format = :short, with_trademark: false)
         opts = { format: format, with_trademark: with_trademark }
-        (@iso_identifier ? @iso_identifier.to_s(format: :ref_num_short, with_edition: true) : "") +
+        (if @iso_identifier
+           @iso_identifier.to_s(format: :ref_num_short,
+                                with_edition: true)
+         else
+           ""
+         end) +
           self.class.get_renderer_class.new(to_h(deep: false)).render(**opts) +
           (with_trademark ? trademark(@number) : "")
       end

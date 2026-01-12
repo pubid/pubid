@@ -2,7 +2,9 @@ module Pubid::Iso
   RSpec.describe Identifier do
     describe "#parse_from_title" do
       subject { described_class.parse_from_title(title) }
-      let(:title) { "#{pubid} Geographic information — Metadata — Part 1: Fundamentals" }
+      let(:title) do
+        "#{pubid} Geographic information — Metadata — Part 1: Fundamentals"
+      end
       let(:pubid) { "ISO 19115-1:2014" }
 
       it "extracts pubid from title" do
@@ -19,7 +21,10 @@ module Pubid::Iso
     end
 
     describe "#resolve_identifier" do
-      subject { described_class.resolve_identifier({ number: 1, publisher: "ISO", type: type, stage: typed_stage }) }
+      subject do
+        described_class.resolve_identifier({ number: 1, publisher: "ISO", type: type,
+                                             stage: typed_stage })
+      end
       let(:type) { nil }
       let(:typed_stage) { nil }
 

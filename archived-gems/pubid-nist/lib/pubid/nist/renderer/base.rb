@@ -10,13 +10,13 @@ module Pubid::Nist
       def render_identifier(params, opts)
         case opts[:format]
         when :short, :mr
-          "%{series}%{code}%{volume}%{part}%{edition}%{revision}%{version}"\
-          "%{supplement}%{section}%{appendix}%{errata}%{index}%{insert}%{update}"\
-          "%{stage}%{translation}" % params
+          "%<series>s%<code>s%<volume>s%<part>s%<edition>s%<revision>s%<version>s"\
+          "%<supplement>s%<section>s%<appendix>s%<errata>s%<index>s%<insert>s%<update>s"\
+          "%<stage>s%<translation>s" % params
         else
-          "%{series}%{code}%{stage}%{volume}%{part}%{revision}%{version}"\
-          "%{supplement}%{section}%{appendix}%{errata}%{index}%{insert}%{update}"\
-          "%{edition}%{translation}" % params
+          "%<series>s%<code>s%<stage>s%<volume>s%<part>s%<revision>s%<version>s"\
+          "%<supplement>s%<section>s%<appendix>s%<errata>s%<index>s%<insert>s%<update>s"\
+          "%<edition>s%<translation>s" % params
         end
       end
 
@@ -55,7 +55,7 @@ module Pubid::Nist
           ", Rev. "
         when :short, :mr
           "r"
-        end + (revision == '' ? '1' : revision).to_s
+        end + (revision == "" ? "1" : revision).to_s
       end
 
       def render_version(version, opts, _params)
@@ -69,7 +69,7 @@ module Pubid::Nist
         end + version
       end
 
-      def render_volume(volume, opts, params)
+      def render_volume(volume, opts, _params)
         case opts[:format]
         when :long
           ", Volume "
@@ -130,7 +130,7 @@ module Pubid::Nist
         end + supplement
       end
 
-      def render_appendix(appendix, opts, _params)
+      def render_appendix(_appendix, opts, _params)
         case opts[:format]
         when :long
           " Appendix "
@@ -152,7 +152,7 @@ module Pubid::Nist
         end + section
       end
 
-      def render_errata(errata, opts, _params)
+      def render_errata(_errata, opts, _params)
         case opts[:format]
         when :long
           " Errata "
@@ -163,7 +163,7 @@ module Pubid::Nist
         end
       end
 
-      def render_index(index, opts, _params)
+      def render_index(_index, opts, _params)
         case opts[:format]
         when :long
           " Index "
@@ -174,7 +174,7 @@ module Pubid::Nist
         end
       end
 
-      def render_insert(insert, opts, _params)
+      def render_insert(_insert, opts, _params)
         case opts[:format]
         when :long
           " Insert "

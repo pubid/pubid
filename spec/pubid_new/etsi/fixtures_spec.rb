@@ -1,7 +1,9 @@
 require "spec_helper"
 
 RSpec.describe "ETSI Fixture Round-trip Tests" do
-  let(:fixtures) { File.readlines("gems/pubid-etsi/spec/fixtures/pubids.txt").map(&:strip) }
+  let(:fixtures) do
+    File.readlines("gems/pubid-etsi/spec/fixtures/pubids.txt").map(&:strip)
+  end
 
   describe "ETSI identifiers" do
     it "round-trips all ETSI identifiers" do
@@ -21,13 +23,13 @@ RSpec.describe "ETSI Fixture Round-trip Tests" do
             failures << {
               original: identifier,
               rendered: rendered,
-              class: parsed.class.name
+              class: parsed.class.name,
             }
           end
-        rescue => e
+        rescue StandardError => e
           failures << {
             original: identifier,
-            error: "#{e.class}: #{e.message}"
+            error: "#{e.class}: #{e.message}",
           }
         end
       end

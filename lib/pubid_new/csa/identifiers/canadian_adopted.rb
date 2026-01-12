@@ -25,7 +25,7 @@ module PubidNew
           # For CAN3- identifiers, don't add CAN/ prefix (CAN3- is already complete)
           # For CAN/CSA- identifiers, CAN/ wraps CSA- part
           if wrapped_identifier.respond_to?(:publisher_prefix) &&
-             wrapped_identifier.publisher_prefix == "CAN3-"
+              wrapped_identifier.publisher_prefix == "CAN3-"
             # CAN3- is standalone, just render wrapped identifier with reaffirmation
             result = wrapped_identifier.to_s
           else

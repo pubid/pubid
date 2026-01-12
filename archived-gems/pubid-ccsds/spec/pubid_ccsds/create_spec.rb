@@ -1,7 +1,10 @@
 module Pubid::Ccsds
   RSpec.describe Identifier do
     describe "creating new identifier" do
-      subject { described_class.create(**{ number: number, book_color: book_color, edition: edition }.merge(params)) }
+      subject do
+        described_class.create(**{ number: number, book_color: book_color,
+                                   edition: edition }.merge(params))
+      end
       let(:number) { 123 }
       let(:book_color) { "B" }
       let(:edition) { 1 }
@@ -36,8 +39,12 @@ module Pubid::Ccsds
       end
 
       context "with corrigendum" do
-        let(:base) { { number: number, book_color: book_color, edition: edition } }
-        subject { described_class.create(type: :corrigendum, number: 1, base: base) }
+        let(:base) do
+          { number: number, book_color: book_color, edition: edition }
+        end
+        subject do
+          described_class.create(type: :corrigendum, number: 1, base: base)
+        end
 
         it "renders corrigendum" do
           expect(subject.to_s).to eq("CCSDS #{number}.0-B-1 Cor. 1")

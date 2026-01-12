@@ -8,7 +8,7 @@ module Pubid::Iec
 
     rule(:technical_committee) do
       ((str("CIS/") >> match("[A-Z]")) |
-      (match("[A-Za-z0-9-]").repeat(1))).as(:technical_committee)
+      match("[A-Za-z0-9-]").repeat(1)).as(:technical_committee)
     end
 
     rule(:number) do

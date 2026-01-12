@@ -12,7 +12,8 @@ module PubidNew
         base_identifier&.publisher
       end
 
-      def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+      def to_s(lang: :en, lang_single: false, with_edition: false, format: nil,
+stage_format_long: nil, with_date: nil)
         # If format is provided, create appropriate rendering style
         if format
           style = RenderingStyle.from_format(format)
@@ -38,17 +39,17 @@ module PubidNew
               with_edition: with_edition,
               format: format,
               stage_format_long: stage_format_long,
-              with_date: with_date
+              with_date: with_date,
             ),
             "/#{typed_stage.abbreviation(format_long: stage_format_long)}",
-          ].join('')
+          ].join("")
           # Only add space if abbreviation doesn't end with a period
-          parts << (typed_stage.abbreviation(format_long: stage_format_long).end_with?('.') ? '' : ' ')
+          parts << (typed_stage.abbreviation(format_long: stage_format_long).end_with?(".") ? "" : " ")
           parts << number_portion(lang_single: lang_single)
 
-          parts << ' ' + edition_portion(lang: lang) if with_edition && edition&.number
+          parts << " " + edition_portion(lang: lang) if with_edition && edition&.number
           parts << language_portion(lang_single: lang_single) if languages&.any?
-        end.compact.join('')
+        end.compact.join("")
       end
 
       # Generate URN for supplement using UrnGenerator
@@ -56,7 +57,7 @@ module PubidNew
       #
       # @return [String] The generated URN in RFC 5141-bis format
       def to_urn
-        require_relative 'urn_generator'
+        require_relative "urn_generator"
         UrnGenerator.new(self).generate
       end
     end

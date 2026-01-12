@@ -3,7 +3,6 @@
 require "spec_helper"
 
 RSpec.describe PubidNew::Astm::Identifier::WorkInProgress do
-
   # ========================================
   # Work in Progress (3 IDs, 1%)
   # ========================================

@@ -8,7 +8,7 @@ module PubidNew
       # ITU Series component
       # Examples: BO, V, X, A, etc.
       class Series < Lutaml::Model::Serializable
-        attribute :series, :string  # e.g., BO, V, X, R, SG1, OB
+        attribute :series, :string # e.g., BO, V, X, R, SG1, OB
 
         def initialize(series:)
           @series = series
@@ -20,6 +20,7 @@ module PubidNew
 
         def ==(other)
           return false unless other.is_a?(Series)
+
           series == other.series
         end
       end

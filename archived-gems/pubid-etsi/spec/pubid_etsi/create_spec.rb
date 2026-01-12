@@ -2,7 +2,10 @@ module Pubid::Etsi
   RSpec.describe Identifier do
     describe "creating new identifier" do
       # type: "EN", number: 1234, part: 4, version: "1.2.3", date: "1999-01"
-      let(:base) { described_class.create(**{ type: type, number: number, part: part, published: published }.merge(params)) }
+      let(:base) do
+        described_class.create(**{ type: type, number: number, part: part,
+                                   published: published }.merge(params))
+      end
       subject { base }
       let(:type) { "EN" }
       let(:number) { 1234 }
@@ -23,7 +26,9 @@ module Pubid::Etsi
       end
 
       context "with corrigendum" do
-        subject { described_class.create(type: :corrigendum, number: 1, base: base) }
+        subject do
+          described_class.create(type: :corrigendum, number: 1, base: base)
+        end
 
         it "renders corrigendum" do
           expect(subject.to_s).to eq("ETSI EN 1234-4/C1 V1.2.3 (1999-01)")
@@ -42,7 +47,9 @@ module Pubid::Etsi
         let(:type) { "WRONG_TYPE" }
 
         it "raises an error" do
-          expect { subject }.to raise_exception(Pubid::Core::Errors::WrongTypeError)
+          expect do
+            subject
+          end.to raise_exception(Pubid::Core::Errors::WrongTypeError)
         end
       end
     end

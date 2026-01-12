@@ -17,26 +17,26 @@ module PubidNew
       def build(parsed_hash)
         # Determine identifier class based on type
         identifier_class = case parsed_hash[:type]&.to_s
-                          when "BULL"
-                            Identifiers::Bulletin
-                          when "MPMS"
-                            Identifiers::Mpms
-                          when "RP"
-                            Identifiers::RecommendedPractice
-                          when "SPEC"
-                            Identifiers::Specification
-                          when "STD"
-                            Identifiers::Standard
-                          when "TR"
-                            Identifiers::TechnicalReport
-                          when "COS"
-                            Identifiers::ContinuousOperationsStandard
-                          when "PUBL"
-                            Identifiers::Publication
-                          else
-                            # No type = typeless standard
-                            Identifiers::TypelessStandard
-                          end
+                           when "BULL"
+                             Identifiers::Bulletin
+                           when "MPMS"
+                             Identifiers::Mpms
+                           when "RP"
+                             Identifiers::RecommendedPractice
+                           when "SPEC"
+                             Identifiers::Specification
+                           when "STD"
+                             Identifiers::Standard
+                           when "TR"
+                             Identifiers::TechnicalReport
+                           when "COS"
+                             Identifiers::ContinuousOperationsStandard
+                           when "PUBL"
+                             Identifiers::Publication
+                           else
+                             # No type = typeless standard
+                             Identifiers::TypelessStandard
+                           end
 
         identifier = identifier_class.new
 
@@ -71,11 +71,11 @@ module PubidNew
         # Reaffirmation (nested hash with year inside)
         if parsed_hash[:reaffirmation]
           reaffirm_data = parsed_hash[:reaffirmation]
-          if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
-            identifier.reaffirmation = reaffirm_data[:year].to_s
-          else
-            identifier.reaffirmation = reaffirm_data.to_s
-          end
+          identifier.reaffirmation = if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
+                                       reaffirm_data[:year].to_s
+                                     else
+                                       reaffirm_data.to_s
+                                     end
         end
 
         identifier

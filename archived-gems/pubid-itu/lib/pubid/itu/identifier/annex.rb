@@ -1,7 +1,7 @@
 module Pubid::Itu
   module Identifier
     class Annex < Supplement
-      def_delegators 'Pubid::Itu::Identifier::Annex', :type
+      def_delegators "Pubid::Itu::Identifier::Annex", :type
 
       attribute :base, :string
 

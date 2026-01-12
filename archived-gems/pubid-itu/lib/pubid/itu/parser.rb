@@ -40,7 +40,9 @@ module Pubid::Itu
     end
 
     rule(:series_range) do
-      (dash >> dynamic { |s, c| str(c.captures[:series]) } >> dot >> full_number).as(:range)
+      (dash >> dynamic do |_s, c|
+        str(c.captures[:series])
+      end >> dot >> full_number).as(:range)
     end
 
     rule(:sector_series_number) do

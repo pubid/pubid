@@ -7,8 +7,7 @@ module Pubid::Ieee
         { number: 1,
           parameters: { year: 1999 },
           organizations: { publisher: "IEEE" },
-          type_status: { type: "Std" }
-        }
+          type_status: { type: "Std" } }
       end
 
       let(:result) do

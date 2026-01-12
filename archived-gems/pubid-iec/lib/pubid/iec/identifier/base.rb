@@ -28,7 +28,6 @@ module Pubid::Iec
                    trf_series: nil, trf_version: nil, test_type: nil,
                    edition: nil, type: nil, month: nil, day: nil,
                    language: nil, stage: nil, sheet: nil, **args)
-
       @vap = vap.to_s if vap
       @database = database if database
       @fragment = fragment if fragment
@@ -60,7 +59,8 @@ module Pubid::Iec
     def lookup_typed_stage(lookup_code)
       self.class::TYPED_STAGES.each do |abbr, stage|
         if stage[:harmonized_stages] & lookup_code == lookup_code
-          return Identifier.build_typed_stage(abbr: abbr, harmonized_code: lookup_code)
+          return Identifier.build_typed_stage(abbr: abbr,
+                                              harmonized_code: lookup_code)
         end
       end
 
@@ -84,7 +84,7 @@ module Pubid::Iec
 
     class << self
       def has_project_stage?(project_stage)
-        self::PROJECT_STAGES.any? { |k, v| v[:abbr] == project_stage }
+        self::PROJECT_STAGES.any? { |_k, v| v[:abbr] == project_stage }
       end
 
       def has_type?(type)
@@ -98,11 +98,12 @@ module Pubid::Iec
       end
 
       def resolve_project_stage(project_stage)
-        stage = self::PROJECT_STAGES.find do |k, v|
+        stage = self::PROJECT_STAGES.find do |_k, v|
           v[:abbr] == project_stage
         end
 
-        Identifier.build_project_stage(abbr: stage[1][:abbr], harmonized_code: stage[1][:harmonized_stages])
+        Identifier.build_project_stage(abbr: stage[1][:abbr],
+                                       harmonized_code: stage[1][:harmonized_stages])
       end
 
       def transform_hash(params)
@@ -118,9 +119,12 @@ module Pubid::Iec
           return Identifier.create(
             type: :ish,
             base: Identifier.create(
-              **identifier_params.dup.tap { |h| h.delete(:interpretation_sheet) }),
+              **identifier_params.dup.tap do |h|
+                h.delete(:interpretation_sheet)
+              end,
+            ),
             number: identifier_params[:interpretation_sheet][:number],
-            year: identifier_params[:interpretation_sheet][:year]
+            year: identifier_params[:interpretation_sheet][:year],
           )
         end
 

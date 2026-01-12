@@ -14,7 +14,6 @@ RSpec.describe Pubid::Ieee::Identifier do
       it "renders publisher with copublisher" do
         expect(subject.to_s).to eq("IEC/IEEE Std #{number}")
       end
-
     end
 
     context "ISO identifier" do
@@ -25,8 +24,7 @@ RSpec.describe Pubid::Ieee::Identifier do
              { copublisher: "IEEE" },
              { number: number },
              { part: 1 },
-             { year: 2019 }],
-        }
+             { year: 2019 }] }
       end
 
       it "renders ISO identifier" do
@@ -50,20 +48,28 @@ RSpec.describe Pubid::Ieee::Identifier do
       context "with month" do
         let(:params) { { edition: "1.0", year: 2011, month: 1 } }
 
-        it { expect(subject.to_s).to eq("IEEE Std #{number} Edition 1.0, January 2011") }
+        it {
+          expect(subject.to_s).to eq("IEEE Std #{number} Edition 1.0, January 2011")
+        }
       end
     end
 
     context "revision" do
       let(:params) { { revision: [described_class.create(number: 1)] } }
 
-      it { expect(subject.to_s).to eq("IEEE Std #{number} (Revision of IEEE Std 1)") }
+      it {
+        expect(subject.to_s).to eq("IEEE Std #{number} (Revision of IEEE Std 1)")
+      }
     end
 
     context "draft" do
-      let(:params) { { draft: { version: 1, revision: 2 }, month: 1, day: 1, year: 1999 } }
+      let(:params) do
+        { draft: { version: 1, revision: 2 }, month: 1, day: 1, year: 1999 }
+      end
 
-      it { expect(subject.to_s).to eq("IEEE Draft Std #{number}/D1.2, January 1, 1999") }
+      it {
+        expect(subject.to_s).to eq("IEEE Draft Std #{number}/D1.2, January 1, 1999")
+      }
     end
 
     context "part" do
@@ -94,7 +100,9 @@ RSpec.describe Pubid::Ieee::Identifier do
       context "with comment" do
         let(:params) { { amendment: described_class.create(number: 1) } }
 
-        it { expect(subject.to_s).to eq("IEEE Std #{number} (Amendment to IEEE Std 1)") }
+        it {
+          expect(subject.to_s).to eq("IEEE Std #{number} (Amendment to IEEE Std 1)")
+        }
       end
 
       context "iso amendment" do
@@ -106,15 +114,23 @@ RSpec.describe Pubid::Ieee::Identifier do
       end
 
       context "several amendments" do
-        let(:params) { { amendment: [described_class.create(number: 1), described_class.create(number: 2)] } }
+        let(:params) do
+          { amendment: [described_class.create(number: 1),
+                        described_class.create(number: 2)] }
+        end
 
-        it { expect(subject.to_s).to eq("IEEE Std #{number} (Amendment to IEEE Std 1 as amended by IEEE Std 2)") }
+        it {
+          expect(subject.to_s).to eq("IEEE Std #{number} (Amendment to IEEE Std 1 as amended by IEEE Std 2)")
+        }
       end
     end
 
     context "corrigendum" do
       context "with comment" do
-        let(:params) { { year: 2000, corrigendum_comment: described_class.create(number: 1, year: 1999 ) } }
+        let(:params) do
+          { year: 2000,
+            corrigendum_comment: described_class.create(number: 1, year: 1999) }
+        end
 
         it { expect(subject.to_s).to eq("IEEE Std #{number}-1999/Cor 1-2000") }
       end
@@ -129,7 +145,9 @@ RSpec.describe Pubid::Ieee::Identifier do
     context "supplement" do
       let(:params) { { supplement: described_class.create(number: 2) } }
 
-      it { expect(subject.to_s).to eq("IEEE Std #{number} (Supplement to IEEE Std 2)") }
+      it {
+        expect(subject.to_s).to eq("IEEE Std #{number} (Supplement to IEEE Std 2)")
+      }
     end
 
     context "redline" do
@@ -147,20 +165,30 @@ RSpec.describe Pubid::Ieee::Identifier do
     context "incorporates" do
       let(:params) { { incorporates: [described_class.create(number: 2)] } }
 
-      it { expect(subject.to_s).to eq("IEEE Std #{number} (Incorporates IEEE Std 2)") }
+      it {
+        expect(subject.to_s).to eq("IEEE Std #{number} (Incorporates IEEE Std 2)")
+      }
     end
 
     context "reaffirmed" do
       context "year" do
         let(:params) { { reaffirmed: { year: 1999 } } }
 
-        it { expect(subject.to_s).to eq("IEEE Std #{number} (Reaffirmed 1999)") }
+        it {
+          expect(subject.to_s).to eq("IEEE Std #{number} (Reaffirmed 1999)")
+        }
       end
 
       context "Reaffirmation of" do
-        let(:params) { { year: 1998, reaffirmed: { reaffirmation_of: described_class.create(number: 2, year: 1999) } } }
+        let(:params) do
+          { year: 1998,
+            reaffirmed: { reaffirmation_of: described_class.create(number: 2,
+                                                                   year: 1999) } }
+        end
 
-        it { expect(subject.to_s).to eq("IEEE Std #{number}-1999 (Reaffirmed 1998)") }
+        it {
+          expect(subject.to_s).to eq("IEEE Std #{number}-1999 (Reaffirmed 1998)")
+        }
       end
     end
   end

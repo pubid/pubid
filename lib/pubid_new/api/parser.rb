@@ -42,7 +42,7 @@ module PubidNew
       # Allow any mix of digits and letters
       rule(:number_with_part) do
         match("[0-9A-Z]").repeat(1).as(:number) >>
-        (dash >> match("[0-9A-Z]").repeat(1).as(:part)).maybe
+          (dash >> match("[0-9A-Z]").repeat(1).as(:part)).maybe
       end
 
       # Digits with optional letter suffix (for MPMS sections: 6.4A, 3.1A)
@@ -72,54 +72,54 @@ module PubidNew
       # Edition notation (e.g., ", 4th edition")
       rule(:edition_notation) do
         str(", ") >>
-        digits.as(:edition_number) >>
-        (str("st") | str("nd") | str("rd") | str("th")) >>
-        str(" edition")
+          digits.as(:edition_number) >>
+          (str("st") | str("nd") | str("rd") | str("th")) >>
+          str(" edition")
       end
 
       # MPMS identifier (special format with CH)
       rule(:mpms_identifier) do
         publisher >>
-        str("MPMS").as(:type) >>
-        chapter_notation >>
-        (dot >> digits_with_letter.as(:section)).maybe >>
-        (dot >> digits_with_letter.as(:subsection)).maybe >>
-        (date_dash | date_colon).maybe
+          str("MPMS").as(:type) >>
+          chapter_notation >>
+          (dot >> digits_with_letter.as(:section)).maybe >>
+          (dot >> digits_with_letter.as(:subsection)).maybe >>
+          (date_dash | date_colon).maybe
       end
 
       # Standard identifier with type
       rule(:typed_identifier) do
         publisher >>
-        doc_type >> space >>
-        number_with_part >>
-        part_notation.maybe >>
-        (date_dash | date_colon).maybe >>
-        reaffirmation.maybe
+          doc_type >> space >>
+          number_with_part >>
+          part_notation.maybe >>
+          (date_dash | date_colon).maybe >>
+          reaffirmation.maybe
       end
 
       # Typeless identifier (just API + number)
       rule(:typeless_identifier) do
         publisher >>
-        number_with_part >>
-        part_notation.maybe >>
-        (date_dash | date_colon).maybe >>
-        reaffirmation.maybe
+          number_with_part >>
+          part_notation.maybe >>
+          (date_dash | date_colon).maybe >>
+          reaffirmation.maybe
       end
 
       # Second identifier in combined (no API prefix, just type + number)
       rule(:second_identifier) do
         doc_type >> space >>
-        number_with_part >>
-        part_notation.maybe >>
-        (date_dash | date_colon).maybe
+          number_with_part >>
+          part_notation.maybe >>
+          (date_dash | date_colon).maybe
       end
 
       # Combined identifier (two identifiers separated by slash)
       rule(:combined_identifier) do
         (mpms_identifier | typed_identifier | typeless_identifier).as(:first) >>
-        slash >>
-        second_identifier.as(:second) >>
-        edition_notation.maybe
+          slash >>
+          second_identifier.as(:second) >>
+          edition_notation.maybe
       end
 
       # Main identifier (try combined first, then MPMS, then typed, then typeless)

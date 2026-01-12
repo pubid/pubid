@@ -34,14 +34,14 @@ RSpec.describe Pubid::Nist::NistTechPubs, vcr: true do
 
     it "uses doi when cannot parse document id" do
       expect(described_class.convert(
-               { id: "NBS CIRC re3", doi: "NBS.CIRC.5e3" },
-             ).to_s).to eq("NBS CIRC 5e3")
+        { id: "NBS CIRC re3", doi: "NBS.CIRC.5e3" },
+      ).to_s).to eq("NBS CIRC 5e3")
     end
 
     it "uses doi when doi more complete then id" do
       expect(described_class.convert(
-               { id: "NIST SP 260-162", doi: "NIST SP 260-162 2006ed." },
-             ).to_s).to eq("NIST SP 260-162e2006")
+        { id: "NIST SP 260-162", doi: "NIST SP 260-162 2006ed." },
+      ).to_s).to eq("NIST SP 260-162e2006")
     end
 
     it "combines data from id and doi" do
@@ -53,8 +53,8 @@ RSpec.describe Pubid::Nist::NistTechPubs, vcr: true do
     context "when doi code is wrong" do
       xit "skips merging with doi" do
         expect(described_class.convert(
-                 { id: "NIST TN 1648", doi: "NISTPUB.0413171251" },
-               ).to_s).to eq("NIST TN 1648")
+          { id: "NIST TN 1648", doi: "NISTPUB.0413171251" },
+        ).to_s).to eq("NIST TN 1648")
       end
     end
   end

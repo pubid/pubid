@@ -1,11 +1,9 @@
 module Pubid::Iec
   module Identifier
     class InternationalStandard < Base
-      def_delegators 'Pubid::Iec::Identifier::InternationalStandard', :type
+      def_delegators "Pubid::Iec::Identifier::InternationalStandard", :type
 
-      TYPED_STAGES = {
-
-      }.freeze
+      TYPED_STAGES = {}.freeze
 
       PROJECT_STAGES = {
         afdis: {

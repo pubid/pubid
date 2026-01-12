@@ -10,12 +10,12 @@ module PubidNew
       # AIEE (American Institute of Electrical Engineers): 1884-1963
       class Identifier < Lutaml::Model::Serializable
         attribute :publisher, :string, default: -> { "AIEE" }
-        attribute :type, :string  # "No.", "No", "Standard", "Trans."
+        attribute :type, :string # "No.", "No", "Standard", "Trans."
         attribute :number, Components::Code
         attribute :year, :integer
         attribute :month, :string
-        attribute :separator, :string  # "," or "." for long form dates
-        attribute :original_format, :string  # "short" or "long" (preserves parsed format)
+        attribute :separator, :string # "," or "." for long form dates
+        attribute :original_format, :string # "short" or "long" (preserves parsed format)
 
         def initialize(**args)
           super()
@@ -30,6 +30,7 @@ module PubidNew
           # Set other attributes
           args.each do |key, value|
             next if key == :number
+
             send("#{key}=", value) if respond_to?("#{key}=")
           end
         end
@@ -57,7 +58,7 @@ module PubidNew
 
           if !format
             # Auto-detect from parsed attributes
-            format = (month || separator) ? "long" : "short"
+            format = month || separator ? "long" : "short"
           end
 
           # Date formatting based on format parameter
@@ -68,17 +69,17 @@ module PubidNew
               base += "-#{year}"
             when "long", :long
               # Long form: separator + optional month + year
-              sep = separator || ","  # Default to comma for long form
+              sep = separator || "," # Default to comma for long form
               base += "#{sep} #{month ? month + ' ' : ''}#{year}"
             else
               # Preserve original format (backward compatibility)
-              if separator
-                base += "#{separator} #{month ? month + ' ' : ''}#{year}"
-              elsif month
-                base += ", #{month} #{year}"
-              else
-                base += "-#{year}"
-              end
+              base += if separator
+                        "#{separator} #{month ? month + ' ' : ''}#{year}"
+                      elsif month
+                        ", #{month} #{year}"
+                      else
+                        "-#{year}"
+                      end
             end
           end
 

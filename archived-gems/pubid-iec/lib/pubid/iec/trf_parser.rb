@@ -48,11 +48,11 @@ module Pubid::Iec
 
     rule(:identifier) do
       ((str("IECEx").as(:publisher) >> space >> iecex_document_body) |
-        (str("IECEE").as(:publisher) >> space >> iecee_document_body)) #>>
-        # decision_sheet.maybe >>
-        # trf_series.maybe >>
-        # edition.maybe >>
-        # (str(":") >> year).maybe
+        (str("IECEE").as(:publisher) >> space >> iecee_document_body)) # >>
+      # decision_sheet.maybe >>
+      # trf_series.maybe >>
+      # edition.maybe >>
+      # (str(":") >> year).maybe
     end
 
     rule(:root) { identifier }

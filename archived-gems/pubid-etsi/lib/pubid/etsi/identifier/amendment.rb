@@ -1,7 +1,7 @@
 module Pubid::Etsi
   module Identifier
     class Amendment < Supplement
-      def_delegators 'Pubid::Etsi::Identifier::Amendment', :type
+      def_delegators "Pubid::Etsi::Identifier::Amendment", :type
 
       def self.type
         { key: :amendment, title: "Amendment" }

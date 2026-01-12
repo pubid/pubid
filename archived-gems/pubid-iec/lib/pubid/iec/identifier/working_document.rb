@@ -15,7 +15,8 @@ module Pubid::Iec
 
       attribute :technical_committee, :string
 
-      def initialize(publisher: "IEC", technical_committee: nil, stage: nil, **args)
+      def initialize(publisher: "IEC", technical_committee: nil, stage: nil,
+**args)
         super(**args.merge(publisher: publisher))
         @stage = stage
         @technical_committee = technical_committee

@@ -1,11 +1,10 @@
 module Pubid::Iec::Renderer
   class TrfUrn < Urn
-
     def render_identifier(params)
-      "urn:iec:std:%{publisher}%{copublisher}:trf%{trf_publisher}:%{number}"\
-      "%{part}%{conjuction_part}%{year}%{vap}"\
-      "%{version}%{part_version}"\
-      "%{trf_version}" % params
+      "urn:iec:std:%<publisher>s%<copublisher>s:trf%<trf_publisher>s:%<number>s"\
+      "%<part>s%<conjuction_part>s%<year>s%<vap>s"\
+      "%<version>s%<part_version>s"\
+      "%<trf_version>s" % params
     end
 
     def render_trf_version(trf_version, _opts, _params)

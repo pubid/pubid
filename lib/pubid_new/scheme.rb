@@ -62,7 +62,9 @@ module PubidNew
     end
 
     def all_identifier_classes_by_type_code
-      @all_identifier_classes ||= (@identifiers + @supplement_identifiers).sort_by { |klass| klass.type[:key].to_s }
+      @all_identifier_classes ||= (@identifiers + @supplement_identifiers).sort_by do |klass|
+        klass.type[:key].to_s
+      end
     end
 
     def locate_identifier_klass_by_type_code(type_code)

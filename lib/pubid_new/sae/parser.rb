@@ -39,7 +39,7 @@ module PubidNew
       # Main identifier
       rule(:identifier) do
         publisher >> space >> doc_type >> space >>
-        number >> date.maybe
+          number >> date.maybe
       end
 
       root(:identifier)

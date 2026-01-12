@@ -7,8 +7,8 @@ module PubidNew
     # Base class for supplement identifiers (Amendment, Explanation)
     # Supplements are modifications to base documents
     class SupplementIdentifier < Identifiers::Base
-      attribute :base, PubidNew::Jis::Identifiers::Base  # Base document being supplemented
-      attribute :number, :integer  # Supplement number (optional for Explanation)
+      attribute :base, PubidNew::Jis::Identifiers::Base # Base document being supplemented
+      attribute :number, :integer # Supplement number (optional for Explanation)
 
       def initialize(base:, number: nil, year: nil, **args)
         @base = base

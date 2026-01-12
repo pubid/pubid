@@ -4,9 +4,9 @@ module Pubid::Jis::Renderer
   class Explanation < Base
     def render_identifier(params)
       if params[:number].to_s.empty?
-        "%{base}/EXPL" % params
+        "%<base>s/EXPL" % params
       else
-        "%{base}/EXPL %{number}" % params
+        "%<base>s/EXPL %<number>s" % params
       end
     end
   end

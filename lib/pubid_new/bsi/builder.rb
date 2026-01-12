@@ -141,7 +141,10 @@ module PubidNew
           identifier = build_adopted_identifier(data)
 
           # Wrap with consolidated if supplements present
-          identifier = wrap_with_consolidated(identifier, supplements_data) if supplements_data.any?
+          if supplements_data.any?
+            identifier = wrap_with_consolidated(identifier,
+                                                supplements_data)
+          end
 
           # Wrap with ExpertCommentary if needed
           identifier = wrap_with_expert_commentary(identifier) if data[:expert_commentary]
@@ -163,12 +166,18 @@ module PubidNew
               identifier.send("#{k}=", v) if identifier.respond_to?("#{k}=")
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
         # Wrap with consolidated if supplements present
-        identifier = wrap_with_consolidated(identifier, supplements_data) if supplements_data.any?
+        if supplements_data.any?
+          identifier = wrap_with_consolidated(identifier,
+                                              supplements_data)
+        end
 
         # Wrap with ExpertCommentary if needed
         identifier = wrap_with_expert_commentary(identifier) if data[:expert_commentary]
@@ -180,14 +189,14 @@ module PubidNew
 
       def build_index(data)
         # Extract values from the parsed data
-        publisher_val = data[:publisher].to_s if data[:publisher]
+        data[:publisher]&.to_s
         number_val = data[:number][:number] if data[:number].is_a?(Hash)
         number_val ||= data[:number].to_s if data[:number]
         year_val = data[:year].to_i if data[:year]
 
         # Extract index_suffix information
         index_suffix_data = data[:index_suffix]
-        format = "space"  # default
+        format = "space" # default
         issue_number = nil
 
         if index_suffix_data.is_a?(Hash)
@@ -202,7 +211,7 @@ module PubidNew
         attrs = {
           number: Components::Code.new(value: number_val),
           issue_number: issue_number,
-          index_format: format
+          index_format: format,
         }
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
@@ -232,7 +241,7 @@ module PubidNew
 
         # Extract part from parts array (e.g., [{part: "1"}] -> "1")
         part_val = nil
-        if data[:parts] && data[:parts].is_a?(Array) && !data[:parts].empty?
+        if data[:parts].is_a?(Array) && !data[:parts].empty?
           # Parts come as [{part: "1"}], so we need to extract the :part key
           first_part = data[:parts][0]
           if first_part.is_a?(Hash) && first_part[:part]
@@ -252,14 +261,14 @@ module PubidNew
 
       def build_method(data)
         # Extract values from the parsed data
-        publisher_val = data[:publisher].to_s if data[:publisher]
+        data[:publisher]&.to_s
         number_val = data[:number][:number] if data[:number].is_a?(Hash)
         number_val ||= data[:number].to_s if data[:number]
         year_val = data[:year].to_i if data[:year]
 
         # Extract part from parts array (e.g., [{part: "1"}] -> "1")
         part_val = nil
-        if data[:parts] && data[:parts].is_a?(Array) && !data[:parts].empty?
+        if data[:parts].is_a?(Array) && !data[:parts].empty?
           # Parts come as [{part: "1"}], so we need to extract the :part key
           first_part = data[:parts][0]
           if first_part.is_a?(Hash) && first_part[:part]
@@ -288,7 +297,7 @@ module PubidNew
           method_code: method_code,
           method_to: method_to,
           method_and: method_and,
-          is_plural: is_plural
+          is_plural: is_plural,
         }
         attrs[:part] = Components::Code.new(value: part_val) if part_val
         attrs[:date] = Components::Date.new(year: year_val) if year_val
@@ -320,7 +329,10 @@ module PubidNew
           test_series: test_series,
           test_id: test_id,
         }
-        attrs[:publisher] = Components::Publisher.new(body: publisher_val) if publisher_val
+        if publisher_val
+          attrs[:publisher] =
+            Components::Publisher.new(body: publisher_val)
+        end
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::TestMethod.new(attrs)
@@ -337,7 +349,7 @@ module PubidNew
         # Extract section_suffix information
         section_suffix_data = data[:section_suffix]
         section_id = nil
-        format = "space"  # default
+        format = "space" # default
 
         if section_suffix_data.is_a?(Hash)
           section_id = section_suffix_data[:section_id].to_s if section_suffix_data[:section_id]
@@ -348,9 +360,12 @@ module PubidNew
         attrs = {
           number: Components::Code.new(value: number_val),
           section_id: section_id,
-          section_format: format
+          section_format: format,
         }
-        attrs[:publisher] = Components::Publisher.new(body: publisher_val) if publisher_val
+        if publisher_val
+          attrs[:publisher] =
+            Components::Publisher.new(body: publisher_val)
+        end
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Section.new(attrs)
@@ -376,7 +391,10 @@ module PubidNew
           number: Components::Code.new(value: number_val),
         }
         attrs[:spec_code] = Components::Code.new(value: spec_code) if spec_code
-        attrs[:publisher] = Components::Publisher.new(body: publisher_val) if publisher_val
+        if publisher_val
+          attrs[:publisher] =
+            Components::Publisher.new(body: publisher_val)
+        end
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::DetailedSpecification.new(attrs)
@@ -391,7 +409,7 @@ module PubidNew
 
         # Extract part from parts array (if present)
         part_val = nil
-        if data[:parts] && data[:parts].any?
+        if data[:parts]&.any?
           parts_array = Array(data[:parts])
           if parts_array.first && parts_array.first[:part]
             part_val = parts_array.first[:part].to_s
@@ -439,11 +457,9 @@ module PubidNew
         end
 
         # Also check for :part_with_letter_edition key (for alternative patterns)
-        if !part_val && data[:part_with_letter_edition]
-          if data[:part_with_letter_edition].is_a?(Hash)
-            part_val = data[:part_with_letter_edition][:part].to_s if data[:part_with_letter_edition][:part]
-            part_edition_val = data[:part_with_letter_edition][:letter_edition].to_s if data[:part_with_letter_edition][:letter_edition]
-          end
+        if !part_val && data[:part_with_letter_edition].is_a?(Hash)
+          part_val = data[:part_with_letter_edition][:part].to_s if data[:part_with_letter_edition][:part]
+          part_edition_val = data[:part_with_letter_edition][:letter_edition].to_s if data[:part_with_letter_edition][:letter_edition]
         end
 
         # Extract iteration (optional, may be empty)
@@ -485,26 +501,26 @@ module PubidNew
           # Build base identifier
           base_id = SingleIdentifier.new(
             publisher: Components::Publisher.new(body: "BS"),
-            number: Components::Code.new(value: base_number)
+            number: Components::Code.new(value: base_number),
           )
 
           # Build identifiers for each part
           id1 = SingleIdentifier.new(
             publisher: Components::Publisher.new(body: "BS"),
             number: Components::Code.new(value: base_number),
-            part: Components::Code.new(value: part1)
+            part: Components::Code.new(value: part1),
           )
 
           id2 = SingleIdentifier.new(
             publisher: Components::Publisher.new(body: "BS"),
             number: Components::Code.new(value: base_number),
-            part: Components::Code.new(value: part2)
+            part: Components::Code.new(value: part2),
           )
 
           Identifiers::BundledIdentifier.new(
             identifiers: [base_id, id1, id2],
             bundle_type: bundle_type,
-            common_year: year_val ? Components::Date.new(year: year_val) : nil
+            common_year: year_val ? Components::Date.new(year: year_val) : nil,
           )
 
         elsif data[:bundled_list]
@@ -522,11 +538,12 @@ module PubidNew
 
           # Process first item
           if first_elem[:bundle_item]
-            items << build_bundle_item(first_elem[:bundle_item], publisher_val, prefix_val)
+            items << build_bundle_item(first_elem[:bundle_item], publisher_val,
+                                       prefix_val)
           end
 
           # Process remaining elements (may be separator+item or just year)
-          list_array[1..-1].each do |elem|
+          list_array[1..].each do |elem|
             if elem[:year]
               # Year element - will be extracted separately
               next
@@ -549,7 +566,8 @@ module PubidNew
                       " and "
                     end
               separators << sep
-              items << build_bundle_item(elem[:bundle_item], publisher_val, prefix_val)
+              items << build_bundle_item(elem[:bundle_item], publisher_val,
+                                         prefix_val)
             end
           end
 
@@ -560,7 +578,7 @@ module PubidNew
           Identifiers::BundledIdentifier.new(
             identifiers: items,
             separators: separators,
-            common_year: year_val ? Components::Date.new(year: year_val) : nil
+            common_year: year_val ? Components::Date.new(year: year_val) : nil,
           )
         end
       end
@@ -574,7 +592,7 @@ module PubidNew
 
         identifiers = []
 
-        items_array.each_with_index do |item, i|
+        items_array.each_with_index do |item, _i|
           # Extract the actual item data from :set_item key
           item_data = item[:set_item] || item
 
@@ -584,18 +602,18 @@ module PubidNew
 
           # Publisher (BS)
           if item_data[:publisher]
-            id_str += "#{item_data[:publisher].to_s} "
+            id_str += "#{item_data[:publisher]} "
           end
 
           # Adopted org (ISO, IEC, etc.)
           if item_data[:adopted_org]
-            id_str += "#{item_data[:adopted_org].to_s} "
+            id_str += "#{item_data[:adopted_org]} "
           end
 
           # Number
           if item_data[:number]
             number_val = if item_data[:number].is_a?(Hash)
-                           item_data[:number][:number].to_s if item_data[:number][:number]
+                           item_data[:number][:number]&.to_s
                          else
                            item_data[:number].to_s
                          end
@@ -603,7 +621,7 @@ module PubidNew
           end
 
           # Add part if present (parts is an array from the parser)
-          if item_data[:parts] && item_data[:parts].is_a?(Hash) && item_data[:parts][:parts]
+          if item_data[:parts].is_a?(Hash) && item_data[:parts][:parts]
             parts_array = item_data[:parts][:parts]
             if parts_array.is_a?(Array) && parts_array.any?
               part_val = parts_array.first[:part]
@@ -613,7 +631,7 @@ module PubidNew
 
           # Add year if present
           if item_data[:year]
-            id_str += ":#{item_data[:year].to_s}"
+            id_str += ":#{item_data[:year]}"
           end
 
           # Skip if empty string
@@ -626,7 +644,7 @@ module PubidNew
 
         Identifiers::Set.new(
           identifiers: identifiers,
-          separators: [" + "] * [0, identifiers.length - 1].max
+          separators: [" + "] * [0, identifiers.length - 1].max,
         )
       end
 
@@ -660,14 +678,15 @@ module PubidNew
         end
 
         id = SingleIdentifier.new(
-          publisher: Components::Publisher.new(body: publisher_val)
+          publisher: Components::Publisher.new(body: publisher_val),
         )
         id.prefix = prefix_val if prefix_val && !prefix_val.empty?
         id.number = Components::Code.new(value: number_val) if number_val
 
         # Store explicit flags for rendering (use instance variables since it's metadata)
         # Track both publisher and prefix explicitly
-        id.instance_variable_set(:@explicit_prefix, has_explicit_publisher || has_explicit_prefix)
+        id.instance_variable_set(:@explicit_prefix,
+                                 has_explicit_publisher || has_explicit_prefix)
         id.instance_variable_set(:@explicit_publisher, has_explicit_publisher)
 
         # Handle dash-separated parts (from parts array)
@@ -699,7 +718,7 @@ module PubidNew
                  elsif @original_data[:expert_commentary]
                    "abbr"
                  else
-                   "abbr"  # Default
+                   "abbr" # Default
                  end
 
         topic = @original_data[:expert_commentary_topic]&.to_s
@@ -707,7 +726,7 @@ module PubidNew
         Identifiers::ExpertCommentary.new(
           base_identifier: base_id,
           format: format,
-          topic: topic
+          topic: topic,
         )
       end
 
@@ -739,20 +758,20 @@ module PubidNew
           iteration: iteration_val,
           parts: parts_val,
           flex_prefix: flex_prefix_val,
-          year: base_year
+          year: base_year,
         }
 
         base_id = build(base_data)
 
         # Determine supplement type (with or without "No.")
         # Check if supp_no_prefix is "No." string or if it's nil/absent
-        if data[:supp_no_prefix] == "No."
-          supplement_type = "No."
-        elsif data[:supp_no_prefix]
-          supplement_type = data[:supp_no_prefix].to_s
-        else
-          supplement_type = ""
-        end
+        supplement_type = if data[:supp_no_prefix] == "No."
+                            "No."
+                          elsif data[:supp_no_prefix]
+                            data[:supp_no_prefix].to_s
+                          else
+                            ""
+                          end
 
         Identifiers::SupplementDocument.new(
           base_identifier: base_id,
@@ -760,7 +779,7 @@ module PubidNew
           supplement_year: data[:supplement_year].to_i,
           supplement_type: supplement_type,
           reverse_format: reverse_format,
-          separator: data[:supp_sep].to_s
+          separator: data[:supp_sep].to_s,
         )
       end
 
@@ -779,19 +798,19 @@ module PubidNew
           iteration: iteration_val,
           parts: parts_val,
           flex_prefix: flex_prefix_val,
-          year: data[:base_year]
+          year: data[:base_year],
         }
 
         base_id = build(base_data)
 
         # Determine addendum type (with or without "No.")
-        if data[:add_no_prefix] == "No."
-          addendum_type = "No."
-        elsif data[:add_no_prefix]
-          addendum_type = data[:add_no_prefix].to_s
-        else
-          addendum_type = ""
-        end
+        addendum_type = if data[:add_no_prefix] == "No."
+                          "No."
+                        elsif data[:add_no_prefix]
+                          data[:add_no_prefix].to_s
+                        else
+                          ""
+                        end
 
         # Determine separator - use colon when add_sep is nil and base_year is present
         add_sep = data[:add_sep]
@@ -806,7 +825,7 @@ module PubidNew
           addendum_number: data[:addendum_number].to_s,
           addendum_year: data[:addendum_year].to_i,
           addendum_type: addendum_type,
-          separator: add_sep.to_s
+          separator: add_sep.to_s,
         )
       end
 
@@ -824,7 +843,7 @@ module PubidNew
         attrs = {
           amendment_number: Components::Code.new(value: amendment_number),
           corrigendum: corrigendum,
-          parenthesized: parenthesized
+          parenthesized: parenthesized,
         }
 
         Identifiers::StandaloneAmendment.new(attrs)
@@ -848,7 +867,7 @@ module PubidNew
         Identifiers::CommitteeDocument.new(attrs)
       end
 
-      def build_value_added_publication(data, supplements_data)
+      def build_value_added_publication(data, _supplements_data)
         require_relative "identifiers/value_added_publication"
 
         # Determine format type
@@ -871,11 +890,11 @@ module PubidNew
 
         Identifiers::ValueAddedPublication.new(
           base_identifier: base_id,
-          format: format
+          format: format,
         )
       end
 
-      def build_national_annex(data, supplements_data)
+      def build_national_annex(data, _supplements_data)
         # Build base identifier (what comes after "NA to")
         base_data = data.dup
         base_data.delete(:na_prefix)
@@ -915,24 +934,24 @@ module PubidNew
 
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
-              base_identifier: nil,  # NA supplements don't wrap base
+              base_identifier: nil, # NA supplements don't wrap base
               amendment_number: supp[:number],
               amendment_year: year_val&.to_i,
-              separator: supp[:separator] || "+"
+              separator: supp[:separator] || "+",
             )
           else
             Identifiers::Corrigendum.new(
               base_identifier: nil,
               corrigendum_number: supp[:number],
               corrigendum_year: year_val&.to_i,
-              separator: supp[:separator] || "+"
+              separator: supp[:separator] || "+",
             )
           end
         end
 
         Identifiers::NationalAnnex.new(
           na_supplements: na_supps,
-          base_doc: base_id
+          base_doc: base_id,
         )
       end
 
@@ -949,7 +968,7 @@ module PubidNew
             type: supp_data[:amd_number] ? :amendment : :corrigendum,
             number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
             year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
-            separator: separator
+            separator: separator,
           }
         end
       end
@@ -984,7 +1003,7 @@ module PubidNew
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,
             typed_stage: typed_stage,
-            original_abbr: value.to_s  # Preserve original abbreviation
+            original_abbr: value.to_s, # Preserve original abbreviation
           }
 
         when :publisher
@@ -1055,10 +1074,12 @@ module PubidNew
           # Parser returns: {:expert_commentary_topic=>"Fire"} or {:expert_commentary_full=>"Expert Commentary"}
           if value.is_a?(Hash)
             if value[:expert_commentary_topic]
-              @original_data[:expert_commentary_topic] = value[:expert_commentary_topic].to_s
+              @original_data[:expert_commentary_topic] =
+                value[:expert_commentary_topic].to_s
             end
             if value[:expert_commentary_full]
-              @original_data[:expert_commentary_full] = value[:expert_commentary_full].to_s
+              @original_data[:expert_commentary_full] =
+                value[:expert_commentary_full].to_s
             end
           end
           true
@@ -1162,44 +1183,64 @@ module PubidNew
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
           # Update @original_data so wrap_with_expert_commentary can access it
           @original_data[:expert_commentary_full] = "Expert Commentary"
-          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+          unless @original_data.key?(:expert_commentary)
+            @original_data[:expert_commentary] =
+              true
+          end
         elsif adopted_str.end_with?("ExComm (")
           adopted_str = adopted_str.sub(/ExComm \(.*\)$/, "")
           data[:expert_commentary_full] = "Expert Commentary"
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
           @original_data[:expert_commentary_full] = "Expert Commentary"
-          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+          unless @original_data.key?(:expert_commentary)
+            @original_data[:expert_commentary] =
+              true
+          end
         elsif adopted_str.include?("ExComm (")
           # Extract topic from "ExComm (Fire)"
           topic_match = adopted_str.match(/ExComm\s*\(([^)]+)\)/)
           adopted_str = adopted_str.sub(/ExComm\s*\(.*\)$/, "")
           data[:expert_commentary_topic] = topic_match[1] if topic_match
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
-          @original_data[:expert_commentary_topic] = topic_match[1] if topic_match
-          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+          if topic_match
+            @original_data[:expert_commentary_topic] =
+              topic_match[1]
+          end
+          unless @original_data.key?(:expert_commentary)
+            @original_data[:expert_commentary] =
+              true
+          end
         elsif adopted_str.match?(/ExComm\s*$/)
           # Abbreviated form "ExComm" at the end
           adopted_str = adopted_str.sub(/ExComm\s*$/, "")
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
-          @original_data[:expert_commentary] = true unless @original_data.key?(:expert_commentary)
+          unless @original_data.key?(:expert_commentary)
+            @original_data[:expert_commentary] =
+              true
+          end
         end
 
         # Only extract edition if NOT bare - bare identifiers should preserve edition internally
         edition_match = is_bare ? nil : adopted_str.match(/\s+ED(\d+)\s*$/)
         extracted_edition = edition_match ? edition_match[1] : nil
         # Remove edition from adopted string for recursive parsing (only if extracted)
-        adopted_str_clean = edition_match ? adopted_str.sub(/\s+ED\d+\s*$/, "") : adopted_str
+        adopted_str_clean = if edition_match
+                              adopted_str.sub(/\s+ED\d+\s*$/,
+                                              "")
+                            else
+                              adopted_str
+                            end
 
         # Use extracted edition if no edition in data
         final_edition = data[:edition] || extracted_edition
 
         # Determine the BSI prefix to use (BS, PD, DD)
         bsi_prefix = if data[:type]
-                       data[:type].to_s  # PD, DD, etc.
+                       data[:type].to_s # PD, DD, etc.
                      elsif data[:publisher]
-                       data[:publisher].to_s  # BS
+                       data[:publisher].to_s # BS
                      else
-                       "BS"  # Default
+                       "BS" # Default
                      end
 
         # Multi-level adoption hierarchy (check most specific first):
@@ -1216,46 +1257,44 @@ module PubidNew
           iso_iec_str = adopted_str_clean.sub(/^EN\s+/, "")
 
           if iso_iec_str.start_with?("ISO/IEC") || iso_iec_str.include?("ISO/IEC")
-            require_relative '../iso'
+            require_relative "../iso"
             adopted_id = PubidNew::Iso.parse(iso_iec_str)
           elsif iso_iec_str.start_with?("ISO")
-            require_relative '../iso'
+            require_relative "../iso"
             adopted_id = PubidNew::Iso.parse(iso_iec_str)
           elsif iso_iec_str.start_with?("IEC")
-            require_relative '../iec'
+            require_relative "../iec"
             adopted_id = PubidNew::Iec.parse(iso_iec_str)
           end
 
           # Wrap ISO/IEC identifier in EN adoption
           if adopted_id
-            require_relative '../cen'
+            require_relative "../cen"
             adopted_id = PubidNew::Cen::Identifiers::AdoptedEuropeanNorm.new(
               publisher: ["EN"],
-              adopted_identifier: adopted_id
+              adopted_identifier: adopted_id,
             )
           end
 
         # Check for direct ISO/IEC patterns (double-level: BS ISO, BS IEC or bare ISO/IEC)
         elsif adopted_str_clean.start_with?("ISO/IEC") || adopted_str_clean.include?("ISO/IEC")
-          require_relative '../iso'
+          require_relative "../iso"
           adopted_id = PubidNew::Iso.parse(adopted_str_clean)
         elsif adopted_str_clean.start_with?("ISO")
-          require_relative '../iso'
+          require_relative "../iso"
           adopted_id = PubidNew::Iso.parse(adopted_str_clean)
         elsif adopted_str_clean.start_with?("IEC")
-          require_relative '../iec'
+          require_relative "../iec"
           adopted_id = PubidNew::Iec.parse(adopted_str_clean)
 
         # Check for EN patterns (double-level: BS EN or DD/PD CEN) or CEN types
-        elsif adopted_str_clean.start_with?("EN") || adopted_str_clean.start_with?("CEN") || adopted_str_clean.start_with?("CLC") ||
-              adopted_str_clean.start_with?("CR") || adopted_str_clean.start_with?("ES") ||
-              adopted_str_clean.start_with?("ENV") || adopted_str_clean.start_with?("HD") ||
-              adopted_str_clean.start_with?("CWA")
-          require_relative '../cen'
+        elsif adopted_str_clean.start_with?("EN", "CEN", "CLC", "CR", "ES",
+                                            "ENV", "HD", "CWA")
+          require_relative "../cen"
           adopted_id = PubidNew::Cen.parse(adopted_str_clean)
         # Check for CISPR
         elsif adopted_str_clean.start_with?("CISPR")
-          require_relative '../iec'
+          require_relative "../iec"
           adopted_id = PubidNew::Iec.parse(adopted_str_clean)
         end
 
@@ -1266,23 +1305,23 @@ module PubidNew
         if adopted_id
           # If adopted_id is a CEN identifier (in Cen module), use AdoptedEuropeanNorm
           identifier = if adopted_id.class.name.start_with?("PubidNew::Cen::")
-            Identifiers::AdoptedEuropeanNorm.new(
-              publisher: Components::Publisher.new(body: bsi_prefix),
-              adopted_identifier: adopted_id,
-              edition: final_edition&.to_s,
-              translation_lang: data[:translation_lang]&.to_s,
-              translation_upper: data[:translation_upper]&.to_s
-            )
-          else
-            # Otherwise it's ISO/IEC, use AdoptedInternationalStandard
-            Identifiers::AdoptedInternationalStandard.new(
-              publisher: Components::Publisher.new(body: bsi_prefix),
-              adopted_identifier: adopted_id,
-              edition: final_edition&.to_s,
-              translation_lang: data[:translation_lang]&.to_s,
-              translation_upper: data[:translation_upper]&.to_s
-            )
-          end
+                         Identifiers::AdoptedEuropeanNorm.new(
+                           publisher: Components::Publisher.new(body: bsi_prefix),
+                           adopted_identifier: adopted_id,
+                           edition: final_edition&.to_s,
+                           translation_lang: data[:translation_lang]&.to_s,
+                           translation_upper: data[:translation_upper]&.to_s,
+                         )
+                       else
+                         # Otherwise it's ISO/IEC, use AdoptedInternationalStandard
+                         Identifiers::AdoptedInternationalStandard.new(
+                           publisher: Components::Publisher.new(body: bsi_prefix),
+                           adopted_identifier: adopted_id,
+                           edition: final_edition&.to_s,
+                           translation_lang: data[:translation_lang]&.to_s,
+                           translation_upper: data[:translation_upper]&.to_s,
+                         )
+                       end
 
           # Wrap with ExpertCommentary if needed
           identifier = wrap_with_expert_commentary(identifier) if data[:expert_commentary]
@@ -1310,20 +1349,20 @@ module PubidNew
               base_identifier: base_identifier,
               amendment_number: supp[:number],
               amendment_year: year_val&.to_i,
-              separator: supp[:separator] || "+"
+              separator: supp[:separator] || "+",
             )
           else
             Identifiers::Corrigendum.new(
               base_identifier: base_identifier,
               corrigendum_number: supp[:number],
               corrigendum_year: year_val&.to_i,
-              separator: supp[:separator] || "+"
+              separator: supp[:separator] || "+",
             )
           end
         end
 
         Identifiers::ConsolidatedIdentifier.new(
-          identifiers: [base_identifier] + supplement_ids
+          identifiers: [base_identifier] + supplement_ids,
         )
       end
 
@@ -1343,7 +1382,7 @@ module PubidNew
             type: supp_data[:amd_number] ? :amendment : :corrigendum,
             number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
             year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
-            separator: separator
+            separator: separator,
           }
         end
       end

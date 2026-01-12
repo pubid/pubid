@@ -29,7 +29,6 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
       expect(result.to_s).to eq(subject)
     end
 
-
     # ANSI C37.06.1-2000
     it "parses lettered standard with complex number and dash year" do
       subject { "ANSI C37.06.1-2000" }
@@ -49,7 +48,6 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
       expect(result.year).to eq("2002")
       expect(result.to_s).to eq(subject)
     end
-
   end
 
   context "Co-published identifiers" do

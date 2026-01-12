@@ -20,27 +20,27 @@ module PubidNew
       rule(:multi_letter_prefix) do
         # Flex type prefixes for supplement/addendum documents (5-character first)
         str("E9111") |
-        # CECC (4-character)
-        str("CECC") |
-        # 4-character prefixes
-        str("2HC") | str("2HR") | str("2SP") | str("2TA") |
-        str("3HR") | str("3TA") |
-        # 3-character prefixes
-        str("2A") | str("2B") | str("2C") | str("2F") | str("2G") |
-        str("2L") | str("2M") | str("2S") |
-        str("3B") | str("3F") | str("3G") | str("3J") | str("3L") | str("3S") |
-        str("4F") | str("4L") | str("4S") |
-        str("5S") | str("7S") |
-        # 2-character prefixes
-        str("SP")
+          # CECC (4-character)
+          str("CECC") |
+          # 4-character prefixes
+          str("2HC") | str("2HR") | str("2SP") | str("2TA") |
+          str("3HR") | str("3TA") |
+          # 3-character prefixes
+          str("2A") | str("2B") | str("2C") | str("2F") | str("2G") |
+          str("2L") | str("2M") | str("2S") |
+          str("3B") | str("3F") | str("3G") | str("3J") | str("3L") | str("3S") |
+          str("4F") | str("4L") | str("4S") |
+          str("5S") | str("7S") |
+          # 2-character prefixes
+          str("SP")
       end
 
       rule(:single_letter_prefix) do
         # Two-letter prefixes BEFORE single-letter
         str("AU") | str("HC") | str("MA") | str("PL") | str("QC") | str("TA") |
-        # Single-letter prefixes
-        str("A") | str("B") | str("C") | str("F") | str("G") |
-        str("L") | str("M") | str("S") | str("X")
+          # Single-letter prefixes
+          str("A") | str("B") | str("C") | str("F") | str("G") |
+          str("L") | str("M") | str("S") | str("X")
       end
 
       rule(:specialized_prefix) do
@@ -67,10 +67,10 @@ module PubidNew
       rule(:index_suffix) do
         # Issue format: " Index Issue N" (must be before colon format to match correctly)
         space >> str("Index") >> space >> str("Issue") >> space >> digits.as(:issue_number) |
-        # Colon format: ":Index"
-        colon.as(:colon_sep) >> str("Index") |
-        # Space format: " Index" (year rule includes the colon)
-        space >> str("Index")
+          # Colon format: ":Index"
+          colon.as(:colon_sep) >> str("Index") |
+          # Space format: " Index" (year rule includes the colon)
+          space >> str("Index")
       end
 
       # Supplementary Index suffix - handles one format:
@@ -92,10 +92,10 @@ module PubidNew
       rule(:method_suffix) do
         # Range format (plural): ":Methods X to Y" (must be first to match the "to" keyword)
         colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("to") >> space >> method_code.as(:method_to) |
-        # And format (plural): ":Methods X and Y"
-        colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("and") >> space >> method_code.as(:method_and) |
-        # Basic format (singular): ":Method X"
-        colon >> str("Method") >> space >> method_code.as(:method_code)
+          # And format (plural): ":Methods X and Y"
+          colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("and") >> space >> method_code.as(:method_and) |
+          # Basic format (singular): ":Method X"
+          colon >> str("Method") >> space >> method_code.as(:method_code)
       end
 
       # Method code - alphanumeric like "131B", "451F", "823A", "1006"
@@ -139,8 +139,8 @@ module PubidNew
       rule(:section_suffix) do
         # Colon format: ":Section N" (DD format)
         colon.as(:colon_sep) >> str("Section") >> space >> section_id.as(:section_id) |
-        # Space format: " Section N" (BS format)
-        space >> str("Section") >> space >> section_id.as(:section_id)
+          # Space format: " Section N" (BS format)
+          space >> str("Section") >> space >> section_id.as(:section_id)
       end
 
       # Section ID - can be numeric (0-7) or alphanumeric (B2, C1, D1, etc.)
@@ -153,16 +153,20 @@ module PubidNew
       rule(:detailed_spec_suffix) do
         space >> (
           # C notation with range: C155-168
-          (str("C") >> match["0-9"].repeat(1, 3) >> dash >> match["0-9"].repeat(1, 3)).as(:spec_code) |
+          (str("C") >> match["0-9"].repeat(1,
+                                           3) >> dash >> match["0-9"].repeat(1,
+                                                                             3)).as(:spec_code) |
           # N notation with optional part: N002 or N0009-1
-          (str("N") >> match["0-9"].repeat(1, 4) >> (dash >> match["0-9"].repeat(1)).maybe).as(:spec_code)
+          (str("N") >> match["0-9"].repeat(1,
+                                           4) >> (dash >> match["0-9"].repeat(1)).maybe).as(:spec_code)
         )
       end
 
       # Committee Document identifier
       # Format: "YY/NNNNNNNN DC" (2-digit year, 8-digit number, DC suffix)
       rule(:committee_document) do
-        (digit.repeat(2, 2).as(:year) >> slash >> match["0-9"].repeat(8).as(:document_number) >> space >> str("DC")).as(:committee_document)
+        (digit.repeat(2,
+                      2).as(:year) >> slash >> match["0-9"].repeat(8).as(:document_number) >> space >> str("DC")).as(:committee_document)
       end
 
       # Standalone Amendment identifier
@@ -170,11 +174,11 @@ module PubidNew
       rule(:standalone_amendment) do
         # Parenthesized format: "(AMD 10971)" or "(AMD Corrigendum 14716)"
         (str("(") >> str("AMD") >> space >> str("Corrigendum").as(:corrigendum) >> space >> digits.as(:amendment_number) >> str(")")).as(:parenthesized_amd) |
-        (str("(") >> str("AMD") >> space >> digits.as(:amendment_number) >> str(")")).as(:parenthesized_amd) |
-        # Regular format with corrigendum: "AMD Corrigendum 14716"
-        (str("AMD") >> space >> str("Corrigendum").as(:corrigendum) >> space >> digits.as(:amendment_number)).as(:standalone_amendment) |
-        # Basic format: "AMD 11015"
-        (str("AMD") >> space >> digits.as(:amendment_number)).as(:standalone_amendment)
+          (str("(") >> str("AMD") >> space >> digits.as(:amendment_number) >> str(")")).as(:parenthesized_amd) |
+          # Regular format with corrigendum: "AMD Corrigendum 14716"
+          (str("AMD") >> space >> str("Corrigendum").as(:corrigendum) >> space >> digits.as(:amendment_number)).as(:standalone_amendment) |
+          # Basic format: "AMD 11015"
+          (str("AMD") >> space >> digits.as(:amendment_number)).as(:standalone_amendment)
       end
 
       # DISC identifier - "DISC PD <number>[-<part>]:<year>"
@@ -207,22 +211,22 @@ module PubidNew
       # Publisher/Type - longer patterns first
       rule(:publisher_or_type) do
         na_prefix >>
-        (draft.as(:stage) |
-         dd.as(:type) |
-         pd.as(:type) |
-         bs.as(:publisher)) |
-        flex.as(:flex_type) |
-        handbook.as(:type) |
-        bip.as(:type) |
-        ts.as(:type) |
-        draft.as(:stage) |
-        dd.as(:type) |
-        pd.as(:type) |
-        pas.as(:type) |
-        pp.as(:type) |
-        na.as(:type) |
-        (bs.as(:publisher) >> space >> specialized_prefix) |
-        bs.as(:publisher)
+          (draft.as(:stage) |
+           dd.as(:type) |
+           pd.as(:type) |
+           bs.as(:publisher)) |
+          flex.as(:flex_type) |
+          handbook.as(:type) |
+          bip.as(:type) |
+          ts.as(:type) |
+          draft.as(:stage) |
+          dd.as(:type) |
+          pd.as(:type) |
+          pas.as(:type) |
+          pp.as(:type) |
+          na.as(:type) |
+          (bs.as(:publisher) >> space >> specialized_prefix) |
+          bs.as(:publisher)
       end
 
       # Number (with optional bracket notation for iterations like 1000[9])
@@ -230,7 +234,9 @@ module PubidNew
       rule(:number) { match["0-9A-Z"].repeat(1).as(:number) }
 
       # Bracket notation for iterations (e.g., 1000[9])
-      rule(:bracket_iteration) { str("[") >> match["0-9"].repeat(1).as(:iteration) >> str("]") }
+      rule(:bracket_iteration) do
+        str("[") >> match["0-9"].repeat(1).as(:iteration) >> str("]")
+      end
 
       # Part (can be multi-level like 1-2 or 2.3 with dots, or with letters like F3, or ampersand like 3A & B)
       rule(:part) { dash >> match["0-9A-Za-z.& "].repeat(1).as(:part) }
@@ -241,18 +247,20 @@ module PubidNew
       rule(:part_with_letter_edition) do
         # Part number (digits, dots) followed by single letter edition
         (dash >> match["0-9."].repeat(1).as(:part) >> letter_edition.as(:letter_edition)) |
-        # Just part number (no edition)
-        (dash >> match["0-9."].repeat(1).as(:part))
+          # Just part number (no edition)
+          (dash >> match["0-9."].repeat(1).as(:part))
       end
 
       # Number with optional letter suffix edition for aerospace standards (e.g., "145e" or "159G")
       rule(:number_with_letter_edition) do
         (match["0-9"].repeat(1).as(:number) >> letter_edition.as(:letter_edition)) |
-        (match["0-9"].repeat(1).as(:number))
+          match["0-9"].repeat(1).as(:number)
       end
 
       # Space-separated alphanumeric part (for bundled patterns like "9113 N001")
-      rule(:space_separated_part) { space >> (match["A-Z"].repeat(1) >> match["0-9"].repeat(1)).as(:part) }
+      rule(:space_separated_part) do
+        space >> (match["A-Z"].repeat(1) >> match["0-9"].repeat(1)).as(:part)
+      end
 
       # Iteration (for formats like BS 1000[9])
       rule(:iteration) { bracket_iteration.repeat(0).as(:iteration) }
@@ -267,7 +275,9 @@ module PubidNew
       rule(:month) { dash >> digit.repeat(2, 2).as(:month) }
 
       # Edition (v1.0, v2.0, etc.) for Flex - lowercase v
-      rule(:flex_edition) { space >> str("v") >> match["0-9."].repeat(1).as(:edition) }
+      rule(:flex_edition) do
+        space >> str("v") >> match["0-9."].repeat(1).as(:edition)
+      end
 
       # Edition for IEC/ISO standards (ED2, ED3, etc.) - space before ED, uppercase
       rule(:edition) { space >> str("ED") >> digits.as(:edition) }
@@ -279,18 +289,18 @@ module PubidNew
       # Amendment (+A1:2008 or /A2:2019 or +A1:15 for short year)
       rule(:amendment) do
         (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-        str("A") >> digits.as(:amd_number) >>
-        colon >> digit.repeat(2, 4).as(:amd_year)
+          str("A") >> digits.as(:amd_number) >>
+          colon >> digit.repeat(2, 4).as(:amd_year)
       end
 
       # Corrigendum (+AC:2009 or +AC1:2008 or /AC1:2005 or +C1:2018 or +C1 without year)
       rule(:corrigendum) do
         (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-        str("AC") >> digits.maybe.as(:cor_number) >>
-        (colon >> digit.repeat(2, 4).as(:cor_year)).maybe |
-        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-        str("C") >> digits.as(:cor_number) >>
-        (colon >> digit.repeat(2, 4).as(:cor_year)).maybe
+          str("AC") >> digits.maybe.as(:cor_number) >>
+          (colon >> digit.repeat(2, 4).as(:cor_year)).maybe |
+          (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+            str("C") >> digits.as(:cor_number) >>
+            (colon >> digit.repeat(2, 4).as(:cor_year)).maybe
       end
 
       # Supplements Document (not amendment/corrigendum supplements, but standalone supplement documents)
@@ -301,46 +311,54 @@ module PubidNew
         # With multi-letter flex type prefix (CECC, E9111, etc.)
         (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
          (colon | space).as(:supp_sep) >> str("Supplement") >> space >> str("No.").as(:supp_no_prefix) >> space >>
-         digits.as(:supplement_number) >> colon >> digit.repeat(4, 4).as(:supplement_year)
+         digits.as(:supplement_number) >> colon >> digit.repeat(4,
+                                                                4).as(:supplement_year)
         ).as(:supplement_document) |
-        (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:supp_sep) >> str("Supplement") >> space >>
-         digits.as(:supplement_number) >> colon >> digit.repeat(4, 4).as(:supplement_year)
-        ).as(:supplement_document) |
-        # With single-letter flex type prefix (M, etc.)
-        (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:supp_sep) >> str("Supplement") >> space >> str("No.").as(:supp_no_prefix) >> space >>
-         digits.as(:supplement_number) >> colon >> digit.repeat(4, 4).as(:supplement_year)
-        ).as(:supplement_document) |
-        (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:supp_sep) >> str("Supplement") >> space >>
-         digits.as(:supplement_number) >> colon >> digit.repeat(4, 4).as(:supplement_year)
-        ).as(:supplement_document) |
-        # Without flex type prefix - with "No." prefix
-        (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:supp_sep) >> str("Supplement") >> space >> str("No.").as(:supp_no_prefix) >> space >>
-         digits.as(:supplement_number) >> colon >> digit.repeat(4, 4).as(:supplement_year)
-        ).as(:supplement_document) |
-        # Without "No." prefix
-        (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:supp_sep) >> str("Supplement") >> space >>
-         digits.as(:supplement_number) >> colon >> digit.repeat(4, 4).as(:supplement_year)
-        ).as(:supplement_document)
+          (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:supp_sep) >> str("Supplement") >> space >>
+           digits.as(:supplement_number) >> colon >> digit.repeat(4,
+                                                                  4).as(:supplement_year)
+          ).as(:supplement_document) |
+          # With single-letter flex type prefix (M, etc.)
+          (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:supp_sep) >> str("Supplement") >> space >> str("No.").as(:supp_no_prefix) >> space >>
+           digits.as(:supplement_number) >> colon >> digit.repeat(4,
+                                                                  4).as(:supplement_year)
+          ).as(:supplement_document) |
+          (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:supp_sep) >> str("Supplement") >> space >>
+           digits.as(:supplement_number) >> colon >> digit.repeat(4,
+                                                                  4).as(:supplement_year)
+          ).as(:supplement_document) |
+          # Without flex type prefix - with "No." prefix
+          (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:supp_sep) >> str("Supplement") >> space >> str("No.").as(:supp_no_prefix) >> space >>
+           digits.as(:supplement_number) >> colon >> digit.repeat(4,
+                                                                  4).as(:supplement_year)
+          ).as(:supplement_document) |
+          # Without "No." prefix
+          (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:supp_sep) >> str("Supplement") >> space >>
+           digits.as(:supplement_number) >> colon >> digit.repeat(4,
+                                                                  4).as(:supplement_year)
+          ).as(:supplement_document)
       end
 
       rule(:supplement_document_reverse) do
         # With "No." prefix
         (str("Supplement") >> space >> str("No.").as(:supp_no_prefix) >> space >>
-         digits.as(:supplement_number) >> space >> str("(") >> digit.repeat(4, 4).as(:supplement_year) >>
+         digits.as(:supplement_number) >> space >> str("(") >> digit.repeat(4,
+                                                                            4).as(:supplement_year) >>
          str(")") >> space >> str("to ") >> bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
          colon >> digit.repeat(4, 4).as(:base_year)
         ).as(:supplement_document) |
-        # Without "No." prefix
-        (str("Supplement") >> space >>
-         digits.as(:supplement_number) >> space >> str("(") >> digit.repeat(4, 4).as(:supplement_year) >>
-         str(")") >> space >> str("to ") >> bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         colon >> digit.repeat(4, 4).as(:base_year)
-        ).as(:supplement_document)
+          # Without "No." prefix
+          (str("Supplement") >> space >>
+           digits.as(:supplement_number) >> space >> str("(") >> digit.repeat(4,
+                                                                              4).as(:supplement_year) >>
+           str(")") >> space >> str("to ") >> bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           colon >> digit.repeat(4, 4).as(:base_year)
+          ).as(:supplement_document)
       end
 
       # Addendum Document
@@ -351,65 +369,77 @@ module PubidNew
         # With multi-letter flex type prefix (CECC, E9111, etc.)
         (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
          (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
+         digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                              4).as(:addendum_year)
         ).as(:addendum_document) |
-        (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:add_sep) >> str("Addendum") >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document) |
-        # With single-letter flex type prefix (M, etc.)
-        (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document) |
-        (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:add_sep) >> str("Addendum") >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document) |
-        # With year before Addendum and SPACE separator: "BS NUMBER:YEAR Addendum No. N:YEAR"
-        (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         colon >> digit.repeat(4, 4).as(:base_year) >> space.as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document) |
-        # With year before Addendum and COLON separator: "BS NUMBER:YEAR:Addendum No. N:YEAR"
-        (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         colon >> digit.repeat(4, 4).as(:base_year) >> colon.as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document) |
-        # Without flex type prefix - with "No." prefix
-        (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document) |
-        # Without "No." prefix
-        (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:add_sep) >> str("Addendum") >> space >>
-         digits.as(:addendum_number) >> colon >> digit.repeat(4, 4).as(:addendum_year)
-        ).as(:addendum_document)
+          (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document) |
+          # With single-letter flex type prefix (M, etc.)
+          (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document) |
+          (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document) |
+          # With year before Addendum and SPACE separator: "BS NUMBER:YEAR Addendum No. N:YEAR"
+          (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           colon >> digit.repeat(4,
+                                 4).as(:base_year) >> space.as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document) |
+          # With year before Addendum and COLON separator: "BS NUMBER:YEAR:Addendum No. N:YEAR"
+          (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           colon >> digit.repeat(4,
+                                 4).as(:base_year) >> colon.as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document) |
+          # Without flex type prefix - with "No." prefix
+          (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document) |
+          # Without "No." prefix
+          (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space >>
+           digits.as(:addendum_number) >> colon >> digit.repeat(4,
+                                                                4).as(:addendum_year)
+          ).as(:addendum_document)
       end
 
       # Bundled Identifiers - Collections of standards published together
       # Separators for bundles
       rule(:bundle_sep_and) { space >> str("and") >> space }
-      rule(:bundle_sep_to) { space >> (str("TO") | str("to")).as(:to_case) >> space }
+      rule(:bundle_sep_to) do
+        space >> (str("TO") | str("to")).as(:to_case) >> space
+      end
       rule(:bundle_sep_ampersand) { space >> str("&") >> space }
       rule(:bundle_sep_semicolon) { str(";") >> space }
       rule(:bundle_sep_comma) { str(",") }
 
       rule(:bundle_separator) do
         bundle_sep_and.as(:sep_and) |
-        bundle_sep_to.as(:sep_to) |
-        bundle_sep_ampersand.as(:sep_ampersand) |
-        bundle_sep_semicolon.as(:sep_semicolon) |
-        bundle_sep_comma.as(:sep_comma)
+          bundle_sep_to.as(:sep_to) |
+          bundle_sep_ampersand.as(:sep_ampersand) |
+          bundle_sep_semicolon.as(:sep_semicolon) |
+          bundle_sep_comma.as(:sep_comma)
       end
 
       # Parts/Sections bundle like "BS 4048:Parts 1 and 2:1966"
       rule(:parts_bundle) do
         (str("Parts") | str("Sections")).as(:bundle_type) >> space >>
-        match["0-9"].repeat(1).as(:part1) >>
-        bundle_sep_and >>
-        match["0-9."].repeat(1).as(:part2)
+          match["0-9"].repeat(1).as(:part1) >>
+          bundle_sep_and >>
+          match["0-9."].repeat(1).as(:part2)
       end
 
       # Single identifier for bundling (without year in some cases)
@@ -418,32 +448,32 @@ module PubidNew
       rule(:bundle_item) do
         # With full BS prefix and multi-letter specialized prefix (for "to" ranges like "BS 2SP 68 to BS 2SP 71")
         (bs.as(:publisher) >> space >> multi_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
-        # With full BS prefix and single-letter specialized prefix
-        (bs.as(:publisher) >> space >> single_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
-        # With full BS prefix, number, and space-separated alphanumeric part
-        (bs.as(:publisher) >> space >> number >> space_separated_part).as(:bundle_item) |
-        # With full BS prefix only
-        (bs.as(:publisher) >> space >> number >> parts).as(:bundle_item) |
-        # Without BS prefix but with multi-letter prefix (continuing same type)
-        (multi_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
-        # Without BS prefix but with single-letter prefix
-        (single_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
-        # Number with space-separated alphanumeric part (BEFORE simple number+parts)
-        (number >> space_separated_part).as(:bundle_item) |
-        # Space-separated alphanumeric parts like "N001" (standalone, for abbreviated forms)
-        (match["A-Z"].repeat(1) >> match["0-9"].repeat(1)).as(:bundle_item) |
-        # Just number and parts (minimal form - LAST to avoid consuming space-separated)
-        (number >> parts).as(:bundle_item)
+          # With full BS prefix and single-letter specialized prefix
+          (bs.as(:publisher) >> space >> single_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
+          # With full BS prefix, number, and space-separated alphanumeric part
+          (bs.as(:publisher) >> space >> number >> space_separated_part).as(:bundle_item) |
+          # With full BS prefix only
+          (bs.as(:publisher) >> space >> number >> parts).as(:bundle_item) |
+          # Without BS prefix but with multi-letter prefix (continuing same type)
+          (multi_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
+          # Without BS prefix but with single-letter prefix
+          (single_letter_prefix.as(:prefix) >> space >> number >> parts).as(:bundle_item) |
+          # Number with space-separated alphanumeric part (BEFORE simple number+parts)
+          (number >> space_separated_part).as(:bundle_item) |
+          # Space-separated alphanumeric parts like "N001" (standalone, for abbreviated forms)
+          (match["A-Z"].repeat(1) >> match["0-9"].repeat(1)).as(:bundle_item) |
+          # Just number and parts (minimal form - LAST to avoid consuming space-separated)
+          (number >> parts).as(:bundle_item)
       end
 
       # Bundled identifier patterns
       rule(:bundled_identifier) do
         # Parts/Sections format: "BS NUMBER:Parts/Sections N and N:YEAR"
         (publisher_or_type >> space >> number >> colon >> parts_bundle >> year).as(:bundled_parts) |
-        # List format with multiple separators: "BS SP 13; 14; 15 and 16:1949"
-        (publisher_or_type >> space >> bundle_item >>
-         (bundle_separator >> bundle_item).repeat(1) >>
-         year.maybe).as(:bundled_list)
+          # List format with multiple separators: "BS SP 13; 14; 15 and 16:1949"
+          (publisher_or_type >> space >> bundle_item >>
+           (bundle_separator >> bundle_item).repeat(1) >>
+           year.maybe).as(:bundled_list)
       end
 
       # Supplements
@@ -456,13 +486,15 @@ module PubidNew
       # 3. "ExComm (Fire)" (with optional topic suffix)
       rule(:expert_commentary) do
         space >> (
-          (str("Expert Commentary").as(:expert_commentary_full)) |
+          str("Expert Commentary").as(:expert_commentary_full) |
           (str("ExComm") >> (space >> str("(") >> match["A-Za-z"].repeat(1).as(:expert_commentary_topic) >> str(")")).maybe).as(:expert_commentary)
         )
       end
 
       # Tracked Changes suffix
-      rule(:tracked_changes) { space >> dash >> space >> str("TC").as(:tracked_changes) }
+      rule(:tracked_changes) do
+        space >> dash >> space >> str("TC").as(:tracked_changes)
+      end
 
       # PDF suffix
       rule(:pdf_suffix) { space >> str("PDF").as(:pdf) }
@@ -470,13 +502,13 @@ module PubidNew
       # Translation (captures language name from various formats)
       rule(:translation) do
         space >> str("(") >>
-        (
-          match["A-Za-z"].repeat(1).as(:translation_lang) >>
-          (space >> (str("Translation") | str("version"))).maybe
-        ) >>
-        str(")") |
-        # All-caps format: " SPANISH TRANSLATION" (supplements already parsed)
-        space >> (str("SPANISH") | str("FRENCH") | str("GERMAN") | str("ITALIAN")).as(:translation_upper) >> space >> str("TRANSLATION")
+          (
+            match["A-Za-z"].repeat(1).as(:translation_lang) >>
+            (space >> (str("Translation") | str("version"))).maybe
+          ) >>
+          str(")") |
+          # All-caps format: " SPANISH TRANSLATION" (supplements already parsed)
+          space >> (str("SPANISH") | str("FRENCH") | str("GERMAN") | str("ITALIAN")).as(:translation_upper) >> space >> str("TRANSLATION")
       end
 
       # Collection number (second number after slash like 2035/2030)
@@ -488,7 +520,7 @@ module PubidNew
       # IMPORTANT: Must NOT capture expert_commentary suffixes - let them be captured separately
       rule(:adopted_org_prefix) do
         str("EN") | str("ISO") | str("IEC") | str("CISPR") | str("CEN") | str("CLC") |
-        str("CR") | str("ES") | str("ENV") | str("HD") | str("CWA")
+          str("CR") | str("ES") | str("ENV") | str("HD") | str("CWA")
       end
 
       # Simple adopted string without expert commentary checks (for use in adopted_with_expert_commentary)
@@ -529,55 +561,55 @@ module PubidNew
       rule(:identifier) do
         # Standalone Amendment - must be first as it starts with "AMD"
         standalone_amendment |
-        # Committee Document - must be before bare adopted as it starts with digits
-        committee_document |
-        # Index identifier - must be before regular identifier
-        (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
-        # Supplementary Index identifier - must be before regular identifier
-        (bs.as(:publisher) >> space >> number >> supplementary_index_suffix.as(:supplementary_index_suffix) >> year).as(:supplementary_index_identifier) |
-        # Explanatory Supplement identifier - must be before regular identifier
-        (bs.as(:publisher) >> space >> number >> parts >> explanatory_supplement_suffix.as(:explanatory_supplement_suffix) >> year).as(:explanatory_supplement_identifier) |
-        # Method identifier - must be before regular identifier
-        (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
-        # Test Method identifier - BS {number}:{test_series}:{test_id}:{year}
-        (bs.as(:publisher) >> space >> number >> test_method_suffix.as(:test_method_suffix) >> year).as(:test_method_identifier) |
-        # Section identifier - must be before regular identifier
-        (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
-        # Detailed Specification identifier - must be before regular identifier
-        (bs.as(:publisher) >> space >> number >> detailed_spec_suffix.as(:detailed_spec_suffix) >> year).as(:detailed_specification) |
-        # Aerospace/Specialized identifier with letter suffix edition (e.g., BS AU 145e:2018)
-        # Must be before DISC and regular identifiers
-        (bs.as(:publisher) >> space >> (single_letter_prefix | multi_letter_prefix).as(:prefix) >> space >>
-         number_with_letter_edition >> part_with_letter_edition.maybe >> iteration.as(:iteration).maybe >>
-         year).as(:aerospace_identifier) |
-        # DISC identifier - "DISC PD <number>[-<part>]:<year>"
-        (disc_prefix >> number >> parts.maybe >> year).as(:disc_identifier) |
-        # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
-        supplement_document_reverse.as(:supplement_document) |
-        # Supplement Document - forward format (BS NUMBER:Supplement No. N:YEAR)
-        supplement_document_forward |
-        # Addendum Document (BS NUMBER:Addendum No. N:YEAR)
-        addendum_document |
-        # Set identifier - multiple identifiers joined by +
-        # Must be BEFORE bare_adopted and regular identifier with adopted_string
-        set_identifier.as(:set) |
-        # Bundled Identifiers (must be before regular identifiers)
-        bundled_identifier |
-        # Bare adopted identifier (ISO, IEC without BSI prefix) - check BEFORE adopted_string
-        bare_adopted.as(:adopted_string) |
-        # Flex with v-style edition before date
-        (flex.as(:flex_type) >> space >> number >> parts >> flex_edition.maybe >> (year >> month.maybe).maybe >> supplements) |
-        # Regular BSI identifier - VAP suffix at the end
-        publisher_or_type >>
-        (space >> adopted_string).maybe >>
-        (space >> number >> parts >> collection_number.maybe >>
-        (year >> month.maybe).maybe >>
-        flex_edition.maybe).maybe >>
-        supplements.maybe >>
-        edition.maybe >>
-        expert_commentary.maybe >>
-        translation.maybe >>
-        vapSuffix.maybe
+          # Committee Document - must be before bare adopted as it starts with digits
+          committee_document |
+          # Index identifier - must be before regular identifier
+          (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
+          # Supplementary Index identifier - must be before regular identifier
+          (bs.as(:publisher) >> space >> number >> supplementary_index_suffix.as(:supplementary_index_suffix) >> year).as(:supplementary_index_identifier) |
+          # Explanatory Supplement identifier - must be before regular identifier
+          (bs.as(:publisher) >> space >> number >> parts >> explanatory_supplement_suffix.as(:explanatory_supplement_suffix) >> year).as(:explanatory_supplement_identifier) |
+          # Method identifier - must be before regular identifier
+          (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
+          # Test Method identifier - BS {number}:{test_series}:{test_id}:{year}
+          (bs.as(:publisher) >> space >> number >> test_method_suffix.as(:test_method_suffix) >> year).as(:test_method_identifier) |
+          # Section identifier - must be before regular identifier
+          (publisher_or_type >> space >> number >> section_suffix.as(:section_suffix) >> year).as(:section_identifier) |
+          # Detailed Specification identifier - must be before regular identifier
+          (bs.as(:publisher) >> space >> number >> detailed_spec_suffix.as(:detailed_spec_suffix) >> year).as(:detailed_specification) |
+          # Aerospace/Specialized identifier with letter suffix edition (e.g., BS AU 145e:2018)
+          # Must be before DISC and regular identifiers
+          (bs.as(:publisher) >> space >> (single_letter_prefix | multi_letter_prefix).as(:prefix) >> space >>
+           number_with_letter_edition >> part_with_letter_edition.maybe >> iteration.as(:iteration).maybe >>
+           year).as(:aerospace_identifier) |
+          # DISC identifier - "DISC PD <number>[-<part>]:<year>"
+          (disc_prefix >> number >> parts.maybe >> year).as(:disc_identifier) |
+          # Supplement Document - reverse format (Supplement No. N (YEAR) to BS...)
+          supplement_document_reverse.as(:supplement_document) |
+          # Supplement Document - forward format (BS NUMBER:Supplement No. N:YEAR)
+          supplement_document_forward |
+          # Addendum Document (BS NUMBER:Addendum No. N:YEAR)
+          addendum_document |
+          # Set identifier - multiple identifiers joined by +
+          # Must be BEFORE bare_adopted and regular identifier with adopted_string
+          set_identifier.as(:set) |
+          # Bundled Identifiers (must be before regular identifiers)
+          bundled_identifier |
+          # Bare adopted identifier (ISO, IEC without BSI prefix) - check BEFORE adopted_string
+          bare_adopted.as(:adopted_string) |
+          # Flex with v-style edition before date
+          (flex.as(:flex_type) >> space >> number >> parts >> flex_edition.maybe >> (year >> month.maybe).maybe >> supplements) |
+          # Regular BSI identifier - VAP suffix at the end
+          publisher_or_type >>
+            (space >> adopted_string).maybe >>
+            (space >> number >> parts >> collection_number.maybe >>
+            (year >> month.maybe).maybe >>
+            flex_edition.maybe).maybe >>
+            supplements.maybe >>
+            edition.maybe >>
+            expert_commentary.maybe >>
+            translation.maybe >>
+            vapSuffix.maybe
       end
 
       rule(:root) { identifier }
@@ -585,7 +617,7 @@ module PubidNew
       def self.parse(input)
         # Normalize "BSI " to "BS " for consistency, but NOT for "BSI Flex"
         normalized = if input.start_with?("BSI Flex")
-                       input  # Keep as is
+                       input # Keep as is
                      else
                        input.gsub(/\bBSI\s+/, "BS ")
                      end

@@ -5,7 +5,9 @@ module Pubid::Bsi
     end
 
     rule(:type) do
-      national_annex.maybe >> array_to_str(Identifier.config.types.map { |type| type.type[:short] }.compact).as(:type)
+      national_annex.maybe >> array_to_str(Identifier.config.types.map { |type|
+        type.type[:short]
+      }.compact).as(:type)
     end
 
     rule(:part) do
@@ -37,7 +39,7 @@ module Pubid::Bsi
       space >> ((str("(") >> match("[A-Za-z]").repeat(1).as(:translation) >>
         (space >> (str("Translation") | str("version"))).maybe >> str(")")) |
         (match("[A-Z]").repeat(1).as(:translation) >> str(" TRANSLATION"))
-      )
+               )
     end
 
     rule(:pdf) do

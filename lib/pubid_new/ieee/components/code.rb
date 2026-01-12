@@ -14,10 +14,11 @@ module PubidNew
       class Code < Lutaml::Model::Serializable
         attribute :prefix, :string             # C, P for some identifiers
         attribute :number, :string             # Main number (802, 1234, etc.)
-        attribute :parts, :string, collection: true  # Array of part strings
+        attribute :parts, :string, collection: true # Array of part strings
         attribute :original_separator, :string # Original separator (. or -) from parsing
 
-        def initialize(prefix: nil, number: nil, parts: nil, original_separator: nil)
+        def initialize(prefix: nil, number: nil, parts: nil,
+original_separator: nil)
           super()
           self.prefix = prefix
           self.number = number
@@ -52,7 +53,7 @@ module PubidNew
             prefix: prefix,
             number: number,
             parts: components.empty? ? nil : components,
-            original_separator: separator
+            original_separator: separator,
           )
         end
 
@@ -65,7 +66,7 @@ module PubidNew
             # Use original separator if available
             if original_separator
               separator = original_separator
-            else
+            elsif prefix == "P" || (!prefix && parts.first && parts.first.length > 3)
               # Fallback to heuristics when original separator unknown
               # Determine separator based on prefix and pattern:
               # - Letter prefix (C, etc.) codes use dots: C37.111
@@ -78,16 +79,14 @@ module PubidNew
               # 2. Letter prefix (except P) → dot
               # 3. Long number (5+ digits) → dash (IEC pattern)
               # 4. Default → dot (traditional IEEE)
-              if prefix == "P" || (!prefix && parts.first && parts.first.length > 3)
-                separator = "-"
-              elsif prefix && prefix != "P"
-                separator = "."
-              elsif !prefix && number && number.length >= 5
-                separator = "-"
-              else
-                # Default to dot for traditional IEEE codes like 802.11
-                separator = "."
-              end
+              separator = "-"
+            elsif prefix && prefix != "P"
+              separator = "."
+            elsif !prefix && number && number.length >= 5
+              separator = "-"
+            else
+              # Default to dot for traditional IEEE codes like 802.11
+              separator = "."
             end
 
             parts.each do |part|

@@ -63,10 +63,12 @@ module PubidNew
 
       def load_series
         @series = YAML.load_file(@series_file_path)
-      rescue Errno::ENOENT => e
-        raise ConfigurationError, "Series configuration file not found: #{@series_file_path}"
+      rescue Errno::ENOENT
+        raise ConfigurationError,
+              "Series configuration file not found: #{@series_file_path}"
       rescue Psych::SyntaxError => e
-        raise ConfigurationError, "Invalid YAML in series configuration: #{e.message}"
+        raise ConfigurationError,
+              "Invalid YAML in series configuration: #{e.message}"
       end
     end
 

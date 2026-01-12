@@ -1,7 +1,7 @@
 module Pubid::Bsi
   module Identifier
     class Flex < Base
-      def_delegators 'Pubid::Bsi::Identifier::Flex', :type
+      def_delegators "Pubid::Bsi::Identifier::Flex", :type
 
       def self.type
         { key: :flex, title: "Flex", short: "Flex" }

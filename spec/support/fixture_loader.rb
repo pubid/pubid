@@ -10,7 +10,9 @@ module FixtureLoader
     path = fixture_path(flavor, filename)
     return [] unless File.exist?(path)
 
-    File.readlines(path).map(&:strip).reject(&:empty?).reject { |line| line.start_with?('#') }
+    File.readlines(path).map(&:strip).reject(&:empty?).reject do |line|
+      line.start_with?("#")
+    end
   end
 
   # Get fixture file path
@@ -28,10 +30,13 @@ module FixtureLoader
   # @param filename [String] The fixture filename in gems/pubid-{flavor}/spec/fixtures/
   # @return [Array<String>] Array of test case strings
   def load_gem_fixture(flavor, filename)
-    path = File.join(__dir__, "..", "..", "gems", "pubid-#{flavor}", "spec", "fixtures", filename)
+    path = File.join(__dir__, "..", "..", "gems", "pubid-#{flavor}", "spec",
+                     "fixtures", filename)
     return [] unless File.exist?(path)
 
-    File.readlines(path).map(&:strip).reject(&:empty?).reject { |line| line.start_with?('#') }
+    File.readlines(path).map(&:strip).reject(&:empty?).reject do |line|
+      line.start_with?("#")
+    end
   end
 
   # Test result tracker
@@ -53,7 +58,8 @@ module FixtureLoader
     def record_fail(test_case, expected, actual)
       @failed += 1
       @total += 1
-      @errors << { test: test_case, expected: expected, actual: actual, type: :mismatch }
+      @errors << { test: test_case, expected: expected, actual: actual,
+                   type: :mismatch }
     end
 
     def record_error(test_case, error)
@@ -73,7 +79,7 @@ module FixtureLoader
         passed: @passed,
         failed: @failed,
         total: @total,
-        pass_rate: pass_rate
+        pass_rate: pass_rate,
       }
     end
   end

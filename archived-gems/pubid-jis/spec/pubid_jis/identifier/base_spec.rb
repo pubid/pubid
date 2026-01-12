@@ -2,12 +2,13 @@ module Pubid::Jis
   module Identifier
     RSpec.describe Base do
       describe "#transform_supplements" do
-        subject { described_class.transform_supplements(supplements, base_params) }
+        subject do
+          described_class.transform_supplements(supplements, base_params)
+        end
         let(:base_params) do
           { publisher: "JIS",
             number: "1",
-            year: "2016",
-          }
+            year: "2016" }
         end
         let(:supplements) do
           [{ type: "AMD", number: "2", year: "1999" }]

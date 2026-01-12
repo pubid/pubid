@@ -104,7 +104,8 @@ RSpec.describe "PubidNew::Nist identifier parsing" do
           { input: "NBS CSM v6n1", expected: "NBS CSM v6n1" },
           { input: "NBS CIRC 154supprev", expected: "NBS CIRC 154supprev" },
           # Canonical format uses DOT separator, not "rev"
-          { input: "NBS CIRC 13e2revJune1908", expected: "NBS CIRC 13e2.June1908" }
+          { input: "NBS CIRC 13e2revJune1908",
+            expected: "NBS CIRC 13e2.June1908" },
         ]
 
         test_cases.each do |test_case|

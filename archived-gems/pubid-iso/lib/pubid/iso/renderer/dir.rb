@@ -2,18 +2,19 @@ require_relative "base"
 
 module Pubid::Iso::Renderer
   class Dir < Base
-
-    def render_identifier(params, opts)
-      if params.key?(:jtc_dir)
-        res = ("%{publisher}%{dirtype}%{number} DIR%{year}%{edition}" % params)
-      else
-        res = ("%{publisher} DIR%{dirtype}%{number}%{year}%{edition}" % params)
-      end
+    def render_identifier(params, _opts)
+      res = if params.key?(:jtc_dir)
+              ("%<publisher>s%<dirtype>s%<number>s DIR%<year>s%<edition>s" % params)
+            else
+              ("%<publisher>s DIR%<dirtype>s%<number>s%<year>s%<edition>s" % params)
+            end
 
       if params.key?(:joint_document)
-        joint_params = prerender_params(params[:joint_document].to_h(deep: false), {})
+        joint_params = prerender_params(
+          params[:joint_document].to_h(deep: false), {}
+        )
         joint_params.default = ""
-        res += (" + %{publisher}%{dirtype}%{number}%{year}" % joint_params)
+        res += (" + %<publisher>s%<dirtype>s%<number>s%<year>s" % joint_params)
       end
 
       res

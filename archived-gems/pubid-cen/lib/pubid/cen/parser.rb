@@ -16,8 +16,11 @@ module Pubid::Cen
     rule(:type) do
       (str("/") | space).maybe >>
         array_to_str(
-          Identifier.config.types.map { |type| [type.type[:short], type.type[:short]&.upcase] }
-                    .flatten.compact).as(:type)
+          Identifier.config.types.map { |type|
+            [type.type[:short], type.type[:short]&.upcase]
+          }
+                    .flatten.compact,
+        ).as(:type)
     end
 
     rule(:stage) do

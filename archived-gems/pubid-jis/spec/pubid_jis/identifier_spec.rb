@@ -189,9 +189,9 @@ module Pubid::Jis
             pub_id = pub_id.split("#").first.strip.chomp
             expect do
               described_class.parse(pub_id)
-            rescue Exception => failure
+            rescue Exception => e
               raise Pubid::Core::Errors::ParseError,
-                    "couldn't parse #{pub_id}\n#{failure.message}"
+                    "couldn't parse #{pub_id}\n#{e.message}"
             end.not_to raise_error
 
             expect(described_class.parse(pub_id).to_s.upcase).to eq(pub_id.upcase)

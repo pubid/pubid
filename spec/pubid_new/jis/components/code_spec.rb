@@ -52,7 +52,7 @@ RSpec.describe PubidNew::Jis::Components::Code do
         series: "C",
         number: 5401,
         parts: [2, 1],
-        part_strings: ["2", "001"]
+        part_strings: ["2", "001"],
       )
       expect(code.to_s).to eq("C 5401-2-001")
     end
@@ -66,8 +66,10 @@ RSpec.describe PubidNew::Jis::Components::Code do
     end
 
     it "returns true regardless of string formatting" do
-      code1 = described_class.new(series: "A", number: 123, number_string: "0123")
-      code2 = described_class.new(series: "A", number: 123, number_string: "123")
+      code1 = described_class.new(series: "A", number: 123,
+                                  number_string: "0123")
+      code2 = described_class.new(series: "A", number: 123,
+                                  number_string: "123")
       expect(code1 == code2).to be true
     end
 

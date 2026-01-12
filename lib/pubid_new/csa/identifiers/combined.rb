@@ -17,8 +17,8 @@ module PubidNew
         attribute :third, Standard
         attribute :reaffirmation, :string
         attribute :package, :string
-        attribute :year_format, :string  # Dummy for compatibility
-        attribute :separator, :string, default: -> { "/" }  # "/" or ", "
+        attribute :year_format, :string # Dummy for compatibility
+        attribute :separator, :string, default: -> { "/" } # "/" or ", "
 
         def to_s
           # For comma separator, render both parts with full prefix
@@ -49,7 +49,7 @@ module PubidNew
           # Add CSA prefix if present in original
           if identifier.has_publisher
             prefix = identifier.publisher_prefix || "CSA"
-            needs_space = !prefix.end_with?("-")
+            !prefix.end_with?("-")
             parts << prefix
           end
 
@@ -70,17 +70,17 @@ module PubidNew
 
           # Year with proper format (colon or dash)
           if identifier.year
-            separator = (identifier.year_format == "dash") ? "-" : ":"
+            separator = identifier.year_format == "dash" ? "-" : ":"
             year_part = separator
-            year_part += identifier.year_prefix if identifier.year_prefix  # Add M or F prefix
-            year_part += "F" if identifier.french && identifier.year_format != "dash" && !identifier.year_prefix  # Only add F if no prefix
+            year_part += identifier.year_prefix if identifier.year_prefix # Add M or F prefix
+            year_part += "F" if identifier.french && identifier.year_format != "dash" && !identifier.year_prefix # Only add F if no prefix
             # Convert 4-digit year back to 2-digit
             year_str = identifier.year.to_s
-            if year_str.length == 4 && year_str.start_with?("20")
-              year_part += year_str[2..3]
-            else
-              year_part += year_str
-            end
+            year_part += if year_str.length == 4 && year_str.start_with?("20")
+                           year_str[2..3]
+                         else
+                           year_str
+                         end
             code_part += year_part
           end
 

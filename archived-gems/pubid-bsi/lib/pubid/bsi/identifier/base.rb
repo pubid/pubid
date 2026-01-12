@@ -18,7 +18,6 @@ module Pubid::Bsi
                      supplement: nil, number: nil, adopted: nil,
                      expert_commentary: false, tracked_changes: false,
                      translation: nil, pdf: false, **opts)
-
         super(**opts.merge(publisher: publisher, number: number))
         @month = month if month
         @edition = edition if edition
@@ -35,7 +34,7 @@ module Pubid::Bsi
             get_transformer_class.new.apply(k => v.is_a?(Hash) ? transform_hash(v) : v)
           end.inject({}, :merge)
         end
-        
+
         # Use Identifier#create to resolve identifier's type class
         def transform(params)
           identifier_params = transform_hash(params)

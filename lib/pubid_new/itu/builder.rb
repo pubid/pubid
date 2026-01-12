@@ -31,15 +31,19 @@ module PubidNew
 
         # Check if this is a combined identifier (has combined_series and combined_number)
         if data[:combined_series] || data[:combined_number]
-          combined_series = Components::Series.new(
-            series: data[:combined_series][:series].to_s
-          ) if data[:combined_series]
-          
-          combined_code = Components::Code.new(
-            number: data[:combined_number].to_s,
-            subseries: data[:combined_subseries]&.to_s,
-            parts: extract_parts(data[:combined_parts])
-          ) if data[:combined_number]
+          if data[:combined_series]
+            combined_series = Components::Series.new(
+              series: data[:combined_series][:series].to_s,
+            )
+          end
+
+          if data[:combined_number]
+            combined_code = Components::Code.new(
+              number: data[:combined_number].to_s,
+              subseries: data[:combined_subseries]&.to_s,
+              parts: extract_parts(data[:combined_parts]),
+            )
+          end
 
           return Identifiers::CombinedIdentifier.new(
             sector: sector,
@@ -48,7 +52,7 @@ module PubidNew
             combined_series: combined_series,
             combined_code: combined_code,
             date: date,
-            language: data[:language]&.to_s
+            language: data[:language]&.to_s,
           )
         end
 
@@ -57,7 +61,7 @@ module PubidNew
           series: series,
           code: code,
           date: date,
-          language: data[:language]&.to_s
+          language: data[:language]&.to_s,
         )
       end
 
@@ -80,7 +84,7 @@ module PubidNew
         supplement_date = if data[:supplement_year]
                             PubidNew::Components::Date.new(
                               year: data[:supplement_year].to_s,
-                              month: data[:supplement_month]&.to_s
+                              month: data[:supplement_month]&.to_s,
                             )
                           end
 
@@ -92,7 +96,7 @@ module PubidNew
           base: base,
           number: data[:supplement_number].to_s,
           date: supplement_date,
-          language: data[:language]&.to_s
+          language: data[:language]&.to_s,
         )
       end
 
@@ -102,14 +106,14 @@ module PubidNew
         Components::Code.new(
           number: data[:number].to_s,
           subseries: data[:subseries]&.to_s,
-          parts: extract_parts(data[:parts])
+          parts: extract_parts(data[:parts]),
         )
       end
 
       def build_date(data)
         PubidNew::Components::Date.new(
           year: data[:year].to_s,
-          month: data[:month]&.to_s
+          month: data[:month]&.to_s,
         )
       end
 

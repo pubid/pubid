@@ -1,16 +1,16 @@
 module Pubid::Cen::Renderer
   class Base < Pubid::Core::Renderer::Base
     def render_identifier(params)
-      return "%{publisher} %{adopted}%{supplements}" % params unless params[:adopted].to_s.empty?
+      return "%<publisher>s %<adopted>s%<supplements>s" % params unless params[:adopted].to_s.empty?
 
-      "%{stage}%{publisher}%{type} %{number}%{part}%{year}%{supplements}" % params
+      "%<stage>s%<publisher>s%<type>s %<number>s%<part>s%<year>s%<supplements>s" % params
     end
 
-    def render_type(type, _opts, _params)
+    def render_type(_type, _opts, _params)
       ""
     end
 
-    def render_part(part, opts, _params)
+    def render_part(part, _opts, _params)
       return "-#{part.join('-')}" if part.is_a?(Array)
 
       "-#{part}"

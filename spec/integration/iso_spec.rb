@@ -25,16 +25,17 @@ RSpec.describe "ISO Integration" do
 
   describe "parsing all basic fixtures" do
     it "parses all basic ISO identifiers" do
-      fixture = File.join(__dir__, "../fixtures/iso/identifiers/full/iso-pubid-basic.txt")
-      lines = File.readlines(fixture).map(&:strip).reject { |l| l.empty? || l.start_with?("#") }
+      fixture = File.join(__dir__,
+                          "../fixtures/iso/identifiers/full/iso-pubid-basic.txt")
+      lines = File.readlines(fixture).map(&:strip).reject do |l|
+        l.empty? || l.start_with?("#")
+      end
 
       failed = []
       lines.each do |line|
-        begin
-          PubidNew::Iso.parse(line)
-        rescue => e
-          failed << line
-        end
+        PubidNew::Iso.parse(line)
+      rescue StandardError
+        failed << line
       end
 
       puts "\n\nFailed to parse #{failed.size}/#{lines.size} identifiers" if failed.any?

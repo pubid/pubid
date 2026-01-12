@@ -11,7 +11,8 @@ RSpec.describe Pubid::Iec::Parser do
     end
 
     it "parses identifier with edition" do
-      expect(subject.identifier).to parse("IEC 61691-6 Edition 1.0 2009-12", trace: true)
+      expect(subject.identifier).to parse("IEC 61691-6 Edition 1.0 2009-12",
+                                          trace: true)
     end
   end
 
@@ -21,7 +22,9 @@ RSpec.describe Pubid::Iec::Parser do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
           next if pub_id.match?("^#")
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp, trace: true)
+
+          expect(subject).to parse(pub_id.split("#").first.strip.chomp,
+                                   trace: true)
         end
       end
     end

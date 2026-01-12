@@ -46,7 +46,7 @@ module PubidNew
             "OWMWP" => Identifiers::Owmwp,
             "NSRDS" => Identifiers::Nsrds,
             "LC" => Identifiers::LetterCircular,
-            "LCIRC" => Identifiers::LetterCircular,  # Alias
+            "LCIRC" => Identifiers::LetterCircular, # Alias
             "CS" => Identifiers::CommercialStandard,
             "CSM" => Identifiers::CommercialStandardsMonthly,
             # All other series use Base as default
@@ -75,7 +75,7 @@ module PubidNew
             Identifiers::CommercialStandard,
             Identifiers::CommercialStandardEmergency,
             Identifiers::CommercialStandardsMonthly,
-            Identifiers::Base,  # Fallback for unmapped series
+            Identifiers::Base, # Fallback for unmapped series
           ]
         end
 
@@ -116,7 +116,7 @@ module PubidNew
             first_num_str = first_num.respond_to?(:to_str) ? first_num.to_str : first_num.to_s
 
             # Match e104 or e104 (when "e104-43" is split into first+second)
-            if first_num_str =~ /^e\d{3,}/
+            if /^e\d{3,}/.match?(first_num_str)
               return Identifiers::CommercialStandardEmergency
             end
           end
@@ -131,10 +131,10 @@ module PubidNew
         # Check if parsed hash has supplement indicators
         def has_supplement?(parsed_hash)
           parsed_hash[:supplement] ||
-          parsed_hash[:supplement_date_range] ||
-          parsed_hash[:supplement_date] ||
-          parsed_hash[:supplement_slash_year] ||
-          parsed_hash[:supplement_with_rev]
+            parsed_hash[:supplement_date_range] ||
+            parsed_hash[:supplement_date] ||
+            parsed_hash[:supplement_slash_year] ||
+            parsed_hash[:supplement_with_rev]
         end
 
         # Check if series is valid
@@ -160,7 +160,7 @@ module PubidNew
           "BRPD-CRPL-D", "CRPL-F-A", "CRPL-F-B", "CS-E",
           "CSRC Building Block", "CSRC Use Case", "CSRC Book",
           "ITL Bulletin", "NIST LC", "NIST PS", "NIST DCI",
-          "NIST Other", "NSRDS-NBS",
+          "NIST Other", "NSRDS-NBS"
         ].freeze
       end
     end

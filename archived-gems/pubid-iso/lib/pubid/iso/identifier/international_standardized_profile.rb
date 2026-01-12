@@ -3,7 +3,8 @@ require_relative "../renderer/international_standardized_profile"
 module Pubid::Iso
   module Identifier
     class InternationalStandardizedProfile < Base
-      def_delegators 'Pubid::Iso::Identifier::InternationalStandardizedProfile', :type
+      def_delegators "Pubid::Iso::Identifier::InternationalStandardizedProfile",
+                     :type
 
       TYPED_STAGES = {
         disp: {

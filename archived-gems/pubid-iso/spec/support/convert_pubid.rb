@@ -16,19 +16,22 @@ end
 
 shared_examples "converts to pubid with edition" do
   it "converts to pubid with edition" do
-    expect(subject.to_s(format: :ref_num_long, with_edition: true)).to eq(pubid_with_edition)
+    expect(subject.to_s(format: :ref_num_long,
+                        with_edition: true)).to eq(pubid_with_edition)
   end
 end
 
 shared_examples "converts pubid to french pubid" do
   it "converts pubid to french pubid" do
-    expect(subject.to_s(format: :ref_num_long, lang: :french)).to eq(french_pubid)
+    expect(subject.to_s(format: :ref_num_long,
+                        lang: :french)).to eq(french_pubid)
   end
 end
 
 shared_examples "converts pubid to russian pubid" do
   it "converts pubid to russian pubid" do
-    expect(subject.to_s(format: :ref_num_long, lang: :russian)).to eq(russian_pubid)
+    expect(subject.to_s(format: :ref_num_long,
+                        lang: :russian)).to eq(russian_pubid)
   end
 end
 
@@ -47,7 +50,8 @@ end
 shared_examples "converts urn to pubid" do |result = nil|
   it "converts urn to pubid" do
     result ||= original || pubid
-    expect(described_class.parse(urn).to_s(with_edition: true, format: :ref_num_long)).to eq result
+    expect(described_class.parse(urn).to_s(with_edition: true,
+                                           format: :ref_num_long)).to eq result
   end
 end
 

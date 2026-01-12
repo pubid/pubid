@@ -4,7 +4,7 @@ require_relative "../renderer/urn-extract"
 module Pubid::Iso
   module Identifier
     class Extract < Base
-      def_delegators 'Pubid::Iso::Identifier::Extract', :type
+      def_delegators "Pubid::Iso::Identifier::Extract", :type
 
       TYPED_STAGES = {}.freeze
 

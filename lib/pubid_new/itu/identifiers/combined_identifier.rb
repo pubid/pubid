@@ -16,11 +16,11 @@ module PubidNew
           result = "#{publisher}-#{sector}"
 
           # Add primary series and code
-          if series
-            result += " #{series}.#{code}"
-          else
-            result += " #{code}"
-          end
+          result += if series
+                      " #{series}.#{code}"
+                    else
+                      " #{code}"
+                    end
 
           # Add combined series and code
           if combined_series && combined_code
@@ -29,11 +29,11 @@ module PubidNew
 
           # Add date if present
           if date
-            if date.month
-              result += " (#{date.month}/#{date.year})"
-            else
-              result += " (#{date.year})"
-            end
+            result += if date.month
+                        " (#{date.month}/#{date.year})"
+                      else
+                        " (#{date.year})"
+                      end
           end
 
           # Add language

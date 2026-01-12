@@ -58,7 +58,9 @@ module Pubid::Bsi
       end
 
       context "supplements" do
-        let(:params) { { supplement: Identifier.create(type: type, number: 1, year: 1999) } }
+        let(:params) do
+          { supplement: Identifier.create(type: type, number: 1, year: 1999) }
+        end
 
         context "amendment" do
           let(:type) { :amd }
@@ -127,7 +129,9 @@ module Pubid::Bsi
       end
 
       context "expert commentary" do
-        let(:params) { { type: :ec, base: described_class.create(number: number) } }
+        let(:params) do
+          { type: :ec, base: described_class.create(number: number) }
+        end
 
         it "renders expert commentary identifier" do
           expect(subject.to_s).to eq("BS #{number} ExComm")
@@ -151,7 +155,10 @@ module Pubid::Bsi
         end
 
         context "with ammendment" do
-          let(:params) { { type: :na, supplement: described_class.create(type: :amd, number: 1, year: 1999), base: base } }
+          let(:params) do
+            { type: :na,
+              supplement: described_class.create(type: :amd, number: 1, year: 1999), base: base }
+          end
 
           it "renders national annex" do
             expect(subject.to_s).to eq("NA+A1:1999 to BS #{number}")
@@ -170,9 +177,11 @@ module Pubid::Bsi
       context "collection" do
         let(:params) do
           { type: :collection,
-            identifiers: [Identifier.create(number: 1), Identifier.create(number: 2)],
+            identifiers: [Identifier.create(number: 1),
+                          Identifier.create(number: 2)],
             year: 1999,
-            supplement: described_class.create(type: :amd, number: 1, year: 2000) }
+            supplement: described_class.create(type: :amd, number: 1,
+                                               year: 2000) }
         end
 
         it "renders collection with supplement and year" do

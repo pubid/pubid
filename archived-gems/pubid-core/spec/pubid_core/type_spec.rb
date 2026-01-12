@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Core
   RSpec.describe Type do
@@ -8,7 +8,8 @@ module Pubid::Core
       config.default_type = DummyDefaultType
       config.type_names = { default: { long: "Default Type", short: "DEF" },
                             tr: { long: "Technical Report", short: "TR" },
-                            ts: { long: "Technical Specification", short: "TS" } }
+                            ts: { long: "Technical Specification",
+                                  short: "TS" } }
       config
     end
 

@@ -12,7 +12,7 @@ module PubidNew
         attribute :fragment_number, :string
 
         def to_s
-          "#{base_identifier.to_s} FRAG#{fragment_number}"
+          "#{base_identifier} FRAG#{fragment_number}"
         end
 
         def publisher

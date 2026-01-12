@@ -17,7 +17,8 @@ module Pubid::Iso::Renderer
 
     # Render identifier
     # @param with_edition [Boolean] include edition in output
-    def render(with_edition: true, with_date: true, with_language_code: :iso, **args)
+    def render(with_edition: true, with_date: true, with_language_code: :iso,
+**args)
       render_base_identifier(**args.merge(
         { with_edition: with_edition,
           with_date: with_date,
@@ -38,8 +39,8 @@ module Pubid::Iso::Renderer
     #   ":stage-#{typed_stage.stage.harmonized_code}" if typed_stage.stage
     # end
     #
-    def render_stage(stage, _opts, params)
-      ":stage-#{stage.harmonized_code.to_s}"
+    def render_stage(stage, _opts, _params)
+      ":stage-#{stage.harmonized_code}"
     end
 
     def render_iteration(iteration, _opts, params)
@@ -54,7 +55,7 @@ module Pubid::Iso::Renderer
       ":#{year}"
     end
 
-    def render_part(part, opts, _params)
+    def render_part(part, _opts, _params)
       return ":-#{part.reverse.join('-')}" if part.is_a?(Array)
 
       ":-#{part}"

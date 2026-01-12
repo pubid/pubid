@@ -125,7 +125,7 @@ RSpec.describe PubidNew::Ccsds do
         "CCSDS 551.1-O-2 - Russian Translated",
         "CCSDS 401.0-B-S",
         "CCSDS 912.1-B-2-S Cor. 1",
-        "CCSDS A01.2-Y-4.1-S"
+        "CCSDS A01.2-Y-4.1-S",
       ].each do |identifier|
         it "round-trips #{identifier}" do
           result = described_class.parse(identifier)

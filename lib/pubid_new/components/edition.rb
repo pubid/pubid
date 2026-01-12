@@ -3,8 +3,8 @@ module PubidNew
     # Edition component (typically a year and number)
     class Edition < Lutaml::Model::Serializable
       attribute :year, :string
-      attribute :number, Lutaml::Model::Type::Value  # Accept any value type
-      attribute :original_text, :string  # Store the exact parsed edition text
+      attribute :number, Lutaml::Model::Type::Value # Accept any value type
+      attribute :original_text, :string # Store the exact parsed edition text
 
       def to_s
         # Always use canonical format for rendering

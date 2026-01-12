@@ -2,7 +2,6 @@ require "parslet"
 
 module Pubid
   module Ieee
-
   end
 end
 

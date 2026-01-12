@@ -49,14 +49,14 @@ config.types = [Pubid::Bsi::Identifier::BritishStandard,
                 Pubid::Bsi::Identifier::ExpertCommentary,
                 Pubid::Bsi::Identifier::Collection]
 config.type_names = {
-                      bs: {
-                        long: "British Standard",
-                        short: "BS",
-                      },
-                      pas: {
-                        long: "Publicly Available Specification",
-                        short: "PAS",
-                      },
-                    }.freeze
+  bs: {
+    long: "British Standard",
+    short: "BS",
+  },
+  pas: {
+    long: "Publicly Available Specification",
+    short: "PAS",
+  },
+}.freeze
 config.prefixes = ["BS", "PAS", "PD", "DD", "Flex", "BSI"]
 Pubid::Bsi::Identifier.set_config(config)

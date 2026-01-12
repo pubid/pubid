@@ -2,12 +2,13 @@ module Pubid::Iso
   module Identifier
     RSpec.describe Base do
       describe "#transform_supplements" do
-        subject { described_class.transform_supplements(supplements, base_params) }
+        subject do
+          described_class.transform_supplements(supplements, base_params)
+        end
         let(:base_params) do
           { publisher: "ISO",
             number: "1",
-            year: "2016",
-          }
+            year: "2016" }
         end
         let(:supplements) do
           [{ type: "Amd", number: "2", iteration: "3" }]

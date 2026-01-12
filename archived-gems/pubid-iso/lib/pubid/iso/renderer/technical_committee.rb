@@ -2,17 +2,16 @@ require_relative "base"
 
 module Pubid::Iso::Renderer
   class TechnicalCommittee < Base
-
     def omit_post_publisher_symbol?(_typed_stage, _stage, _opts)
       # always need post publisher symbol, because we always have to add "TR"
       false
     end
 
-    def render_identifier(params, opts)
+    def render_identifier(params, _opts)
       if params[:wgnumber] && !params[:wgnumber].empty?
-        "%{publisher}%{tctype} %{tcnumber}%{sctype}%{scnumber}%{wgtype}%{wgnumber} %{number}" % params
+        "%<publisher>s%<tctype>s %<tcnumber>s%<sctype>s%<scnumber>s%<wgtype>s%<wgnumber>s %<number>s" % params
       else
-        "%{publisher}%{tctype} %{tcnumber}%{sctype}%{wgtype}%{scnumber} %{number}" % params
+        "%<publisher>s%<tctype>s %<tcnumber>s%<sctype>s%<wgtype>s%<scnumber>s %<number>s" % params
       end
     end
 

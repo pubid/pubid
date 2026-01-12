@@ -41,16 +41,18 @@ module PubidNew
         #     (identifier.date ? ":#{identifier.date.year}" : "")
         # end
 
-        def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+        def to_s(lang: :en, lang_single: false, with_edition: false,
+format: nil, stage_format_long: nil, with_date: nil)
           if base_identifier
             # Full rendering with base identifier
             [
-              base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date),
+              base_identifier.to_s(lang: lang, lang_single: lang_single,
+                                   with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date),
               " #{supplement_publisher.body}",
-              " SUP",  # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
+              " SUP", # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
               (date ? ":#{date.year}" : ""),
-              (edition ? " Edition #{edition.number.value}" : "")
-            ].join('')
+              (edition ? " Edition #{edition.number.value}" : ""),
+            ].join("")
           else
             # Simplified rendering for bundled identifiers (just the supplement part)
             to_supplement_s(lang: lang, lang_single: lang_single)
@@ -58,19 +60,20 @@ module PubidNew
         end
 
         # Render just the supplement part (for use in bundled identifiers)
-        def to_supplement_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
+        def to_supplement_s(lang: :en, lang_single: false, with_edition: false,
+format: nil, stage_format_long: nil, with_date: nil)
           date_str = if date
-            month_part = date.month ? "-#{date.month}" : ""
-            ":#{date.year}#{month_part}"
-          else
-            ""
-          end
+                       month_part = date.month ? "-#{date.month}" : ""
+                       ":#{date.year}#{month_part}"
+                     else
+                       ""
+                     end
 
           [
             supplement_publisher.body,
             " SUP",
-            date_str
-          ].join('')
+            date_str,
+          ].join("")
         end
 
         # DirectivesSupplement use urn:iso:doc scheme (not urn:iso:std)
@@ -85,7 +88,7 @@ module PubidNew
             jtc_parts = supplement_publisher.body.downcase.split
             # Insert JTC parts before "sup"
             parts = base_urn.split(":")
-            parts.concat(jtc_parts)  # Add "jtc" and "1"
+            parts.concat(jtc_parts) # Add "jtc" and "1"
             parts << "sup"
           else
             # Normal supplement

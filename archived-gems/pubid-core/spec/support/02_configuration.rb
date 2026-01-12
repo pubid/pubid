@@ -9,8 +9,8 @@ module Pubid::Core
   config.stages = {}
   # config.type_class = Type
   config.default_type = DummyInternationalStandardType
-  config.types = [DummyInternationalStandardType, DummyTechnicalReportType, DummyAmendment]
-
+  config.types = [DummyInternationalStandardType, DummyTechnicalReportType,
+                  DummyAmendment]
 
   config.stages["abbreviations"] = {
     "WD" => %w[20.20 20.60 20.98 20.99],
@@ -34,7 +34,6 @@ module Pubid::Core
   config.stages["draft_codes"] = %w[20.00 20.20 20.60]
   config.stages["canceled_codes"] = %w[00.98 10.98 20.98]
   config.stages["published_codes"] = %w[60.00 60.60]
-
 
   config.type_names = { tr: { long: "Technical Report",
                               short: "TR" } }

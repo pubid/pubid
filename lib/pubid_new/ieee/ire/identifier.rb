@@ -10,7 +10,7 @@ module PubidNew
       # IRE (Institute of Radio Engineers): 1912-1963
       class Identifier < Lutaml::Model::Serializable
         attribute :publisher, :string, default: -> { "IRE" }
-        attribute :type, :string  # "Trans.", "Standard", "Std"
+        attribute :type, :string # "Trans.", "Standard", "Std"
         attribute :number, Components::Code
         attribute :year, :integer
 
@@ -27,6 +27,7 @@ module PubidNew
           # Set other attributes
           args.each do |key, value|
             next if key == :number
+
             send("#{key}=", value) if respond_to?("#{key}=")
           end
         end

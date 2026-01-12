@@ -13,7 +13,8 @@ module Pubid::Core
         @harmonized_code = if harmonized_code.is_a?(HarmonizedStageCode)
                              harmonized_code
                            else
-                             HarmonizedStageCode.new(harmonized_code, config: config)
+                             HarmonizedStageCode.new(harmonized_code,
+                                                     config: config)
                            end
         @abbr ||= lookup_abbr(@harmonized_code.stages)
       end

@@ -3,7 +3,8 @@ require_relative "../renderer/technology_trends_assessments"
 module Pubid::Iso
   module Identifier
     class TechnologyTrendsAssessments < Base
-      def_delegators 'Pubid::Iso::Identifier::TechnologyTrendsAssessments', :type
+      def_delegators "Pubid::Iso::Identifier::TechnologyTrendsAssessments",
+                     :type
 
       TYPED_STAGES = {
         dtta: {

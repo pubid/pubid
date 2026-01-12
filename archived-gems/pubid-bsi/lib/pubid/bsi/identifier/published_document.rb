@@ -1,7 +1,7 @@
 module Pubid::Bsi
   module Identifier
     class PublishedDocument < Base
-      def_delegators 'Pubid::Bsi::Identifier::PublishedDocument', :type
+      def_delegators "Pubid::Bsi::Identifier::PublishedDocument", :type
 
       def self.type
         { key: :pd, title: "Published Document", short: "PD" }

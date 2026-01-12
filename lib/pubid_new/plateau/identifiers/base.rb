@@ -8,7 +8,7 @@ module PubidNew
       # Base class for all PLATEAU identifiers
       class Base < Lutaml::Model::Serializable
         attribute :number, :integer
-        attribute :annex, :integer, default: -> { nil }
+        attribute :annex, :integer, default: -> {}
 
         def publisher
           "PLATEAU"

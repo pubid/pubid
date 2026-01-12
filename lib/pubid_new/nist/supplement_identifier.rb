@@ -41,11 +41,11 @@ module PubidNew
         # Add edition information if present (just ID, not type prefix)
         if edition && edition.id
           # Smart dash logic: month=no dash, year=dash
-          if edition.id.match?(/^[A-Z]/)
-            result += edition.id
-          else
-            result += "-#{edition.id}"
-          end
+          result += if edition.id.match?(/^[A-Z]/)
+                      edition.id
+                    else
+                      "-#{edition.id}"
+                    end
         end
 
         result

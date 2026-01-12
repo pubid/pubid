@@ -29,7 +29,7 @@ module PubidNew
           type: data[:type]&.to_s,
           edition: data[:edition]&.to_s,
           suffix: data[:suffix]&.to_s,
-          language: data[:language]&.to_s
+          language: data[:language]&.to_s,
         )
       end
 
@@ -50,7 +50,7 @@ module PubidNew
         corr_numbers.reduce(base) do |current_base, cor_num|
           Identifiers::Corrigendum.new(
             base_identifier: current_base,
-            cor_number: cor_num
+            cor_number: cor_num,
           )
         end
       end

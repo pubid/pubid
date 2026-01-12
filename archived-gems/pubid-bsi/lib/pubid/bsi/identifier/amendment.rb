@@ -1,7 +1,7 @@
 module Pubid::Bsi
   module Identifier
     class Amendment < Base
-      def_delegators 'Pubid::Bsi::Identifier::Amendment', :type
+      def_delegators "Pubid::Bsi::Identifier::Amendment", :type
 
       def self.type
         { key: :amd, title: "Amendment" }

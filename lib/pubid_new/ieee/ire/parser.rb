@@ -21,14 +21,14 @@ module PubidNew
         # Year pattern - handle both 2-digit (52 = 1952) and 4-digit (1952) formats
         rule(:year_short) do
           # 2-digit year: 12-63 (1912-1963 IRE period)
-          match('[1-6]') >> digit
+          match("[1-6]") >> digit
         end
 
         rule(:year_full) do
           # 4-digit year for IRE period: 1912-1963
           (str("191") >> digit.repeat(1, 1)) | # 1912-1919
-          (str("19") >> (str("2") | str("3") | str("4") | str("5")) >> digit) | # 1920-1959
-          (str("196") >> match("[0-3]")) # 1960-1963
+            (str("19") >> (str("2") | str("3") | str("4") | str("5")) >> digit) | # 1920-1959
+            (str("196") >> match("[0-3]")) # 1960-1963
         end
 
         rule(:year) { year_full | year_short }
@@ -36,7 +36,7 @@ module PubidNew
         # IRE prefix variations
         rule(:ire_prefix) do
           (
-            str("IEEE-IRE") |  # Transitional period (1963-1965)
+            str("IEEE-IRE") | # Transitional period (1963-1965)
             str("IRE")
           ).as(:publisher)
         end
@@ -76,12 +76,12 @@ module PubidNew
         rule(:ire_identifier) do
           # Format: "52 IRE 7.S2" or "1952 IRE 7.S2"
           year.as(:year) >>
-          space >>
-          ire_prefix >>
-          space >>
-          (ire_type >> space).maybe >>
-          number >>
-          (space? >> (dash | str(",")).maybe >> space? >> year_full.as(:full_year)).maybe
+            space >>
+            ire_prefix >>
+            space >>
+            (ire_type >> space).maybe >>
+            number >>
+            (space? >> (dash | str(",")).maybe >> space? >> year_full.as(:full_year)).maybe
         end
 
         root(:ire_identifier)

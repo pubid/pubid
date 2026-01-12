@@ -17,7 +17,8 @@ def render_report_doc(doc)
 end
 
 class Pubid::Nist::CLI < Thor
-  desc "report", "Create report for NIST Tech Pubs database (fetches from GitHub)"
+  desc "report",
+       "Create report for NIST Tech Pubs database (fetches from GitHub)"
   option :csv, aliases: "-c", type: :boolean, desc: "Export to CSV format"
   option :updated, aliases: "-u", type: :boolean,
                    desc: "Return only updated identifiers",
@@ -48,7 +49,11 @@ class Pubid::Nist::CLI < Thor
 
     documents = Pubid::Nist::NistTechPubs.status
 
-    documents = documents.reject { |doc| doc[:finalPubId] == doc[:id] } if options[:updated]
+    if options[:updated]
+      documents = documents.reject do |doc|
+        doc[:finalPubId] == doc[:id]
+      end
+    end
 
     documents.each do |doc|
       if options[:csv]
@@ -80,7 +85,8 @@ class Pubid::Nist::CLI < Thor
       raise "Invalid PubID style"
     end
 
-    raise "Invalid render format" unless %w[string json].include? options[:format].downcase
+    raise "Invalid render format" unless %w[string
+                                            json].include? options[:format].downcase
 
     unless code.empty?
       if options[:format] == "string"

@@ -41,7 +41,7 @@ module PubidNew
           # Language (slash_colon format with year) - language/colon/year as unit
           if language && language.format == "slash_colon"
             result += "/#{language.code}:#{year}"
-            return result  # Year already added
+            return result # Year already added
           end
 
           # Date with separator (for non-slash-colon formats)

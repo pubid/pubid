@@ -7,7 +7,7 @@ module Pubid::Itu::Renderer
     end
 
     def render_type_series(params)
-      "%{type}%{series}" % params
+      "%<type>s%<series>s" % params
     end
 
     def render_base_identifier(**args)
@@ -24,9 +24,11 @@ module Pubid::Itu::Renderer
       if @params[:annex] && @params[:annex][:number].nil?
         prefix += "Annex to "
       elsif opts[:language] &&
-          (type_translation = Pubid::Itu::I18N["type"][@params[:type]]&.fetch(opts[:language].to_s, nil))
+          (type_translation = Pubid::Itu::I18N["type"][@params[:type]]&.fetch(
+            opts[:language].to_s, nil
+          ))
         if opts[:language] == :cn
-          postfix =+ type_translation
+          postfix = + type_translation
         elsif opts[:language] == :ar
           postfix += " #{type_translation}"
         else
@@ -34,14 +36,16 @@ module Pubid::Itu::Renderer
         end
       end
 
-      "#{prefix}%{publisher}-%{sector} #{render_type_series(params)}%{number}%{subseries}"\
-      "%{part}%{second_number}%{range}%{annex}%{amendment}%{corrigendum}%{supplement}"\
-      "%{addendum}%{appendix}%{date}#{postfix}" % params
+      "#{prefix}%<publisher>s-%<sector>s #{render_type_series(params)}%<number>s%<subseries>s"\
+      "%<part>s%<second_number>s%<range>s%<annex>s%<amendment>s%<corrigendum>s%<supplement>s"\
+      "%<addendum>s%<appendix>s%<date>s#{postfix}" % params
     end
 
     def render_publisher(publisher, opts, params)
       if opts[:language] &&
-          (publisher_translation = Pubid::Itu::I18N["publisher"][publisher]&.fetch(opts[:language].to_s, nil))
+          (publisher_translation = Pubid::Itu::I18N["publisher"][publisher]&.fetch(
+            opts[:language].to_s, nil
+          ))
         return super(publisher_translation, opts, params)
       end
 
@@ -66,7 +70,7 @@ module Pubid::Itu::Renderer
       "#{type}-" if opts[:with_type]
     end
 
-    def render_part(part, opts, _params)
+    def render_part(part, _opts, _params)
       return "-#{part.reverse.join('-')}" if part.is_a?(Array)
 
       "-#{part}"
@@ -105,7 +109,8 @@ module Pubid::Itu::Renderer
     end
 
     def render_corrigendum(corrigendum, opts, params)
-      "#{render_date(corrigendum[:date], opts, params)} Cor. #{corrigendum[:number]}"
+      "#{render_date(corrigendum[:date], opts,
+                     params)} Cor. #{corrigendum[:number]}"
     end
 
     def render_range(range, _opts, params)

@@ -1,7 +1,7 @@
 module Pubid::Plateau
   module Identifier
     class TechnicalReport < Base
-      def_delegators 'Pubid::Plateau::Identifier::TechnicalReport', :type
+      def_delegators "Pubid::Plateau::Identifier::TechnicalReport", :type
 
       def self.get_renderer_class
         Renderer::TechnicalReport

@@ -84,7 +84,7 @@ RSpec.describe PubidNew::Plateau do
         "PLATEAU Technical Report #46-1",
         "PLATEAU Handbook #00 第1.0版 Annex A",
         "PLATEAU Technical Report #01 Annex B",
-        "PLATEAU Handbook #03-1 第2.0版 Annex C"
+        "PLATEAU Handbook #03-1 第2.0版 Annex C",
       ].each do |identifier|
         it "round-trips #{identifier}" do
           result = described_class.parse(identifier)

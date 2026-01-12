@@ -26,7 +26,7 @@ module PubidNew
         AMENDMENT_TO = "amendment_to"
         CORRIGENDUM_TO = "corrigendum_to"
         INCORPORATES = "incorporates"
-        INCORPORATING = "incorporating"  # Synonym for incorporates
+        INCORPORATING = "incorporating" # Synonym for incorporates
         ADOPTION_OF = "adoption_of"
         SUPPLEMENT_TO = "supplement_to"
         DRAFT_AMENDMENT_TO = "draft_amendment_to"
@@ -35,7 +35,7 @@ module PubidNew
         REDESIGNATION_OF = "redesignation_of"
         SUPERSEDES = "supersedes"
         PREVIOUSLY_DESIGNATED_AS = "previously_designated_as"
-        INCLUDES = "includes"  # NEW Session 171: For "Includes IEEE Std X" pattern
+        INCLUDES = "includes" # NEW Session 171: For "Includes IEEE Std X" pattern
 
         # All valid relationship types
         VALID_TYPES = [
@@ -52,7 +52,7 @@ module PubidNew
           REDESIGNATION_OF,
           SUPERSEDES,
           PREVIOUSLY_DESIGNATED_AS,
-          INCLUDES  # NEW Session 171
+          INCLUDES, # NEW Session 171
         ].freeze
 
         # Attributes
@@ -61,7 +61,8 @@ module PubidNew
         # Use regular Ruby attributes to avoid circular dependency
         # related_identifiers: Array of Base identifiers
         # intermediate_amendments: Array of Base identifiers (for "as amended by" clause)
-        attr_accessor :related_identifiers, :intermediate_amendments, :approved_amendments_flag
+        attr_accessor :related_identifiers, :intermediate_amendments,
+                      :approved_amendments_flag
 
         # Validation
         def initialize(**args)
@@ -126,7 +127,7 @@ module PubidNew
           when REDESIGNATION_OF then "Redesignation of"
           when SUPERSEDES then "Supersedes"
           when PREVIOUSLY_DESIGNATED_AS then "Previously designated as"
-          when INCLUDES then "Includes"  # NEW Session 171
+          when INCLUDES then "Includes" # NEW Session 171
           else relationship_type
           end
         end

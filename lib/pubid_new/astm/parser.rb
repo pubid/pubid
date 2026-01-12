@@ -62,11 +62,11 @@ module PubidNew
       # ========================================
       rule(:research_report) do
         publisher.maybe >>
-        str("RR").as(:type) >>
-        colon >>
-        (letter >> digit.repeat(2, 2)).as(:committee) >>
-        dash >>
-        digits.as(:number)
+          str("RR").as(:type) >>
+          colon >>
+          (letter >> digit.repeat(2, 2)).as(:committee) >>
+          dash >>
+          digits.as(:number)
       end
 
       # ========================================
@@ -74,14 +74,14 @@ module PubidNew
       # ========================================
       rule(:manual) do
         publisher.maybe >>
-        str("MNL").as(:type) >>
-        (str("TP").as(:tp_designation)).maybe >>
-        digits.as(:number) >>
-        (dash >> edition).maybe >>
-        (
-          supplement >> format_suffix_no_dash.maybe |
-          format_suffix.maybe
-        )
+          str("MNL").as(:type) >>
+          str("TP").as(:tp_designation).maybe >>
+          digits.as(:number) >>
+          (dash >> edition).maybe >>
+          (
+            supplement >> format_suffix_no_dash.maybe |
+            format_suffix.maybe
+          )
       end
 
       # ========================================
@@ -89,10 +89,10 @@ module PubidNew
       # ========================================
       rule(:monograph) do
         publisher.maybe >>
-        str("MONO").as(:type) >>
-        digits.as(:number) >>
-        (dash >> edition).maybe >>
-        format_suffix.maybe
+          str("MONO").as(:type) >>
+          digits.as(:number) >>
+          (dash >> edition).maybe >>
+          format_suffix.maybe
       end
 
       # ========================================
@@ -104,22 +104,22 @@ module PubidNew
         dash >> str("S") >> digits.as(:subseries)
       end
       rule(:data_series_subseries_no_dash) do
-        digits.as(:subseries)  # Directly after letter suffix
+        digits.as(:subseries) # Directly after letter suffix
       end
       rule(:data_series_code) do
         digits.as(:number) >>
-        (
-          str("HOL").as(:hol_suffix) |
-          (data_series_suffix >> data_series_subseries_no_dash.maybe) |
-          data_series_subseries_with_dash
-        ).maybe
+          (
+            str("HOL").as(:hol_suffix) |
+            (data_series_suffix >> data_series_subseries_no_dash.maybe) |
+            data_series_subseries_with_dash
+          ).maybe
       end
 
       rule(:data_series) do
         publisher.maybe >>
-        str("DS").as(:type) >>
-        data_series_code >>
-        format_suffix.maybe
+          str("DS").as(:type) >>
+          data_series_code >>
+          format_suffix.maybe
       end
 
       # ========================================
@@ -127,8 +127,8 @@ module PubidNew
       # ========================================
       rule(:work_in_progress) do
         publisher.maybe >>
-        str("WK").as(:type) >>
-        digits.as(:number)
+          str("WK").as(:type) >>
+          digits.as(:number)
       end
 
       # ========================================
@@ -146,10 +146,10 @@ module PubidNew
       # One standard can have multiple adjuncts
       rule(:adjunct) do
         publisher.maybe >>
-        str("ADJ").as(:type) >>
-        (letter >> digits | letters | digits).as(:designation) >>
-        (dash >> str("EA")).maybe.as(:ea_suffix) >>
-        (str("DVD")).maybe.as(:dvd_suffix)
+          str("ADJ").as(:type) >>
+          (letter >> digits | letters | digits).as(:designation) >>
+          (dash >> str("EA")).maybe.as(:ea_suffix) >>
+          str("DVD").maybe.as(:dvd_suffix)
       end
 
       # ========================================
@@ -157,17 +157,17 @@ module PubidNew
       # ========================================
       rule(:technical_report_iso_astm) do
         str("ISO/ASTMTR").as(:type) >>
-        digits.as(:number) >>
-        format_suffix.maybe >>
-        comment.maybe
+          digits.as(:number) >>
+          format_suffix.maybe >>
+          comment.maybe
       end
 
       rule(:technical_report_simple) do
         publisher.maybe >>
-        str("TR").as(:type) >>
-        digits.as(:number) >>
-        format_suffix.maybe >>
-        comment.maybe
+          str("TR").as(:type) >>
+          digits.as(:number) >>
+          format_suffix.maybe >>
+          comment.maybe
       end
 
       rule(:technical_report) do
@@ -195,47 +195,47 @@ module PubidNew
       # Dual unit pattern: F1862/F1862M
       rule(:dual_unit) do
         slash >>
-        standard_letter >>
-        digits >>
-        str("M").as(:dual_m)
+          standard_letter >>
+          digits >>
+          str("M").as(:dual_m)
       end
 
       rule(:standard_code_with_letter) do
         standard_letter >>
-        digits.as(:number) >>
-        dual_unit.maybe
+          digits.as(:number) >>
+          dual_unit.maybe
       end
 
       # Digit-only standards (primarily 5xxxx ISO/ASTM dual-published)
       # Parsed as digit-only, semantic meaning is dual-published with ISO
       rule(:standard_code_digit_only) do
-        digits.as(:number)  # Accept digit-only, no implicit E prefix
+        digits.as(:number) # Accept digit-only, no implicit E prefix
       end
 
       rule(:standard) do
         publisher.maybe >>
-        (standard_code_with_letter | standard_code_digit_only) >>
-        (
-          dash >> year_2digit >>
-          sub_year.maybe >>
-          reapproval.maybe >>
-          edition.maybe
-        ).maybe >>
-        comment.maybe
+          (standard_code_with_letter | standard_code_digit_only) >>
+          (
+            dash >> year_2digit >>
+            sub_year.maybe >>
+            reapproval.maybe >>
+            edition.maybe
+          ).maybe >>
+          comment.maybe
       end
 
       # ========================================
       # Main identifier rule - ORDER MATTERS!
       # ========================================
       rule(:identifier) do
-        research_report |       # Most specific (has colon)
-        technical_report |      # Has TR prefix
-        manual |                # Has MNL prefix
-        monograph |             # Has MONO prefix
-        data_series |           # Has DS prefix
-        work_in_progress |      # Has WK prefix
-        adjunct |               # Has ADJ prefix
-        standard                # DEFAULT (A-G letter)
+        research_report | # Most specific (has colon)
+          technical_report |      # Has TR prefix
+          manual |                # Has MNL prefix
+          monograph |             # Has MONO prefix
+          data_series |           # Has DS prefix
+          work_in_progress |      # Has WK prefix
+          adjunct |               # Has ADJ prefix
+          standard                # DEFAULT (A-G letter)
       end
 
       root(:identifier)

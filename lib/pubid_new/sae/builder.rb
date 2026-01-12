@@ -29,7 +29,10 @@ module PubidNew
               identifier.send("#{k}=", v) if identifier.respond_to?("#{k}=")
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 

@@ -111,14 +111,14 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
-          year: "2012"
+          year: "2012",
         )
       end
 
       it "renders single relationship with one identifier" do
         relationship = PubidNew::Ieee::Components::Relationship.new(
           relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
-          related_identifiers: [related_id]
+          related_identifiers: [related_id],
         )
 
         id = PubidNew::Ieee::Identifiers::Base.new(
@@ -126,7 +126,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           type: "Std",
           code: "802.11",
           year: "2016",
-          relationships: [relationship]
+          relationships: [relationship],
         )
 
         expect(id.to_s).to eq("IEEE Std 802.11-2016 (Revision of IEEE Std 802.11-2012)")
@@ -135,7 +135,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       it "renders multiple relationships separated by /" do
         rev_rel = PubidNew::Ieee::Components::Relationship.new(
           relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
-          related_identifiers: [related_id]
+          related_identifiers: [related_id],
         )
 
         inc_rel = PubidNew::Ieee::Components::Relationship.new(
@@ -144,8 +144,8 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
             publisher: "IEEE",
             type: "Std",
             code: "802.11a",
-            year: "1999"
-          )]
+            year: "1999",
+          )],
         )
 
         id = PubidNew::Ieee::Identifiers::Base.new(
@@ -153,7 +153,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           type: "Std",
           code: "802.11",
           year: "2016",
-          relationships: [rev_rel, inc_rel]
+          relationships: [rev_rel, inc_rel],
         )
 
         expect(id.to_s).to eq("IEEE Std 802.11-2016 (Revision of IEEE Std 802.11-2012 / incorporates IEEE Std 802.11a-1999)")
@@ -164,19 +164,19 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           publisher: "IEEE",
           type: "Std",
           code: "1232",
-          year: "1995"
+          year: "1995",
         )
 
         id2 = PubidNew::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232.1",
-          year: "1997"
+          year: "1997",
         )
 
         relationship = PubidNew::Ieee::Components::Relationship.new(
           relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
-          related_identifiers: [id1, id2]
+          related_identifiers: [id1, id2],
         )
 
         id = PubidNew::Ieee::Identifiers::Base.new(
@@ -184,7 +184,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           type: "Std",
           code: "1232",
           year: "2002",
-          relationships: [relationship]
+          relationships: [relationship],
         )
 
         expect(id.to_s).to eq("IEEE Std 1232-2002 (Revision of IEEE Std 1232-1995 and IEEE Std 1232.1-1997)")
@@ -198,7 +198,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           "IEEE Std C37.111-2013",
           "IEEE P11073-10404-10419",
           "IEC 61523-4",
-          "AIEE No 14-1925"
+          "AIEE No 14-1925",
           # NOTE: Parenthetical content tests above show V2's MODEL-DRIVEN approach
           # differs from V1's buggy string preservation
         ]

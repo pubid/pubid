@@ -14,7 +14,7 @@ module PubidNew
         attribute :code, Components::Code
         attribute :year, :string
         attribute :date_separator, :string
-        attribute :iec_identifier, :string  # IEC portion as string
+        attribute :iec_identifier, :string # IEC portion as string
         attribute :style, :string
 
         def to_s

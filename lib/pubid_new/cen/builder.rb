@@ -38,6 +38,7 @@ module PubidNew
           if data[:publisher]&.to_s == "ENV"
             return build_env_adopted_identifier(data)
           end
+
           return build_adopted_identifier(data)
         end
 
@@ -63,7 +64,10 @@ module PubidNew
               identifier.send("#{k}=", v) if identifier.respond_to?("#{k}=")
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
@@ -94,23 +98,29 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |k, v|
-              base_identifier.send("#{k}=", v) if base_identifier.respond_to?("#{k}=")
+              if base_identifier.respond_to?("#{k}=")
+                base_identifier.send("#{k}=",
+                                     v)
+              end
             end
           else
-            base_identifier.send("#{key}=", realized_components) if base_identifier.respond_to?("#{key}=")
+            if base_identifier.respond_to?("#{key}=")
+              base_identifier.send("#{key}=",
+                                   realized_components)
+            end
           end
         end
 
         # Build Amendment identifier wrapping the base
         amendment = Identifiers::Amendment.new(
           base_identifier: base_identifier,
-          amendment_number: data[:amendment_number].to_s
+          amendment_number: data[:amendment_number].to_s,
         )
 
         # Build Fragment wrapping the amendment
         Identifiers::Fragment.new(
           base_identifier: amendment,
-          fragment_number: data[:fragment_number].to_s
+          fragment_number: data[:fragment_number].to_s,
         )
       end
 
@@ -139,7 +149,7 @@ module PubidNew
           {
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,
-            typed_stage: typed_stage
+            typed_stage: typed_stage,
           }
 
         when :publisher
@@ -151,7 +161,9 @@ module PubidNew
 
         when :copublishers
           # Handle array of copublishers
-          Array(value).map { |v| Components::Publisher.new(body: v[:copublisher].to_s) }
+          Array(value).map do |v|
+            Components::Publisher.new(body: v[:copublisher].to_s)
+          end
 
         when :number
           Components::Code.new(value: value.to_s)
@@ -189,7 +201,7 @@ module PubidNew
           typed_stage = @scheme.locate_typed_stage_by_abbr(value.to_s)
           {
             stage: typed_stage.to_stage,
-            typed_stage: typed_stage
+            typed_stage: typed_stage,
           }
 
         when :edition
@@ -214,18 +226,18 @@ module PubidNew
         return nil unless adopted_str && !adopted_str.empty?
 
         adopted_id = if adopted_str.start_with?("ISO/IEC") || adopted_str.include?("ISO/IEC")
-          require_relative '../iso'
-          PubidNew::Iso.parse(adopted_str)
-        elsif adopted_str.start_with?("ISO")
-          require_relative '../iso'
-          PubidNew::Iso.parse(adopted_str)
-        elsif adopted_str.start_with?("IEC")
-          require_relative '../iec'
-          PubidNew::Iec.parse(adopted_str)
-        elsif adopted_str.start_with?("CISPR")
-          # CISPR might need specific handling
-          nil
-        end
+                       require_relative "../iso"
+                       PubidNew::Iso.parse(adopted_str)
+                     elsif adopted_str.start_with?("ISO")
+                       require_relative "../iso"
+                       PubidNew::Iso.parse(adopted_str)
+                     elsif adopted_str.start_with?("IEC")
+                       require_relative "../iec"
+                       PubidNew::Iec.parse(adopted_str)
+                     elsif adopted_str.start_with?("CISPR")
+                       # CISPR might need specific handling
+                       nil
+                     end
 
         # Build publishers array (EN is default for adoptions)
         publishers = []
@@ -244,7 +256,7 @@ module PubidNew
 
         Identifiers::AdoptedEuropeanNorm.new(
           publisher: publishers,
-          adopted_identifier: adopted_id
+          adopted_identifier: adopted_id,
         )
       end
 
@@ -256,18 +268,18 @@ module PubidNew
         return nil unless adopted_str && !adopted_str.empty?
 
         adopted_id = if adopted_str.start_with?("ISO/IEC") || adopted_str.include?("ISO/IEC")
-          require_relative '../iso'
-          PubidNew::Iso.parse(adopted_str)
-        elsif adopted_str.start_with?("ISO")
-          require_relative '../iso'
-          PubidNew::Iso.parse(adopted_str)
-        elsif adopted_str.start_with?("IEC")
-          require_relative '../iec'
-          PubidNew::Iec.parse(adopted_str)
-        end
+                       require_relative "../iso"
+                       PubidNew::Iso.parse(adopted_str)
+                     elsif adopted_str.start_with?("ISO")
+                       require_relative "../iso"
+                       PubidNew::Iso.parse(adopted_str)
+                     elsif adopted_str.start_with?("IEC")
+                       require_relative "../iec"
+                       PubidNew::Iec.parse(adopted_str)
+                     end
 
         Identifiers::EuropeanPrestandard.new(
-          adopted_identifier: adopted_id
+          adopted_identifier: adopted_id,
         )
       end
 
@@ -281,13 +293,13 @@ module PubidNew
             Identifiers::Amendment.new(
               base_identifier: base_identifier,
               amendment_number: supp[:number],
-              amendment_year: supp[:year]&.to_i
+              amendment_year: supp[:year]&.to_i,
             )
           else
             corr_attrs = {
               base_identifier: base_identifier,
               corrigendum_number: supp[:number],
-              corrigendum_year: supp[:year]&.to_i
+              corrigendum_year: supp[:year]&.to_i,
             }
             corr_attrs[:corrigendum_month] = supp[:month] if supp[:month]
             Identifiers::Corrigendum.new(**corr_attrs)
@@ -295,7 +307,7 @@ module PubidNew
         end
 
         Identifiers::ConsolidatedIdentifier.new(
-          identifiers: [base_identifier] + supplement_ids
+          identifiers: [base_identifier] + supplement_ids,
         )
       end
 
@@ -322,7 +334,7 @@ module PubidNew
             type: supp_data[:amd_number] ? :amendment : :corrigendum,
             number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
             year: year_val,
-            month: month_val
+            month: month_val,
           }
         end
       end
@@ -356,10 +368,16 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |k, v|
-              base_identifier.send("#{k}=", v) if base_identifier.respond_to?("#{k}=")
+              if base_identifier.respond_to?("#{k}=")
+                base_identifier.send("#{k}=",
+                                     v)
+              end
             end
           else
-            base_identifier.send("#{key}=", realized_components) if base_identifier.respond_to?("#{key}=")
+            if base_identifier.respond_to?("#{key}=")
+              base_identifier.send("#{key}=",
+                                   realized_components)
+            end
           end
         end
 
@@ -373,16 +391,19 @@ module PubidNew
           Identifiers::Amendment.new(
             base_identifier: base_identifier,
             amendment_number: supp_data[:amd_number].to_s,
-            amendment_year: supp_data[:amd_year]&.to_i
+            amendment_year: supp_data[:amd_year]&.to_i,
           )
         else
           corr_attrs = {
             base_identifier: base_identifier,
             corrigendum_number: supp_data[:cor_number]&.to_s,
-            corrigendum_year: (supp_data[:cor_year] || supp_data[:year])&.to_i
+            corrigendum_year: (supp_data[:cor_year] || supp_data[:year])&.to_i,
           }
           month_val = supp_data[:month]&.to_s
-          corr_attrs[:corrigendum_month] = month_val if month_val && !month_val.empty?
+          if month_val && !month_val.empty?
+            corr_attrs[:corrigendum_month] =
+              month_val
+          end
           Identifiers::Corrigendum.new(**corr_attrs)
         end
       end

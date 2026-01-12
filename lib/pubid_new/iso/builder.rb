@@ -81,10 +81,12 @@ module PubidNew
 
         # Merge copublishers into publisher object
         if parsed_hash[:publisher] && parsed_hash[:copublishers]
-          copublisher_strings = parsed_hash[:copublishers].map { |cp| cp[:copublisher] }
+          copublisher_strings = parsed_hash[:copublishers].map do |cp|
+            cp[:copublisher]
+          end
           parsed_hash[:publisher] = {
             publisher: parsed_hash[:publisher],
-            copublisher:  copublisher_strings
+            copublisher: copublisher_strings,
           }
         end
 
@@ -103,10 +105,16 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+              if identifier.respond_to?("#{sub_key}=")
+                identifier.send("#{sub_key}=",
+                                sub_value)
+              end
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
@@ -121,33 +129,33 @@ module PubidNew
 
         # Detect rendering style from parsed abbreviation
         if identifier.respond_to?(:rendering_style=) && identifier.respond_to?(:typed_stage) && identifier.typed_stage
-          require_relative 'rendering_style'
+          require_relative "rendering_style"
           ts = identifier.typed_stage
 
           # Detect stage format from parsed abbreviation
           stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.long_abbr)
-            true  # Long form (starts with Amd, DAmd, FDAmd, Cor, DCor, FDCor)
-          elsif ts.long_abbr && ts.original_abbr && ts.original_abbr.include?("Directives")
-            # Special case for Directives: any form with "Directives" word is long form
-            true  # "Directives Part", "Directives, Part", "Directives,"
-          elsif ts.short_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.short_abbr)
-            false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR, DIR)
-          else
-            false  # Default to short/canonical
-          end
+                                true # Long form (starts with Amd, DAmd, FDAmd, Cor, DCor, FDCor)
+                              elsif ts.long_abbr && ts.original_abbr && ts.original_abbr.include?("Directives")
+                                # Special case for Directives: any form with "Directives" word is long form
+                                true # "Directives Part", "Directives, Part", "Directives,"
+                              elsif ts.short_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.short_abbr)
+                                false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR, DIR)
+                              else
+                                false  # Default to short/canonical
+                              end
 
           # Detect language code format from parsed languages
           with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
-            # Check if original_code was single-char (E, F, R, A, S, D)
-            first_lang = identifier.languages.first
-            if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
-              :single
-            else
-              :iso  # 2-char codes (en, fr, ru, ar, es, de)
-            end
-          else
-            :none
-          end
+                                 # Check if original_code was single-char (E, F, R, A, S, D)
+                                 first_lang = identifier.languages.first
+                                 if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
+                                   :single
+                                 else
+                                   :iso # 2-char codes (en, fr, ru, ar, es, de)
+                                 end
+                               else
+                                 :none
+                               end
 
           # with_date is always true for base identifiers (show the date if present)
           # Only supplements might have undated references
@@ -157,7 +165,7 @@ module PubidNew
           identifier.rendering_style = RenderingStyle.new(
             with_language_code: with_language_code,
             stage_format_long: stage_format_long,
-            with_date: with_date
+            with_date: with_date,
           )
         end
 
@@ -184,9 +192,9 @@ module PubidNew
         roman_numeral.to_s.upcase.chars.reverse.each do |char|
           value = roman_to_int_map[char]
           if value < prev_value
-        result -= value
+            result -= value
           else
-        result += value
+            result += value
           end
           prev_value = value
         end
@@ -208,7 +216,7 @@ module PubidNew
           if value.is_a?(Hash)
             PubidNew::Iso::Components::Publisher.new(
               publisher: value[:publisher],
-              copublisher: value[:copublisher]
+              copublisher: value[:copublisher],
             )
           else
             PubidNew::Iso::Components::Publisher.new(publisher: value)
@@ -253,7 +261,7 @@ module PubidNew
             if year_value >= 1900 && year_value <= 2099
               return {
                 number: PubidNew::Iso::Components::Code.new(number: number),
-                date: PubidNew::Components::Date.new(year: part)
+                date: PubidNew::Components::Date.new(year: part),
               }
             end
           end
@@ -267,7 +275,8 @@ module PubidNew
           end
 
           if subpart
-            code_hash[:subpart] = PubidNew::Iso::Components::Code.new(number: subpart)
+            code_hash[:subpart] =
+              PubidNew::Iso::Components::Code.new(number: subpart)
           end
 
           code_hash
@@ -280,7 +289,7 @@ module PubidNew
           # "WD"
           # "PAS"
           # "CD TR"
-          original_value = value.to_s  # Store the original parsed value
+          original_value = value.to_s # Store the original parsed value
           iteration = original_value.match(/(\d+)$/)
           normalized_value = original_value.sub(iteration.to_s, "")
           typed_stage = locate_typed_stage(normalized_value || "")
@@ -319,19 +328,21 @@ module PubidNew
           # Extract just the digit(s) for the number field
           number_string = original_text.match(/\d+/)&.to_s
           number_code = number_string ? PubidNew::Iso::Components::Code.new(number: number_string) : nil
-          PubidNew::Components::Edition.new(number: number_code, original_text: original_text)
+          PubidNew::Components::Edition.new(number: number_code,
+                                            original_text: original_text)
 
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
           original_value = value.to_s
           normalized_value = original_value.gsub("/", ",")
 
-          normalized_value.split(",").map.with_index do |lang, idx|
+          normalized_value.split(",").map.with_index do |lang, _idx|
             # We need to convert these into 2 char language codes
             lang = lang.strip
-            original_lang = lang  # Store original format before conversion
+            original_lang = lang # Store original format before conversion
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            PubidNew::Components::Language.new(code: lang, original_code: original_lang)
+            PubidNew::Components::Language.new(code: lang,
+                                               original_code: original_lang)
           end
 
         when :all_parts
@@ -341,7 +352,7 @@ module PubidNew
         when :joint_identifier
           case value[:publisher]
           when "IDF"
-            require_relative '../idf/builder'
+            require_relative "../idf/builder"
             Idf::Builder.new(Idf::Scheme).build(value)
           end
 

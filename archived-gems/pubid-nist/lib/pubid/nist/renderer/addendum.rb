@@ -3,7 +3,7 @@ require_relative "base"
 module Pubid::Nist::Renderer
   class Addendum < Base
     def render_identifier(params, opts)
-       # = "%{base}" % params
+      # = "%{base}" % params
       result = params[:base].to_s(opts[:format])
       case opts[:format]
       when :long

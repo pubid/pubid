@@ -2,7 +2,6 @@ module PubidNew
   module Components
     # Language component (typically a language code)
     class Language < Lutaml::Model::Serializable
-
       CHAR_MAP = {
         "R" => "ru",
         "F" => "fr",
@@ -14,7 +13,7 @@ module PubidNew
 
       # code is always an ISO 639-1 two-letter code
       attribute :code, :string, values: CHAR_MAP.values
-      attribute :original_code, :string  # Store the actual parsed format
+      attribute :original_code, :string # Store the actual parsed format
 
       def to_s(lang_single: false)
         # When multi-char format requested (lang_single: false) but original was

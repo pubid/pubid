@@ -28,7 +28,14 @@ module Pubid::Nist
         parsed = Parsers::Default.new.parse(parsed[:remaining].to_s)
       end
       if publisher
-        parsed.is_a?(Array) ? parsed << { series: series, publisher: publisher } : parsed.merge({ series: series, publisher: publisher })
+        if parsed.is_a?(Array)
+          parsed << { series: series,
+                      publisher: publisher }
+        else
+          parsed.merge({
+                         series: series, publisher: publisher
+                       })
+        end
       else
         parsed.is_a?(Array) ? parsed << { series: series } : parsed.merge({ series: series })
       end

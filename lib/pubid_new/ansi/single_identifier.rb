@@ -8,7 +8,7 @@ module PubidNew
         [].tap do |parts|
           parts << publisher_portion
           parts << number_portion
-        end.compact.join(' ').tap do |s|
+        end.compact.join(" ").tap do |s|
           s << language_portion if languages&.any?
         end
       end
@@ -28,11 +28,11 @@ module PubidNew
           number.value,
           (part ? "-#{part.value}" : ""),
           (date ? ":#{date.year}" : ""),
-        ].join('')
+        ].join("")
       end
 
       def language_portion
-        return '' unless languages&.any?
+        return "" unless languages&.any?
 
         "(#{languages.map(&:code).join(',')})"
       end

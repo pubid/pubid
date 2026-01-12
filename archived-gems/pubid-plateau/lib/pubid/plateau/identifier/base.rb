@@ -12,7 +12,8 @@ module Pubid::Plateau
         { key: :plateau }
       end
 
-      def initialize(number:, publisher: "PLATEAU", annex: nil, edition: nil, **opts)
+      def initialize(number:, publisher: "PLATEAU", annex: nil, edition: nil,
+**opts)
         @annex = annex if annex
         @edition = edition if edition
         super(**opts.merge(publisher: publisher, number: number.to_i))

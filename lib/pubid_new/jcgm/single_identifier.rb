@@ -26,23 +26,23 @@ module PubidNew
         parts = []
         parts << number.value if number
         parts << ":#{date.year}" if date
-        parts.join('')
+        parts.join("")
       end
 
       def language_portion
-        return '' unless languages&.any?
+        return "" unless languages&.any?
 
         [
           "(",
-          languages.map(&:original_code).join('/'),
-          ")"
-        ].join('')
+          languages.map(&:original_code).join("/"),
+          ")",
+        ].join("")
       end
 
       def to_s
         parts = [publisher_portion]
         parts << number_portion unless number_portion.empty?
-        result = parts.join(' ')
+        result = parts.join(" ")
         result += language_portion
         result
       end

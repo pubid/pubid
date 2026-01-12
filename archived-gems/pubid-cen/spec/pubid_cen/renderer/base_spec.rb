@@ -2,8 +2,13 @@ module Pubid::Cen
   module Renderer
     RSpec.describe Base do
       describe "#sort_supplements" do
-        subject { described_class.new({}).sort_supplements([first_supplement, second_supplement]) }
-        let(:first_supplement) { Identifier::Amendment.new(year: 1999, number: 1) }
+        subject do
+          described_class.new({}).sort_supplements([first_supplement,
+                                                    second_supplement])
+        end
+        let(:first_supplement) do
+          Identifier::Amendment.new(year: 1999, number: 1)
+        end
         let(:second_supplement) do
           Identifier::Amendment.new(year: second_supplement_year,
                                     number: second_supplement_number)

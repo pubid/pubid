@@ -19,7 +19,7 @@ class FixturesClassifier
       total: 0,
       passing: 0,
       failing: 0,
-      by_class: Hash.new { |h, k| h[k] = { pass: 0, fail: 0 } }
+      by_class: Hash.new { |h, k| h[k] = { pass: 0, fail: 0 } },
     }
     validate_flavor!
   end
@@ -61,7 +61,8 @@ class FixturesClassifier
 
   def validate_flavor!
     unless PubidNew::Registry.registered?(flavor)
-      raise ArgumentError, "Unknown flavor: #{flavor}. Valid: #{PubidNew::Registry.flavor_names.join(', ')}"
+      raise ArgumentError,
+            "Unknown flavor: #{flavor}. Valid: #{PubidNew::Registry.flavor_names.join(', ')}"
     end
   end
 
@@ -80,6 +81,7 @@ class FixturesClassifier
       File.readlines(file).each do |line|
         line = line.strip
         next if line.empty? || line.start_with?("#")
+
         identifiers << line
       end
     end
@@ -102,86 +104,84 @@ class FixturesClassifier
     @stats[:total] += 1
 
     case entry
-    when /^!(.+)!(.+)$/  # Normalized format
+    when /^!(.+)!(.+)$/ # Normalized format
       classify_normalized($1, $2)
-    when /^#(.+)# (.+)$/  # Errored format
+    when /^#(.+)# (.+)$/ # Errored format
       classify_errored($1, $2)
-    else  # Plain identifier
+    else # Plain identifier
       classify_plain(entry)
     end
   end
 
   def classify_plain(id_str)
-    begin
-      parsed = parse_identifier(id_str)
-      rendered = parsed.to_s
+    parsed = parse_identifier(id_str)
+    rendered = parsed.to_s
 
-      if rendered == id_str
-        # Perfect round-trip - write as plain
-        @stats[:passing] += 1
-        class_name = detect_class_name(parsed, id_str)
-        @stats[:by_class][class_name][:pass] += 1
-        append_to_file("pass", class_name, id_str)
-      else
-        # Successful parse but different rendering - write as normalized to PASS
-        @stats[:passing] += 1
-        class_name = detect_class_name(parsed, id_str)
-        @stats[:by_class][class_name][:pass] += 1
-        append_to_file("pass", class_name, "!#{id_str}!#{rendered}")
-      end
-    rescue StandardError => e
-      # Parse failed - write as errored to FAIL
-      @stats[:failing] += 1
-      class_name = detect_class_from_string(id_str)
-      @stats[:by_class][class_name][:fail] += 1
-      append_to_file("fail", class_name, "##{id_str}# #{e.class}: #{e.message.inspect}")
-    end
-  end
-
-  def classify_normalized(original, expected)
-    begin
-      parsed = parse_identifier(original)
-      actual_rendered = parsed.to_s
-
-      # SUCCESS: It parses! Use actual rendered output, not old expectation
+    if rendered == id_str
+      # Perfect round-trip - write as plain
       @stats[:passing] += 1
-      class_name = detect_class_name(parsed, original)
+      class_name = detect_class_name(parsed, id_str)
       @stats[:by_class][class_name][:pass] += 1
-
-      # Write with ACTUAL rendered output (may differ from old expectation)
-      if actual_rendered == original
-        # Perfect round-trip now
-        append_to_file("pass", class_name, original)
-      else
-        # Still normalized, but use actual rendering
-        append_to_file("pass", class_name, "!#{original}!#{actual_rendered}")
-      end
-    rescue StandardError => e
-      # FAIL: Parse error
-      @stats[:failing] += 1
-      class_name = detect_class_from_string(original)
-      @stats[:by_class][class_name][:fail] += 1
-      append_to_file("fail", class_name, "##{original}# #{e.class}: #{e.message.inspect}")
+      append_to_file("pass", class_name, id_str)
+    else
+      # Successful parse but different rendering - write as normalized to PASS
+      @stats[:passing] += 1
+      class_name = detect_class_name(parsed, id_str)
+      @stats[:by_class][class_name][:pass] += 1
+      append_to_file("pass", class_name, "!#{id_str}!#{rendered}")
     end
+  rescue StandardError => e
+    # Parse failed - write as errored to FAIL
+    @stats[:failing] += 1
+    class_name = detect_class_from_string(id_str)
+    @stats[:by_class][class_name][:fail] += 1
+    append_to_file("fail", class_name,
+                   "##{id_str}# #{e.class}: #{e.message.inspect}")
   end
 
-  def classify_errored(original, error_msg)
+  def classify_normalized(original, _expected)
+    parsed = parse_identifier(original)
+    actual_rendered = parsed.to_s
+
+    # SUCCESS: It parses! Use actual rendered output, not old expectation
+    @stats[:passing] += 1
+    class_name = detect_class_name(parsed, original)
+    @stats[:by_class][class_name][:pass] += 1
+
+    # Write with ACTUAL rendered output (may differ from old expectation)
+    if actual_rendered == original
+      # Perfect round-trip now
+      append_to_file("pass", class_name, original)
+    else
+      # Still normalized, but use actual rendering
+      append_to_file("pass", class_name, "!#{original}!#{actual_rendered}")
+    end
+  rescue StandardError => e
+    # FAIL: Parse error
+    @stats[:failing] += 1
+    class_name = detect_class_from_string(original)
+    @stats[:by_class][class_name][:fail] += 1
+    append_to_file("fail", class_name,
+                   "##{original}# #{e.class}: #{e.message.inspect}")
+  end
+
+  def classify_errored(original, _error_msg)
     # Re-validate: maybe it parses now after fixes?
-    begin
-      parsed = parse_identifier(original)
-      rendered = parsed.to_s
-      # It parses now! Move to pass
-      @stats[:passing] += 1
-      class_name = detect_class_name(parsed, original)
-      @stats[:by_class][class_name][:pass] += 1
-      append_to_file("pass", class_name, "!#{original}!#{rendered}")
-    rescue StandardError => e
-      # Still fails, keep in fail with updated error
-      @stats[:failing] += 1
-      class_name = detect_class_from_string(original)
-      @stats[:by_class][class_name][:fail] += 1
-      append_to_file("fail", class_name, "##{original}# #{e.class}: #{e.message.inspect}")
-    end
+
+    parsed = parse_identifier(original)
+    rendered = parsed.to_s
+    # It parses now! Move to pass
+    @stats[:passing] += 1
+    class_name = detect_class_name(parsed, original)
+    @stats[:by_class][class_name][:pass] += 1
+    append_to_file("pass", class_name, "!#{original}!#{rendered}")
+  rescue StandardError => e
+    # Still fails, keep in fail with updated error
+    @stats[:failing] += 1
+    class_name = detect_class_from_string(original)
+    @stats[:by_class][class_name][:fail] += 1
+    append_to_file("fail", class_name,
+                   "##{original}# #{e.class}: #{e.message.inspect}")
   end
 
   def parse_identifier(id_str)
@@ -218,113 +218,125 @@ class FixturesClassifier
   end
 
   def detect_iso_class(id_str)
-    return "nsb_format" if id_str =~ /FprISO|PrISO/
-    return "cyrillic" if id_str =~ /[А-Яа-яЁё]/
-    return "guide" if id_str =~ /Guide/i
-    return "directives" if id_str =~ /DIR/
-    return "amendment" if id_str =~ /\/Amd|\/AMD|\/FDAM|\/PDAM|\/DAM/
-    return "corrigendum" if id_str =~ /\/Cor|\/COR|\/FDCOR|\/DCOR/
-    return "technical_report" if id_str =~ /\bTR\b/
-    return "technical_specification" if id_str =~ /\bTS\b/
-    return "pas" if id_str =~ /\bPAS\b/
-    return "international_workshop_agreement" if id_str =~ /\bIWA\b/
-    return "addendum" if id_str =~ /\/Add/
+    return "nsb_format" if /FprISO|PrISO/.match?(id_str)
+    return "cyrillic" if /[А-Яа-яЁё]/.match?(id_str)
+    return "guide" if /Guide/i.match?(id_str)
+    return "directives" if /DIR/.match?(id_str)
+    return "amendment" if /\/Amd|\/AMD|\/FDAM|\/PDAM|\/DAM/.match?(id_str)
+    return "corrigendum" if /\/Cor|\/COR|\/FDCOR|\/DCOR/.match?(id_str)
+    return "technical_report" if /\bTR\b/.match?(id_str)
+    return "technical_specification" if /\bTS\b/.match?(id_str)
+    return "pas" if /\bPAS\b/.match?(id_str)
+    return "international_workshop_agreement" if /\bIWA\b/.match?(id_str)
+    return "addendum" if /\/Add/.match?(id_str)
+
     "international_standard"
   end
 
   def detect_iec_class(id_str)
-    return "technical_report" if id_str =~ /\bTR\b/
-    return "technical_specification" if id_str =~ /\bTS\b/
-    return "guide" if id_str =~ /GUIDE/i
-    return "pas" if id_str =~ /\bPAS\b/
-    return "srd" if id_str =~ /\bSRD\b/
-    return "amendment" if id_str =~ /\/AMD/
-    return "corrigendum" if id_str =~ /\/COR/
-    return "interpretation_sheet" if id_str =~ /\/ISH/
-    return "vap_identifier" if id_str =~ /\bVAP\b/
-    return "consolidated_identifier" if id_str =~ /\+AMD|\+COR/
+    return "technical_report" if /\bTR\b/.match?(id_str)
+    return "technical_specification" if /\bTS\b/.match?(id_str)
+    return "guide" if /GUIDE/i.match?(id_str)
+    return "pas" if /\bPAS\b/.match?(id_str)
+    return "srd" if /\bSRD\b/.match?(id_str)
+    return "amendment" if /\/AMD/.match?(id_str)
+    return "corrigendum" if /\/COR/.match?(id_str)
+    return "interpretation_sheet" if /\/ISH/.match?(id_str)
+    return "vap_identifier" if /\bVAP\b/.match?(id_str)
+    return "consolidated_identifier" if /\+AMD|\+COR/.match?(id_str)
+
     "international_standard"
   end
 
-  def detect_ieee_class(id_str)
+  def detect_ieee_class(_id_str)
     "standard"
   end
 
   def detect_nist_class(id_str)
-    return "fips" if id_str =~ /\bFIPS\b/
-    return "sp" if id_str =~ /\bSP\b/
-    return "nist_ir" if id_str =~ /\bNISTIR\b/
+    return "fips" if /\bFIPS\b/.match?(id_str)
+    return "sp" if /\bSP\b/.match?(id_str)
+    return "nist_ir" if /\bNISTIR\b/.match?(id_str)
+
     "unknown"
   end
 
   def detect_jcgm_class(id_str)
-    return "guide" if id_str =~ /^JCGM \d+/
+    return "guide" if /^JCGM \d+/.match?(id_str)
+
     "unknown"
   end
 
   def detect_astm_class(id_str)
-    return "research_report" if id_str =~ /\bRR:/
-    return "manual" if id_str =~ /\bMNL/
-    return "monograph" if id_str =~ /\bMONO/
-    return "data_series" if id_str =~ /\bDS\d/
-    return "work_in_progress" if id_str =~ /\bWK/
-    return "adjunct" if id_str =~ /\bADJ/
-    return "technical_report" if id_str =~ /\bTR\d|ISO\/ASTMTR/
+    return "research_report" if /\bRR:/.match?(id_str)
+    return "manual" if /\bMNL/.match?(id_str)
+    return "monograph" if /\bMONO/.match?(id_str)
+    return "data_series" if /\bDS\d/.match?(id_str)
+    return "work_in_progress" if /\bWK/.match?(id_str)
+    return "adjunct" if /\bADJ/.match?(id_str)
+    return "technical_report" if /\bTR\d|ISO\/ASTMTR/.match?(id_str)
+
     "standard"
   end
 
   def detect_asme_class(id_str)
-    return "joint_published" if id_str =~ /CSA\/ASME|API\/ASME|ISO\/ASME/
+    return "joint_published" if /CSA\/ASME|API\/ASME|ISO\/ASME/.match?(id_str)
+
     "standard"
   end
 
   def detect_api_class(id_str)
-    return "bull" if id_str =~ /\bBULL\b/
-    return "mpms" if id_str =~ /\bMPMS\b/
-    return "rp" if id_str =~ /\bRP\b/
-    return "spec" if id_str =~ /\bSPEC\b/
-    return "std" if id_str =~ /\bSTD\b/
-    return "tr" if id_str =~ /\bTR\b/
+    return "bull" if /\bBULL\b/.match?(id_str)
+    return "mpms" if /\bMPMS\b/.match?(id_str)
+    return "rp" if /\bRP\b/.match?(id_str)
+    return "spec" if /\bSPEC\b/.match?(id_str)
+    return "std" if /\bSTD\b/.match?(id_str)
+    return "tr" if /\bTR\b/.match?(id_str)
+
     "publication"
   end
 
   def detect_oiml_class(id_str)
-    return "basic_publication" if id_str =~ /\bB \d/
-    return "document" if id_str =~ /\bD \d/
-    return "expert_report" if id_str =~ /\bE \d/
-    return "guide" if id_str =~ /\bG \d/
-    return "recommendation" if id_str =~ /\bR \d/
-    return "seminar_report" if id_str =~ /\bS \d/
-    return "vocabulary" if id_str =~ /\bV \d|VIML/
-    return "amendment" if id_str =~ /Amendment/
-    return "annex" if id_str =~ /Annex/
+    return "basic_publication" if /\bB \d/.match?(id_str)
+    return "document" if /\bD \d/.match?(id_str)
+    return "expert_report" if /\bE \d/.match?(id_str)
+    return "guide" if /\bG \d/.match?(id_str)
+    return "recommendation" if /\bR \d/.match?(id_str)
+    return "seminar_report" if /\bS \d/.match?(id_str)
+    return "vocabulary" if /\bV \d|VIML/.match?(id_str)
+    return "amendment" if /Amendment/.match?(id_str)
+    return "annex" if /Annex/.match?(id_str)
+
     "unknown"
   end
 
   def detect_idf_class(id_str)
-    return "international_standard" if id_str =~ /^IDF \d/
-    return "reviewed_method" if id_str =~ /\(RM\)/
-    return "amendment" if id_str =~ /Amendment/
-    return "corrigendum" if id_str =~ /Corrigendum/
+    return "international_standard" if /^IDF \d/.match?(id_str)
+    return "reviewed_method" if /\(RM\)/.match?(id_str)
+    return "amendment" if /Amendment/.match?(id_str)
+    return "corrigendum" if /Corrigendum/.match?(id_str)
+
     "unknown"
   end
 
   def detect_csa_class(id_str)
-    return "series" if id_str =~ /SERIES/
-    return "bundled" if id_str =~ /\+/
-    return "combined" if id_str =~ /\//
-    return "package" if id_str =~ /PACKAGE/
-    return "canadian_adopted" if id_str =~ /^CAN\//
-    return "csa_adopted" if id_str =~ /CSA ISO|CSA IEC|CSA CISPR/
+    return "series" if /SERIES/.match?(id_str)
+    return "bundled" if /\+/.match?(id_str)
+    return "combined" if /\//.match?(id_str)
+    return "package" if /PACKAGE/.match?(id_str)
+    return "canadian_adopted" if /^CAN\//.match?(id_str)
+    return "csa_adopted" if /CSA ISO|CSA IEC|CSA CISPR/.match?(id_str)
+
     "standard"
   end
 
   def append_to_file(status, class_name, content)
-    filename = File.join(fixtures_dir, "identifiers", status, "#{class_name}.txt")
+    filename = File.join(fixtures_dir, "identifiers", status,
+                         "#{class_name}.txt")
 
     unless File.exist?(filename)
       File.open(filename, "w") do |f|
-        f.puts "# #{flavor.upcase} #{class_name.tr('_', ' ').split.map(&:capitalize).join(' ')} - #{status.capitalize}"
+        f.puts "# #{flavor.upcase} #{class_name.tr('_',
+                                                   ' ').split.map(&:capitalize).join(' ')} - #{status.capitalize}"
         f.puts "# Auto-generated by classify_fixtures.rb"
         f.puts
       end
@@ -346,8 +358,10 @@ class FixturesClassifier
       f.puts "OVERALL STATISTICS"
       f.puts "-" * 70
       f.puts "Total: #{@stats[:total]}"
-      f.puts "Pass: #{@stats[:passing]} (#{percentage(@stats[:passing], @stats[:total])}%)"
-      f.puts "Fail: #{@stats[:failing]} (#{percentage(@stats[:failing], @stats[:total])}%)"
+      f.puts "Pass: #{@stats[:passing]} (#{percentage(@stats[:passing],
+                                                      @stats[:total])}%)"
+      f.puts "Fail: #{@stats[:failing]} (#{percentage(@stats[:failing],
+                                                      @stats[:total])}%)"
       f.puts
       f.puts "BY CLASS"
       f.puts "-" * 70
@@ -364,22 +378,25 @@ class FixturesClassifier
     puts "CLASSIFICATION COMPLETE: #{flavor.upcase}"
     puts "=" * 70
     puts "Total: #{@stats[:total]}"
-    puts "Pass:  #{@stats[:passing]} (#{percentage(@stats[:passing], @stats[:total])}%)"
-    puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing], @stats[:total])}%)"
+    puts "Pass:  #{@stats[:passing]} (#{percentage(@stats[:passing],
+                                                   @stats[:total])}%)"
+    puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing],
+                                                   @stats[:total])}%)"
     puts "=" * 70
   end
 
   def percentage(part, whole)
     return 0 if whole.zero?
+
     ((part.to_f / whole) * 100).round(2)
   end
 
   def underscore(camel_cased_word)
     camel_cased_word.to_s.gsub("::", "/")
-                    .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-                    .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-                    .tr("-", "_")
-                    .downcase
+      .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+      .gsub(/([a-z\d])([A-Z])/, '\1_\2')
+      .tr("-", "_")
+      .downcase
   end
 
   def log(message)

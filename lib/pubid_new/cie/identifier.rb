@@ -9,11 +9,11 @@ module PubidNew
     # Base Identifier class for CIE
     # Provides parse() entry point
     class Identifier < Lutaml::Model::Serializable
-      attribute :style, :string  # "legacy" or "current"
+      attribute :style, :string # "legacy" or "current"
 
       # Parse CIE identifier string
       def self.parse(input)
-        require_relative "identifiers/standard"  # Ensure loaded
+        require_relative "identifiers/standard" # Ensure loaded
 
         parsed = Parser.parse(input)
         builder = Builder.new

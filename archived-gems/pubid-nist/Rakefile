@@ -16,6 +16,8 @@ task :fetch_pubs_export do
   Zip::File.open_buffer(pub_export_file) do |zip_file|
     zip_file.each { |entry| result_json += entry.get_input_stream.read }
   end
-  File.write('spec/fixtures/pubs-export.txt',
-             (JSON.parse(result_json).map { |rec| "NIST #{rec['docidentifier']}" }.join("\n")))
+  File.write("spec/fixtures/pubs-export.txt",
+             JSON.parse(result_json).map do |rec|
+               "NIST #{rec['docidentifier']}"
+             end.join("\n"))
 end

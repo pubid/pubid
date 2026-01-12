@@ -28,7 +28,7 @@ module PubidNew
         "chi" => "zho",
         "viet" => "vie",
         "port" => "por",
-        "esp" => "spa"
+        "esp" => "spa",
       }.freeze
 
       def initialize(scheme)
@@ -57,7 +57,7 @@ module PubidNew
 
         # Cast and assign all attributes
         parsed_hash.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value, parsed_hash)  # Pass parsed_hash for context
+          realized_components = cast(key.to_sym, value, parsed_hash) # Pass parsed_hash for context
           next if realized_components.nil?
 
           # Track number components
@@ -81,10 +81,16 @@ module PubidNew
               elsif sub_key == :revision
                 extracted_revision = sub_value
               end
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+              if identifier.respond_to?("#{sub_key}=")
+                identifier.send("#{sub_key}=",
+                                sub_value)
+              end
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
@@ -96,7 +102,7 @@ module PubidNew
           elsif second_num
             # Check for special patterns first
             if first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
-               second_num.value.to_s.match?(/^\d{2,4}$/)
+                second_num.value.to_s.match?(/^\d{2,4}$/)
               # Pattern: "11e2-1915" OR "123e2-50" parsed as first="11e2"|"123e2", second="1915"|"50"
               # Extract number and edition from first_num
               match_data = first_num.value.to_s.match(/^(\d+)e(\d+)$/)
@@ -108,9 +114,10 @@ module PubidNew
               year_part = "19#{year_part}" if year_part.length == 2
 
               identifier.number = Components::Code.new(number: number_part)
-              identifier.edition = Components::Edition.new(type: "e", id: edition_id, additional_text: year_part)
+              identifier.edition = Components::Edition.new(type: "e",
+                                                           id: edition_id, additional_text: year_part)
             elsif first_num.value.to_s.match?(/^(\d+)supp?$/) &&
-                  second_num.value.to_s.match?(/^\d{4}$/)
+                second_num.value.to_s.match?(/^\d{4}$/)
               # Pattern: "25supp-1924" parsed as first="25supp", second="1924"
               number_part = first_num.value.to_s.match(/^(\d+)supp?$/)[1]
               year_part = second_num.value.to_s
@@ -118,11 +125,12 @@ module PubidNew
               identifier.number = Components::Code.new(number: number_part)
               identifier.supplement = year_part
             elsif identifier.is_a?(Identifiers::TechnicalNote) &&
-                  second_num.value.to_s.match?(/^(19|20)\d{2}$/)
+                second_num.value.to_s.match?(/^(19|20)\d{2}$/)
               # SPECIAL CASE FOR TN: second_num is edition year
               # Following "date IS edition" rule: -1993 becomes Edition(type: "e", id: "1993")
               identifier.number = first_num
-              edition_obj = Components::Edition.new(type: "e", id: second_num.value.to_s)
+              edition_obj = Components::Edition.new(type: "e",
+                                                    id: second_num.value.to_s)
               identifier.edition_component = edition_obj
               identifier.edition = edition_obj
               identifier.edition_year = second_num.value.to_s
@@ -140,7 +148,8 @@ module PubidNew
         # Apply extracted revision if not already set
         if extracted_revision && !identifier.edition
           # Convert extracted revision to Edition component
-          identifier.edition = Components::Edition.new(type: "r", id: extracted_revision.to_s)
+          identifier.edition = Components::Edition.new(type: "r",
+                                                       id: extracted_revision.to_s)
         end
 
         identifier
@@ -173,7 +182,7 @@ module PubidNew
           base_hash = {
             series: parsed_hash[:series],
             first_number: base_str,
-            parsed_format: parsed_hash[:parsed_format]
+            parsed_format: parsed_hash[:parsed_format],
           }
 
           # Recursively build base identifier
@@ -185,10 +194,12 @@ module PubidNew
         if parsed_hash[:supplement_month_year]
           # Parse month+year format like "Jan1924"
           month_year = parsed_hash[:supplement_month_year].to_s
-          supplement.edition = Components::Edition.new(type: "s", id: month_year)
+          supplement.edition = Components::Edition.new(type: "s",
+                                                       id: month_year)
         elsif parsed_hash[:supplement_year]
           # Just year: 1924
-          supplement.edition = Components::Edition.new(type: "s", id: parsed_hash[:supplement_year].to_s)
+          supplement.edition = Components::Edition.new(type: "s",
+                                                       id: parsed_hash[:supplement_year].to_s)
         elsif parsed_hash[:supplement_empty]
           # Empty supplement - no edition
           # supplement.edition remains nil
@@ -216,6 +227,7 @@ module PubidNew
         case type
         when :publisher
           return nil if value.nil? || value.to_s.strip.empty?
+
           Components::Publisher.new(publisher: value.to_s)
 
         when :series
@@ -234,7 +246,7 @@ module PubidNew
           if publisher_extracted
             {
               publisher: Components::Publisher.new(publisher: publisher_extracted),
-              series: Components::Code.new(number: str_value)
+              series: Components::Code.new(number: str_value),
             }
           else
             Components::Code.new(number: str_value)
@@ -243,11 +255,13 @@ module PubidNew
         when :volume_number
           # Volume from v#n# pattern - return Volume component
           return nil if value.nil? || value.to_s.strip.empty?
+
           { volume: Components::Volume.new(value: value.to_s) }
 
         when :issue_number
           # Issue number from v#n# pattern - return Part component
           return nil if value.nil? || value.to_s.strip.empty?
+
           { part: Components::Part.new(type: "n", value: value.to_s) }
 
         when :first_number, :second_number
@@ -260,7 +274,7 @@ module PubidNew
             issue_num = value[:issue_number].to_s
             return {
               volume: Components::Volume.new(value: volume_num),
-              part: Components::Part.new(type: "n", value: issue_num)
+              part: Components::Part.new(type: "n", value: issue_num),
             }
           end
 
@@ -277,7 +291,8 @@ module PubidNew
               year_part = parsed_hash[:edition_year_separate].to_s
               return {
                 first_number: Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "e", id: edition_id, additional_text: year_part)
+                edition: Components::Edition.new(type: "e", id: edition_id,
+                                                 additional_text: year_part),
               }
             end
 
@@ -287,15 +302,17 @@ module PubidNew
               month_part = parsed_hash[:historical_month].to_s
               year_part = parsed_hash[:historical_year].to_s
               # Check if str_value is just a number (the part before dash)
-              if str_value =~ /^\d+$/
+              if /^\d+$/.match?(str_value)
                 return {
                   first_number: Components::Code.new(number: str_value),
-                  edition: Components::Edition.new(type: "-", additional_text: "#{month_part}#{year_part}")
+                  edition: Components::Edition.new(type: "-",
+                                                   additional_text: "#{month_part}#{year_part}"),
                 }
               else
                 # No number, just historical edition
                 return {
-                  edition: Components::Edition.new(type: "-", additional_text: "#{month_part}#{year_part}")
+                  edition: Components::Edition.new(type: "-",
+                                                   additional_text: "#{month_part}#{year_part}"),
                 }
               end
             end
@@ -307,7 +324,7 @@ module PubidNew
               year_part = parsed_hash[:supplement_year].to_s
               return {
                 first_number: Components::Code.new(number: number_part),
-                supplement: year_part
+                supplement: year_part,
               }
             end
 
@@ -316,7 +333,7 @@ module PubidNew
               return {
                 first_number: Components::Code.new(number: $1),
                 supplement: "",
-                supplement_has_revision: true
+                supplement_has_revision: true,
               }
             # NEW: Pattern "11e2-1915" - edition with separate year (inline match)
             # Creates: number="11", Edition(type: "e", id: "2", additional_text: "1915")
@@ -327,7 +344,8 @@ module PubidNew
               year_part = $3
               return {
                 first_number: Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "e", id: edition_id, additional_text: year_part)
+                edition: Components::Edition.new(type: "e", id: edition_id,
+                                                 additional_text: year_part),
               }
             # NEW: Pattern "-April1909" - historical edition with month+year (inline match)
             # Creates: Edition(type: "-", additional_text: "April1909")
@@ -336,16 +354,17 @@ module PubidNew
               month_part = $1
               year_part = $2
               return {
-                edition: Components::Edition.new(type: "-", additional_text: "#{month_part}#{year_part}")
+                edition: Components::Edition.new(type: "-",
+                                                 additional_text: "#{month_part}#{year_part}"),
               }
             # NEW: CS Emergency pattern "e104" or "e104-43" → extract number
             # This must come BEFORE bare edition check to avoid conflict
             # CS emergency always has 3+ digit number (e104, not e2)
-            elsif str_value =~ /^e(\d{3,})(-\d+)?$/
+            elsif /^e(\d{3,})(-\d+)?$/.match?(str_value)
               # Extract emergency number: e104 → 104, e104-43 → 104-43
               emergency_num = str_value.sub(/^e/, "")
               return {
-                first_number: Components::Code.new(number: emergency_num)
+                first_number: Components::Code.new(number: emergency_num),
               }
             # NEW: Bare edition pattern like "100e1" (CS series without year)
             # ONLY when NO second_number present (to avoid conflict with "123e2-50")
@@ -356,7 +375,7 @@ module PubidNew
               edition_id = $2
               return {
                 first_number: Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "e", id: edition_id)
+                edition: Components::Edition.new(type: "e", id: edition_id),
               }
             # NEW: Bare edition pattern "e2" - just edition without number prefix
             # Creates: Edition(type: "e", id: "2")
@@ -365,7 +384,7 @@ module PubidNew
             elsif str_value =~ /^e(\d{1,2})$/
               edition_id = $1
               return {
-                edition: Components::Edition.new(type: "e", id: edition_id)
+                edition: Components::Edition.new(type: "e", id: edition_id),
               }
             # Pattern: "13e2rev1908" - edition with revision year-only (NO month)
             # Creates: Edition(type: "e", id: "2", additional_text: "1908")
@@ -377,7 +396,8 @@ module PubidNew
               year_part = $3
               return {
                 first_number: Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "e", id: edition_id_part, additional_text: year_part)
+                edition: Components::Edition.new(type: "e",
+                                                 id: edition_id_part, additional_text: year_part),
               }
             # Pattern: "13e2revJune1908" - edition with revision month+year
             # Creates: Edition(type: "e", id: "2", additional_text: "June1908")
@@ -391,7 +411,8 @@ module PubidNew
               additional_text = rev_part.sub(/^rev/, "")
               return {
                 first_number: Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "e", id: edition_id_part, additional_text: additional_text)
+                edition: Components::Edition.new(type: "e",
+                                                 id: edition_id_part, additional_text: additional_text),
               }
             # NEW: Pattern "24suppJan1924" - supplement with month and year in first_number
             # Creates: number="24", supplement="Jan1924"
@@ -401,7 +422,7 @@ module PubidNew
               year_part = $3
               return {
                 first_number: Components::Code.new(number: number_part),
-                supplement: "#{month_part}#{year_part}"
+                supplement: "#{month_part}#{year_part}",
               }
             # NEW: Pattern "25supp-1924" - supplement with dash-year (inline match)
             # Creates: number="25", supplement="1924"
@@ -411,7 +432,7 @@ module PubidNew
               year_part = $2
               return {
                 first_number: Components::Code.new(number: number_part),
-                supplement: year_part
+                supplement: year_part,
               }
             # NEW: Pattern "25sup-1924" - supplement with dash-year (short form, inline match)
             # Creates: number="25", supplement="1924"
@@ -421,7 +442,7 @@ module PubidNew
               year_part = $2
               return {
                 first_number: Components::Code.new(number: number_part),
-                supplement: year_part
+                supplement: year_part,
               }
             # NEW: Pattern "101e2supp" - edition + supplement
             # Creates: number="101", Edition(type: "e", id: "2"), supplement=""
@@ -432,9 +453,9 @@ module PubidNew
               return {
                 first_number: Components::Code.new(number: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id),
-                supplement: ""
+                supplement: "",
               }
-          end
+            end
           elsif type == :second_number && value.is_a?(Hash) && value[:first_number]
             # Handle second_number as a hash with first_number context
             # e.g., for pattern 800-57pt1r4
@@ -444,7 +465,7 @@ module PubidNew
             return {
               first_number: Components::Code.new(number: number_part),
               part: Components::Part.new(value: part_value),
-              edition: Components::Edition.new(type: "r", id: revision_value)
+              edition: Components::Edition.new(type: "r", id: revision_value),
             }
           end
 
@@ -463,14 +484,14 @@ module PubidNew
             return {
               type => Components::Code.new(number: number_part),
               part: Components::Part.new(type: "pt", value: part_value),
-              edition: Components::Edition.new(type: "r", id: revision_value)
+              edition: Components::Edition.new(type: "r", id: revision_value),
             }
           elsif str_value =~ /^(.+?)pt(\d+)$/
             number_part = $1
             part_value = $2
             return {
               type => Components::Code.new(number: number_part),
-              part: Components::Part.new(type: "pt", value: part_value)
+              part: Components::Part.new(type: "pt", value: part_value),
             }
           end
 
@@ -481,7 +502,7 @@ module PubidNew
             volume_part = $2
             return {
               type => Components::Code.new(number: number_part),
-              volume: volume_part
+              volume: volume_part,
             }
           end
 
@@ -489,51 +510,53 @@ module PubidNew
           if str_value =~ /^(.+?)(r\d+\/\d{4})$/i
             # Pattern: r6/1925 (revision with slash-year)
             number_part = $1
-            revision_with_year = $2  # e.g., "r6/1925"
+            revision_with_year = $2 # e.g., "r6/1925"
             # Extract revision and year
             if revision_with_year =~ /^r(\d+)\/(\d{4})$/
               revision_id = $1
               year_part = $2
               return {
                 type => Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "r", id: revision_id, additional_text: year_part)
+                edition: Components::Edition.new(type: "r", id: revision_id,
+                                                 additional_text: year_part),
               }
             end
           elsif str_value =~ /^(.+?)(r\d{4})$/i
             # Pattern: r1963 (revision as 4-digit year)
             number_part = $1
-            year_value = $2.sub(/^r/, "")  # Strip 'r' prefix
+            year_value = $2.sub(/^r/, "") # Strip 'r' prefix
             return {
               type => Components::Code.new(number: number_part),
-              edition: Components::Edition.new(type: "r", id: year_value)
+              edition: Components::Edition.new(type: "r", id: year_value),
             }
           elsif str_value =~ /^(.+?)(r[A-Za-z]{3,9}\d{4})$/i
             # Pattern: rJun1992 (revision with month and year)
             number_part = $1
-            revision_with_date = $2  # e.g., "rJun1992"
+            revision_with_date = $2 # e.g., "rJun1992"
             # Extract month and year
             if revision_with_date =~ /^r([A-Za-z]{3,9})(\d{4})$/
               month_part = $1
               year_part = $2
               return {
                 type => Components::Code.new(number: number_part),
-                edition: Components::Edition.new(type: "r", id: "#{month_part}#{year_part}")
+                edition: Components::Edition.new(type: "r",
+                                                 id: "#{month_part}#{year_part}"),
               }
             end
           elsif str_value =~ /^(.+?)(r\d+[a-z]?)$/i
             # Pattern: r5, r1a (simple revision)
             number_part = $1
-            revision_value = $2.sub(/^r/, "")  # Strip 'r' prefix
+            revision_value = $2.sub(/^r/, "") # Strip 'r' prefix
             return {
               type => Components::Code.new(number: number_part),
-              edition: Components::Edition.new(type: "r", id: revision_value)
+              edition: Components::Edition.new(type: "r", id: revision_value),
             }
           elsif str_value =~ /^(.+?)(r)$/i
             # Pattern: bare r with no digits (e.g., "800-90r")
             number_part = $1
             return {
               type => Components::Code.new(number: number_part),
-              edition: Components::Edition.new(type: "r", id: "1")
+              edition: Components::Edition.new(type: "r", id: "1"),
             }
           end
 
@@ -550,7 +573,7 @@ module PubidNew
             return {
               type => Components::Code.new(number: number_part),
               part: Components::Part.new(type: "", value: letter_part),
-              edition: Components::Edition.new(type: "r", id: revision_part)
+              edition: Components::Edition.new(type: "r", id: revision_part),
             }
           # Pattern: bare UPPERCASE letter suffix (e.g., "800-56A" → number + Part("", "A"))
           # Only matches uppercase letters - won't match revision markers
@@ -559,7 +582,7 @@ module PubidNew
             letter_part = $2
             return {
               type => Components::Code.new(number: number_part),
-              part: Components::Part.new(type: "", value: letter_part)
+              part: Components::Part.new(type: "", value: letter_part),
             }
           end
 
@@ -567,6 +590,7 @@ module PubidNew
 
         when :crpl_range
           return nil if value.nil? || value.to_s.strip.empty?
+
           # For "1-2_3-1", store as range notation
           "-#{value}"
 
@@ -575,6 +599,7 @@ module PubidNew
         when :stage
           # Stage from nested hash with id and type
           return nil unless value.is_a?(Hash)
+
           stage_id = value[:stage_id]&.to_s&.downcase
           stage_type = value[:stage_type]&.to_s&.downcase
           return nil if stage_id.nil? || stage_type.nil? || stage_id.empty? || stage_type.empty?
@@ -611,23 +636,25 @@ module PubidNew
         when :update
           # Update component with number, year, and optional month
           if value.is_a?(Hash)
-            number = value[:update_number]&.to_s || "1"  # Keep as string
+            number = value[:update_number]&.to_s || "1" # Keep as string
             year = value[:update_year]&.to_s     # String not integer
             month = value[:update_month]&.to_s   # String not integer
 
             # Create update with at least number
-            update_obj = Components::Update.new(number: number, year: year, month: month)
+            update_obj = Components::Update.new(number: number, year: year,
+                                                month: month)
             {
-              update: update_obj,  # Main attribute for tests
-              update_component: update_obj  # V2 component
+              update: update_obj, # Main attribute for tests
+              update_component: update_obj, # V2 component
             }
           elsif value.to_s.strip.empty?
             # Empty update string means "-upd" with no details
             # Create Update with default number="1", year="2021", month="02"
-            update_obj = Components::Update.new(number: "1", year: "2021", month: "02")
+            update_obj = Components::Update.new(number: "1", year: "2021",
+                                                month: "02")
             {
               update: update_obj,
-              update_component: update_obj
+              update_component: update_obj,
             }
           else
             # Simple string value - shouldn't reach here
@@ -658,17 +685,17 @@ module PubidNew
 
           # Handle bare "r" → normalize to "r1"
           revision_id = if str_value.empty? || str_value == "r" || str_value == "R"
-            "1"
-          # Handle "r4", "R5", "4" etc.
-          elsif str_value =~ /^[rR]?(\d+[a-z]?)$/
-            $1
-          else
-            str_value
-          end
+                          "1"
+                        # Handle "r4", "R5", "4" etc.
+                        elsif str_value =~ /^[rR]?(\d+[a-z]?)$/
+                          $1
+                        else
+                          str_value
+                        end
 
           # Return Edition component
           {
-            edition: Components::Edition.new(type: "r", id: revision_id)
+            edition: Components::Edition.new(type: "r", id: revision_id),
           }
 
         when :revision_year, :revision_month
@@ -683,13 +710,14 @@ module PubidNew
               year_value
             else
               # V2: revision with year only - create Edition component
-              return {
-                edition: Components::Edition.new(type: "r", id: year_value)
+              {
+                edition: Components::Edition.new(type: "r", id: year_value),
               }
             end
           else
             # revision_month - preserve as string for legacy rendering
             return nil if value.nil? || value.to_s.strip.empty?
+
             value.to_s.strip
           end
 
@@ -699,18 +727,21 @@ module PubidNew
           # Already handled in first_number regex matching above, but if it reaches here
           # as a separate capture, we need to process it
           return nil if value.nil? || value.to_s.strip.empty?
-          value.to_s  # Return as string for potential use
+
+          value.to_s # Return as string for potential use
 
         when :historical_month
           # NEW: Historical month from "-April1909" pattern
           # Handled in first_number pattern matching, but return as string if separate
           return nil if value.nil? || value.to_s.strip.empty?
+
           value.to_s
 
         when :historical_year
           # NEW: Historical year from "-April1909" pattern
           # Handled in first_number pattern matching, but return as string if separate
           return nil if value.nil? || value.to_s.strip.empty?
+
           value.to_s
 
         when :supplement_year
@@ -719,7 +750,8 @@ module PubidNew
           # Already handled in first_number regex matching above, but if it reaches here
           # as a separate capture, return as supplement value
           return nil if value.nil? || value.to_s.strip.empty?
-          { supplement: value.to_s }  # Return as supplement attribute
+
+          { supplement: value.to_s } # Return as supplement attribute
 
         when :supplement
           handle_supplement_cast(value)
@@ -734,7 +766,7 @@ module PubidNew
 
           {
             supplement_date_range_start: (month_start && year_start ? "#{month_start}#{year_start}" : nil),
-            supplement_date_range_end: (month_end && year_end ? "#{month_end}#{year_end}" : nil)
+            supplement_date_range_end: (month_end && year_end ? "#{month_end}#{year_end}" : nil),
           }
 
         when :supplement_date
@@ -764,31 +796,37 @@ module PubidNew
         when :edition_e
           # Edition with "e" prefix: e2, e2021
           return nil unless value.is_a?(Hash) && value[:edition_id]
+
           edition_id = value[:edition_id].to_s
 
           {
             edition: Components::Edition.new(type: "e", id: edition_id),
-            edition_component: Components::Edition.new(type: "e", id: edition_id)
+            edition_component: Components::Edition.new(type: "e",
+                                                       id: edition_id),
           }
 
         when :edition_r
           # Revision with "r" prefix: r5, r2021
           return nil unless value.is_a?(Hash) && value[:edition_id]
+
           edition_id = value[:edition_id].to_s
 
           {
             edition: Components::Edition.new(type: "r", id: edition_id),
-            edition_component: Components::Edition.new(type: "r", id: edition_id)
+            edition_component: Components::Edition.new(type: "r",
+                                                       id: edition_id),
           }
 
         when :edition_historical
           # Historical with "-" prefix: -3, -4
           return nil unless value.is_a?(Hash) && value[:edition_id]
+
           edition_id = value[:edition_id].to_s
 
           {
             edition: Components::Edition.new(type: "-", id: edition_id),
-            edition_component: Components::Edition.new(type: "-", id: edition_id)
+            edition_component: Components::Edition.new(type: "-",
+                                                       id: edition_id),
           }
 
         when :edition_id
@@ -800,7 +838,7 @@ module PubidNew
         when :legacy_edition
           # Legacy edition patterns - will be phased out
           # For now, map to old edition_year/edition_month attributes
-          nil  # Handled by existing edition_year logic below
+          nil # Handled by existing edition_year logic below
 
         when :edition_year, :edition_month, :edition_day, :edition_has_rev
           # Skip if this is edition_month, edition_day, or edition_has_rev
@@ -810,14 +848,14 @@ module PubidNew
           return nil if value.nil? || value.to_s.strip.empty?
 
           # Build Edition component from parsed edition data
-          edition_attrs = { year: value.to_s }  # Keep as string
+          edition_attrs = { year: value.to_s } # Keep as string
 
           # Add month and day if present in parsed_hash
           if parsed_hash[:edition_month]
             month_str = parsed_hash[:edition_month].to_s
             month_num = Date::ABBR_MONTHNAMES.index(month_str) ||
-                        Date::MONTHNAMES.index(month_str) ||
-                        month_str.to_i
+              Date::MONTHNAMES.index(month_str) ||
+              month_str.to_i
             edition_attrs[:month] = month_num if month_num && month_num > 0
           end
           if parsed_hash[:edition_day]
@@ -829,9 +867,9 @@ module PubidNew
 
           # Return as hash to set edition and edition_year
           {
-            edition: edition_obj,  # Main attribute for tests
-            edition_component: edition_obj,  # V2 component
-            edition_year: value.to_s  # Keep string for render logic
+            edition: edition_obj, # Main attribute for tests
+            edition_component: edition_obj, # V2 component
+            edition_year: value.to_s, # Keep string for render logic
           }
 
         when :part
@@ -844,7 +882,7 @@ module PubidNew
           if str_value =~ /^(\d+)add/
             {
               part: Components::Part.new(type: "pt", value: $1),
-              addendum: "true"
+              addendum: "true",
             }
           else
             # Just a part number - return Part component with pt type
@@ -857,10 +895,12 @@ module PubidNew
 
         when :edition_letter
           return nil if value.nil? || value.to_s.strip.empty?
+
           value.to_s
 
         when :public_draft
           return nil if value.nil?
+
           value.to_s
 
         when :draft
@@ -886,6 +926,7 @@ module PubidNew
 
         when :update_number, :update_year
           return nil if value.nil? || value.to_s.strip.empty?
+
           value.to_s
 
         when :addendum
@@ -893,6 +934,7 @@ module PubidNew
 
         when :addendum_number
           return nil if value.nil? || value.to_s.strip.empty?
+
           value.to_s
 
         when :supplement_suffix
@@ -910,15 +952,16 @@ module PubidNew
             # If month is a word like "April", this is historical edition format
             if month_str.match?(/^[A-Za-z]+$/)
               return {
-                edition: Components::Edition.new(type: "-", additional_text: "#{month_str}#{year_str}")
+                edition: Components::Edition.new(type: "-",
+                                                 additional_text: "#{month_str}#{year_str}"),
               }
             end
           end
 
           # Regular date processing
-          year = value[:date_year]&.to_s
-          month = value[:date_month]&.to_s
-          day = value[:date_day]&.to_s
+          value[:date_year]&.to_s
+          value[:date_month]&.to_s
+          value[:date_day]&.to_s
 
         else
           # Unknown types are ignored (returning nil)
@@ -944,7 +987,7 @@ module PubidNew
         if value.is_a?(Hash)
           {
             update_number: value[:update_number]&.to_s,
-            update_year: value[:update_year]&.to_s
+            update_year: value[:update_year]&.to_s,
           }.compact
         elsif value.to_s.strip.empty?
           # Empty update string (just "-upd" with no details)

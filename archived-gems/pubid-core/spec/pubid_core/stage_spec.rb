@@ -1,5 +1,4 @@
 Pubid::Core.configure do |config|
-
 end
 module Pubid::Core
   RSpec.describe Stage do
@@ -56,22 +55,31 @@ module Pubid::Core
       let(:abbrev) { :WD }
 
       it "returns correct harmonized stage code" do
-        expect(subject.harmonized_code).to eq(Pubid::Core::HarmonizedStageCode.new(config.stages["abbreviations"][abbrev.to_s], config: config))
+        expect(subject.harmonized_code).to eq(Pubid::Core::HarmonizedStageCode.new(
+                                                config.stages["abbreviations"][abbrev.to_s], config: config
+                                              ))
       end
 
       context "wrong code" do
         let(:abbrev) { :ABC }
 
         it "raise an error" do
-          expect { subject }.to raise_exception(Pubid::Core::Errors::StageInvalidError)
+          expect do
+            subject
+          end.to raise_exception(Pubid::Core::Errors::StageInvalidError)
         end
       end
     end
 
     context "when harmonized stage code" do
-      subject { described_class.new(config: config, harmonized_code: harmonized_code) }
+      subject do
+        described_class.new(config: config, harmonized_code: harmonized_code)
+      end
       let(:harmonized_code) { harmonized_code_object }
-      let(:harmonized_code_object) { Pubid::Core::HarmonizedStageCode.new(config.stages["abbreviations"]["WD"], config: config) }
+      let(:harmonized_code_object) do
+        Pubid::Core::HarmonizedStageCode.new(config.stages["abbreviations"]["WD"],
+                                             config: config)
+      end
 
       it "returns abbreviated code" do
         expect(subject.abbr).to eq("WD")
@@ -143,8 +151,13 @@ module Pubid::Core
     end
 
     context "when harmonized code and abbreviation" do
-      subject { described_class.new(config: config, harmonized_code: harmonized_code, abbr: abbrev) }
-      let(:harmonized_code) { Pubid::Core::HarmonizedStageCode.new("20", "00", config: config) }
+      subject do
+        described_class.new(config: config, harmonized_code: harmonized_code,
+                            abbr: abbrev)
+      end
+      let(:harmonized_code) do
+        Pubid::Core::HarmonizedStageCode.new("20", "00", config: config)
+      end
       let(:abbrev) { :CD }
 
       it "returns abbreviated code" do
@@ -211,7 +224,10 @@ module Pubid::Core
     end
 
     describe "#empty_abbr?" do
-      subject { described_class.new(config: config, abbr: abbrev).empty_abbr?(with_prf: with_prf) }
+      subject do
+        described_class.new(config: config,
+                            abbr: abbrev).empty_abbr?(with_prf: with_prf)
+      end
       let(:with_prf) { false }
 
       context "when abbr is nil" do

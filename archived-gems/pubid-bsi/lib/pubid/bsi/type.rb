@@ -1,6 +1,5 @@
 module Pubid::Bsi
   class Type < Pubid::Core::Type
-
     DEFAULT_TYPE = :bs
 
     TYPE_NAMES = {

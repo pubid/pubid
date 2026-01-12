@@ -5,7 +5,9 @@ RSpec.describe Pubid::Nist::Parsers::Hb do
 
   context "when report number with edition" do
     it "skips edition year" do
-      expect(subject.report_number.parse("44e2-1955")).to eq(first_report_number: "44", edition: "2")
+      expect(subject.report_number.parse("44e2-1955")).to eq(
+        first_report_number: "44", edition: "2",
+      )
     end
 
     it "parses 105-1-1990" do

@@ -90,8 +90,8 @@ module PubidNew
           [
             # The publisher is omitted because it is an IWA
             typed_stage.abbreviation,
-            number_portion(lang_single: lang_single)
-          ].compact.join(' ').tap do |s|
+            number_portion(lang_single: lang_single),
+          ].compact.join(" ").tap do |s|
             s << language_portion(lang_single: lang_single) if languages&.any?
           end
         end

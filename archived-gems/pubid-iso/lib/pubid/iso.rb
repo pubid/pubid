@@ -5,7 +5,8 @@ require "yaml"
 
 module Pubid
   module Iso
-    UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__), "../../update_codes.yaml"))
+    UPDATE_CODES = YAML.load_file(File.join(File.dirname(__FILE__),
+                                            "../../update_codes.yaml"))
   end
 end
 
@@ -33,7 +34,8 @@ require_relative "iso/identifier/addendum"
 require_relative "iso/identifier/data"
 
 config = Pubid::Core::Configuration.new
-config.stages = YAML.load_file(File.join(File.dirname(__FILE__), "../../stages.yaml"))
+config.stages = YAML.load_file(File.join(File.dirname(__FILE__),
+                                         "../../stages.yaml"))
 config.default_type = Pubid::Iso::Identifier::InternationalStandard
 config.type_class = Pubid::Core::Type
 config.types = [Pubid::Iso::Identifier::InternationalStandard,

@@ -32,7 +32,8 @@ module Pubid::Iso::Renderer
     # Render identifier
     # @param with_edition [Boolean] include edition in output
     # @see Pubid::Core::Renderer::Base for another options
-    def render(with_edition: true, with_language_code: :iso, with_date: true, **args)
+    def render(with_edition: true, with_language_code: :iso, with_date: true,
+**args)
       render_base_identifier(**args.merge({ with_date: with_date,
                                             with_language_code: with_language_code,
                                             with_edition: with_edition })) +
@@ -52,7 +53,12 @@ module Pubid::Iso::Renderer
     end
 
     def render_identifier(params, opts)
-      stage = params.key?(:stage) ? postrender_stage(params[:stage], opts, params) : ""
+      stage = if params.key?(:stage)
+                postrender_stage(params[:stage], opts,
+                                 params)
+              else
+                ""
+              end
       type = render_type_prefix(params, opts)
       "%<publisher>s#{stage}#{type} %<number>s%<part>s%<iteration>s%<year>s%" \
       "<amendments>s%<corrigendums>s%<addendum>s%<edition>s" % params
@@ -68,7 +74,8 @@ module Pubid::Iso::Renderer
       when Array
         ([publisher] + copublishers.map(&:to_s)).map do |pub|
           if opts[:language]
-            (TRANSLATION[opts[:language]][:publisher][pub] || pub).gsub('-', '/')
+            (TRANSLATION[opts[:language]][:publisher][pub] || pub).gsub("-",
+                                                                        "/")
           else
             pub
           end
@@ -93,7 +100,8 @@ module Pubid::Iso::Renderer
 
         # No copublisher and IS
         # ISO xxx
-        if omit_post_publisher_symbol?(params[:typed_stage], params[:stage], opts)
+        if omit_post_publisher_symbol?(params[:typed_stage], params[:stage],
+                                       opts)
           return publisher
         end
 
@@ -102,7 +110,8 @@ module Pubid::Iso::Renderer
         return "#{publisher}/"
       end
 
-      publisher_string = render_copublisher_string(publisher, params[:copublisher], opts)
+      publisher_string = render_copublisher_string(publisher,
+                                                   params[:copublisher], opts)
       publisher_string.sub!("/IEC", "/CEI") if opts[:language] == :french
 
       # With copublisher and IS
@@ -116,7 +125,7 @@ module Pubid::Iso::Renderer
       "#{publisher_string} "
     end
 
-    def render_typed_stage(typed_stage, opts, params)
+    def render_typed_stage(typed_stage, opts, _params)
       return nil if typed_stage.to_s.empty?
 
       if opts[:language]

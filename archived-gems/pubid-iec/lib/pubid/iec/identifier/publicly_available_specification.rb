@@ -1,7 +1,8 @@
 module Pubid::Iec
   module Identifier
     class PubliclyAvailableSpecification < Base
-      def_delegators 'Pubid::Iec::Identifier::PubliclyAvailableSpecification', :type
+      def_delegators "Pubid::Iec::Identifier::PubliclyAvailableSpecification",
+                     :type
 
       TYPED_STAGES = {
         cdpas: {
@@ -13,7 +14,7 @@ module Pubid::Iec
           abbr: "DPAS",
           name: "Draft Publicly Available Specification",
           harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
-        }
+        },
       }.freeze
 
       PROJECT_STAGES = {
@@ -21,7 +22,7 @@ module Pubid::Iec
           abbr: "PRVDPAS",
           name: "Preparation of RVDPAS",
           harmonized_stages: %w[50.60],
-        }
+        },
       }.freeze
 
       def self.type

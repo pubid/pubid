@@ -66,7 +66,10 @@ module Pubid::Jis
       end
 
       context "amendment" do
-        let(:params) { { type: :amd, base: described_class.create(number: number), number: 1, year: 1999 } }
+        let(:params) do
+          { type: :amd, base: described_class.create(number: number), number: 1,
+            year: 1999 }
+        end
 
         it "renders amendment to base identifier" do
           expect(subject.to_s).to eq("JIS #{number}/AMD 1:1999")
@@ -74,7 +77,10 @@ module Pubid::Jis
       end
 
       context "explanation" do
-        let(:params) { { type: :explanation, base: described_class.create(number: number), number: 1 } }
+        let(:params) do
+          { type: :explanation, base: described_class.create(number: number),
+            number: 1 }
+        end
 
         it "renders explanation to base identifier" do
           expect(subject.to_s).to eq("JIS #{number}/EXPL 1")

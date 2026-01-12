@@ -3,7 +3,8 @@ require_relative "../renderer/international_workshop_agreement"
 module Pubid::Iso
   module Identifier
     class InternationalWorkshopAgreement < Base
-      def_delegators 'Pubid::Iso::Identifier::InternationalWorkshopAgreement', :type
+      def_delegators "Pubid::Iso::Identifier::InternationalWorkshopAgreement",
+                     :type
 
       TYPED_STAGES = {
         diwa: {

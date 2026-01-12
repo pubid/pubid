@@ -13,7 +13,7 @@ module PubidNew
       class Code < Lutaml::Model::Serializable
         attribute :number, :string  # Main number (can contain dots, letters, etc.)
         attribute :minor, :string   # Optional minor part
-        attribute :parts, :string, collection: true  # Parts array
+        attribute :parts, :string, collection: true # Parts array
 
         def initialize(number:, minor: nil, parts: nil)
           @number = number

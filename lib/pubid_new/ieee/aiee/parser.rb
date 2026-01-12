@@ -21,17 +21,17 @@ module PubidNew
         # Year pattern (for AIEE period: 1884-1963)
         rule(:year) do
           (str("18") >> digit.repeat(2, 2)) | # 1884-1899
-          (str("19") >> (str("0") | str("1") | str("2") | str("3") | str("4") | str("5")) >> digit) | # 1900-1959
-          (str("196") >> match("[0-3]")) # 1960-1963
+            (str("19") >> (str("0") | str("1") | str("2") | str("3") | str("4") | str("5")) >> digit) | # 1900-1959
+            (str("196") >> match("[0-3]")) # 1960-1963
         end
 
         # Month patterns
         rule(:month_name) do
           str("January") | str("February") | str("March") | str("April") |
-          str("May") | str("June") | str("July") | str("August") |
-          str("September") | str("October") | str("November") | str("December") |
-          str("Jan") | str("Feb") | str("Mar") | str("Apr") | str("Jun") |
-          str("Jul") | str("Aug") | str("Sep") | str("Sept") | str("Oct") | str("Nov") | str("Dec")
+            str("May") | str("June") | str("July") | str("August") |
+            str("September") | str("October") | str("November") | str("December") |
+            str("Jan") | str("Feb") | str("Mar") | str("Apr") | str("Jun") |
+            str("Jul") | str("Aug") | str("Sep") | str("Sept") | str("Oct") | str("Nov") | str("Dec")
         end
 
         # AIEE prefix variations
@@ -77,15 +77,15 @@ module PubidNew
         # NEW: Also support "May-1928" (month dash year, no comma)
         rule(:date_long) do
           space? >>
-          (
-            # Format 1: ", Month Year" or ". Month Year"
-            ((str(",") | dot).as(:separator) >> space? >>
-             (month_name.as(:month) >> space).maybe >> year.as(:year)) |
-            # Format 2: " -Year" (space dash year)
-            ((space >> dash).as(:separator) >> space? >> year.as(:year)) |
-            # Format 3: "Month-Year" (NEW - month dash year, no comma/dot/space prefix)
-            (month_name.as(:month) >> dash >> year.as(:year))
-          )
+            (
+              # Format 1: ", Month Year" or ". Month Year"
+              ((str(",") | dot).as(:separator) >> space? >>
+               (month_name.as(:month) >> space).maybe >> year.as(:year)) |
+              # Format 2: " -Year" (space dash year)
+              ((space >> dash).as(:separator) >> space? >> year.as(:year)) |
+              # Format 3: "Month-Year" (NEW - month dash year, no comma/dot/space prefix)
+              (month_name.as(:month) >> dash >> year.as(:year))
+            )
         end
 
         # Short form: "-1962" (directly after number)
@@ -101,11 +101,11 @@ module PubidNew
         # Complete AIEE identifier
         rule(:aiee_identifier) do
           aiee_prefix >>
-          space >>
-          aiee_type >>
-          space >>
-          number >>
-          date
+            space >>
+            aiee_type >>
+            space >>
+            number >>
+            date
         end
 
         root(:aiee_identifier)

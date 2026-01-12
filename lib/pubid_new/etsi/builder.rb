@@ -40,12 +40,12 @@ module PubidNew
           if supp[:amendment]
             Identifiers::Amendment.new(
               base: current_base,
-              number: supp[:amendment][:number].to_i
+              number: supp[:amendment][:number].to_i,
             )
           elsif supp[:corrigendum]
             Identifiers::Corrigendum.new(
               base: current_base,
-              number: supp[:corrigendum][:number].to_i
+              number: supp[:corrigendum][:number].to_i,
             )
           else
             current_base # Skip unknown supplement types
@@ -63,7 +63,7 @@ module PubidNew
           type: data[:type].to_s,
           code: code,
           version: version,
-          date: date
+          date: date,
         )
       end
 
@@ -72,41 +72,43 @@ module PubidNew
 
         # Extract number string based on format
         number = if number_data.is_a?(Hash)
-          # Captured format
-          if number_data[:gsm_prefix]
-            # GSM with space: "GSM 11.14"
-            "GSM #{number_data[:main]}.#{number_data[:sub]}"
-          elsif number_data[:main] && number_data[:sub]
-            # Dotted format: "11.40"
-            "#{number_data[:main]}.#{number_data[:sub]}"
-          elsif number_data[:prefix1]
-            # Complex format: "ABC 123" or "ABC-DEF 123"
-            prefix = number_data[:prefix1].to_s
-            prefix += "-#{number_data[:prefix2]}" if number_data[:prefix2]
-            "#{prefix} #{number_data[:num]}"
-          else
-            # Simple with capture
-            number_data[:num].to_s
-          end
-        else
-          number_data.to_s
-        end
+                   # Captured format
+                   if number_data[:gsm_prefix]
+                     # GSM with space: "GSM 11.14"
+                     "GSM #{number_data[:main]}.#{number_data[:sub]}"
+                   elsif number_data[:main] && number_data[:sub]
+                     # Dotted format: "11.40"
+                     "#{number_data[:main]}.#{number_data[:sub]}"
+                   elsif number_data[:prefix1]
+                     # Complex format: "ABC 123" or "ABC-DEF 123"
+                     prefix = number_data[:prefix1].to_s
+                     prefix += "-#{number_data[:prefix2]}" if number_data[:prefix2]
+                     "#{prefix} #{number_data[:num]}"
+                   else
+                     # Simple with capture
+                     number_data[:num].to_s
+                   end
+                 else
+                   number_data.to_s
+                 end
 
         parts = extract_parts(data[:parts])
 
         Components::Code.new(
           number: number,
           minor: data[:minor]&.to_s,
-          parts: parts
+          parts: parts,
         )
       end
 
       def build_version(data)
         # Handle both version and edition
         if data[:version]
-          Components::Version.new(version: data[:version].to_s, is_edition: false)
+          Components::Version.new(version: data[:version].to_s,
+                                  is_edition: false)
         elsif data[:edition]
-          Components::Version.new(version: data[:edition].to_s, is_edition: true)
+          Components::Version.new(version: data[:edition].to_s,
+                                  is_edition: true)
         else
           Components::Version.new(version: "1.0.0", is_edition: false)
         end
@@ -115,7 +117,7 @@ module PubidNew
       def build_date(data)
         PubidNew::Components::Date.new(
           year: data[:year].to_s,
-          month: data[:month].to_s
+          month: data[:month].to_s,
         )
       end
 

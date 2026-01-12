@@ -6,7 +6,8 @@ require "fileutils"
 # Fixtures Extraction Script for spec/fixtures/{flavor}/{pass,fail}/{class}.txt
 # Note: This script expects PubID libraries to be already loaded
 class FixturesExtractor
-  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi].freeze
+  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau
+               ansi].freeze
 
   attr_reader :flavor, :verbose, :output_dir
 
@@ -18,7 +19,7 @@ class FixturesExtractor
       total: 0,
       passing: 0,
       failing: 0,
-      by_class: Hash.new { |h, k| h[k] = { pass: 0, fail: 0 } }
+      by_class: Hash.new { |h, k| h[k] = { pass: 0, fail: 0 } },
     }
     validate_flavor!
   end
@@ -56,7 +57,8 @@ class FixturesExtractor
 
   def validate_flavor!
     unless FLAVORS.include?(flavor)
-      raise ArgumentError, "Unknown flavor: #{flavor}. Valid: #{FLAVORS.join(', ')}"
+      raise ArgumentError,
+            "Unknown flavor: #{flavor}. Valid: #{FLAVORS.join(', ')}"
     end
   end
 
@@ -71,8 +73,8 @@ class FixturesExtractor
     log "Processing: #{File.basename(fixture_file)}"
 
     identifiers = File.readlines(fixture_file)
-                      .map(&:strip)
-                      .reject { |line| line.empty? || line.start_with?("#") }
+      .map(&:strip)
+      .reject { |line| line.empty? || line.start_with?("#") }
 
     identifiers.each do |id_str|
       @stats[:total] += 1
@@ -91,7 +93,7 @@ class FixturesExtractor
           @stats[:failing] += 1
           class_name = detect_class_name(parsed, id_str)
           @stats[:by_class][class_name][:fail] += 1
-          append_to_file("fail", class_name, "!#{id_str}!#{parsed.to_s}")
+          append_to_file("fail", class_name, "!#{id_str}!#{parsed}")
         end
       rescue StandardError => e
         # Parse error - failing fixture
@@ -99,7 +101,7 @@ class FixturesExtractor
         class_name = detect_class_from_string(id_str)
         @stats[:by_class][class_name][:fail] += 1
         append_to_file("fail", class_name, id_str,
-                      comment: "Parse error: #{e.class.name}")
+                       comment: "Parse error: #{e.class.name}")
       end
     end
   end
@@ -146,51 +148,55 @@ class FixturesExtractor
   end
 
   def detect_iso_class(id_str)
-    return "nsb_format" if id_str =~ /FprISO|PrISO/
-    return "cyrillic" if id_str =~ /[А-Яа-яЁё]/
-    return "guide" if id_str =~ /Guide/i
-    return "directives" if id_str =~ /DIR/
-    return "amendment" if id_str =~ /\/Amd|\/AMD|\/FDAM|\/PDAM|\/DAM/
-    return "corrigendum" if id_str =~ /\/Cor|\/COR|\/FDCOR|\/DCOR/
-    return "technical_report" if id_str =~ /\bTR\b/
-    return "technical_specification" if id_str =~ /\bTS\b/
-    return "pas" if id_str =~ /\bPAS\b/
-    return "iwa" if id_str =~ /\bIWA\b/
-    return "addendum" if id_str =~ /\/Add/
+    return "nsb_format" if /FprISO|PrISO/.match?(id_str)
+    return "cyrillic" if /[А-Яа-яЁё]/.match?(id_str)
+    return "guide" if /Guide/i.match?(id_str)
+    return "directives" if /DIR/.match?(id_str)
+    return "amendment" if /\/Amd|\/AMD|\/FDAM|\/PDAM|\/DAM/.match?(id_str)
+    return "corrigendum" if /\/Cor|\/COR|\/FDCOR|\/DCOR/.match?(id_str)
+    return "technical_report" if /\bTR\b/.match?(id_str)
+    return "technical_specification" if /\bTS\b/.match?(id_str)
+    return "pas" if /\bPAS\b/.match?(id_str)
+    return "iwa" if /\bIWA\b/.match?(id_str)
+    return "addendum" if /\/Add/.match?(id_str)
+
     "international_standard"
   end
 
   def detect_iec_class(id_str)
-    return "technical_report" if id_str =~ /\bTR\b/
-    return "technical_specification" if id_str =~ /\bTS\b/
-    return "guide" if id_str =~ /GUIDE/i
-    return "pas" if id_str =~ /\bPAS\b/
-    return "srd" if id_str =~ /\bSRD\b/
-    return "amendment" if id_str =~ /\/AMD/
-    return "corrigendum" if id_str =~ /\/COR/
-    return "interpretation_sheet" if id_str =~ /\/ISH/
-    return "vap" if id_str =~ /\bVAP\b/
-    return "consolidated" if id_str =~ /\+AMD|\+COR/
+    return "technical_report" if /\bTR\b/.match?(id_str)
+    return "technical_specification" if /\bTS\b/.match?(id_str)
+    return "guide" if /GUIDE/i.match?(id_str)
+    return "pas" if /\bPAS\b/.match?(id_str)
+    return "srd" if /\bSRD\b/.match?(id_str)
+    return "amendment" if /\/AMD/.match?(id_str)
+    return "corrigendum" if /\/COR/.match?(id_str)
+    return "interpretation_sheet" if /\/ISH/.match?(id_str)
+    return "vap" if /\bVAP\b/.match?(id_str)
+    return "consolidated" if /\+AMD|\+COR/.match?(id_str)
+
     "international_standard"
   end
 
   def detect_ieee_class(id_str)
-    return "unapproved" if id_str =~ /Unapproved/
-    return "draft" if id_str =~ /\/D\d/
-    return "adopted" if id_str =~ /\(Adoption\)/
+    return "unapproved" if /Unapproved/.match?(id_str)
+    return "draft" if /\/D\d/.match?(id_str)
+    return "adopted" if /\(Adoption\)/.match?(id_str)
     return "no_std_prefix" if id_str !~ /\bStd\b/ && id_str =~ /^IEEE/
-    return "historical" if id_str =~ /^AIEE|^IRE/
+    return "historical" if /^AIEE|^IRE/.match?(id_str)
+
     "standard"
   end
 
   def detect_nist_class(id_str)
-    return "fips" if id_str =~ /\bFIPS\b/
-    return "sp" if id_str =~ /\bSP\b/
-    return "ir" if id_str =~ /\bIR\b/
-    return "tn" if id_str =~ /\bTN\b/
-    return "hb" if id_str =~ /\bHB\b/
-    return "gcr" if id_str =~ /\bGCR\b/
-    return "bms" if id_str =~ /\bBMS\b/
+    return "fips" if /\bFIPS\b/.match?(id_str)
+    return "sp" if /\bSP\b/.match?(id_str)
+    return "ir" if /\bIR\b/.match?(id_str)
+    return "tn" if /\bTN\b/.match?(id_str)
+    return "hb" if /\bHB\b/.match?(id_str)
+    return "gcr" if /\bGCR\b/.match?(id_str)
+    return "bms" if /\bBMS\b/.match?(id_str)
+
     "unknown"
   end
 
@@ -200,7 +206,8 @@ class FixturesExtractor
     # Initialize file with header if it doesn't exist
     unless File.exist?(filename)
       File.open(filename, "w") do |f|
-        f.puts "# #{flavor.upcase} #{class_name.tr('_', ' ').capitalize} - #{status.capitalize}"
+        f.puts "# #{flavor.upcase} #{class_name.tr('_',
+                                                   ' ').capitalize} - #{status.capitalize}"
         f.puts "# Auto-generated by extract_fixtures.rb"
         f.puts
       end
@@ -226,13 +233,15 @@ class FixturesExtractor
       f.puts "OVERALL STATISTICS"
       f.puts "-" * 70
       f.puts "Total Identifiers: #{@stats[:total]}"
-      f.puts "Passing: #{@stats[:passing]} (#{percentage(@stats[:passing], @stats[:total])}%)"
-      f.puts "Failing: #{@stats[:failing]} (#{percentage(@stats[:failing], @stats[:total])}%)"
+      f.puts "Passing: #{@stats[:passing]} (#{percentage(@stats[:passing],
+                                                         @stats[:total])}%)"
+      f.puts "Failing: #{@stats[:failing]} (#{percentage(@stats[:failing],
+                                                         @stats[:total])}%)"
       f.puts
 
       f.puts "BY IDENTIFIER CLASS"
       f.puts "-" * 70
-      f.puts "#{"Class".ljust(30)} | #{"Pass".rjust(6)} | #{"Fail".rjust(6)} | #{"Total".rjust(6)} | Pass%"
+      f.puts "#{'Class'.ljust(30)} | #{'Pass'.rjust(6)} | #{'Fail'.rjust(6)} | #{'Total'.rjust(6)} | Pass%"
       f.puts "-" * 70
 
       @stats[:by_class].sort_by { |k, _| k }.each do |class_name, counts|
@@ -246,8 +255,12 @@ class FixturesExtractor
       f.puts "FILES GENERATED"
       f.puts "-" * 70
 
-      pass_files = Dir.glob(File.join(output_dir, "pass", "*.txt")).map { |f| File.basename(f) }.sort
-      fail_files = Dir.glob(File.join(output_dir, "fail", "*.txt")).map { |f| File.basename(f) }.sort
+      pass_files = Dir.glob(File.join(output_dir, "pass", "*.txt")).map do |f|
+        File.basename(f)
+      end.sort
+      fail_files = Dir.glob(File.join(output_dir, "fail", "*.txt")).map do |f|
+        File.basename(f)
+      end.sort
 
       f.puts "Pass directory: #{pass_files.size} files"
       pass_files.each { |file| f.puts "  - #{file}" }
@@ -287,8 +300,10 @@ class FixturesExtractor
     puts "EXTRACTION COMPLETE: #{flavor.upcase}"
     puts "=" * 70
     puts "Total: #{@stats[:total]} identifiers"
-    puts "Pass:  #{@stats[:passing]} (#{percentage(@stats[:passing], @stats[:total])}%)"
-    puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing], @stats[:total])}%)"
+    puts "Pass:  #{@stats[:passing]} (#{percentage(@stats[:passing],
+                                                   @stats[:total])}%)"
+    puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing],
+                                                   @stats[:total])}%)"
     puts
     puts "Classes: #{@stats[:by_class].size}"
     puts "Output:  #{output_dir}"
@@ -297,15 +312,16 @@ class FixturesExtractor
 
   def percentage(part, whole)
     return 0 if whole.zero?
+
     ((part.to_f / whole) * 100).round(2)
   end
 
   def underscore(camel_cased_word)
     camel_cased_word.to_s.gsub("::", "/")
-                    .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
-                    .gsub(/([a-z\d])([A-Z])/, '\1_\2')
-                    .tr("-", "_")
-                    .downcase
+      .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
+      .gsub(/([a-z\d])([A-Z])/, '\1_\2')
+      .tr("-", "_")
+      .downcase
   end
 
   def log(message)

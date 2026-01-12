@@ -74,5 +74,4 @@ RSpec.describe PubidNew::Idf::Identifiers::ReviewedMethod do
       expect(parsed.to_s).to eq(subject)
     end
   end
-
 end

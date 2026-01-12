@@ -13,13 +13,14 @@ module Pubid::Etsi
 
         @config.types.each do |identifier_type|
           if identifier_type.type_match?(parameters)
-            return identifier_type.new(**parameters.reject { |k, _| k == :type })
+            return identifier_type.new(**parameters.reject do |k, _|
+              k == :type
+            end)
           end
         end
 
         @config.default_type.new(**parameters)
       end
-
     end
   end
 end

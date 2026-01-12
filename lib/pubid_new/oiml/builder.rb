@@ -13,7 +13,7 @@ module PubidNew
         "G" => "Guide",
         "R" => "Recommendation",
         "S" => "SeminarReport",
-        "V" => "Vocabulary"
+        "V" => "Vocabulary",
       }.freeze
 
       def build(parsed_hash)
@@ -37,14 +37,20 @@ module PubidNew
         # Build base identifier from the code and type
         base_hash = {
           publisher: parsed_hash[:publisher],
-          type: parsed_hash[:type]
+          type: parsed_hash[:type],
         }
 
         # Copy number/part/subpart from base_code
         if parsed_hash[:base_code]
           base_hash[:number] = parsed_hash[:base_code][:number]
-          base_hash[:part] = parsed_hash[:base_code][:part] if parsed_hash[:base_code][:part]
-          base_hash[:subpart] = parsed_hash[:base_code][:subpart] if parsed_hash[:base_code][:subpart]
+          if parsed_hash[:base_code][:part]
+            base_hash[:part] =
+              parsed_hash[:base_code][:part]
+          end
+          if parsed_hash[:base_code][:subpart]
+            base_hash[:subpart] =
+              parsed_hash[:base_code][:subpart]
+          end
         end
 
         # Build the base document
@@ -56,10 +62,10 @@ module PubidNew
 
         # Extract year from edition_format if present, otherwise from year directly
         year_value = if parsed_hash[:edition_format].is_a?(Hash)
-          parsed_hash[:edition_format][:year]
-        else
-          parsed_hash[:year]
-        end
+                       parsed_hash[:edition_format][:year]
+                     else
+                       parsed_hash[:year]
+                     end
 
         amendment.year = year_value.to_s if year_value
         amendment.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
@@ -75,10 +81,10 @@ module PubidNew
       def build_supplement(parsed_hash)
         # Determine supplement type
         supplement_class = if parsed_hash[:annex_letter] || parsed_hash[:annex_marker]
-          Identifiers::Annex
-        else
-          Identifiers::Amendment
-        end
+                             Identifiers::Annex
+                           else
+                             Identifiers::Amendment
+                           end
 
         supplement = supplement_class.new
 
@@ -89,10 +95,10 @@ module PubidNew
 
         # Extract year from edition_format if present, otherwise from year directly
         year_value = if parsed_hash[:edition_format].is_a?(Hash)
-          parsed_hash[:edition_format][:year]
-        else
-          parsed_hash[:year]
-        end
+                       parsed_hash[:edition_format][:year]
+                     else
+                       parsed_hash[:year]
+                     end
 
         # Set supplement-specific attributes
         supplement.year = year_value.to_s if year_value
@@ -110,7 +116,7 @@ module PubidNew
       def build_base_document(parsed_hash)
         # Determine identifier class from type
         type = parsed_hash[:type].to_s
-        class_name = TYPE_CLASS_MAP[type] || "Recommendation"  # Default to R
+        class_name = TYPE_CLASS_MAP[type] || "Recommendation" # Default to R
         identifier_class = Identifiers.const_get(class_name)
 
         identifier = identifier_class.new
@@ -118,9 +124,15 @@ module PubidNew
         # Handle code (number-part-subpart) specially
         if parsed_hash[:number] || parsed_hash[:part] || parsed_hash[:subpart]
           code_attrs = {}
-          code_attrs[:number] = parsed_hash[:number].to_s if parsed_hash[:number]
+          if parsed_hash[:number]
+            code_attrs[:number] =
+              parsed_hash[:number].to_s
+          end
           code_attrs[:part] = parsed_hash[:part].to_s if parsed_hash[:part]
-          code_attrs[:subpart] = parsed_hash[:subpart].to_s if parsed_hash[:subpart]
+          if parsed_hash[:subpart]
+            code_attrs[:subpart] =
+              parsed_hash[:subpart].to_s
+          end
           identifier.code = Components::Code.new(**code_attrs)
         end
 
@@ -147,13 +159,13 @@ module PubidNew
 
         # Determine parsed format for round-trip fidelity
         # If edition_format was captured, it means "Edition" text was present
-        if parsed_hash[:edition_format]
-          identifier.parsed_format = "long"
-        elsif parsed_hash[:space_before_lang]
-          identifier.parsed_format = "short_with_space"
-        else
-          identifier.parsed_format = "short"
-        end
+        identifier.parsed_format = if parsed_hash[:edition_format]
+                                     "long"
+                                   elsif parsed_hash[:space_before_lang]
+                                     "short_with_space"
+                                   else
+                                     "short"
+                                   end
 
         # Handle stage attributes
         identifier.stage = parsed_hash[:stage].to_s if parsed_hash[:stage]

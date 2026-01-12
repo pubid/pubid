@@ -4,7 +4,7 @@ RSpec.describe Pubid::Iec::TrfParser do
   describe "#identifier" do
     subject { described_class.new.identifier }
 
-    let(:iecee_pattern) { "60086-1&2A:2017"}
+    let(:iecee_pattern) { "60086-1&2A:2017" }
     let(:iecex_pattern) { "60079-15v1:2002" }
 
     context "when IECEE TRF" do
@@ -48,7 +48,9 @@ RSpec.describe Pubid::Iec::TrfParser do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
           next if pub_id.match?("^#")
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp, trace: true)
+
+          expect(subject).to parse(pub_id.split("#").first.strip.chomp,
+                                   trace: true)
         end
       end
     end

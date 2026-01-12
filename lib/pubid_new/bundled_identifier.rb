@@ -14,7 +14,7 @@ module PubidNew
   class BundledIdentifier < Identifier
     attribute :base_document, Identifier, polymorphic: true
     attribute :supplements, Identifier, polymorphic: true, collection: true
-    attribute :type, :string, default: -> { 'bundled_identifier' }
+    attribute :type, :string, default: -> { "bundled_identifier" }
 
     # Delegate common attributes to base_document for easier access
     def publisher
@@ -45,18 +45,22 @@ module PubidNew
       base_document&.typed_stage
     end
 
-    def to_s(lang: :en, lang_single: false, with_edition: false, format: nil, stage_format_long: nil, with_date: nil)
-      result = base_document.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)
+    def to_s(lang: :en, lang_single: false, with_edition: false, format: nil,
+stage_format_long: nil, with_date: nil)
+      result = base_document.to_s(lang: lang, lang_single: lang_single,
+                                  with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)
 
       supplements.each do |supplement|
         # ISO DirectivesSupplement always uses " + " (space before)
         # CEN-style supplements (AC, A) without base_identifier use "+" (no space before)
         # Other ISO supplements with base_identifier use " + " (space before)
         if supplement.class.name&.include?("DirectivesSupplement") ||
-           (supplement.respond_to?(:base_identifier) && !supplement.base_identifier.nil?)
-          result += " + #{supplement.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
+            (supplement.respond_to?(:base_identifier) && !supplement.base_identifier.nil?)
+          result += " + #{supplement.to_s(lang: lang, lang_single: lang_single,
+                                          with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
         else
-          result += "+#{supplement.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
+          result += "+#{supplement.to_s(lang: lang, lang_single: lang_single,
+                                        with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
         end
       end
 

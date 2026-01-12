@@ -10,7 +10,7 @@ module PubidNew
       def self.parse(string)
         parser = Parser.new
         scheme = Scheme.new
-        
+
         parsed = parser.parse(string)
         Builder.build(parsed, scheme)
       rescue Parslet::ParseFailed => e

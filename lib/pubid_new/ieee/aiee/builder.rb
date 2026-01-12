@@ -34,11 +34,11 @@ module PubidNew
           attributes[:separator] = separator_str if separator_str
 
           # Set original format based on parsed data
-          if separator_str || month_str
-            attributes[:original_format] = "long"
-          else
-            attributes[:original_format] = "short"
-          end
+          attributes[:original_format] = if separator_str || month_str
+                                           "long"
+                                         else
+                                           "short"
+                                         end
 
           # Create identifier
           require_relative "identifier"

@@ -26,7 +26,7 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandardsMonthly do
         test_cases = [
           "NBS CSM v6n1",
           "NBS CSM v7n12",
-          "NBS CSM v9n9"
+          "NBS CSM v9n9",
         ]
 
         test_cases.each do |test_case|

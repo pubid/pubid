@@ -20,30 +20,31 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
 
   FIXTURE_FILES.each do |fixture_file|
     describe fixture_file do
-      let(:fixture_path) {
-        File.join(__dir__, "../../../archived-gems/pubid-iso/spec/fixtures/#{fixture_file}")
-      }
-      let(:fixture_ids) {
-        File.readlines(fixture_path).map(&:strip).reject { |line|
+      let(:fixture_path) do
+        File.join(__dir__,
+                  "../../../archived-gems/pubid-iso/spec/fixtures/#{fixture_file}")
+      end
+      let(:fixture_ids) do
+        File.readlines(fixture_path).map(&:strip).reject do |line|
           line.empty? || line.start_with?("#")
-        }
-      }
+        end
+      end
 
       it "parses and round-trips #{fixture_file} identifiers" do
         successes = 0
         failures = []
 
         fixture_ids.each do |id_str|
-          begin
-            parsed = PubidNew::Iso.parse(id_str)
-            if parsed.to_s == id_str
-              successes += 1
-            else
-              failures << { original: id_str, rendered: parsed.to_s, type: "mismatch" }
-            end
-          rescue StandardError => e
-            failures << { original: id_str, error: e.class.name, type: "parse_error" }
+          parsed = PubidNew::Iso.parse(id_str)
+          if parsed.to_s == id_str
+            successes += 1
+          else
+            failures << { original: id_str, rendered: parsed.to_s,
+                          type: "mismatch" }
           end
+        rescue StandardError => e
+          failures << { original: id_str, error: e.class.name,
+                        type: "parse_error" }
         end
 
         total = fixture_ids.count
@@ -78,10 +79,11 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
       total_identifiers = 0
 
       FIXTURE_FILES.each do |fixture_file|
-        fixture_path = File.join(__dir__, "../../../archived-gems/pubid-iso/spec/fixtures/#{fixture_file}")
-        fixture_ids = File.readlines(fixture_path).map(&:strip).reject { |line|
+        fixture_path = File.join(__dir__,
+                                 "../../../archived-gems/pubid-iso/spec/fixtures/#{fixture_file}")
+        fixture_ids = File.readlines(fixture_path).map(&:strip).reject do |line|
           line.empty? || line.start_with?("#")
-        }
+        end
 
         fixture_ids.each do |id_str|
           total_identifiers += 1
@@ -104,7 +106,8 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
       puts "Pass rate: #{overall_pass_rate}%"
       puts "=" * 60
 
-      expect(overall_pass_rate).to be >= 95.0, "Expected ≥95% overall but got #{overall_pass_rate}%"
+      expect(overall_pass_rate).to be >= 95.0,
+                                   "Expected ≥95% overall but got #{overall_pass_rate}%"
     end
   end
 end

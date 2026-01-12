@@ -1,7 +1,7 @@
 module Pubid::Bsi::Renderer
   class Collection < Pubid::Core::Renderer::Base
     def render_identifier(params)
-      "%{identifiers}%{year}%{supplement}" % params
+      "%<identifiers>s%<year>s%<supplement>s" % params
     end
 
     def render_supplement(supplement, _opts, _params)

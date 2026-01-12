@@ -14,7 +14,7 @@ module PubidNew
 
         def to_s
           if base_identifier
-            result = "#{base_identifier.to_s}/A#{amendment_number}"
+            result = "#{base_identifier}/A#{amendment_number}"
             result += ":#{amendment_year}" if amendment_year
             result
           else

@@ -5,7 +5,7 @@ module Pubid::Jis
     class Explanation < Base
       attribute :base, :string
 
-      def_delegators 'Pubid::Jis::Identifier::Explanation', :type
+      def_delegators "Pubid::Jis::Identifier::Explanation", :type
 
       def initialize(base: nil, number: nil, **opts)
         super(**opts.merge(number: number))

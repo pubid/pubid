@@ -13,11 +13,18 @@ module Pubid::Iec
         @harmonized_code = if harmonized_code.is_a?(Pubid::Core::HarmonizedStageCode)
                              harmonized_code
                            else
-                             Pubid::Core::HarmonizedStageCode.new(harmonized_code, config: config)
+                             Pubid::Core::HarmonizedStageCode.new(
+                               harmonized_code, config: config
+                             )
                            end
       end
 
-      raise Errors::ProjectStageInvalidError, "#{abbr} is not valid project stage" unless config.typed_project_stages.any? { |k, v| v[:abbr] == abbr }
+      unless config.typed_project_stages.any? do |_k, v|
+        v[:abbr] == abbr
+      end
+        raise Errors::ProjectStageInvalidError,
+              "#{abbr} is not valid project stage"
+      end
     end
 
     # Compares one stage with another

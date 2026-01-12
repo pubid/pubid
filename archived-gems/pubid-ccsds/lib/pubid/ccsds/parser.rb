@@ -1,6 +1,5 @@
 module Pubid::Ccsds
   class Parser < Pubid::Core::Parser
-
     rule(:book_color) do
       dash >> match["BGMYOR"].as(:book_color)
     end

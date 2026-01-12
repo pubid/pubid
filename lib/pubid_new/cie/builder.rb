@@ -188,11 +188,15 @@ module PubidNew
         elsif parsed_hash[:slash_year]
           # Slash-year format (legacy): /1998
           year_value = extract_value(parsed_hash[:slash_year])
-          date_sep = "slash"  # Special format for identical identifiers
+          date_sep = "slash" # Special format for identical identifiers
         end
 
         # Detect style from date separator
-        style = date_sep == "colon" ? "current" : (date_sep == "dash" ? "legacy" : detect_style_fallback(parsed_hash))
+        style = if date_sep == "colon"
+                  "current"
+                else
+                  (date_sep == "dash" ? "legacy" : detect_style_fallback(parsed_hash))
+                end
         attributes[:style] = style
 
         # Set year and separator if present
@@ -201,9 +205,16 @@ module PubidNew
 
         # Extract code
         if parsed_hash[:number]
-          code_attrs = { number: extract_value(parsed_hash[:number]), style: style }
-          code_attrs[:part] = extract_value(parsed_hash[:part]) if parsed_hash[:part]
-          code_attrs[:iteration] = extract_value(parsed_hash[:iteration]) if parsed_hash[:iteration]
+          code_attrs = { number: extract_value(parsed_hash[:number]),
+                         style: style }
+          if parsed_hash[:part]
+            code_attrs[:part] =
+              extract_value(parsed_hash[:part])
+          end
+          if parsed_hash[:iteration]
+            code_attrs[:iteration] =
+              extract_value(parsed_hash[:iteration])
+          end
 
           # Detect part separator from parser markers
           if parsed_hash[:slash_sep]
@@ -217,7 +228,8 @@ module PubidNew
 
         # Conference number (separate from regular code)
         if parsed_hash[:conf_number]
-          attributes[:conference_number] = extract_value(parsed_hash[:conf_number])
+          attributes[:conference_number] =
+            extract_value(parsed_hash[:conf_number])
         end
 
         # Extract language (direct lang_code for slash_colon format)
@@ -244,7 +256,7 @@ module PubidNew
           lang_code = extract_value(parsed_hash[:lang_code])
           # Check if colon was present in the pattern
           if parsed_hash[:lang_colon]
-            lang_format = "slash_colon"  # /E:YYYY format
+            lang_format = "slash_colon" # /E:YYYY format
           else
             # This shouldn't happen with preprocessing, but default to slash
             lang_format = "slash"
@@ -261,10 +273,16 @@ module PubidNew
         attributes[:s_prefix] = parsed_hash[:s_prefix] ? true : false
 
         # Extract stage
-        attributes[:stage] = extract_value(parsed_hash[:stage]) if parsed_hash[:stage]
+        if parsed_hash[:stage]
+          attributes[:stage] =
+            extract_value(parsed_hash[:stage])
+        end
 
         # Extract doc type
-        attributes[:doc_type] = extract_value(parsed_hash[:doc_type]) if parsed_hash[:doc_type]
+        if parsed_hash[:doc_type]
+          attributes[:doc_type] =
+            extract_value(parsed_hash[:doc_type])
+        end
 
         # Extract copublisher info
         if parsed_hash[:copublisher]
@@ -273,19 +291,28 @@ module PubidNew
 
         # Extract ISO reference (for identical identifiers)
         if parsed_hash[:iso_reference]
-          attributes[:iso_reference] = extract_value(parsed_hash[:iso_reference])
+          attributes[:iso_reference] =
+            extract_value(parsed_hash[:iso_reference])
         end
 
         # Extract IEC identifier (for dual published)
         if parsed_hash[:iec_identifier]
-          attributes[:iec_identifier] = extract_value(parsed_hash[:iec_identifier])
+          attributes[:iec_identifier] =
+            extract_value(parsed_hash[:iec_identifier])
         end
 
         # Extract supplement data
         if parsed_hash[:supplement_number]
-          attributes[:supplement_number] = extract_value(parsed_hash[:supplement_number])
-          attributes[:supplement_part] = extract_value(parsed_hash[:supplement_part]) if parsed_hash[:supplement_part]
-          attributes[:base_number] = extract_value(parsed_hash[:base_number]) if parsed_hash[:base_number]
+          attributes[:supplement_number] =
+            extract_value(parsed_hash[:supplement_number])
+          if parsed_hash[:supplement_part]
+            attributes[:supplement_part] =
+              extract_value(parsed_hash[:supplement_part])
+          end
+          if parsed_hash[:base_number]
+            attributes[:base_number] =
+              extract_value(parsed_hash[:base_number])
+          end
         end
 
         # Extract corrigendum data
@@ -294,18 +321,26 @@ module PubidNew
           attributes[:cor_year] = extract_value(parsed_hash[:cor_year])
           attributes[:base_number] = extract_value(parsed_hash[:base_number])
           attributes[:base_year] = extract_value(parsed_hash[:base_year])
-          attributes[:base_supplement] = extract_value(parsed_hash[:base_supplement]) if parsed_hash[:base_supplement]
-          attributes[:base_supplement_part] = extract_value(parsed_hash[:base_supplement_part]) if parsed_hash[:base_supplement_part]
+          if parsed_hash[:base_supplement]
+            attributes[:base_supplement] =
+              extract_value(parsed_hash[:base_supplement])
+          end
+          if parsed_hash[:base_supplement_part]
+            attributes[:base_supplement_part] =
+              extract_value(parsed_hash[:base_supplement_part])
+          end
         end
 
         # Extract amendment (on conference)
         if parsed_hash[:amd_number]
-          attributes[:amendment_number] = extract_value(parsed_hash[:amd_number])
+          attributes[:amendment_number] =
+            extract_value(parsed_hash[:amd_number])
         end
 
         # Extract bundle data
         if parsed_hash[:bundle_number]
-          attributes[:bundle_number] = extract_value(parsed_hash[:bundle_number])
+          attributes[:bundle_number] =
+            extract_value(parsed_hash[:bundle_number])
         end
 
         # Extract trailing language from legacy_code_with_year

@@ -1,7 +1,6 @@
 module Pubid::Iec
   module Identifier
     class TestReportForm < Base
-
       attribute :version, :string
       attribute :decision_sheet, :string
       attribute :conjuction_part, :string

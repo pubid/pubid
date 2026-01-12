@@ -22,6 +22,7 @@ RSpec.describe Pubid::Iso::Parser do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
           next if pub_id.match?("^#")
+
           expect(subject).to parse(pub_id.split("#").first.strip.chomp)
         end
       end

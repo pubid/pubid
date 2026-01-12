@@ -1,4 +1,4 @@
-require 'forwardable'
+require "forwardable"
 
 module Pubid::Core
   module DummyTestIdentifier
@@ -19,7 +19,7 @@ module Pubid::Core
 
   class DummyDefaultType < BaseTestIdentifier
     extend Forwardable
-    def_delegators 'Pubid::Core::DummyDefaultType', :type
+    def_delegators "Pubid::Core::DummyDefaultType", :type
 
     def self.type
       { key: :default, title: "Default Type" }
@@ -28,7 +28,7 @@ module Pubid::Core
 
   class DummyTechnicalReportType < BaseTestIdentifier
     extend Forwardable
-    def_delegators 'Pubid::Core::DummyTechnicalReportType', :type
+    def_delegators "Pubid::Core::DummyTechnicalReportType", :type
 
     TYPED_STAGES = {
       dtr: {
@@ -49,7 +49,7 @@ module Pubid::Core
 
   class DummyInternationalStandardType < BaseTestIdentifier
     extend Forwardable
-    def_delegators 'Pubid::Core::DummyInternationalStandardType', :type
+    def_delegators "Pubid::Core::DummyInternationalStandardType", :type
 
     TYPED_STAGES = {
       dp: {
@@ -76,7 +76,7 @@ module Pubid::Core
 
   class DummyAmendment < BaseTestIdentifier
     extend Forwardable
-    def_delegators 'Pubid::Core::DummyAmendment', :type
+    def_delegators "Pubid::Core::DummyAmendment", :type
 
     attr_accessor :base
 
@@ -90,4 +90,3 @@ module Pubid::Core
     end
   end
 end
-

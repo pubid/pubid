@@ -21,7 +21,6 @@ RSpec.describe PubidNew::Ieee::Identifiers::AdoptedStandard do
     end
 
     context "IEC edition with IEEE adoption" do
-
       # TODO: This is very weird but preserving behavior for now:
       # "Published in alignment with IEEE Std 1801™-2013" is not "Adopted" but
       # is "IEEE adopted by IEC"...
@@ -47,6 +46,5 @@ RSpec.describe PubidNew::Ieee::Identifiers::AdoptedStandard do
         expect(id.to_s).to eq("IEEE Std C37.111-2013 (IEC 60255-24:2013-04 ED2.0)")
       end
     end
-
   end
 end

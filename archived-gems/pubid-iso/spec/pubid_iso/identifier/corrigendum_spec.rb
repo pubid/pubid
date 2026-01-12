@@ -4,7 +4,10 @@ module Pubid::Iso
       context "when create corrigendum identifier" do
         let(:base) { Identifier.create(**{ number: number }.merge(params)) }
 
-        subject { described_class.new(type: :cor, number: 1, base: base, **corrigendum_params) }
+        subject do
+          described_class.new(type: :cor, number: 1, base: base,
+                              **corrigendum_params)
+        end
 
         let(:params) { { year: 1999 } }
         let(:number) { 123 }

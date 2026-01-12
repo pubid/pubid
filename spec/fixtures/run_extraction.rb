@@ -22,7 +22,7 @@ verbose = ARGV.include?("--verbose")
 if flavor_arg == "all"
   puts "Extracting fixtures for all flavors..."
   puts
-  
+
   success_count = 0
   FixturesExtractor::FLAVORS.each do |flavor|
     begin
@@ -34,7 +34,7 @@ if flavor_arg == "all"
     end
     puts
   end
-  
+
   puts "=" * 70
   puts "COMPLETE: #{success_count}/#{FixturesExtractor::FLAVORS.size} flavors extracted"
   puts "=" * 70

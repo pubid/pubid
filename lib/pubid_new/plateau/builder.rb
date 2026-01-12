@@ -29,7 +29,7 @@ module PubidNew
 
         # Build parameters common to all types
         params = {
-          number: parsed[:number].to_s.to_i
+          number: parsed[:number].to_s.to_i,
         }
 
         params[:annex] = parsed[:annex].to_s.to_i if parsed[:annex]
@@ -46,7 +46,7 @@ module PubidNew
 
         Identifiers::Annex.new(
           base_identifier: base,
-          letter: parsed[:annex_letter].to_s
+          letter: parsed[:annex_letter].to_s,
         )
       end
     end

@@ -18,4 +18,3 @@ module Pubid::Nist
     end
   end
 end
-

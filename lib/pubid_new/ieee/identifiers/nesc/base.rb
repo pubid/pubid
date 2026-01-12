@@ -24,8 +24,8 @@ module PubidNew
         #   nesc.variant     # => "Handbook"
         #   nesc.edition     # => "Premier Edition"
         class Base < Lutaml::Model::Serializable
-          attribute :code, PubidNew::Ieee::Components::Code        # "C2" code designation
-          attribute :year, PubidNew::Components::Date        # Publication year
+          attribute :code, PubidNew::Ieee::Components::Code # "C2" code designation
+          attribute :year, PubidNew::Components::Date # Publication year
           attribute :variant, :string              # Handbook, Redline, etc.
           attribute :edition, :string              # Edition notation
           attribute :draft, :boolean               # Draft flag
@@ -44,7 +44,7 @@ module PubidNew
           def to_s
             parts = []
             if code && year
-              parts << "#{code.to_s}-#{year.year}"
+              parts << "#{code}-#{year.year}"
             elsif year
               parts << year.year.to_s
             end
