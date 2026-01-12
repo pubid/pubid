@@ -69,8 +69,20 @@ module PubidNew
         space >> str("Index") >> space >> str("Issue") >> space >> digits.as(:issue_number) |
         # Colon format: ":Index"
         colon.as(:colon_sep) >> str("Index") |
-        # Space format: " Index"
+        # Space format: " Index" (year rule includes the colon)
         space >> str("Index")
+      end
+
+      # Supplementary Index suffix - handles one format:
+      # Space format: " Supplementary Index" (year rule includes the colon)
+      rule(:supplementary_index_suffix) do
+        space >> str("Supplementary Index")
+      end
+
+      # Explanatory Supplement suffix - handles one format:
+      # Colon format: ":Explanatory Supplement" (year rule includes the second colon)
+      rule(:explanatory_supplement_suffix) do
+        colon >> str("Explanatory Supplement")
       end
 
       # Method suffix - handles three formats:
@@ -489,6 +501,10 @@ module PubidNew
         committee_document |
         # Index identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
+        # Supplementary Index identifier - must be before regular identifier
+        (bs.as(:publisher) >> space >> number >> supplementary_index_suffix.as(:supplementary_index_suffix) >> year).as(:supplementary_index_identifier) |
+        # Explanatory Supplement identifier - must be before regular identifier
+        (bs.as(:publisher) >> space >> number >> parts >> explanatory_supplement_suffix.as(:explanatory_supplement_suffix) >> year).as(:explanatory_supplement_identifier) |
         # Method identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> parts >> method_suffix.as(:method_suffix) >> year).as(:method_identifier) |
         # Section identifier - must be before regular identifier

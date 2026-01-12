@@ -23,6 +23,8 @@ require_relative "identifiers/addendum_document"
 require_relative "identifiers/bundled_identifier"
 require_relative "identifiers/committee_document"
 require_relative "identifiers/technical_specification"
+require_relative "identifiers/supplementary_index"
+require_relative "identifiers/explanatory_supplement"
 require_relative "identifiers/standalone_amendment"
 require_relative "components/publisher"
 
@@ -56,6 +58,16 @@ module PubidNew
         # Check for Index identifier first
         if data[:index_identifier]
           return build_index(data[:index_identifier])
+        end
+
+        # Check for Supplementary Index identifier
+        if data[:supplementary_index_identifier]
+          return build_supplementary_index(data[:supplementary_index_identifier])
+        end
+
+        # Check for Explanatory Supplement identifier
+        if data[:explanatory_supplement_identifier]
+          return build_explanatory_supplement(data[:explanatory_supplement_identifier])
         end
 
         # Check for Method identifier
@@ -183,6 +195,47 @@ module PubidNew
         attrs[:date] = Components::Date.new(year: year_val) if year_val
 
         Identifiers::Index.new(attrs)
+      end
+
+      def build_supplementary_index(data)
+        # Extract values from the parsed data
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Build attributes hash
+        attrs = {
+          number: Components::Code.new(value: number_val),
+        }
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::SupplementaryIndex.new(attrs)
+      end
+
+      def build_explanatory_supplement(data)
+        # Extract values from the parsed data
+        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val ||= data[:number].to_s if data[:number]
+        year_val = data[:year].to_i if data[:year]
+
+        # Extract part from parts array (e.g., [{part: "1"}] -> "1")
+        part_val = nil
+        if data[:parts] && data[:parts].is_a?(Array) && !data[:parts].empty?
+          # Parts come as [{part: "1"}], so we need to extract the :part key
+          first_part = data[:parts][0]
+          if first_part.is_a?(Hash) && first_part[:part]
+            part_val = first_part[:part].to_s
+          end
+        end
+
+        # Build attributes hash
+        attrs = {
+          number: Components::Code.new(value: number_val),
+        }
+        attrs[:part] = Components::Code.new(value: part_val) if part_val
+        attrs[:date] = Components::Date.new(year: year_val) if year_val
+
+        Identifiers::ExplanatorySupplement.new(attrs)
       end
 
       def build_method(data)
