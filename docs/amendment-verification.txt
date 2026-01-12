@@ -1,0 +1,186 @@
+# BSI Amendment Class Verification Report
+# Task 6.1: Verify Existing Amendment Class
+# Date: 2026-01-12
+
+## Executive Summary
+
+The existing Amendment class is CORRECT for its intended purpose - handling
+amendment supplement identifiers with `/A{number}:{year}` format used within
+ConsolidatedIdentifier. However, there are additional amendment patterns in the
+fixtures that are NOT handled and will require the StandaloneAmendment class.
+
+## 1. Current Amendment Implementation
+
+### File: lib/pubid_new/bsi/identifiers/amendment.rb
+
+```ruby
+class Amendment < Base
+  attribute :base_identifier, Base, polymorphic: true
+  attribute :amendment_number, :string
+  attribute :amendment_year, :integer
+  attribute :separator, :string, default: -> { "+" }
+
+  def to_s
+    if base_identifier
+      "#{base_identifier.to_s}#{separator}A#{amendment_number}:#{amendment_year}"
+    else
+      "#{separator}A#{amendment_number}:#{amendment_year}"
+    end
+  end
+end
+```
+
+### Characteristics:
+- Has `base_identifier` reference (CORRECT - supplement wraps a base)
+- Uses `separator` attribute (can be "/" or "+")
+- Outputs format: `{base}+A{number}:{year}` or `{base}/A{number}:{year}`
+- Designed for use WITHIN ConsolidatedIdentifier
+
+## 2. Parser Implementation
+
+### File: lib/pubid_new/bsi/parser.rb (line 196-201)
+
+```ruby
+# Amendment (+A1:2008 or /A2:2019 or +A1:15 for short year)
+rule(:amendment) do
+  (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+  str("A") >> digits.as(:amd_number) >>
+  colon >> digit.repeat(2, 4).as(:amd_year)
+end
+```
+
+### Parser Handles:
+- `+A{number}:{year}` - ConsolidatedIdentifier format
+- `/A{number}:{year}` - Amendment format (slash separator)
+- Supports 2-4 digit years
+
+## 3. ConsolidatedIdentifier Relationship
+
+### File: lib/pubid_new/bsi/identifiers/consolidated_identifier.rb
+
+```ruby
+# Consolidated Identifier - contains base document plus supplements
+# Example: "BS 4592-0:2006+A1:2012" = [BS 4592-0:2006, Amendment 1:2012]
+class ConsolidatedIdentifier < Base
+  attribute :identifiers, Base, polymorphic: true, collection: true
+
+  def to_s(lang: :en, lang_single: false)
+    # Renders as: {base}+A{number}:{year}
+    ...
+  end
+end
+```
+
+### ConsolidatedIdentifier:
+- Uses `+` syntax to combine base + amendment(s)
+- Example: `BS 4592-0:2006+A1:2012`
+- Different from Amendment (which uses `/` syntax)
+- Amendment objects are used INTERNALLY by ConsolidatedIdentifier
+
+## 4. Amendment Fixtures Analysis
+
+### File: spec/fixtures/bsi/identifiers/full/amendment.txt
+
+```
+# Amendment
+AMD 11015                     # NOT HANDLED - Standalone amendment
+AMD 16019                     # NOT HANDLED - Standalone amendment
+AMD 6262                      # NOT HANDLED - Standalone amendment
+AMD 7602                      # NOT HANDLED - Standalone amendment
+BS 2011-2.1Z/AMD:1977         # NOT HANDLED - Uses /AMD: not /A:
+PD 5500 Amd 1 (09/15)         # NOT HANDLED - "Amd" text format
+BS 7671 Amendment 2:August 2013  # NOT HANDLED - "Amendment" word format
+BS SP 94 AMD2                 # NOT HANDLED - Space separator, no year
+BS 7671 AMD2                  # NOT HANDLED - Space separator, no year
+BS 7291-2 AMD1                # NOT HANDLED - Space separator, no year
+BS 7291-3 AMD1                # NOT HANDLED - Space separator, no year
+BS 851188-1 AMD1              # NOT HANDLED - Space separator, no year
+BS 1377-3 AMD1                # NOT HANDLED - Space separator, no year
+BS 3L 500 AMD1                # NOT HANDLED - Space separator, no year
+BS 6305:1992 AMD1             # NOT HANDLED - Space separator, no year
+```
+
+### Fixtures Status:
+- NO amendment.txt file in `pass/` folder - NONE of these patterns parse successfully
+- Some AMD patterns in `british_standard.txt` pass file are parsed as BritishStandard,
+  NOT as Amendment objects
+
+## 5. Pattern Classification
+
+### Three Distinct Amendment Patterns:
+
+1. **Amendment (Current Implementation - CORRECT)**
+   - Pattern: `BS 5839-6:2019/A1:2020` or `/A{number}:{year}`
+   - Purpose: Supplement identifier wrapping a base
+   - Syntax: `/A{number}:{year}` or `/AMD:{year}`
+   - Has base_identifier reference: YES
+   - Current Implementation: CORRECT
+
+2. **ConsolidatedIdentifier (Existing, No Changes Needed)**
+   - Pattern: `BS 1234:2020+A1:2021`
+   - Purpose: Bundle of separate identifiers as one publication
+   - Syntax: `+` combines base + amendment(s)
+   - Has base_identifier reference: YES (via identifiers array)
+   - Current Implementation: CORRECT
+
+3. **StandaloneAmendment (NEW CLASS NEEDED - Task 6.2)**
+   - Pattern: `AMD 11015` or `(AMD 10971)`
+   - Purpose: Amendment without base identifier reference
+   - Syntax: `AMD {number}` or `(AMD {number})`
+   - Has base_identifier reference: NO
+   - Current Implementation: NOT HANDLED - Needs Task 6.2
+
+### Additional Unhandled Patterns (Space-Separated):
+- `BS 7671 AMD2` - Space separator, no year
+- `BS 6305:1992 AMD1` - Space separator, no year
+- These may need special handling or may be edge cases
+
+## 6. Key Findings
+
+### Correct:
+1. Amendment class correctly has `base_identifier` attribute
+2. Amendment class correctly outputs `/A{number}:{year}` format
+3. Parser correctly handles `/` and `+` separators
+4. Clear separation from ConsolidatedIdentifier (different syntax)
+5. Amendment used internally by ConsolidatedIdentifier
+
+### Issues:
+1. NO patterns from amendment.txt parse successfully (no pass file)
+2. `/AMD:` pattern (not `/A:`) is NOT handled by parser
+3. `AMD {number}` standalone patterns NOT handled (needs Task 6.2)
+4. Space-separated patterns (`BS 7671 AMD2`) NOT handled
+5. "Amd" text format NOT handled
+6. "Amendment" word format NOT handled
+
+## 7. Recommendations
+
+### For Current Amendment Implementation:
+- **NO CHANGES NEEDED** - Current implementation is correct for intended patterns
+- Handles `/A{number}:{year}` format correctly
+- Works correctly with ConsolidatedIdentifier
+
+### For Task 6.2 (StandaloneAmendment):
+- Create new StandaloneAmendment class
+- Handle `AMD {number}` patterns
+- Handle `(AMD {number})` patterns
+- NO base_identifier reference
+
+### Future Considerations:
+- May need to handle `/AMD:` pattern (distinct from `/A:`)
+- May need to handle space-separated patterns (`BS 7671 AMD2`)
+- May need to handle "Amd" and "Amendment" text formats
+
+## 8. Conclusion
+
+The existing Amendment class is CORRECT for its intended purpose. It correctly:
+- Handles `/A{number}:{year}` patterns
+- Has base_identifier reference
+- Separates from ConsolidatedIdentifier
+
+The unhandled patterns in amendment.txt require:
+1. StandaloneAmendment class (Task 6.2) for `AMD {number}` patterns
+2. Additional parser rules for `/AMD:`, space-separated, and text formats
+
+---
+
+Status: READY FOR TASK 6.2 (StandaloneAmendment Implementation)
