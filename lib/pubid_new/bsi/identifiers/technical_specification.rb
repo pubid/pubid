@@ -36,15 +36,27 @@ module PubidNew
 
           # Number with part/subpart
           if number
-            number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+            number_str = if number.respond_to?(:value)
+                           number.value.to_s
+                         else
+                           number.to_s
+                         end
 
             # Part and subpart
             if part
-              part_val = part.respond_to?(:value) ? part.value : part
+              part_val = if part.respond_to?(:value)
+                           part.value
+                         else
+                           part
+                         end
               number_str += "-#{part_val}"
             end
             if subpart
-              subpart_val = subpart.respond_to?(:value) ? subpart.value : subpart
+              subpart_val = if subpart.respond_to?(:value)
+                              subpart.value
+                            else
+                              subpart
+                            end
               number_str += "-#{subpart_val}"
             end
 

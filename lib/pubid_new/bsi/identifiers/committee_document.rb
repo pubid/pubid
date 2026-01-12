@@ -34,8 +34,13 @@ module PubidNew
         def to_s(lang: :en, lang_single: false)
           # Committee documents use a unique format: YY/NNNNNNNN DC
           # The year is 2-digit (extracted from date or use current date format)
+          # Note: Assumes 2000s for years 00-99 (Y2K assumption)
           year_str = if date
-                       date.respond_to?(:year) ? date.year.to_s[-2, 2] : date.to_s[-2, 2]
+                       if date.respond_to?(:year)
+                         date.year.to_s[-2, 2]
+                       else
+                         date.to_s[-2, 2]
+                       end
                      else
                        "00"  # Default if no date
                      end

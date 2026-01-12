@@ -6,7 +6,10 @@ require_relative "base"
 module PubidNew
   module Bsi
     module Identifiers
-      # Set represents multiple standards published as a set with + separator
+      # Set represents multiple standards published as a set
+      # Format: {identifier} + {identifier} [+ {identifier} ...]
+      # Each identifier is separated by " + " (space, plus, space)
+      #
       # Examples:
       #   BS ISO 20400 + BS ISO 44001+BS ISO 44002
       #   BS ISO 9001+BS ISO 14001

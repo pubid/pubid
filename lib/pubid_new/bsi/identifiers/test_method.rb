@@ -40,7 +40,11 @@ module PubidNew
 
           # Number
           if number
-            number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+            number_str = if number.respond_to?(:value)
+                           number.value.to_s
+                         else
+                           number.to_s
+                         end
             parts << number_str
           end
 
