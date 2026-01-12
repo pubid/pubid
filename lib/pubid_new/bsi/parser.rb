@@ -114,6 +114,12 @@ module PubidNew
         )
       end
 
+      # Committee Document identifier
+      # Format: "YY/NNNNNNNN DC" (2-digit year, 8-digit number, DC suffix)
+      rule(:committee_document) do
+        (digit.repeat(2, 2).as(:year) >> slash >> match["0-9"].repeat(8).as(:document_number) >> space >> str("DC")).as(:committee_document)
+      end
+
       # Standalone Amendment identifier
       # Formats: "AMD 11015", "(AMD 10971)", "AMD Corrigendum 14716"
       rule(:standalone_amendment) do
@@ -477,6 +483,8 @@ module PubidNew
       rule(:identifier) do
         # Standalone Amendment - must be first as it starts with "AMD"
         standalone_amendment |
+        # Committee Document - must be before bare adopted as it starts with digits
+        committee_document |
         # Index identifier - must be before regular identifier
         (bs.as(:publisher) >> space >> number >> index_suffix.as(:index_suffix) >> year).as(:index_identifier) |
         # Method identifier - must be before regular identifier

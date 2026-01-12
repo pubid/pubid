@@ -21,6 +21,7 @@ require_relative "identifiers/aerospace_standard"
 require_relative "identifiers/supplement_document"
 require_relative "identifiers/addendum_document"
 require_relative "identifiers/bundled_identifier"
+require_relative "identifiers/committee_document"
 require_relative "identifiers/standalone_amendment"
 require_relative "components/publisher"
 
@@ -44,6 +45,11 @@ module PubidNew
         # Check for StandaloneAmendment first (very specific pattern)
         if data[:standalone_amendment] || data[:parenthesized_amd]
           return build_standalone_amendment(data)
+        end
+
+        # Check for CommitteeDocument
+        if data[:committee_document]
+          return build_committee_document(data[:committee_document])
         end
 
         # Check for Index identifier first
@@ -661,6 +667,24 @@ module PubidNew
         }
 
         Identifiers::StandaloneAmendment.new(attrs)
+      end
+
+      def build_committee_document(data)
+        # Extract values from the parsed data
+        # Format: "YY/NNNNNNNN DC"
+        year_val = data[:year].to_s if data[:year]
+        document_number = data[:document_number].to_s if data[:document_number]
+
+        # Convert 2-digit year to 4-digit year (assuming 2000s for 00-99)
+        # Could also use a more sophisticated algorithm for year conversion
+        full_year = year_val ? "20#{year_val}" : nil
+
+        attrs = {
+          document_number: document_number,
+        }
+        attrs[:date] = Components::Date.new(year: full_year.to_i) if full_year
+
+        Identifiers::CommitteeDocument.new(attrs)
       end
 
       def build_value_added_publication(data, supplements_data)
