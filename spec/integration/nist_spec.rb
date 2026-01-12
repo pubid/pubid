@@ -9,7 +9,7 @@ RSpec.describe "NIST v2 Implementation" do
   describe "comprehensive fixture tests" do
     context "all records" do
       let(:results) { FixtureLoader::TestResults.new }
-      let(:test_cases) { load_gem_fixture(:nist, "allrecords.txt") }
+      let(:test_cases) { load_fixture(:nist, "identifiers/full/allrecords.txt") }
 
       it "parses and renders all records correctly" do
         test_cases.each do |test_case|
@@ -49,7 +49,7 @@ RSpec.describe "NIST v2 Implementation" do
 
     context "publication exports" do
       let(:results) { FixtureLoader::TestResults.new }
-      let(:test_cases) { load_gem_fixture(:nist, "pubs-export.txt") }
+      let(:test_cases) { load_fixture(:nist, "identifiers/full/pubs-export.txt") }
 
       it "parses and renders all publication exports correctly" do
         test_cases.each do |test_case|
@@ -88,7 +88,7 @@ RSpec.describe "NIST v2 Implementation" do
 
     context "September 2024 updates" do
       let(:results) { FixtureLoader::TestResults.new }
-      let(:test_cases) { load_gem_fixture(:nist, "sept2024-update.txt") }
+      let(:test_cases) { load_fixture(:nist, "identifiers/full/sept2024-update.txt") }
 
       it "parses and renders all September 2024 updates correctly" do
         test_cases.each do |test_case|
