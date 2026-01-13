@@ -182,7 +182,8 @@ module PubidNew
         # Examples: "330-2019" → "330e2019", "304a-2017" → "304Ae2017"
         # Must NOT match existing edition patterns like "11e2-1915" (e2 is edition, -1915 is separate)
         # Must be at end or before space to avoid breaking number-number patterns like "800-53"
-        cleaned = cleaned.gsub(/(\d(?:[A-DF-Z]?))-(\d{4})(?=\s|$)/, '\1e\2')
+        # Negative lookbehind (?<![eE]) prevents matching digits after e/E (avoids e2-1915)
+        cleaned = cleaned.gsub(/(?<![eE])(\d(?:[A-DF-Z]?))-(\d{4})(?=\s|$)/, '\1e\2')
 
         # ENHANCEMENT 2: Version normalization (v1.1 → ver1.1, Ver. 2.0 → ver2.0)
         # Normalize short v format to verbose ver format per NIST spec
@@ -412,6 +413,8 @@ module PubidNew
           (digits >> dash >> (str("III") | str("II") | str("IV") | str("I") | str("V") | str("VI") | str("VII") | str("VIII") | str("IX") | str("X")) >> dash >> digits >> (dot >> digits).maybe) |
           # GB series pattern: 1190GB-1, 1190GB-4A
           (digits >> str("GB") >> dash >> digits >> upper_letter.maybe) |
+          # CS series pattern with letter in middle: 102E-42, 123A-50
+          (digits >> upper_letter >> dash >> digits) |
           # Volume-number format for CSM series: v6n1, v7n12
           # CHANGED: Capture volume and issue_number separately for proper semantics
           (str("v") >> digits.as(:volume_number) >> str("n") >> digits.as(:issue_number)) |

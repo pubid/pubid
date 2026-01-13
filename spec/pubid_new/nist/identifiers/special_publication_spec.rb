@@ -260,11 +260,12 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "normalizes to ver notation" do
-          expect(parsed.to_s).to eq("NIST SP 500-268ver1.1")
+          expect(parsed.to_s).to eq("NIST SP 500-268 ver1.1")
         end
 
-        it "parses version" do
-          expect(parsed.version).to eq("1.1")
+        it "parses version_component" do
+          expect(parsed.version_component).to be_a(PubidNew::Nist::Components::Version)
+          expect(parsed.version_component.value).to eq("1.1")
         end
       end
 
@@ -277,11 +278,12 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "normalizes to ver2.0" do
-          expect(parsed.to_s).to eq("NIST SP 800-60ver2.0")
+          expect(parsed.to_s).to eq("NIST SP 800-60 ver2.0")
         end
 
-        it "parses version" do
-          expect(parsed.version).to eq("2.0")
+        it "parses version_component" do
+          expect(parsed.version_component).to be_a(PubidNew::Nist::Components::Version)
+          expect(parsed.version_component.value).to eq("2.0")
         end
       end
     end

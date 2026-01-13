@@ -28,6 +28,9 @@ module PubidNew
           # Number (already extracted from e104 → 104 in builder)
           result += " #{number.value}" if number
 
+          # Edition (e1943 for e104-43 pattern)
+          result += "#{edition}" if edition
+
           result
         end
       end

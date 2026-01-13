@@ -104,7 +104,19 @@ module PubidNew
             # V#n# pattern handled as Part in first_number cast
           elsif second_num
             # Check for special patterns first
-            if first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
+            # CS Emergency pattern: e104-43 → number=104, edition_year=1943
+            # Logic: e104-43 means "emergency 104 from 1943" (43 = 1943)
+            if first_num.value.to_s.match?(/^e(\d{3})$/) &&
+                second_num.value.to_s.match?(/^\d{2}$/)
+              match_data = first_num.value.to_s.match(/^e(\d{3})$/)
+              number_part = match_data[1]  # 104
+              year_suffix = second_num.value.to_s  # 43
+              # Edition year: 19 + 43 = 1943 (1900s + year suffix)
+              edition_year = "19#{year_suffix}"
+
+              identifier.number = Components::Code.new(number: number_part)
+              identifier.edition = Components::Edition.new(type: "e", id: edition_year)
+            elsif first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
                 second_num.value.to_s.match?(/^\d{2,4}$/)
               # Pattern: "11e2-1915" OR "123e2-50" parsed as first="11e2"|"123e2", second="1915"|"50"
               # Extract number and edition from first_num
@@ -372,11 +384,18 @@ module PubidNew
             # NEW: CS Emergency pattern "e104" or "e104-43" → extract number
             # This must come BEFORE bare edition check to avoid conflict
             # CS emergency always has 3+ digit number (e104, not e2)
-            elsif /^e(\d{3,})(-\d+)?$/.match?(str_value)
-              # Extract emergency number: e104 → 104, e104-43 → 104-43
+            # NOTE: If second_number exists (e104-43 pattern), defer to compound number logic
+            elsif /^e(\d{3,})$/.match?(str_value) && !parsed_hash[:second_number]
+              # Extract emergency number: e104 → 104 (only when no second_number)
               emergency_num = str_value.sub(/^e/, "")
               return {
                 first_number: Components::Code.new(number: emergency_num),
+              }
+            # If e104-43 pattern (with second_number), keep e prefix for compound number logic
+            elsif /^e(\d{3,})$/.match?(str_value) && parsed_hash[:second_number]
+              # Keep e104 as-is, let compound number logic handle it
+              return {
+                first_number: Components::Code.new(number: str_value),
               }
             # NEW: Bare edition pattern like "100e1" (CS series without year)
             # ONLY when NO second_number present (to avoid conflict with "123e2-50")
