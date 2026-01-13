@@ -89,6 +89,12 @@ module PubidNew
             result += " #{num_value}"
           end
 
+          # Add part component (pt3-1)
+          result += part.to_s if part
+
+          # Add supplement
+          result += supplement if supplement
+
           result += range_notation if range_notation
           result
         end

@@ -461,7 +461,9 @@ module PubidNew
             # Letter followed by dash and digits (e.g., "m-5")
             (lower_letter >> dash >> digits) |
             # Number with pt suffix (e.g., "57pt1")
-            (digits >> str("pt") >> digits) |
+            # EXCLUDE pt#-# patterns (e.g., "pt3-1") which are part components for CRPL
+            # Use negative lookahead to prevent matching when followed by dash
+            (digits >> str("pt") >> digits >> dash.absent?) |
             # Number with uppercase letter suffix (e.g., "56A", "123B") - for patterns like "56Ar2"
             (digits >> upper_letter) |
             # Special patterns like "NCNR", "PERMIS", "BFRL"
