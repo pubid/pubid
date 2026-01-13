@@ -22,10 +22,73 @@ module PubidNew
           "CRPL"
         end
 
+        # Return normalized number value for tests
+        # - c4-4 → 4-4 (remove 'c' prefix)
+        # - 4-m-5 → 4-M-5 (uppercase 'm')
+        def normalized_number
+          return nil unless number
+
+          num_value = number.value.to_s
+
+          # Pattern: c4-4 → 4-4 (hide 'c' prefix)
+          if num_value =~ /^c(\d+.*)$/
+            num_value = $1
+          # Pattern: 4-m-5 → 4-M-5 (uppercase 'm')
+          elsif num_value =~ /-m-/
+            num_value = num_value.gsub(/-m-/, '-M-')
+          # Pattern: m-5 → M-5 (uppercase 'm' at start)
+          elsif num_value =~ /^m-/
+            num_value = num_value.gsub(/^m-/, 'M-')
+          end
+
+          num_value
+        end
+
+        # Override number to return normalized value
+        # Tests expect number.value to be normalized (c4-4 → 4-4, 4-m-5 → 4-M-5)
+        def number
+          num = super()
+          return num unless num
+
+          num_value = num.value.to_s
+
+          # Pattern: c4-4 → 4-4 (hide 'c' prefix)
+          if num_value =~ /^c(\d+.*)$/
+            num_value = $1
+          # Pattern: 4-m-5 → 4-M-5 (uppercase 'm')
+          elsif num_value =~ /-m-/
+            num_value = num_value.gsub(/-m-/, '-M-')
+          # Pattern: m-5 → M-5 (uppercase 'm' at start)
+          elsif num_value =~ /^m-/
+            num_value = num_value.gsub(/^m-/, 'M-')
+          end
+
+          # Return new Code object with normalized value
+          Components::Code.new(number: num_value)
+        end
+
         def to_s
           result = "#{default_publisher} #{series_code}"
-          result += " #{prefix}" if prefix
-          result += " #{number}" if number
+
+          if number
+            # Normalize number value for CRPL patterns
+            num_value = number.value.to_s
+
+            # Pattern: c4-4 → 4-4 (hide 'c' prefix)
+            if num_value =~ /^c(\d+.*)$/
+              num_value = $1
+            # Pattern: 4-m-5 → 4-M-5 (uppercase 'm')
+            elsif num_value =~ /-m-/
+              num_value = num_value.gsub(/-m-/, '-M-')
+            # Pattern: m-5 → M-5 (uppercase 'm' at start)
+            elsif num_value =~ /^m-/
+              num_value = num_value.gsub(/^m-/, 'M-')
+            end
+
+            result += " #{prefix}" if prefix
+            result += " #{num_value}"
+          end
+
           result += range_notation if range_notation
           result
         end
