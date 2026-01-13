@@ -17,6 +17,13 @@ RSpec.describe PubidNew::Nist::Components::Update do
       expect(update.year).to eq("2015")
       expect(update.month).to be_nil
     end
+
+    it "creates update with number only" do
+      update = described_class.new(number: "1")
+      expect(update.number).to eq("1")
+      expect(update.year).to be_nil
+      expect(update.month).to be_nil
+    end
   end
 
   describe "#to_s" do
@@ -45,22 +52,32 @@ RSpec.describe PubidNew::Nist::Components::Update do
         update = described_class.new(number: "2", year: "2020", month: "6")
         expect(update.to_s(:short)).to eq("/Upd2-202006")
       end
+
+      it "renders update with number only (no year)" do
+        update = described_class.new(number: "1")
+        expect(update.to_s(:short)).to eq("/Upd1")
+      end
     end
 
     context "mr (machine-readable) format" do
       it "renders update with year and month" do
         update = described_class.new(number: "1", year: "2021", month: "2")
-        expect(update.to_s(:mr)).to eq(".u1-202102")
+        expect(update.to_s(:mr)).to eq("-upd1-202102")
       end
 
       it "renders update with year only" do
         update = described_class.new(number: "3", year: "2015")
-        expect(update.to_s(:mr)).to eq(".u3-2015")
+        expect(update.to_s(:mr)).to eq("-upd3-2015")
       end
 
       it "renders update number 2 with year and month" do
         update = described_class.new(number: "2", year: "2020", month: "6")
-        expect(update.to_s(:mr)).to eq(".u2-202006")
+        expect(update.to_s(:mr)).to eq("-upd2-202006")
+      end
+
+      it "renders update with number only (no year)" do
+        update = described_class.new(number: "1")
+        expect(update.to_s(:mr)).to eq("-upd1")
       end
     end
 
@@ -83,6 +100,11 @@ RSpec.describe PubidNew::Nist::Components::Update do
       it "renders update with December" do
         update = described_class.new(number: "1", year: "2021", month: "12")
         expect(update.to_s(:long)).to eq("Update 1-2021 December")
+      end
+
+      it "renders update with number only (no year)" do
+        update = described_class.new(number: "1")
+        expect(update.to_s(:long)).to eq("Update 1")
       end
     end
 

@@ -87,8 +87,12 @@ module PubidNew
 
         # Generate identifier string in specified format
         # @param format [:full, :long, :abbreviated, :short, :mr] output format
-        def to_s(format = :short)
-          case format
+        def to_s(format = nil)
+          # Use parsed_format if available and no explicit format specified
+          # Convert string to symbol if necessary
+          effective_format = format || parsed_format || :short
+          effective_format = effective_format.to_sym if effective_format.is_a?(String)
+          case effective_format
           when :full, :long
             to_full_style
           when :abbreviated, :abbrev

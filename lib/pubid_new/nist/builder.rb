@@ -636,7 +636,7 @@ module PubidNew
         when :update
           # Update component with number, year, and optional month
           if value.is_a?(Hash)
-            number = value[:update_number]&.to_s || "1" # Keep as string
+            number = value[:update_number]&.to_s # Don't default to "1"
             year = value[:update_year]&.to_s     # String not integer
             month = value[:update_month]&.to_s   # String not integer
 
@@ -650,8 +650,8 @@ module PubidNew
           elsif value.to_s.strip.empty?
             # Empty update string means "-upd" with no details
             # Create Update with default number="1", year="2021", month="02"
-            update_obj = Components::Update.new(number: "1", year: "2021",
-                                                month: "02")
+            update_obj = Components::Update.new(number: nil, year: nil,
+                                                month: nil)
             {
               update: update_obj,
               update_component: update_obj,

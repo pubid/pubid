@@ -233,7 +233,14 @@ module PubidNew
         result = new.parse(cleaned)
 
         # Add format to result
-        result.is_a?(Hash) ? result.merge(parsed_format: format) : result
+        if result.is_a?(Hash)
+          result.merge(parsed_format: format)
+        elsif result.is_a?(Array)
+          # For array results, add format to the first hash
+          result.first.merge(parsed_format: format) if result.first.is_a?(Hash)
+        else
+          result
+        end
       end
 
       # Detect format from input string
@@ -595,7 +602,7 @@ module PubidNew
       # Examples: /Upd1-2015, /Upd3-202102, -upd, /upd (after preprocessing)
       # Update number is optional (e.g., "500-300-upd" has no number)
       rule(:update) do
-        (str("/Upd") | space >> (str("/upd") | str("-upd"))) >>
+        (str("/Upd") | (space.maybe >> (str("/upd") | str("-upd")))) >>
           (
             digits.as(:update_number).maybe >>
             (dash >>
@@ -747,7 +754,7 @@ module PubidNew
           (dot >> (digits | upper_letter)).repeat(0, 3) >> # Support additional dot-separated parts
           # Support letter suffix before update (e.g., 8286C-upd1) - Session 219
           upper_letter.maybe >>
-          (dash >> str("upd") >> digits.maybe).maybe >>
+          update.maybe >>
           parts.repeat >> draft.maybe
       end
 

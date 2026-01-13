@@ -22,6 +22,9 @@ module PubidNew
         # @param format [:short, :mr, :long] The output format
         # @return [String] The formatted update representation
         def to_s(format = :short)
+          # For MR format, render -upd even without number
+          return "-upd" if format == :mr && number.nil? && year.nil?
+          # For other formats, return empty string if no number
           return "" if number.nil?
 
           case format
@@ -38,26 +41,38 @@ module PubidNew
 
         private
 
-        # Build short format: "/Upd1-202102" or "/Upd3-2015"
+        # Build short format: "/Upd1-202102" or "/Upd3-2015" or "/Upd1" (no year)
         def build_short_format
-          year_month = build_year_month_string
-          "/Upd#{number}-#{year_month}"
+          if year
+            year_month = build_year_month_string
+            "/Upd#{number}-#{year_month}"
+          else
+            "/Upd#{number}"
+          end
         end
 
-        # Build machine-readable format: ".u1-202102"
+        # Build machine-readable format: "-upd1-202102" or "-upd3-2015" or "-upd1" (no year)
         def build_mr_format
-          year_month = build_year_month_string
-          ".u#{number}-#{year_month}"
+          if year
+            year_month = build_year_month_string
+            "-upd#{number}-#{year_month}"
+          else
+            "-upd#{number}"
+          end
         end
 
         # Build long format: "Update 1-2021 February" or "Update 3-2015"
         def build_long_format
+          return "Update #{number}" unless year
+
           month_str = month ? " #{Date::MONTHNAMES[month.to_i]}" : ""
           "Update #{number}-#{year}#{month_str}"
         end
 
         # Build year-month string: "202102" or "2015"
         def build_year_month_string
+          return "" unless year
+
           if month
             "#{year}#{month.to_s.rjust(2, '0')}"
           else
