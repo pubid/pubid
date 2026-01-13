@@ -870,6 +870,18 @@ module PubidNew
                                                        id: edition_id),
           }
 
+        when :edition_rev
+          # Revision with "rev" prefix (verbose): rev2013, rev 2013
+          return nil unless value.is_a?(Hash) && value[:edition_id]
+
+          edition_id = value[:edition_id].to_s
+
+          {
+            edition: Components::Edition.new(type: "r", id: edition_id),
+            edition_component: Components::Edition.new(type: "r",
+                                                       id: edition_id),
+          }
+
         when :edition_historical
           # Historical with "-" prefix: -3, -4
           return nil unless value.is_a?(Hash) && value[:edition_id]
@@ -883,7 +895,7 @@ module PubidNew
           }
 
         when :edition_id
-          # Captured by edition_e, edition_r, edition_historical
+          # Captured by edition_e, edition_r, edition_rev, edition_historical
           nil
 
         # ========== LEGACY EDITION (for migration) ==========

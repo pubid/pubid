@@ -220,6 +220,11 @@ module PubidNew
         # Fix verbose "Revision" format: " Revision (r)" → " r"
         cleaned = cleaned.gsub(/\s+Revision\s+\(r\)/, " r")
 
+        # Fix verbose "rev YYYY" format: "126 rev 2013" → "126r2013"
+        # Removes space between number and "rev", and converts to "r" prefix
+        # Handles patterns like "NIST SP 260-126 rev 2013" → "NIST SP 260-126r2013"
+        cleaned = cleaned.gsub(/(\d+)\s+rev\s+(\d{4})/, "\\1r\\2")
+
         # REMOVED: Incorrect dot preprocessing that treated dots as number separators
         # This was semantically wrong - dots are PART separators in NIST!
         # DELETE: cleaned = cleaned.gsub(/(\d{3,})\.(\d{1,4})(?=\s|$)/, '\1_\2')
@@ -458,17 +463,15 @@ module PubidNew
             str("NCNR") | str("PERMIS") | str("BFRL") |
             # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
             upper_letter.repeat(1, 3) |
-            # Lowercase letter suffix (e.g., "a", "b") - Session 219
-            lower_letter.repeat(1, 2) |
             # Regular number with optional suffix - but NOT if part of FIPS date (digit-dash-month-digit-slash)
             (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?)
           ).as(:second_number)
       end
 
       # Edition component per NIST spec: <edition-type><edition-id>
-      # Type: "e" (edition), "r" (revision), "-" (historical)
+      # Type: "e" (edition), "r" (revision), "rev" (revision verbose), "-" (historical)
       # ID: number (1-9) or year (yyyy)
-      # Examples: e2, e2021, r5, -3
+      # Examples: e2, e2021, r5, rev2013, rev 2013, -3
       # Enhanced: Support space-separated format from preprocessing (r1 separated from number)
       rule(:edition) do
         (
@@ -476,6 +479,8 @@ module PubidNew
           (space.maybe >> str("e") >> digits.as(:edition_id)).as(:edition_e) |
           # Revision with "r" prefix: r1, r5, r2021
           (space.maybe >> str("r") >> digits.as(:edition_id)).as(:edition_r) |
+          # Revision with "rev" prefix (verbose): rev2013, rev 2013
+          (space.maybe >> str("rev") >> space.maybe >> digits.as(:edition_id)).as(:edition_rev) |
           # Historical with "-" prefix: -2, -3 (ONLY if followed by non-digit or end)
           # This avoids consuming date patterns like "-1908"
           # Historical precedent uses small numbers (1-9), dates use 4-digit years
@@ -509,8 +514,8 @@ module PubidNew
           # Complex revision patterns: r1a, r2b
           ((str("r") | str(" R")) >> match("[0-9]").repeat(1,
                                                            2).as(:edition) >> lower_letter.as(:edition_letter)) |
-          # Edition with revision and year: rev2013, rev2020
-          (str("rev") >> digits.as(:edition_year)) |
+          # Edition with revision and year: rev2013, rev2020, rev 2013 (with space)
+          (str("rev") >> space.maybe >> digits.as(:edition_year)) |
           # Edition with revision and date: e2revJune1908 (will migrate to e2 + date)
           ((str("e") | str(" E")) >> match("[0-9]").repeat(1, 3).as(:edition) >>
            str("rev") >> match("[A-Za-z]").repeat(3,
