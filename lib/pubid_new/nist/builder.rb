@@ -53,6 +53,7 @@ module PubidNew
         # Track first_number and second_number for building compound number
         first_num = nil
         second_num = nil
+        part_num = nil
         extracted_revision = nil
 
         # Cast and assign all attributes
@@ -65,6 +66,8 @@ module PubidNew
             first_num = realized_components
           elsif key == :second_number && realized_components.is_a?(Components::Code)
             second_num = realized_components
+          elsif key == :part_number
+            part_num = value.to_s
           end
 
           # Handle composite hash returns (multiple related values)
@@ -137,6 +140,8 @@ module PubidNew
             else
               # Normal compound number
               compound_value = "#{first_num.value}-#{second_num.value}"
+              # Include part number if present (GCR pattern: 85-3273-37)
+              compound_value += "-#{part_num}" if part_num
               identifier.number = Components::Code.new(number: compound_value)
             end
           else
@@ -263,6 +268,13 @@ module PubidNew
           return nil if value.nil? || value.to_s.strip.empty?
 
           { part: Components::Part.new(type: "n", value: value.to_s) }
+
+        when :part_number
+          # Part number from GCR pattern (e.g., 85-3273-37)
+          # Return raw value for inclusion in compound number
+          return nil if value.nil? || value.to_s.strip.empty?
+
+          value  # Return raw value to be tracked in builder
 
         when :first_number, :second_number
           return nil if value.nil? || value.to_s.strip.empty?
@@ -577,13 +589,22 @@ module PubidNew
             }
           # Pattern: bare UPPERCASE letter suffix (e.g., "800-56A" → number + Part("", "A"))
           # Only matches uppercase letters - won't match revision markers
+          # IMPORTANT: For MR format preservation, keep letter suffix as part of number
           elsif str_value =~ /^(.+?)([A-Z])$/
             number_part = $1
             letter_part = $2
-            return {
-              type => Components::Code.new(number: number_part),
-              part: Components::Part.new(type: "", value: letter_part),
-            }
+            # Check if we should preserve letter suffix in number (for MR format)
+            # When parsed_format is :mr, keep the full number with letter suffix (e.g., "8286C")
+            if parsed_hash[:parsed_format] == :mr
+              # For MR format, preserve letter suffix as part of number
+              return { type => Components::Code.new(number: str_value) }
+            else
+              # For other formats, extract letter suffix as separate Part component
+              return {
+                type => Components::Code.new(number: number_part),
+                part: Components::Part.new(type: "", value: letter_part),
+              }
+            end
           end
 
           Components::Code.new(number: str_value)

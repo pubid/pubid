@@ -17,7 +17,7 @@ module PubidNew
           "MONO"
         end
 
-        def to_s(format = :short)
+        def to_s(format = nil)
           case format
           when :mr
             to_mr_style
@@ -29,11 +29,12 @@ module PubidNew
         private
 
         def to_mr_style
-          # "NBS.MN.158" or "NIST.MN.178"
+          # "NBS.MN.158" or "NIST.MN.1-1b" (per NIST PubID spec, page 36)
+          # Note: MR format uses MN, not MONO (MONO is for human-readable only)
           result = (publisher || default_publisher).to_s
-          result += ".MN" # MR format uses MN not MONO
+          result += ".MN" # MR format uses MN per spec
           result += ".#{number}" if number
-          result += "pt#{number.part}" if number&.part
+          # Part is already included in compound number (e.g., "1-1B")
           result += "v#{volume}" if volume
           result
         end

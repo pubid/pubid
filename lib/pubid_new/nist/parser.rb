@@ -127,7 +127,8 @@ module PubidNew
         # But preserve r6/1925 format (don't add space before slash/year)
         # And preserve 300-8r1/upd format (don't separate r1/upd)
         # ENHANCED: Also handle r1a (revision with letter suffix) - "800-22r1a" → "800-22 r1A"
-        cleaned = cleaned.gsub(/(\d)(r\d+)([a-z]?)(?=-|[A-Z]|$)/) do
+        # FIXED: Match full number before revision, not just last digit
+        cleaned = cleaned.gsub(/(\d+)(r\d+)([a-z]?)(?=-|[A-Z]|$)/) do
           num = $1
           rev = $2
           letter = $3
@@ -236,8 +237,13 @@ module PubidNew
         if result.is_a?(Hash)
           result.merge(parsed_format: format)
         elsif result.is_a?(Array)
-          # For array results, add format to the first hash
-          result.first.merge(parsed_format: format) if result.first.is_a?(Hash)
+          # For array results, merge all hashes into one
+          # This handles cases where identifier rule returns multiple components (e.g., compound_series + edition)
+          merged = result.inject({}) do |acc, hash|
+            next acc unless hash.is_a?(Hash)
+            acc.merge(hash)
+          end
+          merged.merge(parsed_format: format)
         else
           result
         end
@@ -377,7 +383,9 @@ module PubidNew
           str("t") |
           str("hi") |
           str("iet") |
-          str("ort")).absent? >>
+          str("ort") |
+          str("r") # NEW: Exclude "r" revision marker (e.g., r5, r1963)
+          ).absent? >>
           digits.maybe
       end
 
@@ -461,12 +469,13 @@ module PubidNew
       # Type: "e" (edition), "r" (revision), "-" (historical)
       # ID: number (1-9) or year (yyyy)
       # Examples: e2, e2021, r5, -3
+      # Enhanced: Support space-separated format from preprocessing (r1 separated from number)
       rule(:edition) do
         (
           # Edition with "e" prefix: e2, e3, e2021 (1-4 digits for ID)
-          (str("e") >> digits.as(:edition_id)).as(:edition_e) |
+          (space.maybe >> str("e") >> digits.as(:edition_id)).as(:edition_e) |
           # Revision with "r" prefix: r1, r5, r2021
-          (str("r") >> digits.as(:edition_id)).as(:edition_r) |
+          (space.maybe >> str("r") >> digits.as(:edition_id)).as(:edition_r) |
           # Historical with "-" prefix: -2, -3 (ONLY if followed by non-digit or end)
           # This avoids consuming date patterns like "-1908"
           # Historical precedent uses small numbers (1-9), dates use 4-digit years
@@ -524,15 +533,18 @@ module PubidNew
 
       # Full report number - support dot-separated parts AND CRPL ranges
       # ENHANCED: Support multiple dashes for GCR patterns (Session 220)
+      # FIXED: Put GCR pattern first to prioritize matching full dash-separated patterns
+      # FIXED: Add edition.maybe to support revision patterns like 800-53r5 in short format
       rule(:report_number) do
         first_number >>
           (
-            # Multiple dash pattern for GCR: 21-917-48 (year-seq-part)
-            (dash >> second_number >> dash >> digits) |
+            # GCR multi-dash pattern (e.g., 85-3273-37) - MUST BE FIRST for priority
+            (dash >> second_number >> dash >> digits.as(:part_number)) |
             # Dot-separated part (e.g., 984.4 = number 984, part 4)
             (dot >> second_number) |
-            # Dash-separated (traditional)
-            (dash >> (crpl_range | second_number))
+            # Dash-separated with optional revision (e.g., 800-53r5, 1019r1963)
+            # Support edition after second_number for short format
+            (dash >> (crpl_range | second_number) >> edition.maybe)
           ).maybe
       end
 
@@ -744,6 +756,7 @@ module PubidNew
 
       # Dot-separated machine-readable format: NIST.SP.800-116 or #NIST.2024-01-15.123
       # Enhanced to support parts after number like NIST.SP.1011-I-2.0
+      # Enhanced to support revision+update patterns like NIST.IR.8115r1-upd
       rule(:mr_identifier) do
         hash_prefix.maybe >>
           publisher >> dot >>
@@ -754,6 +767,8 @@ module PubidNew
           (dot >> (digits | upper_letter)).repeat(0, 3) >> # Support additional dot-separated parts
           # Support letter suffix before update (e.g., 8286C-upd1) - Session 219
           upper_letter.maybe >>
+          # Support revision component (r1, r5, etc.) before update
+          edition.maybe >>
           update.maybe >>
           parts.repeat >> draft.maybe
       end
