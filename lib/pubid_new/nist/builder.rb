@@ -661,18 +661,28 @@ module PubidNew
             year = value[:update_year]&.to_s     # String not integer
             month = value[:update_month]&.to_s   # String not integer
 
+            # Determine prefix from update_prefix key (captured by parser)
+            # If not present, default to "slash" (/Upd format)
+            prefix_str = value[:update_prefix]&.to_s
+            prefix_value = if prefix_str&.include?("-") || prefix_str == "-upd"
+                             "dash"
+                           else
+                             "slash"
+                           end
+
             # Create update with at least number
             update_obj = Components::Update.new(number: number, year: year,
-                                                month: month)
+                                                month: month, prefix: prefix_value)
             {
               update: update_obj, # Main attribute for tests
               update_component: update_obj, # V2 component
             }
           elsif value.to_s.strip.empty?
             # Empty update string means "-upd" with no details
-            # Create Update with default number="1", year="2021", month="02"
-            update_obj = Components::Update.new(number: nil, year: nil,
-                                                month: nil)
+            # Create Update with default number="1" (no year/month)
+            # Default prefix to "dash" for empty update (common case like "-upd")
+            update_obj = Components::Update.new(number: "1", year: nil,
+                                                month: nil, prefix: "dash")
             {
               update: update_obj,
               update_component: update_obj,
@@ -682,7 +692,7 @@ module PubidNew
             { update: value.to_s.strip } unless value.to_s.strip.empty?
           end
 
-        when :update_number, :update_year, :update_month
+        when :update_prefix, :update_number, :update_year, :update_month
           # Captured as part of :update processing
           nil
 

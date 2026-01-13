@@ -613,8 +613,14 @@ module PubidNew
       # Format: /Upd{N}-{YYYY}{MM} where MM is optional
       # Examples: /Upd1-2015, /Upd3-202102, -upd, /upd (after preprocessing)
       # Update number is optional (e.g., "500-300-upd" has no number)
+      # Captures prefix to preserve original format (-upd vs /Upd)
       rule(:update) do
-        (str("/Upd") | (space.maybe >> (str("/upd") | str("-upd")))) >>
+        prefix = (
+          str("/Upd") |
+          (space.maybe >> (str("/upd") | str("-upd")))
+        ).as(:update_prefix)
+
+        prefix >>
           (
             digits.as(:update_number).maybe >>
             (dash >>

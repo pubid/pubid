@@ -12,11 +12,13 @@ module PubidNew
       # Examples:
       #   Update.new(number: 1, year: 2021, month: 2).to_s(:short) # => "/Upd1-202102"
       #   Update.new(number: 3, year: 2015).to_s(:short)           # => "/Upd3-2015"
-      #   Update.new(number: 1, year: 2021, month: 2).to_s(:mr)    # => ".u1-202102"
+      #   Update.new(number: 1, year: 2021, month: 2).to_s(:mr)    # => "-upd1-202102"
+      #   Update.new(number: 1, prefix: "dash").to_s(:short)       # => "-upd1" (preserves original prefix)
       class Update < Lutaml::Model::Serializable
         attribute :number, :string   # Update number as string
         attribute :year, :string     # Year (4 digits as string)
         attribute :month, :string    # Month (01-12 as string, optional)
+        attribute :prefix, :string   # Original prefix: "dash" for -upd, "slash" for /Upd (default: "slash")
 
         # Render update in specified format
         # @param format [:short, :mr, :long] The output format
@@ -26,6 +28,11 @@ module PubidNew
           return "-upd" if format == :mr && number.nil? && year.nil?
           # For other formats, return empty string if no number
           return "" if number.nil?
+
+          # Use prefix attribute to determine which prefix to use
+          # If prefix is "dash", always use dash prefix regardless of format
+          # This preserves original input format (e.g., -upd vs /Upd)
+          return build_dash_format if prefix == "dash"
 
           case format
           when :short
@@ -40,6 +47,17 @@ module PubidNew
         end
 
         private
+
+        # Build dash format: "-upd1-202102" or "-upd3-2015" or "-upd1" (no year)
+        # Used when original input used dash prefix (-upd) to preserve format
+        def build_dash_format
+          if year
+            year_month = build_year_month_string
+            "-upd#{number}-#{year_month}"
+          else
+            "-upd#{number}"
+          end
+        end
 
         # Build short format: "/Upd1-202102" or "/Upd3-2015" or "/Upd1" (no year)
         def build_short_format
