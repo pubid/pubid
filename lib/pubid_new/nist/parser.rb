@@ -459,12 +459,17 @@ module PubidNew
             (lower_letter >> dash >> digits) |
             # Number with pt suffix (e.g., "57pt1")
             (digits >> str("pt") >> digits) |
+            # Number with uppercase letter suffix (e.g., "56A", "123B") - for patterns like "56Ar2"
+            (digits >> upper_letter) |
             # Special patterns like "NCNR", "PERMIS", "BFRL"
             str("NCNR") | str("PERMIS") | str("BFRL") |
-            # Just capital letters (e.g., "A", "B") - NEW for RPT patterns
+            # Just capital letters (e.g., "A", "B", "C") - standalone
             upper_letter.repeat(1, 3) |
             # Regular number with optional suffix - but NOT if part of FIPS date (digit-dash-month-digit-slash)
-            (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?)
+            (digits_with_suffix >> (dash >> month_abbrev >> digits >> slash).absent?) |
+            # Single lowercase letter (e.g., "a", "b") - but NOT "r" followed by digits (edition marker)
+            # This is for patterns like "126a" but not "126r2"
+            (lower_letter >> digit.absent?)
           ).as(:second_number)
       end
 
