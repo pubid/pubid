@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "../supplement_identifier"
+require_relative "../../components/typed_stage"
 
 module PubidNew
   module Nist
@@ -13,6 +14,26 @@ module PubidNew
       # - "NBS CIRC 25supp-1924" → CircularSupplement(base: Circular(25), edition: 1924)
       # - "NBS CIRC suppJun1925-Jun1926" → CircularSupplement(edition with date range)
       class CircularSupplement < SupplementIdentifier
+        # NOTE: CircularSupplement uses same TYPED_STAGES as Circular
+        # It's a variant edition pattern, not a separate series type
+        TYPED_STAGES = [
+          PubidNew::Components::TypedStage.new(
+            abbr: ["CIRC", "NBS CIRC"],
+            stage_code: "published",
+            type_code: "circ",
+          ),
+        ].freeze
+
+        class << self
+          def typed_stages
+            TYPED_STAGES
+          end
+
+          def type
+            { key: :circ, title: "NBS Circular Supplement", short: "CIRC" }
+          end
+        end
+
         attribute :supplement_date_range_start, :string  # Jun1925
         attribute :supplement_date_range_end, :string    # Jun1926
 

@@ -27,8 +27,43 @@ module PubidNew
     # Single Responsibility: Identifier class registry and series-to-class mapping
     class Scheme
       class << self
+        # Aggregate TYPED_STAGES from all identifier classes
+        # @return [Array<Components::TypedStage>] all typed stages
+        def typed_stages
+          @typed_stages ||= identifiers
+            .reject { |klass| klass == Identifiers::Base } # Skip Base fallback class
+            .flat_map(&:typed_stages)
+            .freeze
+        end
+
+        # Locate TypedStage by abbreviation
+        # @param abbr [String, Symbol] the type abbreviation
+        # @return [Components::TypedStage] the matching typed stage
+        # @raise [ArgumentError] if abbreviation not found
+        def locate_typed_stage_by_abbr(abbr)
+          abbr_str = abbr.to_s.upcase
+          typed_stages.find do |ts|
+            ts.abbr.any? { |a| a.to_s.upcase == abbr_str }
+          end || raise(ArgumentError, "Unknown type abbreviation: #{abbr}")
+        end
+
+        # Locate identifier class by type code
+        # @param type_code [String, Symbol] the type code
+        # @return [Class] the identifier class
+        # @raise [ArgumentError] if type code not found
+        def locate_identifier_klass_by_type_code(type_code)
+          type_str = type_code.to_s
+          identifiers
+            .reject { |klass| klass == Identifiers::Base } # Skip Base fallback class
+            .find do |klass|
+              klass.typed_stages.any? { |ts| ts.type_code.to_s == type_str }
+            end || raise(ArgumentError, "Unknown type code: #{type_code}")
+        end
+
         # Registry of identifier classes by series code
         # ONE CLASS PER SERIES TYPE (like ISO)
+        # NOTE: This is kept for backward compatibility during migration
+        # TODO: Remove in Phase 7 after Builder is updated
         def series_to_class_map
           {
             "SP" => Identifiers::SpecialPublication,
