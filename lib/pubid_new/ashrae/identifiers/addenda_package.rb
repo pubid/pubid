@@ -15,7 +15,7 @@ module PubidNew
       # - ASHRAE Standard 52.2-2007 Addenda Supplement Package (Contains Addendum b)
       # - ASHRAE Standard 62.2-2004: Addenda Supplement Package (Contains Addendum g) (PDF)
       class AddendaPackage < SupplementIdentifier
-        attribute :package_description, :string  # e.g., "Addenda Supplement Package"
+        attribute :package_description, :string # e.g., "Addenda Supplement Package"
 
         TYPED_STAGES = [
           Components::TypedStage.new(
@@ -26,7 +26,8 @@ module PubidNew
         ].freeze
 
         def self.type
-          { key: :addenda_package, title: "ASHRAE Addenda Package", short: "Addenda Package" }
+          { key: :addenda_package, title: "ASHRAE Addenda Package",
+            short: "Addenda Package" }
         end
 
         def to_s

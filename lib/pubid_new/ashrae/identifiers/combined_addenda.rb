@@ -15,8 +15,8 @@ module PubidNew
       # - ASHRAE Addenda c and d to Standard 15-1994
       # - ASHRAE Addenda f and h for Standard 15-2007
       class CombinedAddenda < SupplementIdentifier
-        attribute :addendum_codes, :string  # Multiple codes like "c and d"
-        attribute :connector, :string  # "and" or ","
+        attribute :addendum_codes, :string # Multiple codes like "c and d"
+        attribute :connector, :string # "and" or ","
 
         TYPED_STAGES = [
           Components::TypedStage.new(
@@ -27,7 +27,8 @@ module PubidNew
         ].freeze
 
         def self.type
-          { key: :combined_addenda, title: "ASHRAE Combined Addenda", short: "Addenda" }
+          { key: :combined_addenda, title: "ASHRAE Combined Addenda",
+            short: "Addenda" }
         end
 
         def to_s

@@ -23,7 +23,8 @@ module PubidNew
         ].freeze
 
         def self.type
-          { key: :interpretation, title: "ASHRAE Interpretations", short: "Interpretations" }
+          { key: :interpretation, title: "ASHRAE Interpretations",
+            short: "Interpretations" }
         end
 
         def to_s

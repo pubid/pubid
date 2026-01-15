@@ -38,7 +38,7 @@ module PubidNew
 
           if copublisher
             # Format: ANSI/ASHRAE Addendum a to ANSI/ASHRAE Standard 15-2019
-            result = "#{copublisher} Addendum #{addendum_code} to #{base_identifier.to_s}"
+            result = "#{copublisher} Addendum #{addendum_code} to #{base_identifier}"
           else
             # Format: ASHRAE Addendum a to Standard 15-2001
             result = "ASHRAE Addendum #{addendum_code} to #{base_type} #{base_identifier.code}"
