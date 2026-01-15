@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifier::DataSeries do
+RSpec.describe PubidNew::Astm::Identifiers::DataSeries do
   context "Data Series identifiers" do
     # ========================================
     # Data Series (33 IDs, 11%)

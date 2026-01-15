@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifier::Standard do
+RSpec.describe PubidNew::Astm::Identifiers::Standard do
   # ========================================
   # Standard (76 IDs, 26%)
   # ========================================

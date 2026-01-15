@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifier::TechnicalReport do
+RSpec.describe PubidNew::Astm::Identifiers::TechnicalReport do
   # ========================================
   # Technical Report (11 IDs, 4%)
   # ========================================

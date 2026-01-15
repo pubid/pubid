@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifier::Adjunct do
+RSpec.describe PubidNew::Astm::Identifiers::Adjunct do
   # ========================================
   # Adjunct (4 IDs, 1%)
   # ========================================
