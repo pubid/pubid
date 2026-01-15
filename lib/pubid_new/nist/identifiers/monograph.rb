@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "base"
+require_relative "../../components/typed_stage"
 
 module PubidNew
   module Nist
@@ -13,6 +14,24 @@ module PubidNew
       # - "NIST MONO 1-1F" - Monograph with letter suffix
       # - "NIST MONO 1-2Bv1" - Monograph with letter suffix and volume
       class Monograph < Base
+        TYPED_STAGES = [
+          PubidNew::Components::TypedStage.new(
+            abbr: ["MONO", "NBS MONO", "NIST MONO"],
+            stage_code: "published",
+            type_code: "mono"
+          ),
+        ].freeze
+
+        class << self
+          def typed_stages
+            TYPED_STAGES
+          end
+
+          def type
+            { key: :mono, title: "Monograph", short: "MONO" }
+          end
+        end
+
         def series_code
           "MONO"
         end
