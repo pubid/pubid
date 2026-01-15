@@ -169,10 +169,10 @@ The failing tests fall into two categories:
 ## Fixture Classification Results
 
 **Classification Run Date:** 2026-01-16
-**Total Fixtures:** 84,729
-**Passing:** 84,514
-**Failing:** 215
-**Pass Rate:** 99.75%
+**Total Fixtures:** 94,281
+**Passing:** 93,187
+**Failing:** 1,094
+**Pass Rate:** 98.84%
 
 ### Overview
 
@@ -196,7 +196,7 @@ Fixture classification tests real-world identifier parsing by running the parser
 | **ETSI** | 24,718 | 24,718 | 0 | 100.00% | ✅ Perfect |
 | **IDF** | 20 | 20 | 0 | 100.00% | ✅ Perfect |
 | **IEC** | 12,456 | 12,299 | 157 | 98.74% | ✅ Excellent |
-| **IEEE** | ~200+ | TBD | TBD | TBD | - |
+| **IEEE** | 9,552 | 8,673 | 879 | 90.80% | ⚠️ Needs attention |
 | **ISO** | 7,648 | 7,572 | 76 | 99.01% | ✅ Excellent |
 | **ITU** | 2,041 | 2,041 | 0 | 100.00% | ✅ Perfect |
 | **JCGM** | 9 | 9 | 0 | 100.00% | ✅ Perfect |
@@ -221,7 +221,8 @@ This demonstrates that the parser implementation for these flavors is robust and
 
 #### Flavors Requiring Attention (81-96% Pass Rate)
 - **CSA** (81.68%) - 166 failures out of 906 fixtures. Priority: HIGH
-- **BSI** (88.79%) - 177 failures out of 1,579 fixtures. Priority: MEDIUM
+- **BSI** (88.79%) - 177 failures out of 1,579 fixtures. Priority: HIGH
+- **IEEE** (90.80%) - 879 failures out of 9,552 fixtures. Priority: HIGH
 - **CEN** (88.98%) - 13 failures out of 118 fixtures. Priority: MEDIUM
 - **ASTM** (96.77%) - 8 failures out of 248 fixtures. Priority: LOW
 - **AMCA** (92.00%) - 4 failures out of 50 fixtures. Priority: LOW
@@ -240,6 +241,18 @@ BSI failures are spread across 177 fixtures. This suggests:
 - Edge cases in supplement handling
 - Type detection issues
 
+#### IEEE Failures (9.2%)
+IEEE has 879 failures across 9,552 fixtures. Analysis by class:
+- Base identifiers: 673 failures out of 4,827 (86.06% pass)
+- Standard identifiers: 202 failures out of 3,405 (94.07% pass)
+- NESC handbook: 4 failures out of 4 (0% pass)
+- All other classes: 100% pass
+
+This suggests:
+- Gaps in base identifier pattern coverage (673 failures)
+- Issues with standard identifier parsing (202 failures)
+- NESC handbook needs implementation (4 failures)
+
 #### CEN Failures (11.02%)
 Similar to BSI, CEN has failures concentrated in specific patterns:
 - Complex copublisher scenarios
@@ -248,22 +261,26 @@ Similar to BSI, CEN has failures concentrated in specific patterns:
 
 ### Key Insights
 
-1. **ETSI dominates fixture count** with 24,718 fixtures (29% of total), all passing. This validates the ETSI parser as extremely robust.
+1. **ETSI dominates fixture count** with 24,718 fixtures (26% of total), all passing. This validates the ETSI parser as extremely robust.
 
 2. **NIST has the second-largest fixture set** (19,826) with 99.93% pass rate, demonstrating excellent handling of complex historical patterns.
 
-3. **Small flavors perform exceptionally well** - All flavors with <1000 fixtures have 100% pass rates except AMCA (92%).
+3. **IEEE has the third-largest fixture set** (9,552) with 90.80% pass rate. The 879 failures are concentrated in base identifier patterns (673) and standard identifiers (202).
 
-4. **Supplement handling is the main challenge** - Most failures in IEC, ISO, BSI, and CEN are related to complex supplement structures.
+4. **Small flavors perform exceptionally well** - All flavors with <1000 fixtures have 100% pass rates except AMCA (92%) and CSA (81.68%).
 
-5. **Real-world validation differs from unit tests** - The fixture pass rates differ from RSpec test pass rates because fixtures contain production data with edge cases not covered in unit tests.
+5. **Supplement handling is the main challenge** - Most failures in IEC, ISO, BSI, and CEN are related to complex supplement structures.
+
+6. **Real-world validation differs from unit tests** - The fixture pass rates differ from RSpec test pass rates because fixtures contain production data with edge cases not covered in unit tests.
 
 ### Recommendations
 
-1. **Priority 1: CSA parser enhancement** - Address 166 failing patterns to bring CSA to production-ready status.
+1. **Priority 1: IEEE base/standard pattern fixes** - Address 879 failing patterns (673 base, 202 standard, 4 NESC handbook) to improve IEEE coverage from 90.80% to 98%+.
 
-2. **Priority 2: BSI edge cases** - Investigate and fix the 177 failing BSI patterns, focusing on supplement handling.
+2. **Priority 2: CSA parser enhancement** - Address 166 failing patterns to bring CSA from 81.68% to production-ready status.
 
-3. **Priority 3: CEN edge cases** - Fix the 13 failing CEN patterns, likely in copublisher and supplement scenarios.
+3. **Priority 3: BSI edge cases** - Investigate and fix the 177 failing BSI patterns, focusing on supplement handling.
 
-4. **Priority 4: Continue NIST/ISO refinement** - These flavors already have excellent pass rates (99%+); remaining failures are complex edge cases that can be addressed iteratively.
+4. **Priority 4: CEN edge cases** - Fix the 13 failing CEN patterns, likely in copublisher and supplement scenarios.
+
+5. **Priority 5: Continue NIST/ISO/IEC refinement** - These flavors already have excellent pass rates (98-99%); remaining failures are complex edge cases that can be addressed iteratively.
