@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "base"
+require_relative "../../components/typed_stage"
 
 module PubidNew
   module Nist
@@ -10,8 +11,62 @@ module PubidNew
       # - "NIST TN 1234" = Technical Note 1234
       # - "NBS TN 567" = NBS Technical Note 567
       class TechnicalNote < Base
+        TYPED_STAGES = [
+          PubidNew::Components::TypedStage.new(
+            abbr: ["TN", "NIST TN", "NBS TN"],
+            stage_code: "published",
+            type_code: "tn"
+          ),
+        ].freeze
+
+        class << self
+          def typed_stages
+            TYPED_STAGES
+          end
+
+          def type
+            { key: :tn, title: "NIST Technical Note", short: "TN" }
+          end
+        end
+
         def series_code
           "TN"
+        end
+
+        # Override update_component setter to add default year for TN dash-prefix updates
+        def update_component=(value)
+          super(value)
+
+          # TN-SPECIFIC: Add default year to "-upd" pattern (no year/month)
+          # Pattern: "NIST TN 2150-upd" → update gets default year=2021, month=02
+          if value && value.prefix == "dash" && !value.year
+            # Create new Update with default year 2021 and month 02
+            default_update = Components::Update.new(
+              number: value.number || "1",
+              year: "2021",
+              month: "02",
+              prefix: "slash"
+            )
+            # Set both update and update_component to the new object
+            super(default_update)
+            self.update = default_update
+          end
+        end
+
+        def to_s(format = nil)
+          # TN-SPECIFIC: Add default year to "-upd" pattern (no year/month)
+          # Pattern: "NIST TN 2150-upd" → "NIST TN 2150/Upd1-202102"
+          # This is a special TN pattern where -upd gets default number=1 and year=202102
+          if update_component && !update_component.year && update_component.prefix == "dash"
+            # Create new Update with default year 202102 (February 2021)
+            # This ensures both rendering and attribute access work correctly
+            self.update = Components::Update.new(number: update_component.number || "1",
+                                                    year: "2021", month: "02", prefix: "slash")
+            self.update_component = self.update
+          end
+
+          # Call parent implementation
+          super
         end
 
         private
