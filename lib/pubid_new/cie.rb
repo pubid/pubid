@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "cie/identifier"
+require_relative "cie/single_identifier"
 
 module PubidNew
   module Cie

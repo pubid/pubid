@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../single_identifier"
 require_relative "../components/code"
 require_relative "../components/language"
 
@@ -13,14 +14,11 @@ module PubidNew
       #   CIE S 006.1/1998 (ISO 16508:1999) - iteration with dot
       #   CIE S 014-4/E2007 - part with dash + language
       #   CIE S 008/E:2001 (ISO 8995-1:2002(E)) - language with colon year
-      class Identical < Lutaml::Model::Serializable
+      class Identical < SingleIdentifier
         attribute :s_prefix, :boolean, default: -> { false }
         attribute :code, Components::Code
-        attribute :year, :string
-        attribute :date_separator, :string
         attribute :language, Components::Language
         attribute :iso_reference, :string # The ISO identifier in parentheses
-        attribute :style, :string
 
         def to_s
           parts = ["CIE"]

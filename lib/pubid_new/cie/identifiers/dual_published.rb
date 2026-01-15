@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../single_identifier"
 require_relative "../components/code"
 
 module PubidNew
@@ -9,13 +10,10 @@ module PubidNew
       # Dual published identifier for CIE
       # Represents CIE/IEC dual published standards
       # Example: CIE S 009:2002/IEC 62471:2006
-      class DualPublished < Lutaml::Model::Serializable
+      class DualPublished < SingleIdentifier
         attribute :s_prefix, :boolean, default: -> { false }
         attribute :code, Components::Code
-        attribute :year, :string
-        attribute :date_separator, :string
         attribute :iec_identifier, :string # IEC portion as string
-        attribute :style, :string
 
         def to_s
           parts = ["CIE"]

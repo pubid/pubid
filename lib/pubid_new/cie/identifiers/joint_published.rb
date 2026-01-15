@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../single_identifier"
 require_relative "../components/code"
 require_relative "../components/language"
 
@@ -9,15 +10,12 @@ module PubidNew
     module Identifiers
       # Joint published identifier for CIE
       # Handles CIE ISO, CIE IEC, CIE ISO/CIE patterns
-      class JointPublished < Lutaml::Model::Serializable
+      class JointPublished < SingleIdentifier
         attribute :copublisher, :string       # "ISO", "IEC", or "ISO/CIE"
         attribute :code, Components::Code
-        attribute :year, :string
-        attribute :date_separator, :string
         attribute :language, Components::Language
         attribute :doc_type, :string          # "TR" for Technical Report
         attribute :stage, :string             # "DIS" for draft stage
-        attribute :style, :string
 
         def to_s
           parts = ["CIE", copublisher]

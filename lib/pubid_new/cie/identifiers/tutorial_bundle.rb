@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../single_identifier"
 
 module PubidNew
   module Cie
@@ -8,9 +9,8 @@ module PubidNew
       # Tutorial Bundle identifier for CIE
       # Special text-based identifier
       # Example: CIE Tutorials Bundle 1
-      class TutorialBundle < Lutaml::Model::Serializable
+      class TutorialBundle < SingleIdentifier
         attribute :bundle_number, :string
-        attribute :style, :string
 
         def to_s
           "CIE Tutorials Bundle #{bundle_number}"

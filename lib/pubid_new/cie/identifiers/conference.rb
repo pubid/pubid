@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../single_identifier"
 
 module PubidNew
   module Cie
@@ -8,12 +9,9 @@ module PubidNew
       # Conference identifier for CIE
       # Handles x-prefix conference proceedings
       # Example: CIE x038:2013, CIE x038:2013 Amendment 1
-      class Conference < Lutaml::Model::Serializable
+      class Conference < SingleIdentifier
         attribute :conference_number, :string
-        attribute :year, :string
-        attribute :date_separator, :string # "dash" or "colon"
         attribute :amendment_number, :string
-        attribute :style, :string
 
         def to_s
           result = "CIE x#{conference_number}"

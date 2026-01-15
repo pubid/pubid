@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../single_identifier"
 require_relative "../components/code"
 require_relative "../components/language"
 
@@ -9,14 +10,11 @@ module PubidNew
     module Identifiers
       # Standard identifier for CIE
       # Handles both legacy (pre-2001) and current (2001+) styles
-      class Standard < Lutaml::Model::Serializable
+      class Standard < SingleIdentifier
         attribute :s_prefix, :boolean, default: -> { false }
         attribute :code, Components::Code
-        attribute :year, :string
-        attribute :date_separator, :string  # "dash" or "colon"
         attribute :language, Components::Language
-        attribute :stage, :string           # DIS, DS
-        attribute :style, :string           # "legacy" or "current"
+        attribute :stage, :string # DIS, DS
 
         def to_s
           parts = ["CIE"]
