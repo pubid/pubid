@@ -18,4 +18,18 @@ RSpec.describe PubidNew::Astm::Scheme do
       expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::IsoDualPublished)
     end
   end
+
+  describe ".locate_typed_stage_by_abbr" do
+    it "raises error indicating ASTM does not use typed stages" do
+      expect { described_class.locate_typed_stage_by_abbr("anything") }
+        .to raise_error(ArgumentError, /ASTM identifiers do not use typed stages/)
+    end
+  end
+
+  describe ".locate_identifier_klass_by_type_code" do
+    it "raises error indicating ASTM does not use type codes" do
+      expect { described_class.locate_identifier_klass_by_type_code("anything") }
+        .to raise_error(ArgumentError, /ASTM identifiers do not use type codes/)
+    end
+  end
 end
