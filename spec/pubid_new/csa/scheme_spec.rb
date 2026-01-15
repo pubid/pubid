@@ -17,4 +17,18 @@ RSpec.describe PubidNew::Csa::Scheme do
       expect(PubidNew::Csa::Scheme.identifiers).to include(PubidNew::Csa::Identifiers::Combined)
     end
   end
+
+  describe ".locate_typed_stage_by_abbr" do
+    it "raises error indicating CSA does not use typed stages" do
+      expect { described_class.locate_typed_stage_by_abbr("anything") }
+        .to raise_error(ArgumentError, /CSA identifiers do not use typed stages/)
+    end
+  end
+
+  describe ".locate_identifier_klass_by_type_code" do
+    it "raises error indicating CSA does not use type codes" do
+      expect { described_class.locate_identifier_klass_by_type_code("anything") }
+        .to raise_error(ArgumentError, /CSA identifiers do not use type codes/)
+    end
+  end
 end
