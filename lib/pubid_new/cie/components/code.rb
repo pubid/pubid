@@ -28,9 +28,10 @@ module PubidNew
           elsif part
             # Use part_separator if explicitly set (preserves original)
             # Otherwise fall back to style-based separator
-            separator = if part_separator == "slash"
+            separator = case part_separator
+                        when "slash"
                           "/"
-                        elsif part_separator == "dash"
+                        when "dash"
                           "-"
                         else
                           # Legacy: slash "/" (e.g., "170/1")

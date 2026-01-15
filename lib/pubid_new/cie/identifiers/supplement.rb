@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../supplement_identifier"
 require_relative "../components/language"
 
 module PubidNew
@@ -9,7 +10,7 @@ module PubidNew
       # Supplement identifier for CIE
       # Handles -SPN and -SPN.P notation with recursive base parsing
       # Examples: CIE 121-SP1:2009, CIE 198-SP1.4:2011, CIE DIS 025-SP1/E:2019
-      class Supplement < Lutaml::Model::Serializable
+      class Supplement < SupplementIdentifier
         attribute :base_number, :string
         attribute :supplement_number, :string    # "1", "2"
         attribute :supplement_part, :string      # "1" in "SP1.1", "4" in "SP1.4"

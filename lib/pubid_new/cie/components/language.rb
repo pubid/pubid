@@ -37,7 +37,7 @@ module PubidNew
 
           # Detect slash format
           if lang_str.start_with?("/")
-            new(code: lang_str[1..-1], format: "slash")
+            new(code: lang_str[1..], format: "slash")
           # Detect paren with year
           elsif lang_str.match?(/\(([A-Z]{2})-(\d{4})\)/)
             match = lang_str.match(/\(([A-Z]{2})-(\d{4})\)/)

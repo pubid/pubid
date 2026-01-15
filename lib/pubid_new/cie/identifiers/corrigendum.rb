@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../supplement_identifier"
 
 module PubidNew
   module Cie
@@ -8,7 +9,7 @@ module PubidNew
       # Corrigendum identifier for CIE
       # Handles /CorN notation with recursive base parsing
       # Examples: CIE 232:2019/Cor1:2020, CIE 198-SP1.4:2011/Cor1:2013
-      class Corrigendum < Lutaml::Model::Serializable
+      class Corrigendum < SupplementIdentifier
         attribute :base_number, :string
         attribute :base_year, :string
         attribute :base_supplement, :string       # If base is a supplement

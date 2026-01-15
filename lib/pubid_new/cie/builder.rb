@@ -344,7 +344,7 @@ module PubidNew
         end
 
         # Extract trailing language from legacy_code_with_year
-        if parsed_hash[:trailing_lang] && parsed_hash[:trailing_lang].is_a?(Hash)
+        if parsed_hash[:trailing_lang].is_a?(Hash)
           lang_data = parsed_hash[:trailing_lang]
           # trailing_lang contains language_paren_year hash
           if lang_data[:language_paren_year]
@@ -400,11 +400,11 @@ module PubidNew
 
         if value.is_a?(Array)
           joined = value.map(&:to_s).join
-          return joined.length > 0 ? joined : nil
+          return joined.length.positive? ? joined : nil
         end
 
         str_value = value.to_s.strip
-        str_value.length > 0 ? str_value : nil
+        str_value.length.positive? ? str_value : nil
       end
     end
   end
