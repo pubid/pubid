@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "base"
+require_relative "../../components/typed_stage"
 
 module PubidNew
   module Nist
@@ -11,6 +12,24 @@ module PubidNew
       # - "NBS CRPL 4-m-5" = Report 4, month m, issue 5
       # - "NBS CRPL c4-4" = Report c4, issue 4
       class CrplReport < Base
+        TYPED_STAGES = [
+          PubidNew::Components::TypedStage.new(
+            abbr: ["CRPL", "NBS CRPL"],
+            stage_code: "published",
+            type_code: "crpl"
+          ),
+        ].freeze
+
+        class << self
+          def typed_stages
+            TYPED_STAGES
+          end
+
+          def type
+            { key: :crpl, title: "NBS CRPL Report", short: "CRPL" }
+          end
+        end
+
         attribute :range_notation, :string # For underscore ranges like "1-2_3-1"
         attribute :prefix, :string # For "c" or "m" prefixes
 
@@ -92,8 +111,11 @@ module PubidNew
           # Add part component (pt3-1)
           result += part.to_s if part
 
-          # Add supplement
-          result += supplement if supplement
+          # Add supplement with "sup" prefix for CRPL identifiers
+          if supplement
+            # Check if supplement already has "sup" prefix (for backward compatibility)
+            result += (supplement.start_with?('sup') ? supplement : "sup#{supplement}")
+          end
 
           result += range_notation if range_notation
           result

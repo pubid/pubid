@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "base"
+require_relative "../../components/typed_stage"
 
 module PubidNew
   module Nist
@@ -9,6 +10,24 @@ module PubidNew
       # Format: NBS CSM N where N is simple number
       # Example: "NBS CSM 1", "NBS CSM 40"
       class CommercialStandardsMonthly < Base
+        TYPED_STAGES = [
+          PubidNew::Components::TypedStage.new(
+            abbr: ["CSM", "NBS CSM"],
+            stage_code: "published",
+            type_code: "csm"
+          ),
+        ].freeze
+
+        class << self
+          def typed_stages
+            TYPED_STAGES
+          end
+
+          def type
+            { key: :csm, title: "Commercial Standards Monthly", short: "CSM" }
+          end
+        end
+
         def publisher
           "NBS"
         end
