@@ -1,6 +1,7 @@
 require_relative "../components/publisher"
 require_relative "../components/code"
 require_relative "../components/date"
+require_relative "scheme"
 
 module PubidNew
   # Identifier that
@@ -15,16 +16,15 @@ module PubidNew
         "D" => "de",
       }.freeze
 
-      def initialize(scheme)
-        @scheme = scheme
-        self
+      def initialize
+        # Builder uses Idf::Scheme class methods (class << self pattern)
       end
 
       def locate_typed_stage(typed_stage_string)
         # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
         typed_stage_string = "" if typed_stage_string.nil?
 
-        typed_stage = (@scheme.typed_stages + @scheme.supplement_typed_stages).detect do |typed_stage|
+        typed_stage = (Scheme.typed_stages + Scheme.supplement_typed_stages).detect do |typed_stage|
           typed_stage.abbr.include?(typed_stage_string)
         end
 
@@ -37,7 +37,7 @@ module PubidNew
       end
 
       def locate_identifier_klass(type_code)
-        identifier_klass = (@scheme.identifiers + @scheme.supplement_identifiers).detect do |identifier_class|
+        identifier_klass = (Scheme.identifiers + Scheme.supplement_identifiers).detect do |identifier_class|
           identifier_class.type[:key].to_s == type_code
         end
 

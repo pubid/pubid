@@ -63,7 +63,7 @@ module PubidNew
                 "Invalid identifier format"
         end
 
-        PubidNew::Idf::Builder.new(PubidNew::Idf::Scheme).build(parsed)
+        PubidNew::Idf::Builder.new.build(parsed)
       end
     end
   end
