@@ -36,3 +36,6 @@ require_relative "oiml/identifiers/seminar_report"
 require_relative "oiml/identifiers/vocabulary"
 require_relative "oiml/identifiers/amendment"
 require_relative "oiml/identifiers/annex"
+
+# Scheme (must be loaded after identifiers)
+require_relative "oiml/scheme"
