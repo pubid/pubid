@@ -60,60 +60,6 @@ module PubidNew
             end || raise(ArgumentError, "Unknown type code: #{type_code}")
         end
 
-        # Registry of identifier classes by series code
-        # ONE CLASS PER SERIES TYPE (like ISO)
-        # NOTE: This is kept for backward compatibility during migration
-        # TODO: Remove in Phase 7 after Builder is updated
-        def series_to_class_map
-          {
-            "SP" => Identifiers::SpecialPublication,
-            "FIPS" => Identifiers::FederalInformationProcessingStandards,
-            "IR" => Identifiers::InteragencyReport,
-            "HB" => Identifiers::Handbook,
-            "TN" => Identifiers::TechnicalNote,
-            "CIRC" => Identifiers::Circular,
-            "CRPL" => Identifiers::CrplReport,
-            "RPT" => Identifiers::Report,
-            "MONO" => Identifiers::Monograph,
-            "MP" => Identifiers::MiscellaneousPublication,
-            "GCR" => Identifiers::GrantContractorReport,
-            "NCSTAR" => Identifiers::Ncstar,
-            "OWMWP" => Identifiers::Owmwp,
-            "NSRDS" => Identifiers::Nsrds,
-            "LC" => Identifiers::LetterCircular,
-            "LCIRC" => Identifiers::LetterCircular, # Alias
-            "CS" => Identifiers::CommercialStandard,
-            "CSM" => Identifiers::CommercialStandardsMonthly,
-            # All other series use Base as default
-          }.freeze
-        end
-
-        # All identifier classes
-        def identifiers
-          [
-            Identifiers::SpecialPublication,
-            Identifiers::FederalInformationProcessingStandards,
-            Identifiers::InteragencyReport,
-            Identifiers::Handbook,
-            Identifiers::TechnicalNote,
-            Identifiers::Circular,
-            Identifiers::CircularSupplement,
-            Identifiers::CrplReport,
-            Identifiers::Report,
-            Identifiers::Monograph,
-            Identifiers::MiscellaneousPublication,
-            Identifiers::GrantContractorReport,
-            Identifiers::Ncstar,
-            Identifiers::Owmwp,
-            Identifiers::Nsrds,
-            Identifiers::LetterCircular,
-            Identifiers::CommercialStandard,
-            Identifiers::CommercialStandardEmergency,
-            Identifiers::CommercialStandardsMonthly,
-            Identifiers::Base, # Fallback for unmapped series
-          ]
-        end
-
         # Locate identifier class by series and pattern
         # @param parsed_hash [Hash] the parsed identifier data
         # @return [Class] the identifier class
@@ -133,7 +79,7 @@ module PubidNew
               end
             end
 
-            # Use series mapping for other compound series
+            # Use simple series for lookup (TYPED_STAGES abbr handles compound forms)
             series = simple_series
           end
 
@@ -156,11 +102,16 @@ module PubidNew
             end
           end
 
-          # Look up in series-to-class mapping
-          klass = series_to_class_map[series]
-
-          # Default to Base for unmapped series
-          klass || Identifiers::Base
+          # Look up using TYPED_STAGES registry (replaces series_to_class_map)
+          # This handles simple series, compound series (via abbr array), and all variants
+          begin
+            typed_stage = locate_typed_stage_by_abbr(series)
+            type_code = typed_stage.type_code
+            locate_identifier_klass_by_type_code(type_code)
+          rescue ArgumentError
+            # Fallback to Base for unmapped series (e.g., "AMS", "VTS")
+            Identifiers::Base
+          end
         end
 
         # Check if parsed hash has supplement indicators
@@ -170,6 +121,33 @@ module PubidNew
             parsed_hash[:supplement_date] ||
             parsed_hash[:supplement_slash_year] ||
             parsed_hash[:supplement_with_rev]
+        end
+
+        # All identifier classes
+        # @return [Array<Class>] list of all identifier classes
+        def identifiers
+          @identifiers ||= [
+            Identifiers::SpecialPublication,
+            Identifiers::FederalInformationProcessingStandards,
+            Identifiers::InteragencyReport,
+            Identifiers::Handbook,
+            Identifiers::TechnicalNote,
+            Identifiers::Circular,
+            Identifiers::CircularSupplement,
+            Identifiers::CrplReport,
+            Identifiers::Report,
+            Identifiers::Monograph,
+            Identifiers::MiscellaneousPublication,
+            Identifiers::GrantContractorReport,
+            Identifiers::Ncstar,
+            Identifiers::Owmwp,
+            Identifiers::Nsrds,
+            Identifiers::LetterCircular,
+            Identifiers::CommercialStandard,
+            Identifiers::CommercialStandardEmergency,
+            Identifiers::CommercialStandardsMonthly,
+            Identifiers::Base, # Fallback for unmapped series
+          ].freeze
         end
 
         # Check if series is valid
