@@ -1,10 +1,10 @@
-require_relative "../identifier"
+require_relative "../single_identifier"
 require_relative "../../components/typed_stage"
 
 module PubidNew
   module Idf
     module Identifiers
-      class ReviewedMethod < Identifier
+      class ReviewedMethod < SingleIdentifier
         attribute :type, Components::Type, default: -> { type[:key] }
         TYPED_STAGES = [
           Components::TypedStage.new(

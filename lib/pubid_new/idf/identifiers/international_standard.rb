@@ -1,11 +1,11 @@
-require_relative "../identifier"
+require_relative "../single_identifier"
 require_relative "../../components/typed_stage"
 
 module PubidNew
   module Idf
     module Identifiers
       # International Standard Identifier
-      class InternationalStandard < Identifier
+      class InternationalStandard < SingleIdentifier
         attribute :type, Components::Type, default: -> { type[:key] }
 
         TYPED_STAGES = [
