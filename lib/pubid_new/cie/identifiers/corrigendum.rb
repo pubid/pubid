@@ -16,7 +16,6 @@ module PubidNew
         attribute :base_supplement_part, :string  # Part of supplement
         attribute :cor_number, :string
         attribute :cor_year, :string
-        attribute :style, :string
 
         def to_s
           # Build base identifier string

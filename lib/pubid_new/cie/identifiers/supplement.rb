@@ -15,7 +15,6 @@ module PubidNew
         attribute :supplement_number, :string    # "1", "2"
         attribute :supplement_part, :string      # "1" in "SP1.1", "4" in "SP1.4"
         attribute :year, :string
-        attribute :style, :string
         attribute :stage, :string                # "DIS", "DS"
         attribute :language, Components::Language
 
