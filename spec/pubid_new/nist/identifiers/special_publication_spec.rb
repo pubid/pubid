@@ -344,9 +344,32 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses language" do
-          expect(parsed.translation.language).to eq("spa")
+          expect(parsed.translation_component.code).to eq("spa")
         end
       end
+    end
+  end
+
+  describe ".typed_stages" do
+    it "returns array of typed stages" do
+      stages = described_class.typed_stages
+      expect(stages).to be_a(Array)
+      expect(stages.first).to be_a(PubidNew::Components::TypedStage)
+    end
+
+    it "includes published stage with SP abbr" do
+      stages = described_class.typed_stages
+      sp_stage = stages.find { |s| s.stage_code == "published" }
+      expect(sp_stage).not_to be_nil
+      expect(sp_stage.type_code).to eq("sp")
+      expect(sp_stage.abbr).to include("SP")
+    end
+  end
+
+  describe ".type" do
+    it "returns type hash" do
+      type = described_class.type
+      expect(type).to eq({ key: :sp, title: "NIST Special Publication", short: "SP" })
     end
   end
 end
