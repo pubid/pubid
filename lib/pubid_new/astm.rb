@@ -21,6 +21,9 @@ require_relative "astm/identifiers/monograph"
 require_relative "astm/identifiers/adjunct"
 require_relative "astm/identifiers/work_in_progress"
 
+# Scheme (must be loaded after identifiers)
+require_relative "astm/scheme"
+
 module PubidNew
   module Astm
     def self.parse(str)
