@@ -13,6 +13,9 @@ require_relative "asme/builder"
 require_relative "asme/identifiers/base"
 require_relative "asme/identifiers/standard"
 
+# Scheme (must be loaded after identifiers)
+require_relative "asme/scheme"
+
 module PubidNew
   module Asme
     def self.parse(str)
