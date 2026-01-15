@@ -13,6 +13,9 @@ require_relative "csa/identifiers/package"
 require_relative "csa/identifiers/series"
 require_relative "csa/identifiers/cec"
 
+# Scheme (must be loaded after identifiers)
+require_relative "csa/scheme"
+
 module PubidNew
   module Csa
     def self.parse(identifier_string)
