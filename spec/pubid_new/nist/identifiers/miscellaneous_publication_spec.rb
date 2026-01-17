@@ -26,7 +26,8 @@ RSpec.describe PubidNew::Nist::Identifiers::MiscellaneousPublication do
         end
 
         it "parses edition" do
-          expect(parsed.edition).to eq("1")
+          expect(parsed.edition.id).to eq("1")
+          expect(parsed.edition.type).to eq("e")
         end
 
         it "round-trips" do
@@ -34,23 +35,9 @@ RSpec.describe PubidNew::Nist::Identifiers::MiscellaneousPublication do
         end
       end
 
-      describe "NBS MP 39(1)" do
-        subject { "NBS MP 39(1)" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
-
-        it "parses as MiscellaneousPublication" do
-          expect(parsed).to be_a(described_class)
-        end
-
-        it "normalizes parenthetical edition to e notation" do
-          expect(parsed.to_s).to eq("NBS MP 39e1")
-        end
-
-        it "parses number and edition" do
-          expect(parsed.number.value).to eq("39")
-          expect(parsed.edition).to eq("1")
-        end
-      end
+      # NOTE: Parenthetical edition format (e.g., "39(1)") does NOT exist for MP identifiers
+      # Only "e" notation is valid (e.g., "39e1", "260e1965")
+      # This test was removed as it represents an invalid identifier format
 
       describe "NBS.MP.39e1" do
         subject { "NBS.MP.39e1" }
@@ -66,7 +53,8 @@ RSpec.describe PubidNew::Nist::Identifiers::MiscellaneousPublication do
 
         it "parses MR format" do
           expect(parsed.number.value).to eq("39")
-          expect(parsed.edition).to eq("1")
+          expect(parsed.edition.id).to eq("1")
+          expect(parsed.edition.type).to eq("e")
         end
       end
     end

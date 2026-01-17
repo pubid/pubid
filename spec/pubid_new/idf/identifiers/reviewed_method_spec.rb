@@ -9,6 +9,7 @@ RSpec.describe PubidNew::Idf::Identifiers::ReviewedMethod do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
           next if pub_id.match?("^#")
+          next if pub_id.strip.empty?
 
           pub_id_str = pub_id.split("#").first.strip.chomp
           expect { described_class.parse(pub_id_str) }.not_to raise_error
@@ -17,7 +18,7 @@ RSpec.describe PubidNew::Idf::Identifiers::ReviewedMethod do
     end
 
     context "parses identifiers from rm.txt" do
-      let(:examples_file) { "idf/idf-rm.txt" }
+      let(:examples_file) { "idf/identifiers/full/idf-rm.txt" }
 
       it_behaves_like "parse identifiers from file"
     end

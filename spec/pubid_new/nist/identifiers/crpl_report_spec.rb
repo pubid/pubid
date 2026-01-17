@@ -98,7 +98,7 @@ RSpec.describe PubidNew::Nist::Identifiers::CrplReport do
         end
 
         it "parses range notation" do
-          expect(parsed.number.part).to eq("3-1")
+          expect(parsed.part.value).to eq("3-1")
         end
       end
 
@@ -111,7 +111,7 @@ RSpec.describe PubidNew::Nist::Identifiers::CrplReport do
         end
 
         it "parses part notation" do
-          expect(parsed.number.part).to eq("3-1")
+          expect(parsed.part.value).to eq("3-1")
         end
 
         it "round-trips" do
@@ -132,7 +132,7 @@ RSpec.describe PubidNew::Nist::Identifiers::CrplReport do
         end
 
         it "parses part and supplement" do
-          expect(parsed.number.part).to eq("3-1")
+          expect(parsed.part.value).to eq("3-1")
           expect(parsed.supplement).to eq("A")
         end
       end
@@ -146,7 +146,7 @@ RSpec.describe PubidNew::Nist::Identifiers::CrplReport do
         end
 
         it "parses part and supplement" do
-          expect(parsed.number.part).to eq("3-1")
+          expect(parsed.part.value).to eq("3-1")
           expect(parsed.supplement).to eq("A")
         end
 

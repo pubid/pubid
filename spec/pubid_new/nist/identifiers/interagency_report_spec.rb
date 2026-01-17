@@ -545,7 +545,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.part.value).to eq("1")
         end
       end
 
@@ -562,7 +562,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses part from trailing number" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.part.value).to eq("1")
         end
       end
 
@@ -592,7 +592,7 @@ RSpec.describe PubidNew::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses multi-digit part" do
-          expect(parsed.number.part).to eq("11")
+          expect(parsed.part.value).to eq("11")
         end
       end
 

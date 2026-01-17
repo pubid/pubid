@@ -157,7 +157,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.part.value).to eq("1")
         end
 
         it "round-trips" do
@@ -178,7 +178,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.part.value).to eq("1")
         end
       end
     end
@@ -193,7 +193,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.part.value).to eq("1")
         end
 
         it "parses addendum" do
