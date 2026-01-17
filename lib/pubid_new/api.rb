@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "api/identifier"
+require_relative "api/scheme"
 
 module PubidNew
   module Api

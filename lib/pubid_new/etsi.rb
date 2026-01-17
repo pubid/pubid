@@ -3,6 +3,7 @@
 require "lutaml/model"
 require_relative "components/date"
 require_relative "etsi/identifier"
+require_relative "etsi/scheme"
 
 module PubidNew
   module Etsi

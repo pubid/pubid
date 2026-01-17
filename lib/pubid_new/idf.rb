@@ -1,3 +1,5 @@
+require_relative "idf/identifier"
+require_relative "idf/single_identifier"
 require_relative "idf/identifiers/international_standard"
 require_relative "idf/identifiers/reviewed_method"
 require_relative "idf/identifiers/amendment"

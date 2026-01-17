@@ -2,6 +2,7 @@
 
 require "lutaml/model"
 require_relative "jis/identifier"
+require_relative "jis/scheme"
 
 module PubidNew
   module Jis

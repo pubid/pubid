@@ -2,6 +2,7 @@
 
 require "lutaml/model"
 require_relative "ccsds/identifier"
+require_relative "ccsds/scheme"
 
 module PubidNew
   module Ccsds

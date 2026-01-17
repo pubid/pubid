@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "sae/identifier"
+require_relative "sae/scheme"
 
 module PubidNew
   module Sae
@@ -8,4 +9,7 @@ module PubidNew
       Identifier.parse(input)
     end
   end
+
+  # Register this flavor with the PubidNew registry
+  Registry.register(:sae, Sae)
 end

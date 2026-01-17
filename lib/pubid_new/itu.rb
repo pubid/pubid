@@ -3,6 +3,7 @@
 require "lutaml/model"
 require_relative "components/date"
 require_relative "itu/identifier"
+require_relative "itu/scheme"
 
 module PubidNew
   module Itu
