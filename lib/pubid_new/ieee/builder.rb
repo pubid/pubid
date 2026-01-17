@@ -141,13 +141,20 @@ module PubidNew
         # Build IEEE portion
         ieee_id = build_single_identifier(parsed[:ieee_portion])
 
-        # Extract CSA portion as string (it's complex, just store as string for now)
+        # Extract and parse CSA portion using CSA parser
         csa_string = extract_value(parsed[:csa_portion])
+
+        # Prepend "CSA " prefix if not present (CSA parser expects this format)
+        csa_string = "CSA #{csa_string}" unless csa_string.start_with?("CSA") || csa_string.start_with?("CAN/")
+
+        # Use CSA parser to parse the CSA portion
+        require_relative "../../csa" unless defined?(PubidNew::Csa)
+        csa_id = PubidNew::Csa.parse(csa_string)
 
         require_relative "identifiers/csa_dual_published"
         Identifiers::CsaDualPublished.new(
           ieee_identifier: ieee_id,
-          csa_portion: csa_string,
+          csa_identifier: csa_id,
         )
       end
 
@@ -156,10 +163,25 @@ module PubidNew
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
 
+        # Handle multi-numbered identifiers (cross-reference and joint standards)
+        if parsed_hash[:primary_identifier] && (parsed_hash[:secondary_crossref] || parsed_hash[:secondary_joint])
+          return build_multi_numbered_identifier(parsed_hash)
+        end
+
         # Handle corrigendum supplements (check for base_identifier + cor_number)
         # This enables recursive base identifier parsing like ISO/IEC Amendment
         if parsed_hash[:base_identifier] && parsed_hash[:cor_number]
           return build_corrigendum_supplement(parsed_hash)
+        end
+
+        # Handle interpretation supplements (check for base_identifier + int_year)
+        if parsed_hash[:base_identifier] && (parsed_hash[:int_year] || parsed_hash[:interpretation])
+          return build_interpretation_supplement(parsed_hash)
+        end
+
+        # Handle conformance supplements (check for base_identifier + conf_number)
+        if parsed_hash[:base_identifier] && parsed_hash[:conf_number]
+          return build_conformance_supplement(parsed_hash)
         end
 
         # Handle joint development patterns from parser
@@ -255,6 +277,158 @@ module PubidNew
           base_identifier: base_identifier,
           cor_number: cor_number,
           cor_year: cor_year,
+        )
+      end
+
+      # Build interpretation supplement with recursive base parsing
+      # @param parsed_hash [Hash] parsed data with base and supplement info
+      # @return [Identifiers::InterpretationIdentifier] interpretation identifier
+      def build_interpretation_supplement(parsed_hash)
+        # Reconstruct base identifier string from parsed components (same logic as corrigendum)
+        base_parts = []
+        base_data = parsed_hash[:base_identifier]
+
+        # Extract publisher
+        if base_data[:publishers]
+          pub_data = base_data[:publishers]
+          publisher_str = extract_value(pub_data[:publisher])
+
+          if pub_data[:copublishers] && !pub_data[:copublishers].empty?
+            copubs = pub_data[:copublishers]
+            copubs = [copubs] unless copubs.is_a?(Array)
+            copub_strs = copubs.map do |cp|
+              extract_value(cp[:copublisher])
+            end.compact
+            publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
+          end
+
+          base_parts << publisher_str
+        end
+
+        # Extract type
+        if base_data[:type]
+          base_parts << extract_value(base_data[:type])
+        end
+
+        # Extract number with parts and year
+        number_str = extract_value(base_data[:number])
+
+        # Add part if present
+        if base_data[:part]
+          part_val = extract_value(base_data[:part])
+          separator = number_str.match?(/^[A-Z]/) ? "." : "."
+          number_str += separator + part_val
+        end
+
+        # Add subpart if present
+        if base_data[:subpart]
+          subparts = base_data[:subpart]
+          subparts = [subparts] unless subparts.is_a?(Array)
+          subparts.each do |sp|
+            subpart_val = extract_value(sp)
+            number_str += ".#{subpart_val}" if subpart_val
+          end
+        end
+
+        # Add year with dash
+        if base_data[:year]
+          year_val = extract_value(base_data[:year])
+          number_str += "-#{year_val}"
+        end
+
+        base_parts << number_str
+
+        # Build base string and recursively parse it
+        base_string = base_parts.join(" ")
+
+        # Recursively parse base identifier using Base.parse
+        base_identifier = Identifiers::Base.parse(base_string)
+
+        # Extract interpretation attributes
+        int_year = extract_value(parsed_hash[:int_year])
+
+        # Create InterpretationIdentifier with parsed base
+        require_relative "identifiers/interpretation_identifier"
+        Identifiers::InterpretationIdentifier.new(
+          base_identifier: base_identifier,
+          int_year: int_year,
+        )
+      end
+
+      # Build conformance supplement with recursive base parsing
+      # @param parsed_hash [Hash] parsed data with base and supplement info
+      # @return [Identifiers::ConformanceIdentifier] conformance identifier
+      def build_conformance_supplement(parsed_hash)
+        # Reconstruct base identifier string from parsed components (same logic as corrigendum)
+        base_parts = []
+        base_data = parsed_hash[:base_identifier]
+
+        # Extract publisher
+        if base_data[:publishers]
+          pub_data = base_data[:publishers]
+          publisher_str = extract_value(pub_data[:publisher])
+
+          if pub_data[:copublishers] && !pub_data[:copublishers].empty?
+            copubs = pub_data[:copublishers]
+            copubs = [copubs] unless copubs.is_a?(Array)
+            copub_strs = copubs.map do |cp|
+              extract_value(cp[:copublisher])
+            end.compact
+            publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
+          end
+
+          base_parts << publisher_str
+        end
+
+        # Extract type
+        if base_data[:type]
+          base_parts << extract_value(base_data[:type])
+        end
+
+        # Extract number with parts and year
+        number_str = extract_value(base_data[:number])
+
+        # Add part if present
+        if base_data[:part]
+          part_val = extract_value(base_data[:part])
+          separator = number_str.match?(/^[A-Z]/) ? "." : "."
+          number_str += separator + part_val
+        end
+
+        # Add subpart if present
+        if base_data[:subpart]
+          subparts = base_data[:subpart]
+          subparts = [subparts] unless subparts.is_a?(Array)
+          subparts.each do |sp|
+            subpart_val = extract_value(sp)
+            number_str += ".#{subpart_val}" if subpart_val
+          end
+        end
+
+        # Add year with dash
+        if base_data[:year]
+          year_val = extract_value(base_data[:year])
+          number_str += "-#{year_val}"
+        end
+
+        base_parts << number_str
+
+        # Build base string and recursively parse it
+        base_string = base_parts.join(" ")
+
+        # Recursively parse base identifier using Base.parse
+        base_identifier = Identifiers::Base.parse(base_string)
+
+        # Extract conformance attributes
+        conf_number = extract_value(parsed_hash[:conf_number])
+        conf_year = extract_value(parsed_hash[:conf_year])
+
+        # Create ConformanceIdentifier with parsed base
+        require_relative "identifiers/conformance_identifier"
+        Identifiers::ConformanceIdentifier.new(
+          base_identifier: base_identifier,
+          conf_number: conf_number,
+          conf_year: conf_year,
         )
       end
 
@@ -375,26 +549,85 @@ module PubidNew
         Identifiers::SiStandard.new(**attributes)
       end
 
+      # Build multi-numbered identifier from parsed data
+      # @param parsed [Hash] parsed multi-numbered data
+      # @return [Identifiers::MultiNumberedIdentifier] multi-numbered identifier
+      def build_multi_numbered_identifier(parsed)
+        require_relative "identifiers/multi_numbered_identifier"
+
+        # Build primary identifier
+        primary_id = build_single_identifier(parsed[:primary_identifier])
+
+        # Build secondary identifier based on format
+        if parsed[:secondary_crossref]
+          # Cross-reference format: /C62.22.1-1996
+          # Reconstruct as full IEEE identifier
+          crossref_str = extract_value(parsed[:secondary_crossref])
+          secondary_id = Identifiers::Base.parse("IEEE C#{crossref_str}")
+        elsif parsed[:secondary_joint]
+          # Joint standard format: ", Std 1177-1989"
+          # Build from parsed components
+          secondary_id = build_single_identifier(parsed[:secondary_joint])
+        else
+          secondary_id = nil
+        end
+
+        Identifiers::MultiNumberedIdentifier.new(
+          primary_identifier: primary_id,
+          secondary_identifier: secondary_id,
+        )
+      end
+
       # Determine which identifier class to use based on attributes
+      # CRITICAL: Use Scheme for type-based decisions, NOT hardcoded logic here
+      # Builder's job is ONLY to cast types, not make business decisions
       def determine_identifier_class(attributes)
+        # Get type from attributes and use Scheme to locate class
+        type_code = attributes[:type]
+
+        # Use Scheme registry for type-to-class mapping
+        if type_code
+          klass = Ieee::Scheme.locate_identifier_klass_by_type_code(type_code)
+          return klass if klass
+        end
+
+        # Non-type-based routing (structural patterns, not business logic)
+        # These are structural checks, not type decisions
+
         # Check for SI standards (handles both SI and PSI via typed_stage)
-        if ["SI", "PSI"].include?(attributes[:type])
+        if ["SI", "PSI"].include?(type_code)
           require_relative "identifiers/si_standard"
           return Identifiers::SiStandard
         end
 
-        # Check for corrigendum supplements
+        # Check for interpretation supplements (structural: has interpretation flag or int_year)
+        if attributes[:interpretation] || attributes[:int_year]
+          require_relative "identifiers/interpretation_identifier"
+          return Identifiers::InterpretationIdentifier
+        end
+
+        # Check for conformance supplements (structural: has conf_number)
+        if attributes[:conf_number]
+          require_relative "identifiers/conformance_identifier"
+          return Identifiers::ConformanceIdentifier
+        end
+
+        # Check for corrigendum supplements (structural: has cor_number)
         if attributes[:cor_number]
           require_relative "identifiers/corrigendum"
           return Identifiers::Corrigendum
         end
+
+        # Check for multi-numbered standards (structural: has crossref or joint patterns)
+        # These are handled at the build() method level, not here
+        # (cross-reference patterns like /C62.22.1-1996 and joint standards)
 
         # Check for adopted standards (parenthetical adoptions)
         if attributes[:adoption] || (attributes[:parameters] && attributes[:parameters][:adoption])
           return Identifiers::AdoptedStandard
         end
 
-        # Check for redline standards
+        # Check for redline standards (structural: has redline flag)
         if attributes[:redline]
           return Identifiers::RedlinedStandard
         end
@@ -485,9 +718,33 @@ module PubidNew
 
         # Handle case where parser captured number without "P" prefix
         # Check original input to see if there was a P before the number
-        if !type_value && @original_input && @original_input.match?(/IEEE\s+P\d/)
+        if !type_value && @original_input && @original_input.match?(/IEEE\s+P/)
           # Extract P as type since it was in the original but parser stripped it
           type_value = "P"
+        end
+
+        # Handle ANSI P prefix patterns (e.g., "ANSI PN42.34-2015")
+        if !type_value && @original_input && @original_input.match?(/ANSI\s+P/)
+          # Extract P as type since it was in the original but parser stripped it
+          type_value = "P"
+        end
+
+        # Special case: For IEEE/CSA dual published patterns, strip P prefix from code
+        # Pattern: "IEEE/CSA P844.1-2017" -> code should be "844.1" not "P844.1"
+        if code_str&.start_with?("P") && @original_input&.include?("/CSA")
+          # Check if the copublisher attribute indicates CSA
+          pub_data = parsed[:publishers]
+          has_csa_copub = if pub_data && pub_data[:copublishers]
+                            copubs = pub_data[:copublishers]
+                            copubs = [copubs] unless copubs.is_a?(Array)
+                            copubs.any? { |cp| extract_value(cp[:copublisher])&.include?("CSA") }
+                          else
+                            @original_input&.include?("/CSA")
+                          end
+
+          if has_csa_copub
+            code_str = code_str.sub(/^P/, "")
+          end
         end
 
         if code_str && !code_parts.empty?
@@ -524,7 +781,9 @@ module PubidNew
         end
 
         # Set type attribute for backward compatibility (after P extraction)
-        attributes[:type] = type_value if type_value
+        # BUT: Don't set type to "P" - "P" is a project status (typed_stage), not a type
+        # Type should only be things like "Std", "No", etc.
+        attributes[:type] = type_value if type_value && type_value != "P"
 
         # Lookup typed_stage from registry
         typed_stage_abbr = determine_stage_abbr(type_value, draft_status_value,
@@ -555,6 +814,18 @@ module PubidNew
 
         # Handle amendment
         handle_amendment(parsed, attributes)
+
+        # Handle interpretation (already extracted as boolean)
+        # attributes[:interpretation] = true if parsed[:interpretation]
+
+        # Handle conformance
+        handle_conformance(parsed, attributes)
+
+        # Handle ASHRAE copub
+        handle_ashrae_copub(parsed, attributes)
+
+        # Handle IEEE crossref
+        handle_ieee_crossref(parsed, attributes)
 
         # Handle reaffirmed
         handle_reaffirmed(parsed, attributes)
@@ -760,6 +1031,44 @@ module PubidNew
           attributes[:reaffirmed] = extract_value(reaf_data[:year])
         elsif parsed[:reaffirmed]
           attributes[:reaffirmed] = extract_value(parsed[:reaffirmed])
+        end
+      end
+
+      # Handle conformance document information
+      def handle_conformance(parsed, attributes)
+        if parsed[:conformance].is_a?(Hash)
+          conf_data = parsed[:conformance]
+          attributes[:conf_number] = extract_value(conf_data[:conf_number])
+          if conf_data[:conf_year]
+            attributes[:conf_year] = extract_value(conf_data[:conf_year])
+          end
+        elsif parsed[:conformance]
+          attributes[:conformance] = extract_value(parsed[:conformance])
+        end
+      end
+
+      # Handle ASHRAE joint publication information
+      def handle_ashrae_copub(parsed, attributes)
+        if parsed[:ashrae_copub].is_a?(Hash)
+          ashrae_data = parsed[:ashrae_copub]
+          attributes[:ashrae_number] = extract_value(ashrae_data[:ashrae_number])
+          if ashrae_data[:ashrae_year]
+            attributes[:ashrae_year] = extract_value(ashrae_data[:ashrae_year])
+          end
+        elsif parsed[:ashrae_copub]
+          attributes[:ashrae_copub] = extract_value(parsed[:ashrae_copub])
+        end
+      end
+
+      # Handle IEEE cross-reference information
+      def handle_ieee_crossref(parsed, attributes)
+        if parsed[:ieee_crossref].is_a?(Hash)
+          crossref_data = parsed[:ieee_crossref]
+          # Extract the cross-reference string (e.g., "C62.22.1-1996")
+          # Store it for rendering
+          attributes[:crossref] = "/C" + extract_value(crossref).to_s.sub(/^\//, "")
+        elsif parsed[:ieee_crossref]
+          attributes[:crossref] = extract_value(parsed[:ieee_crossref])
         end
       end
 

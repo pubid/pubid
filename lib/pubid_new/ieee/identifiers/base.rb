@@ -45,6 +45,11 @@ module PubidNew
         attribute :interpretation, :boolean, default: -> {
           false
         } # /INT notation
+        attribute :conf_number, :string # Conformance document number
+        attribute :conf_year, :string # Conformance document year
+        attribute :ashrae_number, :string # ASHRAE Guideline number
+        attribute :ashrae_year, :string # ASHRAE Guideline year
+        attribute :crossref, :string # IEEE cross-reference (e.g., /C62.22.1-1996)
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -123,6 +128,11 @@ module PubidNew
           require_relative "dual_published"
           require_relative "adopted_standard"
           require_relative "iec_ieee_copublished"
+
+          # Preprocessing: Convert comma-separated dual standards to "and" format
+          # This must happen BEFORE the "and" check below
+          # Pattern: "IEEE Std 960-1989, Std 1177-1989" -> "IEEE Std 960-1989 and IEEE Std 1177-1989"
+          input = input.gsub(/(\d{4}),\s+Std\s/, '\1 and IEEE Std ')
 
           # Check for IEC/IEEE copublished patterns first (before other checks)
           if input.start_with?("IEC/IEEE ")
@@ -463,6 +473,21 @@ module PubidNew
 
             # Append interpretation notation (/INT)
             result += "/INT" if interpretation
+
+            # Append conformance notation (/ConformanceNN-YYYY)
+            if conf_number
+              result += "/Conformance#{conf_number}"
+              result += "-#{conf_year}" if conf_year
+            end
+
+            # Append ASHRAE joint publication (/ASHRAE Guideline NN-YYYY)
+            if ashrae_number
+              result += "/ASHRAE Guideline #{ashrae_number}"
+              result += "-#{ashrae_year}" if ashrae_year
+            end
+
+            # Append IEEE cross-reference (/C62.22.1-1996)
+            result += crossref if crossref
 
             parts << result
           elsif should_render_type && typed_stage&.project_status

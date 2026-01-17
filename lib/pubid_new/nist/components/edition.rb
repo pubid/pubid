@@ -51,7 +51,7 @@ module PubidNew
 
         private
 
-        # Build short format: "e2", "e2.June1908", "e2.1908", "e2.50", "r1963", "-April1909"
+        # Build short format: "e2", "e2.June1908", "e2.1908", "e2.50", "r1963", "-April1909", "r1a"
         # If original_prefix is set, preserves original format (e.g., "Rev. 5" not "r5")
         def build_short_format
           # For revision type, use original prefix if available (format preservation)
@@ -66,6 +66,10 @@ module PubidNew
             # Pattern: "-April1909" not "-.April1909"
             if type == "-" && additional_text.match?(/^[A-Z][a-z]+\d{4}$/)
               result = "-#{additional_text}"
+            # For letter suffixes (single letter like "a", "A", "b", "B", etc.), NO dot separator
+            # Pattern: "r1a" for SP patterns like 800-22r1a
+            elsif additional_text.match?(/^[A-Za-z]$/)
+              result += additional_text.downcase  # Normalize to lowercase: r1a
             else
               # For ALL years (2-digit or 4-digit) and month+year, use DOT separator
               # Examples: e2.50, e2.1915, e2.June1908

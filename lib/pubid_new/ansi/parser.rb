@@ -1,4 +1,5 @@
 require "parslet"
+# frozen_string_literal: true
 require_relative "../parser/common_parse_rules"
 require_relative "../parser/common_parse_methods"
 

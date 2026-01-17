@@ -1,4 +1,5 @@
 require_relative "idf/identifier"
+# frozen_string_literal: true
 require_relative "idf/single_identifier"
 require_relative "idf/identifiers/international_standard"
 require_relative "idf/identifiers/reviewed_method"

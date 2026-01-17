@@ -1,4 +1,5 @@
 require_relative "../scheme"
+# frozen_string_literal: true
 require_relative "identifiers/standard"
 
 module PubidNew

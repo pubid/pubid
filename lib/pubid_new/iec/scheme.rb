@@ -1,4 +1,5 @@
 require_relative "identifiers/international_standard"
+# frozen_string_literal: true
 require_relative "identifiers/technical_specification"
 require_relative "identifiers/technical_report"
 require_relative "identifiers/publicly_available_specification"

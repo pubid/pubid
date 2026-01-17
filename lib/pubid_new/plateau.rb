@@ -1,4 +1,5 @@
 require "parslet"
+# frozen_string_literal: true
 require_relative "plateau/parser"
 require_relative "plateau/scheme"
 require_relative "plateau/builder"

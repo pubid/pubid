@@ -1,4 +1,5 @@
 require_relative "base"
+# frozen_string_literal: true
 
 module PubidNew
   module Iec

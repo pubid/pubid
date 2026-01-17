@@ -1,4 +1,5 @@
 require_relative "base"
+# frozen_string_literal: true
 require_relative "../../components/typed_stage"
 
 module PubidNew

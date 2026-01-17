@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "base"
+require_relative "supplement_identifier"
 
 module PubidNew
   module Ieee
@@ -8,8 +8,7 @@ module PubidNew
       # Corrigendum identifier for IEEE standards
       # Represents corrections to published standards
       # Example: IEEE Std 535-2013/Cor. 1-2017
-      class Corrigendum < Base
-        attribute :base_identifier, Base
+      class Corrigendum < SupplementIdentifier
         attribute :cor_number, :string
         attribute :cor_year, :string
 

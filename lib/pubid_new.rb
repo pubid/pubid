@@ -61,6 +61,10 @@ require_relative "pubid_new/asme"
 require_relative "pubid_new/csa"
 require_relative "pubid_new/cie"
 require_relative "pubid_new/astm"
+require_relative "pubid_new/ashrae"
+require_relative "pubid_new/amca"
+require_relative "pubid_new/api"
+require_relative "pubid_new/sae"
 
 module PubidNew
 end

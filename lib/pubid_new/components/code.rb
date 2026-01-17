@@ -1,4 +1,5 @@
 require "lutaml/model"
+# frozen_string_literal: true
 
 module PubidNew
   module Components

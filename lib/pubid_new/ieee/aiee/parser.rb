@@ -64,6 +64,10 @@ module PubidNew
             # But don't match if it's actually "Nos 72 and 73" pattern
             (digits >> upper >> (space >> str("and")).absent?) |
 
+            # Number with parenthetical variant: 431 (105)
+            # Pattern: main number followed by alternate number in parentheses
+            (digits.as(:main_number) >> space >> (str("(") >> digits.as(:alt_number) >> str(")")).as(:parenthetical)) |
+
             # Simple number: 56, 123, 18, 552
             digits >>
 
@@ -88,14 +92,16 @@ module PubidNew
             )
         end
 
-        # Short form: "-1962" (directly after number)
+        # Short form: "-1962" (directly after number) or " -1958" (with space)
+        # ENHANCED: Allow leading space for patterns like "431 (105) -1958"
         rule(:date_short) do
-          dash >> year.as(:year)
+          space.maybe >> dash >> year.as(:year)
         end
 
         # Combined date rule
+        # Try short form first to avoid matching empty prefix in date_long
         rule(:date) do
-          (date_long | date_short).maybe
+          (date_short | date_long).maybe
         end
 
         # Complete AIEE identifier

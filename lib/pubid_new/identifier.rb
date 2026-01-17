@@ -1,4 +1,5 @@
 require_relative "components/code"
+# frozen_string_literal: true
 require_relative "components/date"
 require_relative "components/edition"
 require_relative "components/language"

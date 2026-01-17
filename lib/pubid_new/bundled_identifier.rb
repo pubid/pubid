@@ -1,4 +1,5 @@
 require_relative "identifier"
+# frozen_string_literal: true
 
 module PubidNew
   # Identifier that represents a combined bundle of documents using the + operator.

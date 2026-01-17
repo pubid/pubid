@@ -1,4 +1,5 @@
 require_relative "../identifier"
+# frozen_string_literal: true
 require_relative "../components/vap_suffix"
 
 module PubidNew

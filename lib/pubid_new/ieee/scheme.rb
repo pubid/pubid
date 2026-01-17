@@ -56,18 +56,18 @@ module PubidNew
         end
 
         # Locate identifier class by type code
-        # @param type_code [String, Symbol] type code (:standard, :draft, etc.)
+        # @param type_code [String, Symbol] type code (:standard, :draft, :std, etc.)
         # @return [Class] identifier class
         def locate_identifier_klass_by_type_code(type_code)
           type_str = type_code.to_s
 
           case type_str
-          when "draft"
+          when "draft", "Draft Std", "Draft"
             require_relative "identifiers/base"
             Identifiers::Base # For now, use Base for drafts
-          when "standard"
-            require_relative "identifiers/base"
-            Identifiers::Base
+          when "standard", "Std", "std"
+            require_relative "identifiers/standard"
+            Identifiers::Standard
           else
             # Default to base identifier
             require_relative "identifiers/base"

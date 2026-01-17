@@ -9,9 +9,9 @@ RSpec.describe "NIST Multi-Format Rendering" do
       expect(identifier.to_s(:short)).to eq("NIST SP 800-53")
     end
 
-    it "renders identifier with edition in short format" do
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 r5")
-      expect(identifier.to_s(:short)).to eq("NIST SP 800-53 r5")
+    it "renders identifier with revision in short format" do
+      identifier = PubidNew::Nist.parse("NIST SP 800-53r5")
+      expect(identifier.to_s(:short)).to eq("NIST SP 800-53r5")
     end
 
     it "renders identifier with stage in short format" do
@@ -36,9 +36,9 @@ RSpec.describe "NIST Multi-Format Rendering" do
       expect(identifier.to_s(:mr)).to eq("NIST.SP.800-53")
     end
 
-    it "renders identifier with edition in mr format" do
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 r5")
-      expect(identifier.to_s(:mr)).to eq("NIST.SP.800-53 r5")
+    it "renders identifier with revision in mr format" do
+      identifier = PubidNew::Nist.parse("NIST SP 800-53r5")
+      expect(identifier.to_s(:mr)).to eq("NIST.SP.800-53r5")
     end
 
     it "renders identifier with stage in mr format" do
@@ -83,8 +83,8 @@ RSpec.describe "NIST Multi-Format Rendering" do
       expect(result).to include("800-53")
     end
 
-    it "renders identifier with edition in abbreviated format" do
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 r5")
+    it "renders identifier with revision in abbreviated format" do
+      identifier = PubidNew::Nist.parse("NIST SP 800-53r5")
       result = identifier.to_s(:abbrev)
       expect(result).to include("r5")
     end

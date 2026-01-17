@@ -213,6 +213,7 @@ class FixturesClassifier
     when "oiml" then detect_oiml_class(id_str)
     when "idf" then detect_idf_class(id_str)
     when "csa" then detect_csa_class(id_str)
+    when "ashrae" then detect_ashrae_class(id_str)
     else "unknown"
     end
   end
@@ -248,8 +249,12 @@ class FixturesClassifier
     "international_standard"
   end
 
-  def detect_ieee_class(_id_str)
-    "standard"
+  def detect_ieee_class(id_str)
+    return "nesc/standard" if /\bC2-/.match?(id_str)
+    return "nesc/handbook" if /NESC.*Handbook/i.match?(id_str)
+    return "standard" if /\bIEEE Std\b/.match?(id_str)
+    return "base" if /\bIEEE\b/.match?(id_str)
+    return "standard" # Default fallback for IEEE
   end
 
   def detect_nist_class(id_str)
@@ -329,9 +334,22 @@ class FixturesClassifier
     "standard"
   end
 
+  def detect_ashrae_class(id_str)
+    return "guideline" if /\bGuideline\b/.match?(id_str)
+    return "addendum" if /\bAddendum\b/.match?(id_str)
+    return "interpretation" if /\bInterpretations\b/.match?(id_str)
+    return "errata" if /\bErrata\b/.match?(id_str)
+
+    "standard"
+  end
+
   def append_to_file(status, class_name, content)
     filename = File.join(fixtures_dir, "identifiers", status,
                          "#{class_name}.txt")
+
+    # Create parent directories if needed
+    parent_dir = File.dirname(filename)
+    FileUtils.mkdir_p(parent_dir) unless Dir.exist?(parent_dir)
 
     unless File.exist?(filename)
       File.open(filename, "w") do |f|

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module PubidNew
   module Components
     # Language component (typically a language code)

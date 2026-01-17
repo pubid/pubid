@@ -1,4 +1,5 @@
 require "lutaml/model"
+# frozen_string_literal: true
 require_relative "../components/publisher"
 require_relative "../components/code"
 require_relative "../components/date"

@@ -21,11 +21,9 @@ RSpec.describe "NIST Edition Year Normalization" do
 
     it "does not normalize patterns with existing edition (e2-YYYY)" do
       # This pattern has an existing edition indicator (e2) followed by a year
-      # The normalization fix prevents incorrect transformation that would lose the edition
-      # FUTURE ENHANCEMENT: Should parse as "11e2.1915" (edition 2 with year as additional_text)
-      # CURRENT: Parses to "11e1915" (edition number lost - needs parser enhancement)
+      # The fix now correctly preserves the edition number and renders with CIRC dot notation
       identifier = PubidNew::Nist.parse("NBS CIRC 11e2-1915")
-      expect(identifier.to_s).to eq("NBS CIRC 11e1915")
+      expect(identifier.to_s).to eq("NBS CIRC 11e2.1915")
     end
   end
 

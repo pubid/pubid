@@ -1,4 +1,5 @@
 require_relative "identifiers/base"
+# frozen_string_literal: true
 require_relative "identifiers/corrigendum"
 
 module PubidNew

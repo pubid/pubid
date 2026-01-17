@@ -1,33 +1,35 @@
 Flavor: NIST
-Classified: 2026-01-01 09:24:10
+Classified: 2026-01-16 02:31:59
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
 Total: 19826
-Pass: 19824 (99.99%)
-Fail: 2 (0.01%)
+Pass: 19812 (99.93%)
+Fail: 14 (0.07%)
 
 BY CLASS
 ----------------------------------------------------------------------
 base                                     Pass: 1284/1284 (100.0%)
-circular                                 Pass: 867/867 (100.0%)
-circular_supplement                      Pass: 2/2 (100.0%)
-commercial_standard                      Pass: 276/276 (100.0%)
-commercial_standard_emergency            Pass: 6/6 (100.0%)
+circular                                 Pass: 848/848 (100.0%)
+circular_supplement                      Pass: 22/22 (100.0%)
+commercial_standard                      Pass: 277/277 (100.0%)
+commercial_standard_emergency            Pass: 5/5 (100.0%)
 commercial_standards_monthly             Pass: 99/99 (100.0%)
 crpl_report                              Pass: 36/36 (100.0%)
-federal_information_processing_standards Pass: 367/367 (100.0%)
+federal_information_processing_standards Pass: 363/363 (100.0%)
+fips                                     Pass: 0/4 (0.0%)
 grant_contractor_report                  Pass: 116/116 (100.0%)
 handbook                                 Pass: 357/357 (100.0%)
-internal_report                          Pass: 7820/7820 (100.0%)
-letter_circular                          Pass: 1122/1122 (100.0%)
+interagency_report                       Pass: 7820/7820 (100.0%)
+letter_circular                          Pass: 1117/1117 (100.0%)
 miscellaneous_publication                Pass: 299/299 (100.0%)
 monograph                                Pass: 249/249 (100.0%)
 ncstar                                   Pass: 62/62 (100.0%)
 nsrds                                    Pass: 110/110 (100.0%)
 owmwp                                    Pass: 1/1 (100.0%)
-report                                   Pass: 1805/1805 (100.0%)
-special_publication                      Pass: 2831/2831 (100.0%)
+report                                   Pass: 1803/1803 (100.0%)
+sp                                       Pass: 0/2 (0.0%)
+special_publication                      Pass: 2829/2829 (100.0%)
 technical_note                           Pass: 2115/2115 (100.0%)
-unknown                                  Pass: 0/2 (0.0%)
+unknown                                  Pass: 0/8 (0.0%)

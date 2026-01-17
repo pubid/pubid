@@ -35,6 +35,10 @@ module PubidNew
           end
         end
 
+        def number
+          @number&.to_s
+        end
+
         # Parse AIEE identifier string
         def self.parse(input)
           require_relative "parser"

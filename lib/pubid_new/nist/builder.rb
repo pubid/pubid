@@ -66,6 +66,9 @@ module PubidNew
             first_num = realized_components
           elsif key == :second_number && realized_components.is_a?(Components::Code)
             second_num = realized_components
+          elsif key == :crpl_range && realized_components.is_a?(Components::Code)
+            # crpl_range is treated as second_number for compound number construction
+            second_num = realized_components
           elsif key == :part_number
             part_num = value.to_s
           end
@@ -129,6 +132,11 @@ module PubidNew
               year_part = "19#{year_part}" if year_part.length == 2
 
               identifier.number = Components::Code.new(number: number_part)
+
+              # For edition+year patterns, handling depends on identifier type:
+              # - CIRC: edition number + year as additional_text, rendered with dot ("11e2-1915" → "11e2.1915")
+              # - HB, others: edition number + year as additional_text, rendered with dash ("44e2-1955")
+              # Both use the same Edition component structure, only rendering differs
               identifier.edition = Components::Edition.new(type: "e",
                                                            id: edition_id, additional_text: year_part)
             elsif first_num.value.to_s.match?(/^(\d+)supp?$/) &&
@@ -151,10 +159,17 @@ module PubidNew
               identifier.edition_year = second_num.value.to_s
             else
               # Normal compound number
-              compound_value = "#{first_num.value}-#{second_num.value}"
-              # Include part number if present (GCR pattern: 85-3273-37)
-              compound_value += "-#{part_num}" if part_num
-              identifier.number = Components::Code.new(number: compound_value)
+              # For IR identifiers, part_number should be a Part component (type="pt"), not in compound number
+              if part_num && parsed_hash[:series].to_s.include?("IR")
+                # For IR, create Part component with type="pt"
+                identifier.part = Components::Part.new(type: "pt", value: part_num)
+                identifier.number = Components::Code.new(number: "#{first_num.value}-#{second_num.value}")
+              else
+                # For GCR and others, include part number in compound number
+                compound_value = "#{first_num.value}-#{second_num.value}"
+                compound_value += "-#{part_num}" if part_num
+                identifier.number = Components::Code.new(number: compound_value)
+              end
             end
           else
             # No second_num, use first_num directly
@@ -167,6 +182,24 @@ module PubidNew
           # Convert extracted revision to Edition component
           identifier.edition = Components::Edition.new(type: "r",
                                                        id: extracted_revision.to_s)
+        end
+
+        # IR-SPECIFIC: Handle compound numbers that were converted to edition+year format
+        # For IR identifiers, "84-2946" should remain as compound number, not become "84e2946"
+        # The preprocessing converts "84-2946" to "84e2946", so we need to convert it back for IR
+        is_ir = parsed_hash[:series].to_s.include?("IR") rescue false
+        if is_ir && identifier.number && identifier.number.value.to_s.match?(/^(\d+)e(\d{4})$/)
+          # Extract the compound number parts from the edition+year format
+          match_data = identifier.number.value.to_s.match(/^(\d+)e(\d{4})$/)
+          number_part = match_data[1]  # "84"
+          year_part = match_data[2]     # "2946"
+
+          # Convert to compound number format
+          identifier.number = Components::Code.new(number: "#{number_part}-#{year_part}")
+
+          # Clear the edition that was incorrectly set from the year
+          identifier.edition = nil
+          identifier.edition_component = nil
         end
 
         identifier
@@ -404,6 +437,7 @@ module PubidNew
             elsif str_value =~ /^(\d+)e(\d+)$/ && !parsed_hash[:second_number]
               number_part = $1
               edition_id = $2
+
               return {
                 first_number: Components::Code.new(number: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id),
@@ -609,13 +643,22 @@ module PubidNew
           # Pattern: bare UPPERCASE letter suffix (e.g., "800-56A" → number + Part("", "A"))
           # Only matches uppercase letters - won't match revision markers
           # IMPORTANT: For MR format preservation, keep letter suffix as part of number
+          # IMPORTANT: For Report, FIPS, IR, and LC series, preserve letter suffix as part of number
           elsif str_value =~ /^(.+?)([A-Z])$/
             number_part = $1
             letter_part = $2
-            # Check if we should preserve letter suffix in number (for MR format)
-            # When parsed_format is :mr, keep the full number with letter suffix (e.g., "8286C")
-            if parsed_hash[:parsed_format] == :mr
-              # For MR format, preserve letter suffix as part of number
+            # Check if we should preserve letter suffix in number
+            # Check for specific series that need letter suffix preserved
+            is_report = parsed_hash[:series].to_s.include?("RPT") rescue false
+            is_fips = parsed_hash[:series].to_s.include?("FIPS") rescue false
+            is_ir = parsed_hash[:series].to_s.include?("IR") rescue false
+            is_mono = parsed_hash[:series].to_s.include?("MONO") rescue false
+            is_mp = parsed_hash[:series].to_s.include?("MP") rescue false
+            # Check for LC but exclude LCIRC (Letter Circular uses LC, not LCIRC)
+            is_lc = parsed_hash[:series].to_s.include?("LC") && !parsed_hash[:series].to_s.include?("LCIRC") rescue false
+
+            if parsed_hash[:parsed_format] == :mr || is_report || is_fips || is_ir || is_lc || is_mono || is_mp
+              # For MR format, Report, FIPS, IR, LC, MONO, and MP, preserve letter suffix as part of number
               return { type => Components::Code.new(number: str_value) }
             else
               # For other formats, extract letter suffix as separate Part component
@@ -631,8 +674,40 @@ module PubidNew
         when :crpl_range
           return nil if value.nil? || value.to_s.strip.empty?
 
-          # For "1-2_3-1", store as range notation
-          "-#{value}"
+          # For CRPL range patterns like "2_3-1" or "2_3-1A" (with supplement)
+          # Format: X_Y-Z where X,Y,Z are digits, optional trailing letter is supplement
+          # This should split into:
+          # - X → second_number (to combine with first_number as "1-X")
+          # - Y-Z → Part component (with type "pt" for CRPL)
+          # - trailing letter (if present) → Supplement
+          str_value = value.to_s
+
+          # Check for supplement letter suffix (e.g., "2_3-1A" → supplement="A")
+          if str_value =~ /^(\d+)_(\d+-\d+)([A-Z])$/
+            second_num_part = $1  # "2"
+            part_value = $2  # "3-1"
+            supplement_letter = $3  # "A"
+
+            # Return second_number, Part, and Supplement
+            {
+              second_number: Components::Code.new(number: second_num_part),
+              part: Components::Part.new(type: "pt", value: part_value),
+              supplement: supplement_letter,
+            }
+          elsif str_value =~ /^(\d+)_(\d+-\d+)$/
+            # No supplement letter
+            second_num_part = $1  # "2"
+            part_value = $2  # "3-1"
+
+            # Return second_number and Part
+            {
+              second_number: Components::Code.new(number: second_num_part),
+              part: Components::Part.new(type: "pt", value: part_value),
+            }
+          else
+            # Fallback: treat entire value as second_number (shouldn't happen with valid CRPL patterns)
+            Components::Code.new(number: str_value)
+          end
 
         # ========== V2 COMPONENT CASTING ==========
 
@@ -725,7 +800,13 @@ module PubidNew
           str_value = value.to_s.strip
           return nil if str_value.empty?
 
-          str_value
+          # For volume, create Volume component from string value
+          # This handles patterns like "v1" that come from parser as simple strings
+          if type == :volume
+            Components::Volume.new(value: str_value)
+          else
+            str_value
+          end
 
         when :revision
           # Revision MUST be Edition component with type "r"
@@ -865,6 +946,20 @@ module PubidNew
 
         # ========== V2 EDITION COMPONENT ==========
 
+        when :edition_e_date
+          # Edition with "e" prefix + 6-digit date (YYYYMM): e199206, e202103
+          # Used for IR revision+month patterns after preprocessing: "4743rJun1992" → "4743e199206"
+          return nil unless value.is_a?(Hash) && value[:edition_date]
+
+          edition_date = value[:edition_date].to_s
+          # Parse 6-digit date as YYYYMM
+          # Store as id directly - renders as "e199206"
+          {
+            edition: Components::Edition.new(type: "e", id: edition_date),
+            edition_component: Components::Edition.new(type: "e",
+                                                       id: edition_date),
+          }
+
         when :edition_e
           # Edition with "e" prefix: e2, e2021
           return nil unless value.is_a?(Hash) && value[:edition_id]
@@ -887,6 +982,7 @@ module PubidNew
             edition: Components::Edition.new(type: "r", id: edition_id),
             edition_component: Components::Edition.new(type: "r",
                                                        id: edition_id),
+            revision: "r#{edition_id}", # Also set revision string attribute for compatibility
           }
 
         when :edition_rev
@@ -899,6 +995,35 @@ module PubidNew
             edition: Components::Edition.new(type: "r", id: edition_id),
             edition_component: Components::Edition.new(type: "r",
                                                        id: edition_id),
+            revision: "r#{edition_id}", # Also set revision string attribute for compatibility
+          }
+
+        when :edition_r_letter
+          # Revision with "r" prefix and letter suffix: r1a, r2b (for SP patterns like 800-22r1a)
+          return nil unless value.is_a?(Hash) && value[:edition_id] && value[:edition_letter]
+
+          edition_id = value[:edition_id].to_s
+          edition_letter = value[:edition_letter].to_s.downcase
+
+          {
+            edition: Components::Edition.new(type: "r", id: edition_id, additional_text: edition_letter),
+            edition_component: Components::Edition.new(type: "r",
+                                                       id: edition_id,
+                                                       additional_text: edition_letter),
+            revision: "r#{edition_id}#{edition_letter}", # Also set revision string attribute for compatibility
+          }
+
+        when :edition_r_letter_only
+          # Revision with "r" prefix and only letter (no digit): ra, rb (for SP patterns like 800-27ra)
+          return nil unless value.is_a?(Hash) && value[:edition_letter]
+
+          edition_letter = value[:edition_letter].to_s.downcase
+
+          {
+            edition: Components::Edition.new(type: "r", id: edition_letter),
+            edition_component: Components::Edition.new(type: "r",
+                                                       id: edition_letter),
+            revision: "r#{edition_letter}", # Also set revision string attribute for compatibility
           }
 
         when :edition_historical
@@ -915,6 +1040,10 @@ module PubidNew
 
         when :edition_id
           # Captured by edition_e, edition_r, edition_rev, edition_historical
+          nil
+
+        when :edition_date
+          # Captured by edition_e_date
           nil
 
         # ========== LEGACY EDITION (for migration) ==========

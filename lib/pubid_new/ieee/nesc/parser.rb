@@ -119,7 +119,20 @@ module PubidNew
             (comma >> space >> edition).maybe
         end
 
-        # Pattern 3: Draft format
+        # Pattern 3: Name-first format
+        # Examples: "National Electrical Safety Code, C2-2012"
+        #           "National Electrical Safety Code, C2-2012 - Redline"
+        rule(:name_first) do
+          nesc_full_name >>
+            comma >>
+            space >>
+            c2_code >>
+            dash >>
+            year.as(:year) >>
+            (space >> str("-") >> space >> variant.as(:variant)).maybe
+        end
+
+        # Pattern 4: Draft format
         # Examples: "Draft National Electrical Safety Code, January 2016"
         #           "Draft NESC, June 2011"
         rule(:draft_nesc) do
@@ -133,7 +146,7 @@ module PubidNew
         # Main identifier rule - try patterns in order
         # Put most specific patterns first
         rule(:nesc_identifier) do
-          draft_nesc | c2_standard | year_first
+          draft_nesc | name_first | c2_standard | year_first
         end
       end
     end

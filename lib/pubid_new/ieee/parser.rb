@@ -114,6 +114,23 @@ module PubidNew
         )
       end
 
+      # Conformance document patterns (/Conformance01-2003, /Conformance02-2014)
+      # Allow optional space before slash for malformed inputs
+      rule(:conformance) do
+        (space? >> slash >> str("Conformance") >> match("[0-9]").repeat(1).as(:conf_number) >> dash >> year_digits.as(:conf_year)).as(:conformance)
+      end
+
+      # ASHRAE joint publication patterns (/ASHRAE Guideline 21-2012)
+      rule(:ashrae_copub) do
+        (slash >> str("ASHRAE") >> space >> str("Guideline") >> space >> digits.as(:ashrae_number) >> dash >> year_digits.as(:ashrae_year)).as(:ashrae_copub)
+      end
+
+      # IEEE cross-reference patterns (/C62.22.1-1996)
+      # References another IEEE standard from a specific series (e.g., C62, C37, C57)
+      rule(:ieee_crossref) do
+        (slash >> str("C") >> digits >> dot >> digits >> dot >> digits >> dash >> year_digits).as(:ieee_crossref)
+      end
+
       # Document number - support letters and digits, with optional prefix P
       # Complex multi-part numbers like P11073-10404-10419 should be fully captured
       # But simple cases like "623-1976" should not consume the dash before year
@@ -233,8 +250,9 @@ module PubidNew
       end
 
       # Interpretation notation (/INT)
+      # Enhanced to support optional year suffix: /INT-1991, /INT 1991
       rule(:interpretation) do
-        (slash >> str("INT")).as(:interpretation)
+        (slash >> str("INT") >> ((dash | str(":") | space) >> year_digits.as(:int_year)).maybe).as(:interpretation)
       end
 
       # Reaffirmed - enhanced to support (R1992) format without space
@@ -555,7 +573,9 @@ module PubidNew
           # YYYY NESC pattern
           (year_digits >> space >> (str("NESC") | str("National Electrical Safety Code"))) |
           # Draft NESC pattern
-          (str("Draft") >> space >> (str("NESC") | str("National Electrical Safety Code")))
+          (str("Draft") >> space >> (str("NESC") | str("National Electrical Safety Code"))) |
+          # Name-first pattern (NEW)
+          (str("National Electrical Safety Code") >> str(",") >> space >> str("C2-"))
         ).present? >>
           # Delegate to NESC parser if pattern detected
           Nesc::Parser.new.nesc_identifier.as(:nesc)
@@ -621,6 +641,59 @@ module PubidNew
           parenthetical.maybe
       end
 
+      # Interpretation identifier with recursive base parsing
+      # Captures base identifier for recursive parsing, then interpretation supplement
+      # Example: IEEE Std 1076/INT-1991, IEEE Std 1003.1-1988/INT
+      rule(:interpretation_identifier) do
+        # Match a complete base identifier
+        (
+          ((publisher >> copublisher.repeat.as(:copublishers)).as(:publishers) >> space).maybe >>
+          (type_word.as(:type) >> space?).maybe >>
+          number >>
+          part_subpart_year.maybe
+        ).as(:base_identifier) >>
+          # Now match the interpretation portion
+          (slash | dash | space) >>
+          str("INT") >>
+          ((dash | str(":") | space) >> year_digits.as(:int_year)).maybe >> # Optional year suffix
+          parenthetical.maybe
+      end
+
+      # Conformance identifier with recursive base parsing
+      # Captures base identifier for recursive parsing, then conformance supplement
+      # Example: IEEE Std 802.16/Conformance01-2003
+      rule(:conformance_identifier) do
+        # Match a complete base identifier
+        (
+          ((publisher >> copublisher.repeat.as(:copublishers)).as(:publishers) >> space).maybe >>
+          (type_word.as(:type) >> space?).maybe >>
+          number >>
+          part_subpart_year.maybe
+        ).as(:base_identifier) >>
+          # Now match the conformance portion
+          (slash | dash | space) >>
+          str("Conformance") >>
+          match("[0-9]").repeat(1).as(:conf_number) >>
+          dash >>
+          year_digits.as(:conf_year) >>
+          parenthetical.maybe
+      end
+
+      # Multi-numbered identifier: same document with multiple numbers
+      # Examples: IEEE Std 1299/C62.22.1-1996, IEEE Std 960-1989, Std 1177-1989
+      rule(:multi_numbered_identifier) do
+        # Primary identifier (full IEEE identifier)
+        (
+          (publisher >> space).maybe >>
+          (type_word.as(:type) >> space?).maybe >>
+          number >>
+          (part_subpart_year | edition).maybe
+        ).as(:primary_identifier) >>
+          # Separator: slash for cross-ref format, comma for joint standard
+          (slash >> str("C") >> digits >> dot >> digits >> dot >> digits >> dash >> year_digits).as(:secondary_crossref) |
+          (comma >> space >> (type_word.as(:type) >> space?).maybe >> number >> dash >> year_digits).as(:secondary_joint)
+      end
+
       # CSA dual published pattern: IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17
       rule(:csa_dual_published) do
         # IEEE portion (full identifier)
@@ -656,8 +729,11 @@ module PubidNew
           ire_identifier |
           nesc_identifier |
           ieee_astm_si_psi | # NEW Session 171: Add IEEE/ASTM SI/PSI support
+          multi_numbered_identifier | # NEW: Try multi-numbered identifiers before generic patterns
           csa_dual_published | # NEW: Try CSA dual published before generic patterns
           corrigendum_identifier | # NEW: Try corrigendum before generic patterns
+          interpretation_identifier | # NEW: Try interpretation identifier before generic patterns
+          conformance_identifier | # NEW: Try conformance identifier before generic patterns
           joint_development_ieee_format |
           joint_development_iso_format |
           iec_ieee_copublished |
@@ -675,6 +751,9 @@ module PubidNew
           corrigendum.maybe >>
           amendment.maybe >>
           interpretation.maybe >> # NEW: Add /INT support
+          conformance.maybe >> # NEW: Add /Conformance support
+          ashrae_copub.maybe >> # NEW: Add /ASHRAE Guideline support
+          ieee_crossref.maybe >> # NEW: Add /C62.22.1-1996 cross-reference support
           draft.maybe >>
           # Enhanced: Accept both comma and space before month/year
           ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
@@ -692,6 +771,11 @@ module PubidNew
       def self.parse(string)
         # Strip .pdf extension if present (Pattern 3: File Extensions)
         cleaned = string.sub(/\.pdf$/i, "")
+
+        # Note: IEC and ANSI identifiers are NOT filtered here because they can have
+        # IEEE co-publication or adoption. The Base.parse method handles determining
+        # which standards are actually IEEE-related.
+        # ISO-only standards are still filtered as they have separate handling.
 
         # Pattern 3: Replace underscore before ISO stage codes with slash
         # These are joint development drafts that use underscore instead of slash
@@ -724,6 +808,10 @@ module PubidNew
         cleaned = cleaned.gsub("&amp;amp;", "&")   # Double-encoded ampersand
         cleaned = cleaned.gsub("&amp;", "&")       # Single-encoded ampersand
 
+        # NEW: Wrap P&V notation in parentheses (Paper & Video, etc.)
+        # Pattern: "IEEE Std 500-1984 P&V" → "IEEE Std 500-1984 (P&V)"
+        cleaned = cleaned.gsub(/\s+(P&V)\s*$/, ' (\1)')
+
         # NEW Phase 1: Fix number spacing issues (e.g., "C57.1 2.25" → "C57.12.25")
         # This handles cases where a space appears in the middle of a number
         cleaned = cleaned.gsub(/(\d+\.\d+)\s+(\d+\.)/, '\1\2')
@@ -731,6 +819,19 @@ module PubidNew
         # NEW Phase 1: Fix year spacing issues (e.g., "1 996" → "1996")
         # Remove spaces within 4-digit years
         cleaned = cleaned.gsub(/\b(1|2)\s+(\d{3})\b/, '\1\2')
+
+        # NEW: Fix month+year spacing (e.g., "March2016" → "March 2016")
+        # Add space between month name and 4-digit year when they're concatenated
+        cleaned = cleaned.gsub(/\b(January|February|March|April|May|June|July|August|September|October|November|December)(\d{4})\b/, '\1 \2')
+        # Also handle abbreviated months
+        cleaned = cleaned.gsub(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(\d{4})\b/, '\1 \2')
+
+        # NEW: Convert IEC/IEEE space-separated to semicolon format
+        # Pattern: "IEC 61523-3 First edition 2004-09; IEEE 1497" → already semicolon
+        # Pattern: "IEC 62539 First Edition 2007-07 IEEE 930" → needs semicolon
+        # Match: IEC identifier (with edition) + space + IEEE identifier
+        # Be conservative: only convert if IEC has "First edition" or similar and followed by IEEE
+        cleaned = cleaned.gsub(/(IEC\s+\d+(?:-\d+)?(?:\s+First?\s+Edition\s+\d{4}-\d{2})?)\s+(IEEE\s+\S+)/, '\1; \2')
 
         # NEW Phase 1 (Session 141): Remove literal trademark symbol
         # "C57.110™-2018" → "C57.110-2018"
@@ -837,11 +938,6 @@ module PubidNew
           cleaned = cleaned.sub(/;\s+([A-Z][^;]+)$/, ' (\1)')
         end
 
-        # 2. Comma-separated dual to "and IEEE Std" (CombinedIdentifier)
-        # "IEEE Std 960-1989, Std 1177-1989" → "IEEE Std 960-1989 and IEEE Std 1177-1989"
-        # Pattern: year + comma + space + "Std" + space + number
-        cleaned = cleaned.gsub(/(\d{4}),\s+Std\s/, '\1 and IEEE Std ')
-
         # === SESSION 174: Additional TODO.IEEE-MUST-DO.txt Preprocessing ===
 
         # Part A: Edition Abbreviation Normalization (Lines 10-11)
@@ -920,9 +1016,12 @@ module PubidNew
         cleaned = cleaned.gsub(/(\/INT|\/Cor\s+\d+-\d{4})\./, '\1')
 
         # Part G: Conformance Pattern Spacing
-        # 9. Fix spacing in "/Conformance" patterns
+        # 9. Fix spacing in "/Conformance" patterns WITHOUT year (malformed only)
         # "1904.1(TM)/Conformance02" -> "1904.1 /Conformance02" (space before slash)
-        cleaned = cleaned.gsub(/(\d)\/Conformance(\d+)/, '\1 /Conformance\2')
+        # BUT: DO NOT touch valid patterns like "802.16/Conformance01-2003" (with year)
+        # Use positive check for year suffix to exclude valid patterns
+        # Actually, this preprocessing is breaking valid patterns - just remove it entirely
+        # The parser can handle both "6/Conformance01-2003" and "6 /Conformance02" formats
 
         # Part H: Edition Text After /INT
         # 10. Handle ", Month YYYY Edition" after /INT by converting to month-year format

@@ -88,9 +88,11 @@ module PubidNew
         # Generate identifier string in specified format
         # @param format [:full, :long, :abbreviated, :short, :mr] output format
         def to_s(format = nil)
-          # Use parsed_format if available and no explicit format specified
-          # Convert string to symbol if necessary
-          effective_format = format || parsed_format || :short
+          # Default to short format, unless explicit format specified
+          # The parsed_format is stored but not used as default output format
+          # This ensures consistent short format output regardless of input format
+          # Use to_s(:mr) or to_s(:long) explicitly for other formats
+          effective_format = format || :short
           effective_format = effective_format.to_sym if effective_format.is_a?(String)
           case effective_format
           when :full, :long
@@ -214,9 +216,19 @@ module PubidNew
           end
 
           # NEW: Use edition component properly (e2, e2021, r5, -3)
-          # Add space before edition if no number (bare edition case like "e2")
+          # NO space before edition when number present (per NIST spec)
+          # Only add space for bare edition (no number case) or if original_prefix has specific format
           if edition
-            result += (number ? "" : " ") + edition.to_s
+            if edition.original_prefix && !edition.original_prefix.empty?
+              # original_prefix includes the full prefix (e.g., " Rev. " for verbose format)
+              result += edition.to_s
+            elsif number
+              # Number present, NO space: "800-53r5"
+              result += edition.to_s
+            else
+              # Bare edition, add space: " r5"
+              result += " #{edition.to_s}"
+            end
           end
 
           # V2: Use version_component if available, else use version string
@@ -293,8 +305,16 @@ module PubidNew
           result += ".#{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-          # NEW: Use edition component
-          result += edition.to_s if edition
+          # NEW: Use edition component - NO space before edition in MR format (per NIST spec)
+          if edition
+            # If edition has original_prefix set (e.g., verbose " Rev. "), use it as-is
+            # Otherwise, no space needed in MR format: ".800-53r5"
+            if edition.original_prefix && !edition.original_prefix.empty?
+              result += edition.to_s
+            else
+              result += edition.to_s
+            end
+          end
 
           # V2: Use version_component
           result += "#{version_component.to_s(:mr)}" if version_component

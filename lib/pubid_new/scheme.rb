@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module PubidNew
   # < Lutaml::Model::Serializable
   class Scheme

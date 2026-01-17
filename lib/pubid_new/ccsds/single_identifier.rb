@@ -1,4 +1,5 @@
 require "lutaml/model"
+# frozen_string_literal: true
 require_relative "identifier"
 
 module PubidNew

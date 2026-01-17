@@ -38,15 +38,9 @@ module PubidNew
 
         # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
         cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
-        # NEW FIX 1: Revision with 1-2 digits + lowercase letter: "800-22r1a" → "800-22 r1A"
-        # Capture parts separately to avoid interpolation issues
-        cleaned = cleaned.gsub(/(\d)(r)(\d{1,2})([a-z])\b/) do
-          num = $1
-          r_prefix = $2
-          rev_num = $3
-          letter = $4.upcase
-          "#{num} #{r_prefix}#{rev_num}#{letter}"
-        end
+        # REMOVED: Revision with 1-2 digits + lowercase letter preprocessing
+        # This is now handled by the more comprehensive fix at lines 131-142
+        # which keeps "22r1a" together (no space) for second_number pattern matching
 
         # CRITICAL: Normalize lowercase letter suffix to uppercase
         # Fix dash-letter pattern: "6529-a" → "6529-A" (FIXED - was incorrect)
@@ -126,15 +120,24 @@ module PubidNew
         # "8115r1-upd" → "8115 r1-upd" so that later "r1-upd" → "r1 -upd" works
         # But preserve r6/1925 format (don't add space before slash/year)
         # And preserve 300-8r1/upd format (don't separate r1/upd)
-        # ENHANCED: Also handle r1a (revision with letter suffix) - "800-22r1a" → "800-22 r1A"
-        # FIXED: Match full number before revision, not just last digit
-        cleaned = cleaned.gsub(/(\d+)(r\d+)([a-z]?)(?=-|[A-Z]|$)/) do
+        # ENHANCED: Also handle r1a (revision with letter suffix) - "800-22r1a" → "800-22r1A"
+        # FIXED: When there's a letter suffix, keep together for second_number pattern
+        # CRITICAL: Use \d{1,2} instead of \d+ to limit revision to 1-2 digits, allowing [a-z] to match
+        # First rule: Match r+digit+letter (keep together)
+        cleaned = cleaned.gsub(/(\d+)(r\d{1,2})([a-z])(?=-|[A-Z]|$)/) do
           num = $1
           rev = $2
           letter = $3
-          # Uppercase the trailing letter if present
-          letter_fixed = letter.empty? ? "" : letter.upcase
-          "#{num} #{rev}#{letter_fixed}"
+          # Keep together when there's a letter suffix
+          "#{num}#{rev}#{letter.upcase}"
+        end
+        # Second rule: Match r+digit WITHOUT letter suffix (add space)
+        # CRITICAL: Use negative lookahead (?![a-zA-Z]) to avoid matching when there's a letter
+        cleaned = cleaned.gsub(/(\d+)(r\d{1,2})(?![a-zA-Z])(?=-|[A-Z]|$)/) do
+          num = $1
+          rev = $2
+          # Add space when no letter suffix
+          "#{num} #{rev}"
         end
 
         # Fix spaces in version/volume numbers: "v1 1" → "v1.1", "1011-I-2 0" → "1011-I-2.0"
@@ -166,9 +169,11 @@ module PubidNew
         # Fix supplement patterns: ensure space before supplement (5th variant)
         cleaned = cleaned.gsub(/(\d)(sup\d+\b)/, '\1 \2') # 100-2sup1 → 100-2 sup1
 
-        # Fix revision letter patterns: ensure space before revision with letter
-        cleaned = cleaned.gsub(/(\d)(r\d+[a-z])/, '\1 \2')       # 800-22r1a → 800-22 r1a
-        cleaned = cleaned.gsub(/(\d)(r[a-z]+\b)/, "\1 \2")       # 800-27ra → 800-27 ra (one or more letters)
+        # REMOVED: Revision letter patterns that add space before revision with letter
+        # These conflicted with the fix at lines 131-142 which keeps "22r1a" together
+        # for second_number pattern matching. The comprehensive fix now handles:
+        # - "800-22r1a" → "800-22r1A" (kept together, uppercase letter)
+        # - "800-22r1" → "800-22 r1" (space added when no letter suffix)
 
         # Fix number with letter suffix followed by standalone 'r': "56ar" → "56a r" (NEW)
         cleaned = cleaned.gsub(/(\d[a-z])r\b/, '\1 r')
@@ -188,6 +193,12 @@ module PubidNew
         # ENHANCEMENT 2: Version normalization (v1.1 → ver1.1, Ver. 2.0 → ver2.0)
         # Normalize short v format to verbose ver format per NIST spec
         # Already handled in version rule, but normalize in preprocessing for consistency
+
+        # CRITICAL: MR format version normalization must come BEFORE general v normalization
+        # Pattern: "NIST.SP.500-281-v1.0" → "NIST.SP.500-281.ver1.0"
+        # This allows report_number to match "500-281" and version rule to match ".ver1.0"
+        cleaned = cleaned.gsub(/-v(\d+\.\d+)/, '.ver\1')
+
         # Handle Ver. with period: "Ver. 2.0" → "ver2.0" (remove period and space)
         cleaned = cleaned.gsub(/\bVer\.\s+(\d+(?:\.\d+)*)/, 'ver\1')
         # Handle verbose "v" to "ver": "v1.1" → "ver1.1" (only with dots - versions have dots)
@@ -466,6 +477,9 @@ module PubidNew
             (digits >> str("pt") >> digits >> dash.absent?) |
             # Number with uppercase letter suffix (e.g., "56A", "123B") - for patterns like "56Ar2"
             (digits >> upper_letter) |
+            # NEW: Revision pattern with letter suffix (e.g., "22r1a", "22r1A" for SP patterns)
+            # This allows second_number to match the entire "22r1A" as a single unit
+            (digits >> str("r") >> digits >> match("[a-zA-Z]")) |
             # Special patterns like "NCNR", "PERMIS", "BFRL"
             str("NCNR") | str("PERMIS") | str("BFRL") |
             # Just capital letters (e.g., "A", "B", "C") - standalone
@@ -611,11 +625,12 @@ module PubidNew
       end
 
       # Version - V1 SP PARSER COMPATIBLE
-      # Supports: ver1.0.2, ver2, " Ver. 2.0", " Version 1.0", v1.0.2, -v1.0
+      # Supports: ver1.0.2, ver2, " Ver. 2.0", " Version 1.0", v1.0.2, -v1.0, .ver1.0 (MR format)
       rule(:version) do
         (
           # Verbose "ver" form - with or without dots (space.maybe before AND after "ver")
-          (space.maybe >> str("ver") >> space.maybe >> (digits >> (dot >> digits).repeat).as(:version)) |
+          # ENHANCED: Accept dot prefix for MR format (e.g., "500-281.ver1.0")
+          ((space | dot).maybe >> str("ver") >> space.maybe >> (digits >> (dot >> digits).repeat).as(:version)) |
           # Verbose forms with space: " Ver. ", " Version " - require dots
           ((str(" Ver. ") | str(" Version ")) >>
             (digits >> dot >> digits >> (dot >> digits).maybe).as(:version)) |

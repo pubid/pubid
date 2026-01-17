@@ -30,5 +30,5 @@ module PubidNew
   end
 
   # Register this flavor with the PubidNew registry
-  Registry.register(:ieee, Ieee)
+  # Registry.register(:ieee, Ieee)
 end
