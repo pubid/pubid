@@ -51,31 +51,30 @@ RSpec.describe PubidNew::Iso::Scheme do
     it "returns the correct typed stage for known abbreviations" do
       stage = described_class.locate_typed_stage_by_abbr("")
       expect(stage).to be_a(PubidNew::Components::TypedStage)
-      expect(stage.type_code).to eq(:is)
+      expect(stage.type_code).to eq("is")
     end
 
     it "returns typed stage for IS abbreviation" do
       stage = described_class.locate_typed_stage_by_abbr("IS")
       expect(stage).to be_a(PubidNew::Components::TypedStage)
-      expect(stage.type_code).to eq(:is)
+      expect(stage.type_code).to eq("is")
     end
 
     it "returns typed stage for TR abbreviation" do
       stage = described_class.locate_typed_stage_by_abbr("TR")
       expect(stage).to be_a(PubidNew::Components::TypedStage)
-      expect(stage.type_code).to eq(:tr)
+      expect(stage.type_code).to eq("tr")
     end
 
     it "returns typed stage for Amd abbreviation" do
       stage = described_class.locate_typed_stage_by_abbr("Amd")
       expect(stage).to be_a(PubidNew::Components::TypedStage)
-      expect(stage.type_code).to eq(:amd)
+      expect(stage.type_code).to eq("amd")
     end
 
-    it "raises ArgumentError for unknown abbreviations" do
-      expect {
-        described_class.locate_typed_stage_by_abbr("UNKNOWN")
-      }.to raise_error(ArgumentError, /Unknown type abbreviation/)
+    it "returns nil for unknown abbreviations" do
+      stage = described_class.locate_typed_stage_by_abbr("UNKNOWN")
+      expect(stage).to be_nil
     end
   end
 
@@ -95,10 +94,9 @@ RSpec.describe PubidNew::Iso::Scheme do
       expect(klass).to eq(PubidNew::Iso::Identifiers::Amendment)
     end
 
-    it "raises ArgumentError for unknown type codes" do
-      expect {
-        described_class.locate_identifier_klass_by_type_code(:unknown_type_code)
-      }.to raise_error(ArgumentError, /Unknown type code/)
+    it "returns nil for unknown type codes" do
+      klass = described_class.locate_identifier_klass_by_type_code(:unknown_type_code)
+      expect(klass).to be_nil
     end
   end
 end
