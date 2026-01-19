@@ -24,5 +24,4 @@ module PubidNew
   end
 
   # Register this flavor with the PubidNew registry
-  Registry.register(:csa, Csa)
 end

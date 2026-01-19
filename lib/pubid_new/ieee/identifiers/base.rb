@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../../serializable"
 require_relative "../components/typed_stage"
 require_relative "../components/relationship"
+require_relative "../urn_generator"
 
 module PubidNew
   module Ieee
@@ -13,6 +15,15 @@ module PubidNew
     module Identifiers
       # Base class for all IEEE identifiers
       class Base < Lutaml::Model::Serializable
+        include PubidNew::Serializable
+
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
+
         attribute :publisher, :string, default: -> { "IEEE" }
         attribute :copublisher, :string, collection: true # IEC, ISO, ANSI, etc.
         attribute :code, :string # Will store code as object in initialize

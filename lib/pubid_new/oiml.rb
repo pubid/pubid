@@ -15,9 +15,6 @@ module PubidNew
       builder.build(parsed)
     end
   end
-
-  # Register this flavor with the PubidNew registry
-  Registry.register(:oiml, Oiml)
 end
 
 require_relative "oiml/identifier"

@@ -1,10 +1,25 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+
+require_relative "../serializable"
+require_relative "urn_generator"
 
 module PubidNew
   module Api
     class SingleIdentifier < Lutaml::Model::Serializable
+      include PubidNew::Serializable
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
+
+      def publisher
+        "API"
+      end
+
       attribute :code, Components::Code
       attribute :part, :string
       attribute :year, :string

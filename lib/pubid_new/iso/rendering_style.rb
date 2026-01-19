@@ -42,6 +42,9 @@ module PubidNew
           result << identifier.language_portion(lang_single: single_char_language?)
         end
 
+        # All parts notation (if applicable)
+        result << " (all parts)" if identifier.respond_to?(:all_parts) && identifier.all_parts
+
         result
       end
 

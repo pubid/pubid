@@ -1,11 +1,11 @@
 require "lutaml/model"
 # frozen_string_literal: true
-require_relative "identifier"
+require_relative "identifiers/base"
 
 module PubidNew
   module Cen
-    class SupplementIdentifier < Identifier
-      attribute :base_identifier, Identifier, polymorphic: true
+    class SupplementIdentifier < Identifiers::Base
+      attribute :base_identifier, Identifiers::Base, polymorphic: true
       attribute :number, Components::Code
       attribute :date, Components::Date
       attribute :stage, Components::Stage

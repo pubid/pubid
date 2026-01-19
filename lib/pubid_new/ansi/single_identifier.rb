@@ -1,10 +1,21 @@
 require_relative "identifier"
 # frozen_string_literal: true
+require_relative "urn_generator"
+require_relative "../serializable"
 
 module PubidNew
   module Ansi
     # Single ANSI identifier (non-bundled)
     class SingleIdentifier < Identifier
+      include PubidNew::Serializable
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
+
       def to_s(lang: :en)
         [].tap do |parts|
           parts << publisher_portion

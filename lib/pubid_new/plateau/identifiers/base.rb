@@ -1,12 +1,22 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+
+require_relative "../../serializable"
+require_relative "../urn_generator"
 
 module PubidNew
   module Plateau
     module Identifiers
       # Base class for all PLATEAU identifiers
       class Base < Lutaml::Model::Serializable
+      include PubidNew::Serializable
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
         attribute :number, :integer
         attribute :annex, :integer, default: -> {}
 
@@ -32,6 +42,14 @@ module PubidNew
 
           number == other.number &&
             annex == other.annex
+        end
+
+        # Include type_string and annex in serialization for round-trip compatibility
+        def base_hash
+          hash = super
+          hash[:type] = type_string if respond_to?(:type_string)
+          hash[:annex] = annex if annex
+          hash
         end
       end
     end

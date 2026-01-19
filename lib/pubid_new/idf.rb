@@ -16,9 +16,6 @@ module PubidNew
       builder.build(parsed)
     end
   end
-
-  # Register this flavor with the PubidNew registry
-  Registry.register(:idf, Idf)
 end
 
 require_relative "idf/scheme"

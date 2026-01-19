@@ -22,14 +22,52 @@ module PubidNew
 
       root :identifier
 
+      # TC documents must come first since they start with "ISO/"
+      # and we need to distinguish them from regular ISO/IEC identifiers
       rule(:identifier) do
-        directives_identifiers |
+        tc_document |
+          directives_identifiers |
           iso_r_supplement_identifier |
           iso_r_identifier |
           supplement_supplement_identifier |
           supplement_identifier |
           joint_identifier |
           identifier_copublishers
+      end
+
+      # TC Document: ISO/TC 184/SC 4/WG 3 N 123
+      #             ISO/TC 184 N 100
+      #             ISO/JTC 1 N 456
+      #             ISO/TC 184/SC 4 N 789 (TC and SC only, no WG)
+      rule(:tc_document) do
+        prefix_sole_publisher >> str("/") >> tc_type >> space >> tc_number.as(:tc_number) >>
+          tc_subcommittee_part.maybe >>
+          space >> str("N") >> space? >> digits.as(:number) >>
+          (str(":") >> year_digits.as(:year)).maybe
+      end
+
+      rule(:tc_subcommittee_part) do
+        # Full path: TC/SC 4/WG 3
+        (str("/") >> sc_type >> space >> digits.as(:sc_number) >> str("/") >>
+          wg_type >> space >> digits.as(:wg_number)) |
+        # TC and SC only: TC/SC 4 N 789
+        (str("/") >> sc_type >> space >> digits.as(:sc_number))
+      end
+
+      rule(:tc_type) do
+        array_to_str(Identifiers::TcDocument::TC_TYPES).as(:tc_type)
+      end
+
+      rule(:sc_type) do
+        str("SC").as(:sc_type)
+      end
+
+      rule(:wg_type) do
+        array_to_str(Identifiers::TcDocument::WG_TYPES).as(:wg_type)
+      end
+
+      rule(:tc_number) do
+        digits
       end
 
       # ISO/R 947:1969 (legacy Recommendation without supplement)

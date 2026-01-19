@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+require_relative "../serializable"
+
+
+require_relative "urn_generator"
 require_relative "identifiers/base"
 
 module PubidNew
@@ -8,6 +11,8 @@ module PubidNew
     # Base class for single (non-supplement) ASHRAE identifiers
     # Includes: Guideline, Standard
     class SingleIdentifier < Identifiers::Base
+      include PubidNew::Serializable
+
       def to_s
         parts = []
         parts << publisher if publisher

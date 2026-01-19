@@ -5,7 +5,7 @@ module Pubid::Ccsds
     end
 
     rule(:edition) do
-      dash >> (digits >> (dot >> digits).maybe).as(:edition)
+      dash >> (digits >> (dot >> digits >> match["h"].maybe).maybe).as(:edition)
     end
 
     rule(:part) do

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../../serializable"
 require_relative "../components/publisher"
 require_relative "../components/code"
 require_relative "../components/stage"
@@ -12,6 +13,7 @@ require_relative "../components/issue_number"
 require_relative "../components/volume"
 require_relative "../components/part"
 require_relative "../components/supplement"
+require_relative "../urn_generator"
 
 module PubidNew
   module Nist
@@ -19,6 +21,15 @@ module PubidNew
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
       class Base < Lutaml::Model::Serializable
+        include PubidNew::Serializable
+
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
+
         attribute :publisher, Components::Publisher
         attribute :series, Components::Code # Set by Builder from parsed data
         attribute :number, Components::Code
@@ -106,6 +117,87 @@ module PubidNew
           else
             to_short_style
           end
+        end
+
+        # Returns weight based on amount of defined attributes
+        # Used for ranking identifiers by specificity for conflict resolution
+        # @return [Integer] weight score (higher = more specific)
+        def weight
+          instance_variables.inject(0) do |sum, var|
+            val = instance_variable_get(var)
+            # Count non-nil, non-false values
+            val && !val.to_s.empty? ? sum + 1 : sum
+          end
+        end
+
+        # Merge another document into this one
+        # Used for combining document data, preferring more specific values
+        # @param document [Base] another NIST document to merge
+        # @return [Base] self with merged attributes
+        def merge(document)
+          return self unless document.is_a?(Base)
+
+          # For each attribute, prefer more specific value:
+          # 1. New value if current is nil
+          # 2. New value if it's longer/more specific
+          # 3. New value for certain attributes (series, publisher)
+          document.instance_variables.each do |var|
+            next if var == :@rendering_style # Skip non-data attributes
+            next if var == :@parsed_format
+
+            var_name = var.to_s.sub("@", "").to_sym
+            current_val = instance_variable_get(var)
+
+            new_val = document.instance_variable_get(var)
+            next unless new_val
+
+            # Apply merge rules
+            should_merge = case var_name
+                           when :publisher, :series, :number
+                             # Always take new value for core identifying attributes
+                             true
+                           when :edition
+                             # Compare edition numerically (extract number from r3, r5, etc.)
+                             current_val.nil? || edition_greater?(new_val,
+                                                                  current_val)
+                           when :volume, :part, :version, :revision
+                             # Prefer longer/more specific value for these
+                             current_val.nil? || (new_val.to_s.length > current_val.to_s.length)
+                           when :supplement, :errata, :index, :insert, :section, :appendix, :translation
+                             # Always merge these if present
+                             true
+                           when :year, :month, :update, :draft
+                             # Prefer new value
+                             true
+                           else
+                             false
+                           end
+
+            if should_merge && respond_to?("#{var_name}=")
+              send("#{var_name}=",
+                   new_val)
+            end
+          end
+
+          self
+        end
+
+        # Helper to compare edition values numerically
+        # @return [Boolean] true if edition1 is greater than edition2
+        def edition_greater?(edition1, edition2)
+          num1 = extract_edition_number(edition1)
+          num2 = extract_edition_number(edition2)
+          num1 && num2 && num1 > num2
+        end
+
+        # Extract numeric value from edition (r3 -> 3, r5 -> 5, e2 -> 2)
+        # @return [Integer, nil] the edition number or nil if not extractable
+        def extract_edition_number(edition)
+          # Handle both String and Edition component
+          edition_str = edition.to_s
+          # Match patterns like r3, r5, e2, etc.
+          match = edition_str.match(/^[er]?(\d+)$/)
+          match ? match[1].to_i : nil
         end
 
         private
@@ -227,7 +319,7 @@ module PubidNew
               result += edition.to_s
             else
               # Bare edition, add space: " r5"
-              result += " #{edition.to_s}"
+              result += " #{edition}"
             end
           end
 
@@ -309,11 +401,11 @@ module PubidNew
           if edition
             # If edition has original_prefix set (e.g., verbose " Rev. "), use it as-is
             # Otherwise, no space needed in MR format: ".800-53r5"
-            if edition.original_prefix && !edition.original_prefix.empty?
-              result += edition.to_s
-            else
-              result += edition.to_s
-            end
+            result += if edition.original_prefix && !edition.original_prefix.empty?
+                        edition.to_s
+                      else
+                        edition.to_s
+                      end
           end
 
           # V2: Use version_component

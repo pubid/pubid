@@ -9,11 +9,11 @@ ISO/IEC DIR 2 IEC:2022
 ISO/IEC DIR 2 ISO
 ISO/IEC DIR 2 ISO:2022
 ISO/IEC DIR 2:2021
-!ISO/IEC Directives Part 1!ISO/IEC Directives, Part 1
-!ISO/IEC Directives Part 2!ISO/IEC Directives, Part 2
-ISO/IEC Directives, Part 1
-ISO/IEC Directives, Part 1:2022
-ISO/IEC Directives, Part 2
-ISO/IEC Directives, Part 2:2021
+!ISO/IEC Directives Part 1!ISO/IEC DIR 1
+!ISO/IEC Directives Part 2!ISO/IEC DIR 2
+!ISO/IEC Directives, Part 1!ISO/IEC DIR 1
+!ISO/IEC Directives, Part 1:2022!ISO/IEC DIR 1:2022
+!ISO/IEC Directives, Part 2!ISO/IEC DIR 2
+!ISO/IEC Directives, Part 2:2021!ISO/IEC DIR 2:2021
 ISO/IEC JTC 1 DIR
 ISO/IEC JTC 1 DIR:2004

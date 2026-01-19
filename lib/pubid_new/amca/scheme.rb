@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
+require_relative "../identifier"
+require_relative "../scheme"
 require_relative "identifier"
-require_relative "scheme"
 require_relative "identifiers/base"
 require_relative "identifiers/standard"
 require_relative "identifiers/publication"

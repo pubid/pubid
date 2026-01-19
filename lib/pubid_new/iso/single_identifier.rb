@@ -8,6 +8,7 @@ module PubidNew
   module Iso
     class SingleIdentifier < Identifier
       attribute :typed_stage, Components::TypedStage
+      attribute :all_parts, ::Lutaml::Model::Type::Boolean, default: false
 
       # Rendering style is a strategy object, not serializable data
       attr_accessor :rendering_style

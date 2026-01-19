@@ -12,7 +12,8 @@ module PubidNew
       Identifier.parse(identifier)
     end
   end
-
-  # Register this flavor with the PubidNew registry
-  Registry.register(:ashrae, Ashrae)
 end
+
+require_relative "ashrae/scheme"
+require_relative "ashrae/parser"
+require_relative "ashrae/builder"

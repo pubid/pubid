@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+
+require_relative "../../serializable"
+require_relative "../urn_generator"
 require_relative "../../components/date"
 require_relative "../components/code"
 require_relative "../components/version"
@@ -10,6 +12,14 @@ module PubidNew
     module Identifiers
       # Base class for all ETSI identifiers
       class Base < Lutaml::Model::Serializable
+      include PubidNew::Serializable
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
         attribute :type, :string
         attribute :code, PubidNew::Etsi::Components::Code
         attribute :version, PubidNew::Etsi::Components::Version

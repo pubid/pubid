@@ -11,5 +11,4 @@ module PubidNew
   end
 
   # Register this flavor with the PubidNew registry
-  Registry.register(:api, Api)
 end

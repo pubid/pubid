@@ -80,6 +80,16 @@ format: nil, stage_format_long: nil, with_date: nil)
         # DirectivesSupplement use urn:iso:doc scheme (not urn:iso:std)
         # Format: urn:iso:doc:{base_urn_parts}:jtc:X:sup[:{year}][:{edition}]
         def to_urn
+          # If this is a standalone supplement (no base_identifier), build URN directly
+          unless base_identifier
+            parts = ["urn", "iso", "doc"]
+            parts << supplement_publisher.body.downcase if supplement_publisher
+            parts << "sup"
+            parts << date.year.to_s if date
+            parts << "ed-#{edition.number}" if edition && edition.number
+            return parts.join(":")
+          end
+
           # Start with base identifier's URN parts (it will use urn:iso:doc scheme)
           base_urn = base_identifier.to_urn
 

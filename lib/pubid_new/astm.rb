@@ -32,5 +32,4 @@ module PubidNew
   end
 
   # Register this flavor with the PubidNew registry
-  Registry.register(:astm, Astm)
 end

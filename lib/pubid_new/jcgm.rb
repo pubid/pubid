@@ -15,7 +15,6 @@ module PubidNew
   end
 
   # Register this flavor with the PubidNew registry
-  Registry.register(:jcgm, Jcgm)
 end
 
 require_relative "jcgm/identifier"

@@ -1,11 +1,19 @@
 require_relative "identifier"
 # frozen_string_literal: true
 require_relative "../components/typed_stage"
+require_relative "urn_generator"
 
 module PubidNew
   module Iec
     class SingleIdentifier < Identifier
       attribute :typed_stage, Components::TypedStage
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
 
       def to_s(lang: :en, lang_single: false, with_edition: false)
         [].tap do |parts|

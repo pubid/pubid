@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../serializable"
+
 require_relative "identifier"
 require_relative "../components/typed_stage"
 require_relative "components/publisher"
@@ -10,6 +12,8 @@ require_relative "../components/language"
 module PubidNew
   module Jcgm
     class SingleIdentifier < Identifier
+      include PubidNew::Serializable
+
       attribute :publisher, Jcgm::Components::Publisher
       attribute :typed_stage, PubidNew::Components::TypedStage
       attribute :number, PubidNew::Components::Code
@@ -17,6 +21,14 @@ module PubidNew
       attribute :languages, PubidNew::Components::Language, collection: true
       attribute :stage, PubidNew::Components::Stage
       attribute :type, PubidNew::Components::Type
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        require_relative "urn_generator"
+        UrnGenerator.new(self).generate
+      end
 
       def publisher_portion
         publisher.to_s

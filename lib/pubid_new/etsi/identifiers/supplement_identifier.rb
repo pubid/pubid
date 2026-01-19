@@ -44,6 +44,16 @@ module PubidNew
 
           base == other.base && number == other.number
         end
+
+        # Include supplement notation in serialization
+        def base_hash
+          hash = super
+          # ETSI supplements need the type (e.g., "ETS", "TR") from the base document
+          hash[:type] = base.type if base.respond_to?(:type) && base.type
+          hash[:supplement_notation] = supplement_notation
+          hash[:supplement_type] = self.class.name.split("::").last.downcase
+          hash
+        end
       end
     end
   end

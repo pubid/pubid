@@ -13,5 +13,4 @@ module PubidNew
   end
 
   # Register CIE flavor in the global registry
-  Registry.register(:cie, Cie)
 end

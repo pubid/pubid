@@ -44,6 +44,11 @@ module PubidNew
           return BundledIdentifier
         end
 
+        # TC documents are identified by the presence of tc_type
+        if parsed_hash[:tc_type]
+          return Identifiers::TcDocument
+        end
+
         # Check the `:type_with_stage` to determine the identifier class
         # 1. :type_with_stage will be nil if:
         # a) It is an IS.
@@ -234,6 +239,11 @@ module PubidNew
             end
           end
 
+        when :year
+          # For TC documents, parser returns :year but identifier uses :date
+          # Return as date for assignment
+          { date: PubidNew::Components::Date.new(year: value.to_s) }
+
         when :number_with_part
           # "1234" (no part)
           # or "1234-1" ('1' is part)
@@ -347,14 +357,15 @@ module PubidNew
           end
 
         when :all_parts
-          PubidNew::Components::Locality.new(all_parts: true)
+          # Set all_parts boolean attribute directly on identifier
+          true
 
         # ISO 4214:2022 | IDF/RM 254:2022
         when :joint_identifier
           case value[:publisher]
           when "IDF"
             require_relative "../idf/builder"
-            Idf::Builder.new(Idf::Scheme).build(value)
+            Idf::Builder.new.build(value)
           end
 
         when :subgroup
@@ -370,6 +381,29 @@ module PubidNew
         when :base_document
           # For bundled identifiers, build the base document
           build(value)
+
+        # TC Document attributes
+        when :tc_type, :sc_type, :wg_type
+          # TC, SC, WG types are code components
+          PubidNew::Iso::Components::Code.new(number: value.to_s)
+
+        when :tc_number, :sc_number, :wg_number
+          # TC, SC, WG numbers are code components
+          PubidNew::Iso::Components::Code.new(number: value.to_s)
+
+        when :year
+          # For TC documents with year, convert to Date
+          PubidNew::Components::Date.new(year: value.to_s)
+
+        when :number
+          # For TC documents, number is the document number (N number)
+          # For regular identifiers, this is handled in :number_with_part
+          if value.is_a?(Parslet::Slice) || value.is_a?(String) ||
+              value.is_a?(Integer)
+            PubidNew::Iso::Components::Code.new(number: value.to_s)
+          else
+            value
+          end
 
         else
           raise ArgumentError, "Unknown parameter type: #{type}"

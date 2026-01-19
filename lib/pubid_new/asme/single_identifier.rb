@@ -1,10 +1,21 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "urn_generator"
+require_relative "../serializable"
 
 module PubidNew
   module Asme
     class SingleIdentifier < Lutaml::Model::Serializable
+      include PubidNew::Serializable
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
+
       attribute :publisher, :string
       attribute :code, Components::Code
       attribute :year, :string

@@ -116,7 +116,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             # Publisher portion (includes JTC subgroup and DIR type)
             parts << publisher_portion(
               lang: lang,
-              stage_format_long: rendering_style.stage_format_long,
+              stage_format_long: false,  # Always use short form "DIR" for normalization
             )
 
             # Number portion (may be just ":date" if no number)
@@ -145,7 +145,40 @@ format: nil, stage_format_long: nil, with_date: nil)
 
             result
           else
-            super
+            # Always normalize to short form "DIR" for consistency
+            parts = []
+
+            # Publisher portion (includes JTC subgroup and DIR type)
+            parts << publisher_portion(
+              lang: lang,
+              stage_format_long: false,  # Always use short form "DIR"
+            )
+
+            # Number portion (may be just ":date" if no number)
+            num_part = number_portion(
+              lang_single: lang_single,
+              with_date: true,
+            )
+
+            # If number portion starts with ":" (just date, no number), don't add space
+            if num_part && num_part.start_with?(":")
+              result = parts.compact.join(" ") + num_part
+            else
+              parts << num_part if num_part
+              result = parts.compact.join(" ")
+            end
+
+            # Edition portion (if requested)
+            if with_edition && edition && (edition.number || edition.original_text)
+              result << " " << edition_portion(lang: lang).to_s
+            end
+
+            # Language portion (if applicable)
+            if languages&.any?
+              result << language_portion(lang_single: lang_single)
+            end
+
+            result
           end
         end
       end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "../serializable"
+
 require_relative "identifier"
 
 module PubidNew
@@ -16,6 +18,7 @@ module PubidNew
     # Concrete classes should add their own default value like:
     #   attribute :type, Components::Type, default: -> { type[:key] }
     class SingleIdentifier < Identifier
+      include PubidNew::Serializable
     end
   end
 end

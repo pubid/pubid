@@ -13,9 +13,6 @@ module PubidNew
       builder.build(parsed)
     end
   end
-
-  # Register this flavor with the PubidNew registry
-  Registry.register(:ansi, Ansi)
 end
 
 require_relative "ansi/identifier"

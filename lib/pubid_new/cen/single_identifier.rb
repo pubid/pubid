@@ -1,5 +1,6 @@
 require "lutaml/model"
 # frozen_string_literal: true
+require_relative "../serializable"
 require_relative "../components/publisher"
 require_relative "../components/code"
 require_relative "../components/date"
@@ -10,6 +11,7 @@ require_relative "../components/typed_stage"
 module PubidNew
   module Cen
     class SingleIdentifier < Lutaml::Model::Serializable
+      include PubidNew::Serializable
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "EN")
       }
@@ -21,6 +23,14 @@ module PubidNew
       attribute :stage, Components::Stage
       attribute :type, Components::Type
       attribute :typed_stage, Components::TypedStage
+
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        require_relative "urn_generator"
+        UrnGenerator.new(self).generate
+      end
 
       def to_s(lang: :en, lang_single: false)
         parts = []

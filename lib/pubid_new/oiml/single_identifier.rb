@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
+require_relative "../serializable"
+
 module PubidNew
   module Oiml
     class SingleIdentifier < Identifier
+      include PubidNew::Serializable
+
       # Base class for OIML single identifiers (non-supplements)
       attribute :publisher, :string
       attribute :code, Oiml::Components::Code

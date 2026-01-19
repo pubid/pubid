@@ -1,16 +1,26 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../serializable"
 require_relative "components/publisher"
 require_relative "components/code"
 require_relative "components/date"
 require_relative "components/type"
 require_relative "../components/stage"
 require_relative "../components/typed_stage"
+require_relative "urn_generator"
 
 module PubidNew
   module Bsi
     class SingleIdentifier < Lutaml::Model::Serializable
+      include PubidNew::Serializable
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        UrnGenerator.new(self).generate
+      end
+
       attribute :publisher, Bsi::Components::Publisher, default: -> {
         Bsi::Components::Publisher.new(body: "BS")
       }

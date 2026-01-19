@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../../serializable"
+require_relative "../urn_generator"
 
 module PubidNew
   module Ccsds
@@ -9,6 +11,25 @@ module PubidNew
       # Format: CCSDS NUMBER.PART-TYPE-EDITION[-SUFFIX]
       # Example: CCSDS 120.0-G-4, CCSDS 100.0-G-1-S
       class Base < Lutaml::Model::Serializable
+        include PubidNew::Serializable
+
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
+
+        # Include CCSDS-specific attributes in serialization
+        def base_hash
+          hash = super
+          # CCSDS uses plain strings for type, edition, suffix
+          hash[:type] = type if type
+          hash[:suffix] = suffix if suffix
+          hash[:language] = language if language
+          hash
+        end
+
         attribute :number, :string
         attribute :part, :string
         attribute :type, :string # B, G, M, R, Y, O, etc.

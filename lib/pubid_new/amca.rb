@@ -14,5 +14,4 @@ module PubidNew
   end
 
   # Register this flavor with the PubidNew registry
-  Registry.register(:amca, Amca)
 end

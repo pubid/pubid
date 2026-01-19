@@ -112,13 +112,14 @@ module PubidNew
             if first_num.value.to_s.match?(/^e(\d{3})$/) &&
                 second_num.value.to_s.match?(/^\d{2}$/)
               match_data = first_num.value.to_s.match(/^e(\d{3})$/)
-              number_part = match_data[1]  # 104
-              year_suffix = second_num.value.to_s  # 43
+              number_part = match_data[1] # 104
+              year_suffix = second_num.value.to_s # 43
               # Edition year: 19 + 43 = 1943 (1900s + year suffix)
               edition_year = "19#{year_suffix}"
 
               identifier.number = Components::Code.new(number: number_part)
-              identifier.edition = Components::Edition.new(type: "e", id: edition_year)
+              identifier.edition = Components::Edition.new(type: "e",
+                                                           id: edition_year)
             elsif first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
                 second_num.value.to_s.match?(/^\d{2,4}$/)
               # Pattern: "11e2-1915" OR "123e2-50" parsed as first="11e2"|"123e2", second="1915"|"50"
@@ -157,19 +158,18 @@ module PubidNew
               identifier.edition_component = edition_obj
               identifier.edition = edition_obj
               identifier.edition_year = second_num.value.to_s
-            else
+            elsif part_num && parsed_hash[:series].to_s.include?("IR")
               # Normal compound number
               # For IR identifiers, part_number should be a Part component (type="pt"), not in compound number
-              if part_num && parsed_hash[:series].to_s.include?("IR")
-                # For IR, create Part component with type="pt"
-                identifier.part = Components::Part.new(type: "pt", value: part_num)
-                identifier.number = Components::Code.new(number: "#{first_num.value}-#{second_num.value}")
-              else
-                # For GCR and others, include part number in compound number
-                compound_value = "#{first_num.value}-#{second_num.value}"
-                compound_value += "-#{part_num}" if part_num
-                identifier.number = Components::Code.new(number: compound_value)
-              end
+              identifier.part = Components::Part.new(type: "pt",
+                                                     value: part_num)
+              identifier.number = Components::Code.new(number: "#{first_num.value}-#{second_num.value}")
+            # For IR, create Part component with type="pt"
+            else
+              # For GCR and others, include part number in compound number
+              compound_value = "#{first_num.value}-#{second_num.value}"
+              compound_value += "-#{part_num}" if part_num
+              identifier.number = Components::Code.new(number: compound_value)
             end
           else
             # No second_num, use first_num directly
@@ -187,12 +187,16 @@ module PubidNew
         # IR-SPECIFIC: Handle compound numbers that were converted to edition+year format
         # For IR identifiers, "84-2946" should remain as compound number, not become "84e2946"
         # The preprocessing converts "84-2946" to "84e2946", so we need to convert it back for IR
-        is_ir = parsed_hash[:series].to_s.include?("IR") rescue false
+        is_ir = begin
+          parsed_hash[:series].to_s.include?("IR")
+        rescue StandardError
+          false
+        end
         if is_ir && identifier.number && identifier.number.value.to_s.match?(/^(\d+)e(\d{4})$/)
           # Extract the compound number parts from the edition+year format
           match_data = identifier.number.value.to_s.match(/^(\d+)e(\d{4})$/)
-          number_part = match_data[1]  # "84"
-          year_part = match_data[2]     # "2946"
+          number_part = match_data[1] # "84"
+          year_part = match_data[2] # "2946"
 
           # Convert to compound number format
           identifier.number = Components::Code.new(number: "#{number_part}-#{year_part}")
@@ -319,7 +323,7 @@ module PubidNew
           # Return raw value for inclusion in compound number
           return nil if value.nil? || value.to_s.strip.empty?
 
-          value  # Return raw value to be tracked in builder
+          value # Return raw value to be tracked in builder
 
         when :first_number, :second_number
           return nil if value.nil? || value.to_s.strip.empty?
@@ -489,20 +493,20 @@ module PubidNew
                 first_number: Components::Code.new(number: number_part),
                 supplement: "#{month_part}#{year_part}",
               }
-            # NEW: Pattern "25supp-1924" - supplement with dash-year (inline match)
+            # NEW: Pattern "25supp1924" - supplement with year (no dash, no month)
             # Creates: number="25", supplement="1924"
-            # Renders: "NBS CIRC 25supp-1924"
-            elsif str_value =~ /^(\d+)supp-(\d{4})$/
+            # Renders: "NBS SP 25supp1924"
+            elsif str_value =~ /^(\d+)supp(\d{4})$/
               number_part = $1
               year_part = $2
               return {
                 first_number: Components::Code.new(number: number_part),
                 supplement: year_part,
               }
-            # NEW: Pattern "25sup-1924" - supplement with dash-year (short form, inline match)
+            # NEW: Pattern "25supp-1924" - supplement with dash-year (inline match)
             # Creates: number="25", supplement="1924"
             # Renders: "NBS CIRC 25supp-1924"
-            elsif str_value =~ /^(\d+)sup-(\d{4})$/
+            elsif str_value =~ /^(\d+)supp-(\d{4})$/
               number_part = $1
               year_part = $2
               return {
@@ -649,13 +653,37 @@ module PubidNew
             letter_part = $2
             # Check if we should preserve letter suffix in number
             # Check for specific series that need letter suffix preserved
-            is_report = parsed_hash[:series].to_s.include?("RPT") rescue false
-            is_fips = parsed_hash[:series].to_s.include?("FIPS") rescue false
-            is_ir = parsed_hash[:series].to_s.include?("IR") rescue false
-            is_mono = parsed_hash[:series].to_s.include?("MONO") rescue false
-            is_mp = parsed_hash[:series].to_s.include?("MP") rescue false
+            is_report = begin
+              parsed_hash[:series].to_s.include?("RPT")
+            rescue StandardError
+              false
+            end
+            is_fips = begin
+              parsed_hash[:series].to_s.include?("FIPS")
+            rescue StandardError
+              false
+            end
+            is_ir = begin
+              parsed_hash[:series].to_s.include?("IR")
+            rescue StandardError
+              false
+            end
+            is_mono = begin
+              parsed_hash[:series].to_s.include?("MONO")
+            rescue StandardError
+              false
+            end
+            is_mp = begin
+              parsed_hash[:series].to_s.include?("MP")
+            rescue StandardError
+              false
+            end
             # Check for LC but exclude LCIRC (Letter Circular uses LC, not LCIRC)
-            is_lc = parsed_hash[:series].to_s.include?("LC") && !parsed_hash[:series].to_s.include?("LCIRC") rescue false
+            is_lc = begin
+              parsed_hash[:series].to_s.include?("LC") && !parsed_hash[:series].to_s.include?("LCIRC")
+            rescue StandardError
+              false
+            end
 
             if parsed_hash[:parsed_format] == :mr || is_report || is_fips || is_ir || is_lc || is_mono || is_mp
               # For MR format, Report, FIPS, IR, LC, MONO, and MP, preserve letter suffix as part of number
@@ -684,9 +712,9 @@ module PubidNew
 
           # Check for supplement letter suffix (e.g., "2_3-1A" → supplement="A")
           if str_value =~ /^(\d+)_(\d+-\d+)([A-Z])$/
-            second_num_part = $1  # "2"
-            part_value = $2  # "3-1"
-            supplement_letter = $3  # "A"
+            second_num_part = $1 # "2"
+            part_value = $2 # "3-1"
+            supplement_letter = $3 # "A"
 
             # Return second_number, Part, and Supplement
             {
@@ -696,8 +724,8 @@ module PubidNew
             }
           elsif str_value =~ /^(\d+)_(\d+-\d+)$/
             # No supplement letter
-            second_num_part = $1  # "2"
-            part_value = $2  # "3-1"
+            second_num_part = $1 # "2"
+            part_value = $2 # "3-1"
 
             # Return second_number and Part
             {
@@ -829,7 +857,8 @@ module PubidNew
 
             # Return Edition component with original_prefix for format preservation
             {
-              edition: Components::Edition.new(type: "r", id: revision_id, original_prefix: prefix),
+              edition: Components::Edition.new(type: "r", id: revision_id,
+                                               original_prefix: prefix),
             }
           else
             # Legacy handling: revision as simple string value
@@ -942,7 +971,9 @@ module PubidNew
           { supplement: "", supplement_has_revision: true }
 
         when :supp_year
-          value.to_s
+          # Parser extracts supplement year from patterns like "187supp1924"
+          # This should set the supplement attribute with the year value
+          { supplement: value.to_s }
 
         # ========== V2 EDITION COMPONENT ==========
 
@@ -1006,7 +1037,8 @@ module PubidNew
           edition_letter = value[:edition_letter].to_s.downcase
 
           {
-            edition: Components::Edition.new(type: "r", id: edition_id, additional_text: edition_letter),
+            edition: Components::Edition.new(type: "r", id: edition_id,
+                                             additional_text: edition_letter),
             edition_component: Components::Edition.new(type: "r",
                                                        id: edition_id,
                                                        additional_text: edition_letter),
