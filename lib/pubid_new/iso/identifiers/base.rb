@@ -5,6 +5,7 @@ require_relative "../../identifier"
 require_relative "../../components/date"
 require_relative "../components/publisher"
 require_relative "../components/code"
+require_relative "../../rendering/context"
 
 module PubidNew
   module Iso
@@ -17,51 +18,84 @@ module PubidNew
         # Only add ISO-specific attributes if needed
         attribute :stage_iteration, ::PubidNew::Components::Code
 
+        # ISO rendering context singleton
+        def self.rendering_context
+          @rendering_context ||= PubidNew::Rendering::RenderingContext.iso
+        end
+
+        # Render identifier using OOP approach - each component renders itself
+        #
+        # @param lang [Symbol] language for rendering (:en or :fr)
+        # @param lang_single [Boolean] use single char language format
+        # @param with_edition [Boolean] include edition in output
+        # @return [String] formatted identifier string
         def to_s(lang: :en, lang_single: false, with_edition: false)
-          result = publisher.to_s
+          # Create rendering context with language settings
+          context = PubidNew::Rendering::RenderingContext.new(
+            stage_separator: "/",
+            stage_separator_with_copublisher: " ",
+            type_separator: "/",
+            type_separator_with_prefix: " ",
+            default_type_abbr: "IS",
+            lang: lang,
+            lang_single: lang_single,
+          )
 
-          # Add stage if present
-          if stage&.abbr
-            result += publisher.has_copublisher? ? " #{stage.abbr}" : "/#{stage.abbr}"
+          # Compose the identifier from component renderings
+          render_from_components(context: context, with_edition: with_edition)
+        end
+
+        private
+
+        # Compose identifier string by having each component render itself
+        #
+        # @param context [RenderingContext] rendering context for flavor rules
+        # @param with_edition [Boolean] include edition in output
+        # @return [String] composed identifier string
+        def render_from_components(context:, with_edition: false)
+          parts = []
+          parts << publisher.to_s
+
+          # Stage renders itself with context-aware separators
+          if stage
+            has_copub = publisher.respond_to?(:has_copublisher?) && publisher.has_copublisher?
+            parts << stage.to_s(context: context, has_copublisher: has_copub)
           end
 
-          # Add type if present (TR, TS, Guide, PAS, DATA, TTA, R, ISP)
-          # Type should display for all non-IS types
-          if type&.abbr && type.abbr != "IS"
-            # Separator: space after stage or copublisher, slash otherwise
-            has_prefix = stage&.abbr || publisher.has_copublisher?
-            sep = has_prefix ? " " : "/"
-            result += "#{sep}#{type.abbr}"
+          # Type renders itself with context-aware separators and default handling
+          if type
+            has_prefix = stage || (publisher.respond_to?(:has_copublisher?) && publisher.has_copublisher?)
+            type_render = type.to_s(context: context, has_prefix: has_prefix)
+            parts << type_render if type_render != ""
           end
 
-          # Add number
-          result += " #{number.value}" if number&.value
+          # Number renders itself
+          parts << " #{number.value}" if number&.value
 
-          # Add part (with dash)
-          result += "-#{part.value}" if part&.value
+          # Parts render themselves
+          parts << "-#{part.value}" if part&.value
+          parts << "-#{subpart.value}" if subpart&.value
 
-          # Add subpart (with dash)
-          result += "-#{subpart.value}" if subpart&.value
+          # Stage iteration renders itself
+          parts << ".#{stage_iteration.value}" if stage_iteration&.value
 
-          # Add stage iteration if present
-          result += ".#{stage_iteration.value}" if stage_iteration&.value
+          # Date renders itself with context
+          parts << date.to_s(context: context) if date&.year
 
-          # Add year
-          result += ":#{date.year}" if date&.year
+          # Edition renders itself
+          parts << " #{edition}" if with_edition && edition&.number
 
-          # Add edition if with_edition flag is set
-          result += " #{edition}" if with_edition && edition&.number
-
-          # Add language
+          # Languages render themselves
           if languages&.any?
-            # Use the language's to_s method which handles original_code properly
-            result += "(#{languages.map do |l|
-              l.to_s(lang_single: lang_single)
+            parts << "(#{languages.map do |l|
+              l.to_s(lang_single: context.lang_single)
             end.join('/')})"
           end
 
-          result
+          parts.join
         end
+
+        public
 
         # V1 API compatibility - tests expect .copublishers returning array of Publisher objects
         def copublishers
