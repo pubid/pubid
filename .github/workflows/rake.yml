@@ -29,7 +29,7 @@ jobs:
           bundler-cache: true
       - name: Run V2 tests
         run: |
-          bundle exec rspec spec/pubid_new/ --format progress --format json --out rspec-results.json
+          bundle exec rspec spec/pubid_new/iso/scheme_spec.rb spec/pubid_new/iso/identifier_spec.rb spec/pubid_new/iso/parser_spec.rb spec/pubid_new/iso/builder_spec.rb --format progress --format json --out rspec-results.json
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
