@@ -38,7 +38,7 @@ jobs:
           path: rspec-results.json
 
   rake:
-    if: hashFiles('gems/**') != ''
+    if: ${{ hashFiles('gems/**') != '' }}
     uses: ./.github/workflows/generic-rake.yml
     with:
       monorepo: true
