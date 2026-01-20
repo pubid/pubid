@@ -30,9 +30,20 @@ on:
       pat_token:
         required: false
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  statuses: write
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+      statuses: write
     outputs:
       head_tag: ${{ steps.check.outputs.head_tag }}
       foreign_pr: ${{ steps.check.outputs.foreign_pr }}

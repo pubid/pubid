@@ -28,6 +28,10 @@ on:
         required: true
         default: 'skip'
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   release:
     uses: ./.github/workflows/rubygems-release.yml

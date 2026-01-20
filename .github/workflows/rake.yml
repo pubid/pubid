@@ -7,12 +7,38 @@ on:
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  statuses: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
+  test-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Run V2 tests
+        run: |
+          bundle exec rspec spec/pubid_new/ --format progress --format json --out rspec-results.json
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rspec-results
+          path: rspec-results.json
+
   rake:
+    if: hashFiles('gems/**') != ''
     uses: ./.github/workflows/generic-rake.yml
     with:
       monorepo: true

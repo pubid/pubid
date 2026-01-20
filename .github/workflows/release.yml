@@ -20,6 +20,12 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: write
+  actions: read
+  checks: write
+  statuses: write
+
 jobs:
   release:
     runs-on: ubuntu-latest

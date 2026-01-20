@@ -6,6 +6,12 @@ on:
   repository_dispatch:
     types: [ tests-passed, release-passed ]
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  statuses: write
+
 jobs:
   build-matrix:
     uses: metanorma/ci/.github/workflows/prepare-rake.yml@main
