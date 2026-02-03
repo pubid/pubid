@@ -64,7 +64,7 @@ module Pubid::Iec::Renderer
     end
 
     def render_vap(vap, _opts, _params)
-      ":#{vap.downcase}"
+      ":#{vap.map(&:downcase).join('-')}"
     end
 
     def render_fragment(fragment, _opts, _params)
@@ -105,6 +105,10 @@ module Pubid::Iec::Renderer
 
     def render_language(language, _opts, _params)
       ":" + (language.is_a?(Array) ? language.join("-") : language)
+    end
+
+    def render_copublisher(copublisher, _opts, _params)
+      "-" + Array(copublisher).map { |c| c.to_s.downcase }.join("-")
     end
 
   end

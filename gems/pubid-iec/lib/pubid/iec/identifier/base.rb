@@ -19,7 +19,7 @@ module Pubid::Iec
                    edition: nil, type: nil, month: nil, day: nil,
                    language: nil, stage: nil, sheet: nil, **args)
 
-      @vap = vap.to_s if vap
+      @vap = Array(vap).map(&:to_s) if vap
       @database = database if database
       @fragment = fragment if fragment
       @version = version if version

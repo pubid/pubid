@@ -1,0 +1,55 @@
+# Minimal test set for relaton-data-iec identifiers
+# Reduced from 32,275 IDs to ~38 representative cases
+# === Commit-Required Test Cases (5a638b5) ===
+# /AMD not parsed as part
+ISO/IEC 10030/AMD2:1992
+# /COR not parsed as part
+IEC 61464/COR1:2003
+# /FRAG not parsed as part
+ISO/IEC 30149/FRAG1
+# Sheet without part (dash prefix)
+IEC 60285-/1:1989
+# Copublisher order preserved (NOT alphabetically sorted!)
+IEC/ISO/IEEE 80005-1:2012
+ISO/IEC/IEEE 8802-3:2017
+# Corrigendum after VAP (CSV/COR format)
+IEC 60529:1989+AMD1:1999 CSV/COR2:2007
+# === CISPR Publisher ===
+CISPR 10:1977
+CISPR 11A:1976
+CISPR 8D:1982
+CISPR TR 16-2-5:2008
+CISPR 10:1981/AMD1:1983
+# === Joint Publishers ===
+IEC/IEEE 82079-1:2019
+IEC/IEEE 8802-1AB:2017/AMD1:2023
+IEC/ISO 31010:2009
+ISO/IEC/IEEE 8802-3:2021/AMD14:2022
+IEC/ASTM 62885-7:2020+AMD1:2022 CSV
+ISO 10079-1:1991
+# === Document Types ===
+IEC SRD 62559-4:2020
+IEC GUIDE 102:1979
+IEC PAS 60027-6:2004
+CISPR PAS 38:2025
+# === Letter Edition Suffix ===
+IEC 60027-2A:1975
+IEC 60027-2B:1976
+CISPR 7B:1969
+# === Amendments & Corrigenda ===
+CISPR 10:1992/COR1:1994
+CISPR 10:1992/AMD1:1995/COR1:1995
+ISO/IEC/IEEE 8802-1Q:2024/AMD35:2024
+ISO 10079-1:2015/AMD1:2018
+ISO 10079-1:1991/COR2:1993
+# === FRAG ===
+IEC 60335-2-25/FRAG2
+IEC 60050-111/AMD1/FRAG1
+# === Multi-level Parts ===
+ISO/IEC 14543-2-1:2006
+IEC 60034-11-2:1984
+ISO/IEC/IEEE 8802-1Q:2020
+# === Edge Cases ===
+IEC 112:2017
+IEC 60067d:1960
+ISO/IEC VIM:1993
