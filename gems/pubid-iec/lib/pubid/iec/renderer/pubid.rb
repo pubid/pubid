@@ -54,7 +54,7 @@ module Pubid::Iec::Renderer
       params[:vap]&.include?("CSV") ? "+" : "/"
     end
 
-    def render_amendments(amendments, _opts, _params)
+    def render_amendments(amendments, _opts, params)
       supplement_prefix(params) + amendments.sort.map(&:to_s).join("+")
     end
 
@@ -70,8 +70,8 @@ module Pubid::Iec::Renderer
       " ED#{edition}" unless params[:version]
     end
 
-    def render_conjuction_part(conjuction_parts, _opts, _params)
-      conjunction_symbol = case _params[:publisher]
+    def render_conjuction_part(conjuction_parts, _opts, params)
+      conjunction_symbol = case params[:publisher]
       when "IECEE"
         # IECEE TRFs use '&' as parts separator (IECEE OD-2020)
         "&"
