@@ -7,8 +7,8 @@ module Pubid::Iec
         { key: :cs, title: "Component Specification", short: "CS" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "CS")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "CS")
       end
     end
   end

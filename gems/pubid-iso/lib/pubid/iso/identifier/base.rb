@@ -88,7 +88,7 @@ module Pubid::Iso
         @dir = dir.to_s if dir
         @dirtype = dirtype.to_s if dirtype
         if jtc_dir
-          @jtc_dir = jtc_dir
+          @jtc_dir = jtc_dir.to_s
         end
         if base
           if base.is_a?(Hash)
@@ -100,7 +100,7 @@ module Pubid::Iso
         @part = part.to_s if part
         @addendum = addendum if addendum
         @edition = edition
-        @month = month
+        @month = month.to_s if month
       end
 
       class << self
@@ -143,7 +143,7 @@ module Pubid::Iso
               month: supplement[:month],
               stage: supplement[:typed_stage], edition: supplement[:edition],
               iteration: supplement[:iteration], type: supplement[:type] || !supplement[:typed_stage] && :sup,
-              publisher: supplement[:publisher], base: Identifier.create(**base_params)
+              publisher: supplement[:publisher]&.to_s, base: Identifier.create(**base_params)
             )
           end
         end

@@ -7,8 +7,8 @@ module Pubid::Iec
         { key: :srd, title: "Systems Reference Document", short: "SRD" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "SRD")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "SRD")
       end
     end
   end

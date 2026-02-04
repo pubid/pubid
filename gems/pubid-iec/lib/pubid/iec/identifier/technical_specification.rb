@@ -49,7 +49,7 @@ module Pubid::Iec
       end
 
       def to_h(deep: true)
-        super.merge(type: "TS")
+        super(deep: deep).merge(type: "TS")
       end
     end
   end

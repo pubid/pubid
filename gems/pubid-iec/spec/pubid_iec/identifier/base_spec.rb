@@ -448,5 +448,23 @@ module Pubid::Iec
         end
       end
     end
+
+    describe "#to_yaml" do
+      context "CISPR TR 16-3:2000+AMD1:2002 CSV" do
+        let(:pubid) { "CISPR TR 16-3:2000+AMD1:2002 CSV" }
+
+        it "serializes amendments as hashes without ruby/object markers" do
+          expect(subject.to_h.to_yaml).not_to include("ruby/object")
+        end
+      end
+
+      context "IEC/ASTM 62885-6:2018" do
+        let(:pubid) { "IEC/ASTM 62885-6:2018" }
+
+        it "serializes copublisher without ruby/object markers" do
+          expect(subject.to_h.to_yaml).not_to include("ruby/object")
+        end
+      end
+    end
   end
 end

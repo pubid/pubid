@@ -7,8 +7,8 @@ module Pubid::Iec
         { key: :tec, title: "Technology Report", short: "Technology Report" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "Technology Report")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "Technology Report")
       end
     end
   end

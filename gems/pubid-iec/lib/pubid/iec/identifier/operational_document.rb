@@ -7,8 +7,8 @@ module Pubid::Iec
         { key: :od, title: "Operational Document", short: "OD" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "OD")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "OD")
       end
     end
   end

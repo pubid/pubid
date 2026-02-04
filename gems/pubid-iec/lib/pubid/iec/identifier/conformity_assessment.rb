@@ -7,8 +7,8 @@ module Pubid::Iec
         { key: :ca, title: "Conformity Assessment", short: "CA" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "CA")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "CA")
       end
     end
   end

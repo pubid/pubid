@@ -20,8 +20,8 @@ module Pubid::Iec
         { key: :guide, title: "Guide", short: %w[Guide GUIDE] }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "Guide")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "Guide")
       end
     end
   end

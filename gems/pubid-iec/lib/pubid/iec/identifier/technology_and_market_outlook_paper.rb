@@ -7,8 +7,8 @@ module Pubid::Iec
         { key: :tmop, title: "Technology and Market Outlook Paper", short: "Technology and Market Outlook Paper" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "Technology and Market Outlook Paper")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "Technology and Market Outlook Paper")
       end
     end
   end

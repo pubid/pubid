@@ -46,7 +46,7 @@ module Pubid::Core
 
         @publisher = publisher.to_s
         @number = number&.to_s
-        @copublisher = copublisher if copublisher
+        @copublisher = Array(copublisher).map(&:to_s) if copublisher
         @part = part.to_s if part
         @year = year.to_i if year
         @edition = edition.to_i if edition
