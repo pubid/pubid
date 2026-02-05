@@ -48,8 +48,8 @@ module Pubid::Iec
         { key: :tr, title: "Technical Report", short: "TR" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "TR")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "TR")
       end
     end
   end

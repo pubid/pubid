@@ -28,8 +28,8 @@ module Pubid::Iec
         { key: :pas, title: "Publicly Available Specification", short: "PAS" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "PAS")
+      def to_h(deep: true)
+        super(deep: deep).merge(type: "PAS")
       end
     end
   end

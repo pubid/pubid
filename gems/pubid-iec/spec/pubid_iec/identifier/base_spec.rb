@@ -37,6 +37,12 @@ module Pubid::Iec
 
         it_behaves_like "parse identifiers from file"
       end
+
+      context "parses identifiers from relaton-data-iec-pubid.txt" do
+        let(:examples_file) { "relaton-data-iec-pubid.txt" }
+
+        it_behaves_like "parse identifiers from file"
+      end
     end
 
     context "IEC 60050-351:2013/AMD1:2016" do
@@ -83,7 +89,7 @@ module Pubid::Iec
 
     context "IEC 60529:1989+AMD1:1999 CSV/COR2:2007" do
       let(:original) { "IEC 60529:1989+AMD1:1999 CSV/COR2:2007"}
-      let(:pubid) { "IEC 60529:1989+AMD1:1999+COR2:2007 CSV"}
+      let(:pubid) { "IEC 60529:1989+AMD1:1999 CSV/COR2:2007"}
       let(:urn) { "urn:iec:std:iec:60529:1989:csv:amd:1999:v1:cor:2007:v2" }
 
       it_behaves_like "converts pubid to pubid"
@@ -439,6 +445,24 @@ module Pubid::Iec
 
         it "renders correct URN" do
           expect(subject.urn).to eq("urn:iec:std:iec:123:stage-draft")
+        end
+      end
+    end
+
+    describe "#to_yaml" do
+      context "CISPR TR 16-3:2000+AMD1:2002 CSV" do
+        let(:pubid) { "CISPR TR 16-3:2000+AMD1:2002 CSV" }
+
+        it "serializes amendments as hashes without ruby/object markers" do
+          expect(subject.to_h.to_yaml).not_to include("ruby/object")
+        end
+      end
+
+      context "IEC/ASTM 62885-6:2018" do
+        let(:pubid) { "IEC/ASTM 62885-6:2018" }
+
+        it "serializes copublisher without ruby/object markers" do
+          expect(subject.to_h.to_yaml).not_to include("ruby/object")
         end
       end
     end

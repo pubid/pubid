@@ -6,6 +6,10 @@ module Pubid::Iec
         @year = year&.to_i
       end
 
+      def to_h(deep: true, add_type: true)
+        { number: number, year: year }.compact
+      end
+
       def <=>(other)
         return 0 if year.nil? && other.year
 

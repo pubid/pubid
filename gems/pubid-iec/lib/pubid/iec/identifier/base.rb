@@ -19,22 +19,22 @@ module Pubid::Iec
                    edition: nil, type: nil, month: nil, day: nil,
                    language: nil, stage: nil, sheet: nil, **args)
 
-      @vap = vap.to_s if vap
+      @vap = Array(vap).map(&:to_s) if vap
       @database = database if database
-      @fragment = fragment if fragment
+      @fragment = fragment.to_s if fragment
       @version = version if version
       @decision_sheet = decision_sheet if decision_sheet
-      @conjuction_part = conjuction_part if conjuction_part
+      @conjuction_part = Array(conjuction_part).map(&:to_s) if conjuction_part
       @part_version = part_version if part_version
       @trf_publisher = trf_publisher.to_s if trf_publisher
       @trf_series = trf_series if trf_series
       @trf_version = trf_version.to_s if trf_version
       @test_type = test_type if test_type
       @edition = edition.to_s if edition
-      @month = month if month
-      @day = day if day
-      @language = language if language
-      @sheet = sheet if sheet
+      @month = month.to_s if month
+      @day = day.to_s if day
+      @language = Array(language).map(&:to_s) if language
+      @sheet = sheet.transform_values(&:to_s) if sheet
 
       if stage
         @stage = self.class.has_project_stage?(stage) ? self.class.resolve_project_stage(stage) : resolve_stage(stage)
@@ -70,6 +70,10 @@ module Pubid::Iec
 
     def to_s(with_edition_month_date: false)
       self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date)
+    end
+
+    def to_yaml
+      to_h(deep: true).to_yaml
     end
 
     class << self
