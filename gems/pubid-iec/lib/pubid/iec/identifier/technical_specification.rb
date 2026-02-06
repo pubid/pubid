@@ -48,8 +48,10 @@ module Pubid::Iec
         { key: :ts, title: "Technical Specification", short: "TS" }
       end
 
-      def to_h(deep: true)
-        super(deep: deep).merge(type: "TS")
+      def to_h(deep: true, add_type: true)
+        result = super(deep: deep, add_type: false)
+        result[:type] = "TS" if add_type
+        result
       end
     end
   end

@@ -7,8 +7,10 @@ module Pubid::Iec
         { key: :srd, title: "Systems Reference Document", short: "SRD" }
       end
 
-      def to_h(deep: true)
-        super(deep: deep).merge(type: "SRD")
+      def to_h(deep: true, add_type: true)
+        result = super(deep: deep, add_type: false)
+        result[:type] = "SRD" if add_type
+        result
       end
     end
   end
