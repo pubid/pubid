@@ -8,8 +8,10 @@ module Pubid::Iec
         { key: :sttr, title: "Societal and Technology Trend Report", short: "Trend Report" }
       end
 
-      def to_h(deep: true)
-        super(deep: deep).merge(type: "Trend Report")
+      def to_h(deep: true, add_type: true)
+        result = super(deep: deep, add_type: false)
+        result[:type] = "Trend Report" if add_type
+        result
       end
     end
   end

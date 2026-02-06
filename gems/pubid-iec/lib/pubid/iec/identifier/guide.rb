@@ -20,8 +20,10 @@ module Pubid::Iec
         { key: :guide, title: "Guide", short: %w[Guide GUIDE] }
       end
 
-      def to_h(deep: true)
-        super(deep: deep).merge(type: "Guide")
+      def to_h(deep: true, add_type: true)
+        result = super(deep: deep, add_type: false)
+        result[:type] = "Guide" if add_type
+        result
       end
     end
   end
