@@ -4,8 +4,8 @@ module Pubid::Iec
   class Base < Pubid::Core::Identifier::Base
 
     attr_accessor :vap, :database, :fragment, :version, :decision_sheet,
-                  :conjuction_part, :part_version, :trf_publisher,
-                  :trf_series, :trf_version, :test_type, :month, :day, :sheet
+                  :conjuction_part, :part_version, :trf_publisher, :trf_series,
+                  :trf_version, :test_type, :month, :day, :sheet, :base
 
     extend Forwardable
 
@@ -74,6 +74,10 @@ module Pubid::Iec
 
     def to_yaml
       to_h(deep: true).to_yaml
+    end
+
+    def root
+      base || self
     end
 
     class << self
