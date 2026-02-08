@@ -432,6 +432,25 @@ module Pubid::Iec
       end
     end
 
+    describe "#root" do
+      context "when base is nil" do
+        subject { described_class.new(number: 60050) }
+
+        it "returns self" do
+          expect(subject.root).to eq(subject)
+        end
+      end
+
+      context "when base is set" do
+        let(:base_identifier) { Identifier.create(number: 60050, part: 351, year: 2013) }
+        subject { Identifier::InterpretationSheet.new(base: base_identifier, number: 123) }
+
+        it "returns the base identifier" do
+          expect(subject.root).to eq(base_identifier)
+        end
+      end
+    end
+
     describe "creating new identifier" do
       subject { described_class.new(**{ number: number }.merge(params)) }
       let(:number) { 123 }

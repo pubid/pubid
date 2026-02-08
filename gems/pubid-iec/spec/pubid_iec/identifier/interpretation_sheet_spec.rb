@@ -6,7 +6,7 @@ module Pubid::Iec
           subject { described_class.new(number: 60050) }
 
           it "creates instance with nil base" do
-            expect(subject.instance_variable_get(:@base)).to be_nil
+            expect(subject.base).to be_nil
           end
 
           it "passes options to parent class" do
