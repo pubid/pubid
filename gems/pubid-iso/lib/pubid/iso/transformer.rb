@@ -26,15 +26,20 @@ module Pubid::Iso
         context[:supplements] =
           context[:supplements].map do |supplement|
             if supplement[:typed_stage]
-              supplement.merge(
-                case supplement[:typed_stage]
-                when "PDAM" then { typed_stage: "CD", type: "Amd" }
-                when "pDCOR" then { typed_stage: "CD", type: "Cor" }
-                # when "DAD" then { typed_stage: "WD", type: "Amd" }
-                when "draft" then convert_urn_sup_draft_type supplement[:type]
-                else convert_urn_sup_stage_code(supplement)
-                end,
-              )
+              if supplement[:typed_stage] == "published"
+                supplement.delete(:typed_stage)
+                supplement
+              else
+                supplement.merge(
+                  case supplement[:typed_stage]
+                  when "PDAM" then { typed_stage: "CD", type: "Amd" }
+                  when "pDCOR" then { typed_stage: "CD", type: "Cor" }
+                  # when "DAD" then { typed_stage: "WD", type: "Amd" }
+                  when "draft" then convert_urn_sup_draft_type supplement[:type]
+                  else convert_urn_sup_stage_code(supplement)
+                  end,
+                )
+              end
             else
               case supplement[:type]
               when "Addendum" then supplement.merge({ type: "Add" })
@@ -141,8 +146,12 @@ module Pubid::Iso
 
     def self.convert_urn_sup_stage_code(sup)
       stage_type = convert_urn_sup_type(sup[:type])
-      abbr = convert_stage_code(sup[:typed_stage])
-      stage_type[:typed_stage] = abbr if abbr
+      if /\A[\d.]+\z/.match?(sup[:typed_stage].to_s)
+        stage_type[:typed_stage] = sup[:typed_stage].to_s
+      else
+        abbr = convert_stage_code(sup[:typed_stage])
+        stage_type[:typed_stage] = abbr if abbr
+      end
       stage_type
     end
 
