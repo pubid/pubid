@@ -1339,6 +1339,12 @@ module Pubid::Iso
           it_behaves_like "converts urn to urn"
         end
 
+        context "stage-published" do
+          let(:urn) { "urn:iso:std:iso:19115:-1:ed-1:stage-published:amd:2018:v1" }
+          it_behaves_like "converts urn to pubid", "ISO 19115-1 ED1/Amd 1:2018"
+          it_behaves_like "converts urn to urn"
+        end
+
         context "90.92" do
           let(:urn) { "urn:iso:std:iso:11930:ed-2:stage-90.92:amd:2022:v1" }
           it_behaves_like "converts urn to pubid", "ISO 11930 ED2/WDR Amd 1:2022"

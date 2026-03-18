@@ -27,8 +27,8 @@ module Pubid::Iso
           context[:supplements].map do |supplement|
             if supplement[:typed_stage]
               if supplement[:typed_stage] == "published"
-                supplement.delete(:typed_stage)
-                supplement
+                supplement[:typed_stage] = "IS"
+                supplement.merge(convert_urn_sup_stage_code(supplement))
               else
                 supplement.merge(
                   case supplement[:typed_stage]
