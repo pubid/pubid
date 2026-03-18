@@ -28,8 +28,13 @@ module Pubid::Iso::Renderer
       stage = params[:stage]
 
       if params[:stage].instance_of?(Pubid::Core::Stage) && !params[:stage].to_s(with_prf: opts[:with_prf]).empty?
-        type_prefix = " #{type_prefix}"
-        stage = params[:stage].to_s(with_prf: opts[:with_prf])
+        stage_str = params[:stage].to_s(with_prf: opts[:with_prf])
+        if stage_str == "IS"
+          stage = ""
+        else
+          type_prefix = " #{type_prefix}"
+          stage = stage_str
+        end
       end
 
       if instance_of?(Supplement)

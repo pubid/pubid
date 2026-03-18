@@ -1329,13 +1329,13 @@ module Pubid::Iso
       context "Suppliment" do
         context "60.00" do
           let(:urn) { "urn:iso:std:iso:10033:-1:ed-1:stage-60.00:amd:1:v1"}
-          it_behaves_like "converts urn to pubid", "ISO 10033-1 ED1/IS Amd 1"
+          it_behaves_like "converts urn to pubid", "ISO 10033-1 ED1/Amd 1"
           it_behaves_like "converts urn to urn"
         end
 
         context "60.60" do
           let(:urn) { "urn:iso:std:iec:60086:-3:ed-4:stage-60.60:cor:2023:v1" }
-          it_behaves_like "converts urn to pubid", "IEC 60086-3 ED4/IS Cor 1:2023"
+          it_behaves_like "converts urn to pubid", "IEC 60086-3 ED4/Cor 1:2023"
           it_behaves_like "converts urn to urn"
         end
 
