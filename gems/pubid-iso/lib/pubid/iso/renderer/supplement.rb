@@ -14,7 +14,7 @@ module Pubid::Iso::Renderer
           base_type: @params[:base].type[:key],
           **args
         ) +
-        if @params[:base].language
+        if !@params[:language] && @params[:base].language
           render_language(@params[:base].language,
                           { with_language_code: with_language_code }, nil).to_s
         else
