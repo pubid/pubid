@@ -81,8 +81,8 @@ module Pubid::Nist
       end
 
       # @param without_edition [Boolean] render pubid without rendering edition
-      def to_s(format = :short, without_edition: false)
-        self.class.get_renderer_class.new(to_h(deep: false)).render(format: format, without_edition: without_edition)
+      def to_s(format = :short, without_edition: false, annotated: false)
+        self.class.get_renderer_class.new(to_h(deep: false)).render(format: format, without_edition: without_edition, annotated: annotated)
       end
 
       def to_json(*args)

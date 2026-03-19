@@ -7,11 +7,11 @@ module Pubid::Iso::Renderer
     # Render identifier
     # @param with_edition [Boolean] include edition in output
     # @see Pubid::Core::Renderer::Base for another options
-    def render(with_edition: true, with_language_code: :iso, with_date: true, **args) # rubocop:disable Metrics/MethodLength
-      @params[:base].to_s(lang: args[:language], with_edition: with_edition) +
+    def render(with_edition: true, with_language_code: :iso, with_date: true, annotated: false, **args) # rubocop:disable Metrics/MethodLength
+      @params[:base].to_s(lang: args[:language], with_edition: with_edition, annotated: annotated) +
         super(
           with_edition: with_edition, with_language_code: with_language_code, with_date: with_date,
-          base_type: @params[:base].type[:key],
+          annotated: annotated, base_type: @params[:base].type[:key],
           **args
         ) +
         if !@params[:language] && @params[:base].language

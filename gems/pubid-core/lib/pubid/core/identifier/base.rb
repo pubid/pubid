@@ -103,8 +103,9 @@ module Pubid::Core
       end
 
       # Render identifier using default renderer
-      def to_s
-        self.class.get_renderer_class.new(to_h(deep: false)).render
+      # @param annotated [Boolean] wrap semantic components in <span> tags
+      def to_s(annotated: false)
+        self.class.get_renderer_class.new(to_h(deep: false)).render(annotated: annotated)
       end
 
       def exclude(*args)

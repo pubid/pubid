@@ -266,11 +266,12 @@ module Pubid::Iso
       #   :ref_undated -- reference undated: no language code + short form (DAM) + undated
       #   :ref_undated_long -- reference undated long: 1 letter language code + long form (DAmd) + undated
       # @return [String] pubid identifier
-      def to_s(lang: nil, with_edition: false, with_prf: false, format: :ref_dated_long)
+      def to_s(lang: nil, with_edition: false, with_prf: false, format: :ref_dated_long, annotated: false)
         options = resolve_format(format)
         options[:with_edition] = with_edition
         options[:with_prf] = with_prf
         options[:language] = lang
+        options[:annotated] = annotated
 
         self.class.get_renderer_class.new(to_h(deep: false)).render(**options) +
           render_joint_document(@joint_document) + render_all_parts
