@@ -10,8 +10,14 @@ module Pubid::Iso
       context[:root]
     end
 
-    rule(edition: "Ed") do
-      { edition: "1" }
+    rule(edition: subtree(:edition)) do |context|
+      if context[:edition].to_s == "Ed"
+        { edition: "1" }
+      elsif context[:edition].is_a?(Hash)
+        { edition: context[:edition].transform_values(&:to_s) }
+      else
+        context
+      end
     end
 
     rule(stage: subtree(:stage)) do |context|
