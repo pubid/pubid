@@ -1,3 +1,3 @@
 module Pubid
-  VERSION = "1.15.7".freeze
+  VERSION = "1.15.8".freeze
 end
