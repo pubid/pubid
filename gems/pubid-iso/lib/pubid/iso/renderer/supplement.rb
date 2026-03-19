@@ -37,14 +37,17 @@ module Pubid::Iso::Renderer
         end
       end
 
+      sep = params[:separator]
+      sep = "/" if sep.nil? || sep.empty?
+
       if instance_of?(Supplement)
         if opts[:base_type] == :dir
           "%<stage>s%<publisher>s SUP%<number>s%<part>s%<iteration>s%<year>s%<month>s%<edition>s" % params
         else
-          "/#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
+          "#{sep}#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
         end
       else
-        "/#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
+        "#{sep}#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
       end
     end
 

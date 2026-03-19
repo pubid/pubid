@@ -231,6 +231,18 @@ module Pubid::Iso
       it_behaves_like "converts pubid to pubid"
     end
 
+    context "ISO 19115-1 + Amd 1" do
+      let(:original) { "ISO 19115-1 + Amd 1" }
+      let(:pubid) { "ISO 19115-1 + Amd 1" }
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 19115-1, Amd 1" do
+      let(:original) { "ISO 19115-1, Amd 1" }
+      let(:pubid) { "ISO 19115-1, Amd 1" }
+      it_behaves_like "converts pubid to pubid"
+    end
+
     context "ISO 10360-1:2000/Cor 1:2002" do
       let(:original) { "ISO 10360-1:2000/Cor 1:2002 ED1" }
       let(:pubid) { "ISO 10360-1:2000/Cor 1:2002" }

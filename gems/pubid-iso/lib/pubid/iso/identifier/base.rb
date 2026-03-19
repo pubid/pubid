@@ -143,7 +143,8 @@ module Pubid::Iso
               month: supplement[:month],
               stage: supplement[:typed_stage], edition: supplement[:edition],
               iteration: supplement[:iteration], type: supplement[:type] || !supplement[:typed_stage] && :sup,
-              publisher: supplement[:publisher]&.to_s, base: Identifier.create(**base_params)
+              publisher: supplement[:publisher]&.to_s, base: Identifier.create(**base_params),
+              separator: ([" + ", ", "].include?(supplement[:separator]&.to_s) ? supplement[:separator].to_s : nil)
             )
           end
         end

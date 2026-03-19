@@ -119,7 +119,7 @@ module Pubid::Iso
     end
 
     rule(:supplement) do
-      ((str("/") | space).maybe >>
+      ((str(" + ") | str(", ") | str("/") | space).as(:separator).maybe >>
         (((stage.as(:typed_stage) >> space).maybe >> supplements.as(:type)) |
           staged_supplement.as(:typed_stage)) >>
         (space | str(".")).repeat(1).maybe >>
