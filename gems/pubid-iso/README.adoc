@@ -162,6 +162,30 @@ to see all available options.
 => "ISO 8601-1:2019/DAM 1"
 ----
 
+=== Annotated rendering
+
+Use `to_s(annotated: true)` to wrap each semantic component of the identifier in
+an HTML `<span>` tag with a CSS class, useful for styling in web applications.
+
+[source,ruby]
+----
+> pubid = Pubid::Iso::Identifier.parse("ISO 1234-1:2013")
+> pubid.to_s(annotated: true)
+=> '<span class="publisher">ISO</span> <span class="docnumber">1234</span>-<span class="part">1</span>:<span class="year">2013</span>'
+----
+
+With copublisher and document type:
+
+[source,ruby]
+----
+> pubid = Pubid::Iso::Identifier.parse("ISO/IEC TR 2131-1:2013")
+> pubid.to_s(annotated: true)
+=> '<span class="publisher">ISO/IEC</span> <span class="doctype">TR</span> <span class="docnumber">2131</span>-<span class="part">1</span>:<span class="year">2013</span>'
+----
+
+The `annotated:` option can be combined with other `to_s` options like `format:`,
+`lang:`, etc.
+
 === Using language specific rendering
 [source,ruby]
 ----

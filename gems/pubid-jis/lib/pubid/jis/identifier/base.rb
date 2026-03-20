@@ -33,9 +33,10 @@ module Pubid::Jis
       end
 
       # @param with_publisher [Boolean] add publisher to output
-      def to_s(with_publisher: true)
+      def to_s(with_publisher: true, annotated: false)
         options = {}
         options[:with_publisher] = with_publisher
+        options[:annotated] = annotated
 
         self.class.get_renderer_class.new(to_h(deep: false)).render(**options)
       end

@@ -29,6 +29,26 @@ pubid.to_h
 => { publisher: "ISO", number: 1, year: 1999 }
 ----
 
+=== Annotated rendering
+
+Use `to_s(annotated: true)` to produce HTML output where each semantic component
+is wrapped in a `<span>` tag with a CSS class. This is useful for styling
+individual parts of an identifier in web UIs.
+
+[source,ruby]
+----
+pubid = Identifier.parse("ISO 1234-1:2013")
+pubid.to_s(annotated: true)
+=> '<span class="publisher">ISO</span> <span class="docnumber">1234</span>-<span class="part">1</span>:<span class="year">2013</span>'
+----
+
+Available CSS classes: `publisher`, `docnumber`, `part`, `year`, `edition`,
+`amendment`, `corrigendum`, `language`, `doctype`, `stage`, `iteration`,
+`addendum`.
+
+The `annotated:` option can be combined with other `to_s` options such as
+`format:` and `lang:`.
+
 === Using #new_edition_of? to compare identifiers
 
 [source,ruby]

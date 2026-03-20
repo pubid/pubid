@@ -62,7 +62,7 @@ pubid               # Meta-gem that bundles common gems (released last)
 - **Parslet PEG parsers**: Each gem uses `parslet` for identifier parsing (`parser.rb`)
 - **Transformers**: AST transformation via `transformer.rb`
 - **Identifier models**: Core `Identifier` class extended by each standards org
-- **Renderers**: Output formatting in `renderer/` directories (base, URN formats)
+- **Renderers**: Output formatting in `renderer/` directories (base, URN formats). Supports `annotated: true` option in `to_s` to wrap semantic components in `<span>` tags with CSS classes (defined in `Pubid::Core::Renderer::Base::SEMANTIC_CLASSES`).
 
 ### Version Synchronization
 

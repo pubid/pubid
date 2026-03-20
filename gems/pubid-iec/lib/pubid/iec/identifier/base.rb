@@ -68,8 +68,8 @@ module Pubid::Iec
       values
     end
 
-    def to_s(with_edition_month_date: false)
-      self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date)
+    def to_s(with_edition_month_date: false, annotated: false)
+      self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date, annotated: annotated)
     end
 
     def to_yaml
