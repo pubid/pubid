@@ -1328,7 +1328,7 @@ module Pubid::Iso
         context "60.60" do
           let(:urn) { "urn:iso:std:iec:60086:-3:stage-60.60" }
           it_behaves_like "converts urn to pubid", "IEC/IS 60086-3"
-          it_behaves_like "converts urn to urn", "urn:iso:std:iec:60086:-3:stage-published"
+          it_behaves_like "converts urn to urn"
         end
 
         context "95.99" do

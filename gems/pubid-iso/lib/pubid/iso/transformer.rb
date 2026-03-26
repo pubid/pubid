@@ -146,7 +146,12 @@ module Pubid::Iso
       when "preCD" then { stage: "PreCD" }
       when "published" then { stage: "IS" }
       # when "draft" then { stage: "WD" }
-      else { stage: convert_stage_code(code.to_s) }
+      else
+        if /\A[\d.]+\z/.match?(code.to_s)
+          { stage: code.to_s }
+        else
+          { stage: convert_stage_code(code.to_s) }
+        end
       end
     end
 
