@@ -468,6 +468,49 @@ module Pubid::Iec
       end
     end
 
+    describe "URN roundtrip parsing" do
+      shared_examples "parses URN roundtrip" do
+        it "parses URN and renders back to the same URN" do
+          expect(described_class.parse(urn).urn).to eq(urn)
+        end
+      end
+
+      context "urn:iec:std:iec:60027::::" do
+        let(:urn) { "urn:iec:std:iec:60027::::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:60050:-351:2013:::" do
+        let(:urn) { "urn:iec:std:iec:60050:-351:2013:::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:100:-44::stage-draft:ed-1:" do
+        let(:urn) { "urn:iec:std:iec:100:-44::stage-draft:ed-1:" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:61010:-2-201:2017:rlv::" do
+        let(:urn) { "urn:iec:std:iec:61010:-2-201:2017:rlv::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:123::::en-fr" do
+        let(:urn) { "urn:iec:std:iec:123::::en-fr" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:ca:01:2020:csv::" do
+        let(:urn) { "urn:iec:std:iec:ca:01:2020:csv::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:srd:syccomm:-1::stage-draft:ed-1:" do
+        let(:urn) { "urn:iec:std:iec:srd:syccomm:-1::stage-draft:ed-1:" }
+        it_behaves_like "parses URN roundtrip"
+      end
+    end
+
     describe "#to_yaml" do
       context "CISPR TR 16-3:2000+AMD1:2002 CSV" do
         let(:pubid) { "CISPR TR 16-3:2000+AMD1:2002 CSV" }
