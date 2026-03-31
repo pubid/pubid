@@ -80,7 +80,11 @@ module Pubid::Iec::Renderer
         with_date: with_date, with_language_code: with_language_code, annotated: annotated,
       ))
       lang = strip_leading_colon(@prerendered_params[:language].to_s)
-      "#{base}:#{lang}"
+      if @prerendered_params.key?(:all_parts)
+        "#{base}ser"
+      else
+        "#{base}:#{lang}"
+      end
     end
 
     def render_number(number, _opts, _params)

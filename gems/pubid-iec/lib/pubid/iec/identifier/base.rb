@@ -69,7 +69,9 @@ module Pubid::Iec
     end
 
     def to_s(with_edition_month_date: false, annotated: false)
-      self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date, annotated: annotated)
+      result = self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date, annotated: annotated)
+      result += " (all parts)" if all_parts
+      result
     end
 
     def to_yaml

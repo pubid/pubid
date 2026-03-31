@@ -31,7 +31,9 @@ module Pubid
           end
 
           rule(:urn_part) do
-            (colon >> dash >> (match('[a-z0-9]') | dash).repeat(1).as(:part)).maybe
+            # Accept both new format (colon-dash, e.g. ":-6") and legacy API
+            # format (dash only, e.g. "-6") for part numbers in URNs
+            (colon.maybe >> dash >> (match('[a-z0-9]') | dash).repeat(1).as(:part)).maybe
           end
 
           rule(:urn_conjuction_part) do
@@ -39,7 +41,8 @@ module Pubid
           end
 
           rule(:urn_year) do
-            year_digits.as(:year).maybe
+            # Accept optional month suffix (e.g. "2008-03") for legacy API URNs
+            (year_digits.as(:year) >> (dash >> month_digits.as(:month)).maybe).maybe
           end
 
           rule(:urn_iteration) do
