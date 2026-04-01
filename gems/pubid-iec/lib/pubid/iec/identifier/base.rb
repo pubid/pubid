@@ -69,7 +69,9 @@ module Pubid::Iec
     end
 
     def to_s(with_edition_month_date: false, annotated: false)
-      self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date, annotated: annotated)
+      result = self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date, annotated: annotated)
+      result += " (all parts)" if all_parts
+      result
     end
 
     def to_yaml
@@ -111,7 +113,7 @@ module Pubid::Iec
 
       def transform(params)
         identifier_params = transform_hash(params)
-
+        normalize_urn_params!(identifier_params) if identifier_params[:publisher].to_s.match?(/\A[a-z]+\z/)
         if identifier_params[:interpretation_sheet]
           return Identifier.create(
             type: :ish,
@@ -123,6 +125,27 @@ module Pubid::Iec
         end
 
         Identifier.create(**identifier_params)
+      end
+
+      def normalize_urn_params!(params)
+        params[:publisher] = params[:publisher].to_s.upcase
+        params[:copublisher] = params[:copublisher].to_s.upcase if params[:copublisher]
+        params[:type] = params[:type].to_s.upcase if params[:type]
+        params[:number] = params[:number].to_s.upcase
+
+        # Map fuzzy URN stages to abbreviations that resolve correctly
+        if params[:stage]
+          stage_str = params[:stage].to_s
+          case stage_str
+          when "draft" then params[:stage] = "CD"
+          when "published" then params[:stage] = "60.60"
+          end
+        end
+
+        # Remove amendments/corrigendums parsed as bare strings from URN
+        # (full supplement round-trip support to be added later)
+        params.delete(:amendments) if params[:amendments].is_a?(String)
+        params.delete(:corrigendums) if params[:corrigendums].is_a?(String)
       end
 
       def get_amendment_class

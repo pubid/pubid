@@ -12,5 +12,11 @@ module Pubid::Iec::Renderer
     def render_stage(stage, _opts, _params)
       ":stage-#{stage.to_s.downcase}"
     end
+
+    def render(with_date: true, with_language_code: :iso, annotated: false, **args)
+      render_base_identifier(**args.merge(
+        with_date: with_date, with_language_code: with_language_code, annotated: annotated,
+      )) + @prerendered_params[:language].to_s
+    end
   end
 end

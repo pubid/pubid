@@ -1,7 +1,9 @@
 require "pubid-core"
+require_relative "parser_urn"
 
 module Pubid::Iec
   class Parser < Pubid::Core::Parser
+    include Pubid::Iec::ParserUrn
     rule(:organization) do
       str("IECEE") | str("IECEx") | str("IECQ") | str("IEC") | str("ISO") |
         str("IEEE") | str("CISPR") | str("ASTM")
@@ -106,6 +108,6 @@ module Pubid::Iec
         language.maybe)
     end
 
-    rule(:root) { identifier }
+    rule(:root) { urn_identifier | identifier }
   end
 end

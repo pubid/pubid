@@ -53,10 +53,38 @@ module Pubid::Iec::Renderer
     }.freeze
 
     def render_identifier(params)
-      "urn:iec:std:%{publisher}%{copublisher}%{type}:%{number}"\
-      "%{part}%{conjuction_part}%{year}%{stage}%{vap}"\
-      "%{urn_stage}%{corrigendum_stage}%{iteration}%{version}%{part_version}"\
-      "%{edition}%{amendments}%{corrigendums}%{fragment}" % params
+      result = "urn:iec:std:#{params[:publisher]}#{params[:copublisher]}" \
+               "#{params[:type]}:#{params[:number]}" \
+               "#{params[:part]}#{params[:conjuction_part]}"
+
+      # Positional fields — always colon-separated even when empty
+      result += ":#{strip_leading_colon(params[:year])}"
+
+      stage_value = [params[:stage], params[:vap], params[:urn_stage],
+                     params[:corrigendum_stage], params[:iteration],
+                     params[:version], params[:part_version]].map(&:to_s).join
+      result += ":#{strip_leading_colon(stage_value)}"
+
+      result += ":#{strip_leading_colon(params[:edition])}"
+
+      # Non-positional suffixes
+      result += params[:amendments].to_s
+      result += params[:corrigendums].to_s
+      result += params[:fragment].to_s
+
+      result
+    end
+
+    def render(with_date: true, with_language_code: :iso, annotated: false, **args)
+      base = render_base_identifier(**args.merge(
+        with_date: with_date, with_language_code: with_language_code, annotated: annotated,
+      ))
+      lang = strip_leading_colon(@prerendered_params[:language].to_s)
+      if @prerendered_params.key?(:all_parts)
+        "#{base}ser"
+      else
+        "#{base}:#{lang}"
+      end
     end
 
     def render_number(number, _opts, _params)
@@ -109,6 +137,13 @@ module Pubid::Iec::Renderer
 
     def render_copublisher(copublisher, _opts, _params)
       "-" + Array(copublisher).map { |c| c.to_s.downcase }.join("-")
+    end
+
+    private
+
+    def strip_leading_colon(value)
+      s = value.to_s
+      s.start_with?(":") ? s[1..] : s
     end
 
   end
