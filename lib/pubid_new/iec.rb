@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module PubidNew
   module Iec
   end
@@ -14,15 +15,16 @@ require_relative "iec/identifiers/publicly_available_specification"
 require_relative "iec/identifiers/guide"
 require_relative "iec/identifiers/test_report_form"
 require_relative "iec/identifiers/interpretation_sheet"
-require_relative "iec/identifiers/component_specification"
-require_relative "iec/identifiers/operational_document"
-require_relative "iec/identifiers/conformity_assessment"
 require_relative "iec/identifiers/systems_reference_document"
-require_relative "iec/identifiers/technology_report"
-require_relative "iec/identifiers/societal_technology_trend_report"
-require_relative "iec/identifiers/white_paper"
+require_relative "iec/identifiers/working_document"
 require_relative "iec/identifiers/amendment"
 require_relative "iec/identifiers/corrigendum"
+
+# Wrapper identifier types
+require_relative "iec/identifiers/vap_identifier"
+require_relative "iec/identifiers/sheet_identifier"
+require_relative "iec/identifiers/consolidated_identifier"
+require_relative "iec/identifiers/fragment_identifier"
 
 module PubidNew
   module Iec
@@ -35,20 +37,15 @@ module PubidNew
       Identifiers::Guide,
       Identifiers::TestReportForm,
       Identifiers::InterpretationSheet,
-      Identifiers::ComponentSpecification,
-      Identifiers::OperationalDocument,
-      Identifiers::ConformityAssessment,
       Identifiers::SystemsReferenceDocument,
-      Identifiers::TechnologyReport,
-      Identifiers::SocietalTechnologyTrendReport,
-      Identifiers::WhitePaper,
+      Identifiers::WorkingDocument,
     ].freeze
 
     # Supplement types (can appear with / notation)
     SUPPLEMENT_IDENTIFIER_TYPES = [
       Identifiers::Amendment,
       Identifiers::Corrigendum,
-      Identifiers::InterpretationSheet,  # ISH can act as supplement (/ISH1:1996)
+      Identifiers::InterpretationSheet, # ISH can act as supplement (/ISH1:1996)
     ].freeze
 
     # Create the Scheme registry with all identifier types
@@ -62,8 +59,17 @@ module PubidNew
       parsed = Parser.new.parse(identifier_string)
       Builder.new(Scheme).build(parsed)
     end
+
+    # Parse an IEC URN string
+    # @param urn [String] the URN string to parse
+    # @return [Identifier] the parsed identifier
+    # @raise [Errors::ParseError] if URN is invalid
+    def self.parse_urn(urn)
+      UrnParser.parse(urn)
+    end
   end
 end
 
+require_relative "iec/urn_parser"
 require_relative "iec/builder"
 require_relative "iec/parser"

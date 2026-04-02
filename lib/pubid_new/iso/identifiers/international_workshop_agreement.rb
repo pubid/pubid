@@ -1,4 +1,5 @@
 require_relative "../single_identifier"
+# frozen_string_literal: true
 require_relative "../../components/typed_stage"
 
 module PubidNew
@@ -6,7 +7,7 @@ module PubidNew
     module Identifiers
       # International Workshop Agreement Identifier
       class InternationalWorkshopAgreement < SingleIdentifier
-        attribute :type, Components::Type, default: -> { type[:key] }
+        attribute :type, Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           Components::TypedStage.new(
@@ -64,7 +65,7 @@ module PubidNew
             type_code: :iwa,
             abbr: ["PRF IWA"],
             name: "Proof International Workshop Agreement",
-            harmonized_stages: %w[60.00],
+            harmonized_stages: %w[50.00],
           ),
           Components::TypedStage.new(
             code: :iwa,
@@ -90,8 +91,10 @@ module PubidNew
           [
             # The publisher is omitted because it is an IWA
             typed_stage.abbreviation,
-            number_portion(lang_single: lang_single)
-          ].compact.join(' ')
+            number_portion(lang_single: lang_single),
+          ].compact.join(" ").tap do |s|
+            s << language_portion(lang_single: lang_single) if languages&.any?
+          end
         end
       end
     end

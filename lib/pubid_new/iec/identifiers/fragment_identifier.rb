@@ -1,4 +1,5 @@
 require_relative "../identifier"
+# frozen_string_literal: true
 
 module PubidNew
   module Iec
@@ -9,23 +10,24 @@ module PubidNew
       class FragmentIdentifier < Identifier
         attribute :base_identifier, Identifier, polymorphic: true
         attribute :fragment_number, :string
-        attribute :edition, ::PubidNew::Components::Edition, default: -> { nil }
+        attribute :edition, ::PubidNew::Components::Edition, default: -> {}
 
         def to_s(lang: :en, lang_single: false, with_edition: false)
           parts = []
 
           # Render base identifier (the amendment/corrigendum)
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
+          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
+                                        with_edition: with_edition)
 
           # Add fragment notation /FRAGN or /FRAGCN depending on base type
-          if base_identifier.is_a?(Identifiers::Corrigendum)
-            parts << "/FRAGC#{fragment_number}"
-          else
-            parts << "/FRAG#{fragment_number}"
-          end
+          parts << if base_identifier.is_a?(Identifiers::Corrigendum)
+                     "/FRAGC#{fragment_number}"
+                   else
+                     "/FRAG#{fragment_number}"
+                   end
 
           # Add edition if present
-          parts << " #{edition.to_s}" if edition && edition.number
+          parts << " #{edition}" if edition && edition.number
 
           parts.join
         end

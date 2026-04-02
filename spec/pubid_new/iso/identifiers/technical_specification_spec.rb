@@ -3,20 +3,20 @@ require "spec_helper"
 RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
   subject { described_class }
 
-  xdescribe "parse identifiers from examples" do
+  describe "parse identifiers from examples" do
     shared_examples "parse identifiers from file" do
       it "parse identifiers from file" do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
-          next if pub_id.match?("^#")
+          next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp)
+          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
 
     context "parses identifiers from iso-technical-specification.txt" do
-      let(:examples_file) { "iso/iso-technical-specification.txt" }
+      let(:examples_file) { "iso/identifiers/pass/technical_specification.txt" }
 
       it_behaves_like "parse identifiers from file"
     end
@@ -27,11 +27,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 10832:2009
     describe "ISO/TS 10832:2009" do
       subject { "ISO/TS 10832:2009" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:ts:10832" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -39,7 +39,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -51,18 +51,18 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("ts")
+        expect(parsed.typed_stage.type_code).to eq("ts")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("TS")
+        expect(parsed.typed_stage.abbr.first).to eq("TS")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -73,11 +73,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 16791
     describe "ISO/TS 16791" do
       subject { "ISO/TS 16791" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:ts:16791" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -85,7 +85,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -97,18 +97,18 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("ts")
+        expect(parsed.typed_stage.type_code).to eq("ts")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("TS")
+        expect(parsed.typed_stage.abbr.first).to eq("TS")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -119,11 +119,12 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 10303-1751:2014
     describe "ISO/TS 10303-1751:2014" do
       subject { "ISO/TS 10303-1751:2014" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:normalized) { "ISO/TS 10303-1751:2014" }
       let(:urn) { "urn:iso:std:iso:ts:10303:-1751" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -142,7 +143,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -150,15 +151,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC TS 17021-2:2012
     describe "ISO/IEC TS 17021-2:2012" do
       subject { "ISO/IEC TS 17021-2:2012" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:17021:-2" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses number" do
@@ -177,7 +178,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -189,15 +190,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       # ISO/IEC TS 17961:2013
       describe "ISO/IEC TS 17961:2013" do
         subject { "ISO/IEC TS 17961:2013" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:ts:17961" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.copublishers.first.body).to eq("IEC")
+          expect(parsed.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses number" do
@@ -212,7 +213,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -224,16 +225,16 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC/TS 17021-2 (extra slash)
     describe "ISO/IEC/TS 17021-2" do
       subject { "ISO/IEC/TS 17021-2" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC TS 17021-2" }
       let(:urn) { "urn:iso:std:iso-iec:ts:17021:-2" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses number" do
@@ -248,7 +249,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         expect(parsed.to_s).to eq(normalized)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -256,11 +257,12 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 10303- 1751:2014 (extra space)
     describe "ISO/TS 10303- 1751:2014" do
       subject { "ISO/TS 10303- 1751:2014" }
-      let(:parsed) { described_class.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:ts:10303:- 1751" }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:normalized) { "ISO/TS 10303-1751:2014" }
+      let(:urn) { "urn:iso:std:iso:ts:10303:-1751" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -268,18 +270,18 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq(" 1751")
+        expect(parsed.part.value).to eq("1751")
       end
 
       it "parses date" do
         expect(parsed.date.year).to eq("2014")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+      it "normalizes format" do
+        expect(parsed.to_s).to eq(normalized)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -291,11 +293,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       # ISO/NP TS 20594-1
       describe "ISO/NP TS 20594-1" do
         subject { "ISO/NP TS 20594-1" }
-        let(:parsed) { described_class.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:ts:20594:-1:stage-00.00" }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:urn) { "urn:iso:std:iso:ts:20594:-1:stage-10.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -307,14 +309,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("np")
+          expect(parsed.typed_stage.stage_code).to eq("np")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -324,15 +326,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       # ISO/IEC WD TS 25025
       describe "ISO/IEC WD TS 25025" do
         subject { "ISO/IEC WD TS 25025" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:ts:25025:stage-20.20" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.copublishers.first.body).to eq("IEC")
+          expect(parsed.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses number" do
@@ -340,14 +342,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("wd")
+          expect(parsed.typed_stage.stage_code).to eq("wd")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -357,11 +359,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       # ISO/DTS 18759
       describe "ISO/DTS 18759" do
         subject { "ISO/DTS 18759" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:ts:18759:stage-40.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -369,14 +371,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to be_nil
+          expect(parsed.typed_stage.stage_code).to eq("dts")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -384,15 +386,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       # ISO/IEC DTS 5723
       describe "ISO/IEC DTS 5723" do
         subject { "ISO/IEC DTS 5723" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:ts:5723:stage-40.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.copublishers.first.body).to eq("IEC")
+          expect(parsed.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses number" do
@@ -400,14 +402,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to be_nil
+          expect(parsed.typed_stage.stage_code).to eq("dts")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -419,11 +421,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/DTS 21328.4
     describe "ISO/DTS 21328.4" do
       subject { "ISO/DTS 21328.4" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:ts:21328:stage-40.00.v4" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -431,7 +433,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to be_nil
+        expect(parsed.typed_stage.stage_code).to eq("dts")
       end
 
       it "parses iteration" do
@@ -442,7 +444,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -450,15 +452,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC DTS 25052-1.2
     describe "ISO/IEC DTS 25052-1.2" do
       subject { "ISO/IEC DTS 25052-1.2" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:25052:-1:stage-40.00.v2" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses number" do
@@ -470,7 +472,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to be_nil
+        expect(parsed.typed_stage.stage_code).to eq("dts")
       end
 
       it "parses iteration" do
@@ -481,7 +483,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -492,15 +494,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC PDTS 19583-24
     describe "ISO/IEC PDTS 19583-24" do
       subject { "ISO/IEC PDTS 19583-24" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:19583:-24:stage-30.00" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses number" do
@@ -512,14 +514,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to eq("cd")
+        expect(parsed.typed_stage.stage_code).to eq("cd")
       end
 
       it "round-trips" do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -527,15 +529,15 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC PDTS 27008
     describe "ISO/IEC PDTS 27008" do
       subject { "ISO/IEC PDTS 27008" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:27008:stage-30.00" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.copublishers.first.body).to eq("IEC")
+        expect(parsed.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses number" do
@@ -543,14 +545,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to eq("cd")
+        expect(parsed.typed_stage.stage_code).to eq("cd")
       end
 
       it "round-trips" do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -561,11 +563,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC/IEEE DTS 17301-1-1:2016(en)
     describe "ISO/IEC/IEEE DTS 17301-1-1:2016(en)" do
       subject { "ISO/IEC/IEEE DTS 17301-1-1:2016(en)" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec-ieee:ts:17301:-1-1:stage-40.00:en" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublishers" do
@@ -589,14 +591,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnicalSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to be_nil
+        expect(parsed.typed_stage.stage_code).to eq("dts")
       end
 
       it "round-trips" do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end

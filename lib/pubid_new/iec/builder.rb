@@ -1,4 +1,5 @@
 require_relative "../components/publisher"
+# frozen_string_literal: true
 require_relative "../components/code"
 require_relative "../components/date"
 
@@ -32,13 +33,13 @@ module PubidNew
       def locate_identifier_klass(parsed_hash)
         # Check for working programme
         if parsed_hash[:wp_stage]
-          require_relative 'identifiers/working_document'
+          require_relative "identifiers/working_document"
           return Identifiers::WorkingDocument
         end
 
         # Check for working document
         if parsed_hash[:technical_committee] && parsed_hash[:wd_number]
-          require_relative 'identifiers/working_document'
+          require_relative "identifiers/working_document"
           return Identifiers::WorkingDocument
         end
 
@@ -50,8 +51,60 @@ module PubidNew
       end
 
       def build(parsed_hash)
+        # Handle sheet_supplement_identifier pattern:
+        # {base_identifier: {...}, sheet_number: ..., sheet_year: ..., type_with_stage: "COR", number_with_part: "1", date: "1995"}
+        # This is a Corrigendum/Amendment wrapping a SheetIdentifier
+        if parsed_hash[:base_identifier] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year]) && parsed_hash[:type_with_stage]
+          # Extract sheet info first
+          sheet_number = parsed_hash.delete(:sheet_number)
+          sheet_year = parsed_hash.delete(:sheet_year)
+
+          # Build the base identifier (IEC 60695-2-1 with /1:1994 -> SheetIdentifier)
+          base_parsed = parsed_hash[:base_identifier].dup
+          base_parsed[:sheet_number] = sheet_number
+          base_parsed[:sheet_year] = sheet_year if sheet_year
+          sheet_id = wrap_with_sheet(build(base_parsed), sheet_number, sheet_year)
+
+          # Now build the supplement on top of the sheet
+          # We need to preserve the supplement data and create a wrapper
+          supplement_type = parsed_hash.delete(:type_with_stage)
+          supplement_number = parsed_hash.delete(:number_with_part)
+          supplement_date = parsed_hash.delete(:date)
+          supplement_edition = parsed_hash.delete(:edition)
+
+          # Locate the supplement identifier class
+          typed_stage = locate_typed_stage(supplement_type)
+          identifier_class = @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+
+          # Create the supplement identifier
+          supplement = identifier_class.new
+          if supplement.respond_to?(:number=)
+            supplement.number = Components::Code.new(value: supplement_number.to_s)
+          end
+          if supplement_date && supplement.respond_to?(:date=)
+            supplement.date = cast(:date, supplement_date)
+          end
+          if supplement_edition && supplement.respond_to?(:edition=)
+            supplement.edition = cast(:edition, supplement_edition)
+          end
+          supplement.typed_stage = typed_stage
+
+          # Wrap the sheet with the supplement
+          return wrap_with_supplement(sheet_id, supplement)
+        end
+
+        # Handle sheet_identifier pattern: {base_identifier: {...}, sheet_number: ..., sheet_year: ...}
+        if parsed_hash[:base_identifier] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year])
+          # Build the base identifier first
+          base_id = build(parsed_hash[:base_identifier])
+          # Wrap with SheetIdentifier
+          sheet_number = parsed_hash.delete(:sheet_number)
+          sheet_year = parsed_hash.delete(:sheet_year)
+          return wrap_with_sheet(base_id, sheet_number, sheet_year)
+        end
+
         # Extract FRAG/FRAGC indicator if present
-        is_fragment = parsed_hash[:type_with_stage] == "FRAG" || parsed_hash[:type_with_stage] == "FRAGC"
+        is_fragment = ["FRAG", "FRAGC"].include?(parsed_hash[:type_with_stage])
         fragment_number = nil
         fragment_edition = nil
 
@@ -68,7 +121,8 @@ module PubidNew
           # Build the base identifier (Amendment/Corrigendum) directly
           if parsed_hash[:base_identifier]
             base_id = build(parsed_hash[:base_identifier])
-            return wrap_with_fragment(base_id, fragment_number, fragment_edition)
+            return wrap_with_fragment(base_id, fragment_number,
+                                      fragment_edition)
           end
         end
 
@@ -78,7 +132,7 @@ module PubidNew
           # Build CISPR identifier without year
           cispr_number = parsed_hash.delete(:number_with_part)
           cispr_id = Identifiers::InternationalStandard.new(
-            publisher: Components::Publisher.new(body: "CISPR")
+            publisher: Components::Publisher.new(body: "CISPR"),
           )
           # Set number via cast
           number_components = cast(:number_with_part, cispr_number)
@@ -91,8 +145,9 @@ module PubidNew
         # Extract and store wrapper data before building
         consolidated_supplements_data = parsed_hash.delete(:consolidated_supplements)
         vap_suffix_data = parsed_hash.delete(:vap_suffix)
-        sheet_number_data = parsed_hash.delete(:sheet_number)
-        sheet_year_data = parsed_hash.delete(:sheet_year)
+        # Note: sheet_number and sheet_year are now handled in sheet_identifier check above
+        fragment_type_data = parsed_hash.delete(:fragment_type)
+        fragment_number_data = parsed_hash.delete(:fragment_number)
 
         # Instantiate the identifier based on the typed stage
         identifier = locate_identifier_klass(parsed_hash).new
@@ -117,28 +172,85 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+              if identifier.respond_to?("#{sub_key}=")
+                identifier.send("#{sub_key}=",
+                                sub_value)
+              end
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
+        # Detect rendering style from parsed abbreviation
+        if identifier.respond_to?(:rendering_style=) && identifier.respond_to?(:typed_stage) && identifier.typed_stage
+          require_relative "rendering_style"
+          ts = identifier.typed_stage
+
+          # Detect IEC format from parsed abbreviation
+          # IEC uses space to indicate long form: "Amd 1", "Cor 1"
+          # No space indicates short form: "AMD1", "COR1"
+          stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.include?(" ")
+                                true # Long form has space: "Amd 1", "Cor 1"
+                              elsif ts.short_abbr && ts.original_abbr && !ts.original_abbr.include?(" ")
+                                false  # Short form: "AMD1", "COR1", "CDV", "FDIS"
+                              else
+                                false  # Default to short/canonical
+                              end
+
+          # Detect language code format from parsed languages
+          with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
+                                 # Check if original_code was single-char (E, F, R, A, S, D)
+                                 first_lang = identifier.languages.first
+                                 if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
+                                   :single
+                                 else
+                                   :iso # 2-char codes (en, fr, ru, ar, es, de)
+                                 end
+                               else
+                                 :none
+                               end
+
+          # with_date is always true for base identifiers (show the date if present)
+          # Only supplements might have undated references
+          with_date = true
+
+          # Create custom rendering style based on parsed format
+          identifier.rendering_style = RenderingStyle.new(
+            with_language_code: with_language_code,
+            stage_format_long: stage_format_long,
+            with_date: with_date,
+          )
+        end
+
         # After building base identifier, apply wrappers
-        identifier = wrap_with_sheet(identifier, sheet_number_data, sheet_year_data) if sheet_number_data
-        identifier = wrap_with_consolidated(identifier, consolidated_supplements_data) if consolidated_supplements_data
-        identifier = wrap_with_vap(identifier, vap_suffix_data) if vap_suffix_data
+        if fragment_type_data && fragment_number_data
+          identifier = wrap_with_fragment(identifier, fragment_number_data.to_s)
+        end
+        # Note: sheet wrapping is now handled earlier in build method for sheet_identifier pattern
+        if consolidated_supplements_data
+          identifier = wrap_with_consolidated(identifier,
+                                              consolidated_supplements_data)
+        end
+        if vap_suffix_data
+          identifier = wrap_with_vap(identifier,
+                                     vap_suffix_data)
+        end
 
         identifier
       end
 
       # Wrap identifier with FragmentIdentifier for /FRAGN notation
-      def wrap_with_fragment(base_identifier, fragment_number, edition_data = nil)
-        require_relative 'identifiers/fragment_identifier'
+      def wrap_with_fragment(base_identifier, fragment_number,
+edition_data = nil)
+        require_relative "identifiers/fragment_identifier"
 
         fragment = Identifiers::FragmentIdentifier.new(
           base_identifier: base_identifier,
-          fragment_number: fragment_number
+          fragment_number: fragment_number,
         )
 
         # Set edition if provided
@@ -151,49 +263,61 @@ module PubidNew
 
       # Wrap identifier with SheetIdentifier for /N:YEAR notation
       def wrap_with_sheet(base_identifier, sheet_number, sheet_year)
-        require_relative 'identifiers/sheet_identifier'
+        require_relative "identifiers/sheet_identifier"
+
+        # Only pass year if it's present
+        year_value = sheet_year ? sheet_year.to_s : nil
 
         Identifiers::SheetIdentifier.new(
           base_identifier: base_identifier,
           sheet_number: sheet_number.to_s,
-          year: sheet_year.to_s
+          year: year_value,
         )
+      end
+
+      # Wrap base identifier with supplement (Amendment/Corrigendum)
+      def wrap_with_supplement(base_identifier, supplement)
+        supplement.base_identifier = base_identifier
+        supplement
       end
 
       # Wrap identifier with ConsolidatedIdentifier for +AMD chains
       def wrap_with_consolidated(base_identifier, supplements_data)
-        require_relative 'identifiers/consolidated_identifier'
-        require_relative 'identifiers/amendment'
-        require_relative 'identifiers/corrigendum'
+        require_relative "identifiers/consolidated_identifier"
+        require_relative "identifiers/amendment"
+        require_relative "identifiers/corrigendum"
 
         supplements = supplements_data.map do |supp|
           type = supp[:supplement_type].to_s
           number = supp[:supplement_number].to_s
-          year = supp[:supplement_year].to_s
+          year = supp[:supplement_year]
+
+          # Only create Date component if year is present
+          date_component = year ? PubidNew::Components::Date.new(year: year.to_s) : nil
 
           if type == "AMD"
             Identifiers::Amendment.new(
               number: Components::Code.new(value: number),
-              date: PubidNew::Components::Date.new(year: year)
+              date: date_component,
             )
           elsif type == "COR"
             Identifiers::Corrigendum.new(
               number: Components::Code.new(value: number),
-              date: PubidNew::Components::Date.new(year: year)
+              date: date_component,
             )
           end
         end.compact
 
         Identifiers::ConsolidatedIdentifier.new(
-          identifiers: [base_identifier] + supplements
+          identifiers: [base_identifier] + supplements,
         )
       end
 
       # Wrap identifier with VapIdentifier for CSV/CMV/RLV/SER suffix
       def wrap_with_vap(base_identifier, vap_suffix_data)
-        require_relative 'identifiers/vap_identifier'
-        require_relative 'identifiers/consolidated_identifier'
-        require_relative 'components/vap_suffix'
+        require_relative "identifiers/vap_identifier"
+        require_relative "identifiers/consolidated_identifier"
+        require_relative "components/vap_suffix"
 
         vap_suffix = Components::VapSuffix.new(code: vap_suffix_data.to_s)
 
@@ -213,7 +337,7 @@ module PubidNew
         Identifiers::VapIdentifier.new(
           base_identifier: base_identifier,
           vap_suffix: vap_suffix,
-          edition: edition
+          edition: edition,
         )
       end
 
@@ -276,6 +400,11 @@ module PubidNew
         when :cispr_identifier
           # CISPR identifier object for TRF
           value
+
+        when :number
+          # Plain number for sub-org identifiers (CA, IECQ CS, IECQ OD)
+          # Just return as Code component
+          { number: Components::Code.new(value: value.to_s) }
 
         when :number_with_part
           # "60038" (no part)
@@ -343,6 +472,12 @@ module PubidNew
         when :edition
           PubidNew::Components::Edition.new(number: value)
 
+        when :sheet_number
+          value.to_s
+
+        when :sheet_year
+          value.to_s
+
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
           value = value.to_s.gsub("/", ",")
@@ -365,7 +500,7 @@ module PubidNew
         when :joint_identifier
           case value[:publisher]
           when "ISO"
-            require_relative '../iso/builder'
+            require_relative "../iso/builder"
             Iso::Builder.new(Iso::Scheme).build(value)
           end
 

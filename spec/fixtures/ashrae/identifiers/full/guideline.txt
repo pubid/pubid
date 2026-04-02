@@ -1,0 +1,64 @@
+
+# ASHRAE
+# Pattern:
+# {publisher(s)} (Standard|Guideline) <number>["." or if multiple "," part(s)][R for revision, P for proposed][-<year>] [{reaffirmation year} | {dual publication info}]
+
+# Guideline
+ASHRAE Guideline 0-2019
+ASHRAE Guideline 0.2-2015
+ASHRAE Guideline 1.1-2025
+ASHRAE Guideline 1.2-2019
+ASHRAE Guideline 1.3-2018
+ASHRAE Guideline 1.4-2019
+ASHRAE Guideline 1.5
+ASHRAE Guideline 1.5-2025
+ASHRAE Guideline 10-2023
+ASHRAE Guideline 11-2018
+ASHRAE Guideline 11-2021
+ASHRAE Guideline 12-2020
+ASHRAE Guideline 12-2023
+ASHRAE Guideline 13-2024
+ASHRAE Guideline 14-2023
+ASHRAE Guideline 16-2022
+ASHRAE Guideline 21-2022
+ASHRAE Guideline 22-2025
+ASHRAE Guideline 23-2016
+ASHRAE Guideline 27-2019
+ASHRAE Guideline 28-2016
+ASHRAE Guideline 28-2021
+ASHRAE Guideline 29-2019
+ASHRAE Guideline 32-2018
+ASHRAE Guideline 33-2021
+ASHRAE Guideline 34-2017
+ASHRAE Guideline 36-2018
+ASHRAE Guideline 36-2021
+ASHRAE Guideline 36-2024
+ASHRAE Guideline 38-2023
+ASHRAE Guideline 39-2017
+ASHRAE Guideline 4-2019
+ASHRAE Guideline 40-2017
+ASHRAE Guideline 41-2020
+ASHRAE Guideline 42-2023
+ASHRAE Guideline 43-2025
+ASHRAE Guideline 44-2024
+ASHRAE Guideline 6-2015
+
+# Revision
+ASHRAE Guideline 27-2019R
+
+# Proposed Guideline
+ASHRAE Guideline 0.3P
+ASHRAE Guideline 1.6P
+ASHRAE Guideline 45P
+ASHRAE Guideline 48P
+
+# Reaffirmation component
+ASHRAE Guideline 20-2010 (RA2016)
+ASHRAE Guideline 33-2021 (RA 2016)
+
+# Withdrawn
+ASHRAE Guideline 3-1996
+ASHRAE Guideline 2-2010(RA2014)
+ASHRAE Guideline 8-1994
+ASHRAE Guideline 24-2015
+ASHRAE Guideline 26-2012

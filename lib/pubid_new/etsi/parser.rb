@@ -65,7 +65,7 @@ module PubidNew
 
       # Parts
       rule(:part) do
-        dash >> (alnums).as(:part)
+        dash >> alnums.as(:part)
       end
 
       rule(:parts) { part.repeat(0).as(:parts) }

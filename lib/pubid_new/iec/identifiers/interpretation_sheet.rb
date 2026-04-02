@@ -1,4 +1,5 @@
 require_relative "../supplement_identifier"
+# frozen_string_literal: true
 require_relative "../../components/typed_stage"
 
 module PubidNew
@@ -17,7 +18,7 @@ module PubidNew
             type_code: :ish,
             abbr: ["CDISH"],
             name: "Draft circulated as DISH",
-            harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99]
+            harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
           ),
           PubidNew::Components::TypedStage.new(
             code: :dish,
@@ -25,7 +26,7 @@ module PubidNew
             type_code: :ish,
             abbr: ["DISH"],
             name: "Draft Interpretation Sheet",
-            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99]
+            harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
           ),
           PubidNew::Components::TypedStage.new(
             code: :ish,
@@ -33,8 +34,8 @@ module PubidNew
             type_code: :ish,
             abbr: ["ISH"],
             name: "Interpretation Sheet",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         # Project stages specific to Interpretation Sheets
@@ -42,23 +43,23 @@ module PubidNew
           decdish: {
             abbr: "DECDISH",
             name: "DISH at editing check",
-            harmonized_stages: %w[50.00]
+            harmonized_stages: %w[50.00],
           },
           prvdish: {
             abbr: "PRVDISH",
             name: "Preparation of RVDISH",
-            harmonized_stages: %w[50.60]
+            harmonized_stages: %w[50.60],
           },
           rdish: {
             abbr: "RDISH",
             name: "DISH received and registered",
-            harmonized_stages: %w[50.00]
+            harmonized_stages: %w[50.00],
           },
           tdish: {
             abbr: "TDISH",
             name: "Translation of DISH",
-            harmonized_stages: %w[50.00]
-          }
+            harmonized_stages: %w[50.00],
+          },
         }.freeze
 
         def self.type

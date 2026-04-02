@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../../serializable"
+require_relative "../urn_generator"
 
 module PubidNew
   module Cen
@@ -8,15 +10,24 @@ module PubidNew
       # Base CEN identifier
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
       class Base < Lutaml::Model::Serializable
-        attribute :publisher, :string, collection: true  # EN, CEN, CLC, etc.
-        attribute :type, :string  # TR, TS, Guide
+        include PubidNew::Serializable
+
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
+
+        attribute :publisher, :string, collection: true # EN, CEN, CLC, etc.
+        attribute :type, :string # TR, TS, Guide
         attribute :number, :string
         attribute :parts, :string, collection: true
         attribute :year, :integer
-        attribute :stage, :string  # prEN, FprEN
-        attribute :supplements, :string, collection: true  # Amendments and corrigenda
-        attribute :adopted_identifier, Base, polymorphic: true  # Nested identifier object (ISO, IEC, etc.)
-        attribute :edition, :string  # Edition number
+        attribute :stage, :string # prEN, FprEN
+        attribute :supplements, :string, collection: true # Amendments and corrigenda
+        attribute :adopted_identifier, Base, polymorphic: true # Nested identifier object (ISO, IEC, etc.)
+        attribute :edition, :string # Edition number
 
         def to_s
           result = ""
@@ -30,13 +41,13 @@ module PubidNew
 
           # If we have adopted_identifier, render it (contains all info)
           if adopted_identifier
-            result += " #{adopted_identifier.to_s}"
+            result += " #{adopted_identifier}"
             # Don't add our own number/parts/year - they're in adopted_identifier
           else
             # Only render our own fields if no adoption
             # Type - use space for Guide, slash for TR/TS
             if type
-              sep = (type == "Guide") ? " " : "/"
+              sep = type == "Guide" ? " " : "/"
               result += "#{sep}#{type}"
             end
 
@@ -63,6 +74,7 @@ module PubidNew
 
         def ==(other)
           return false unless other.is_a?(Base)
+
           publisher == other.publisher && number == other.number &&
             parts == other.parts && year == other.year
         end

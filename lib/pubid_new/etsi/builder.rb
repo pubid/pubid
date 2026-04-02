@@ -4,6 +4,8 @@ require_relative "../components/date"
 require_relative "components/code"
 require_relative "components/version"
 require_relative "identifiers/etsi_standard"
+require_relative "identifiers/amendment"
+require_relative "identifiers/corrigendum"
 
 module PubidNew
   module Etsi
@@ -13,10 +15,43 @@ module PubidNew
       end
 
       def build(data)
-        build_etsi_standard(data)
+        # Check if supplements are present
+        if data[:supplements]
+          build_with_supplements(data)
+        else
+          build_etsi_standard(data)
+        end
       end
 
       private
+
+      def build_with_supplements(data)
+        # Build base identifier first (without supplements)
+        base_data = data.dup
+        base_data.delete(:supplements)
+        base = build_etsi_standard(base_data)
+
+        # Process supplements - create supplement objects wrapping the base
+        supplements_array = data[:supplements]
+        supplements_array = [supplements_array] unless supplements_array.is_a?(Array)
+
+        # Build supplements recursively - each wraps the previous
+        supplements_array.reduce(base) do |current_base, supp|
+          if supp[:amendment]
+            Identifiers::Amendment.new(
+              base: current_base,
+              number: supp[:amendment][:number].to_i,
+            )
+          elsif supp[:corrigendum]
+            Identifiers::Corrigendum.new(
+              base: current_base,
+              number: supp[:corrigendum][:number].to_i,
+            )
+          else
+            current_base # Skip unknown supplement types
+          end
+        end
+      end
 
       def build_etsi_standard(data)
         # Build components
@@ -24,30 +59,11 @@ module PubidNew
         version = build_version(data)
         date = build_date(data)
 
-        # Extract amendments and corrigenda from supplements
-        amendments = []
-        corrigenda = []
-
-        if data[:supplements]
-          supplements_array = data[:supplements]
-          supplements_array = [supplements_array] unless supplements_array.is_a?(Array)
-
-          supplements_array.each do |supp|
-            if supp[:amendment]
-              amendments << supp[:amendment][:number].to_i
-            elsif supp[:corrigendum]
-              corrigenda << supp[:corrigendum][:number].to_i
-            end
-          end
-        end
-
         Identifiers::EtsiStandard.new(
           type: data[:type].to_s,
           code: code,
           version: version,
           date: date,
-          amendments: amendments.empty? ? nil : amendments,
-          corrigenda: corrigenda.empty? ? nil : corrigenda
         )
       end
 
@@ -56,41 +72,43 @@ module PubidNew
 
         # Extract number string based on format
         number = if number_data.is_a?(Hash)
-          # Captured format
-          if number_data[:gsm_prefix]
-            # GSM with space: "GSM 11.14"
-            "GSM #{number_data[:main]}.#{number_data[:sub]}"
-          elsif number_data[:main] && number_data[:sub]
-            # Dotted format: "11.40"
-            "#{number_data[:main]}.#{number_data[:sub]}"
-          elsif number_data[:prefix1]
-            # Complex format: "ABC 123" or "ABC-DEF 123"
-            prefix = number_data[:prefix1].to_s
-            prefix += "-#{number_data[:prefix2]}" if number_data[:prefix2]
-            "#{prefix} #{number_data[:num]}"
-          else
-            # Simple with capture
-            number_data[:num].to_s
-          end
-        else
-          number_data.to_s
-        end
+                   # Captured format
+                   if number_data[:gsm_prefix]
+                     # GSM with space: "GSM 11.14"
+                     "GSM #{number_data[:main]}.#{number_data[:sub]}"
+                   elsif number_data[:main] && number_data[:sub]
+                     # Dotted format: "11.40"
+                     "#{number_data[:main]}.#{number_data[:sub]}"
+                   elsif number_data[:prefix1]
+                     # Complex format: "ABC 123" or "ABC-DEF 123"
+                     prefix = number_data[:prefix1].to_s
+                     prefix += "-#{number_data[:prefix2]}" if number_data[:prefix2]
+                     "#{prefix} #{number_data[:num]}"
+                   else
+                     # Simple with capture
+                     number_data[:num].to_s
+                   end
+                 else
+                   number_data.to_s
+                 end
 
         parts = extract_parts(data[:parts])
 
         Components::Code.new(
           number: number,
           minor: data[:minor]&.to_s,
-          parts: parts
+          parts: parts,
         )
       end
 
       def build_version(data)
         # Handle both version and edition
         if data[:version]
-          Components::Version.new(version: data[:version].to_s, is_edition: false)
+          Components::Version.new(version: data[:version].to_s,
+                                  is_edition: false)
         elsif data[:edition]
-          Components::Version.new(version: data[:edition].to_s, is_edition: true)
+          Components::Version.new(version: data[:edition].to_s,
+                                  is_edition: true)
         else
           Components::Version.new(version: "1.0.0", is_edition: false)
         end
@@ -99,7 +117,7 @@ module PubidNew
       def build_date(data)
         PubidNew::Components::Date.new(
           year: data[:year].to_s,
-          month: data[:month].to_s
+          month: data[:month].to_s,
         )
       end
 

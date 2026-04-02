@@ -1,121 +1,92 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+require_relative "typed_stages"
 
 module PubidNew
   module Ieee
-    # Scheme class representing an IEEE identifier structure
-    # Single Responsibility: Data model for IEEE identifiers
-    class Scheme < Lutaml::Model::Serializable
-      attribute :publisher, :string, default: -> { "IEEE" }
-      attribute :copublishers, :string, collection: true, default: -> { [] }
-      attribute :type, :string, default: -> { nil }
-      attribute :draft_status, :string, default: -> { nil }
-      attribute :number, :string
-      attribute :part, :string, default: -> { nil }
-      attribute :subpart, :string, default: -> { nil }
-      attribute :year, :string, default: -> { nil }
-      attribute :month, :string, default: -> { nil }
-      attribute :day, :string, default: -> { nil }
-      attribute :edition, :string, default: -> { nil }
-      attribute :draft, :string, default: -> { nil }
-      attribute :draft_version, :string, default: -> { nil }
-      attribute :revision, :string, default: -> { nil }
-      attribute :corrigendum, :string, default: -> { nil }
-      attribute :cor_number, :string, default: -> { nil }
-      attribute :cor_year, :string, default: -> { nil }
-      attribute :amendment, :string, default: -> { nil }
-      attribute :amd_number, :string, default: -> { nil }
-      attribute :amd_year, :string, default: -> { nil }
-      attribute :reaffirmed, :string, default: -> { nil }
-      attribute :redline, :boolean, default: -> { false }
-      attribute :revision_of, :string, default: -> { nil }
-      attribute :amendment_to, :string, default: -> { nil }
-      attribute :adoption, :string, default: -> { nil }
-      attribute :note, :string, default: -> { nil }
+    # Scheme provides registry access for IEEE identifiers
+    # Following the proven ISO/IEC/CEN/BSI pattern
+    #
+    # This class is the single source of truth for:
+    # - TypedStage lookup by abbreviation
+    # - TypedStage lookup by IEEE draft notation
+    # - TypedStage lookup by ISO stage code
+    # - Identifier class selection based on type code
+    class Scheme
+      class << self
+        # Locate typed stage by abbreviation
+        # @param abbr [String, nil] stage abbreviation (e.g., "D1", "FDIS", "Std")
+        # @return [Components::TypedStage] matching typed stage
+        def locate_typed_stage_by_abbr(abbr)
+          return DEFAULT_TYPED_STAGE if abbr.nil? || abbr.to_s.strip.empty?
 
-      # Convert to string representation
-      # @return [String] the identifier string
-      def to_s
-        parts = []
+          # Normalize abbreviation
+          abbr_str = abbr.to_s.strip
 
-        # Publisher(s)
-        if publisher
-          pub_str = publisher
-          if copublishers && !copublishers.empty?
-            pub_str += "/" + copublishers.join("/")
+          # Find typed stage that includes this abbreviation
+          typed_stage = TYPED_STAGES.find { |ts| ts.abbr.include?(abbr_str) }
+
+          # Fall back to default if not found
+          typed_stage || DEFAULT_TYPED_STAGE
+        end
+
+        # Locate typed stage by IEEE draft notation
+        # @param draft [String] IEEE draft notation (e.g., "D1", "D5", "P")
+        # @return [Components::TypedStage, nil] matching typed stage
+        def locate_typed_stage_by_ieee_draft(draft)
+          return nil if draft.nil? || draft.to_s.strip.empty?
+
+          draft_str = draft.to_s.strip
+
+          # Try exact match on abbreviation first
+          ts = TYPED_STAGES.find { |t| t.abbr.include?(draft_str) }
+          return ts if ts
+
+          # Try match on ieee_draft_equivalent
+          TYPED_STAGES.find { |t| t.ieee_draft_equivalent == draft_str }
+        end
+
+        # Locate typed stage by ISO stage code
+        # @param stage [String] ISO stage code (e.g., "WD", "CD", "DIS", "FDIS")
+        # @return [Components::TypedStage, nil] matching typed stage
+        def locate_typed_stage_by_iso_stage(stage)
+          return nil if stage.nil? || stage.to_s.strip.empty?
+
+          TYPED_STAGES.find { |ts| ts.iso_stage_equivalent == stage.to_s.strip }
+        end
+
+        # Locate identifier class by type code
+        # @param type_code [String, Symbol] type code (:standard, :draft, :std, :P, etc.)
+        # @return [Class] identifier class
+        def locate_identifier_klass_by_type_code(type_code)
+          type_str = type_code.to_s
+
+          case type_str
+          when "draft", "Draft Std", "Draft", "P"
+            # "P" indicates project draft status - maps to ProjectDraftIdentifier
+            require_relative "identifiers/project_draft_identifier"
+            Identifiers::ProjectDraftIdentifier
+          when "standard", "Std", "std"
+            require_relative "identifiers/standard"
+            Identifiers::Standard
+          else
+            # Default to base identifier
+            require_relative "identifiers/base"
+            Identifiers::Base
           end
-          parts << pub_str
         end
 
-        # Type and draft status
-        if draft_status
-          parts << draft_status.strip
-        end
-        
-        if type
-          # Preserve the exact type as parsed
-          parts << type.to_s
+        # Get all typed stages
+        # @return [Array<Components::TypedStage>] all registered typed stages
+        def typed_stages
+          TYPED_STAGES
         end
 
-        # Number
-        parts << number
-
-        result = parts.join(" ")
-
-        # Part/subpart
-        result += ".#{part}" if part
-        result += ".#{subpart}" if subpart
-
-        # Year
-        result += "-#{year}" if year && !month
-
-        # Corrigendum
-        if corrigendum || cor_number
-          result += "/Cor #{cor_number || '1'}"
-          result += "-#{cor_year}" if cor_year
+        # Get default typed stage (published standard)
+        # @return [Components::TypedStage] default typed stage
+        def default_typed_stage
+          DEFAULT_TYPED_STAGE
         end
-
-        # Amendment
-        if amendment || amd_number
-          result += "/Amd#{amd_number || '1'}"
-          result += "-#{amd_year}" if amd_year
-        end
-
-        # Draft
-        if draft_version
-          result += "/D#{draft_version}"
-          result += ".#{revision}" if revision
-        elsif draft
-          result += "/D#{draft}"
-          result += ".#{revision}" if revision
-        end
-
-        # Month and year (publication date)
-        if month
-          result += ", #{month} #{year}"
-        end
-
-        # Edition
-        if edition
-          result += ", #{year} Edition" if year && !month
-          # Or "Edition X.Y - YYYY" format
-        end
-
-        # Additional parameters
-        params = []
-        params << "Reaffirmed #{reaffirmed}" if reaffirmed
-        params << "Revision of IEEE Std #{revision_of}" if revision_of
-        params << "Amendment to IEEE Std #{amendment_to}" if amendment_to
-        params << "Adoption of #{adoption}" if adoption
-        params << note if note
-
-        result += " (#{params.join(', ')})" if params.any?
-
-        # Redline
-        result += " - Redline" if redline
-
-        result
       end
     end
   end

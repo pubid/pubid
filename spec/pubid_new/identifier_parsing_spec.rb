@@ -48,7 +48,6 @@
 #       it_behaves_like "converts urn to pubid", "ISO/IEC Guide 71(fr)"
 #     end
 
-
 #     context "Руководство ИСО/МЭК 76" do
 #       let(:original) { "Руководство ИСО/МЭК 76" }
 #       let(:pubid) { "ISO/IEC Guide 76" }
@@ -120,7 +119,6 @@
 #       it_behaves_like "converts pubid to urn"
 #       it_behaves_like "converts urn to pubid", "IEC/DPAS 63086-3-1"
 #     end
-
 
 #     context "URN with numered stage" do
 #       context "Base" do

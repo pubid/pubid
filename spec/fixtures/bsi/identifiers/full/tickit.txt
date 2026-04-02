@@ -1,0 +1,5 @@
+# TickIT Guide
+
+TS 3:1993
+TS 1:1998
+TS 1:1995

@@ -1,4 +1,5 @@
 require_relative "base"
+# frozen_string_literal: true
 require_relative "../../components/typed_stage"
 
 module PubidNew
@@ -9,7 +10,8 @@ module PubidNew
       # Can embed CISPR identifiers for IECEE TRF format
       class TestReportForm < Base
         # TRF can embed a CISPR identifier (MODEL-DRIVEN)
-        attribute :cispr_identifier, Identifier, polymorphic: true, default: -> { nil }
+        attribute :cispr_identifier, Identifier, polymorphic: true, default: -> {
+        }
 
         # TRF has type abbreviation for parsing
         TYPED_STAGES = [
@@ -19,8 +21,8 @@ module PubidNew
             type_code: :trf,
             abbr: ["TRF"],
             name: "Test Report Form",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         def self.type
@@ -39,7 +41,7 @@ module PubidNew
         end
 
         # TRF uses special rendering
-        def to_s(format = :short)
+        def to_s(_format = :short)
           parts = []
 
           # Publisher and type portion
@@ -52,11 +54,11 @@ module PubidNew
 
             # Build number portion with part
             num_str = cispr_identifier.number.to_s
-            num_str += "-#{cispr_identifier.part.to_s}" if cispr_identifier.part && cispr_identifier.part.to_s != ""
+            num_str += "-#{cispr_identifier.part}" if cispr_identifier.part && cispr_identifier.part.to_s != ""
             cispr_parts << num_str
 
             # Join with space and add TRF year
-            cispr_str = cispr_parts.join(' ')
+            cispr_str = cispr_parts.join(" ")
             cispr_str += ":#{date.year}" if date
 
             parts << " #{cispr_str}"

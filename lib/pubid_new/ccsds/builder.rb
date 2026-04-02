@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "identifiers/base"
+require_relative "identifiers/corrigendum"
 
 module PubidNew
   module Ccsds
@@ -10,22 +11,48 @@ module PubidNew
       end
 
       def build(data)
-        # Extract corrigenda
-        corrigenda = []
-        if data[:corrigenda]
-          corr_array = data[:corrigenda]
-          corr_array = [corr_array] unless corr_array.is_a?(Array)
-          corrigenda = corr_array.map { |c| c[:cor_number].to_i }
+        # Check if corrigenda are present - if so, build Corrigendum objects
+        if data[:corrigenda] && !data[:corrigenda].empty?
+          return build_corrigendum(data)
         end
 
+        # Build base identifier
+        build_base(data)
+      end
+
+      private
+
+      def build_base(data)
         Identifiers::Base.new(
           number: data[:number].to_s,
           part: data[:part]&.to_s,
           type: data[:type]&.to_s,
           edition: data[:edition]&.to_s,
           suffix: data[:suffix]&.to_s,
-          corrigenda: corrigenda.empty? ? nil : corrigenda
+          language: data[:language]&.to_s,
         )
+      end
+
+      def build_corrigendum(data)
+        # Extract corrigenda numbers
+        corr_array = data[:corrigenda]
+        corr_array = [corr_array] unless corr_array.is_a?(Array)
+        corr_numbers = corr_array.map { |c| c[:cor_number].to_i }
+
+        # Build base identifier (without corrigenda)
+        base_data = data.dup
+        base_data.delete(:corrigenda)
+        base = build_base(base_data)
+
+        # Build Corrigendum object for each corrigendum number
+        # Note: CCSDS uses "Cor. 1" format (single corrigendum per identifier)
+        # If multiple corrigenda exist, we build the last one wrapping the base
+        corr_numbers.reduce(base) do |current_base, cor_num|
+          Identifiers::Corrigendum.new(
+            base_identifier: current_base,
+            cor_number: cor_num,
+          )
+        end
       end
     end
   end

@@ -3,24 +3,8 @@ require "spec_helper"
 RSpec.describe PubidNew::Iso::Identifiers::Data do
   subject { described_class }
 
-  xdescribe "parse identifiers from examples" do
-    shared_examples "parse identifiers from file" do
-      it "parse identifiers from file" do
-        f = open("spec/fixtures/#{examples_file}")
-        f.readlines.each do |pub_id|
-          next if pub_id.match?("^#")
-
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp)
-        end
-      end
-    end
-
-    context "parses identifiers from iso-data.txt" do
-      let(:examples_file) { "iso/iso-data.txt" }
-
-      it_behaves_like "parse identifiers from file"
-    end
-  end
+  # Note: No sweep test - fixture file iso/iso-data.txt does not exist
+  # The identifier-specific tests below provide adequate coverage
 
   # Test basic identifiers
   context "basic identifiers" do
@@ -28,11 +12,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
     context "dated data" do
       describe "ISO/DATA 1:1978" do
         subject { "ISO/DATA 1:1978" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:data:1" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -52,33 +36,32 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
         end
 
         it "provides type code" do
-          expect(parsed.type.type_code).to eq("data")
+          expect(parsed.typed_stage.type_code).to eq("data")
         end
 
         it "provides stage code" do
-          expect(parsed.stage.stage_code).to eq("published")
+          expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        it "provides typed_stage with abbreviation" do
-          expect(parsed.typed_stage.abbreviation).to eq("DATA")
+        it "provides type abbreviation" do
+          expect(parsed.type.abbr).to eq("DATA")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
-
     end
 
     # Test normal undated data
     context "undated data" do
       describe "ISO/DATA 9" do
         subject { "ISO/DATA 9" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:data:9" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -98,22 +81,21 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
         end
 
         it "provides type code" do
-          expect(parsed.type.type_code).to eq("data")
+          expect(parsed.typed_stage.type_code).to eq("data")
         end
 
         it "provides stage code" do
-          expect(parsed.stage.stage_code).to eq("published")
+          expect(parsed.typed_stage.stage_code).to eq("published")
         end
 
-        it "provides typed_stage with abbreviation" do
-          expect(parsed.typed_stage.abbreviation).to eq("DATA")
+        it "provides type abbreviation" do
+          expect(parsed.type.abbr).to eq("DATA")
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
     end
   end
-
 end

@@ -1,0 +1,12 @@
+# Obtain from https://www.canada.ca/en/public-services-procurement/services/standards-oversight/canadian-general-standards-board/development-services/catalogue.html
+
+# CGSB (Canadian General Standards Board) adopted
+CAN/CGSB/CSA-ISO 19650-1:24
+CAN/CGSB/CSA-ISO 19650-2:24
+CAN/CGSB/CSA-ISO 19650-3:24
+CAN/CGSB/CSA-ISO 19650-4:24
+CAN/CGSB/CSA-ISO 19650-5:24
+CAN/CGSB/CSA-ISO 7817-1:25
+CAN/CGSB/CSA-Z1610-11 (R2021)
+CAN/CGSB/CSA-Z1640-18 (R2023)
+CAN/CGSB/CSA-Z16602:14

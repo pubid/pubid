@@ -26,16 +26,17 @@ RSpec.describe "ITU Integration" do
 
   describe "parsing all fixtures" do
     it "parses all ITU-R identifiers" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-itu/spec/fixtures/itu-r.txt")
+      fixture_file = File.join(__dir__,
+                               "../fixtures/itu/identifiers/full/recommendation.txt")
 
       File.readlines(fixture_file).each do |line|
         line = line.strip
         next if line.empty? || line.start_with?("#")
 
-        expect {
+        expect do
           identifier = PubidNew::Itu.parse(line)
           expect(identifier.to_s).to eq(line)
-        }.not_to raise_error, "Failed to parse: #{line}"
+        end.not_to raise_error, "Failed to parse: #{line}"
       end
     end
   end

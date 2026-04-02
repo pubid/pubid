@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+require_relative "base"
+require_relative "../components/code"
+require_relative "../components/date"
+
+module PubidNew
+  module Bsi
+    module Identifiers
+      # BSI Practice Guide (PP - Published Practice)
+      # Examples: "PP 888:1982", "PP 7307:1986", "PP 7722:2006"
+      class PracticeGuide < Base
+        attribute :number, Bsi::Components::Code
+        attribute :date, Bsi::Components::Date
+
+        def self.type
+          {
+            short: "PP",
+            full: "Published Practice",
+          }
+        end
+
+        def to_s(lang: :en, lang_single: false)
+          result = "PP #{number}"
+          result += ":#{date.year}" if date
+          result
+        end
+      end
+    end
+  end
+end

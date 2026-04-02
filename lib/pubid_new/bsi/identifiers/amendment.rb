@@ -11,12 +11,31 @@ module PubidNew
         attribute :base_identifier, Base, polymorphic: true
         attribute :amendment_number, :string
         attribute :amendment_year, :integer
+        attribute :separator, :string, default: -> { "+" }
 
         def to_s
           if base_identifier
-            "#{base_identifier.to_s}+A#{amendment_number}:#{amendment_year}"
+            if amendment_year
+              "#{base_identifier}#{separator}A#{amendment_number}:#{amendment_year}"
+            else
+              # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
+              if amendment_number&.match?(/^[A-Z]+$/)
+                "#{base_identifier} AMD #{amendment_number}"
+              else
+                "#{base_identifier} AMD#{amendment_number}"
+              end
+            end
           else
-            "+A#{amendment_number}:#{amendment_year}"
+            if amendment_year
+              "#{separator}A#{amendment_number}:#{amendment_year}"
+            else
+              # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
+              if amendment_number&.match?(/^[A-Z]+$/)
+                "AMD #{amendment_number}"
+              else
+                "AMD#{amendment_number}"
+              end
+            end
           end
         end
 

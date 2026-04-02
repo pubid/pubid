@@ -1,6 +1,8 @@
 require_relative "../components/publisher"
+# frozen_string_literal: true
 require_relative "../components/code"
 require_relative "../components/date"
+require_relative "scheme"
 
 module PubidNew
   # Identifier that
@@ -15,47 +17,17 @@ module PubidNew
         "D" => "de",
       }.freeze
 
-      def initialize(scheme)
-        @scheme = scheme
-        self
-      end
-
-      def locate_typed_stage(typed_stage_string)
-        # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
-        typed_stage_string = "" if typed_stage_string.nil?
-
-        typed_stage = (@scheme.typed_stages + @scheme.supplement_typed_stages).detect do |typed_stage|
-          typed_stage.abbr.include?(typed_stage_string)
-        end
-
-        unless typed_stage
-          raise ArgumentError,
-                "Unknown type abbreviation: '#{typed_stage_string}'"
-        end
-
-        typed_stage
-      end
-
-      def locate_identifier_klass(type_code)
-        identifier_klass = (@scheme.identifiers + @scheme.supplement_identifiers).detect do |identifier_class|
-          identifier_class.type[:key].to_s == type_code
-        end
-
-        unless identifier_klass
-          raise ArgumentError,
-                "Unknown type code: #{type_code}"
-        end
-
-        identifier_klass
+      def initialize
+        # Builder uses Idf::Scheme class methods (class << self pattern)
       end
 
       def build(parsed_hash)
         # Check the `:type_with_stage` to determine the identifier class
         # :type_with_stage will be nil if it is an IS.
-        typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
+        typed_stage = Scheme.locate_typed_stage_by_abbr(parsed_hash[:type_with_stage])
 
         # Instantiate the identifier based on the typed stage
-        identifier = locate_identifier_klass(typed_stage.type_code).new
+        identifier = Scheme.locate_identifier_klass_by_type_code(typed_stage.type_code).new
 
         # For French GUIDE entries: "Guide ISO/CEI 37:1995"
         if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
@@ -69,10 +41,16 @@ module PubidNew
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value) if identifier.respond_to?("#{sub_key}=")
+              if identifier.respond_to?("#{sub_key}=")
+                identifier.send("#{sub_key}=",
+                                sub_value)
+              end
             end
           else
-            identifier.send("#{key}=", realized_components) if identifier.respond_to?("#{key}=")
+            if identifier.respond_to?("#{key}=")
+              identifier.send("#{key}=",
+                              realized_components)
+            end
           end
         end
 
@@ -117,7 +95,7 @@ module PubidNew
           # "CD TR"
           iteration = value.to_s.match(/(\d+)$/)
           value = value.to_s.sub(iteration.to_s, "")
-          typed_stage = locate_typed_stage(value || "")
+          typed_stage = Scheme.locate_typed_stage_by_abbr(value || "")
 
           ## IMPORTANT!!
           # Always use TypedStage in an Identifier or separate Type and Stage.

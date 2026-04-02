@@ -1,0 +1,25 @@
+Flavor: CEN
+Classified: 2026-04-01 22:07:58
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 118
+Pass: 105 (88.98%)
+Fail: 13 (11.02%)
+
+BY CLASS
+----------------------------------------------------------------------
+adopted_european_norm                    Pass: 17/17 (100.0%)
+amendment                                Pass: 5/5 (100.0%)
+cen_report                               Pass: 21/21 (100.0%)
+consolidated_identifier                  Pass: 6/6 (100.0%)
+corrigendum                              Pass: 6/6 (100.0%)
+european_norm                            Pass: 21/21 (100.0%)
+european_prestandard                     Pass: 6/6 (100.0%)
+fragment                                 Pass: 1/1 (100.0%)
+guide                                    Pass: 11/11 (100.0%)
+harmonization_document                   Pass: 2/2 (100.0%)
+technical_report                         Pass: 5/5 (100.0%)
+technical_specification                  Pass: 4/4 (100.0%)
+unknown                                  Pass: 0/13 (0.0%)

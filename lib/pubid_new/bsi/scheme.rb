@@ -1,152 +1,245 @@
+# frozen_string_literal: true
+
+require_relative "../components/typed_stage"
+require_relative "../components/stage"
+require_relative "../components/type"
+
 module PubidNew
   module Bsi
     class Scheme
-      # Transform parsed data into structured hash
-      def self.transform(parsed)
-        result = {}
-        
-        # Handle national annex
-        if parsed[:national_annex]
-          na_data = parsed[:national_annex]
-          na_hash = { type: "NA" }
-          if na_data[:na_supplement]
-            na_hash[:supplement] = transform_supplement(na_data[:na_supplement])
-          end
-          result[:national_annex] = na_hash
-        end
+      # TYPED_STAGES_REGISTRY for native BSI types
+      TYPED_STAGES_REGISTRY = [
+        # British Standard (BS)
+        PubidNew::Components::TypedStage.new(
+          code: :pubbs,
+          stage_code: :published,
+          type_code: :bs,
+          abbr: ["BS"],
+          name: "British Standard",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+        PubidNew::Components::TypedStage.new(
+          code: :drbs,
+          stage_code: :draft,
+          type_code: :bs,
+          abbr: ["Draft BS", "DBS"],
+          name: "Draft British Standard",
+          harmonized_stages: %w[30.00 30.20 30.60 40.00 40.20 40.60],
+        ),
 
-        # Document type
-        if parsed[:type]
-          type_str = parsed[:type].to_s
-          result[:type] = normalize_type(type_str)
-        end
+        # Published Document (PD)
+        PubidNew::Components::TypedStage.new(
+          code: :pubpd,
+          stage_code: :published,
+          type_code: :pd,
+          abbr: ["PD"],
+          name: "Published Document",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Number and part
-        result[:number] = parsed[:number].to_s if parsed[:number]
-        result[:part] = parsed[:part].to_s if parsed[:part]
-        result[:second_number] = parsed[:second_number].to_s if parsed[:second_number]
+        # Publicly Available Specification (PAS)
+        PubidNew::Components::TypedStage.new(
+          code: :pubpas,
+          stage_code: :published,
+          type_code: :pas,
+          abbr: ["PAS"],
+          name: "Publicly Available Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Year and month
-        result[:year] = parsed[:year].to_s if parsed[:year]
-        result[:month] = parsed[:month].to_s if parsed[:month]
+        # National Annex (NA)
+        PubidNew::Components::TypedStage.new(
+          code: :pubna,
+          stage_code: :published,
+          type_code: :na,
+          abbr: ["NA"],
+          name: "National Annex",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Edition (for Flex)
-        result[:edition] = parsed[:edition].to_s if parsed[:edition]
+        # Draft Document (DD)
+        PubidNew::Components::TypedStage.new(
+          code: :pubdd,
+          stage_code: :published,
+          type_code: :dd,
+          abbr: ["DD"],
+          name: "Draft Document",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Supplements
-        if parsed[:supplements]
-          supplements = parsed[:supplements].is_a?(Array) ? parsed[:supplements] : [parsed[:supplements]]
-          result[:supplements] = supplements.map do |s|
-            # Extract from nested :supplement key if present
-            supp_data = s[:supplement] || s
-            transform_supplement(supp_data)
-          end.compact
-        end
+        # Flex Document
+        PubidNew::Components::TypedStage.new(
+          code: :pubflex,
+          stage_code: :published,
+          type_code: :flex,
+          abbr: ["Flex", "BSI Flex"],
+          name: "BSI Flex",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Adopted document
-        if parsed[:adopted]
-          adopted_str = parsed[:adopted].to_s
-          result[:adopted] = parse_adopted(adopted_str)
-        end
+        # Handbook
+        PubidNew::Components::TypedStage.new(
+          code: :pubhandbook,
+          stage_code: :published,
+          type_code: :handbook,
+          abbr: ["Handbook", "HB"],
+          name: "BSI Handbook",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Expert commentary
-        result[:expert_commentary] = true if parsed[:expert_commentary]
+        # Practice Guide (PP)
+        PubidNew::Components::TypedStage.new(
+          code: :pubpp,
+          stage_code: :published,
+          type_code: :pp,
+          abbr: ["PP"],
+          name: "Published Practice",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Tracked changes
-        result[:tracked_changes] = true if parsed[:tracked_changes]
+        # British Industrial Practice (BIP)
+        PubidNew::Components::TypedStage.new(
+          code: :pubbip,
+          stage_code: :published,
+          type_code: :bip,
+          abbr: ["BIP"],
+          name: "British Industrial Practice",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # Translation
-        if parsed[:translation]
-          trans = parsed[:translation].to_s
-          result[:translation] = trans.capitalize
-        end
+        # Aerospace/Specialized British Standard (with letter prefix)
+        PubidNew::Components::TypedStage.new(
+          code: :pubaerospace,
+          stage_code: :published,
+          type_code: :aerospace,
+          abbr: ["BS A", "BS AU", "BS C", "BS M", "BS S", "BS L", "BS TA",
+                 "BS MA", "BS PL", "BS QC", "BS G", "BS HC", "BS F", "BS X", "BS B"],
+          name: "Aerospace/Specialized British Standard",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        # PDF marker
-        result[:pdf] = true if parsed[:pdf]
+        # Index
+        PubidNew::Components::TypedStage.new(
+          code: :pubindex,
+          stage_code: :published,
+          type_code: :index,
+          abbr: ["Index"],
+          name: "BSI Index",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        result
+        # Method
+        PubidNew::Components::TypedStage.new(
+          code: :pubmethod,
+          stage_code: :published,
+          type_code: :method,
+          abbr: ["Method", "Methods"],
+          name: "BSI Method",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # Section
+        PubidNew::Components::TypedStage.new(
+          code: :pubsection,
+          stage_code: :published,
+          type_code: :section,
+          abbr: ["Section"],
+          name: "BSI Section",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # DISC (Delivering Information Solutions to Customers)
+        PubidNew::Components::TypedStage.new(
+          code: :pubdisc,
+          stage_code: :published,
+          type_code: :disc,
+          abbr: ["DISC"],
+          name: "DISC",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # Detailed Specification (with N or C notation)
+        PubidNew::Components::TypedStage.new(
+          code: :pubdetailed_spec,
+          stage_code: :published,
+          type_code: :detailed_specification,
+          abbr: ["DETAILED SPEC"],
+          name: "Detailed Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # Standalone Amendment
+        PubidNew::Components::TypedStage.new(
+          code: :standalone_amendment,
+          stage_code: :published,
+          type_code: :amendment,
+          abbr: ["AMD"],
+          name: "Amendment",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+
+        # Technical Specification
+        PubidNew::Components::TypedStage.new(
+          code: :pubts,
+          stage_code: :published,
+          type_code: :ts,
+          abbr: ["TS"],
+          name: "Technical Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+      ].freeze
+
+      # Map type codes to identifier classes
+      IDENTIFIER_CLASS_MAP = {
+        bs: "Identifiers::BritishStandard",
+        pd: "Identifiers::PublishedDocument",
+        pas: "Identifiers::PubliclyAvailableSpecification",
+        na: "Identifiers::NationalAnnex",
+        dd: "Identifiers::DraftDocument",
+        flex: "Identifiers::Flex",
+        handbook: "Identifiers::Handbook",
+        pp: "Identifiers::PracticeGuide",
+        bip: "Identifiers::BritishIndustrialPractice",
+        aerospace: "Identifiers::AerospaceStandard",
+        index: "Identifiers::Index",
+        method: "Identifiers::Method",
+        section: "Identifiers::Section",
+        disc: "Identifiers::Disc",
+        bundled: "Identifiers::BundledIdentifier",
+        detailed_specification: "Identifiers::DetailedSpecification",
+        standalone_amendment: "Identifiers::StandaloneAmendment",
+        ts: "Identifiers::TechnicalSpecification",
+        committee_document: "Identifiers::CommitteeDocument",
+        explanatory_supplement: "Identifiers::ExplanatorySupplement",
+        supplementary_index: "Identifiers::SupplementaryIndex",
+        test_method: "Identifiers::TestMethod",
+        set: "Identifiers::Set",
+      }.freeze
+
+      # Default typed stage for when no match is found
+      DEFAULT_TYPED_STAGE = PubidNew::Components::TypedStage.new(
+        code: :pubbs,
+        stage_code: :published,
+        type_code: :bs,
+        abbr: ["BS"],
+        name: "British Standard",
+        harmonized_stages: %w[60.00 60.60],
+      ).freeze
+
+      def locate_typed_stage_by_abbr(abbr)
+        abbr_str = abbr.to_s.strip
+        TYPED_STAGES_REGISTRY.find do |ts|
+          ts.abbr.include?(abbr_str)
+        end || DEFAULT_TYPED_STAGE
       end
 
-      private
+      def locate_identifier_klass_by_type_code(type_code)
+        class_name = IDENTIFIER_CLASS_MAP[type_code.to_sym]
+        return Identifiers::BritishStandard unless class_name
 
-      def self.normalize_type(type_str)
-        case type_str
-        when "BS", "BSI"
-          "BS"
-        when "PAS"
-          "PAS"
-        when "PD"
-          "PD"
-        when "DD"
-          "DD"
-        when "Flex", "BSI Flex"
-          "BSI Flex"
-        else
-          type_str
-        end
-      end
-
-      def self.transform_supplement(supp_data)
-        return nil unless supp_data
-
-        if supp_data[:amd_number]
-          # Extract year from nested structure if present
-          year_value = if supp_data[:amd_year]
-            supp_data[:amd_year].is_a?(Hash) ? supp_data[:amd_year][:year].to_s : supp_data[:amd_year].to_s
-          end
-          
-          {
-            type: "amendment",
-            number: supp_data[:amd_number].to_s,
-            year: year_value
-          }
-        elsif supp_data[:cor_number]
-          # Extract year from nested structure if present
-          year_value = if supp_data[:cor_year]
-            supp_data[:cor_year].is_a?(Hash) ? supp_data[:cor_year][:year].to_s : supp_data[:cor_year].to_s
-          end
-          
-          {
-            type: "corrigendum",
-            number: supp_data[:cor_number].to_s,
-            year: year_value
-          }
-        end
-      end
-
-      def self.parse_adopted(adopted_str)
-        # Try to parse as IEC first
-        begin
-          return { flavor: "iec", identifier: PubidNew::Iec.parse(adopted_str) }
-        rescue Parslet::ParseFailed, StandardError
-          # Continue to ISO
-        end
-
-        # Try ISO
-        begin
-          return { flavor: "iso", identifier: PubidNew::Iso.parse(adopted_str) }
-        rescue Parslet::ParseFailed, StandardError
-          # Continue to CEN
-        end
-
-        # Try CEN
-        begin
-          return { flavor: "cen", identifier: PubidNew::Cen.parse(adopted_str) }
-        rescue Parslet::ParseFailed, StandardError
-          # Return as string if all parsers fail
-          { flavor: "unknown", text: adopted_str }
-        end
-      end
-
-      def self.normalize_year(year_str)
-        return nil unless year_str
-        
-        year = year_str.to_i
-        if year < 100
-          # Two-digit year: 00-50 means 2000-2050, 51-99 means 1951-1999
-          year < 51 ? 2000 + year : 1900 + year
-        else
-          year
+        # Convert string to actual class
+        class_name.split("::").reduce(PubidNew::Bsi) do |mod, name|
+          mod.const_get(name)
         end
       end
     end

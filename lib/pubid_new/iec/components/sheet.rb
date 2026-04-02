@@ -1,4 +1,5 @@
 require "lutaml/model"
+# frozen_string_literal: true
 
 module PubidNew
   module Iec
@@ -15,7 +16,7 @@ module PubidNew
 
         # Parse sheet notation from string like "/1" or "1"
         def self.parse(string)
-          number = string.to_s.gsub('/', '')
+          number = string.to_s.gsub("/", "")
           new(number: number)
         end
 

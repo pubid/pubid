@@ -1,4 +1,5 @@
 require "lutaml/model"
+# frozen_string_literal: true
 
 module PubidNew
   module Iec
@@ -7,16 +8,16 @@ module PubidNew
       # Single Responsibility: Represents TRF-specific publishing information
       # Example: IECEE TRF or IECEx TRF publications
       class TrfInfo < Lutaml::Model::Serializable
-        attribute :publisher, :string, default: -> { nil }
-        attribute :series, :string, default: -> { nil }
-        attribute :version, :string, default: -> { nil }
+        attribute :publisher, :string, default: -> {}
+        attribute :series, :string, default: -> {}
+        attribute :version, :string, default: -> {}
 
         def to_s
           parts = []
           parts << publisher if publisher
           parts << series if series
           parts << "Ver.#{version}" if version
-          parts.join(' ')
+          parts.join(" ")
         end
 
         # Check if TRF info is empty (no data)
@@ -27,7 +28,8 @@ module PubidNew
         # Validate that at least publisher or series is present
         def validate!
           if empty?
-            raise ArgumentError, "TrfInfo must have at least publisher or series"
+            raise ArgumentError,
+                  "TrfInfo must have at least publisher or series"
           end
         end
       end

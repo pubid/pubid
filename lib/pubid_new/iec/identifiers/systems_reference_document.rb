@@ -1,4 +1,5 @@
 require_relative "base"
+# frozen_string_literal: true
 require_relative "../../components/typed_stage"
 
 module PubidNew
@@ -15,8 +16,8 @@ module PubidNew
             type_code: :srd,
             abbr: ["SRD"],
             name: "Systems Reference Document",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         def self.type

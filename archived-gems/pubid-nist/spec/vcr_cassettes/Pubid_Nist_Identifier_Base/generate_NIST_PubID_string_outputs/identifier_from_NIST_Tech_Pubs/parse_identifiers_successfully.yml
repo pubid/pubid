@@ -1,0 +1,69 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://raw.githubusercontent.com/usnistgov/NIST-Tech-Pubs/nist-pages/xml/allrecords.xml
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '14'
+      Content-Security-Policy:
+      - default-src 'none'; style-src 'unsafe-inline'; sandbox
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - deny
+      X-Xss-Protection:
+      - 1; mode=block
+      Content-Type:
+      - text/plain; charset=utf-8
+      X-Github-Request-Id:
+      - E523:3B5C9B:913E4:14D523:691AF863
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Mon, 17 Nov 2025 10:26:44 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-hkg17920-HKG
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1763375204.694278,VS0,VE312
+      Vary:
+      - Authorization,Accept-Encoding
+      Access-Control-Allow-Origin:
+      - "*"
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      X-Fastly-Request-Id:
+      - 923a743979fd2be9595a0c8b7015845c8f7de564
+      Expires:
+      - Mon, 17 Nov 2025 10:31:44 GMT
+      Source-Age:
+      - '0'
+    body:
+      encoding: UTF-8
+      string: '404: Not Found'
+  recorded_at: Mon, 17 Nov 2025 10:26:44 GMT
+recorded_with: VCR 6.3.1

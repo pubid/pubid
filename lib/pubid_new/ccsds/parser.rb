@@ -38,9 +38,15 @@ module PubidNew
 
       rule(:corrigenda) { corrigendum.repeat(0).as(:corrigenda) }
 
-      # Trailing metadata (anything after " - ")
-      rule(:metadata) do
-        (space >> dash >> space >> any.repeat).ignore
+      # Language metadata (e.g., " - French Translated", " - Russian Translated")
+      rule(:language_metadata) do
+        space >> dash >> space >>
+          (
+            (str("French") | str("Russian") | str("English") |
+             str("German") | str("Spanish") | str("Italian") |
+             str("Portuguese") | str("Chinese") | str("Japanese")).as(:language) >>
+            (space >> str("Translated")).maybe
+          )
       end
 
       # Main identifier
@@ -52,7 +58,7 @@ module PubidNew
           edition.maybe >>
           suffix.maybe >>
           corrigenda >>
-          metadata.maybe
+          language_metadata.maybe
       end
 
       rule(:root) { identifier }

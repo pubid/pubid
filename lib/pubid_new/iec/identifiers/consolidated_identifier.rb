@@ -1,4 +1,5 @@
 require_relative "../identifier"
+# frozen_string_literal: true
 
 module PubidNew
   module Iec
@@ -14,17 +15,25 @@ module PubidNew
           identifiers.map.with_index do |id, idx|
             if idx == 0
               # First identifier renders normally
-              id.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)
-            else
+              id.to_s(lang: lang, lang_single: lang_single,
+                      with_edition: with_edition)
+            elsif id.is_a?(Amendment)
               # Subsequent identifiers render with + prefix
-              # For amendments, just show +AMDn:year part
-              if id.is_a?(Amendment)
+              # For amendments, just show +AMDn:year part (or +AMDn if no date)
+              if id.date&.year && !id.date.year.empty?
                 "+AMD#{id.number}:#{id.date.year}"
-              elsif id.is_a?(Corrigendum)
+              else
+                "+AMD#{id.number}"
+              end
+            elsif id.is_a?(Corrigendum)
+              if id.date&.year && !id.date.year.empty?
                 "+COR#{id.number}:#{id.date.year}"
               else
-                "+#{id.to_s(lang: lang, lang_single: lang_single, with_edition: with_edition)}"
+                "+COR#{id.number}"
               end
+            else
+              "+#{id.to_s(lang: lang, lang_single: lang_single,
+                          with_edition: with_edition)}"
             end
           end.join
         end

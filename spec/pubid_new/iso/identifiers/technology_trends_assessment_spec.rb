@@ -3,20 +3,20 @@ require "spec_helper"
 RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
   subject { described_class }
 
-  xdescribe "parse identifiers from examples" do
+  describe "parse identifiers from examples" do
     shared_examples "parse identifiers from file" do
       it "parse identifiers from file" do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
-          next if pub_id.match?("^#")
+          next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp)
+          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
 
     context "parses identifiers from iso-technology-trends-assessments.txt" do
-      let(:examples_file) { "iso/iso-technology-trends-assessments.txt" }
+      let(:examples_file) { "iso/identifiers/pass/technology_trends_assessments.txt" }
 
       it_behaves_like "parse identifiers from file"
     end
@@ -27,11 +27,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 1:1994
     describe "ISO/TTA 1:1994" do
       subject { "ISO/TTA 1:1994" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:1" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -39,7 +39,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -51,18 +51,18 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("tta")
+        expect(parsed.typed_stage.type_code).to eq("tta")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("TTA")
+        expect(parsed.typed_stage.abbr.first).to eq("TTA")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -73,11 +73,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 2
     describe "ISO/TTA 2" do
       subject { "ISO/TTA 2" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:2" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -85,7 +85,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -97,18 +97,18 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("tta")
+        expect(parsed.typed_stage.type_code).to eq("tta")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("TTA")
+        expect(parsed.typed_stage.abbr.first).to eq("TTA")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -119,11 +119,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 5:2006
     describe "ISO/TTA 5:2006" do
       subject { "ISO/TTA 5:2006" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:5" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -138,7 +138,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -146,11 +146,11 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 5:2007 (updated version)
     describe "ISO/TTA 5:2007" do
       subject { "ISO/TTA 5:2007" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:5" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -165,7 +165,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end

@@ -19,25 +19,31 @@ module PubidNew
       rule(:clc) { str("CLC") }
       rule(:cwa) { str("CWA") }
       rule(:hd) { str("HD") }
+      rule(:es) { str("ES") }
+      rule(:cr) { str("CR") }
+      rule(:env) { str("ENV") }
 
       # Adopted organizations (ISO, IEC)
       rule(:iso) { str("ISO") }
       rule(:iec) { str("IEC") }
       rule(:cispr) { str("CISPR") }
 
-      # Publisher (can be combined like CEN/CLC)
+      # Publisher (can be combined like EN/CLC or CEN/CLC)
       rule(:publisher) do
-        (cwa | hd).as(:publisher) |
-        (cen.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
-        (clc.as(:publisher) >> (slash >> cen.as(:copublisher)).maybe) |
-        en.as(:publisher)
+        (cwa | hd | es | cr | env).as(:publisher) |
+          (en.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
+          (cen.as(:publisher) >> (slash >> clc.as(:copublisher)).maybe) |
+          (clc.as(:publisher) >> (slash >> cen.as(:copublisher)).maybe) |
+          en.as(:publisher)
       end
 
-      # Stage (prEN, FprEN)
-      rule(:stage) { (str("FprEN") | str("prEN")).as(:stage) }
+      # Stage prefixes captured as type_with_stage for proper lookup
+      rule(:stage_prefix) { (str("FprEN") | str("prEN")).as(:type_with_stage) }
 
       # Type
-      rule(:type) { (str("Guide") | str("GUIDE") | str("TR") | str("TS")).as(:type) }
+      rule(:type) do
+        (str("Guide") | str("GUIDE") | str("TR") | str("TS")).as(:type)
+      end
 
       # Number
       rule(:number) { digits.as(:number) }
@@ -49,17 +55,33 @@ module PubidNew
       # Year
       rule(:year) { colon >> digit.repeat(4, 4).as(:year) }
 
-      # Amendment (+A1:2008 or +A11:2020 or /A2:2019)
-      rule(:amendment) do
-        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-        str("A") >> digits.as(:amd_number) >>
-        colon >> digit.repeat(4, 4).as(:amd_year)
+      # Month support for dates like 2016-11
+      rule(:month_digits) do
+        (
+          str("01") | str("02") | str("03") | str("04") |
+          str("05") | str("06") | str("07") | str("08") |
+          str("09") | str("10") | str("11") | str("12")
+        ).as(:month)
       end
 
-      # Corrigendum (+AC:2009 or +AC1:2008 or +AC2:2009)
+      rule(:year_with_month) do
+        colon >> digit.repeat(4, 4).as(:year) >> dash >> month_digits
+      end
+
+      rule(:date) { year_with_month | year }
+
+      # Amendment (+A1:2008 or +A11:2020 or /A2:2019 or /A1 without year)
+      rule(:amendment) do
+        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+          str("A") >> digits.as(:amd_number) >>
+          (colon >> digit.repeat(4, 4).as(:amd_year)).maybe
+      end
+
+      # Corrigendum (+AC:2009 or +AC1:2008 or +AC2:2009 or /AC1:2005 or /AC:2016-11 with month)
       rule(:corrigendum) do
-        plus >> str("AC") >> digits.maybe.as(:cor_number) >>
-        colon >> digit.repeat(4, 4).as(:cor_year)
+        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+          str("AC") >> digits.maybe.as(:cor_number) >>
+          (year_with_month | (colon >> digit.repeat(4, 4).as(:year))).maybe
       end
 
       # Supplements (amendments and corrigenda)
@@ -68,6 +90,14 @@ module PubidNew
 
       # Edition (ED2, ED3, etc.)
       rule(:edition) { space >> str("ED") >> digits.as(:edition) }
+
+      # Fragment identifier (EN 60038 AMD1 FRAG2)
+      rule(:fragment_identifier) do
+        (stage_prefix | publisher) >>
+          space >> number >> parts >>
+          space >> str("AMD") >> digits.as(:amendment_number) >>
+          space >> str("FRAG") >> digits.as(:fragment_number)
+      end
 
       # Adopted standard as opaque string - must start with org name
       rule(:adopted_org_prefix) do
@@ -81,22 +111,32 @@ module PubidNew
 
       # Identifier
       rule(:identifier) do
-        (stage | publisher) >>
-        (space >> adopted_string).maybe >>
-        (space >> type | slash >> type).maybe >>
-        (space >> number >> parts >>
-        year.maybe).maybe >>
-        supplements >>
-        edition.maybe
+        fragment_identifier |
+          (stage_prefix | publisher) >>
+            (space >> adopted_string).maybe >>
+            (space >> type | slash >> type).maybe >>
+            (space >> number >> parts >>
+            year.maybe).maybe >>
+            supplements >>
+            edition.maybe
       end
 
       rule(:root) { identifier }
 
       def self.parse(input)
+        # Normalize special dash characters
+        normalized = input.gsub(/[\u2011\u00AD]/, "-")
+
+        # Remove trailing hash symbols
+        normalized = normalized.gsub(/#.*$/, "").strip
+
+        # Filter out parenthetical notes (case-insensitive, multiple patterns)
+        normalized = normalized.gsub(/\s*\([^)]*corrigendum[^)]*\)/i, "")
+
         # Normalize dash to slash in publisher combinations
-        normalized = input.gsub("CEN-CLC", "CEN/CLC")
-                          .gsub("CLC-CEN", "CLC/CEN")
-                          .gsub("GUIDE", "Guide")
+        normalized = normalized.gsub("CEN-CLC", "CEN/CLC")
+          .gsub("CLC-CEN", "CLC/CEN")
+          .gsub("GUIDE", "Guide")
         new.parse(normalized)
       end
     end

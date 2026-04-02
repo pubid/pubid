@@ -1,4 +1,5 @@
 require "parslet"
+# frozen_string_literal: true
 require_relative "plateau/parser"
 require_relative "plateau/scheme"
 require_relative "plateau/builder"
@@ -9,9 +10,13 @@ module PubidNew
       def parse(input)
         parser = Parser.new
         parsed = parser.parse(input)
-        builder = Builder.new(Scheme)
-        builder.build(parsed)
+        Builder.build(parsed)
       end
     end
   end
+
+  # Register this flavor with the PubidNew registry
 end
+
+# Register Uplateau flavor with the registry
+PubidNew::Registry.register(:plateau, PubidNew::Plateau)

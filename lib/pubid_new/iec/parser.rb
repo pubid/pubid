@@ -1,4 +1,5 @@
 require "parslet"
+# frozen_string_literal: true
 require_relative "../parser/common_parse_rules"
 require_relative "../parser/common_parse_methods"
 require_relative "identifier"
@@ -21,9 +22,13 @@ module PubidNew
       root :identifier
 
       rule(:identifier) do
-        working_programme |
+        working_programme_with_publisher |
+          working_programme |
           working_document |
+          sheet_supplement_identifier |
+          sheet_identifier |
           supplement_supplement_identifier |
+          standalone_supplement |
           supplement_identifier |
           joint_identifier |
           identifier_copublishers
@@ -44,12 +49,27 @@ module PubidNew
           (space >> edition).maybe
       end
 
+      # Working Programme with publisher prefix: IEC/PWI [TR] number edition
+      # Examples: "IEC/PWI 60038", "ISO/IEC/PWI TR 100-36 ED1"
+      rule(:working_programme_with_publisher) do
+        prefix_with_copublishers >> str("/") >>
+          (str("PWI") | str("PNW")).as(:wp_stage) >>
+          space >>
+          (
+            (str("TR") >> space) |
+            (str("TS") >> space) |
+            (str("SRD") >> space)
+          ).maybe.as(:wp_type) >>
+          wp_number >>
+          (space >> edition).maybe
+      end
+
       # Working programme numbers can be digits or TC names
       rule(:wp_number) do
         # TC-style: SYCSMARTENERGY-1, SyCLVDC-125
-        (match('[A-Za-z]').repeat(1) >> match('[A-Za-z\d]').repeat >> (dash >> match('\d').repeat(1)).maybe).as(:number_with_part) |
-        # Regular numeric: 100-36
-        number_with_part
+        (match("[A-Za-z]").repeat(1) >> match('[A-Za-z\d]').repeat >> (dash >> match('\d').repeat(1)).maybe).as(:number_with_part) |
+          # Regular numeric: 100-36
+          number_with_part
       end
 
       # Working Document format: TC/number/stage
@@ -59,14 +79,14 @@ module PubidNew
         # TC patterns: digits (100), letters (ACEA), letters/letters (CIS/D), or complex (JTC1-SC41)
         (
           # Try specific patterns first
-          (str("JTC1-SC") >> match('\d').repeat(1)) |  # JTC1-SC41
-          (match('[A-Z]').repeat(1) >> str("/") >> match('[A-Z]').repeat(1)) |  # CIS/D
-          match('[A-Za-z\d]').repeat(1)  # Simple: 100, 86B, ACEA, SyCSmartEnergy
+          (str("JTC1-SC") >> match('\d').repeat(1)) | # JTC1-SC41
+          (match("[A-Z]").repeat(1) >> str("/") >> match("[A-Z]").repeat(1)) | # CIS/D
+          match('[A-Za-z\d]').repeat(1) # Simple: 100, 86B, ACEA, SyCSmartEnergy
         ).as(:technical_committee) >>
           str("/") >>
-          (match('[A-Za-z\d]').repeat(1)).as(:wd_number) >>
-          (str("(") >> match('[A-Z]').as(:wd_language) >> str(")")).maybe >>
-          (str("/") >> match('[A-Z]').repeat(1).as(:wd_stage)).maybe
+          match('[A-Za-z\d]').repeat(1).as(:wd_number) >>
+          (str("(") >> match("[A-Z]").as(:wd_language) >> str(")")).maybe >>
+          (str("/") >> match("[A-Z]").repeat(1).as(:wd_stage)).maybe
       end
 
       # IEC 60038:2009
@@ -75,8 +95,16 @@ module PubidNew
       # IECQ 080000:2017 (special IEC publisher)
       # IECEE (IEC System for Conformity Assessment)
       # IECEx (IEC System for Certification to Standards)
+      # IEC CA (IEC Conformity Assessment)
+      # IECQ CS (IECQ Component Specifications)
+      # IECQ OD (IECQ Operational Documents)
       rule(:prefix_sole_publisher) do
         (
+          str("IECQ OD") |
+          str("IECQ CS") |
+          str("IEC CAB") |
+          str("IEC CA") |
+          str("IECRE") |
           str("CISPR") |
           str("IECEE") |
           str("IECEx") |
@@ -110,25 +138,32 @@ module PubidNew
       rule(:number) do
         # Special case for VIM publication
         str("VIM") |
-        # Special case for SYMBOL publication
-        str("SYMBOL") |
-        # IECEx TRF version notation: 62784v1a_ds, 62784v1A
-        (match('\d').repeat(1, 6) >> str("v") >> match('\d').repeat(1) >> match('[a-zA-Z]').repeat >> (str("_") >> match('[a-zA-Z]').repeat).maybe) |
-        # Can be 5-6 digits for TRF: 60065, 610091
-        # Can have letter suffix: 60065N, 610091A
-        # Can have letter + underscore + letters: 61215F_SE
-        (match('\d').repeat(1, 6) >> (
-          match('[A-Z]') >> (str("_") >> match('[A-Z]').repeat).maybe
-        ).maybe)
+          # Special case for SYMBOL publication
+          str("SYMBOL") |
+          # IECEx TRF version notation: 62784v1a_ds, 62784v1A
+          (match('\d').repeat(1,
+                              6) >> str("v") >> match('\d').repeat(1) >> match("[a-zA-Z]").repeat >> (str("_") >> match("[a-zA-Z]").repeat).maybe) |
+          # IECEE letter-based numbers: AD-001, GD-2053, OD-1000, CAB-G01, 01-S
+          # Pattern: 2-4 letter prefix followed by optional dash and number
+          # The suffix uses [A-Z\d] but not space to properly separate from edition
+          (match('[A-Z]').repeat(2, 4) >> (
+            dash >> match('\d').repeat(1)
+          ).maybe >> match('[A-Z\d]').repeat) |
+          # Can be 5-6 digits for TRF: 60065, 610091
+          # Can have letter suffix: 60065N, 610091A
+          # Can have letter + underscore + letters: 61215F_SE
+          (match('\d').repeat(1, 6) >> (
+            match("[A-Z]") >> (str("_") >> match("[A-Z]").repeat).maybe
+          ).maybe)
       end
 
       rule(:date) do
         # :2005-02 or optional for DB without date
         (str(":") | dash) >>
-        (year_digits >>
-          (dash >> month_digits).maybe >>
-          (dash >> day_digits).maybe
-        ).as(:date)
+          (year_digits >>
+            (dash >> month_digits).maybe >>
+            (dash >> day_digits).maybe
+          ).as(:date)
       end
 
       rule(:part_and_subpart) do
@@ -158,7 +193,8 @@ module PubidNew
         # "DTR"
         # "TS"
         # "Guide"
-        array_to_str(TYPED_STAGES).as(:type_with_stage) >>
+        # Also includes supplement stages like "CDCor" for standalone draft corrigenda
+        array_to_str(TYPED_STAGES + TYPED_STAGES_SUPPLEMENTS).as(:type_with_stage) >>
           (match('\d').as(:stage_iteration) >> space).maybe
       end
 
@@ -197,9 +233,42 @@ module PubidNew
           year_digits.as(:sheet_year)
       end
 
+      # Sheet notation without year: /1 (sheet 1 without year)
+      # IEC 60695-2-1/1
+      rule(:sheet_notation_no_year) do
+        str("/") >>
+          match('\d').repeat(1).as(:sheet_number)
+      end
+
+      # Fragment notation: /FRAG2 or /FRAGC1 (fragment of amendment/corrigendum)
+      # IEC 60050-191/AMD2/FRAG2
+      # IEC 60050-191/COR1/FRAGC1
+      rule(:fragment_notation) do
+        str("/") >>
+          (str("FRAGC") | str("FRAG")).as(:fragment_type) >>
+          match('\d').repeat(1).as(:fragment_number)
+      end
+
+      # Sheet identifier: base identifier followed by /N:YEAR
+      # IEC 60695-2-1/1:1994 (sheet 1 from year 1994)
+      # IEC 60695-2-1/1 (sheet 1 without year)
+      rule(:sheet_identifier) do
+        identifier_copublishers_no_third.as(:base_identifier) >>
+          (sheet_notation | sheet_notation_no_year)
+      end
+
+      # Sheet identifier followed by supplement: base/sheet/supplement
+      # IEC 60695-2-1/1:1994/COR1:1995
+      rule(:sheet_supplement_identifier) do
+        identifier_copublishers_no_third.as(:base_identifier) >>
+          sheet_notation >>
+          str("/") >> supplement_type_with_stage >>
+          space? >> second_part >> third_part
+      end
+
       # VAP suffix for consolidated/version types
       # CSV = Consolidated version (with Supplements)
-      # CMV = Compiled Maintenance Version
+      # CMV = Commented Version
       # RLV = Redline Version (shows changes)
       # SER = Serial version
       # EXV = Example version
@@ -224,13 +293,13 @@ module PubidNew
       end
 
       # Consolidated amendments: +AMD1:2016+AMD2:2019
+      # Also supports without dates: +AMD1+AMD2
       # Creates ConsolidatedIdentifier with array of amendments
       rule(:consolidated_supplement) do
         str("+") >>
           (str("AMD") | str("COR")).as(:supplement_type) >>
           match('\d').repeat(1).as(:supplement_number) >>
-          str(":") >>
-          year_digits.as(:supplement_year)
+          ((str(":") >> year_digits.as(:supplement_year)).maybe)
       end
 
       rule(:consolidated_supplements) do
@@ -241,7 +310,7 @@ module PubidNew
         # Try TRF organization number first, fallback to regular number
         (trf_org_number | number_with_part) >>
           stage_iteration.maybe >>
-          (space? >> date | sheet_notation).maybe >>
+          (space? >> date).maybe >>
           consolidated_supplements.maybe >>
           (vap_suffix | database_suffix).maybe
       end
@@ -251,8 +320,8 @@ module PubidNew
       end
 
       rule(:third_part) do
-        # End of the identifier, we can have language, edition, or all parts
-        third_part_edition >> language.maybe >> all_parts.maybe
+        # End of the identifier, we can have language, edition, fragment, or all parts
+        third_part_edition >> language.maybe >> fragment_notation.maybe >> all_parts.maybe
       end
 
       # prefix sole or copublishers with type and stage
@@ -297,6 +366,15 @@ module PubidNew
         (array_to_str(TYPED_STAGES_SUPPLEMENTS) | str("FRAGC") | str("FRAG")).as(:type_with_stage)
       end
 
+      # Standalone draft supplement (no base identifier)
+      # IEC/FDAM 60038-1
+      # IEC/FDCOR 12345
+      rule(:standalone_supplement) do
+        prefix_with_copublishers >> str("/") >>
+          supplement_type_with_stage >>
+          space >> second_part >> third_part
+      end
+
       # IEC 60038:2009/Amd 1:2011
       rule(:supplement_identifier_no_third) do
         identifier_copublishers_no_third.as(:base_identifier) >>
@@ -319,6 +397,14 @@ module PubidNew
         DASH_CHARS.map { |char| str(char) }.reduce(:|)
       end
 
+      # Preprocess input to normalize tab-separated editions and other formats
+      def parse(input)
+        # Normalize tab-separated editions: "IECEE AD-001\tED1.6" -> "IECEE AD-001 ED1.6"
+        normalized = input.gsub(/\t/, " ")
+        # Normalize comma-separated editions: "IEC CAB-G01:2025-02, Ed. 2.1" -> "IEC CAB-G01:2025-02 Ed. 2.1"
+        normalized = normalized.gsub(/,\s+Ed\./, " Ed.")
+        super(normalized)
+      end
     end
   end
 end

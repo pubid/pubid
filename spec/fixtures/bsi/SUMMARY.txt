@@ -1,0 +1,43 @@
+Flavor: BSI
+Classified: 2026-04-01 22:07:57
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 1579
+Pass: 1497 (94.81%)
+Fail: 82 (5.19%)
+
+BY CLASS
+----------------------------------------------------------------------
+addendum_document                        Pass: 22/22 (100.0%)
+adopted_european_norm                    Pass: 215/215 (100.0%)
+adopted_international_standard           Pass: 81/81 (100.0%)
+aerospace_standard                       Pass: 339/339 (100.0%)
+british_standard                         Pass: 330/330 (100.0%)
+bundled_identifier                       Pass: 27/27 (100.0%)
+committee_document                       Pass: 6/6 (100.0%)
+consolidated_identifier                  Pass: 98/98 (100.0%)
+detailed_specification                   Pass: 16/16 (100.0%)
+disc                                     Pass: 9/9 (100.0%)
+draft_document                           Pass: 13/13 (100.0%)
+expert_commentary                        Pass: 25/25 (100.0%)
+explanatory_supplement                   Pass: 1/1 (100.0%)
+flex                                     Pass: 23/23 (100.0%)
+handbook                                 Pass: 13/13 (100.0%)
+index                                    Pass: 13/13 (100.0%)
+method                                   Pass: 14/14 (100.0%)
+national_annex                           Pass: 18/18 (100.0%)
+nil_class                                Pass: 49/49 (100.0%)
+practice_guide                           Pass: 3/3 (100.0%)
+publicly_available_specification         Pass: 56/56 (100.0%)
+published_document                       Pass: 76/76 (100.0%)
+section                                  Pass: 11/11 (100.0%)
+set                                      Pass: 1/1 (100.0%)
+standalone_amendment                     Pass: 4/4 (100.0%)
+supplement_document                      Pass: 18/18 (100.0%)
+supplementary_index                      Pass: 1/1 (100.0%)
+technical_specification                  Pass: 3/3 (100.0%)
+test_method                              Pass: 6/6 (100.0%)
+unknown                                  Pass: 0/82 (0.0%)
+value_added_publication                  Pass: 6/6 (100.0%)

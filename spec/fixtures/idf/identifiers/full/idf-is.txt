@@ -1,0 +1,46 @@
+# IDF International Standard Identifiers
+# Test fixture for InternationalStandard class
+# Published standards (no stage prefix)
+IDF 1:2010
+IDF 87:2019
+IDF 99:2009
+IDF 117:2016
+IDF 123:2020
+# With part numbers
+IDF 124-2:2005
+IDF 125A:1988
+IDF 141-1:2018
+IDF 193-3:2015
+# Without year
+IDF 259
+# Proposed Work Item (PWI)
+IDF PWI 150:2023
+IDF PWI 201:2024
+# New Work Item (NP/NWIP)
+IDF NP 260:2022
+IDF NWIP 180:2021
+# Approved Work Item (AWI)
+IDF AWI 280:2023
+IDF AWI 75:2024
+# Working Draft (WD)
+IDF WD 220:2022
+IDF WD 88:2021
+# Committee Draft (CD)
+IDF CD 190:2023
+IDF CD 95:2022
+# Final Committee Draft (FCD)
+IDF FCD 130:2023
+IDF FCD 210:2024
+# Draft International Standard (DIS/FPD)
+IDF DIS 160:2022
+IDF FPD 145:2023
+# Final Draft International Standard (FDIS)
+IDF FDIS 110:2022
+IDF FDIS 195:2023
+# Proof (PRF/Fpr)
+IDF PRF 100:2023
+IDF Fpr 170:2024
+# Withdrawal stages
+IDF WDR 50:2020
+IDF WDA 60:2021
+IDF WDAR 40:2019

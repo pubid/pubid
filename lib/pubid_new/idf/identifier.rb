@@ -1,4 +1,5 @@
 require_relative "../identifier"
+# frozen_string_literal: true
 require_relative "../components/typed_stage"
 
 module PubidNew
@@ -11,15 +12,15 @@ module PubidNew
       def to_s(lang: :en, lang_single: false, with_edition: false)
         [
           publisher_portion(lang: lang),
-          number_portion(lang_single: lang_single)
-        ].join('')
+          number_portion(lang_single: lang_single),
+        ].join("")
       end
 
       def publisher_portion(lang: :en)
         [
           publisher.body,
           (typed_stage.abbreviation.empty? ? "" : "/#{typed_stage.abbreviation}"),
-        ].join('')
+        ].join("")
       end
 
       def number_portion(lang_single: false)
@@ -38,22 +39,22 @@ module PubidNew
           (date ? ":#{date.year}" : ""),
 
           # Languages are optional
-          language_portion(lang_single: lang_single)
-        ].join('')
+          language_portion(lang_single: lang_single),
+        ].join("")
       end
 
       # Returns a string representation of the languages
       # :single returns single-char language codes
       def language_portion(lang_single: false)
-        return '' unless languages&.any?
+        return "" unless languages&.any?
 
         [
           "(",
           languages.map do |lang|
             lang.to_s(lang_single: lang_single)
-          end.join(lang_single ? '/' : ','),
-          ")"
-        ].join('')
+          end.join(lang_single ? "/" : ","),
+          ")",
+        ].join("")
       end
 
       def self.parse(string)
@@ -63,7 +64,7 @@ module PubidNew
                 "Invalid identifier format"
         end
 
-        PubidNew::Idf::Builder.new(PubidNew::Idf::Scheme).build(parsed)
+        PubidNew::Idf::Builder.new.build(parsed)
       end
     end
   end

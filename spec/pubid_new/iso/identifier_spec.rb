@@ -34,12 +34,17 @@ RSpec.describe PubidNew::Iso::Identifier do
         end
       end
 
-      # TODO: implement language-aware French / Russian pubids
-      xcontext "French PubID Guide ISO/CEI 51:1999(F/E/R)" do
+      # V2: Guide is a type, not a separate identifier class
+      # ISO/CEI 51:1999(F/E/R) parses as InternationalStandard with CEI copublisher
+      context "French PubID ISO/CEI 51:1999(F/E/R)" do
         let(:pubid) { "Guide ISO/CEI 51:1999(F/E/R)" }
         it "handles PubID Guide ISO/CEI 51:1999(F/E/R)" do
-          expect(id.class).to eq(PubidNew::Iso::Identifiers::Guide)
-          expect(id.to_s).to eq(pubid)
+          id = PubidNew::Iso.parse(pubid)
+          # In V2, Guide is a type of InternationalStandard, not a separate class
+          expect(id.class).to eq(PubidNew::Iso::Identifiers::InternationalStandard)
+          expect(id.type.abbr).to eq("Guide")
+          # Note: V2 reorders to standard format (copublisher before type)
+          expect(id.to_s).to eq("ISO/CEI Guide 51:1999(F/E/R)")
         end
       end
 

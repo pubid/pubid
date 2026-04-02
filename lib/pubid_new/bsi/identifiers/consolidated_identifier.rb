@@ -10,39 +10,101 @@ module PubidNew
       class ConsolidatedIdentifier < Base
         attribute :identifiers, Base, polymorphic: true, collection: true
 
-        def to_s
-          result = identifiers.map.with_index do |id, idx|
-            if idx == 0
-              # First identifier renders without suffixes (pdf, tc, excomm)
-              base_str =
-                id.is_a?(Base) ? render_base_without_suffixes(id) : id.to_s
-              base_str
-            else
-              # Supplements render with + prefix
-              if id.is_a?(Amendment)
-                "+A#{id.amendment_number}:#{id.amendment_year}"
-              elsif id.is_a?(Corrigendum)
-                result = "+C#{id.corrigendum_number}"
-                result += ":#{id.corrigendum_year}" if id.corrigendum_year
-                result
+        def to_s(lang: :en, lang_single: false)
+          base_id = identifiers.first
+
+          # Render base without suffixes (will add them after supplements)
+          result = if base_id.respond_to?(:to_s_without_suffixes)
+                     base_id.to_s_without_suffixes
+                   else
+                     # Temporarily remove suffixes for rendering
+                     base_str = base_id.to_s
+                     # Remove known suffixes (more flexible patterns to handle topics)
+                     base_str = base_str.sub(/ ExComm \(.*?\)$/, "")  # ExComm (Fire)
+                       .sub(/ ExComm$/, "")                     # ExComm without topic
+                       .sub(/ - TC$/, "")
+                       .sub(/ PDF$/, "")
+                       .sub(/ \([A-Z][a-z]+\)$/, "")
+                     base_str
+                   end
+
+          # Add supplements
+          identifiers[1..].each do |id|
+            if id.is_a?(Amendment)
+              if id.amendment_year
+                sep = id.respond_to?(:separator) && id.separator ? id.separator : "+"
+                result += "#{sep}A#{id.amendment_number}:#{id.amendment_year}"
               else
-                # Fallback for other types
-                id.to_s
+                # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
+                if id.amendment_number&.match?(/^[A-Z]+$/)
+                  result += " AMD #{id.amendment_number}"
+                else
+                  result += " AMD#{id.amendment_number}"
+                end
               end
+            elsif id.is_a?(Corrigendum)
+              sep = id.respond_to?(:separator) && id.separator ? id.separator : "+"
+              result += "#{sep}C"
+              result += id.corrigendum_number.to_s if id.corrigendum_number
+              result += ":#{id.corrigendum_year}" if id.corrigendum_year
+            else
+              result += id.to_s
             end
-          end.join
+          end
 
-          # Add suffixes AFTER supplements
-          result += " ExComm" if identifiers.first&.excomm
-          result += " PDF" if identifiers.first&.pdf
-          result += " - TC" if identifiers.first&.tc
+          # Add suffixes from base identifier AFTER supplements
+          if base_id.respond_to?(:expert_commentary) && base_id.expert_commentary
+            if base_id.respond_to?(:expert_commentary_topic) && base_id.expert_commentary_topic
+              result += " ExComm (#{base_id.expert_commentary_topic})"
+            else
+              result += " ExComm"
+            end
+          end
+          result += " - TC" if base_id.respond_to?(:tracked_changes) && base_id.tracked_changes
 
-          # Translation
-          if identifiers.first&.translation
-            result += " (#{identifiers.first.translation})"
+          # Translation - preserve the "version" or "Translation" suffix if present
+          if base_id.respond_to?(:translation_lang) && base_id.translation_lang
+            if base_id.respond_to?(:translation_suffix_type) && base_id.translation_suffix_type == "version"
+              result += " (#{base_id.translation_lang} version)"
+            elsif base_id.respond_to?(:translation_suffix_type) && base_id.translation_suffix_type == "Translation"
+              result += " (#{base_id.translation_lang} Translation)"
+            else
+              result += " (#{base_id.translation_lang})"
+            end
+          elsif base_id.respond_to?(:translation_upper) && base_id.translation_upper
+            if base_id.respond_to?(:translation_suffix_type) && base_id.translation_suffix_type == "Translation"
+              result += " (#{base_id.translation_upper} Translation)"
+            else
+              result += " (#{base_id.translation_upper})"
+            end
+          end
+
+          # Reaffirmation notation like (R2004)
+          if base_id.respond_to?(:reaffirmation_year) && base_id.reaffirmation_year
+            result += " (R#{base_id.reaffirmation_year})"
           end
 
           result
+        end
+
+        def to_urn
+          base = identifiers&.first
+          return nil unless base
+
+          urn = base.to_urn if base.respond_to?(:to_urn)
+          return urn unless urn
+
+          # Append supplement info to URN
+          identifiers[1..].each do |id|
+            if id.is_a?(Amendment)
+              urn += ":amd:#{id.amendment_number}"
+              urn += ":#{id.amendment_year}" if id.amendment_year
+            elsif id.is_a?(Corrigendum)
+              urn += ":cor:#{id.corrigendum_number}"
+              urn += ":#{id.corrigendum_year}" if id.corrigendum_year
+            end
+          end
+          urn
         end
 
         # Delegate to first identifier (base document)
@@ -55,43 +117,23 @@ module PubidNew
         end
 
         def year
-          identifiers&.first&.year
+          identifiers&.first&.year if identifiers&.first.respond_to?(:year)
+        end
+
+        def date
+          identifiers&.first&.date if identifiers&.first.respond_to?(:date)
         end
 
         def parts
-          identifiers&.first&.parts
+          identifiers&.first&.parts if identifiers&.first.respond_to?(:parts)
+        end
+
+        def part
+          identifiers&.first&.part if identifiers&.first.respond_to?(:part)
         end
 
         def type
-          identifiers&.first&.type
-        end
-
-        private
-
-        def render_base_without_suffixes(base_id)
-          # Render base identifier but skip excomm, pdf, tc
-          result = ""
-
-          if base_id.national_annex
-            result += "NA to "
-          end
-
-          result += base_id.publisher.to_s
-
-          if base_id.adopted_identifier
-            result += " #{base_id.adopted_identifier.to_s}"
-          else
-            result += " #{base_id.adopted_org}" if base_id.adopted_org
-            result += " #{base_id.adopted_type}" if base_id.adopted_type
-            result += " #{base_id.number}" if base_id.number
-            result += "/#{base_id.collection_number}" if base_id.collection_number
-            result += base_id.parts.map { |p| "-#{p}" }.join if base_id.parts&.any?
-            result += " v#{base_id.version}" if base_id.version
-            result += ":#{base_id.year}" if base_id.year
-            result += "-#{base_id.month}" if base_id.month
-          end
-
-          result
+          identifiers&.first&.type if identifiers&.first.respond_to?(:type)
         end
       end
     end

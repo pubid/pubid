@@ -16,8 +16,8 @@ def gem_to_namespace(gem_name)
 end
 
 # Helper to run command in gem directory
-def in_gem_dir(gem_name, &block)
-  Dir.chdir("gems/#{gem_name}", &block)
+def in_gem_dir(gem_name, &)
+  Dir.chdir("gems/#{gem_name}", &)
 end
 
 # Define tasks for each gem
@@ -245,7 +245,7 @@ namespace :release do
 
   desc "Show release status for the monorepo"
   task :status do
-    master_version = IO.read('VERSION').strip
+    master_version = IO.read("VERSION").strip
 
     puts "Release Status Summary"
     puts "======================"
@@ -282,7 +282,7 @@ namespace :release do
               all_synced = false
               sync_issues << "#{gem_name}: #{gem_version} (expected #{master_version})"
             end
-          rescue StandardError => e
+          rescue StandardError
             all_synced = false
             sync_issues << "#{gem_name}: Error reading version"
           end
@@ -347,7 +347,7 @@ namespace :release do
 end
 
 def get_master_version
-  IO.read('VERSION').strip
+  IO.read("VERSION").strip
 end
 
 namespace :version do
@@ -433,7 +433,7 @@ namespace :version do
 
   desc "Sync master version to all gem version files and dependencies"
   task :sync do
-    master_version = IO.read('VERSION').strip
+    master_version = IO.read("VERSION").strip
     puts "Syncing master version #{master_version} to all gems..."
 
     # Update version files
@@ -500,7 +500,7 @@ namespace :version do
   end
 
   desc "Bump version and sync to all gems"
-  task :bump, [:type] do |t, args|
+  task :bump, [:type] do |_t, args|
     bump_type = args[:type] || "patch"
     unless %w[major minor patch].include?(bump_type)
       puts "Error: bump type must be major, minor, or patch"
@@ -533,6 +533,136 @@ end
 
 # Default task
 task default: ["test:all", "test:integration"]
+
+# Validation tasks for V2 implementations
+namespace :validation do
+  desc "Run classification for all V2 flavors"
+  task :classify_all do
+    puts "Running classification for all V2 flavors..."
+    puts
+    sh "cd spec/fixtures && ruby run_classify.rb all"
+  end
+
+  desc "Run classification for a specific flavor"
+  task :classify, [:flavor] do |_t, args|
+    flavor = args[:flavor] || raise("Usage: rake validation:classify[flavor]")
+    sh "cd spec/fixtures && ruby run_classify.rb #{flavor}"
+  end
+
+  desc "Show validation summary for all flavors"
+  task :report do
+    require_relative "spec/fixtures/classify_fixtures"
+    require_relative "lib/pubid_new"
+
+    # All V2 flavors with SUMMARY.txt
+    results = []
+
+    Dir.glob("spec/fixtures/*/SUMMARY.txt").sort.each do |summary_file|
+      flavor = File.basename(File.dirname(summary_file))
+
+      # Read SUMMARY.txt to extract stats
+      content = File.read(summary_file)
+
+      if content =~ /Total: (\d+)/
+        total = $1.to_i
+      else
+        next
+      end
+
+      if content =~ /Pass: (\d+) \(([\d.]+)%\)/
+        pass = $1.to_i
+        percentage = $2.to_f
+      else
+        next
+      end
+
+      fail = if content =~ /Fail: (\d+)/
+               $1.to_i
+             else
+               total - pass
+             end
+
+      results << {
+        flavor: flavor,
+        pass: pass,
+        fail: fail,
+        total: total,
+        percentage: percentage,
+      }
+    end
+
+    # Sort by percentage descending, then by flavor name
+    results.sort_by! { |r| [-r[:percentage], r[:flavor]] }
+
+    # Display pretty report
+    puts
+    puts "=" * 85
+    puts " " * 22 + "PubID V2 Validation Report"
+    puts "=" * 85
+    puts
+    puts "Flavor".ljust(12) + "Pass".rjust(10) + "Fail".rjust(8) + "Total".rjust(10) + "Percentage".rjust(15) + "  Status"
+    puts "-" * 85
+
+    results.each do |r|
+      status = if r[:percentage] == 100.0
+                 "🎉 Perfect"
+               elsif r[:percentage] >= 99.0
+                 "✨ Excellent"
+               elsif r[:percentage] >= 95.0
+                 "✅ Very Good"
+               elsif r[:percentage] >= 90.0
+                 "👍 Good"
+               elsif r[:percentage] >= 85.0
+                 "📈 Enhanced"
+               else
+                 "⚠️  Partial"
+               end
+
+      puts r[:flavor].upcase.ljust(12) +
+        r[:pass].to_s.rjust(10) +
+        r[:fail].to_s.rjust(8) +
+        r[:total].to_s.rjust(10) +
+        "#{r[:percentage]}%".rjust(15) +
+        "  #{status}"
+    end
+
+    puts "-" * 85
+    total_pass = results.sum { |r| r[:pass] }
+    total_fail = results.sum { |r| r[:fail] }
+    total_all = results.sum { |r| r[:total] }
+    overall_pct = ((total_pass.to_f / total_all) * 100).round(2)
+
+    puts "TOTAL".ljust(12) +
+      total_pass.to_s.rjust(10) +
+      total_fail.to_s.rjust(8) +
+      total_all.to_s.rjust(10) +
+      "#{overall_pct}%".rjust(15)
+    puts "=" * 85
+    puts
+    puts "Flavors validated: #{results.length}"
+    puts "Perfect (100%): #{results.count { |r| r[:percentage] == 100.0 }}"
+    puts "Excellent (99%+): #{results.count do |r|
+      r[:percentage] >= 99.0 && r[:percentage] < 100.0
+    end}"
+    puts "Good (90%+): #{results.count do |r|
+      r[:percentage] >= 90.0 && r[:percentage] < 99.0
+    end}"
+    puts
+    puts "Legend:"
+    puts "  🎉 Perfect:   100%     - All identifiers validated"
+    puts "  ✨ Excellent: 99-100%  - Production excellent quality"
+    puts "  ✅ Very Good: 95-99%   - Production ready"
+    puts "  👍 Good:      90-95%   - High quality"
+    puts "  📈 Enhanced:  85-90%   - Enhanced implementation"
+    puts "  ⚠️  Partial:   <85%     - Needs enhancement"
+    puts
+    puts "Commands:"
+    puts "  rake validation:classify_all     - Classify all flavors"
+    puts "  rake validation:classify[flavor] - Classify specific flavor"
+    puts "  rake validation:report           - Show this report"
+    puts
+  end
+end
 
 # Convenience tasks
 task test: "test:all"

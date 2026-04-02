@@ -1,0 +1,26 @@
+Flavor: IEC
+Classified: 2026-01-24 06:53:37
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 12456
+Pass: 12298 (98.73%)
+Fail: 158 (1.27%)
+
+BY CLASS
+----------------------------------------------------------------------
+amendment                                Pass: 679/679 (100.0%)
+corrigendum                              Pass: 194/195 (99.49%)
+fragment_identifier                      Pass: 17/17 (100.0%)
+guide                                    Pass: 57/58 (98.28%)
+international_standard                   Pass: 2542/2698 (94.22%)
+interpretation_sheet                     Pass: 120/120 (100.0%)
+publicly_available_specification         Pass: 12/12 (100.0%)
+sheet_identifier                         Pass: 6/6 (100.0%)
+systems_reference_document               Pass: 21/21 (100.0%)
+technical_report                         Pass: 1346/1346 (100.0%)
+technical_specification                  Pass: 803/803 (100.0%)
+test_report_form                         Pass: 2180/2180 (100.0%)
+vap_identifier                           Pass: 1971/1971 (100.0%)
+working_document                         Pass: 2350/2350 (100.0%)

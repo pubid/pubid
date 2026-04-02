@@ -5,31 +5,31 @@ require "lutaml/model"
 module PubidNew
   module Nist
     module Components
-      # NIST document code (series + number with optional revision)
-      # Handles formats like:
-      #   IR 73-101      - series IR, number 73-101
-      #   SP 800-53r5    - series SP, number 800-53, revision r5
-      #   TN 1234        - series TN, number 1234
+      # Code component for NIST identifiers
+      # Handles number codes like series, volume, etc.
       class Code < Lutaml::Model::Serializable
-        attribute :series, :string           # IR, SP, TN, HB, FIPS, etc.
-        attribute :number, :string           # Main number
-        attribute :part, :string             # Part number after dash
-        attribute :revision, :string         # Revision like r5, e2, etc.
-
-        def initialize(series: nil, number: nil, part: nil, revision: nil)
-          super()
-          self.series = series
-          self.number = number
-          self.part = part
-          self.revision = revision
-        end
+        attribute :number, :string
+        attribute :subpart, :string
 
         def to_s
-          result = series.to_s
-          result += " #{number}"
-          result += "-#{part}" if part
-          result += revision if revision
+          result = number.to_s
+          result += ".#{subpart}" if subpart
           result
+        end
+
+        # Alias for compatibility
+        def value
+          to_s
+        end
+
+        # Backward compatibility: extract part from compound numbers like "140-2"
+        # Returns the part number if the value contains a dash, nil otherwise
+        def part
+          return nil unless number && number.include?('-')
+          # Split by last dash to handle patterns like "4-4" (just number-part)
+          # and "4-M-5" (which would return "M-5" as part)
+          parts = number.to_s.split('-')
+          parts.last if parts.length > 1
         end
       end
     end

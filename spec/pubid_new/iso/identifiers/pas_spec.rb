@@ -3,20 +3,20 @@ require "spec_helper"
 RSpec.describe PubidNew::Iso::Identifiers::Pas do
   subject { described_class }
 
-  xdescribe "parse identifiers from examples" do
+  describe "parse identifiers from examples" do
     shared_examples "parse identifiers from file" do
       it "parse identifiers from file" do
         f = open("spec/fixtures/#{examples_file}")
         f.readlines.each do |pub_id|
-          next if pub_id.match?("^#")
+          next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(subject).to parse(pub_id.split("#").first.strip.chomp)
+          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
 
     context "parses identifiers from iso-pas.txt" do
-      let(:examples_file) { "iso/iso-pas.txt" }
+      let(:examples_file) { "iso/identifiers/pass/pas.txt" }
 
       it_behaves_like "parse identifiers from file"
     end
@@ -27,11 +27,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
     # ISO/PAS 5643:2021
     describe "ISO/PAS 5643:2021" do
       subject { "ISO/PAS 5643:2021" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:pas:5643" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -39,7 +39,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       end
 
       it "parses part" do
-        expect(parsed.part).to be_nil
+        expect(parsed.part&.value).to be_nil
       end
 
       it "parses date" do
@@ -51,18 +51,18 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("pas")
+        expect(parsed.typed_stage.type_code).to eq("pas")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("PAS")
+        expect(parsed.typed_stage.abbr.first).to eq("PAS")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -73,11 +73,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
     # ISO/PAS 23678-3
     describe "ISO/PAS 23678-3" do
       subject { "ISO/PAS 23678-3" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:pas:23678:-3" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -97,18 +97,18 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       end
 
       it "provides type code" do
-        expect(parsed.type.type_code).to eq("pas")
+        expect(parsed.typed_stage.type_code).to eq("pas")
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("published")
+        expect(parsed.typed_stage.stage_code).to eq("published")
       end
 
       it "provides typed_stage with abbreviation" do
-        expect(parsed.typed_stage.abbreviation).to eq("PAS")
+        expect(parsed.typed_stage.abbr.first).to eq("PAS")
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -119,11 +119,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
     # ISO/PAS 17208-1:2012
     describe "ISO/PAS 17208-1:2012" do
       subject { "ISO/PAS 17208-1:2012" }
-      let(:parsed) { described_class.parse(subject) }
+      let(:parsed) { PubidNew::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:pas:17208:-1" }
 
       it "parses publisher" do
-        expect(parsed.publisher.body).to eq("ISO")
+        expect(parsed.publisher.publisher).to eq("ISO")
       end
 
       it "parses number" do
@@ -142,7 +142,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         expect(parsed.to_s).to eq(subject)
       end
 
-      xit "generates urn" do
+      it "generates urn" do
         expect(parsed.to_urn).to eq(urn)
       end
     end
@@ -154,15 +154,15 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/SAE PAS 22736:2021
       describe "ISO/SAE PAS 22736:2021" do
         subject { "ISO/SAE PAS 22736:2021" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-sae:pas:22736" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.copublishers.first.body).to eq("SAE")
+          expect(parsed.publisher.copublisher.first).to eq("SAE")
         end
 
         it "parses number" do
@@ -177,7 +177,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -190,11 +190,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/AWI PAS 24499
       describe "ISO/AWI PAS 24499" do
         subject { "ISO/AWI PAS 24499" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:24499:stage-10.99" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -202,14 +202,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("awi")
+          expect(parsed.typed_stage.stage_code).to eq("awi")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -217,11 +217,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/WD PAS 34507
       describe "ISO/WD PAS 34507" do
         subject { "ISO/WD PAS 34507" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:34507:stage-20.20" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -229,14 +229,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("wd")
+          expect(parsed.typed_stage.stage_code).to eq("wd")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -246,11 +246,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/CD PAS 22399
       describe "ISO/CD PAS 22399" do
         subject { "ISO/CD PAS 22399" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:22399:stage-30.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -258,14 +258,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("cd")
+          expect(parsed.typed_stage.stage_code).to eq("cd")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -275,11 +275,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/DPAS 45007
       describe "ISO/DPAS 45007" do
         subject { "ISO/DPAS 45007" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:45007:stage-40.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -287,14 +287,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("dpas")
+          expect(parsed.typed_stage.stage_code).to eq("dpas")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -302,12 +302,12 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/DPAS 5643:2021(E)
       describe "ISO/DPAS 5643:2021(E)" do
         subject { "ISO/DPAS 5643:2021(E)" }
-        let(:parsed) { described_class.parse(subject) }
-        let(:normalized) { "ISO/DPAS 5643:2021(en)" }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:normalized) { "ISO/DPAS 5643:2021(E)" }  # V2 preserves original format
         let(:urn) { "urn:iso:std:iso:pas:5643:stage-40.00:en" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -319,14 +319,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("dpas")
+          expect(parsed.typed_stage.stage_code).to eq("dpas")
         end
 
         it "normalizes language" do
           expect(parsed.to_s).to eq(normalized)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -334,11 +334,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/DPAS 5474-6
       describe "ISO/DPAS 5474-6" do
         subject { "ISO/DPAS 5474-6" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:5474:-6:stage-40.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -350,14 +350,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("dpas")
+          expect(parsed.typed_stage.stage_code).to eq("dpas")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -367,11 +367,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/PRF PAS 22596
       describe "ISO/PRF PAS 22596" do
         subject { "ISO/PRF PAS 22596" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:22596:stage-60.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -379,14 +379,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("prf")
+          expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -394,11 +394,11 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/PRF PAS 5643:2021
       describe "ISO/PRF PAS 5643:2021" do
         subject { "ISO/PRF PAS 5643:2021" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:5643:stage-60.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses number" do
@@ -410,14 +410,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("prf")
+          expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end
@@ -425,15 +425,15 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
       # ISO/SAE PRF PAS 22736:2021
       describe "ISO/SAE PRF PAS 22736:2021" do
         subject { "ISO/SAE PRF PAS 22736:2021" }
-        let(:parsed) { described_class.parse(subject) }
+        let(:parsed) { PubidNew::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-sae:pas:22736:stage-60.00" }
 
         it "parses publisher" do
-          expect(parsed.publisher.body).to eq("ISO")
+          expect(parsed.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.copublishers.first.body).to eq("SAE")
+          expect(parsed.publisher.copublisher.first).to eq("SAE")
         end
 
         it "parses number" do
@@ -445,14 +445,14 @@ RSpec.describe PubidNew::Iso::Identifiers::Pas do
         end
 
         it "parses stage" do
-          expect(parsed.stage.stage_code).to eq("prf")
+          expect(parsed.typed_stage.stage_code).to eq("prf")
         end
 
         it "round-trips" do
           expect(parsed.to_s).to eq(subject)
         end
 
-        xit "generates urn" do
+        it "generates urn" do
           expect(parsed.to_urn).to eq(urn)
         end
       end

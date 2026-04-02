@@ -1,12 +1,13 @@
 require "lutaml/model"
+# frozen_string_literal: true
 
 module PubidNew
   module Plateau
     class Scheme < Lutaml::Model::Serializable
       attribute :type, :string
       attribute :number, :integer
-      attribute :annex, :integer, default: -> { nil }
-      attribute :edition, :string, default: -> { nil }
+      attribute :annex, :integer, default: -> {}
+      attribute :edition, :string, default: -> {}
 
       def to_s
         result = "PLATEAU #{type_string} #{formatted_number}"

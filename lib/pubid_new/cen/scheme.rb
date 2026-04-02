@@ -1,68 +1,166 @@
-require_relative "identifiers/european_norm"
-require_relative "identifiers/technical_specification"
-require_relative "identifiers/technical_report"
-require_relative "identifiers/cen_workshop_agreement"
-require_relative "identifiers/harmonization_document"
-require_relative "identifiers/guide"
-require_relative "identifiers/amendment"
-require_relative "identifiers/corrigendum"
+# frozen_string_literal: true
+
+require_relative "../components/typed_stage"
+require_relative "../components/stage"
+require_relative "../components/type"
 
 module PubidNew
   module Cen
     class Scheme
-      class << self
-        def identifiers
-          [
-            Identifiers::EuropeanNorm,
-            Identifiers::TechnicalSpecification,
-            Identifiers::TechnicalReport,
-            Identifiers::CenWorkshopAgreement,
-            Identifiers::HarmonizationDocument,
-            Identifiers::Guide,
-          ]
-        end
+      # TYPED_STAGES_REGISTRY for native CEN types
+      TYPED_STAGES_REGISTRY = [
+        # European Norm (EN)
+        PubidNew::Components::TypedStage.new(
+          code: :puben,
+          stage_code: :published,
+          type_code: :en,
+          abbr: ["EN"],
+          name: "European Norm",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+        PubidNew::Components::TypedStage.new(
+          code: :pren,
+          stage_code: :proposal,
+          type_code: :en,
+          abbr: ["prEN"],
+          name: "Proposal European Norm",
+          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+        ),
+        PubidNew::Components::TypedStage.new(
+          code: :fpren,
+          stage_code: :final_proposal,
+          type_code: :en,
+          abbr: ["FprEN"],
+          name: "Final Proposal European Norm",
+          harmonized_stages: %w[40.00 40.20 40.60 40.92 40.98 40.99],
+        ),
 
-        def supplement_identifiers
-          [
-            Identifiers::Amendment,
-            Identifiers::Corrigendum,
-          ]
-        end
+        # Technical Specification (TS)
+        PubidNew::Components::TypedStage.new(
+          code: :pubts,
+          stage_code: :published,
+          type_code: :ts,
+          abbr: ["TS"],
+          name: "Technical Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+        PubidNew::Components::TypedStage.new(
+          code: :prts,
+          stage_code: :proposal,
+          type_code: :ts,
+          abbr: ["prTS"],
+          name: "Proposal Technical Specification",
+          harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+        ),
 
-        def typed_stages
-          identifiers.flat_map { |klass| klass::TYPED_STAGES }
-        end
+        # Technical Report (TR)
+        PubidNew::Components::TypedStage.new(
+          code: :pubtr,
+          stage_code: :published,
+          type_code: :tr,
+          abbr: ["TR"],
+          name: "Technical Report",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        def supplement_typed_stages
-          supplement_identifiers.flat_map { |klass| klass::TYPED_STAGES }
-        end
+        # CEN Workshop Agreement (CWA)
+        PubidNew::Components::TypedStage.new(
+          code: :pubcwa,
+          stage_code: :published,
+          type_code: :cwa,
+          abbr: ["CWA"],
+          name: "CEN Workshop Agreement",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        def locate_typed_stage_by_abbr(abbr)
-          abbr = "" if abbr.nil?
+        # Guide
+        PubidNew::Components::TypedStage.new(
+          code: :pubguide,
+          stage_code: :published,
+          type_code: :guide,
+          abbr: ["Guide"],
+          name: "Guide",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-          typed_stage = (typed_stages + supplement_typed_stages).detect do |ts|
-            ts.abbr.include?(abbr)
-          end
+        # Harmonization Document (HD)
+        PubidNew::Components::TypedStage.new(
+          code: :pubhd,
+          stage_code: :published,
+          type_code: :hd,
+          abbr: ["HD"],
+          name: "Harmonization Document",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-          unless typed_stage
-            raise ArgumentError,
-                  "Unknown type abbreviation: '#{abbr}'"
-          end
+        # European Specification (ES)
+        PubidNew::Components::TypedStage.new(
+          code: :pubes,
+          stage_code: :published,
+          type_code: :es,
+          abbr: ["ES"],
+          name: "European Specification",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-          typed_stage
-        end
+        # CEN Report (CR)
+        PubidNew::Components::TypedStage.new(
+          code: :pubcr,
+          stage_code: :published,
+          type_code: :cr,
+          abbr: ["CR"],
+          name: "CEN Report",
+          harmonized_stages: %w[60.00 60.60],
+        ),
 
-        def locate_identifier_klass_by_type_code(type_code)
-          identifier_klass = (identifiers + supplement_identifiers).detect do |klass|
-            klass.type[:key].to_s == type_code.to_s
-          end
+        # European Prestandard (ENV)
+        PubidNew::Components::TypedStage.new(
+          code: :pubenv,
+          stage_code: :published,
+          type_code: :env,
+          abbr: ["ENV"],
+          name: "European Prestandard",
+          harmonized_stages: %w[60.00 60.60],
+        ),
+      ].freeze
 
-          unless identifier_klass
-            raise ArgumentError,
-                  "Unknown type code: #{type_code}"
-          end
+      # Map type codes to identifier classes
+      IDENTIFIER_CLASS_MAP = {
+        en: "Identifiers::EuropeanNorm",
+        ts: "Identifiers::TechnicalSpecification",
+        tr: "Identifiers::TechnicalReport",
+        cwa: "Identifiers::CenWorkshopAgreement",
+        guide: "Identifiers::Guide",
+        hd: "Identifiers::HarmonizationDocument",
+        es: "Identifiers::EuropeanSpecification",
+        cr: "Identifiers::CenReport",
+        env: "Identifiers::EuropeanPrestandard",
+      }.freeze
 
-          identifier_klass
+      # Default typed stage for when no match is found
+      DEFAULT_TYPED_STAGE = PubidNew::Components::TypedStage.new(
+        code: :puben,
+        stage_code: :published,
+        type_code: :en,
+        abbr: ["EN"],
+        name: "European Norm",
+        harmonized_stages: %w[60.00 60.60],
+      ).freeze
+
+      def locate_typed_stage_by_abbr(abbr)
+        abbr_str = abbr.to_s.strip
+        TYPED_STAGES_REGISTRY.find do |ts|
+          ts.abbr.include?(abbr_str)
+        end || DEFAULT_TYPED_STAGE
+      end
+
+      def locate_identifier_klass_by_type_code(type_code)
+        class_name = IDENTIFIER_CLASS_MAP[type_code.to_sym]
+        return Identifiers::EuropeanNorm unless class_name
+
+        # Convert string to actual class
+        class_name.split("::").reduce(PubidNew::Cen) do |mod, name|
+          mod.const_get(name)
         end
       end
     end

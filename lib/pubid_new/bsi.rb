@@ -1,12 +1,22 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+require_relative "../pubid_new"
+require_relative "bsi/scheme"
+require_relative "bsi/parser"
+require_relative "bsi/builder"
 require_relative "bsi/identifier"
 
 module PubidNew
   module Bsi
-    def self.parse(identifier)
-      Identifier.parse(identifier)
+    def self.parse(string)
+      Identifier.parse(string)
+    end
+
+    def self.transform(data)
+      Builder.build(data)
     end
   end
 end
+
+# Register Ubsi flavor with the registry
+PubidNew::Registry.register(:bsi, PubidNew::Bsi)

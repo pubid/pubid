@@ -1,4 +1,5 @@
 require "lutaml/model"
+# frozen_string_literal: true
 
 module PubidNew
   module Bsi
@@ -6,7 +7,7 @@ module PubidNew
     class Supplement < Lutaml::Model::Serializable
       attribute :type, :string
       attribute :number, :string
-      attribute :year, :string, default: -> { nil }
+      attribute :year, :string, default: -> {}
 
       def to_s
         prefix = type == "amendment" ? "A" : "C"
@@ -19,8 +20,8 @@ module PubidNew
     # National Annex model
     class NationalAnnex < Lutaml::Model::Serializable
       attribute :type, :string
-      attribute :supplement, Supplement, default: -> { nil }
-      attribute :base, Identifier, default: -> { nil }
+      attribute :supplement, Supplement, default: -> {}
+      attribute :base, Identifier, default: -> {}
 
       def to_s
         result = type
@@ -34,7 +35,7 @@ module PubidNew
     class Collection < Lutaml::Model::Serializable
       attribute :type, :string
       attribute :numbers, :string, collection: true
-      attribute :year, :string, default: -> { nil }
+      attribute :year, :string, default: -> {}
       attribute :supplements, Supplement, collection: true, default: -> { [] }
 
       def to_s
@@ -57,19 +58,20 @@ module PubidNew
     # Main BSI Identifier model
     class Identifier < Lutaml::Model::Serializable
       attribute :type, :string, default: -> { "BS" }
-      attribute :number, :string, default: -> { nil }
-      attribute :part, :string, default: -> { nil }
-      attribute :second_number, :string, default: -> { nil }
-      attribute :year, :string, default: -> { nil }
-      attribute :month, :string, default: -> { nil }
-      attribute :edition, :string, default: -> { nil }
+      attribute :number, :string, default: -> {}
+      attribute :part, :string, default: -> {}
+      attribute :second_number, :string, default: -> {}
+      attribute :year, :string, default: -> {}
+      attribute :month, :string, default: -> {}
+      attribute :edition, :string, default: -> {}
       attribute :supplements, Supplement, collection: true, default: -> { [] }
-      attribute :adopted, :string, default: -> { nil }  # Will store adopted identifier object
+      attribute :adopted, :string, default: -> {
+      } # Will store adopted identifier object
       attribute :expert_commentary, :boolean, default: -> { false }
       attribute :tracked_changes, :boolean, default: -> { false }
-      attribute :translation, :string, default: -> { nil }
+      attribute :translation, :string, default: -> {}
       attribute :pdf, :boolean, default: -> { false }
-      attribute :national_annex, NationalAnnex, default: -> { nil }
+      attribute :national_annex, NationalAnnex, default: -> {}
 
       def to_s
         # Handle national annex
@@ -86,7 +88,7 @@ module PubidNew
             year: year,
             month: month,
             supplements: supplements,
-            adopted: adopted
+            adopted: adopted,
           )
           return "#{base_id} ExComm"
         end
@@ -104,14 +106,14 @@ module PubidNew
 
       def render_national_annex
         result = "NA"
-        
+
         # Add NA supplements
         if national_annex.supplement
           result += national_annex.supplement.to_s
         end
-        
+
         result += " to "
-        
+
         # Render base identifier
         base_id = self.class.new(
           type: type,
@@ -120,36 +122,36 @@ module PubidNew
           year: year,
           month: month,
           supplements: supplements,
-          adopted: adopted
+          adopted: adopted,
         )
         result += base_id.to_s
-        
+
         result
       end
 
       def render_collection
         first_num = number
         second_num = second_number
-        
+
         result = "#{type} #{first_num}/#{second_num}"
         result += ":#{year}" if year
         supplements.each { |s| result += s.to_s }
-        
+
         result
       end
 
       def render_identifier
-        result = ""
-        
+        ""
+
         # Type prefix
-        if type == "BSI Flex"
-          result = "BSI Flex"
-        else
-          result = type
-        end
-        
+        result = if type == "BSI Flex"
+                   "BSI Flex"
+                 else
+                   type
+                 end
+
         result += " "
-        
+
         # Adopted document or number
         if adopted
           # For adopted documents, render the adopted identifier
@@ -165,28 +167,28 @@ module PubidNew
           result += number.to_s if number
           result += "-#{part}" if part
         end
-        
+
         # Edition (for Flex) - must come before year-month
         result += " v#{edition}" if edition
-        
+
         # Year and month
         if year
           result += ":#{year}"
           result += "-#{month}" if month
         end
-        
+
         # Supplements
         supplements.each { |s| result += s.to_s }
-        
+
         # Tracked changes
         result += " - TC" if tracked_changes
-        
+
         # Translation
         result += " (#{translation})" if translation
-        
+
         # PDF marker
         result += " PDF" if pdf
-        
+
         result
       end
     end

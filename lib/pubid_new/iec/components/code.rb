@@ -1,12 +1,13 @@
 require "lutaml/model"
+# frozen_string_literal: true
 
 module PubidNew
   module Iec
     module Components
       class Code < Lutaml::Model::Serializable
-        attribute :prefix, :string, default: -> { nil }
+        attribute :prefix, :string, default: -> {}
         attribute :number, :string
-        attribute :part, :string, default: -> { nil }
+        attribute :part, :string, default: -> {}
 
         def initialize(value: nil, number: nil, prefix: nil, part: nil)
           # Support both 'value' (for convenience) and 'number' (explicit)
@@ -33,7 +34,7 @@ module PubidNew
         # - "TR 61000" (with prefix)
         # - "TS 62443" (with prefix)
         def self.parse(string)
-          parts = string.strip.split(' ', 2)
+          parts = string.strip.split(" ", 2)
 
           if parts.size == 2
             # Has prefix: "TR 61000-1-2"
@@ -46,7 +47,7 @@ module PubidNew
           end
 
           # Split number and part
-          number_parts = number_part.split('-', 2)
+          number_parts = number_part.split("-", 2)
           number = number_parts[0]
           part = number_parts[1]
 

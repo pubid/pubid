@@ -8,7 +8,7 @@ module PubidNew
     def self.parse(identifier)
       parser = Parser.new
       builder = Builder.new(Scheme)
-      
+
       parsed = parser.parse(identifier)
       builder.build(parsed)
     end
@@ -17,7 +17,10 @@ end
 
 require_relative "ansi/identifier"
 require_relative "ansi/single_identifier"
-require_relative "ansi/identifiers/american_national_standard"
+require_relative "ansi/identifiers/standard"
 require_relative "ansi/scheme"
 require_relative "ansi/parser"
 require_relative "ansi/builder"
+
+# Register Uansi flavor with the registry
+PubidNew::Registry.register(:ansi, PubidNew::Ansi)

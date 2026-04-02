@@ -10,6 +10,11 @@ module PubidNew
         attribute :number, :string
         attribute :parts, :string, collection: true
 
+        # Alias for compatibility with rendering code
+        def value
+          number
+        end
+
         def to_s
           result = number.to_s
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
@@ -18,6 +23,7 @@ module PubidNew
 
         def ==(other)
           return false unless other.is_a?(Code)
+
           number == other.number && parts == other.parts
         end
       end

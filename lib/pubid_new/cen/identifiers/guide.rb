@@ -1,11 +1,12 @@
 require "lutaml/model"
+# frozen_string_literal: true
 require_relative "../single_identifier"
 
 module PubidNew
   module Cen
     module Identifiers
       class Guide < SingleIdentifier
-        attribute :type, Components::Type, default: -> { type[:key] }
+        attribute :type, Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           Components::TypedStage.new(

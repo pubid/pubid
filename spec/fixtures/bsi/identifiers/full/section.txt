@@ -1,0 +1,12 @@
+# SectionIdentifier
+DD 51:Section 0:1977
+DD 51:Section 1:1977
+DD 51:Section 2:1977
+DD 51:Section 3:1977
+DD 51:Section 4:1977
+DD 51:Section 5:1977
+DD 51:Section 6:1977
+DD 51:Section 7:1977
+BS 3224 Section B2:1970
+BS 3224 Section C1:1963
+BS 3224 Section D1:1960

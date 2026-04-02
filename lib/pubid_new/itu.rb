@@ -3,6 +3,7 @@
 require "lutaml/model"
 require_relative "components/date"
 require_relative "itu/identifier"
+require_relative "itu/scheme"
 
 module PubidNew
   module Itu
@@ -11,3 +12,6 @@ module PubidNew
     end
   end
 end
+
+# Register Uitu flavor with the registry
+PubidNew::Registry.register(:itu, PubidNew::Itu)

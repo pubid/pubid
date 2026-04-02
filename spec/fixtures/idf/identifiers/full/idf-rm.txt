@@ -1,0 +1,34 @@
+# IDF Reviewed Method Identifiers
+# Test fixture for ReviewedMethod class
+# Published Reviewed Methods (RM is used as type, no slash)
+IDF RM 254:2022
+IDF RM 233-1:2017
+IDF RM 200:2015
+IDF RM 180:2018
+# Proposed Work Item (PWI RM)
+IDF PWI RM 220:2023
+IDF PWI RM 240:2024
+# New Work Item (NP RM)
+IDF NP RM 260:2022
+IDF NP RM 190:2023
+# Approved Work Item (AWI RM)
+IDF AWI RM 270:2023
+IDF AWI RM 210:2024
+# Working Draft (WD RM)
+IDF WD RM 230:2022
+IDF WD RM 205:2023
+# Committee Draft (CD RM)
+IDF CD RM 215:2023
+IDF CD RM 185:2022
+# Proposed Draft (PDRM)
+IDF PDRM 195:2023
+IDF PDRM 175:2024
+# Draft (DRM)
+IDF DRM 165:2022
+IDF DRM 155:2023
+# Final Draft (FDRM)
+IDF FDRM 145:2022
+IDF FDRM 135:2023
+# Proof (PRF RM)
+IDF PRF RM 125:2023
+IDF PRF RM 115:2024

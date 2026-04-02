@@ -1,0 +1,21 @@
+Flavor: ASTM
+Classified: 2026-04-01 22:07:54
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 248
+Pass: 248 (100.0%)
+Fail: 0 (0.0%)
+
+BY CLASS
+----------------------------------------------------------------------
+adjunct                                  Pass: 4/4 (100.0%)
+data_series                              Pass: 33/33 (100.0%)
+iso_dual_published                       Pass: 5/5 (100.0%)
+manual                                   Pass: 74/74 (100.0%)
+monograph                                Pass: 11/11 (100.0%)
+research_report                          Pass: 59/59 (100.0%)
+standard                                 Pass: 47/47 (100.0%)
+technical_report                         Pass: 12/12 (100.0%)
+work_in_progress                         Pass: 3/3 (100.0%)

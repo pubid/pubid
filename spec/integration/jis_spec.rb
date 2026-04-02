@@ -43,38 +43,51 @@ RSpec.describe "JIS Integration" do
     context "technical reports" do
       include_examples "parses and renders correctly", "JIS TR Z 8301:2019"
       include_examples "parses and renders correctly", "JIS TR B 0035:2019"
-      include_examples "parses and renders correctly", "JIS/TR X 0005:1998", "JIS TR X 0005:1998"
-      include_examples "parses and renders correctly", "TR B 0035:2019", "JIS TR B 0035:2019"
+      include_examples "parses and renders correctly", "JIS/TR X 0005:1998",
+                       "JIS TR X 0005:1998"
+      include_examples "parses and renders correctly", "TR B 0035:2019",
+                       "JIS TR B 0035:2019"
     end
 
     context "technical specifications" do
       include_examples "parses and renders correctly", "JIS TS Z 8301:2019"
       include_examples "parses and renders correctly", "JIS TS Z 0030-1:2017"
-      include_examples "parses and renders correctly", "TS Z0030-1:2017", "JIS TS Z 0030-1:2017"
+      include_examples "parses and renders correctly", "TS Z0030-1:2017",
+                       "JIS TS Z 0030-1:2017"
     end
 
     context "amendments" do
-      include_examples "parses and renders correctly", "JIS A 0001:1999/AMD 1:2000"
-      include_examples "parses and renders correctly", "JIS X 0208:1997/AMENDMENT 1:2012", "JIS X 0208:1997/AMD 1:2012"
+      include_examples "parses and renders correctly",
+                       "JIS A 0001:1999/AMD 1:2000"
+      include_examples "parses and renders correctly",
+                       "JIS X 0208:1997/AMENDMENT 1:2012", "JIS X 0208:1997/AMD 1:2012"
     end
 
     context "explanations" do
       include_examples "parses and renders correctly", "JIS K 2151:2004/EXPL"
-      include_examples "parses and renders correctly", "JIS K 2249-4:2011/EXPL 4"
-      include_examples "parses and renders correctly", "JIS K 2249-4:2011/EXPLANATION 4", "JIS K 2249-4:2011/EXPL 4"
+      include_examples "parses and renders correctly",
+                       "JIS K 2249-4:2011/EXPL 4"
+      include_examples "parses and renders correctly",
+                       "JIS K 2249-4:2011/EXPLANATION 4", "JIS K 2249-4:2011/EXPL 4"
     end
 
     context "Japanese characters" do
-      include_examples "parses and renders correctly", "JIS　B　0001", "JIS B 0001"
-      include_examples "parses and renders correctly", "JIS C 61000ｰ3ｰ2", "JIS C 61000-3-2"
-      include_examples "parses and renders correctly", "JIS C 61000-3-2：2011", "JIS C 61000-3-2:2011"
-      include_examples "parses and renders correctly", "JISX0902-1:2019", "JIS X 0902-1:2019"
-      include_examples "parses and renders correctly", "JISX0836:2005", "JIS X 0836:2005"
+      include_examples "parses and renders correctly", "JIS　B　0001",
+                       "JIS B 0001"
+      include_examples "parses and renders correctly", "JIS C 61000ｰ3ｰ2",
+                       "JIS C 61000-3-2"
+      include_examples "parses and renders correctly", "JIS C 61000-3-2：2011",
+                       "JIS C 61000-3-2:2011"
+      include_examples "parses and renders correctly", "JISX0902-1:2019",
+                       "JIS X 0902-1:2019"
+      include_examples "parses and renders correctly", "JISX0836:2005",
+                       "JIS X 0836:2005"
     end
 
     context "without publisher prefix" do
       include_examples "parses and renders correctly", "B 0001", "JIS B 0001"
-      include_examples "parses and renders correctly", "A 0001:1999", "JIS A 0001:1999"
+      include_examples "parses and renders correctly", "A 0001:1999",
+                       "JIS A 0001:1999"
     end
   end
 
@@ -97,16 +110,17 @@ RSpec.describe "JIS Integration" do
 
   describe "parsing all fixtures" do
     it "parses all identifiers from jis-pubids.txt" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-jis/spec/fixtures/jis-pubids.txt")
+      fixture_file = File.join(__dir__,
+                               "../fixtures/jis/identifiers/full/international_standard.txt")
 
       File.readlines(fixture_file).each do |line|
         line = line.strip
         next if line.empty? || line.start_with?("#")
 
-        expect {
+        expect do
           identifier = PubidNew::Jis.parse(line)
           expect(identifier.to_s.upcase).to eq(line.upcase)
-        }.not_to raise_error, "Failed to parse: #{line}"
+        end.not_to raise_error, "Failed to parse: #{line}"
       end
     end
   end

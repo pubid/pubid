@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "../../serializable"
 require_relative "../components/code"
+require_relative "../urn_generator"
 
 module PubidNew
   module Jis
@@ -9,9 +11,18 @@ module PubidNew
       # Base class for all JIS identifiers
       # Provides common attributes and behavior
       class Base < Lutaml::Model::Serializable
+        include PubidNew::Serializable
+
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
+
         attribute :code, PubidNew::Jis::Components::Code
         attribute :year, :integer
-        attribute :language, :string  # "E" or "J"
+        attribute :language, :string # "E" or "J"
         attribute :all_parts, :boolean, default: -> { false }
 
         def initialize(code: nil, series: nil, number: nil, parts: nil,
@@ -22,7 +33,7 @@ module PubidNew
             @code = Components::Code.new(
               series: series,
               number: number,
-              parts: parts || []
+              parts: parts || [],
             )
           end
           @year = year
@@ -47,7 +58,7 @@ module PubidNew
           if all_parts? || other.all_parts?
             # Compare only series and number, ignore year, parts, all_parts
             return code.series == other.code.series &&
-                   code.number == other.code.number
+                code.number == other.code.number
           end
 
           # Normal full comparison

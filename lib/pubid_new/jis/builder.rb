@@ -37,7 +37,7 @@ module PubidNew
           code: code,
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
-          all_parts: data[:all_parts] ? true : false
+          all_parts: data[:all_parts] ? true : false,
         }
 
         # Determine identifier class from type
@@ -65,7 +65,7 @@ module PubidNew
         Identifiers::Amendment.new(
           base: base,
           number: amd_data[:amd_number].to_i,
-          year: amd_data[:amd_year].to_i
+          year: amd_data[:amd_year].to_i,
         )
       end
 
@@ -80,7 +80,7 @@ module PubidNew
         Identifiers::Explanation.new(
           base: base,
           number: expl_data[:expl_number]&.to_i,
-          year: base.year
+          year: base.year,
         )
       end
 
@@ -99,7 +99,7 @@ module PubidNew
           number: number,
           parts: parts,
           number_string: number_str,
-          part_strings: part_strings
+          part_strings: part_strings,
         )
       end
 

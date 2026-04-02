@@ -1,0 +1,70 @@
+## Standards
+
+# JointPublishedIdentifier: Jointly published identifier with ISO or IEC
+CIE ISO 10916:2024
+CIE ISO 11664-1:2019
+CIE ISO 11664-2:2022
+CIE ISO 11664-3:2019
+CIE ISO 11664-4:2019
+CIE ISO 11664-5:2016
+CIE ISO 11664-5:2024
+CIE ISO 11664-6:2014
+CIE ISO 11664-6:2022
+CIE ISO 17166:2019
+CIE ISO 19476:2014
+CIE ISO 20086:2019
+CIE ISO 23539:2023
+CIE ISO 23603:2024
+CIE ISO 28077:2016
+CIE ISO 28077:2024
+CIE ISO 8995-1:2025(en)
+CIE ISO 8995-3:2018
+CIE ISO TR 21783:2022(E)
+CIE ISO/CIE TR 3092:2023(E)
+CIE IEC 017.4-1987
+
+# DraftInternationalStandard: Draft International Standard of ISO
+CIE ISO DIS 23539:2021
+
+# CIE Standards
+## S means Standard
+## "/{...}" means language code: E=English, G=German, F=French
+## Style: legacy to_s: "0nnnn.pp-yyyy" means document number nnnn, part pp, year yyyy from 1900 to 2001
+## Style: current to_s: "0nnnn/pp:yyyy" means document number nnnn, part pp, year yyyy from 2001 to present
+## the 2001 ones are specially mixed and we need to remember.
+
+CIE S 004/E-2001
+CIE S 007/G-1998
+CIE S 009/G:2002
+CIE S 013/E:2003
+CIE S 014-3/E:2011
+!CIE S 014-4/E2007!CIE S 014-4/E:2007
+CIE S 014-5/E:2009
+CIE S 014-6/E:2013
+CIE S 015/E:2005
+CIE S 017/E:2011
+CIE S 017/E:2020
+CIE S 020/E:2007
+
+# IdenticalIdentifier: Identical identifier with ISO
+
+## 006.1 means iteration 1
+CIE S 006.1/1998 (ISO 16508:1999)
+CIE S 007/1998 (ISO 17166:1999)
+CIE S 008/E:2001 (ISO 8995-1:2002(E))
+CIE S 010/E:2004 (ISO 23539:2005)
+CIE S 011/E:2003 (ISO 15469:2004(E))
+CIE S 012/E:2004 (ISO 23603:2005(E))
+CIE S 014-1/E:2006 (ISO 10527:2007(E))
+CIE S 014-1/E:2006 (ISO 11664-1:2007(E))
+CIE S 014-2/E:2006 (ISO 10526:2007(E))
+CIE S 014-2/E:2006 (ISO 11664-2:2007(E))
+CIE S 014-3/E:2011 (ISO 11664-3:2012(E))
+CIE S 014-4/E:2007 (ISO 11664-4:2008)
+CIE S 014-5/E:2009 (ISO 11664-5:2009)
+CIE S 016/E:2005 (ISO 8995-3:2006(E))
+CIE S 019/E:2006 (ISO 28077:2006)
+CIE S 020/E:2007 (ISO 30061:2007(E))
+
+# DualPublishedIdentifier: Dual identifier with IEC
+CIE S 009:2002/IEC 62471:2006

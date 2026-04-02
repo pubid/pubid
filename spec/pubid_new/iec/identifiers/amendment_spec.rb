@@ -13,7 +13,7 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base_identifier.number.number).to eq("60038")
       end
 
       it "parses base identifier date" do
@@ -21,7 +21,7 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -37,7 +37,7 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq("IEC 60038:2009/AMD1:2011")
       end
     end
   end
@@ -52,11 +52,11 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base_identifier.number.number).to eq("60038")
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number.number).to eq("1")
       end
 
       it "provides type code" do
@@ -87,7 +87,7 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base_identifier.number.number).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -95,7 +95,7 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -103,7 +103,7 @@ RSpec.describe PubidNew::Iec::Identifiers::Amendment do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq("ISO/IEC 17025:2017/AMD1:2020")
       end
     end
   end

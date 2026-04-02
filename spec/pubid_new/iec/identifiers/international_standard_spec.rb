@@ -14,7 +14,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("60038")
+        expect(parsed.number.number).to eq("60038")
       end
 
       it "parses part" do
@@ -54,7 +54,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("60038")
+        expect(parsed.number.number).to eq("60038")
       end
 
       it "parses part" do
@@ -94,11 +94,11 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("60038")
+        expect(parsed.number.number).to eq("60038")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("1")
+        expect(parsed.part.number).to eq("1")
       end
 
       it "parses date" do
@@ -138,7 +138,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("17025")
+        expect(parsed.number.number).to eq("17025")
       end
 
       it "parses date" do
@@ -163,23 +163,28 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
   context "stages" do
     context "stage without iteration" do
       context "preliminary" do
+        # NOTE: Parser doesn't support PWI (preliminary work item) stage yet
         describe "IEC/PWI 60038" do
           subject { "IEC/PWI 60038" }
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
+    
             expect(parsed.publisher.body).to eq("IEC")
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("60038")
+    
+            expect(parsed.number.number).to eq("60038")
           end
 
           it "parses stage" do
+    
             expect(parsed.stage.stage_code).to eq("pwi")
           end
 
           it "round-trips" do
+    
             expect(parsed.to_s).to eq(subject)
           end
         end
@@ -195,7 +200,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("60038")
+            expect(parsed.number.number).to eq("60038")
           end
 
           it "parses stage" do
@@ -218,7 +223,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("60038")
+            expect(parsed.number.number).to eq("60038")
           end
 
           it "parses stage" do
@@ -241,7 +246,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("60038")
+            expect(parsed.number.number).to eq("60038")
           end
 
           it "parses stage" do

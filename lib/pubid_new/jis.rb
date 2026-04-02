@@ -2,6 +2,7 @@
 
 require "lutaml/model"
 require_relative "jis/identifier"
+require_relative "jis/scheme"
 
 module PubidNew
   module Jis
@@ -11,3 +12,6 @@ module PubidNew
     end
   end
 end
+
+# Register Ujis flavor with the registry
+PubidNew::Registry.register(:jis, PubidNew::Jis)

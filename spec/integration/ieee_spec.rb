@@ -63,7 +63,11 @@ RSpec.describe "IEEE identifiers" do
     it "parses IEEE P1234/D5, July 2019" do
       parsed = PubidNew::Ieee.parse("IEEE P1234/D5, July 2019")
 
-      expect(parsed.code.prefix).to eq("P")
+      # Should be a ProjectDraftIdentifier, not a StandardIdentifier
+      expect(parsed).to be_a(PubidNew::Ieee::Identifiers::ProjectDraftIdentifier)
+
+      # "P" is a project/draft stage indicator, NOT a code prefix
+      expect(parsed.code.prefix).to be_nil
       expect(parsed.code.number).to eq("1234")
       expect(parsed.draft).to be_a(PubidNew::Ieee::Components::Draft)
       expect(parsed.draft.version).to eq("5")
@@ -81,7 +85,9 @@ RSpec.describe "IEEE identifiers" do
   end
 
   describe "fixture file parsing" do
-    let(:fixture_file) { File.join(__dir__, "../../gems/pubid-ieee/spec/fixtures/pubid-parsed.txt") }
+    let(:fixture_file) do
+      File.join(__dir__, "../../archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt")
+    end
 
     it "parses all identifiers from fixture file", :slow do
       total = 0
@@ -96,14 +102,15 @@ RSpec.describe "IEEE identifiers" do
 
         begin
           parsed = PubidNew::Ieee.parse(identifier)
-          expect(parsed).to be_a(PubidNew::Ieee::Identifiers::Base)
+          # Accept both Identifiers::Base and Aiee::Identifier
+          expect(parsed).to satisfy { |id| id.is_a?(PubidNew::Ieee::Identifiers::Base) || id.is_a?(PubidNew::Ieee::Aiee::Identifier) }
 
           # Test round-trip by converting back to string
           output = parsed.to_s
           expect(output).to be_a(String)
           expect(output).not_to be_empty
           passed += 1
-        rescue => e
+        rescue StandardError
           failed << "Line #{index + 1}: #{identifier}"
         end
       end
@@ -111,6 +118,8 @@ RSpec.describe "IEEE identifiers" do
       pass_rate = (passed.to_f / total * 100).round(1)
       puts "\n\nIEEE Fixture Results: #{passed}/#{total} (#{pass_rate}%)"
       puts "Failed: #{failed.length}" if failed.any?
+      puts "\nFirst 20 failures:" if failed.any?
+      failed.first(20).each { |f| puts "  #{f}" } if failed.any?
 
       expect(pass_rate).to be >= 85.0
     end

@@ -26,8 +26,9 @@ RSpec.describe "CCSDS Integration" do
   end
 
   describe "parsing all fixtures" do
-    it "parses all active publications" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-ccsds/spec/fixtures/active-publications.txt")
+    it "parses all CCSDS identifiers from fixtures" do
+      fixture_file = File.join(__dir__,
+                               "../fixtures/ccsds/identifiers/full/international_standard.txt")
 
       File.readlines(fixture_file).each do |line|
         line = line.strip
@@ -36,27 +37,10 @@ RSpec.describe "CCSDS Integration" do
         # Strip metadata notes (anything after " - ")
         clean_line = line.split(" - ").first
 
-        expect {
-          identifier = PubidNew::Ccsds.parse(line)
+        expect do
+          identifier = PubidNew::Ccsds.parse(clean_line)
           expect(identifier.to_s).to eq(clean_line)
-        }.not_to raise_error, "Failed to parse: #{line}"
-      end
-    end
-
-    it "parses all historical publications" do
-      fixture_file = File.join(__dir__, "../../gems/pubid-ccsds/spec/fixtures/historical-publications.txt")
-
-      File.readlines(fixture_file).each do |line|
-        line = line.strip
-        next if line.empty? || line.start_with?("#")
-
-        # Strip metadata notes (anything after " - ")
-        clean_line = line.split(" - ").first
-
-        expect {
-          identifier = PubidNew::Ccsds.parse(line)
-          expect(identifier.to_s).to eq(clean_line)
-        }.not_to raise_error, "Failed to parse: #{line}"
+        end.not_to raise_error, "Failed to parse: #{clean_line}"
       end
     end
   end

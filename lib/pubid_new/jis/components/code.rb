@@ -14,12 +14,13 @@ module PubidNew
       class Code < Lutaml::Model::Serializable
         attribute :series, :string    # Single letter A-Z
         attribute :number, :integer   # Required number
-        attribute :parts, :integer, collection: true  # Optional multi-level parts
+        attribute :parts, :integer, collection: true # Optional multi-level parts
 
         # Store original string representations for formatting
         attr_accessor :number_string, :part_strings
 
-        def initialize(series:, number:, parts: nil, number_string: nil, part_strings: nil)
+        def initialize(series:, number:, parts: nil, number_string: nil,
+part_strings: nil)
           @series = series
           @number = number
           @parts = parts || []

@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require_relative "model"
+
 module PubidNew
   module Itu
     class Scheme
@@ -20,7 +24,7 @@ module PubidNew
         second_number: :second_number,
         range_series: :range_series,
         range_number: :range_number,
-        sg_number: :sg_number
+        sg_number: :sg_number,
       }.freeze
 
       # Model class to use for rendering
@@ -31,25 +35,25 @@ module PubidNew
       # Convert parsed data to model attributes
       def self.transform(parsed)
         attributes = {}
-        
+
         # Extract sector
         attributes[:sector] = parsed[:sector].to_s if parsed[:sector]
-        
+
         # Determine content based on sector
         content = parsed[:t_content] || parsed[:r_content] || {}
-        
+
         # Extract series and study group
         if content[:series].is_a?(Hash) && content[:series][:sg_number]
           # Study groups (questions)
-          attributes[:series] = "SG#{content[:series][:sg_number].to_s}"
+          attributes[:series] = "SG#{content[:series][:sg_number]}"
         elsif content[:series]
           attributes[:series] = content[:series].to_s
         end
-        
+
         # Extract numbering components
         if content[:numbering]
           numbering = content[:numbering]
-          
+
           # Handle numbering as array (e.g., number + subseries)
           if numbering.is_a?(Array)
             numbering.each do |part|
@@ -59,7 +63,8 @@ module PubidNew
                 elsif part[:subseries]
                   # Collect subseries parts
                   if attributes[:subseries]
-                    attributes[:subseries] = "#{attributes[:subseries]}.#{part[:subseries].to_s}"
+                    attributes[:subseries] =
+                      "#{attributes[:subseries]}.#{part[:subseries]}"
                   else
                     attributes[:subseries] = part[:subseries].to_s
                   end
@@ -71,24 +76,33 @@ module PubidNew
           elsif numbering.is_a?(Hash)
             # Handle numbering as hash
             attributes[:number] = numbering[:number].to_s if numbering[:number]
-            attributes[:subseries] = numbering[:subseries].to_s if numbering[:subseries]
+            if numbering[:subseries]
+              attributes[:subseries] =
+                numbering[:subseries].to_s
+            end
             attributes[:part] = numbering[:part].to_s if numbering[:part]
           end
         end
-        
+
         # Extract supplement/amendment/etc.
-        attributes[:supplement] = content[:supplement].to_s if content[:supplement]
+        if content[:supplement]
+          attributes[:supplement] =
+            content[:supplement].to_s
+        end
         attributes[:amendment] = content[:amendment].to_s if content[:amendment]
         attributes[:annex] = content[:annex].to_s if content[:annex]
-        attributes[:corrigendum] = content[:corrigendum].to_s if content[:corrigendum]
+        if content[:corrigendum]
+          attributes[:corrigendum] =
+            content[:corrigendum].to_s
+        end
         attributes[:addendum] = content[:addendum].to_s if content[:addendum]
-        
+
         # Handle appendix (convert Roman numerals to Arabic)
         if content[:appendix]
           appendix = content[:appendix].to_s
           attributes[:appendix] = roman_to_arabic(appendix) || appendix
         end
-        
+
         # Extract date
         if content[:date]
           date = content[:date]
@@ -99,7 +113,7 @@ module PubidNew
             attributes[:year] = date[:year].to_s
           end
         end
-        
+
         # Extract second number (for combined standards like G.780/Y.1351)
         if content[:second_number]
           second = content[:second_number]
@@ -107,7 +121,10 @@ module PubidNew
           second_attrs[:series] = second[:series].to_s if second[:series]
           if second[:numbering]
             numbering = second[:numbering]
-            second_attrs[:number] = numbering[:number].to_s if numbering[:number]
+            if numbering[:number]
+              second_attrs[:number] =
+                numbering[:number].to_s
+            end
             if numbering[:subseries]
               second_attrs[:subseries] = numbering[:subseries].to_s
             end
@@ -115,31 +132,31 @@ module PubidNew
           end
           attributes[:second_number] = second_attrs unless second_attrs.empty?
         end
-        
+
         # Extract range (for Q.400-Q.490 style)
         if content[:range_series] && content[:range_number]
           attributes[:range] = {
             series: content[:range_series].to_s,
-            number: content[:range_number].to_s
+            number: content[:range_number].to_s,
           }
         end
-        
+
         attributes
       end
-      
+
       # Convert Roman numerals to Arabic numbers
       def self.roman_to_arabic(roman)
         return roman unless roman.match?(/^[IVXLCDM]+$/i)
-        
+
         roman_map = {
-          'I' => 1, 'V' => 5, 'X' => 10, 'L' => 50,
-          'C' => 100, 'D' => 500, 'M' => 1000
+          "I" => 1, "V" => 5, "X" => 10, "L" => 50,
+          "C" => 100, "D" => 500, "M" => 1000
         }
-        
+
         roman = roman.upcase
         result = 0
         prev_value = 0
-        
+
         roman.reverse.each_char do |char|
           value = roman_map[char]
           if value < prev_value
@@ -149,7 +166,7 @@ module PubidNew
           end
           prev_value = value
         end
-        
+
         result.to_s
       end
     end

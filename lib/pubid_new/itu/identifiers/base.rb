@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
+
+require_relative "../../serializable"
+require_relative "../urn_generator"
 require_relative "../../components/date"
 require_relative "../components/sector"
 require_relative "../components/series"
@@ -11,6 +13,27 @@ module PubidNew
     module Identifiers
       # Base class for all ITU identifiers
       class Base < Lutaml::Model::Serializable
+        include PubidNew::Serializable
+
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
+
+        # Override base_hash to handle ITU-specific attributes
+        def base_hash
+          hash = super
+          # ITU Series has a 'series' attribute, not 'number'
+          if hash[:series].is_a?(Hash)
+            hash[:series] = series.series if series
+          end
+          # Add sector (ITU-specific, has a 'sector' attribute)
+          hash[:sector] = sector.sector if sector
+          hash
+        end
+
         attribute :sector, PubidNew::Itu::Components::Sector
         attribute :series, PubidNew::Itu::Components::Series
         attribute :code, PubidNew::Itu::Components::Code
@@ -25,17 +48,19 @@ module PubidNew
           result = "#{publisher}-#{sector}"
 
           # Add series and code
-          if series
-            result += " #{series}.#{code}"
-          else
-            result += " #{code}"
-          end
+          result += if series
+                      " #{series}.#{code}"
+                    else
+                      " #{code}"
+                    end
 
           # Add date if present
           if date
-            result += " (#{date.year}"
-            result += "/#{date.month}" if date.month
-            result += ")"
+            result += if date.month
+                        " (#{date.month}/#{date.year})"
+                      else
+                        " (#{date.year})"
+                      end
           end
 
           # Add language

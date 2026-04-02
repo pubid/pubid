@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe PubidNew::Cen::Identifiers::EuropeanNorm do
-  let(:scheme) { PubidNew::Cen::Scheme }
+  let(:scheme) { PubidNew::Cen::Scheme.new }
   let(:parser) { PubidNew::Cen::Parser.new }
   let(:builder) { PubidNew::Cen::Builder.new(scheme) }
 

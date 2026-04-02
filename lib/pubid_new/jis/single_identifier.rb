@@ -11,7 +11,7 @@ module PubidNew
       TYPE_CLASSES = {
         "TR" => "TechnicalReport",
         "TS" => "TechnicalSpecification",
-        nil => "JapaneseIndustrialStandard"  # Default
+        nil => "JapaneseIndustrialStandard", # Default
       }.freeze
 
       # Determine identifier class from type prefix

@@ -1,10 +1,20 @@
 require "lutaml/model"
-require_relative "identifier"
+# frozen_string_literal: true
+require_relative "../serializable"
+require_relative "../components/publisher"
+require_relative "../components/code"
+require_relative "../components/date"
+require_relative "../components/stage"
+require_relative "../components/type"
+require_relative "../components/typed_stage"
 
 module PubidNew
   module Cen
-    class SingleIdentifier < Identifier
-      attribute :publisher, Components::Publisher, default: -> { Components::Publisher.new(body: "EN") }
+    class SingleIdentifier < Lutaml::Model::Serializable
+      include PubidNew::Serializable
+      attribute :publisher, Components::Publisher, default: -> {
+        Components::Publisher.new(body: "EN")
+      }
       attribute :copublishers, Components::Publisher, collection: true
       attribute :number, Components::Code
       attribute :part, Components::Code
@@ -14,22 +24,56 @@ module PubidNew
       attribute :type, Components::Type
       attribute :typed_stage, Components::TypedStage
 
+      # Generate URN for this identifier
+      #
+      # @return [String] URN representation
+      def to_urn
+        require_relative "urn_generator"
+        UrnGenerator.new(self).generate
+      end
+
       def to_s(lang: :en, lang_single: false)
         parts = []
-        
-        # Get type details
-        type_short = type.is_a?(Components::Type) ? self.class.type[:short] : type[:short]
-        
-        # Stage prefix (prEN, FprEN) OR publisher
-        if typed_stage && typed_stage.abbr.first != type_short
+
+        # Check if we have a draft stage (prEN, FprEN) - these include both stage and type
+        is_draft_stage = typed_stage && typed_stage.abbr && %w[prEN
+                                                               FprEN].include?(typed_stage.abbr.first)
+
+        # Get type short name - for draft stages, extract base type
+        type_short = if is_draft_stage
+                       typed_stage.type_code.to_s.upcase # :en => "EN"
+                     elsif type.is_a?(Components::Type)
+                       type.abbr
+                     elsif self.class.respond_to?(:type)
+                       self.class.type[:short]
+                     else
+                       "EN" # Default
+                     end
+
+        # Track if we should use slash before type
+        use_slash_before_type = false
+
+        # For CWA/HD, they act as publisher (not EN)
+        if %w[CWA HD CR].include?(type_short)
+          # Stage prefix OR type as publisher
+          if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
+            parts << typed_stage.abbr.first
+          else
+            parts << type_short
+          end
+        elsif is_draft_stage
+          # Draft stage prefix (prEN, FprEN) OR regular publisher
           parts << typed_stage.abbr.first
         elsif publisher
-          parts << publisher.body
+          parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
+          use_slash_before_type = true # When publisher present, use slash before type
         end
-        
+
         # Copublishers - add to last part (publisher) with slash
         if copublishers && copublishers.any?
-          copub_str = copublishers.map(&:body).join("/")
+          copub_str = copublishers.map do |cp|
+            cp.respond_to?(:body) ? cp.body : cp.to_s
+          end.join("/")
           unless copub_str.empty?
             if parts.any?
               parts[-1] = "#{parts[-1]}/#{copub_str}"
@@ -38,40 +82,59 @@ module PubidNew
             end
           end
         end
-        
-        # Type for non-EN documents (TS, TR, CWA, etc.)
-        # But not if CWA/HD (they act as publisher)
-        if type_short != "EN" && !%w[CWA HD].include?(type_short)
-          parts << type_short
+
+        # Type for non-EN documents (TS, TR) - but not CWA/HD or Guide
+        if type_short != "EN" && !%w[CWA HD CR Guide].include?(type_short)
+          if use_slash_before_type && parts.any?
+            # Use slash separator for publisher/type combination (TS, TR only)
+            parts << "/#{type_short}"
+          else
+            parts << type_short
+          end
+        elsif type_short == "Guide"
+          # Guide uses SPACE separator, not slash
+          parts << "Guide"
         end
-        
-        # Number with part/subpart
+
+        # Number with part (which may be multi-level like "5-1-1")
         if number
-          number_str = number.value.to_s
-          number_str += "-#{part.value}" if part
-          number_str += "-#{subpart.value}" if subpart
+          number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+          if part
+            part_val = part.respond_to?(:value) ? part.value : part
+            number_str += "-#{part_val}"
+          end
           parts << number_str
         end
-        
-        result = parts.join(" ")
-        
+
+        # Join parts - but handle slash prefix for type
+        result = ""
+        parts.each_with_index do |part, idx|
+          if idx > 0 && !part.start_with?("/")
+            result += " "
+          end
+          result += part
+        end
+
         # Date
-        result += ":#{date.year}" if date
-        
+        if date
+          year_val = date.respond_to?(:year) ? date.year : date.to_i
+          result += ":#{year_val}"
+        end
+
         result
       end
 
       def <=>(other)
         return nil unless other.is_a?(SingleIdentifier)
-        
+
         # Compare by number first
         num_cmp = number.to_s <=> other.number.to_s
         return num_cmp unless num_cmp.zero?
-        
+
         # Then by part
         part_cmp = (part || Components::Code.new(value: "0")).to_s <=> (other.part || Components::Code.new(value: "0")).to_s
         return part_cmp unless part_cmp.zero?
-        
+
         # Then by date
         if date && other.date
           date.to_s <=> other.date.to_s

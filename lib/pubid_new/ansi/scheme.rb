@@ -1,11 +1,12 @@
 require_relative "../scheme"
-require_relative "identifiers/american_national_standard"
+# frozen_string_literal: true
+require_relative "identifiers/standard"
 
 module PubidNew
   module Ansi
     # Scheme configuration for ANSI identifiers
     IDENTIFIER_TYPES = [
-      Identifiers::AmericanNationalStandard,
+      Identifiers::Standard,
     ].freeze
 
     Scheme = PubidNew::Scheme.new(
