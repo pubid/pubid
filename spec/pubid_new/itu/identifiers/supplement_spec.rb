@@ -2,11 +2,11 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Itu::Identifiers::Supplement do
+RSpec.describe Pubid::Itu::Identifiers::Supplement do
   describe "basic supplement patterns" do
     context "ITU-T H Suppl. 1" do
       subject { "ITU-T H Suppl. 1" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses as Supplement" do
         expect(parsed).to be_a(described_class)
@@ -35,7 +35,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
 
     context "ITU-T E.156 Suppl. 2" do
       subject { "ITU-T E.156 Suppl. 2" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses as Supplement" do
         expect(parsed).to be_a(described_class)
@@ -46,7 +46,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
       end
 
       it "parses base recommendation number" do
-        expect(parsed.base).to be_a(PubidNew::Itu::Identifiers::Recommendation)
+        expect(parsed.base).to be_a(Pubid::Itu::Identifiers::Recommendation)
         expect(parsed.base.code.number).to eq("156")
       end
 
@@ -61,7 +61,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
 
     context "ITU-T A Suppl. 2 (12/2022)" do
       subject { "ITU-T A Suppl. 2 (12/2022)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses as Supplement" do
         expect(parsed).to be_a(described_class)
@@ -93,7 +93,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
   describe "supplement with different series" do
     context "ITU-T G.780 Suppl. 1" do
       subject { "ITU-T G.780 Suppl. 1" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses series" do
         expect(parsed.series.series).to eq("G")
@@ -114,7 +114,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
 
     context "ITU-R V.574 Suppl. 3" do
       subject { "ITU-R V.574 Suppl. 3" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses sector" do
         expect(parsed.sector.sector).to eq("R")
@@ -137,7 +137,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
   describe "supplement with dates" do
     context "ITU-T H Suppl. 1 (06/2020)" do
       subject { "ITU-T H Suppl. 1 (06/2020)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses year" do
         expect(parsed.date.year).to eq("2020")
@@ -154,7 +154,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
 
     context "ITU-T E.156 Suppl. 2 (2018)" do
       subject { "ITU-T E.156 Suppl. 2 (2018)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses year without month" do
         expect(parsed.date.year).to eq("2018")
@@ -173,7 +173,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
   describe "multi-digit supplement numbers" do
     context "ITU-T H Suppl. 10" do
       subject { "ITU-T H Suppl. 10" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses multi-digit supplement number" do
         expect(parsed.number).to eq("10")
@@ -186,7 +186,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Supplement do
 
     context "ITU-T E.156 Suppl. 25" do
       subject { "ITU-T E.156 Suppl. 25" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses multi-digit supplement number" do
         expect(parsed.number).to eq("25")

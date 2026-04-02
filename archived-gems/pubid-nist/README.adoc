@@ -272,7 +272,7 @@ Now it's easy to screen through the anomalies and surface the data issues!
 
 The NIST V2 parser has been completely redesigned with a clean three-layer architecture and model-driven design, achieving **98.47% parse success rate** on 19,488 real-world test identifiers from the NIST publication database.
 
-The V2 implementation is located in [`lib/pubid_new/nist/`](../../lib/pubid_new/nist/) while V1 code remains for backward compatibility during the migration period.
+The V2 implementation is located in [`lib/pubid/nist/`](../../lib/pubid/nist/) while V1 code remains for backward compatibility during the migration period.
 
 === Architecture
 
@@ -300,17 +300,17 @@ V2 implements clean separation of concerns across three distinct layers:
 
 Where:
 
-Parser:: [`parser.rb`](../../lib/pubid_new/nist/parser.rb) - Parslet-based grammar defining syntax rules (~300 lines)
-Builder:: [`builder.rb`](../../lib/pubid_new/nist/builder.rb) - Transforms parse tree to attributes (~200 lines)
-Identifier:: [`identifiers/`](../../lib/pubid_new/nist/identifiers/) - Lutaml::Model classes with rendering logic
+Parser:: [`parser.rb`](../../lib/pubid/nist/parser.rb) - Parslet-based grammar defining syntax rules (~300 lines)
+Builder:: [`builder.rb`](../../lib/pubid/nist/builder.rb) - Transforms parse tree to attributes (~200 lines)
+Identifier:: [`identifiers/`](../../lib/pubid/nist/identifiers/) - Lutaml::Model classes with rendering logic
 
 ==== Identifier classes
 
 The V2 implementation uses dedicated identifier classes for different publication types:
 
-Base:: [`identifiers/base.rb`](../../lib/pubid_new/nist/identifiers/base.rb) - Standard NIST publications
-Circular:: [`identifiers/circular.rb`](../../lib/pubid_new/nist/identifiers/circular.rb) - NBS CIRC and LCIRC series
-CommercialStandardsMonthly:: [`identifiers/commercial_standards_monthly.rb`](../../lib/pubid_new/nist/identifiers/commercial_standards_monthly.rb) - NBS CSM series
+Base:: [`identifiers/base.rb`](../../lib/pubid/nist/identifiers/base.rb) - Standard NIST publications
+Circular:: [`identifiers/circular.rb`](../../lib/pubid/nist/identifiers/circular.rb) - NBS CIRC and LCIRC series
+CommercialStandardsMonthly:: [`identifiers/commercial_standards_monthly.rb`](../../lib/pubid/nist/identifiers/commercial_standards_monthly.rb) - NBS CSM series
 CommercialStandardEmergency:: NBS CSE series
 CircularSupplement:: NBS CIRC supplements
 
@@ -356,20 +356,20 @@ The NBS Letter Circular (LCIRC) series is now fully supported, including revisio
 [source,ruby]
 ----
 # Basic LCIRC
-id = PubidNew::Nist.parse("NBS LCIRC 1000")
+id = Pubid::Nist.parse("NBS LCIRC 1000")
 id.to_s  # => "NBS LCIRC 1000"
 
 # LCIRC with revision year
-id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+id = Pubid::Nist.parse("NBS LCIRC 1019r1963")
 id.to_s  # => "NBS LCIRC 1019r1963"
 
 # LCIRC revised in 1985
-id = PubidNew::Nist.parse("NBS LCIRC 1035r1985")
+id = Pubid::Nist.parse("NBS LCIRC 1035r1985")
 id.to_s  # => "NBS LCIRC 1035r1985"
 ----
 ====
 
-**Implementation:** Added "NBS LCIRC" to compound_series in [`parser.rb:24`](../../lib/pubid_new/nist/parser.rb#L24)
+**Implementation:** Added "NBS LCIRC" to compound_series in [`parser.rb:24`](../../lib/pubid/nist/parser.rb#L24)
 
 ==== CSM volume-number format
 
@@ -381,20 +381,20 @@ The Commercial Standards Monthly (CSM) series uses a special volume-number forma
 [source,ruby]
 ----
 # Volume 6, Number 1
-id = PubidNew::Nist.parse("NBS CSM v6n1")
+id = Pubid::Nist.parse("NBS CSM v6n1")
 id.to_s  # => "NBS CSM v6n1"
 
 # Volume 7, Number 12
-id = PubidNew::Nist.parse("NBS CSM v7n12")
+id = Pubid::Nist.parse("NBS CSM v7n12")
 id.to_s  # => "NBS CSM v7n12"
 
 # Volume 9, Number 9
-id = PubidNew::Nist.parse("NBS CSM v9n9")
+id = Pubid::Nist.parse("NBS CSM v9n9")
 id.to_s  # => "NBS CSM v9n9"
 ----
 ====
 
-**Implementation:** Added v#n# pattern to first_number in [`parser.rb:67`](../../lib/pubid_new/nist/parser.rb#L67)
+**Implementation:** Added v#n# pattern to first_number in [`parser.rb:67`](../../lib/pubid/nist/parser.rb#L67)
 
 ==== Supplement with revision
 
@@ -406,19 +406,19 @@ Circular supplements can be combined with revisions in a compact "supprev" notat
 [source,ruby]
 ----
 # Circular 154, supplement with revision
-id = PubidNew::Nist.parse("NBS CIRC 154supprev")
+id = Pubid::Nist.parse("NBS CIRC 154supprev")
 id.to_s  # => "NBS CIRC 154supprev"
 
 # Circular 25, supplement January 1924
-id = PubidNew::Nist.parse("NBS CIRC 25suppJan1924")
+id = Pubid::Nist.parse("NBS CIRC 25suppJan1924")
 id.to_s  # => "NBS CIRC 25suppJan1924"
 ----
 ====
 
 **Implementation:**
-- Added "supprev" pattern in [`parser.rb:70`](../../lib/pubid_new/nist/parser.rb#L70)
-- Special handling in [`builder.rb:145`](../../lib/pubid_new/nist/builder.rb#L145)
-- Rendering logic in [`identifiers/base.rb:280`](../../lib/pubid_new/nist/identifiers/base.rb#L280)
+- Added "supprev" pattern in [`parser.rb:70`](../../lib/pubid/nist/parser.rb#L70)
+- Special handling in [`builder.rb:145`](../../lib/pubid/nist/builder.rb#L145)
+- Rendering logic in [`identifiers/base.rb:280`](../../lib/pubid/nist/identifiers/base.rb#L280)
 
 ==== Edition with revision and date
 
@@ -430,19 +430,19 @@ Edition numbers can combine with revision indicators and dates in a single ident
 [source,ruby]
 ----
 # Circular 13, edition 2, revision June 1908
-id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
+id = Pubid::Nist.parse("NBS CIRC 13e2revJune1908")
 id.to_s  # => "NBS CIRC 13e2revJune1908"
 
 # Circular 24, edition 4, supplement
-id = PubidNew::Nist.parse("NBS CIRC 24e4supp")
+id = Pubid::Nist.parse("NBS CIRC 24e4supp")
 id.to_s  # => "NBS CIRC 24e4supp"
 ----
 ====
 
 **Implementation:**
-- Pattern for number+edition+revision+date in [`parser.rb`](../../lib/pubid_new/nist/parser.rb)
-- Extraction logic in [`builder.rb`](../../lib/pubid_new/nist/builder.rb)
-- Rendering with "rev" not "-" in [`identifiers/base.rb`](../../lib/pubid_new/nist/identifiers/base.rb)
+- Pattern for number+edition+revision+date in [`parser.rb`](../../lib/pubid/nist/parser.rb)
+- Extraction logic in [`builder.rb`](../../lib/pubid/nist/builder.rb)
+- Rendering with "rev" not "-" in [`identifiers/base.rb`](../../lib/pubid/nist/identifiers/base.rb)
 
 ==== Year expansion in editions
 
@@ -454,12 +454,12 @@ id.to_s  # => "NBS CIRC 24e4supp"
 [source,ruby]
 ----
 # 2-digit year input
-id = PubidNew::Nist.parse("NBS HB e104-43")
+id = Pubid::Nist.parse("NBS HB e104-43")
 id.to_s  # => "NBS HB e104-1943"  # Expanded to 4 digits
 ----
 ====
 
-**Implementation:** Year expansion logic in [`identifiers/base.rb:266`](../../lib/pubid_new/nist/identifiers/base.rb#L266)
+**Implementation:** Year expansion logic in [`identifiers/base.rb:266`](../../lib/pubid/nist/identifiers/base.rb#L266)
 
 === V2 usage
 
@@ -467,10 +467,10 @@ id.to_s  # => "NBS HB e104-1943"  # Expanded to 4 digits
 
 [source,ruby]
 ----
-require 'pubid_new/nist'
+require 'pubid/nist'
 
 # Parse standard NIST identifier
-id = PubidNew::Nist.parse("NIST SP 800-53r5")
+id = Pubid::Nist.parse("NIST SP 800-53r5")
 id.series    # => "SP"
 id.number    # => "800-53"
 id.revision  # => "r5"
@@ -482,19 +482,19 @@ id.to_s      # => "NIST SP 800-53r5"
 [source,ruby]
 ----
 # Parse LCIRC series
-id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+id = Pubid::Nist.parse("NBS LCIRC 1019r1963")
 id.to_s  # => "NBS LCIRC 1019r1963"
 
 # Parse CSM volume-number
-id = PubidNew::Nist.parse("NBS CSM v6n1")
+id = Pubid::Nist.parse("NBS CSM v6n1")
 id.to_s  # => "NBS CSM v6n1"
 
 # Parse supplement with revision
-id = PubidNew::Nist.parse("NBS CIRC 154supprev")
+id = Pubid::Nist.parse("NBS CIRC 154supprev")
 id.to_s  # => "NBS CIRC 154supprev"
 
 # Parse edition with revision and date
-id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
+id = Pubid::Nist.parse("NBS CIRC 13e2revJune1908")
 id.to_s  # => "NBS CIRC 13e2revJune1908"
 ----
 
@@ -515,7 +515,7 @@ These patterns are rare and often represent data quality issues in the source da
 [source,bash]
 ----
 cd gems/pubid-nist
-bundle exec rspec spec/pubid_new/nist/ --format documentation
+bundle exec rspec spec/pubid/nist/ --format documentation
 ----
 
 ==== Measure success rate
@@ -524,13 +524,13 @@ bundle exec rspec spec/pubid_new/nist/ --format documentation
 ----
 cd gems/pubid-nist
 ruby -e "
-require_relative '../../lib/pubid_new/nist'
+require_relative '../../lib/pubid/nist'
 total = passes = 0
 File.readlines('spec/fixtures/allrecords.txt').each do |line|
   id = line.strip
   next if id.empty?
   total += 1
-  passes += 1 if PubidNew::Nist.parse(id).to_s == id rescue nil
+  passes += 1 if Pubid::Nist.parse(id).to_s == id rescue nil
 end
 puts \"NIST: #{passes}/#{total} (#{(passes.to_f/total*100).round(2)}%)\"
 "

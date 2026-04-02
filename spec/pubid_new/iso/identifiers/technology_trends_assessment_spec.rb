@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
+RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
   subject { described_class }
 
   describe "parse identifiers from examples" do
@@ -10,7 +10,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
         f.readlines.each do |pub_id|
           next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
+          expect(Pubid::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
@@ -27,7 +27,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 1:1994
     describe "ISO/TTA 1:1994" do
       subject { "ISO/TTA 1:1994" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:1" }
 
       it "parses publisher" do
@@ -73,7 +73,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 2
     describe "ISO/TTA 2" do
       subject { "ISO/TTA 2" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:2" }
 
       it "parses publisher" do
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 5:2006
     describe "ISO/TTA 5:2006" do
       subject { "ISO/TTA 5:2006" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:5" }
 
       it "parses publisher" do
@@ -146,7 +146,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 5:2007 (updated version)
     describe "ISO/TTA 5:2007" do
       subject { "ISO/TTA 5:2007" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:5" }
 
       it "parses publisher" do

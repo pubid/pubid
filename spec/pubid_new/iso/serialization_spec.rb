@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/iso"
+require_relative "../../../lib/pubid/iso"
 
 RSpec.describe "ISO Serialization" do
   describe "#to_h" do
     it "exports basic identifier as hash" do
-      id = PubidNew::Iso.parse("ISO 9001:2015")
+      id = Pubid::Iso.parse("ISO 9001:2015")
       hash = id.to_h
 
       expect(hash[:flavor]).to eq("iso")
@@ -16,7 +16,7 @@ RSpec.describe "ISO Serialization" do
     end
 
     it "exports identifier with copublisher" do
-      id = PubidNew::Iso.parse("ISO/IEC 27001:2013")
+      id = Pubid::Iso.parse("ISO/IEC 27001:2013")
       hash = id.to_h
 
       expect(hash[:publisher]).to eq("ISO/IEC")
@@ -24,7 +24,7 @@ RSpec.describe "ISO Serialization" do
     end
 
     it "exports identifier with part" do
-      id = PubidNew::Iso.parse("ISO 8601-1:2019")
+      id = Pubid::Iso.parse("ISO 8601-1:2019")
       hash = id.to_h
 
       expect(hash[:number]).to eq("8601")
@@ -32,7 +32,7 @@ RSpec.describe "ISO Serialization" do
     end
 
     it "exports identifier with supplements" do
-      id = PubidNew::Iso.parse("ISO 9001:2015/Amd 1:2020")
+      id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
       hash = id.to_h
 
       expect(hash[:supplements]).to be_a(Array)
@@ -42,7 +42,7 @@ RSpec.describe "ISO Serialization" do
 
   describe "#to_json" do
     it "exports identifier as JSON" do
-      id = PubidNew::Iso.parse("ISO 9001:2015")
+      id = Pubid::Iso.parse("ISO 9001:2015")
       json = id.to_json
 
       parsed = JSON.parse(json)
@@ -53,12 +53,12 @@ RSpec.describe "ISO Serialization" do
 
   describe "#to_mr_string" do
     it "exports basic identifier as MR string" do
-      id = PubidNew::Iso.parse("ISO 9001:2015")
+      id = Pubid::Iso.parse("ISO 9001:2015")
       expect(id.to_mr_string).to eq("ISO.9001.2015")
     end
 
     it "exports identifier with part as MR string" do
-      id = PubidNew::Iso.parse("ISO 8601-1:2019")
+      id = Pubid::Iso.parse("ISO 8601-1:2019")
       expect(id.to_mr_string).to eq("ISO.8601-1.2019")
     end
   end
@@ -72,7 +72,7 @@ RSpec.describe "ISO Serialization" do
         year: "2015"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("ISO 9001:2015")
     end
 
@@ -87,7 +87,7 @@ RSpec.describe "ISO Serialization" do
         ]
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to include("Amd 1:2020")
     end
   end
@@ -96,7 +96,7 @@ RSpec.describe "ISO Serialization" do
     it "creates identifier from JSON" do
       json = '{"flavor":"iso","publisher":"ISO","number":"9001","year":"2015"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to eq("ISO 9001:2015")
     end
   end
@@ -105,24 +105,24 @@ RSpec.describe "ISO Serialization" do
     it "creates identifier from MR string" do
       mr_string = "ISO.9001.2015"
 
-      id = PubidNew::Serializable.from_mr_string(mr_string)
+      id = Pubid::Serializable.from_mr_string(mr_string)
       expect(id.to_s).to eq("ISO 9001:2015")
     end
   end
 
   describe "round-trip conversion" do
     it "preserves all data through hash conversion" do
-      original = PubidNew::Iso.parse("ISO 9001:2015/Amd 1:2020")
+      original = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves all data through JSON conversion" do
-      original = PubidNew::Iso.parse("ISO 9001:2015")
+      original = Pubid::Iso.parse("ISO 9001:2015")
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end

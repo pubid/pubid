@@ -3,7 +3,7 @@
 
 require "fileutils"
 require "bundler/setup"
-require_relative "../../lib/pubid_new"
+require_relative "../../lib/pubid"
 
 # Fixtures Classification Script
 # Reads from identifiers/full/ and classifies into identifiers/pass/ and identifiers/fail/
@@ -60,9 +60,9 @@ class FixturesClassifier
   private
 
   def validate_flavor!
-    unless PubidNew::Registry.registered?(flavor)
+    unless Pubid::Registry.registered?(flavor)
       raise ArgumentError,
-            "Unknown flavor: #{flavor}. Valid: #{PubidNew::Registry.flavor_names.join(', ')}"
+            "Unknown flavor: #{flavor}. Valid: #{Pubid::Registry.flavor_names.join(', ')}"
     end
   end
 
@@ -185,7 +185,7 @@ class FixturesClassifier
   end
 
   def parse_identifier(id_str)
-    flavor_module = PubidNew::Registry.get(flavor)
+    flavor_module = Pubid::Registry.get(flavor)
     if flavor_module && flavor_module.respond_to?(:parse)
       flavor_module.parse(id_str)
     else

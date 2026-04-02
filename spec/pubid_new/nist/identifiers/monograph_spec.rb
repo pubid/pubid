@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Monograph do
+RSpec.describe Pubid::Nist::Identifiers::Monograph do
   subject { described_class }
 
   describe ".parse" do
     context "basic MONO identifiers" do
       describe "NBS MONO 158" do
         subject { "NBS MONO 158" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NIST MONO 178" do
         subject { "NIST MONO 178" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -53,7 +53,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NBS.MONO.158" do
         subject { "NBS.MONO.158" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -70,7 +70,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NIST.MONO.178" do
         subject { "NIST.MONO.178" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -85,7 +85,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
     context "MONO with parts" do
       describe "NBS MONO 128pt1" do
         subject { "NBS MONO 128pt1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -102,7 +102,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NBS MONO 128p1" do
         subject { "NBS MONO 128p1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -121,7 +121,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
     context "MONO with letter suffix" do
       describe "NIST MONO 1-1F" do
         subject { "NIST MONO 1-1F" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -138,7 +138,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NIST MONO 1-1f" do
         subject { "NIST MONO 1-1f" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -155,7 +155,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NIST.MONO.1-1f" do
         subject { "NIST.MONO.1-1f" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -170,7 +170,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
     context "MONO with letter suffix and volume" do
       describe "NIST MONO 1-2Bv1" do
         subject { "NIST MONO 1-2Bv1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)
@@ -191,7 +191,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Monograph do
 
       describe "NIST.MONO.1-2bv1" do
         subject { "NIST.MONO.1-2bv1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Monograph" do
           expect(parsed).to be_a(described_class)

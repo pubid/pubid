@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
+RSpec.describe Pubid::Bsi::Identifiers::PubliclyAvailableSpecification do
   subject { described_class }
 
   context "basic PAS identifiers" do
     describe "PAS 1234:2020" do
       subject { "PAS 1234:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)
@@ -33,7 +33,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
 
     describe "PAS 5678" do
       subject { "PAS 5678" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)
@@ -56,7 +56,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
   context "PAS with parts" do
     describe "PAS 7654-3:2019" do
       subject { "PAS 7654-3:2019" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)
@@ -81,7 +81,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
 
     describe "PAS 8888-2-1:2020" do
       subject { "PAS 8888-2-1:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
   context "PAS with month" do
     describe "PAS 1234:2020-03" do
       subject { "PAS 1234:2020-03" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)
@@ -133,7 +133,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
   context "PAS with edition" do
     describe "PAS 5432:2018 v2.0" do
       subject { "PAS 5432:2018 v2.0" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)
@@ -152,7 +152,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification do
   context "multi-digit numbers" do
     describe "PAS 10000:2022" do
       subject { "PAS 10000:2022" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PubliclyAvailableSpecification" do
         expect(parsed).to be_a(described_class)

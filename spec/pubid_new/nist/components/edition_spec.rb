@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Edition do
+RSpec.describe Pubid::Nist::Components::Edition do
   describe "initialization and basic attributes" do
     context "with edition number only" do
       it "creates edition with number" do
@@ -199,7 +199,7 @@ RSpec.describe PubidNew::Nist::Components::Edition do
   describe "integration with parsing" do
     context "parsing identifiers with edition" do
       it "parses e2 pattern" do
-        id = PubidNew::Nist.parse("NIST SP 800-53e2")
+        id = Pubid::Nist.parse("NIST SP 800-53e2")
         expect(id.edition).to be_a(described_class)
         expect(id.edition.type).to eq("e")
         expect(id.edition.id).to eq("2")
@@ -207,7 +207,7 @@ RSpec.describe PubidNew::Nist::Components::Edition do
       end
 
       it "parses r5 pattern" do
-        id = PubidNew::Nist.parse("NIST SP 800-53r5")
+        id = Pubid::Nist.parse("NIST SP 800-53r5")
         expect(id.edition).to be_a(described_class)
         expect(id.edition.type).to eq("r")
         expect(id.edition.id).to eq("5")
@@ -215,7 +215,7 @@ RSpec.describe PubidNew::Nist::Components::Edition do
       end
 
       it "parses r1963 pattern (revision as year)" do
-        id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+        id = Pubid::Nist.parse("NBS LCIRC 1019r1963")
         expect(id.edition).to be_a(described_class)
         expect(id.edition.type).to eq("r")
         expect(id.edition.id).to eq("1963")
@@ -223,7 +223,7 @@ RSpec.describe PubidNew::Nist::Components::Edition do
       end
 
       it "parses e2revJune1908 pattern (legacy format with rev)" do
-        id = PubidNew::Nist.parse("NBS CIRC 13e2revJune1908")
+        id = Pubid::Nist.parse("NBS CIRC 13e2revJune1908")
         expect(id.edition).to be_a(described_class)
         expect(id.edition.type).to eq("e")
         expect(id.edition.id).to eq("2")
@@ -233,7 +233,7 @@ RSpec.describe PubidNew::Nist::Components::Edition do
       end
 
       it "parses e2rev1908 pattern (legacy format with rev and year)" do
-        id = PubidNew::Nist.parse("NBS CIRC 13e2rev1908")
+        id = Pubid::Nist.parse("NBS CIRC 13e2rev1908")
         expect(id.edition).to be_a(described_class)
         expect(id.edition.type).to eq("e")
         expect(id.edition.id).to eq("2")
@@ -249,17 +249,17 @@ RSpec.describe PubidNew::Nist::Components::Edition do
       original_input = "NBS CIRC 13e2revJune1908"
       canonical_output = "NBS CIRC 13e2.June1908"
 
-      parsed = PubidNew::Nist.parse(original_input)
+      parsed = Pubid::Nist.parse(original_input)
       expect(parsed.to_s).to eq(canonical_output)
     end
 
     it "renders simple edition correctly" do
-      id = PubidNew::Nist.parse("NIST SP 800-53r5")
+      id = Pubid::Nist.parse("NIST SP 800-53r5")
       expect(id.to_s).to eq("NIST SP 800-53r5")
     end
 
     it "renders revision year correctly" do
-      id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+      id = Pubid::Nist.parse("NBS LCIRC 1019r1963")
       expect(id.to_s).to eq("NBS LC 1019r1963")
     end
   end

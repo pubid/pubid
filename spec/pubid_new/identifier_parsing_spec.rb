@@ -1,4 +1,4 @@
-# module PubidNew
+# module Pubid
 #   RSpec.describe Identifier do
 #     shared_examples "converts pubid to pubid" do
 #       it "converts pubid to pubid" do
@@ -7,7 +7,7 @@
 #       end
 
 #       it "creates same identifier from #to_h output" do
-#         expect(subject.to_s).to eq(PubidNew::Identifier.create(**subject.to_h).to_s)
+#         expect(subject.to_s).to eq(Pubid::Identifier.create(**subject.to_h).to_s)
 #       end
 #     end
 

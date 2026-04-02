@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
+RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
   subject { described_class }
 
   context "BS ISO adoption" do
     describe "BS ISO 8601:2019" do
       subject { "BS ISO 8601:2019" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -19,7 +19,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
       end
 
       it "adopted_identifier is ISO object" do
-        expect(parsed.adopted_identifier).to be_a(PubidNew::Iso::Identifier)
+        expect(parsed.adopted_identifier).to be_a(Pubid::Iso::Identifier)
       end
 
       it "delegates number to adopted identifier" do
@@ -37,7 +37,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS ISO 9001:2015" do
       subject { "BS ISO 9001:2015" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -58,7 +58,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS ISO 1234" do
       subject { "BS ISO 1234" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -77,7 +77,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
   context "BS IEC adoption" do
     describe "BS IEC 62600:2020" do
       subject { "BS IEC 62600:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -88,7 +88,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
       end
 
       it "adopted_identifier is IEC object" do
-        expect(parsed.adopted_identifier).to be_a(PubidNew::Iec::Identifier)
+        expect(parsed.adopted_identifier).to be_a(Pubid::Iec::Identifier)
       end
 
       it "delegates number to adopted identifier" do
@@ -106,7 +106,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS IEC 60050-113:2011" do
       subject { "BS IEC 60050-113:2011" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -129,7 +129,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
   context "BS ISO/IEC copublisher adoption" do
     describe "BS ISO/IEC 27001:2013" do
       subject { "BS ISO/IEC 27001:2013" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -140,7 +140,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
       end
 
       it "adopted_identifier is ISO object" do
-        expect(parsed.adopted_identifier).to be_a(PubidNew::Iso::Identifier)
+        expect(parsed.adopted_identifier).to be_a(Pubid::Iso::Identifier)
       end
 
       it "delegates number" do
@@ -162,7 +162,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS ISO/IEC 15693-3:2019" do
       subject { "BS ISO/IEC 15693-3:2019" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)
@@ -189,7 +189,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedInternationalStandard do
   context "multi-digit numbers" do
     describe "BS ISO 10000:2022" do
       subject { "BS ISO 10000:2022" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
         expect(parsed).to be_a(described_class)

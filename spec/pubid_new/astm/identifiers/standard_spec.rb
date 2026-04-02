@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::Standard do
+RSpec.describe Pubid::Astm::Identifiers::Standard do
   # ========================================
   # Standard (76 IDs, 26%)
   # ========================================
 
   describe "parses simple standard" do
     subject { "ASTM E2938-15" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -23,7 +23,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Standard do
 
   describe "parses standard with reapproval" do
     subject { "ASTM E2938-15(2023)" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -36,7 +36,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Standard do
 
   describe "parses dual unit standard" do
     subject { "ASTM F1862/F1862M-17" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -50,7 +50,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Standard do
 
   describe "parses standard with edition notation" do
     subject { "ASTM C1028-07e1" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -63,7 +63,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Standard do
 
   describe "parses standard without ASTM prefix" do
     subject { "ASTM 51608-15(2022)e1" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

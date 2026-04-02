@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Jis::Identifier do
+RSpec.describe Pubid::Jis::Identifier do
   describe ".parse" do
     context "basic JIS identifiers" do
       describe "JIS B 0001" do
@@ -10,7 +10,7 @@ RSpec.describe PubidNew::Jis::Identifier do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as JapaneseIndustrialStandard" do
-          expect(parsed).to be_a(PubidNew::Jis::Identifiers::JapaneseIndustrialStandard)
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::JapaneseIndustrialStandard)
         end
 
         it "parses series" do
@@ -167,7 +167,7 @@ RSpec.describe PubidNew::Jis::Identifier do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as TechnicalReport" do
-          expect(parsed).to be_a(PubidNew::Jis::Identifiers::TechnicalReport)
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::TechnicalReport)
         end
 
         it "round-trips" do
@@ -200,7 +200,7 @@ RSpec.describe PubidNew::Jis::Identifier do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as TechnicalSpecification" do
-          expect(parsed).to be_a(PubidNew::Jis::Identifiers::TechnicalSpecification)
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::TechnicalSpecification)
         end
 
         it "round-trips" do
@@ -224,7 +224,7 @@ RSpec.describe PubidNew::Jis::Identifier do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Amendment" do
-          expect(parsed).to be_a(PubidNew::Jis::Identifiers::Amendment)
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::Amendment)
         end
 
         it "parses base identifier" do
@@ -266,7 +266,7 @@ RSpec.describe PubidNew::Jis::Identifier do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Explanation" do
-          expect(parsed).to be_a(PubidNew::Jis::Identifiers::Explanation)
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::Explanation)
         end
 
         it "parses base identifier" do

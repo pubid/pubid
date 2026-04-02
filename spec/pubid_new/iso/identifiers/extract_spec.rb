@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::Extract do
+RSpec.describe Pubid::Iso::Identifiers::Extract do
   subject { described_class }
 
   # Note: No sweep test - fixture file iso/iso-extract.txt does not exist
@@ -12,7 +12,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Extract do
     context "extract with base identifier" do
       describe "ISO 1101:1983/Ext 1:1983" do
         subject { "ISO 1101:1983/Ext 1:1983" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:1101:ext:1983:v1" }
 
         it "parses publisher" do

@@ -1,6 +1,6 @@
 # module Pubid::Iso
 #   RSpec.describe Identifier::Base do
-#     subject { PubidNew::Iso.parse(original || pubid) }
+#     subject { Pubid::Iso.parse(original || pubid) }
 #     let(:original) { nil }
 
 #     context "ISO TC 184/SC 4 N1110" do

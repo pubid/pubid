@@ -2,12 +2,12 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
+RSpec.describe Pubid::Csa::Identifiers::CanadianAdopted do
   describe ".parse" do
     context "CAN/CSA- prefix patterns" do
       describe "CAN/CSA-A123.2-03" do
         subject { "CAN/CSA-A123.2-03" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
           expect(parsed).to be_a(described_class)
@@ -28,7 +28,7 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
 
       describe "CAN/CSA-A123.4-04 (R2023)" do
         subject { "CAN/CSA-A123.4-04 (R2023)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses reaffirmation" do
           expect(parsed.reaffirmation).to eq("2023")
@@ -45,14 +45,14 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
 
       describe "CAN/CSA-C22.2 NO. 1010.2.031-94(R04)" do
         subject { "CAN/CSA-C22.2 NO. 1010.2.031-94(R04)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
           expect(parsed).to be_a(described_class)
         end
 
         it "wraps CecIdentifier" do
-          expect(parsed.wrapped_identifier).to be_a(PubidNew::Csa::Identifiers::Cec)
+          expect(parsed.wrapped_identifier).to be_a(Pubid::Csa::Identifiers::Cec)
         end
 
         it "parses CEC part" do
@@ -80,7 +80,7 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
     context "CAN/CSA- with SERIES notation" do
       describe "CAN/CSA-A220 SERIES-06 (R2021)" do
         subject { "CAN/CSA-A220 SERIES-06 (R2021)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
           expect(parsed).to be_a(described_class)
@@ -105,7 +105,7 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
 
       describe "CAN/CSA-B45 SERIES-02 (R2013)" do
         subject { "CAN/CSA-B45 SERIES-02 (R2013)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses series notation" do
           expect(parsed.wrapped_identifier.series).to eq(true)
@@ -120,7 +120,7 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
     context "CAN3- legacy prefix patterns" do
       describe "CAN3-A451.1-M86 (R2001)" do
         subject { "CAN3-A451.1-M86 (R2001)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
           expect(parsed).to be_a(described_class)
@@ -145,7 +145,7 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
 
       describe "CAN3-Z299.0-86 (R2006)" do
         subject { "CAN3-Z299.0-86 (R2006)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code with decimal" do
           expect(parsed.wrapped_identifier.code.value).to eq("Z299.0")
@@ -162,7 +162,7 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
 
       describe "CAN3-B78.1-M83 (R2002)" do
         subject { "CAN3-B78.1-M83 (R2002)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses M-prefix year" do
           expect(parsed.wrapped_identifier.year).to eq("1983")
@@ -177,14 +177,14 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
     context "NO. notation with CAN/CSA- prefix" do
       describe "CAN/CSA-C22.2 NO. 60079-11:14" do
         subject { "CAN/CSA-C22.2 NO. 60079-11:14" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
           expect(parsed).to be_a(described_class)
         end
 
         it "wraps CecIdentifier" do
-          expect(parsed.wrapped_identifier).to be_a(PubidNew::Csa::Identifiers::Cec)
+          expect(parsed.wrapped_identifier).to be_a(Pubid::Csa::Identifiers::Cec)
         end
 
         it "parses CEC part" do
@@ -206,14 +206,14 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
 
       describe "CAN/CSA-C22.2 NO. 60601-1-9:15 (R2024)" do
         subject { "CAN/CSA-C22.2 NO. 60601-1-9:15 (R2024)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
           expect(parsed).to be_a(described_class)
         end
 
         it "wraps CecIdentifier" do
-          expect(parsed.wrapped_identifier).to be_a(PubidNew::Csa::Identifiers::Cec)
+          expect(parsed.wrapped_identifier).to be_a(Pubid::Csa::Identifiers::Cec)
         end
 
         it "parses CEC part" do
@@ -241,15 +241,15 @@ RSpec.describe PubidNew::Csa::Identifiers::CanadianAdopted do
     context "combined with canadian adopted patterns" do
       describe "CAN/CSA-B138.1-17/CAN/CSA-B138.2-17 (R2022)" do
         subject { "CAN/CSA-B138.1-17/CAN/CSA-B138.2-17 (R2022)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
-          expect(parsed).to be_a(PubidNew::Csa::Identifiers::Combined)
+          expect(parsed).to be_a(Pubid::Csa::Identifiers::Combined)
         end
 
         it "parses both identifiers" do
-          expect(parsed.first).to be_a(PubidNew::Csa::Identifiers::Standard)
-          expect(parsed.second).to be_a(PubidNew::Csa::Identifiers::Standard)
+          expect(parsed.first).to be_a(Pubid::Csa::Identifiers::Standard)
+          expect(parsed.second).to be_a(Pubid::Csa::Identifiers::Standard)
         end
 
         it "first identifier has publisher prefix" do

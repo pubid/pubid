@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Debug preprocessing
 
-require_relative "../../../lib/pubid_new"
+require_relative "../../../lib/pubid"
 
 test_case = "IEEE Std 802.16/Conformance01-2003"
 

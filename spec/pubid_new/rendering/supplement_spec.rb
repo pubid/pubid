@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/rendering/supplement"
-require_relative "../../../lib/pubid_new/components/date"
+require_relative "../../../lib/pubid/rendering/supplement"
+require_relative "../../../lib/pubid/components/date"
 
-RSpec.describe PubidNew::Rendering::Supplement do
+RSpec.describe Pubid::Rendering::Supplement do
   # Mock TypedStage class
   class MockTypedStage
     def initialize(abbr)
@@ -18,7 +18,7 @@ RSpec.describe PubidNew::Rendering::Supplement do
 
   let(:test_class) do
     Class.new do
-      include PubidNew::Rendering::Supplement
+      include Pubid::Rendering::Supplement
 
       attr_accessor :base_identifier, :supplements
 
@@ -38,7 +38,7 @@ RSpec.describe PubidNew::Rendering::Supplement do
 
     it "renders base with amendment" do
       base = double("base", to_s: "ISO 9001:2015")
-      supplements = [{ typed_stage: MockTypedStage.new("Amd"), type: "amendment", number: "1", date: PubidNew::Components::Date.new(year: 2020) }]
+      supplements = [{ typed_stage: MockTypedStage.new("Amd"), type: "amendment", number: "1", date: Pubid::Components::Date.new(year: 2020) }]
       result = instance.render_supplements(base, supplements)
       expect(result).to include("ISO 9001:2015")
       expect(result).to include("Amd")
@@ -49,8 +49,8 @@ RSpec.describe PubidNew::Rendering::Supplement do
     it "renders multiple supplements" do
       base = double("base", to_s: "ISO 9001:2015")
       supplements = [
-        { typed_stage: MockTypedStage.new("Amd"), type: "amendment", number: "1", date: PubidNew::Components::Date.new(year: 2020) },
-        { typed_stage: MockTypedStage.new("Cor"), type: "corrigendum", number: "1", date: PubidNew::Components::Date.new(year: 2021) }
+        { typed_stage: MockTypedStage.new("Amd"), type: "amendment", number: "1", date: Pubid::Components::Date.new(year: 2020) },
+        { typed_stage: MockTypedStage.new("Cor"), type: "corrigendum", number: "1", date: Pubid::Components::Date.new(year: 2021) }
       ]
       result = instance.render_supplements(base, supplements)
       expect(result).to include("Amd")
@@ -59,7 +59,7 @@ RSpec.describe PubidNew::Rendering::Supplement do
 
     it "uses custom separator" do
       base = double("base", to_s: "ISO 9001:2015")
-      supplements = [{ typed_stage: MockTypedStage.new("Amd"), type: "amendment", number: "1", date: PubidNew::Components::Date.new(year: 2020) }]
+      supplements = [{ typed_stage: MockTypedStage.new("Amd"), type: "amendment", number: "1", date: Pubid::Components::Date.new(year: 2020) }]
       result = instance.render_supplements(base, supplements, supplement_separator: " — ")
       expect(result).to include("— Amd")
     end

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::Supplement do
+RSpec.describe Pubid::Iso::Identifiers::Supplement do
   subject { described_class }
 
   # Note: No pass/ fixture exists for generic supplements (only directives_supplement)
@@ -10,7 +10,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
   context "basic supplement identifiers" do
     describe "ISO/IEC Guide 98-3:2008/Suppl 1:2008" do
       subject { "ISO/IEC Guide 98-3:2008/Suppl 1:2008" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1" }
 
       it "parses publisher" do
@@ -68,7 +68,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
     describe "ISO 123:1999/Suppl 1" do
       subject { "ISO 123:1999/Suppl 1" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:123:sup:1:v1" }
 
       it "parses publisher" do
@@ -117,7 +117,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
   context "legacy format normalization" do
     describe "ISO/IEC Guide 98-3/Suppl.1:2008" do
       subject { "ISO/IEC Guide 98-3/Suppl.1:2008" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC Guide 98-3/Suppl 1:2008" }
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1" }
 
@@ -172,7 +172,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
     describe "ISO/IEC Guide 98-3:2008/Suppl.1:2008(en)" do
       subject { "ISO/IEC Guide 98-3:2008/Suppl.1:2008(en)" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC Guide 98-3:2008/Suppl 1:2008(en)" }
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1:en" }
 
@@ -239,7 +239,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
     context "proposal" do
       describe "ISO/IEC Guide 98-3/NP Suppl 2" do
         subject { "ISO/IEC Guide 98-3/NP Suppl 2" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:stage-10.00:sup:2:v1" }
 
         it "parses publisher" do
@@ -291,7 +291,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
     context "draft supplement" do
       describe "ISO Guide 98:1995/DSuppl 1.2" do
         subject { "ISO Guide 98:1995/DSuppl 1.2" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:pubid) { "ISO Guide 98:1995/DSuppl 1.2" }
         let(:urn) { "urn:iso:std:iso:guide:98:stage-40.00:sup:1:v1" }
 
@@ -342,7 +342,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
       describe "ISO/IEC NP Guide 98:1995/DSuppl 1.2" do
         subject { "ISO/IEC NP Guide 98:1995/DSuppl 1.2" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) do
           "urn:iso:std:iso-iec:guide:98:stage-10.00:stage-40.00:sup:1:v1"
         end
@@ -406,7 +406,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
   context "supplement without number" do
     describe "ISO 3758:1991/Suppl:1993" do
       subject { "ISO 3758:1991/Suppl:1993" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:3758:sup:1993" }
 
       it "parses publisher" do
@@ -455,7 +455,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
   context "supplement with different base types" do
     describe "ISO/TR 10000:2000/Suppl 1:2005" do
       subject { "ISO/TR 10000:2000/Suppl 1:2005" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tr:10000:sup:2005:v1" }
 
       it "parses publisher" do
@@ -505,7 +505,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
     describe "ISO 14000:2015/Suppl 1:2020" do
       subject { "ISO 14000:2015/Suppl 1:2020" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:14000:sup:2020:v1" }
 
       it "parses publisher" do
@@ -558,7 +558,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
   context "supplement stage variations" do
     describe "ISO 10000:2020/WD Suppl 1" do
       subject { "ISO 10000:2020/WD Suppl 1" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:10000:stage-20.20:sup:1:v1" }
 
       it "parses publisher" do
@@ -600,7 +600,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
     describe "ISO 10000:2020/CD Suppl 1" do
       subject { "ISO 10000:2020/CD Suppl 1" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:10000:stage-30.00:sup:1:v1" }
 
       it "parses publisher" do
@@ -642,7 +642,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
     describe "ISO 12345:2020/FDIS Suppl 1" do
       subject { "ISO 12345:2020/FDIS Suppl 1" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:pubid) { "ISO 12345:2020/FDSuppl 1" }
       let(:urn) { "urn:iso:std:iso:12345:stage-50.00:sup:1:v1" }
 
@@ -685,7 +685,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Supplement do
 
     describe "ISO 12345:2020/PRF Suppl 1" do
       subject { "ISO 12345:2020/PRF Suppl 1" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:12345:stage-50.00:sup:1:v1" }
 
       it "parses publisher" do

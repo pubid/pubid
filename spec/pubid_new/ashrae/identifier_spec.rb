@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Ashrae::Identifier do
+RSpec.describe Pubid::Ashrae::Identifier do
   describe ".parse" do
     it "parses a basic identifier" do
       # Basic smoke test to verify parsing works

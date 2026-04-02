@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Ansi::Identifiers::Standard do
+RSpec.describe Pubid::Ansi::Identifiers::Standard do
   # ========================================
   # Standard (76 IDs, 26%)
   # ========================================
   describe "parses letter-less simple standard" do
     subject { "ANSI 802.3-2012" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -20,7 +20,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses lettered standard with dash year" do
     subject { "ANSI C135.14-1979" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses lettered standard with complex number and dash year" do
     subject { "ANSI C37.06.1-2000" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -44,7 +44,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses lettered standard with letter suffix and dash year" do
     subject { "ANSI N323D-2002" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -56,7 +56,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with slash" do
     subject { "ANSI/ASME B16.5" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -69,7 +69,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with slash and dash year" do
     subject { "ANSI/ASTM E1527-2013" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -81,7 +81,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with IEC" do
     subject { "ANSI/IEC 60601-1" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -93,7 +93,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with IEEE" do
     subject { "ANSI/IEEE 1-1986" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -105,7 +105,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with IEEE and complex number" do
     subject { "ANSI/IEEE 802.3j-1993" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -117,7 +117,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with IEEE and lettered complex number" do
     subject { "ANSI/IEEE C67.92-1987" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -129,7 +129,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with ISO and colon year" do
     subject { "ANSI/ISO 9899:1990" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -142,7 +142,7 @@ RSpec.describe PubidNew::Ansi::Identifiers::Standard do
 
   describe "parses co-published standard with SAE and no year" do
     subject { "ANSI/SAE J1939" }
-    let(:parsed) { PubidNew::Ansi.parse(subject) }
+    let(:parsed) { Pubid::Ansi.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

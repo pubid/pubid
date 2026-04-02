@@ -2,11 +2,11 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
+RSpec.describe Pubid::Itu::Identifiers::Corrigendum do
   describe "basic corrigendum patterns" do
     context "ITU-T Z.100 (1999) Cor. 1 (10/2001)" do
       subject { "ITU-T Z.100 (1999) Cor. 1 (10/2001)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses as Corrigendum" do
         expect(parsed).to be_a(described_class)
@@ -21,7 +21,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
       end
 
       it "parses base recommendation" do
-        expect(parsed.base).to be_a(PubidNew::Itu::Identifiers::Recommendation)
+        expect(parsed.base).to be_a(Pubid::Itu::Identifiers::Recommendation)
         expect(parsed.base.code.number).to eq("100")
       end
 
@@ -45,7 +45,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
 
     context "ITU-T G.780 (2004) Cor. 1 (2005)" do
       subject { "ITU-T G.780 (2004) Cor. 1 (2005)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses as Corrigendum" do
         expect(parsed).to be_a(described_class)
@@ -80,7 +80,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
   describe "corrigendum without dates" do
     context "ITU-T G.989 Cor. 1" do
       subject { "ITU-T G.989 Cor. 1" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses as Corrigendum" do
         expect(parsed).to be_a(described_class)
@@ -107,7 +107,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
   describe "corrigendum with combined identifier" do
     context "ITU-T G.780/Y.1351 (2004) Cor. 1 (2005)" do
       subject { "ITU-T G.780/Y.1351 (2004) Cor. 1 (2005)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses series" do
         expect(parsed.series.series).to eq("G")
@@ -130,7 +130,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
   describe "ITU-R corrigendum" do
     context "ITU-R V.574-5 (2020) Cor. 1 (2021)" do
       subject { "ITU-R V.574-5 (2020) Cor. 1 (2021)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses sector" do
         expect(parsed.sector.sector).to eq("R")
@@ -156,7 +156,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
 
     context "ITU-R SA.364-6 (2015) Cor. 2 (02/2016)" do
       subject { "ITU-R SA.364-6 (2015) Cor. 2 (02/2016)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses two-letter series" do
         expect(parsed.series.series).to eq("SA")
@@ -180,7 +180,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
   describe "multi-digit corrigendum numbers" do
     context "ITU-T Z.100 (1999) Cor. 10 (10/2001)" do
       subject { "ITU-T Z.100 (1999) Cor. 10 (10/2001)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses multi-digit corrigendum number" do
         expect(parsed.number).to eq("10")
@@ -193,7 +193,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
 
     context "ITU-T G.780 (2004) Cor. 25 (2005)" do
       subject { "ITU-T G.780 (2004) Cor. 25 (2005)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses multi-digit corrigendum number" do
         expect(parsed.number).to eq("25")
@@ -208,7 +208,7 @@ RSpec.describe PubidNew::Itu::Identifiers::Corrigendum do
   describe "corrigendum with subseries" do
     context "ITU-T M.3016.1 (2018) Cor. 1 (2019)" do
       subject { "ITU-T M.3016.1 (2018) Cor. 1 (2019)" }
-      let(:parsed) { PubidNew::Itu.parse(subject) }
+      let(:parsed) { Pubid::Itu.parse(subject) }
 
       it "parses base with subseries" do
         expect(parsed.base.code.number).to eq("3016")

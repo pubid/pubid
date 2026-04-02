@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
+RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
   subject { described_class }
 
   describe "parse identifiers from examples" do
@@ -10,7 +10,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
         f.readlines.each do |pub_id|
           next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
+          expect(Pubid::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
@@ -28,7 +28,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
     context "dated ISP" do
       describe "ISO/IEC ISP 10611-3:2003" do
         subject { "ISO/IEC ISP 10611-3:2003" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:10611:-3" }
 
         it "parses publisher" do
@@ -74,7 +74,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
 
       describe "ISO/IEC ISP 12345:2020" do
         subject { "ISO/IEC ISP 12345:2020" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:12345" }
 
         it "parses publisher" do
@@ -123,7 +123,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
     context "undated ISP" do
       describe "ISO/IEC ISP 12062-3" do
         subject { "ISO/IEC ISP 12062-3" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:12062:-3" }
 
         it "parses publisher" do
@@ -169,7 +169,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
 
       describe "ISO/IEC ISP 10000" do
         subject { "ISO/IEC ISP 10000" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:10000" }
 
         it "parses publisher" do
@@ -220,7 +220,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
     context "ISO only publisher" do
       describe "ISO ISP 12066-1" do
         subject { "ISO ISP 12066-1" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:pubid) { "ISO/ISP 12066-1" }
         let(:urn) { "urn:iso:std:iso:isp:12066:-1" }
 
@@ -272,7 +272,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
     context "proposal" do
       describe "ISO/IEC NP ISP 29110-4-2" do
         subject { "ISO/IEC NP ISP 29110-4-2" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:29110:-4-2:stage-10.00" }
 
         it "parses publisher" do
@@ -316,7 +316,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
     context "preparatory" do
       describe "ISO/IEC WD ISP 10613-2" do
         subject { "ISO/IEC WD ISP 10613-2" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:stage-20.20" }
 
         it "parses publisher" do
@@ -356,7 +356,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
     context "enquiry" do
       describe "ISO/IEC DISP 12069" do
         subject { "ISO/IEC DISP 12069" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:12069:stage-40.00" }
 
         it "parses publisher" do
@@ -390,7 +390,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
 
       describe "ISO/DISP 12066-1" do
         subject { "ISO/DISP 12066-1" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:isp:12066:-1:stage-40.00" }
 
         it "parses publisher" do
@@ -432,7 +432,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
   context "complex parts" do
     describe "ISO/IEC ISP 11183-1-1:2001" do
       subject { "ISO/IEC ISP 11183-1-1:2001" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:isp:11183:-1-1" }
 
       it "parses publisher" do
@@ -485,7 +485,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
   context "languages" do
     describe "ISO/IEC ISP 10611-3:2003(en)" do
       subject { "ISO/IEC ISP 10611-3:2003(en)" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:isp:10611:-3:en" }
 
       it "parses publisher" do
@@ -535,7 +535,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
 
     describe "ISO/IEC ISP 12062-3(E/F)" do
       subject { "ISO/IEC ISP 12062-3(E/F)" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC ISP 12062-3(E/F)" }  # V2 preserves original language format
       let(:urn) { "urn:iso:std:iso-iec:isp:12062:-3:en,fr" }
 
@@ -589,7 +589,7 @@ RSpec.describe PubidNew::Iso::Identifiers::InternationalStandardizedProfile do
   context "stage iterations" do
     describe "ISO/IEC WD ISP 10613-2.2" do
       subject { "ISO/IEC WD ISP 10613-2.2" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:stage-20.20.v2" }
 
       it "parses publisher" do

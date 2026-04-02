@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Part do
+RSpec.describe Pubid::Nist::Components::Part do
   describe "#to_s" do
     context "with n_notation (default)" do
       it "renders with n prefix" do

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid_new/ieee"
+require_relative "../../lib/pubid/ieee"
 
 RSpec.describe "IEEE identifiers" do
   describe "simple standards" do
     it "parses IEEE Std 1234-2007" do
-      parsed = PubidNew::Ieee.parse("IEEE Std 1234-2007")
+      parsed = Pubid::Ieee.parse("IEEE Std 1234-2007")
 
-      expect(parsed).to be_a(PubidNew::Ieee::Identifiers::Base)
+      expect(parsed).to be_a(Pubid::Ieee::Identifiers::Base)
       expect(parsed.publisher).to eq("IEEE")
       expect(parsed.code.number).to eq("1234")
       expect(parsed.year).to eq("2007")
@@ -16,14 +16,14 @@ RSpec.describe "IEEE identifiers" do
     end
 
     it "parses IEEE No 264-1968" do
-      parsed = PubidNew::Ieee.parse("IEEE No 264-1968")
+      parsed = Pubid::Ieee.parse("IEEE No 264-1968")
 
       expect(parsed.code.number).to eq("264")
       expect(parsed.year).to eq("1968")
     end
 
     it "parses AIEE No 1B-1944" do
-      parsed = PubidNew::Ieee.parse("AIEE No 1B-1944")
+      parsed = Pubid::Ieee.parse("AIEE No 1B-1944")
 
       expect(parsed.publisher).to eq("AIEE")
       expect(parsed.code.number).to eq("1B")
@@ -33,7 +33,7 @@ RSpec.describe "IEEE identifiers" do
 
   describe "standards with parts" do
     it "parses IEEE Std 802.3-2018" do
-      parsed = PubidNew::Ieee.parse("IEEE Std 802.3-2018")
+      parsed = Pubid::Ieee.parse("IEEE Std 802.3-2018")
 
       expect(parsed.code.number).to eq("802")
       expect(parsed.code.parts).to eq(["3"])
@@ -42,7 +42,7 @@ RSpec.describe "IEEE identifiers" do
     end
 
     it "parses IEEE Std 802.15.4-2020" do
-      parsed = PubidNew::Ieee.parse("IEEE Std 802.15.4-2020")
+      parsed = Pubid::Ieee.parse("IEEE Std 802.15.4-2020")
 
       expect(parsed.code.number).to eq("802")
       expect(parsed.code.parts).to eq(["15", "4"])
@@ -50,7 +50,7 @@ RSpec.describe "IEEE identifiers" do
     end
 
     it "parses IEEE Std C57.12.00-2015" do
-      parsed = PubidNew::Ieee.parse("IEEE Std C57.12.00-2015")
+      parsed = Pubid::Ieee.parse("IEEE Std C57.12.00-2015")
 
       expect(parsed.code.prefix).to eq("C")
       expect(parsed.code.number).to eq("57")
@@ -61,22 +61,22 @@ RSpec.describe "IEEE identifiers" do
 
   describe "draft standards" do
     it "parses IEEE P1234/D5, July 2019" do
-      parsed = PubidNew::Ieee.parse("IEEE P1234/D5, July 2019")
+      parsed = Pubid::Ieee.parse("IEEE P1234/D5, July 2019")
 
       # Should be a ProjectDraftIdentifier, not a StandardIdentifier
-      expect(parsed).to be_a(PubidNew::Ieee::Identifiers::ProjectDraftIdentifier)
+      expect(parsed).to be_a(Pubid::Ieee::Identifiers::ProjectDraftIdentifier)
 
       # "P" is a project/draft stage indicator, NOT a code prefix
       expect(parsed.code.prefix).to be_nil
       expect(parsed.code.number).to eq("1234")
-      expect(parsed.draft).to be_a(PubidNew::Ieee::Components::Draft)
+      expect(parsed.draft).to be_a(Pubid::Ieee::Components::Draft)
       expect(parsed.draft.version).to eq("5")
       expect(parsed.draft.month).to eq("7")
       expect(parsed.draft.year).to eq("2019")
     end
 
     it "parses IEEE Unapproved Draft Std P1234/D5, July 2019" do
-      parsed = PubidNew::Ieee.parse("IEEE Unapproved Draft Std P1234/D5, July 2019")
+      parsed = Pubid::Ieee.parse("IEEE Unapproved Draft Std P1234/D5, July 2019")
 
       expect(parsed.draft_status).to eq("Unapproved")
       expect(parsed.type).to eq("Draft Std")
@@ -101,9 +101,9 @@ RSpec.describe "IEEE identifiers" do
         total += 1
 
         begin
-          parsed = PubidNew::Ieee.parse(identifier)
+          parsed = Pubid::Ieee.parse(identifier)
           # Accept both Identifiers::Base and Aiee::Identifier
-          expect(parsed).to satisfy { |id| id.is_a?(PubidNew::Ieee::Identifiers::Base) || id.is_a?(PubidNew::Ieee::Aiee::Identifier) }
+          expect(parsed).to satisfy { |id| id.is_a?(Pubid::Ieee::Identifiers::Base) || id.is_a?(Pubid::Ieee::Aiee::Identifier) }
 
           # Test round-trip by converting back to string
           output = parsed.to_s

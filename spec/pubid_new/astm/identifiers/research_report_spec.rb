@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::ResearchReport do
+RSpec.describe Pubid::Astm::Identifiers::ResearchReport do
   # ========================================
   # Research Report (59 IDs, 20%)
   # ========================================
 
   describe "parses research report" do
     subject { "ASTM RR:A01-1001" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -21,7 +21,7 @@ RSpec.describe PubidNew::Astm::Identifiers::ResearchReport do
 
   describe "parses research report with different committee" do
     subject { "ASTM RR:C09-2005" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
+RSpec.describe Pubid::Bsi::Identifiers::PublishedDocument do
   subject { described_class }
 
   context "basic Published Document identifiers" do
     describe "PD 1234:2020" do
       subject { "PD 1234:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)
@@ -33,7 +33,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
 
     describe "PD 5678" do
       subject { "PD 5678" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)
@@ -56,7 +56,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
   context "Published Document with parts" do
     describe "PD 7654-3:2019" do
       subject { "PD 7654-3:2019" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)
@@ -81,7 +81,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
 
     describe "PD 8888-2-1:2020" do
       subject { "PD 8888-2-1:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
   context "Published Document with month" do
     describe "PD 1234:2020-03" do
       subject { "PD 1234:2020-03" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)
@@ -133,7 +133,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
   context "Published Document with edition" do
     describe "PD 5432:2018 v2.0" do
       subject { "PD 5432:2018 v2.0" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)
@@ -152,7 +152,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::PublishedDocument do
   context "multi-digit numbers" do
     describe "PD 10000:2022" do
       subject { "PD 10000:2022" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as PublishedDocument" do
         expect(parsed).to be_a(described_class)

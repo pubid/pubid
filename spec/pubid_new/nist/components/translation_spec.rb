@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Translation do
+RSpec.describe Pubid::Nist::Components::Translation do
   describe "initialization" do
     it "creates translation with code" do
       translation = described_class.new(code: "spa")

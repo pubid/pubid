@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid_new/bsi"
+require_relative "../../lib/pubid/bsi"
 
 RSpec.describe "BSI Integration Tests" do
   # Test format: [input, expected_output (if different from input)]
@@ -94,7 +94,7 @@ RSpec.describe "BSI Integration Tests" do
 
     context "when parsing '#{test_input}'" do
       it "round-trips correctly to '#{expected_output}'" do
-        parsed = PubidNew::Bsi.parse(test_input)
+        parsed = Pubid::Bsi.parse(test_input)
         expect(parsed.to_s).to eq(expected_output)
       end
     end

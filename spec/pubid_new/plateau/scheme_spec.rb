@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Plateau::Scheme do
+RSpec.describe Pubid::Plateau::Scheme do
   describe ".new" do
     it "creates a new scheme with type and number" do
       scheme = described_class.new(type: "Handbook", number: 1)

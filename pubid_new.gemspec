@@ -1,8 +1,8 @@
-require_relative "lib/pubid_new/version"
+require_relative "lib/pubid/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "pubid_new"
-  spec.version       = PubidNew::VERSION
+  spec.name          = "pubid"
+  spec.version       = Pubid::VERSION
   spec.authors       = ["Ribose Inc."]
   spec.email         = ["open.source@ribose.com"]
 

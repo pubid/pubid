@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
+RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
   subject { described_class }
 
   describe ".parse" do
     context "basic LC identifiers" do
       describe "NBS LC 1" do
         subject { "NBS LC 1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 1" do
         subject { "NBS LC 1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -49,7 +49,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 1088" do
         subject { "NBS LC 1088" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -68,7 +68,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
     context "LC with revision year" do
       describe "NBS LC 1013r1953" do
         subject { "NBS LC 1013r1953" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -89,7 +89,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 1013rv1953" do
         subject { "NBS LC 1013rv1953" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -106,7 +106,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 145" do
         subject { "NBS LC 145" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 378" do
         subject { "NBS LC 378" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -134,7 +134,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
     context "LC with letter suffix" do
       describe "NBS LC 378g" do
         subject { "NBS LC 378g" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -151,7 +151,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 378G" do
         subject { "NBS LC 378G" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -170,7 +170,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
     context "LC with language codes" do
       describe "NBS LC 1088sp" do
         subject { "NBS LC 1088sp" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -187,7 +187,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 378(sp)" do
         subject { "NBS LC 378(sp)" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -206,10 +206,10 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
     context "LC with supplement date" do
       describe "NBS.LC.118sup12/1926" do
         subject { "NBS.LC.118sup12/1926" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CircularSupplement with LetterCircular base" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
           expect(parsed.base_identifier).to be_a(described_class)
         end
 
@@ -228,10 +228,10 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 118sup" do
         subject { "NBS LC 118sup" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CircularSupplement with LetterCircular base" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
           expect(parsed.base_identifier).to be_a(described_class)
         end
 
@@ -247,10 +247,10 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 378sup1/1927" do
         subject { "NBS LC 378sup1/1927" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CircularSupplement with LetterCircular base" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
           expect(parsed.base_identifier).to be_a(described_class)
         end
 
@@ -263,10 +263,10 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
     context "LC with revision date" do
       describe "NBS.LC.145r11/1925" do
         subject { "NBS.LC.145r11/1925" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CircularSupplement with LetterCircular base" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
           expect(parsed.base_identifier).to be_a(described_class)
         end
 
@@ -281,7 +281,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
 
       describe "NBS LC 145r1926" do
         subject { "NBS LC 145r1926" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)
@@ -302,7 +302,7 @@ RSpec.describe PubidNew::Nist::Identifiers::LetterCircular do
     context "LC MR format" do
       describe "NBS.LC.887" do
         subject { "NBS.LC.887" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as LetterCircular" do
           expect(parsed).to be_a(described_class)

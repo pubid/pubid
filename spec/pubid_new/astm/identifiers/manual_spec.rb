@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::Manual do
+RSpec.describe Pubid::Astm::Identifiers::Manual do
   # ========================================
   # Manual (75 IDs, 26%)
   # ========================================
 
   describe "parses manual with edition" do
     subject { "ASTM MNL1-9TH-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -22,7 +22,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Manual do
 
   describe "parses manual without edition" do
     subject { "ASTM MNL9-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -34,7 +34,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Manual do
 
   describe "parses manual with supplement" do
     subject { "ASTM MNL20-2ND-SUP-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

@@ -1,7 +1,7 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Builder do
-  let(:scheme) { PubidNew::Iso::Scheme.new }
+RSpec.describe Pubid::Iso::Builder do
+  let(:scheme) { Pubid::Iso::Scheme.new }
   let(:builder) { described_class.new(scheme) }
 
   # ============================================================================
@@ -20,47 +20,47 @@ RSpec.describe PubidNew::Iso::Builder do
   describe "scheme.locate_identifier_klass_by_type_code" do
     it "returns InternationalStandard for 'is' type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("is")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::InternationalStandard)
+      expect(klass).to eq(Pubid::Iso::Identifiers::InternationalStandard)
     end
 
     it "returns Guide for guide type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("guide")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::Guide)
+      expect(klass).to eq(Pubid::Iso::Identifiers::Guide)
     end
 
     it "returns TechnicalReport for tr type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("tr")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::TechnicalReport)
+      expect(klass).to eq(Pubid::Iso::Identifiers::TechnicalReport)
     end
 
     it "returns TechnicalSpecification for ts type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("ts")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::TechnicalSpecification)
+      expect(klass).to eq(Pubid::Iso::Identifiers::TechnicalSpecification)
     end
 
     it "returns Pas for pas type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("pas")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::Pas)
+      expect(klass).to eq(Pubid::Iso::Identifiers::Pas)
     end
 
     it "returns TechnologyTrendsAssessments for tta type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("tta")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::TechnologyTrendsAssessments)
+      expect(klass).to eq(Pubid::Iso::Identifiers::TechnologyTrendsAssessments)
     end
 
     it "returns InternationalWorkshopAgreement for iwa type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("iwa")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::InternationalWorkshopAgreement)
+      expect(klass).to eq(Pubid::Iso::Identifiers::InternationalWorkshopAgreement)
     end
 
     it "returns InternationalStandardizedProfile for isp type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("isp")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::InternationalStandardizedProfile)
+      expect(klass).to eq(Pubid::Iso::Identifiers::InternationalStandardizedProfile)
     end
 
     it "returns Directives for dir type_code" do
       klass = scheme.locate_identifier_klass_by_type_code("dir")
-      expect(klass).to eq(PubidNew::Iso::Identifiers::Directives)
+      expect(klass).to eq(Pubid::Iso::Identifiers::Directives)
     end
   end
 
@@ -100,7 +100,7 @@ RSpec.describe PubidNew::Iso::Builder do
     describe ":publisher type" do
       it "creates Publisher with single publisher" do
         result = builder.cast(:publisher, "ISO")
-        expect(result).to be_a(PubidNew::Iso::Components::Publisher)
+        expect(result).to be_a(Pubid::Iso::Components::Publisher)
         expect(result.to_s).to eq("ISO")
       end
 
@@ -121,7 +121,7 @@ RSpec.describe PubidNew::Iso::Builder do
 
       it "defaults to ISO when publisher is not specified" do
         # When parsing a number without publisher prefix, ISO is added
-        expect(PubidNew::Iso.parse("ISO 9001:2015").publisher.to_s).to eq("ISO")
+        expect(Pubid::Iso.parse("ISO 9001:2015").publisher.to_s).to eq("ISO")
       end
     end
 
@@ -129,13 +129,13 @@ RSpec.describe PubidNew::Iso::Builder do
       it "creates Hash with number Code" do
         result = builder.cast(:number_with_part, "19115")
         expect(result).to be_a(Hash)
-        expect(result[:number]).to be_a(PubidNew::Iso::Components::Code)
+        expect(result[:number]).to be_a(Pubid::Iso::Components::Code)
         expect(result[:number].value).to eq("19115")
       end
 
       it "creates Hash with part Code" do
         result = builder.cast(:number_with_part, "13818-1")
-        expect(result[:part]).to be_a(PubidNew::Iso::Components::Code)
+        expect(result[:part]).to be_a(Pubid::Iso::Components::Code)
         expect(result[:part].value).to eq("1")
       end
 
@@ -158,7 +158,7 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::InternationalStandard)
+        expect(result).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
       end
 
       it "creates TechnicalReport for TR type" do
@@ -170,7 +170,7 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::TechnicalReport)
+        expect(result).to be_a(Pubid::Iso::Identifiers::TechnicalReport)
       end
 
       it "creates Guide for Guide type" do
@@ -182,7 +182,7 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::Guide)
+        expect(result).to be_a(Pubid::Iso::Identifiers::Guide)
       end
 
       it "creates TechnicalSpecification for TS type" do
@@ -193,7 +193,7 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::TechnicalSpecification)
+        expect(result).to be_a(Pubid::Iso::Identifiers::TechnicalSpecification)
       end
 
       it "creates Pas for PAS type" do
@@ -204,7 +204,7 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::Pas)
+        expect(result).to be_a(Pubid::Iso::Identifiers::Pas)
       end
     end
 
@@ -221,20 +221,20 @@ RSpec.describe PubidNew::Iso::Builder do
 
         result = builder.build(data)
 
-        expect(result.publisher).to be_a(PubidNew::Iso::Components::Publisher)
+        expect(result.publisher).to be_a(Pubid::Iso::Components::Publisher)
         expect(result.publisher.to_s).to eq("ISO/IEC")
 
         expect(result.typed_stage).not_to be_nil
         expect(result.typed_stage.type_code).to eq("tr")
 
-        expect(result.number).to be_a(PubidNew::Iso::Components::Code)
+        expect(result.number).to be_a(Pubid::Iso::Components::Code)
         expect(result.number.value).to eq("29186")
 
-        expect(result.date).to be_a(PubidNew::Components::Date)
+        expect(result.date).to be_a(Pubid::Components::Date)
         expect(result.date.year).to eq("2012")
 
         expect(result.languages).to be_an(Array)
-        expect(result.languages.first).to be_a(PubidNew::Components::Language)
+        expect(result.languages.first).to be_a(Pubid::Components::Language)
         # "E/F/R" is parsed as 3 separate language objects
         expect(result.languages.count).to eq(3)
         expect(result.languages.map(&:original_code)).to eq(["E", "F", "R"])
@@ -250,9 +250,9 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result.stage).to be_a(PubidNew::Components::Stage)
+        expect(result.stage).to be_a(Pubid::Components::Stage)
         # stage_iteration is set as a Code component via cast
-        expect(result.stage_iteration).to be_a(PubidNew::Iso::Components::Code)
+        expect(result.stage_iteration).to be_a(Pubid::Iso::Components::Code)
         expect(result.stage_iteration.value).to eq("2")
       end
     end
@@ -271,8 +271,8 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::Amendment)
-        expect(result.base_identifier).to be_a(PubidNew::Iso::Identifiers::InternationalStandard)
+        expect(result).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(result.base_identifier).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
         expect(result.number.value).to eq("1")
       end
 
@@ -321,9 +321,9 @@ RSpec.describe PubidNew::Iso::Builder do
         }
         result = builder.build(cor_data)
 
-        expect(result).to be_a(PubidNew::Iso::Identifiers::Corrigendum)
-        expect(result.base_identifier).to be_a(PubidNew::Iso::Identifiers::Amendment)
-        expect(result.base_identifier.base_identifier).to be_a(PubidNew::Iso::Identifiers::InternationalStandard)
+        expect(result).to be_a(Pubid::Iso::Identifiers::Corrigendum)
+        expect(result.base_identifier).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(result.base_identifier.base_identifier).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
       end
 
       it "infers supplement class from typed_stage" do
@@ -338,13 +338,13 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::Corrigendum)
+        expect(result).to be_a(Pubid::Iso::Identifiers::Corrigendum)
       end
 
       it "handles supplement numbers (whitespace stripped by parser)" do
         # Whitespace is stripped during parsing, not in builder
         # This is validated by integration tests
-        id = PubidNew::Iso.parse("ISO 19110:2005/Amd 1:2018")
+        id = Pubid::Iso.parse("ISO 19110:2005/Amd 1:2018")
         expect(id.number.value).to eq("1")
       end
     end
@@ -360,7 +360,7 @@ RSpec.describe PubidNew::Iso::Builder do
         }
 
         result = builder.build(data)
-        expect(result).to be_a(PubidNew::Iso::Identifiers::Directives)
+        expect(result).to be_a(Pubid::Iso::Identifiers::Directives)
         expect(result.publisher.to_s).to eq("ISO/IEC")
       end
     end

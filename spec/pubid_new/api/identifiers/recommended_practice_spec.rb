@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Api::Identifiers::RecommendedPractice do
+RSpec.describe Pubid::Api::Identifiers::RecommendedPractice do
   # Basic smoke test for identifier class
   # TODO: Add comprehensive tests for parsing, rendering, and attributes
 

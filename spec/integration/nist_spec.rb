@@ -13,7 +13,7 @@ RSpec.describe "NIST v2 Implementation" do
 
       it "parses and renders all records correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Nist.parse(test_case)
+          identifier = Pubid::Nist.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -53,7 +53,7 @@ RSpec.describe "NIST v2 Implementation" do
 
       it "parses and renders all publication exports correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Nist.parse(test_case)
+          identifier = Pubid::Nist.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -92,7 +92,7 @@ RSpec.describe "NIST v2 Implementation" do
 
       it "parses and renders all September 2024 updates correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Nist.parse(test_case)
+          identifier = Pubid::Nist.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -137,7 +137,7 @@ RSpec.describe "NIST v2 Implementation" do
       "NIST TN 2050",
     ].each do |test_case|
       it "correctly parses and renders '#{test_case}'" do
-        identifier = PubidNew::Nist.parse(test_case)
+        identifier = Pubid::Nist.parse(test_case)
         expect(identifier.to_s).to eq(test_case)
       end
     end

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../../lib/pubid_new/iso"
+require_relative "../../../../lib/pubid/iso"
 
-RSpec.describe PubidNew::Iso::Identifiers::TcDocument do
+RSpec.describe Pubid::Iso::Identifiers::TcDocument do
   describe "#parse" do
     it "parses TC document with SC and WG" do
-      id = PubidNew::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
+      id = Pubid::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
       expect(id).to be_a(described_class)
       expect(id.tc_type.value).to eq("TC")
       expect(id.tc_number.value).to eq("184")
@@ -18,7 +18,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TcDocument do
     end
 
     it "parses simple TC document" do
-      id = PubidNew::Iso.parse("ISO/TC 184 N 100")
+      id = Pubid::Iso.parse("ISO/TC 184 N 100")
       expect(id).to be_a(described_class)
       expect(id.tc_type.value).to eq("TC")
       expect(id.tc_number.value).to eq("184")
@@ -28,7 +28,7 @@ RSpec.describe PubidNew::Iso::Identifiers::TcDocument do
     end
 
     it "parses JTC document" do
-      id = PubidNew::Iso.parse("ISO/JTC 1 N 456")
+      id = Pubid::Iso.parse("ISO/JTC 1 N 456")
       expect(id).to be_a(described_class)
       expect(id.tc_type.value).to eq("JTC")
       expect(id.tc_number.value).to eq("1")
@@ -36,14 +36,14 @@ RSpec.describe PubidNew::Iso::Identifiers::TcDocument do
     end
 
     it "parses TC document with year" do
-      id = PubidNew::Iso.parse("ISO/TC 184 N 100:2024")
+      id = Pubid::Iso.parse("ISO/TC 184 N 100:2024")
       expect(id).to be_a(described_class)
       expect(id.number.value).to eq("100")
       expect(id.date.year).to eq("2024")
     end
 
     it "parses TC document with TC and SC only" do
-      id = PubidNew::Iso.parse("ISO/TC 184/SC 4 N 789")
+      id = Pubid::Iso.parse("ISO/TC 184/SC 4 N 789")
       expect(id).to be_a(described_class)
       expect(id.tc_type.value).to eq("TC")
       expect(id.tc_number.value).to eq("184")
@@ -56,49 +56,49 @@ RSpec.describe PubidNew::Iso::Identifiers::TcDocument do
 
   describe "#to_s" do
     it "renders TC document with SC and WG" do
-      id = PubidNew::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
+      id = Pubid::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
       expect(id.to_s).to eq("ISO/TC 184/SC 4/WG 3 N 123")
     end
 
     it "renders simple TC document" do
-      id = PubidNew::Iso.parse("ISO/TC 184 N 100")
+      id = Pubid::Iso.parse("ISO/TC 184 N 100")
       expect(id.to_s).to eq("ISO/TC 184 N 100")
     end
 
     it "renders JTC document" do
-      id = PubidNew::Iso.parse("ISO/JTC 1 N 456")
+      id = Pubid::Iso.parse("ISO/JTC 1 N 456")
       expect(id.to_s).to eq("ISO/JTC 1 N 456")
     end
 
     it "renders TC document with year" do
-      id = PubidNew::Iso.parse("ISO/TC 184 N 100:2024")
+      id = Pubid::Iso.parse("ISO/TC 184 N 100:2024")
       expect(id.to_s).to eq("ISO/TC 184 N 100:2024")
     end
 
     it "renders TC document with TC and SC only" do
-      id = PubidNew::Iso.parse("ISO/TC 184/SC 4 N 789")
+      id = Pubid::Iso.parse("ISO/TC 184/SC 4 N 789")
       expect(id.to_s).to eq("ISO/TC 184/SC 4 N 789")
     end
   end
 
   describe "#to_urn" do
     it "generates URN for TC document with SC and WG" do
-      id = PubidNew::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
+      id = Pubid::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
       expect(id.to_urn).to eq("urn:iso:doc:iso:tc:184:sc-4:wg-3:123")
     end
 
     it "generates URN for simple TC document" do
-      id = PubidNew::Iso.parse("ISO/TC 184 N 100")
+      id = Pubid::Iso.parse("ISO/TC 184 N 100")
       expect(id.to_urn).to eq("urn:iso:doc:iso:tc:184:100")
     end
 
     it "generates URN for JTC document" do
-      id = PubidNew::Iso.parse("ISO/JTC 1 N 456")
+      id = Pubid::Iso.parse("ISO/JTC 1 N 456")
       expect(id.to_urn).to eq("urn:iso:doc:iso:tc:1:456")
     end
 
     it "generates URN for TC document with TC and SC only" do
-      id = PubidNew::Iso.parse("ISO/TC 184/SC 4 N 789")
+      id = Pubid::Iso.parse("ISO/TC 184/SC 4 N 789")
       expect(id.to_urn).to eq("urn:iso:doc:iso:tc:184:sc-4:789")
     end
   end
@@ -119,20 +119,20 @@ RSpec.describe PubidNew::Iso::Identifiers::TcDocument do
 
   describe "#==" do
     it "compares TC documents correctly" do
-      id1 = PubidNew::Iso.parse("ISO/TC 184 N 100")
-      id2 = PubidNew::Iso.parse("ISO/TC 184 N 100")
+      id1 = Pubid::Iso.parse("ISO/TC 184 N 100")
+      id2 = Pubid::Iso.parse("ISO/TC 184 N 100")
       expect(id1).to eq(id2)
     end
 
     it "distinguishes different TC documents" do
-      id1 = PubidNew::Iso.parse("ISO/TC 184 N 100")
-      id2 = PubidNew::Iso.parse("ISO/TC 184 N 101")
+      id1 = Pubid::Iso.parse("ISO/TC 184 N 100")
+      id2 = Pubid::Iso.parse("ISO/TC 184 N 101")
       expect(id1).not_to eq(id2)
     end
 
     it "distinguishes TC from non-TC documents" do
-      tc_id = PubidNew::Iso.parse("ISO/TC 184 N 100")
-      std_id = PubidNew::Iso.parse("ISO 9001:2015")
+      tc_id = Pubid::Iso.parse("ISO/TC 184 N 100")
+      std_id = Pubid::Iso.parse("ISO 9001:2015")
       expect(tc_id).not_to eq(std_id)
     end
   end

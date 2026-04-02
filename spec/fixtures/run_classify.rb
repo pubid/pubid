@@ -4,38 +4,38 @@
 require "bundler/setup"
 require_relative "classify_fixtures"
 
-# Load PubidNew base classes first
-require_relative "../../lib/pubid_new/scheme"
-require_relative "../../lib/pubid_new/identifier"
+# Load Pubid base classes first
+require_relative "../../lib/pubid/scheme"
+require_relative "../../lib/pubid/identifier"
 
 # Load all PubID V2 implementations
 # Explicitly load all 19 flavors
-require_relative "../../lib/pubid_new/iso"
-require_relative "../../lib/pubid_new/iec"
-require_relative "../../lib/pubid_new/ieee"
-require_relative "../../lib/pubid_new/nist"
-require_relative "../../lib/pubid_new/jcgm"
-require_relative "../../lib/pubid_new/idf"
-require_relative "../../lib/pubid_new/oiml"
-require_relative "../../lib/pubid_new/astm"
-require_relative "../../lib/pubid_new/asme"
-require_relative "../../lib/pubid_new/api"
-require_relative "../../lib/pubid_new/csa"
-require_relative "../../lib/pubid_new/jis"
-require_relative "../../lib/pubid_new/etsi"
-require_relative "../../lib/pubid_new/ccsds"
-require_relative "../../lib/pubid_new/itu"
-require_relative "../../lib/pubid_new/plateau"
-require_relative "../../lib/pubid_new/ansi"
-require_relative "../../lib/pubid_new/cen"
-require_relative "../../lib/pubid_new/bsi"
+require_relative "../../lib/pubid/iso"
+require_relative "../../lib/pubid/iec"
+require_relative "../../lib/pubid/ieee"
+require_relative "../../lib/pubid/nist"
+require_relative "../../lib/pubid/jcgm"
+require_relative "../../lib/pubid/idf"
+require_relative "../../lib/pubid/oiml"
+require_relative "../../lib/pubid/astm"
+require_relative "../../lib/pubid/asme"
+require_relative "../../lib/pubid/api"
+require_relative "../../lib/pubid/csa"
+require_relative "../../lib/pubid/jis"
+require_relative "../../lib/pubid/etsi"
+require_relative "../../lib/pubid/ccsds"
+require_relative "../../lib/pubid/itu"
+require_relative "../../lib/pubid/plateau"
+require_relative "../../lib/pubid/ansi"
+require_relative "../../lib/pubid/cen"
+require_relative "../../lib/pubid/bsi"
 
 # Get flavor from command line
 flavor = ARGV[0]&.downcase
 
 if flavor.nil? || flavor == "all"
-  # Classify all registered flavors from the PubidNew::Registry
-  PubidNew::Registry.flavor_names.each do |f|
+  # Classify all registered flavors from the Pubid::Registry
+  Pubid::Registry.flavor_names.each do |f|
     puts
     begin
       classifier = FixturesClassifier.new(f, verbose: true)

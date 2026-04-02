@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Jis::Components::Code do
+RSpec.describe Pubid::Jis::Components::Code do
   describe "#initialize" do
     it "creates code with series and number" do
       code = described_class.new(series: "A", number: 123)

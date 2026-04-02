@@ -1,0 +1,25 @@
+# frozen_string_literal: true
+
+module Pubid
+  module Ashrae
+    # Base class for single (non-supplement) ASHRAE identifiers
+    # Includes: Guideline, Standard
+    class SingleIdentifier < Identifiers::Base
+      include Pubid::Serializable
+
+      def to_s
+        parts = []
+        parts << publisher if publisher
+        parts << type.to_s if type
+        result = parts.join(" ")
+        result += " " if result.length.positive?
+        result += code.to_s
+        result += "-#{year}" if year
+        result += " (#{amendment})" if amendment
+        result += suffix if suffix
+        result += " (RA#{reaffirmed})" if reaffirmed
+        result
+      end
+    end
+  end
+end

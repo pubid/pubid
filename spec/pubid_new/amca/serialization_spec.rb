@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/amca"
+require_relative "../../../lib/pubid/amca"
 
 RSpec.describe "AMCA Serialization" do
   describe "#to_h" do
     it "exports basic identifier as hash" do
-      id = PubidNew::Amca.parse("AMCA Standard 210-08")
+      id = Pubid::Amca.parse("AMCA Standard 210-08")
       hash = id.to_h
 
       expect(hash[:flavor]).to eq("amca")
@@ -16,7 +16,7 @@ RSpec.describe "AMCA Serialization" do
     end
 
     it "exports identifier with type" do
-      id = PubidNew::Amca.parse("AMCA Standard 210-08")
+      id = Pubid::Amca.parse("AMCA Standard 210-08")
       hash = id.to_h
 
       expect(hash[:type]).to eq("standard")
@@ -25,7 +25,7 @@ RSpec.describe "AMCA Serialization" do
 
   describe "#to_json" do
     it "exports identifier as JSON" do
-      id = PubidNew::Amca.parse("AMCA Standard 210-08")
+      id = Pubid::Amca.parse("AMCA Standard 210-08")
       json = id.to_json
 
       parsed = JSON.parse(json)
@@ -37,7 +37,7 @@ RSpec.describe "AMCA Serialization" do
 
   describe "#to_mr_string" do
     it "exports basic identifier as MR string" do
-      id = PubidNew::Amca.parse("AMCA Standard 210-08")
+      id = Pubid::Amca.parse("AMCA Standard 210-08")
       mr_string = id.to_mr_string
 
       expect(mr_string).to eq("AMCA.210.08")
@@ -54,7 +54,7 @@ RSpec.describe "AMCA Serialization" do
         type: "standard"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to include("AMCA")
       expect(id.to_s).to include("210")
     end
@@ -64,7 +64,7 @@ RSpec.describe "AMCA Serialization" do
     it "creates identifier from JSON" do
       json = '{"flavor":"amca","publisher":"AMCA","number":"210","year":"08","type":"standard"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to include("AMCA")
       expect(id.to_s).to include("210")
     end
@@ -72,17 +72,17 @@ RSpec.describe "AMCA Serialization" do
 
   describe "round-trip conversion" do
     it "preserves all data through hash conversion" do
-      original = PubidNew::Amca.parse("AMCA Standard 210-08")
+      original = Pubid::Amca.parse("AMCA Standard 210-08")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves all data through JSON conversion" do
-      original = PubidNew::Amca.parse("AMCA Publication 202-96")
+      original = Pubid::Amca.parse("AMCA Publication 202-96")
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end

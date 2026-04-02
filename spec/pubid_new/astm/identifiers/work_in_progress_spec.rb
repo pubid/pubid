@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::WorkInProgress do
+RSpec.describe Pubid::Astm::Identifiers::WorkInProgress do
   # ========================================
   # Work in Progress (3 IDs, 1%)
   # ========================================
 
   describe "parses work in progress" do
     subject { "ASTM WK91249" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -20,7 +20,7 @@ RSpec.describe PubidNew::Astm::Identifiers::WorkInProgress do
 
   describe "parses work in progress without prefix" do
     subject { "ASTM WK95199" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

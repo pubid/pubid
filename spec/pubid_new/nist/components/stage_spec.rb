@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Stage do
+RSpec.describe Pubid::Nist::Components::Stage do
   describe "initialization" do
     it "creates stage with id and type" do
       stage = described_class.new(id: "i", type: "pd")

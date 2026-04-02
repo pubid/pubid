@@ -3,10 +3,10 @@
 require "spec_helper"
 require "json"
 
-RSpec.describe PubidNew::Serializable do
+RSpec.describe Pubid::Serializable do
   describe "#to_h" do
     context "with ISO InternationalStandard" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 9001:2015") }
+      let(:identifier) { Pubid::Iso.parse("ISO 9001:2015") }
 
       it "exports basic identifier attributes" do
         hash = identifier.to_h
@@ -46,7 +46,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with ISO identifier with copublisher" do
-      let(:identifier) { PubidNew::Iso.parse("ISO/IEC 27001:2013") }
+      let(:identifier) { Pubid::Iso.parse("ISO/IEC 27001:2013") }
 
       it "exports copublisher" do
         hash = identifier.to_h
@@ -56,7 +56,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with ISO identifier with part" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 8601-1:2019") }
+      let(:identifier) { Pubid::Iso.parse("ISO 8601-1:2019") }
 
       it "exports part" do
         hash = identifier.to_h
@@ -72,7 +72,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with ISO identifier with languages" do
-      let(:identifier) { PubidNew::Iso.parse("ISO/IEC Guide 51:1999(E/F/R)") }
+      let(:identifier) { Pubid::Iso.parse("ISO/IEC Guide 51:1999(E/F/R)") }
 
       it "exports languages" do
         hash = identifier.to_h(include_metadata: false)
@@ -83,7 +83,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with ISO amendment" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 19110:2005/Amd 1:2011") }
+      let(:identifier) { Pubid::Iso.parse("ISO 19110:2005/Amd 1:2011") }
 
       it "exports supplement information" do
         hash = identifier.to_h
@@ -99,7 +99,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with nested supplements" do
-      let(:identifier) { PubidNew::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017") }
+      let(:identifier) { Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017") }
 
       it "exports all supplements in correct order" do
         hash = identifier.to_h
@@ -122,7 +122,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with include_metadata: false" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 9001:2015") }
+      let(:identifier) { Pubid::Iso.parse("ISO 9001:2015") }
 
       it "excludes URN and metadata" do
         hash = identifier.to_h(include_metadata: false)
@@ -134,7 +134,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with NIST identifier" do
-      let(:identifier) { PubidNew::Nist.parse("NIST SP 800-53") }
+      let(:identifier) { Pubid::Nist.parse("NIST SP 800-53") }
 
       it "exports NIST-specific attributes" do
         hash = identifier.to_h(include_metadata: false)
@@ -146,7 +146,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with IEEE identifier" do
-      let(:identifier) { PubidNew::Ieee.parse("IEEE Std 802.3-2018") }
+      let(:identifier) { Pubid::Ieee.parse("IEEE Std 802.3-2018") }
 
       it "exports IEEE-specific attributes" do
         hash = identifier.to_h(include_metadata: false)
@@ -160,7 +160,7 @@ RSpec.describe PubidNew::Serializable do
   end
 
   describe "#to_json" do
-    let(:identifier) { PubidNew::Iso.parse("ISO 9001:2015") }
+    let(:identifier) { Pubid::Iso.parse("ISO 9001:2015") }
 
     it "returns valid JSON string" do
       json = identifier.to_json
@@ -183,14 +183,14 @@ RSpec.describe PubidNew::Serializable do
     it "can be parsed back with from_json" do
       original = identifier
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end
   end
 
   describe "#to_yaml" do
-    let(:identifier) { PubidNew::Iso.parse("ISO 9001:2015") }
+    let(:identifier) { Pubid::Iso.parse("ISO 9001:2015") }
 
     it "returns valid YAML string" do
       yaml = identifier.to_yaml
@@ -214,7 +214,7 @@ RSpec.describe PubidNew::Serializable do
     it "can be parsed back with from_yaml" do
       original = identifier
       yaml = original.to_yaml
-      restored = PubidNew::Serializable.from_yaml(yaml)
+      restored = Pubid::Serializable.from_yaml(yaml)
 
       expect(restored.to_s).to eq(original.to_s)
     end
@@ -222,7 +222,7 @@ RSpec.describe PubidNew::Serializable do
 
   describe "#to_mr_string" do
     context "with ISO identifier" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 9001:2015") }
+      let(:identifier) { Pubid::Iso.parse("ISO 9001:2015") }
 
       it "returns dot-separated format" do
         mr_string = identifier.to_mr_string
@@ -232,7 +232,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with ISO identifier with part" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 8601-1:2019") }
+      let(:identifier) { Pubid::Iso.parse("ISO 8601-1:2019") }
 
       it "includes part in dot-separated format" do
         mr_string = identifier.to_mr_string
@@ -242,7 +242,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with ISO/IEC identifier" do
-      let(:identifier) { PubidNew::Iso.parse("ISO/IEC 27001:2013") }
+      let(:identifier) { Pubid::Iso.parse("ISO/IEC 27001:2013") }
 
       it "includes publisher only (copublisher not in MR format)" do
         mr_string = identifier.to_mr_string
@@ -254,7 +254,7 @@ RSpec.describe PubidNew::Serializable do
     end
 
     context "with undated ISO identifier" do
-      let(:identifier) { PubidNew::Iso.parse("ISO 4") }
+      let(:identifier) { Pubid::Iso.parse("ISO 4") }
 
       it "handles missing year" do
         mr_string = identifier.to_mr_string
@@ -278,12 +278,12 @@ RSpec.describe PubidNew::Serializable do
       it "creates identifier from hash" do
         identifier = described_class.from_h(hash)
 
-        expect(identifier).to be_a(PubidNew::Iso::Identifiers::InternationalStandard)
+        expect(identifier).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
         expect(identifier.to_s).to eq("ISO 9001:2015")
       end
 
       it "round-trips through to_h" do
-        original = PubidNew::Iso.parse("ISO 9001:2015")
+        original = Pubid::Iso.parse("ISO 9001:2015")
         hash = original.to_h
         restored = described_class.from_h(hash)
 
@@ -373,7 +373,7 @@ RSpec.describe PubidNew::Serializable do
   end
 
   describe ".from_json" do
-    let(:identifier) { PubidNew::Iso.parse("ISO 9001:2015") }
+    let(:identifier) { Pubid::Iso.parse("ISO 9001:2015") }
 
     it "creates identifier from JSON string" do
       json = identifier.to_json
@@ -418,7 +418,7 @@ RSpec.describe PubidNew::Serializable do
 
     context "round-trip with to_mr_string" do
       it "round-trips ISO identifier" do
-        original = PubidNew::Iso.parse("ISO 9001:2015")
+        original = Pubid::Iso.parse("ISO 9001:2015")
         mr_string = original.to_mr_string
         restored = described_class.from_mr_string(mr_string)
 
@@ -426,7 +426,7 @@ RSpec.describe PubidNew::Serializable do
       end
 
       it "round-trips ISO identifier with part" do
-        original = PubidNew::Iso.parse("ISO 8601-1:2019")
+        original = Pubid::Iso.parse("ISO 8601-1:2019")
         mr_string = original.to_mr_string
         restored = described_class.from_mr_string(mr_string)
 
@@ -453,7 +453,7 @@ RSpec.describe PubidNew::Serializable do
           # Parse based on publisher prefix
           identifier = parse_identifier(identifier_string)
           hash = identifier.to_h
-          restored = PubidNew::Serializable.from_h(hash)
+          restored = Pubid::Serializable.from_h(hash)
 
           expect(restored.to_s).to eq(identifier.to_s)
         end
@@ -461,7 +461,7 @@ RSpec.describe PubidNew::Serializable do
         it "round-trips through to_json and from_json" do
           identifier = parse_identifier(identifier_string)
           json = identifier.to_json
-          restored = PubidNew::Serializable.from_json(json)
+          restored = Pubid::Serializable.from_json(json)
 
           expect(restored.to_s).to eq(identifier.to_s)
         end
@@ -469,7 +469,7 @@ RSpec.describe PubidNew::Serializable do
         it "preserves all important attributes" do
           identifier = parse_identifier(identifier_string)
           hash = identifier.to_h
-          restored = PubidNew::Serializable.from_h(hash)
+          restored = Pubid::Serializable.from_h(hash)
 
           # Check that key attributes match
           # Handle different attribute names across flavors (number vs code, date vs year)
@@ -498,13 +498,13 @@ RSpec.describe PubidNew::Serializable do
   def parse_identifier(identifier_string)
     case identifier_string
     when /^ISO/
-      PubidNew::Iso.parse(identifier_string)
+      Pubid::Iso.parse(identifier_string)
     when /^NIST/
-      PubidNew::Nist.parse(identifier_string)
+      Pubid::Nist.parse(identifier_string)
     when /^IEEE/
-      PubidNew::Ieee.parse(identifier_string)
+      Pubid::Ieee.parse(identifier_string)
     else
-      PubidNew::Iso.parse(identifier_string) # Default to ISO
+      Pubid::Iso.parse(identifier_string) # Default to ISO
     end
   end
 end

@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandards do
+RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards do
   subject { described_class }
 
   describe ".parse" do
     context "basic FIPS identifiers" do
       describe "FIPS 1" do
         subject { "FIPS 1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 140" do
         subject { "FIPS 140" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -51,7 +51,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
     context "FIPS with edition" do
       describe "FIPS 14-1971" do
         subject { "FIPS 14-1971" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -62,7 +62,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1971")
         end
@@ -70,14 +70,14 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 107e198503" do
         subject { "FIPS 107e198503" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses edition with month+year normalized to number" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("198503")
         end
@@ -89,7 +89,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 107-Mar1985" do
         subject { "FIPS 107-Mar1985" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -100,7 +100,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
         end
 
         it "parses edition with month+year (converts to number format)" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("198503")
         end
@@ -108,7 +108,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 11-1-Sep30/1977" do
         subject { "FIPS 11-1-Sep30/1977" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
         end
 
         it "parses edition with month+day+year (converts to number format)" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("19770930")
         end
@@ -127,14 +127,14 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 46e1993" do
         subject { "FIPS 46e1993" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1993")
         end
@@ -146,7 +146,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 46-1977" do
         subject { "FIPS 46-1977" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -157,7 +157,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1977")
         end
@@ -167,7 +167,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
     context "FIPS with parts" do
       describe "FIPS 140-1" do
         subject { "FIPS 140-1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -184,7 +184,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 140-2" do
         subject { "FIPS 140-2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -201,7 +201,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 140-3" do
         subject { "FIPS 140-3" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -220,7 +220,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
     context "FIPS with letter suffix" do
       describe "FIPS 46a" do
         subject { "FIPS 46a" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -237,7 +237,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS 81A" do
         subject { "FIPS 81A" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -256,14 +256,14 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
     context "FIPS with revision" do
       describe "FIPS 197r2001" do
         subject { "FIPS 197r2001" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses revision as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("2001")
         end
@@ -277,7 +277,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
     context "FIPS dotted format" do
       describe "FIPS.140-2" do
         subject { "FIPS.140-2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -294,7 +294,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
 
       describe "FIPS.46e1993" do
         subject { "FIPS.46e1993" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
           expect(parsed).to be_a(described_class)
@@ -305,7 +305,7 @@ RSpec.describe PubidNew::Nist::Identifiers::FederalInformationProcessingStandard
         end
 
         it "parses edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1993")
         end

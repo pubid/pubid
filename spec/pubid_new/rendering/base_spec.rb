@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/pubid_new/rendering/base'
+require_relative '../../../lib/pubid/rendering/base'
 
-RSpec.describe PubidNew::Rendering::Base do
+RSpec.describe Pubid::Rendering::Base do
   class TestIdentifier
-    include PubidNew::Rendering::Base
+    include Pubid::Rendering::Base
 
     attr_accessor :publisher, :copublishers, :number, :part, :subpart, :date, :stage, :type, :languages
 
@@ -38,12 +38,12 @@ RSpec.describe PubidNew::Rendering::Base do
     end
 
     it "renders number with part" do
-      id = TestIdentifier.new(number: PubidNew::Components::Code.new(value: "9001"), part: PubidNew::Components::Code.new(value: "1"))
+      id = TestIdentifier.new(number: Pubid::Components::Code.new(value: "9001"), part: Pubid::Components::Code.new(value: "1"))
       expect(id.render_base).to eq(" 9001-1")
     end
 
     it "renders date" do
-      id = TestIdentifier.new(number: PubidNew::Components::Code.new(value: "9001"), date: PubidNew::Components::Date.new(year: "2015"))
+      id = TestIdentifier.new(number: Pubid::Components::Code.new(value: "9001"), date: Pubid::Components::Date.new(year: "2015"))
       expect(id.render_base).to eq(" 9001:2015")
     end
   end

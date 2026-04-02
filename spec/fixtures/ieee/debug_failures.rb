@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Test script to debug IEEE parser failures
 
-require_relative "../../../lib/pubid_new"
+require_relative "../../../lib/pubid"
 
 # Test cases for failing proper IEEE standards
 test_cases = [
@@ -33,7 +33,7 @@ test_cases.each do |identifier|
   puts "-" * 80
 
   begin
-    result = PubidNew::Ieee.parse(identifier)
+    result = Pubid::Ieee.parse(identifier)
     puts "✓ SUCCESS: Parsed as #{result.class}"
     puts "  Result: #{result.to_s}"
   rescue Parslet::ParseFailed => e

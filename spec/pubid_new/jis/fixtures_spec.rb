@@ -13,7 +13,7 @@ RSpec.describe "JIS Fixture Round-trip" do
     failed = []
 
     identifiers.each do |pubid|
-      identifier = PubidNew::Jis.parse(pubid)
+      identifier = Pubid::Jis.parse(pubid)
       rendered = identifier.to_s
       if pubid == rendered
         passed += 1

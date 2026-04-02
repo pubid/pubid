@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/bsi"
+require_relative "../../../lib/pubid/bsi"
 
 RSpec.describe "BSI Serialization" do
   describe "#to_h" do
     it "exports basic identifier as hash" do
-      id = PubidNew::Bsi.parse("BS 123200:2001")
+      id = Pubid::Bsi.parse("BS 123200:2001")
       hash = id.to_h
 
       expect(hash[:flavor]).to eq("bsi")
@@ -16,7 +16,7 @@ RSpec.describe "BSI Serialization" do
     end
 
     it "exports identifier with part" do
-      id = PubidNew::Bsi.parse("BS 1016-10:1977")
+      id = Pubid::Bsi.parse("BS 1016-10:1977")
       hash = id.to_h
 
       expect(hash[:number]).to eq("1016")
@@ -24,7 +24,7 @@ RSpec.describe "BSI Serialization" do
     end
 
     it "exports identifier with amendment" do
-      id = PubidNew::Bsi.parse("BS 7291-2 AMD1")
+      id = Pubid::Bsi.parse("BS 7291-2 AMD1")
       hash = id.to_h
 
       expect(hash[:number]).to eq("7291")
@@ -36,7 +36,7 @@ RSpec.describe "BSI Serialization" do
 
   describe "#to_json" do
     it "exports identifier as JSON" do
-      id = PubidNew::Bsi.parse("BS 123200:2001")
+      id = Pubid::Bsi.parse("BS 123200:2001")
       json = id.to_json
 
       parsed = JSON.parse(json)
@@ -48,7 +48,7 @@ RSpec.describe "BSI Serialization" do
 
   describe "#to_mr_string" do
     it "exports basic identifier as MR string" do
-      id = PubidNew::Bsi.parse("BS 123200:2001")
+      id = Pubid::Bsi.parse("BS 123200:2001")
       mr_string = id.to_mr_string
 
       expect(mr_string).to include("BS")
@@ -65,7 +65,7 @@ RSpec.describe "BSI Serialization" do
         year: "2001"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to include("BS")
       expect(id.to_s).to include("123200")
     end
@@ -75,7 +75,7 @@ RSpec.describe "BSI Serialization" do
     it "creates identifier from JSON" do
       json = '{"flavor":"bsi","publisher":"BS","number":"123200","year":"2001"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to include("BS")
       expect(id.to_s).to include("123200")
     end
@@ -83,9 +83,9 @@ RSpec.describe "BSI Serialization" do
 
   describe "round-trip conversion" do
     it "preserves all data through hash conversion" do
-      original = PubidNew::Bsi.parse("BS 123200:2001")
+      original = Pubid::Bsi.parse("BS 123200:2001")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       # Check that core attributes are preserved
       expect(restored.to_s).to include("BS")

@@ -2,17 +2,17 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Jcgm::Scheme do
+RSpec.describe Pubid::Jcgm::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
       expect(described_class.identifiers).to be_an(Array)
       expect(described_class.identifiers).to all(be_a(Class))
-      expect(described_class.identifiers).to include(PubidNew::Jcgm::Identifiers::Guide)
+      expect(described_class.identifiers).to include(Pubid::Jcgm::Identifiers::Guide)
     end
 
     it "includes expected identifier types" do
-      expect(described_class.identifiers).to include(PubidNew::Jcgm::Identifiers::Guide)
-      expect(described_class.identifiers).to include(PubidNew::Jcgm::Identifiers::GumGuide)
+      expect(described_class.identifiers).to include(Pubid::Jcgm::Identifiers::Guide)
+      expect(described_class.identifiers).to include(Pubid::Jcgm::Identifiers::GumGuide)
     end
   end
 
@@ -23,7 +23,7 @@ RSpec.describe PubidNew::Jcgm::Scheme do
     end
 
     it "includes Amendment" do
-      expect(described_class.supplement_identifiers).to include(PubidNew::Jcgm::Identifiers::Amendment)
+      expect(described_class.supplement_identifiers).to include(Pubid::Jcgm::Identifiers::Amendment)
     end
   end
 
@@ -31,7 +31,7 @@ RSpec.describe PubidNew::Jcgm::Scheme do
     it "returns array of TYPED_STAGES from all identifiers" do
       stages = described_class.typed_stages
       expect(stages).to be_an(Array)
-      expect(stages).to all(be_a(PubidNew::Components::TypedStage))
+      expect(stages).to all(be_a(Pubid::Components::TypedStage))
     end
 
     it "includes stages from both base and supplement identifiers" do
@@ -43,7 +43,7 @@ RSpec.describe PubidNew::Jcgm::Scheme do
   describe ".locate_typed_stage_by_abbr" do
     it "returns the correct typed stage for empty string" do
       stage = described_class.locate_typed_stage_by_abbr("")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
     end
 
     it "raises ArgumentError for unknown abbreviations" do
@@ -56,7 +56,7 @@ RSpec.describe PubidNew::Jcgm::Scheme do
   describe ".locate_identifier_klass_by_type_code" do
     it "returns the correct identifier class for known type codes" do
       klass = described_class.locate_identifier_klass_by_type_code("guide")
-      expect(klass).to eq(PubidNew::Jcgm::Identifiers::Guide)
+      expect(klass).to eq(Pubid::Jcgm::Identifiers::Guide)
     end
 
     it "raises ArgumentError for unknown type codes" do

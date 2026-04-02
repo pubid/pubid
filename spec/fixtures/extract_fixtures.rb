@@ -108,19 +108,19 @@ class FixturesExtractor
 
   def parse_identifier(id_str)
     case flavor
-    when "iso" then PubidNew::Iso.parse(id_str)
-    when "iec" then PubidNew::Iec.parse(id_str)
-    when "ieee" then PubidNew::Ieee.parse(id_str)
-    when "nist" then PubidNew::Nist.parse(id_str)
-    when "jis" then PubidNew::Jis.parse(id_str)
-    when "etsi" then PubidNew::Etsi.parse(id_str)
-    when "ccsds" then PubidNew::Ccsds.parse(id_str)
-    when "itu" then PubidNew::Itu.parse(id_str)
-    when "plateau" then PubidNew::Plateau.parse(id_str)
-    when "ansi" then PubidNew::Ansi.parse(id_str)
-    when "cen" then PubidNew::Cen.parse(id_str)
-    when "bsi" then PubidNew::Bsi.parse(id_str)
-    when "idf" then PubidNew::Idf.parse(id_str)
+    when "iso" then Pubid::Iso.parse(id_str)
+    when "iec" then Pubid::Iec.parse(id_str)
+    when "ieee" then Pubid::Ieee.parse(id_str)
+    when "nist" then Pubid::Nist.parse(id_str)
+    when "jis" then Pubid::Jis.parse(id_str)
+    when "etsi" then Pubid::Etsi.parse(id_str)
+    when "ccsds" then Pubid::Ccsds.parse(id_str)
+    when "itu" then Pubid::Itu.parse(id_str)
+    when "plateau" then Pubid::Plateau.parse(id_str)
+    when "ansi" then Pubid::Ansi.parse(id_str)
+    when "cen" then Pubid::Cen.parse(id_str)
+    when "bsi" then Pubid::Bsi.parse(id_str)
+    when "idf" then Pubid::Idf.parse(id_str)
     else
       raise "Unknown flavor: #{flavor}"
     end

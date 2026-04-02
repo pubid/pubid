@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Amca::Identifiers::Interpretation do
+RSpec.describe Pubid::Amca::Identifiers::Interpretation do
   # Basic smoke test for identifier class
   # TODO: Add comprehensive tests for parsing, rendering, and attributes
 

@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
+RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
   subject { described_class }
 
   context "single-level EN adoption" do
     describe "BS EN 10077-1:2006" do
       subject { "BS EN 10077-1:2006" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedEuropeanNorm" do
         expect(parsed).to be_a(described_class)
@@ -19,7 +19,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
       end
 
       it "adopted_identifier is CEN object" do
-        expect(parsed.adopted_identifier.class.name).to start_with("PubidNew::Cen::")
+        expect(parsed.adopted_identifier.class.name).to start_with("Pubid::Cen::")
       end
 
       it "delegates number to adopted identifier" do
@@ -37,7 +37,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
 
     describe "BS EN 1234:2020" do
       subject { "BS EN 1234:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedEuropeanNorm" do
         expect(parsed).to be_a(described_class)
@@ -58,7 +58,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
 
     describe "BS EN 5678" do
       subject { "BS EN 5678" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedEuropeanNorm" do
         expect(parsed).to be_a(described_class)
@@ -77,7 +77,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
   context "EN with parts and subparts" do
     describe "BS EN 1991-1-1:2002" do
       subject { "BS EN 1991-1-1:2002" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedEuropeanNorm" do
         expect(parsed).to be_a(described_class)
@@ -101,7 +101,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
   context "EN/CLC copublisher" do
     describe "BS EN/CLC TS 50131-1:2006" do
       subject { "BS EN/CLC TS 50131-1:2006" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedEuropeanNorm" do
         expect(parsed).to be_a(described_class)
@@ -128,7 +128,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::AdoptedEuropeanNorm do
   context "multi-digit numbers" do
     describe "BS EN 10000:2022" do
       subject { "BS EN 10000:2022" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedEuropeanNorm" do
         expect(parsed).to be_a(described_class)

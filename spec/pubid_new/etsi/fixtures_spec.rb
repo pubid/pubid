@@ -19,7 +19,7 @@ RSpec.describe "ETSI Fixture Round-trip Tests" do
         next if identifier.empty? || identifier.start_with?("#")
 
         begin
-          parsed = PubidNew::Etsi.parse(identifier)
+          parsed = Pubid::Etsi.parse(identifier)
           rendered = parsed.to_s
 
           if rendered == identifier

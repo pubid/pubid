@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Update do
+RSpec.describe Pubid::Nist::Components::Update do
   describe "initialization" do
     it "creates update with number, year, and month" do
       update = described_class.new(number: "1", year: "2021", month: "2")

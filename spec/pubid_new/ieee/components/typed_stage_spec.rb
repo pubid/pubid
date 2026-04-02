@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../../../lib/pubid_new/ieee/components/typed_stage"
-require_relative "../../../../lib/pubid_new/ieee/typed_stages"
-require_relative "../../../../lib/pubid_new/ieee/scheme"
+require_relative "../../../../lib/pubid/ieee/components/typed_stage"
+require_relative "../../../../lib/pubid/ieee/typed_stages"
+require_relative "../../../../lib/pubid/ieee/scheme"
 
-RSpec.describe PubidNew::Ieee::Components::TypedStage do
+RSpec.describe Pubid::Ieee::Components::TypedStage do
   describe "TypedStage component" do
     let(:published_stage) do
       described_class.new(
@@ -102,64 +102,64 @@ RSpec.describe PubidNew::Ieee::Components::TypedStage do
 
   describe "TYPED_STAGES registry" do
     it "includes published standard" do
-      std = PubidNew::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("Std") }
+      std = Pubid::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("Std") }
       expect(std).not_to be_nil
       expect(std.type_code).to eq("standard")
       expect(std.stage_code).to eq("published")
     end
 
     it "includes IEEE draft stages D1-D9" do
-      d1 = PubidNew::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("D1") }
+      d1 = Pubid::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("D1") }
       expect(d1).not_to be_nil
       expect(d1.project_status).to be true
 
-      d5 = PubidNew::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("D5") }
+      d5 = Pubid::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("D5") }
       expect(d5).not_to be_nil
       expect(d5.ieee_draft_equivalent).to eq("D4-D6")
     end
 
     it "includes ISO stages for joint development" do
-      fdis = PubidNew::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("FDIS") }
+      fdis = Pubid::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("FDIS") }
       expect(fdis).not_to be_nil
       expect(fdis.iso_stage_equivalent).to eq("FDIS")
       expect(fdis.ieee_draft_equivalent).to eq("D8")
     end
 
     it "includes historical stages" do
-      no = PubidNew::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("No") }
+      no = Pubid::Ieee::TYPED_STAGES.find { |ts| ts.abbr.include?("No") }
       expect(no).not_to be_nil
       expect(no.stage_code).to eq("published")
     end
 
     it "has default typed stage" do
-      expect(PubidNew::Ieee::DEFAULT_TYPED_STAGE).not_to be_nil
-      expect(PubidNew::Ieee::DEFAULT_TYPED_STAGE.abbr).to include("Std")
+      expect(Pubid::Ieee::DEFAULT_TYPED_STAGE).not_to be_nil
+      expect(Pubid::Ieee::DEFAULT_TYPED_STAGE.abbr).to include("Std")
     end
   end
 
   describe "Scheme class" do
     describe ".locate_typed_stage_by_abbr" do
       it "finds stage by abbreviation" do
-        ts = PubidNew::Ieee::Scheme.locate_typed_stage_by_abbr("D5")
+        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_abbr("D5")
         expect(ts.abbr).to include("D5")
       end
 
       it "returns default for empty abbreviation" do
-        ts = PubidNew::Ieee::Scheme.locate_typed_stage_by_abbr("")
-        expect(ts).to eq(PubidNew::Ieee::DEFAULT_TYPED_STAGE)
+        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_abbr("")
+        expect(ts).to eq(Pubid::Ieee::DEFAULT_TYPED_STAGE)
       end
     end
 
     describe ".locate_typed_stage_by_ieee_draft" do
       it "finds stage by IEEE draft notation" do
-        ts = PubidNew::Ieee::Scheme.locate_typed_stage_by_ieee_draft("D1")
+        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_ieee_draft("D1")
         expect(ts.abbr).to include("D1")
       end
     end
 
     describe ".locate_typed_stage_by_iso_stage" do
       it "finds stage by ISO stage code" do
-        ts = PubidNew::Ieee::Scheme.locate_typed_stage_by_iso_stage("FDIS")
+        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_iso_stage("FDIS")
         expect(ts.iso_stage_equivalent).to eq("FDIS")
       end
     end

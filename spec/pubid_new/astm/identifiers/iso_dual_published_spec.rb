@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::IsoDualPublished do
+RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
   subject { described_class }
 
   describe "ISO/ASTM dual-published standards (5xxxx series)" do
 
     describe "parses normal identifier" do
       subject { "ASTM 52303-24e1" }
-      let(:parsed) { PubidNew::Astm.parse(subject) }
+      let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 52303-24e1" do
         expect(parsed).to be_a(described_class)
@@ -24,7 +24,7 @@ RSpec.describe PubidNew::Astm::Identifiers::IsoDualPublished do
 
     describe "parses reapproval identifier" do
       subject { "ASTM 52921-13(2018)e1" }
-      let(:parsed) { PubidNew::Astm.parse(subject) }
+      let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 52921-13(2018)e1" do
         expect(parsed).to be_a(described_class)
@@ -38,7 +38,7 @@ RSpec.describe PubidNew::Astm::Identifiers::IsoDualPublished do
 
     describe "parses identifier with edition" do
       subject { "ASTM 51956-19e1" }
-      let(:parsed) { PubidNew::Astm.parse(subject) }
+      let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 51956-19e1" do
         expect(parsed).to be_a(described_class)
@@ -51,7 +51,7 @@ RSpec.describe PubidNew::Astm::Identifiers::IsoDualPublished do
 
     describe "parses identifier without edition" do
       subject { "ASTM 52900-15" }
-      let(:parsed) { PubidNew::Astm.parse(subject) }
+      let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 52900-15" do
         expect(parsed).to be_a(described_class)
@@ -64,19 +64,19 @@ RSpec.describe PubidNew::Astm::Identifiers::IsoDualPublished do
 
     describe "semantic classification" do
       it "5xxxx digit-only standards are IsoDualPublished not generic Standard" do
-        id = PubidNew::Astm.parse("ASTM 52303-24e1")
+        id = Pubid::Astm.parse("ASTM 52303-24e1")
         expect(id).to be_a(described_class)
         # It IS also a Standard (due to inheritance), which is correct
-        expect(id).to be_a(PubidNew::Astm::Identifiers::Standard)
+        expect(id).to be_a(Pubid::Astm::Identifiers::Standard)
       end
 
       it "inherits from Standard class" do
-        expect(described_class.ancestors).to include(PubidNew::Astm::Identifiers::Standard)
+        expect(described_class.ancestors).to include(Pubid::Astm::Identifiers::Standard)
       end
     end
 
     describe "ISO counterpart relationship" do
-      let(:astm_version) { PubidNew::Astm.parse("ASTM 52303-24e1") }
+      let(:astm_version) { Pubid::Astm.parse("ASTM 52303-24e1") }
 
       it "ASTM 52303-24e1 corresponds to ISO/ASTM 52303:2024" do
 
@@ -87,7 +87,7 @@ RSpec.describe PubidNew::Astm::Identifiers::IsoDualPublished do
 
         # ISO publishes as: ISO/ASTM 52303:2024
         iso_version = astm_version.to_iso_identifier
-        expect(iso_version).to be_a(PubidNew::Iso::Identifiers::InternationalStandard)
+        expect(iso_version).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
         expect(iso_version.number.number).to eq("52303")
         expect(iso_version.date.year).to eq("2024")
         expect(iso_version.publisher.copublisher.first).to eq("ASTM")

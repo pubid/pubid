@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/ccsds"
+require_relative "../../../lib/pubid/ccsds"
 
 RSpec.describe "CCSDS Serialization" do
   describe "#to_h" do
     it "exports basic identifier as hash" do
-      id = PubidNew::Ccsds.parse("CCSDS 120.0-G-4")
+      id = Pubid::Ccsds.parse("CCSDS 120.0-G-4")
       hash = id.to_h
 
       expect(hash[:flavor]).to eq("ccsds")
@@ -18,14 +18,14 @@ RSpec.describe "CCSDS Serialization" do
     end
 
     it "exports identifier with suffix" do
-      id = PubidNew::Ccsds.parse("CCSDS 100.0-G-1-S")
+      id = Pubid::Ccsds.parse("CCSDS 100.0-G-1-S")
       hash = id.to_h
 
       expect(hash[:suffix]).to eq("S")
     end
 
     it "exports identifier with language" do
-      id = PubidNew::Ccsds.parse("CCSDS 551.1-O-2 - Russian Translated")
+      id = Pubid::Ccsds.parse("CCSDS 551.1-O-2 - Russian Translated")
       hash = id.to_h
 
       expect(hash[:language]).to eq("Russian")
@@ -33,7 +33,7 @@ RSpec.describe "CCSDS Serialization" do
     end
 
     it "exports identifier with different book colors" do
-      id = PubidNew::Ccsds.parse("CCSDS 101.0-B-1-S")
+      id = Pubid::Ccsds.parse("CCSDS 101.0-B-1-S")
       hash = id.to_h
 
       expect(hash[:type]).to eq("B")
@@ -44,7 +44,7 @@ RSpec.describe "CCSDS Serialization" do
 
   describe "#to_json" do
     it "exports identifier as JSON" do
-      id = PubidNew::Ccsds.parse("CCSDS 100.0-G-1-S")
+      id = Pubid::Ccsds.parse("CCSDS 100.0-G-1-S")
       json = id.to_json
 
       parsed = JSON.parse(json)
@@ -65,7 +65,7 @@ RSpec.describe "CCSDS Serialization" do
         edition: "4"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("CCSDS 120.0-G-4")
     end
 
@@ -80,7 +80,7 @@ RSpec.describe "CCSDS Serialization" do
         suffix: "S"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("CCSDS 100.0-G-1-S")
     end
 
@@ -95,7 +95,7 @@ RSpec.describe "CCSDS Serialization" do
         language: "Russian"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("CCSDS 551.1-O-2 - Russian Translated")
     end
 
@@ -110,7 +110,7 @@ RSpec.describe "CCSDS Serialization" do
         suffix: "S"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("CCSDS 101.0-B-1-S")
     end
   end
@@ -119,47 +119,47 @@ RSpec.describe "CCSDS Serialization" do
     it "creates identifier from JSON" do
       json = '{"flavor":"ccsds","publisher":"CCSDS","number":"120","part":"0","type":"G","edition":"4"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to eq("CCSDS 120.0-G-4")
     end
 
     it "creates identifier with suffix from JSON" do
       json = '{"flavor":"ccsds","publisher":"CCSDS","number":"100","part":"0","type":"G","edition":"1","suffix":"S"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to eq("CCSDS 100.0-G-1-S")
     end
   end
 
   describe "round-trip conversion" do
     it "preserves all data through hash conversion" do
-      original = PubidNew::Ccsds.parse("CCSDS 100.0-G-1-S")
+      original = Pubid::Ccsds.parse("CCSDS 100.0-G-1-S")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves all data through JSON conversion" do
-      original = PubidNew::Ccsds.parse("CCSDS 120.0-G-4")
+      original = Pubid::Ccsds.parse("CCSDS 120.0-G-4")
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves identifier with language through hash" do
-      original = PubidNew::Ccsds.parse("CCSDS 551.1-O-2 - Russian Translated")
+      original = Pubid::Ccsds.parse("CCSDS 551.1-O-2 - Russian Translated")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves identifier with different book color through JSON" do
-      original = PubidNew::Ccsds.parse("CCSDS 101.0-B-1-S")
+      original = Pubid::Ccsds.parse("CCSDS 101.0-B-1-S")
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end

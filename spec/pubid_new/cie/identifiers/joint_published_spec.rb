@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../../../lib/pubid_new/cie/identifiers/joint_published"
+require_relative "../../../../lib/pubid/cie/identifiers/joint_published"
 
-RSpec.describe PubidNew::Cie::Identifiers::JointPublished do
+RSpec.describe Pubid::Cie::Identifiers::JointPublished do
   # Basic smoke test for identifier class
   # TODO: Add comprehensive tests for parsing, rendering, and attributes
 

@@ -2,53 +2,53 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::Base do
+RSpec.describe Pubid::Iso::Identifiers::Base do
   describe "#all_parts" do
     context "with all parts notation" do
       it "parses ISO identifier with (all parts)" do
-        id = PubidNew::Iso.parse("ISO 9000 (all parts)")
+        id = Pubid::Iso.parse("ISO 9000 (all parts)")
         expect(id.to_s).to eq("ISO 9000 (all parts)")
         expect(id.all_parts).to be true
       end
 
       it "parses ISO/IEC identifier with (all parts)" do
-        id = PubidNew::Iso.parse("ISO/IEC 27000 (all parts)")
+        id = Pubid::Iso.parse("ISO/IEC 27000 (all parts)")
         expect(id.to_s).to eq("ISO/IEC 27000 (all parts)")
         expect(id.all_parts).to be true
       end
 
       it "parses ISO identifier with year and (all parts)" do
-        id = PubidNew::Iso.parse("ISO 9000:2015 (all parts)")
+        id = Pubid::Iso.parse("ISO 9000:2015 (all parts)")
         expect(id.to_s).to eq("ISO 9000:2015 (all parts)")
         expect(id.all_parts).to be true
       end
 
       it "parses ISO identifier with part and (all parts)" do
-        id = PubidNew::Iso.parse("ISO 9000-1 (all parts)")
+        id = Pubid::Iso.parse("ISO 9000-1 (all parts)")
         expect(id.to_s).to eq("ISO 9000-1 (all parts)")
         expect(id.all_parts).to be true
       end
 
       it "parses ISO TR with (all parts)" do
-        id = PubidNew::Iso.parse("ISO/TR 10000 (all parts)")
+        id = Pubid::Iso.parse("ISO/TR 10000 (all parts)")
         expect(id.to_s).to eq("ISO/TR 10000 (all parts)")
         expect(id.all_parts).to be true
       end
 
       it "parses ISO with languages and (all parts)" do
-        id = PubidNew::Iso.parse("ISO 9000:2015(E/F) (all parts)")
+        id = Pubid::Iso.parse("ISO 9000:2015(E/F) (all parts)")
         expect(id.to_s).to eq("ISO 9000:2015(E/F) (all parts)")
         expect(id.all_parts).to be true
       end
 
       it "round-trips all parts notation" do
         original = "ISO 9000 (all parts)"
-        id = PubidNew::Iso.parse(original)
+        id = Pubid::Iso.parse(original)
         expect(id.to_s).to eq(original)
       end
 
       it "defaults all_parts to false when not specified" do
-        id = PubidNew::Iso.parse("ISO 9000")
+        id = Pubid::Iso.parse("ISO 9000")
         expect(id.all_parts).to be false
         expect(id.to_s).to eq("ISO 9000")
       end
@@ -56,8 +56,8 @@ RSpec.describe PubidNew::Iso::Identifiers::Base do
 
     context "equality with all_parts" do
       it "considers all_parts in equality comparison" do
-        id1 = PubidNew::Iso.parse("ISO 9000 (all parts)")
-        id2 = PubidNew::Iso.parse("ISO 9000")
+        id1 = Pubid::Iso.parse("ISO 9000 (all parts)")
+        id2 = Pubid::Iso.parse("ISO 9000")
         # Current == implementation doesn't include all_parts, but behavior is correct
         # The identifiers have different to_s output
         expect(id1.to_s).not_to eq(id2.to_s)

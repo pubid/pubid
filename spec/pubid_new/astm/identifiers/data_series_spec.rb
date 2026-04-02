@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::DataSeries do
+RSpec.describe Pubid::Astm::Identifiers::DataSeries do
   # ========================================
   # Data Series (33 IDs, 11%)
   # ========================================
   describe "parses simple data series" do
     subject { "ASTM DS4B-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -20,7 +20,7 @@ RSpec.describe PubidNew::Astm::Identifiers::DataSeries do
 
   describe "parses data series with subseries" do
     subject { "ASTM DS7-S1-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Astm::Identifiers::DataSeries do
 
   describe "parses data series with HOL suffix" do
     subject { "ASTM DS51HOL-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

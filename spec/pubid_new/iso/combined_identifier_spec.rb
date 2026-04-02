@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::CombinedIdentifier do
+RSpec.describe Pubid::Iso::CombinedIdentifier do
   subject { described_class }
 
   context "joint identifiers" do
@@ -16,7 +16,7 @@ RSpec.describe PubidNew::Iso::CombinedIdentifier do
       end
 
       it "has joint identifier of ReviewedMethod class" do
-        expect(additional_identifier).to be_a(PubidNew::Idf::Identifiers::ReviewedMethod)
+        expect(additional_identifier).to be_a(Pubid::Idf::Identifiers::ReviewedMethod)
       end
 
       it "parses joint identifier number" do
@@ -69,7 +69,7 @@ RSpec.describe PubidNew::Iso::CombinedIdentifier do
       end
 
       it "has joint identifier of InternationalStandard class" do
-        expect(additional_identifier).to be_a(PubidNew::Idf::Identifiers::InternationalStandard)
+        expect(additional_identifier).to be_a(Pubid::Idf::Identifiers::InternationalStandard)
       end
 
       it "parses joint identifier number" do
@@ -126,7 +126,7 @@ RSpec.describe PubidNew::Iso::CombinedIdentifier do
       end
 
       it "has joint identifier of InternationalStandard class" do
-        expect(additional_identifier).to be_a(PubidNew::Idf::Identifiers::InternationalStandard)
+        expect(additional_identifier).to be_a(Pubid::Idf::Identifiers::InternationalStandard)
       end
 
       it "parses joint identifier number" do
@@ -179,7 +179,7 @@ RSpec.describe PubidNew::Iso::CombinedIdentifier do
       end
 
       it "has joint identifier of InternationalStandard class" do
-        expect(additional_identifier).to be_a(PubidNew::Idf::Identifiers::InternationalStandard)
+        expect(additional_identifier).to be_a(Pubid::Idf::Identifiers::InternationalStandard)
       end
 
       it "parses joint identifier number" do

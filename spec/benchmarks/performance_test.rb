@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 $LOAD_PATH.unshift File.expand_path("../../lib", __dir__)
-require "pubid_new"
+require "pubid"
 require "benchmark"
 
 # Performance benchmark for PubID v2 optimizations
-module PubidNew
+module Pubid
   module Benchmark
     class PerformanceTest
       # Test identifiers for parsing
@@ -58,12 +58,12 @@ module PubidNew
         puts "-" * 80
 
         # Warm up JIT - only ISO for now
-        10.times { ISO_IDENTIFIERS.each { |id| PubidNew::Iso.parse(id) } }
+        10.times { ISO_IDENTIFIERS.each { |id| Pubid::Iso.parse(id) } }
 
         # ISO parsing
         iso_time = ::Benchmark.realtime do
           @iterations.times do
-            ISO_IDENTIFIERS.each { |id| PubidNew::Iso.parse(id) }
+            ISO_IDENTIFIERS.each { |id| Pubid::Iso.parse(id) }
           end
         end
 
@@ -80,7 +80,7 @@ module PubidNew
           valid_nist = []
           NIST_IDENTIFIERS.each do |id|
             begin
-              PubidNew::Nist.parse(id)
+              Pubid::Nist.parse(id)
               valid_nist << id
             rescue Parslet::ParseFailed
               # Skip unparsable identifiers
@@ -90,11 +90,11 @@ module PubidNew
 
           if valid_nist.any?
             # Warm up
-            10.times { valid_nist.each { |id| PubidNew::Nist.parse(id) } }
+            10.times { valid_nist.each { |id| Pubid::Nist.parse(id) } }
 
             nist_time = ::Benchmark.realtime do
               @iterations.times do
-                valid_nist.each { |id| PubidNew::Nist.parse(id) }
+                valid_nist.each { |id| Pubid::Nist.parse(id) }
               end
             end
 
@@ -116,7 +116,7 @@ module PubidNew
         puts "2. REGISTRY LOOKUP PERFORMANCE (#{@iterations} iterations)"
         puts "-" * 80
 
-        scheme = PubidNew::Iso::Scheme.instance
+        scheme = Pubid::Iso::Scheme.instance
 
         # Warm up
         100.times { scheme.locate_typed_stage_by_abbr("WD") }
@@ -143,9 +143,9 @@ module PubidNew
         puts "3. HASH OPERATIONS PERFORMANCE (#{@iterations} iterations)"
         puts "-" * 80
 
-        id1 = PubidNew::Iso.parse("ISO 9001:2015")
-        id2 = PubidNew::Iso.parse("ISO 14001:2015")
-        id3 = PubidNew::Iso.parse("ISO 9001:2015")
+        id1 = Pubid::Iso.parse("ISO 9001:2015")
+        id2 = Pubid::Iso.parse("ISO 14001:2015")
+        id3 = Pubid::Iso.parse("ISO 9001:2015")
 
         # Warm up
         100.times { [id1, id2, id3].each(&:hash) }
@@ -168,7 +168,7 @@ module PubidNew
         puts "4. SET OPERATIONS PERFORMANCE (#{@iterations} iterations)"
         puts "-" * 80
 
-        ids = ISO_IDENTIFIERS.map { |id| PubidNew::Iso.parse(id) }
+        ids = ISO_IDENTIFIERS.map { |id| Pubid::Iso.parse(id) }
         set = ids.to_set
 
         # Warm up
@@ -205,4 +205,4 @@ module PubidNew
 end
 
 # Run benchmarks
-PubidNew::Benchmark::PerformanceTest.new.run_all
+Pubid::Benchmark::PerformanceTest.new.run_all

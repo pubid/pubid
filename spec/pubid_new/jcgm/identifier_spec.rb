@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "pubid_new/jcgm"
+require "pubid/jcgm"
 
-RSpec.describe PubidNew::Jcgm do
+RSpec.describe Pubid::Jcgm do
   describe ".parse" do
     context "standard guides" do
       describe "JCGM 100:2008" do
@@ -11,7 +11,7 @@ RSpec.describe PubidNew::Jcgm do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Guide" do
-          expect(parsed).to be_a(PubidNew::Jcgm::Identifiers::Guide)
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Guide)
         end
 
         it "parses publisher" do
@@ -68,7 +68,7 @@ RSpec.describe PubidNew::Jcgm do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Guide" do
-          expect(parsed).to be_a(PubidNew::Jcgm::Identifiers::Guide)
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Guide)
         end
 
         it "parses publisher" do
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Jcgm do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as GumGuide" do
-          expect(parsed).to be_a(PubidNew::Jcgm::Identifiers::GumGuide)
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::GumGuide)
         end
 
         it "parses publisher" do
@@ -135,7 +135,7 @@ RSpec.describe PubidNew::Jcgm do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as GumGuide" do
-          expect(parsed).to be_a(PubidNew::Jcgm::Identifiers::GumGuide)
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::GumGuide)
         end
 
         it "parses GUM number" do
@@ -164,11 +164,11 @@ RSpec.describe PubidNew::Jcgm do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Amendment" do
-          expect(parsed).to be_a(PubidNew::Jcgm::Identifiers::Amendment)
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Amendment)
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(PubidNew::Jcgm::Identifiers::Guide)
+          expect(parsed.base_identifier).to be_a(Pubid::Jcgm::Identifiers::Guide)
           expect(parsed.base_identifier.number.value).to eq("100")
           expect(parsed.base_identifier.date.year).to eq("2008")
         end
@@ -191,11 +191,11 @@ RSpec.describe PubidNew::Jcgm do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Amendment" do
-          expect(parsed).to be_a(PubidNew::Jcgm::Identifiers::Amendment)
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Amendment)
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(PubidNew::Jcgm::Identifiers::Guide)
+          expect(parsed.base_identifier).to be_a(Pubid::Jcgm::Identifiers::Guide)
         end
 
         it "parses iteration" do

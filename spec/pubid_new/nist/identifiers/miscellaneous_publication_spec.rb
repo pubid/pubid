@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::MiscellaneousPublication do
+RSpec.describe Pubid::Nist::Identifiers::MiscellaneousPublication do
   subject { described_class }
 
   describe ".parse" do
     context "basic MP identifiers" do
       describe "NBS MP 39e1" do
         subject { "NBS MP 39e1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as MiscellaneousPublication" do
           expect(parsed).to be_a(described_class)
@@ -41,7 +41,7 @@ RSpec.describe PubidNew::Nist::Identifiers::MiscellaneousPublication do
 
       describe "NBS.MP.39e1" do
         subject { "NBS.MP.39e1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as MiscellaneousPublication" do
           expect(parsed).to be_a(described_class)

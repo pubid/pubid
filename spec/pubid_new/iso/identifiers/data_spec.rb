@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::Data do
+RSpec.describe Pubid::Iso::Identifiers::Data do
   subject { described_class }
 
   # Note: No sweep test - fixture file iso/iso-data.txt does not exist
@@ -12,7 +12,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
     context "dated data" do
       describe "ISO/DATA 1:1978" do
         subject { "ISO/DATA 1:1978" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:data:1" }
 
         it "parses publisher" do
@@ -57,7 +57,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Data do
     context "undated data" do
       describe "ISO/DATA 9" do
         subject { "ISO/DATA 9" }
-        let(:parsed) { PubidNew::Iso.parse(subject) }
+        let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:data:9" }
 
         it "parses publisher" do

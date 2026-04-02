@@ -23,7 +23,7 @@ RSpec.describe "JCGM Fixture Round-trip Tests" do
 
           identifiers.each do |id_str|
             begin
-              parsed = PubidNew::Jcgm.parse(id_str)
+              parsed = Pubid::Jcgm.parse(id_str)
               rendered = parsed.to_s
 
               if rendered == id_str

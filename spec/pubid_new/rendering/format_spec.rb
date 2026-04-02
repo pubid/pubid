@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/rendering/format"
+require_relative "../../../lib/pubid/rendering/format"
 
-RSpec.describe PubidNew::Rendering::Format do
+RSpec.describe Pubid::Rendering::Format do
   let(:test_class) do
     Class.new do
-      include PubidNew::Rendering::Format
+      include Pubid::Rendering::Format
 
       def to_short_style
         "short"

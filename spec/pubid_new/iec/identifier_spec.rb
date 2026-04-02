@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifier do
+RSpec.describe Pubid::Iec::Identifier do
   describe ".parse" do
     it "parses a basic identifier" do
       # Basic smoke test to verify parsing works

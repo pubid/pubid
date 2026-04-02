@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/jis"
+require_relative "../../../lib/pubid/jis"
 
 RSpec.describe "JIS Serialization" do
   describe "#to_h" do
     it "exports basic identifier as hash" do
-      id = PubidNew::Jis.parse("JIS Z 8301:2019")
+      id = Pubid::Jis.parse("JIS Z 8301:2019")
       hash = id.to_h
 
       expect(hash[:flavor]).to eq("jis")
@@ -16,7 +16,7 @@ RSpec.describe "JIS Serialization" do
     end
 
     it "exports identifier with part" do
-      id = PubidNew::Jis.parse("JIS C 6101-5:2019")
+      id = Pubid::Jis.parse("JIS C 6101-5:2019")
       hash = id.to_h
 
       # JIS includes part in the number field
@@ -26,7 +26,7 @@ RSpec.describe "JIS Serialization" do
 
   describe "#to_json" do
     it "exports identifier as JSON" do
-      id = PubidNew::Jis.parse("JIS Z 8301:2019")
+      id = Pubid::Jis.parse("JIS Z 8301:2019")
       json = id.to_json
 
       parsed = JSON.parse(json)
@@ -38,7 +38,7 @@ RSpec.describe "JIS Serialization" do
 
   describe "#to_mr_string" do
     it "exports basic identifier as MR string" do
-      id = PubidNew::Jis.parse("JIS Z 8301:2019")
+      id = Pubid::Jis.parse("JIS Z 8301:2019")
       mr_string = id.to_mr_string
 
       expect(mr_string).to include("JIS")
@@ -55,7 +55,7 @@ RSpec.describe "JIS Serialization" do
         year: "2019"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to include("JIS")
       expect(id.to_s).to include("8301")
     end
@@ -65,7 +65,7 @@ RSpec.describe "JIS Serialization" do
     it "creates identifier from JSON" do
       json = '{"flavor":"jis","publisher":"JIS","number":"Z 8301","year":"2019"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to include("JIS")
       expect(id.to_s).to include("8301")
     end
@@ -73,9 +73,9 @@ RSpec.describe "JIS Serialization" do
 
   describe "round-trip conversion" do
     it "preserves all data through hash conversion" do
-      original = PubidNew::Jis.parse("JIS Z 8301:2019")
+      original = Pubid::Jis.parse("JIS Z 8301:2019")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       # Check that core attributes are preserved
       expect(restored.to_s).to include("JIS")

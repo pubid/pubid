@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Debug joint standard parsing
 
-require_relative "../../../lib/pubid_new"
+require_relative "../../../lib/pubid"
 
 input = "IEEE Std 960-1989, Std 1177-1989"
 puts "Input: #{input}"
@@ -12,7 +12,7 @@ puts "After preprocessing: #{test}"
 
 # Try parsing
 begin
-  result = PubidNew::Ieee.parse(input)
+  result = Pubid::Ieee.parse(input)
   puts "Success: #{result.class}"
   puts "Result: #{result.to_s}"
 rescue => e

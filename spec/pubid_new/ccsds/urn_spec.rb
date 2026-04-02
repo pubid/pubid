@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/ccsds"
+require_relative "../../../lib/pubid/ccsds"
 
 RSpec.describe "CCSDS URN Generation" do
   describe "#to_urn" do
     it "generates URN for basic identifier" do
-      id = PubidNew::Ccsds.parse("CCSDS 120.0-G-4")
+      id = Pubid::Ccsds.parse("CCSDS 120.0-G-4")
       urn = id.to_urn
       expect(urn).to start_with("urn:ccsds:")
     end
 
     it "generates URN with suffix" do
-      id = PubidNew::Ccsds.parse("CCSDS 100.0-G-1-S")
+      id = Pubid::Ccsds.parse("CCSDS 100.0-G-1-S")
       urn = id.to_urn
       expect(urn).to start_with("urn:ccsds:")
     end
@@ -20,7 +20,7 @@ RSpec.describe "CCSDS URN Generation" do
 
   describe "URN format compliance" do
     it "follows URN format" do
-      id = PubidNew::Ccsds.parse("CCSDS 120.0-G-4")
+      id = Pubid::Ccsds.parse("CCSDS 120.0-G-4")
       urn = id.to_urn
       expect(urn).to start_with("urn:")
     end

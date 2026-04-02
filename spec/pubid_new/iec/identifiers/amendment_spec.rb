@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::Amendment do
+RSpec.describe Pubid::Iec::Identifiers::Amendment do
   subject { described_class }
 
   context "parse amendment identifier" do

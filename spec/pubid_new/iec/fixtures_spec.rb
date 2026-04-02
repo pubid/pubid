@@ -22,7 +22,7 @@ RSpec.describe "IEC V2 Fixtures Tests" do
       failures = []
 
       fixture_ids.each do |id_str|
-        parsed = PubidNew::Iec.parse(id_str)
+        parsed = Pubid::Iec.parse(id_str)
         if parsed.to_s == id_str
           successes += 1
         else

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Cen::Parser do
+RSpec.describe Pubid::Cen::Parser do
   subject { described_class.new }
 
   describe "#parse" do

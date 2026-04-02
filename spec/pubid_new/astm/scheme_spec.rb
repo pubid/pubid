@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../../lib/pubid_new/astm/scheme"
+require_relative "../../../lib/pubid/astm/scheme"
 
-RSpec.describe PubidNew::Astm::Scheme do
+RSpec.describe Pubid::Astm::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
-      expect(PubidNew::Astm::Scheme.identifiers).to be_an(Array)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::Standard)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::Manual)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::ResearchReport)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::DataSeries)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::TechnicalReport)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::Monograph)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::Adjunct)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::WorkInProgress)
-      expect(PubidNew::Astm::Scheme.identifiers).to include(PubidNew::Astm::Identifiers::IsoDualPublished)
+      expect(Pubid::Astm::Scheme.identifiers).to be_an(Array)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Standard)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Manual)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::ResearchReport)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::DataSeries)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::TechnicalReport)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Monograph)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Adjunct)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::WorkInProgress)
+      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::IsoDualPublished)
     end
   end
 

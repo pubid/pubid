@@ -35,7 +35,7 @@ RSpec.describe "NIST Fixture Round-trip Tests" do
                 expected = id_str
               end
 
-              parsed = PubidNew::Nist.parse(input)
+              parsed = Pubid::Nist.parse(input)
               rendered = parsed.to_s
 
               if rendered == expected

@@ -3,10 +3,10 @@
 require "spec_helper"
 require "lutaml/model"
 
-RSpec.describe PubidNew::Idf::SingleIdentifier do
+RSpec.describe Pubid::Idf::SingleIdentifier do
   # Test that SingleIdentifier inherits from Identifier
-  it "is a subclass of PubidNew::Idf::Identifier" do
-    expect(described_class).to be < PubidNew::Idf::Identifier
+  it "is a subclass of Pubid::Idf::Identifier" do
+    expect(described_class).to be < Pubid::Idf::Identifier
   end
 
   # Test that SingleIdentifier has typed_stage attribute (inherited from base)
@@ -27,7 +27,7 @@ RSpec.describe PubidNew::Idf::SingleIdentifier do
 
   # Test that SingleIdentifier can have typed_stage set
   it "can have typed_stage set" do
-    typed_stage = PubidNew::Components::TypedStage.new(
+    typed_stage = Pubid::Components::TypedStage.new(
       code: :published,
       stage_code: :published,
       type_code: :is,
@@ -43,8 +43,8 @@ RSpec.describe PubidNew::Idf::SingleIdentifier do
   # Test that a concrete SingleIdentifier subclass can be instantiated
   describe "with a concrete class" do
     let(:concrete_class) do
-      Class.new(PubidNew::Idf::SingleIdentifier) do
-        attribute :type, PubidNew::Components::Type, default: -> { self.class.type[:key] }
+      Class.new(Pubid::Idf::SingleIdentifier) do
+        attribute :type, Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         def self.type
           { key: :test, title: "Test Type", short: "TST" }
@@ -54,7 +54,7 @@ RSpec.describe PubidNew::Idf::SingleIdentifier do
 
     it "can be instantiated" do
       identifier = concrete_class.new
-      expect(identifier).to be_a(PubidNew::Idf::SingleIdentifier)
+      expect(identifier).to be_a(Pubid::Idf::SingleIdentifier)
     end
 
     it "has the type method" do

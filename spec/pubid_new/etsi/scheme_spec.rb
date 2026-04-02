@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Etsi::Scheme do
+RSpec.describe Pubid::Etsi::Scheme do
   describe ".new" do
     it "creates a new scheme with type and number" do
       scheme = described_class.new(type: "EN", number: "300 000")

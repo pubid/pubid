@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::Corrigendum do
+RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   subject { described_class }
 
   # Test published corrigendum

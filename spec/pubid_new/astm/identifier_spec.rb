@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm do
+RSpec.describe Pubid::Astm do
   describe ".parse" do
   end
 end

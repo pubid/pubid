@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid_new/ccsds"
+require_relative "../../lib/pubid/ccsds"
 
 RSpec.describe "CCSDS Integration" do
   describe "parsing and rendering" do
     shared_examples "parses and renders correctly" do |input, expected_output = nil|
       it "parses and renders #{input}" do
         expected = expected_output || input
-        identifier = PubidNew::Ccsds.parse(input)
+        identifier = Pubid::Ccsds.parse(input)
         expect(identifier.to_s).to eq(expected)
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe "CCSDS Integration" do
         clean_line = line.split(" - ").first
 
         expect do
-          identifier = PubidNew::Ccsds.parse(clean_line)
+          identifier = Pubid::Ccsds.parse(clean_line)
           expect(identifier.to_s).to eq(clean_line)
         end.not_to raise_error, "Failed to parse: #{clean_line}"
       end

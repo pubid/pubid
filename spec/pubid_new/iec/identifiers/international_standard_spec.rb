@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
+RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
   subject { described_class }
 
   # Test normal identifier dated
@@ -169,22 +169,22 @@ RSpec.describe PubidNew::Iec::Identifiers::InternationalStandard do
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
-    
+
             expect(parsed.publisher.body).to eq("IEC")
           end
 
           it "parses number" do
-    
+
             expect(parsed.number.number).to eq("60038")
           end
 
           it "parses stage" do
-    
+
             expect(parsed.stage.stage_code).to eq("pwi")
           end
 
           it "round-trips" do
-    
+
             expect(parsed.to_s).to eq(subject)
           end
         end

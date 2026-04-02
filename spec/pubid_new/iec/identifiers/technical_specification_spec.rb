@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::TechnicalSpecification do
+RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   subject { described_class }
 
   # Test normal identifier dated

@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
+RSpec.describe Pubid::Bsi::Identifiers::BritishStandard do
   subject { described_class }
 
   context "basic British Standard identifiers" do
     describe "BS 1234:2020" do
       subject { "BS 1234:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -33,7 +33,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
 
     describe "BS 5678" do
       subject { "BS 5678" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -56,7 +56,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
   context "British Standard with parts" do
     describe "BS 7654-3:2019" do
       subject { "BS 7654-3:2019" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -81,7 +81,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
 
     describe "BS 8888-2-1:2020" do
       subject { "BS 8888-2-1:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
   context "Draft British Standards" do
     describe "Draft BS 9999:2021" do
       subject { "Draft BS 9999:2021" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -135,7 +135,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
   context "British Standard with month" do
     describe "BS 1234:2020-03" do
       subject { "BS 1234:2020-03" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -158,7 +158,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
   context "British Standard with edition" do
     describe "BS 5432:2018 v2.0" do
       subject { "BS 5432:2018 v2.0" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)
@@ -177,7 +177,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::BritishStandard do
   context "multi-digit numbers" do
     describe "BS 10000:2022" do
       subject { "BS 10000:2022" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as BritishStandard" do
         expect(parsed).to be_a(described_class)

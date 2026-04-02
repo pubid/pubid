@@ -2,10 +2,10 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Itu::Scheme do
+RSpec.describe Pubid::Itu::Scheme do
   describe ".model_class" do
     it "returns the Model class" do
-      expect(described_class.model_class).to eq(PubidNew::Itu::Model)
+      expect(described_class.model_class).to eq(Pubid::Itu::Model)
     end
   end
 

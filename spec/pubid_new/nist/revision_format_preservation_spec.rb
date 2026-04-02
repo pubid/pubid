@@ -8,12 +8,12 @@ RSpec.describe "NIST Revision Format Preservation" do
     # "Rev. 5" should NOT be rendered as "r5"
 
     it "preserves Rev. format (capital R with period and space)" do
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 Rev. 5")
+      identifier = Pubid::Nist.parse("NIST SP 800-53 Rev. 5")
       expect(identifier.to_s).to eq("NIST SP 800-53 Rev. 5")
     end
 
     it "preserves r format (lowercase r)" do
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 r5")
+      identifier = Pubid::Nist.parse("NIST SP 800-53 r5")
       expect(identifier.to_s).to eq("NIST SP 800-53 r5")
     end
 
@@ -22,9 +22,9 @@ RSpec.describe "NIST Revision Format Preservation" do
   describe "round-trip fidelity for preserved formats" do
     it "maintains Rev. format through parse-serialize-parse cycle" do
       original = "NIST SP 800-53 Rev. 5"
-      first = PubidNew::Nist.parse(original)
+      first = Pubid::Nist.parse(original)
       serialized = first.to_s
-      second = PubidNew::Nist.parse(serialized)
+      second = Pubid::Nist.parse(serialized)
 
       expect(serialized).to eq(original)
       expect(second.to_s).to eq(original)
@@ -32,9 +32,9 @@ RSpec.describe "NIST Revision Format Preservation" do
 
     it "maintains r format through parse-serialize-parse cycle" do
       original = "NIST SP 800-53 r5"
-      first = PubidNew::Nist.parse(original)
+      first = Pubid::Nist.parse(original)
       serialized = first.to_s
-      second = PubidNew::Nist.parse(serialized)
+      second = Pubid::Nist.parse(serialized)
 
       expect(serialized).to eq(original)
       expect(second.to_s).to eq(original)
@@ -44,13 +44,13 @@ RSpec.describe "NIST Revision Format Preservation" do
   describe "revision with letters" do
     it "preserves Rev. format with letter suffix (uppercase)" do
       # Note: Parser normalizes letter suffixes to uppercase
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 Rev. 5a")
+      identifier = Pubid::Nist.parse("NIST SP 800-53 Rev. 5a")
       expect(identifier.to_s).to eq("NIST SP 800-53 Rev. 5A")
     end
 
     it "preserves r format with letter suffix (uppercase)" do
       # Note: Parser normalizes letter suffixes to uppercase
-      identifier = PubidNew::Nist.parse("NIST SP 800-53 r5a")
+      identifier = Pubid::Nist.parse("NIST SP 800-53 r5a")
       expect(identifier.to_s).to eq("NIST SP 800-53 r5A")
     end
   end

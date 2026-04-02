@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Ashrae::Identifiers::Base do
+RSpec.describe Pubid::Ashrae::Identifiers::Base do
   # Basic smoke test for identifier class
   # TODO: Add comprehensive tests for parsing, rendering, and attributes
 

@@ -17,7 +17,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all CSV identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -57,7 +57,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all IEC identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -97,7 +97,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all IECEE TRF identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -137,7 +137,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all IECEx TRF identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -177,7 +177,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all IECQ identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -217,7 +217,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all ISH identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -257,7 +257,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all ISO/IEC identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -297,7 +297,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all Sheets identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -337,7 +337,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all TC1 identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -377,7 +377,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all TR identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -417,7 +417,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all TS identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -457,7 +457,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all VAP identifiers correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -497,7 +497,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all WD special groups correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -537,7 +537,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all working documents correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -577,7 +577,7 @@ RSpec.describe "IEC v2 Implementation" do
 
       it "parses and renders all working programmes correctly" do
         test_cases.each do |test_case|
-          identifier = PubidNew::Iec.parse(test_case)
+          identifier = Pubid::Iec.parse(test_case)
           rendered = identifier.to_s
 
           if test_case == rendered
@@ -642,7 +642,7 @@ RSpec.describe "IEC v2 Implementation" do
       "IEC TR 62048:2011",
     ].each do |test_case|
       it "correctly parses and renders '#{test_case}'" do
-        identifier = PubidNew::Iec.parse(test_case)
+        identifier = Pubid::Iec.parse(test_case)
         expect(identifier.to_s).to eq(test_case)
       end
     end

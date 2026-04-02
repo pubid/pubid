@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
+RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
   subject { described_class }
 
   describe ".parse" do
     context "basic SP identifiers" do
       describe "NIST SP 800-53" do
         subject { "NIST SP 800-53" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 250-1039" do
         subject { "NIST SP 250-1039" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -47,14 +47,14 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     context "SP with revision" do
       describe "NIST SP 800-53r4" do
         subject { "NIST SP 800-53r4" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses revision as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("4")
         end
@@ -66,7 +66,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-90r" do
         subject { "NIST SP 800-90r" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -77,7 +77,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses revision as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("1")
         end
@@ -85,16 +85,16 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-57pt1r4" do
         subject { "NIST SP 800-57pt1r4" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses part and revision" do
-          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.value).to eq("1")
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("4")
         end
@@ -106,7 +106,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-56Ar2" do
         subject { "NIST SP 800-56Ar2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -114,10 +114,10 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
         it "parses letter suffix and revision" do
           expect(parsed.number.value).to eq("800-56")
-          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.type).to eq("")
           expect(parsed.part.value).to eq("A")
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("2")
         end
@@ -129,7 +129,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 260-126 rev 2013" do
         subject { "NIST SP 260-126 rev 2013" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -140,7 +140,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses revision year as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("2013")
         end
@@ -150,7 +150,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     context "SP with edition year" do
       describe "NIST SP 330-2019" do
         subject { "NIST SP 330-2019" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -161,7 +161,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2019")
         end
@@ -169,7 +169,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 304a-2017" do
         subject { "NIST SP 304a-2017" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -181,10 +181,10 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
         it "parses edition year with letter suffix" do
           expect(parsed.number.value).to eq("304")
-          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.type).to eq("")
           expect(parsed.part.value).to eq("A")
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2017")
         end
@@ -192,7 +192,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 260-162 2006ed." do
         subject { "NIST SP 260-162 2006ed." }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -203,7 +203,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2006")
         end
@@ -213,14 +213,14 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     context "SP with update" do
       describe "NIST SP 800-53r4/Upd3-2015" do
         subject { "NIST SP 800-53r4/Upd3-2015" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses revision and update" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("4")
           expect(parsed.update.number).to eq("3")
@@ -234,7 +234,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 500-300-upd" do
         subject { "NIST SP 500-300-upd" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -253,7 +253,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     context "SP with version" do
       describe "NIST SP 500-268v1.1" do
         subject { "NIST SP 500-268v1.1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -264,14 +264,14 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses version_component" do
-          expect(parsed.version_component).to be_a(PubidNew::Nist::Components::Version)
+          expect(parsed.version_component).to be_a(Pubid::Nist::Components::Version)
           expect(parsed.version_component.value).to eq("1.1")
         end
       end
 
       describe "NIST SP 800-60 Ver. 2.0" do
         subject { "NIST SP 800-60 Ver. 2.0" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -282,7 +282,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses version_component" do
-          expect(parsed.version_component).to be_a(PubidNew::Nist::Components::Version)
+          expect(parsed.version_component).to be_a(Pubid::Nist::Components::Version)
           expect(parsed.version_component.value).to eq("2.0")
         end
       end
@@ -291,7 +291,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     context "SP with stage" do
       describe "NIST SP(IPD) 800-53r5" do
         subject { "NIST SP(IPD) 800-53r5" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -302,7 +302,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses revision and stage" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("5")
           expect(parsed.stage.to_s).to eq("ipd")
@@ -311,7 +311,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP(IPD) 800-53e5" do
         subject { "NIST SP(IPD) 800-53e5" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -322,7 +322,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses edition and stage" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("5")
           expect(parsed.stage.to_s).to eq("ipd")
@@ -333,7 +333,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     context "SP with language" do
       describe "NIST SP 1262es" do
         subject { "NIST SP 1262es" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
           expect(parsed).to be_a(described_class)
@@ -354,7 +354,7 @@ RSpec.describe PubidNew::Nist::Identifiers::SpecialPublication do
     it "returns array of typed stages" do
       stages = described_class.typed_stages
       expect(stages).to be_a(Array)
-      expect(stages.first).to be_a(PubidNew::Components::TypedStage)
+      expect(stages.first).to be_a(Pubid::Components::TypedStage)
     end
 
     it "includes published stage with SP abbr" do

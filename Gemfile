@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in pubid_new.gemspec
+# Specify your gem's dependencies in pubid.gemspec
 gemspec
 
 gem "rake"
@@ -11,3 +11,4 @@ gem "rubocop"
 gem "rubocop-performance"
 gem "rubocop-rake"
 gem "rubocop-rspec"
+gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"

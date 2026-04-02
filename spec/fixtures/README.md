@@ -78,7 +78,7 @@ Comments (lines starting with `#`) are allowed for organization.
 
 ### Classification Process
 
-1. **Parse each identifier** using `PubidNew::{Flavor}.parse(id_str)`
+1. **Parse each identifier** using `Pubid::{Flavor}.parse(id_str)`
 2. **Determine class** from parsed object or error pattern
 3. **Classify as pass or fail**:
    - **Pass**: `parsed.to_s == original_string`
@@ -109,15 +109,15 @@ For each flavor, detect the identifier class:
 Create targeted tests for specific identifier types:
 
 ```ruby
-RSpec.describe PubidNew::Iso::Identifiers::Amendment do
+RSpec.describe Pubid::Iso::Identifiers::Amendment do
   let(:passing_fixtures) {
     File.readlines("spec/fixtures/iso/pass/amendment.txt")
         .reject { |l| l.strip.empty? || l.start_with?("#") }
   }
-  
+
   it "parses all passing amendment fixtures" do
     passing_fixtures.each do |fixture|
-      expect { PubidNew::Iso.parse(fixture) }.not_to raise_error
+      expect { Pubid::Iso.parse(fixture) }.not_to raise_error
     end
   end
 end
@@ -204,18 +204,18 @@ ISO Руководство 2:2004
 ### Unit Tests by Class
 
 ```ruby
-# spec/pubid_new/iso/identifiers/amendment_spec.rb
-RSpec.describe PubidNew::Iso::Identifiers::Amendment do
+# spec/pubid/iso/identifiers/amendment_spec.rb
+RSpec.describe Pubid::Iso::Identifiers::Amendment do
   describe "fixture validation" do
     let(:pass_fixtures) {
       File.readlines("spec/fixtures/iso/pass/amendment.txt")
           .map(&:strip)
           .reject { |l| l.empty? || l.start_with?("#") }
     }
-    
+
     it "parses and round-trips all passing fixtures" do
       pass_fixtures.each do |id_str|
-        parsed = PubidNew::Iso.parse(id_str)
+        parsed = Pubid::Iso.parse(id_str)
         expect(parsed).to be_a(described_class)
         expect(parsed.to_s).to eq(id_str)
       end
@@ -227,19 +227,19 @@ end
 ### Comprehensive Coverage
 
 ```ruby
-# spec/pubid_new/iso/coverage_spec.rb
+# spec/pubid/iso/coverage_spec.rb
 RSpec.describe "ISO Fixture Coverage" do
   it "has fixtures for all identifier types" do
     identifier_classes = [
-      PubidNew::Iso::Identifiers::InternationalStandard,
-      PubidNew::Iso::Identifiers::Amendment,
+      Pubid::Iso::Identifiers::InternationalStandard,
+      Pubid::Iso::Identifiers::Amendment,
       # ... all classes
     ]
-    
+
     identifier_classes.each do |klass|
       type_name = klass.name.split("::").last.underscore
       pass_file = "spec/fixtures/iso/pass/#{type_name}.txt"
-      expect(File.exist?(pass_file)).to be(true), 
+      expect(File.exist?(pass_file)).to be(true),
         "Missing pass fixtures for #{klass}"
     end
   end
@@ -313,5 +313,5 @@ Pass rate: 97.2% → 97.4% (+0.2pp)
 
 ---
 
-**Last Updated**: 2025-12-06  
+**Last Updated**: 2025-12-06
 **Maintained By**: PubID V2 Development Team

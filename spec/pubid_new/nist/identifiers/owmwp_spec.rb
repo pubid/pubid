@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Owmwp do
+RSpec.describe Pubid::Nist::Identifiers::Owmwp do
   subject { described_class }
 
   describe ".parse" do
     context "OWMWP with date-based format" do
       describe "NIST OWMWP 06-13-2018" do
         subject { "NIST OWMWP 06-13-2018" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Owmwp" do
           expect(parsed).to be_a(described_class)
@@ -36,7 +36,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Owmwp do
 
       describe "NIST OWMWP 01-01-2020" do
         subject { "NIST OWMWP 01-01-2020" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Owmwp" do
           expect(parsed).to be_a(described_class)
@@ -57,7 +57,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Owmwp do
 
       describe "NIST OWMWP 12-25-2019" do
         subject { "NIST OWMWP 12-25-2019" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Owmwp" do
           expect(parsed).to be_a(described_class)

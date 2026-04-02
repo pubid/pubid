@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::Adjunct do
+RSpec.describe Pubid::Astm::Identifiers::Adjunct do
   # ========================================
   # Adjunct (4 IDs, 1%)
   # ========================================
 
   describe "parses simple adjunct" do
     subject { "ASTM ADJD2148" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -20,7 +20,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Adjunct do
 
   describe "parses adjunct with EA suffix" do
     subject { "ADJF3504-EA" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Adjunct do
 
   describe "parses adjunct with DVD suffix" do
     subject { "ADJG0088DVD" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

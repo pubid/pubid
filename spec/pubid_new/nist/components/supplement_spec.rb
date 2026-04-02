@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Supplement do
+RSpec.describe Pubid::Nist::Components::Supplement do
   describe "initialization" do
     it "creates supplement with number" do
       supplement = described_class.new(number: "2")

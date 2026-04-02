@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Csa::Identifiers::Cec do
+RSpec.describe Pubid::Csa::Identifiers::Cec do
   subject { described_class }
 
   describe "parsing CEC identifiers" do
     context "C22.2 NO. patterns" do
       describe "CSA C22.2 NO. 286:23" do
         subject { "CSA C22.2 NO. 286:23" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
           expect(parsed).to be_a(described_class)
@@ -34,7 +34,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
 
       describe "CSA C22.2 NO. 0:20" do
         subject { "CSA C22.2 NO. 0:20" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
           expect(parsed).to be_a(described_class)
@@ -51,7 +51,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
 
       describe "CSA C22.2 NO. 60601-1-9:22" do
         subject { "CSA C22.2 NO. 60601-1-9:22" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses complex NO. number" do
           expect(parsed.no_number.value).to eq("60601-1-9")
@@ -66,7 +66,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
     context "other C22.x parts" do
       describe "CSA C22.3 NO. 7:20" do
         subject { "CSA C22.3 NO. 7:20" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses C22.3 part" do
           expect(parsed.cec_part.value).to eq("C22.3")
@@ -79,7 +79,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
 
       describe "CSA C22.4 NO. 1:18" do
         subject { "CSA C22.4 NO. 1:18" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses C22.4 part" do
           expect(parsed.cec_part.value).to eq("C22.4")
@@ -88,7 +88,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
 
       describe "CSA C22.6 NO. 5:19" do
         subject { "CSA C22.6 NO. 5:19" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses C22.6 part" do
           expect(parsed.cec_part.value).to eq("C22.6")
@@ -99,7 +99,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
     context "with dash year format" do
       describe "CSA C22.2 NO. 0.16-M92 (R2001)" do
         subject { "CSA C22.2 NO. 0.16-M92 (R2001)" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses dotted NO. number" do
           expect(parsed.no_number.value).to eq("0.16")
@@ -123,7 +123,7 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
     context "with French year prefix" do
       describe "CSA C22.2 NO. 144.1:F20" do
         subject { "CSA C22.2 NO. 144.1:F20" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses dotted NO. number" do
           expect(parsed.no_number.value).to eq("144.1")
@@ -143,10 +143,10 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
     context "wrapped in CanadianAdopted" do
       describe "CAN/CSA-C22.2 NO. 286:23" do
         subject { "CAN/CSA-C22.2 NO. 286:23" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
-          expect(parsed).to be_a(PubidNew::Csa::Identifiers::CanadianAdopted)
+          expect(parsed).to be_a(Pubid::Csa::Identifiers::CanadianAdopted)
         end
 
         it "wraps CecIdentifier" do
@@ -160,10 +160,10 @@ RSpec.describe PubidNew::Csa::Identifiers::Cec do
 
       describe "CAN3-C22.2 NO. 0.16-M92" do
         subject { "CAN3-C22.2 NO. 0.16-M92" }
-        let(:parsed) { PubidNew::Csa.parse(subject) }
+        let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
-          expect(parsed).to be_a(PubidNew::Csa::Identifiers::CanadianAdopted)
+          expect(parsed).to be_a(Pubid::Csa::Identifiers::CanadianAdopted)
         end
 
         it "wraps CecIdentifier" do

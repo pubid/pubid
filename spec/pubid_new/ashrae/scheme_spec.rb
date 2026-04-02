@@ -2,19 +2,19 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Ashrae::Scheme do
+RSpec.describe Pubid::Ashrae::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
       expect(described_class.identifiers).to be_an(Array)
       expect(described_class.identifiers).to all(be_a(Class))
-      expect(described_class.identifiers).to include(PubidNew::Ashrae::Identifiers::Standard)
-      expect(described_class.identifiers).to include(PubidNew::Ashrae::Identifiers::Guideline)
+      expect(described_class.identifiers).to include(Pubid::Ashrae::Identifiers::Standard)
+      expect(described_class.identifiers).to include(Pubid::Ashrae::Identifiers::Guideline)
     end
 
     it "includes supplement identifiers" do
-      expect(described_class.identifiers).to include(PubidNew::Ashrae::Identifiers::Addendum)
-      expect(described_class.identifiers).to include(PubidNew::Ashrae::Identifiers::Interpretation)
-      expect(described_class.identifiers).to include(PubidNew::Ashrae::Identifiers::Errata)
+      expect(described_class.identifiers).to include(Pubid::Ashrae::Identifiers::Addendum)
+      expect(described_class.identifiers).to include(Pubid::Ashrae::Identifiers::Interpretation)
+      expect(described_class.identifiers).to include(Pubid::Ashrae::Identifiers::Errata)
     end
   end
 
@@ -22,7 +22,7 @@ RSpec.describe PubidNew::Ashrae::Scheme do
     it "returns array of TYPED_STAGES from all identifiers" do
       stages = described_class.typed_stages
       expect(stages).to be_an(Array)
-      expect(stages).to all(be_a(PubidNew::Components::TypedStage))
+      expect(stages).to all(be_a(Pubid::Components::TypedStage))
     end
 
     it "includes stages from all identifier classes" do
@@ -34,12 +34,12 @@ RSpec.describe PubidNew::Ashrae::Scheme do
   describe ".locate_typed_stage_by_abbr" do
     it "returns the correct typed stage for ASHRAE" do
       stage = described_class.locate_typed_stage_by_abbr("ASHRAE")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
     end
 
     it "returns the correct typed stage for nil" do
       stage = described_class.locate_typed_stage_by_abbr(nil)
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
     end
 
     it "raises ArgumentError for unknown abbreviations" do
@@ -52,7 +52,7 @@ RSpec.describe PubidNew::Ashrae::Scheme do
   describe ".locate_identifier_klass_by_type_code" do
     it "returns the correct identifier class for known type codes" do
       klass = described_class.locate_identifier_klass_by_type_code("standard")
-      expect(klass).to eq(PubidNew::Ashrae::Identifiers::Standard)
+      expect(klass).to eq(Pubid::Ashrae::Identifiers::Standard)
     end
 
     it "raises ArgumentError for unknown type codes" do

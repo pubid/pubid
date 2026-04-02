@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/rendering/stage"
-require_relative "../../../lib/pubid_new/components/stage"
-require_relative "../../../lib/pubid_new/components/type"
+require_relative "../../../lib/pubid/rendering/stage"
+require_relative "../../../lib/pubid/components/stage"
+require_relative "../../../lib/pubid/components/type"
 
-RSpec.describe PubidNew::Rendering::Stage do
+RSpec.describe Pubid::Rendering::Stage do
   let(:test_class) do
     Class.new do
-      include PubidNew::Rendering::Stage
+      include Pubid::Rendering::Stage
 
       attr_accessor :stage, :type
     end
@@ -18,30 +18,30 @@ RSpec.describe PubidNew::Rendering::Stage do
 
   describe "#render_stage" do
     it "renders stage only" do
-      stage = PubidNew::Components::Stage.new(abbr: "WD")
+      stage = Pubid::Components::Stage.new(abbr: "WD")
       expect(instance.render_stage(stage)).to eq("/WD")
     end
 
     it "renders stage with copublisher" do
-      stage = PubidNew::Components::Stage.new(abbr: "WD")
+      stage = Pubid::Components::Stage.new(abbr: "WD")
       expect(instance.render_stage(stage, nil, has_copublisher: true)).to eq(" WD")
     end
 
     it "renders stage and type" do
-      stage = PubidNew::Components::Stage.new(abbr: "WD")
-      type = PubidNew::Components::Type.new(abbr: "TR")
+      stage = Pubid::Components::Stage.new(abbr: "WD")
+      type = Pubid::Components::Type.new(abbr: "TR")
       expect(instance.render_stage(stage, type)).to eq("/WD/TR")
     end
 
     it "renders stage and type with copublisher" do
-      stage = PubidNew::Components::Stage.new(abbr: "WD")
-      type = PubidNew::Components::Type.new(abbr: "TR")
+      stage = Pubid::Components::Stage.new(abbr: "WD")
+      type = Pubid::Components::Type.new(abbr: "TR")
       expect(instance.render_stage(stage, type, has_copublisher: true)).to eq(" WD TR")
     end
 
     it "does not render default type" do
-      stage = PubidNew::Components::Stage.new(abbr: "DIS")
-      type = PubidNew::Components::Type.new(abbr: "IS")
+      stage = Pubid::Components::Stage.new(abbr: "DIS")
+      type = Pubid::Components::Type.new(abbr: "IS")
       expect(instance.render_stage(stage, type)).to eq("/DIS")
     end
 

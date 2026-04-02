@@ -74,10 +74,10 @@ PubID V2 implements RFC 5141-bis compliant URN generation for ISO identifiers wi
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
 # Parse and generate URN
-id = PubidNew::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016")
+id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016")
 id.to_urn
 # => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3"
 ----
@@ -109,9 +109,9 @@ PubID V2 provides two-way machine-readable conversion for all identifiers, suppo
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
-id = PubidNew::Iso.parse("ISO 9001:2015/Amd 1:2020")
+id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
 id.to_h
 # => {
 #      flavor: "iso",
@@ -130,9 +130,9 @@ id.to_h
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
-id = PubidNew::Iso.parse("ISO 9001:2015")
+id = Pubid::Iso.parse("ISO 9001:2015")
 id.to_json
 # => '{"flavor":"iso","publisher":"ISO","number":"9001","year":"2015",...}'
 ----
@@ -141,7 +141,7 @@ id.to_json
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
 hash = {
   flavor: "iso",
@@ -149,7 +149,7 @@ hash = {
   number: "9001",
   year: "2015"
 }
-id = PubidNew::Serializable.from_h(hash)
+id = Pubid::Serializable.from_h(hash)
 id.to_s # => "ISO 9001:2015"
 ----
 
@@ -157,10 +157,10 @@ id.to_s # => "ISO 9001:2015"
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
 json = '{"flavor":"iso","publisher":"ISO","number":"9001","year":"2015"}'
-id = PubidNew::Serializable.from_json(json)
+id = Pubid::Serializable.from_json(json)
 id.to_s # => "ISO 9001:2015"
 ----
 
@@ -170,11 +170,11 @@ All identifiers support full round-trip conversion preserving all attributes:
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
-original = PubidNew::Iso.parse("ISO 9001:2015/Amd 1:2020/Cor 1:2021")
+original = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020/Cor 1:2021")
 hash = original.to_h
-restored = PubidNew::Serializable.from_h(hash)
+restored = Pubid::Serializable.from_h(hash)
 
 restored.to_s # => "ISO 9001:2015/Amd 1:2020/Cor 1:2021"
 restored.to_urn # => "urn:iso:std:iso:9001:amd:2020:cor:2021:v1"
@@ -190,9 +190,9 @@ The `exclude` method returns a copy of the identifier without specified attribut
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
-id = PubidNew::Iso.parse("ISO 9001:2015/Amd 1:2020")
+id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
 id.exclude(:supplements).to_s
 # => "ISO 9001:2015"
 
@@ -206,16 +206,16 @@ The `new_edition_of?` method checks if an identifier is a newer edition of the s
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
-id1 = PubidNew::Iso.parse("ISO 9001:2015")
-id2 = PubidNew::Iso.parse("ISO 9001:2019")
+id1 = Pubid::Iso.parse("ISO 9001:2015")
+id2 = Pubid::Iso.parse("ISO 9001:2019")
 
 id2.new_edition_of?(id1) # => true
 id1.new_edition_of?(id2) # => false
 
 # Raises ArgumentError for different documents
-id3 = PubidNew::Iso.parse("ISO 9002:2019")
+id3 = Pubid::Iso.parse("ISO 9002:2019")
 id3.new_edition_of?(id1) # => ArgumentError: Cannot compare edition: different number
 ----
 
@@ -225,14 +225,14 @@ The `root` method traverses supplement chains to return the base document:
 
 [source,ruby]
 ----
-require 'pubid_new/iso'
+require 'pubid/iso'
 
-id = PubidNew::Iso.parse("ISO 9001:2015/Amd 1:2020/Cor 1:2021")
+id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020/Cor 1:2021")
 id.root.to_s
 # => "ISO 9001:2015"
 
 # Returns self for base identifiers
-base = PubidNew::Iso.parse("ISO 9001:2015")
+base = Pubid::Iso.parse("ISO 9001:2015")
 base.root.to_s # => "ISO 9001:2015"
 base.root.equal?(base) # => true
 ----
@@ -264,15 +264,15 @@ The rendering styles feature enables PubID to parse and render identifiers in mu
 [source,ruby]
 ----
 # ISO - Preserves long form (mixed case)
-id = PubidNew::Iso.parse("ISO 8601:2019/DAmd 1")
+id = Pubid::Iso.parse("ISO 8601:2019/DAmd 1")
 id.to_s  # => "ISO 8601:2019/DAmd 1"
 
 # ISO - Preserves short form (uppercase)
-id = PubidNew::Iso.parse("ISO 8601:2019/DAM 1")
+id = Pubid::Iso.parse("ISO 8601:2019/DAM 1")
 id.to_s  # => "ISO 8601:2019/DAM 1"
 
 # Corrigendum with long form
-id = PubidNew::Iso.parse("ISO/IEC 19115:2003/Cor 1:2006")
+id = Pubid::Iso.parse("ISO/IEC 19115:2003/Cor 1:2006")
 id.to_s  # => "ISO/IEC 19115:2003/Cor 1:2006"
 ----
 
@@ -281,11 +281,11 @@ id.to_s  # => "ISO/IEC 19115:2003/Cor 1:2006"
 [source,ruby]
 ----
 # IEC - Preserves long form (with space)
-id = PubidNew::Iec.parse("IEC 60050-351:2013/Amd 1:2016")
+id = Pubid::Iec.parse("IEC 60050-351:2013/Amd 1:2016")
 id.to_s  # => "IEC 60050-351:2013/Amd 1:2016"
 
 # IEC - Preserves short form (no space)
-id = PubidNew::Iec.parse("IEC 60050-351:2013/AMD1:2016")
+id = Pubid::Iec.parse("IEC 60050-351:2013/AMD1:2016")
 id.to_s  # => "IEC 60050-351:2013/AMD1:2016"
 ----
 
@@ -324,7 +324,7 @@ The monorepo is organized as follows:
 [source]
 ----
 .
-├── lib/pubid_new/          # V2 implementation (ACTIVE)
+├── lib/pubid/          # V2 implementation (ACTIVE)
 │   ├── iso/               # ISO V2 - Production ready
 │   ├── iec/               # IEC V2 - Production ready
 │   ├── cen/               # CEN V2 - Production ready
@@ -344,7 +344,7 @@ The monorepo is organized as follows:
 │   ├── pubid-ieee/        # IEEE V1 (replaced by V2)
 │   └── pubid-nist/        # NIST V1 (replaced by V2)
 ├── spec/                   # Integration tests
-│   ├── pubid_new/         # V2 tests (ACTIVE)
+│   ├── pubid/         # V2 tests (ACTIVE)
 │   └── integration/       # Cross-gem tests
 ├── docs/                   # Documentation
 │   ├── ISO_V1_TO_V2_MIGRATION.adoc  # Migration guide
@@ -360,7 +360,7 @@ The monorepo is organized as follows:
 
 === General
 
-PubID V2 implements a completely redesigned parser architecture with clean separation of concerns and model-driven design. The V2 implementation is located in [`lib/pubid_new/`](lib/pubid_new/) while V1 code remains in [`gems/`](gems/) for backward compatibility.
+PubID V2 implements a completely redesigned parser architecture with clean separation of concerns and model-driven design. The V2 implementation is located in [`lib/pubid/`](lib/pubid/) while V1 code remains in [`gems/`](gems/) for backward compatibility.
 
 === Three-layer design
 
@@ -462,10 +462,10 @@ The NIST parser handles standard NIST publications and historical NBS patterns:
 
 [source,ruby]
 ----
-require 'pubid_new'
+require 'pubid'
 
 # Parse standard NIST identifier
-id = PubidNew::Nist.parse("NIST SP 800-53r5")
+id = Pubid::Nist.parse("NIST SP 800-53r5")
 
 # Access components
 id.series    # => "SP"
@@ -476,15 +476,15 @@ id.revision  # => "r5"
 id.to_s      # => "NIST SP 800-53r5"
 
 # Parse historical NBS patterns
-id = PubidNew::Nist.parse("NBS LCIRC 1019r1963")
+id = Pubid::Nist.parse("NBS LCIRC 1019r1963")
 id.to_s      # => "NBS LCIRC 1019r1963"
 
 # CSM volume-number format
-id = PubidNew::Nist.parse("NBS CSM v6n1")
+id = Pubid::Nist.parse("NBS CSM v6n1")
 id.to_s      # => "NBS CSM v6n1"
 
 # Supplement with revision
-id = PubidNew::Nist.parse("NBS CIRC 154supprev")
+id = Pubid::Nist.parse("NBS CIRC 154supprev")
 id.to_s      # => "NBS CIRC 154supprev"
 ----
 
@@ -499,15 +499,15 @@ The IEC parser handles complex patterns including adopted standards and dual-pub
 
 [source,ruby]
 ----
-require 'pubid_new'
+require 'pubid'
 
 # Parse standard IEC identifier
-id = PubidNew::Iec.parse("IEC 62014-5 IEEE Std 1734-2011")
-id.class  # => PubidNew::Iec::Identifiers::DualPublished
+id = Pubid::Iec.parse("IEC 62014-5 IEEE Std 1734-2011")
+id.class  # => Pubid::Iec::Identifiers::DualPublished
 id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"  # normalized
 
 # Space-separated dual identifiers are auto-detected
-id = PubidNew::Iec.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
+id = Pubid::Iec.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
 id.to_s   # => "ANSI C37.61-1973 and IEEE Std 321-1973"
 ----
 
@@ -552,20 +552,20 @@ IEEE supports 7 relationship types with recursive identifier parsing:
 .Parsing Pattern 4 Identifiers
 [source,ruby]
 ----
-require 'pubid_new/ieee'
+require 'pubid/ieee'
 
 # Parse relationship identifier
-id = PubidNew::Ieee.parse('IEEE Std 802 (Revision of IEEE Std 801)')
+id = Pubid::Ieee.parse('IEEE Std 802 (Revision of IEEE Std 801)')
 id.relationships.first.relationship_type  # => "revision_of"
 id.relationships.first.related_identifiers.first.to_s  # => "IEEE Std 801"
 id.to_s  # => "IEEE Std 802 (Revision of IEEE Std 801)" (perfect round-trip)
 
 # Multiple related identifiers
-id = PubidNew::Ieee.parse('IEEE Std 100 (Amendment to IEEE Std 99, IEEE Std 98)')
+id = Pubid::Ieee.parse('IEEE Std 100 (Amendment to IEEE Std 99, IEEE Std 98)')
 id.relationships.first.related_identifiers.count # => 2
 
 # Intermediate amendments (as amended by clause)
-id = PubidNew::Ieee.parse('IEEE Std 200 (Corrigendum to IEEE Std 199 as amended by IEEE Std 199a)')
+id = Pubid::Ieee.parse('IEEE Std 200 (Corrigendum to IEEE Std 199 as amended by IEEE Std 199a)')
 id.relationships.first.intermediate_amendments.first.to_s # => "IEEE Std 199a"
 ----
 
@@ -584,13 +584,13 @@ IEEE supports two historical predecessor organizations that merged in 1963 to fo
 [source,ruby]
 ----
 # Parse AIEE identifier with long date format
-aiee = PubidNew::Ieee.parse("AIEE No. 552, November 1955")
+aiee = Pubid::Ieee.parse("AIEE No. 552, November 1955")
 aiee.to_s                        # => "AIEE No. 552, November 1955"
 aiee.to_s(date_format: :short)   # => "AIEE No. 552-1955"
 aiee.to_s(date_format: :long)    # => "AIEE No. 552, November 1955"
 
 # Parse AIEE identifier with short date format
-aiee = PubidNew::Ieee.parse("AIEE No. 59-1962")
+aiee = Pubid::Ieee.parse("AIEE No. 59-1962")
 aiee.to_s                        # => "AIEE No. 59-1962"
 aiee.to_s(date_format: :long)    # => "AIEE No. 59, 1962"
 ----
@@ -605,12 +605,12 @@ aiee.to_s(date_format: :long)    # => "AIEE No. 59, 1962"
 [source,ruby]
 ----
 # Parse IRE identifier (year-first format)
-ire = PubidNew::Ieee.parse("52 IRE 7.S2")
+ire = Pubid::Ieee.parse("52 IRE 7.S2")
 ire.to_s      # => "52 IRE 7.S2"
 ire.year      # => 1952 (converts 2-digit to 4-digit internally)
 
 # IRE with committee notation
-ire = PubidNew::Ieee.parse("61 IRE 28 S1")
+ire = Pubid::Ieee.parse("61 IRE 28 S1")
 ire.to_s      # => "61 IRE 28 S1"
 ire.year      # => 1961
 ----
@@ -655,11 +655,11 @@ Added support for additional copublisher organizations:
 [source,ruby]
 ----
 # CSA copublisher
-csa_id = PubidNew::Ieee.parse("IEEE/CSA P844.1-2017")
+csa_id = Pubid::Ieee.parse("IEEE/CSA P844.1-2017")
 csa_id.copublisher  # => ["CSA"]
 
 # ASME in semicolon equivalence
-asme_id = PubidNew::Ieee.parse("IEEE Std 120-1955; ASME PTC 19.6-1955")
+asme_id = Pubid::Ieee.parse("IEEE Std 120-1955; ASME PTC 19.6-1955")
 ----
 
 **Corrigendum as Proper Identifier Type:**
@@ -668,8 +668,8 @@ IEEE corrigenda are now first-class SupplementIdentifier objects with full base 
 
 [source,ruby]
 ----
-cor = PubidNew::Ieee.parse("IEEE Std 535-2013/Cor. 1-2017")
-cor.class                  # => PubidNew::Ieee::Identifiers::Corrigendum
+cor = Pubid::Ieee.parse("IEEE Std 535-2013/Cor. 1-2017")
+cor.class                  # => Pubid::Ieee::Identifiers::Corrigendum
 cor.cor_number             # => "1"
 cor.cor_year               # => "2017"
 cor.base_identifier        # => <Base identifier object>
@@ -677,7 +677,7 @@ cor.base_identifier.to_s   # => "IEEE Std 535-2013"
 cor.to_s                   # => "IEEE Std 535-2013/Cor. 1-2017"
 
 # Round-trip fidelity preserved
-cor2 = PubidNew::Ieee.parse("IEEE Std 802.1AC-2016/Cor. 1-2018")
+cor2 = Pubid::Ieee.parse("IEEE Std 802.1AC-2016/Cor. 1-2018")
 cor2.to_s                  # => "IEEE Std 802.1AC-2016/Cor. 1-2018"
 ----
 
@@ -734,16 +734,16 @@ Now supports **11 relationship types** (added Reaffirmation and Redesignation):
 [source,ruby]
 ----
 # Reaffirmation relationship
-reaffirm = PubidNew::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)")
+reaffirm = Pubid::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)")
 reaffirm.relationships.first.relationship_type  # => "reaffirmation_of"
 reaffirm.to_s  # => "ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)"
 
 # Redesignation relationship
-redesig = PubidNew::Ieee.parse("ANSI N42.18-2004 (Redesignation of ANSI N13.10-1974)")
+redesig = Pubid::Ieee.parse("ANSI N42.18-2004 (Redesignation of ANSI N13.10-1974)")
 redesig.relationships.first.relationship_type  # => "redesignation_of"
 
 # Multiple relationships with semicolon separator
-multi = PubidNew::Ieee.parse("IEEE Std 100 (Reaffirmation of X; Redesignation of Y)")
+multi = Pubid::Ieee.parse("IEEE Std 100 (Reaffirmation of X; Redesignation of Y)")
 multi.relationships.length  # => 2
 multi.relationships[0].relationship_type  # => "reaffirmation_of"
 multi.relationships[1].relationship_type  # => "redesignation_of"
@@ -755,7 +755,7 @@ Added support for ANSI draft project identifiers (P prefix):
 
 [source,ruby]
 ----
-ansi_p = PubidNew::Ieee.parse("ANSI PN42.34-2015")
+ansi_p = Pubid::Ieee.parse("ANSI PN42.34-2015")
 ansi_p.publisher  # => "ANSI"
 ansi_p.type       # => "P"
 ansi_p.to_s       # => "ANSI PN42.34-2015"
@@ -856,30 +856,30 @@ ASME uses 23+ multi-character codes for specialized document types:
 .Usage Examples
 [source,ruby]
 ----
-require 'pubid_new/asme'
+require 'pubid/asme'
 
 # Parse standard code
-id = PubidNew::Asme.parse("ASME B16.5-2020")
+id = Pubid::Asme.parse("ASME B16.5-2020")
 id.code.designator  # => "B"
 id.code.number      # => "16.5"
 id.year             # => "2020"
 id.to_s             # => "ASME B16.5-2020"
 
 # Parse BPVC subdivision
-bpvc = PubidNew::Asme.parse("ASME BPVC.III.1.NB-2021")
+bpvc = Pubid::Asme.parse("ASME BPVC.III.1.NB-2021")
 bpvc.code.designator  # => "BPVC.III.1.NB"
 bpvc.code.number      # => ""
 bpvc.year             # => "2021"
 bpvc.to_s             # => "ASME BPVC.III.1.NB-2021"
 
 # Parse multi-char designator
-ptc = PubidNew::Asme.parse("ASME PTC-1-2022")
+ptc = Pubid::Asme.parse("ASME PTC-1-2022")
 ptc.code.designator   # => "PTC"
 ptc.code.number       # => "1"
 ptc.to_s              # => "ASME PTC-1-2022"
 
 # Parse CSA dual-published
-dual = PubidNew::Asme.parse("ASME A17.1/CSA B44-2022")
+dual = Pubid::Asme.parse("ASME A17.1/CSA B44-2022")
 dual.code.designator  # => "A"
 dual.code.number      # => "17.1"
 dual.csa_number       # => "B44"
@@ -902,18 +902,18 @@ BSI supports value-added publication formats as wrapper identifiers following IE
 [source,ruby]
 ----
 # PDF format
-pdf = PubidNew::Bsi.parse("PD 5500:2018+A3:2020 PDF")
-pdf.class  # => PubidNew::Bsi::Identifiers::ValueAddedPublication
+pdf = Pubid::Bsi.parse("PD 5500:2018+A3:2020 PDF")
+pdf.class  # => Pubid::Bsi::Identifiers::ValueAddedPublication
 pdf.format # => "PDF"
 pdf.to_s   # => "PD 5500:2018+A3:2020 PDF"
 
 # Tracked Changes
-tc = PubidNew::Bsi.parse("PAS 96:2017 - TC")
+tc = Pubid::Bsi.parse("PAS 96:2017 - TC")
 tc.format  # => "TC"
 tc.to_s    # => "PAS 96:2017 - TC"
 
 # Book format
-book = PubidNew::Bsi.parse("PP 7722:2006 BOOK")
+book = Pubid::Bsi.parse("PP 7722:2006 BOOK")
 book.format # => "BOOK"
 book.to_s   # => "PP 7722:2006 BOOK"
 ----
@@ -972,17 +972,17 @@ BSI adopts international and European standards with prefix preservation:
 [source,ruby]
 ----
 # Adopted ISO standard
-bsi = PubidNew::Bsi.parse("BS ISO 37101:2016")
+bsi = Pubid::Bsi.parse("BS ISO 37101:2016")
 bsi.to_s  # => "BS ISO 37101:2016"
 
 # Adopted European Norm with ISO (three-level)
-bsi = PubidNew::Bsi.parse("BS EN ISO 13485:2016+A11:2021")
+bsi = Pubid::Bsi.parse("BS EN ISO 13485:2016+A11:2021")
 bsi.publisher.body  # => "BS"
 bsi.adopted_identifier.publisher.body  # => "EN"
 # Three-level: BS wraps EN wraps ISO
 
 # National Annex with supplements
-na = PubidNew::Bsi.parse("NA+A1:2012 to BS EN 1993-5:2007")
+na = Pubid::Bsi.parse("NA+A1:2012 to BS EN 1993-5:2007")
 na.supplements.first.number  # => "1"
 na.supplements.first.year    # => "2012"
 ----
@@ -1041,20 +1041,20 @@ Features: EN documents, technical specifications/reports, joint committee public
 [source,ruby]
 ----
 # CEN Technical Specification (slash separator!)
-cen = PubidNew::Cen.parse("CEN/TS 14972")
+cen = Pubid::Cen.parse("CEN/TS 14972")
 cen.to_s  # => "CEN/TS 14972" (slash, not space!)
 
 # CLC Technical Report
-clc = PubidNew::Cen.parse("CLC/TR 62125:2008")
+clc = Pubid::Cen.parse("CLC/TR 62125:2008")
 clc.to_s  # => "CLC/TR 62125:2008"
 
 # Joint committee (NEW in Session 285)
-joint = PubidNew::Cen.parse("CEN/CLC/TR 17602-80-12:2021")
+joint = Pubid::Cen.parse("CEN/CLC/TR 17602-80-12:2021")
 joint.publisher.copublisher  # => ["CLC"]
 joint.to_s  # => "CEN/CLC/TR 17602-80-12:2021"
 
 # European Prestandard with ISO adoption (NEW)
-env = PubidNew::Cen.parse("ENV ISO 11079:1999")
+env = Pubid::Cen.parse("ENV ISO 11079:1999")
 env.adopted_identifier.to_s  # => "ISO 11079:1999"
 env.to_s  # => "ENV ISO 11079:1999"
 ----
@@ -1098,22 +1098,22 @@ Features: 5 document types with letter suffix support
 
 [source,ruby]
 ----
-require 'pubid_new/sae'
+require 'pubid/sae'
 
 # Aerospace Material Specification with letter suffix
-sae = PubidNew::Sae.parse("SAE AMS 7904F:2024")
+sae = Pubid::Sae.parse("SAE AMS 7904F:2024")
 sae.type.to_s          # => "AMS"
 sae.number.to_s        # => "7904F" (includes letter suffix)
 sae.date.year          # => 2024
 sae.to_s               # => "SAE AMS 7904F:2024"
 
 # Aerospace Information Report
-air = PubidNew::Sae.parse("SAE AIR 8466:2024")
+air = Pubid::Sae.parse("SAE AIR 8466:2024")
 air.type.to_s  # => "AIR"
 air.to_s       # => "SAE AIR 8466:2024"
 
 # Perfect round-trip fidelity
-parsed = PubidNew::Sae.parse("SAE AMS 2813G:2022")
+parsed = Pubid::Sae.parse("SAE AMS 2813G:2022")
 parsed.to_s    # => "SAE AMS 2813G:2022"
 ----
 
@@ -1128,10 +1128,10 @@ parsed.to_s    # => "SAE AMS 2813G:2022"
 
 [source,ruby]
 ----
-require 'pubid_new'
+require 'pubid'
 
 # Parse ISO identifier
-id = PubidNew::Iso.parse("ISO 19115:2003")
+id = Pubid::Iso.parse("ISO 19115:2003")
 
 # Access components and render
 # (Implementation details to be documented)
@@ -1212,7 +1212,7 @@ All identifiers use shared components for common attributes:
 
 [source]
 ----
-::PubidNew::Identifier (parent)
+::Pubid::Identifier (parent)
   │
   ├─ SingleIdentifier (base documents)
   │   ├─ InternationalStandard (default)
@@ -1241,19 +1241,19 @@ All identifiers use shared components for common attributes:
 
 [source,ruby]
 ----
-require "pubid_new"
+require "pubid"
 
 # International Standard
-id = PubidNew::Iso.parse("ISO 19115:2003")
-id.class # => PubidNew::Iso::Identifiers::InternationalStandard
+id = Pubid::Iso.parse("ISO 19115:2003")
+id.class # => Pubid::Iso::Identifiers::InternationalStandard
 id.to_s  # => "ISO 19115:2003"
 
 # With copublisher
-id = PubidNew::Iso.parse("ISO/IEC 27001:2013")
+id = Pubid::Iso.parse("ISO/IEC 27001:2013")
 id.publisher.to_s # => "ISO/IEC"
 
 # Multiple copublishers
-id = PubidNew::Iso.parse("ISO/IEC/IEEE 8802-3:2021")
+id = Pubid::Iso.parse("ISO/IEC/IEEE 8802-3:2021")
 id.publisher.copublisher # => ["IEC", "IEEE"]
 ----
 
@@ -1262,19 +1262,19 @@ id.publisher.copublisher # => ["IEC", "IEEE"]
 [source,ruby]
 ----
 # Technical Report
-id = PubidNew::Iso.parse("ISO/IEC TR 29186:2012")
+id = Pubid::Iso.parse("ISO/IEC TR 29186:2012")
 id.type.abbr # => "TR"
 
 # Technical Specification
-id = PubidNew::Iso.parse("ISO/IEC TS 25011:2017")
+id = Pubid::Iso.parse("ISO/IEC TS 25011:2017")
 id.type.abbr # => "TS"
 
 # Guide with languages
-id = PubidNew::Iso.parse("ISO/IEC Guide 51:1999(E/F/R)")
+id = Pubid::Iso.parse("ISO/IEC Guide 51:1999(E/F/R)")
 id.languages.map(&:original_code) # => ["E/F/R"]
 
 # Data
-id = PubidNew::Iso.parse("ISO/DATA 7:1979")
+id = Pubid::Iso.parse("ISO/DATA 7:1979")
 id.type.abbr # => "DATA"
 ----
 
@@ -1283,25 +1283,25 @@ id.type.abbr # => "DATA"
 [source,ruby]
 ----
 # Amendment
-id = PubidNew::Iso.parse("ISO 19110:2005/Amd 1:2011")
-id.class # => PubidNew::Iso::Identifiers::Amendment
+id = Pubid::Iso.parse("ISO 19110:2005/Amd 1:2011")
+id.class # => Pubid::Iso::Identifiers::Amendment
 id.base_identifier.to_s # => "ISO 19110:2005"
 id.number.value # => "1"
 
 # Staged amendment (FDAM = Final Draft Amendment)
-id = PubidNew::Iso.parse("ISO/IEC 8802-3:2021/FDAM 1")
+id = Pubid::Iso.parse("ISO/IEC 8802-3:2021/FDAM 1")
 id.typed_stage.abbreviation # => "FDAM"
 id.typed_stage.stage_code.to_s # => "fdamd"
 
 # Corrigendum
-id = PubidNew::Iso.parse("ISO/IEC 8802-21:2018/Cor 1:2018")
-id.class # => PubidNew::Iso::Identifiers::Corrigendum
+id = Pubid::Iso.parse("ISO/IEC 8802-21:2018/Cor 1:2018")
+id.class # => Pubid::Iso::Identifiers::Corrigendum
 
 # Multi-level (Amendment to Amendment gets Corrigendum)
-id = PubidNew::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
-id.class # => PubidNew::Iso::Identifiers::Corrigendum
-id.base_identifier.class # => PubidNew::Iso::Identifiers::Amendment
-id.base_identifier.base_identifier.class # => PubidNew::Iso::Identifiers::InternationalStandard
+id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
+id.class # => Pubid::Iso::Identifiers::Corrigendum
+id.base_identifier.class # => Pubid::Iso::Identifiers::Amendment
+id.base_identifier.base_identifier.class # => Pubid::Iso::Identifiers::InternationalStandard
 ----
 
 ===== Special patterns
@@ -1309,26 +1309,26 @@ id.base_identifier.base_identifier.class # => PubidNew::Iso::Identifiers::Intern
 [source,ruby]
 ----
 # Directives
-id = PubidNew::Iso.parse("ISO/IEC DIR 1:2022")
-id.class # => PubidNew::Iso::Identifiers::Directives
+id = Pubid::Iso.parse("ISO/IEC DIR 1:2022")
+id.class # => Pubid::Iso::Identifiers::Directives
 id.number.value # => "1"
 
 # Directives Supplement
-id = PubidNew::Iso.parse("ISO/IEC DIR 1 ISO SUP:2022")
-id.class # => PubidNew::Iso::Identifiers::DirectivesSupplement
-id.base_identifier.class # => PubidNew::Iso::Identifiers::Directives
+id = Pubid::Iso.parse("ISO/IEC DIR 1 ISO SUP:2022")
+id.class # => Pubid::Iso::Identifiers::DirectivesSupplement
+id.base_identifier.class # => Pubid::Iso::Identifiers::Directives
 id.supplement_publisher.to_s # => "ISO"
 
 # Bundled Directives (combined document + supplement)
-id = PubidNew::Iso.parse("ISO/IEC DIR 1:2022 + IEC SUP:2022")
-id.class # => PubidNew::Iso::Identifiers::BundledIdentifier
-id.base_document.class # => PubidNew::Iso::Identifiers::Directives
-id.supplements.first.class # => PubidNew::Iso::Identifiers::DirectivesSupplement
+id = Pubid::Iso.parse("ISO/IEC DIR 1:2022 + IEC SUP:2022")
+id.class # => Pubid::Iso::Identifiers::BundledIdentifier
+id.base_document.class # => Pubid::Iso::Identifiers::Directives
+id.supplements.first.class # => Pubid::Iso::Identifiers::DirectivesSupplement
 id.to_s # => "ISO/IEC DIR 1:2022 + IEC SUP:2022"
 
 # International Workshop Agreement
-id = PubidNew::Iso.parse("IWA 14-1:2013")
-id.class # => PubidNew::Iso::Identifiers::InternationalWorkshopAgreement
+id = Pubid::Iso.parse("IWA 14-1:2013")
+id.class # => Pubid::Iso::Identifiers::InternationalWorkshopAgreement
 id.to_s # => "IWA 14-1:2013"
 ----
 
@@ -1385,16 +1385,16 @@ Result: Corrigendum → Amendment → InternationalStandard
 
 ==== Testing
 
-Integration tests: `spec/pubid_new/iso/identifier_spec.rb`
+Integration tests: `spec/pubid/iso/identifier_spec.rb`
 
-Unit tests: `spec/pubid_new/iso/**/*_spec.rb`
+Unit tests: `spec/pubid/iso/**/*_spec.rb`
 
 Run tests:
 
 [source,shell]
 ----
-bundle exec rspec spec/pubid_new/iso/identifier_spec.rb
-bundle exec rspec spec/pubid_new/iso/
+bundle exec rspec spec/pubid/iso/identifier_spec.rb
+bundle exec rspec spec/pubid/iso/
 ----
 
 === V2 architecture principles
@@ -1411,7 +1411,7 @@ Test Quality:: Each class has dedicated spec file, no lowering pass thresholds, 
 
 [source]
 ----
-lib/pubid_new/              # V2 implementation (ACTIVE)
+lib/pubid/              # V2 implementation (ACTIVE)
 ├── iso/                    # Production ready (92.84%)
 │   ├── parser.rb
 │   ├── builder.rb
@@ -1425,7 +1425,7 @@ lib/pubid_new/              # V2 implementation (ACTIVE)
 ├── cen/                    # In progress (26%)
 └── ...                     # Not started
 
-spec/pubid_new/             # V2 tests (ACTIVE)
+spec/pubid/             # V2 tests (ACTIVE)
 ├── iso/                    # 2,654/2,859 tests
 ├── iec/                    # 823/973 tests
 ├── cen/                    # 79/95 tests
@@ -1629,10 +1629,10 @@ NIST parser handles all series withFIPS month-year patterns (Session 199):
 
 [source,ruby]
 ----
-require 'pubid_new/nist'
+require 'pubid/nist'
 
 # Standard NIST publication
-id = PubidNew::Nist.parse("NIST SP 800-53r5")
+id = Pubid::Nist.parse("NIST SP 800-53r5")
 
 # Access components
 id.series    # => "SP"
@@ -1647,21 +1647,21 @@ OIML supports 9 identifier types with edition and supplement support:
 
 [source,ruby]
 ----
-require 'pubid_new/oiml'
+require 'pubid/oiml'
 
 # Standard recommendation (short format)
-rec = PubidNew::Oiml.parse("OIML R 138:2007(E)")
+rec = Pubid::Oiml.parse("OIML R 138:2007(E)")
 
 rec.to_s(format: :short)  # => "OIML R 138:2007(E)"
 rec.to_s(format: :long)   # => "OIML R 138 Edition 2007 (E)"
 
 # With edition number
-guide = PubidNew::Oiml.parse("OIML E 5 6th Edition 2015 (E)")
+guide = Pubid::Oiml.parse("OIML E 5 6th Edition 2015 (E)")
 guide.edition    # => "6"
 guide.year       # => "2015"
 
 # Amendment with recursive parsing
-amd = PubidNew::Oiml.parse("Amendment (2009) to OIML R 138 Edition 2007 (E)")
+amd = Pubid::Oiml.parse("Amendment (2009) to OIML R 138 Edition 2007 (E)")
 amd.base_identifier.to_s  # => "OIML R 138 Edition 2007 (E)"
 amd.year                  # => "2009"
 ----
@@ -1672,29 +1672,29 @@ CCSDS (Consultative Committee for Space Data Systems) parser handles space data 
 
 [source,ruby]
 ----
-require 'pubid_new/ccsds'
+require 'pubid/ccsds'
 
 # Standard CCSDS document
-doc = PubidNew::Ccsds.parse("CCSDS 727.0-B-5")
+doc = Pubid::Ccsds.parse("CCSDS 727.0-B-5")
 doc.code.number     # => "727.0"
 doc.version         # => "B"
 doc.revision        # => "5"
 doc.to_s            # => "CCSDS 727.0-B-5"
 
 # With color code
-doc = PubidNew::Ccsds.parse("CCSDS 211.2-B-1 Magenta Book")
+doc = Pubid::Ccsds.parse("CCSDS 211.2-B-1 Magenta Book")
 doc.color           # => "Magenta"
 doc.to_s            # => "CCSDS 211.2-B-1 Magenta Book"
 
 # Corrigendum supplement (with lutaml-model)
-cor = PubidNew::Ccsds.parse("CCSDS 727.0-B-5 Cor. 1")
-cor.class                  # => PubidNew::Ccsds::Identifiers::Corrigendum
+cor = Pubid::Ccsds.parse("CCSDS 727.0-B-5 Cor. 1")
+cor.class                  # => Pubid::Ccsds::Identifiers::Corrigendum
 cor.cor_number             # => 1
 cor.base_identifier.to_s   # => "CCSDS 727.0-B-5"
 cor.to_s                   # => "CCSDS 727.0-B-5 Cor. 1"
 
 # Language translation
-doc = PubidNew::Ccsds.parse("CCSDS 211.0-B-5 (Chinese)")
+doc = Pubid::Ccsds.parse("CCSDS 211.0-B-5 (Chinese)")
 doc.language        # => "Chinese"
 doc.to_s            # => "CCSDS 211.0-B-5 (Chinese)"
 ----

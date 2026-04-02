@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid_new/cen"
+require_relative "../../lib/pubid/cen"
 
 RSpec.describe "CEN Integration Tests" do
   test_cases = [
@@ -49,7 +49,7 @@ RSpec.describe "CEN Integration Tests" do
 
     context "when parsing '#{test_input}'" do
       it "round-trips correctly to '#{expected_output}'" do
-        parsed = PubidNew::Cen.parse(test_input)
+        parsed = Pubid::Cen.parse(test_input)
         expect(parsed.to_s).to eq(expected_output)
       end
     end

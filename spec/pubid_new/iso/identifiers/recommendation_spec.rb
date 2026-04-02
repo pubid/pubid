@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
+RSpec.describe Pubid::Iso::Identifiers::Recommendation do
   subject { described_class }
 
   describe "parse identifiers from examples" do
@@ -10,7 +10,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
         f.readlines.each do |pub_id|
           next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
+          expect(Pubid::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
@@ -27,7 +27,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 125:1966
     describe "ISO/R 125:1966" do
       subject { "ISO/R 125:1966" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:125" }
 
       it "parses publisher" do
@@ -73,7 +73,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 4
     describe "ISO/R 4" do
       subject { "ISO/R 4" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:4" }
 
       it "parses publisher" do
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
   context "parse legacy format with date" do
     describe "ISO/R 170-1960" do
       subject { "ISO/R 170-1960" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:170" }
 
       it "parses publisher" do
@@ -161,7 +161,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 93-3:1969
     describe "ISO/R 93-3:1969" do
       subject { "ISO/R 93-3:1969" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:93:-3" }
 
       it "parses publisher" do
@@ -208,7 +208,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # Test legacy format ISO/R 93/1-1963 normalizes to ISO/R 93-1:1963
     describe "ISO/R 93/1-1963" do
       subject { "ISO/R 93/1-1963" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/R 93-1:1963" }
       let(:urn) { "urn:iso:std:iso:r:93:-1" }
 
@@ -249,7 +249,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # Test roman numeral parts ISO/R 300/III-1968 normalizes to ISO/R 300-3:1968
     describe "ISO/R 300/III-1968" do
       subject { "ISO/R 300/III-1968" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/R 300-3:1968" }
       let(:urn) { "urn:iso:std:iso:r:300:-3" }
 
@@ -290,7 +290,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # Test undated roman numeral parts ISO/R 657/IV normalizes to ISO/R 657-4
     describe "ISO/R 657/IV" do
       subject { "ISO/R 657/IV" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/R 657-4" }
       let(:urn) { "urn:iso:std:iso:r:657:-4" }
 
@@ -334,7 +334,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 105-1:1959
     describe "ISO/R 105-1:1959" do
       subject { "ISO/R 105-1:1959" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:105:-1" }
 
       it "parses publisher" do
@@ -374,7 +374,7 @@ RSpec.describe PubidNew::Iso::Identifiers::Recommendation do
     # ISO/R 355-8:1973
     describe "ISO/R 355-8:1973" do
       subject { "ISO/R 355-8:1973" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:355:-8" }
 
       it "parses publisher" do

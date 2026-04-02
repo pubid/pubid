@@ -1,35 +1,35 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Ieee::Parser do
+RSpec.describe Pubid::Ieee::Parser do
   describe "parsing through module interface" do
     context "basic IEEE identifiers" do
       it "parses IEEE Std identifiers" do
-        expect { PubidNew::Ieee.parse("IEEE Std 623-1976") }.not_to raise_error
+        expect { Pubid::Ieee.parse("IEEE Std 623-1976") }.not_to raise_error
         expect do
-          PubidNew::Ieee.parse("IEEE Std C37.111-2013")
+          Pubid::Ieee.parse("IEEE Std C37.111-2013")
         end.not_to raise_error
       end
 
       it "parses IEEE P (project) identifiers" do
         expect do
-          PubidNew::Ieee.parse("IEEE P11073-10404-10419")
+          Pubid::Ieee.parse("IEEE P11073-10404-10419")
         end.not_to raise_error
       end
 
       it "parses AIEE identifiers" do
-        expect { PubidNew::Ieee.parse("AIEE No 14-1925") }.not_to raise_error
+        expect { Pubid::Ieee.parse("AIEE No 14-1925") }.not_to raise_error
       end
     end
 
     context "IEC identifiers" do
       it "parses basic IEC identifiers" do
-        expect { PubidNew::Ieee.parse("IEC 61523-4") }.not_to raise_error
-        expect { PubidNew::Ieee.parse("IEC 61671-2") }.not_to raise_error
+        expect { Pubid::Ieee.parse("IEC 61523-4") }.not_to raise_error
+        expect { Pubid::Ieee.parse("IEC 61671-2") }.not_to raise_error
       end
 
       it "parses IEC with edition format" do
         expect do
-          PubidNew::Ieee.parse("IEC 61671-2 Edition 1.0 2016-04")
+          Pubid::Ieee.parse("IEC 61671-2 Edition 1.0 2016-04")
         end.not_to raise_error
       end
     end
@@ -37,19 +37,19 @@ RSpec.describe PubidNew::Ieee::Parser do
     context "parenthetical content" do
       it "parses single adoption in parentheses" do
         expect do
-          PubidNew::Ieee.parse("AIEE No 14-1925 (AESC C22-1925)")
+          Pubid::Ieee.parse("AIEE No 14-1925 (AESC C22-1925)")
         end.not_to raise_error
       end
 
       it "parses multi-part adoptions with commas" do
         expect do
-          PubidNew::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
+          Pubid::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
         end.not_to raise_error
       end
 
       it "parses descriptive parenthetical notes" do
         expect do
-          PubidNew::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
+          Pubid::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
         end.not_to raise_error
       end
     end
@@ -57,13 +57,13 @@ RSpec.describe PubidNew::Ieee::Parser do
     context "IEC edition with year-month and IEEE adoption" do
       it "parses complex IEC/IEEE copublished format" do
         expect do
-          PubidNew::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
+          Pubid::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
         end.not_to raise_error
       end
 
       it "parses IEEE with IEC edition in parentheses" do
         expect do
-          PubidNew::Ieee.parse("IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)")
+          Pubid::Ieee.parse("IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)")
         end.not_to raise_error
       end
     end
@@ -71,19 +71,19 @@ RSpec.describe PubidNew::Ieee::Parser do
     context "code separator patterns" do
       it "parses codes with letter prefixes using dots" do
         expect do
-          PubidNew::Ieee.parse("IEEE Std C37.111-2013")
+          Pubid::Ieee.parse("IEEE Std C37.111-2013")
         end.not_to raise_error
       end
 
       it "parses P-prefix codes using dashes" do
         expect do
-          PubidNew::Ieee.parse("IEEE P11073-10404-10419")
+          Pubid::Ieee.parse("IEEE P11073-10404-10419")
         end.not_to raise_error
       end
 
       it "parses traditional IEEE codes with dots" do
         expect do
-          PubidNew::Ieee.parse("IEEE Std 802.11-2016")
+          Pubid::Ieee.parse("IEEE Std 802.11-2016")
         end.not_to raise_error
       end
     end

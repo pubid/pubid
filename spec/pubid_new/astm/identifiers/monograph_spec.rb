@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Astm::Identifiers::Monograph do
+RSpec.describe Pubid::Astm::Identifiers::Monograph do
   # ========================================
   # Monograph (10 IDs, 3%)
   # ========================================
 
   describe "parses monograph with edition" do
     subject { "ASTM MONO6-2ND-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
@@ -21,7 +21,7 @@ RSpec.describe PubidNew::Astm::Identifiers::Monograph do
 
   describe "parses monograph without edition" do
     subject { "ASTM MONO1-EB" }
-    let(:parsed) { PubidNew::Astm.parse(subject) }
+    let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)

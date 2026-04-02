@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "pubid_new/iso/utilities"
+require "pubid/iso/utilities"
 
-RSpec.describe PubidNew::Iso::Utilities do
+RSpec.describe Pubid::Iso::Utilities do
   describe ".parse_from_title" do
     context "with title starting with identifier" do
       it "extracts ISO identifier with year" do

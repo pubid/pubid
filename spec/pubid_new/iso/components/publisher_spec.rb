@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Components::Publisher do
+RSpec.describe Pubid::Iso::Components::Publisher do
   describe "#initialize" do
     it "accepts publisher parameter" do
       publisher = described_class.new(publisher: "ISO")

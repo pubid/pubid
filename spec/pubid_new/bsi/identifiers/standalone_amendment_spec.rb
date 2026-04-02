@@ -2,22 +2,22 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::StandaloneAmendment do
+RSpec.describe Pubid::Bsi::Identifiers::StandaloneAmendment do
   describe "parsing" do
     it "parses AMD with number" do
-      id = PubidNew::Bsi.parse("AMD 11015")
+      id = Pubid::Bsi.parse("AMD 11015")
       expect(id.class).to eq(described_class)
       expect(id.amendment_number.value).to eq("11015")
     end
 
     it "parses parenthesized AMD" do
-      id = PubidNew::Bsi.parse("(AMD 10971)")
+      id = Pubid::Bsi.parse("(AMD 10971)")
       expect(id.class).to eq(described_class)
       expect(id.amendment_number.value).to eq("10971")
     end
 
     it "parses AMD with corrigendum" do
-      id = PubidNew::Bsi.parse("AMD Corrigendum 14716")
+      id = Pubid::Bsi.parse("AMD Corrigendum 14716")
       expect(id.class).to eq(described_class)
       expect(id.amendment_number.value).to eq("14716")
       expect(id.corrigendum).to be true
@@ -26,23 +26,23 @@ RSpec.describe PubidNew::Bsi::Identifiers::StandaloneAmendment do
 
   describe "rendering" do
     it "renders AMD format" do
-      id = PubidNew::Bsi.parse("AMD 11015")
+      id = Pubid::Bsi.parse("AMD 11015")
       expect(id.to_s).to eq("AMD 11015")
     end
 
     it "renders parenthesized AMD" do
-      id = PubidNew::Bsi.parse("(AMD 10971)")
+      id = Pubid::Bsi.parse("(AMD 10971)")
       expect(id.to_s).to eq("(AMD 10971)")
     end
 
     it "renders AMD with corrigendum" do
-      id = PubidNew::Bsi.parse("AMD Corrigendum 14716")
+      id = Pubid::Bsi.parse("AMD Corrigendum 14716")
       expect(id.to_s).to eq("AMD Corrigendum 14716")
     end
 
     it "maintains round-trip fidelity" do
       original = "AMD 11015"
-      id = PubidNew::Bsi.parse(original)
+      id = Pubid::Bsi.parse(original)
       expect(id.to_s).to eq(original)
     end
   end

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Debug test for conformance patterns
 
-require_relative "../../../lib/pubid_new"
+require_relative "../../../lib/pubid"
 
 test_case = "IEEE Std 802.16/Conformance01-2003"
 
@@ -10,7 +10,7 @@ puts "-" * 80
 
 # Try with instance method (no preprocessing)
 begin
-  parser = PubidNew::Ieee::Parser.new
+  parser = Pubid::Ieee::Parser.new
   result = parser.parse(test_case)
   puts "Instance parse tree:"
   puts result.inspect
@@ -21,7 +21,7 @@ end
 # Try with class method (with preprocessing)
 puts "\nTrying class method (with preprocessing)..."
 begin
-  parser = PubidNew::Ieee::Parser
+  parser = Pubid::Ieee::Parser
   result = parser.parse(test_case)
   puts "Class parse tree:"
   puts result.inspect
@@ -30,9 +30,9 @@ rescue Parslet::ParseFailed => e
 end
 
 # Now try the full parse
-puts "\nTrying full PubidNew::Ieee.parse..."
+puts "\nTrying full Pubid::Ieee.parse..."
 begin
-  id = PubidNew::Ieee.parse(test_case)
+  id = Pubid::Ieee.parse(test_case)
   puts "\n✓ SUCCESS: Parsed as #{id.class}"
   puts "Result: #{id.to_s}"
 rescue Parslet::ParseFailed => e

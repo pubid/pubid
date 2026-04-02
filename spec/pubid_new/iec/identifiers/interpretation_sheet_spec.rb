@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
+RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
   subject { described_class }
 
   # Test basic ISH identifier dated
   context "basic ISH identifier dated" do
     describe "IEC 60050-191:2010/ISH1:2015" do
       subject { "IEC 60050-191:2010/ISH1:2015" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)
@@ -59,7 +59,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "ISH identifier undated" do
     describe "IEC 60050-191/ISH1" do
       subject { "IEC 60050-191/ISH1" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)
@@ -87,7 +87,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "draft interpretation sheet" do
     describe "IEC DISH 60050-191" do
       subject { "IEC DISH 60050-191" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)
@@ -127,7 +127,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "circulated draft interpretation sheet" do
     describe "IEC CDISH 60050-191" do
       subject { "IEC CDISH 60050-191" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)
@@ -161,7 +161,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "ISH with copublisher" do
     describe "ISO/IEC 60050-191:2010/ISH1:2015" do
       subject { "ISO/IEC 60050-191:2010/ISH1:2015" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)
@@ -189,7 +189,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "ISH with subpart" do
     describe "IEC 60050-191-2:2010/ISH1:2015" do
       subject { "IEC 60050-191-2:2010/ISH1:2015" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)
@@ -213,7 +213,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "multi-digit ISH number" do
     describe "IEC 60050-191:2010/ISH10:2015" do
       subject { "IEC 60050-191:2010/ISH10:2015" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses multi-digit ISH number" do
         expect(parsed.number.number).to eq("10")
@@ -229,7 +229,7 @@ RSpec.describe PubidNew::Iec::Identifiers::InterpretationSheet do
   context "draft ISH with date" do
     describe "IEC DISH 60050-191:2014" do
       subject { "IEC DISH 60050-191:2014" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as InterpretationSheet" do
         expect(parsed).to be_a(described_class)

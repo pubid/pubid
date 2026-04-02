@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Idf::Identifiers::InternationalStandard do
+RSpec.describe Pubid::Idf::Identifiers::InternationalStandard do
   subject { described_class }
 
   describe "parse identifiers from examples" do

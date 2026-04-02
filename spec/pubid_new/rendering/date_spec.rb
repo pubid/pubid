@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/rendering/date"
-require_relative "../../../lib/pubid_new/components/date"
+require_relative "../../../lib/pubid/rendering/date"
+require_relative "../../../lib/pubid/components/date"
 
-RSpec.describe PubidNew::Rendering::Date do
+RSpec.describe Pubid::Rendering::Date do
   let(:test_class) do
     Class.new do
-      include PubidNew::Rendering::Date
+      include Pubid::Rendering::Date
 
       attr_accessor :date
     end
@@ -17,22 +17,22 @@ RSpec.describe PubidNew::Rendering::Date do
 
   describe "#render_date" do
     it "renders year only" do
-      date = PubidNew::Components::Date.new(year: 2015)
+      date = Pubid::Components::Date.new(year: 2015)
       expect(instance.render_date(date)).to eq(":2015")
     end
 
     it "renders year with month" do
-      date = PubidNew::Components::Date.new(year: 2015, month: 6)
+      date = Pubid::Components::Date.new(year: 2015, month: 6)
       expect(instance.render_date(date, include_month: true)).to eq(":2015-06")
     end
 
     it "renders year with month and day" do
-      date = PubidNew::Components::Date.new(year: 2015, month: 6, day: 15)
+      date = Pubid::Components::Date.new(year: 2015, month: 6, day: 15)
       expect(instance.render_date(date, include_month: true, include_day: true)).to eq(":2015-06-15")
     end
 
     it "does not include month when option not set" do
-      date = PubidNew::Components::Date.new(year: 2015, month: 6)
+      date = Pubid::Components::Date.new(year: 2015, month: 6)
       expect(instance.render_date(date)).to eq(":2015")
     end
 

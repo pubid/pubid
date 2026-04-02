@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Ieee::Components::Relationship do
+RSpec.describe Pubid::Ieee::Components::Relationship do
   describe "constants" do
     it "defines all relationship types" do
       expect(described_class::REVISION_OF).to eq("revision_of")
@@ -57,7 +57,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
 
   describe "#to_s with single identifier" do
     let(:related_id) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.11",
@@ -124,7 +124,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
 
   describe "#to_s with two identifiers" do
     let(:id1) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232",
@@ -133,7 +133,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
     end
 
     let(:id2) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232.1",
@@ -152,7 +152,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
 
   describe "#to_s with three or more identifiers" do
     let(:id1) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232",
@@ -161,7 +161,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
     end
 
     let(:id2) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232.1",
@@ -170,7 +170,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
     end
 
     let(:id3) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232.2",
@@ -189,7 +189,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
 
   describe "#to_s with intermediate amendments" do
     let(:base_id) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.1Q",
@@ -198,7 +198,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
     end
 
     let(:amendment1) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.1Qca",
@@ -207,7 +207,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
     end
 
     let(:amendment2) do
-      PubidNew::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifiers::Base.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.1Qcd",
@@ -254,7 +254,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
   describe "integration tests with parsing" do
     context "semicolon separator for multiple relationships" do
       it "parses Reaffirmation and Redesignation with semicolon" do
-        id = PubidNew::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980; Redesignation of ANSI N13.10-1974)")
+        id = Pubid::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980; Redesignation of ANSI N13.10-1974)")
         expect(id.relationships).not_to be_empty
         expect(id.relationships.length).to eq(2)
         expect(id.relationships[0].relationship_type).to eq("reaffirmation_of")
@@ -262,7 +262,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
       end
 
       it "renders semicolon-separated relationships correctly" do
-        id = PubidNew::Ieee.parse("IEEE Std 100 (Reaffirmation of ANSI X; Redesignation of ANSI Y)")
+        id = Pubid::Ieee.parse("IEEE Std 100 (Reaffirmation of ANSI X; Redesignation of ANSI Y)")
         expect(id.relationships.length).to eq(2)
         # Note: Parser uses " / " separator in rendering, not semicolon
         expect(id.to_s).to include("Reaffirmation of")
@@ -272,7 +272,7 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
 
     context "reaffirmation relationship parsing" do
       it "parses long form reaffirmation" do
-        id = PubidNew::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)")
+        id = Pubid::Ieee.parse("ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)")
         expect(id.relationships).not_to be_empty
         expect(id.relationships.first.relationship_type).to eq("reaffirmation_of")
         expect(id.relationships.first.related_identifiers.first.to_s).to include("N42.18-1980")
@@ -280,14 +280,14 @@ RSpec.describe PubidNew::Ieee::Components::Relationship do
 
       it "round-trips reaffirmation relationship" do
         original = "ANSI N42.18-2004 (Reaffirmation of ANSI N42.18-1980)"
-        parsed = PubidNew::Ieee.parse(original)
+        parsed = Pubid::Ieee.parse(original)
         expect(parsed.relationships.first.relationship_type).to eq("reaffirmation_of")
       end
     end
 
     context "redesignation relationship parsing" do
       it "parses redesignation relationship" do
-        id = PubidNew::Ieee.parse("ANSI N42.18-2004 (Redesignation of ANSI N13.10-1974)")
+        id = Pubid::Ieee.parse("ANSI N42.18-2004 (Redesignation of ANSI N13.10-1974)")
         expect(id.relationships).not_to be_empty
         expect(id.relationships.first.relationship_type).to eq("redesignation_of")
         expect(id.relationships.first.related_identifiers.first.to_s).to include("N13.10-1974")

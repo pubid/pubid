@@ -1,12 +1,12 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Cen::Identifiers::HarmonizationDocument do
+RSpec.describe Pubid::Cen::Identifiers::HarmonizationDocument do
   subject { described_class }
 
   context "basic HD identifiers" do
     describe "HD 123:2020" do
       subject { "HD 123:2020" }
-      let(:parsed) { PubidNew::Cen.parse(subject) }
+      let(:parsed) { Pubid::Cen.parse(subject) }
 
       it "parses as HarmonizationDocument" do
         expect(parsed).to be_a(described_class)
@@ -35,7 +35,7 @@ RSpec.describe PubidNew::Cen::Identifiers::HarmonizationDocument do
 
     describe "HD 456" do
       subject { "HD 456" }
-      let(:parsed) { PubidNew::Cen.parse(subject) }
+      let(:parsed) { Pubid::Cen.parse(subject) }
 
       it "parses as HarmonizationDocument" do
         expect(parsed).to be_a(described_class)
@@ -54,7 +54,7 @@ RSpec.describe PubidNew::Cen::Identifiers::HarmonizationDocument do
   context "HD with part number" do
     describe "HD 789-1:2019" do
       subject { "HD 789-1:2019" }
-      let(:parsed) { PubidNew::Cen.parse(subject) }
+      let(:parsed) { Pubid::Cen.parse(subject) }
 
       it "parses as HarmonizationDocument" do
         expect(parsed).to be_a(described_class)
@@ -79,7 +79,7 @@ RSpec.describe PubidNew::Cen::Identifiers::HarmonizationDocument do
 
     describe "HD 321-5:2021" do
       subject { "HD 321-5:2021" }
-      let(:parsed) { PubidNew::Cen.parse(subject) }
+      let(:parsed) { Pubid::Cen.parse(subject) }
 
       it "parses part" do
         expect(parsed.part.value).to eq("5")
@@ -94,7 +94,7 @@ RSpec.describe PubidNew::Cen::Identifiers::HarmonizationDocument do
   context "multi-digit numbers" do
     describe "HD 12345:2022" do
       subject { "HD 12345:2022" }
-      let(:parsed) { PubidNew::Cen.parse(subject) }
+      let(:parsed) { Pubid::Cen.parse(subject) }
 
       it "parses as HarmonizationDocument" do
         expect(parsed).to be_a(described_class)

@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
+RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
   subject { described_class }
 
   # Test basic sheet identifier with year
   context "basic sheet identifier with year" do
     describe "IEC 60695-2-1/1:1994" do
       subject { "IEC 60695-2-1/1:1994" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -59,7 +59,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet identifier without year" do
     describe "IEC 60695-2-1/1" do
       subject { "IEC 60695-2-1/1" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -87,7 +87,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet with multiple digit number" do
     describe "IEC 60695-2-1/12:2000" do
       subject { "IEC 60695-2-1/12:2000" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -111,7 +111,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet with copublisher" do
     describe "ISO/IEC 60695-2-1/1:1994" do
       subject { "ISO/IEC 60695-2-1/1:1994" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -153,7 +153,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet with dated base identifier" do
     describe "IEC 60695-2-1:2013/1:2014" do
       subject { "IEC 60695-2-1:2013/1:2014" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -185,7 +185,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet with simple part" do
     describe "IEC 60034-1/1:2017" do
       subject { "IEC 60034-1/1:2017" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -217,7 +217,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet without parts in base" do
     describe "IEC 60529/2:1989" do
       subject { "IEC 60529/2:1989" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -249,7 +249,7 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "stage delegation to base" do
     describe "IEC 60695-2-1/1:1994" do
       subject { "IEC 60695-2-1/1:1994" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "delegates stage to base" do
         expect(parsed.stage).to eq(parsed.base_identifier.stage)
@@ -265,14 +265,14 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet of technical report" do
     describe "IEC TR 60695-2-1/1:1994" do
       subject { "IEC TR 60695-2-1/1:1994" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
       end
 
       it "base is TechnicalReport" do
-        expect(parsed.base_identifier).to be_a(PubidNew::Iec::Identifiers::TechnicalReport)
+        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::TechnicalReport)
       end
 
       it "parses sheet_number" do
@@ -289,14 +289,14 @@ RSpec.describe PubidNew::Iec::Identifiers::SheetIdentifier do
   context "sheet of technical specification" do
     describe "IEC TS 62443-3/1:2018" do
       subject { "IEC TS 62443-3/1:2018" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SheetIdentifier" do
         expect(parsed).to be_a(described_class)
       end
 
       it "base is TechnicalSpecification" do
-        expect(parsed.base_identifier).to be_a(PubidNew::Iec::Identifiers::TechnicalSpecification)
+        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::TechnicalSpecification)
       end
 
       it "parses sheet_number" do

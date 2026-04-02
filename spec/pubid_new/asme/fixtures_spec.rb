@@ -23,7 +23,7 @@ RSpec.describe "ASME Fixture Round-trip Tests" do
 
           identifiers.each do |id_str|
             begin
-              parsed = PubidNew::Asme.parse(id_str)
+              parsed = Pubid::Asme.parse(id_str)
               rendered = parsed.to_s
 
               if rendered == id_str

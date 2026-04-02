@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid_new/jis"
+require_relative "../../lib/pubid/jis"
 
 RSpec.describe "JIS Integration" do
   describe "parsing and rendering" do
     shared_examples "parses and renders correctly" do |input, expected_output = nil|
       it "parses and renders #{input}" do
         expected = expected_output || input
-        identifier = PubidNew::Jis.parse(input)
+        identifier = Pubid::Jis.parse(input)
         expect(identifier.to_s).to eq(expected)
       end
     end
@@ -93,16 +93,16 @@ RSpec.describe "JIS Integration" do
 
   describe "all_parts comparison" do
     it "matches identifiers with same series and number regardless of year/part" do
-      all_parts_id = PubidNew::Jis.parse("JIS C 0617（規格群）")
-      specific_id = PubidNew::Jis.parse("JIS C 0617-2:2017")
+      all_parts_id = Pubid::Jis.parse("JIS C 0617（規格群）")
+      specific_id = Pubid::Jis.parse("JIS C 0617-2:2017")
 
       expect(all_parts_id).to eq(specific_id)
       expect(specific_id).to eq(all_parts_id)
     end
 
     it "does not match identifiers with different series" do
-      all_parts_id = PubidNew::Jis.parse("JIS C 0617（規格群）")
-      different_id = PubidNew::Jis.parse("JIS C 0618-1")
+      all_parts_id = Pubid::Jis.parse("JIS C 0617（規格群）")
+      different_id = Pubid::Jis.parse("JIS C 0618-1")
 
       expect(all_parts_id).not_to eq(different_id)
     end
@@ -118,7 +118,7 @@ RSpec.describe "JIS Integration" do
         next if line.empty? || line.start_with?("#")
 
         expect do
-          identifier = PubidNew::Jis.parse(line)
+          identifier = Pubid::Jis.parse(line)
           expect(identifier.to_s.upcase).to eq(line.upcase)
         end.not_to raise_error, "Failed to parse: #{line}"
       end

@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../../lib/pubid_new/idf/scheme"
+require_relative "../../../lib/pubid/idf/scheme"
 
-RSpec.describe PubidNew::Idf::Scheme do
+RSpec.describe Pubid::Idf::Scheme do
   describe ".identifiers" do
     subject(:identifiers) { described_class.identifiers }
 
     it "returns an array with all IDF base identifier classes" do
       expect(identifiers).to be_an(Array)
-      expect(identifiers).to include(PubidNew::Idf::Identifiers::InternationalStandard)
-      expect(identifiers).to include(PubidNew::Idf::Identifiers::ReviewedMethod)
+      expect(identifiers).to include(Pubid::Idf::Identifiers::InternationalStandard)
+      expect(identifiers).to include(Pubid::Idf::Identifiers::ReviewedMethod)
     end
   end
 
@@ -19,8 +19,8 @@ RSpec.describe PubidNew::Idf::Scheme do
 
     it "returns an array with all IDF supplement identifier classes" do
       expect(supplement_identifiers).to be_an(Array)
-      expect(supplement_identifiers).to include(PubidNew::Idf::Identifiers::Amendment)
-      expect(supplement_identifiers).to include(PubidNew::Idf::Identifiers::Corrigendum)
+      expect(supplement_identifiers).to include(Pubid::Idf::Identifiers::Amendment)
+      expect(supplement_identifiers).to include(Pubid::Idf::Identifiers::Corrigendum)
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe PubidNew::Idf::Scheme do
 
     it "returns an array of TYPED_STAGES from all identifiers" do
       expect(typed_stages).to be_an(Array)
-      expect(typed_stages).to all(be_a(PubidNew::Components::TypedStage))
+      expect(typed_stages).to all(be_a(Pubid::Components::TypedStage))
 
       # Verify some known typed stages exist (using stage_code)
       stage_codes = typed_stages.map(&:stage_code).compact
@@ -57,13 +57,13 @@ RSpec.describe PubidNew::Idf::Scheme do
   describe ".locate_identifier_klass_by_type_code" do
     it "returns the correct identifier class for known type codes" do
       expect(described_class.locate_identifier_klass_by_type_code("is"))
-        .to eq(PubidNew::Idf::Identifiers::InternationalStandard)
+        .to eq(Pubid::Idf::Identifiers::InternationalStandard)
       expect(described_class.locate_identifier_klass_by_type_code("amd"))
-        .to eq(PubidNew::Idf::Identifiers::Amendment)
+        .to eq(Pubid::Idf::Identifiers::Amendment)
       expect(described_class.locate_identifier_klass_by_type_code("cor"))
-        .to eq(PubidNew::Idf::Identifiers::Corrigendum)
+        .to eq(Pubid::Idf::Identifiers::Corrigendum)
       expect(described_class.locate_identifier_klass_by_type_code("rm"))
-        .to eq(PubidNew::Idf::Identifiers::ReviewedMethod)
+        .to eq(Pubid::Idf::Identifiers::ReviewedMethod)
     end
 
     it "raises ArgumentError for unknown type codes" do

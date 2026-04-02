@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::GrantContractorReport do
+RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
   subject { described_class }
 
   describe ".parse" do
     context "basic GCR identifiers" do
       describe "NIST GCR 17-917-45" do
         subject { "NIST GCR 17-917-45" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as GrantContractorReport" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::GrantContractorReport do
 
       describe "NIST GCR 20-123-45" do
         subject { "NIST GCR 20-123-45" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as GrantContractorReport" do
           expect(parsed).to be_a(described_class)
@@ -51,7 +51,7 @@ RSpec.describe PubidNew::Nist::Identifiers::GrantContractorReport do
     context "GCR with volume" do
       describe "NIST GCR 21-917-48v3" do
         subject { "NIST GCR 21-917-48v3" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as GrantContractorReport" do
           expect(parsed).to be_a(described_class)
@@ -74,7 +74,7 @@ RSpec.describe PubidNew::Nist::Identifiers::GrantContractorReport do
     context "GCR with volume and letter suffix" do
       describe "NIST GCR 21-917-48v3B" do
         subject { "NIST GCR 21-917-48v3B" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as GrantContractorReport" do
           expect(parsed).to be_a(described_class)
@@ -96,7 +96,7 @@ RSpec.describe PubidNew::Nist::Identifiers::GrantContractorReport do
 
       describe "NIST GCR 18-100-20v2A" do
         subject { "NIST GCR 18-100-20v2A" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as GrantContractorReport" do
           expect(parsed).to be_a(described_class)
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Nist::Identifiers::GrantContractorReport do
     context "GCR with letter suffix only" do
       describe "NIST GCR 19-200-30B" do
         subject { "NIST GCR 19-200-30B" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as GrantContractorReport" do
           expect(parsed).to be_a(described_class)

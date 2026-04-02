@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
+RSpec.describe Pubid::Nist::Identifiers::TechnicalNote do
   subject { described_class }
 
   describe ".parse" do
     context "basic TN identifiers" do
       describe "NIST TN 1297" do
         subject { "NIST TN 1297" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
 
       describe "NBS TN 100" do
         subject { "NBS TN 100" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -53,7 +53,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
 
       describe "NIST TN 2150" do
         subject { "NIST TN 2150" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -70,7 +70,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
 
       describe "NIST TN 1648" do
         subject { "NIST TN 1648" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -89,7 +89,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
     context "TN with edition year" do
       describe "NIST TN 1297-1993" do
         subject { "NIST TN 1297-1993" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -100,7 +100,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1993")
         end
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
     context "TN with update" do
       describe "NIST TN 2150-upd" do
         subject { "NIST TN 2150-upd" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -131,7 +131,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
     context "TN with letter suffix" do
       describe "NBS TN 100-A" do
         subject { "NBS TN 100-A" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -150,7 +150,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
     context "TN with parts" do
       describe "NBS TN 467pt1" do
         subject { "NBS TN 467pt1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -167,7 +167,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
 
       describe "NBS TN 467p1" do
         subject { "NBS TN 467p1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -186,7 +186,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
     context "TN with addendum" do
       describe "NBS TN 467pt1 Add." do
         subject { "NBS TN 467pt1 Add." }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)
@@ -207,7 +207,7 @@ RSpec.describe PubidNew::Nist::Identifiers::TechnicalNote do
 
       describe "NBS TN 467p1adde1" do
         subject { "NBS TN 467p1adde1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as TechnicalNote" do
           expect(parsed).to be_a(described_class)

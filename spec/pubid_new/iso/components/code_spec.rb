@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Components::Code do
+RSpec.describe Pubid::Iso::Components::Code do
   describe "#initialize" do
     it "accepts number parameter" do
       code = described_class.new(number: "12345")

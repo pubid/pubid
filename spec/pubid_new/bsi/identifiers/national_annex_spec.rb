@@ -2,13 +2,13 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
+RSpec.describe Pubid::Bsi::Identifiers::NationalAnnex do
   subject { described_class }
 
   context "basic National Annex identifiers" do
     describe "NA to BS EN 1234:2020" do
       subject { "NA to BS EN 1234:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as NationalAnnex" do
         expect(parsed).to be_a(described_class)
@@ -25,7 +25,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
 
     describe "NA to BS 5678:2021" do
       subject { "NA to BS 5678:2021" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as NationalAnnex" do
         expect(parsed).to be_a(described_class)
@@ -52,7 +52,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
   context "National Annex with parts" do
     describe "NA to BS EN 1990-1:2019" do
       subject { "NA to BS EN 1990-1:2019" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as NationalAnnex" do
         expect(parsed).to be_a(described_class)
@@ -69,7 +69,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
 
     describe "NA to BS EN 1991-1-1:2020" do
       subject { "NA to BS EN 1991-1-1:2020" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as NationalAnnex" do
         expect(parsed).to be_a(described_class)
@@ -88,7 +88,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
   context "National Annex to adopted standards" do
     describe "NA to BS EN ISO 9001:2015" do
       subject { "NA to BS EN ISO 9001:2015" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as NationalAnnex" do
         expect(parsed).to be_a(described_class)
@@ -107,7 +107,7 @@ RSpec.describe PubidNew::Bsi::Identifiers::NationalAnnex do
   context "multi-digit numbers" do
     describe "NA to BS EN 10000:2022" do
       subject { "NA to BS EN 10000:2022" }
-      let(:parsed) { PubidNew::Bsi.parse(subject) }
+      let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as NationalAnnex" do
         expect(parsed).to be_a(described_class)

@@ -2,11 +2,11 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Ieee::Identifiers::Nesc::Standard do
+RSpec.describe Pubid::Ieee::Identifiers::Nesc::Standard do
   describe "#parse" do
     context "C2-YYYY format (basic)" do
       let(:input) { "C2-1997 National Electric Safety Code (NESC)" }
-      let(:parsed) { PubidNew::Ieee.parse(input) }
+      let(:parsed) { Pubid::Ieee.parse(input) }
 
       it "parses as NESC::Standard" do
         expect(parsed).to be_a(described_class)
@@ -28,7 +28,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Nesc::Standard do
 
     context "C2-YYYY format (no NESC suffix)" do
       let(:input) { "C2-2012 National Electrical Safety Code" }
-      let(:parsed) { PubidNew::Ieee.parse(input) }
+      let(:parsed) { Pubid::Ieee.parse(input) }
 
       it "parses as NESC::Standard" do
         expect(parsed).to be_a(described_class)
@@ -45,7 +45,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Nesc::Standard do
 
     context "C2-YYYY with comma separator" do
       let(:input) { "C2-2007, National Electrical Safety Code" }
-      let(:parsed) { PubidNew::Ieee.parse(input) }
+      let(:parsed) { Pubid::Ieee.parse(input) }
 
       it "parses as NESC::Standard" do
         expect(parsed).to be_a(described_class)
@@ -63,7 +63,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Nesc::Standard do
 
     context "C2-YYYY typo variation (Electric vs Electrical)" do
       let(:input) { "C2-2002 National Electric Safety Code" }
-      let(:parsed) { PubidNew::Ieee.parse(input) }
+      let(:parsed) { Pubid::Ieee.parse(input) }
 
       it "parses as NESC::Standard" do
         expect(parsed).to be_a(described_class)

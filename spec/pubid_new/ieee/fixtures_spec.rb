@@ -30,7 +30,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         expected = parts[2]  # EXPECTED part
 
         begin
-          parsed = PubidNew::Ieee.parse(identifier)
+          parsed = Pubid::Ieee.parse(identifier)
           rendered = parsed.to_s
 
           # Compare to expected output
@@ -97,7 +97,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         expected = parts[2]  # EXPECTED part
 
         begin
-          parsed = PubidNew::Ieee.parse(identifier)
+          parsed = Pubid::Ieee.parse(identifier)
           rendered = parsed.to_s
 
           # Compare to expected output
@@ -160,7 +160,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         total_tested += 1
 
         begin
-          parsed = PubidNew::Ieee.parse(line)
+          parsed = Pubid::Ieee.parse(line)
           rendered = parsed.to_s
 
           # Round-trip: rendered should match original input
@@ -216,7 +216,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         next if identifier.empty? || identifier.start_with?("#")
 
         begin
-          parsed = PubidNew::Ieee.parse(identifier)
+          parsed = Pubid::Ieee.parse(identifier)
           rendered = parsed.to_s
 
           if rendered == identifier

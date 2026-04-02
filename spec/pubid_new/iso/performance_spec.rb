@@ -10,7 +10,7 @@ RSpec.describe "ISO Parser Performance" do
   describe "parse time benchmarks" do
     it "parses simple identifiers efficiently" do
       time = Benchmark.measure do
-        1000.times { PubidNew::Iso::Identifier.parse(simple_id) }
+        1000.times { Pubid::Iso::Identifier.parse(simple_id) }
       end
 
       avg_ms = (time.real / 1000 * 1000).round(2)
@@ -20,7 +20,7 @@ RSpec.describe "ISO Parser Performance" do
 
     it "parses complex identifiers efficiently" do
       time = Benchmark.measure do
-        1000.times { PubidNew::Iso::Identifier.parse(complex_id) }
+        1000.times { Pubid::Iso::Identifier.parse(complex_id) }
       end
 
       avg_ms = (time.real / 1000 * 1000).round(2)
@@ -30,7 +30,7 @@ RSpec.describe "ISO Parser Performance" do
 
     it "parses multi-level identifiers efficiently" do
       time = Benchmark.measure do
-        1000.times { PubidNew::Iso::Identifier.parse(multilevel_id) }
+        1000.times { Pubid::Iso::Identifier.parse(multilevel_id) }
       end
 
       avg_ms = (time.real / 1000 * 1000).round(2)
@@ -40,7 +40,7 @@ RSpec.describe "ISO Parser Performance" do
 
     it "parses special patterns efficiently" do
       time = Benchmark.measure do
-        1000.times { PubidNew::Iso::Identifier.parse(dir_sup_id) }
+        1000.times { Pubid::Iso::Identifier.parse(dir_sup_id) }
       end
 
       avg_ms = (time.real / 1000 * 1000).round(2)
@@ -53,9 +53,9 @@ RSpec.describe "ISO Parser Performance" do
     it "handles parse -> to_s -> parse efficiently" do
       time = Benchmark.measure do
         500.times do
-          id = PubidNew::Iso::Identifier.parse(complex_id)
+          id = Pubid::Iso::Identifier.parse(complex_id)
           str = id.to_s
-          PubidNew::Iso::Identifier.parse(str)
+          Pubid::Iso::Identifier.parse(str)
         end
       end
 
@@ -69,12 +69,12 @@ RSpec.describe "ISO Parser Performance" do
     it "does not leak memory on repeated parsing" do
       # Parse same identifier 10,000 times
       # GC should keep memory stable
-      10_000.times { PubidNew::Iso::Identifier.parse(simple_id) }
+      10_000.times { Pubid::Iso::Identifier.parse(simple_id) }
 
       GC.start
       mem_before = `ps -o rss= -p #{Process.pid}`.to_i
 
-      10_000.times { PubidNew::Iso::Identifier.parse(simple_id) }
+      10_000.times { Pubid::Iso::Identifier.parse(simple_id) }
 
       GC.start
       mem_after = `ps -o rss= -p #{Process.pid}`.to_i

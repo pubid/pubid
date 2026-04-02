@@ -3,7 +3,7 @@
 
 # Load all PubID libraries without RSpec
 require "bundler/setup"
-require_relative "../../lib/pubid_new"
+require_relative "../../lib/pubid"
 require_relative "extract_fixtures"
 
 # Run extraction

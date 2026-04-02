@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
+RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
   subject { described_class }
 
   # Test CSV (Consolidated version with Supplements)
   context "CSV wrapper type" do
     describe "IEC 61666:2010 CSV" do
       subject { "IEC 61666:2010 CSV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -55,7 +55,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "CMV wrapper type" do
     describe "IEC 60034-1:2017 CMV" do
       subject { "IEC 60034-1:2017 CMV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -87,7 +87,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "RLV wrapper type" do
     describe "IEC 62443-3-3:2013 RLV" do
       subject { "IEC 62443-3-3:2013 RLV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -119,7 +119,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "SER wrapper type" do
     describe "IEC 60529:1989 SER" do
       subject { "IEC 60529:1989 SER" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -147,14 +147,14 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "CSV wrapping consolidated identifier" do
     describe "IEC 61666:2010+AMD1:2021 CSV" do
       subject { "IEC 61666:2010+AMD1:2021 CSV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
       end
 
       it "parses base as ConsolidatedIdentifier" do
-        expect(parsed.base_identifier).to be_a(PubidNew::Iec::Identifiers::ConsolidatedIdentifier)
+        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::ConsolidatedIdentifier)
       end
 
       it "parses vap_suffix" do
@@ -171,7 +171,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "edition at VAP level" do
     describe "IEC 61666:2010 CSV ED2" do
       subject { "IEC 61666:2010 CSV ED2" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -195,7 +195,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "copublisher with VAP" do
     describe "ISO/IEC 27001:2013 CSV" do
       subject { "ISO/IEC 27001:2013 CSV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -231,7 +231,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "undated identifier with VAP" do
     describe "IEC 61666 CSV" do
       subject { "IEC 61666 CSV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
@@ -259,7 +259,7 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "stage delegation to base" do
     describe "IEC 60034-1:2017 CMV" do
       subject { "IEC 60034-1:2017 CMV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "delegates stage to base" do
         expect(parsed.stage).to eq(parsed.base_identifier.stage)
@@ -275,14 +275,14 @@ RSpec.describe PubidNew::Iec::Identifiers::VapIdentifier do
   context "complex base identifier with VAP" do
     describe "IEC 62443-3-3:2013+AMD1:2018 CSV" do
       subject { "IEC 62443-3-3:2013+AMD1:2018 CSV" }
-      let(:parsed) { PubidNew::Iec.parse(subject) }
+      let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as VapIdentifier" do
         expect(parsed).to be_a(described_class)
       end
 
       it "parses base as ConsolidatedIdentifier" do
-        expect(parsed.base_identifier).to be_a(PubidNew::Iec::Identifiers::ConsolidatedIdentifier)
+        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::ConsolidatedIdentifier)
       end
 
       it "parses base identifier number" do

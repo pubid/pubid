@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Handbook do
+RSpec.describe Pubid::Nist::Identifiers::Handbook do
   subject { described_class }
 
   describe ".parse" do
     context "basic HB identifiers" do
       describe "NBS HB 131" do
         subject { "NBS HB 131" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS HB 105-8" do
         subject { "NBS HB 105-8" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -51,7 +51,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
     context "HB with edition" do
       describe "NBS HB 44e2-1955" do
         subject { "NBS HB 44e2-1955" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -62,7 +62,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2")
           expect(parsed.edition.additional_text).to eq("1955")
@@ -75,14 +75,14 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS HB 44e4" do
         subject { "NBS HB 44e4" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("4")
         end
@@ -94,14 +94,14 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS HB 130-1979" do
         subject { "NBS HB 130-1979" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1979")
         end
@@ -115,7 +115,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
     context "HB with parts and editions" do
       describe "NBS HB 105-1-1990" do
         subject { "NBS HB 105-1-1990" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -126,7 +126,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1990")
         end
@@ -138,7 +138,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS.HB.28pt1e1969" do
         subject { "NBS.HB.28pt1e1969" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -149,7 +149,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses edition year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("1969")
         end
@@ -164,7 +164,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
     context "HB with revisions" do
       describe "NBS HB 105-3r1979" do
         subject { "NBS HB 105-3r1979" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -175,7 +175,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
         end
 
         it "parses revision as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("1979")
         end
@@ -187,14 +187,14 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS HB 111r1977" do
         subject { "NBS HB 111r1977" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses revision as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("1977")
         end
@@ -206,14 +206,14 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS.HB.105-1r1990" do
         subject { "NBS.HB.105-1r1990" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
         end
 
         it "parses revision as edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("r")
           expect(parsed.edition.id).to eq("1990")
         end
@@ -227,7 +227,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
     context "HB with supplements" do
       describe "NBS HB 28supp1957pt1" do
         subject { "NBS HB 28supp1957pt1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -237,7 +237,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
           # V2: Part component is properly separated from supplement
           # "pt1" is a Part component, "1957" is the supplement year
           expect(parsed.supplement).to eq("1957")
-          expect(parsed.part).to be_a(PubidNew::Nist::Components::Part)
+          expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.value).to eq("1")
         end
 
@@ -249,7 +249,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS HB 67suppFeb1965" do
         subject { "NBS HB 67suppFeb1965" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)
@@ -266,7 +266,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Handbook do
 
       describe "NBS HB 67suppJune1965" do
         subject { "NBS HB 67suppJune1965" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
           expect(parsed).to be_a(described_class)

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Csa::Components::Code do
+RSpec.describe Pubid::Csa::Components::Code do
   describe "#initialize" do
     it "creates code with basic value" do
       code = described_class.new(value: "B149.1")

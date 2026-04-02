@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
+RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
   subject { described_class }
 
   describe "parse identifiers from examples" do
@@ -10,7 +10,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
         f.readlines.each do |pub_id|
           next if pub_id.match?(/^#/) || pub_id.match?(/^!/) || pub_id.strip.empty?
 
-          expect(PubidNew::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
+          expect(Pubid::Iso.parse(pub_id.split("#").first.strip.chomp)).to be_a(described_class)
         end
       end
     end
@@ -26,7 +26,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "basic directives supplement identifiers" do
     describe "ISO/IEC DIR 1 ISO SUP:2022" do
       subject { "ISO/IEC DIR 1 ISO SUP:2022" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso:2022" }
 
       it "parses publisher" do
@@ -72,7 +72,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR IEC SUP:2022" do
       subject { "ISO/IEC DIR IEC SUP:2022" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec:2022" }
 
       it "parses publisher" do
@@ -114,7 +114,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR 1 IEC SUP" do
       subject { "ISO/IEC DIR 1 IEC SUP" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iec" }
 
       it "parses publisher" do
@@ -160,7 +160,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR IEC SUP" do
       subject { "ISO/IEC DIR IEC SUP" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec" }
 
       it "parses publisher" do
@@ -202,7 +202,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR 1 ISO SUP" do
       subject { "ISO/IEC DIR 1 ISO SUP" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
 
       it "parses publisher" do
@@ -251,7 +251,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "JTC variations" do
     describe "ISO/IEC DIR JTC 1 SUP:2021" do
       subject { "ISO/IEC DIR JTC 1 SUP:2021" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:jtc:1:sup:2021" }
 
       it "parses publisher" do
@@ -293,7 +293,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR JTC 1 SUP" do
       subject { "ISO/IEC DIR JTC 1 SUP" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:jtc:1:sup" }
 
       it "parses publisher" do
@@ -338,7 +338,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "format normalization" do
     describe "ISO/IEC Directives, IEC Supplement:2022" do
       subject { "ISO/IEC Directives, IEC Supplement:2022" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR IEC SUP:2022" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec:2022" }
 
@@ -381,7 +381,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" do
       subject { "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR 1 ISO SUP" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
 
@@ -431,7 +431,7 @@ RSpec.describe PubidNew::Iso::Identifiers::DirectivesSupplement do
   context "editions" do
     describe "ISO/IEC DIR 1 ISO SUP Edition 13" do
       subject { "ISO/IEC DIR 1 ISO SUP Edition 13" }
-      let(:parsed) { PubidNew::Iso.parse(subject) }
+      let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso:ed-13" }
 
       it "parses publisher" do

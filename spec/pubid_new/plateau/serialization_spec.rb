@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid_new/plateau"
+require_relative "../../../lib/pubid/plateau"
 
 RSpec.describe "Plateau Serialization" do
   describe "#to_h" do
     it "exports basic Handbook identifier as hash" do
-      id = PubidNew::Plateau.parse("PLATEAU Handbook #00")
+      id = Pubid::Plateau.parse("PLATEAU Handbook #00")
       hash = id.to_h
 
       expect(hash[:flavor]).to eq("plateau")
@@ -16,7 +16,7 @@ RSpec.describe "Plateau Serialization" do
     end
 
     it "exports Handbook with edition" do
-      id = PubidNew::Plateau.parse("PLATEAU Handbook #00 第1.0版")
+      id = Pubid::Plateau.parse("PLATEAU Handbook #00 第1.0版")
       hash = id.to_h
 
       expect(hash[:edition]).to eq("1.0")
@@ -24,14 +24,14 @@ RSpec.describe "Plateau Serialization" do
     end
 
     it "exports Handbook with annex" do
-      id = PubidNew::Plateau.parse("PLATEAU Handbook #03-1")
+      id = Pubid::Plateau.parse("PLATEAU Handbook #03-1")
       hash = id.to_h
 
       expect(hash[:annex]).to eq(1)
     end
 
     it "exports Technical Report identifier" do
-      id = PubidNew::Plateau.parse("PLATEAU Technical Report #01")
+      id = Pubid::Plateau.parse("PLATEAU Technical Report #01")
       hash = id.to_h
 
       expect(hash[:type]).to eq("Technical Report")
@@ -39,7 +39,7 @@ RSpec.describe "Plateau Serialization" do
     end
 
     it "exports identifier with Annex supplement" do
-      id = PubidNew::Plateau.parse("PLATEAU Handbook #00 第1.0版 Annex A")
+      id = Pubid::Plateau.parse("PLATEAU Handbook #00 第1.0版 Annex A")
       hash = id.to_h
 
       expect(hash[:supplements]).to be_a(Array)
@@ -51,7 +51,7 @@ RSpec.describe "Plateau Serialization" do
 
   describe "#to_json" do
     it "exports identifier as JSON" do
-      id = PubidNew::Plateau.parse("PLATEAU Handbook #00")
+      id = Pubid::Plateau.parse("PLATEAU Handbook #00")
       json = id.to_json
 
       parsed = JSON.parse(json)
@@ -70,7 +70,7 @@ RSpec.describe "Plateau Serialization" do
         number: "0"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("PLATEAU Handbook #00")
     end
 
@@ -83,7 +83,7 @@ RSpec.describe "Plateau Serialization" do
         edition: "1.0"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("PLATEAU Handbook #00 第1.0版")
     end
 
@@ -96,7 +96,7 @@ RSpec.describe "Plateau Serialization" do
         annex: 1
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("PLATEAU Handbook #03-1")
     end
 
@@ -108,7 +108,7 @@ RSpec.describe "Plateau Serialization" do
         number: "1"
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("PLATEAU Technical Report #01")
     end
 
@@ -124,7 +124,7 @@ RSpec.describe "Plateau Serialization" do
         ]
       }
 
-      id = PubidNew::Serializable.from_h(hash)
+      id = Pubid::Serializable.from_h(hash)
       expect(id.to_s).to eq("PLATEAU Handbook #00 第1.0版 Annex A")
     end
   end
@@ -133,55 +133,55 @@ RSpec.describe "Plateau Serialization" do
     it "creates identifier from JSON" do
       json = '{"flavor":"plateau","publisher":"PLATEAU","type":"Handbook","number":"0"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to eq("PLATEAU Handbook #00")
     end
 
     it "creates identifier with edition from JSON" do
       json = '{"flavor":"plateau","publisher":"PLATEAU","type":"Handbook","number":"0","edition":"1.0"}'
 
-      id = PubidNew::Serializable.from_json(json)
+      id = Pubid::Serializable.from_json(json)
       expect(id.to_s).to eq("PLATEAU Handbook #00 第1.0版")
     end
   end
 
   describe "round-trip conversion" do
     it "preserves all data through hash conversion" do
-      original = PubidNew::Plateau.parse("PLATEAU Handbook #00 第1.0版")
+      original = Pubid::Plateau.parse("PLATEAU Handbook #00 第1.0版")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves all data through JSON conversion" do
-      original = PubidNew::Plateau.parse("PLATEAU Technical Report #01")
+      original = Pubid::Plateau.parse("PLATEAU Technical Report #01")
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves Handbook with annex through hash" do
-      original = PubidNew::Plateau.parse("PLATEAU Handbook #03-1 第2.0版")
+      original = Pubid::Plateau.parse("PLATEAU Handbook #03-1 第2.0版")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves Annex supplement through hash" do
-      original = PubidNew::Plateau.parse("PLATEAU Handbook #00 第1.0版 Annex A")
+      original = Pubid::Plateau.parse("PLATEAU Handbook #00 第1.0版 Annex A")
       hash = original.to_h
-      restored = PubidNew::Serializable.from_h(hash)
+      restored = Pubid::Serializable.from_h(hash)
 
       expect(restored.to_s).to eq(original.to_s)
     end
 
     it "preserves Technical Report with annex through JSON" do
-      original = PubidNew::Plateau.parse("PLATEAU Technical Report #46-1")
+      original = Pubid::Plateau.parse("PLATEAU Technical Report #46-1")
       json = original.to_json
-      restored = PubidNew::Serializable.from_json(json)
+      restored = Pubid::Serializable.from_json(json)
 
       expect(restored.to_s).to eq(original.to_s)
     end

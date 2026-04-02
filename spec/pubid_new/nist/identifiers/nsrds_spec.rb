@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
+RSpec.describe Pubid::Nist::Identifiers::Nsrds do
   subject { described_class }
 
   describe ".parse" do
     context "basic NSRDS identifiers" do
       describe "NBS NSRDS 1" do
         subject { "NBS NSRDS 1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
 
       describe "NBS NSRDS 100" do
         subject { "NBS NSRDS 100" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)
@@ -49,7 +49,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
 
       describe "NBS NSRDS 3" do
         subject { "NBS NSRDS 3" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)
@@ -64,7 +64,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
     context "NSRDS with part notation" do
       describe "NBS NSRDS 61p1" do
         subject { "NBS NSRDS 61p1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)
@@ -81,7 +81,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
 
       describe "NBS NSRDS 100pt2" do
         subject { "NBS NSRDS 100pt2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)
@@ -100,7 +100,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
     context "NSRDS with edition" do
       describe "NIST NSRDS 100-2017" do
         subject { "NIST NSRDS 100-2017" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)
@@ -123,7 +123,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Nsrds do
     context "NSRDS MR format" do
       describe "NBS.NSRDS.1" do
         subject { "NBS.NSRDS.1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Nsrds" do
           expect(parsed).to be_a(described_class)

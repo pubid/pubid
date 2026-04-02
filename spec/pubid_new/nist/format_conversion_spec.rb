@@ -13,7 +13,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
     end
 
     it "parses all formats to same components" do
-      parsed_identifiers = examples.map { |input| PubidNew::Nist.parse(input) }
+      parsed_identifiers = examples.map { |input| Pubid::Nist.parse(input) }
 
       # All should have same stage
       parsed_identifiers.each do |id|
@@ -31,7 +31,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
 
     it "converts between all formats correctly" do
       examples.each do |input|
-        parsed = PubidNew::Nist.parse(input)
+        parsed = Pubid::Nist.parse(input)
 
         # Generate all 4 formats
         short = parsed.to_s(:short)
@@ -46,8 +46,8 @@ RSpec.describe "NIST Format Cross-Conversion" do
         expect(abbrev).to include("Natl. Inst.")
 
         # Re-parse rendered formats
-        reparsed_short = PubidNew::Nist.parse(short)
-        reparsed_mr = PubidNew::Nist.parse(mr)
+        reparsed_short = Pubid::Nist.parse(short)
+        reparsed_mr = Pubid::Nist.parse(mr)
 
         # Should have same components
         expect(reparsed_short.stage.id).to eq("i")
@@ -69,7 +69,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
     end
 
     it "parses all formats to normalized translation" do
-      parsed_identifiers = examples.map { |input| PubidNew::Nist.parse(input) }
+      parsed_identifiers = examples.map { |input| Pubid::Nist.parse(input) }
 
       # All should normalize to 'spa'
       parsed_identifiers.each do |id|
@@ -80,7 +80,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
 
     it "converts between formats with consistency" do
       examples.each do |input|
-        parsed = PubidNew::Nist.parse(input)
+        parsed = Pubid::Nist.parse(input)
 
         short = parsed.to_s(:short)
         mr = parsed.to_s(:mr)
@@ -90,7 +90,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
         expect(mr).to eq("NIST.SP.1262.spa")
 
         # Re-parse and verify
-        reparsed = PubidNew::Nist.parse(short)
+        reparsed = Pubid::Nist.parse(short)
         expect(reparsed.translation_component.code).to eq("spa")
       end
     end
@@ -99,7 +99,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
   describe "Combined stage + translation" do
     it "handles both stage and translation correctly" do
       input = "NIST SP 800-189 ipd spa"
-      parsed = PubidNew::Nist.parse(input)
+      parsed = Pubid::Nist.parse(input)
 
       # Should have both components
       expect(parsed.stage.id).to eq("i")
@@ -130,7 +130,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
 
     it "preserves format on round-trip" do
       test_cases.each do |input|
-        parsed = PubidNew::Nist.parse(input)
+        parsed = Pubid::Nist.parse(input)
 
         # Determine original format
         format = input.include?(".") ? :mr : :short
@@ -139,7 +139,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
         output = parsed.to_s(format)
 
         # Re-parse
-        reparsed = PubidNew::Nist.parse(output)
+        reparsed = Pubid::Nist.parse(output)
 
         # Should render identically
         expect(reparsed.to_s(format)).to eq(output)

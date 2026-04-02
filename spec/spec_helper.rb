@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../lib/pubid_new"
+require_relative "../lib/pubid"
 
 # Load shared test helpers
 Dir[File.expand_path("support/*.rb", __dir__)].sort.each do |file|

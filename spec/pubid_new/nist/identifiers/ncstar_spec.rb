@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
+RSpec.describe Pubid::Nist::Identifiers::Ncstar do
   subject { described_class }
 
   describe ".parse" do
     context "basic NCSTAR identifiers" do
       describe "NIST NCSTAR 1" do
         subject { "NIST NCSTAR 1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-1" do
         subject { "NIST NCSTAR 1-1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -49,7 +49,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-2" do
         subject { "NIST NCSTAR 1-2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -68,7 +68,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
     context "NCSTAR with volume" do
       describe "NIST NCSTAR 1-1v1" do
         subject { "NIST NCSTAR 1-1v1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -89,7 +89,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-2v2" do
         subject { "NIST NCSTAR 1-2v2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -107,7 +107,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1v1" do
         subject { "NIST NCSTAR 1v1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -126,7 +126,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
     context "NCSTAR with letter suffix" do
       describe "NIST NCSTAR 1-1b" do
         subject { "NIST NCSTAR 1-1b" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -143,7 +143,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-1A" do
         subject { "NIST NCSTAR 1-1A" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -160,7 +160,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-1D" do
         subject { "NIST NCSTAR 1-1D" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -177,7 +177,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-3C" do
         subject { "NIST NCSTAR 1-3C" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -196,7 +196,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
     context "NCSTAR with letter suffix and volume" do
       describe "NIST NCSTAR 1-1Cv1" do
         subject { "NIST NCSTAR 1-1Cv1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -217,7 +217,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-1cv1" do
         subject { "NIST NCSTAR 1-1cv1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -238,7 +238,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-1Bv2" do
         subject { "NIST NCSTAR 1-1Bv2" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)
@@ -256,7 +256,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Ncstar do
 
       describe "NIST NCSTAR 1-2Av1" do
         subject { "NIST NCSTAR 1-2Av1" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Ncstar" do
           expect(parsed).to be_a(described_class)

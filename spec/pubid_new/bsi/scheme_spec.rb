@@ -2,40 +2,40 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Bsi::Scheme do
+RSpec.describe Pubid::Bsi::Scheme do
   describe "#locate_typed_stage_by_abbr" do
     it "returns the correct typed stage for BS abbreviation" do
       scheme = described_class.new
       stage = scheme.locate_typed_stage_by_abbr("BS")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("bs")
     end
 
     it "returns the correct typed stage for PD abbreviation" do
       scheme = described_class.new
       stage = scheme.locate_typed_stage_by_abbr("PD")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("pd")
     end
 
     it "returns the correct typed stage for PAS abbreviation" do
       scheme = described_class.new
       stage = scheme.locate_typed_stage_by_abbr("PAS")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("pas")
     end
 
     it "returns the correct typed stage for Draft BS abbreviation" do
       scheme = described_class.new
       stage = scheme.locate_typed_stage_by_abbr("Draft BS")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("bs")
     end
 
     it "returns default typed stage for unknown abbreviation" do
       scheme = described_class.new
       stage = scheme.locate_typed_stage_by_abbr("UNKNOWN")
-      expect(stage).to be_a(PubidNew::Components::TypedStage)
+      expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage).to eq(described_class::DEFAULT_TYPED_STAGE)
     end
   end
@@ -44,32 +44,32 @@ RSpec.describe PubidNew::Bsi::Scheme do
     it "returns the correct identifier class for bs type code" do
       scheme = described_class.new
       klass = scheme.locate_identifier_klass_by_type_code(:bs)
-      expect(klass).to eq(PubidNew::Bsi::Identifiers::BritishStandard)
+      expect(klass).to eq(Pubid::Bsi::Identifiers::BritishStandard)
     end
 
     it "returns the correct identifier class for pd type code" do
       scheme = described_class.new
       klass = scheme.locate_identifier_klass_by_type_code(:pd)
-      expect(klass).to eq(PubidNew::Bsi::Identifiers::PublishedDocument)
+      expect(klass).to eq(Pubid::Bsi::Identifiers::PublishedDocument)
     end
 
     it "returns the correct identifier class for pas type code" do
       scheme = described_class.new
       klass = scheme.locate_identifier_klass_by_type_code(:pas)
-      expect(klass).to eq(PubidNew::Bsi::Identifiers::PubliclyAvailableSpecification)
+      expect(klass).to eq(Pubid::Bsi::Identifiers::PubliclyAvailableSpecification)
     end
 
     it "returns BritishStandard for unknown type code" do
       scheme = described_class.new
       klass = scheme.locate_identifier_klass_by_type_code(:unknown)
-      expect(klass).to eq(PubidNew::Bsi::Identifiers::BritishStandard)
+      expect(klass).to eq(Pubid::Bsi::Identifiers::BritishStandard)
     end
   end
 
   describe "TYPED_STAGES_REGISTRY" do
     it "contains all expected typed stages" do
       expect(described_class::TYPED_STAGES_REGISTRY).to be_an(Array)
-      expect(described_class::TYPED_STAGES_REGISTRY).to all(be_a(PubidNew::Components::TypedStage))
+      expect(described_class::TYPED_STAGES_REGISTRY).to all(be_a(Pubid::Components::TypedStage))
     end
 
     it "includes BS typed stage" do

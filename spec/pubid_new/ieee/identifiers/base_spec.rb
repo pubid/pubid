@@ -1,12 +1,12 @@
 require "spec_helper"
-require_relative "../../../../lib/pubid_new"
+require_relative "../../../../lib/pubid"
 
-RSpec.describe PubidNew::Ieee::Identifiers::Base do
+RSpec.describe Pubid::Ieee::Identifiers::Base do
   describe ".parse" do
     context "basic IEEE identifiers" do
       it "parses IEEE Std identifiers" do
-        id = PubidNew::Ieee.parse("IEEE Std 623-1976")
-        expect(id).to be_a(PubidNew::Ieee::Identifiers::Base)
+        id = Pubid::Ieee.parse("IEEE Std 623-1976")
+        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
 
         expect(id.code.to_s).to eq("623")
         expect(id.year).to eq("1976")
@@ -15,9 +15,9 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
 
       it "parses IEEE Std with letter prefix codes" do
-        id = PubidNew::Ieee.parse("IEEE Std C37.111-2013")
+        id = Pubid::Ieee.parse("IEEE Std C37.111-2013")
 
-        expect(id).to be_a(PubidNew::Ieee::Identifiers::Base)
+        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
         expect(id.code.to_s).to eq("C37.111")
         expect(id.year).to eq("2013")
 
@@ -25,9 +25,9 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
 
       it "parses IEEE P (project) identifiers" do
-        id = PubidNew::Ieee.parse("IEEE P11073-10404/D10")
+        id = Pubid::Ieee.parse("IEEE P11073-10404/D10")
 
-        expect(id).to be_a(PubidNew::Ieee::Identifiers::Base)
+        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
         expect(id.code.to_s).to eq("11073-10404")
         expect(id.draft_obj.version).to eq("10")
 
@@ -35,8 +35,8 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
 
       it "parses AIEE identifiers" do
-        id = PubidNew::Ieee.parse("AIEE No 14-1925")
-        expect(id).to be_a(PubidNew::Ieee::Aiee::Identifier)
+        id = Pubid::Ieee.parse("AIEE No 14-1925")
+        expect(id).to be_a(Pubid::Ieee::Aiee::Identifier)
         expect(id.number).to eq("14")
         expect(id.year).to eq("1925")  # Year is stored as String for consistency with Base
         expect(id.to_s).to eq("AIEE No 14-1925")
@@ -45,12 +45,12 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
 
     context "IEC identifiers" do
       it "parses basic IEC identifiers" do
-        id = PubidNew::Ieee.parse("IEC 61523-4")
+        id = Pubid::Ieee.parse("IEC 61523-4")
         expect(id.to_s).to eq("IEC 61523-4")
       end
 
       it "parses IEC with edition format" do
-        id = PubidNew::Ieee.parse("IEC 61671-2 Edition 1.0 2016-04")
+        id = Pubid::Ieee.parse("IEC 61671-2 Edition 1.0 2016-04")
         expect(id.to_s).to eq("IEC 61671-2 Edition 1.0 2016-04")
       end
     end
@@ -66,41 +66,41 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
         # PENDING: Multi-part adoptions (comma-separated) not yet supported in V2
         # V2 explicitly skips adoption_part containing commas (line 428 of base.rb)
         # This would require handling adopted_identifiers as an array instead of single identifier
-        id = PubidNew::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
+        id = Pubid::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
 
-        expect(id).to be_a(PubidNew::Ieee::Identifiers::AdoptedStandard)
+        expect(id).to be_a(Pubid::Ieee::Identifiers::AdoptedStandard)
         expect(id.ieee_identifier.to_s).to eq("IEEE Std 623-1976")
 
         adopted_identifiers = id.adopted_identifiers
         expect(adopted_identifiers.size).to eq(2)
 
         ansi_identifier = adopted_identifiers.first
-        expect(ansi_identifier).to be_a(PubidNew::Ansi::Identifiers::Standard)
+        expect(ansi_identifier).to be_a(Pubid::Ansi::Identifiers::Standard)
         expect(ansi_identifier.to_s).to eq("ANSI Y32.21-1976")
         expect(ansi_identifier.publish).to eq("ANSI")
         expect(ansi_identifier.year).to eq("1976")
 
         ncta_identifier = adopted_identifiers.last
-        expect(ncta_identifier).to be_a(PubidNew::Ieee::Identifiers::Base)
+        expect(ncta_identifier).to be_a(Pubid::Ieee::Identifiers::Base)
         expect(ncta_identifier.to_s).to eq("NCTA 006-0975")
 
         expect(id.to_s).to match("IEEE Std 623-1976 (ANSI Y32.21-1976 and NCTA 006-0975)")
       end
 
       it "parses AIEE with Supersedes relationship" do
-        id = PubidNew::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
+        id = Pubid::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
 
-        expect(id).to be_a(PubidNew::Ieee::Aiee::Identifier)
+        expect(id).to be_a(Pubid::Ieee::Aiee::Identifier)
         expect(id.number.to_s).to eq("19")
         expect(id.year).to eq("1943")
         expect(id.relationships.size).to eq(1)
 
         relationship = id.relationships.first
-        expect(relationship.relationship_type).to eq(PubidNew::Ieee::Components::Relationship::SUPERSEDES)
+        expect(relationship.relationship_type).to eq(Pubid::Ieee::Components::Relationship::SUPERSEDES)
         expect(relationship.related_identifiers.size).to eq(1)
 
         related_id = relationship.related_identifiers.first
-        expect(related_id).to be_a(PubidNew::Ieee::Aiee::Identifier)
+        expect(related_id).to be_a(Pubid::Ieee::Aiee::Identifier)
         expect(related_id.number.to_s).to eq("19")
         expect(related_id.year).to eq("1938")
 
@@ -110,7 +110,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
 
     context "relationships" do
       let(:related_id) do
-        PubidNew::Ieee::Identifiers::Base.new(
+        Pubid::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
@@ -119,12 +119,12 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
 
       it "renders single relationship with one identifier" do
-        relationship = PubidNew::Ieee::Components::Relationship.new(
-          relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
+        relationship = Pubid::Ieee::Components::Relationship.new(
+          relationship_type: Pubid::Ieee::Components::Relationship::REVISION_OF,
           related_identifiers: [related_id],
         )
 
-        id = PubidNew::Ieee::Identifiers::Base.new(
+        id = Pubid::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
@@ -136,14 +136,14 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
 
       it "renders multiple relationships separated by /" do
-        rev_rel = PubidNew::Ieee::Components::Relationship.new(
-          relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
+        rev_rel = Pubid::Ieee::Components::Relationship.new(
+          relationship_type: Pubid::Ieee::Components::Relationship::REVISION_OF,
           related_identifiers: [related_id],
         )
 
-        inc_rel = PubidNew::Ieee::Components::Relationship.new(
-          relationship_type: PubidNew::Ieee::Components::Relationship::INCORPORATES,
-          related_identifiers: [PubidNew::Ieee::Identifiers::Base.new(
+        inc_rel = Pubid::Ieee::Components::Relationship.new(
+          relationship_type: Pubid::Ieee::Components::Relationship::INCORPORATES,
+          related_identifiers: [Pubid::Ieee::Identifiers::Base.new(
             publisher: "IEEE",
             type: "Std",
             code: "802.11a",
@@ -151,7 +151,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
           )],
         )
 
-        id = PubidNew::Ieee::Identifiers::Base.new(
+        id = Pubid::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
@@ -163,26 +163,26 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
       end
 
       it "renders relationship with multiple identifiers" do
-        id1 = PubidNew::Ieee::Identifiers::Base.new(
+        id1 = Pubid::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232",
           year: "1995",
         )
 
-        id2 = PubidNew::Ieee::Identifiers::Base.new(
+        id2 = Pubid::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232.1",
           year: "1997",
         )
 
-        relationship = PubidNew::Ieee::Components::Relationship.new(
-          relationship_type: PubidNew::Ieee::Components::Relationship::REVISION_OF,
+        relationship = Pubid::Ieee::Components::Relationship.new(
+          relationship_type: Pubid::Ieee::Components::Relationship::REVISION_OF,
           related_identifiers: [id1, id2],
         )
 
-        id = PubidNew::Ieee::Identifiers::Base.new(
+        id = Pubid::Ieee::Identifiers::Base.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232",
@@ -207,7 +207,7 @@ RSpec.describe PubidNew::Ieee::Identifiers::Base do
         ]
 
         test_cases.each do |test_case|
-          expect(PubidNew::Ieee.parse(test_case).to_s).to eq(test_case)
+          expect(Pubid::Ieee.parse(test_case).to_s).to eq(test_case)
         end
       end
     end

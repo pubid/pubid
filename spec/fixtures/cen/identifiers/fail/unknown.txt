@@ -3,8 +3,8 @@
 
 #CECC 16000:1979# RuntimeError: "Failed to parse CEN identifier 'CECC 16000:1979': Expected one of [FRAGMENT_IDENTIFIER, (STAGE_PREFIX / PUBLISHER) (SPACE ADOPTED_STRING)? (SPACE TYPE / SLASH TYPE)? (SPACE NUMBER PARTS YEAR?)? SUPPLEMENTS EDITION?] at line 1 char 1."
 #CECC 16100:1980# RuntimeError: "Failed to parse CEN identifier 'CECC 16100:1980': Expected one of [FRAGMENT_IDENTIFIER, (STAGE_PREFIX / PUBLISHER) (SPACE ADOPTED_STRING)? (SPACE TYPE / SLASH TYPE)? (SPACE NUMBER PARTS YEAR?)? SUPPLEMENTS EDITION?] at line 1 char 1."
-#ES 59008-6-1:1999# NameError: "uninitialized constant PubidNew::Cen::Identifiers::EuropeanSpecification"
-#ES 59008-1:2000# NameError: "uninitialized constant PubidNew::Cen::Identifiers::EuropeanSpecification"
+#ES 59008-6-1:1999# NameError: "uninitialized constant Pubid::Cen::Identifiers::EuropeanSpecification"
+#ES 59008-1:2000# NameError: "uninitialized constant Pubid::Cen::Identifiers::EuropeanSpecification"
 #HD 384.7.711 S1:2003# RuntimeError: "Failed to parse CEN identifier 'HD 384.7.711 S1:2003': Expected one of [FRAGMENT_IDENTIFIER, (STAGE_PREFIX / PUBLISHER) (SPACE ADOPTED_STRING)? (SPACE TYPE / SLASH TYPE)? (SPACE NUMBER PARTS YEAR?)? SUPPLEMENTS EDITION?] at line 1 char 1."
 #HD 629.3 S1:2024# RuntimeError: "Failed to parse CEN identifier 'HD 629.3 S1:2024': Expected one of [FRAGMENT_IDENTIFIER, (STAGE_PREFIX / PUBLISHER) (SPACE ADOPTED_STRING)? (SPACE TYPE / SLASH TYPE)? (SPACE NUMBER PARTS YEAR?)? SUPPLEMENTS EDITION?] at line 1 char 1."
 #HD 629.2 S3:2024# RuntimeError: "Failed to parse CEN identifier 'HD 629.2 S3:2024': Expected one of [FRAGMENT_IDENTIFIER, (STAGE_PREFIX / PUBLISHER) (SPACE ADOPTED_STRING)? (SPACE TYPE / SLASH TYPE)? (SPACE NUMBER PARTS YEAR?)? SUPPLEMENTS EDITION?] at line 1 char 1."

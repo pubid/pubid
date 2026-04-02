@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid_new/iso"
+require_relative "../../lib/pubid/iso"
 
 RSpec.describe "ISO Integration" do
   describe "basic parsing" do
     shared_examples "parses correctly" do |input, expected = nil|
       it "parses #{input}" do
-        expect { PubidNew::Iso.parse(input) }.not_to raise_error
-        id = PubidNew::Iso.parse(input)
+        expect { Pubid::Iso.parse(input) }.not_to raise_error
+        id = Pubid::Iso.parse(input)
         expect(id.to_s).to eq(expected || input) if expected
       end
     end
@@ -33,7 +33,7 @@ RSpec.describe "ISO Integration" do
 
       failed = []
       lines.each do |line|
-        PubidNew::Iso.parse(line)
+        Pubid::Iso.parse(line)
       rescue StandardError
         failed << line
       end

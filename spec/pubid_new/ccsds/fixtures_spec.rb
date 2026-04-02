@@ -18,7 +18,7 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         next if identifier.empty? || identifier.start_with?("#")
 
         begin
-          parsed = PubidNew::Ccsds.parse(identifier)
+          parsed = Pubid::Ccsds.parse(identifier)
           rendered = parsed.to_s
 
           if rendered == identifier
@@ -72,7 +72,7 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         next if identifier.empty? || identifier.start_with?("#")
 
         begin
-          parsed = PubidNew::Ccsds.parse(identifier)
+          parsed = Pubid::Ccsds.parse(identifier)
           rendered = parsed.to_s
 
           if rendered == identifier
@@ -126,7 +126,7 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         next if identifier.empty? || identifier.start_with?("#")
 
         begin
-          parsed = PubidNew::Ccsds.parse(identifier)
+          parsed = Pubid::Ccsds.parse(identifier)
           rendered = parsed.to_s
 
           if rendered == identifier

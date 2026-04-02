@@ -11,7 +11,7 @@ RSpec.describe "ANSI Fixture Round-trip Tests" do
       successes = 0
 
       fixtures.each do |identifier|
-        parsed = PubidNew::Ansi.parse(identifier)
+        parsed = Pubid::Ansi.parse(identifier)
         rendered = parsed.to_s
 
         if rendered == identifier

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Components::Volume do
+RSpec.describe Pubid::Nist::Components::Volume do
   describe "#to_s" do
     it "renders with v prefix" do
       volume = described_class.new(value: "6")

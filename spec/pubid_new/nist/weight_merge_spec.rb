@@ -2,17 +2,17 @@
 
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Base do
+RSpec.describe Pubid::Nist::Identifiers::Base do
   describe "#weight" do
     context "basic identifier" do
       it "returns weight for simple identifier" do
-        id = PubidNew::Nist.parse("NIST SP 800-53")
+        id = Pubid::Nist.parse("NIST SP 800-53")
         expect(id.weight).to be > 0
       end
 
       it "returns higher weight for identifier with more attributes" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53")
-        id2 = PubidNew::Nist.parse("NIST SP 800-53r5")
+        id1 = Pubid::Nist.parse("NIST SP 800-53")
+        id2 = Pubid::Nist.parse("NIST SP 800-53r5")
 
         expect(id2.weight).to be > id1.weight
       end
@@ -22,7 +22,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
       it "counts all defined attributes" do
         # Use valid NIST format with supplement (based on fixtures:
         # NBS HB 28supp1957pt1)
-        id = PubidNew::Nist.parse("NIST SP 800-53r5supp1924")
+        id = Pubid::Nist.parse("NIST SP 800-53r5supp1924")
         base_weight = id.weight
 
         # Each non-nil attribute adds to weight
@@ -35,16 +35,16 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
   describe "#merge" do
     context "merging basic attributes" do
       it "merges series from another document" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53")
-        id2 = PubidNew::Nist.parse("NIST FIPS 199")
+        id1 = Pubid::Nist.parse("NIST SP 800-53")
+        id2 = Pubid::Nist.parse("NIST FIPS 199")
 
         merged = id1.merge(id2)
         expect(merged.series.to_s).to eq("FIPS")
       end
 
       it "merges number from another document" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53")
-        id2 = PubidNew::Nist.parse("NIST SP 800-187")
+        id1 = Pubid::Nist.parse("NIST SP 800-53")
+        id2 = Pubid::Nist.parse("NIST SP 800-187")
 
         merged = id1.merge(id2)
         # Number is replaced entirely (not partially merged)
@@ -52,16 +52,16 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
       end
 
       it "prefers higher edition value numerically" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53r3")
-        id2 = PubidNew::Nist.parse("NIST SP 800-53r5")
+        id1 = Pubid::Nist.parse("NIST SP 800-53r3")
+        id2 = Pubid::Nist.parse("NIST SP 800-53r5")
 
         merged = id1.merge(id2)
         expect(merged.edition.to_s).to eq("r5")
       end
 
       it "does not override if new edition is lower numerically" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53r5")
-        id2 = PubidNew::Nist.parse("NIST SP 800-53r3")
+        id1 = Pubid::Nist.parse("NIST SP 800-53r5")
+        id2 = Pubid::Nist.parse("NIST SP 800-53r3")
 
         merged = id1.merge(id2)
         expect(merged.edition.to_s).to eq("r5")
@@ -70,10 +70,10 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
 
     context "merging special attributes" do
       it "merges supplement attribute" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53")
+        id1 = Pubid::Nist.parse("NIST SP 800-53")
         # Use valid NIST supplement format - simple number without dash
         # Based on fixtures: NIST SP 305supp20, NIST SP 955supp2002
-        id2 = PubidNew::Nist.parse("NIST SP 187supp1924")
+        id2 = Pubid::Nist.parse("NIST SP 187supp1924")
 
         merged = id1.merge(id2)
         expect(merged.supplement).not_to be_nil
@@ -81,16 +81,16 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
       end
 
       it "merges errata attribute" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53")
-        id2 = PubidNew::Nist.parse("NIST SP 800-53errata")
+        id1 = Pubid::Nist.parse("NIST SP 800-53")
+        id2 = Pubid::Nist.parse("NIST SP 800-53errata")
 
         merged = id1.merge(id2)
         expect(merged.errata).to eq("errata")
       end
 
       it "returns self for method chaining" do
-        id1 = PubidNew::Nist.parse("NIST SP 800-53")
-        id2 = PubidNew::Nist.parse("NIST SP 800-187")
+        id1 = Pubid::Nist.parse("NIST SP 800-53")
+        id2 = Pubid::Nist.parse("NIST SP 800-187")
 
         result = id1.merge(id2)
         expect(result).to eq(id1)
@@ -99,8 +99,8 @@ RSpec.describe PubidNew::Nist::Identifiers::Base do
 
     context "with non-NIST document" do
       it "returns self unchanged" do
-        id = PubidNew::Nist.parse("NIST SP 800-53")
-        iso_id = PubidNew::Iso.parse("ISO 9001")
+        id = Pubid::Nist.parse("NIST SP 800-53")
+        iso_id = Pubid::Iso.parse("ISO 9001")
 
         merged = id.merge(iso_id)
         expect(merged).to eq(id)

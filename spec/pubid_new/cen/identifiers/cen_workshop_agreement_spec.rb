@@ -1,9 +1,9 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Cen::Identifiers::CenWorkshopAgreement do
-  let(:scheme) { PubidNew::Cen::Scheme.new }
-  let(:parser) { PubidNew::Cen::Parser.new }
-  let(:builder) { PubidNew::Cen::Builder.new(scheme) }
+RSpec.describe Pubid::Cen::Identifiers::CenWorkshopAgreement do
+  let(:scheme) { Pubid::Cen::Scheme.new }
+  let(:parser) { Pubid::Cen::Parser.new }
+  let(:builder) { Pubid::Cen::Builder.new(scheme) }
 
   describe "#to_s" do
     context "basic CWA identifiers" do

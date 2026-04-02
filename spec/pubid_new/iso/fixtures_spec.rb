@@ -33,7 +33,7 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
         failures = []
 
         fixture_ids.each do |id_str|
-          parsed = PubidNew::Iso.parse(id_str)
+          parsed = Pubid::Iso.parse(id_str)
           if parsed.to_s == id_str
             successes += 1
           else
@@ -86,7 +86,7 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
         fixture_ids.each do |id_str|
           total_identifiers += 1
           begin
-            parsed = PubidNew::Iso.parse(id_str)
+            parsed = Pubid::Iso.parse(id_str)
             total_successes += 1 if parsed.to_s == id_str
           rescue StandardError
             # Count as failure

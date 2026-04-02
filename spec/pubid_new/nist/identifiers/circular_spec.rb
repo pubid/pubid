@@ -1,11 +1,11 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Circular do
+RSpec.describe Pubid::Nist::Identifiers::Circular do
   subject { described_class }
 
   describe ".parse" do
     context "basic CIRC identifiers" do
-      let(:parsed) { PubidNew::Nist.parse(subject) }
+      let(:parsed) { Pubid::Nist.parse(subject) }
 
       describe "NBS CIRC 13" do
         subject { "NBS CIRC 13" }
@@ -49,7 +49,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
     end
 
     context "CIRC with edition" do
-      let(:parsed) { PubidNew::Nist.parse(subject) }
+      let(:parsed) { Pubid::Nist.parse(subject) }
 
       describe "NBS CIRC 11e2-1915" do
         subject { "NBS CIRC 11e2-1915" }
@@ -59,7 +59,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
         end
 
         it "parses edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2")
         end
@@ -77,7 +77,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
         end
 
         it "parses bare edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2")
         end
@@ -89,7 +89,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
     end
 
     context "CIRC with revision" do
-      let(:parsed) { PubidNew::Nist.parse(subject) }
+      let(:parsed) { Pubid::Nist.parse(subject) }
 
       describe "NBS CIRC 13e2revJune1908" do
         subject { "NBS CIRC 13e2revJune1908" }
@@ -99,7 +99,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
         end
 
         it "parses edition with revision" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.id).to eq("2")
           expect(parsed.edition.additional_text).to eq("June1908")
         end
@@ -117,7 +117,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
         end
 
         it "parses historical edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("-")
           expect(parsed.edition.additional_text).to eq("April1909")
         end
@@ -129,22 +129,22 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
     end
 
     context "CIRC with supplement" do
-      let(:parsed) { PubidNew::Nist.parse(subject) }
+      let(:parsed) { Pubid::Nist.parse(subject) }
 
       describe "NBS CIRC 25supp-1924" do
         subject { "NBS CIRC 25supp-1924" }
 
         it "parses as CircularSupplement" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(PubidNew::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier).to be_a(Pubid::Nist::Identifiers::Circular)
           expect(parsed.base_identifier.number.value).to eq("25")
         end
 
         it "parses supplement edition" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.id).to eq("1924")
         end
 
@@ -157,13 +157,13 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
         subject { "NBS CIRC 101e2supp" }
 
         it "parses as CircularSupplement" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
         it "parses base identifier with edition" do
-          expect(parsed.base_identifier).to be_a(PubidNew::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier).to be_a(Pubid::Nist::Identifiers::Circular)
           expect(parsed.base_identifier.number.value).to eq("101")
-          expect(parsed.base_identifier.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.base_identifier.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.base_identifier.edition.type).to eq("e")
           expect(parsed.base_identifier.edition.id).to eq("2")
         end
@@ -197,16 +197,16 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
         subject { "NBS CIRC 24suppJan1924" }
 
         it "parses as CircularSupplement" do
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(PubidNew::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier).to be_a(Pubid::Nist::Identifiers::Circular)
           expect(parsed.base_identifier.number.value).to eq("24")
         end
 
         it "parses supplement edition with month+year" do
-          expect(parsed.edition).to be_a(PubidNew::Nist::Components::Edition)
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.id).to eq("Jan1924")
         end
 
@@ -220,7 +220,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
 
         it "parses as CircularSupplement (not Circular)" do
           # NOTE: This is a supplement-only identifier, parsed as CircularSupplement
-          expect(parsed).to be_a(PubidNew::Nist::Identifiers::CircularSupplement)
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
         it "parses supplement date range" do
@@ -235,7 +235,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Circular do
     end
 
     context "CIRC with special notations" do
-      let(:parsed) { PubidNew::Nist.parse(subject) }
+      let(:parsed) { Pubid::Nist.parse(subject) }
 
       describe "NBS CIRC 488sec1" do
         subject { "NBS CIRC 488sec1" }

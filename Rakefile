@@ -552,7 +552,7 @@ namespace :validation do
   desc "Show validation summary for all flavors"
   task :report do
     require_relative "spec/fixtures/classify_fixtures"
-    require_relative "lib/pubid_new"
+    require_relative "lib/pubid"
 
     # All V2 flavors with SUMMARY.txt
     results = []

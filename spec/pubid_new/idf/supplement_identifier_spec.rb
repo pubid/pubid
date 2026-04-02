@@ -1,23 +1,23 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Idf::SupplementIdentifier do
+RSpec.describe Pubid::Idf::SupplementIdentifier do
   subject { described_class }
 
   describe "inheritance" do
     it "inherits from Identifier" do
-      expect(described_class.superclass).to eq(PubidNew::Idf::Identifier)
+      expect(described_class.superclass).to eq(Pubid::Idf::Identifier)
     end
   end
 
   describe "shared attributes" do
-    let(:parsed) { PubidNew::Idf.parse("IDF 125:1988/AMD 1:2023") }
+    let(:parsed) { Pubid::Idf.parse("IDF 125:1988/AMD 1:2023") }
 
     it "has base_identifier attribute" do
       expect(parsed.respond_to?(:base_identifier)).to be true
     end
 
     it "base_identifier returns the base identifier" do
-      expect(parsed.base_identifier).to be_a(PubidNew::Idf::Identifiers::InternationalStandard)
+      expect(parsed.base_identifier).to be_a(Pubid::Idf::Identifiers::InternationalStandard)
     end
 
     it "base_identifier has the correct number" do
@@ -27,33 +27,33 @@ RSpec.describe PubidNew::Idf::SupplementIdentifier do
 
   describe "shared to_s behavior" do
     context "Amendment" do
-      subject { PubidNew::Idf.parse("IDF 125:1988/AMD 1:2023") }
+      subject { Pubid::Idf.parse("IDF 125:1988/AMD 1:2023") }
 
       it "renders supplement with base" do
         expect(subject.to_s).to eq("IDF 125:1988/AMD 1:2023")
       end
 
       it "parses and round-trips amendment" do
-        expect(subject.class).to eq(PubidNew::Idf::Identifiers::Amendment)
+        expect(subject.class).to eq(Pubid::Idf::Identifiers::Amendment)
         expect(subject.to_s).to eq("IDF 125:1988/AMD 1:2023")
       end
     end
 
     context "Corrigendum" do
-      subject { PubidNew::Idf.parse("IDF 125:1988/COR 1:2023") }
+      subject { Pubid::Idf.parse("IDF 125:1988/COR 1:2023") }
 
       it "renders supplement with base" do
         expect(subject.to_s).to eq("IDF 125:1988/COR 1:2023")
       end
 
       it "parses and round-trips corrigendum" do
-        expect(subject.class).to eq(PubidNew::Idf::Identifiers::Corrigendum)
+        expect(subject.class).to eq(Pubid::Idf::Identifiers::Corrigendum)
         expect(subject.to_s).to eq("IDF 125:1988/COR 1:2023")
       end
     end
 
     context "supplement without date" do
-      subject { PubidNew::Idf.parse("IDF 125:1988/AMD 1") }
+      subject { Pubid::Idf.parse("IDF 125:1988/AMD 1") }
 
       it "renders supplement without date" do
         expect(subject.to_s).to eq("IDF 125:1988/AMD 1")
@@ -69,7 +69,7 @@ RSpec.describe PubidNew::Idf::SupplementIdentifier do
     end
 
     context "supplement with part number" do
-      subject { PubidNew::Idf.parse("IDF 140-1:2007/AMD 1:2012") }
+      subject { Pubid::Idf.parse("IDF 140-1:2007/AMD 1:2012") }
 
       it "renders supplement with part" do
         expect(subject.to_s).to eq("IDF 140-1:2007/AMD 1:2012")

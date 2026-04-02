@@ -1,23 +1,23 @@
 require "spec_helper"
-require_relative "../../../../lib/pubid_new"
+require_relative "../../../../lib/pubid"
 
-RSpec.describe PubidNew::Nist::Identifiers::CommercialStandardsMonthly do
+RSpec.describe Pubid::Nist::Identifiers::CommercialStandardsMonthly do
   describe ".parse" do
     context "CSM v#n# format" do
       it "parses basic v#n# format" do
-        id = PubidNew::Nist.parse("NBS CSM v6n1")
-        expect(id).to be_a(PubidNew::Nist::Identifiers::CommercialStandardsMonthly)
+        id = Pubid::Nist.parse("NBS CSM v6n1")
+        expect(id).to be_a(Pubid::Nist::Identifiers::CommercialStandardsMonthly)
         expect(id.to_s).to eq("NBS CSM v6n1")
       end
 
       it "parses different volume-number combinations" do
-        expect(PubidNew::Nist.parse("NBS CSM v7n12").to_s).to eq("NBS CSM v7n12")
-        expect(PubidNew::Nist.parse("NBS CSM v9n9").to_s).to eq("NBS CSM v9n9")
-        expect(PubidNew::Nist.parse("NBS CSM v1n1").to_s).to eq("NBS CSM v1n1")
+        expect(Pubid::Nist.parse("NBS CSM v7n12").to_s).to eq("NBS CSM v7n12")
+        expect(Pubid::Nist.parse("NBS CSM v9n9").to_s).to eq("NBS CSM v9n9")
+        expect(Pubid::Nist.parse("NBS CSM v1n1").to_s).to eq("NBS CSM v1n1")
       end
 
       it "handles double-digit volumes and numbers" do
-        expect(PubidNew::Nist.parse("NBS CSM v10n10").to_s).to eq("NBS CSM v10n10")
+        expect(Pubid::Nist.parse("NBS CSM v10n10").to_s).to eq("NBS CSM v10n10")
       end
     end
 
@@ -30,13 +30,13 @@ RSpec.describe PubidNew::Nist::Identifiers::CommercialStandardsMonthly do
         ]
 
         test_cases.each do |test_case|
-          expect(PubidNew::Nist.parse(test_case).to_s).to eq(test_case)
+          expect(Pubid::Nist.parse(test_case).to_s).to eq(test_case)
         end
       end
     end
 
     context "class attributes" do
-      let(:id) { PubidNew::Nist.parse("NBS CSM v6n1") }
+      let(:id) { Pubid::Nist.parse("NBS CSM v6n1") }
 
       it "has correct publisher" do
         expect(id.publisher).to eq("NBS")

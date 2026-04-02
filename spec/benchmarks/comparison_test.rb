@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 $LOAD_PATH.unshift File.expand_path("../../lib", __dir__)
-require "pubid_new"
+require "pubid"
 require "benchmark"
 
 # Comparison benchmark: Before vs After optimization
-module PubidNew
+module Pubid
   module Benchmark
     class ComparisonTest
       def initialize
@@ -28,7 +28,7 @@ module PubidNew
         puts "1. REGISTRY LOOKUP COMPARISON"
         puts "-" * 80
 
-        scheme = PubidNew::Iso::Scheme.instance
+        scheme = Pubid::Iso::Scheme.instance
         abbrs = ["WD", "CD", "FDIS", "Amd", "Cor", "PWI", "NP", "IS", "", "FDAM", "CDAMD",
                  "PWI Guide", "NP Guide", "AWI", "DAmd", "DAnnex", "DEx"]
         total_lookups = @iterations * abbrs.size
@@ -73,10 +73,10 @@ module PubidNew
         puts "-" * 80
 
         ids = [
-          PubidNew::Iso.parse("ISO 9001:2015"),
-          PubidNew::Iso.parse("ISO 14001:2015"),
-          PubidNew::Iso.parse("ISO 27001:2022"),
-          PubidNew::Iso.parse("ISO/IEC 27001:2022"),
+          Pubid::Iso.parse("ISO 9001:2015"),
+          Pubid::Iso.parse("ISO 14001:2015"),
+          Pubid::Iso.parse("ISO 27001:2022"),
+          Pubid::Iso.parse("ISO/IEC 27001:2022"),
         ]
 
         # Create a set for membership testing
@@ -121,4 +121,4 @@ module PubidNew
 end
 
 # Run comparison benchmarks
-PubidNew::Benchmark::ComparisonTest.new.run_all
+Pubid::Benchmark::ComparisonTest.new.run_all

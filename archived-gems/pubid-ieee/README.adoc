@@ -132,7 +132,7 @@ IEEE.{number1}_{part1}.{subpart11}.{subpart12}-{year1}_{number2}_{part2}.{subpar
 
 The IEEE V2 parser has been completely redesigned with a clean three-layer architecture and model-driven design, achieving **100% success rate** on complex test patterns.
 
-The V2 implementation is located in [`lib/pubid_new/ieee/`](../../lib/pubid_new/ieee/) while V1 code remains for backward compatibility during the migration period.
+The V2 implementation is located in [`lib/pubid/ieee/`](../../lib/pubid/ieee/) while V1 code remains for backward compatibility during the migration period.
 
 === Architecture
 
@@ -160,26 +160,26 @@ V2 implements clean separation of concerns across three distinct layers:
 
 Where:
 
-Parser:: [`parser.rb`](../../lib/pubid_new/ieee/parser.rb) - Parslet-based grammar defining syntax rules (~210 lines)
-Builder:: [`builder.rb`](../../lib/pubid_new/ieee/builder.rb) - Transforms parse tree to attributes (~330 lines)
-Identifier:: [`identifiers/`](../../lib/pubid_new/ieee/identifiers/) - Lutaml::Model classes with rendering logic
-Components:: [`components/`](../../lib/pubid_new/ieee/components/) - Reusable components (Code, Draft)
+Parser:: [`parser.rb`](../../lib/pubid/ieee/parser.rb) - Parslet-based grammar defining syntax rules (~210 lines)
+Builder:: [`builder.rb`](../../lib/pubid/ieee/builder.rb) - Transforms parse tree to attributes (~330 lines)
+Identifier:: [`identifiers/`](../../lib/pubid/ieee/identifiers/) - Lutaml::Model classes with rendering logic
+Components:: [`components/`](../../lib/pubid/ieee/components/) - Reusable components (Code, Draft)
 
 ==== Identifier classes
 
 The V2 implementation uses dedicated identifier classes for different publication patterns:
 
-Base:: [`identifiers/base.rb`](../../lib/pubid_new/ieee/identifiers/base.rb) - Standard IEEE Std, AIEE, ANSI formats
-AdoptedStandard:: [`identifiers/adopted_standard.rb`](../../lib/pubid_new/ieee/identifiers/adopted_standard.rb) - Standards adopted in parenthetical notation
-DualPublished:: [`identifiers/dual_published.rb`](../../lib/pubid_new/ieee/identifiers/dual_published.rb) - Space-separated and " and " patterns
+Base:: [`identifiers/base.rb`](../../lib/pubid/ieee/identifiers/base.rb) - Standard IEEE Std, AIEE, ANSI formats
+AdoptedStandard:: [`identifiers/adopted_standard.rb`](../../lib/pubid/ieee/identifiers/adopted_standard.rb) - Standards adopted in parenthetical notation
+DualPublished:: [`identifiers/dual_published.rb`](../../lib/pubid/ieee/identifiers/dual_published.rb) - Space-separated and " and " patterns
 IecIeeeCopublished:: Standards co-published between IEC and IEEE
 
 Each class handles its specific notation patterns and rendering requirements.
 
 ==== Components
 
-Code:: [`components/code.rb`](../../lib/pubid_new/ieee/components/code.rb) - Handles code parsing with automatic separator preservation
-Draft:: [`components/draft.rb`](../../lib/pubid_new/ieee/components/draft.rb) - Draft version, revision, and date handling
+Code:: [`components/code.rb`](../../lib/pubid/ieee/components/code.rb) - Handles code parsing with automatic separator preservation
+Draft:: [`components/draft.rb`](../../lib/pubid/ieee/components/draft.rb) - Draft version, revision, and date handling
 
 === Performance metrics
 
@@ -218,16 +218,16 @@ IEC identifiers are now fully supported as standalone publishers.
 [source,ruby]
 ----
 # Basic IEC identifier
-id = PubidNew::Ieee.parse("IEC 61523-4")
+id = Pubid::Ieee.parse("IEC 61523-4")
 id.to_s  # => "IEC 61523-4"
 
 # IEC with edition and year-month
-id = PubidNew::Ieee.parse("IEC 61671-2 Edition 1.0 2016-04")
+id = Pubid::Ieee.parse("IEC 61671-2 Edition 1.0 2016-04")
 id.to_s  # => "IEC 61671-2 Edition 1.0 2016-04"
 ----
 ====
 
-**Implementation:** Added IEC, AESC to organizations in [`parser.rb:40`](../../lib/pubid_new/ieee/parser.rb#L40)
+**Implementation:** Added IEC, AESC to organizations in [`parser.rb:40`](../../lib/pubid/ieee/parser.rb#L40)
 
 ==== Parenthetical content preservation
 
@@ -239,24 +239,24 @@ Parenthetical notes and references are now preserved exactly as parsed.
 [source,ruby]
 ----
 # Supersession note
-id = PubidNew::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
+id = Pubid::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
 id.to_s  # => "AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)"
 
 # Revision note
-id = PubidNew::Ieee.parse("IEEE Std 1018-2013 (Revision of IEEE Std 1018-2004)")
+id = Pubid::Ieee.parse("IEEE Std 1018-2013 (Revision of IEEE Std 1018-2004)")
 id.to_s  # => "IEEE Std 1018-2013 (Revision of IEEE Std 1018-2004)"
 
 # Amendment note
-id = PubidNew::Ieee.parse("IEEE Std 802.16m-2011 (Amendment to IEEE Std 802.16-2009)")
+id = Pubid::Ieee.parse("IEEE Std 802.16m-2011 (Amendment to IEEE Std 802.16-2009)")
 id.to_s  # => "IEEE Std 802.16m-2011 (Amendment to IEEE Std 802.16-2009)"
 ----
 ====
 
 **Implementation:**
-- Enhanced additional_parameters rule in [`parser.rb:160`](../../lib/pubid_new/ieee/parser.rb#L160)
-- Extract parenthetical_content in [`builder.rb:318`](../../lib/pubid_new/ieee/builder.rb#L318)
-- Added parenthetical_content attribute in [`identifiers/base.rb:34`](../../lib/pubid_new/ieee/identifiers/base.rb#L34)
-- Render in to_s() in [`identifiers/base.rb:165`](../../lib/pubid_new/ieee/identifiers/base.rb#L165)
+- Enhanced additional_parameters rule in [`parser.rb:160`](../../lib/pubid/ieee/parser.rb#L160)
+- Extract parenthetical_content in [`builder.rb:318`](../../lib/pubid/ieee/builder.rb#L318)
+- Added parenthetical_content attribute in [`identifiers/base.rb:34`](../../lib/pubid/ieee/identifiers/base.rb#L34)
+- Render in to_s() in [`identifiers/base.rb:165`](../../lib/pubid/ieee/identifiers/base.rb#L165)
 
 ==== Multi-part adoptions
 
@@ -268,16 +268,16 @@ IEEE standards adopting multiple external standards are supported.
 [source,ruby]
 ----
 # Multiple adopted standards
-id = PubidNew::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
+id = Pubid::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
 id.to_s  # => "IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)"
 
 # AIEE adopting AESC standard
-id = PubidNew::Ieee.parse("AIEE No 14-1925 (AESC C22-1925)")
+id = Pubid::Ieee.parse("AIEE No 14-1925 (AESC C22-1925)")
 id.to_s  # => "AIEE No 14-1925 (AESC C22-1925)"
 ----
 ====
 
-**Implementation:** Skip recursive parsing when commas present in [`identifiers/base.rb:130`](../../lib/pubid_new/ieee/identifiers/base.rb#L130)
+**Implementation:** Skip recursive parsing when commas present in [`identifiers/base.rb:130`](../../lib/pubid/ieee/identifiers/base.rb#L130)
 
 ==== IEC edition year-month formats
 
@@ -289,20 +289,20 @@ IEC-style edition formats with year-month notation (Edition X.Y YYYY-MM).
 [source,ruby]
 ----
 # IEC edition with IEEE adoption
-id = PubidNew::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
+id = Pubid::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
 id.to_s  # => "IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)"
 
 # IEEE with IEC adoption including edition
-id = PubidNew::Ieee.parse("IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)")
+id = Pubid::Ieee.parse("IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)")
 id.to_s  # => "IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)"
 ----
 ====
 
 **Implementation:**
-- Capture edition_month in [`parser.rb:120`](../../lib/pubid_new/ieee/parser.rb#L120)
-- Extract edition_month in [`builder.rb:174`](../../lib/pubid_new/ieee/builder.rb#L174)
-- Added edition_month attribute in [`identifiers/base.rb:35`](../../lib/pubid_new/ieee/identifiers/base.rb#L35)
-- Render Edition + YYYY-MM in [`identifiers/base.rb:194`](../../lib/pubid_new/ieee/identifiers/base.rb#L194)
+- Capture edition_month in [`parser.rb:120`](../../lib/pubid/ieee/parser.rb#L120)
+- Extract edition_month in [`builder.rb:174`](../../lib/pubid/ieee/builder.rb#L174)
+- Added edition_month attribute in [`identifiers/base.rb:35`](../../lib/pubid/ieee/identifiers/base.rb#L35)
+- Render Edition + YYYY-MM in [`identifiers/base.rb:194`](../../lib/pubid/ieee/identifiers/base.rb#L194)
 
 ==== Dash preservation in codes
 
@@ -314,21 +314,21 @@ The Code component now preserves the original separator (dash or dot) used in th
 [source,ruby]
 ----
 # Dash-separated code
-id = PubidNew::Ieee.parse("AESC C22-1925")
+id = Pubid::Ieee.parse("AESC C22-1925")
 id.code.original_separator  # => "-"
 id.code.to_s                # => "C22-1925"  # dash preserved
 
 # Dot-separated code
-id = PubidNew::Ieee.parse("IEEE Std C37.111-2013")
+id = Pubid::Ieee.parse("IEEE Std C37.111-2013")
 id.code.original_separator  # => "."
 id.code.to_s                # => "C37.111"  # dot preserved
 ----
 ====
 
 **Implementation:**
-- Added original_separator attribute to Code component in [`components/code.rb:18`](../../lib/pubid_new/ieee/components/code.rb#L18)
+- Added original_separator attribute to Code component in [`components/code.rb:18`](../../lib/pubid/ieee/components/code.rb#L18)
 - Parser detects and stores actual separator (dash or dot)
-- Rendering uses preserved separator in [`components/code.rb:48`](../../lib/pubid_new/ieee/components/code.rb#L48)
+- Rendering uses preserved separator in [`components/code.rb:48`](../../lib/pubid/ieee/components/code.rb#L48)
 
 ==== Space-separated dual identifiers
 
@@ -340,20 +340,20 @@ Standards jointly published by two organizations with space-separated format are
 [source,ruby]
 ----
 # Space-separated input (auto-detected)
-id = PubidNew::Ieee.parse("IEC 62014-5 IEEE Std 1734-2011")
-id.class  # => PubidNew::Ieee::Identifiers::DualPublished
+id = Pubid::Ieee.parse("IEC 62014-5 IEEE Std 1734-2011")
+id.class  # => Pubid::Ieee::Identifiers::DualPublished
 id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"  # normalized with "and"
 
 # " and " format (preserved)
-id = PubidNew::Ieee.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
+id = Pubid::Ieee.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
 id.to_s   # => "ANSI C37.61-1973 and IEEE Std 321-1973"
 ----
 ====
 
 **Implementation:**
-- Dynamic publisher position detection in [`identifiers/base.rb:113`](../../lib/pubid_new/ieee/identifiers/base.rb#L113)
+- Dynamic publisher position detection in [`identifiers/base.rb:113`](../../lib/pubid/ieee/identifiers/base.rb#L113)
 - Distinguishes from co-published (Publisher1/Publisher2)
-- Comprehensive tests in [`spec/pubid_new/ieee/identifiers/dual_published_spec.rb`](../../spec/pubid_new/ieee/identifiers/dual_published_spec.rb)
+- Comprehensive tests in [`spec/pubid/ieee/identifiers/dual_published_spec.rb`](../../spec/pubid/ieee/identifiers/dual_published_spec.rb)
 
 ==== Code separator logic
 
@@ -371,7 +371,7 @@ P11073-10404   # P-prefix → dashes
 ----
 ====
 
-**Implementation:** Smart separator logic in [`components/code.rb:48`](../../lib/pubid_new/ieee/components/code.rb#L48)
+**Implementation:** Smart separator logic in [`components/code.rb:48`](../../lib/pubid/ieee/components/code.rb#L48)
 
 === V2 usage
 
@@ -379,10 +379,10 @@ P11073-10404   # P-prefix → dashes
 
 [source,ruby]
 ----
-require 'pubid_new/ieee'
+require 'pubid/ieee'
 
 # Parse standard IEEE identifier
-id = PubidNew::Ieee.parse("IEEE Std C37.111-2013")
+id = Pubid::Ieee.parse("IEEE Std C37.111-2013")
 id.code.to_s        # => "C37.111"
 id.year             # => "2013"
 id.to_s             # => "IEEE Std C37.111-2013"
@@ -393,8 +393,8 @@ id.to_s             # => "IEEE Std C37.111-2013"
 [source,ruby]
 ----
 # Parse adopted standard
-id = PubidNew::Ieee.parse("IEEE Std 18-1968 (ANSI C55.1-1968)")
-id.class                    # => PubidNew::Ieee::Identifiers::AdoptedStandard
+id = Pubid::Ieee.parse("IEEE Std 18-1968 (ANSI C55.1-1968)")
+id.class                    # => Pubid::Ieee::Identifiers::AdoptedStandard
 id.ieee_identifier.to_s     # => "IEEE Std 18-1968"
 id.adopted_identifier.to_s  # => "ANSI C55.1-1968"
 id.to_s                     # => "IEEE Std 18-1968 (ANSI C55.1-1968)"
@@ -405,8 +405,8 @@ id.to_s                     # => "IEEE Std 18-1968 (ANSI C55.1-1968)"
 [source,ruby]
 ----
 # Parse dual-published standard
-id = PubidNew::Ieee.parse("IEC 62014-5 IEEE Std 1734-2011")
-id.class  # => PubidNew::Ieee::Identifiers::DualPublished
+id = Pubid::Ieee.parse("IEC 62014-5 IEEE Std 1734-2011")
+id.class  # => Pubid::Ieee::Identifiers::DualPublished
 id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"
 ----
 
@@ -415,19 +415,19 @@ id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"
 [source,ruby]
 ----
 # IEC identifier
-id = PubidNew::Ieee.parse("IEC 61523-4")
+id = Pubid::Ieee.parse("IEC 61523-4")
 id.to_s  # => "IEC 61523-4"
 
 # Parenthetical content
-id = PubidNew::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
+id = Pubid::Ieee.parse("AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)")
 id.to_s  # => "AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)"
 
 # Multi-part adoptions
-id = PubidNew::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
+id = Pubid::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
 id.to_s  # => "IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)"
 
 # IEC edition with year-month
-id = PubidNew::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
+id = Pubid::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
 id.to_s  # => "IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)"
 ----
 
@@ -465,7 +465,7 @@ Proper slash and comma rendering for co-published standards.
 
 [source,bash]
 ----
-bundle exec rspec spec/pubid_new/ieee/ --format documentation
+bundle exec rspec spec/pubid/ieee/ --format documentation
 ----
 
 ==== Run specific identifier tests
@@ -473,13 +473,13 @@ bundle exec rspec spec/pubid_new/ieee/ --format documentation
 [source,bash]
 ----
 # Test adopted standards
-bundle exec rspec spec/pubid_new/ieee/identifiers/adopted_standard_spec.rb
+bundle exec rspec spec/pubid/ieee/identifiers/adopted_standard_spec.rb
 
 # Test dual published
-bundle exec rspec spec/pubid_new/ieee/identifiers/dual_published_spec.rb
+bundle exec rspec spec/pubid/ieee/identifiers/dual_published_spec.rb
 
 # Test base identifiers
-bundle exec rspec spec/pubid_new/ieee/identifiers/base_spec.rb
+bundle exec rspec spec/pubid/ieee/identifiers/base_spec.rb
 ----
 
 Expected output: All tests passing (35 examples, 0 failures)

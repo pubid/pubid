@@ -1,13 +1,13 @@
 require "spec_helper"
 
-RSpec.describe PubidNew::Nist::Identifiers::Report do
+RSpec.describe Pubid::Nist::Identifiers::Report do
   subject { described_class }
 
   describe ".parse" do
     context "basic RPT identifiers" do
       describe "NBS RPT 8079" do
         subject { "NBS RPT 8079" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -32,7 +32,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
 
       describe "NBS report ; 8079" do
         subject { "NBS report ; 8079" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -49,7 +49,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
 
       describe "NBS.RPT.8079" do
         subject { "NBS.RPT.8079" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -68,7 +68,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
     context "RPT with supplement" do
       describe "NBS RPT 9350sup" do
         subject { "NBS RPT 9350sup" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -91,7 +91,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
     context "RPT with letter suffix" do
       describe "NBS RPT 4817-A" do
         subject { "NBS RPT 4817-A" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -108,7 +108,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
 
       describe "NBS RPT 7386a" do
         subject { "NBS RPT 7386a" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -127,7 +127,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
     context "RPT with date range" do
       describe "NBS report ; Oct-Dec1950" do
         subject { "NBS report ; Oct-Dec1950" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -144,7 +144,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
 
       describe "NBS.RPT.1946-1947" do
         subject { "NBS.RPT.1946-1947" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -163,7 +163,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
     context "RPT special formats" do
       describe "NBS RPT ADHOC" do
         subject { "NBS RPT ADHOC" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
@@ -180,7 +180,7 @@ RSpec.describe PubidNew::Nist::Identifiers::Report do
 
       describe "NBS report ; div9" do
         subject { "NBS report ; div9" }
-        let(:parsed) { PubidNew::Nist.parse(subject) }
+        let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Report" do
           expect(parsed).to be_a(described_class)
