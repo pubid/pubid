@@ -62,10 +62,8 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
       # - V1 stores parenthetical as string instead of parsing (anti-pattern)
       # V2 correctly uses MODEL-DRIVEN architecture to parse identifiers within parenthetical
 
-      it "parses multi-part adoptions with commas", :pending do
-        # PENDING: Multi-part adoptions (comma-separated) not yet supported in V2
-        # V2 explicitly skips adoption_part containing commas (line 428 of base.rb)
-        # This would require handling adopted_identifiers as an array instead of single identifier
+      it "parses multi-part adoptions with commas" do
+        # Multi-part adoptions (comma-separated) supported in V2
         id = Pubid::Ieee.parse("IEEE Std 623-1976 (ANSI Y32.21-1976, NCTA 006-0975)")
 
         expect(id).to be_a(Pubid::Ieee::Identifiers::AdoptedStandard)
@@ -77,8 +75,8 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
         ansi_identifier = adopted_identifiers.first
         expect(ansi_identifier).to be_a(Pubid::Ansi::Identifiers::Standard)
         expect(ansi_identifier.to_s).to eq("ANSI Y32.21-1976")
-        expect(ansi_identifier.publish).to eq("ANSI")
-        expect(ansi_identifier.year).to eq("1976")
+        expect(ansi_identifier.publisher.body).to eq("ANSI")
+        expect(ansi_identifier.part.value).to eq("1976")
 
         ncta_identifier = adopted_identifiers.last
         expect(ncta_identifier).to be_a(Pubid::Ieee::Identifiers::Base)

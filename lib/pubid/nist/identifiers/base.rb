@@ -111,10 +111,10 @@ module Pubid
                      format
                    end
 
-          # Use parsed_format if no format specified (round-trip support)
-          # This preserves the original input format (MR, short, etc.)
+          # Default to :short format for output (normalization)
+          # MR format input is converted to short format on output
           # Explicit format parameter always overrides parsed_format
-          effective_format = format || parsed_format || :short
+          effective_format = format || :short
           effective_format = effective_format.to_sym if effective_format.is_a?(String)
           case effective_format
           when :full, :long
@@ -451,6 +451,11 @@ module Pubid
 
           # V2: Use stage
           result += ".#{stage.to_s(:mr)}" if stage
+
+          # Add addendum - render as ".Add." suffix in MR format
+          if addendum || addendum_number
+            result += ".Add."
+          end
 
           # V2: Use translation_component
           result += "#{translation_component.to_s(:mr)}" if translation_component

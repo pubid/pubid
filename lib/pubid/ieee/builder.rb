@@ -925,9 +925,8 @@ module Pubid
 
       # Handle draft information
       def handle_draft(parsed, attributes)
-        return unless parsed[:draft]
-
-        draft_data = parsed[:draft]
+        draft_data = parsed[:draft] || parsed[:digit_draft]
+        return unless draft_data
 
         # Draft can be an array of hash elements or a single hash
         if draft_data.is_a?(Array)

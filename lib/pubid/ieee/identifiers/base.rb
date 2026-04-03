@@ -409,10 +409,8 @@ module Pubid
 
             # Check if adoption_part looks like an identifier (contains publisher or type keywords)
             # BUT exclude revision/amendment/supersedes notes
-            # AND exclude multi-part adoptions (containing commas)
             # AND exclude Pattern 4 relationship types
             if main_part && adoption_part &&
-                !adoption_part.include?(",") && # Skip multi-part adoptions
                 !adoption_part.match?(/^\s*(Revision|Revison|Amendment|Corrigendum|Corrigenda|incorporates|Incorporating|Incorporates|Adoption|Supplement|Draft Amendment|DRAFT Amendment|Draft Revision|Reaffirmation|Redesignation|redesignated as|Supersedes|Supercedes|Includes|Previously designated as|Notebooks|Standard Newspaper)/i) &&
                 (adoption_part.match?(/\b(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\s/) ||
                  adoption_part.match?(/^\s*(ANSI|ISO|IEC|IEEE|AIEE|IRE|ASA|ASTM|CSA|ASME|NACE|NSF|ASHRAE|NCTA|AESC)\b/) ||
@@ -420,26 +418,31 @@ module Pubid
               # Parse the main IEEE identifier
               ieee_id = parse_single(main_part)
 
-              # Parse the adopted identifier (could be ANSI, ISO, IEC, etc.)
-              # Use the appropriate parser based on the adoption_part prefix
-              adopted_id = if adoption_part.strip.start_with?("IEC")
-                             # Use IEC parser for IEC adoptions
-                             # Preprocess to convert "Edition X.Y" to IEC format
-                             # Pattern: "IEC 60255-24 Edition 2.0 2013-04" → "IEC 60255-24:2013-04 ED2.0"
-                             iec_part = adoption_part.dup
-                             # Replace " Edition X.Y YYYY-MM" (or similar) with ":YYYY-MM EDX.Y"
-                             iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s+([0-9-]+)/, ':\2 ED\1')
-                             # Replace " Edition X.Y" at end (no date)
-                             iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s*$/, ' ED\1')
-                             Pubid::Iec.parse(iec_part)
-                           else
-                             # Use IEEE parser for other adoptions
-                             parse_single(adoption_part)
-                           end
+              # Parse comma-separated adopted identifiers
+              adopted_parts = adoption_part.split(",").map(&:strip)
+              adopted_ids = adopted_parts.map do |part|
+                if part.strip.start_with?("IEC")
+                  # Use IEC parser for IEC adoptions
+                  # Preprocess to convert "Edition X.Y" to IEC format
+                  # Pattern: "IEC 60255-24 Edition 2.0 2013-04" → "IEC 60255-24:2013-04 ED2.0"
+                  iec_part = part.dup
+                  # Replace " Edition X.Y YYYY-MM" (or similar) with ":YYYY-MM EDX.Y"
+                  iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s+([0-9-]+)/, ':\2 ED\1')
+                  # Replace " Edition X.Y" at end (no date)
+                  iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s*$/, ' ED\1')
+                  Pubid::Iec.parse(iec_part)
+                elsif part.strip.start_with?("ANSI")
+                  # Use ANSI parser for ANSI adoptions
+                  Pubid::Ansi.parse(part)
+                else
+                  # Use IEEE parser for other adoptions
+                  parse_single(part)
+                end
+              end
 
               return Identifiers::AdoptedStandard.new(
                 ieee_identifier: ieee_id,
-                adopted_identifier: adopted_id,
+                adopted_identifiers: adopted_ids,
               )
             end
             # If it doesn't look like an identifier, let the parser handle it as additional_parameters
@@ -539,11 +542,14 @@ module Pubid
           result = parts.join(" ")
 
           # Month/Day - append directly to avoid extra space before comma
-          if month && !draft_obj
-            # Format: ", Month Day, Year" or ", Month Year"
+          if month
+            # Format: ", Month Day, Year" or ", Month, Year"
             result += ", #{month}"
             result += " #{day}" if day
-            result += " #{year}" if year && !edition # Don't duplicate year if already in edition
+            if year && !edition
+              # Add comma after month if year follows
+              result += ", #{year}"
+            end
           end
 
           # Add parenthetical content if present

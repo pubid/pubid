@@ -11,12 +11,15 @@ module Pubid
         # IEEE's identifier for this adopted standard
         attribute :ieee_identifier, Base, polymorphic: true
 
-        # Original identifier from ANSI/ISO/IEC/etc
-        attribute :adopted_identifier, Base, polymorphic: true
+        # Original identifiers from ANSI/ISO/IEC/etc (array for multi-part adoptions)
+        attribute :adopted_identifiers, Base, polymorphic: true, collection: true
 
         def to_s
           result = ieee_identifier.to_s
-          result += " (#{adopted_identifier})" if adopted_identifier
+          if adopted_identifiers && !adopted_identifiers.empty?
+            adopted_strs = adopted_identifiers.map(&:to_s)
+            result += " (#{adopted_strs.join(" and ")})"
+          end
           result
         end
 

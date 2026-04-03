@@ -11,9 +11,9 @@ RSpec.describe Pubid::Ieee::Identifiers::AdoptedStandard do
         expect(id.ieee_identifier).to be_a(Pubid::Ieee::Aiee::Identifier)
         expect(id.ieee_identifier.to_s).to eq("AIEE No 14-1925")
 
-        expect(id.adopted_identifier).to be_a(Pubid::Ieee::Identifiers::Base)
-        expect(id.adopted_identifier.publisher).to eq("AESC")
-        expect(id.adopted_identifier.to_s).to eq("AESC C22-1925")
+        expect(id.adopted_identifiers.first).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id.adopted_identifiers.first.publisher).to eq("AESC")
+        expect(id.adopted_identifiers.first.to_s).to eq("AESC C22-1925")
 
         # Dash separator is now correctly preserved
         expect(id.to_s).to eq("AIEE No 14-1925 (AESC C22-1925)")
@@ -28,7 +28,7 @@ RSpec.describe Pubid::Ieee::Identifiers::AdoptedStandard do
         id = Pubid::Ieee.parse("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
         expect(id).to be_a(Pubid::Ieee::Identifiers::AdoptedStandard)
         expect(id.ieee_identifier.to_s).to eq("IEC 61523-4 Edition 1.0 2015-03")
-        expect(id.adopted_identifier.to_s).to eq("IEEE Std 1801-2013")
+        expect(id.adopted_identifiers.first.to_s).to eq("IEEE Std 1801-2013")
         # Dash separator is now correctly preserved
         expect(id.to_s).to eq("IEC 61523-4 Edition 1.0 2015-03 (IEEE Std 1801-2013)")
       end
@@ -40,8 +40,8 @@ RSpec.describe Pubid::Ieee::Identifiers::AdoptedStandard do
         expect(id.ieee_identifier).to be_a(Pubid::Ieee::Identifiers::Base)
         expect(id.ieee_identifier.to_s).to eq("IEEE Std C37.111-2013")
 
-        expect(id.adopted_identifier).to be_a(Pubid::Iec::Identifiers::InternationalStandard)
-        expect(id.adopted_identifier.to_s).to eq("IEC 60255-24:2013 ED2.0")
+        expect(id.adopted_identifiers.first).to be_a(Pubid::Iec::Identifiers::InternationalStandard)
+        expect(id.adopted_identifiers.first.to_s).to eq("IEC 60255-24:2013 ED2.0")
 
         expect(id.to_s).to eq("IEEE Std C37.111-2013 (IEC 60255-24:2013 ED2.0)")
       end

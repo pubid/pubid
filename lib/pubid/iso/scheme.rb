@@ -169,7 +169,7 @@ module Pubid
         # Construct the Addendum supplement manually
         addendum = Identifiers::Addendum.new
         addendum.base_identifier = base_identifier
-        addendum.number = ::Pubid::Components::Code.new(number: supplement_number)
+        addendum.number = Iso::Components::Code.new(number: supplement_number)
         addendum.date = Pubid::Components::Date.new(year: supplement_year) if supplement_year
 
         # Set typed_stage from register (uses TYPED_STAGES in Addendum class)

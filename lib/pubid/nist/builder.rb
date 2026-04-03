@@ -937,6 +937,17 @@ module Pubid
             return { second_number: value }
           end
 
+          # NEW: Handle second_number with revision_letter (hash with :revision_letter containing :number_only and :letter)
+          # This handles "27ra" pattern where parser returns {revision_letter: {number_only: "27", letter: "a"}}
+          # Should be combined to "27rA" format
+          if type == :second_number && value.is_a?(Hash) && value[:revision_letter]
+            revision_data = value[:revision_letter]
+            number_only = revision_data[:number_only].to_s
+            letter = revision_data[:letter].to_s.upcase
+            # Return as second_number with combined format "27rA"
+            return { second_number: Components::Code.new(number: "#{number_only}r#{letter}") }
+          end
+
           # Handle v#n# pattern (CSM series) - comes as hash from parser
           # Return Volume and Part components separately
           if value.is_a?(Hash) && value[:volume_number] && value[:issue_number]
@@ -1918,7 +1929,13 @@ module Pubid
           str_value = value.to_s.strip
 
           # Pattern: "1adde1" → Part(value: "1"), addendum=true
-          if str_value =~ /^(\d+)add/
+          # Note: eN after add is discarded (not included in output per fixture)
+          if str_value =~ /^(\d+)add(e\d+)$/
+            {
+              part: Components::Part.new(type: "pt", value: $1),
+              addendum: "true",
+            }
+          elsif str_value =~ /^(\d+)add/
             {
               part: Components::Part.new(type: "pt", value: $1),
               addendum: "true",

@@ -118,8 +118,7 @@ module Pubid
         rule(:aiee_identifier) do
           aiee_prefix >>
             space >>
-            aiee_type >>
-            space >>
+            (aiee_type >> space).maybe >>
             number >>
             date
         end

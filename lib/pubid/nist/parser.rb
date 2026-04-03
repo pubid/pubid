@@ -642,7 +642,7 @@ module Pubid
             (digits >> upper_letter) |
             # NEW: Revision pattern where r is directly followed by a letter (e.g., "27ra" -> rA)
             # For patterns like NIST SP 800-27ra where revision 'ra' is attached directly to number
-            (digits.as(:number_only) >> str("r") >> match("[a-zA-Z]")).as(:revision_letter) |
+            (digits.as(:number_only) >> str("r") >> match("[a-zA-Z]").as(:letter)).as(:revision_letter) |
             # NEW: Revision pattern where r is directly followed by a letter without leading digits (e.g., "rA")
             # For patterns like NIST SP 800-27ra where revision 'ra' is attached directly to number
             (str("r") >> match("[a-zA-Z]")).as(:revision_letter_suffix) |

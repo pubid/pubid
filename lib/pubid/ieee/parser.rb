@@ -181,7 +181,8 @@ module Pubid
 
       rule(:draft_version) do
         # Enhanced to handle multiple draft notation patterns
-        str("D") >> str("IS").absent? >> # Avoid matching "DIS" (ISO stage)
+        # D is optional to handle /08 style drafts (e.g., IEEE P1052/08)
+        (str("D") >> str("IS").absent?).maybe >> # Avoid matching "DIS" (ISO stage)
           (
             # Pattern: D3.1 (decimal with 1-2 digits on each side) - MOST COMMON, put first
             # Also handles trailing letter: D7.3A, D2.0E
@@ -208,6 +209,19 @@ module Pubid
             (comma >> space? >> year_digits.as(:year)) |
             (space >> year_digits.as(:year))
           ))
+      end
+
+      # FDIS and similar ISO stage codes without D prefix (Pattern 3)
+      # These appear after / in IEEE P identifiers but don't have the D prefix
+      # Examples: IEEE P15939/FDIS, IEEE P1234/CDV
+      rule(:fdraft) do
+        (slash >>
+         (str("FDIS") | str("CDV") | str("CD") | str("WD") | str("PWI") | str("NP")) >>
+         (
+           ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)) | # Month Year
+           ((comma | space) >> year_digits.as(:year))  # Year only (e.g., /FDIS, 2016)
+         ).maybe >>
+         parenthetical.maybe).as(:fdraft)
       end
 
       rule(:draft) do
@@ -480,6 +494,10 @@ module Pubid
           str("P") >> space.maybe >> # Make space after P optional
           number >>
           (part_subpart_year | edition).maybe >>
+          # Pattern for /08 style drafts (digits without D prefix) - MUST come before corrigendum
+          ((slash >> digits.as(:draft_version)).as(:digit_draft)).maybe >>
+          # FDIS and other ISO stage codes without D prefix (Pattern 3)
+          fdraft.maybe >>
           # Enhanced: Accept both comma and space before month/year
           ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)).maybe >>
           corrigendum.maybe >>
