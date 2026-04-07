@@ -31,8 +31,9 @@ module Pubid
           end
 
           rule(:urn_part) do
-            # Accept both new format (colon-dash, e.g. ":-6") and legacy API
-            # format (dash only, e.g. "-6") for part numbers in URNs
+            # Accepts both ":-N" (legacy stored format) and "-N" (canonical IEC API format).
+            # The renderer always emits the canonical "-N" form; the legacy form is accepted
+            # only for parsing pre-existing stored URNs.
             (colon.maybe >> dash >> (match('[a-z0-9]') | dash).repeat(1).as(:part)).maybe
           end
 

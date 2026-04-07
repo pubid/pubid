@@ -87,6 +87,10 @@ module Pubid::Iec::Renderer
       end
     end
 
+    def render_part(part, _opts, _params)
+      "-#{part}"
+    end
+
     def render_number(number, _opts, _params)
       number.to_s.downcase
     end
