@@ -47,7 +47,7 @@ module Pubid::Iec
 
     context "IEC 60050-351:2013/AMD1:2016" do
       let(:pubid) { "IEC 60050-351:2013/AMD1:2016" }
-      let(:urn) { "urn:iec:std:iec:60050:-351:2013:::amd:2016:v1:" }
+      let(:urn) { "urn:iec:std:iec:60050-351:2013:::amd:2016:v1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -55,7 +55,7 @@ module Pubid::Iec
 
     context "IEC 61010-2-201:2017 RLV" do
       let(:pubid) { "IEC 61010-2-201:2017 RLV" }
-      let(:urn) { "urn:iec:std:iec:61010:-2-201:2017:rlv::" }
+      let(:urn) { "urn:iec:std:iec:61010-2-201:2017:rlv::" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -81,7 +81,7 @@ module Pubid::Iec
 
     context "IEC 62439-1:2010+AMD1:2012+AMD2:2016 CSV" do
       let(:pubid) { "IEC 62439-1:2010+AMD1:2012+AMD2:2016 CSV" }
-      let(:urn) { "urn:iec:std:iec:62439:-1:2010:csv::amd:2012:v1:amd:2016:v2:" }
+      let(:urn) { "urn:iec:std:iec:62439-1:2010:csv::amd:2012:v1:amd:2016:v2:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -96,9 +96,17 @@ module Pubid::Iec
       it_behaves_like "converts pubid to urn"
     end
 
+    context "IEC 60050-102:2007" do
+      let(:pubid) { "IEC 60050-102:2007" }
+      let(:urn) { "urn:iec:std:iec:60050-102:2007:::" }
+
+      it_behaves_like "converts pubid to pubid"
+      it_behaves_like "converts pubid to urn"
+    end
+
     context "IEC 60050-102:2007/AMD1:2017 ED1" do
       let(:pubid) { "IEC 60050-102:2007/AMD1:2017 ED1" }
-      let(:urn) { "urn:iec:std:iec:60050:-102:2007::ed-1:amd:2017:v1:" }
+      let(:urn) { "urn:iec:std:iec:60050-102:2007::ed-1:amd:2017:v1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -106,7 +114,7 @@ module Pubid::Iec
 
     context "IEC 60050-111/AMD1/FRAG1 ED2" do
       let(:pubid) { "IEC 60050-111/AMD1/FRAG1 ED2" }
-      let(:urn) { "urn:iec:std:iec:60050:-111:::ed-2:amd:1:v1:frag:1:" }
+      let(:urn) { "urn:iec:std:iec:60050-111:::ed-2:amd:1:v1:frag:1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -130,7 +138,7 @@ module Pubid::Iec
     context "PWI 100-44 ED1" do
       let(:original) { "PWI 100-44 ED1" }
       let(:pubid) { "IEC PWI 100-44 ED1"}
-      let(:urn) { "urn:iec:std:iec:100:-44::stage-draft:ed-1:" }
+      let(:urn) { "urn:iec:std:iec:100-44::stage-draft:ed-1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -139,7 +147,7 @@ module Pubid::Iec
     context "PWI SRD SyCCOMM-1 ED1" do
       let(:original) { "PWI SRD SyCCOMM-1 ED1" }
       let(:pubid) { "IEC SRD PWI SyCCOMM-1 ED1" }
-      let(:urn) { "urn:iec:std:iec:srd:syccomm:-1::stage-draft:ed-1:" }
+      let(:urn) { "urn:iec:std:iec:srd:syccomm-1::stage-draft:ed-1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -480,18 +488,18 @@ module Pubid::Iec
         it_behaves_like "parses URN roundtrip"
       end
 
-      context "urn:iec:std:iec:60050:-351:2013:::" do
-        let(:urn) { "urn:iec:std:iec:60050:-351:2013:::" }
+      context "urn:iec:std:iec:60050-351:2013:::" do
+        let(:urn) { "urn:iec:std:iec:60050-351:2013:::" }
         it_behaves_like "parses URN roundtrip"
       end
 
-      context "urn:iec:std:iec:100:-44::stage-draft:ed-1:" do
-        let(:urn) { "urn:iec:std:iec:100:-44::stage-draft:ed-1:" }
+      context "urn:iec:std:iec:100-44::stage-draft:ed-1:" do
+        let(:urn) { "urn:iec:std:iec:100-44::stage-draft:ed-1:" }
         it_behaves_like "parses URN roundtrip"
       end
 
-      context "urn:iec:std:iec:61010:-2-201:2017:rlv::" do
-        let(:urn) { "urn:iec:std:iec:61010:-2-201:2017:rlv::" }
+      context "urn:iec:std:iec:61010-2-201:2017:rlv::" do
+        let(:urn) { "urn:iec:std:iec:61010-2-201:2017:rlv::" }
         it_behaves_like "parses URN roundtrip"
       end
 
@@ -505,8 +513,8 @@ module Pubid::Iec
         it_behaves_like "parses URN roundtrip"
       end
 
-      context "urn:iec:std:iec:srd:syccomm:-1::stage-draft:ed-1:" do
-        let(:urn) { "urn:iec:std:iec:srd:syccomm:-1::stage-draft:ed-1:" }
+      context "urn:iec:std:iec:srd:syccomm-1::stage-draft:ed-1:" do
+        let(:urn) { "urn:iec:std:iec:srd:syccomm-1::stage-draft:ed-1:" }
         it_behaves_like "parses URN roundtrip"
       end
     end
