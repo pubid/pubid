@@ -181,6 +181,15 @@ module Pubid
             supp_year = parts.shift
           end
 
+          # Consume trailing "vN" or "vN.M" version suffix belonging to this
+          # supplement (e.g., amd:2018:v1). Without this, the vN token would be
+          # left in parts and the next loop iteration would treat it as a new
+          # spurious supplement, overwriting the base identifier's fields.
+          if parts.first&.match?(/\Av(\d+)(?:\.(\d+))?\z/)
+            ver_match = parts.shift.match(/\Av(\d+)(?:\.(\d+))?\z/)
+            supp_number ||= ver_match[1].to_i
+          end
+
           # Check for language after supplement
           supp_languages = nil
           if parts.first && !parts.first.match(/^\d+$/) && !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-)/i)

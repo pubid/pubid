@@ -56,3 +56,4 @@ dist/
 .rubocop-https*
 *.orig
 
+.claude/settings.local.json
