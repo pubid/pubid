@@ -68,4 +68,37 @@ RSpec.describe "IEC Serialization" do
       expect(id.to_s).to eq("IEC 60050:2011")
     end
   end
+
+  # Compound identifiers (consolidated, VAP, sheet, fragment) wrap a base
+  # identifier that does not have a `.code` attribute. Before the fix these
+  # wrappers defined a `def code` delegation; Serializable#extract_number
+  # detected it via `respond_to?(:code)` and then crashed inside
+  # lutaml-model's method_missing when the delegate had no `.code`.
+  describe "compound identifier serialization (Harmonized API inputs)" do
+    {
+      "IEC 60529:1989+AMD1:1999 CSV/COR2:2007" => "Corrigendum",
+      "CISPR TR 16-3:2000+AMD1:2002 CSV" => "VapIdentifier",
+      "IEC/ASTM 62885-6:2018" => "InternationalStandard",
+    }.each do |input, expected_class_suffix|
+      context input do
+        let(:id) { Pubid::Iec.parse(input) }
+
+        it "parses to the expected class" do
+          expect(id.class.name).to end_with(expected_class_suffix)
+        end
+
+        it "round-trips via to_s" do
+          expect(id.to_s).to eq(input)
+        end
+
+        it "serializes to_h without raising" do
+          expect { id.to_h }.not_to raise_error
+        end
+
+        it "serializes to_yaml without ruby/object markers" do
+          expect(id.to_h.to_yaml).not_to include("ruby/object")
+        end
+      end
+    end
+  end
 end

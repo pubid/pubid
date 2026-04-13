@@ -16,6 +16,14 @@ module Pubid
           @part = part
         end
 
+        # Serializable helpers (e.g. extract_supplement_number) treat the
+        # identifier number as having a `.value` method (ISO Code convention).
+        # Expose `value` as an alias for `number` so IEC identifiers work the
+        # same way without forcing each Serializable helper to special-case.
+        def value
+          number
+        end
+
         def to_s
           result = ""
           result += "#{prefix} " if prefix

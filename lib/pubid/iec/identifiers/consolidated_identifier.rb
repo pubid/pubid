@@ -47,10 +47,6 @@ module Pubid
           identifiers&.first&.copublishers
         end
 
-        def code
-          identifiers&.first&.code
-        end
-
         def number
           identifiers&.first&.number
         end

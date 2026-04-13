@@ -37,10 +37,6 @@ module Pubid
           base_identifier&.copublishers
         end
 
-        def code
-          base_identifier&.code
-        end
-
         def number
           base_identifier&.number
         end
