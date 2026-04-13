@@ -318,11 +318,28 @@ module Pubid
         array_to_str(TYPED_STAGES_SUPPLEMENTS).as(:type_with_stage)
       end
 
+      # Alternate supplement separators for Relaton combine_doc output:
+      # "ISO 19115-1 + Amd 1" (derivedFrom) and "ISO 19115-1, Amd 1" (amendments).
+      # Captured as :separator so the renderer can preserve it on round-trip.
+      # The "+ " (no leading space) variant exists because upstream rules
+      # (second_part / third_part_edition) end with `space?` that absorbs
+      # the leading space; the builder normalizes "+ " back to " + ".
+      #
+      # The leading lookahead `match['/+,']` is a fast-fail: parsers that
+      # parse non-supplement identifiers (the common case) try the supplement
+      # rules first and would otherwise pay 4 alternative attempts before
+      # backtracking. The lookahead rejects in O(1) when the next char isn't
+      # a separator candidate.
+      rule(:supplement_separator) do
+        match["/+,"].present? >>
+          (str("/") | str(" + ") | str("+ ") | str(", ")).as(:separator)
+      end
+
       # ISO 8601-1:2019/Amd 2:2024
       # ISO/IEC 10646-1:1993/pDCOR.2 (legacy dot-prefixed format)
       rule(:supplement_identifier_no_third) do
         identifier_copublishers_no_third.as(:base_identifier) >>
-          str("/") >> supplement_type_with_stage >>
+          supplement_separator >> supplement_type_with_stage >>
           (space? >> second_part | str(".") >> digits.as(:number) | space? >> date)
       end
 
@@ -335,14 +352,14 @@ module Pubid
       # ISO/IEC 10646-1:1993/pDCOR.2 (legacy dot-prefixed format)
       rule(:supplement_supplement_identifier) do
         supplement_identifier_no_third.as(:base_identifier) >>
-          str("/") >> supplement_type_with_stage >>
+          supplement_separator >> supplement_type_with_stage >>
           (space? >> second_part >> third_part | str(".") >> digits.as(:number) >> third_part)
       end
 
       # ISO 12345:2020/Amd 1:2021/Cor 1:2022/Amd 2:2023 (three-level supplement)
       rule(:supplement_supplement_supplement_identifier) do
         supplement_supplement_identifier.as(:base_identifier) >>
-          str("/") >> supplement_type_with_stage >>
+          supplement_separator >> supplement_type_with_stage >>
           (space? >> second_part >> third_part | str(".") >> digits.as(:number) >> third_part)
       end
 

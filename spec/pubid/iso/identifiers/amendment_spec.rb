@@ -2520,4 +2520,41 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
     end
   end
+
+  # Relaton's combine_doc emits supplement references with " + " (derivedFrom)
+  # and ", " (amendments) instead of "/". The parser must accept both and
+  # round-trip the original separator; the URN must be unaffected.
+  context "alternate supplement separators (Relaton combine_doc)" do
+    {
+      "ISO 19115-1 + Amd 1" => " + ",
+      "ISO 19115-1, Amd 1" => ", ",
+      "ISO 19115-1:2014 + Amd 1:2018" => " + ",
+      "ISO 19115-1:2014, Amd 1:2018" => ", ",
+    }.each do |input, sep|
+      describe input do
+        let(:parsed) { Pubid::Iso.parse(input) }
+
+        it "produces an Amendment" do
+          expect(parsed).to be_a(described_class)
+        end
+
+        it "round-trips the original separator on to_s" do
+          expect(parsed.to_s).to eq(input)
+        end
+
+        it "captures the separator on the supplement" do
+          expect(parsed.separator).to eq(sep)
+        end
+      end
+    end
+
+    it "renders the same URN regardless of separator" do
+      urns = [
+        "ISO 19115-1:2014/Amd 1:2018",
+        "ISO 19115-1:2014 + Amd 1:2018",
+        "ISO 19115-1:2014, Amd 1:2018",
+      ].map { |s| Pubid::Iso.parse(s).to_urn }
+      expect(urns.uniq.length).to eq(1)
+    end
+  end
 end

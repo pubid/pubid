@@ -5,6 +5,7 @@ module Pubid
     # Identifier that represents a supplement to a base identifier.
     class SupplementIdentifier < SingleIdentifier
       attribute :base_identifier, Identifier, polymorphic: true
+      attribute :separator, ::Lutaml::Model::Type::String
 
       # Delegate publisher to base_identifier
       def publisher
@@ -33,6 +34,8 @@ stage_format_long: nil, with_date: nil)
           with_date = true if with_date.nil?
         end
 
+        sep = separator && !separator.empty? ? separator : "/"
+
         [].tap do |parts|
           parts << [
             base_identifier.to_s(
@@ -43,7 +46,7 @@ stage_format_long: nil, with_date: nil)
               stage_format_long: stage_format_long,
               with_date: with_date,
             ),
-            "/#{typed_stage.abbreviation(format_long: stage_format_long)}",
+            "#{sep}#{typed_stage.abbreviation(format_long: stage_format_long)}",
           ].join("")
           # Only add space if number_portion has a number (not just a date starting with :)
           num_port = number_portion(lang_single: lang_single)

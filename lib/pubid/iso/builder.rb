@@ -411,6 +411,14 @@ module Pubid
             value
           end
 
+        when :separator
+          # Supplement separator (" + ", ", ", or "/") captured so the
+          # renderer can preserve the original form on round-trip. The
+          # parser also matches the "+ " (no leading space) variant when
+          # upstream rules consumed the leading space; normalize back.
+          raw = value.to_s
+          raw == "+ " ? " + " : raw
+
         when :stage
           # Raw stage code from URN parser (e.g., "10.00", "50.00")
           # Convert to type_with_stage format for builder
