@@ -102,8 +102,10 @@ module Pubid
 
         # Parse edition if present (ed-N format) - comes after year in URN
         edition = nil
+        edition_explicit = false
         if parts.first&.start_with?("ed-")
           edition = parts.shift.sub("ed-", "").to_i
+          edition_explicit = true
         end
 
         # Parse language if present (2-letter codes like "en" or comma-separated)
@@ -214,13 +216,19 @@ module Pubid
 
         # Build the identifier hash
         build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                       harmonized_stage_code, year, edition, languages, supplements)
+                       harmonized_stage_code, year, edition, edition_explicit, languages, supplements)
       end
 
       private
 
-      # Helper to find IS-type TypedStage by harmonized stage code
-      # Used when URN doesn't specify a type code (defaults to IS)
+      # Helper to find IS-type TypedStage by harmonized stage code.
+      # Used when URN doesn't specify a type code (defaults to IS).
+      #
+      # Note: harmonized "60.00" matches both `published` and `prf`
+      # (Proof / Final proof of reading). V2 deliberately maps `stage-60.00`
+      # to PRF — see existing specs in international_standard_spec.rb that
+      # assert `ISO/PRF 6709` round-trips. We honor that ordering here by
+      # using `detect` (first match wins) and not overriding with published.
       def scheme_is_typed_stage_by_harmonized(harmonized_code)
         Pubid::Iso::Scheme.instance.all_typed_stages.detect do |ts|
           ts.type_code.to_s == "is" && ts.harmonized_stages&.include?(harmonized_code)
@@ -291,7 +299,7 @@ module Pubid
 
       # Build identifier from parsed components
       def build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                         harmonized_stage_code, year, edition, languages, supplements)
+                         harmonized_stage_code, year, edition, edition_explicit, languages, supplements)
         # Debug output
         # puts "build_identifier: publishers=#{publishers.inspect}, number=#{number.inspect}, year=#{year.inspect}, edition=#{edition.inspect}"
 
@@ -313,6 +321,7 @@ module Pubid
 
         base_hash[:year] = year if year
         base_hash[:edition] = edition if edition
+        base_hash[:urn_explicit_edition] = true if edition_explicit
 
         # Add type_with_stage if type_code is present
         if type_code && type_code != :is

@@ -425,6 +425,12 @@ module Pubid
           # that would otherwise be normalized away.
           value.to_s
 
+        when :urn_explicit_edition
+          # Set by the URN parser when an `ed-N` segment was consumed.
+          # Tells `to_s` to render the edition by default so URN-sourced
+          # identifiers round-trip back to "ISO N-N EDx" form.
+          value ? true : false
+
         when :stage
           # Raw stage code from URN parser (e.g., "10.00", "50.00")
           # Convert to type_with_stage format for builder

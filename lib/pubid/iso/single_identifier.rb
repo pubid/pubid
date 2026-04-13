@@ -16,6 +16,13 @@ module Pubid
       # same as before.
       attribute :urn_explicit_stage, ::Lutaml::Model::Type::String
 
+      # Set by the URN parser when an explicit `ed-N` segment was consumed.
+      # Tells `to_s` to render the edition by default — V2's default is
+      # `with_edition: false`, but URN-sourced identifiers should round-trip
+      # back to the same shape (`ISO 10033-1 ED1` etc.). String-parsed
+      # identifiers leave this false and keep V2's default behavior.
+      attribute :urn_explicit_edition, ::Lutaml::Model::Type::Boolean, default: false
+
       # Rendering style is a strategy object, not serializable data
       attr_accessor :rendering_style
 
@@ -27,6 +34,14 @@ module Pubid
 
       def to_s(lang: :en, lang_single: false, with_edition: false, format: nil,
 stage_format_long: nil, with_date: nil)
+        # URN-sourced identifiers default to rendering their edition so the
+        # round-trip back through `to_s` preserves the "ISO N-N EDx" form.
+        # String-parsed identifiers keep `with_edition: false` as the V2
+        # default. The caller's explicit `with_edition: true` always wins;
+        # `false` (the default) is upgraded only when the URN parser flagged
+        # the edition as explicit.
+        with_edition = true if !with_edition && urn_explicit_edition && edition
+
         # If format is provided, create appropriate rendering style
         if format
           style = RenderingStyle.from_format(format)

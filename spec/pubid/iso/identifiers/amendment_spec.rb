@@ -2529,18 +2529,32 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
   # urn_explicit_stage capture, the segment was normalized away because the
   # generator treats published as the implicit default.
   context "URN stage-published round-trip" do
+    # URNs that include an explicit `ed-N` segment render the edition by
+    # default (via urn_explicit_edition). URNs without `ed-N` keep V2's
+    # standard "no edition in to_s" behavior.
     {
-      "urn:iso:std:iso:19115:-1:ed-1:stage-published:amd:2018:v1" => "ISO 19115-1/AMD 1:2018",
+      "urn:iso:std:iso:19115:-1:ed-1:stage-published:amd:2018:v1" => "ISO 19115-1 ED1/AMD 1:2018",
       "urn:iso:std:iso:19115:-3:stage-published" => "ISO 19115-3",
+      # Harmonized stage codes (60.00, 60.60) must round-trip the same way
+      # — `urn_explicit_stage` captures any literal stage token, not just
+      # the symbolic "published" form.
+      "urn:iso:std:iso:10033:-1:ed-1:stage-60.00:amd:1:v1" => nil,
+      "urn:iso:std:iec:60086:-3:ed-4:stage-60.60:cor:2023:v1" => nil,
     }.each do |urn, pubid|
       describe urn do
         let(:id) { Pubid::Iso.parse_urn(urn) }
 
-        it "parses to the expected pubid string" do
-          expect(id.to_s).to eq(pubid)
+        it "parses without raising" do
+          expect { id }.not_to raise_error
         end
 
-        it "round-trips the URN with stage-published preserved" do
+        if pubid
+          it "parses to the expected pubid string" do
+            expect(id.to_s).to eq(pubid)
+          end
+        end
+
+        it "round-trips the URN with the original stage token preserved" do
           expect(id.to_urn).to eq(urn)
         end
       end
