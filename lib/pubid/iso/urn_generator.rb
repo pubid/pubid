@@ -78,8 +78,14 @@ module Pubid
         part_comp = part_component
         parts << part_comp if part_comp
 
-        # Stage (only for non-published documents)
-        stage_comp = stage_component
+        # Stage (only for non-published documents). If the URN parser
+        # captured an explicit stage token, preserve it on round-trip even
+        # for harmonized 60.x / :published which stage_component would drop.
+        stage_comp = if identifier.respond_to?(:urn_explicit_stage) && identifier.urn_explicit_stage
+                       "stage-#{identifier.urn_explicit_stage}"
+                     else
+                       stage_component
+                     end
         parts << stage_comp if stage_comp
 
         # Year (for published documents and when edition is present)
@@ -154,7 +160,14 @@ module Pubid
           # - Include if base is proposal stage (10.xx) and supplement has different stage
           # - Don't include if base is approval/publication stage (50.xx, 60.xx)
           # - Don't include if supplement has same stage as base
-          base_stage_comp = base_gen.send(:stage_component)
+          # - If the URN parser captured an explicit stage token on the base,
+          #   preserve it on round-trip even when stage_component would
+          #   normally drop it (e.g. "stage-published").
+          if base_id.respond_to?(:urn_explicit_stage) && base_id.urn_explicit_stage
+            base_stage_comp = "stage-#{base_id.urn_explicit_stage}"
+          else
+            base_stage_comp = base_gen.send(:stage_component)
+          end
           if base_stage_comp
             # Check if any supplement has a stage
             supplement_stages = supplement_chain.map do |supp|
@@ -185,8 +198,16 @@ module Pubid
 
           # Supplement stage (for draft supplements)
           # Note: editions are added at base level, not here
-          stage_comp = supp_gen.send(:stage_component)
-          parts << stage_comp if stage_comp
+          # If the URN parser captured an explicit stage token (e.g.
+          # "stage-published", "stage-60.60"), preserve it on round-trip.
+          # Otherwise fall back to the normal stage_component logic which
+          # omits implicit-published stages.
+          if supp.respond_to?(:urn_explicit_stage) && supp.urn_explicit_stage
+            parts << "stage-#{supp.urn_explicit_stage}"
+          else
+            stage_comp = supp_gen.send(:stage_component)
+            parts << stage_comp if stage_comp
+          end
 
           # Supplement type code (amd, cor, sup)
           suppl_type = supp_gen.send(:supplement_type_component)

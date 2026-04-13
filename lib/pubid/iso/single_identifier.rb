@@ -8,6 +8,13 @@ module Pubid
     class SingleIdentifier < Identifier
       attribute :typed_stage, ::Pubid::Components::TypedStage
       attribute :all_parts, ::Lutaml::Model::Type::Boolean, default: false
+      # When the URN parser sees an explicit stage segment (e.g.
+      # "stage-published", "stage-60.60"), it stores the original token here so
+      # the URN generator can emit it back. Without this, harmonized 60.x and
+      # :published stages get normalized away because stage_component returns
+      # nil for them. String-parsed identifiers leave this nil and behave the
+      # same as before.
+      attribute :urn_explicit_stage, ::Lutaml::Model::Type::String
 
       # Rendering style is a strategy object, not serializable data
       attr_accessor :rendering_style

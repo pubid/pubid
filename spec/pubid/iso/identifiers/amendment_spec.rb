@@ -2524,6 +2524,34 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
   # Relaton's combine_doc emits supplement references with " + " (derivedFrom)
   # and ", " (amendments) instead of "/". The parser must accept both and
   # round-trip the original separator; the URN must be unaffected.
+  # When a URN includes an explicit "stage-published" (or harmonized 60.x)
+  # segment on the base, the URN generator must round-trip it. Without the
+  # urn_explicit_stage capture, the segment was normalized away because the
+  # generator treats published as the implicit default.
+  context "URN stage-published round-trip" do
+    {
+      "urn:iso:std:iso:19115:-1:ed-1:stage-published:amd:2018:v1" => "ISO 19115-1/AMD 1:2018",
+      "urn:iso:std:iso:19115:-3:stage-published" => "ISO 19115-3",
+    }.each do |urn, pubid|
+      describe urn do
+        let(:id) { Pubid::Iso.parse_urn(urn) }
+
+        it "parses to the expected pubid string" do
+          expect(id.to_s).to eq(pubid)
+        end
+
+        it "round-trips the URN with stage-published preserved" do
+          expect(id.to_urn).to eq(urn)
+        end
+      end
+    end
+
+    it "does not emit stage-published for string-parsed identifiers" do
+      id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
+      expect(id.to_urn).to eq("urn:iso:std:iso:9001:amd:2020:v1")
+    end
+  end
+
   context "alternate supplement separators (Relaton combine_doc)" do
     {
       "ISO 19115-1 + Amd 1" => " + ",

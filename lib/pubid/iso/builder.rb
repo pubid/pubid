@@ -419,6 +419,12 @@ module Pubid
           raw = value.to_s
           raw == "+ " ? " + " : raw
 
+        when :urn_explicit_stage
+          # Stage token captured by the URN parser so the URN generator
+          # can round-trip "stage-published" / "stage-60.60" segments
+          # that would otherwise be normalized away.
+          value.to_s
+
         when :stage
           # Raw stage code from URN parser (e.g., "10.00", "50.00")
           # Convert to type_with_stage format for builder

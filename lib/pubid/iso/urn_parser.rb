@@ -142,9 +142,15 @@ module Pubid
           supp_stage = nil
 
           # Check for supplement stage
+          supp_explicit_stage = nil
           if parts.first&.start_with?("stage-")
             supp_stage_data = parts.shift
             supp_stage, _ = parse_stage_code(supp_stage_data)
+            # Capture the original stage token so the URN generator can
+            # round-trip it. Without this, "stage-published" / "stage-60.60"
+            # gets normalized away because they map to the default published
+            # state and stage_component returns nil for :published.
+            supp_explicit_stage = supp_stage_data.sub("stage-", "").sub(/\.v\d+$/i, "")
           elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase)
             supp_stage_abbr = parts.shift.upcase
             supp_stage = TYPED_STAGE_REVERSE_MAP[supp_stage_abbr]
@@ -201,6 +207,7 @@ module Pubid
             number: supp_number,
             year: supp_year,
             stage: supp_stage,
+            explicit_stage: supp_explicit_stage,
             languages: supp_languages,
           }
         end
@@ -342,6 +349,11 @@ module Pubid
             base_hash[:stage] = harmonized_stage_code || stage_code.to_s
           end
 
+          # Capture original stage token so the generator can round-trip it.
+          # This matters for "stage-published" / "stage-60.60" segments that
+          # would otherwise be normalized away.
+          base_hash[:urn_explicit_stage] = harmonized_stage_code if harmonized_stage_code
+
           # Add stage iteration if present
           base_hash[:stage_iteration] = stage_iteration.to_s if stage_iteration
         end
@@ -372,6 +384,10 @@ module Pubid
 
           if supp[:languages]
             supp_hash[:languages] = supp[:languages].join("/")
+          end
+
+          if supp[:explicit_stage]
+            supp_hash[:urn_explicit_stage] = supp[:explicit_stage]
           end
 
           # Wrap current identifier with supplement
