@@ -79,6 +79,14 @@ module Pubid
         number_part = parts.shift
         number, part, subpart = parse_number_part(number_part)
 
+        # Handle URN-style part notation where part is on a separate colon
+        # segment with leading dash, e.g. urn:iec:std:iec:60050:-351:2013.
+        # Re-parse combined "number-part" through parse_number_part so subpart
+        # handling (e.g. 61010:-2-201) stays consistent.
+        if parts.first&.start_with?("-")
+          number, part, subpart = parse_number_part("#{number}#{parts.shift}")
+        end
+
         # Check for stage (stage-XX.XX or typed stage like WD, CD, etc.)
         stage_code = nil
         stage_iteration = nil
@@ -110,6 +118,13 @@ module Pubid
         # Check for supplements (amd, cor)
         supplements = []
         while parts.any?
+          # Drain padding empty segments that come from URN syntax like
+          # "...:2013:::amd:..." — split(":") leaves "" tokens that no
+          # consumer below would handle, causing an infinite loop.
+          parts.shift while parts.first == ""
+          break if parts.empty?
+
+          parts_before = parts.length
           supp_type = nil
           supp_number = nil
           supp_date = nil
@@ -149,12 +164,30 @@ module Pubid
             supp_date = parts.shift
           end
 
-          supplements << {
-            type: supp_type,
-            number: supp_number,
-            date: supp_date,
-            stage: supp_stage,
-          }
+          # Consume trailing "vN" or "vN.M" version suffix belonging to this
+          # supplement (e.g., amd:2016:v1). Without this, the vN token would
+          # be left in parts and the next iteration would treat it as a new
+          # spurious supplement, overwriting the base identifier's fields.
+          if parts.first&.match?(/\Av(\d+)(?:\.(\d+))?\z/)
+            ver_match = parts.shift.match(/\Av(\d+)(?:\.(\d+))?\z/)
+            supp_number ||= ver_match[1].to_i
+          end
+
+          # Only push a supplement if it has a type/stage anchor — a bare
+          # number or year without a supplement keyword (amd/cor/stage-)
+          # is usually a fragment, redline marker, or similar URN extension
+          # we don't model yet, and must not become a spurious supplement.
+          # If we consumed nothing, drop the leading token as a loop guard.
+          if supp_type || supp_stage
+            supplements << {
+              type: supp_type,
+              number: supp_number,
+              date: supp_date,
+              stage: supp_stage,
+            }
+          elsif parts.length == parts_before
+            parts.shift
+          end
         end
 
         # Build the identifier hash
