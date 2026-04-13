@@ -47,6 +47,7 @@ module Pubid
   autoload :IdentifierMetadata, "pubid/identifier_metadata"
   autoload :IdentifierRegistry, "pubid/identifier_registry"
   autoload :Rendering, "pubid/rendering"
+  autoload :Rewrites, "pubid/rewrites"
   autoload :Scheme, "pubid/scheme"
   autoload :Serializable, "pubid/serializable"
   autoload :Utils, "pubid/utils"

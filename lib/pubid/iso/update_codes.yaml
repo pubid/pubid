@@ -1,0 +1,12 @@
+# Pre-parse rewrite map for ISO identifiers.
+#
+# Only entries that V2's parser does NOT already handle natively belong here.
+# V1's update_codes.yaml had additional entries (e.g. "ISO/R 657/IV" and
+# "ISO/IEC/IEEE 8802-22.2:..."), but V2's parser handles those legacy formats
+# directly and the existing V2 specs assert that behavior — adding rewrites
+# for them would override the parser's correct output.
+#
+# Keep this file minimal: only legacy strings that genuinely cannot round-trip
+# through V2's grammar without a textual normalization step.
+ISO/TR 17716.2: ISO/TR 17716
+ISO/TR 17716.2(E): ISO/TR 17716(E)
