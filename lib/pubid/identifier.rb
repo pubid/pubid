@@ -40,6 +40,22 @@ module Pubid
       self
     end
 
+    # Returns an HTML-annotated rendering: each known semantic component
+    # (publisher, docnumber, part, year, edition...) is wrapped in a
+    # `<span class="...">` tag while separators stay outside. Forwards any
+    # arguments to the flavor's #to_s so the same rendering knobs apply.
+    #
+    # @example
+    #   id = Pubid::Iso.parse("ISO 9001:2015")
+    #   id.annotated
+    #   # => "<span class=\"publisher\">ISO</span> " \
+    #   #    "<span class=\"docnumber\">9001</span>:" \
+    #   #    "<span class=\"year\">2015</span>"
+    def annotated(*args, **kwargs)
+      plain = kwargs.empty? ? to_s(*args) : to_s(*args, **kwargs)
+      Pubid::Rendering::Annotator.annotate(self, plain)
+    end
+
     # Returns a new identifier without specified attributes
     #
     # @param args [Array<Symbol, Hash>] attributes to exclude

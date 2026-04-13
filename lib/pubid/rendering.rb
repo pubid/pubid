@@ -12,5 +12,6 @@ module Pubid
     autoload :Stage, "pubid/rendering/stage"
     autoload :Supplement, "pubid/rendering/supplement"
     autoload :RenderingContext, "pubid/rendering/context"
+    autoload :Annotator, "pubid/rendering/annotator"
   end
 end
