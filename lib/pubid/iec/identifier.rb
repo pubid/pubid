@@ -16,6 +16,16 @@ module Pubid
 
         Pubid::Iec::Builder.new(Pubid::Iec::Scheme).build(parsed)
       end
+
+      # Generate URN. Lives on the base IEC Identifier (rather than only on
+      # SingleIdentifier) so wrapper classes — VapIdentifier, FragmentIdentifier,
+      # SheetIdentifier, ConsolidatedIdentifier — also inherit it. The
+      # dispatch in UrnGenerator#generate routes to the right
+      # `generate_<wrapper>_urn` per identifier class.
+      def to_urn
+        require_relative "urn_generator"
+        UrnGenerator.new(self).generate
+      end
     end
   end
 end

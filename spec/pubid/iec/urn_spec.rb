@@ -31,6 +31,31 @@ RSpec.describe "IEC URN Generation" do
       expect(id.to_s).to eq("IEC 61010-2-201:2017")
     end
 
+    # Wrapper identifiers (VAP, Fragment, Sheet) had no `to_urn` on their
+    # base class, and the URN parser did not consume `vap.X` / `frag.X` /
+    # `sheet.X` tokens — so the wrapper info was dropped on URN round-trip.
+    # `lib/pubid/iec/identifier.rb` now defines `to_urn` on the IEC base
+    # `Identifier`, and `lib/pubid/iec/urn_parser.rb` extracts the wrapper
+    # tokens before the supplements loop and reapplies them after build.
+    describe "wrapper identifier URN round-trip" do
+      it "round-trips a VapIdentifier (RLV)" do
+        id = Pubid::Iec.parse("IEC 61010-2-201:2017 RLV")
+        expect(id.to_urn).to eq("urn:iec:std:iec:61010:-2-201:2017:vap.rlv")
+        rt = Pubid::Iec.parse_urn(id.to_urn)
+        expect(rt).to be_a(Pubid::Iec::Identifiers::VapIdentifier)
+        expect(rt.to_s).to eq("IEC 61010-2-201:2017 RLV")
+        expect(rt.to_urn).to eq(id.to_urn)
+      end
+
+      it "round-trips a FragmentIdentifier" do
+        id = Pubid::Iec.parse("IEC 60050-191/AMD2/FRAG2")
+        rt = Pubid::Iec.parse_urn(id.to_urn)
+        expect(rt).to be_a(Pubid::Iec::Identifiers::FragmentIdentifier)
+        expect(rt.to_s).to eq("IEC 60050-191/AMD2/FRAG2")
+        expect(rt.to_urn).to eq(id.to_urn)
+      end
+    end
+
     it "generates URN with amendment" do
       id = Pubid::Iec.parse("IEC 60050:2011/Amd 1:2015")
       expect(id.to_urn).to eq("urn:iec:std:iec:60050:2011:amd:2015:v1")

@@ -115,6 +115,23 @@ module Pubid
           edition = parts.shift.sub("ed.", "").to_i
         end
 
+        # Extract trailing wrapper tokens that V2's URN generator emits for
+        # VAP / Fragment / Sheet identifiers (vap.csv, frag.2, sheet.1).
+        # These wrap the entire built identifier and must be reapplied after
+        # build_identifier returns; pull them out of `parts` first so the
+        # supplements loop below doesn't trip over them.
+        vap_code = nil
+        fragment_number = nil
+        sheet_number = nil
+        parts.reject! do |segment|
+          case segment
+          when /\Avap\.(.+)\z/i    then vap_code = Regexp.last_match(1).upcase; true
+          when /\Afrag\.(.+)\z/i   then fragment_number = Regexp.last_match(1); true
+          when /\Asheet\.(.+)\z/i  then sheet_number = Regexp.last_match(1); true
+          else false
+          end
+        end
+
         # Check for supplements (amd, cor)
         supplements = []
         while parts.any?
@@ -191,8 +208,30 @@ module Pubid
         end
 
         # Build the identifier hash
-        build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
+        result = build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
                        date, edition, supplements)
+
+        # Wrap with VAP / Fragment / Sheet identifier if the URN had any.
+        # The wrapping is mutually exclusive at the URN level: V2's
+        # generator only emits one of these tokens per URN.
+        if vap_code
+          Pubid::Iec::Identifiers::VapIdentifier.new(
+            base_identifier: result,
+            vap_suffix: Pubid::Iec::Components::VapSuffix.new(code: vap_code),
+          )
+        elsif fragment_number
+          Pubid::Iec::Identifiers::FragmentIdentifier.new(
+            base_identifier: result,
+            fragment_number: fragment_number,
+          )
+        elsif sheet_number
+          Pubid::Iec::Identifiers::SheetIdentifier.new(
+            base_identifier: result,
+            sheet_number: sheet_number,
+          )
+        else
+          result
+        end
       end
 
       private
