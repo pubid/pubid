@@ -191,6 +191,13 @@ jobs:
         rubygems: ${{ matrix.rubygems }}
         bundler-cache: true
         working-directory: dependent
+        # On Windows the first setup-ruby call already installed the
+        # msys2 toolchain and symlinked it into D:\a\_temp\msys64. A
+        # second setup-ruby call in the same job tries to recreate that
+        # symlink and fails with `EEXIST`. Skipping the toolchain install
+        # on the re-setup avoids the collision; the toolchain installed
+        # by the first call is still on PATH for the rest of the job.
+        windows-toolchain: none
 
     - run: bundle exec rake
       working-directory: dependent
