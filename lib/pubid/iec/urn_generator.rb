@@ -239,18 +239,26 @@ module Pubid
         type_code.to_s
       end
 
-      # Generate part component
+      # Generate part component. Compound parts (e.g. IEC 61010-2-201)
+      # are stored as part="2"/subpart="201" in V2's data model but must
+      # round-trip through the URN as a SINGLE colon-segment ":-2-201",
+      # not two separate segments ":-2:-201". Subpart is therefore inlined
+      # here and emitted as part of the same URN token.
       def part_component(id = identifier)
         return nil unless id&.part
 
-        "-#{id.part.to_s}"
+        if id.subpart
+          "-#{id.part}-#{id.subpart}"
+        else
+          "-#{id.part}"
+        end
       end
 
-      # Generate subpart component
-      def subpart_component(id = identifier)
-        return nil unless id&.subpart
-
-        "-#{id.subpart.to_s}"
+      # Subpart is now inlined into part_component above so that compound
+      # part designators (e.g. "2-201") survive the URN round-trip as one
+      # token. Kept as a no-op so external callers don't break.
+      def subpart_component(_id = identifier)
+        nil
       end
     end
   end
