@@ -15,7 +15,6 @@ jobs:
   rake:
     uses: ./.github/workflows/generic-rake.yml
     with:
-      monorepo: true
-      gem_directory: gems
+      monorepo: false
     secrets:
       pat_token: ${{ secrets.METANORMA_CI_PAT_TOKEN }}

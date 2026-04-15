@@ -23,8 +23,12 @@ jobs:
     - name: Find all pubid gems
       id: find-gems
       run: |
-        # Find all .gemspec files in gems/* directories and extract gem names
-        gems=$(find gems -name "*.gemspec" -type f | sed 's|gems/||' | sed 's|/.*||' | sort -u | jq -R -s -c 'split("\n")[:-1]')
+        # Find pubid gemspec at root (V2 single-gem layout)
+        if [ -f "pubid.gemspec" ]; then
+          gems='["pubid"]'
+        else
+          gems='[]'
+        fi
         echo "Found gems: $gems"
         echo "gems=$gems" >> $GITHUB_OUTPUT
 
@@ -126,7 +130,7 @@ jobs:
         import re
         print("Python version:", sys.version)
 
-        # Parse Gemfile.lock to find all pubid-* gems actually installed
+        # Parse Gemfile.lock to find all pubid* gems actually installed
         gemfile_lock_path = "Gemfile.lock"
         pubid_gems_in_lock = []
 
@@ -134,7 +138,7 @@ jobs:
           print(f"Parsing {gemfile_lock_path} for pubid gems...")
           with open(gemfile_lock_path, 'r') as f:
             content = f.read()
-            # Find all pubid-* gems in the SPECS section
+            # Find all pubid* gems in the SPECS section
             specs_section = False
             for line in content.split('\n'):
               line = line.strip()
@@ -145,7 +149,7 @@ jobs:
                 specs_section = False
                 continue
 
-              if specs_section and line.startswith('pubid-'):
+              if specs_section and line.startswith('pubid'):
                 # Extract gem name (before version info)
                 gem_name = line.split(' ')[0]
                 if gem_name not in pubid_gems_in_lock:
@@ -159,12 +163,13 @@ jobs:
         # Add all found pubid gems to Gemfile with local paths
         gemfile_additions = []
         for gem in pubid_gems_in_lock:
-          gem_path = f"../gems/{gem}"
-          if os.path.exists(gem_path):
+          # V2 single-gem layout: root directory has pubid.gemspec
+          gem_path = "../"
+          if os.path.exists(gem_path + "pubid.gemspec"):
             gemfile_additions.append(f'gem "{gem}", path: "{gem_path}"')
             print(f"Will add: gem \"{gem}\", path: \"{gem_path}\"")
           else:
-            print(f"Warning: {gem_path} does not exist, skipping {gem}")
+            print(f"Warning: {gem_path} does not have pubid.gemspec, skipping {gem}")
 
         # Append to Gemfile
         if gemfile_additions:
