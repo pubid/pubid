@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Pubid
   module Iec
   end
@@ -56,18 +57,9 @@ module Pubid
 
     # Main entry point for IEC identifiers
     def self.parse(identifier_string)
-      rewritten = rewrites.apply(identifier_string)
-      parsed = Parser.new.parse(rewritten)
+      normalized = Core::UpdateCodes.apply(identifier_string, :iec)
+      parsed = Parser.new.parse(normalized)
       Builder.new(Scheme).build(parsed)
-    end
-
-    # Memoized rewrite map loaded from lib/pubid/iec/update_codes.yaml.
-    # @return [Pubid::Rewrites]
-    def self.rewrites
-      @rewrites ||= begin
-        require_relative "rewrites"
-        Pubid::Rewrites.load_yaml(File.join(__dir__, "iec", "update_codes.yaml"))
-      end
     end
 
     # Parse an IEC URN string

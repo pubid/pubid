@@ -24,18 +24,8 @@ module Pubid
     # @param identifier [String] the identifier string to parse
     # @return [Identifier] the parsed identifier
     def self.parse(identifier)
-      # Apply legacy-code rewrites (e.g. "ISO/TR 17716.2" -> "ISO/TR 17716")
-      # before handing to the grammar. Loaded once and memoized.
-      Scheme.parse(rewrites.apply(identifier))
-    end
-
-    # Memoized rewrite map loaded from lib/pubid/iso/update_codes.yaml.
-    # @return [Pubid::Rewrites]
-    def self.rewrites
-      @rewrites ||= begin
-        require_relative "rewrites"
-        Pubid::Rewrites.load_yaml(File.join(__dir__, "iso", "update_codes.yaml"))
-      end
+      normalized = Core::UpdateCodes.apply(identifier, :iso)
+      Scheme.parse(normalized)
     end
 
     # Parse an ISO URN string

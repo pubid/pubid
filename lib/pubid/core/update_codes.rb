@@ -14,11 +14,11 @@ module Pubid
     # before any parser-specific preprocessing.
     #
     # Format in YAML files:
-    #   plain string match: "IEC 60285-/1:1989"  →  "IEC 60285-1:1989"
-    #   regex match:        "/^NBS CIRC sup$/"  →  "NBS CIRC 24e7sup"
+    #   plain string match: "IEC 60285-/1:1989"  ->  "IEC 60285-1:1989"
+    #   regex match:        "/^NBS CIRC sup$/"  ->  "NBS CIRC 24e7sup"
     #
-    # Plain strings use full-line anchoring (^pattern$).
-    # Regex patterns are wrapped in /.../ slashes.
+    # Plain strings are converted to anchored regexps at load time.
+    # Regex patterns are wrapped in /.../ slashes in the YAML.
     class UpdateCodes
       DATA_DIR = Pathname.new(__dir__).join("../../../data").expand_path
 
@@ -28,26 +28,21 @@ module Pubid
         # @param code [String] identifier string to normalize
         # @param flavor [Symbol, String] flavor name (e.g., :iso, :iec, :ieee, :nist)
         # @return [String] normalized identifier string
-        #
-        # @example
-        #   UpdateCodes.apply("IEC 60285-/1:1989", :iec)
-        #   # => "IEC 60285-1:1989"
         def apply(code, flavor)
           codes = for_flavor(flavor)
           return code if codes.nil? || codes.empty?
 
-          codes.each do |from, to|
-            code = code.gsub(
-              from.match?(%r{^/.*/$}) ? Regexp.new(from[1..-2]) : /^#{Regexp.escape(from)}$/, to
-            )
+          stripped = code.to_s.strip
+          codes.each do |pattern, replacement|
+            stripped = stripped.gsub(pattern, replacement)
           end
-          code
+          stripped
         end
 
-        # Get the loaded update_codes hash for a flavor (cached).
+        # Get the compiled update_codes hash for a flavor (cached).
         #
         # @param flavor [Symbol, String] flavor name
-        # @return [Hash, nil] the YAML hash, or nil if file doesn't exist
+        # @return [Hash, nil] compiled { Regexp => String } map, or nil if file doesn't exist
         def for_flavor(flavor)
           @cache ||= {}
           flavor_key = flavor.to_s.to_sym
@@ -65,11 +60,21 @@ module Pubid
 
         private
 
+        # Load and compile YAML patterns into frozen Regexp=>String map.
         def load_yaml(flavor)
           yaml_path = DATA_DIR / flavor.to_s / "update_codes.yaml"
           return nil unless yaml_path.exist?
 
-          YAML.load_file(yaml_path)
+          raw = YAML.safe_load_file(yaml_path) || {}
+          compiled = {}
+          raw.each do |from, to|
+            if from.match?(%r{^/.*/$})
+              compiled[Regexp.new(from[1..-2])] = to
+            else
+              compiled[/^#{Regexp.escape(from)}$/] = to
+            end
+          end
+          compiled.freeze
         end
       end
     end
