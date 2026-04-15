@@ -37,7 +37,7 @@ module Pubid
           # The CSA identifier should render with "CSA" prefix
           csa_str = csa_identifier.to_s
           # Ensure CSA prefix is present
-          csa_str = "CSA #{csa_str}" unless csa_str.start_with?("CSA") || csa_str.start_with?("CAN/")
+          csa_str = "CSA #{csa_str}" unless csa_str.start_with?("CSA", "CAN/")
 
           "#{ieee_identifier}/#{csa_str}"
         end

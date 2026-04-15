@@ -50,7 +50,7 @@ RSpec.describe "ANSI Serialization" do
         flavor: "ansi",
         publisher: "ANSI",
         number: "802.3",
-        part: "2012"
+        part: "2012",
       }
 
       id = Pubid::Serializable.from_h(hash)

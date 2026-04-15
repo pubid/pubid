@@ -11,9 +11,9 @@ module Pubid
       class SpecialPublication < Base
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
-            abbr: ["SP", "NIST SP", "NBS SP"],  # Compound series
+            abbr: ["SP", "NIST SP", "NBS SP"], # Compound series
             stage_code: "published",
-            type_code: "sp"
+            type_code: "sp",
           ),
         ].freeze
 

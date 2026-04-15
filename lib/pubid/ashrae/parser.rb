@@ -75,11 +75,11 @@ module Pubid
 
       # Additional copublisher pattern (e.g., /AMCA 210-99 or (ANSI/AMCA 330-97))
       rule(:additional_copublisher) do
-        slash >> (letter.repeat(4,
-                                10) >> space >> (digits >> (dash >> digits).maybe).maybe).as(:additional_copublisher) |
-          lparen >> (str("ANSI") >> slash >> (letter.repeat(2,
-                                                            10) >> (slash >> letter.repeat(2, 10)).repeat(0,
-                                                                                                          2))).as(:additional_copublisher) >> space >> (digits >> (dash >> digits).maybe).maybe >> rparen
+        (slash >> (letter.repeat(4,
+                                 10) >> space >> (digits >> (dash >> digits).maybe).maybe).as(:additional_copublisher)) |
+          (lparen >> (str("ANSI") >> slash >> (letter.repeat(2,
+                                                             10) >> (slash >> letter.repeat(2, 10)).repeat(0,
+                                                                                                           2))).as(:additional_copublisher) >> space >> (digits >> (dash >> digits).maybe).maybe >> rparen)
       end
 
       # Optional suffix in parentheses (PDF), (I-P and SI versions), long descriptions, etc.
@@ -116,10 +116,11 @@ module Pubid
                                                        2) >> comma.maybe >> (space | comma.maybe) >>
          year_digits.as(:errata_year) >> rparen).as(:errata_date) |
           # Month+day without year: (August 27)
-          (lparen >> month_name >> space >> digit.repeat(1, 2) >> rparen).as(:errata_date) |
+          (lparen >> month_name >> space >> digit.repeat(1,
+                                                         2) >> rparen).as(:errata_date) |
           # Numeric date with dash: (7-17- 2003) or (7-17-2003)
           (lparen >> digit.repeat(1, 2) >> dash >> digit.repeat(1,
-                                                                 2) >> dash >> space.maybe >> year_digits.as(:errata_year) >> rparen).as(:errata_date)
+                                                                2) >> dash >> space.maybe >> year_digits.as(:errata_year) >> rparen).as(:errata_date)
       end
 
       # Errata suffix pattern - handles descriptive text like "– Spanish Edition" after "Errata"
@@ -135,11 +136,15 @@ module Pubid
         space >> str("Errata").as(:errata_keyword) >>
           (
             # Full date: (Month Day, Year)
-            space >> lparen >> month_name >> space >> digit.repeat(1, 2) >> comma.maybe >> (space | comma.maybe) >> year_digits >> rparen |
+            (space >> lparen >> month_name >> space >> digit.repeat(1,
+                                                                    2) >> comma.maybe >> (space | comma.maybe) >> year_digits >> rparen) |
             # Month+day without year: (August 27)
-            space >> lparen >> month_name >> space >> digit.repeat(1, 2) >> rparen |
+            (space >> lparen >> month_name >> space >> digit.repeat(1,
+                                                                    2) >> rparen) |
             # Numeric date with dash: (7-17-2003)
-            space >> lparen >> digit.repeat(1, 2) >> dash >> digit.repeat(1, 2) >> dash >> space.maybe >> year_digits >> rparen |
+            (space >> lparen >> digit.repeat(1,
+                                             2) >> dash >> digit.repeat(1,
+                                                                        2) >> dash >> space.maybe >> year_digits >> rparen) |
             # No date at all
             str("")
           )
@@ -148,7 +153,7 @@ module Pubid
       # Errata pattern (base identifier + " Errata (date)")
       rule(:errata_identifier) do
         # Format with copublisher: ANSI/ASHRAE Standard 105-2014 Errata (May 23, 2014)
-        (
+        ((
           (
             (str("ANSI") >> dash >> str("ASHRAE")) |
             (str("ANSI") >> slash >> str("ASHRAE") >> (slash >> letter.repeat(3, 10)).repeat(
@@ -165,14 +170,14 @@ module Pubid
           space >>
           str("Errata").as(:errata_keyword) >>
           (
-            errata_suffix >> errata_date |
-            errata_date >> errata_suffix |
+            (errata_suffix >> errata_date) |
+            (errata_date >> errata_suffix) |
             errata_date |
             errata_suffix
           ).maybe >>
-          optional_suffix.repeat(0, 2).as(:optional_suffixes) |
+          optional_suffix.repeat(0, 2).as(:optional_suffixes)) |
           # Format with copublisher, missing type: ANSI/ASHRAE 51-1999 Errata (May 23, 2014)
-          (
+          ((
             (
               (str("ANSI") >> dash >> str("ASHRAE")) |
               (str("ANSI") >> slash >> str("ASHRAE") >> (slash >> letter.repeat(3, 10)).repeat(
@@ -187,14 +192,14 @@ module Pubid
             space >>
             str("Errata").as(:errata_keyword) >>
             (
-              errata_suffix >> errata_date |
-              errata_date >> errata_suffix |
+              (errata_suffix >> errata_date) |
+              (errata_date >> errata_suffix) |
               errata_date |
               errata_suffix
             ).maybe >>
-            optional_suffix.repeat(0, 2).as(:optional_suffixes) |
+            optional_suffix.repeat(0, 2).as(:optional_suffixes)) |
           # Format with publisher: ASHRAE Guideline 0-2005 Errata (September 28, 2011)
-          (
+          ((
             publisher.as(:publisher) >> space >>
             type.as(:type) >> space >>
             code >>
@@ -207,7 +212,7 @@ module Pubid
             str("Errata").as(:errata_keyword) >>
             errata_date.maybe >>
             errata_suffix.maybe >>
-            optional_suffix.repeat(0, 2).as(:optional_suffixes)
+            optional_suffix.repeat(0, 2).as(:optional_suffixes))
       end
 
       # Interpretation pattern ("Interpretations for Standard X-YYYY")
@@ -248,7 +253,7 @@ module Pubid
             type.as(:type) >> space >>
             code >>
             (dash >> year_digits.as(:year)) >>
-            (colon >> space | space) >>
+            ((colon >> space) | space) >>
             str("Addenda") >> space >>
             addendum_code >> # First addendum code
             (
@@ -326,7 +331,7 @@ module Pubid
             type.as(:type) >> space >>
             code >>
             (dash >> year_digits.as(:year)).maybe >>
-            (colon >> space | space) >>
+            ((colon >> space) | space) >>
             str("Addenda") >> space >>
             addendum_code >> # First addendum code
             (
@@ -397,7 +402,7 @@ module Pubid
           type.as(:type) >> space >>
           code >>
           (dash >> year_digits.as(:year)).maybe >>
-          (colon >> space | space) >>
+          ((colon >> space) | space) >>
           str("Addenda") >> space >>
           ((str("Supplement") >> (space >> str("Package")).maybe) | str("Package")).as(:package_description) >>
           (space >> str("for") >> space >> year_digits.as(:target_year)).maybe >>
@@ -424,7 +429,7 @@ module Pubid
             additional_copublisher.maybe >>
             suffix.maybe >>
             reaffirmed.maybe >>
-            (colon >> space | space) >>
+            ((colon >> space) | space) >>
             str("Addenda") >> space >>
             ((str("Supplement") >> (space >> str("Package")).maybe) | str("Package")).as(:package_description) >>
             (space >> str("for") >> space >> year_digits.as(:target_year)).maybe >>
@@ -569,7 +574,7 @@ module Pubid
             additional_copublisher.maybe >>
             suffix.maybe >>
             reaffirmed.maybe >>
-            (colon >> space | space) >>
+            ((colon >> space) | space) >>
             (str("Addendum") | str("addendum")) >> space >>
             addendum_code >>
             addendum_date_suffix.maybe >>
@@ -667,7 +672,7 @@ module Pubid
         cleaned = cleaned.gsub(/[,.]$/, "")
 
         # Remove trailing double parentheses (typos in source data)
-        cleaned = cleaned.gsub(/\)\)/, ")")
+        cleaned = cleaned.gsub("))", ")")
 
         # Fix unclosed trailing parenthesis (data truncation issue)
         open_count = cleaned.count("(")

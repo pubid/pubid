@@ -34,7 +34,7 @@ RSpec.describe "PLATEAU Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "PLATEAU ROUND-TRIP RESULTS"
       puts "=" * 80
       puts "Total identifiers: #{fixtures.size}"

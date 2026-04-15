@@ -6,12 +6,12 @@ require "yaml"
 module Pubid
   module Itu
     LANGUAGES = {
-      "ru": "R",
-      "fr": "F",
-      "en": "E",
-      "ar": "A",
-      "es": "S",
-      "zh": "C",
+      ru: "R",
+      fr: "F",
+      en: "E",
+      ar: "A",
+      es: "S",
+      zh: "C",
     }.freeze
 
     I18N = YAML.load_file(File.join(File.dirname(__FILE__), "../../i18n.yaml"))

@@ -16,11 +16,11 @@ module Pubid
           type_str = extract_value(parsed[:type])
           # Normalize compound types like "Standard No." to "No"
           # Also normalize "Standard No" (without dot) to "No"
-          if type_str&.start_with?("Standard")
-            attributes[:type] = "No"
-          else
-            attributes[:type] = type_str
-          end
+          attributes[:type] = if type_str&.start_with?("Standard")
+                                "No"
+                              else
+                                type_str
+                              end
 
           # Extract code
           code_str = extract_value(parsed[:number])
@@ -58,12 +58,12 @@ module Pubid
           return nil if value.is_a?(Array) && value.empty?
 
           if value.is_a?(Array)
-            joined = value.map(&:to_s).join
-            return joined.length > 0 ? joined : nil
+            joined = value.join
+            return joined.length.positive? ? joined : nil
           end
 
           str_value = value.to_s.strip
-          str_value.length > 0 ? str_value : nil
+          str_value.length.positive? ? str_value : nil
         end
       end
     end

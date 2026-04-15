@@ -245,7 +245,7 @@ namespace :release do
 
   desc "Show release status for the monorepo"
   task :status do
-    master_version = IO.read("VERSION").strip
+    master_version = File.read("VERSION").strip
 
     puts "Release Status Summary"
     puts "======================"
@@ -347,7 +347,7 @@ namespace :release do
 end
 
 def get_master_version
-  IO.read("VERSION").strip
+  File.read("VERSION").strip
 end
 
 namespace :version do
@@ -433,7 +433,7 @@ namespace :version do
 
   desc "Sync master version to all gem version files and dependencies"
   task :sync do
-    master_version = IO.read("VERSION").strip
+    master_version = File.read("VERSION").strip
     puts "Syncing master version #{master_version} to all gems..."
 
     # Update version files
@@ -557,7 +557,7 @@ namespace :validation do
     # All V2 flavors with SUMMARY.txt
     results = []
 
-    Dir.glob("spec/fixtures/*/SUMMARY.txt").sort.each do |summary_file|
+    Dir.glob("spec/fixtures/*/SUMMARY.txt").each do |summary_file|
       flavor = File.basename(File.dirname(summary_file))
 
       # Read SUMMARY.txt to extract stats
@@ -597,10 +597,10 @@ namespace :validation do
     # Display pretty report
     puts
     puts "=" * 85
-    puts " " * 22 + "PubID V2 Validation Report"
+    puts "#{' ' * 22}PubID V2 Validation Report"
     puts "=" * 85
     puts
-    puts "Flavor".ljust(12) + "Pass".rjust(10) + "Fail".rjust(8) + "Total".rjust(10) + "Percentage".rjust(15) + "  Status"
+    puts "#{'Flavor'.ljust(12)}#{'Pass'.rjust(10)}#{'Fail'.rjust(8)}#{'Total'.rjust(10)}#{'Percentage'.rjust(15)}  Status"
     puts "-" * 85
 
     results.each do |r|

@@ -1,11 +1,15 @@
 require_relative "base"
 
-module Pubid::Bsi::Renderer
-  class DraftDocument < Base
-    TYPE = "DD".freeze
+module Pubid
+  module Bsi
+    module Renderer
+      class DraftDocument < Base
+        TYPE = "DD".freeze
 
-    def render_publisher(_publisher, _, _)
-      TYPE
+        def render_publisher(_publisher, _, _)
+          TYPE
+        end
+      end
     end
   end
 end

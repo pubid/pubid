@@ -194,7 +194,7 @@ module Pubid
           stage_code.maybe.as(:stage) >>
           digits.as(:number) >>
           (dash >> digits.as(:part)).maybe >>
-          (colon >> year_digits.as(:year) | dash >> year_digits.as(:year)).maybe >>
+          ((colon >> year_digits.as(:year)) | (dash >> year_digits.as(:year))).maybe >>
           language.maybe
       end
 

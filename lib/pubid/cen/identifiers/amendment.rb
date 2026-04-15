@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Cen
     module Identifiers
@@ -12,15 +11,13 @@ module Pubid
         attribute :amendment_year, :integer
 
         def to_s
-          if base_identifier
-            result = "#{base_identifier}/A#{amendment_number}"
-            result += ":#{amendment_year}" if amendment_year
-            result
-          else
-            result = "/A#{amendment_number}"
-            result += ":#{amendment_year}" if amendment_year
-            result
-          end
+          result = if base_identifier
+                     "#{base_identifier}/A#{amendment_number}"
+                   else
+                     "/A#{amendment_number}"
+                   end
+          result += ":#{amendment_year}" if amendment_year
+          result
         end
 
         def publisher

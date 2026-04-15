@@ -17,11 +17,11 @@ module Pubid
         parts = ["urn", "oiml"]
 
         # Type (R, D, etc.)
-        if identifier.respond_to?(:type) && identifier.type
-          parts << identifier.type.to_s.downcase
-        else
-          parts << "r"
-        end
+        parts << if identifier.respond_to?(:type) && identifier.type
+                   identifier.type.to_s.downcase
+                 else
+                   "r"
+                 end
 
         # Code (may include series and number)
         if identifier.respond_to?(:code) && identifier.code

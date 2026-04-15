@@ -38,7 +38,7 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "CCSDS Base Publications Results"
       puts "=" * 80
       puts "Total: #{base_fixtures.size}"
@@ -92,7 +92,7 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "CCSDS Corrigendum Publications Results"
       puts "=" * 80
       puts "Total: #{corrigendum_fixtures.size}"
@@ -146,7 +146,7 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "CCSDS OVERALL ROUND-TRIP RESULTS"
       puts "=" * 80
       puts "Total identifiers: #{all_fixtures.size}"

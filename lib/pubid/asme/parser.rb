@@ -282,7 +282,7 @@ module Pubid
             # Regular pattern with designator + optional spaced number
             (designator >> spaced_number_part.maybe >>
              # CSA portion can be followed by handbook keyword
-             (csa_portion >> handbook_keyword.maybe | handbook_keyword).maybe >>
+             ((csa_portion >> handbook_keyword.maybe) | handbook_keyword).maybe >>
              # Language can come before or after year
              language.maybe >>
              (dash >> (draft_year | year_4digit)).maybe >>

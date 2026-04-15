@@ -47,7 +47,7 @@ stage_format_long: nil, with_date: nil)
               with_date: with_date,
             ),
             "#{sep}#{typed_stage.abbreviation(format_long: stage_format_long)}",
-          ].join("")
+          ].join
           # Only add space if number_portion has a number (not just a date starting with :)
           num_port = number_portion(lang_single: lang_single)
           if num_port && !num_port.empty? && !num_port.start_with?(":")
@@ -55,9 +55,9 @@ stage_format_long: nil, with_date: nil)
           end
           parts << num_port
 
-          parts << " " + edition_portion(lang: lang) if with_edition && edition&.number
+          parts << " #{edition_portion(lang: lang)}" if with_edition && edition&.number
           parts << language_portion(lang_single: lang_single) if languages&.any?
-        end.compact.join("")
+        end.compact.join
       end
 
       # Generate URN for supplement using UrnGenerator

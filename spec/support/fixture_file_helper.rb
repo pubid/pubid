@@ -28,25 +28,24 @@ module FixtureFileHelper
     successes = 0
 
     identifiers.each do |id_str|
-      begin
-        parsed = parser.parse(id_str)
-        rendered = parsed.to_s
+      parsed = parser.parse(id_str)
+      rendered = parsed.to_s
 
-        if rendered == id_str
-          successes += 1
-        else
-          failures << { original: id_str, rendered: rendered,
-                        type: "mismatch" }
-        end
-      rescue StandardError => e
-        failures << { original: id_str, error: "#{e.class}: #{e.message}",
-                      type: "parse_error" }
+      if rendered == id_str
+        successes += 1
+      else
+        failures << { original: id_str, rendered: rendered,
+                      type: "mismatch" }
       end
+    rescue StandardError => e
+      failures << { original: id_str, error: "#{e.class}: #{e.message}",
+                    type: "parse_error" }
     end
 
     total = identifiers.count
     pass_rate = total.positive? ? (successes.to_f / total * 100).round(2) : 0
 
-    { successes: successes, failures: failures, total: total, pass_rate: pass_rate }
+    { successes: successes, failures: failures, total: total,
+      pass_rate: pass_rate }
   end
 end

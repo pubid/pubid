@@ -62,7 +62,7 @@ RSpec.describe "ISO URN Generation" do
       urn = id.to_urn
 
       expect(urn).to start_with("urn:")
-      expect(urn).to match(/^urn:[a-z0-9\-]+:/)
+      expect(urn).to match(/^urn:[a-z0-9-]+:/)
     end
 
     it "uses correct namespace" do

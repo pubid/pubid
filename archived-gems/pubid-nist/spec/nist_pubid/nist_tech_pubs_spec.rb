@@ -109,8 +109,8 @@ RSpec.describe Pubid::Nist::NistTechPubs, vcr: true do
     let(:doi) { "NBS.LCIRC.897" }
     let(:mr) { "NBS.LC.897" }
     let(:title) do
-      "Letter Circular 897: tables for transforming chromaticity coordinates"\
-        " from the I.C.I system to the R-U-C-S system"
+      "Letter Circular 897: tables for transforming chromaticity coordinates " \
+        "from the I.C.I system to the R-U-C-S system"
     end
     let(:finalPubId) { "NBS LC 897" }
 

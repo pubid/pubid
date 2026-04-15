@@ -52,7 +52,7 @@ module Pubid
             year_part += if original_year_4digit
                            # Preserve 4-digit format (e.g., "M1981" stays "M1981")
                            year_str
-                         elsif year_prefix && year_prefix.match?(/^[MF]$/) && year_str.length == 4 && year_str.start_with?("19")
+                         elsif year_prefix&.match?(/^[MF]$/) && year_str.length == 4 && year_str.start_with?("19")
                            # M/F + 4-digit year (1900s) → convert to 2-digit with prefix
                            year_str[2..3]
                          elsif year_str.length == 4 && year_str.start_with?("20")
@@ -77,10 +77,10 @@ module Pubid
                    elsif parts.length == 2
                      # No space after dash-ending prefix - join first two parts directly
                      # If there are more parts after code, they should still have spaces
-                     parts.join("")
+                     parts.join
                    else
                      # More than 2 parts shouldn't happen in current design
-                     parts.join("")
+                     parts.join
                    end
 
           # Reaffirmation - preserve original format and determine spacing
@@ -95,16 +95,18 @@ module Pubid
             # If original was 4-digit, keep as 4-digit
             # If original was 2-digit, convert from 4-digit storage back to 2-digit
             reaffirmation_str = if reaffirmation_was_4digit
-                                   # Original was 4-digit, keep as-is
-                                   reaffirmation.to_s
-                                 elsif reaffirmation.to_s.length == 4 && (reaffirmation.to_s.start_with?("19") || reaffirmation.to_s.start_with?("20"))
-                                   # Original was 2-digit, convert 4-digit storage back to 2-digit
-                                   # (R2004) → (R04), (R1994) → (R94)
-                                   reaffirmation.to_s[2..3]
-                                 else
-                                   # Already 2-digit or other format
-                                   reaffirmation.to_s
-                                 end
+                                  # Original was 4-digit, keep as-is
+                                  reaffirmation.to_s
+                                elsif reaffirmation.to_s.length == 4 && reaffirmation.to_s.start_with?(
+                                  "19", "20"
+                                )
+                                  # Original was 2-digit, convert 4-digit storage back to 2-digit
+                                  # (R2004) → (R04), (R1994) → (R94)
+                                  reaffirmation.to_s[2..3]
+                                else
+                                  # Already 2-digit or other format
+                                  reaffirmation.to_s
+                                end
 
             # Determine spacing based on original formats
             # Space needed if year is 2-digit and reaffirmation is 4-digit (original format)

@@ -25,7 +25,7 @@ module Pubid
         parts << publisher if with_publisher
         parts << type_prefix if respond_to?(:type_prefix) && type_prefix
         result = parts.join(" ")
-        result += " " if result.length > 0
+        result += " " if result.length.positive?
         result += code.to_s
         result += ":#{year}" if year
         result += "(#{language})" if language

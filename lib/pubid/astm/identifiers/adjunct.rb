@@ -12,7 +12,7 @@ module Pubid
           result = []
           # Only include publisher for simple adjuncts (no EA or DVD suffix)
           result << publisher if publisher && !ea_suffix && !dvd_suffix
-          result << "ADJ#{designation}#{ea_suffix ? '-EA' : ''}#{dvd_suffix ? 'DVD' : ''}"
+          result << "ADJ#{designation}#{'-EA' if ea_suffix}#{'DVD' if dvd_suffix}"
           result.compact.join(" ")
         end
       end

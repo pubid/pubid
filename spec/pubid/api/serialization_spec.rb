@@ -34,7 +34,7 @@ RSpec.describe "API Serialization" do
         flavor: "api",
         publisher: "API",
         number: "1104",
-        type: "STD"
+        type: "STD",
       }
 
       id = Pubid::Serializable.from_h(hash)

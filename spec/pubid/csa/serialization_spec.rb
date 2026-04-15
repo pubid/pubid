@@ -42,7 +42,7 @@ RSpec.describe "CSA Serialization" do
         flavor: "csa",
         publisher: "CSA",
         number: "B44",
-        year: "2020"
+        year: "2020",
       }
 
       id = Pubid::Serializable.from_h(hash)

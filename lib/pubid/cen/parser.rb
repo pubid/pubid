@@ -112,13 +112,13 @@ module Pubid
       # Identifier
       rule(:identifier) do
         fragment_identifier |
-          (stage_prefix | publisher) >>
+          ((stage_prefix | publisher) >>
             (space >> adopted_string).maybe >>
-            (space >> type | slash >> type).maybe >>
+            ((space >> type) | (slash >> type)).maybe >>
             (space >> number >> parts >>
             year.maybe).maybe >>
             supplements >>
-            edition.maybe
+            edition.maybe)
       end
 
       rule(:root) { identifier }

@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/pubid/rendering/base'
+require_relative "../../../lib/pubid/rendering/base"
 
 RSpec.describe Pubid::Rendering::Base do
   class TestIdentifier
     include Pubid::Rendering::Base
 
-    attr_accessor :publisher, :copublishers, :number, :part, :subpart, :date, :stage, :type, :languages
+    attr_accessor :publisher, :copublishers, :number, :part, :subpart, :date,
+                  :stage, :type, :languages
 
-    def initialize(publisher: nil, copublishers: nil, number: nil, part: nil, subpart: nil, date: nil, stage: nil, type: nil, languages: nil)
+    def initialize(publisher: nil, copublishers: nil, number: nil, part: nil,
+subpart: nil, date: nil, stage: nil, type: nil, languages: nil)
       @publisher = publisher
       @copublishers = copublishers
       @number = number
@@ -22,7 +24,8 @@ RSpec.describe Pubid::Rendering::Base do
 
     def respond_to?(method)
       # Mock respond_to for all attributes
-      [:publisher, :copublishers, :number, :part, :subpart, :date, :stage, :type, :languages].include?(method)
+      %i[publisher copublishers number part subpart date stage
+         type languages].include?(method)
     end
   end
 
@@ -38,12 +41,16 @@ RSpec.describe Pubid::Rendering::Base do
     end
 
     it "renders number with part" do
-      id = TestIdentifier.new(number: Pubid::Components::Code.new(value: "9001"), part: Pubid::Components::Code.new(value: "1"))
+      id = TestIdentifier.new(
+        number: Pubid::Components::Code.new(value: "9001"), part: Pubid::Components::Code.new(value: "1"),
+      )
       expect(id.render_base).to eq(" 9001-1")
     end
 
     it "renders date" do
-      id = TestIdentifier.new(number: Pubid::Components::Code.new(value: "9001"), date: Pubid::Components::Date.new(year: "2015"))
+      id = TestIdentifier.new(
+        number: Pubid::Components::Code.new(value: "9001"), date: Pubid::Components::Date.new(year: "2015"),
+      )
       expect(id.render_base).to eq(" 9001:2015")
     end
   end

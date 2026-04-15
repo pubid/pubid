@@ -35,11 +35,9 @@ module Pubid
       rule(:subpart_number) { dash >> digits.as(:subpart) }
 
       rule(:full_number) do
-        (
-          number_only >> part_number >> subpart_number |
-          number_only >> part_number |
+        (number_only >> part_number >> subpart_number) |
+          (number_only >> part_number) |
           number_only
-        )
       end
 
       # Edition number - ordinal numbers
@@ -70,7 +68,7 @@ module Pubid
       # Draft stage - WD or CD with optional iteration
       rule(:stage_iteration) do
         (
-          digits >> str(".") >> digits | # 3.1
+          (digits >> str(".") >> digits) | # 3.1
           digits # 1, 2, 3
         ).as(:iteration)
       end
@@ -94,7 +92,7 @@ module Pubid
 
       rule(:language_code) do
         (
-          lang_single >> slash >> lang_single |  # E/F
+          (lang_single >> slash >> lang_single) | # E/F
           lang_single |                          # E, F
           lang_multi                             # en, fr
         ).as(:language)
@@ -148,7 +146,7 @@ module Pubid
       rule(:annex_letter_identifier) do
         base_without_language.as(:base_identifier) >>
           space >> str("Annex") >> space >> match("[A-Z]").as(:annex_letter) >>
-          (space >> edition_text >> space >> year_digits.as(:year) | colon >> year_digits.as(:year)).maybe >>
+          ((space >> edition_text >> space >> year_digits.as(:year)) | (colon >> year_digits.as(:year))).maybe >>
           language_portion.maybe.as(:language)
       end
 

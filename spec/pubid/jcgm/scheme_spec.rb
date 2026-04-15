@@ -47,9 +47,9 @@ RSpec.describe Pubid::Jcgm::Scheme do
     end
 
     it "raises ArgumentError for unknown abbreviations" do
-      expect {
+      expect do
         described_class.locate_typed_stage_by_abbr("UNKNOWN")
-      }.to raise_error(ArgumentError, /Unknown type abbreviation/)
+      end.to raise_error(ArgumentError, /Unknown type abbreviation/)
     end
   end
 
@@ -60,9 +60,9 @@ RSpec.describe Pubid::Jcgm::Scheme do
     end
 
     it "raises ArgumentError for unknown type codes" do
-      expect {
+      expect do
         described_class.locate_identifier_klass_by_type_code(:unknown_type_code)
-      }.to raise_error(ArgumentError, /Unknown type code/)
+      end.to raise_error(ArgumentError, /Unknown type code/)
     end
   end
 end

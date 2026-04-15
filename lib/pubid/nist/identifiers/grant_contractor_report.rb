@@ -12,7 +12,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["GCR", "NIST GCR"],
             stage_code: "published",
-            type_code: "gcr"
+            type_code: "gcr",
           ),
         ].freeze
 

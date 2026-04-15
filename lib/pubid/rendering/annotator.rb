@@ -151,12 +151,38 @@ module Pubid
 
       def component_strings_for(level)
         result = {}
-        result[:publisher] = stringify_publisher(level.publisher) if respond_with?(level, :publisher)
-        result[:number]    = stringify_value(level.number)        if respond_with?(level, :number)
-        result[:part]      = stringify_value(level.part)          if respond_with?(level, :part)
-        result[:subpart]   = stringify_value(level.subpart)       if respond_with?(level, :subpart)
-        result[:year]      = year_string_for(level)               if year_string_for(level)
-        result[:edition]   = edition_string_for(level)            if edition_string_for(level)
+        if respond_with?(
+          level, :publisher
+        )
+          result[:publisher] =
+            stringify_publisher(level.publisher)
+        end
+        if respond_with?(
+          level, :number
+        )
+          result[:number] =
+            stringify_value(level.number)
+        end
+        if respond_with?(
+          level, :part
+        )
+          result[:part] =
+            stringify_value(level.part)
+        end
+        if respond_with?(
+          level, :subpart
+        )
+          result[:subpart] =
+            stringify_value(level.subpart)
+        end
+        if year_string_for(level)
+          result[:year]      =
+            year_string_for(level)
+        end
+        if edition_string_for(level)
+          result[:edition]   =
+            edition_string_for(level)
+        end
         result.compact
       end
 
@@ -183,7 +209,7 @@ module Pubid
       end
 
       def year_string_for(level)
-        return nil unless level.respond_to?(:date) && level.date && level.date.year
+        return nil unless level.respond_to?(:date) && level.date&.year
 
         level.date.year.to_s
       end

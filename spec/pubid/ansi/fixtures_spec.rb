@@ -2,7 +2,9 @@ require "spec_helper"
 
 RSpec.describe "ANSI Fixture Round-trip Tests" do
   let(:fixtures) do
-    File.readlines("spec/fixtures/ansi/identifiers/pass/standard.txt").map(&:strip).reject(&:empty?).select { |l| !l.start_with?("#") }
+    File.readlines("spec/fixtures/ansi/identifiers/pass/standard.txt").map(&:strip).reject(&:empty?).reject do |l|
+      l.start_with?("#")
+    end
   end
 
   describe "ANSI identifiers from IEEE fixtures" do
@@ -30,7 +32,7 @@ RSpec.describe "ANSI Fixture Round-trip Tests" do
         }
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "ANSI FIXTURE ROUND-TRIP RESULTS"
       puts "=" * 80
       puts "Total identifiers: #{fixtures.size}"

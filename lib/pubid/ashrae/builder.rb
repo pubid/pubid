@@ -144,7 +144,7 @@ module Pubid
         return nil if value.is_a?(Array) && value.empty?
 
         if value.is_a?(Array)
-          joined = value.map(&:to_s).join
+          joined = value.join
           return joined.length.positive? ? joined : nil
         end
 

@@ -146,7 +146,7 @@ module Pubid
           # IECEE letter-based numbers: AD-001, GD-2053, OD-1000, CAB-G01, 01-S
           # Pattern: 2-4 letter prefix followed by optional dash and number
           # The suffix uses [A-Z\d] but not space to properly separate from edition
-          (match('[A-Z]').repeat(2, 4) >> (
+          (match("[A-Z]").repeat(2, 4) >> (
             dash >> match('\d').repeat(1)
           ).maybe >> match('[A-Z\d]').repeat) |
           # Can be 5-6 digits for TRF: 60065, 610091
@@ -176,13 +176,11 @@ module Pubid
         # - TRF commas: 60309-1,2G or 60335-1-14,15G
 
         # the "space?" needed to handle potential spaces
-        (
-          (dash | str(",")) >> space? >>
+        (dash | str(",")) >> space? >>
           # matches a part with special TRF characters including commas
           match('[\w&_,]').repeat >>
           # matches subparts
           ((dash | str(",")) >> match('[\w&_,]').repeat).repeat.maybe
-        )
       end
 
       rule(:all_parts) do
@@ -299,7 +297,7 @@ module Pubid
         str("+") >>
           (str("AMD") | str("COR")).as(:supplement_type) >>
           match('\d').repeat(1).as(:supplement_number) >>
-          ((str(":") >> year_digits.as(:supplement_year)).maybe)
+          (str(":") >> year_digits.as(:supplement_year)).maybe
       end
 
       rule(:consolidated_supplements) do
@@ -400,7 +398,7 @@ module Pubid
       # Preprocess input to normalize tab-separated editions and other formats
       def parse(input)
         # Normalize tab-separated editions: "IECEE AD-001\tED1.6" -> "IECEE AD-001 ED1.6"
-        normalized = input.gsub(/\t/, " ")
+        normalized = input.gsub("\t", " ")
         # Normalize comma-separated editions: "IEC CAB-G01:2025-02, Ed. 2.1" -> "IEC CAB-G01:2025-02 Ed. 2.1"
         normalized = normalized.gsub(/,\s+Ed\./, " Ed.")
         super(normalized)

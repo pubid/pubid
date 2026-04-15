@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pubid-core", "= 1.15.2"
   spec.add_dependency "pubid-iec", "= 1.15.2"
   spec.add_dependency "pubid-iso", "= 1.15.2"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

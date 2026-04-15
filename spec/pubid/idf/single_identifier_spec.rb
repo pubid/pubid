@@ -58,7 +58,8 @@ RSpec.describe Pubid::Idf::SingleIdentifier do
     end
 
     it "has the type method" do
-      expect(concrete_class.type).to eq({ key: :test, title: "Test Type", short: "TST" })
+      expect(concrete_class.type).to eq({ key: :test, title: "Test Type",
+                                          short: "TST" })
     end
   end
 end

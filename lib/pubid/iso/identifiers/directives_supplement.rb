@@ -51,7 +51,7 @@ format: nil, stage_format_long: nil, with_date: nil)
               " SUP", # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
               (date ? ":#{date.year}" : ""),
               (edition ? " Edition #{edition.number.value}" : ""),
-            ].join("")
+            ].join
           else
             # Simplified rendering for bundled identifiers (just the supplement part)
             to_supplement_s(lang: lang, lang_single: lang_single)
@@ -72,7 +72,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             supplement_publisher.body,
             " SUP",
             date_str,
-          ].join("")
+          ].join
         end
 
         # DirectivesSupplement use urn:iso:doc scheme (not urn:iso:std)
@@ -84,7 +84,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             parts << supplement_publisher.body.downcase if supplement_publisher
             parts << "sup"
             parts << date.year.to_s if date
-            parts << "ed-#{edition.number}" if edition && edition.number
+            parts << "ed-#{edition.number}" if edition&.number
             return parts.join(":")
           end
 
@@ -92,7 +92,7 @@ format: nil, stage_format_long: nil, with_date: nil)
           base_urn = base_identifier.to_urn
 
           # Handle JTC pattern specially
-          if supplement_publisher && supplement_publisher.body.match?(/^JTC\s+(\d+)$/i)
+          if supplement_publisher&.body&.match?(/^JTC\s+(\d+)$/i)
             # Extract JTC number: "JTC 1" -> ["jtc", "1"]
             jtc_parts = supplement_publisher.body.downcase.split
             # Insert JTC parts before "sup"
@@ -109,7 +109,7 @@ format: nil, stage_format_long: nil, with_date: nil)
           parts << date.year.to_s if date
 
           # Edition (if present)
-          parts << "ed-#{edition.number}" if edition && edition.number
+          parts << "ed-#{edition.number}" if edition&.number
 
           parts.join(":")
         end

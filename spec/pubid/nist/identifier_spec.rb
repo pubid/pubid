@@ -115,7 +115,9 @@ RSpec.describe "Pubid::Nist identifier parsing" do
     end
 
     context "fixture file round-trip test" do
-      let(:fixture_path) { "spec/fixtures/nist/identifiers/full/allrecords.txt" }
+      let(:fixture_path) do
+        "spec/fixtures/nist/identifiers/full/allrecords.txt"
+      end
 
       it "achieves 98%+ round-trip success rate" do
         total = 0

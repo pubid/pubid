@@ -9,7 +9,9 @@ module Pubid
         attribute :base, Standard
         attribute :bundled_with, Standard, collection: true
         attribute :reaffirmation, :string
-        attribute :original_reaffirmation_4digit, :boolean, default: -> { false }
+        attribute :original_reaffirmation_4digit, :boolean, default: -> {
+          false
+        }
         attribute :year_format, :string # Add for compatibility with identifier.rb
 
         def to_s
@@ -21,16 +23,16 @@ module Pubid
             needs_space = !prefix.end_with?("-")
             # Convert 4-digit year back to 2-digit for display
             year_display = if base.year
-                            year_str = base.year.to_s
-                            if year_str.length == 4 && year_str.start_with?("20")
-                              year_str[2..3]
-                            else
-                              year_str
-                            end
-                          end
+                             year_str = base.year.to_s
+                             if year_str.length == 4 && year_str.start_with?("20")
+                               year_str[2..3]
+                             else
+                               year_str
+                             end
+                           end
             base_str = (needs_space ? "#{prefix} " : prefix) +
-                       "#{base.code.value}" +  # Use normalized code (e.g., "C22.2-1")
-                       ":#{year_display}"
+              base.code.value.to_s + # Use normalized code (e.g., "C22.2-1")
+              ":#{year_display}"
             parts = [base_str]
           else
             # Standard rendering for other identifier types
@@ -42,7 +44,7 @@ module Pubid
             bundled_with.each do |bundled|
               # For Cec identifiers, use normalized code format
               if bundled.is_a?(Cec)
-                bundled_part = bundled.code.value.to_s  # Normalized code (e.g., "C22.2-2")
+                bundled_part = bundled.code.value.to_s # Normalized code (e.g., "C22.2-2")
                 if bundled.year
                   # Use dash if year_format is dash, otherwise colon
                   separator = bundled.year_format == "dash" ? "-" : ":"
@@ -104,15 +106,15 @@ module Pubid
             # Note: We need to track this at the Bundled level, but for now
             # assume 4-digit if the value is 4 digits and starts with 19/20
             reaffirmation_was_4digit = reaffirmation.to_s.length == 4 &&
-                                     (reaffirmation.to_s.start_with?("19") || reaffirmation.to_s.start_with?("20"))
+              reaffirmation.to_s.start_with?("19", "20")
 
             # Determine spacing based on original formats
             # Space needed if year is 2-digit and reaffirmation is 4-digit
-            if year_was_2digit && reaffirmation_was_4digit
-              result += " (R#{reaffirmation})"
-            else
-              result += "(R#{reaffirmation})"
-            end
+            result += if year_was_2digit && reaffirmation_was_4digit
+                        " (R#{reaffirmation})"
+                      else
+                        "(R#{reaffirmation})"
+                      end
           end
 
           result

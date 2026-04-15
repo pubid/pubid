@@ -35,10 +35,6 @@ module Pubid
         # Render standard IEEE format
         #
         # @return [String] IEEE Std XXX-YYYY format
-        def to_s
-          # Use Base's to_s method which handles all the complexity
-          super
-        end
       end
     end
   end

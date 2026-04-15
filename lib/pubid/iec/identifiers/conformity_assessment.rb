@@ -15,8 +15,8 @@ module Pubid
             type_code: :ca,
             abbr: ["CA"],
             name: "Conformity Assessment",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         def self.type

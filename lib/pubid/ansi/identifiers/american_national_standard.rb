@@ -1,4 +1,3 @@
-
 module Pubid
   module Ansi
     module Identifiers

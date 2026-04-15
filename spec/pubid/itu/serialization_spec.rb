@@ -65,7 +65,7 @@ RSpec.describe "ITU Serialization" do
         publisher: "ITU",
         sector: "R",
         number: "1073-1",
-        series: "BO"
+        series: "BO",
       }
 
       id = Pubid::Serializable.from_h(hash)

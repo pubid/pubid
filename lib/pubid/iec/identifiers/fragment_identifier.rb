@@ -27,7 +27,7 @@ module Pubid
                    end
 
           # Add edition if present
-          parts << " #{edition}" if edition && edition.number
+          parts << " #{edition}" if edition&.number
 
           parts.join
         end

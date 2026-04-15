@@ -1,10 +1,12 @@
-module Pubid::Nist
-  module Identifier
-    class << self
-      include Pubid::Core::Identifier
+module Pubid
+  module Nist
+    module Identifier
+      class << self
+        include Pubid::Core::Identifier
 
-      def parse(*args)
-        Base.parse(*args)
+        def parse(*args)
+          Base.parse(*args)
+        end
       end
     end
   end

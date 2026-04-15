@@ -21,7 +21,8 @@ module Pubid
       # `with_edition: false`, but URN-sourced identifiers should round-trip
       # back to the same shape (`ISO 10033-1 ED1` etc.). String-parsed
       # identifiers leave this false and keep V2's default behavior.
-      attribute :urn_explicit_edition, ::Lutaml::Model::Type::Boolean, default: false
+      attribute :urn_explicit_edition, ::Lutaml::Model::Type::Boolean,
+                default: false
 
       # Rendering style is a strategy object, not serializable data
       attr_accessor :rendering_style
@@ -80,14 +81,14 @@ stage_format_long: nil, with_date: nil)
           return [
             publisher.body,
             (abbr.empty? ? "" : "/#{abbr}"),
-          ].join("")
+          ].join
         end
 
         # If there are copublishers, join them with slashes
         [
           ([publisher] + copublishers).map(&:body).join("/"),
           (abbr.empty? ? "" : " #{abbr}"),
-        ].join("")
+        ].join
       end
 
       # def publisher_portion_en
@@ -107,7 +108,7 @@ stage_format_long: nil, with_date: nil)
       def number_portion(lang_single: false, with_date: true)
         [
           # Directives may not have a number
-          (number ? "#{number.value}" : ""),
+          (number ? number.value.to_s : ""),
 
           # Parts and subparts are optional
           (part ? "-#{part.value}" : ""),
@@ -118,7 +119,7 @@ stage_format_long: nil, with_date: nil)
 
           # Date is optional and controlled by with_date parameter
           (date && with_date ? ":#{date.year}" : ""),
-        ].join("")
+        ].join
       end
 
       # Returns a string representation of the languages
@@ -132,7 +133,7 @@ stage_format_long: nil, with_date: nil)
             lang.to_s(lang_single: lang_single)
           end.join(lang_single ? "/" : ","),
           ")",
-        ].join("")
+        ].join
       end
 
       def edition_portion(lang: :en)

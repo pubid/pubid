@@ -36,7 +36,7 @@ module Pubid
           # Map PWI/PNW to stage codes
           stage_map = {
             "PWI" => "pwi",
-            "PNW" => "pnw"
+            "PNW" => "pnw",
           }
           stage_code = stage_map[wp_stage]
           return nil unless stage_code
@@ -52,14 +52,14 @@ module Pubid
             if publisher
               parts << publisher.body
               if copublishers&.any?
-                parts << "/" + copublishers.map(&:body).join("/")
+                parts << "/#{copublishers.map(&:body).join('/')}"
               end
               parts << "/"
             end
             parts << wp_stage
             # Only add wp_type if it exists and is not empty/whitespace
             if wp_type && !wp_type.strip.empty?
-              parts << " " + wp_type.strip
+              parts << " #{wp_type.strip}"
             end
 
             # Render full number with parts
@@ -67,11 +67,11 @@ module Pubid
               num_str = number.to_s
               num_str += "-#{part}" if part && part.to_s != ""
               num_str += "-#{subpart}" if subpart && subpart.to_s != ""
-              parts << " " + num_str
+              parts << " #{num_str}"
             end
 
-            parts << " " + edition.to_s if edition && edition.number
-            return parts.join("")
+            parts << " #{edition}" if edition&.number
+            return parts.join
           end
 
           # Working Document format: "100/3705(F)/FDIS"

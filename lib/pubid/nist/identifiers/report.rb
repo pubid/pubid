@@ -16,7 +16,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["RPT", "NBS RPT"],
             stage_code: "published",
-            type_code: "rpt"
+            type_code: "rpt",
           ),
         ].freeze
 

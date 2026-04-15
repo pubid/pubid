@@ -10,7 +10,7 @@ RSpec.describe Pubid::Cie::SupplementIdentifier do
         base_number: "232",
         base_year: "2019",
         cor_number: "1",
-        cor_year: "2020"
+        cor_year: "2020",
       )
       expect(cor).to be_a(Pubid::Cie::SupplementIdentifier)
       expect(cor).to be_a(Pubid::Cie::Identifier)
@@ -20,7 +20,7 @@ RSpec.describe Pubid::Cie::SupplementIdentifier do
       sup = Pubid::Cie::Identifiers::Supplement.new(
         base_number: "121",
         supplement_number: "1",
-        year: "2009"
+        year: "2009",
       )
       expect(sup).to be_a(Pubid::Cie::SupplementIdentifier)
       expect(sup).to be_a(Pubid::Cie::Identifier)
@@ -34,7 +34,7 @@ RSpec.describe Pubid::Cie::SupplementIdentifier do
         base_year: "2019",
         cor_number: "1",
         cor_year: "2020",
-        style: "current"
+        style: "current",
       )
       expect(cor.style).to eq("current")
     end

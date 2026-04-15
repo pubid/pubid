@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Cen
     module Identifiers
@@ -17,19 +16,14 @@ module Pubid
             result = base_identifier.to_s
             result += "/AC"
             result += corrigendum_number if corrigendum_number && !corrigendum_number.empty?
-            if corrigendum_year
-              result += ":#{corrigendum_year}"
-              result += "-#{corrigendum_month}" if corrigendum_month && !corrigendum_month.empty?
-            end
-            result
           else
             result = "/AC#{corrigendum_number}"
-            if corrigendum_year
-              result += ":#{corrigendum_year}"
-              result += "-#{corrigendum_month}" if corrigendum_month && !corrigendum_month.empty?
-            end
-            result
           end
+          if corrigendum_year
+            result += ":#{corrigendum_year}"
+            result += "-#{corrigendum_month}" if corrigendum_month && !corrigendum_month.empty?
+          end
+          result
         end
 
         def publisher

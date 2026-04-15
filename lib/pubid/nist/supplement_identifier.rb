@@ -43,32 +43,31 @@ module Pubid
 
           if is_implicit
             # Implicit supplement: "{base}/{update}" (e.g., "145/Upd1-192511")
-            result += "/#{update}"
           else
             # Explicit supplement: "{base}sup/{update}" (e.g., "118sup/Upd12-1926")
-            is_circ_supplement = series.to_s == "LCIRC" || series.to_s == "CIRC"
+            is_circ_supplement = ["LCIRC", "CIRC"].include?(series.to_s)
             result += is_circ_supplement ? "sup" : "supp"
-            result += "/#{update}"
           end
+          result += "/#{update}"
           return result
         end
 
         # Original supplement rendering
         # For LCIRC/CIRC supplements with update, use "sup"
         # For LCIRC/CIRC supplements without update, normalize "sup" to "supp" for consistency
-        is_circ_supplement = series.to_s == "LCIRC" || series.to_s == "CIRC"
+        is_circ_supplement = ["LCIRC", "CIRC"].include?(series.to_s)
         # When update is present, use "sup" (e.g., "118sup/Upd1-192612")
         # When update is not present, use "supp" (e.g., "378Gsupp" - normalized from "sup")
         result += if is_circ_supplement && !update
-                     "supp"
-                   elsif is_circ_supplement
-                     "sup"
-                   else
-                     "supp"
-                   end
+                    "supp"
+                  elsif is_circ_supplement
+                    "sup"
+                  else
+                    "supp"
+                  end
 
         # Add edition information if present (just ID, not type prefix)
-        if edition && edition.id
+        if edition&.id
           # Smart dash logic: month=no dash, year=dash
           result += if edition.id.match?(/^[A-Z]/)
                       edition.id

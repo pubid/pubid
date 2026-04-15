@@ -18,7 +18,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses series" do
-          expect(parsed.series.to_s).to eq("LCIRC")  # Internal representation
+          expect(parsed.series.to_s).to eq("LCIRC") # Internal representation
         end
 
         it "parses number" do
@@ -313,14 +313,13 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "normalizes LC to LC as single definition of truth" do
-          expect(parsed.series.to_s).to eq("LCIRC")  # Internal representation
+          expect(parsed.series.to_s).to eq("LCIRC") # Internal representation
         end
 
         it "parses number" do
           expect(parsed.number.value).to eq("887")
         end
       end
-
     end
   end
 end

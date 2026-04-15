@@ -94,53 +94,51 @@ module Pubid
           base_str = "#{adoption_org} #{adoption_number}#{year_sep}#{wrapped_year}"
 
           # Parse base identifier
-          base_identifier = if adoption_org.start_with?("ISO") || adoption_org.start_with?("CEI")
-                               Pubid::Iso.parse(base_str)
-                             elsif adoption_org.start_with?("IEC")
-                               Pubid::Iec.parse(base_str)
-                             else
-                               begin
-                                 Pubid::Iso.parse(base_str)
-                               rescue Pubid::Errors::ParseError
-                                 Pubid::Iec.parse(base_str)
-                               end
-                             end
+          if adoption_org.start_with?("ISO", "CEI")
+            Pubid::Iso.parse(base_str)
+          elsif adoption_org.start_with?("IEC")
+            Pubid::Iec.parse(base_str)
+          else
+            begin
+              Pubid::Iso.parse(base_str)
+            rescue Pubid::Errors::ParseError
+              Pubid::Iec.parse(base_str)
+            end
+          end
 
           # Build amendment string for external parser
           amendment_year = parsed_hash[:adoption_amendment_year].to_s
           wrapped_amendment_year = if amendment_year.length == 2
-                                       "20#{amendment_year}"
-                                     else
-                                       amendment_year
-                                     end
+                                     "20#{amendment_year}"
+                                   else
+                                     amendment_year
+                                   end
 
           # The external parser uses Amendment class which wraps the base
           # We need to construct the amendment identifier
           # For ISO: "ISO/IEC 9594-2:2021/Amd 1:2022"
           # For IEC: similar format
 
-          amendment_str = if adoption_org.start_with?("ISO") || adoption_org.start_with?("CEI")
-                             # ISO format
-                             "#{base_str}/Amd #{parsed_hash[:adoption_amendment]}:#{wrapped_amendment_year}"
-                           elsif adoption_org.start_with?("IEC")
-                             # IEC format
-                             "#{base_str}/Amd #{parsed_hash[:adoption_amendment]}:#{wrapped_amendment_year}"
-                           else
-                             # CISPR or other
-                             "#{base_str}/Amd #{parsed_hash[:adoption_amendment]}:#{wrapped_amendment_year}"
-                           end
+          if adoption_org.start_with?("ISO", "CEI")
+          # ISO format
+          elsif adoption_org.start_with?("IEC")
+          # IEC format
+          else
+            # CISPR or other
+          end
+          amendment_str = "#{base_str}/Amd #{parsed_hash[:adoption_amendment]}:#{wrapped_amendment_year}"
 
-          wrapped_identifier = if adoption_org.start_with?("ISO") || adoption_org.start_with?("CEI")
+          wrapped_identifier = if adoption_org.start_with?("ISO", "CEI")
+                                 Pubid::Iso.parse(amendment_str)
+                               elsif adoption_org.start_with?("IEC")
+                                 Pubid::Iec.parse(amendment_str)
+                               else
+                                 begin
                                    Pubid::Iso.parse(amendment_str)
-                                 elsif adoption_org.start_with?("IEC")
+                                 rescue Pubid::Errors::ParseError
                                    Pubid::Iec.parse(amendment_str)
-                                 else
-                                   begin
-                                     Pubid::Iso.parse(amendment_str)
-                                   rescue Pubid::Errors::ParseError
-                                     Pubid::Iec.parse(amendment_str)
-                                   end
                                  end
+                               end
         else
           # No amendment, simple base identifier
           wrapped_id_str = "#{adoption_org} #{adoption_number}#{year_sep}#{wrapped_year}"
@@ -150,17 +148,17 @@ module Pubid
             wrapped_id_str = wrapped_id_str.sub("CEI/IEC", "IEC")
           end
 
-          wrapped_identifier = if adoption_org.start_with?("ISO") || adoption_org.start_with?("CEI")
+          wrapped_identifier = if adoption_org.start_with?("ISO", "CEI")
+                                 Pubid::Iso.parse(wrapped_id_str)
+                               elsif adoption_org.start_with?("IEC")
+                                 Pubid::Iec.parse(wrapped_id_str)
+                               else
+                                 begin
                                    Pubid::Iso.parse(wrapped_id_str)
-                                 elsif adoption_org.start_with?("IEC")
+                                 rescue Pubid::Errors::ParseError
                                    Pubid::Iec.parse(wrapped_id_str)
-                                 else
-                                   begin
-                                     Pubid::Iso.parse(wrapped_id_str)
-                                   rescue Pubid::Errors::ParseError
-                                     Pubid::Iec.parse(wrapped_id_str)
-                                   end
                                  end
+                               end
         end
 
         adoption.wrapped_identifier = wrapped_identifier
@@ -200,16 +198,14 @@ module Pubid
           wrapped_identifier = build_series(wrapped_data)
           # Set the full publisher_prefix on the wrapped Series for proper rendering
           # The test expects wrapped_identifier.publisher_prefix to be "CAN/CSA-"
-          wrapped_identifier.publisher_prefix = original_prefix if original_prefix && wrapped_identifier.respond_to?(:publisher_prefix=)
         elsif parsed_hash.key?(:cec_part)
           # CEC matched - build Cec identifier
           wrapped_identifier = build_cec(wrapped_data)
-          wrapped_identifier.publisher_prefix = original_prefix if original_prefix && wrapped_identifier.respond_to?(:publisher_prefix=)
         else
           # Standard CSA identifier
           wrapped_identifier = build_single(wrapped_data)
-          wrapped_identifier.publisher_prefix = original_prefix if original_prefix && wrapped_identifier.respond_to?(:publisher_prefix=)
         end
+        wrapped_identifier.publisher_prefix = original_prefix if original_prefix && wrapped_identifier.respond_to?(:publisher_prefix=)
 
         canadian_adopted.wrapped_identifier = wrapped_identifier
 
@@ -228,10 +224,10 @@ module Pubid
           # Legacy format (Hash or String)
           reaffirm_data = parsed_hash[:reaffirmation]
           canadian_adopted.reaffirmation = if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
-                                       reaffirm_data[:year].to_s
-                                     else
-                                       reaffirm_data.to_s
-                                     end
+                                             reaffirm_data[:year].to_s
+                                           else
+                                             reaffirm_data.to_s
+                                           end
         end
 
         canadian_adopted
@@ -405,11 +401,11 @@ module Pubid
         elsif parsed_hash[:reaffirmation]
           # Legacy format (Hash or String)
           reaffirm_data = parsed_hash[:reaffirmation]
-          if reaffirm_data.is_a?(Hash)
-            cec.reaffirmation = reaffirm_data[:year].to_s
-          else
-            cec.reaffirmation = reaffirm_data.to_s
-          end
+          cec.reaffirmation = if reaffirm_data.is_a?(Hash)
+                                reaffirm_data[:year].to_s
+                              else
+                                reaffirm_data.to_s
+                              end
         end
 
         cec

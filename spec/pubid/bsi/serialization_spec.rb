@@ -62,7 +62,7 @@ RSpec.describe "BSI Serialization" do
         flavor: "bsi",
         publisher: "BS",
         number: "123200",
-        year: "2001"
+        year: "2001",
       }
 
       id = Pubid::Serializable.from_h(hash)

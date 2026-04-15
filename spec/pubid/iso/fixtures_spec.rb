@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
-  FIXTURE_FILES ||= [
+  FIXTURE_FILES = [
     "iso-pubid-basic.txt",
     "iso-pubid-cd.txt",
     "iso-pubid-coramd.txt",
@@ -95,7 +95,7 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
       end
 
       overall_pass_rate = (total_successes.to_f / total_identifiers * 100).round(2)
-      puts "\n" + "=" * 60
+      puts "\n#{'=' * 60}"
       puts "OVERALL ISO FIXTURES VALIDATION"
       puts "=" * 60
       puts "Total identifiers: #{total_identifiers}"

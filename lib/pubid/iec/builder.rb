@@ -63,7 +63,8 @@ module Pubid
           base_parsed = parsed_hash[:base_identifier].dup
           base_parsed[:sheet_number] = sheet_number
           base_parsed[:sheet_year] = sheet_year if sheet_year
-          sheet_id = wrap_with_sheet(build(base_parsed), sheet_number, sheet_year)
+          sheet_id = wrap_with_sheet(build(base_parsed), sheet_number,
+                                     sheet_year)
 
           # Now build the supplement on top of the sheet
           # We need to preserve the supplement data and create a wrapper
@@ -193,7 +194,7 @@ module Pubid
           # Detect IEC format from parsed abbreviation
           # IEC uses space to indicate long form: "Amd 1", "Cor 1"
           # No space indicates short form: "AMD1", "COR1"
-          stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.include?(" ")
+          stage_format_long = if ts.long_abbr && ts.original_abbr&.include?(" ")
                                 true # Long form has space: "Amd 1", "Cor 1"
                               elsif ts.short_abbr && ts.original_abbr && !ts.original_abbr.include?(" ")
                                 false  # Short form: "AMD1", "COR1", "CDV", "FDIS"
@@ -266,7 +267,7 @@ edition_data = nil)
         require_relative "identifiers/sheet_identifier"
 
         # Only pass year if it's present
-        year_value = sheet_year ? sheet_year.to_s : nil
+        year_value = sheet_year&.to_s
 
         Identifiers::SheetIdentifier.new(
           base_identifier: base_identifier,
@@ -287,7 +288,7 @@ edition_data = nil)
         require_relative "identifiers/amendment"
         require_relative "identifiers/corrigendum"
 
-        supplements = supplements_data.map do |supp|
+        supplements = supplements_data.filter_map do |supp|
           type = supp[:supplement_type].to_s
           number = supp[:supplement_number].to_s
           year = supp[:supplement_year]
@@ -306,7 +307,7 @@ edition_data = nil)
               date: date_component,
             )
           end
-        end.compact
+        end
 
         Identifiers::ConsolidatedIdentifier.new(
           identifiers: [base_identifier] + supplements,
@@ -462,7 +463,7 @@ edition_data = nil)
           if value.match?(/^\d{4}(-\d{2})?$/)
             year, month = value.split("-")
             Pubid::Components::Date.new(year: year, month: month || nil)
-          elsif value.is_a?(Integer) || value.is_a?(String) && value.match?(/^\d{4}$/)
+          elsif value.is_a?(Integer) || (value.is_a?(String) && value.match?(/^\d{4}$/))
             # If it's just a year, "2005"
             Pubid::Components::Date.new(year: value)
           else

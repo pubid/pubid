@@ -51,8 +51,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
   context "NIST SP 800-57pt1r4" do
     let(:short_pubid) { "NIST SP 800-57pt1r4" }
     let(:long_pubid) do
-      "National Institute of Standards and Technology Special Publication"\
-          " 800-57 Part 1, Revision 4"
+      "National Institute of Standards and Technology Special Publication " \
+        "800-57 Part 1, Revision 4"
     end
     let(:abbrev_pubid) do
       "Natl. Inst. Stand. Technol. Spec. Publ. 800-57 Pt. 1, Rev. 4"
@@ -65,8 +65,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     let(:original_pubid) { "NIST SP 800-53r4/Upd3-2015" }
     let(:short_pubid) { "NIST SP 800-53r4/Upd3-2015" }
     let(:long_pubid) do
-      "National Institute of Standards and Technology Special Publication "\
-          "800-53, Revision 4 Update 3-2015"
+      "National Institute of Standards and Technology Special Publication " \
+        "800-53, Revision 4 Update 3-2015"
     end
     let(:abbrev_pubid) do
       "Natl. Inst. Stand. Technol. Spec. Publ. 800-53, Rev. 4 Upd. 3-2015"
@@ -80,8 +80,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     let(:original_pubid) { "NIST SP 800-38a-add" }
     let(:short_pubid) { "NIST SP 800-38A Add." }
     let(:long_pubid) do
-      "Addendum to National Institute of Standards and Technology Special"\
-          " Publication 800-38A"
+      "Addendum to National Institute of Standards and Technology Special " \
+        "Publication 800-38A"
     end
     let(:abbrev_pubid) do
       "Add. to Natl. Inst. Stand. Technol. Spec. Publ. 800-38A"
@@ -99,12 +99,12 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     let(:original_pubid) { "NIST SP(IPD) 800-53r5" }
     let(:short_pubid) { "NIST SP 800-53r5 ipd" }
     let(:long_pubid) do
-      "National Institute of Standards and Technology Special Publication "\
-          "800-53 (Initial Public Draft), Revision 5"
+      "National Institute of Standards and Technology Special Publication " \
+        "800-53 (Initial Public Draft), Revision 5"
     end
     let(:abbrev_pubid) do
-      "Natl. Inst. Stand. Technol. Spec. Publ. 800-53 (Initial Public Draft),"\
-          " Rev. 5"
+      "Natl. Inst. Stand. Technol. Spec. Publ. 800-53 (Initial Public Draft), " \
+        "Rev. 5"
     end
     let(:mr_pubid) { "NIST.SP.800-53r5.ipd" }
 
@@ -115,12 +115,12 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     let(:original_pubid) { "NIST SP(IPD) 800-53e5" }
     let(:short_pubid) { "NIST SP 800-53e5 ipd" }
     let(:long_pubid) do
-      "National Institute of Standards and Technology Special Publication "\
-          "800-53 (Initial Public Draft) Edition 5"
+      "National Institute of Standards and Technology Special Publication " \
+        "800-53 (Initial Public Draft) Edition 5"
     end
     let(:abbrev_pubid) do
-      "Natl. Inst. Stand. Technol. Spec. Publ. 800-53 (Initial Public Draft) "\
-          "Ed. 5"
+      "Natl. Inst. Stand. Technol. Spec. Publ. 800-53 (Initial Public Draft) " \
+        "Ed. 5"
     end
     let(:mr_pubid) { "NIST.SP.800-53e5.ipd" }
 
@@ -208,8 +208,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     let(:original_pubid) { "NIST SP 305supp26" }
     let(:short_pubid) { "NIST SP 305sup26" }
     let(:long_pubid) do
-      "National Institute of Standards and Technology Special Publication "\
-          "305 Supplement 26"
+      "National Institute of Standards and Technology Special Publication " \
+        "305 Supplement 26"
     end
     let(:abbrev_pubid) do
       "Natl. Inst. Stand. Technol. Spec. Publ. 305 Suppl. 26"

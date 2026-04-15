@@ -3,7 +3,7 @@
 require "bundler/setup"
 require "rspec/matchers"
 
-Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
+Dir["./spec/support/**/*.rb"].each { |f| require f }
 
 require_relative "../lib/pubid-iso"
 

@@ -95,7 +95,7 @@ RSpec.describe "ETSI Serialization" do
         number: "300 100",
         year: "1998",
         month: "04",
-        version: "V1.1.1"
+        version: "V1.1.1",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -110,7 +110,7 @@ RSpec.describe "ETSI Serialization" do
         number: "300 100-1",
         year: "1998",
         month: "04",
-        version: "V1.1.1"
+        version: "V1.1.1",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -127,7 +127,7 @@ RSpec.describe "ETSI Serialization" do
         month: "12",
         version: "ed.1",
         supplement_notation: "A1",
-        supplement_type: "amendment"
+        supplement_type: "amendment",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -144,7 +144,7 @@ RSpec.describe "ETSI Serialization" do
         month: "07",
         version: "V1.1.1",
         supplement_notation: "C1",
-        supplement_type: "corrigendum"
+        supplement_type: "corrigendum",
       }
 
       id = Pubid::Serializable.from_h(hash)

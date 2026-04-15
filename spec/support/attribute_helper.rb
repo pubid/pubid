@@ -10,7 +10,7 @@ module AttributeHelper
     expected_attrs.each do |attr, expected_value|
       actual_value = identifier.send(attr)
       expect(actual_value).to eq(expected_value),
-        "expected #{attr} to be #{expected_value.inspect}, got #{actual_value.inspect}"
+                              "expected #{attr} to be #{expected_value.inspect}, got #{actual_value.inspect}"
     end
   end
 
@@ -76,17 +76,20 @@ module AttributeHelper
 
   def normalize_publisher(publisher)
     return publisher.body if publisher.respond_to?(:body)
+
     publisher
   end
 
   def normalize_code(code)
     return code.value if code.respond_to?(:value)
+
     code
   end
 
   def normalize_year(identifier)
     return identifier.year if identifier.respond_to?(:year)
-    return identifier.date.year if identifier.respond_to?(:date) && identifier.date&.respond_to?(:year)
+    return identifier.date.year if identifier.respond_to?(:date) && identifier.date.respond_to?(:year)
+
     nil
   end
 end

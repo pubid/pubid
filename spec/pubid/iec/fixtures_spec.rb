@@ -35,7 +35,7 @@ RSpec.describe "IEC V2 Fixtures Tests" do
       total = fixture_ids.count
       pass_rate = (successes.to_f / total * 100).round(2)
 
-      puts "\n" + "=" * 70
+      puts "\n#{'=' * 70}"
       puts "IEC Fixtures Test Results (REAL IDENTIFIERS ONLY):"
       puts "=" * 70
       puts "Total identifiers: #{total}"

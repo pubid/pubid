@@ -40,7 +40,7 @@ module Pubid
 
         def initialize(**args)
           # Call super FIRST to initialize Lutaml::Model attributes
-          super(**args)
+          super
 
           # Then handle typed_stage
           if args[:typed_stage].is_a?(Components::TypedStage)

@@ -102,7 +102,8 @@ module Pubid
     # @param yaml_string [String] YAML representation of identifier
     # @return [Identifier] parsed identifier instance
     def self.from_yaml(yaml_string)
-      from_h(YAML.safe_load(yaml_string, permitted_classes: [Symbol], aliases: true))
+      from_h(YAML.safe_load(yaml_string, permitted_classes: [Symbol],
+                                         aliases: true))
     end
 
     # Create identifier from machine-readable string
@@ -183,7 +184,10 @@ module Pubid
     # Extract base document's data (for supplement identifiers, this walks down to the base)
     def extract_base_identifier_data
       # If this is a base identifier (no supplements), return its own data
-      return { number: extract_number, part: extract_part, year: extract_year, month: extract_month } unless has_supplements?
+      unless has_supplements?
+        return { number: extract_number, part: extract_part, year: extract_year,
+                 month: extract_month }
+      end
 
       # Walk down to find the base identifier (handle both base_identifier and base)
       current = self
@@ -201,8 +205,12 @@ module Pubid
         number: extract_number_from_identifier(current),
         part: extract_part_from_identifier(current),
         # Use date.year like extract_year does
-        year: (current.respond_to?(:date) && current.date) ? current.date.year.to_s : (current.respond_to?(:year) && current.year ? current.year.to_s : nil),
-        month: (current.respond_to?(:date) && current.date && current.date.respond_to?(:month)) ? current.date.month.to_s : nil,
+        year: if current.respond_to?(:date) && current.date
+                current.date.year.to_s
+              else
+                (current.respond_to?(:year) && current.year ? current.year.to_s : nil)
+              end,
+        month: current.respond_to?(:date) && current.date.respond_to?(:month) ? current.date.month.to_s : nil,
       }
     end
 
@@ -219,8 +227,10 @@ module Pubid
       if identifier.respond_to?(:gum_number) && identifier.gum_number
         return identifier.gum_number.respond_to?(:value) ? identifier.gum_number.value : identifier.gum_number.to_s
       end
+
       if identifier.respond_to?(:number) && identifier.number
         return identifier.number.value if identifier.number.respond_to?(:value)
+
         return identifier.number.to_s
       end
       if identifier.respond_to?(:code) && identifier.code
@@ -242,6 +252,7 @@ module Pubid
       return nil unless identifier.respond_to?(:part)
       return identifier.part.value if identifier.part.respond_to?(:value)
       return identifier.part if identifier.part.is_a?(String)
+
       nil
     end
 
@@ -313,8 +324,6 @@ module Pubid
         type.abbr
       elsif type&.type_code
         type.type_code.to_s
-      else
-        nil
       end
     end
 
@@ -323,16 +332,17 @@ module Pubid
       return publisher.to_s if respond_to?(:publisher) && publisher
       # CSA uses publisher_prefix
       return publisher_prefix.to_s if respond_to?(:publisher_prefix) && publisher_prefix
+
       nil
     end
 
     # Extract copublishers as array of strings
     def extract_copublishers
       # Handle copublishers (array of Publisher components)
-      return copublishers.map(&:to_s) if respond_to?(:copublishers) && copublishers&.is_a?(Array) && copublishers&.any?
+      return copublishers.map(&:to_s) if respond_to?(:copublishers) && copublishers.is_a?(Array) && copublishers.any?
 
       # Handle copublisher (array of Publisher components, different naming)
-      return copublisher.map(&:to_s) if respond_to?(:copublisher) && copublisher&.is_a?(Array) && copublisher&.any?
+      return copublisher.map(&:to_s) if respond_to?(:copublisher) && copublisher.is_a?(Array) && copublisher.any?
 
       nil
     end
@@ -346,11 +356,11 @@ module Pubid
       # Handle ETSI which uses @code as a Code component with to_s that includes parts
       # Check this BEFORE number.to_s because ETSI supplements have both code and number
       # where number is the supplement number, not the document number
-      if respond_to?(:code) && code && code.respond_to?(:to_s)
+      if respond_to?(:code) && code&.respond_to?(:to_s)
         return code.to_s
       end
       # Handle number attribute (most flavors)
-      return number.value if respond_to?(:number) && number&.respond_to?(:value)
+      return number.value if respond_to?(:number) && number.respond_to?(:value)
       # Handle integer number (Plateau, etc.)
       return number.to_s if respond_to?(:number) && number
 
@@ -363,6 +373,7 @@ module Pubid
       return part.value if part.respond_to?(:value)
       # For flavors using plain string attributes (like CCSDS)
       return part if part.is_a?(String)
+
       nil
     end
 
@@ -372,6 +383,7 @@ module Pubid
       return subpart.value if subpart.respond_to?(:value)
       # For flavors using plain string attributes (like CCSDS)
       return subpart if subpart.is_a?(String)
+
       nil
     end
 
@@ -379,6 +391,7 @@ module Pubid
     def extract_year
       # Most flavors use date.year
       return date.year if respond_to?(:date) && date
+
       # IEEE/NIST use year directly
       year.to_s if respond_to?(:year) && year
     end
@@ -387,6 +400,7 @@ module Pubid
     def extract_month
       return nil unless respond_to?(:date) && date
       return date.month if date.respond_to?(:month)
+
       nil
     end
 
@@ -463,12 +477,14 @@ module Pubid
       return nil unless respond_to?(:languages) && languages&.any?
 
       # Use original_code if available (preserves original case like E/F/R)
-      languages.map { |l| l.respond_to?(:original_code) && l.original_code ? l.original_code : l.to_s }
+      languages.map do |l|
+        l.respond_to?(:original_code) && l.original_code ? l.original_code : l.to_s
+      end
     end
 
     # Check if identifier has supplements
     def has_supplements?
-      respond_to?(:base_identifier) && base_identifier || respond_to?(:base) && base
+      (respond_to?(:base_identifier) && base_identifier) || (respond_to?(:base) && base)
     end
 
     # Machine-readable publisher
@@ -476,6 +492,7 @@ module Pubid
       return publisher.to_s if respond_to?(:publisher) && publisher
       # CSA uses publisher_prefix
       return publisher_prefix.to_s if respond_to?(:publisher_prefix) && publisher_prefix
+
       nil
     end
 
@@ -494,11 +511,11 @@ module Pubid
       end
       # Handle ETSI which uses @code as a Code component with to_s that includes parts
       # Check this BEFORE number.to_s because ETSI supplements have both code and number
-      if respond_to?(:code) && code && code.respond_to?(:to_s)
+      if respond_to?(:code) && code&.respond_to?(:to_s)
         return code.to_s
       end
       # Handle number attribute (most flavors)
-      return number.value if respond_to?(:number) && number&.respond_to?(:value)
+      return number.value if respond_to?(:number) && number.respond_to?(:value)
       # Handle integer number (Plateau, etc.)
       return number.to_s if respond_to?(:number) && number
 
@@ -511,6 +528,7 @@ module Pubid
       return part.value if part.respond_to?(:value)
       # For flavors using plain string attributes (like CCSDS)
       return part if part.is_a?(String)
+
       nil
     end
 
@@ -518,6 +536,7 @@ module Pubid
     def mr_year
       # Most flavors use date.year
       return date.year if respond_to?(:date) && date
+
       # IEEE/NIST use year directly
       year.to_s if respond_to?(:year) && year
     end
@@ -541,6 +560,7 @@ module Pubid
     def extract_supplement_number(supplement)
       return nil unless supplement.respond_to?(:number)
       return supplement.number.to_s if supplement.number.is_a?(Integer)
+
       supplement.number&.value
     end
 
@@ -573,7 +593,10 @@ module Pubid
         name: typed_stage.name,
       }
       # Not all flavors have harmonized_stages (IEEE doesn't)
-      hash[:harmonized_stages] = typed_stage.harmonized_stages if typed_stage.respond_to?(:harmonized_stages)
+      if typed_stage.respond_to?(:harmonized_stages)
+        hash[:harmonized_stages] =
+          typed_stage.harmonized_stages
+      end
 
       hash.compact
     end

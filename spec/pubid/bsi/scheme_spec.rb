@@ -73,7 +73,9 @@ RSpec.describe Pubid::Bsi::Scheme do
     end
 
     it "includes BS typed stage" do
-      bs_stage = described_class::TYPED_STAGES_REGISTRY.find { |ts| ts.type_code == "bs" }
+      bs_stage = described_class::TYPED_STAGES_REGISTRY.find do |ts|
+        ts.type_code == "bs"
+      end
       expect(bs_stage).not_to be_nil
       expect(bs_stage.abbr).to include("BS")
     end

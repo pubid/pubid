@@ -62,7 +62,7 @@ RSpec.describe "CCSDS Serialization" do
         number: "120",
         part: "0",
         type: "G",
-        edition: "4"
+        edition: "4",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -77,7 +77,7 @@ RSpec.describe "CCSDS Serialization" do
         part: "0",
         type: "G",
         edition: "1",
-        suffix: "S"
+        suffix: "S",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -92,7 +92,7 @@ RSpec.describe "CCSDS Serialization" do
         part: "1",
         type: "O",
         edition: "2",
-        language: "Russian"
+        language: "Russian",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -107,7 +107,7 @@ RSpec.describe "CCSDS Serialization" do
         part: "0",
         type: "B",
         edition: "1",
-        suffix: "S"
+        suffix: "S",
       }
 
       id = Pubid::Serializable.from_h(hash)

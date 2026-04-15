@@ -31,13 +31,12 @@ module Pubid
       # NEW: Also support pure numbers with HB suffix (e.g., 15189HB)
       # NEW: Simple letter+number codes (e.g., Z240, A220) for Series identifiers
       rule(:code_pattern) do
-        (
-          # Pattern 1: Pure dotted numbers - e.g., 12.4, 2.15, 3.11
-          (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1) >>
-           # Allow single-dash suffix for part numbers (e.g., "12.4-1")
-           # But NOT 2-digit years which are handled separately
-           (dash >> match("[0-9]").repeat(1)).repeat(0, 1) >>
-           letter.repeat(2, 6).maybe).as(:code) |
+        # Pattern 1: Pure dotted numbers - e.g., 12.4, 2.15, 3.11
+        (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1) >>
+         # Allow single-dash suffix for part numbers (e.g., "12.4-1")
+         # But NOT 2-digit years which are handled separately
+         (dash >> match("[0-9]").repeat(1)).repeat(0, 1) >>
+         letter.repeat(2, 6).maybe).as(:code) |
           # Pattern 2: Pure numbers with HB suffix - e.g., 15189HB (NEW)
           (match("[0-9]").repeat(1) >> letter.repeat(2, 6)).as(:code) |
           # Pattern 3: Letter + numbers with dots then dashes - e.g., C22.2-144, B149.1
@@ -48,16 +47,15 @@ module Pubid
            # 3+ digits or letter suffix = part number (e.g., "-144", "-1A")
            # But DON'T consume 2-digit years which are matched separately
            (dash >> (
-             (match("[0-9]") >> match("[0-9]").absent?) |  # exactly 1 digit (no digit follows)
-             match("[0-9]").repeat(3) |  # 3+ digits = part number (e.g., "-144")
-             (match("[0-9]").repeat(1) >> letter.repeat(1))  # digit + letter = part number (e.g., "-1A")
+             (match("[0-9]") >> match("[0-9]").absent?) | # exactly 1 digit (no digit follows)
+             match("[0-9]").repeat(3) | # 3+ digits = part number (e.g., "-144")
+             (match("[0-9]").repeat(1) >> letter.repeat(1)) # digit + letter = part number (e.g., "-1A")
            )).repeat >>
            letter.repeat(2, 6).maybe).as(:code) | # Allow HB, CIICHB, SP, etc.
           # Pattern 4: Simple letter + number codes - e.g., Z240, A220, B140 (for Series)
           (letter >> match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1).maybe).as(:code) |
           # Pattern 5: Letter + multi-digit number without dots/dashes - e.g., Z240, A220
-          (letter >> match("[0-9]").repeat(2,)).as(:code)
-        )
+          (letter >> match("[0-9]").repeat(2)).as(:code)
       end
 
       # NO. notation - "Number" designation within a series (e.g., C22.2 NO. 1)
@@ -79,10 +77,10 @@ module Pubid
           # CRITICAL: 2-digit suffix allowed only when first part has 5+ digits
           # (IEC-style numbers like 60601, 60079). 3-4 digit first parts with 2-digit
           # suffixes are year patterns (e.g., "109-17" = number 109, year 2017).
-          (match("[0-9]").repeat(5) >> dash >> match("[0-9]").repeat(1)) |  # 5+ digits: any suffix
+          (match("[0-9]").repeat(5) >> dash >> match("[0-9]").repeat(1)) | # 5+ digits: any suffix
           (match("[0-9]").repeat(3, 4) >> dash >> (
-            (match("[0-9]") >> match("[0-9]").absent?) |  # exactly 1 digit (e.g., -1)
-            match("[0-9]").repeat(3)  # 3+ digits (e.g., -144)
+            (match("[0-9]") >> match("[0-9]").absent?) | # exactly 1 digit (e.g., -1)
+            match("[0-9]").repeat(3) # 3+ digits (e.g., -144)
           )) |
           # Multi-part dotted number (e.g., 144.1, 1010.2.031, 1010.2.031.5)
           # Can have 1-3 dots (2-4 numeric parts)
@@ -101,8 +99,8 @@ module Pubid
       # Year with colon (modern format) - mark as colon_year
       # Support both with prefix (:M04) and without prefix (:04)
       rule(:colon_year) do
-        str("").as(:colon_format) >>  # Mark that colon format was used
-        colon >> (
+        str("").as(:colon_format) >> # Mark that colon format was used
+          colon >> (
           # With M/F prefix (e.g., :M04, :F04)
           (year_prefix >> (year_4digit | year_2digit).as(:year)) |
           # Without prefix (e.g., :04)
@@ -113,8 +111,8 @@ module Pubid
       # Year with dash (older format) - mark as dash_year
       # Support both with prefix (-M04) and without prefix (-04)
       rule(:dash_year) do
-        str("").as(:dash_format) >>  # Mark that dash format was used
-        dash >> (
+        str("").as(:dash_format) >> # Mark that dash format was used
+          dash >> (
           # With M/F prefix (e.g., -M04, -F04)
           (year_prefix >> (year_4digit | year_2digit).as(:year)) |
           # Without prefix (e.g., -04)
@@ -141,9 +139,7 @@ module Pubid
 
       # Package keywords
       rule(:package_keyword) do
-        (
-          str("Code") | str("Handbook") | str("Training Package") | str("Package")
-        )
+        str("Code") | str("Handbook") | str("Training Package") | str("Package")
       end
 
       # Package portion: "Code, Handbook & Training Package"
@@ -175,7 +171,7 @@ module Pubid
           (
             code_pattern |
             # Letter + multi-digit number for Series (e.g., Z240, A220, B139)
-            (letter >> match("[0-9]").repeat(2,)).as(:code) |
+            (letter >> match("[0-9]").repeat(2)).as(:code) |
             # Dotted numeric code (e.g., 245.20)
             (match("[0-9]").repeat(1) >> dot >> match("[0-9]").repeat(1)).as(:code)
           ) >>
@@ -237,8 +233,8 @@ module Pubid
           (year_4digit | year_2digit).as(:adoption_year) >>
           (
             # Amendment with year: /A1:22 or /A1-22
-            (slash >> str("A") >> digit.as(:adoption_amendment) >>
-             (colon | dash) >> (year_4digit | year_2digit).as(:adoption_amendment_year))
+            slash >> str("A") >> digit.as(:adoption_amendment) >>
+             (colon | dash) >> (year_4digit | year_2digit).as(:adoption_amendment_year)
           ).maybe >>
           reaffirmation.maybe
       end
@@ -385,7 +381,7 @@ module Pubid
         # DO NOT normalize NO., let it be parsed as a separate identifier component
 
         # Normalize CEI/IEC to IEC (CEI is French name for IEC)
-        normalized = normalized.gsub(/CEI\/IEC/, "IEC")
+        normalized = normalized.gsub("CEI/IEC", "IEC")
         normalized = normalized.gsub(/\bCEI\b/, "IEC")
 
         # Track original publisher prefix

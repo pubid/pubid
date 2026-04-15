@@ -17,7 +17,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: [""],
             stage_code: "published",
-            type_code: "base"
+            type_code: "base",
           ),
         ].freeze
 

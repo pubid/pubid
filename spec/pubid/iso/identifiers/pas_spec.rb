@@ -303,7 +303,10 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       describe "ISO/DPAS 5643:2021(E)" do
         subject { "ISO/DPAS 5643:2021(E)" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:normalized) { "ISO/DPAS 5643:2021(E)" }  # V2 preserves original format
+        # V2 preserves original format
+        let(:normalized) do
+          "ISO/DPAS 5643:2021(E)"
+        end
         let(:urn) { "urn:iso:std:iso:pas:5643:stage-40.00:en" }
 
         it "parses publisher" do

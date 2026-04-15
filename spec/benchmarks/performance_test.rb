@@ -79,13 +79,11 @@ module Pubid
           # Test NIST identifiers first
           valid_nist = []
           NIST_IDENTIFIERS.each do |id|
-            begin
-              Pubid::Nist.parse(id)
-              valid_nist << id
-            rescue Parslet::ParseFailed
-              # Skip unparsable identifiers
-              next
-            end
+            Pubid::Nist.parse(id)
+            valid_nist << id
+          rescue Parslet::ParseFailed
+            # Skip unparsable identifiers
+            next
           end
 
           if valid_nist.any?
@@ -107,7 +105,7 @@ module Pubid
           else
             puts "NIST Parsing: Skipped (no valid identifiers)"
           end
-        rescue => e
+        rescue StandardError => e
           puts "NIST Parsing: Skipped (#{e.message})"
         end
       end

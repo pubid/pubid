@@ -67,7 +67,7 @@ RSpec.describe "Plateau Serialization" do
         flavor: "plateau",
         publisher: "PLATEAU",
         type: "Handbook",
-        number: "0"
+        number: "0",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -80,7 +80,7 @@ RSpec.describe "Plateau Serialization" do
         publisher: "PLATEAU",
         type: "Handbook",
         number: "0",
-        edition: "1.0"
+        edition: "1.0",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -93,7 +93,7 @@ RSpec.describe "Plateau Serialization" do
         publisher: "PLATEAU",
         type: "Handbook",
         number: "3",
-        annex: 1
+        annex: 1,
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -105,7 +105,7 @@ RSpec.describe "Plateau Serialization" do
         flavor: "plateau",
         publisher: "PLATEAU",
         type: "Technical Report",
-        number: "1"
+        number: "1",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -120,8 +120,8 @@ RSpec.describe "Plateau Serialization" do
         number: "0",
         edition: "1.0",
         supplements: [
-          { type: "annex", letter: "A" }
-        ]
+          { type: "annex", letter: "A" },
+        ],
       }
 
       id = Pubid::Serializable.from_h(hash)

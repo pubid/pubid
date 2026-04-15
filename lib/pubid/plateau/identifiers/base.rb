@@ -1,19 +1,18 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Plateau
     module Identifiers
       # Base class for all PLATEAU identifiers
       class Base < Lutaml::Model::Serializable
-      include Pubid::Serializable
+        include Pubid::Serializable
 
-      # Generate URN for this identifier
-      #
-      # @return [String] URN representation
-      def to_urn
-        UrnGenerator.new(self).generate
-      end
+        # Generate URN for this identifier
+        #
+        # @return [String] URN representation
+        def to_urn
+          UrnGenerator.new(self).generate
+        end
         attribute :number, :integer
         attribute :annex, :integer, default: -> {}
 

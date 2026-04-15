@@ -20,10 +20,8 @@ RSpec.describe "NIST Format Cross-Conversion" do
         expect(id.stage).not_to be_nil
         expect(id.stage.id).to eq("i")
         expect(id.stage.type).to eq("pd")
-      end
 
-      # All should have same number and revision
-      parsed_identifiers.each do |id|
+        # All should have same number and revision
         expect(id.number.value).to eq("800-53")
         expect(id.revision).to eq("r5")
       end

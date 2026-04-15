@@ -148,7 +148,7 @@ module Pubid
 
           # Then supplement editions
           supplement_chain.each do |supp|
-            if supp.edition && supp.edition.number
+            if supp.edition&.number
               all_editions << "ed-#{supp.edition.number}"
             end
           end
@@ -170,10 +170,10 @@ module Pubid
           end
           if base_stage_comp
             # Check if any supplement has a stage
-            supplement_stages = supplement_chain.map do |supp|
+            supplement_stages = supplement_chain.filter_map do |supp|
               supp_gen = self.class.new(supp)
               supp_gen.send(:stage_component)
-            end.compact
+            end
 
             # Only include base stage if:
             # 1. No supplements have a stage, OR
@@ -322,14 +322,14 @@ module Pubid
         # Fallback: use harmonized stage codes for unmapped stages
         # This handles stages like PWI, NP, AWI, PRF that don't have typed abbreviations
         harmonized_codes = identifier.typed_stage.harmonized_stages
-        return nil unless harmonized_codes && harmonized_codes.any?
+        return nil unless harmonized_codes&.any?
 
         # Use first harmonized code from the array
         harmonized_code = harmonized_codes.first
 
         # Skip published documents (60.00, 60.60) EXCEPT for PRF (Proof) stage
         # PRF is at 60.00 but should still be included in URNs
-        if harmonized_code.start_with?("60.") && !(stage_code.to_s == "prf")
+        if harmonized_code.start_with?("60.") && stage_code.to_s != "prf"
           return nil
         end
 
@@ -347,14 +347,14 @@ module Pubid
 
       # Generate edition component
       def edition_component
-        return nil unless identifier.edition && identifier.edition.number
+        return nil unless identifier.edition&.number
 
         "ed-#{identifier.edition.number}"
       end
 
       # Generate year component
       def year_component
-        return nil unless identifier.date && identifier.date.year
+        return nil unless identifier.date&.year
 
         # ISO base identifiers (SingleIdentifier) use undated URN format (no year)
         # Supplements include their own year in the supplement section

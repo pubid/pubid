@@ -21,14 +21,14 @@ module Pubid
 
         # TC types from ISO system
         TC_TYPES = %w[TC JTC PC IT CAB CASCO COPOLCO COUNCIL CPSG CS DEVCO GA
-                     GAAB INFCO ITN ISOlutions REMCO TMB TMBG WMO DMT JCG SGPM
-                     ATMG CCCC CCCC-TG JDMT JSAG JSCTF-TF JTCG JTCG-TF SAG_Acc
-                     SAG_CRMI SAG_CRMI_CG SAG_ESG SAG_ESG_CG SAG_MRS SAG_SF SAG_SF_CG
-                     SMCC STMG MENA_STAR].freeze
+                      GAAB INFCO ITN ISOlutions REMCO TMB TMBG WMO DMT JCG SGPM
+                      ATMG CCCC CCCC-TG JDMT JSAG JSCTF-TF JTCG JTCG-TF SAG_Acc
+                      SAG_CRMI SAG_CRMI_CG SAG_ESG SAG_ESG_CG SAG_MRS SAG_SF SAG_SF_CG
+                      SMCC STMG MENA_STAR].freeze
 
         # WG types from ISO system
         WG_TYPES = %w[AG AhG WG JWG QC TF PPC CAG CSC ITSAG CSC/FIN CSC/NOM CSC/OVE
-                     CSC/SP CSC SF ITSG JAG JCTF JSG JTAG JTG].freeze
+                      CSC/SP CSC SF ITSG JAG JCTF JSG JTAG JTG].freeze
 
         # TC documents don't use typed stages like other identifiers
         TYPED_STAGES = [].freeze
@@ -46,18 +46,18 @@ module Pubid
 
           # Add TC type and number
           result += "/#{tc_type.value} " if tc_type&.value
-          result += "#{tc_number.value}" if tc_number&.value
+          result += tc_number.value.to_s if tc_number&.value
 
           # Add SC type and number
           if sc_type&.value && sc_number&.value
             result += "/#{sc_type.value} "
-            result += "#{sc_number.value}"
+            result += sc_number.value.to_s
           end
 
           # Add WG type and number
           if wg_type&.value && wg_number&.value
             result += "/#{wg_type.value} "
-            result += "#{wg_number.value}"
+            result += wg_number.value.to_s
           end
 
           # Add document number

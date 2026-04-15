@@ -11,7 +11,8 @@ RSpec.describe Pubid::Etsi::Scheme do
     end
 
     it "creates a new scheme with parts" do
-      scheme = described_class.new(type: "EN", number: "300 000", part: ["1", "2"])
+      scheme = described_class.new(type: "EN", number: "300 000",
+                                   part: ["1", "2"])
       expect(scheme.part).to eq(["1", "2"])
     end
   end
@@ -28,12 +29,14 @@ RSpec.describe Pubid::Etsi::Scheme do
     end
 
     it "renders identifier with amendment" do
-      scheme = described_class.new(type: "EN", number: "300 000", amendment: "1")
+      scheme = described_class.new(type: "EN", number: "300 000",
+                                   amendment: "1")
       expect(scheme.to_s).to eq("ETSI EN 300 000/A1")
     end
 
     it "renders identifier with corrigendum" do
-      scheme = described_class.new(type: "EN", number: "300 000", corrigendum: "1")
+      scheme = described_class.new(type: "EN", number: "300 000",
+                                   corrigendum: "1")
       expect(scheme.to_s).to eq("ETSI EN 300 000/C1")
     end
 

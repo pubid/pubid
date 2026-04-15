@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pubid-jis", "= 1.15.2"
   spec.add_dependency "pubid-nist", "= 1.15.2"
   spec.add_dependency "pubid-plateau", "= 1.15.2"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

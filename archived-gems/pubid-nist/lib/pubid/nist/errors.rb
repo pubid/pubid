@@ -1,7 +1,9 @@
-module Pubid::Nist
-  module Errors
-    class ParseError < StandardError; end
-    class SerieInvalidError < StandardError; end
-    class PublisherInvalidError < StandardError; end
+module Pubid
+  module Nist
+    module Errors
+      class ParseError < StandardError; end
+      class SerieInvalidError < StandardError; end
+      class PublisherInvalidError < StandardError; end
+    end
   end
 end

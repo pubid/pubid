@@ -16,7 +16,9 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     end
 
     context "parses identifiers from iso-isp.txt" do
-      let(:examples_file) { "iso/identifiers/pass/international_standardized_profile.txt" }
+      let(:examples_file) do
+        "iso/identifiers/pass/international_standardized_profile.txt"
+      end
 
       it_behaves_like "parse identifiers from file"
     end
@@ -536,7 +538,10 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     describe "ISO/IEC ISP 12062-3(E/F)" do
       subject { "ISO/IEC ISP 12062-3(E/F)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC ISP 12062-3(E/F)" }  # V2 preserves original language format
+      # V2 preserves original language format
+      let(:normalized) do
+        "ISO/IEC ISP 12062-3(E/F)"
+      end
       let(:urn) { "urn:iso:std:iso-iec:isp:12062:-3:en,fr" }
 
       it "parses publisher" do

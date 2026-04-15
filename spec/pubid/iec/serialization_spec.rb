@@ -43,7 +43,7 @@ RSpec.describe "IEC Serialization" do
         flavor: "iec",
         publisher: "IEC",
         number: "60050",
-        year: "2011"
+        year: "2011",
       }
 
       id = Pubid::Serializable.from_h(hash)

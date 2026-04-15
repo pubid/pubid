@@ -16,7 +16,9 @@ module Pubid
         attribute :second, Standard
         attribute :third, Standard
         attribute :reaffirmation, :string
-        attribute :original_reaffirmation_4digit, :boolean, default: -> { false }
+        attribute :original_reaffirmation_4digit, :boolean, default: -> {
+          false
+        }
         attribute :package, :string
         attribute :year_format, :string # Dummy for compatibility
         attribute :separator, :string, default: -> { "/" } # "/" or ", "
@@ -47,15 +49,15 @@ module Pubid
             # Note: We need to track this at the Combined level, but for now
             # assume 4-digit if the value is 4 digits and starts with 19/20
             reaffirmation_was_4digit = reaffirmation.to_s.length == 4 &&
-                                     (reaffirmation.to_s.start_with?("19") || reaffirmation.to_s.start_with?("20"))
+              reaffirmation.to_s.start_with?("19", "20")
 
             # Determine spacing based on original formats
             # Space needed if year is 2-digit and reaffirmation is 4-digit
-            if year_was_2digit && reaffirmation_was_4digit
-              result += " (R#{reaffirmation})"
-            else
-              result += "(R#{reaffirmation})"
-            end
+            result += if year_was_2digit && reaffirmation_was_4digit
+                        " (R#{reaffirmation})"
+                      else
+                        "(R#{reaffirmation})"
+                      end
           end
 
           result += package if package
@@ -116,7 +118,7 @@ module Pubid
               parts.join(" ")
             else
               # No space after dash-ending prefix
-              parts[0] + parts[1..-1].join(" ")
+              parts[0] + parts[1..].join(" ")
             end
           else
             parts.join(" ")

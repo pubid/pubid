@@ -34,7 +34,7 @@ RSpec.describe "ASTM Serialization" do
         flavor: "astm",
         publisher: "ASTM",
         number: "D2148",
-        year: "2022"
+        year: "2022",
       }
 
       id = Pubid::Serializable.from_h(hash)

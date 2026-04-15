@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Cen
     module Identifiers
@@ -21,19 +20,19 @@ module Pubid
         end
 
         def year
-          adopted_identifier&.year if adopted_identifier&.respond_to?(:year)
+          adopted_identifier&.year if adopted_identifier.respond_to?(:year)
         end
 
         def date
-          adopted_identifier&.date if adopted_identifier&.respond_to?(:date)
+          adopted_identifier&.date if adopted_identifier.respond_to?(:date)
         end
 
         def parts
-          adopted_identifier&.parts if adopted_identifier&.respond_to?(:parts)
+          adopted_identifier&.parts if adopted_identifier.respond_to?(:parts)
         end
 
         def part
-          adopted_identifier&.part if adopted_identifier&.respond_to?(:part)
+          adopted_identifier&.part if adopted_identifier.respond_to?(:part)
         end
       end
     end

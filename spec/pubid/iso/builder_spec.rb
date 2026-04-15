@@ -284,7 +284,7 @@ RSpec.describe Pubid::Iso::Builder do
           number_with_part: "13818-1",
           year: "2015",
         }
-        base = builder.build(base_data)
+        builder.build(base_data)
 
         # Build amendment by manually constructing supplement data
         # (In practice, the parser provides this structure)
@@ -298,7 +298,7 @@ RSpec.describe Pubid::Iso::Builder do
           number: "3",
           year: "2016",
         }
-        amd = builder.build(amd_data)
+        builder.build(amd_data)
 
         # Build corrigendum
         cor_data = {

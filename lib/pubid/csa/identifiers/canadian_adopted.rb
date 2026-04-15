@@ -45,7 +45,7 @@ module Pubid
             # No space if both year and reaffirmation are 2-digit
             # Check original_year_4digit flag - if false, year was originally 2-digit
             year_was_2digit = wrapped_identifier.respond_to?(:original_year_4digit) &&
-                               !wrapped_identifier.original_year_4digit
+              !wrapped_identifier.original_year_4digit
             # Check original_reaffirmation_4digit flag
             reaffirmation_was_4digit = original_reaffirmation_4digit
 
@@ -53,16 +53,18 @@ module Pubid
             # If original was 4-digit, keep as 4-digit
             # If original was 2-digit, convert from 4-digit storage back to 2-digit
             reaffirmation_str = if reaffirmation_was_4digit
-                                   # Original was 4-digit, keep as-is
-                                   reaffirmation.to_s
-                                 elsif reaffirmation.to_s.length == 4 && (reaffirmation.to_s.start_with?("19") || reaffirmation.to_s.start_with?("20"))
-                                   # Original was 2-digit, convert 4-digit storage back to 2-digit
-                                   # (R2004) → (R04), (R1994) → (R94)
-                                   reaffirmation.to_s[2..3]
-                                 else
-                                   # Already 2-digit or other format
-                                   reaffirmation.to_s
-                                 end
+                                  # Original was 4-digit, keep as-is
+                                  reaffirmation.to_s
+                                elsif reaffirmation.to_s.length == 4 && reaffirmation.to_s.start_with?(
+                                  "19", "20"
+                                )
+                                  # Original was 2-digit, convert 4-digit storage back to 2-digit
+                                  # (R2004) → (R04), (R1994) → (R94)
+                                  reaffirmation.to_s[2..3]
+                                else
+                                  # Already 2-digit or other format
+                                  reaffirmation.to_s
+                                end
 
             if year_was_2digit && reaffirmation_was_4digit
               # Year was 2-digit, reaffirmation was 4-digit → add space

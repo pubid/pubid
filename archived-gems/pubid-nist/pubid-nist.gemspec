@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pubid-core", "= 1.15.2"
   spec.add_dependency "rubyzip"
   spec.add_dependency "thor"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

@@ -12,13 +12,14 @@ module Pubid
         attribute :ieee_identifier, Base, polymorphic: true
 
         # Original identifiers from ANSI/ISO/IEC/etc (array for multi-part adoptions)
-        attribute :adopted_identifiers, Base, polymorphic: true, collection: true
+        attribute :adopted_identifiers, Base, polymorphic: true,
+                                              collection: true
 
         def to_s
           result = ieee_identifier.to_s
           if adopted_identifiers && !adopted_identifiers.empty?
             adopted_strs = adopted_identifiers.map(&:to_s)
-            result += " (#{adopted_strs.join(" and ")})"
+            result += " (#{adopted_strs.join(' and ')})"
           end
           result
         end

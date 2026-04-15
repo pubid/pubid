@@ -1,4 +1,6 @@
-module Pubid::Itu
-  module Errors
+module Pubid
+  module Itu
+    module Errors
+    end
   end
 end

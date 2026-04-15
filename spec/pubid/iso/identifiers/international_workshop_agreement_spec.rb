@@ -16,7 +16,9 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     end
 
     context "parses identifiers from international-workshop-agreement.txt" do
-      let(:examples_file) { "iso/identifiers/pass/international_workshop_agreement.txt" }
+      let(:examples_file) do
+        "iso/identifiers/pass/international_workshop_agreement.txt"
+      end
 
       it_behaves_like "parse identifiers from file"
     end

@@ -43,7 +43,7 @@ RSpec.describe "JCGM Serialization" do
         flavor: "jcgm",
         publisher: "JCGM",
         number: "200",
-        year: "2008"
+        year: "2008",
       }
 
       id = Pubid::Serializable.from_h(hash)

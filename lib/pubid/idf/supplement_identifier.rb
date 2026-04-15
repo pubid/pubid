@@ -36,7 +36,7 @@ module Pubid
           " ",
           number.value,
           (date ? ":#{date.year}" : ""),
-        ].join("")
+        ].join
       end
     end
   end

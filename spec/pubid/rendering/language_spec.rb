@@ -24,7 +24,7 @@ RSpec.describe Pubid::Rendering::Language do
     it "renders multiple languages" do
       languages = [
         Pubid::Components::Language.new(code: "en"),
-        Pubid::Components::Language.new(code: "fr")
+        Pubid::Components::Language.new(code: "fr"),
       ]
       expect(instance.render_languages(languages)).to eq("(en/fr)")
     end
@@ -33,7 +33,7 @@ RSpec.describe Pubid::Rendering::Language do
       languages = [
         Pubid::Components::Language.new(code: "en"),
         Pubid::Components::Language.new(code: "fr"),
-        Pubid::Components::Language.new(code: "ru")
+        Pubid::Components::Language.new(code: "ru"),
       ]
       expect(instance.render_languages(languages)).to eq("(en/fr/ru)")
     end

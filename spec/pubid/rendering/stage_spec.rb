@@ -24,7 +24,8 @@ RSpec.describe Pubid::Rendering::Stage do
 
     it "renders stage with copublisher" do
       stage = Pubid::Components::Stage.new(abbr: "WD")
-      expect(instance.render_stage(stage, nil, has_copublisher: true)).to eq(" WD")
+      expect(instance.render_stage(stage, nil,
+                                   has_copublisher: true)).to eq(" WD")
     end
 
     it "renders stage and type" do
@@ -36,7 +37,8 @@ RSpec.describe Pubid::Rendering::Stage do
     it "renders stage and type with copublisher" do
       stage = Pubid::Components::Stage.new(abbr: "WD")
       type = Pubid::Components::Type.new(abbr: "TR")
-      expect(instance.render_stage(stage, type, has_copublisher: true)).to eq(" WD TR")
+      expect(instance.render_stage(stage, type,
+                                   has_copublisher: true)).to eq(" WD TR")
     end
 
     it "does not render default type" do

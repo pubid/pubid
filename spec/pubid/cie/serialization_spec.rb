@@ -43,7 +43,7 @@ RSpec.describe "CIE Serialization" do
         flavor: "cie",
         publisher: "CIE",
         number: "15",
-        year: "2018"
+        year: "2018",
       }
 
       id = Pubid::Serializable.from_h(hash)

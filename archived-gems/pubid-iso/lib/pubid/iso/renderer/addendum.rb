@@ -1,7 +1,11 @@
 require_relative "supplement"
 
-module Pubid::Iso::Renderer
-  class Addendum < Supplement
-    TYPE = "Add".freeze
+module Pubid
+  module Iso
+    module Renderer
+      class Addendum < Supplement
+        TYPE = "Add".freeze
+      end
+    end
   end
 end

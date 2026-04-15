@@ -37,7 +37,7 @@ module Pubid
           parts << "IEEE/ASTM"
 
           # Type (SI or PSI based on typed_stage)
-          parts << if typed_stage && typed_stage.abbr.include?("PSI")
+          parts << if typed_stage&.abbr&.include?("PSI")
                      "PSI"
                    else
                      "SI"

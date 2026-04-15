@@ -17,6 +17,7 @@ module Pubid
         # Returns cec_part + "-" + no_number (e.g., "C22.2-1")
         def code
           return nil unless cec_part && no_number
+
           @code ||= Components::Code.new(value: "#{cec_part.value}-#{no_number.value}")
         end
 
@@ -49,9 +50,9 @@ module Pubid
                    elsif parts.length <= 2
                      # No space after dash-ending prefix (CAN/CSA-, CAN3-)
                      # Join first two parts directly, rest with spaces
-                     parts.join("")
+                     parts.join
                    else
-                     parts[0] + parts[1..-1].join(" ")
+                     parts[0] + parts[1..].join(" ")
                    end
 
           # Year with proper format (colon or dash)
@@ -75,7 +76,7 @@ module Pubid
                            year_prefix + display_year
                          elsif french && year_format != "dash"
                            # Only add F if no prefix already set
-                           "F" + display_year
+                           "F#{display_year}"
                          else
                            display_year
                          end
@@ -95,16 +96,18 @@ module Pubid
             # If original was 4-digit, keep as 4-digit
             # If original was 2-digit, convert from 4-digit storage back to 2-digit
             reaffirmation_str = if reaffirmation_was_4digit
-                                   # Original was 4-digit, keep as-is
-                                   reaffirmation.to_s
-                                 elsif reaffirmation.to_s.length == 4 && (reaffirmation.to_s.start_with?("19") || reaffirmation.to_s.start_with?("20"))
-                                   # Original was 2-digit, convert 4-digit storage back to 2-digit
-                                   # (R2004) → (R04), (R1994) → (R94)
-                                   reaffirmation.to_s[2..3]
-                                 else
-                                   # Already 2-digit or other format
-                                   reaffirmation.to_s
-                                 end
+                                  # Original was 4-digit, keep as-is
+                                  reaffirmation.to_s
+                                elsif reaffirmation.to_s.length == 4 && reaffirmation.to_s.start_with?(
+                                  "19", "20"
+                                )
+                                  # Original was 2-digit, convert 4-digit storage back to 2-digit
+                                  # (R2004) → (R04), (R1994) → (R94)
+                                  reaffirmation.to_s[2..3]
+                                else
+                                  # Already 2-digit or other format
+                                  reaffirmation.to_s
+                                end
 
             # Determine spacing based on original formats
             # Space needed if year is 2-digit and reaffirmation is 4-digit (original format)

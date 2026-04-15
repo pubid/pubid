@@ -6,7 +6,6 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
   subject { described_class }
 
   describe "ISO/ASTM dual-published standards (5xxxx series)" do
-
     describe "parses normal identifier" do
       subject { "ASTM 52303-24e1" }
       let(:parsed) { Pubid::Astm.parse(subject) }
@@ -79,7 +78,6 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
       let(:astm_version) { Pubid::Astm.parse("ASTM 52303-24e1") }
 
       it "ASTM 52303-24e1 corresponds to ISO/ASTM 52303:2024" do
-
         expect(astm_version.code.number).to eq("52303")
         expect(astm_version.year).to eq("2024")
         expect(astm_version.edition).to eq("1")

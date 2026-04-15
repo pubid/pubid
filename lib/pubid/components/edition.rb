@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Pubid
   module Components
     # Edition component (typically a year and number)

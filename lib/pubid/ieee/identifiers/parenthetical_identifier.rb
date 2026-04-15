@@ -11,7 +11,7 @@ module Pubid
 
         def to_s
           result = base_identifier.to_s
-          result += " (#{parenthetical_identifier.to_s})" if parenthetical_identifier
+          result += " (#{parenthetical_identifier})" if parenthetical_identifier
           result
         end
       end

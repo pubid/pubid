@@ -41,11 +41,13 @@ module Pubid
       # Delegate publisher and copublishers to base_identifier if not set
       def publisher
         return @publisher if @ensuring_base
+
         @publisher || base_identifier&.publisher
       end
 
       def copublishers
         return @copublishers if @ensuring_base
+
         @copublishers || base_identifier&.copublishers
       end
 
@@ -75,7 +77,7 @@ module Pubid
         base = SingleIdentifier.new
         base.publisher = publisher
         base.number = base_number if base_number
-        base.part = nil  # Base doesn't have part - part is the supplement number
+        base.part = nil # Base doesn't have part - part is the supplement number
         base.subpart = subpart if subpart
         base.date = date if date
 
@@ -117,19 +119,19 @@ module Pubid
           # Publisher portion
           if publisher
             parts << publisher.body
-            parts << "/" + copublishers.map(&:body).join("/") if copublishers&.any?
+            parts << "/#{copublishers.map(&:body).join('/')}" if copublishers&.any?
           end
 
           # Supplement type and number with part (use base number)
           abbr = typed_stage.abbr.first
           number_str = base_identifier.number.to_s
-          number_str += "-#{number}" if number  # supplement number
+          number_str += "-#{number}" if number # supplement number
           number_str += "-#{subpart}" if subpart
           parts << "#{abbr} #{number_str}"
 
           result = parts.join("/")
           result += ":#{date.year}" if date
-          result += " #{edition}" if edition && edition.number
+          result += " #{edition}" if edition&.number
           result
         elsif base_identifier
           # Normal supplement with real base identifier
@@ -146,7 +148,7 @@ module Pubid
           parts << supp_part
 
           # Add edition if present
-          parts << " #{edition}" if edition && edition.number
+          parts << " #{edition}" if edition&.number
 
           parts.join
         else

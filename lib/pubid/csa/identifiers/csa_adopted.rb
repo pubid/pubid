@@ -52,7 +52,7 @@ module Pubid
             separator = $2
             amend_year = $3
             # Convert 4-digit year to 2-digit if needed
-            if amend_year.length == 4 && (amend_year.start_with?("20") || amend_year.start_with?("19"))
+            if amend_year.length == 4 && amend_year.start_with?("20", "19")
               amend_year = amend_year[2..3]
             end
             "/A#{amendment_num}#{separator}#{amend_year}"
@@ -61,11 +61,11 @@ module Pubid
           # Apply publisher prefix format
           # If publisher_prefix is "CSA-", render as "CSA-ISO..." (no space)
           # Otherwise render as "CSA ISO..." (with space)
-          if publisher_prefix && publisher_prefix.end_with?("-")
-            result = "#{publisher_prefix}#{base_str}"
-          else
-            result = "CSA #{base_str}"
-          end
+          result = if publisher_prefix&.end_with?("-")
+                     "#{publisher_prefix}#{base_str}"
+                   else
+                     "CSA #{base_str}"
+                   end
 
           # Append reaffirmation if present
           result += " (R#{reaffirmation})" if reaffirmation

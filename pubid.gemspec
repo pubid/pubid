@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "lutaml-model"
   spec.add_dependency "parslet"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

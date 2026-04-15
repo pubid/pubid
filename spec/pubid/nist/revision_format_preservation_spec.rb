@@ -16,7 +16,6 @@ RSpec.describe "NIST Revision Format Preservation" do
       identifier = Pubid::Nist.parse("NIST SP 800-53 r5")
       expect(identifier.to_s).to eq("NIST SP 800-53 r5")
     end
-
   end
 
   describe "round-trip fidelity for preserved formats" do

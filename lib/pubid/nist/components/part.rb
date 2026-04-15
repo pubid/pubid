@@ -35,19 +35,20 @@ module Pubid
         def to_s(notation = nil)
           # Handle symbol notation parameters
           notation_to_use = if notation.is_a?(Symbol)
-            case notation
-            when :n_notation then "n"
-            when :pt_notation then "pt"
-            when :letter_notation then ""
-            else notation.to_s
-            end
-          else
-            notation
-          end
+                              case notation
+                              when :n_notation then "n"
+                              when :pt_notation then "pt"
+                              when :letter_notation then ""
+                              else notation.to_s
+                              end
+                            else
+                              notation
+                            end
 
           # If notation explicitly provided, use it
           if notation_to_use
             return "#{notation_to_use}#{value}" unless notation_to_use.empty?
+
             return value
           end
 

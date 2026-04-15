@@ -69,7 +69,7 @@ RSpec.describe "ISO Serialization" do
         flavor: "iso",
         publisher: "ISO",
         number: "9001",
-        year: "2015"
+        year: "2015",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -83,8 +83,8 @@ RSpec.describe "ISO Serialization" do
         number: "9001",
         year: "2015",
         supplements: [
-          { type: "amendment", number: "1", year: "2020" }
-        ]
+          { type: "amendment", number: "1", year: "2020" },
+        ],
       }
 
       id = Pubid::Serializable.from_h(hash)

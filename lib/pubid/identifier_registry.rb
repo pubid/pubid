@@ -17,12 +17,15 @@ module Pubid
         all_identifiers[identifier_class] = IdentifierMetadata::Metadata.new(
           flavor: metadata.fetch(:flavor),
           identifier_class: identifier_class_name,
-          **metadata
+          **metadata,
         )
 
         # Index by various keys for fast lookup
         index_by_flavor(metadata[:flavor], identifier_class)
-        index_by_type_key(metadata[:type_key], identifier_class) if metadata[:type_key]
+        if metadata[:type_key]
+          index_by_type_key(metadata[:type_key],
+                            identifier_class)
+        end
         index_by_abbr(metadata[:abbr], identifier_class) if metadata[:abbr]
 
         identifier_class
@@ -139,12 +142,14 @@ module Pubid
         total = all_identifiers.size
 
         summary = "Identifier Registry Summary\n"
-        summary += "=" * 50 + "\n"
+        summary += "#{'=' * 50}\n"
         summary += "Total identifiers: #{total}\n"
         summary += "Flavors: #{flavors.join(', ')}\n\n"
 
         flavors.each do |flavor|
-          flavor_ids = all_identifiers.values.select { |m| m.flavor.to_s == flavor }
+          flavor_ids = all_identifiers.values.select do |m|
+            m.flavor.to_s == flavor
+          end
           summary += "#{flavor.upcase} (#{flavor_ids.size}):\n"
           flavor_ids.sort_by(&:type_key).each do |metadata|
             summary += "  - #{metadata.type_key}: #{metadata.title}\n"
@@ -165,7 +170,11 @@ module Pubid
       end
 
       def abbr_index
-        @abbr_index ||= Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = [] } }
+        @abbr_index ||= Hash.new do |h, k|
+          h[k] = Hash.new do |h2, k2|
+            h2[k2] = []
+          end
+        end
       end
 
       def index_by_flavor(flavor, identifier_class)

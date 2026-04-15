@@ -6,6 +6,7 @@ module Pubid
   module Cen
     class SingleIdentifier < Lutaml::Model::Serializable
       include Pubid::Serializable
+
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "EN")
       }
@@ -29,8 +30,8 @@ module Pubid
         parts = []
 
         # Check if we have a draft stage (prEN, FprEN) - these include both stage and type
-        is_draft_stage = typed_stage && typed_stage.abbr && %w[prEN
-                                                               FprEN].include?(typed_stage.abbr.first)
+        is_draft_stage = typed_stage&.abbr && %w[prEN
+                                                 FprEN].include?(typed_stage.abbr.first)
 
         # Get type short name - for draft stages, extract base type
         type_short = if is_draft_stage
@@ -49,11 +50,11 @@ module Pubid
         # For CWA/HD, they act as publisher (not EN)
         if %w[CWA HD CR].include?(type_short)
           # Stage prefix OR type as publisher
-          if typed_stage && typed_stage.abbr && typed_stage.abbr.first != type_short
-            parts << typed_stage.abbr.first
-          else
-            parts << type_short
-          end
+          parts << if typed_stage&.abbr && typed_stage.abbr.first != type_short
+                     typed_stage.abbr.first
+                   else
+                     type_short
+                   end
         elsif is_draft_stage
           # Draft stage prefix (prEN, FprEN) OR regular publisher
           parts << typed_stage.abbr.first
@@ -63,7 +64,7 @@ module Pubid
         end
 
         # Copublishers - add to last part (publisher) with slash
-        if copublishers && copublishers.any?
+        if copublishers&.any?
           copub_str = copublishers.map do |cp|
             cp.respond_to?(:body) ? cp.body : cp.to_s
           end.join("/")
@@ -102,7 +103,7 @@ module Pubid
         # Join parts - but handle slash prefix for type
         result = ""
         parts.each_with_index do |part, idx|
-          if idx > 0 && !part.start_with?("/")
+          if idx.positive? && !part.start_with?("/")
             result += " "
           end
           result += part

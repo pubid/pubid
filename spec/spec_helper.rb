@@ -3,7 +3,7 @@
 require_relative "../lib/pubid"
 
 # Load shared test helpers
-Dir[File.expand_path("support/*.rb", __dir__)].sort.each do |file|
+Dir[File.expand_path("support/*.rb", __dir__)].each do |file|
   require_relative file
 end
 

@@ -1,13 +1,17 @@
 require_relative "base"
 
-module Pubid::Cen::Renderer
-  class HarmonizationDocument < Base
-    def render_publisher(_publisher, _opts, _params)
-      ""
-    end
+module Pubid
+  module Cen
+    module Renderer
+      class HarmonizationDocument < Base
+        def render_publisher(_publisher, _opts, _params)
+          ""
+        end
 
-    def render_type(_type, _opts, _params)
-      "HD"
+        def render_type(_type, _opts, _params)
+          "HD"
+        end
+      end
     end
   end
 end

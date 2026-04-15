@@ -20,7 +20,7 @@ RSpec.describe Pubid::Cie::SingleIdentifier do
 
     it "has date_separator attribute" do
       std = Pubid::Cie::Identifiers::Standard.new(code: "1",
-                                                     date_separator: "colon")
+                                                  date_separator: "colon")
       expect(std.date_separator).to eq("colon")
     end
   end

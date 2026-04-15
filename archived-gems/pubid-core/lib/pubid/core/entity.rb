@@ -1,11 +1,13 @@
-module Pubid::Core
-  class Entity
-    def ==(other)
-      instance_variables.map do |var|
-        return false unless instance_variable_get(var) == other.instance_variable_get(var)
-      end
+module Pubid
+  module Core
+    class Entity
+      def ==(other)
+        instance_variables.map do |var|
+          return false unless instance_variable_get(var) == other.instance_variable_get(var)
+        end
 
-      true
+        true
+      end
     end
   end
 end

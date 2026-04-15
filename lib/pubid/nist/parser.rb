@@ -20,12 +20,12 @@ module Pubid
 
         # Fix publisher+series concatenation: "NISTIR" → "NIST IR", "NBSIR" → "NBS IR"
         # Must come after lowercase publisher fix to catch "nistir" → "NISTIR" → "NIST IR"
-        cleaned = cleaned.gsub(/^(NBS|NIST)(IR|FIPS|GCR|HB|MONO|MP|NCSTAR|NSRDS)/i, '\1 \2')
+        cleaned = cleaned.gsub(
+          /^(NBS|NIST)(IR|FIPS|GCR|HB|MONO|MP|NCSTAR|NSRDS)/i, '\1 \2'
+        )
 
         # Fix lowercase series (ir, sp, tn, etc.)
-        cleaned = cleaned.sub(/\b(ir|sp|tn|hb|fips|ams|vts)\b/i) do |m|
-          m.upcase
-        end
+        cleaned = cleaned.sub(/\b(ir|sp|tn|hb|fips|ams|vts)\b/i, &:upcase)
 
         # Normalize LC to LCIRC (single definition of truth)
         # Pattern: "LC" followed by space/dot/end should become "LCIRC"
@@ -35,11 +35,13 @@ module Pubid
         # Combine "NBS LCIRC" with space into "NBS.LCIRC" ONLY when followed by supplement marker
         # This allows the circ_supplement_identifier rule to match the pattern
         # Only apply to supplement cases, not regular LCIRC identifiers
-        cleaned = cleaned.gsub(/\bNBS LCIRC\b(?=.*\b(?:supp?|sup\+|r\d+\/)\d)/, "NBS.LCIRC")
+        cleaned = cleaned.gsub(/\bNBS LCIRC\b(?=.*\b(?:supp?|sup\+|r\d+\/)\d)/,
+                               "NBS.LCIRC")
 
         # Convert MR format LCIRC supplements to space-separated format
         # "NBS.LCIRC.145r11/1925" → "NBS LCIRC 145r11/1925" (convert series dot to space)
-        cleaned = cleaned.gsub(/\bNBS\.LCIRC\.(\d+r\d+\/\d{4})/, "NBS LCIRC \\1")
+        cleaned = cleaned.gsub(/\bNBS\.LCIRC\.(\d+r\d+\/\d{4})/,
+                               "NBS LCIRC \\1")
         # Also handle without year: "NBS.LCIRC.145r11" → "NBS LCIRC 145r11"
         cleaned = cleaned.gsub(/\bNBS\.LCIRC\.(\d+r\d+)\b/, "NBS LCIRC \\1")
 
@@ -62,7 +64,7 @@ module Pubid
         # AND preserve month abbreviations in patterns like "107-Mar1985" (ar1985 contains 'r')
         # Use word boundary to ensure 'r' is standalone, not part of a month name
         # AND preserve "rv" (revision year) patterns: "1013rv1953" stays as-is
-        cleaned = cleaned.gsub(/\b(r(?![v])\d{4})\b/, ' \1')
+        cleaned = cleaned.gsub(/\b(r(?!v)\d{4})\b/, ' \1')
 
         # Fix month in revision: "4743rJun1992" → "4743 rJun1992" (NEW)
         cleaned = cleaned.gsub(/(\d)(r[A-Z][a-z]{2,8}\d{4})/, '\1 \2')
@@ -83,7 +85,9 @@ module Pubid
         # Only match single letter at end, not part of words like "index", "sec", etc.
         cleaned = cleaned.gsub(/(\d)([a-z&&[^r]])$/) { "#{$1}#{$2.upcase}" }
         # Also fix r+letter patterns (e.g., "22r1a" → "22r1A") separately
-        cleaned = cleaned.gsub(/(\d)(r)(\d+)([a-z])$/) { "#{$1}#{$2}#{$3}#{$4.upcase}" }
+        cleaned = cleaned.gsub(/(\d)(r)(\d+)([a-z])$/) do
+          "#{$1}#{$2}#{$3}#{$4.upcase}"
+        end
         # NEW: Fix letter suffix before r (e.g., "53ar1" → "53Ar1")
         # For patterns like NIST SP 800-53ar1 where letter is between number and revision
         cleaned = cleaned.gsub(/(\d)([a-z])(r\d)/) { "#{$1}#{$2.upcase}#{$3}" }
@@ -94,7 +98,11 @@ module Pubid
         # BUT preserve "rv" (revision year) patterns: "1013rv1953" stays as-is
         # Skip for NCSTAR to preserve lowercase letters (patterns like "1-1av1" should stay lowercase)
         is_ncstar = cleaned.include?("NCSTAR")
-        cleaned = cleaned.gsub(/(\d)([a-z&&[^r]])(v\d+)/) { "#{$1}#{$2.upcase}#{$3}" } unless is_ncstar
+        unless is_ncstar
+          cleaned = cleaned.gsub(/(\d)([a-z&&[^r]])(v\d+)/) do
+            "#{$1}#{$2.upcase}#{$3}"
+          end
+        end
 
         # Fix space before volume number: "80-2073 2" → "80-2073 v2" (Session 219)
         # This handles NBS IR 80-2073 2 and NBS IR 80-2073 3 as volume identifiers
@@ -196,9 +204,9 @@ module Pubid
         # FIXED: Pattern must start with "v" or digit to avoid matching "rev 2013" as "v" + " 2013"
         # CRITICAL: Added word boundary \b to prevent matching "v" within "rev"
         # CRITICAL FIX: Use \b to ensure match starts at word boundary
-        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*[-A-Z]*)\s+(\d+)\s+(\d+)/, '\1.\2.\3')  # Three parts
+        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*[-A-Z]*)\s+(\d+)\s+(\d+)/, '\1.\2.\3') # Three parts
         # CRITICAL FIX: Use \b to ensure match starts at word boundary
-        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*)\s+(\d+)/, '\1.\2')             # Two parts
+        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*)\s+(\d+)/, '\1.\2') # Two parts
 
         # Fix update patterns: ensure space before -upd or /upd (not just at end)
         # Enhanced to handle optional digits after upd: -upd, -upd1, /upd, /upd1
@@ -247,8 +255,10 @@ module Pubid
         # Fix MR format translation codes: ".spa" → " spa", ".por" → " por", ".ind" → " ind" (NEW)
         # Prevents 3-letter translation codes from being parsed as letter suffixes
         # "NIST.SP.1262.spa" → "NIST.SP.1262 spa" (convert dot to space)
-        cleaned = cleaned.gsub(/^([A-Z]+)\.SP\.(\d+)\.([a-z]{2,4})$/, '\1.SP.\2 \3')
-        cleaned = cleaned.gsub(/^([A-Z]+)\.([A-Z]+)\.(\d+)\.([a-z]{2,4})$/, '\1.\2.\3 \4')
+        cleaned = cleaned.gsub(/^([A-Z]+)\.SP\.(\d+)\.([a-z]{2,4})$/,
+                               '\1.SP.\2 \3')
+        cleaned = cleaned.gsub(/^([A-Z]+)\.([A-Z]+)\.(\d+)\.([a-z]{2,4})$/,
+                               '\1.\2.\3 \4')
 
         # ENHANCEMENT 1: Edition year normalization (-YYYY → eYYYY)
         # Per NIST spec, trailing -YYYY should normalize to eYYYY format
@@ -265,38 +275,41 @@ module Pubid
         # Use a more specific pattern: only convert when NOT preceded by "e" + digits (edition)
         # AND only convert when year is in valid range (1901-2099)
         cleaned = cleaned.gsub(/(?<!e\d)(?<![eE-])(\d(?:[A-DF-Z]?))-(\d{4})(?=\s|$)/) do |match|
-          prefix = $1  # Number with optional letter
+          prefix = $1 # Number with optional letter
           year = $2.to_i
           # Only convert to edition format if year is in valid range
-          if year >= 1901 && year <= 2099
+          if year.between?(1901, 2099)
             "#{prefix}e#{year}"
           else
-            match  # Keep dash format for part numbers (e.g., 250-1039)
+            match # Keep dash format for part numbers (e.g., 250-1039)
           end
         end
         # Revert the conversion for HB series to preserve -YYYY format
         # Matches both "HB 130e1979" and "HB 105-1e1990" patterns
         # Use [^:\s.]*? (exclude dots) to avoid consuming MR format dot separators
         # This prevents "NIST.HB.135e2022" from being incorrectly reverted
-        cleaned = cleaned.gsub(/\b(HB|HB\s+)[^:\s.]*?(\d+)e(\d{4})(?=\s|$)/, '\1\2-\3')
+        cleaned = cleaned.gsub(/\b(HB|HB\s+)[^:\s.]*?(\d+)e(\d{4})(?=\s|$)/,
+                               '\1\2-\3')
         # Revert the conversion for OWMWP series to preserve date format MM-DD-YYYY
         # OWMWP uses date as the number: "06-13-2018" (not an edition)
         # Pattern: "OWMWP 06-13e2018" → "OWMWP 06-13-2018"
-        cleaned = cleaned.gsub(/\b(OWMWP|OWMWP\s*)[^:\s]*?(\d{2})-(\d{2})e(\d{4})(?=\s|$)/, '\1\2-\3-\4')
+        cleaned = cleaned.gsub(
+          /\b(OWMWP|OWMWP\s*)[^:\s]*?(\d{2})-(\d{2})e(\d{4})(?=\s|$)/, '\1\2-\3-\4'
+        )
         # Revert the conversion for RPT series to preserve year range format YYYY-YYYY
         # Report series uses year ranges as the number: "1946-1947" (not an edition)
         # Pattern: "RPT 1946e1947" → "RPT 1946-1947"
         # Note: This must check that first year < second year (forward range)
         cleaned = cleaned.gsub(/\b(RPT|RPT\s*)([^:\s]*?)(\d{4})e(\d{4})(?=\s|$)/) do |match|
-          prefix = $1  # "RPT" or "RPT "
-          separator = $2  # "." or "" or other non-colon, non-space chars
+          prefix = $1 # "RPT" or "RPT "
+          separator = $2 # "." or "" or other non-colon, non-space chars
           first_year = $3.to_i
           second_year = $4.to_i
           # Only revert if first < second (year range like 1946-1947)
           if first_year < second_year
             "#{prefix}#{separator}#{first_year}-#{second_year}"
           else
-            match  # Keep e format for editions like e2018e2019
+            match # Keep e format for editions like e2018e2019
           end
         end
 
@@ -379,6 +392,7 @@ module Pubid
           # This handles cases where identifier rule returns multiple components (e.g., compound_series + edition)
           merged = result.inject({}) do |acc, hash|
             next acc unless hash.is_a?(Hash)
+
             acc.merge(hash)
           end
           merged.merge(parsed_format: format)
@@ -397,7 +411,7 @@ module Pubid
         # - "FIPS.46e1977" (series.numberWithEdition)
         # - "NBS.HB.28pt1e1969" (publisher.series.part.edition)
         # Key indicator: dots between components instead of spaces
-        if input.match?(/\./) && !input.match?(/\s/)
+        if input.include?(".") && !input.match?(/\s/)
           :mr
         else
           :short
@@ -454,14 +468,14 @@ module Pubid
 
       # Stage ID: i (initial), f (final), 1-9 (numbered iterations)
       rule(:stage_id) do
-        (str("i") | str("I") | str("f") | str("F") |
-         str("1") | str("2") | str("3") | str("4") | str("5") |
-         str("6") | str("7") | str("8") | str("9"))
+        str("i") | str("I") | str("f") | str("F") |
+          str("1") | str("2") | str("3") | str("4") | str("5") |
+          str("6") | str("7") | str("8") | str("9")
       end
 
       # Stage type: pd (public draft), wd (work-in-progress), prd (preliminary)
       rule(:stage_type) do
-        (str("pd") | str("PD") | str("wd") | str("WD") | str("prd") | str("PRD"))
+        str("pd") | str("PD") | str("wd") | str("WD") | str("prd") | str("PRD")
       end
 
       # Old style stage: (IPD), (FPD), (2PD) - parenthetical at document start
@@ -516,7 +530,7 @@ module Pubid
       # Two-letter suffixes: Ur (Unclassified Revised), Ua (Unclassified Amended), Ub-Uj (series variants)
       # Single letter: any letter not followed by excluded keywords
       rule(:number_suffix) do
-        (str("U") >> lower_letter | match("[a-zA-Z]") >> (
+        (str("U") >> lower_letter) | (match("[a-zA-Z]") >> (
           # Match suffixes
           str("ec") |
           str("ndex") |
@@ -531,7 +545,7 @@ module Pubid
           str("ort") |
           str("r") | # NEW: Exclude "r" revision marker (e.g., r5, r1963)
           str("p") # NEW: Exclude "p" part marker (e.g., 28p11969 - part with year pattern)
-          ).absent? >>
+        ).absent? >>
           digits.maybe)
       end
 
@@ -666,9 +680,8 @@ module Pubid
       # Examples: e2, e2021, r5, rev2013, rev 2013, -3
       # Enhanced: Support space-separated format from preprocessing (r1 separated from number)
       rule(:edition) do
-        (
-          # Edition with "e" prefix: e2, e3, e2021 (1-4 digits for ID)
-          (space.maybe >> str("e") >> digits.as(:edition_id)).as(:edition_e) |
+        # Edition with "e" prefix: e2, e3, e2021 (1-4 digits for ID)
+        (space.maybe >> str("e") >> digits.as(:edition_id)).as(:edition_e) |
           # Revision with "r" prefix and SPACE, with letter: r 5A (preserve format)
           (space >> str("r") >> digits.as(:edition_id) >> match("[a-zA-Z]").as(:edition_letter)).as(:edition_r_with_space_letter) |
           # Revision with "r" prefix and SPACE: r 5 (preserve format)
@@ -685,8 +698,8 @@ module Pubid
           (dash >> match("[1-9]").as(:edition_id) >> digit.absent?).as(:edition_historical) |
           # Edition dash-year pattern: -1979, -1990 (dash + 4-digit year)
           # This matches year-only editions like "NBS HB 130-1979"
-          (dash >> match("[0-9]").repeat(4, 4).as(:dash_year)).as(:edition_dash_year)
-        )
+          (dash >> match("[0-9]").repeat(4,
+                                         4).as(:dash_year)).as(:edition_dash_year)
       end
 
       # Date component per NIST spec: -{YYYY} or -{YYYYMM} or -{YYYYMMDD}
@@ -711,10 +724,9 @@ module Pubid
       # LEGACY EDITION PATTERNS (for backward compatibility during migration)
       # These will be gradually replaced as we migrate to proper Edition/Date components
       rule(:legacy_edition) do
-        (
-          # Complex revision patterns: r1a, r2b
-          ((str("r") | str(" R")) >> match("[0-9]").repeat(1,
-                                                           2).as(:edition) >> lower_letter.as(:edition_letter)) |
+        # Complex revision patterns: r1a, r2b
+        ((str("r") | str(" R")) >> match("[0-9]").repeat(1,
+                                                         2).as(:edition) >> lower_letter.as(:edition_letter)) |
           # Edition with revision and year: rev2013, rev2020, rev 2013 (with space)
           (str("rev") >> space.maybe >> digits.as(:edition_year)) |
           # Edition with revision and date: e2revJune1908 (will migrate to e2 + date)
@@ -729,7 +741,6 @@ module Pubid
           # Revision-based edition: revJune1908, revJan1925 (normalize to date)
           (str("rev") >> match("[A-Za-z]").repeat(3,
                                                   9).as(:edition_month) >> digits.as(:edition_year))
-        )
       end
 
       # CRPL range pattern (e.g., 1-2_3-1, 1-2_3-1A with suffix) - matches after first dash
@@ -767,11 +778,13 @@ module Pubid
             ).as(:letter_suffix)).as(:letter_number) |
             # Edition dash-year pattern (e.g., -1979 for handbooks like "NBS HB 130-1979")
             # Matches any 4-digit sequence - the builder decides if it's a year or second_number
-            (dash >> match("[0-9]").repeat(4, 4).as(:dash_year) >> (space | dot | part | crpl_range | second_number | dash).absent?).as(:edition_dash_year) |
+            (dash >> match("[0-9]").repeat(4,
+                                           4).as(:dash_year) >> (space | dot | part | crpl_range | second_number | dash).absent?).as(:edition_dash_year) |
             # Second number followed by edition dash-year (e.g., -1-1990 for "105-1-1990")
             # Handles compound numbers with edition year at the end
             # MUST be BEFORE GCR pattern because both start with dash + second_number + dash
-            (dash >> second_number >> dash >> match("[0-9]").repeat(4, 4).as(:dash_year) >> (space | dot | part | crpl_range | revision | draft).absent?).as(:second_number_edition_year) |
+            (dash >> second_number >> dash >> match("[0-9]").repeat(4,
+                                                                    4).as(:dash_year) >> (space | dot | part | crpl_range | revision | draft).absent?).as(:second_number_edition_year) |
             # FIPS month+year pattern after part (e.g., -1-Sep1977 for "11-1-Sep1977")
             (dash >> second_number >> dash >> month_abbrev.as(:edition_month) >> digits.as(:edition_year) >> (space | dot | part | crpl_range | edition | revision | draft).absent?).as(:fips_month_year_after_part) |
             # GCR multi-dash pattern (e.g., 85-3273-37, 19-200-30B)
@@ -801,7 +814,7 @@ module Pubid
 
       # Part - enhanced to support patterns like p1adde1 AND pt3r1 (part with revision)
       rule(:part) do
-        (space.maybe >> (str("pt") | str("p") | str("P")) | str(" Part ")) >>
+        ((space.maybe >> (str("pt") | str("p") | str("P"))) | str(" Part ")) >>
           (digits >>
            # NEW: Revision after part number: pt3r1, p1r1 (space.maybe for preprocessing)
            (space.maybe >> str("r") >> digits).maybe >>
@@ -812,10 +825,9 @@ module Pubid
 
       # Revision
       rule(:revision) do
-        (
-          # NEW: Revision with month and year: rJun1992, r Jun1992 - LONGEST MATCH FIRST
-          # Enhanced to support leading space (Session 219)
-          (space.maybe >> (str("r") | str("rev")) >> space.maybe >> month_abbrev.as(:revision_month) >> digits.as(:revision_year)) |
+        # NEW: Revision with month and year: rJun1992, r Jun1992 - LONGEST MATCH FIRST
+        # Enhanced to support leading space (Session 219)
+        (space.maybe >> (str("r") | str("rev")) >> space.maybe >> month_abbrev.as(:revision_month) >> digits.as(:revision_year)) |
           # Revision with slash and year: r6/1925, r11/1924 (NEW for LCIRC patterns)
           (space.maybe >> (str("r") | str("rev")) >> digits.as(:revision) >>
            slash >> digits.as(:revision_year)) |
@@ -829,26 +841,23 @@ module Pubid
           # ENHANCED: Accept BOTH lowercase and uppercase letters in suffix
           # ENHANCED: Capture original format prefix for format preservation (e.g., " Rev. 5")
           ((str(" rev ") | str("rev") | str(" r") | str("r") | str(" Rev. ") | str(" Revision (r)")).as(:revision_prefix) >>
-            (digits >> match("[a-zA-Z]").maybe | match("[a-zA-Z]").repeat(1)).as(:revision_id)).as(:revision) |
+            ((digits >> match("[a-zA-Z]").maybe) | match("[a-zA-Z]").repeat(1)).as(:revision_id)).as(:revision) |
           # NEW: Standalone 'r' - MUST BE LAST to avoid consuming from other patterns
           # Matches " r" at end of input (after preprocessing: "800-56a r", "800-27 r")
           (str(" r") >> any.absent?).as(:revision_standalone)
-        )
       end
 
       # Version - V1 SP PARSER COMPATIBLE
       # Supports: ver1.0.2, ver2, " Ver. 2.0", " Version 1.0", v1.0.2, -v1.0, .ver1.0 (MR format)
       rule(:version) do
-        (
-          # Verbose "ver" form - with or without dots (space.maybe before AND after "ver")
-          # ENHANCED: Accept dot prefix for MR format (e.g., "500-281.ver1.0")
-          ((space | dot).maybe >> str("ver") >> space.maybe >> (digits >> (dot >> digits).repeat).as(:version)) |
+        # Verbose "ver" form - with or without dots (space.maybe before AND after "ver")
+        # ENHANCED: Accept dot prefix for MR format (e.g., "500-281.ver1.0")
+        ((space | dot).maybe >> str("ver") >> space.maybe >> (digits >> (dot >> digits).repeat).as(:version)) |
           # Verbose forms with space: " Ver. ", " Version " - require dots
           ((str(" Ver. ") | str(" Version ")) >>
             (digits >> dot >> digits >> (dot >> digits).maybe).as(:version)) |
           # Short form "v" with mandatory dots (v1.0, v1.0.2) - allow optional dash or space before
           ((dash | space).maybe >> str("v") >> (digits >> dot >> digits >> (dot >> digits).maybe).as(:version))
-        )
       end
 
       # Update - V1 COMPATIBLE
@@ -928,14 +937,12 @@ module Pubid
       # Translation (3-letter language code) - V1 COMPATIBLE
       # Supports: (spa), " spa", ".spa" (MR format)
       rule(:translation) do
-        (
-          # Parenthetical format: (spa), (por), (ind)
-          (str("(") >> match('\w').repeat(3, 3).as(:translation) >> str(")")) |
+        # Parenthetical format: (spa), (por), (ind)
+        (str("(") >> match('\w').repeat(3, 3).as(:translation) >> str(")")) |
           # Space-prefix format: " spa"
           (space >> match('\w').repeat(3, 3).as(:translation)) |
           # Dot-prefix format: ".spa" (machine-readable)
           (dot >> match('\w').repeat(3, 3).as(:translation))
-        )
       end
 
       # Public draft suffix - for patterns like 2pd, 3pd
@@ -946,29 +953,27 @@ module Pubid
       # Draft stage - enhanced to support suffix pattern and number after draft
       # ENHANCED: Accept optional space before dash to match after report_number
       rule(:draft) do
-        (space >> str("(Draft)") |
-         space.maybe >> dash >> str("draft") >> (space >> digits | digits).maybe | # Match " -draft 2" OR "-draft2"
+        ((space >> str("(Draft)")) |
+         (space.maybe >> dash >> str("draft") >> ((space >> digits) | digits).maybe) | # Match " -draft 2" OR "-draft2"
          pd_suffix).as(:draft)
       end
 
       # Special date format with slash for FIPS (part of number, not edition)
       rule(:fips_date) do
-        (dash >> digits.as(:fips_part) >> dash >> month_abbrev.as(:fips_month) >>
-          digits.as(:fips_day) >> slash >> digits.as(:fips_year))
+        dash >> digits.as(:fips_part) >> dash >> month_abbrev.as(:fips_month) >>
+          digits.as(:fips_day) >> slash >> digits.as(:fips_year)
       end
 
       # All possible parts (order matters!)
       rule(:parts) do
-        (
-          # Put more specific patterns first
-          # CRITICAL: new_stage BEFORE language_code to avoid "ipd" being treated as translation
-          new_stage |
+        # Put more specific patterns first
+        # CRITICAL: new_stage BEFORE language_code to avoid "ipd" being treated as translation
+        new_stage |
           section | index | insert | appendix | pd_suffix |
           edition | date | legacy_edition | revision |
           version | # MOVED BEFORE volume - try dotted versions (v1.1) before simple volumes (v1)
           volume | part | update | addendum |
           supplement | errata | language_code
-        )
       end
 
       # CIRC Supplement identifier - split into base + supplement

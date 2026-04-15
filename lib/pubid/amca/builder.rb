@@ -69,13 +69,22 @@ module Pubid
         attributes = {}
 
         # Extract copublisher
-        attributes[:copublisher] = extract_value(parsed[:copublisher]) if parsed[:copublisher]
+        if parsed[:copublisher]
+          attributes[:copublisher] =
+            extract_value(parsed[:copublisher])
+        end
 
         # Extract code
         if parsed[:code_with_year]
           code_year_data = parsed[:code_with_year]
-          attributes[:code] = extract_value(code_year_data[:code]) if code_year_data && code_year_data[:code]
-          attributes[:year] = extract_value(code_year_data[:year]) if code_year_data && code_year_data[:year]
+          if code_year_data && code_year_data[:code]
+            attributes[:code] =
+              extract_value(code_year_data[:code])
+          end
+          if code_year_data && code_year_data[:year]
+            attributes[:year] =
+              extract_value(code_year_data[:year])
+          end
         elsif parsed[:code]
           attributes[:code] = extract_value(parsed[:code])
         end
@@ -87,7 +96,10 @@ module Pubid
         attributes[:suffix] = extract_value(parsed[:suffix]) if parsed[:suffix]
 
         # Extract reaffirmed year (R2008, R2010, etc.)
-        attributes[:reaffirmed] = extract_value(parsed[:reaffirmed]) if parsed[:reaffirmed]
+        if parsed[:reaffirmed]
+          attributes[:reaffirmed] =
+            extract_value(parsed[:reaffirmed])
+        end
 
         attributes
       end
@@ -95,7 +107,7 @@ module Pubid
       # Determine which identifier class to use based on attributes
       # @param attributes [Hash] the extracted attributes
       # @return [Class] the identifier class
-      def determine_identifier_class(attributes)
+      def determine_identifier_class(_attributes)
         # Default to Standard for ACMA
         Identifiers::Standard
       end
@@ -108,12 +120,12 @@ module Pubid
         return nil if value.is_a?(Array) && value.empty?
 
         if value.is_a?(Array)
-          joined = value.map(&:to_s).join
-          return joined.length > 0 ? joined : nil
+          joined = value.join
+          return joined.length.positive? ? joined : nil
         end
 
         str_value = value.to_s.strip
-        str_value.length > 0 ? str_value : nil
+        str_value.length.positive? ? str_value : nil
       end
 
       # Build an Interpretation identifier from parsed interpretation data
@@ -123,7 +135,10 @@ module Pubid
         attributes = extract_attributes(parsed)
 
         # Extract interpretation code (JW, KB, RG, AW, AH, or number)
-        attributes[:interpretation_code] = extract_value(parsed[:interpretation_code]) if parsed[:interpretation_code]
+        if parsed[:interpretation_code]
+          attributes[:interpretation_code] =
+            extract_value(parsed[:interpretation_code])
+        end
 
         # Interpretations may not have a year
         attributes[:year] ||= extract_value(parsed[:interpretation_year]) if parsed[:interpretation_year]
@@ -140,7 +155,10 @@ module Pubid
         # Extract revision (Rev. 01-23)
         if parsed[:revision]
           revision_data = parsed[:revision]
-          attributes[:revision] = extract_value(revision_data[:revision_year]) if revision_data && revision_data[:revision_year]
+          if revision_data && revision_data[:revision_year]
+            attributes[:revision] =
+              extract_value(revision_data[:revision_year])
+          end
         end
 
         Identifiers::Publication.new(**attributes)

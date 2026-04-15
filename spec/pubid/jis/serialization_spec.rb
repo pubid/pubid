@@ -52,7 +52,7 @@ RSpec.describe "JIS Serialization" do
         flavor: "jis",
         publisher: "JIS",
         number: "Z 8301",
-        year: "2019"
+        year: "2019",
       }
 
       id = Pubid::Serializable.from_h(hash)

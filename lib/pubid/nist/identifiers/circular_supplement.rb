@@ -33,7 +33,7 @@ module Pubid
 
         attribute :supplement_date_range_start, :string  # Jun1925
         attribute :supplement_date_range_end, :string    # Jun1926
-        attribute :implicit_supplement, :boolean  # true for implicit supplements (e.g., "145r11/1925")
+        attribute :implicit_supplement, :boolean # true for implicit supplements (e.g., "145r11/1925")
 
         def to_s(format = :short)
           # Handle date range supplements (no base identifier)

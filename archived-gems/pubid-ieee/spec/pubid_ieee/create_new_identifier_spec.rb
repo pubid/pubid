@@ -1,6 +1,6 @@
 RSpec.describe Pubid::Ieee::Identifier do
   describe "creating new identifier" do
-    subject { described_class.create(**{ number: number }.merge(params)) }
+    subject { described_class.create(number: number, **params) }
     let(:number) { 123 }
     let(:params) { {} }
 

@@ -999,14 +999,15 @@ module Pubid
             if first_part.key?(:subpart)
               {
                 part: Components::Code.new(value: part_str),
-                subpart: Components::Code.new(value: first_part[:subpart].to_s)
+                subpart: Components::Code.new(value: first_part[:subpart].to_s),
               }
             else
               # Old format - split on dash to get part and subpart
               part_components = part_str.split("-")
               result = { part: Components::Code.new(value: part_components.first) }
               if part_components.length > 1
-                result[:subpart] = Components::Code.new(value: part_components[1])
+                result[:subpart] =
+                  Components::Code.new(value: part_components[1])
               end
               result
             end
@@ -1152,10 +1153,10 @@ module Pubid
         # The parser may produce nested hash: {:adopted_string=>{:adopted_string=>"ISO 37101:2016"}}
         adopted_str_value = data[:adopted_string]
         adopted_str = if adopted_str_value.is_a?(Hash)
-                       adopted_str_value[:adopted_string] || adopted_str_value[:adopted_string_no_expert]
-                     else
-                       adopted_str_value
-                     end
+                        adopted_str_value[:adopted_string] || adopted_str_value[:adopted_string_no_expert]
+                      else
+                        adopted_str_value
+                      end
         adopted_str = adopted_str.to_s.strip if adopted_str
 
         return nil unless adopted_str && !adopted_str.empty?
@@ -1218,8 +1219,13 @@ module Pubid
           if translation_match
             data[:translation_lang] = translation_match[1]
             # Track if "version" or "Translation" suffix was present
-            data[:translation_suffix_type] = translation_match[2] if translation_match[2]
-            adopted_str = adopted_str.sub(/\s*\([A-Za-z]+(?:\s+(?:Translation|version))?\)\s*$/, "")
+            if translation_match[2]
+              data[:translation_suffix_type] =
+                translation_match[2]
+            end
+            adopted_str = adopted_str.sub(
+              /\s*\([A-Za-z]+(?:\s+(?:Translation|version))?\)\s*$/, ""
+            )
           end
         # Handle all-caps format: "FRENCH TRANSLATION"
         elsif adopted_str.match?(/\s+(SPANISH|FRENCH|GERMAN|ITALIAN)\s+TRANSLATION\s*$/)
@@ -1228,7 +1234,9 @@ module Pubid
             data[:translation_upper] = translation_upper_match[1]
             # Track that "Translation" suffix was present
             data[:translation_suffix_type] = "Translation"
-            adopted_str = adopted_str.sub(/\s+(SPANISH|FRENCH|GERMAN|ITALIAN)\s+TRANSLATION\s*$/, "")
+            adopted_str = adopted_str.sub(
+              /\s+(SPANISH|FRENCH|GERMAN|ITALIAN)\s+TRANSLATION\s*$/, ""
+            )
           end
         end
 
@@ -1263,25 +1271,25 @@ module Pubid
         extracted_supplements = []
         # Match patterns like: +A1:2020, +A11:2021, +AMD1:2001, +C1:2020, +COR1:2020
         # Must be at end of string or followed by space (not colon, which is part of date)
-        adopted_str_clean = adopted_str_clean.gsub(/([+])(A(\d+)|AMD(\d+)|C(\d+)|COR(\d+)):(\d{4})(?:\s|$)/) do |match|
+        adopted_str_clean = adopted_str_clean.gsub(/([+])(A(\d+)|AMD(\d+)|C(\d+)|COR(\d+)):(\d{4})(?:\s|$)/) do |_match|
           separator = $1 # "+" or "/"
           type_code = $2 || $3 || $4 || $5 || $6
-          number = $2 || $3 || $4 || $5 || $6
+          $2 || $3 || $4 || $5 || $6
           year = $7
 
           # Determine supplement type
-          supp_type = if type_code.start_with?("A") || type_code.start_with?("AMD")
-                       :amendment
-                     elsif type_code.start_with?("C") || type_code.start_with?("COR")
-                       :corrigendum
-                     end
+          supp_type = if type_code.start_with?("A", "AMD")
+                        :amendment
+                      elsif type_code.start_with?("C", "COR")
+                        :corrigendum
+                      end
 
           # Extract number from type code (A1 -> 1, AMD1 -> 1, C1 -> 1)
           supp_number = if type_code.start_with?("AMD")
-                         type_code.sub("AMD", "")
-                       else
-                         type_code.sub(/^[AC]/, "")
-                       end
+                          type_code.sub("AMD", "")
+                        else
+                          type_code.sub(/^[AC]/, "")
+                        end
 
           extracted_supplements << {
             type: supp_type,
@@ -1394,9 +1402,9 @@ module Pubid
                            translation_upper: data[:translation_upper]&.to_s,
                            # Pass expert_commentary data ONLY if no supplements
                            # When supplements are present, ConsolidatedIdentifier will add ExComm later
-                           expert_commentary: data[:expert_commentary] && !extracted_supplements.any?,
+                           expert_commentary: data[:expert_commentary] && extracted_supplements.none?,
                            # Pass expert_commentary_topic if present and no supplements
-                           expert_commentary_topic: (data[:expert_commentary_topic] if !extracted_supplements.any?),
+                           expert_commentary_topic: (data[:expert_commentary_topic] if extracted_supplements.none?),
                            # Pass translation_suffix_type for rendering
                            translation_suffix_type: data[:translation_suffix_type]&.to_s,
                            # Pass reaffirmation_year for rendering
@@ -1414,7 +1422,7 @@ module Pubid
               identifier,
               extracted_supplements,
               expert_commentary: data[:expert_commentary],
-              expert_commentary_topic: data[:expert_commentary_topic]
+              expert_commentary_topic: data[:expert_commentary_topic],
             )
           elsif data[:expert_commentary]
             # When no supplements but ExComm present, wrap with ExpertCommentary
@@ -1425,7 +1433,8 @@ module Pubid
         end
       end
 
-      def wrap_with_consolidated(base_identifier, supplements_data, expert_commentary: nil, expert_commentary_topic: nil)
+      def wrap_with_consolidated(base_identifier, supplements_data,
+expert_commentary: nil, expert_commentary_topic: nil)
         # If expert_commentary data is provided, set it on the base_identifier
         # This allows ConsolidatedIdentifier to render the ExComm suffix correctly
         if expert_commentary && base_identifier.respond_to?(:expert_commentary=)

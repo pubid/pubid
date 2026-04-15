@@ -28,7 +28,9 @@ module Pubid
 
       # Number with optional letter prefix or suffix
       rule(:number) do
-        (letter.repeat(1, 1) >> digits | digits >> letter.repeat(0, 1)).as(:number)
+        ((letter.repeat(1,
+                        1) >> digits) | (digits >> letter.repeat(0,
+                                                                 1))).as(:number)
       end
 
       # Year

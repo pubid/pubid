@@ -3,18 +3,18 @@
 
 # Generates docs/legacy-update-codes-reference.md from data/{flavor}/update_codes.yaml files
 
-require 'yaml'
+require "yaml"
 
-DATA_DIR = 'data'
-OUTPUT = 'docs/legacy-update-codes-reference.md'
+DATA_DIR = "data"
+OUTPUT = "docs/legacy-update-codes-reference.md"
 
 FLAVORS = {
-  'iso' => 'ISO',
-  'iec' => 'IEC',
-  'ieee' => 'IEEE',
-  'nist' => 'NIST',
-  'ccsds' => 'CCSDS',
-  'plateau' => 'PLATEAU',
+  "iso" => "ISO",
+  "iec" => "IEC",
+  "ieee" => "IEEE",
+  "nist" => "NIST",
+  "ccsds" => "CCSDS",
+  "plateau" => "PLATEAU",
 }.freeze
 
 def read_yaml_file(file)
@@ -29,16 +29,16 @@ def parse_yaml_content(content)
   entries = []
   content.lines.each do |line|
     line = line.strip
-    next if line.empty? || line.start_with?('#')
+    next if line.empty? || line.start_with?("#")
 
-    if line.include?(':')
+    if line.include?(":")
       # Parse "key: value" or "key: -> value" (regex)
-      parts = line.split(': ', 2)
+      parts = line.split(": ", 2)
       if parts.length == 2
         key = parts[0].strip
         value = parts[1].strip
         entries << { key: key, value: value, regex: false }
-      elsif line =~ %r{^\/(.*)\/:\s*(.+)$} # Regex pattern: /pattern/: value
+      elsif line =~ %r{^/(.*)/:\s*(.+)$} # Regex pattern: /pattern/: value
         entries << { key: line, value: $2.strip, regex: true }
       end
     end
@@ -47,9 +47,8 @@ def parse_yaml_content(content)
 end
 
 def render_entries(entries)
-  lines = []
-  entries.each do |entry|
-    lines << "`#{entry[:key]}` → `#{entry[:value]}`"
+  lines = entries.map do |entry|
+    "`#{entry[:key]}` → `#{entry[:value]}`"
   end
   lines.join("\n")
 end

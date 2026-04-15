@@ -34,9 +34,9 @@ puts "\nTrying full Pubid::Ieee.parse..."
 begin
   id = Pubid::Ieee.parse(test_case)
   puts "\n✓ SUCCESS: Parsed as #{id.class}"
-  puts "Result: #{id.to_s}"
+  puts "Result: #{id}"
 rescue Parslet::ParseFailed => e
   puts "\n✗ FAILED: #{e.message}"
-rescue => e
+rescue StandardError => e
   puts "\n✗ ERROR: #{e.class} - #{e.message}"
 end

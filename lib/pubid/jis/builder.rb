@@ -51,7 +51,7 @@ module Pubid
         amd_data = data[:amendment]
 
         # Build base document (without supplement)
-        base_data = data.reject { |k, _| k == :amendment }
+        base_data = data.except(:amendment)
         base = build_single_identifier(base_data)
 
         # Build amendment
@@ -66,7 +66,7 @@ module Pubid
         expl_data = data[:explanation]
 
         # Build base document (without supplement)
-        base_data = data.reject { |k, _| k == :explanation }
+        base_data = data.except(:explanation)
         base = build_single_identifier(base_data)
 
         # Build explanation

@@ -28,7 +28,7 @@ module Pubid
         parts = []
         parts << number.value if number
         parts << ":#{date.year}" if date
-        parts.join("")
+        parts.join
       end
 
       def language_portion
@@ -38,7 +38,7 @@ module Pubid
           "(",
           languages.map(&:original_code).join("/"),
           ")",
-        ].join("")
+        ].join
       end
 
       def to_s

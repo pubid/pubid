@@ -7,7 +7,7 @@ module Pubid
     class BundledIdentifier < Identifier
       attribute :base_document, Identifier, polymorphic: true
       attribute :supplements, ::Pubid::Identifier, polymorphic: true,
-                                                      collection: true
+                                                   collection: true
       attribute :type, :string, default: -> { "bundled_identifier" }
 
       # Delegate key attributes to base_document for easier access in tests
@@ -72,19 +72,16 @@ stage_format_long: nil, with_date: nil)
 
         # Add each supplement's URN contribution
         supplements.each do |supplement|
+          sup_urn = supplement.to_urn
           if supplement.is_a?(Identifiers::DirectivesSupplement)
-            # DirectivesSupplement has special URN format
-            sup_urn = supplement.to_urn
-            # Extract parts after "urn:iso:doc:"
-            sup_parts = sup_urn.split(":").drop(3)
-            urn_parts.concat(sup_parts)
+          # DirectivesSupplement has special URN format
+          # Extract parts after "urn:iso:doc:"
           else
             # For other supplement types, add their URN parts
-            sup_urn = supplement.to_urn
             # Extract relevant parts and add them
-            sup_parts = sup_urn.split(":").drop(3)
-            urn_parts.concat(sup_parts)
           end
+          sup_parts = sup_urn.split(":").drop(3)
+          urn_parts.concat(sup_parts)
         end
 
         urn_parts.join(":")

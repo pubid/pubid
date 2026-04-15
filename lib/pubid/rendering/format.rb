@@ -16,7 +16,8 @@ module Pubid
       def determine_format(format)
         return :short unless format
         return :mr if format.to_sym == :mr
-        return :full if [:full, :long].include?(format.to_sym)
+        return :full if %i[full long].include?(format.to_sym)
+
         :short
       end
     end

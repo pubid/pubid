@@ -99,14 +99,14 @@ module Pubid
             return [
               publisher.body,
               (abbr.empty? ? "" : " #{abbr}"),
-            ].join("")
+            ].join
           end
 
           # If there are copublishers, join them with slashes, then space + Guide
           [
             ([publisher] + copublishers).map(&:body).join("/"),
             (abbr.empty? ? "" : " #{abbr}"),
-          ].join("")
+          ].join
         end
 
         # TODO: Support French and Russian

@@ -12,7 +12,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["FIPS", "NIST FIPS"],
             stage_code: "published",
-            type_code: "fips"
+            type_code: "fips",
           ),
         ].freeze
 
@@ -22,7 +22,8 @@ module Pubid
           end
 
           def type
-            { key: :fips, title: "Federal Information Processing Standards", short: "FIPS" }
+            { key: :fips, title: "Federal Information Processing Standards",
+              short: "FIPS" }
           end
         end
 

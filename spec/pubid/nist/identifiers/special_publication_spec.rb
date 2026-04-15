@@ -369,7 +369,8 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
   describe ".type" do
     it "returns type hash" do
       type = described_class.type
-      expect(type).to eq({ key: :sp, title: "NIST Special Publication", short: "SP" })
+      expect(type).to eq({ key: :sp, title: "NIST Special Publication",
+                           short: "SP" })
     end
   end
 end

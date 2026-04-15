@@ -51,7 +51,7 @@ RSpec.describe "AMCA Serialization" do
         publisher: "AMCA",
         number: "210",
         year: "08",
-        type: "standard"
+        type: "standard",
       }
 
       id = Pubid::Serializable.from_h(hash)

@@ -14,8 +14,8 @@ RSpec.describe Pubid::IdentifierMetadata do
         short: "IS",
         abbr: ["", "IS"],
         base_class: "SingleIdentifier",
-        stage_codes: [:dp, :wd, :cd],
-        machine_codes: { iso_stage: ["40.60", "60.60"] }
+        stage_codes: %i[dp wd cd],
+        machine_codes: { iso_stage: ["40.60", "60.60"] },
       )
     end
 
@@ -76,7 +76,7 @@ RSpec.describe Pubid::IdentifierRegistry do
         Pubid::Iso::Identifiers::InternationalStandard,
         flavor: :iso,
         type_key: :is,
-        title: "International Standard"
+        title: "International Standard",
       )
 
       expect(described_class.all_identifiers.size).to eq(1)
@@ -90,7 +90,7 @@ RSpec.describe Pubid::IdentifierRegistry do
         flavor: :iso,
         type_key: :is,
         title: "International Standard",
-        abbr: ["", "IS"]
+        abbr: ["", "IS"],
       )
     end
 
@@ -112,7 +112,7 @@ RSpec.describe Pubid::IdentifierRegistry do
         flavor: :iso,
         type_key: :is,
         title: "International Standard",
-        abbr: ["", "IS", "is"]
+        abbr: ["", "IS", "is"],
       )
     end
 
@@ -135,7 +135,7 @@ RSpec.describe Pubid::IdentifierRegistry do
         type_key: :is,
         title: "International Standard",
         abbr: ["IS"],
-        base_class: "SingleIdentifier"
+        base_class: "SingleIdentifier",
       )
     end
 
@@ -163,7 +163,7 @@ RSpec.describe Pubid::IdentifierRegistry do
         flavor: :iso,
         type_key: :is,
         title: "International Standard",
-        abbr: ["IS"]
+        abbr: ["IS"],
       )
     end
 

@@ -20,19 +20,20 @@ module Pubid
 
       # Year pattern (2 digits starting with 0-1, or 4 digits starting with 19 or 20)
       rule(:year_digits) do
-        (str("19") | str("20")) >> digit.repeat(2, 2) |
-        digit.repeat(2, 2)
+        ((str("19") | str("20")) >> digit.repeat(2, 2)) |
+          digit.repeat(2, 2)
       end
 
       # Copublisher (ANSI/AMCA or AMCA)
       rule(:copublisher) do
         (str("ANSI") >> slash >> str("AMCA")) |
-        (str("AMCA"))
+          str("AMCA")
       end
 
       # Additional copublisher after year (e.g., /ASHRAE 51-16)
       rule(:additional_copublisher) do
-        slash >> letter.repeat(2, 10) >> space >> digits >> (dash >> digits).maybe
+        slash >> letter.repeat(2,
+                               10) >> space >> digits >> (dash >> digits).maybe
       end
 
       # Code pattern (e.g., 210, 500-D, 99, 204)
@@ -66,8 +67,8 @@ module Pubid
 
       # Interpretation code (JW, KB, RG, AW, AH, or just a number)
       rule(:interpretation_code) do
-        (letter.repeat(2).as(:interpretation_code)) | # Two-letter code
-        (digits.as(:interpretation_code)) # Number
+        letter.repeat(2).as(:interpretation_code) | # Two-letter code
+          digits.as(:interpretation_code) # Number
       end
 
       # Interpretation keyword
@@ -79,10 +80,10 @@ module Pubid
       rule(:identifier) do
         # Interpretation patterns (must come first as they're more specific)
         interpretation_identifier |
-        # Publication patterns
-        publication_identifier |
-        # Standard patterns (must come last as they're the most general)
-        standard_identifier
+          # Publication patterns
+          publication_identifier |
+          # Standard patterns (must come last as they're the most general)
+          standard_identifier
       end
 
       # Interpretation pattern (e.g., AMCA 99 JW Interp, AMCA 204 – 1)
@@ -93,16 +94,16 @@ module Pubid
           space >>
           # Either a letter code (JW, KB, etc.) or a dash-number pattern
           (
-            interpretation_code >> interp_keyword |
-            (str("–") | str("-")) >> digits.as(:interpretation_year) >> interp_keyword.maybe
+            (interpretation_code >> interp_keyword) |
+            ((str("–") | str("-")) >> digits.as(:interpretation_year) >> interp_keyword.maybe)
           )
         ).as(:interpretation) |
-        # Simple interpretation: AMCA 511 Interp
-        (
-          copublisher.as(:copublisher).maybe >> space >>
-          code >>
-          interp_keyword
-        ).as(:interpretation)
+          # Simple interpretation: AMCA 511 Interp
+          (
+            copublisher.as(:copublisher).maybe >> space >>
+            code >>
+            interp_keyword
+          ).as(:interpretation)
       end
 
       # Publication pattern (e.g., AMCA Publication 211-22 (Rev. 01-23))

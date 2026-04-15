@@ -79,10 +79,10 @@ module Pubid
             (digits.as(:main_number) >> space >> (str("(") >> digits.as(:alt_number) >> str(")")).as(:parenthetical)) |
 
             # Simple number: 56, 123, 18, 552
-            digits >>
+            (digits >>
 
             # Handle "Nos X and Y" pattern - we only capture first number
-            (space >> str("and") >> space >> digits).absent?
+            (space >> str("and") >> space >> digits).absent?)
           ).as(:number)
         end
 

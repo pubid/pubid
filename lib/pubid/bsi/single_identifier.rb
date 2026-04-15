@@ -6,6 +6,7 @@ module Pubid
   module Bsi
     class SingleIdentifier < Lutaml::Model::Serializable
       include Pubid::Serializable
+
       # Generate URN for this identifier
       #
       # @return [String] URN representation

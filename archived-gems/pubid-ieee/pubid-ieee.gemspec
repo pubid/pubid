@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "parslet", "~> 2.0.0"
   spec.add_dependency "pubid-iso", "= 1.15.2"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

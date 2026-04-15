@@ -117,17 +117,14 @@ class FixturesClassifier
     parsed = parse_identifier(id_str)
     rendered = parsed.to_s
 
+    @stats[:passing] += 1
+    class_name = detect_class_name(parsed, id_str)
+    @stats[:by_class][class_name][:pass] += 1
     if rendered == id_str
       # Perfect round-trip - write as plain
-      @stats[:passing] += 1
-      class_name = detect_class_name(parsed, id_str)
-      @stats[:by_class][class_name][:pass] += 1
       append_to_file("pass", class_name, id_str)
     else
       # Successful parse but different rendering - write as normalized to PASS
-      @stats[:passing] += 1
-      class_name = detect_class_name(parsed, id_str)
-      @stats[:by_class][class_name][:pass] += 1
       append_to_file("pass", class_name, "!#{id_str}!#{rendered}")
     end
   rescue StandardError => e
@@ -186,7 +183,7 @@ class FixturesClassifier
 
   def parse_identifier(id_str)
     flavor_module = Pubid::Registry.get(flavor)
-    if flavor_module && flavor_module.respond_to?(:parse)
+    if flavor_module.respond_to?(:parse)
       flavor_module.parse(id_str)
     else
       raise "Unknown or unsupported flavor: #{flavor}"
@@ -222,14 +219,14 @@ class FixturesClassifier
     return "nsb_format" if /FprISO|PrISO/.match?(id_str)
     return "cyrillic" if /[А-Яа-яЁё]/.match?(id_str)
     return "guide" if /Guide/i.match?(id_str)
-    return "directives" if /DIR/.match?(id_str)
+    return "directives" if id_str.include?("DIR")
     return "amendment" if /\/Amd|\/AMD|\/FDAM|\/PDAM|\/DAM/.match?(id_str)
     return "corrigendum" if /\/Cor|\/COR|\/FDCOR|\/DCOR/.match?(id_str)
     return "technical_report" if /\bTR\b/.match?(id_str)
     return "technical_specification" if /\bTS\b/.match?(id_str)
     return "pas" if /\bPAS\b/.match?(id_str)
     return "international_workshop_agreement" if /\bIWA\b/.match?(id_str)
-    return "addendum" if /\/Add/.match?(id_str)
+    return "addendum" if id_str.include?("/Add")
 
     "international_standard"
   end
@@ -240,9 +237,9 @@ class FixturesClassifier
     return "guide" if /GUIDE/i.match?(id_str)
     return "pas" if /\bPAS\b/.match?(id_str)
     return "srd" if /\bSRD\b/.match?(id_str)
-    return "amendment" if /\/AMD/.match?(id_str)
-    return "corrigendum" if /\/COR/.match?(id_str)
-    return "interpretation_sheet" if /\/ISH/.match?(id_str)
+    return "amendment" if id_str.include?("/AMD")
+    return "corrigendum" if id_str.include?("/COR")
+    return "interpretation_sheet" if id_str.include?("/ISH")
     return "vap_identifier" if /\bVAP\b/.match?(id_str)
     return "consolidated_identifier" if /\+AMD|\+COR/.match?(id_str)
 
@@ -254,7 +251,8 @@ class FixturesClassifier
     return "nesc/handbook" if /NESC.*Handbook/i.match?(id_str)
     return "standard" if /\bIEEE Std\b/.match?(id_str)
     return "base" if /\bIEEE\b/.match?(id_str)
-    return "standard" # Default fallback for IEEE
+
+    "standard" # Default fallback for IEEE
   end
 
   def detect_nist_class(id_str)
@@ -308,26 +306,26 @@ class FixturesClassifier
     return "recommendation" if /\bR \d/.match?(id_str)
     return "seminar_report" if /\bS \d/.match?(id_str)
     return "vocabulary" if /\bV \d|VIML/.match?(id_str)
-    return "amendment" if /Amendment/.match?(id_str)
-    return "annex" if /Annex/.match?(id_str)
+    return "amendment" if id_str.include?("Amendment")
+    return "annex" if id_str.include?("Annex")
 
     "unknown"
   end
 
   def detect_idf_class(id_str)
     return "international_standard" if /^IDF \d/.match?(id_str)
-    return "reviewed_method" if /\(RM\)/.match?(id_str)
-    return "amendment" if /Amendment/.match?(id_str)
-    return "corrigendum" if /Corrigendum/.match?(id_str)
+    return "reviewed_method" if id_str.include?("(RM)")
+    return "amendment" if id_str.include?("Amendment")
+    return "corrigendum" if id_str.include?("Corrigendum")
 
     "unknown"
   end
 
   def detect_csa_class(id_str)
-    return "series" if /SERIES/.match?(id_str)
-    return "bundled" if /\+/.match?(id_str)
-    return "combined" if /\//.match?(id_str)
-    return "package" if /PACKAGE/.match?(id_str)
+    return "series" if id_str.include?("SERIES")
+    return "bundled" if id_str.include?("+")
+    return "combined" if id_str.include?("/")
+    return "package" if id_str.include?("PACKAGE")
     return "canadian_adopted" if /^CAN\//.match?(id_str)
     return "csa_adopted" if /CSA ISO|CSA IEC|CSA CISPR/.match?(id_str)
 
@@ -349,7 +347,7 @@ class FixturesClassifier
 
     # Create parent directories if needed
     parent_dir = File.dirname(filename)
-    FileUtils.mkdir_p(parent_dir) unless Dir.exist?(parent_dir)
+    FileUtils.mkdir_p(parent_dir)
 
     unless File.exist?(filename)
       File.open(filename, "w") do |f|

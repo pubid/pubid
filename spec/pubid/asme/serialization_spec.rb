@@ -43,7 +43,7 @@ RSpec.describe "ASME Serialization" do
         flavor: "asme",
         publisher: "ASME",
         number: "B16.5",
-        year: "2020"
+        year: "2020",
       }
 
       id = Pubid::Serializable.from_h(hash)

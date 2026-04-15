@@ -13,7 +13,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["NSRDS", "NBS NSRDS"],
             stage_code: "published",
-            type_code: "nsrds"
+            type_code: "nsrds",
           ),
         ].freeze
 
@@ -23,7 +23,8 @@ module Pubid
           end
 
           def type
-            { key: :nsrds, title: "National Standard Reference Data Series", short: "NSRDS" }
+            { key: :nsrds, title: "National Standard Reference Data Series",
+              short: "NSRDS" }
           end
         end
 

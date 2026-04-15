@@ -138,29 +138,38 @@ RSpec.describe Pubid::Nist::Components::Stage do
 
     it "raises ArgumentError for invalid stage id" do
       stage = described_class.new(id: "x", type: "pd")
-      expect { stage.validate! }.to raise_error(ArgumentError, /Invalid stage id/)
+      expect do
+        stage.validate!
+      end.to raise_error(ArgumentError, /Invalid stage id/)
     end
 
     it "raises ArgumentError for invalid stage type" do
       stage = described_class.new(id: "i", type: "xyz")
-      expect { stage.validate! }.to raise_error(ArgumentError, /Invalid stage type/)
+      expect do
+        stage.validate!
+      end.to raise_error(ArgumentError, /Invalid stage type/)
     end
 
     it "raises ArgumentError for invalid numeric id" do
       stage = described_class.new(id: "0", type: "pd")
-      expect { stage.validate! }.to raise_error(ArgumentError, /Invalid stage id/)
+      expect do
+        stage.validate!
+      end.to raise_error(ArgumentError, /Invalid stage id/)
     end
 
     it "raises ArgumentError for id greater than 9" do
       stage = described_class.new(id: "10", type: "pd")
-      expect { stage.validate! }.to raise_error(ArgumentError, /Invalid stage id/)
+      expect do
+        stage.validate!
+      end.to raise_error(ArgumentError, /Invalid stage id/)
     end
   end
 
   describe "STAGES constant" do
     it "has valid id keys" do
       stages = described_class::STAGES
-      expect(stages["id"]).to include("i", "f", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+      expect(stages["id"]).to include("i", "f", "1", "2", "3", "4", "5", "6",
+                                      "7", "8", "9")
     end
 
     it "has valid type keys" do

@@ -35,7 +35,7 @@ module Pubid
             code_str = parsed_hash[:code].to_s
             identifier.code = Pubid::Ieee::Components::Code.new(
               prefix: code_str[0], # "C" from "C2"
-              number: code_str[1..-1], # "2" from "C2"
+              number: code_str[1..], # "2" from "C2"
             )
           end
 

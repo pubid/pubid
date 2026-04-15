@@ -42,17 +42,15 @@ module Pubid
               # Format: {base} PACKAGE {materials}
               result += " PACKAGE"
               result += " #{package_materials}"
-            else
+            elsif package_materials.match?(/\sPACKAGE\s*$/i)
               # Format: {base} {materials} PACKAGE
               # Check if materials already end with "Package" (to preserve exact capitalization)
-              if package_materials.match?(/\sPACKAGE\s*$/i)
-                # Materials already include the Package suffix
-                result += " #{package_materials}"
-              else
-                # Add Package suffix (use the package_keyword value)
-                result += " #{package_materials}"
-                result += " #{package_keyword}"
-              end
+              # Materials already include the Package suffix
+              result += " #{package_materials}"
+            else
+              # Add Package suffix (use the package_keyword value)
+              result += " #{package_materials}"
+              result += " #{package_keyword}"
             end
           else
             # No materials, just add PACKAGE keyword

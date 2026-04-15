@@ -6,30 +6,26 @@ module Pubid
       class Base < SingleIdentifier
         def to_s
           # Handle joint published identifiers
+          parts = []
           if first_publisher && first_code
             # CSA B44.10/ASME A17.10 or API 579-2/ASME PTB-14 format
-            parts = []
             parts << first_publisher
             parts << first_code
             parts << "/#{second_publisher}" if second_publisher
             parts << code.to_s if code && code.to_s != ""
 
-            result = parts.join(" ")
           elsif joint_publisher
             # ISO/ASME or ASME/ANS format
-            parts = []
             parts << joint_publisher
             parts << code.to_s if code && code.to_s != ""
 
-            result = parts.join(" ")
           else
             # Standard ASME format
-            parts = []
             parts << publisher if publisher
             parts << code.to_s if code
 
-            result = parts.join(" ")
           end
+          result = parts.join(" ")
 
           # PTC suffix (space-separated)
           if ptc_suffix

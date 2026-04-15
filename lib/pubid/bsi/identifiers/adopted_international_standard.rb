@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Bsi
     module Identifiers
@@ -46,11 +45,11 @@ module Pubid
 
           # ExpertCommentary suffix
           if expert_commentary
-            if expert_commentary_topic
-              result += " ExComm (#{expert_commentary_topic})"
-            else
-              result += " ExComm"
-            end
+            result += if expert_commentary_topic
+                        " ExComm (#{expert_commentary_topic})"
+                      else
+                        " ExComm"
+                      end
           end
 
           result
