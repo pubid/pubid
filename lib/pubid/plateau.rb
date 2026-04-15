@@ -12,8 +12,10 @@ module Pubid
     autoload :UrnGenerator, "#{__dir__}/plateau/urn_generator"
 
     def self.parse(input)
+      # Apply legacy update_codes normalization first
+      normalized = Core::UpdateCodes.apply(input, :plateau)
       parser = Parser.new
-      parsed = parser.parse(input)
+      parsed = parser.parse(normalized)
       Builder.build(parsed)
     end
   end

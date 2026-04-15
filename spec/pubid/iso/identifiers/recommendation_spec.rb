@@ -287,11 +287,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     end
 
     # Legacy version of ISO/R with part
-    # Test undated roman numeral parts ISO/R 657/IV normalizes to ISO/R 657-4
+    # update_codes normalizes ISO/R 657/IV to ISO/R 657-4:1969 (with date from update_codes.yaml)
     describe "ISO/R 657/IV" do
       subject { "ISO/R 657/IV" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/R 657-4" }
+      let(:normalized) { "ISO/R 657-4:1969" }
       let(:urn) { "urn:iso:std:iso:r:657:-4" }
 
       it "parses publisher" do
@@ -307,7 +307,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses date" do
-        expect(parsed.date).to be_nil
+        expect(parsed.date.year).to eq("1969")
       end
 
       it "normalizes roman numeral to arabic" do

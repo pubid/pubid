@@ -454,7 +454,9 @@ module Pubid
 
         # Parse a single IEEE identifier
         def self.parse_single(input)
-          parsed = Parser.parse(input) # Use class method for preprocessing
+          # Apply legacy update_codes normalization first, before Parser's extensive preprocessing
+          normalized = Core::UpdateCodes.apply(input, :ieee)
+          parsed = Parser.parse(normalized) # Use class method for preprocessing
           builder = Builder.new(Base)
           # Pass the original input string to builder for context
           builder.instance_variable_set(:@original_input, input)

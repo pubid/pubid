@@ -218,8 +218,8 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
           expect(parsed.edition.id).to eq("1990")
         end
 
-        it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+        it "round-trips with NBS→NIST publisher correction" do
+          expect(parsed.to_s).to eq("NIST.HB.105-1r1990")
         end
       end
     end

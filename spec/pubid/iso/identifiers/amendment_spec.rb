@@ -803,7 +803,8 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       describe "ISO/IEC/IEEE 8802-22.2:2015/Amd.2:2017(E)" do
         subject { "ISO/IEC/IEEE 8802-22.2:2015/Amd.2:2017(E)" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:normalized) { "ISO/IEC/IEEE 8802-22.2:2015/Amd 2:2017(en)" }
+        # update_codes normalizes 8802-22.2 to 8802-22
+        let(:normalized) { "ISO/IEC/IEEE 8802-22:2015/Amd 2:2017(en)" }
         let(:urn) { "urn:iso:std:iso-iec-ieee:8802:-22:amd:2017:v2:en" }
 
         it "parses publisher" do

@@ -369,6 +369,11 @@ V2 implements a clean separation of concerns across three distinct layers:
 [source]
 ----
 ┌─────────────────────────────────────┐
+│    Pre-parser Normalization Layer    │  update_codes.yaml normalization
+│  (Malformed Input → Cleaned Input)  │  BEFORE parsing
+└──────────┬──────────────────────────┘
+           │
+┌──────────▼──────────────────────────┐
 │         Parser Layer                │  Grammar-based parsing (Parslet)
 │  (Syntax → Parse Tree)              │
 └──────────┬──────────────────────────┘
@@ -386,6 +391,7 @@ V2 implements a clean separation of concerns across three distinct layers:
 
 Where:
 
+Pre-parser Normalization:: Applies `update_codes.yaml` mappings from `data/{flavor}/` directory to normalize malformed identifiers before parsing. This handles legacy formats, typos, and historical variations.
 Parser Layer:: Parslet-based grammar defining syntax rules. Handles pattern matching and tokenization.
 Builder Layer:: Transforms hash tree from parser into attribute hash. Handles special cases and edge conditions.
 Identifier Layer:: Lutaml::Model-based classes with rendering logic. Provides serialization and string representation.
@@ -1407,11 +1413,70 @@ Separation of Concerns:: Parser handles syntax only, Builder handles transformat
 Extensibility:: Use inheritance and polymorphism, plugin/registry architecture, avoid hardcoding
 Test Quality:: Each class has dedicated spec file, no lowering pass thresholds, test actual behavior
 
+=== Pre-parser Normalization (update_codes.yaml)
+
+V2 applies pre-parsing normalization using `data/{flavor}/update_codes.yaml` files to handle malformed but commonly-seen identifiers before they reach the parser.
+
+**Purpose:** Some legacy or incorrectly-formatted identifiers need correction before parsing. For example:
+
+* Legacy publisher names: `NBS HB` → `NIST HB` (NBS was renamed to NIST in 1988)
+* Historical formats: `FIPS.140-2` (MR/dotted format) parses as machine-readable
+* Typographical variations: `IEEE Unapproved Draft Std` → `IEEE Unapproved Draft Std`
+* Missing separators: `NBSCS e104` → `NBS CS-E 104` (for Commercial Standard Emergency)
+
+**How it works:**
+
+[source,ruby]
+----
+# Pre-parser normalization is applied automatically
+require 'pubid'
+
+# update_codes.yaml: "NBS HB: NIST HB"
+id = Pubid::Nist.parse("NBS HB 105-1")
+id.to_s  # => "NIST HB 105-1" (NBS→NIST correction applied)
+
+# update_codes.yaml: "FIPS.140-2: FIPS 140-2" (normalizes dotted format)
+id = Pubid::Nist.parse("FIPS.140-2")
+id.to_s  # => "FIPS.140-2" (MR format preserved via parsed_format)
+----
+
+**Centralized UpdateCodes:** The normalization logic is centralized in `lib/pubid/core/update_codes.rb`:
+
+[source,ruby]
+----
+module Pubid
+  module Core
+    class UpdateCodes
+      # Returns all update_codes for a given flavor
+      def self.for_flavor(flavor)
+        # Loads from data/{flavor}/update_codes.yaml
+      end
+
+      # Applies all matching update_codes to an identifier string
+      def self.apply(code, flavor)
+        # Iterates through codes, applies regex and exact matches
+      end
+    end
+  end
+end
+----
+
+**Reference documentation:** See `docs/legacy-update-codes-reference.md` for complete listing of all update_codes entries per flavor.
+
 === V2 file structure
 
 [source]
 ----
+data/                       # Pre-parsing normalization data
+├── iso/update_codes.yaml        # ISO legacy format mappings
+├── iec/update_codes.yaml        # IEC legacy format mappings
+├── ieee/update_codes.yaml       # IEEE legacy format mappings
+├── nist/update_codes.yaml       # NIST legacy format mappings
+├── ccsds/update_codes.yaml      # CCSDS legacy format mappings
+└── plateau/update_codes.yaml    # PLATEAU legacy format mappings
+
 lib/pubid/              # V2 implementation (ACTIVE)
+├── core/                   # Core module (UpdateCodes, Configuration)
 ├── iso/                    # Production ready (92.84%)
 │   ├── parser.rb
 │   ├── builder.rb

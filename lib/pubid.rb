@@ -51,6 +51,7 @@ module Pubid
   autoload :Serializable, "pubid/serializable"
   autoload :Utils, "pubid/utils"
   autoload :Version, "pubid/version"
+  autoload :Core, "pubid/core"
 
   # Require all flavor modules
   autoload :Amca, "pubid/amca"

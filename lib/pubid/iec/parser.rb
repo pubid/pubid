@@ -153,7 +153,7 @@ module Pubid
           # Can have letter suffix: 60065N, 610091A
           # Can have letter + underscore + letters: 61215F_SE
           (match('\d').repeat(1, 6) >> (
-            match("[A-Z]") >> (str("_") >> match("[A-Z]").repeat).maybe
+            match("[a-zA-Z]") >> (str("_") >> match("[a-zA-Z]").repeat).maybe
           ).maybe)
       end
 

@@ -105,8 +105,10 @@ module Pubid
         if match = identifier.match(/^(.+?)\/(F?DAD)\s+(\d+)(?::(\d{4}))?$/)
           parse_dad_pattern(match)
         else
+          # Apply legacy update_codes normalization first, before any other preprocessing
+          normalized = Core::UpdateCodes.apply(identifier, :iso)
           # Normalize Cyrillic (Russian) identifiers to Latin equivalents
-          normalized = normalize_cyrillic(identifier)
+          normalized = normalize_cyrillic(normalized)
           parsed = parser.parse(normalized)
           builder.build(parsed)
         end

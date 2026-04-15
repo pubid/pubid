@@ -11,8 +11,8 @@ module Pubid
       # Handles data quality normalization before parsing
       # Named explicitly to avoid conflict with Parslet's built-in parse method
       def self.class_parse_with_preprocessing(input)
-        # Normalize input
-        cleaned = input.to_s.strip
+        # Apply legacy update_codes normalization first, before any other preprocessing
+        cleaned = Core::UpdateCodes.apply(input.to_s.strip, :nist)
 
         # Fix lowercase publisher at start
         cleaned = cleaned.sub(/^nbs\b/i, "NBS")

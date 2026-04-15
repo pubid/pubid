@@ -111,10 +111,10 @@ module Pubid
                      format
                    end
 
-          # Default to :short format for output (normalization)
-          # MR format input is converted to short format on output
+          # Default to parsed_format if available (preserves input format on round-trip)
+          # Falls back to :short format for output (normalization)
           # Explicit format parameter always overrides parsed_format
-          effective_format = format || :short
+          effective_format = format || (parsed_format&.to_sym if parsed_format) || :short
           effective_format = effective_format.to_sym if effective_format.is_a?(String)
           case effective_format
           when :full, :long
