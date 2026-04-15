@@ -41,7 +41,11 @@ module Pubid::Iec
 
       def initialize(base: nil, **opts)
         super(**opts)
-        @base = base
+        @base = if base.is_a?(Hash)
+                   Identifier.create(**base)
+                 else
+                   base
+                 end
       end
 
       def self.type

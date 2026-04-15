@@ -1,13 +1,31 @@
 module Pubid::Iec::Renderer
   class Pubid < Pubid::Core::Renderer::Base
     def render_identifier(params)
+<<<<<<< HEAD:archived-gems/pubid-iec/lib/pubid/iec/renderer/pubid.rb
       "%<publisher>s%<type>s%<typed_stage>s%<stage>s %<number>s%<part>s%<conjuction_part>s"\
       "%<part_version>s%<version>s%<iteration>s"\
       "%<year>s%<month>s%<day>s%<sheet>s%<amendments>s%<corrigendums>s%<fragment>s%<vap>s%<edition>s%<database>s" % params
+=======
+      # VAP (CSV, CMV, RLV, EXV) always comes before corrigendums
+      # e.g., "IEC 60529:1989+AMD1:1999 CSV/COR2:2007"
+      format_string = "%{publisher}%{copublisher}%{type}%{typed_stage}%{stage} %{number}%{part}%{conjuction_part}"\
+        "%{part_version}%{version}%{iteration}"\
+        "%{year}%{month}%{day}%{sheet}%{amendments}%{vap}%{corrigendums}"\
+        "%{fragment}%{edition}%{database}"
+      format_string % params
+>>>>>>> origin/main:gems/pubid-iec/lib/pubid/iec/renderer/pubid.rb
     end
 
     def render_typed_stage(typed_stage, _opts, _params)
       " #{typed_stage}"
+    end
+
+    def render_publisher(publisher, _opts, _params)
+      publisher
+    end
+
+    def render_copublisher(copublisher, _opts, _params)
+      "/" + Array(copublisher).join("/")
     end
 
     def render_type(type, _opts, params)
@@ -17,7 +35,7 @@ module Pubid::Iec::Renderer
     end
 
     def render_vap(vap, _opts, _params)
-      " #{vap}"
+      " #{vap.join('-')}"
     end
 
     def render_stage(stage, _opts, params)
@@ -30,8 +48,9 @@ module Pubid::Iec::Renderer
       "/FRAG#{fragment}"
     end
 
-    def render_sheet(sheet, _opts, _params)
-      "/#{sheet[:number]}" + (sheet[:year] ? ":#{sheet[:year]}" : "")
+    def render_sheet(sheet, _opts, params)
+      prefix = params[:part] ? "" : "-"
+      "#{prefix}/#{sheet[:number]}" + (sheet[:year] ? ":#{sheet[:year]}" : "")
     end
 
     def render_database(database, _opts, _params)
@@ -39,15 +58,15 @@ module Pubid::Iec::Renderer
     end
 
     def supplement_prefix(params)
-      params[:vap] == "CSV" && "+" || "/"
+      params[:vap]&.include?("CSV") ? "+" : "/"
     end
 
-    def render_amendments(amendments, _opts, _params)
+    def render_amendments(amendments, _opts, params)
       supplement_prefix(params) + amendments.sort.map(&:to_s).join("+")
     end
 
     def render_corrigendums(corrigendums, _opts, _params)
-      supplement_prefix(params) + corrigendums.sort.map(&:to_s).join("+")
+      "/" + corrigendums.sort.map(&:to_s).join("+")
     end
 
     def render_version(version, _opts, params)
@@ -58,6 +77,7 @@ module Pubid::Iec::Renderer
       " ED#{edition}" unless params[:version]
     end
 
+<<<<<<< HEAD:archived-gems/pubid-iec/lib/pubid/iec/renderer/pubid.rb
     def render_conjuction_part(conjuction_parts, _opts, _params)
       conjunction_symbol = case _params[:publisher]
                            when "IECEE"
@@ -68,6 +88,18 @@ module Pubid::Iec::Renderer
                              # IECEx TRFs use ',' as parts separator (IECEx OD-010-1)
                              ","
                            end
+=======
+    def render_conjuction_part(conjuction_parts, _opts, params)
+      conjunction_symbol = case params[:publisher]
+      when "IECEE"
+        # IECEE TRFs use '&' as parts separator (IECEE OD-2020)
+        "&"
+      else
+        # when "IECEx"
+        # IECEx TRFs use ',' as parts separator (IECEx OD-010-1)
+        ","
+      end
+>>>>>>> origin/main:gems/pubid-iec/lib/pubid/iec/renderer/pubid.rb
 
       if conjuction_parts.is_a?(Array)
         conjuction_parts.map(&:to_i).sort.map do |conjuction_part|

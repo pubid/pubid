@@ -136,6 +136,17 @@ module Pubid::Iso
       it_behaves_like "converts pubid to pubid"
     end
 
+    context "ISO/IEC DIR 2 ISO:1992" do
+      let(:original) { "ISO/IEC DIR 2 ISO:1992" }
+      let(:pubid) { "ISO/IEC DIR 2 ISO:1992" }
+
+      it_behaves_like "converts pubid to pubid"
+
+      it "returns plain strings in to_h edition" do
+        expect(subject.to_h[:edition]).to eq({ publisher: "ISO", year: "1992" })
+      end
+    end
+
     context "ISO/IEC DIR 2 IEC:2022" do
       let(:pubid) { "ISO/IEC DIR 2 IEC:2022" }
 

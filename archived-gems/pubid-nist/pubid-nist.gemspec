@@ -32,7 +32,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "lightly"
   spec.add_dependency "nokogiri"
   spec.add_dependency "parslet"
+<<<<<<< HEAD:archived-gems/pubid-nist/pubid-nist.gemspec
   spec.add_dependency "pubid-core", "= 1.15.2"
+=======
+  spec.add_dependency "pubid-core", "= 1.15.12"
+>>>>>>> origin/main:gems/pubid-nist/pubid-nist.gemspec
   spec.add_dependency "rubyzip"
   spec.add_dependency "thor"
 end

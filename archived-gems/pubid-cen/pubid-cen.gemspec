@@ -25,7 +25,13 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 
   spec.add_dependency "parslet"
+<<<<<<< HEAD:archived-gems/pubid-cen/pubid-cen.gemspec
   spec.add_dependency "pubid-core", "= 1.15.2"
   spec.add_dependency "pubid-iec", "= 1.15.2"
   spec.add_dependency "pubid-iso", "= 1.15.2"
+=======
+  spec.add_dependency "pubid-core", "= 1.15.12"
+  spec.add_dependency "pubid-iec", "= 1.15.12"
+  spec.add_dependency "pubid-iso", "= 1.15.12"
+>>>>>>> origin/main:gems/pubid-cen/pubid-cen.gemspec
 end

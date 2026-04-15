@@ -7,8 +7,10 @@ module Pubid::Iec
         { key: :wp, title: "Write Paper", short: "White Paper" }
       end
 
-      def to_h(deep: false)
-        super.merge(type: "White Paper")
+      def to_h(deep: true, add_type: true)
+        result = super(deep: deep, add_type: false)
+        result[:type] = "White Paper" if add_type
+        result
       end
     end
   end

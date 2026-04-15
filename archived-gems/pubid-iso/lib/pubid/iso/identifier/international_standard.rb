@@ -1,3 +1,5 @@
+require_relative "../renderer/international_standard"
+
 module Pubid::Iso
   module Identifier
     class InternationalStandard < Base
@@ -60,6 +62,10 @@ module Pubid::Iso
 
       def self.type
         { key: :is, title: "International Standard", short: nil }
+      end
+
+      def self.get_renderer_class
+        Renderer::InternationalStandard
       end
     end
   end

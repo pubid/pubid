@@ -231,6 +231,18 @@ module Pubid::Iso
       it_behaves_like "converts pubid to pubid"
     end
 
+    context "ISO 19115-1 + Amd 1" do
+      let(:original) { "ISO 19115-1 + Amd 1" }
+      let(:pubid) { "ISO 19115-1 + Amd 1" }
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 19115-1, Amd 1" do
+      let(:original) { "ISO 19115-1, Amd 1" }
+      let(:pubid) { "ISO 19115-1, Amd 1" }
+      it_behaves_like "converts pubid to pubid"
+    end
+
     context "ISO 10360-1:2000/Cor 1:2002" do
       let(:original) { "ISO 10360-1:2000/Cor 1:2002 ED1" }
       let(:pubid) { "ISO 10360-1:2000/Cor 1:2002" }
@@ -1330,9 +1342,14 @@ module Pubid::Iso
       context "Base" do
         context "60.60" do
           let(:urn) { "urn:iso:std:iec:60086:-3:stage-60.60" }
+<<<<<<< HEAD:archived-gems/pubid-iso/spec/pubid_iso/identifier_parsing_spec.rb
           it_behaves_like "converts urn to pubid", "IEC/IS 60086-3"
           it_behaves_like "converts urn to urn",
                           "urn:iso:std:iec:60086:-3:stage-published"
+=======
+          it_behaves_like "converts urn to pubid", "IEC 60086-3"
+          it_behaves_like "converts urn to urn"
+>>>>>>> origin/main:gems/pubid-iso/spec/pubid_iso/identifier_parsing_spec.rb
         end
 
         context "95.99" do
@@ -1344,18 +1361,35 @@ module Pubid::Iso
 
       context "Suppliment" do
         context "60.00" do
+<<<<<<< HEAD:archived-gems/pubid-iso/spec/pubid_iso/identifier_parsing_spec.rb
           let(:urn) { "urn:iso:std:iso:10033:-1:ed-1:stage-60.00:amd:1:v1" }
           it_behaves_like "converts urn to pubid", "ISO 10033-1 ED1/IS Amd 1"
           it_behaves_like "converts urn to urn",
                           "urn:iso:std:iso:10033:-1:ed-1:stage-published:amd:1:v1"
+=======
+          let(:urn) { "urn:iso:std:iso:10033:-1:ed-1:stage-60.00:amd:1:v1"}
+          it_behaves_like "converts urn to pubid", "ISO 10033-1 ED1/Amd 1"
+          it_behaves_like "converts urn to urn"
+>>>>>>> origin/main:gems/pubid-iso/spec/pubid_iso/identifier_parsing_spec.rb
         end
 
         context "60.60" do
           let(:urn) { "urn:iso:std:iec:60086:-3:ed-4:stage-60.60:cor:2023:v1" }
+<<<<<<< HEAD:archived-gems/pubid-iso/spec/pubid_iso/identifier_parsing_spec.rb
           it_behaves_like "converts urn to pubid",
                           "IEC 60086-3 ED4/IS Cor 1:2023"
           it_behaves_like "converts urn to urn",
                           "urn:iso:std:iec:60086:-3:ed-4:stage-published:cor:2023:v1"
+=======
+          it_behaves_like "converts urn to pubid", "IEC 60086-3 ED4/Cor 1:2023"
+          it_behaves_like "converts urn to urn"
+        end
+
+        context "stage-published" do
+          let(:urn) { "urn:iso:std:iso:19115:-1:ed-1:stage-published:amd:2018:v1" }
+          it_behaves_like "converts urn to pubid", "ISO 19115-1 ED1/Amd 1:2018"
+          it_behaves_like "converts urn to urn"
+>>>>>>> origin/main:gems/pubid-iso/spec/pubid_iso/identifier_parsing_spec.rb
         end
 
         context "90.92" do
@@ -1445,7 +1479,7 @@ module Pubid::Iso
 
     context "URN stage-published" do
       let(:urn) { "urn:iso:std:iso:19115:-3:stage-published" }
-      it_behaves_like "converts urn to pubid", "ISO/IS 19115-3"
+      it_behaves_like "converts urn to pubid", "ISO 19115-3"
     end
 
     context "iso-reference" do

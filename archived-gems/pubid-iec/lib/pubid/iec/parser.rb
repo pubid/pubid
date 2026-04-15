@@ -1,7 +1,9 @@
 require "pubid-core"
+require_relative "parser_urn"
 
 module Pubid::Iec
   class Parser < Pubid::Core::Parser
+    include Pubid::Iec::ParserUrn
     rule(:organization) do
       str("IECEE") | str("IECEx") | str("IECQ") | str("IEC") | str("ISO") |
         str("IEEE") | str("CISPR") | str("ASTM")
@@ -19,7 +21,7 @@ module Pubid::Iec
 
     rule(:part) do
       (str("-") | str("/")) >> space? >>
-        (str("Amd") | str("Cor")).absent? >> (match['[\dA-Za-z]'] | str("-")).repeat(1).as(:part)
+        (str("Amd") | str("AMD") | str("Cor") | str("COR") | str("FRAG")).absent? >> (match['[\dA-Za-z]'] | str("-")).repeat(1).as(:part)
     end
 
     rule(:version) { digits >> (dot >> digits).maybe }
@@ -65,7 +67,7 @@ module Pubid::Iec
 
     rule(:number) do
       (digits | str("SYMBOL") | str("SYCSMARTENERGY") | str("SyCLVDC") |
-        str("SYCLVDC") | str("SyCCOMM") | str("SyCAAL") | str("VIM") | match("[A-Za-z0-9 ]").repeat) >>
+        str("SYCLVDC") | str("SyCCOMM") | str("SyCAAL") | str("VIM") | match("[A-Za-z0-9 \\-]").repeat) >>
         ((str(":") >> match("[A-Z]").repeat(1)) | match("[a-zA-Z]")).maybe
     end
 
@@ -76,14 +78,17 @@ module Pubid::Iec
         part.maybe >>
         conjuction_part.maybe >>
         (space? >> str(":") >> year >> (str("-") >> month_digits.as(:month) >>
-          (str("-") >> day_digits.as(:day)).maybe).maybe).maybe >> sheet.maybe >>
+          (str("-") >> day_digits.as(:day)).maybe).maybe).maybe >> str("-").maybe >> sheet.maybe >>
         ((amendment >> vap.maybe >> corrigendum.maybe) | corrigendum).repeat >>
         interpretation_sheet.maybe >> fragment.maybe
     end
 
+    rule(:vap_code) do
+      str("CSV") | str("SER") | str("RLV") | str("CMV") | str("EXV") | str("PAC") | str("PRV")
+    end
+
     rule(:vap) do
-      space >> (str("CSV") | str("SER") | str("RLV") | str("CMV") | str("EXV") |
-        str("PAC") | str("PRV")).as(:vap)
+      space >> vap_code.as(:vap) >> (str("-") >> vap_code.as(:vap)).repeat
     end
 
     rule(:database) do
@@ -99,12 +104,12 @@ module Pubid::Iec
     rule(:identifier) do
       (originator.maybe >> (space.maybe >> stage.as(:stage)).maybe >>
         std_document_body >>
-        vap.maybe >> database.maybe >>
+        vap.maybe >> corrigendum.maybe >> database.maybe >>
         edition.maybe >>
         (str(":") >> year).maybe >>
         language.maybe)
     end
 
-    rule(:root) { identifier }
+    rule(:root) { urn_identifier | identifier }
   end
 end

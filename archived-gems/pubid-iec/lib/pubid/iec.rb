@@ -12,6 +12,7 @@ require "pubid-core"
 require_relative "iec/errors"
 require_relative "iec/stage"
 require_relative "iec/typed_project_stage"
+require_relative "iec/parser_urn"
 require_relative "iec/parser"
 require_relative "iec/trf_parser"
 require_relative "iec/renderer/pubid"
@@ -38,6 +39,7 @@ require_relative "iec/identifier/amendment"
 require_relative "iec/identifier/corrigendum"
 require_relative "iec/identifier/white_paper"
 require_relative "iec/identifier/technology_report"
+require_relative "iec/identifier/technology_and_market_outlook_paper"
 require_relative "iec/identifier/societal_technology_trend_report"
 require_relative "iec/identifier/interpretation_sheet"
 require_relative "iec/working_document_parser"
@@ -64,6 +66,7 @@ config.types = [Pubid::Iec::Identifier::InternationalStandard,
                 Pubid::Iec::Identifier::TestReportForm,
                 Pubid::Iec::Identifier::WritePaper,
                 Pubid::Iec::Identifier::TechnologyReport,
+                Pubid::Iec::Identifier::TechnologyAndMarketOutlookPaper,
                 Pubid::Iec::Identifier::SocietalTechnologyTrendReport,
                 Pubid::Iec::Identifier::InterpretationSheet]
 

@@ -94,7 +94,7 @@ module Pubid::Iso
               let(:stage) { "60.00" }
 
               it "renders long stage and amendment" do
-                expect(subject.to_s).to eq("ISO #{number}:1999/IS Amd 1")
+                expect(subject.to_s).to eq("ISO #{number}:1999/Amd 1")
               end
             end
 
@@ -102,7 +102,7 @@ module Pubid::Iso
               let(:stage) { "60.60" }
 
               it "renders long stage and amendment" do
-                expect(subject.to_s).to eq("ISO #{number}:1999/IS Amd 1")
+                expect(subject.to_s).to eq("ISO #{number}:1999/Amd 1")
               end
             end
           end

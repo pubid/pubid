@@ -1,3 +1,5 @@
+require "set"
+
 module Pubid::Core::Renderer
   class Base
     attr_accessor :params
@@ -10,8 +12,56 @@ module Pubid::Core::Renderer
       "es" => "S",
     }.freeze
 
+    SEMANTIC_CLASSES = {
+      publisher: "publisher",
+      number: "docnumber",
+      part: "part",
+      year: "year",
+      edition: "edition",
+      amendments: "amendment",
+      corrigendums: "corrigendum",
+      language: "language",
+      typed_stage: "doctype",
+      stage: "stage",
+      iteration: "iteration",
+      addendum: "addendum",
+    }.freeze
+
+    SEPARATOR_CHARS = Set.new(["-", ":", "/", " ", ",", "."]).freeze
+
     def initialize(params)
       @params = params
+    end
+
+    # Wraps rendered value in a <span> tag with a semantic CSS class.
+    # Leading/trailing separator characters are preserved outside the span.
+    # @param key [Symbol] parameter key (e.g. :publisher, :number)
+    # @param rendered_value [String] the rendered string value
+    # @return [String] annotated or original value
+    def annotate_value(key, rendered_value)
+      css_class = SEMANTIC_CLASSES[key]
+      return rendered_value if css_class.nil?
+
+      str = rendered_value.to_s
+      return str if str.empty?
+
+      # Extract leading separators
+      leading = ""
+      while !str.empty? && SEPARATOR_CHARS.include?(str[0])
+        leading << str[0]
+        str = str[1..]
+      end
+
+      # Extract trailing separators
+      trailing = ""
+      while !str.empty? && SEPARATOR_CHARS.include?(str[-1])
+        trailing = str[-1] + trailing
+        str = str[0..-2]
+      end
+
+      return rendered_value if str.empty?
+
+      "#{leading}<span class=\"#{css_class}\">#{str}</span>#{trailing}"
     end
 
     # Prerender parameters and store in @prerendered_params
@@ -32,12 +82,22 @@ module Pubid::Core::Renderer
     def prerender_params(params, opts)
       params.map do |key, value|
         next unless value
+<<<<<<< HEAD:archived-gems/pubid-core/lib/pubid/core/renderer/base.rb
 
         if respond_to?("render_#{key}")
           [key, send("render_#{key}", value, opts, params)]
         else
           [key, value]
         end
+=======
+        rendered = if respond_to?("render_#{key}")
+                     send("render_#{key}", value, opts, params)
+                   else
+                     value
+                   end
+        rendered = annotate_value(key, rendered) if opts[:annotated] && rendered
+        [key, rendered]
+>>>>>>> origin/main:gems/pubid-core/lib/pubid/core/renderer/base.rb
       end.compact.to_h
     end
 
@@ -83,9 +143,14 @@ module Pubid::Core::Renderer
     # Render identifier
     # @param with_date [Boolean] include year in output
     # @param with_language_code [:iso,:single] render document language as 2-letter ISO 639-1 language code or single code
+<<<<<<< HEAD:archived-gems/pubid-core/lib/pubid/core/renderer/base.rb
     def render(with_date: true, with_language_code: :iso, **args)
       render_base_identifier(**args.merge({ with_date: with_date,
                                             with_language_code: with_language_code })) + @prerendered_params[:language].to_s
+=======
+    def render(with_date: true, with_language_code: :iso, annotated: false, **args)
+      render_base_identifier(**args.merge({ with_date: with_date, with_language_code: with_language_code, annotated: annotated})) + @prerendered_params[:language].to_s
+>>>>>>> origin/main:gems/pubid-core/lib/pubid/core/renderer/base.rb
     end
 
     def render_identifier(params)

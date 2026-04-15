@@ -37,11 +37,17 @@ module Pubid::Iec
 
         it_behaves_like "parse identifiers from file"
       end
+
+      context "parses identifiers from relaton-data-iec-pubid.txt" do
+        let(:examples_file) { "relaton-data-iec-pubid.txt" }
+
+        it_behaves_like "parse identifiers from file"
+      end
     end
 
     context "IEC 60050-351:2013/AMD1:2016" do
       let(:pubid) { "IEC 60050-351:2013/AMD1:2016" }
-      let(:urn) { "urn:iec:std:iec:60050:-351:2013:amd:2016:v1" }
+      let(:urn) { "urn:iec:std:iec:60050-351:2013:::amd:2016:v1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -49,7 +55,7 @@ module Pubid::Iec
 
     context "IEC 61010-2-201:2017 RLV" do
       let(:pubid) { "IEC 61010-2-201:2017 RLV" }
-      let(:urn) { "urn:iec:std:iec:61010:-2-201:2017:rlv" }
+      let(:urn) { "urn:iec:std:iec:61010-2-201:2017:rlv::" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -67,7 +73,7 @@ module Pubid::Iec
 
     context "IEC 61666:2010+AMD1:2021 CSV" do
       let(:pubid) { "IEC 61666:2010+AMD1:2021 CSV" }
-      let(:urn) { "urn:iec:std:iec:61666:2010:csv:amd:2021:v1" }
+      let(:urn) { "urn:iec:std:iec:61666:2010:csv::amd:2021:v1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -75,16 +81,30 @@ module Pubid::Iec
 
     context "IEC 62439-1:2010+AMD1:2012+AMD2:2016 CSV" do
       let(:pubid) { "IEC 62439-1:2010+AMD1:2012+AMD2:2016 CSV" }
-      let(:urn) { "urn:iec:std:iec:62439:-1:2010:csv:amd:2012:v1:amd:2016:v2" }
+      let(:urn) { "urn:iec:std:iec:62439-1:2010:csv::amd:2012:v1:amd:2016:v2:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
     end
 
     context "IEC 60529:1989+AMD1:1999 CSV/COR2:2007" do
+<<<<<<< HEAD:archived-gems/pubid-iec/spec/pubid_iec/identifier/base_spec.rb
       let(:original) { "IEC 60529:1989+AMD1:1999 CSV/COR2:2007" }
       let(:pubid) { "IEC 60529:1989+AMD1:1999+COR2:2007 CSV" }
       let(:urn) { "urn:iec:std:iec:60529:1989:csv:amd:1999:v1:cor:2007:v2" }
+=======
+      let(:original) { "IEC 60529:1989+AMD1:1999 CSV/COR2:2007"}
+      let(:pubid) { "IEC 60529:1989+AMD1:1999 CSV/COR2:2007"}
+      let(:urn) { "urn:iec:std:iec:60529:1989:csv::amd:1999:v1:cor:2007:v2:" }
+
+      it_behaves_like "converts pubid to pubid"
+      it_behaves_like "converts pubid to urn"
+    end
+
+    context "IEC 60050-102:2007" do
+      let(:pubid) { "IEC 60050-102:2007" }
+      let(:urn) { "urn:iec:std:iec:60050-102:2007:::" }
+>>>>>>> origin/main:gems/pubid-iec/spec/pubid_iec/identifier/base_spec.rb
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -92,7 +112,7 @@ module Pubid::Iec
 
     context "IEC 60050-102:2007/AMD1:2017 ED1" do
       let(:pubid) { "IEC 60050-102:2007/AMD1:2017 ED1" }
-      let(:urn) { "urn:iec:std:iec:60050:-102:2007:ed-1:amd:2017:v1" }
+      let(:urn) { "urn:iec:std:iec:60050-102:2007::ed-1:amd:2017:v1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -100,7 +120,7 @@ module Pubid::Iec
 
     context "IEC 60050-111/AMD1/FRAG1 ED2" do
       let(:pubid) { "IEC 60050-111/AMD1/FRAG1 ED2" }
-      let(:urn) { "urn:iec:std:iec:60050:-111:ed-2:amd:1:v1:frag:1" }
+      let(:urn) { "urn:iec:std:iec:60050-111:::ed-2:amd:1:v1:frag:1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -108,7 +128,7 @@ module Pubid::Iec
 
     context "IEC CA 01:2020 CSV" do
       let(:pubid) { "IEC CA 01:2020 CSV" }
-      let(:urn) { "urn:iec:std:iec:ca:01:2020:csv" }
+      let(:urn) { "urn:iec:std:iec:ca:01:2020:csv::" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -122,8 +142,13 @@ module Pubid::Iec
 
     context "PWI 100-44 ED1" do
       let(:original) { "PWI 100-44 ED1" }
+<<<<<<< HEAD:archived-gems/pubid-iec/spec/pubid_iec/identifier/base_spec.rb
       let(:pubid) { "IEC PWI 100-44 ED1" }
       let(:urn) { "urn:iec:std:iec:100:-44:stage-draft:ed-1" }
+=======
+      let(:pubid) { "IEC PWI 100-44 ED1"}
+      let(:urn) { "urn:iec:std:iec:100-44::stage-draft:ed-1:" }
+>>>>>>> origin/main:gems/pubid-iec/spec/pubid_iec/identifier/base_spec.rb
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -132,7 +157,7 @@ module Pubid::Iec
     context "PWI SRD SyCCOMM-1 ED1" do
       let(:original) { "PWI SRD SyCCOMM-1 ED1" }
       let(:pubid) { "IEC SRD PWI SyCCOMM-1 ED1" }
-      let(:urn) { "urn:iec:std:iec:srd:syccomm:-1:stage-draft:ed-1" }
+      let(:urn) { "urn:iec:std:iec:srd:syccomm-1::stage-draft:ed-1:" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to urn"
@@ -425,6 +450,25 @@ module Pubid::Iec
       end
     end
 
+    describe "#root" do
+      context "when base is nil" do
+        subject { described_class.new(number: 60050) }
+
+        it "returns self" do
+          expect(subject.root).to eq(subject)
+        end
+      end
+
+      context "when base is set" do
+        let(:base_identifier) { Identifier.create(number: 60050, part: 351, year: 2013) }
+        subject { Identifier::InterpretationSheet.new(base: base_identifier, number: 123) }
+
+        it "returns the base identifier" do
+          expect(subject.root).to eq(base_identifier)
+        end
+      end
+    end
+
     describe "creating new identifier" do
       subject { described_class.new(**{ number: number }.merge(params)) }
       let(:number) { 123 }
@@ -437,7 +481,68 @@ module Pubid::Iec
         end
 
         it "renders correct URN" do
-          expect(subject.urn).to eq("urn:iec:std:iec:123:stage-draft")
+          expect(subject.urn).to eq("urn:iec:std:iec:123::stage-draft::")
+        end
+      end
+    end
+
+    describe "URN roundtrip parsing" do
+      shared_examples "parses URN roundtrip" do
+        it "parses URN and renders back to the same URN" do
+          expect(described_class.parse(urn).urn).to eq(urn)
+        end
+      end
+
+      context "urn:iec:std:iec:60027::::" do
+        let(:urn) { "urn:iec:std:iec:60027::::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:60050-351:2013:::" do
+        let(:urn) { "urn:iec:std:iec:60050-351:2013:::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:100-44::stage-draft:ed-1:" do
+        let(:urn) { "urn:iec:std:iec:100-44::stage-draft:ed-1:" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:61010-2-201:2017:rlv::" do
+        let(:urn) { "urn:iec:std:iec:61010-2-201:2017:rlv::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:123::::en-fr" do
+        let(:urn) { "urn:iec:std:iec:123::::en-fr" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:ca:01:2020:csv::" do
+        let(:urn) { "urn:iec:std:iec:ca:01:2020:csv::" }
+        it_behaves_like "parses URN roundtrip"
+      end
+
+      context "urn:iec:std:iec:srd:syccomm-1::stage-draft:ed-1:" do
+        let(:urn) { "urn:iec:std:iec:srd:syccomm-1::stage-draft:ed-1:" }
+        it_behaves_like "parses URN roundtrip"
+      end
+    end
+
+    describe "#to_yaml" do
+      context "CISPR TR 16-3:2000+AMD1:2002 CSV" do
+        let(:pubid) { "CISPR TR 16-3:2000+AMD1:2002 CSV" }
+
+        it "serializes amendments as hashes without ruby/object markers" do
+          expect(subject.to_h.to_yaml).not_to include("ruby/object")
+        end
+      end
+
+      context "IEC/ASTM 62885-6:2018" do
+        let(:pubid) { "IEC/ASTM 62885-6:2018" }
+
+        it "serializes copublisher without ruby/object markers" do
+          expect(subject.to_h.to_yaml).not_to include("ruby/object")
         end
       end
     end

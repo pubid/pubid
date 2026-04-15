@@ -7,14 +7,14 @@ module Pubid::Iso::Renderer
     # Render identifier
     # @param with_edition [Boolean] include edition in output
     # @see Pubid::Core::Renderer::Base for another options
-    def render(with_edition: true, with_language_code: :iso, with_date: true, **args) # rubocop:disable Metrics/MethodLength
-      @params[:base].to_s(lang: args[:language], with_edition: with_edition) +
+    def render(with_edition: true, with_language_code: :iso, with_date: true, annotated: false, **args) # rubocop:disable Metrics/MethodLength
+      @params[:base].to_s(lang: args[:language], with_edition: with_edition, annotated: annotated) +
         super(
           with_edition: with_edition, with_language_code: with_language_code, with_date: with_date,
-          base_type: @params[:base].type[:key],
+          annotated: annotated, base_type: @params[:base].type[:key],
           **args
         ) +
-        if @params[:base].language
+        if !@params[:language] && @params[:base].language
           render_language(@params[:base].language,
                           { with_language_code: with_language_code }, nil).to_s
         else
@@ -28,18 +28,26 @@ module Pubid::Iso::Renderer
       stage = params[:stage]
 
       if params[:stage].instance_of?(Pubid::Core::Stage) && !params[:stage].to_s(with_prf: opts[:with_prf]).empty?
-        type_prefix = " #{type_prefix}"
-        stage = params[:stage].to_s(with_prf: opts[:with_prf])
+        stage_str = params[:stage].to_s(with_prf: opts[:with_prf])
+        if stage_str == "IS"
+          stage = ""
+        else
+          type_prefix = " #{type_prefix}"
+          stage = stage_str
+        end
       end
+
+      sep = params[:separator]
+      sep = "/" if sep.nil? || sep.empty?
 
       if instance_of?(Supplement)
         if opts[:base_type] == :dir
           "%<stage>s%<publisher>s SUP%<number>s%<part>s%<iteration>s%<year>s%<month>s%<edition>s" % params
         else
-          "/#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
+          "#{sep}#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
         end
       else
-        "/#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
+        "#{sep}#{stage}#{type_prefix}%<number>s%<part>s%<iteration>s%<year>s%<edition>s" % params
       end
     end
 

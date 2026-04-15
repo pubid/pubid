@@ -184,6 +184,19 @@ jobs:
         os.system("tail -20 Gemfile")
       working-directory: dependent
 
+    - name: Remove existing msys64 symlink (Windows only)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $rubyVersion = ruby -e "puts RUBY_VERSION"
+        $target = "C:\hostedtoolcache\windows\Ruby\$rubyVersion\x64\msys64"
+        if (Test-Path $target) {
+          Remove-Item $target -Force -Recurse
+          Write-Host "Removed $target"
+        } else {
+          Write-Host "$target does not exist"
+        }
+
     - name: Re-setup Ruby with local pubid gems
       uses: ruby/setup-ruby@v1
       with:

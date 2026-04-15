@@ -10,8 +10,14 @@ module Pubid::Iso
       context[:root]
     end
 
-    rule(edition: "Ed") do
-      { edition: "1" }
+    rule(edition: subtree(:edition)) do |context|
+      if context[:edition].to_s == "Ed"
+        { edition: "1" }
+      elsif context[:edition].is_a?(Hash)
+        { edition: context[:edition].transform_values(&:to_s) }
+      else
+        context
+      end
     end
 
     rule(stage: subtree(:stage)) do |context|
@@ -26,15 +32,20 @@ module Pubid::Iso
         context[:supplements] =
           context[:supplements].map do |supplement|
             if supplement[:typed_stage]
-              supplement.merge(
-                case supplement[:typed_stage]
-                when "PDAM" then { typed_stage: "CD", type: "Amd" }
-                when "pDCOR" then { typed_stage: "CD", type: "Cor" }
-                # when "DAD" then { typed_stage: "WD", type: "Amd" }
-                when "draft" then convert_urn_sup_draft_type supplement[:type]
-                else convert_urn_sup_stage_code(supplement)
-                end,
-              )
+              if supplement[:typed_stage] == "published"
+                supplement[:typed_stage] = "IS"
+                supplement.merge(convert_urn_sup_stage_code(supplement))
+              else
+                supplement.merge(
+                  case supplement[:typed_stage]
+                  when "PDAM" then { typed_stage: "CD", type: "Amd" }
+                  when "pDCOR" then { typed_stage: "CD", type: "Cor" }
+                  # when "DAD" then { typed_stage: "WD", type: "Amd" }
+                  when "draft" then convert_urn_sup_draft_type supplement[:type]
+                  else convert_urn_sup_stage_code(supplement)
+                  end,
+                )
+              end
             else
               case supplement[:type]
               when "Addendum" then supplement.merge({ type: "Add" })
@@ -135,14 +146,23 @@ module Pubid::Iso
       when "preCD" then { stage: "PreCD" }
       when "published" then { stage: "IS" }
       # when "draft" then { stage: "WD" }
-      else { stage: convert_stage_code(code.to_s) }
+      else
+        if /\A[\d.]+\z/.match?(code.to_s)
+          { stage: code.to_s }
+        else
+          { stage: convert_stage_code(code.to_s) }
+        end
       end
     end
 
     def self.convert_urn_sup_stage_code(sup)
       stage_type = convert_urn_sup_type(sup[:type])
-      abbr = convert_stage_code(sup[:typed_stage])
-      stage_type[:typed_stage] = abbr if abbr
+      if /\A[\d.]+\z/.match?(sup[:typed_stage].to_s)
+        stage_type[:typed_stage] = sup[:typed_stage].to_s
+      else
+        abbr = convert_stage_code(sup[:typed_stage])
+        stage_type[:typed_stage] = abbr if abbr
+      end
       stage_type
     end
 

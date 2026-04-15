@@ -19,7 +19,10 @@ module Pubid::Iso
         },
       }.freeze
 
-      def initialize(publisher: nil, **opts)
+      attr_accessor :separator
+
+      def initialize(publisher: nil, separator: nil, **opts)
+        @separator = separator
         super(publisher: publisher, **opts)
       end
 

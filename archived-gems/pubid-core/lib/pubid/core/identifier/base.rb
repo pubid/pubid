@@ -45,7 +45,7 @@ module Pubid::Core
 
         @publisher = publisher.to_s
         @number = number&.to_s
-        @copublisher = copublisher if copublisher
+        @copublisher = Array(copublisher).map(&:to_s) if copublisher
         @part = part.to_s if part
         @year = year.to_i if year
         @edition = edition.to_i if edition
@@ -102,8 +102,9 @@ module Pubid::Core
       end
 
       # Render identifier using default renderer
-      def to_s
-        self.class.get_renderer_class.new(to_h(deep: false)).render
+      # @param annotated [Boolean] wrap semantic components in <span> tags
+      def to_s(annotated: false)
+        self.class.get_renderer_class.new(to_h(deep: false)).render(annotated: annotated)
       end
 
       def exclude(*args)

@@ -2,6 +2,7 @@ require "forwardable"
 
 module Pubid::Iec
   class Base < Pubid::Core::Identifier::Base
+<<<<<<< HEAD:archived-gems/pubid-iec/lib/pubid/iec/identifier/base.rb
     attribute :vap, :string
     attribute :database, :boolean
     attribute :fragment, :string
@@ -16,6 +17,12 @@ module Pubid::Iec
     attribute :month, :integer
     attribute :day, :integer
     attribute :sheet, :string
+=======
+
+    attr_accessor :vap, :database, :fragment, :version, :decision_sheet,
+                  :conjuction_part, :part_version, :trf_publisher, :trf_series,
+                  :trf_version, :test_type, :month, :day, :sheet, :base
+>>>>>>> origin/main:gems/pubid-iec/lib/pubid/iec/identifier/base.rb
 
     extend Forwardable
 
@@ -28,22 +35,27 @@ module Pubid::Iec
                    trf_series: nil, trf_version: nil, test_type: nil,
                    edition: nil, type: nil, month: nil, day: nil,
                    language: nil, stage: nil, sheet: nil, **args)
+<<<<<<< HEAD:archived-gems/pubid-iec/lib/pubid/iec/identifier/base.rb
       @vap = vap.to_s if vap
+=======
+
+      @vap = Array(vap).map(&:to_s) if vap
+>>>>>>> origin/main:gems/pubid-iec/lib/pubid/iec/identifier/base.rb
       @database = database if database
-      @fragment = fragment if fragment
+      @fragment = fragment.to_s if fragment
       @version = version if version
       @decision_sheet = decision_sheet if decision_sheet
-      @conjuction_part = conjuction_part if conjuction_part
+      @conjuction_part = Array(conjuction_part).map(&:to_s) if conjuction_part
       @part_version = part_version if part_version
       @trf_publisher = trf_publisher.to_s if trf_publisher
       @trf_series = trf_series if trf_series
       @trf_version = trf_version.to_s if trf_version
       @test_type = test_type if test_type
       @edition = edition.to_s if edition
-      @month = month if month
-      @day = day if day
-      @language = language if language
-      @sheet = sheet if sheet
+      @month = month.to_s if month
+      @day = day.to_s if day
+      @language = Array(language).map(&:to_s) if language
+      @sheet = sheet.transform_values(&:to_s) if sheet
 
       if stage
         @stage = self.class.has_project_stage?(stage) ? self.class.resolve_project_stage(stage) : resolve_stage(stage)
@@ -78,8 +90,18 @@ module Pubid::Iec
       values
     end
 
-    def to_s(with_edition_month_date: false)
-      self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date)
+    def to_s(with_edition_month_date: false, annotated: false)
+      result = self.class.get_renderer_class.new(renderer_data).render(with_edition_month_date: with_edition_month_date, annotated: annotated)
+      result += " (all parts)" if all_parts
+      result
+    end
+
+    def to_yaml
+      to_h(deep: true).to_yaml
+    end
+
+    def root
+      base || self
     end
 
     class << self
@@ -114,7 +136,7 @@ module Pubid::Iec
 
       def transform(params)
         identifier_params = transform_hash(params)
-
+        normalize_urn_params!(identifier_params) if identifier_params[:publisher].to_s.match?(/\A[a-z]+\z/)
         if identifier_params[:interpretation_sheet]
           return Identifier.create(
             type: :ish,
@@ -129,6 +151,27 @@ module Pubid::Iec
         end
 
         Identifier.create(**identifier_params)
+      end
+
+      def normalize_urn_params!(params)
+        params[:publisher] = params[:publisher].to_s.upcase
+        params[:copublisher] = params[:copublisher].to_s.upcase if params[:copublisher]
+        params[:type] = params[:type].to_s.upcase if params[:type]
+        params[:number] = params[:number].to_s.upcase
+
+        # Map fuzzy URN stages to abbreviations that resolve correctly
+        if params[:stage]
+          stage_str = params[:stage].to_s
+          case stage_str
+          when "draft" then params[:stage] = "CD"
+          when "published" then params[:stage] = "60.60"
+          end
+        end
+
+        # Remove amendments/corrigendums parsed as bare strings from URN
+        # (full supplement round-trip support to be added later)
+        params.delete(:amendments) if params[:amendments].is_a?(String)
+        params.delete(:corrigendums) if params[:corrigendums].is_a?(String)
       end
 
       def get_amendment_class

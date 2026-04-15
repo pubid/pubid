@@ -96,7 +96,7 @@ module Pubid::Iso
         @dir = dir.to_s if dir
         @dirtype = dirtype.to_s if dirtype
         if jtc_dir
-          @jtc_dir = jtc_dir
+          @jtc_dir = jtc_dir.to_s
         end
         if base
           @base = if base.is_a?(Hash)
@@ -108,7 +108,7 @@ module Pubid::Iso
         @part = part.to_s if part
         @addendum = addendum if addendum
         @edition = edition
-        @month = month
+        @month = month.to_s if month
       end
 
       class << self
@@ -158,7 +158,8 @@ module Pubid::Iso
               month: supplement[:month],
               stage: supplement[:typed_stage], edition: supplement[:edition],
               iteration: supplement[:iteration], type: supplement[:type] || !supplement[:typed_stage] && :sup,
-              publisher: supplement[:publisher], base: Identifier.create(**base_params)
+              publisher: supplement[:publisher]&.to_s, base: Identifier.create(**base_params),
+              separator: ([" + ", ", "].include?(supplement[:separator]&.to_s) ? supplement[:separator].to_s : nil)
             )
           end
         end
@@ -282,12 +283,17 @@ module Pubid::Iso
       #   :ref_undated -- reference undated: no language code + short form (DAM) + undated
       #   :ref_undated_long -- reference undated long: 1 letter language code + long form (DAmd) + undated
       # @return [String] pubid identifier
+<<<<<<< HEAD:archived-gems/pubid-iso/lib/pubid/iso/identifier/base.rb
       def to_s(lang: nil, with_edition: false, with_prf: false,
 format: :ref_dated_long)
+=======
+      def to_s(lang: nil, with_edition: false, with_prf: false, format: :ref_dated_long, annotated: false)
+>>>>>>> origin/main:gems/pubid-iso/lib/pubid/iso/identifier/base.rb
         options = resolve_format(format)
         options[:with_edition] = with_edition
         options[:with_prf] = with_prf
         options[:language] = lang
+        options[:annotated] = annotated
 
         self.class.get_renderer_class.new(to_h(deep: false)).render(**options) +
           render_joint_document(@joint_document) + render_all_parts

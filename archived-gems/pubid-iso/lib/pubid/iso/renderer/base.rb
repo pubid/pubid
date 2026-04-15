@@ -32,11 +32,16 @@ module Pubid::Iso::Renderer
     # Render identifier
     # @param with_edition [Boolean] include edition in output
     # @see Pubid::Core::Renderer::Base for another options
+<<<<<<< HEAD:archived-gems/pubid-iso/lib/pubid/iso/renderer/base.rb
     def render(with_edition: true, with_language_code: :iso, with_date: true,
 **args)
+=======
+    def render(with_edition: true, with_language_code: :iso, with_date: true, annotated: false, **args)
+>>>>>>> origin/main:gems/pubid-iso/lib/pubid/iso/renderer/base.rb
       render_base_identifier(**args.merge({ with_date: with_date,
                                             with_language_code: with_language_code,
-                                            with_edition: with_edition })) +
+                                            with_edition: with_edition,
+                                            annotated: annotated })) +
         @prerendered_params[:language].to_s
     end
 
@@ -60,6 +65,10 @@ module Pubid::Iso::Renderer
                 ""
               end
       type = render_type_prefix(params, opts)
+      if opts[:annotated]
+        stage = annotate_value(:stage, stage) if stage && !stage.to_s.empty?
+        type = annotate_value(:typed_stage, type) if type && !type.to_s.empty?
+      end
       "%<publisher>s#{stage}#{type} %<number>s%<part>s%<iteration>s%<year>s%" \
       "<amendments>s%<corrigendums>s%<addendum>s%<edition>s" % params
     end

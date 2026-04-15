@@ -25,5 +25,9 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 
   spec.add_dependency "parslet"
+<<<<<<< HEAD:archived-gems/pubid-plateau/pubid-plateau.gemspec
   spec.add_dependency "pubid-core", "= 1.15.2"
+=======
+  spec.add_dependency "pubid-core", "= 1.15.12"
+>>>>>>> origin/main:gems/pubid-plateau/pubid-plateau.gemspec
 end

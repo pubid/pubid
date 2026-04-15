@@ -64,5 +64,11 @@ RSpec.describe Pubid::Iec::Parser do
 
       it_behaves_like "parse identifiers from file"
     end
+
+    context "parses identifiers from relaton-data-iec-pubid.txt" do
+      let(:examples_file) { "relaton-data-iec-pubid.txt" }
+
+      it_behaves_like "parse identifiers from file"
+    end
   end
 end

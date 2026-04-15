@@ -150,6 +150,7 @@ module Pubid::Ieee
       end
 
       # @param [:short, :full] format
+<<<<<<< HEAD:archived-gems/pubid-ieee/lib/pubid/ieee/identifier/base.rb
       def to_s(format = :short, with_trademark: false)
         opts = { format: format, with_trademark: with_trademark }
         (if @iso_identifier
@@ -158,6 +159,11 @@ module Pubid::Ieee
          else
            ""
          end) +
+=======
+      def to_s(format = :short, with_trademark: false, annotated: false)
+        opts = { format: format, with_trademark: with_trademark, annotated: annotated }
+        (@iso_identifier ? @iso_identifier.to_s(format: :ref_num_short, with_edition: true, annotated: annotated) : "") +
+>>>>>>> origin/main:gems/pubid-ieee/lib/pubid/ieee/identifier/base.rb
           self.class.get_renderer_class.new(to_h(deep: false)).render(**opts) +
           (with_trademark ? trademark(@number) : "")
       end

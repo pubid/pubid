@@ -52,10 +52,49 @@ module Pubid::Iec::Renderer
                WPUB: 95.99 }.freeze
 
     def render_identifier(params)
+<<<<<<< HEAD:archived-gems/pubid-iec/lib/pubid/iec/renderer/urn.rb
       "urn:iec:std:%<publisher>s%<copublisher>s%<type>s:%<number>s"\
       "%<part>s%<conjuction_part>s%<year>s%<stage>s%<vap>s"\
       "%<urn_stage>s%<corrigendum_stage>s%<iteration>s%<version>s%<part_version>s"\
       "%<edition>s%<amendments>s%<corrigendums>s%<fragment>s" % params
+=======
+      result = "urn:iec:std:#{params[:publisher]}#{params[:copublisher]}" \
+               "#{params[:type]}:#{params[:number]}" \
+               "#{params[:part]}#{params[:conjuction_part]}"
+
+      # Positional fields — always colon-separated even when empty
+      result += ":#{strip_leading_colon(params[:year])}"
+
+      stage_value = [params[:stage], params[:vap], params[:urn_stage],
+                     params[:corrigendum_stage], params[:iteration],
+                     params[:version], params[:part_version]].map(&:to_s).join
+      result += ":#{strip_leading_colon(stage_value)}"
+
+      result += ":#{strip_leading_colon(params[:edition])}"
+
+      # Non-positional suffixes
+      result += params[:amendments].to_s
+      result += params[:corrigendums].to_s
+      result += params[:fragment].to_s
+
+      result
+    end
+
+    def render(with_date: true, with_language_code: :iso, annotated: false, **args)
+      base = render_base_identifier(**args.merge(
+        with_date: with_date, with_language_code: with_language_code, annotated: annotated,
+      ))
+      lang = strip_leading_colon(@prerendered_params[:language].to_s)
+      if @prerendered_params.key?(:all_parts)
+        "#{base}ser"
+      else
+        "#{base}:#{lang}"
+      end
+    end
+
+    def render_part(part, _opts, _params)
+      "-#{part}"
+>>>>>>> origin/main:gems/pubid-iec/lib/pubid/iec/renderer/urn.rb
     end
 
     def render_number(number, _opts, _params)
@@ -63,7 +102,7 @@ module Pubid::Iec::Renderer
     end
 
     def render_vap(vap, _opts, _params)
-      ":#{vap.downcase}"
+      ":#{vap.map(&:downcase).join('-')}"
     end
 
     def render_fragment(fragment, _opts, _params)
@@ -107,5 +146,20 @@ module Pubid::Iec::Renderer
     def render_language(language, _opts, _params)
       ":" + (language.is_a?(Array) ? language.join("-") : language)
     end
+<<<<<<< HEAD:archived-gems/pubid-iec/lib/pubid/iec/renderer/urn.rb
+=======
+
+    def render_copublisher(copublisher, _opts, _params)
+      "-" + Array(copublisher).map { |c| c.to_s.downcase }.join("-")
+    end
+
+    private
+
+    def strip_leading_colon(value)
+      s = value.to_s
+      s.start_with?(":") ? s[1..] : s
+    end
+
+>>>>>>> origin/main:gems/pubid-iec/lib/pubid/iec/renderer/urn.rb
   end
 end
