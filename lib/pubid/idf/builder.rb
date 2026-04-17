@@ -110,7 +110,7 @@ module Pubid
           if value.match?(/^\d{4}(-\d{2})?$/)
             year, month = value.split("-")
             Components::Date.new(year: year, month: month || nil)
-          elsif value.is_a?(Integer) || value.is_a?(String) && value.match?(/^\d{4}$/)
+          elsif value.is_a?(Integer) || (value.is_a?(String) && value.match?(/^\d{4}$/))
             # If it's just a year, "2005"
             Components::Date.new(year: value)
           else

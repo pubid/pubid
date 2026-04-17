@@ -28,22 +28,20 @@ module Pubid
                          end
 
           # Annexes have different pattern than amendments
+          base_str = base_identifier.to_s(format: base_format)
+          result = base_str.sub(/:.*/, "").sub(/\s+Edition\s+\d{4}/, "").sub(
+            /\(.*\)/, ""
+          ).strip
           if letter
             # Specific annex: "OIML R 60 Annex A Edition 2013 (E)"
-            base_str = base_identifier.to_s(format: base_format) # Use base's format
-            result = base_str.sub(/:.*/, "").sub(/\s+Edition\s+\d{4}/, "").sub(/\(.*\)/, "").strip # Remove date/edition/language from base
             result += " Annex #{letter}"
 
             result += " Edition #{year}" if year
 
-            # Supplements ALWAYS use space before language
-            result += " (#{language})" if language
+          # Supplements ALWAYS use space before language
 
-            result
           else
             # General annexes: "OIML R 60 Annexes Edition 2021 (E)" or "OIML R 60 Annexes:2021 (E)"
-            base_str = base_identifier.to_s(format: base_format)
-            result = base_str.sub(/:.*/, "").sub(/\s+Edition\s+\d{4}/, "").sub(/\(.*\)/, "").strip # Remove date/edition/language
             result += " Annexes"
 
             if year
@@ -53,10 +51,10 @@ module Pubid
             end
 
             # Supplements ALWAYS use space before language
-            result += " (#{language})" if language
 
-            result
           end
+          result += " (#{language})" if language
+          result
         end
       end
     end

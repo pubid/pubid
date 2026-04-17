@@ -45,7 +45,7 @@ module Pubid
           # Set publisher as ISO with ASTM as copublisher (in Publisher component)
           iso.publisher = Pubid::Iso::Components::Publisher.new(
             publisher: "ISO",
-            copublisher: ["ASTM"]
+            copublisher: ["ASTM"],
           )
 
           # Also set copublishers attribute (array of Publisher objects) for rendering

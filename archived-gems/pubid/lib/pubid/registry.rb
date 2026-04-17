@@ -14,10 +14,8 @@ module Pubid
         modules.each do |mod|
           module_identifier = Kernel.const_get("#{mod}::Identifier")
           return module_identifier.parse(*args) if module_identifier.parseable?(*args)
-        end
 
-        # Go through each module to try to parse unknown prefix
-        modules.each do |mod|
+          # Go through each module to try to parse unknown prefix
           return Kernel.const_get("#{mod}::Identifier").parse(*args)
         rescue Pubid::Core::Errors::ParseError
           next

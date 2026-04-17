@@ -151,14 +151,14 @@ class FixturesExtractor
     return "nsb_format" if /FprISO|PrISO/.match?(id_str)
     return "cyrillic" if /[А-Яа-яЁё]/.match?(id_str)
     return "guide" if /Guide/i.match?(id_str)
-    return "directives" if /DIR/.match?(id_str)
+    return "directives" if id_str.include?("DIR")
     return "amendment" if /\/Amd|\/AMD|\/FDAM|\/PDAM|\/DAM/.match?(id_str)
     return "corrigendum" if /\/Cor|\/COR|\/FDCOR|\/DCOR/.match?(id_str)
     return "technical_report" if /\bTR\b/.match?(id_str)
     return "technical_specification" if /\bTS\b/.match?(id_str)
     return "pas" if /\bPAS\b/.match?(id_str)
     return "iwa" if /\bIWA\b/.match?(id_str)
-    return "addendum" if /\/Add/.match?(id_str)
+    return "addendum" if id_str.include?("/Add")
 
     "international_standard"
   end
@@ -169,9 +169,9 @@ class FixturesExtractor
     return "guide" if /GUIDE/i.match?(id_str)
     return "pas" if /\bPAS\b/.match?(id_str)
     return "srd" if /\bSRD\b/.match?(id_str)
-    return "amendment" if /\/AMD/.match?(id_str)
-    return "corrigendum" if /\/COR/.match?(id_str)
-    return "interpretation_sheet" if /\/ISH/.match?(id_str)
+    return "amendment" if id_str.include?("/AMD")
+    return "corrigendum" if id_str.include?("/COR")
+    return "interpretation_sheet" if id_str.include?("/ISH")
     return "vap" if /\bVAP\b/.match?(id_str)
     return "consolidated" if /\+AMD|\+COR/.match?(id_str)
 
@@ -179,9 +179,9 @@ class FixturesExtractor
   end
 
   def detect_ieee_class(id_str)
-    return "unapproved" if /Unapproved/.match?(id_str)
+    return "unapproved" if id_str.include?("Unapproved")
     return "draft" if /\/D\d/.match?(id_str)
-    return "adopted" if /\(Adoption\)/.match?(id_str)
+    return "adopted" if id_str.include?("(Adoption)")
     return "no_std_prefix" if id_str !~ /\bStd\b/ && id_str =~ /^IEEE/
     return "historical" if /^AIEE|^IRE/.match?(id_str)
 

@@ -23,7 +23,9 @@ module Pubid
         end
 
         def supplement_typed_stages
-          @supplement_typed_stages ||= supplement_identifiers.flat_map { |klass| klass::TYPED_STAGES }
+          @supplement_typed_stages ||= supplement_identifiers.flat_map do |klass|
+            klass::TYPED_STAGES
+          end
         end
 
         def locate_typed_stage_by_abbr(abbr)

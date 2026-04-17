@@ -1,43 +1,45 @@
-module Pubid::Core
-  RSpec.describe TypedStage do
-    context "when abbreviation" do
-      subject do
-        described_class.new(config: DummyTestIdentifier.config, abbr: abbrev)
-      end
-      let(:abbrev) { :dtr }
+module Pubid
+  module Core
+    RSpec.describe TypedStage do
+      context "when abbreviation" do
+        subject do
+          described_class.new(config: DummyTestIdentifier.config, abbr: abbrev)
+        end
+        let(:abbrev) { :dtr }
 
-      it "returns correct harmonized stage code" do
-        expect(subject.harmonized_code).to eq(
-          Pubid::Core::HarmonizedStageCode.new(["40.00"],
-                                               config: DummyTestIdentifier.config),
-        )
-      end
+        it "returns correct harmonized stage code" do
+          expect(subject.harmonized_code).to eq(
+            Pubid::Core::HarmonizedStageCode.new(["40.00"],
+                                                 config: DummyTestIdentifier.config),
+          )
+        end
 
-      context "wrong code" do
-        let(:abbrev) { :ABC }
+        context "wrong code" do
+          let(:abbrev) { :ABC }
 
-        it "raise an error" do
-          expect do
-            subject
-          end.to raise_exception(Pubid::Core::Errors::TypedStageInvalidError)
+          it "raise an error" do
+            expect do
+              subject
+            end.to raise_exception(Pubid::Core::Errors::TypedStageInvalidError)
+          end
+        end
+
+        context "#to_s" do
+          it "returns string representation" do
+            expect(subject.to_s).to eq("DTR")
+          end
         end
       end
 
-      context "#to_s" do
-        it "returns string representation" do
-          expect(subject.to_s).to eq("DTR")
+      context "when harmonized code" do
+        subject do
+          described_class.new(config: DummyTestIdentifier.config,
+                              harmonized_code: "50.00")
         end
-      end
-    end
 
-    context "when harmonized code" do
-      subject do
-        described_class.new(config: DummyTestIdentifier.config,
-                            harmonized_code: "50.00")
-      end
-
-      it "returns abbreviation related to provided harmonized code" do
-        expect(subject.abbr).to eq(:fdis)
+        it "returns abbreviation related to provided harmonized code" do
+          expect(subject.abbr).to eq(:fdis)
+        end
       end
     end
   end

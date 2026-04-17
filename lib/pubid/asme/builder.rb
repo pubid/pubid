@@ -95,47 +95,42 @@ module Pubid
           if bpvc_data[:special]
             # BPVC COMPLETE CODE BIND
             designator_str = "BPVC COMPLETE CODE BIND"
-            number_str = ""
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:ssc_code]
             # BPVC.SSC.XI.II.V.IX pattern
             ssc_sections = bpvc_data[:subdivision][:ssc_sections]
             sections_str = if ssc_sections.is_a?(Array)
-                             ssc_sections.map(&:to_s).join(".")
+                             ssc_sections.join(".")
                            else
                              ssc_sections.to_s
                            end
             designator_str = "BPVC.SSC.#{sections_str}"
-            number_str = ""
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:case_code]
             # BPVC.CC.BPV or BPVC.CC.NC.XI - extract from subdivision hash
             cc = bpvc_data[:subdivision][:case_code].to_s
             case_sub = bpvc_data[:subdivision][:case_sub]&.to_s
 
             designator_str = case_sub && !case_sub.empty? ? "BPVC.CC.#{cc}.#{case_sub}" : "BPVC.CC.#{cc}"
-            number_str = ""
           elsif bpvc_data[:case_code]
             # Dash notation: BPVC-CC-BPV
             cc = bpvc_data[:case_code].to_s
             designator_str = "BPVC-CC-#{cc}"
-            number_str = ""
           elsif bpvc_data[:subdivision]
             # Standard subdivision
-            section = bpvc_data[:subdivision][:section]&.to_s || ""
-            subsection = bpvc_data[:subdivision][:subsection]&.to_s || ""
-            sub_subsection = bpvc_data[:subdivision][:sub_subsection]&.to_s || ""
-            lang_suffix = bpvc_data[:subdivision][:lang_suffix]&.to_s || ""
+            section = bpvc_data[:subdivision][:section].to_s
+            subsection = bpvc_data[:subdivision][:subsection].to_s
+            sub_subsection = bpvc_data[:subdivision][:sub_subsection].to_s
+            lang_suffix = bpvc_data[:subdivision][:lang_suffix].to_s
 
             parts = [section, subsection, sub_subsection].reject do |p|
               p.nil? || p.empty?
             end
             designator_str = "BPVC.#{parts.join('.')}"
             designator_str += "_#{lang_suffix}" if !lang_suffix.empty?
-            number_str = ""
           else
             # Fallback (shouldn't reach here)
             designator_str = "BPVC"
-            number_str = ""
           end
+          number_str = ""
 
           return Components::Code.new(designator: designator_str,
                                       number: number_str)

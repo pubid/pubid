@@ -119,8 +119,6 @@ module Pubid
           "bundle"
         when /TutorialBundle/
           "tut-bundle"
-        else
-          nil
         end
       end
 

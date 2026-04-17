@@ -2,7 +2,6 @@
 
 module Pubid
   module Ansi
-
     autoload :Builder, "#{__dir__}/ansi/builder"
     autoload :Identifier, "#{__dir__}/ansi/identifier"
     autoload :Identifiers, "#{__dir__}/ansi/identifiers/standard"

@@ -476,7 +476,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO 105-B01:1994/AMD 1:1998" do
       subject { "ISO 105-B01:1994/AMD 1:1998" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 105-B01:1994/AMD 1:1998" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 105-B01:1994/AMD 1:1998"
+      end
       let(:urn) { "urn:iso:std:iso:105:-B01:amd:1998:v1" }
 
       it "parses publisher" do
@@ -692,7 +695,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       describe "ISO/IEC/IEEE 8802-3:2021/FDAmd 11" do
         subject { "ISO/IEC/IEEE 8802-3:2021/FDAmd 11" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:normalized) { "ISO/IEC/IEEE 8802-3:2021/FDAmd 11" }  # V2 preserves original format
+        # V2 preserves original format
+        let(:normalized) do
+          "ISO/IEC/IEEE 8802-3:2021/FDAmd 11"
+        end
         let(:urn) { "urn:iso:std:iso-iec-ieee:8802:-3:stage-50.00:amd:11:v1" }
 
         it "parses publisher" do
@@ -1013,7 +1019,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO 10993-18:2020/DAmd 1" do
       subject { "ISO 10993-18:2020/DAmd 1" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 10993-18:2020/DAmd 1" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 10993-18:2020/DAmd 1"
+      end
       let(:urn) { "urn:iso:std:iso:10993:-18:stage-40.00:amd:1:v1" }
 
       it "parses publisher" do
@@ -1299,7 +1308,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO 3245:2015/FDAmd 1" do
       subject { "ISO 3245:2015/FDAmd 1" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 3245:2015/FDAmd 1" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 3245:2015/FDAmd 1"
+      end
       let(:urn) { "urn:iso:std:iso:3245:stage-50.00:amd:1:v1" }
 
       it "parses publisher" do
@@ -1387,7 +1399,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC 14496-10:2014/FPDAM 1(en)" do
       subject { "ISO/IEC 14496-10:2014/FPDAM 1(en)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC 14496-10:2014/FPDAM 1(en)" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC 14496-10:2014/FPDAM 1(en)"
+      end
       let(:urn) { "urn:iso:std:iso-iec:14496:-10:stage-50.00:amd:1:v1:en" }
 
       it "parses publisher" do
@@ -1598,7 +1613,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC DIS 23008-1/DAM 2:2021(E)" do
       subject { "ISO/IEC DIS 23008-1/DAM 2:2021(E)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC DIS 23008-1/DAM 2:2021(en)" }  # V2 normalizes language code
+      # V2 normalizes language code
+      let(:normalized) do
+        "ISO/IEC DIS 23008-1/DAM 2:2021(en)"
+      end
       let(:urn) { "urn:iso:std:iso-iec:23008:-1:stage-40.00:amd:2021:v2:en" }
 
       it "parses publisher" do
@@ -1653,7 +1671,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC DIS 23008-1/DAmd 2(en)" do
       subject { "ISO/IEC DIS 23008-1/DAmd 2(en)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC DIS 23008-1/DAmd 2(en)" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC DIS 23008-1/DAmd 2(en)"
+      end
       let(:urn) { "urn:iso:std:iso-iec:23008:-1:stage-40.00:amd:2:v1:en" }
 
       it "parses publisher" do
@@ -2157,7 +2178,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO 11137-2:2013/FDAmd 1 ED3" do
       subject { "ISO 11137-2:2013/FDAmd 1 ED3" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 11137-2:2013/FDAmd 1 ED3" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 11137-2:2013/FDAmd 1 ED3"
+      end
       let(:urn) { "urn:iso:std:iso:11137:-2:ed-3:stage-50.00:amd:1:v1" }
 
       it "parses publisher" do
@@ -2208,7 +2232,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC 14496-30:2018/FDAmd 1 ED2" do
       subject { "ISO/IEC 14496-30:2018/FDAmd 1 ED2" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC 14496-30:2018/FDAmd 1 ED2" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC 14496-30:2018/FDAmd 1 ED2"
+      end
       let(:urn) { "urn:iso:std:iso-iec:14496:-30:ed-2:stage-50.00:amd:1:v1" }
 
       it "parses publisher" do
@@ -2316,7 +2343,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC FDIS 23090-14/DAmd 1" do
       subject { "ISO/IEC FDIS 23090-14/DAmd 1" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC FDIS 23090-14/DAmd 1" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC FDIS 23090-14/DAmd 1"
+      end
       let(:urn) { "urn:iso:std:iso-iec:23090:-14:stage-40.00:amd:1:v1" }
 
       it "parses publisher" do
@@ -2367,7 +2397,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC 27006:2015/PDAM 1" do
       subject { "ISO/IEC 27006:2015/PDAM 1" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC 27006:2015/PDAM 1" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC 27006:2015/PDAM 1"
+      end
       let(:urn) { "urn:iso:std:iso-iec:27006:stage-30.00:amd:1:v1" }
 
       it "parses publisher" do
@@ -2414,7 +2447,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC 14496-12:2012/PDAM 4 ED4" do
       subject { "ISO/IEC 14496-12:2012/PDAM 4 ED4" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC 14496-12:2012/PDAM 4 ED4" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC 14496-12:2012/PDAM 4 ED4"
+      end
       let(:urn) { "urn:iso:std:iso-iec:14496:-12:ed-4:stage-30.00:amd:4:v1" }
 
       it "parses publisher" do
@@ -2472,7 +2508,10 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
     describe "ISO/IEC 14496-12:2012/PDAM 4" do
       subject { "ISO/IEC 14496-12:2012/PDAM 4" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC 14496-12:2012/PDAM 4" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/IEC 14496-12:2012/PDAM 4"
+      end
       let(:urn) { "urn:iso:std:iso-iec:14496:-12:stage-30.00:amd:4:v1" }
 
       it "parses publisher" do

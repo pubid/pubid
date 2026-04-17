@@ -42,7 +42,7 @@ module Pubid
           parts = []
           # Year comes FIRST in IRE format - render as 2-digit short year
           if year
-            short_year = year >= 1900 && year <= 1999 ? year - 1900 : year
+            short_year = year.between?(1900, 1999) ? year - 1900 : year
             parts << short_year.to_s
           end
           parts << publisher

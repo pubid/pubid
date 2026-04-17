@@ -145,12 +145,12 @@ module Pubid
           ts = identifier.typed_stage
 
           # Detect stage format from parsed abbreviation
-          stage_format_long = if ts.long_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.long_abbr)
+          stage_format_long = if ts.long_abbr && ts.original_abbr&.start_with?(ts.long_abbr)
                                 true # Long form (starts with Amd, DAmd, FDAmd, Cor, DCor, FDCor)
-                              elsif ts.long_abbr && ts.original_abbr && ts.original_abbr.include?("Directives")
+                              elsif ts.long_abbr && ts.original_abbr&.include?("Directives")
                                 # Special case for Directives: any form with "Directives" word is long form
                                 true # "Directives Part", "Directives, Part", "Directives,"
-                              elsif ts.short_abbr && ts.original_abbr && ts.original_abbr.start_with?(ts.short_abbr)
+                              elsif ts.short_abbr && ts.original_abbr&.start_with?(ts.short_abbr)
                                 false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR, DIR)
                               else
                                 false  # Default to short/canonical
@@ -260,7 +260,7 @@ module Pubid
           # LEGACY: "4037-1979" (number-year, year should become date)
 
           # Split the number into parts
-          normalized_value = value.to_s.tr(Parser::DASH_CHARS.join + "/", "-")
+          normalized_value = value.to_s.tr("#{Parser::DASH_CHARS.join}/", "-")
 
           # for "1 IEC" ('IEC' is part) (in case of "ISO/IEC DIR 1 IEC")
           normalized_value.gsub!(" ", "-")
@@ -275,7 +275,7 @@ module Pubid
           if part&.match?(/^\d{4}$/)
             year_value = part.to_i
             # Only treat as year if in reasonable year range (excludes part numbers like "1751")
-            if year_value >= 1900 && year_value <= 2099
+            if year_value.between?(1900, 2099)
               return {
                 number: Pubid::Iso::Components::Code.new(number: number),
                 date: Pubid::Components::Date.new(year: part),
@@ -332,7 +332,7 @@ module Pubid
           if value.match?(/^\d{4}(-\d{2})?$/)
             year, month = value.split("-")
             Pubid::Components::Date.new(year: year, month: month || nil)
-          elsif value.is_a?(Integer) || value.is_a?(String) && value.match?(/^\d{4}$/)
+          elsif value.is_a?(Integer) || (value.is_a?(String) && value.match?(/^\d{4}$/))
             # If it's just a year, "2005"
             Pubid::Components::Date.new(year: value)
           else
@@ -346,7 +346,7 @@ module Pubid
           number_string = original_text.match(/\d+/)&.to_s
           number_code = number_string ? Pubid::Iso::Components::Code.new(number: number_string) : nil
           Pubid::Components::Edition.new(number: number_code,
-                                            original_text: original_text)
+                                         original_text: original_text)
 
         when :languages
           # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
@@ -359,7 +359,7 @@ module Pubid
             original_lang = lang # Store original format before conversion
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
             Pubid::Components::Language.new(code: lang,
-                                               original_code: original_lang)
+                                            original_code: original_lang)
           end
 
         when :all_parts

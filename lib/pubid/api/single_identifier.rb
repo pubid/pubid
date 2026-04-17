@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 require_relative "../serializable"
 require_relative "urn_generator"
 

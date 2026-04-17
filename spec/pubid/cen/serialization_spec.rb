@@ -61,7 +61,7 @@ RSpec.describe "CEN Serialization" do
         flavor: "cen",
         publisher: "EN",
         number: "228",
-        year: "2008"
+        year: "2008",
       }
 
       id = Pubid::Serializable.from_h(hash)

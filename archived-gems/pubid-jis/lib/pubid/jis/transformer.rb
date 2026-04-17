@@ -1,7 +1,9 @@
-module Pubid::Jis
-  class Transformer < Pubid::Core::Transformer
-    rule(part: sequence(:part)) do |context|
-      { part: context[:part].map(&:to_s).join("-") }
+module Pubid
+  module Jis
+    class Transformer < Pubid::Core::Transformer
+      rule(part: sequence(:part)) do |context|
+        { part: context[:part].join("-") }
+      end
     end
   end
 end

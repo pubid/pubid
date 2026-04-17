@@ -88,11 +88,11 @@ module Pubid
         update_codes = has_update_codes?
         lines << "## Pre-parse Normalization"
         lines << ""
-        if update_codes
-          lines << "See `data/#{flavor}/update_codes.yaml` for legacy format mappings."
-        else
-          lines << "No normalization rules defined."
-        end
+        lines << if update_codes
+                   "See `data/#{flavor}/update_codes.yaml` for legacy format mappings."
+                 else
+                   "No normalization rules defined."
+                 end
         lines << ""
 
         lines.join("\n")
@@ -100,13 +100,17 @@ module Pubid
 
       def collect_identifier_types
         types = {}
-        idents_dir = File.join(__dir__, "..", "..", "pubid", flavor, "identifiers")
+        idents_dir = File.join(__dir__, "..", "..", "pubid", flavor,
+                               "identifiers")
 
         return types unless Dir.exist?(idents_dir)
 
-        Dir.glob(File.join(idents_dir, "*.rb")).sort.each do |f|
-          type_name = File.basename(f, ".rb").gsub(/_/, " ").split.map(&:capitalize).join(" ")
-          class_path = "Pubid::#{flavor.capitalize}::Identifiers::#{type_name.gsub(" ", "")}"
+        Dir.glob(File.join(idents_dir, "*.rb")).each do |f|
+          type_name = File.basename(f, ".rb").gsub("_",
+                                                   " ").split.map(&:capitalize).join(" ")
+          class_path = "Pubid::#{flavor.capitalize}::Identifiers::#{type_name.gsub(
+            ' ', ''
+          )}"
 
           typed_stages = extract_typed_stages(f)
 
@@ -122,11 +126,13 @@ module Pubid
       end
 
       def has_urn_generator?
-        File.exist?(File.join(__dir__, "..", "..", "pubid", flavor, "urn_generator.rb"))
+        File.exist?(File.join(__dir__, "..", "..", "pubid", flavor,
+                              "urn_generator.rb"))
       end
 
       def has_update_codes?
-        File.exist?(File.join(__dir__, "..", "..", "..", "data", flavor, "update_codes.yaml"))
+        File.exist?(File.join(__dir__, "..", "..", "..", "data", flavor,
+                              "update_codes.yaml"))
       end
 
       private
@@ -144,7 +150,7 @@ module Pubid
         stages = []
 
         # Find the TYPED_STAGES constant block
-        return stages unless content =~ /TYPED_STAGES\s*=\s*\[/
+        return stages unless /TYPED_STAGES\s*=\s*\[/.match?(content)
 
         # Extract everything from TYPED_STAGES = [ to the matching ].freeze or end of array
         # Use a simpler approach: scan between TYPED_STAGES = [ and ].freeze
@@ -160,7 +166,7 @@ module Pubid
             bracket_count += 1
           when "]"
             bracket_count -= 1
-            if bracket_count == 0
+            if bracket_count.zero?
               end_idx = start_idx + i
               break
             end
@@ -179,30 +185,34 @@ module Pubid
           stage_code = extract_kw_arg(stage_text, "stage_code")
           harmonized = extract_kw_arg(stage_text, "harmonized_stages")
 
-          stages << {
-            name: name,
-            abbr: abbr,
-            stage_code: stage_code,
-            harmonized_stages: harmonized,
-          } if name || abbr
+          if name || abbr
+            stages << {
+              name: name,
+              abbr: abbr,
+              stage_code: stage_code,
+              harmonized_stages: harmonized,
+            }
+          end
         end
 
         stages
       end
 
       def extract_kw_arg(text, key)
-        if text =~ /#{key}:\s*"([^"]*)"/
+        case text
+        when /#{key}:\s*"([^"]*)"/
           $1
-        elsif text =~ /#{key}:\s*:(\w+)/
+        when /#{key}:\s*:(\w+)/
           ":#{$1}"
-        elsif text =~ /#{key}:\s*\[([^\]]*)\]/
+        when /#{key}:\s*\[([^\]]*)\]/
           $1
         end
       end
 
       def collect_fixtures
         fixtures = []
-        pass_dir = File.join(__dir__, "..", "..", "..", "spec", "fixtures", flavor, "pass")
+        pass_dir = File.join(__dir__, "..", "..", "..", "spec", "fixtures",
+                             flavor, "pass")
 
         return fixtures unless Dir.exist?(pass_dir)
 
@@ -247,7 +257,9 @@ module Pubid
         flavors.sort.each do |f|
           gen = new(f)
           types = gen.collect_identifier_types.keys.length
-          stages = gen.collect_identifier_types.values.sum { |t| t[:typed_stages].length }
+          stages = gen.collect_identifier_types.values.sum do |t|
+            t[:typed_stages].length
+          end
           urn = gen.has_urn_generator? ? "Yes" : "No"
           norm = gen.has_update_codes? ? "Yes" : "No"
           lines << "| #{f.upcase} | #{types} | #{stages} | #{urn} | #{norm} |"

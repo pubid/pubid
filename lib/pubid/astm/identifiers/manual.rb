@@ -23,7 +23,7 @@ module Pubid
           # Add separator after publisher
           if publisher
             # Insert space after publisher
-            result = "#{publisher} #{result[publisher.length..-1]}"
+            result = "#{publisher} #{result[publisher.length..]}"
           end
 
           # Add supplement if present

@@ -8,9 +8,17 @@ namespace :docs do
     output_dir = File.join(__dir__, "..", "..", "docs", "identifier-patterns")
     FileUtils.mkdir_p(output_dir)
 
-    flavors = Dir[File.join(__dir__, "..", "..", "lib", "pubid", "*")].select { |d| File.directory?(d) }
-                                 .map { |d| File.basename(d) }
-                                 .reject { |f| %w[core components rendering parser serializable utils].include?(f) }
+    flavors = Dir[File.join(__dir__, "..", "..", "lib", "pubid",
+                            "*")].select do |d|
+      File.directory?(d)
+    end
+      .map do |d|
+      File.basename(d)
+    end
+      .reject do |f|
+      %w[core components rendering
+         parser serializable utils].include?(f)
+    end
 
     flavors.each do |flavor|
       puts "Generating docs for #{flavor}..."

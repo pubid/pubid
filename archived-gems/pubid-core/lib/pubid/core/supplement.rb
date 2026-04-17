@@ -1,43 +1,46 @@
-module Pubid::Core
-  class Supplement
-    include Comparable
-    attr_accessor :number, :year
+module Pubid
+  module Core
+    class Supplement
+      include Comparable
 
-    # Creates new supplement with provided update number and optional year
-    # @param number [Integer]
-    # @param year [Integer]
-    def initialize(number:, year: nil)
-      @number = number&.to_i
-      @year = year&.to_i
-    end
+      attr_accessor :number, :year
 
-    def <=>(other)
-      return 0 if year.nil? && other.year
-
-      return year <=> other.year if number == other.number
-
-      (number <=> other.number) || year <=> other.year
-    end
-
-    def render_pubid_number
-      if @year
-        "#{@number}:#{@year}"
-      else
-        "#{@number}"
+      # Creates new supplement with provided update number and optional year
+      # @param number [Integer]
+      # @param year [Integer]
+      def initialize(number:, year: nil)
+        @number = number&.to_i
+        @year = year&.to_i
       end
-    end
 
-    def render_urn_number
-      if @year
-        ":#{@year}:v#{@number}"
-      else
-        ":#{@number}:v1"
+      def <=>(other)
+        return 0 if year.nil? && other.year
+
+        return year <=> other.year if number == other.number
+
+        (number <=> other.number) || year <=> other.year
       end
-    end
 
-    def to_h
-      { number: number,
-        year: year }
+      def render_pubid_number
+        if @year
+          "#{@number}:#{@year}"
+        else
+          @number.to_s
+        end
+      end
+
+      def render_urn_number
+        if @year
+          ":#{@year}:v#{@number}"
+        else
+          ":#{@number}:v1"
+        end
+      end
+
+      def to_h
+        { number: number,
+          year: year }
+      end
     end
   end
 end

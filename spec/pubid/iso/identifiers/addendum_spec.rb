@@ -214,7 +214,10 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
     describe "ISO 4037-1979/Add. 1-1983(F)" do
       subject { "ISO 4037-1979/Add. 1-1983(F)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 4037:1979/Add 1:1983(F)" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 4037:1979/Add 1:1983(F)"
+      end
       let(:urn) { "urn:iso:std:iso:4037:sup:1983:v1:fr" }
 
       it "parses publisher" do
@@ -316,7 +319,10 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
     describe "ISO/R 91:1970/ADD 1:1975" do
       subject { "ISO/R 91:1970/ADD 1:1975" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/R 91:1970/ADD 1:1975" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO/R 91:1970/ADD 1:1975"
+      end
       let(:urn) { "urn:iso:std:iso:r:91:sup:1975:v1" }
 
       it "parses publisher" do

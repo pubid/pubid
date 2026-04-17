@@ -19,14 +19,13 @@ module Pubid
             result = parts.join
             result += "-S#{subseries}" if subseries
             result += "M" if dual_m
-            result
           else
             # No letter (e.g., DataSeries, ISO/ASTM dual)
             result = number.to_s
             result += suffix if suffix
             result += "-S#{subseries}" if subseries
-            result
           end
+          result
         end
       end
     end

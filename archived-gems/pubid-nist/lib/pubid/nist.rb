@@ -24,10 +24,10 @@ end
 
 PARSERS_CLASSES = Pubid::Nist::Parsers.constants.select do |c|
   Pubid::Nist::Parsers.const_get(c).is_a?(Class)
-end.map do |parser_class|
+end.to_h do |parser_class|
   parser = Pubid::Nist::Parsers.const_get(parser_class)
   [parser.name.split("::").last.gsub(/(.)([A-Z])/, '\1 \2').upcase, parser]
-end.to_h
+end
 
 require_relative "nist/identifier/base"
 require_relative "nist/publisher"

@@ -46,13 +46,11 @@ module Pubid
       rule(:part_and_subpart) do
         # IDF 80-1:2001
         # the "space?" needed to handle "ISO/TS 10303- 1751:2014"
-        (
-          dash >> space? >>
+        dash >> space? >>
           # matches a part
           match('\w').repeat >>
           # matches a subpart, e.g. "A01" or "1-2" (yes we treat {5}-{1-1} as part and subpart)
           (dash >> match('\w').repeat).repeat.maybe
-        )
       end
 
       rule(:all_parts) do
@@ -88,7 +86,7 @@ module Pubid
           stage_iteration.maybe >>
           space? >> (
             # :2005-02
-            (str(":") >> date)
+            str(":") >> date
           ).maybe
       end
 

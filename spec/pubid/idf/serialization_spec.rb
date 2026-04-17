@@ -43,7 +43,7 @@ RSpec.describe "IDF Serialization" do
         flavor: "idf",
         publisher: "IDF",
         number: "1",
-        year: "2010"
+        year: "2010",
       }
 
       id = Pubid::Serializable.from_h(hash)

@@ -76,32 +76,26 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as FragmentIdentifier" do
-
         expect(parsed).to be_a(described_class)
       end
 
       it "parses publisher" do
-
         expect(parsed.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier as corrigendum" do
-
         expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::Corrigendum)
       end
 
       it "parses fragment number" do
-
         expect(parsed.fragment_number).to eq("1")
       end
 
       it "uses FRAGC notation for corrigendum" do
-
         expect(parsed.to_s).to include("FRAGC")
       end
 
       it "round-trips" do
-
         expect(parsed.to_s).to eq(subject)
       end
     end
@@ -116,27 +110,22 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as FragmentIdentifier" do
-
         expect(parsed).to be_a(described_class)
       end
 
       it "parses publisher" do
-
         expect(parsed.publisher.body).to eq("ISO")
       end
 
       it "parses copublisher" do
-
         expect(parsed.copublishers.first.body).to eq("IEC")
       end
 
       it "parses fragment number" do
-
         expect(parsed.fragment_number).to eq("1")
       end
 
       it "round-trips" do
-
         expect(parsed.to_s).to eq(subject)
       end
     end
@@ -150,27 +139,22 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as FragmentIdentifier" do
-
         expect(parsed).to be_a(described_class)
       end
 
       it "parses base date" do
-
         expect(parsed.base_identifier.base_identifier.date.year).to eq("2010")
       end
 
       it "parses amendment date" do
-
         expect(parsed.base_identifier.date.year).to eq("2015")
       end
 
       it "parses fragment number" do
-
         expect(parsed.fragment_number).to eq("2")
       end
 
       it "round-trips" do
-
         expect(parsed.to_s).to eq(subject)
       end
     end
@@ -215,17 +199,14 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses multi-digit fragment number" do
-
         expect(parsed.fragment_number).to eq("12")
       end
 
       it "parses multi-digit amendment number" do
-
         expect(parsed.base_identifier.number.number).to eq("10")
       end
 
       it "round-trips" do
-
         expect(parsed.to_s).to eq(subject)
       end
     end
@@ -298,7 +279,9 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
     end
 
     it "includes FRAG (published) stage" do
-      stage = frag_stages.find { |s| s.abbr.include?("FRAG") && s.stage_code == "published" }
+      stage = frag_stages.find do |s|
+        s.abbr.include?("FRAG") && s.stage_code == "published"
+      end
       expect(stage).not_to be_nil
       expect(stage.name).to eq("Fragment")
       expect(stage.harmonized_stages).to include("60.00", "90.99", "95.99")

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 require_relative "../../serializable"
 require_relative "../urn_generator"
 require_relative "../../components/date"
@@ -26,8 +25,8 @@ module Pubid
         def base_hash
           hash = super
           # ITU Series has a 'series' attribute, not 'number'
-          if hash[:series].is_a?(Hash)
-            hash[:series] = series.series if series
+          if hash[:series].is_a?(Hash) && series
+            hash[:series] = series.series
           end
           # Add sector (ITU-specific, has a 'sector' attribute)
           hash[:sector] = sector.sector if sector

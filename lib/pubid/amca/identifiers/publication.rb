@@ -11,7 +11,8 @@ module Pubid
       class Publication < Base
         attr_reader :revision
 
-        def initialize(code:, year:, copublisher: nil, suffix: nil, reaffirmed: nil, revision: nil)
+        def initialize(code:, year:, copublisher: nil, suffix: nil,
+reaffirmed: nil, revision: nil)
           @code = Components::Code.new(value: code.to_s)
           @year = Components::Date.new(year: year.to_s) if year
           @copublisher = copublisher

@@ -34,7 +34,7 @@ with_language_code: :none, with_date: true)
               publisher.body,
               (subgroup ? " #{subgroup.value}" : ""),
               (abbr.empty? ? "" : " #{abbr}"),
-            ].join("")
+            ].join
           end
 
           # If there are copublishers, join them with slashes
@@ -42,7 +42,7 @@ with_language_code: :none, with_date: true)
             ([publisher] + copublishers).map(&:body).join("/"),
             (subgroup ? " #{subgroup.value}" : ""),
             (abbr.empty? ? "" : " #{abbr}"),
-          ].join("")
+          ].join
         end
 
         # This differs from the basic number_portion in that directives may have
@@ -51,7 +51,7 @@ with_language_code: :none, with_date: true)
         def number_portion(lang_single: false, with_date: true)
           result = [
             # Directives may not have a number
-            (number ? "#{number.value}" : ""),
+            (number ? number.value.to_s : ""),
 
             # Parts and subparts are optional
             (part ? " #{part.value}" : ""),
@@ -62,7 +62,7 @@ with_language_code: :none, with_date: true)
 
             # Date is optional - but don't add leading space if result is empty
             (date && with_date ? ":#{date.year}" : ""),
-          ].join("").strip # Strip to remove any leading/trailing spaces
+          ].join.strip # Strip to remove any leading/trailing spaces
 
           # Return nil if there's nothing to render
           result.empty? ? nil : result
@@ -80,7 +80,7 @@ with_language_code: :none, with_date: true)
           # Subgroup (e.g., JTC) and its number if present
           if subgroup
             # Split subgroup like "JTC 1" into "jtc" and "1"
-            subgroup_parts = subgroup.value.split(" ")
+            subgroup_parts = subgroup.value.split
             parts << subgroup_parts[0].downcase if subgroup_parts[0]
             parts << subgroup_parts[1] if subgroup_parts[1]
           end
@@ -114,7 +114,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             # Publisher portion (includes JTC subgroup and DIR type)
             parts << publisher_portion(
               lang: lang,
-              stage_format_long: false,  # Always use short form "DIR" for normalization
+              stage_format_long: false, # Always use short form "DIR" for normalization
             )
 
             # Number portion (may be just ":date" if no number)
@@ -124,7 +124,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             )
 
             # If number portion starts with ":" (just date, no number), don't add space
-            if num_part && num_part.start_with?(":")
+            if num_part&.start_with?(":")
               result = parts.compact.join(" ") + num_part
             else
               parts << num_part if num_part
@@ -149,7 +149,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             # Publisher portion (includes JTC subgroup and DIR type)
             parts << publisher_portion(
               lang: lang,
-              stage_format_long: false,  # Always use short form "DIR"
+              stage_format_long: false, # Always use short form "DIR"
             )
 
             # Number portion (may be just ":date" if no number)
@@ -159,7 +159,7 @@ format: nil, stage_format_long: nil, with_date: nil)
             )
 
             # If number portion starts with ":" (just date, no number), don't add space
-            if num_part && num_part.start_with?(":")
+            if num_part&.start_with?(":")
               result = parts.compact.join(" ") + num_part
             else
               parts << num_part if num_part

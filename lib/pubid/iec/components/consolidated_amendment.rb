@@ -32,14 +32,14 @@ module Pubid
         def self.parse(string)
           amendment_parts = string.split("+").reject(&:empty?)
 
-          amendments = amendment_parts.map do |part|
+          amendments = amendment_parts.filter_map do |part|
             # Parse "AMD1:2020" format
             if part =~ /AMD(\d+):(\d{4})/
               Amendment.new(number: $1, year: $2)
             elsif part =~ /AMD(\d+)/
               Amendment.new(number: $1)
             end
-          end.compact
+          end
 
           new(amendments: amendments)
         end

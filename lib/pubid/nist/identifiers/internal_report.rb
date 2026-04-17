@@ -13,7 +13,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["IR", "NIST IR", "NBS IR"],
             stage_code: "published",
-            type_code: "ir"
+            type_code: "ir",
           ),
         ].freeze
 

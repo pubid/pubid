@@ -5,4 +5,4 @@ require "rspec/matchers"
 
 require_relative "../lib/pubid-core"
 
-Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
+Dir["./spec/support/**/*.rb"].each { |f| require f }

@@ -11,7 +11,7 @@ module Pubid
         return nil if input.match?(/^CSA (Communities|Group|Learning|OnDemand|Update)/)
 
         # Preprocessing: normalize CEI to IEC (French name)
-        input = input.gsub(/CEI\/IEC/, "IEC").gsub(/\bCEI\b/, "IEC")
+        input = input.gsub("CEI/IEC", "IEC").gsub(/\bCEI\b/, "IEC")
 
         # Detect CAN/ wrapper (Canadian adoption)
         if input.start_with?("CAN/")
@@ -25,13 +25,14 @@ module Pubid
           # 1. Bundled: + separator (e.g., "CSA B127.1:99 + B127.2:99")
           # 2. Combined with space: / separator with space before CSA- (e.g., "CSA A23.1:24/CSA A23.2:24")
           # 3. Combined with CAN/CSA-: / separator with CSA- appearing multiple times (e.g., "CSA-B138.1-17/CSA-B138.2-17")
-          if wrapped_input.include?('+') ||
-             (wrapped_input.include?('/') && wrapped_input.match?(/\s+CSA-/)) ||
-             (wrapped_input.include?('/') && wrapped_input.scan(/CSA-/).length > 1)
+          if wrapped_input.include?("+") ||
+              (wrapped_input.include?("/") && wrapped_input.match?(/\s+CSA-/)) ||
+              (wrapped_input.include?("/") && wrapped_input.scan("CSA-").length > 1)
             # This is a bundled or combined identifier - parse normally and add prefix
             # Normalize CSA- to CSA (with space) for parsing
             normalized = wrapped_input.sub(/^CSA-/, "CSA ")
-            normalized = normalized.gsub(/CAN\/CSA-/, "CSA ").gsub(/CAN3-/, "CSA ")
+            normalized = normalized.gsub("CAN/CSA-", "CSA ").gsub("CAN3-",
+                                                                  "CSA ")
             normalized = normalized.gsub(/\s+/, " ").strip
 
             # Parse normally (will create Bundled or Combined identifier)
@@ -43,8 +44,8 @@ module Pubid
               set_publisher_prefix(result, "CAN/CSA-")
 
               # Handle reaffirmation if present
-              if wrapped_input =~ /\(R(\d{4})\)/
-                result.reaffirmation = $1 if result.respond_to?(:reaffirmation=)
+              if (wrapped_input =~ /\(R(\d{4})\)/) && result.respond_to?(:reaffirmation=)
+                result.reaffirmation = $1
               end
             end
 
@@ -56,10 +57,10 @@ module Pubid
 
           # Extract reaffirmation FIRST (before any other processing)
           reaffirm_year = nil
-          reaffirmation_was_4digit = false  # Track original format
+          reaffirmation_was_4digit = false # Track original format
           if wrapped_input =~ /\(R(\d{2,4})\)/
             reaffirm_year = $1
-            reaffirmation_was_4digit = ($1.length == 4)  # Track if original was 4-digit
+            reaffirmation_was_4digit = ($1.length == 4) # Track if original was 4-digit
             # Convert 2-digit year to 4-digit if needed
             if reaffirm_year.length == 2
               year_int = reaffirm_year.to_i
@@ -75,7 +76,7 @@ module Pubid
                             elsif wrapped_input.start_with?("CSA ")
                               "CSA"
                             end
-          is_can_csa = true  # Track that this has the CAN/ wrapper
+          is_can_csa = true # Track that this has the CAN/ wrapper
 
           # Normalize CSA- to CSA  (with space) for parsing
           wrapped_input = wrapped_input.sub(/^CSA-/, "CSA ")
@@ -130,14 +131,14 @@ module Pubid
 
           # Detect year format before normalization (CAN3- standards use dash format)
           # Format: CAN3-Z299.0-86 (uses dash, not colon)
-          has_dash_year = wrapped_input.match?(/-\d{2}\b/)  # Match -86, -05, etc. (2-digit years)
+          has_dash_year = wrapped_input.match?(/-\d{2}\b/) # Match -86, -05, etc. (2-digit years)
 
           # Extract reaffirmation FIRST (before any other processing)
           reaffirm_year = nil
-          reaffirmation_was_4digit = false  # Track original format
+          reaffirmation_was_4digit = false # Track original format
           if wrapped_input =~ /\(R(\d{2,4})\)/
             reaffirm_year = $1
-            reaffirmation_was_4digit = ($1.length == 4)  # Track if original was 4-digit
+            reaffirmation_was_4digit = ($1.length == 4) # Track if original was 4-digit
             # Convert 2-digit year to 4-digit if needed
             if reaffirm_year.length == 2
               year_int = reaffirm_year.to_i
@@ -264,82 +265,83 @@ module Pubid
 
           # Check if materials come after PACKAGE keyword
           # Match: "CSA Z662:23 PACKAGE INCLUDES: +1" or "CSA B149.1:20 PACKAGE (PDF + PRINT)"
-          if input.match?(/\sPACKAGE\s+[A-Z]/i)
+          case input
+          when /\sPACKAGE\s+[A-Z]/i
             # Format: {base} PACKAGE {materials}
             # Extract materials after PACKAGE keyword
             base_input, package_materials = input.split(/\s+PACKAGE\s+/i, 2)
             base_input = base_input.strip
             package_materials = package_materials ? package_materials.strip : ""
             materials_after = true
-          else
+          when /:(\d{2,4})(\s+[^P]+)\s+PACKAGE/i
             # Format: {base} PACKAGE or {base} {materials} PACKAGE
             # Examples: "C22.1-15 PACKAGE" (no materials), "CSA B149.1:25 Code, Handbook & Training Package"
 
             # Check if there's a year followed by materials before PACKAGE
             # Must check this BEFORE the generic "{base} PACKAGE" pattern
-            if input.match?(/:(\d{2,4})(\s+[^P]+)\s+PACKAGE/i)
-              # Format: {base} {materials} PACKAGE - "CSA B149.1:25 Code, Handbook & Training Package"
-              # OR: Combined identifier with package: "CSA B149.1:25, CSA B149.2:25 & Training Package"
-              year_str = $1
-              materials_with_package = $2
+            $1
+            $2
 
-              # Check if this is a combined identifier (has comma with CSA after it)
-              # Pattern: ", CSA" or ", CAN" which indicates combined identifier
-              if input.match?(/,\s+CSA/)
-                # For combined identifiers, we need to extract everything before "& Training Package"
-                # The base is the combined identifier, materials is just "& Training Package"
-                combined_match = input.match(/^(.+?)(\s+&[^P]+)\s+PACKAGE$/i)
-                if combined_match
-                  base_input = combined_match[1].strip
-                  package_materials = combined_match[2].strip + " Package"  # Keep "& Training Package"
-                else
-                  # Fallback to year-based extraction
-                  year_match = input.match(/:\d{2,4}/)
-                  if year_match
-                    base_input = input[0..year_match.end(0) - 1]
-                    materials_input = input[year_match.end(0)..].strip
-                    package_materials = materials_input
-                  end
-                end
+            # Check if this is a combined identifier (has comma with CSA after it)
+            # Pattern: ", CSA" or ", CAN" which indicates combined identifier
+            if input.match?(/,\s+CSA/)
+              # For combined identifiers, we need to extract everything before "& Training Package"
+              # The base is the combined identifier, materials is just "& Training Package"
+              combined_match = input.match(/^(.+?)(\s+&[^P]+)\s+PACKAGE$/i)
+              if combined_match
+                base_input = combined_match[1].strip
+                package_materials = "#{combined_match[2].strip} Package" # Keep "& Training Package"
               else
-                # Standard single identifier with materials before PACKAGE
+                # Fallback to year-based extraction
                 year_match = input.match(/:\d{2,4}/)
                 if year_match
-                  base_input = input[0..year_match.end(0) - 1]
-                  # Materials is everything between base and PACKAGE - keep the "Package" suffix for correct capitalization
+                  base_input = input[0..(year_match.end(0) - 1)]
                   materials_input = input[year_match.end(0)..].strip
-                  package_materials = materials_input  # Keep full materials including "Package" suffix
-                  base_input = base_input.strip
+                  package_materials = materials_input
                 end
               end
-              materials_after = false
-            elsif input.match?(/^(.+?)\s+PACKAGE\s*$/i)
-              # Format: {base} PACKAGE (no materials) - "C22.1-15 PACKAGE"
-              # Treat PACKAGE as the package description
-              base_input = input.sub(/\s+PACKAGE\s*$/i, "").strip
-              package_materials = ""  # No additional materials
-              materials_after = true
             else
-              # Fallback: try parsing incrementally
-              tokens = input.split(/\s+/)
-              base_input = ""
-              tokens.each do |token|
-                break if token.match?(/^PACKAGE$/i)
-                test_input = base_input.empty? ? token : "#{base_input} #{token}"
-                parsed = parse(test_input)
-                if parsed
-                  base_input = test_input
-                else
-                  break
-                end
+              # Standard single identifier with materials before PACKAGE
+              year_match = input.match(/:\d{2,4}/)
+              if year_match
+                base_input = input[0..(year_match.end(0) - 1)]
+                # Materials is everything between base and PACKAGE - keep the "Package" suffix for correct capitalization
+                materials_input = input[year_match.end(0)..].strip
+                package_materials = materials_input # Keep full materials including "Package" suffix
+                base_input = base_input.strip
               end
+            end
+            materials_after = false
+          # Format: {base} {materials} PACKAGE - "CSA B149.1:25 Code, Handbook & Training Package"
+          # OR: Combined identifier with package: "CSA B149.1:25, CSA B149.2:25 & Training Package"
+          when /^(.+?)\s+PACKAGE\s*$/i
+            # Format: {base} PACKAGE (no materials) - "C22.1-15 PACKAGE"
+            # Treat PACKAGE as the package description
+            base_input = input.sub(/\s+PACKAGE\s*$/i, "").strip
+            package_materials = "" # No additional materials
+            materials_after = true
+          else
+            # Fallback: try parsing incrementally
+            tokens = input.split(/\s+/)
+            base_input = ""
+            tokens.each do |token|
+              break if token.match?(/^PACKAGE$/i)
 
-              # Extract materials as everything between base and PACKAGE
-              if base_input && base_input.length < input.length
-                materials_input = input[base_input.length..].strip
-                package_materials = materials_input.sub(/\s+PACKAGE\s*$/i, "").strip
-                materials_after = !package_materials.empty?
+              test_input = base_input.empty? ? token : "#{base_input} #{token}"
+              parsed = parse(test_input)
+              if parsed
+                base_input = test_input
+              else
+                break
               end
+            end
+
+            # Extract materials as everything between base and PACKAGE
+            if base_input && base_input.length < input.length
+              materials_input = input[base_input.length..].strip
+              package_materials = materials_input.sub(/\s+PACKAGE\s*$/i,
+                                                      "").strip
+              materials_after = !package_materials.empty?
             end
           end
 
@@ -377,9 +379,9 @@ module Pubid
         has_dash_year = input.match?(/-\d{2}\b/)
 
         # Normalize CAN/CSA- and CAN3- to CSA (global replacement for combined identifiers)
-        normalized = input.gsub(/CAN\/CSA-/, "CSA ")
+        normalized = input.gsub("CAN/CSA-", "CSA ")
         # Normalize CAN3- to CSA (historical prefix)
-        normalized = normalized.gsub(/CAN3-/, "CSA ")
+        normalized = normalized.gsub("CAN3-", "CSA ")
 
         tree = Parser.new.parse(normalized)
         result = Builder.new.build(tree)
@@ -404,13 +406,13 @@ module Pubid
         obj.publisher_prefix = prefix if obj.respond_to?(:publisher_prefix=)
 
         # Set on combined identifier parts
-        if obj.respond_to?(:first) && obj.first && obj.first.respond_to?(:publisher_prefix=)
+        if obj.respond_to?(:first) && obj.first.respond_to?(:publisher_prefix=)
           obj.first.publisher_prefix = prefix
         end
-        if obj.respond_to?(:second) && obj.second && obj.second.respond_to?(:has_publisher) && obj.second.has_publisher && obj.second.respond_to?(:publisher_prefix=)
+        if obj.respond_to?(:second) && obj.second.respond_to?(:has_publisher) && obj.second.has_publisher && obj.second.respond_to?(:publisher_prefix=)
           obj.second.publisher_prefix = prefix
         end
-        if obj.respond_to?(:third) && obj.third && obj.third.respond_to?(:has_publisher) && obj.third.has_publisher && obj.third.respond_to?(:publisher_prefix=)
+        if obj.respond_to?(:third) && obj.third.respond_to?(:has_publisher) && obj.third.has_publisher && obj.third.respond_to?(:publisher_prefix=)
           obj.third.publisher_prefix = prefix
         end
 
@@ -428,7 +430,7 @@ module Pubid
         if input.match?(/^(ISO\/IEC|ISO|IEC|CEI|CEI\/IEC)\s/)
           begin
             # Normalize CEI/IEC to IEC for parsing (CEI is French for IEC)
-            normalized_input = input.sub(/^CEI\/IEC/, 'IEC')
+            normalized_input = input.sub(/^CEI\/IEC/, "IEC")
             return Pubid::Iso.parse(normalized_input)
           rescue StandardError
             return nil

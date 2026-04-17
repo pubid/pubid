@@ -15,8 +15,8 @@ module Pubid
             type_code: :tec,
             abbr: ["Technology Report"],
             name: "Technology Report",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         def self.type

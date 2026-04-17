@@ -11,7 +11,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["CSM", "NBS CSM"],
             stage_code: "published",
-            type_code: "csm"
+            type_code: "csm",
           ),
         ].freeze
 

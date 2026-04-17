@@ -84,7 +84,7 @@ module Pubid
           return @revision if @revision
 
           # Compute from edition component if available
-          if edition && edition.type && edition.id
+          if edition&.type && edition.id
             "#{edition.type}#{edition.id}"
           end
         end
@@ -105,16 +105,12 @@ module Pubid
         # @param format [:full, :long, :abbreviated, :short, :mr] output format
         def to_s(format = nil)
           # Handle both keyword argument (hash) and positional argument (symbol/string)
-          format = if format.is_a?(Hash)
-                     format[:format]
-                   else
-                     format
-                   end
+          format = format[:format] if format.is_a?(Hash)
 
           # Default to parsed_format if available (preserves input format on round-trip)
           # Falls back to :short format for output (normalization)
           # Explicit format parameter always overrides parsed_format
-          effective_format = format || (parsed_format&.to_sym if parsed_format) || :short
+          effective_format = format || parsed_format&.to_sym || :short
           effective_format = effective_format.to_sym if effective_format.is_a?(String)
           case effective_format
           when :full, :long
@@ -242,7 +238,7 @@ module Pubid
           result += " #{stage.to_s(:long)}" if stage
 
           # V2: Use translation_component (already includes space)
-          result += "#{translation_component.to_s(:long)}" if translation_component
+          result += translation_component.to_s(:long) if translation_component
 
           result
         end
@@ -298,13 +294,13 @@ module Pubid
 
           # Special handling for compound series that include publisher prefix
           # If series starts with "NBS " (like "NBS CIRC"), use it as-is
-          if effective_series && effective_series.start_with?("NBS ")
+          if effective_series&.start_with?("NBS ")
             result += effective_series
           elsif effective_publisher && effective_series
-            result += effective_publisher + " " + effective_series
+            result += "#{effective_publisher} #{effective_series}"
           elsif effective_series && publisher_was_parsed
             # Only add "NIST" prefix if publisher was explicitly in the input
-            result += "NIST " + effective_series
+            result += "NIST #{effective_series}"
           elsif effective_series
             # No publisher in input, just show series without prefix
             result += effective_series
@@ -319,7 +315,7 @@ module Pubid
             result += " #{volume}#{part}"
           elsif part.is_a?(Components::Part)
             # SP and other series: use Part.type to determine format
-            result += "#{part}"
+            result += part.to_s
           # Legacy: Render standalone volume (not part of v#n#)
           elsif volume && !issue_number && !part
             vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
@@ -372,7 +368,7 @@ module Pubid
           end
 
           # Add other attributes
-          result += "#{errata}" if errata
+          result += errata.to_s if errata
           result += "index" if index
           result += "insert" if insert
           result += "sec#{section}" if section
@@ -385,7 +381,7 @@ module Pubid
 
           # V2: Use update_component if available, else use update string
           if update_component
-            result += "#{update_component.to_s(:short)}"
+            result += update_component.to_s(:short)
           elsif update
             result += "-upd#{update}"
           end
@@ -393,7 +389,7 @@ module Pubid
           # Add draft - render as {N}pd if draft_number present
           if draft_number
             result += " #{draft_number}pd"
-          elsif draft && draft.to_s.include?("draft") && !draft.to_s.include?("Draft)")
+          elsif draft&.to_s&.include?("draft") && !draft.to_s.include?("Draft)")
             result += "-draft"
           end
 
@@ -405,7 +401,7 @@ module Pubid
           # V2: Use translation_component if available, else use translation string
           # Note: translation_component.to_s already includes the space prefix
           if translation_component
-            result += "#{translation_component.to_s(:short)}"
+            result += translation_component.to_s(:short)
           elsif translation
             result += " #{translation}"
           end
@@ -430,24 +426,22 @@ module Pubid
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
           # Part component (pt1, v6n1, etc.)
-          result += "#{part}" if part.is_a?(Components::Part)
+          result += part.to_s if part.is_a?(Components::Part)
 
           # NEW: Use edition component - NO space before edition in MR format (per NIST spec)
           if edition
             # If edition has original_prefix set (e.g., verbose " Rev. "), use it as-is
             # Otherwise, no space needed in MR format: ".800-53r5"
-            result += if edition.original_prefix && !edition.original_prefix.empty?
-                        edition.to_s
-                      else
-                        edition.to_s
-                      end
+            if edition.original_prefix && !edition.original_prefix.empty?
+            end
+            result += edition.to_s
           end
 
           # V2: Use version_component
-          result += "#{version_component.to_s(:mr)}" if version_component
+          result += version_component.to_s(:mr) if version_component
 
           # V2: Use update_component
-          result += "#{update_component.to_s(:mr)}" if update_component
+          result += update_component.to_s(:mr) if update_component
 
           # V2: Use stage
           result += ".#{stage.to_s(:mr)}" if stage
@@ -458,7 +452,7 @@ module Pubid
           end
 
           # V2: Use translation_component
-          result += "#{translation_component.to_s(:mr)}" if translation_component
+          result += translation_component.to_s(:mr) if translation_component
 
           result
         end

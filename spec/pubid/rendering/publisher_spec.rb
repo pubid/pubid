@@ -24,22 +24,25 @@ RSpec.describe Pubid::Rendering::Publisher do
     it "renders publisher with one copublisher" do
       publisher = Pubid::Components::Publisher.new(body: "ISO")
       copublishers = [Pubid::Components::Publisher.new(body: "IEC")]
-      expect(instance.render_publisher(publisher, copublishers)).to eq("ISO/IEC")
+      expect(instance.render_publisher(publisher,
+                                       copublishers)).to eq("ISO/IEC")
     end
 
     it "renders publisher with multiple copublishers" do
       publisher = Pubid::Components::Publisher.new(body: "ISO")
       copublishers = [
         Pubid::Components::Publisher.new(body: "IEC"),
-        Pubid::Components::Publisher.new(body: "IEEE")
+        Pubid::Components::Publisher.new(body: "IEEE"),
       ]
-      expect(instance.render_publisher(publisher, copublishers)).to eq("ISO/IEC/IEEE")
+      expect(instance.render_publisher(publisher,
+                                       copublishers)).to eq("ISO/IEC/IEEE")
     end
 
     it "uses custom separator" do
       publisher = Pubid::Components::Publisher.new(body: "ISO")
       copublishers = [Pubid::Components::Publisher.new(body: "IEC")]
-      expect(instance.render_publisher(publisher, copublishers, copublisher_separator: ";")).to eq("ISO;IEC")
+      expect(instance.render_publisher(publisher, copublishers,
+                                       copublisher_separator: ";")).to eq("ISO;IEC")
     end
 
     it "returns empty string for nil publisher" do

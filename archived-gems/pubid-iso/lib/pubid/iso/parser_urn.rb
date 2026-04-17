@@ -54,7 +54,7 @@ module Pubid
             (urn_typed_stage >>
               colon >> (array_to_str(SUPPLEMENTS).as(:type) >>
               (colon >> year_digits.as(:year)).maybe >>
-              (colon >> ((digits.as(:number) >> str(":v1")) | str("v") >> digits.as(:number))).maybe)
+              (colon >> ((digits.as(:number) >> str(":v1")) | (str("v") >> digits.as(:number)))).maybe)
             ).repeat(1).as(:supplements).maybe
           end
 

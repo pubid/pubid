@@ -79,7 +79,7 @@ module Pubid
           digits.as(:number) >>
           (dash >> edition).maybe >>
           (
-            supplement >> format_suffix_no_dash.maybe |
+            (supplement >> format_suffix_no_dash.maybe) |
             format_suffix.maybe
           )
       end
@@ -147,7 +147,7 @@ module Pubid
       rule(:adjunct) do
         publisher.maybe >>
           str("ADJ").as(:type) >>
-          (letter >> digits | letters | digits).as(:designation) >>
+          ((letter >> digits) | letters | digits).as(:designation) >>
           (dash >> str("EA")).maybe.as(:ea_suffix) >>
           str("DVD").maybe.as(:dvd_suffix)
       end

@@ -54,7 +54,7 @@ RSpec.describe "SAE Serialization" do
         publisher: "SAE",
         number: "1234",
         year: 2010,
-        type: "AMS"
+        type: "AMS",
       }
 
       id = Pubid::Serializable.from_h(hash)
@@ -67,7 +67,7 @@ RSpec.describe "SAE Serialization" do
         publisher: "SAE",
         number: "5678",
         year: 2020,
-        type: "AIR"
+        type: "AIR",
       }
 
       id = Pubid::Serializable.from_h(hash)

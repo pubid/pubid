@@ -127,7 +127,7 @@ module Pubid
             # Convert single-char to 2-char code
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
             Pubid::Components::Language.new(code: lang,
-                                               original_code: original_lang)
+                                            original_code: original_lang)
           end
 
         end

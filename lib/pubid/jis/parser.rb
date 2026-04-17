@@ -14,8 +14,8 @@ module Pubid
 
       # Normalized separators
       rule(:dash) { (str("-") | jp_dash).as(:dash) }
-      rule(:space) { (str(" ") | jp_space) }
-      rule(:colon) { (str(":") | jp_colon) }
+      rule(:space) { str(" ") | jp_space }
+      rule(:colon) { str(":") | jp_colon }
 
       # Basic elements
       rule(:digit) { match["0-9"] }

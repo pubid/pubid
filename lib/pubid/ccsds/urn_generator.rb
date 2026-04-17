@@ -116,7 +116,7 @@ module Pubid
                         identifier.language.to_s
                       end
           # Normalize language code (remove "Translated" suffix)
-          lang_code = lang_code.gsub(/ Translated$/, '').downcase if lang_code
+          lang_code = lang_code.gsub(/ Translated$/, "").downcase if lang_code
           parts << lang_code if lang_code && !lang_code.empty?
         end
 

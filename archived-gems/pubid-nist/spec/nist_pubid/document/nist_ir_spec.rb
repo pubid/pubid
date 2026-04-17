@@ -44,8 +44,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       "National Institute of Standards and Technology IR 8115"
     end
     let(:abbrev_pubid) do
-      "Natl. Inst. Stand. Technol. IR"\
-          " 8115"
+      "Natl. Inst. Stand. Technol. IR " \
+        "8115"
     end
 
     it_behaves_like "converts pubid to different formats"

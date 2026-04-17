@@ -1,9 +1,13 @@
 require_relative "base"
 
-module Pubid::Cen::Renderer
-  class Guide < Base
-    def render_type(_type, _opts, _params)
-      " Guide"
+module Pubid
+  module Cen
+    module Renderer
+      class Guide < Base
+        def render_type(_type, _opts, _params)
+          " Guide"
+        end
+      end
     end
   end
 end

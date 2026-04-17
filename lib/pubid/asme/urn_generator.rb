@@ -72,7 +72,7 @@ module Pubid
 
         # First code (for joint published)
         if identifier.respond_to?(:first_code) && identifier.first_code
-          parts << "code1.#{identifier.first_code.to_s}"
+          parts << "code1.#{identifier.first_code}"
         end
 
         # Second publisher (for joint published)
@@ -140,8 +140,6 @@ module Pubid
           "ptc"
         when /Handbook/
           "handbook"
-        else
-          nil
         end
       end
 

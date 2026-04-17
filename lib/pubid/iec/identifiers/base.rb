@@ -30,7 +30,7 @@ module Pubid
           parts << number_portion
 
           # Edition if present - add space before edition
-          parts << " #{edition}" if edition && edition.number
+          parts << " #{edition}" if edition&.number
 
           # VAP suffix
           parts << vap_suffix.render_with_space if vap_suffix

@@ -28,8 +28,8 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         next if parts.size < 2
 
         total_tested += 1
-        identifier = parts[1]  # INPUT part
-        expected = parts[2]  # EXPECTED part
+        identifier = parts[1] # INPUT part
+        expected = parts[2] # EXPECTED part
 
         begin
           parsed = Pubid::Ieee.parse(identifier)
@@ -55,7 +55,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "IEEE pubid-to-parse.txt Results"
       puts "=" * 80
       puts "Total: #{total_tested}"
@@ -95,8 +95,8 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         parts = line.split("!")
         next if parts.size < 2
 
-        identifier = parts[1]  # INPUT part
-        expected = parts[2]  # EXPECTED part
+        identifier = parts[1] # INPUT part
+        expected = parts[2] # EXPECTED part
 
         begin
           parsed = Pubid::Ieee.parse(identifier)
@@ -122,7 +122,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "IEEE unapproved.txt Results"
       puts "=" * 80
       puts "Total: #{unapproved_fixtures.size}"
@@ -183,7 +183,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "IEEE pubid-parsed.txt Results"
       puts "=" * 80
       puts "Total: #{total_tested}"
@@ -238,7 +238,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "IEEE OVERALL ROUND-TRIP RESULTS"
       puts "=" * 80
       puts "Total identifiers: #{all_fixtures.size}"

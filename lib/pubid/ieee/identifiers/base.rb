@@ -121,7 +121,7 @@ module Pubid
 
         # Expose numeric month from draft if available
         def draft_month
-          return nil unless draft_obj&.respond_to?(:numeric_month)
+          return nil unless draft_obj.respond_to?(:numeric_month)
 
           draft_obj.numeric_month
         end
@@ -258,7 +258,7 @@ module Pubid
               paren_count = before_match.count("(") - before_match.count(")")
 
               # Skip publishers inside parentheses - they're part of relationship clauses
-              next if paren_count > 0
+              next if paren_count.positive?
 
               publisher_positions << { pos: match_pos, publisher: pub }
             end
@@ -275,14 +275,14 @@ module Pubid
             second_pub = publisher_positions[1]
 
             # Get the substring between the two publishers
-            between = input[first_pub[:pos]..second_pub[:pos] - 1]
+            between = input[first_pub[:pos]..(second_pub[:pos] - 1)]
 
             # If there's no slash and no " and ", this might be space-separated dual
             if !between.include?("/") && !between.include?(" and ")
               # Try to split at the second publisher position
               # Back up to find the space before the second publisher
               split_pos = second_pub[:pos]
-              while split_pos > 0 && input[split_pos - 1] == " "
+              while split_pos.positive? && input[split_pos - 1] == " "
                 split_pos -= 1
               end
 
@@ -318,7 +318,7 @@ module Pubid
               paren_count -= 1 if char == ")"
 
               # Check if " and " starts at this position and we're outside parens
-              if paren_count == 0 && input[i..i + 4] == " and "
+              if paren_count.zero? && input[i..(i + 4)] == " and "
                 and_outside_parens = true
                 and_position = i
                 break
@@ -329,7 +329,7 @@ module Pubid
             if and_outside_parens && and_position
               # Split at the found position only (not at all " and " occurrences)
               first_part = input[0...and_position].strip
-              second_part = input[and_position + 5..-1].strip
+              second_part = input[(and_position + 5)..].strip
 
               # Parse each part separately
               first = parse_single(first_part)
@@ -353,7 +353,7 @@ module Pubid
               paren_count -= 1 if char == ")"
 
               # Check if " & " starts at this position and we're outside parens
-              if paren_count == 0 && input[i..i + 2] == " & "
+              if paren_count.zero? && input[i..(i + 2)] == " & "
                 ampersand_outside_parens = true
                 break
               end
@@ -405,7 +405,7 @@ module Pubid
             # Extract the part before parentheses and the adoption part
             main_part = input.split("(").first.strip
             adoption_match = input.match(/\(([^)]+)\)/)
-            adoption_part = adoption_match ? adoption_match.captures.first : nil
+            adoption_part = adoption_match&.captures&.first
 
             # Check if adoption_part looks like an identifier (contains publisher or type keywords)
             # BUT exclude revision/amendment/supersedes notes
@@ -427,7 +427,8 @@ module Pubid
                   # Pattern: "IEC 60255-24 Edition 2.0 2013-04" → "IEC 60255-24:2013-04 ED2.0"
                   iec_part = part.dup
                   # Replace " Edition X.Y YYYY-MM" (or similar) with ":YYYY-MM EDX.Y"
-                  iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s+([0-9-]+)/, ':\2 ED\1')
+                  iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s+([0-9-]+)/,
+                                 ':\2 ED\1')
                   # Replace " Edition X.Y" at end (no date)
                   iec_part.gsub!(/\s+Edition\s+([0-9.]+)\s*$/, ' ED\1')
                   Pubid::Iec.parse(iec_part)
@@ -568,7 +569,7 @@ module Pubid
             parentheticals << "(#{parenthetical_content})"
           elsif relationships && !relationships.empty?
             # Render relationships (multiple separated by /)
-            relationship_str = relationships.map(&:to_s).join(" / ")
+            relationship_str = relationships.join(" / ")
             parentheticals << "(#{relationship_str})"
           elsif revision_of
             parentheticals << "(Revision of IEEE Std #{revision_of})"
@@ -582,7 +583,7 @@ module Pubid
           end
 
           # Append all parentheticals with space separation
-          result += " " + parentheticals.join(" ") unless parentheticals.empty?
+          result += " #{parentheticals.join(' ')}" unless parentheticals.empty?
 
           # Book nickname - outside parentheses in square brackets
           result += " [#{nickname}]" if nickname && !nickname.to_s.strip.empty?

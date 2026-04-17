@@ -47,19 +47,19 @@ module Pubid
         /ix
 
         # Scan for matches and try each one
-        matches = title.to_enum(:scan, identifier_pattern).map { Regexp.last_match }
+        matches = title.to_enum(:scan, identifier_pattern).map do
+          Regexp.last_match
+        end
         matches.each do |m|
-          begin
-            return Pubid::Iso.parse(m[0].strip)
-          rescue Parslet::ParseFailed
-            # Try next match
-          end
+          return Pubid::Iso.parse(m[0].strip)
+        rescue Parslet::ParseFailed
+          # Try next match
         end
 
         # Pattern 3: Split title into words and try progressively shorter suffixes
         words = title.split(/\s+/)
         (2..[words.length, 8].min).each do |count|
-          candidate = words[-count..-1].join(" ")
+          candidate = words[-count..].join(" ")
           begin
             return Pubid::Iso.parse(candidate)
           rescue Parslet::ParseFailed
@@ -69,8 +69,9 @@ module Pubid
 
         # Pattern 4: Try removing trailing descriptive text
         # Common patterns: " — Title", " - Title", ": Title"
-        title.split(/[\s—::-]+/).reverse.each do |part|
-          next if part.nil? || part.length < 5  # Skip very short parts
+        title.split(/[\s—:-]+/).reverse.each do |part|
+          next if part.nil? || part.length < 5 # Skip very short parts
+
           begin
             return Pubid::Iso.parse(part.strip)
           rescue Parslet::ParseFailed

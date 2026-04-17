@@ -40,12 +40,12 @@ module Pubid
           @supplement_typed_stages ||= [].freeze
         end
 
-        def locate_typed_stage_by_abbr(abbr)
+        def locate_typed_stage_by_abbr(_abbr)
           raise ArgumentError,
                 "ASTM identifiers do not use typed stages"
         end
 
-        def locate_identifier_klass_by_type_code(type_code)
+        def locate_identifier_klass_by_type_code(_type_code)
           raise ArgumentError,
                 "ASTM identifiers do not use type codes"
         end

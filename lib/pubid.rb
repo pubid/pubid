@@ -77,5 +77,4 @@ module Pubid
   autoload :Oiml, "pubid/oiml"
   autoload :Plateau, "pubid/plateau"
   autoload :Sae, "pubid/sae"
-
 end

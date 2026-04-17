@@ -48,4 +48,3 @@ RSpec.describe Pubid::Identifier do
     end
   end
 end
-

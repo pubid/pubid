@@ -1,25 +1,27 @@
-module Pubid::Ccsds
-  module Identifier
-    class Corrigendum < Base
-      def_delegators "Pubid::Ccsds::Identifier::Corrigendum", :type
+module Pubid
+  module Ccsds
+    module Identifier
+      class Corrigendum < Base
+        def_delegators "Pubid::Ccsds::Identifier::Corrigendum", :type
 
-      attr_accessor :base
+        attr_accessor :base
 
-      def initialize(base: nil, **opts)
-        super(**opts)
-        @base = if base.is_a?(Hash)
-                  Identifier.create(**base)
-                else
-                  base
-                end
-      end
+        def initialize(base: nil, **opts)
+          super(**opts)
+          @base = if base.is_a?(Hash)
+                    Identifier.create(**base)
+                  else
+                    base
+                  end
+        end
 
-      def self.type
-        { key: :corrigendum, title: "Corrigendum", short: "corrigendum" }
-      end
+        def self.type
+          { key: :corrigendum, title: "Corrigendum", short: "corrigendum" }
+        end
 
-      def self.get_renderer_class
-        Renderer::Corrigendum
+        def self.get_renderer_class
+          Renderer::Corrigendum
+        end
       end
     end
   end

@@ -15,7 +15,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["MONO", "NBS MONO", "NIST MONO"],
             stage_code: "published",
-            type_code: "mono"
+            type_code: "mono",
           ),
         ].freeze
 

@@ -26,8 +26,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
 
     context "when NIST SP 800-53r5" do
       let(:long_pubid) do
-        "National Institute of Standards and Technology Special Publication"\
-          " 800-53, Revision 5"
+        "National Institute of Standards and Technology Special Publication " \
+          "800-53, Revision 5"
       end
       let(:abbrev_pubid) do
         "Natl. Inst. Stand. Technol. Spec. Publ. 800-53, Rev. 5"
@@ -57,8 +57,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:original_pubid) { "NIST NCSTAR 1-1Cv1" }
       let(:short_pubid) { "NIST NCSTAR 1-1Cv1" }
       let(:long_pubid) do
-        "National Institute of Standards and Technology National Construction"\
-          " Safety Team Act Reports 1-1C, Volume 1"
+        "National Institute of Standards and Technology National Construction " \
+          "Safety Team Act Reports 1-1C, Volume 1"
       end
       let(:abbrev_pubid) do
         "Natl. Inst. Stand. Technol. Natl. Constr. Tm. Act Rpt. 1-1C, Vol. 1"
@@ -71,8 +71,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:original_pubid) { "NBS CRPL-F-B150" }
       let(:short_pubid) { "NBS CRPL-F-B 150" }
       let(:long_pubid) do
-        "National Bureau of Standards CRPL Solar-Geophysical"\
-          " Data 150"
+        "National Bureau of Standards CRPL Solar-Geophysical " \
+          "Data 150"
       end
       let(:abbrev_pubid) do
         "Natl. Bur. Stand. CRPL Solar-Geophysical Data 150"
@@ -85,8 +85,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:original_pubid) { "NBS CRPL-F-B245" }
       let(:short_pubid) { "NBS CRPL-F-B 245" }
       let(:long_pubid) do
-        "National Bureau of Standards CRPL Solar-Geophysical"\
-          " Data 245"
+        "National Bureau of Standards CRPL Solar-Geophysical " \
+          "Data 245"
       end
       let(:abbrev_pubid) do
         "Natl. Bur. Stand. CRPL Solar-Geophysical Data 245"
@@ -99,8 +99,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:original_pubid) { "NBS FIPS 100" }
       let(:short_pubid) { "NBS FIPS 100" }
       let(:long_pubid) do
-        "National Bureau of Standards Federal Information Processing Standards"\
-          " Publication 100"
+        "National Bureau of Standards Federal Information Processing Standards " \
+          "Publication 100"
       end
       let(:abbrev_pubid) do
         "Natl. Bur. Stand. Federal Inf. Process. Stds. 100"
@@ -114,8 +114,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:short_pubid) { "NBS FIPS 100" }
       let(:mr_pubid) { "NBS.FIPS.100" }
       let(:long_pubid) do
-        "National Bureau of Standards Federal Information Processing Standards"\
-          " Publication 100"
+        "National Bureau of Standards Federal Information Processing Standards " \
+          "Publication 100"
       end
       let(:abbrev_pubid) do
         "Natl. Bur. Stand. Federal Inf. Process. Stds. 100"
@@ -129,8 +129,8 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:short_pubid) { "NIST FIPS 140-3" }
       let(:mr_pubid) { "NIST.FIPS.140-3" }
       let(:long_pubid) do
-        "National Institute of Standards and Technology Federal Information"\
-          " Processing Standards Publication 140-3"
+        "National Institute of Standards and Technology Federal Information " \
+          "Processing Standards Publication 140-3"
       end
       let(:abbrev_pubid) do
         "Natl. Inst. Stand. Technol. Federal Inf. Process. Stds. 140-3"

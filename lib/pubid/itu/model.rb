@@ -41,7 +41,7 @@ module Pubid
           parts[-1] << "-#{part}" if part
         elsif series
           # Regular series
-          series_str = "#{series}"
+          series_str = series.to_s
           if number
             series_str << ".#{number}"
             series_str << ".#{subseries}" if subseries

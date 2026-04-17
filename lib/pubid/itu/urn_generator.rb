@@ -79,7 +79,7 @@ module Pubid
           base_parts = base_part.split(":")
 
           # Add base identifier components
-          parts.concat(base_parts[0..-1])
+          parts.concat(base_parts)
         else
           # Fallback to sector/series/code if no base
           if identifier.respond_to?(:sector) && identifier.sector

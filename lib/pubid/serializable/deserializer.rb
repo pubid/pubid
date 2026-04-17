@@ -66,7 +66,7 @@ module Pubid
 
         # ASME and ASHRAE/AMCA use dash separator for year
         # Example: ASME B16.5-2020, ASHRAE Standard 90.1-2022, AMCA Standard 210-08
-        if hash[:flavor]&.to_sym == :asme || hash[:flavor]&.to_sym == :ashrae || hash[:flavor]&.to_sym == :amca
+        if %i[asme ashrae amca].include?(hash[:flavor]&.to_sym)
           return build_type_with_dash_identifier_string(hash)
         end
 
@@ -110,11 +110,9 @@ module Pubid
             # - If original_year_4digit is true, keep 4-digit year
             # - If original_year_4digit is false or missing, convert to 2-digit
             year_value = hash[:year].to_s
-            if hash[:flavor]&.to_sym == :csa
-              # Only convert to 2-digit if original was 2-digit (flag is false or missing)
-              if !hash[:original_year_4digit] && year_value.length == 4
-                year_value = year_value[2..3]
-              end
+            # Only convert to 2-digit if original was 2-digit (flag is false or missing)
+            if (hash[:flavor]&.to_sym == :csa) && !hash[:original_year_4digit] && year_value.length == 4
+              year_value = year_value[2..3]
             end
             date_str = "#{date_separator}#{year_value}"
             # Only add month if present and non-empty
@@ -138,14 +136,12 @@ module Pubid
         end
 
         # Supplements (attach to the last part directly, not as separate part)
-        if hash[:supplements]&.any?
-          # Attach supplements to the last part (usually the number_part)
-          if parts.any?
-            # Supplements are serialized from inner to outer (e.g., [Cor, Amd]),
-            # but we need to append them from outer to inner (e.g., /Amd /Cor)
-            # to match the original parsing order
-            parts[-1] += build_supplement_string(hash[:supplements].reverse)
-          end
+        # Attach supplements to the last part (usually the number_part)
+        if hash[:supplements]&.any? && parts.any?
+          # Supplements are serialized from inner to outer (e.g., [Cor, Amd]),
+          # but we need to append them from outer to inner (e.g., /Amd /Cor)
+          # to match the original parsing order
+          parts[-1] += build_supplement_string(hash[:supplements].reverse)
         end
 
         parts.compact.join(" ")
@@ -164,19 +160,19 @@ module Pubid
         result += "-#{hash[:sector]}" if hash[:sector]
 
         # Add series and code
-        if hash[:series]
-          result += " #{hash[:series]}.#{hash[:number]}"
-        else
-          result += " #{hash[:number]}"
-        end
+        result += if hash[:series]
+                    " #{hash[:series]}.#{hash[:number]}"
+                  else
+                    " #{hash[:number]}"
+                  end
 
         # Add date if present (ITU format: (MM/YYYY) or (YYYY))
         if hash[:year]
-          if hash[:month]
-            result += " (#{hash[:month]}/#{hash[:year]})"
-          else
-            result += " (#{hash[:year]})"
-          end
+          result += if hash[:month]
+                      " (#{hash[:month]}/#{hash[:year]})"
+                    else
+                      " (#{hash[:year]})"
+                    end
         end
 
         # Add language
@@ -198,7 +194,7 @@ module Pubid
         if hash[:type]
           type_str = hash[:type].to_s
           # Capitalize first letter
-          type_str = type_str[0].upcase + type_str[1..-1] if type_str.length > 0
+          type_str = type_str[0].upcase + type_str[1..] if type_str.length.positive?
           result += " #{type_str}"
         end
 
@@ -297,7 +293,7 @@ module Pubid
         if hash[:year]
           year_str = hash[:year].to_s
           # Convert 4-digit year to 2-digit if needed
-          year_str = year_str[-2..-1] if year_str.length == 4
+          year_str = year_str[-2..] if year_str.length == 4
           result += "-#{year_str}"
         end
 
@@ -334,8 +330,8 @@ module Pubid
         if hash[:supplements]&.any?
           hash[:supplements].each do |supp|
             # Plateau uses "Annex A" format
-            if supp[:type] == "annex"
-              result += " Annex #{supp[:letter]}" if supp[:letter]
+            if (supp[:type] == "annex") && supp[:letter]
+              result += " Annex #{supp[:letter]}"
             end
           end
         end
@@ -417,7 +413,9 @@ module Pubid
       # @param hash [Hash] hash with string or symbol keys
       # @return [Hash] hash with symbol keys (recursively)
       def self.symbolize_keys(hash)
-        hash.transform_keys { |key| key.to_s.to_sym }.transform_values do |value|
+        hash.transform_keys do |key|
+          key.to_s.to_sym
+        end.transform_values do |value|
           case value
           when Hash
             symbolize_keys(value)

@@ -19,22 +19,24 @@ module Pubid
 
           rule(:urn_type) do
             (array_to_str(
-              Identifier.config.types.map { |t| t.type[:short] }.flatten.compact.map(&:downcase),
+              Identifier.config.types.map do |t|
+                t.type[:short]
+              end.flatten.compact.map(&:downcase),
             ).as(:type) >> colon).maybe
           end
 
           rule(:urn_number) do
             # Alpha-prefix numbers like ca:01 or plain alpha like syccomm
-            (match('[a-z]').repeat(1) >> (str(":") >> match('[a-z0-9]').repeat(1)).maybe |
+            ((match("[a-z]").repeat(1) >> (str(":") >> match("[a-z0-9]").repeat(1)).maybe) |
              # Numeric numbers, optionally followed by a letter (15k)
-             match('[0-9]').repeat(1) >> match('[a-z]').maybe).as(:number)
+             (match("[0-9]").repeat(1) >> match("[a-z]").maybe)).as(:number)
           end
 
           rule(:urn_part) do
             # Accepts both ":-N" (legacy stored format) and "-N" (canonical IEC API format).
             # The renderer always emits the canonical "-N" form; the legacy form is accepted
             # only for parsing pre-existing stored URNs.
-            (colon.maybe >> dash >> (match('[a-z0-9]') | dash).repeat(1).as(:part)).maybe
+            (colon.maybe >> dash >> (match("[a-z0-9]") | dash).repeat(1).as(:part)).maybe
           end
 
           rule(:urn_conjuction_part) do
@@ -85,7 +87,7 @@ module Pubid
           end
 
           rule(:urn_fragment) do
-            (colon >> str("frag") >> colon >> match('[a-z0-9]').repeat(1).as(:fragment)).maybe
+            (colon >> str("frag") >> colon >> match("[a-z0-9]").repeat(1).as(:fragment)).maybe
           end
 
           rule(:urn_language) do

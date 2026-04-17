@@ -1,20 +1,22 @@
-module Pubid::Iec
-  class Transformer < Pubid::Core::Transformer
-    def initialize
-      super
+module Pubid
+  module Iec
+    class Transformer < Pubid::Core::Transformer
+      def initialize
+        super
 
-      rule(database: "DB") do
-        { database: true }
-      end
-    end
-
-    class << self
-      def get_amendment_class
-        Identifier::Amendment
+        rule(database: "DB") do
+          { database: true }
+        end
       end
 
-      def get_corrigendum_class
-        Identifier::Corrigendum
+      class << self
+        def get_amendment_class
+          Identifier::Amendment
+        end
+
+        def get_corrigendum_class
+          Identifier::Corrigendum
+        end
       end
     end
   end

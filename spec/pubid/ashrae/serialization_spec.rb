@@ -52,7 +52,7 @@ RSpec.describe "ASHRAE Serialization" do
         publisher: "ASHRAE",
         number: "90.1",
         year: "2022",
-        type: "standard"
+        type: "standard",
       }
 
       id = Pubid::Serializable.from_h(hash)

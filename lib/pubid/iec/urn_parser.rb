@@ -63,7 +63,10 @@ module Pubid
       # @return [Identifier] parsed identifier
       def parse_urn(urn)
         # Remove urn:iec:std: prefix
-        raise Errors::ParseError, "Invalid IEC URN: #{urn}" unless urn.start_with?("urn:iec:std:")
+        unless urn.start_with?("urn:iec:std:")
+          raise Errors::ParseError,
+                "Invalid IEC URN: #{urn}"
+        end
 
         parts = urn.sub("urn:iec:std:", "").split(":")
 
@@ -118,7 +121,7 @@ module Pubid
           # Check for supplement stage
           if parts.first&.start_with?("stage-")
             supp_stage_data = parts.shift
-            supp_stage, _ = parse_stage_code(supp_stage_data)
+            supp_stage, = parse_stage_code(supp_stage_data)
           elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase)
             supp_stage_abbr = parts.shift.upcase
             supp_stage = TYPED_STAGE_REVERSE_MAP[supp_stage_abbr]
@@ -159,15 +162,14 @@ module Pubid
 
         # Build the identifier hash
         build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                       date, edition, supplements)
+                         date, edition, supplements)
       end
 
       private
 
       # Parse publisher component (iec, iso-iec, etc.)
       def parse_publisher(publisher_str)
-        publishers = publisher_str.split("-").map(&:upcase)
-        publishers
+        publisher_str.split("-").map(&:upcase)
       end
 
       # Parse type component
@@ -203,12 +205,12 @@ module Pubid
       end
 
       # Build identifier from parsed components
-      def build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
+      def build_identifier(publishers, number, part, subpart, type_code, stage_code, _stage_iteration,
                          date, edition, supplements)
         # Start with base document hash
         base_hash = {
           publisher: publishers.first,
-          copublishers: publishers[1..-1]&.map { |c| { copublisher: c } },
+          copublishers: publishers[1..]&.map { |c| { copublisher: c } },
         }
 
         # Build number_with_part (expected by Builder)
@@ -234,7 +236,8 @@ module Pubid
           # Look up the typed stage abbreviation from stage_code
           typed_stage = Scheme.locate_typed_stage_by_stage_code(stage_code)
           if typed_stage
-            base_hash[:type_with_stage] = typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
+            base_hash[:type_with_stage] =
+              typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
           else
             # Fallback to harmonized stage notation
             base_hash[:stage] = stage_code.to_s.gsub(".", ".")
@@ -247,7 +250,12 @@ module Pubid
 
           if supp[:stage]
             typed_stage = Scheme.locate_typed_stage_by_stage_code(supp[:stage])
-            supp_hash[:type_with_stage] = typed_stage ? (typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr) : supp[:stage].to_s.upcase
+            supp_hash[:type_with_stage] = if
+typed_stage
+                                            typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
+                                          else
+                                            supp[:stage].to_s.upcase
+                                          end
           end
 
           supp_hash[:type_with_stage] ||= supp[:type].to_s.upcase if supp[:type]
@@ -263,7 +271,7 @@ module Pubid
           # Wrap current identifier with supplement
           base_hash = {
             base_identifier: base_hash,
-            **supp_hash
+            **supp_hash,
           }
         end
 

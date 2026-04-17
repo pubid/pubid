@@ -11,7 +11,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["OWMWP", "NIST OWMWP"],
             stage_code: "published",
-            type_code: "owmwp"
+            type_code: "owmwp",
           ),
         ].freeze
 
@@ -21,7 +21,8 @@ module Pubid
           end
 
           def type
-            { key: :owmwp, title: "Office of Weights and Measures Workshop Proceedings", short: "OWMWP" }
+            { key: :owmwp,
+              title: "Office of Weights and Measures Workshop Proceedings", short: "OWMWP" }
           end
         end
 

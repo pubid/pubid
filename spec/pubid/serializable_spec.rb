@@ -271,7 +271,7 @@ RSpec.describe Pubid::Serializable do
           flavor: "iso",
           publisher: "ISO",
           number: "9001",
-          year: "2015"
+          year: "2015",
         }
       end
 
@@ -298,7 +298,7 @@ RSpec.describe Pubid::Serializable do
           publisher: "ISO",
           copublishers: ["IEC"],
           number: "27001",
-          year: "2013"
+          year: "2013",
         }
       end
 
@@ -316,7 +316,7 @@ RSpec.describe Pubid::Serializable do
           publisher: "ISO",
           number: "8601",
           part: "1",
-          year: "2019"
+          year: "2019",
         }
       end
 
@@ -333,7 +333,7 @@ RSpec.describe Pubid::Serializable do
           "flavor" => "iso",
           "publisher" => "ISO",
           "number" => "9001",
-          "year" => "2015"
+          "year" => "2015",
         }
       end
 
@@ -348,12 +348,14 @@ RSpec.describe Pubid::Serializable do
       let(:hash) do
         {
           publisher: "ISO",
-          number: "9001"
+          number: "9001",
         }
       end
 
       it "raises ArgumentError" do
-        expect { described_class.from_h(hash) }.to raise_error(ArgumentError, /flavor/)
+        expect do
+          described_class.from_h(hash)
+        end.to raise_error(ArgumentError, /flavor/)
       end
     end
 
@@ -362,12 +364,14 @@ RSpec.describe Pubid::Serializable do
         {
           flavor: "invalid_flavor",
           publisher: "TEST",
-          number: "123"
+          number: "123",
         }
       end
 
       it "raises ArgumentError" do
-        expect { described_class.from_h(hash) }.to raise_error(ArgumentError, /flavor/i)
+        expect do
+          described_class.from_h(hash)
+        end.to raise_error(ArgumentError, /flavor/i)
       end
     end
   end

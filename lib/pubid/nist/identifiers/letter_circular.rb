@@ -14,9 +14,9 @@ module Pubid
       class LetterCircular < Base
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
-            abbr: ["LCIRC"],  # Single definition of truth
+            abbr: ["LCIRC"], # Single definition of truth
             stage_code: "published",
-            type_code: "lc"
+            type_code: "lc",
           ),
         ].freeze
 

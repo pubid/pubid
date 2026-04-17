@@ -55,8 +55,8 @@ module Pubid
         # Full path: TC/SC 4/WG 3
         (str("/") >> sc_type >> space >> digits.as(:sc_number) >> str("/") >>
           wg_type >> space >> digits.as(:wg_number)) |
-        # TC and SC only: TC/SC 4 N 789
-        (str("/") >> sc_type >> space >> digits.as(:sc_number))
+          # TC and SC only: TC/SC 4 N 789
+          (str("/") >> sc_type >> space >> digits.as(:sc_number))
       end
 
       rule(:tc_type) do
@@ -284,7 +284,7 @@ module Pubid
           type_with_stage.maybe >>
           space.maybe >>
           second_part >> third_part) |
-        # WD/ISO - stage prefix with slash before publisher
+          # WD/ISO - stage prefix with slash before publisher
           (str("WD").as(:nsb_stage) >> str("/") >>
             prefix_sole_publisher >> space? >> copublishers.maybe >>
             space.maybe >>
@@ -323,7 +323,7 @@ module Pubid
       rule(:supplement_identifier_no_third) do
         identifier_copublishers_no_third.as(:base_identifier) >>
           str("/") >> supplement_type_with_stage >>
-          (space? >> second_part | str(".") >> digits.as(:number) | space? >> date)
+          ((space? >> second_part) | (str(".") >> digits.as(:number)) | (space? >> date))
       end
 
       rule(:supplement_identifier) do
@@ -336,14 +336,14 @@ module Pubid
       rule(:supplement_supplement_identifier) do
         supplement_identifier_no_third.as(:base_identifier) >>
           str("/") >> supplement_type_with_stage >>
-          (space? >> second_part >> third_part | str(".") >> digits.as(:number) >> third_part)
+          ((space? >> second_part >> third_part) | (str(".") >> digits.as(:number) >> third_part))
       end
 
       # ISO 12345:2020/Amd 1:2021/Cor 1:2022/Amd 2:2023 (three-level supplement)
       rule(:supplement_supplement_supplement_identifier) do
         supplement_supplement_identifier.as(:base_identifier) >>
           str("/") >> supplement_type_with_stage >>
-          (space? >> second_part >> third_part | str(".") >> digits.as(:number) >> third_part)
+          ((space? >> second_part >> third_part) | (str(".") >> digits.as(:number) >> third_part))
       end
 
       # ISO/IEC DIR

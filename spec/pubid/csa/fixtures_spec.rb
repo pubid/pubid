@@ -3,11 +3,11 @@
 require "spec_helper"
 
 module CsaFixturesSpec
-  FIXTURE_FILES = Dir.glob(File.join(__dir__, "../../../fixtures/CSA/identifiers/pass", "*.txt")).freeze
+  FIXTURE_FILES = Dir.glob(File.join(__dir__,
+                                     "../../../fixtures/CSA/identifiers/pass", "*.txt")).freeze
 end
 
 RSpec.describe "CSA Fixture Round-trip Tests" do
-
   describe "all fixture files" do
     CsaFixturesSpec::FIXTURE_FILES.each do |fixture_file|
       describe File.basename(fixture_file) do
@@ -22,20 +22,18 @@ RSpec.describe "CSA Fixture Round-trip Tests" do
           successes = 0
 
           identifiers.each do |id_str|
-            begin
-              parsed = Pubid::Csa.parse(id_str)
-              rendered = parsed.to_s
+            parsed = Pubid::Csa.parse(id_str)
+            rendered = parsed.to_s
 
-              if rendered == id_str
-                successes += 1
-              else
-                failures << { original: id_str, rendered: rendered,
-                              type: "mismatch" }
-              end
-            rescue StandardError => e
-              failures << { original: id_str, error: "#{e.class}: #{e.message}",
-                            type: "parse_error" }
+            if rendered == id_str
+              successes += 1
+            else
+              failures << { original: id_str, rendered: rendered,
+                            type: "mismatch" }
             end
+          rescue StandardError => e
+            failures << { original: id_str, error: "#{e.class}: #{e.message}",
+                          type: "parse_error" }
           end
 
           total = identifiers.count

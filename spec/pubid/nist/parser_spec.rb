@@ -94,7 +94,9 @@ RSpec.describe Pubid::Nist::Parser do
     end
 
     context "parse identifiers from fixtures" do
-      let(:fixture_path) { "spec/fixtures/nist/identifiers/full/allrecords.txt" }
+      let(:fixture_path) do
+        "spec/fixtures/nist/identifiers/full/allrecords.txt"
+      end
 
       it "parses majority of fixture identifiers" do
         # Centralized fixture file for bulk parsing coverage

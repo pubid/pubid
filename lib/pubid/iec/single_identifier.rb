@@ -53,12 +53,12 @@ module Pubid
 
       def number_portion(lang_single: false)
         [
-          (number ? "#{number}" : ""),
+          (number ? number.to_s : ""),
           (part ? "-#{part}" : ""),
           (subpart ? "-#{subpart}" : ""),
           (stage_iteration ? ".#{stage_iteration}" : ""),
           (date ? ":#{date.year}" : ""),
-        ].join("")
+        ].join
       end
 
       def language_portion(lang_single: false)
@@ -70,7 +70,7 @@ module Pubid
             lang.to_s(lang_single: lang_single)
           end.join(lang_single ? "/" : ","),
           ")",
-        ].join("")
+        ].join
       end
 
       def edition_portion(lang: :en)

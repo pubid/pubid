@@ -25,7 +25,9 @@ module Pubid
       # Year pattern (4 digits starting with 19 or 20), optionally followed by letter(s)
       # e.g. 2012, 201x, 2010a
       rule(:year_digits) do
-        (str("19") | str("20")) >> digit.repeat(2, 2) >> lower.repeat(0, 2) >> digits.absent?
+        (str("19") | str("20")) >> digit.repeat(2,
+                                                2) >> lower.repeat(0,
+                                                                   2) >> digits.absent?
       end
 
       # Month patterns - numeric format (01-12)
@@ -86,15 +88,13 @@ module Pubid
       # Characteristic IEEE number patterns (without prefix)
       # These patterns are distinctly IEEE even without "IEEE Std" prefix
       rule(:characteristic_ieee_number) do
-        (
-          # C37.xxx series (power systems) - C followed by 2 digits, dot, more digits
-          str("C") >> digit.repeat(2,
-                                   2) >> dot >> digits >> match("[a-z]").repeat.maybe |
+        # C37.xxx series (power systems) - C followed by 2 digits, dot, more digits
+        (str("C") >> digit.repeat(2,
+                                  2) >> dot >> digits >> match("[a-z]").repeat.maybe) |
           # 802.xxx series (networking) - 802 followed by dot, digits, optional letter suffix
-          str("802") >> dot >> digits >> match("[a-z]").repeat.maybe |
+          (str("802") >> dot >> digits >> match("[a-z]").repeat.maybe) |
           # P followed by digits (draft projects)
-          str("P") >> digits.repeat(1)
-        )
+          (str("P") >> digits.repeat(1))
       end
 
       rule(:publisher) do
@@ -102,13 +102,11 @@ module Pubid
       end
 
       rule(:copublisher) do
-        (
-          # Three-way copublisher strings (treat as single unit, longest first)
-          str("/ISO/IEC").as(:copublisher) |
+        # Three-way copublisher strings (treat as single unit, longest first)
+        str("/ISO/IEC").as(:copublisher) |
           str("/IEC/ISO").as(:copublisher) |
           # Two-way copublishers (original pattern)
           (slash >> space? >> organization.as(:copublisher))
-        )
       end
 
       # Conformance document patterns (/Conformance01-2003, /Conformance02-2014)
@@ -150,7 +148,7 @@ module Pubid
         str("Draft Std") | str("STD") | str("Standard") |
           str("Std No.") | str("Std") | # Add "Std No." before "Std"
           str("PTC") | # ASME Performance Test Code
-          match("[Nn]") >> str("o.") | match("[Nn]") >> str("o") |
+          (match("[Nn]") >> str("o.")) | (match("[Nn]") >> str("o")) |
           str("No")
       end
 
@@ -187,7 +185,8 @@ module Pubid
             # Pattern: D3.1 (decimal with 1-2 digits on each side) - MOST COMMON, put first
             # Also handles trailing letter: D7.3A, D2.0E
             (match("[0-9]").repeat(1,
-                                   2) >> dot >> match("[0-9]").repeat(1, 2) >> lower.maybe) |
+                                   2) >> dot >> match("[0-9]").repeat(1,
+                                                                      2) >> lower.maybe) |
             # Pattern: D.XX (decimal starting with dot) - e.g., D.19
             (dot >> digits) |
             # Pattern: DX+X (plus sign) - e.g., D1+1
@@ -196,14 +195,14 @@ module Pubid
             (digits >> dot.maybe >> str("e") >> digits) |
             # Pattern: D-X or DX or DX-d or DX_letter (original patterns)
             # Handles: D12, D3.0, D043Rev18, suffixes like D15Sept
-            (str("-").maybe >> match("[0-9A-Za-z]").repeat(1) >> (str("-d") | str("_") >> match("[0-9A-Za-z]").repeat(0)).maybe)
+            (str("-").maybe >> match("[0-9A-Za-z]").repeat(1) >> (str("-d") | (str("_") >> match("[0-9A-Za-z]").repeat(0))).maybe)
           ).as(:draft_version)
       end
 
       rule(:draft_date) do
         # Enhanced to handle: ", Sept 2008" or " Sept 2008" or ", Month Year"
         ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)) |
-          ((space? >> comma >> space? | space) >> month_name.as(:month) >>
+          (((space? >> comma >> space?) | space) >> month_name.as(:month) >>
           (
             ((space >> digits.as(:day)).maybe >> comma >> year_digits.as(:year)) |
             (comma >> space? >> year_digits.as(:year)) |
@@ -219,7 +218,7 @@ module Pubid
          (str("FDIS") | str("CDV") | str("CD") | str("WD") | str("PWI") | str("NP")) >>
          (
            ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)) | # Month Year
-           ((comma | space) >> year_digits.as(:year))  # Year only (e.g., /FDIS, 2016)
+           ((comma | space) >> year_digits.as(:year)) # Year only (e.g., /FDIS, 2016)
          ).maybe >>
          parenthetical.maybe).as(:fdraft)
       end
@@ -323,8 +322,7 @@ module Pubid
 
       # Combined relationship type (longest match first)
       rule(:relationship_type) do
-        (
-          relationship_draft_amendment.as(:draft_amendment_to) |
+        relationship_draft_amendment.as(:draft_amendment_to) |
           relationship_draft_revision.as(:draft_revision_of) |
           relationship_previously_designated.as(:previously_designated_as) |
           relationship_reaffirmation.as(:reaffirmation_of) |
@@ -337,7 +335,6 @@ module Pubid
           relationship_incorporates.as(:incorporates) |
           relationship_adoption_of.as(:adoption_of) |
           relationship_supplement_to.as(:supplement_to)
-        )
       end
 
       # Identifier string (for parsing list of related identifiers)
@@ -367,14 +364,12 @@ module Pubid
 
       # "as amended by" clause with identifier list
       rule(:as_amended_by_clause) do
-        (
-          # Variant 1: "as amended by IEEE's X, Y, Z"
-          str(" as amended by IEEE's ") >> identifier_list.as(:amendments) |
+        # Variant 1: "as amended by IEEE's X, Y, Z"
+        (str(" as amended by IEEE's ") >> identifier_list.as(:amendments)) |
           # Variant 2: "as amended by X, Y, Z" (standard)
-          str(" as amended by ") >> identifier_list.as(:amendments) |
+          (str(" as amended by ") >> identifier_list.as(:amendments)) |
           # Variant 3: "and its approved amendments" (no specific list)
           str(" and its approved amendments").as(:approved_amendments)
-        )
       end
 
       # Relationship clause (handles all relationship types)
@@ -495,7 +490,7 @@ module Pubid
           number >>
           (part_subpart_year | edition).maybe >>
           # Pattern for /08 style drafts (digits without D prefix) - MUST come before corrigendum
-          ((slash >> digits.as(:draft_version)).as(:digit_draft)).maybe >>
+          (slash >> digits.as(:draft_version)).as(:digit_draft).maybe >>
           # FDIS and other ISO stage codes without D prefix (Pattern 3)
           fdraft.maybe >>
           # Enhanced: Accept both comma and space before month/year
@@ -714,14 +709,14 @@ module Pubid
       # Examples: IEEE Std 1299/C62.22.1-1996, IEEE Std 960-1989, Std 1177-1989
       rule(:multi_numbered_identifier) do
         # Primary identifier (full IEEE identifier)
-        (
+        ((
           (publisher >> space).maybe >>
           (type_word.as(:type) >> space?).maybe >>
           number >>
           (part_subpart_year | edition).maybe
         ).as(:primary_identifier) >>
           # Separator: slash for cross-ref format, comma for joint standard
-          (slash >> str("C") >> digits >> dot >> digits >> dot >> digits >> dash >> year_digits).as(:secondary_crossref) |
+          (slash >> str("C") >> digits >> dot >> digits >> dot >> digits >> dash >> year_digits).as(:secondary_crossref)) |
           (comma >> space >> (type_word.as(:type) >> space?).maybe >> number >> dash >> year_digits).as(:secondary_joint)
       end
 
@@ -825,7 +820,7 @@ module Pubid
         # NEW Session 171: HTML entity for en dash (&#x2013;)
         # ONLY convert if not already followed by a dash (avoid creating --)
         cleaned = cleaned.gsub(/&#x2013;(?!-)/, "-")  # En dash → regular hyphen (if not followed by dash)
-        cleaned = cleaned.gsub(/&#x2013;-/, "-")      # En-dash-dash → single dash
+        cleaned = cleaned.gsub("&#x2013;-", "-")      # En-dash-dash → single dash
 
         # NEW Session 171: Remove wrong ! prefix
         cleaned = cleaned.gsub(/^!IEEE /, "IEEE ")
@@ -853,16 +848,22 @@ module Pubid
 
         # NEW: Fix month+year spacing (e.g., "March2016" → "March 2016")
         # Add space between month name and 4-digit year when they're concatenated
-        cleaned = cleaned.gsub(/\b(January|February|March|April|May|June|July|August|September|October|November|December)(\d{4})\b/, '\1 \2')
+        cleaned = cleaned.gsub(
+          /\b(January|February|March|April|May|June|July|August|September|October|November|December)(\d{4})\b/, '\1 \2'
+        )
         # Also handle abbreviated months
-        cleaned = cleaned.gsub(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(\d{4})\b/, '\1 \2')
+        cleaned = cleaned.gsub(
+          /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(\d{4})\b/, '\1 \2'
+        )
 
         # NEW: Convert IEC/IEEE space-separated to semicolon format
         # Pattern: "IEC 61523-3 First edition 2004-09; IEEE 1497" → already semicolon
         # Pattern: "IEC 62539 First Edition 2007-07 IEEE 930" → needs semicolon
         # Match: IEC identifier (with edition) + space + IEEE identifier
         # Be conservative: only convert if IEC has "First edition" or similar and followed by IEEE
-        cleaned = cleaned.gsub(/(IEC\s+\d+(?:-\d+)?(?:\s+First?\s+Edition\s+\d{4}-\d{2})?)\s+(IEEE\s+\S+)/, '\1; \2')
+        cleaned = cleaned.gsub(
+          /(IEC\s+\d+(?:-\d+)?(?:\s+First?\s+Edition\s+\d{4}-\d{2})?)\s+(IEEE\s+\S+)/, '\1; \2'
+        )
 
         # NEW Phase 1 (Session 141): Remove literal trademark symbol
         # "C57.110™-2018" → "C57.110-2018"
@@ -880,7 +881,7 @@ module Pubid
         # NEW Session 169: Fix /lNT typo (lowercase L as 1)
         # "1003.1/2003.l/lNT" → "1003.1/2003.1/INT"
         cleaned = cleaned.gsub(/\/lNT\b/, "/INT")
-        cleaned = cleaned.gsub(/\.l\//, ".1/") # Also fix .l/ -> .1/
+        cleaned = cleaned.gsub(".l/", ".1/") # Also fix .l/ -> .1/
 
         # NEW Session 169: Fix I99O typo (letter I and O instead of digits)
         # "IEEE 1076-CONC-I99O" → "IEEE 1076-CONC-1990"
@@ -901,7 +902,7 @@ module Pubid
         open_count = cleaned.count("(")
         close_count = cleaned.count(")")
         if open_count == close_count + 1 && !cleaned.end_with?(")")
-          cleaned = cleaned + ")"
+          cleaned = "#{cleaned})"
         end
 
         # NEW Phase 1: Remove trailing commas/colons and text
@@ -945,8 +946,8 @@ module Pubid
 
         # 3.5. Convert "IEEE No." to "IEEE Std": "IEEE No. 264-1968" → "IEEE Std 264-1968"
         # NOTE: Do NOT convert AIEE No - AIEE uses "No" as standard format
-        cleaned = cleaned.gsub(/^IEEE\s+No\.\s*/, 'IEEE Std ')
-        cleaned = cleaned.gsub(/^IEEE\s+No\s/, 'IEEE Std ')
+        cleaned = cleaned.gsub(/^IEEE\s+No\.\s*/, "IEEE Std ")
+        cleaned = cleaned.gsub(/^IEEE\s+No\s/, "IEEE Std ")
         # Skip AIEE No conversion - AIEE preserves "No" format
 
         # 4. Space before slash in dual published: "262-1973 /ANSI" → "262-1973/ANSI"
@@ -1028,12 +1029,12 @@ module Pubid
 
         # Part B: Symbol Normalization
         # 3. Additional (TM) patterns - strip them out
-        cleaned = cleaned.gsub(/\(TM\)/, "")
+        cleaned = cleaned.gsub("(TM)", "")
 
         # Part C: Year-first format normalization
         # 4. Pattern "62704-4/D4, 2020" -> "IEEE P62704-4/D4, 2020"
         # Only if starts with digits-dash-digits/D pattern
-        if cleaned.match?(/^(\d+[-\.]\d+)\/D\d+/)
+        if cleaned.match?(/^(\d+[-.]\d+)\/D\d+/)
           cleaned = "IEEE P#{cleaned}"
         end
 
@@ -1043,7 +1044,7 @@ module Pubid
 
         # Part E: Relationship Text Normalization
         # 6. "Proposed Revision of" -> "Revision of"
-        cleaned = cleaned.gsub(/Proposed Revision of/, "Revision of")
+        cleaned = cleaned.gsub("Proposed Revision of", "Revision of")
 
         # 7. "ammended" typo -> "amended"
         cleaned = cleaned.gsub(/\bammended\b/i, "amended")
@@ -1091,20 +1092,22 @@ module Pubid
         # Actually, the issue is the number rule consumes "PC37" as P + C37.
         # Better: normalize "IEEE PC" to "IEEE Std PC" so it hits the standard identifier path
         cleaned = cleaned.gsub(/^IEEE\s+PC(\d)/, 'IEEE Std PC\1')
-        cleaned = cleaned.gsub(/^IEEE\s+Unapproved\s+Draft\s+Std\s+PC(\d)/, 'IEEE Unapproved Draft Std PC\1')
+        cleaned = cleaned.gsub(/^IEEE\s+Unapproved\s+Draft\s+Std\s+PC(\d)/,
+                               'IEEE Unapproved Draft Std PC\1')
 
         # Fix 2B: "IEEE P" without "Std"/"Draft" prefix
         # ieee_p_identifier rule handles these directly - no preprocessing needed
         # Only handle "IEEE P" followed by "and ASHRAE" (copub case)
-        cleaned = cleaned.gsub(/^IEEE\s+P(\d+)\s+and\s+ASHRAE/, 'IEEE Std P\1 and ASHRAE')
+        cleaned = cleaned.gsub(/^IEEE\s+P(\d+)\s+and\s+ASHRAE/,
+                               'IEEE Std P\1 and ASHRAE')
 
         # Fix 2C: "ISO/IEC XXXX-YYYY: Title" -> strip title after colon for ISO/IEC published standards
         # These are ISO-format identifiers with IEEE adoption, strip the title
-        cleaned = cleaned.gsub(/^(ISO\/IEC \d+[-\.]\d+-\d{4}):.*$/, '\1')
+        cleaned = cleaned.gsub(/^(ISO\/IEC \d+[-.]\d+-\d{4}):.*$/, '\1')
         cleaned = cleaned.gsub(/^(ISO\/IEC \d+-\d{4}):.*$/, '\1')
 
         # Fix 2D: "ISO/IEC XXXX : YYYY" -> normalize spacing around colon
-        cleaned = cleaned.gsub(/^(ISO\/IEC \d+[-\.]\d*)\s*:\s*(\d{4})/, '\1:\2')
+        cleaned = cleaned.gsub(/^(ISO\/IEC \d+[-.]\d*)\s*:\s*(\d{4})/, '\1:\2')
         cleaned = cleaned.gsub(/^(ISO\/IEC \d+)\s*:\s*(\d{4})/, '\1:\2')
 
         # Fix 2G: "IEC/IEEE PXXX_D5" -> underscore to slash
@@ -1114,31 +1117,39 @@ module Pubid
         # Already handled by earlier semicolon normalization
 
         # Fix 2I: "IEEE/ISO/IEC PXXX/DIS" -> normalize to "ISO/IEC/IEEE PXXX/DIS"
-        cleaned = cleaned.gsub(/^IEEE\/ISO\/IEC\s+(P[\w.-]+)/, 'ISO/IEC/IEEE \1')
-        cleaned = cleaned.gsub(/^IEEE\/IEC\/ISO\s+(P[\w.-]+)/, 'IEC/ISO/IEEE \1')
+        cleaned = cleaned.gsub(/^IEEE\/ISO\/IEC\s+(P[\w.-]+)/,
+                               'ISO/IEC/IEEE \1')
+        cleaned = cleaned.gsub(/^IEEE\/IEC\/ISO\s+(P[\w.-]+)/,
+                               'IEC/ISO/IEEE \1')
 
         # Fix 2J: "IEEE/IEC PXXX D5" -> normalize space to slash before D
         cleaned = cleaned.gsub(/^(IEEE\/IEC P[\w.-]+)\s+D(\d)/, '\1/D\2')
-        cleaned = cleaned.gsub(/^(IEEE\/IEC P[\w.-]+)\s+(CDV|FDIS|CD|DIS|ED\d)/, '\1/\2')
+        cleaned = cleaned.gsub(
+          /^(IEEE\/IEC P[\w.-]+)\s+(CDV|FDIS|CD|DIS|ED\d)/, '\1/\2'
+        )
 
         # Fix 2K: "ISO /IEC/IEEE" -> fix space before slash
-        cleaned = cleaned.gsub(/^ISO\s+\/IEC\/IEEE/, 'ISO/IEC/IEEE')
-        cleaned = cleaned.gsub(/^ISO\s+\/IEC/, 'ISO/IEC')
+        cleaned = cleaned.gsub(/^ISO\s+\/IEC\/IEEE/, "ISO/IEC/IEEE")
+        cleaned = cleaned.gsub(/^ISO\s+\/IEC/, "ISO/IEC")
 
         # Fix 2L: "IS0" typo (letter O instead of digit 0)
-        cleaned = cleaned.gsub(/^IS0\//, 'ISO/')
+        cleaned = cleaned.gsub(/^IS0\//, "ISO/")
 
         # Fix 2M: "IEEE-P15026-3-DIS-January 2015" -> dash-separated format
         # Normalize to "ISO/IEC/IEEE P15026-3/DIS, January 2015"
-        cleaned = cleaned.gsub(/^IEEE-P(\d+)-(\d+)-DIS-(.*)/, 'ISO/IEC/IEEE P\1-\2/DIS, \3')
+        cleaned = cleaned.gsub(/^IEEE-P(\d+)-(\d+)-DIS-(.*)/,
+                               'ISO/IEC/IEEE P\1-\2/DIS, \3')
 
         # Fix 2N: "IEEE/CSA P844.1/293.1/D2" -> normalize CSA dual numbering
-        cleaned = cleaned.gsub(/^IEEE\/CSA\s+(P[\d.]+)\/([\d.]+)\/D(\d+)/, 'IEEE/CSA \1/D\3')
+        cleaned = cleaned.gsub(/^IEEE\/CSA\s+(P[\d.]+)\/([\d.]+)\/D(\d+)/,
+                               'IEEE/CSA \1/D\3')
 
         # Fix 2O: "IEEE Approved Draft Std P" -> normalize spacing
-        cleaned = cleaned.gsub(/^IEEE\s+Approved\s+Draft\s+Std\s+(P\d)/, 'IEEE Approved Draft Std \1')
+        cleaned = cleaned.gsub(/^IEEE\s+Approved\s+Draft\s+Std\s+(P\d)/,
+                               'IEEE Approved Draft Std \1')
         # Fix: "IEEE Approved Draft Std P1234 / D12" -> remove space before slash
-        cleaned = cleaned.gsub(/^(IEEE Approved Draft Std P[\w.-]+)\s+\/\s*D/, '\1/D')
+        cleaned = cleaned.gsub(/^(IEEE Approved Draft Std P[\w.-]+)\s+\/\s*D/,
+                               '\1/D')
 
         # Fix 2P: "IEEE/EIA" -> normalize (parser handles IEEE/EIA via copublisher)
         # Already works - no fix needed
@@ -1147,9 +1158,9 @@ module Pubid
         # "AIEE No.1C-1954" -> "AIEE No. 1C-1954" (add space after No.)
         cleaned = cleaned.gsub(/^AIEE\s+No\.\s*(\d)/, 'AIEE No. \1')
         # "AIEE no 700-1945" -> "AIEE No 700-1945" (capitalize)
-        cleaned = cleaned.gsub(/^AIEE\s+no\s/, 'AIEE No ')
+        cleaned = cleaned.gsub(/^AIEE\s+no\s/, "AIEE No ")
         # "AIEE Std No. 800" -> "AIEE Standard No 800" (normalize type word)
-        cleaned = cleaned.gsub(/^AIEE\s+Std\s+No\.\s*/, 'AIEE Standard No ')
+        cleaned = cleaned.gsub(/^AIEE\s+Std\s+No\.\s*/, "AIEE Standard No ")
         # "AIEE No 750.1-1960" -> handled by AIEE parser if decimal support added
 
         # Fix 2R: "IEEE PSI 10/D2" -> normalize to "IEEE/ASTM PSI 10/D2"
@@ -1159,43 +1170,51 @@ module Pubid
         cleaned = cleaned.gsub(/^(IEEE\/IEC P[\d.-]+\/PC[\d.]+)_D/, '\1/D')
 
         # Fix 2T: "IEC P62271-111/IEEE PC37.60_D5" -> normalize to IEC/IEEE format
-        cleaned = cleaned.gsub(/^IEC\s+(P[\d.-]+)\/IEEE\s+(PC[\d.]+)_D/, 'IEC/IEEE \2/D')
+        cleaned = cleaned.gsub(/^IEC\s+(P[\d.-]+)\/IEEE\s+(PC[\d.]+)_D/,
+                               'IEC/IEEE \2/D')
 
         # Fix 2U: "IEC/IEC P" -> "IEC/IEEE P" (typo)
         cleaned = cleaned.gsub(/^IEC\/IEC\s+(P\d)/, 'IEC/IEEE \1')
 
         # Fix 2V: "NACE SPXXXX-YYYY/IEEE Std NNNN-YYYY" -> normalize slash to parenthetical
-        cleaned = cleaned.gsub(/^(NACE\s+SP\d+-\d+)\/(IEEE\s+Std\s+\d+-\d+)$/, '\1 (\2)')
+        cleaned = cleaned.gsub(/^(NACE\s+SP\d+-\d+)\/(IEEE\s+Std\s+\d+-\d+)$/,
+                               '\1 (\2)')
 
         # Fix 2W: "IEEE Std 802.11g-2003 (Amendment to IEEE Std 802.11, 1999 Edn. (Reaff 2003) as amended by"
         # This is a complex relationship - strip the parenthetical if too complex
         # Let the parser handle it but fix "Edn." to "Edition"
-        cleaned = cleaned.gsub(/Edn\./, "Edition")
+        cleaned = cleaned.gsub("Edn.", "Edition")
 
         # Fix 2X: "IEEE-P15026-3-DIS" format -> normalize
         # Already handled by Fix 2M
 
         # Fix 2Y: "P1635/D10/ASHARE 21/D10" -> fix ASHARE typo to ASHRAE
-        cleaned = cleaned.gsub(/ASHARE/, 'ASHRAE')
+        cleaned = cleaned.gsub("ASHARE", "ASHRAE")
 
         # Fix 2Z: "PC37.30.2/D043 Rev 18" -> normalize draft version with Rev
         # "PC57-15 D2.0" -> normalize to "P57-15/D2.0"
         cleaned = cleaned.gsub(/^PC(\d)/, 'P\1')
 
         # Fix 2AA: "IEEE/ISO/IEC 8802-1Q-2020/Amd31-2021" -> normalize
-        cleaned = cleaned.gsub(/^IEEE\/ISO\/IEC\s+(8802[\w.-]+)/, 'ISO/IEC/IEEE \1')
+        cleaned = cleaned.gsub(/^IEEE\/ISO\/IEC\s+(8802[\w.-]+)/,
+                               'ISO/IEC/IEEE \1')
 
         # Fix 2AB: "IEEE C57.139/D14June 2010" -> add missing space
-        cleaned = cleaned.gsub(/^(IEEE\s+C?\d[\d.]*\/D\d+)([A-Z][a-z]+\s+\d{4})/, '\1, \2')
+        cleaned = cleaned.gsub(
+          /^(IEEE\s+C?\d[\d.]*\/D\d+)([A-Z][a-z]+\s+\d{4})/, '\1, \2'
+        )
 
         # Fix 2AC: "IEEE Std: Title" -> strip colon and title (ANSI/IEEE Std: )
         cleaned = cleaned.gsub(/^(ANSI\/IEEE Std):\s+.*$/, '\1')
 
         # Fix 2AD: "IEEE 1076 IEC 61691-1-1 First edition 2004-10" -> semicolon format
-        cleaned = cleaned.gsub(/^(IEEE\s+[\d.]+)\s+(IEC\s+\d+[-\d]*\s+.*edition\s+\d{4}-\d{2})$/i, '\1; \2')
+        cleaned = cleaned.gsub(
+          /^(IEEE\s+[\d.]+)\s+(IEC\s+\d+[-\d]*\s+.*edition\s+\d{4}-\d{2})$/i, '\1; \2'
+        )
 
         # Fix 2AE: "IEEE No 29-1941 / ASA C77.1-1943" -> normalize to IEEE Std format
-        cleaned = cleaned.gsub(/^IEEE\s+No\s+(\d+-\d+)\s+\/\s+ASA\s+(.*)/, 'IEEE Std \1 (ASA \2)')
+        cleaned = cleaned.gsub(/^IEEE\s+No\s+(\d+-\d+)\s+\/\s+ASA\s+(.*)/,
+                               'IEEE Std \1 (ASA \2)')
 
         # Fix 2AF: "IEEE Std 1003.1/2003.l/lNT" -> fix typos
         # .l -> .1 and lNT -> INT handled by existing fixes

@@ -28,8 +28,8 @@ RSpec.describe Pubid::Itu::Scheme do
         sector: "Q",
         t_content: {
           numbering: [{ number: "10" }],
-          series: { sg_number: "16" }
-        }
+          series: { sg_number: "16" },
+        },
       }
       result = described_class.transform(parsed)
       expect(result[:series]).to eq("SG16")
@@ -41,9 +41,9 @@ RSpec.describe Pubid::Itu::Scheme do
         t_content: {
           numbering: [
             { number: "81" },
-            { subseries: "06" }
-          ]
-        }
+            { subseries: "06" },
+          ],
+        },
       }
       result = described_class.transform(parsed)
       expect(result[:number]).to eq("81")

@@ -12,7 +12,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["TN", "NIST TN", "NBS TN"],
             stage_code: "published",
-            type_code: "tn"
+            type_code: "tn",
           ),
         ].freeze
 
@@ -32,7 +32,7 @@ module Pubid
 
         # Override update_component setter to add default year for TN dash-prefix updates
         def update_component=(value)
-          super(value)
+          super
 
           # TN-SPECIFIC: Add default year to "-upd" pattern (no year/month)
           # Pattern: "NIST TN 2150-upd" → update gets default year=2021, month=02
@@ -42,7 +42,7 @@ module Pubid
               number: value.number || "1",
               year: "2021",
               month: "02",
-              prefix: "slash"
+              prefix: "slash",
             )
             # Set both update and update_component to the new object
             super(default_update)
@@ -58,8 +58,8 @@ module Pubid
             # Create new Update with default year 202102 (February 2021)
             # This ensures both rendering and attribute access work correctly
             self.update = Components::Update.new(number: update_component.number || "1",
-                                                    year: "2021", month: "02", prefix: "slash")
-            self.update_component = self.update
+                                                 year: "2021", month: "02", prefix: "slash")
+            self.update_component = update
           end
 
           # Call parent implementation

@@ -13,7 +13,7 @@ module Pubid
 
         def to_s(lang: :en, lang_single: false, with_edition: false)
           identifiers.map.with_index do |id, idx|
-            if idx == 0
+            if idx.zero?
               # First identifier renders normally
               id.to_s(lang: lang, lang_single: lang_single,
                       with_edition: with_edition)

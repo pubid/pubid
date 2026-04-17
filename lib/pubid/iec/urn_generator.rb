@@ -148,7 +148,7 @@ module Pubid
 
         # Stage iteration (if present)
         if identifier.stage_iteration
-          parts << "iter.#{identifier.stage_iteration.to_s}"
+          parts << "iter.#{identifier.stage_iteration}"
         end
 
         # Edition (if present)
@@ -206,12 +206,12 @@ module Pubid
           parts << supp.date.year.to_s if supp.date
 
           if supp.number
-            parts << "v#{supp.number.to_s}"
+            parts << "v#{supp.number}"
           end
 
           # Stage iteration for supplements
           if supp.stage_iteration
-            parts << "iter.#{supp.stage_iteration.to_s}"
+            parts << "iter.#{supp.stage_iteration}"
           end
         end
 
@@ -243,14 +243,14 @@ module Pubid
       def part_component(id = identifier)
         return nil unless id&.part
 
-        "-#{id.part.to_s}"
+        "-#{id.part}"
       end
 
       # Generate subpart component
       def subpart_component(id = identifier)
         return nil unless id&.subpart
 
-        "-#{id.subpart.to_s}"
+        "-#{id.subpart}"
       end
     end
   end

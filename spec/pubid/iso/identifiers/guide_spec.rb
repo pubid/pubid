@@ -824,7 +824,10 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       describe "ISO/DGUIDE 83:2023(E)" do
         subject { "ISO/DGUIDE 83:2023(E)" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:normalized) { "ISO DGuide 83:2023(E)" }  # V2 preserves original language format
+        # V2 preserves original language format
+        let(:normalized) do
+          "ISO DGuide 83:2023(E)"
+        end
         let(:urn) { "urn:iso:std:iso:guide:83:stage-40.00:en" }
 
         it "parses publisher" do
@@ -964,7 +967,10 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       describe "ISO/IEC FDGuide 98-6:2020(E)" do
         subject { "ISO/IEC FDGuide 98-6:2020(E)" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:normalized) { "ISO/IEC FDGuide 98-6:2020(E)" }  # V2 preserves original language format
+        # V2 preserves original language format
+        let(:normalized) do
+          "ISO/IEC FDGuide 98-6:2020(E)"
+        end
         let(:urn) { "urn:iso:std:iso-iec:guide:98:-6:stage-50.00:en" }
 
         it "parses publisher" do
@@ -1271,7 +1277,10 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
     describe "ISO/IEC Guide 2:2004(E/F/R)" do
       subject { "ISO/IEC Guide 2:2004(E/F/R)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO/IEC Guide 2:2004(E/F/R)" }  # V2 preserves original language format
+      # V2 preserves original language format
+      let(:normalized) do
+        "ISO/IEC Guide 2:2004(E/F/R)"
+      end
       let(:urn) { "urn:iso:std:iso-iec:guide:2:en,fr,ru" }
 
       it "parses publisher" do

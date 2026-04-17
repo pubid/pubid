@@ -28,11 +28,11 @@ module Pubid
         parts = ["urn", "etsi"]
 
         # Type (EN, ES, EG, TS, ETR, ETS, I-ETS, TBR, TCRTR, NET, GR, GS, SR, TR, GTS)
-        if identifier.respond_to?(:type) && identifier.type
-          parts << identifier.type.to_s.downcase
-        else
-          parts << "en"
-        end
+        parts << if identifier.respond_to?(:type) && identifier.type
+                   identifier.type.to_s.downcase
+                 else
+                   "en"
+                 end
 
         # Code (may include series and number)
         if identifier.respond_to?(:code) && identifier.code
@@ -70,7 +70,7 @@ module Pubid
           base_parts = base_part.split(":")
 
           # Add base identifier components
-          parts.concat(base_parts[0..-1])
+          parts.concat(base_parts)
         else
           # Fallback to identifier's own type/code/version if no base
           if identifier.respond_to?(:type) && identifier.type

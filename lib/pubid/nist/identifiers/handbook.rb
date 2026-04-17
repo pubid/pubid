@@ -12,7 +12,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["HB", "NIST HB", "NBS HB"],
             stage_code: "published",
-            type_code: "hb"
+            type_code: "hb",
           ),
         ].freeze
 
@@ -37,9 +37,9 @@ module Pubid
           result = super
 
           # If edition has additional_text (year), replace dot with dash
-          if edition && edition.additional_text && !edition.additional_text.empty?
+          if edition&.additional_text && !edition.additional_text.empty?
             result = result.gsub(/#{Regexp.escape(edition.type)}#{Regexp.escape(edition.id)}\.#{Regexp.escape(edition.additional_text)}/,
-                                     "#{edition.type}#{edition.id}-#{edition.additional_text}")
+                                 "#{edition.type}#{edition.id}-#{edition.additional_text}")
           end
 
           result

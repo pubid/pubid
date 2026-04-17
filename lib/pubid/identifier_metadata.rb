@@ -95,7 +95,7 @@ module Pubid
         @metadata = Metadata.new(
           flavor: flavor,
           identifier_class: identifier_class,
-          **attrs
+          **attrs,
         )
       end
 
@@ -104,8 +104,6 @@ module Pubid
       def metadata
         @metadata ||= if superclass.respond_to?(:metadata)
                         superclass.metadata
-                      else
-                        nil
                       end
       end
 

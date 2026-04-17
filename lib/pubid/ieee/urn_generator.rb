@@ -47,22 +47,20 @@ module Pubid
         parts << draft_status_component if draft_status_component
 
         # Redline (only if not already handled by special type)
-        unless special_type
-          parts << "redline" if identifier.respond_to?(:redline) && identifier.redline
+        if !special_type && identifier.respond_to?(:redline) && identifier.redline
+          parts << "redline"
         end
 
         # Interpretation (only if not already handled by special type)
-        unless special_type
-          parts << "int" if identifier.respond_to?(:interpretation) && identifier.interpretation
+        if !special_type && identifier.respond_to?(:interpretation) && identifier.interpretation
+          parts << "int"
         end
 
         # Conformance notation (only if not already handled by special type)
-        unless special_type == "conformance"
-          if identifier.respond_to?(:conf_number) && identifier.conf_number
-            conf = "conf.#{identifier.conf_number}"
-            conf += "-#{identifier.conf_year}" if identifier.conf_year
-            parts << conf
-          end
+        if special_type != "conformance" && identifier.respond_to?(:conf_number) && identifier.conf_number
+          conf = "conf.#{identifier.conf_number}"
+          conf += "-#{identifier.conf_year}" if identifier.conf_year
+          parts << conf
         end
 
         # ASHRAE joint publication
@@ -77,13 +75,13 @@ module Pubid
 
         # Relationships (supersedes, incorporates, etc.)
         if identifier.respond_to?(:relationships) && identifier.relationships&.any?
-          rel = identifier.relationships.map(&:to_s).join("/")
+          rel = identifier.relationships.join("/")
           parts << "rel.#{rel}"
         end
 
         # Revision of
         if identifier.respond_to?(:revision_of) && identifier.revision_of
-          parts << "revof.#{identifier.revision_of.to_s}"
+          parts << "revof.#{identifier.revision_of}"
         end
 
         # Amendment to
@@ -198,7 +196,7 @@ module Pubid
         draft = identifier.draft_obj
         return nil unless draft
 
-        "draft.#{draft.to_s}"
+        "draft.#{draft}"
       end
 
       def edition_component

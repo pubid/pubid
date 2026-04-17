@@ -11,9 +11,10 @@ module Pubid
       class CrplReport < Base
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
-            abbr: ["CRPL", "NBS CRPL", "CRPL-F-B", "CRPL-F-A", "NBS CRPL-F-B", "NBS CRPL-F-A"],
+            abbr: ["CRPL", "NBS CRPL", "CRPL-F-B", "CRPL-F-A", "NBS CRPL-F-B",
+                   "NBS CRPL-F-A"],
             stage_code: "published",
-            type_code: "crpl"
+            type_code: "crpl",
           ),
         ].freeze
 
@@ -47,14 +48,15 @@ module Pubid
           num_value = number.value.to_s
 
           # Pattern: c4-4 → 4-4 (hide 'c' prefix)
-          if num_value =~ /^c(\d+.*)$/
+          case num_value
+          when /^c(\d+.*)$/
             num_value = $1
           # Pattern: 4-m-5 → 4-M-5 (uppercase 'm')
-          elsif num_value =~ /-m-/
-            num_value = num_value.gsub(/-m-/, '-M-')
+          when /-m-/
+            num_value = num_value.gsub("-m-", "-M-")
           # Pattern: m-5 → M-5 (uppercase 'm' at start)
-          elsif num_value =~ /^m-/
-            num_value = num_value.gsub(/^m-/, 'M-')
+          when /^m-/
+            num_value = num_value.gsub(/^m-/, "M-")
           end
 
           num_value
@@ -63,20 +65,21 @@ module Pubid
         # Override number to return normalized value
         # Tests expect number.value to be normalized (c4-4 → 4-4, 4-m-5 → 4-M-5)
         def number
-          num = super()
+          num = super
           return num unless num
 
           num_value = num.value.to_s
 
           # Pattern: c4-4 → 4-4 (hide 'c' prefix)
-          if num_value =~ /^c(\d+.*)$/
+          case num_value
+          when /^c(\d+.*)$/
             num_value = $1
           # Pattern: 4-m-5 → 4-M-5 (uppercase 'm')
-          elsif num_value =~ /-m-/
-            num_value = num_value.gsub(/-m-/, '-M-')
+          when /-m-/
+            num_value = num_value.gsub("-m-", "-M-")
           # Pattern: m-5 → M-5 (uppercase 'm' at start)
-          elsif num_value =~ /^m-/
-            num_value = num_value.gsub(/^m-/, 'M-')
+          when /^m-/
+            num_value = num_value.gsub(/^m-/, "M-")
           end
 
           # Return new Code object with normalized value
@@ -99,14 +102,15 @@ module Pubid
             num_value = number.value.to_s
 
             # Pattern: c4-4 → 4-4 (hide 'c' prefix)
-            if num_value =~ /^c(\d+.*)$/
+            case num_value
+            when /^c(\d+.*)$/
               num_value = $1
             # Pattern: 4-m-5 → 4-M-5 (uppercase 'm')
-            elsif num_value =~ /-m-/
-              num_value = num_value.gsub(/-m-/, '-M-')
+            when /-m-/
+              num_value = num_value.gsub("-m-", "-M-")
             # Pattern: m-5 → M-5 (uppercase 'm' at start)
-            elsif num_value =~ /^m-/
-              num_value = num_value.gsub(/^m-/, 'M-')
+            when /^m-/
+              num_value = num_value.gsub(/^m-/, "M-")
             end
 
             result += " #{prefix}" if prefix
@@ -119,7 +123,7 @@ module Pubid
           # Add supplement with "sup" prefix for CRPL identifiers
           if supplement
             # Check if supplement already has "sup" prefix (for backward compatibility)
-            result += (supplement.start_with?('sup') ? supplement : "sup#{supplement}")
+            result += (supplement.start_with?("sup") ? supplement : "sup#{supplement}")
           end
 
           result += range_notation if range_notation

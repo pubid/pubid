@@ -54,7 +54,9 @@ RSpec.describe Pubid::Cen::Scheme do
     end
 
     it "includes EN typed stage" do
-      en_stage = described_class::TYPED_STAGES_REGISTRY.find { |ts| ts.type_code == "en" }
+      en_stage = described_class::TYPED_STAGES_REGISTRY.find do |ts|
+        ts.type_code == "en"
+      end
       expect(en_stage).not_to be_nil
       expect(en_stage.abbr).to include("EN")
     end

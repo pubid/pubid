@@ -16,7 +16,9 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
     end
 
     context "parses identifiers from iso-technology-trends-assessments.txt" do
-      let(:examples_file) { "iso/identifiers/pass/technology_trends_assessments.txt" }
+      let(:examples_file) do
+        "iso/identifiers/pass/technology_trends_assessments.txt"
+      end
 
       it_behaves_like "parse identifiers from file"
     end

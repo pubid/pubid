@@ -64,7 +64,10 @@ module Pubid
       # @return [Identifier] parsed identifier
       def parse_urn(urn)
         # Remove urn:iso:std: prefix
-        raise ArgumentError, "Invalid ISO URN: #{urn}" unless urn.start_with?("urn:iso:std:")
+        unless urn.start_with?("urn:iso:std:")
+          raise ArgumentError,
+                "Invalid ISO URN: #{urn}"
+        end
 
         parts = urn.sub("urn:iso:std:", "").split(":")
 
@@ -116,12 +119,13 @@ module Pubid
         # IMPORTANT: This must come AFTER edition/part/language parsing but BEFORE supplements parsing
         stage_code = nil
         stage_iteration = nil
-        harmonized_stage_code = nil  # Track full harmonized code for lookup
+        harmonized_stage_code = nil # Track full harmonized code for lookup
         if parts.first&.start_with?("stage-")
           stage_str = parts.shift
           stage_code, stage_iteration = parse_stage_code(stage_str)
           # Set harmonized_stage_code AFTER parse_stage_code has stripped .vX suffix
-          harmonized_stage_code = stage_str.sub("stage-", "").sub(/\.v\d+$/i, "")
+          harmonized_stage_code = stage_str.sub("stage-", "").sub(/\.v\d+$/i,
+                                                                  "")
         elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase)
           stage_abbr = parts.shift.upcase
           stage_code = TYPED_STAGE_REVERSE_MAP[stage_abbr]
@@ -144,7 +148,7 @@ module Pubid
           # Check for supplement stage
           if parts.first&.start_with?("stage-")
             supp_stage_data = parts.shift
-            supp_stage, _ = parse_stage_code(supp_stage_data)
+            supp_stage, = parse_stage_code(supp_stage_data)
           elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase)
             supp_stage_abbr = parts.shift.upcase
             supp_stage = TYPED_STAGE_REVERSE_MAP[supp_stage_abbr]
@@ -161,7 +165,7 @@ module Pubid
             supp_number = version_str.sub("v", "").to_i
             # Handle version with iteration (v1.2)
             if supp_number.to_s.include?(".")
-              supp_number, supp_iter = supp_number.to_s.split(".")
+              supp_number, = supp_number.to_s.split(".")
               supp_number = supp_number.to_i
               # supp_iter not used in main parsing
             end
@@ -198,7 +202,7 @@ module Pubid
 
         # Build the identifier hash
         build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                       harmonized_stage_code, year, edition, languages, supplements)
+                         harmonized_stage_code, year, edition, languages, supplements)
       end
 
       private
@@ -213,8 +217,7 @@ module Pubid
 
       # Parse publisher component (iso, iso-iec, etc.)
       def parse_publisher(publisher_str)
-        publishers = publisher_str.split("-").map(&:upcase)
-        publishers
+        publisher_str.split("-").map(&:upcase)
       end
 
       # Parse type component
@@ -228,22 +231,22 @@ module Pubid
         return [nil, nil, nil] unless number_str
 
         # Check for URN-style part notation (:-22)
-        if number_str.match(/^[\w]+:-/)
+        if number_str.match?(/^\w+:-/)
           # Split by :- to get number and parts
-          main_and_parts = number_str.split(/:-/)
+          main_and_parts = number_str.split(":-")
           number = main_and_parts[0]
 
           # The rest are parts/subparts separated by -
-          parts = main_and_parts[1..-1].join("-").split("-") if main_and_parts.length > 1
+          parts = main_and_parts[1..].join("-").split("-") if main_and_parts.length > 1
           part = parts[0] if parts && parts[0]
           # Join all remaining elements for subpart (e.g., "1-1" from ["5", "1", "1"])
-          subpart = parts[1..-1].join("-") if parts && parts.length > 1
+          subpart = parts[1..].join("-") if parts && parts.length > 1
           [number, part, subpart]
         elsif number_str.include?("-")
           parts = number_str.split("-")
           number = parts[0]
           part = parts[1] if parts[1]
-          subpart = parts[2..-1].join("-") if parts && parts.length > 2
+          subpart = parts[2..].join("-") if parts && parts.length > 2
           [number, part, subpart]
         else
           [number_str, nil, nil]
@@ -282,7 +285,7 @@ module Pubid
         # Start with base document hash
         base_hash = {
           publisher: publishers.first,
-          copublishers: publishers[1..-1]&.map { |c| { copublisher: c } },
+          copublishers: publishers[1..]&.map { |c| { copublisher: c } },
         }
 
         # Build number_with_part (expected by Builder)
@@ -327,7 +330,8 @@ module Pubid
           end
 
           if typed_stage
-            base_hash[:type_with_stage] = typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
+            base_hash[:type_with_stage] =
+              typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
           else
             # Fallback: use raw harmonized stage code (shouldn't happen if data is correct)
             base_hash[:stage] = harmonized_stage_code || stage_code.to_s
@@ -348,7 +352,12 @@ module Pubid
 
           if supp[:stage]
             typed_stage = Scheme.locate_typed_stage_by_stage_code(supp[:stage])
-            supp_hash[:type_with_stage] = typed_stage ? (typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr) : supp[:stage].to_s.upcase
+            supp_hash[:type_with_stage] = if
+typed_stage
+                                            typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
+                                          else
+                                            supp[:stage].to_s.upcase
+                                          end
           end
 
           supp_hash[:type_with_stage] ||= supp[:type].to_s.upcase if supp[:type]
@@ -368,7 +377,7 @@ module Pubid
           # Wrap current identifier with supplement
           base_hash = {
             base_identifier: base_hash,
-            **supp_hash
+            **supp_hash,
           }
         end
 

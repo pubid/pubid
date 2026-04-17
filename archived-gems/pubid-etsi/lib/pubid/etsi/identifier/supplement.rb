@@ -1,15 +1,17 @@
-module Pubid::Etsi
-  module Identifier
-    class Supplement < Base
-      attr_accessor :base
+module Pubid
+  module Etsi
+    module Identifier
+      class Supplement < Base
+        attr_accessor :base
 
-      def initialize(base:, number:)
-        @base = base
-        @number = number
-      end
+        def initialize(base:, number:)
+          @base = base
+          @number = number
+        end
 
-      def to_h(**args)
-        @base.to_h(**args).merge(type[:key] => super)
+        def to_h(**args)
+          @base.to_h(**args).merge(type[:key] => super)
+        end
       end
     end
   end

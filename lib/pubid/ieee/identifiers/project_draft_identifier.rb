@@ -13,7 +13,7 @@ module Pubid
         # The "P" is reflected in the typed_stage, not in the Code component itself
         def initialize(**args)
           # If code is provided with "P" prefix (e.g., "P1234"), strip it
-          if args[:code]&.is_a?(String) && args[:code]&.start_with?("P")
+          if args[:code].is_a?(String) && args[:code].start_with?("P")
             args[:code] = args[:code][1..] # Strip leading "P"
           end
 

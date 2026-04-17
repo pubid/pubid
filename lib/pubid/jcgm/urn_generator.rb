@@ -100,7 +100,7 @@ module Pubid
           base_parts = base_part.split(":")
 
           # Add base identifier components
-          parts.concat(base_parts[0..-1])
+          parts.concat(base_parts)
 
           # Add supplement type (amd, cor)
           if identifier.respond_to?(:typed_stage) && identifier.typed_stage

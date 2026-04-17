@@ -230,7 +230,10 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
     describe "ISO 105-G01:1993/COR 1:1995" do
       subject { "ISO 105-G01:1993/COR 1:1995" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 105-G01:1993/COR 1:1995" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 105-G01:1993/COR 1:1995"
+      end
       let(:urn) { "urn:iso:std:iso:105:-G01:cor:1995:v1" }
 
       it "parses publisher" do
@@ -776,7 +779,10 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       describe "ISO/IEC 14496-12/DCOR 1" do
         subject { "ISO/IEC 14496-12/DCOR 1" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:normalized) { "ISO/IEC 14496-12/DCOR 1" }  # V2 preserves original format
+        # V2 preserves original format
+        let(:normalized) do
+          "ISO/IEC 14496-12/DCOR 1"
+        end
         let(:urn) { "urn:iso:std:iso-iec:14496:-12:stage-40.00:cor:1:v1" }
 
         it "parses publisher" do
@@ -1033,7 +1039,10 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
     describe "ISO 17301-1:2016/DCOR 1.3:2002" do
       subject { "ISO 17301-1:2016/DCOR 1.3:2002" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 17301-1:2016/DCOR 1.3:2002" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 17301-1:2016/DCOR 1.3:2002"
+      end
       let(:urn) { "urn:iso:std:iso:17301:-1:stage-40.00:cor:2002:v1.3" }
 
       it "parses publisher" do
@@ -1134,7 +1143,10 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
     describe "ISO 17301-1:2016/FDCOR 1.3:2022" do
       subject { "ISO 17301-1:2016/FDCOR 1.3:2022" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 17301-1:2016/FDCOR 1.3:2022" }  # V2 preserves original format
+      # V2 preserves original format
+      let(:normalized) do
+        "ISO 17301-1:2016/FDCOR 1.3:2022"
+      end
       let(:urn) { "urn:iso:std:iso:17301:-1:stage-50.00:cor:2022:v1.3" }
 
       it "parses publisher" do
@@ -1235,7 +1247,10 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
     describe "ISO 17301-1:2016/FCOR 2.3" do
       subject { "ISO 17301-1:2016/FCOR 2.3" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:normalized) { "ISO 17301-1:2016/FDCOR 2.3" }  # V2 uses short_abbr for rendering
+      # V2 uses short_abbr for rendering
+      let(:normalized) do
+        "ISO 17301-1:2016/FDCOR 2.3"
+      end
       let(:urn) { "urn:iso:std:iso:17301:-1:stage-50.00:cor:2:v1.3" }
 
       it "parses publisher" do

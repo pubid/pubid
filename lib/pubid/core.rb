@@ -6,4 +6,3 @@ module Pubid
     autoload :UpdateCodes, "#{__dir__}/core/update_codes"
   end
 end
-

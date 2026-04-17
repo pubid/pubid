@@ -60,10 +60,10 @@ module Pubid
       nested_exclusions = nested_exclusions.reduce({}, :merge)
 
       excluded_hash = to_h(include_metadata: false)
-        .reject { |k, _v| top_level_exclusions.include?(k) }
+        .except(*top_level_exclusions)
         .each_with_object({}) do |(k, v), memo|
           memo[k] = if v.is_a?(Hash) && nested_exclusions.key?(k)
-                      v.reject { |key, _| nested_exclusions[k].include?(key) }
+                      v.except(*nested_exclusions[k])
                     else
                       v
                     end

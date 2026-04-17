@@ -37,11 +37,9 @@ module Pubid
         end
 
         # For supplements (amendments, explanations)
-        if identifier.is_a?(SupplementIdentifier)
-          # Add supplement notation
-          if identifier.respond_to?(:supplement_notation)
-            parts << identifier.supplement_notation.to_s.downcase
-          end
+        # Add supplement notation
+        if identifier.is_a?(SupplementIdentifier) && identifier.respond_to?(:supplement_notation)
+          parts << identifier.supplement_notation.to_s.downcase
         end
 
         parts.join(":")

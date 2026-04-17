@@ -54,7 +54,10 @@ RSpec.describe "Pubid Utility Methods" do
     it "raises error for different documents" do
       id1 = Pubid::Iso.parse("ISO 9001:2015")
       id2 = Pubid::Iso.parse("ISO 9002:2015")
-      expect { id2.new_edition_of?(id1) }.to raise_error(ArgumentError, /Cannot compare edition/)
+      expect do
+        id2.new_edition_of?(id1)
+      end.to raise_error(ArgumentError,
+                         /Cannot compare edition/)
     end
 
     it "handles documents with parts" do
@@ -66,7 +69,10 @@ RSpec.describe "Pubid Utility Methods" do
     it "raises error for different parts" do
       id1 = Pubid::Iso.parse("ISO 8601-1:2015")
       id2 = Pubid::Iso.parse("ISO 8601-2:2015")
-      expect { id2.new_edition_of?(id1) }.to raise_error(ArgumentError, /Cannot compare edition/)
+      expect do
+        id2.new_edition_of?(id1)
+      end.to raise_error(ArgumentError,
+                         /Cannot compare edition/)
     end
   end
 

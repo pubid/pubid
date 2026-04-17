@@ -65,7 +65,8 @@ module Pubid
             type_code: :tr,
             abbr: ["TR"],
             name: "Technical Report",
-            harmonized_stages: %w[60.00 60.60 90.20 90.60 90.92 90.93 90.99 95.20 95.60 95.92 95.99],
+            harmonized_stages: %w[60.00 60.60 90.20 90.60 90.92 90.93 90.99
+                                  95.20 95.60 95.92 95.99],
           ),
         ].freeze
 

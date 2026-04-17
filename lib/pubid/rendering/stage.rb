@@ -9,7 +9,7 @@ module Pubid
       # @param has_copublisher [Boolean] whether copublisher exists
       # @param options [Hash] rendering options
       # @return [String] formatted stage/type string
-      def render_stage(stage, type = nil, has_copublisher: false, **options)
+      def render_stage(stage, type = nil, has_copublisher: false, **_options)
         result = ""
 
         if stage&.abbr

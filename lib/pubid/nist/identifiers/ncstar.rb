@@ -13,7 +13,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["NCSTAR", "NIST NCSTAR"],
             stage_code: "published",
-            type_code: "ncstar"
+            type_code: "ncstar",
           ),
         ].freeze
 
@@ -23,7 +23,8 @@ module Pubid
           end
 
           def type
-            { key: :ncstar, title: "National Construction Safety Team Act Reports", short: "NCSTAR" }
+            { key: :ncstar,
+              title: "National Construction Safety Team Act Reports", short: "NCSTAR" }
           end
         end
 

@@ -9,7 +9,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["Cor", "Corr"],
             stage_code: "published",
-            type_code: "cor"
+            type_code: "cor",
           ),
         ].freeze
 

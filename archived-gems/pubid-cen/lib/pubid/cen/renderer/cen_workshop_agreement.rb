@@ -1,13 +1,17 @@
 require_relative "base"
 
-module Pubid::Cen::Renderer
-  class CenWorkshopAgreement < Base
-    def render_publisher(_publisher, _opts, _params)
-      ""
-    end
+module Pubid
+  module Cen
+    module Renderer
+      class CenWorkshopAgreement < Base
+        def render_publisher(_publisher, _opts, _params)
+          ""
+        end
 
-    def render_type(_type, _opts, _params)
-      "CWA"
+        def render_type(_type, _opts, _params)
+          "CWA"
+        end
+      end
     end
   end
 end

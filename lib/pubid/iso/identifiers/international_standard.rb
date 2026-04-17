@@ -144,11 +144,12 @@ module Pubid
           short: "IS",
           abbr: ["", "IS"],
           base_class: "SingleIdentifier",
-          stage_codes: [:dp, :pwi, :np, :awi, :wd, :pcd, :cd, :fcd, :dis, :fdis, :prf, :wdr, :wda, :wdar],
+          stage_codes: %i[dp pwi np awi wd pcd cd fcd dis
+                          fdis prf wdr wda wdar],
           machine_codes: {
             iso_stage: ["40.60", "60.60"],
-            harcoded: "IS"
-          }
+            harcoded: "IS",
+          },
         )
       end
     end
@@ -157,4 +158,3 @@ end
 
 # NOTE: Identifiers are now registered in the ISO Scheme class
 # The global registry has been removed in favor of per-flavor Schemes
-

@@ -28,7 +28,8 @@ RSpec.describe Pubid::Rendering::Date do
 
     it "renders year with month and day" do
       date = Pubid::Components::Date.new(year: 2015, month: 6, day: 15)
-      expect(instance.render_date(date, include_month: true, include_day: true)).to eq(":2015-06-15")
+      expect(instance.render_date(date, include_month: true,
+                                        include_day: true)).to eq(":2015-06-15")
     end
 
     it "does not include month when option not set" do

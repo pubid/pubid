@@ -14,7 +14,7 @@ puts "After preprocessing: #{test}"
 begin
   result = Pubid::Ieee.parse(input)
   puts "Success: #{result.class}"
-  puts "Result: #{result.to_s}"
-rescue => e
+  puts "Result: #{result}"
+rescue StandardError => e
   puts "Failed: #{e.class} - #{e.message}"
 end

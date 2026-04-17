@@ -31,13 +31,15 @@ RSpec.describe Pubid::Rendering::Numbering do
       number = Pubid::Components::Code.new(value: "9001")
       part = Pubid::Components::Code.new(value: "1")
       subpart = Pubid::Components::Code.new(value: "A")
-      expect(instance.render_numbering(number, part, subpart)).to eq(" 9001-1-A")
+      expect(instance.render_numbering(number, part,
+                                       subpart)).to eq(" 9001-1-A")
     end
 
     it "uses custom part separator" do
       number = Pubid::Components::Code.new(value: "9001")
       part = Pubid::Components::Code.new(value: "1")
-      expect(instance.render_numbering(number, part, nil, part_separator: ".")).to eq(" 9001.1")
+      expect(instance.render_numbering(number, part, nil,
+                                       part_separator: ".")).to eq(" 9001.1")
     end
 
     it "returns empty string for nil number" do

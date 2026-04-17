@@ -4,7 +4,8 @@ module Pubid
   module Ieee
     autoload :Aiee, "#{__dir__}/aiee"
     autoload :Builder, "#{__dir__}/builder"
-    autoload :Identifier, "#{__dir__}/identifier" + " (DEBUG: __dir__ is \#{__dir__})"
+    autoload :Identifier,
+             "#{__dir__}/identifier (DEBUG: __dir__ is \#{__dir__})"
     autoload :Identifiers, "#{__dir__}/identifiers"
     autoload :Ire, "#{__dir__}/ire"
     autoload :Nesc, "#{__dir__}/nesc"

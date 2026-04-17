@@ -69,11 +69,11 @@ module Pubid
       # 3. Issue format: BS 5000 Index Issue 4:1980
       rule(:index_suffix) do
         # Issue format: " Index Issue N" (must be before colon format to match correctly)
-        space >> str("Index") >> space >> str("Issue") >> space >> digits.as(:issue_number) |
+        (space >> str("Index") >> space >> str("Issue") >> space >> digits.as(:issue_number)) |
           # Colon format: ":Index"
-          colon.as(:colon_sep) >> str("Index") |
+          (colon.as(:colon_sep) >> str("Index")) |
           # Space format: " Index" (year rule includes the colon)
-          space >> str("Index")
+          (space >> str("Index"))
       end
 
       # Supplementary Index suffix - handles one format:
@@ -94,11 +94,11 @@ module Pubid
       # 3. And (plural): BS 2782-8:Methods 823A and 823B:1978
       rule(:method_suffix) do
         # Range format (plural): ":Methods X to Y" (must be first to match the "to" keyword)
-        colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("to") >> space >> method_code.as(:method_to) |
+        (colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("to") >> space >> method_code.as(:method_to)) |
           # And format (plural): ":Methods X and Y"
-          colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("and") >> space >> method_code.as(:method_and) |
+          (colon >> str("Methods") >> space >> method_code.as(:method_code) >> space >> str("and") >> space >> method_code.as(:method_and)) |
           # Basic format (singular): ":Method X"
-          colon >> str("Method") >> space >> method_code.as(:method_code)
+          (colon >> str("Method") >> space >> method_code.as(:method_code))
       end
 
       # Method code - alphanumeric like "131B", "451F", "823A", "1006"
@@ -141,9 +141,9 @@ module Pubid
       # 2. Space format (BS): "BS 3224 Section B2:1970"
       rule(:section_suffix) do
         # Colon format: ":Section N" (DD format)
-        colon.as(:colon_sep) >> str("Section") >> space >> section_id.as(:section_id) |
+        (colon.as(:colon_sep) >> str("Section") >> space >> section_id.as(:section_id)) |
           # Space format: " Section N" (BS format)
-          space >> str("Section") >> space >> section_id.as(:section_id)
+          (space >> str("Section") >> space >> section_id.as(:section_id))
       end
 
       # Section ID - can be numeric (0-7) or alphanumeric (B2, C1, D1, etc.)
@@ -213,11 +213,11 @@ module Pubid
 
       # Publisher/Type - longer patterns first
       rule(:publisher_or_type) do
-        na_prefix >>
+        (na_prefix >>
           (draft.as(:stage) |
            dd.as(:type) |
            pd.as(:type) |
-           bs.as(:publisher)) |
+           bs.as(:publisher))) |
           flex.as(:flex_type) |
           handbook.as(:type) |
           bip.as(:type) |
@@ -298,22 +298,22 @@ module Pubid
 
       # Amendment (+A1:2008 or /A2:2019 or /Amd 1:2020 or +A1:15 for short year)
       rule(:amendment) do
-        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+        ((plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
           str("A") >> digits.as(:amd_number) >>
-          colon >> digit.repeat(2, 4).as(:amd_year) |
-        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
-          str("Amd") >> space >> digits.as(:amd_number) >>
-          colon >> digit.repeat(4, 4).as(:amd_year)
+          colon >> digit.repeat(2, 4).as(:amd_year)) |
+          ((plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+            str("Amd") >> space >> digits.as(:amd_number) >>
+            colon >> digit.repeat(4, 4).as(:amd_year))
       end
 
       # Corrigendum (+AC:2009 or +AC1:2008 or /AC1:2005 or +C1:2018 or +C1 without year)
       rule(:corrigendum) do
-        (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+        ((plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
           str("AC") >> digits.maybe.as(:cor_number) >>
-          (colon >> digit.repeat(2, 4).as(:cor_year)).maybe |
-          (plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
+          (colon >> digit.repeat(2, 4).as(:cor_year)).maybe) |
+          ((plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
             str("C") >> digits.as(:cor_number) >>
-            (colon >> digit.repeat(2, 4).as(:cor_year)).maybe
+            (colon >> digit.repeat(2, 4).as(:cor_year)).maybe)
       end
 
       # AMD suffix without year - "AMD5", "AMD AA", "AMD11"
@@ -326,9 +326,11 @@ module Pubid
       # AMD verbose form - "Amd 1 (09/15)" or "Amendment 2:August 2013"
       rule(:amd_verbose) do
         space >> (str("Amd") | str("Amendment")).as(:amd_verbose_type) >> space >>
-        match["0-9"].repeat(1).as(:amd_number) >>
-        (space >> str("(") >> match["0-9/"].repeat(1).as(:amd_date) >> str(")")).maybe >>
-        (colon >> match["A-Za-z"].repeat(1).as(:amd_month) >> space >> digit.repeat(4, 4).as(:amd_year)).maybe
+          match["0-9"].repeat(1).as(:amd_number) >>
+          (space >> str("(") >> match["0-9/"].repeat(1).as(:amd_date) >> str(")")).maybe >>
+          (colon >> match["A-Za-z"].repeat(1).as(:amd_month) >> space >> digit.repeat(
+            4, 4
+          ).as(:amd_year)).maybe
       end
 
       # Supplements Document (not amendment/corrigendum supplements, but standalone supplement documents)
@@ -505,7 +507,9 @@ module Pubid
       end
 
       # Supplements
-      rule(:supplement) { (amendment | corrigendum | amd_suffix | amd_verbose).as(:supplement) }
+      rule(:supplement) do
+        (amendment | corrigendum | amd_suffix | amd_verbose).as(:supplement)
+      end
       rule(:supplements) { supplement.repeat(0).as(:supplements) }
 
       # Expert Commentary suffix - three formats:
@@ -529,14 +533,14 @@ module Pubid
 
       # Translation (captures language name from various formats)
       rule(:translation) do
-        space >> str("(") >>
+        (space >> str("(") >>
           (
             match["A-Za-z"].repeat(1).as(:translation_lang) >>
             (space >> (str("Translation") | str("version"))).maybe
           ) >>
-          str(")") |
+          str(")")) |
           # All-caps format: " SPANISH TRANSLATION" (supplements already parsed)
-          space >> (str("SPANISH") | str("FRENCH") | str("GERMAN") | str("ITALIAN")).as(:translation_upper) >> space >> str("TRANSLATION")
+          (space >> (str("SPANISH") | str("FRENCH") | str("GERMAN") | str("ITALIAN")).as(:translation_upper) >> space >> str("TRANSLATION"))
       end
 
       # Collection number (second number after slash like 2035/2030)
@@ -578,11 +582,9 @@ module Pubid
 
       # Value-Added Publication suffixes (wrapper pattern, not attributes)
       rule(:vapSuffix) do
-        (
-          space >> str("PDF").as(:pdf_format) |
-          space >> str("BOOK").as(:book_format) |
-          space >> dash >> space >> str("TC").as(:tc_format)
-        )
+        (space >> str("PDF").as(:pdf_format)) |
+          (space >> str("BOOK").as(:book_format)) |
+          (space >> dash >> space >> str("TC").as(:tc_format))
       end
 
       # Identifier patterns - try most specific first
@@ -629,7 +631,7 @@ module Pubid
           # Flex with v-style edition before date
           (flex.as(:flex_type) >> space >> number >> parts >> flex_edition.maybe >> (year >> month.maybe).maybe >> supplements) |
           # Regular BSI identifier - VAP suffix at the end
-          publisher_or_type >>
+          (publisher_or_type >>
             (space >> adopted_string).maybe >>
             (space >> number >> parts >> collection_number.maybe >>
             (year >> month.maybe).maybe >>
@@ -638,7 +640,7 @@ module Pubid
             edition.maybe >>
             expert_commentary.maybe >>
             translation.maybe >>
-            vapSuffix.maybe
+            vapSuffix.maybe)
       end
 
       rule(:root) { identifier }

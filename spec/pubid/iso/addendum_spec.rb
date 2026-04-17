@@ -34,7 +34,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
   describe "#to_urn" do
     it "generates URN for addendum" do
       id = Pubid::Iso.parse("ISO 9001:2015/Add 1:2020")
-      expect(id.to_urn).to include("sup")  # Addendums use "sup" in URN per ISO spec
+      expect(id.to_urn).to include("sup") # Addendums use "sup" in URN per ISO spec
       expect(id.to_urn).to include("2020")
       expect(id.to_urn).to include(":v1")
     end

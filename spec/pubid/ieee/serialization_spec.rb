@@ -59,7 +59,7 @@ RSpec.describe "IEEE Serialization" do
         flavor: "ieee",
         publisher: "IEEE",
         number: "1277",
-        year: "2000"
+        year: "2000",
       }
 
       id = Pubid::Serializable.from_h(hash)

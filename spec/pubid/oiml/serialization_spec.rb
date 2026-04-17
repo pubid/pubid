@@ -51,7 +51,7 @@ RSpec.describe "OIML Serialization" do
         publisher: "OIML",
         number: "111-1",
         year: "2009",
-        type: "R"
+        type: "R",
       }
 
       id = Pubid::Serializable.from_h(hash)

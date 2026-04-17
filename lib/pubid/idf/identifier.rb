@@ -11,14 +11,14 @@ module Pubid
         [
           publisher_portion(lang: lang),
           number_portion(lang_single: lang_single),
-        ].join("")
+        ].join
       end
 
       def publisher_portion(lang: :en)
         [
           publisher.body,
           (typed_stage.abbreviation.empty? ? "" : "/#{typed_stage.abbreviation}"),
-        ].join("")
+        ].join
       end
 
       def number_portion(lang_single: false)
@@ -38,7 +38,7 @@ module Pubid
 
           # Languages are optional
           language_portion(lang_single: lang_single),
-        ].join("")
+        ].join
       end
 
       # Returns a string representation of the languages
@@ -52,7 +52,7 @@ module Pubid
             lang.to_s(lang_single: lang_single)
           end.join(lang_single ? "/" : ","),
           ")",
-        ].join("")
+        ].join
       end
 
       def self.parse(string)

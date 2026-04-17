@@ -35,12 +35,12 @@ test_cases.each do |identifier|
   begin
     result = Pubid::Ieee.parse(identifier)
     puts "✓ SUCCESS: Parsed as #{result.class}"
-    puts "  Result: #{result.to_s}"
+    puts "  Result: #{result}"
   rescue Parslet::ParseFailed => e
     puts "✗ FAILED: #{e.message}"
-  rescue => e
+  rescue StandardError => e
     puts "✗ ERROR: #{e.class} - #{e.message}"
   end
 end
 
-puts "\n" + "=" * 80
+puts "\n#{'=' * 80}"

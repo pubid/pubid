@@ -37,7 +37,7 @@ module Pubid
           number.value,
           (part ? "-#{part.value}" : ""),
           (date ? ":#{date.year}" : ""),
-        ].join("")
+        ].join
       end
 
       def language_portion

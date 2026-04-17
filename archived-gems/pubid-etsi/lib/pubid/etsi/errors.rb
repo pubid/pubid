@@ -1,4 +1,6 @@
-module Pubid::Etsi
-  module Errors
+module Pubid
+  module Etsi
+    module Errors
+    end
   end
 end

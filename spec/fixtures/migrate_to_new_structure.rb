@@ -4,7 +4,8 @@
 require "fileutils"
 
 class FixturesMigrator
-  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau ansi]
+  FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau
+               ansi].freeze
 
   def initialize(flavor, verbose: false)
     @flavor = flavor.downcase

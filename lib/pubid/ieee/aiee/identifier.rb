@@ -15,7 +15,8 @@ module Pubid
         attribute :month, :string
         attribute :separator, :string # "," or "." for long form dates
         attribute :original_format, :string # "short" or "long" (preserves parsed format)
-        attribute :relationships, Pubid::Ieee::Components::Relationship, collection: true
+        attribute :relationships, Pubid::Ieee::Components::Relationship,
+                  collection: true
 
         def initialize(**args)
           super()
@@ -32,7 +33,7 @@ module Pubid
           # Set other attributes
           args.each do |key, value|
             # Skip :code and :number as they're handled above
-            next if [:code, :number].include?(key)
+            next if %i[code number].include?(key)
 
             send("#{key}=", value) if respond_to?("#{key}=")
           end
@@ -76,11 +77,11 @@ module Pubid
             when "long", :long
               # Long form: separator + optional month + year
               sep = separator || "," # Default to comma for long form
-              base += "#{sep} #{month ? month + ' ' : ''}#{year}"
+              base += "#{sep} #{"#{month} " if month}#{year}"
             else
               # Preserve original format (backward compatibility)
               base += if separator
-                        "#{separator} #{month ? month + ' ' : ''}#{year}"
+                        "#{separator} #{"#{month} " if month}#{year}"
                       elsif month
                         ", #{month} #{year}"
                       else
@@ -91,7 +92,7 @@ module Pubid
 
           # Add relationships if present
           if relationships && !relationships.empty?
-            relationship_str = relationships.map(&:to_s).join(" / ")
+            relationship_str = relationships.join(" / ")
             base += " (#{relationship_str})"
           end
 

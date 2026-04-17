@@ -86,7 +86,8 @@ RSpec.describe "IEEE identifiers" do
 
   describe "fixture file parsing" do
     let(:fixture_file) do
-      File.join(__dir__, "../../archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt")
+      File.join(__dir__,
+                "../../archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt")
     end
 
     it "parses all identifiers from fixture file", :slow do
@@ -103,7 +104,9 @@ RSpec.describe "IEEE identifiers" do
         begin
           parsed = Pubid::Ieee.parse(identifier)
           # Accept both Identifiers::Base and Aiee::Identifier
-          expect(parsed).to satisfy { |id| id.is_a?(Pubid::Ieee::Identifiers::Base) || id.is_a?(Pubid::Ieee::Aiee::Identifier) }
+          expect(parsed).to(satisfy do |id|
+            id.is_a?(Pubid::Ieee::Identifiers::Base) || id.is_a?(Pubid::Ieee::Aiee::Identifier)
+          end)
 
           # Test round-trip by converting back to string
           output = parsed.to_s

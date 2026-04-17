@@ -13,7 +13,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["MP", "NBS MP"],
             stage_code: "published",
-            type_code: "mp"
+            type_code: "mp",
           ),
         ].freeze
 

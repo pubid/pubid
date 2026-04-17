@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Bsi
     module Identifiers
@@ -19,8 +18,8 @@ module Pubid
                      # Temporarily remove suffixes for rendering
                      base_str = base_id.to_s
                      # Remove known suffixes (more flexible patterns to handle topics)
-                     base_str = base_str.sub(/ ExComm \(.*?\)$/, "")  # ExComm (Fire)
-                       .sub(/ ExComm$/, "")                     # ExComm without topic
+                     base_str = base_str.sub(/ ExComm \(.*?\)$/, "") # ExComm (Fire)
+                       .sub(/ ExComm$/, "") # ExComm without topic
                        .sub(/ - TC$/, "")
                        .sub(/ PDF$/, "")
                        .sub(/ \([A-Z][a-z]+\)$/, "")
@@ -35,11 +34,11 @@ module Pubid
                 result += "#{sep}A#{id.amendment_number}:#{id.amendment_year}"
               else
                 # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
-                if id.amendment_number&.match?(/^[A-Z]+$/)
-                  result += " AMD #{id.amendment_number}"
-                else
-                  result += " AMD#{id.amendment_number}"
-                end
+                result += if id.amendment_number&.match?(/^[A-Z]+$/)
+                            " AMD #{id.amendment_number}"
+                          else
+                            " AMD#{id.amendment_number}"
+                          end
               end
             elsif id.is_a?(Corrigendum)
               sep = id.respond_to?(:separator) && id.separator ? id.separator : "+"

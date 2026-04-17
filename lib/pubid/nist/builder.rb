@@ -38,7 +38,8 @@ module Pubid
         if parsed_hash[:update_prefix] && parsed_hash[:update] && parsed_hash[:edition_e]
           # Move edition_e to update_year
           edition_id = parsed_hash[:edition_e][:edition_id]
-          parsed_hash[:update] = parsed_hash[:update].merge(update_year: edition_id)
+          parsed_hash[:update] =
+            parsed_hash[:update].merge(update_year: edition_id)
           parsed_hash.delete(:edition_e) # Remove the edition_e hash
         end
 
@@ -57,14 +58,17 @@ module Pubid
             letter_suffix = match_data[2].upcase
 
             # Update first_number to exclude letter suffix
-            parsed_hash[:first_number] = Components::Code.new(number: base_number)
+            parsed_hash[:first_number] =
+              Components::Code.new(number: base_number)
 
             # Store Part component for later (after identifier is initialized)
-            letter_suffix_part = Components::Part.new(type: "", value: letter_suffix)
+            letter_suffix_part = Components::Part.new(type: "",
+                                                      value: letter_suffix)
 
             # Convert edition_dash_year to Edition component with type="e"
             dash_year = parsed_hash[:edition_dash_year][:dash_year]
-            edition_from_dash_year = Components::Edition.new(type: "e", id: dash_year)
+            edition_from_dash_year = Components::Edition.new(type: "e",
+                                                             id: dash_year)
             parsed_hash.delete(:edition_dash_year) # Remove the old key
           end
         end
@@ -83,14 +87,15 @@ module Pubid
             edition_id = match_data[3]
 
             # Update first_number to base number only
-            parsed_hash[:first_number] = Components::Code.new(number: base_number)
+            parsed_hash[:first_number] =
+              Components::Code.new(number: base_number)
 
             # Create Edition with additional_text from edition_dash_year
             dash_year = parsed_hash[:edition_dash_year][:dash_year]
             edition_obj = Components::Edition.new(
               type: edition_type,
               id: edition_id,
-              additional_text: dash_year
+              additional_text: dash_year,
             )
             parsed_hash[:edition_with_year] = edition_obj
             parsed_hash.delete(:edition_dash_year)
@@ -113,12 +118,13 @@ module Pubid
             edition_id = match_data[3]
 
             # Update first_number to base number only
-            parsed_hash[:first_number] = Components::Code.new(number: base_number)
+            parsed_hash[:first_number] =
+              Components::Code.new(number: base_number)
 
             # Create Edition without additional_text (no year in this pattern)
             edition_obj = Components::Edition.new(
               type: edition_type,
-              id: edition_id
+              id: edition_id,
             )
             parsed_hash[:edition_with_year] = edition_obj
           end
@@ -169,14 +175,14 @@ module Pubid
 
           # Convert month abbreviation to month number and combine with year
           month_num = Date::ABBR_MONTHNAMES.index(month_str) ||
-                       Date::MONTHNAMES.index(month_str) ||
-                       month_str.to_i
+            Date::MONTHNAMES.index(month_str) ||
+            month_str.to_i
 
-          if month_num && month_num > 0
-            edition_id = "#{year_str}#{format('%02d', month_num)}"
-          else
-            edition_id = year_str
-          end
+          edition_id = if month_num&.positive?
+                         "#{year_str}#{format('%02d', month_num)}"
+                       else
+                         year_str
+                       end
 
           # Create Edition with type="e" and combined ID
           edition_obj = Components::Edition.new(type: "e", id: edition_id)
@@ -199,19 +205,21 @@ module Pubid
           if first_num.match?(/^\d{2}$/) && dash_year.match?(/^\d{4}$/)
             dash_year_num = dash_year.to_i
             # Valid year range for IR: 1901-2026 (NBS establishment to present)
-            is_valid_year = dash_year_num >= 1901 && dash_year_num <= 2026
+            is_valid_year = dash_year_num.between?(1901, 2026)
             # If there's an embedded edition (e2, e3, etc.), treat as compound, not edition
             has_embedded_edition = parsed_hash[:edition_e]
             if is_valid_year && !has_embedded_edition
               # Edition format: "76e1000", "76e2013", "76e1100", "80e2100", "81e2300", "81e2400", "82e2500", "82e2600"
-              parsed_hash[:first_number] = Components::Code.new(number: first_num)
-              parsed_hash[:edition] = Components::Edition.new(type: "e", id: dash_year)
-              parsed_hash.delete(:edition_dash_year)
+              parsed_hash[:first_number] =
+                Components::Code.new(number: first_num)
+              parsed_hash[:edition] =
+                Components::Edition.new(type: "e", id: dash_year)
             else
               # Compound number: "84-2946" or "76-1094e2"
-              parsed_hash[:first_number] = Components::Code.new(number: "#{first_num}-#{dash_year}")
-              parsed_hash.delete(:edition_dash_year)
+              parsed_hash[:first_number] =
+                Components::Code.new(number: "#{first_num}-#{dash_year}")
             end
+            parsed_hash.delete(:edition_dash_year)
           end
         end
 
@@ -221,11 +229,15 @@ module Pubid
         # but it should be second_number="1039" (not a year - years are 1900+ or 2000+)
         if parsed_hash[:first_number] && parsed_hash[:edition_dash_year] && !parsed_hash[:first_number].to_s.match?(/^[0-9]+[a-zA-Z]\d+$/)
           dash_year = parsed_hash[:edition_dash_year][:dash_year].to_s
-          series = parsed_hash[:series].to_s rescue ""
+          series = begin
+            parsed_hash[:series].to_s
+          rescue StandardError
+            ""
+          end
 
           # Check if dash_year is a valid year (1901-2026)
           dash_year_num = dash_year.to_i
-          is_valid_year = dash_year_num >= 1901 && dash_year_num <= 2026
+          is_valid_year = dash_year_num.between?(1901, 2026)
 
           # Check if series uses dash-year as edition (HB, CS, FIPS)
           # These series convert dash-year to edition ONLY for valid years
@@ -243,7 +255,8 @@ module Pubid
 
           if is_rpt
             # For RPT (Report) series with date ranges, create compound number: "1946-1947"
-            parsed_hash[:first_number] = Components::Code.new(number: "#{parsed_hash[:first_number].to_s}-#{dash_year}")
+            parsed_hash[:first_number] =
+              Components::Code.new(number: "#{parsed_hash[:first_number]}-#{dash_year}")
             parsed_hash.delete(:edition_dash_year)
           elsif is_gcr
             # GCR always converts dash_year to edition regardless of whether it's a valid year
@@ -292,17 +305,20 @@ module Pubid
             edition_id = match_data[3]
 
             # Update second_number and create Edition component
-            parsed_hash[:second_number] = Components::Code.new(number: base_number)
+            parsed_hash[:second_number] =
+              Components::Code.new(number: base_number)
             # Store Edition component for later (after identifier is initialized)
-            edition_from_embedded = Components::Edition.new(type: edition_letter, id: edition_id)
+            edition_from_embedded = Components::Edition.new(
+              type: edition_letter, id: edition_id,
+            )
           end
         end
 
         # NEW: Check for CIRC supplement pattern
         # Note: :base_portion is lost during parser merge, so check for supplement indicators
         if parsed_hash[:supplement_date_range] || parsed_hash[:supplement_slash_year] ||
-           parsed_hash[:supplement_month_year] || parsed_hash[:supplement_year] ||
-           parsed_hash[:supplement] || parsed_hash[:base_portion]
+            parsed_hash[:supplement_month_year] || parsed_hash[:supplement_year] ||
+            parsed_hash[:supplement] || parsed_hash[:base_portion]
           return build_circular_supplement(parsed_hash)
         end
 
@@ -402,7 +418,7 @@ module Pubid
                   # Store the raw hash for processing during compound number construction
                   # This prevents the hash from being assigned directly to identifier.number
                   second_num = sub_value
-                  extracted_revision = "r"  # Mark as revision format
+                  extracted_revision = "r" # Mark as revision format
                 end
               # Track revision extraction
               elsif sub_key == :revision
@@ -410,6 +426,7 @@ module Pubid
               end
               # Skip assignment for second_number hashes - they'll be processed during compound number construction
               next if sub_key == :second_number && sub_value.is_a?(Hash) && sub_value[:number_only]
+
               if identifier.respond_to?("#{sub_key}=")
                 identifier.send("#{sub_key}=",
                                 sub_value)
@@ -427,7 +444,7 @@ module Pubid
         if first_num && !identifier.number
           # Skip if this is a v#n# pattern - now handled as Part component
           if identifier.volume && identifier.issue_number
-            # V#n# pattern handled as Part in first_number cast
+          # V#n# pattern handled as Part in first_number cast
           # NEW: Handle decimal number pattern (e.g., 80-2073.3 for IR identifiers)
           # decimal_num is {:decimal_base => "2073", :decimal_suffix => "3"}
           elsif decimal_num
@@ -600,7 +617,7 @@ module Pubid
             number: "1",
             year: year_str,
             month: sprintf("%02d", month_num),
-            prefix: "slash"  # V1 uses /Upd format
+            prefix: "slash", # V1 uses /Upd format
           )
 
           # Set both V2 component and legacy attribute for backward compatibility
@@ -633,7 +650,7 @@ module Pubid
           "Nov" => 11, "November" => 11,
           "Dec" => 12, "December" => 12
         }
-        month_map[month_name] || 1  # Default to January if not found
+        month_map[month_name] || 1 # Default to January if not found
       end
 
       # Build CircularSupplement with base_identifier wrapping
@@ -644,7 +661,7 @@ module Pubid
 
         # Extract series from circ_series if present (nested structure from parser)
         series_value = nil
-        if parsed_hash[:circ_series]&.is_a?(Hash)
+        if parsed_hash[:circ_series].is_a?(Hash)
           series_value = parsed_hash[:circ_series][:series]
         elsif parsed_hash[:series]
           series_value = parsed_hash[:series]
@@ -685,10 +702,10 @@ module Pubid
 
           # Extract publisher from circ_series if present
           publisher_value = nil
-          if parsed_hash[:circ_series]&.is_a?(Hash) && parsed_hash[:circ_series][:series]
+          if parsed_hash[:circ_series].is_a?(Hash) && parsed_hash[:circ_series][:series]
             series_str = parsed_hash[:circ_series][:series].to_s
             # Extract publisher from series (e.g., "NBS LCIRC" -> "NBS")
-            publisher_value = series_str.split(' ').first if series_str.include?(' ')
+            publisher_value = series_str.split.first if series_str.include?(" ")
           end
 
           # Check if base_portion has revision (for patterns like "145r11/1925")
@@ -719,7 +736,8 @@ module Pubid
           # This will be processed by the normal build() logic to create Edition component
           if has_edition
             # Create edition_e hash that will be converted to Edition with type="e"
-            base_hash[:edition_e] = { edition_id: base_portion[:edition_number] }
+            base_hash[:edition_e] =
+              { edition_id: base_portion[:edition_number] }
           end
 
           # Recursively build base identifier
@@ -736,7 +754,7 @@ module Pubid
             # Format: Upd1-{year}{revision_number} (always use "1" and concatenate year+revision)
             update_value = "Upd1-#{supplement_year}#{revision_number}"
             supplement.update = update_value
-            supplement.implicit_supplement = true  # Mark as implicit supplement for rendering
+            supplement.implicit_supplement = true # Mark as implicit supplement for rendering
           end
         elsif parsed_hash[:first_number]
           # base_portion was lost during merge, use first_number to build base identifier
@@ -770,7 +788,7 @@ module Pubid
           supp_year = supp_hash[:supp_year]&.to_s
 
           # Pad supplement number to 2 digits for single-digit numbers
-          supp_number_padded = supp_number.rjust(2, '0')
+          supp_number_padded = supp_number.rjust(2, "0")
 
           # Create Update component for supplement (V1 compatibility uses Update for supplements)
           # Format: Upd1-{year}{padded_number} (always use "1" and concatenate year+padded_number)
@@ -860,10 +878,10 @@ module Pubid
 
           # Combine letter_suffix and letter_suffix_extra (e.g., "U" + "r" = "Ur")
           full_suffix = if letter_suffix_extra && !letter_suffix_extra.empty?
-            letter_suffix + letter_suffix_extra
-          else
-            letter_suffix
-          end
+                          letter_suffix + letter_suffix_extra
+                        else
+                          letter_suffix
+                        end
 
           return nil if full_suffix.nil? || full_suffix.empty?
 
@@ -911,9 +929,11 @@ module Pubid
           # Parser returns: {:owmwp_month=>"06", :owmwp_day=>"13", :owmwp_year=>"2018"}
           # Convert to number + edition: "06-13" + edition "e2018"
           return nil if value.nil?
+
           number_part = "#{value[:owmwp_month]}-#{value[:owmwp_day]}"
-          edition_part = Components::Edition.new(type: "e", id: value[:owmwp_year])
-          return { first_number: Components::Code.new(number: number_part), edition: edition_part }
+          edition_part = Components::Edition.new(type: "e",
+                                                 id: value[:owmwp_year])
+          { first_number: Components::Code.new(number: number_part), edition: edition_part }
 
         when :first_number, :second_number
           return nil if value.nil? || value.to_s.strip.empty?
@@ -924,7 +944,8 @@ module Pubid
           if value.is_a?(Hash) && value[:owmwp_date_number]
             owmwp_hash = value[:owmwp_date_number]
             number_part = "#{owmwp_hash[:owmwp_month]}-#{owmwp_hash[:owmwp_day]}"
-            edition_part = Components::Edition.new(type: "e", id: owmwp_hash[:owmwp_year])
+            edition_part = Components::Edition.new(type: "e",
+                                                   id: owmwp_hash[:owmwp_year])
             return { type => Components::Code.new(number: number_part), edition: edition_part }
           end
 
@@ -1256,7 +1277,8 @@ module Pubid
           end
 
           # REVISION PATTERNS - These must come BEFORE letter suffix to avoid conflicts
-          if str_value =~ /^(.+?)(r\d+\/\d{4})$/i
+          case str_value
+          when /^(.+?)(r\d+\/\d{4})$/i
             # Pattern: r6/1925 (revision with slash-year)
             number_part = $1
             revision_with_year = $2 # e.g., "r6/1925"
@@ -1270,7 +1292,7 @@ module Pubid
                                                  additional_text: year_part),
               }
             end
-          elsif str_value =~ /^(.+?)(r\d{4})$/i
+          when /^(.+?)(r\d{4})$/i
             # Pattern: r1963 (revision as 4-digit year)
             number_part = $1
             year_value = $2.sub(/^r/, "") # Strip 'r' prefix
@@ -1278,7 +1300,7 @@ module Pubid
               type => Components::Code.new(number: number_part),
               edition: Components::Edition.new(type: "r", id: year_value),
             }
-          elsif str_value =~ /^(.+?)(r[A-Za-z]{3,9}\d{4})$/i
+          when /^(.+?)(r[A-Za-z]{3,9}\d{4})$/i
             # Pattern: rJun1992 (revision with month and year)
             number_part = $1
             revision_with_date = $2 # e.g., "rJun1992"
@@ -1292,7 +1314,7 @@ module Pubid
                                                  id: "#{month_part}#{year_part}"),
               }
             end
-          elsif str_value =~ /^(.+?)(r\d+[a-z]?)$/i
+          when /^(.+?)(r\d+[a-z]?)$/i
             # Pattern: r5, r1a (simple revision)
             number_part = $1
             revision_value = $2.sub(/^r/, "") # Strip 'r' prefix
@@ -1300,7 +1322,7 @@ module Pubid
               type => Components::Code.new(number: number_part),
               edition: Components::Edition.new(type: "r", id: revision_value),
             }
-          elsif str_value =~ /^(.+?)(?<![a-zA-Z])(r)$/i
+          when /^(.+?)(?<![a-zA-Z])(r)$/i
             # Pattern: bare r with no digits (e.g., "800-90r")
             # Negative lookbehind ensures r is NOT preceded by a letter (avoids matching Ur, Ua, etc.)
             number_part = $1
@@ -1442,7 +1464,7 @@ module Pubid
 
         when :parsed_format
           # Format detection result from parser
-          value.to_s if value
+          value&.to_s
 
         when :translation
           # V1 TRANSLATION NORMALIZATION
@@ -1881,7 +1903,7 @@ module Pubid
             month_num = Date::ABBR_MONTHNAMES.index(month_str) ||
               Date::MONTHNAMES.index(month_str) ||
               month_str.to_i
-            if month_num && month_num > 0
+            if month_num&.positive?
               # Check if this is FIPS series - FIPS uses number format (e198503), not month abbreviations
               # For historical NBS documents, preserve month name: "April1909" not "190904"
               is_fips = parsed_hash[:series]&.to_s == "FIPS"
@@ -1890,7 +1912,7 @@ module Pubid
                 edition_obj = Components::Edition.new(
                   type: "-",
                   id: "",
-                  additional_text: "#{month_str}#{edition_id}"
+                  additional_text: "#{month_str}#{edition_id}",
                 )
                 return {
                   edition: edition_obj,
@@ -1904,7 +1926,7 @@ module Pubid
                 # For FIPS with day, append day as well: "Sep30/1977" → "19770930"
                 if is_fips && parsed_hash[:edition_day]
                   day_num = parsed_hash[:edition_day].to_s.to_i
-                  if day_num > 0 && day_num <= 31
+                  if day_num.positive? && day_num <= 31
                     edition_id = "#{edition_id}#{format('%02d', day_num)}"
                   end
                 end

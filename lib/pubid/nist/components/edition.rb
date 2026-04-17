@@ -87,7 +87,7 @@ module Pubid
             # For letter suffixes (single letter like "a", "A", "b", "B", etc.), NO dot separator
             # Use UPPERCASE for consistency: "r5A" for SP patterns like 800-53r5a
             elsif additional_text.match?(/^[A-Za-z]$/)
-              result += additional_text.upcase  # Normalize to UPPERCASE: r5A
+              result += additional_text.upcase # Normalize to UPPERCASE: r5A
             else
               # For ALL years (2-digit or 4-digit) and month+year, use DOT separator
               # Examples: e2.50, e2.1915, e2.June1908

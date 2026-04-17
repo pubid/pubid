@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Bsi
     module Identifiers
@@ -38,28 +37,28 @@ module Pubid
 
           # Translation - preserve the "version" or "Translation" suffix if present
           if translation_lang
-            if translation_suffix_type == "version"
-              result += " (#{translation_lang} version)"
-            elsif translation_suffix_type == "Translation"
-              result += " (#{translation_lang} Translation)"
-            else
-              result += " (#{translation_lang})"
-            end
+            result += if translation_suffix_type == "version"
+                        " (#{translation_lang} version)"
+                      elsif translation_suffix_type == "Translation"
+                        " (#{translation_lang} Translation)"
+                      else
+                        " (#{translation_lang})"
+                      end
           elsif translation_upper
-            if translation_suffix_type == "Translation"
-              result += " (#{translation_upper} Translation)"
-            else
-              result += " (#{translation_upper})"
-            end
+            result += if translation_suffix_type == "Translation"
+                        " (#{translation_upper} Translation)"
+                      else
+                        " (#{translation_upper})"
+                      end
           end
 
           # ExpertCommentary suffix
           if expert_commentary
-            if expert_commentary_topic
-              result += " ExComm (#{expert_commentary_topic})"
-            else
-              result += " ExComm"
-            end
+            result += if expert_commentary_topic
+                        " ExComm (#{expert_commentary_topic})"
+                      else
+                        " ExComm"
+                      end
           end
 
           result

@@ -90,14 +90,14 @@ module Pubid
           if copublished_number.include?("/D")
             parts = copublished_number.split("/D")
             copublished_number = parts[0]
-            draft_info = "/D" + (parts[1] || "")
+            draft_info = "/D#{parts[1] || ''}"
           end
 
           # Extract IEC year if present
           if content.include?("IEC:")
             iec_part = content.split("IEC:")[1]
             if iec_part
-              iec_year = iec_part.split(" ").first
+              iec_year = iec_part.split.first
             end
           end
 
@@ -140,7 +140,8 @@ module Pubid
         csa_string = extract_value(parsed[:csa_portion])
 
         # Prepend "CSA " prefix if not present (CSA parser expects this format)
-        csa_string = "CSA #{csa_string}" unless csa_string.start_with?("CSA") || csa_string.start_with?("CAN/")
+        csa_string = "CSA #{csa_string}" unless csa_string.start_with?("CSA",
+                                                                       "CAN/")
 
         # Use CSA parser to parse the CSA portion
         csa_id = Pubid::Csa.parse(csa_string)
@@ -211,10 +212,10 @@ module Pubid
           if pub_data[:copublishers] && !pub_data[:copublishers].empty?
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            copub_strs = copubs.map do |cp|
+            copub_strs = copubs.filter_map do |cp|
               extract_value(cp[:copublisher])
-            end.compact
-            publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
+            end
+            publisher_str += "/#{copub_strs.join('/')}" if !copub_strs.empty?
           end
 
           base_parts << publisher_str
@@ -289,10 +290,10 @@ module Pubid
           if pub_data[:copublishers] && !pub_data[:copublishers].empty?
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            copub_strs = copubs.map do |cp|
+            copub_strs = copubs.filter_map do |cp|
               extract_value(cp[:copublisher])
-            end.compact
-            publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
+            end
+            publisher_str += "/#{copub_strs.join('/')}" if !copub_strs.empty?
           end
 
           base_parts << publisher_str
@@ -363,10 +364,10 @@ module Pubid
           if pub_data[:copublishers] && !pub_data[:copublishers].empty?
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            copub_strs = copubs.map do |cp|
+            copub_strs = copubs.filter_map do |cp|
               extract_value(cp[:copublisher])
-            end.compact
-            publisher_str += "/" + copub_strs.join("/") if !copub_strs.empty?
+            end
+            publisher_str += "/#{copub_strs.join('/')}" if !copub_strs.empty?
           end
 
           base_parts << publisher_str
@@ -439,7 +440,7 @@ module Pubid
 
         code_str = extract_value(parsed[:number])
         if code_str && !code_parts.empty?
-          code_str += "." + code_parts.join(".")
+          code_str += ".#{code_parts.join('.')}"
         end
         attributes[:code] = code_str
 
@@ -542,7 +543,8 @@ module Pubid
       # @return [Identifiers::MultiNumberedIdentifier] multi-numbered identifier
       def build_multi_numbered_identifier(parsed)
         # Build primary identifier
-        primary_id = build_single_identifier(parsed[:primary_identifier], building_secondary: false)
+        primary_id = build_single_identifier(parsed[:primary_identifier],
+                                             building_secondary: false)
 
         # Build secondary identifier based on format
         if parsed[:secondary_crossref]
@@ -554,12 +556,13 @@ module Pubid
           # Format: C62.22.1-1996 where C is part of the crossref notation
           secondary_id = Identifiers::Standard.new(
             publisher: "IEEE",
-            number: extract_value(crossref)
+            number: extract_value(crossref),
           )
         elsif parsed[:secondary_joint]
           # Joint standard format: ", Std 1177-1989"
           # Build from parsed components
-          secondary_id = build_single_identifier(parsed[:secondary_joint], building_secondary: true)
+          secondary_id = build_single_identifier(parsed[:secondary_joint],
+                                                 building_secondary: true)
         else
           secondary_id = nil
         end
@@ -640,7 +643,7 @@ module Pubid
         end
 
         # Rule 2: Check for IEEE draft notation in original input (IEEE-led)
-        if @original_input && @original_input.match?(/\/D\d+/)
+        if @original_input&.match?(/\/D\d+/)
           return "IEEE"
         end
 
@@ -655,7 +658,7 @@ module Pubid
         end
 
         # Rule 4: Check for colon before year in original input (ISO-led)
-        if @original_input && @original_input.match?(/:\d{4}/)
+        if @original_input&.match?(/:\d{4}/)
           return "ISO"
         end
 
@@ -686,9 +689,9 @@ module Pubid
           if pub_data[:copublishers]
             copubs = pub_data[:copublishers]
             copubs = [copubs] unless copubs.is_a?(Array)
-            attributes[:copublisher] = copubs.map do |cp|
+            attributes[:copublisher] = copubs.filter_map do |cp|
               extract_value(cp[:copublisher])
-            end.compact
+            end
           end
         elsif parsed[:publisher]
           attributes[:publisher] = extract_value(parsed[:publisher])
@@ -700,7 +703,7 @@ module Pubid
         if parsed[:subpart]
           subparts = parsed[:subpart]
           subparts = [subparts] unless subparts.is_a?(Array)
-          code_parts.concat(subparts.map { |sp| extract_value(sp) }.compact)
+          code_parts.concat(subparts.filter_map { |sp| extract_value(sp) })
         end
 
         # Create code string with parts
@@ -713,12 +716,12 @@ module Pubid
         # Handle case where parser captured number without "P" prefix
         # Check original input to see if there was a P before the number
         # The ieee_p_identifier rule consumes P without capturing it
-        if !type_value && @original_input && @original_input.match?(/IEEE\s+P/)
+        if !type_value && @original_input&.match?(/IEEE\s+P/)
           type_value = "P"
         end
 
         # Handle ANSI P prefix patterns (e.g., "ANSI PN42.34-2015")
-        if !type_value && @original_input && @original_input.match?(/ANSI\s+P/)
+        if !type_value && @original_input&.match?(/ANSI\s+P/)
           # Extract P as type since it was in the original but parser stripped it
           type_value = "P"
         end
@@ -735,7 +738,9 @@ module Pubid
           has_csa_copub = if pub_data && pub_data[:copublishers]
                             copubs = pub_data[:copublishers]
                             copubs = [copubs] unless copubs.is_a?(Array)
-                            copubs.any? { |cp| extract_value(cp[:copublisher])&.include?("CSA") }
+                            copubs.any? do |cp|
+                              extract_value(cp[:copublisher])&.include?("CSA")
+                            end
                           else
                             @original_input&.include?("/CSA")
                           end
@@ -746,7 +751,7 @@ module Pubid
         end
 
         if code_str && !code_parts.empty?
-          code_str += "." + code_parts.join(".")
+          code_str += ".#{code_parts.join('.')}"
         end
 
         # Year detection: If code_str ends with year-like pattern (dash + 4 digits, 1884-2099)
@@ -758,7 +763,7 @@ module Pubid
         # Match ending with dash followed by 4 digits only (not dot, to preserve 802.1AC patterns)
         if code_str && !parsed[:year] && code_parts.empty? && (match = code_str.match(/^(.+)-(\d{4})$/))
           potential_year = match[2].to_i
-          if potential_year >= 1884 && potential_year <= 2099
+          if potential_year.between?(1884, 2099)
             # This is a year - extract it
             code_str = match[1] # Remove year from code
             parsed[:year] = match[2] # Add to parsed for extraction below
@@ -854,13 +859,11 @@ module Pubid
         # Check for specific draft notation (D1, D2, etc.)
         if parsed[:draft]
           draft_data = parsed[:draft]
-          draft_data = if draft_data.is_a?(Array)
-                         draft_data.inject({}) do |r, e|
-                           r.merge(e)
-                         end
-                       else
-                         draft_data
-                       end
+          if draft_data.is_a?(Array)
+            draft_data = draft_data.inject({}) do |r, e|
+              r.merge(e)
+            end
+          end
 
           if draft_data.is_a?(Hash) && draft_data[:draft_version]
             dv = draft_data[:draft_version]
@@ -877,7 +880,7 @@ module Pubid
               draft_abbr = "D#{version}"
               # Check if this specific draft stage is in registry
               stage = Ieee::Scheme.locate_typed_stage_by_abbr(draft_abbr)
-              return draft_abbr if stage && stage.abbr.include?(draft_abbr)
+              return draft_abbr if stage&.abbr&.include?(draft_abbr)
             end
           end
         end
@@ -909,12 +912,12 @@ module Pubid
         return nil if value.is_a?(Array) && value.empty?
 
         if value.is_a?(Array)
-          joined = value.map(&:to_s).join
-          return joined.length > 0 ? joined : nil
+          joined = value.join
+          return joined.length.positive? ? joined : nil
         end
 
         str_value = value.to_s.strip
-        str_value.length > 0 ? str_value : nil
+        str_value.length.positive? ? str_value : nil
       end
 
       # Extract optional attribute if present
@@ -1047,7 +1050,8 @@ module Pubid
       def handle_ashrae_copub(parsed, attributes)
         if parsed[:ashrae_copub].is_a?(Hash)
           ashrae_data = parsed[:ashrae_copub]
-          attributes[:ashrae_number] = extract_value(ashrae_data[:ashrae_number])
+          attributes[:ashrae_number] =
+            extract_value(ashrae_data[:ashrae_number])
           if ashrae_data[:ashrae_year]
             attributes[:ashrae_year] = extract_value(ashrae_data[:ashrae_year])
           end
@@ -1059,10 +1063,11 @@ module Pubid
       # Handle IEEE cross-reference information
       def handle_ieee_crossref(parsed, attributes)
         if parsed[:ieee_crossref].is_a?(Hash)
-          crossref_data = parsed[:ieee_crossref]
+          parsed[:ieee_crossref]
           # Extract the cross-reference string (e.g., "C62.22.1-1996")
           # Store it for rendering
-          attributes[:crossref] = "/C" + extract_value(crossref).to_s.sub(/^\//, "")
+          attributes[:crossref] =
+            "/C#{extract_value(crossref).to_s.sub(/^\//, '')}"
         elsif parsed[:ieee_crossref]
           attributes[:crossref] = extract_value(parsed[:ieee_crossref])
         end

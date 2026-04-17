@@ -38,7 +38,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
         id = Pubid::Ieee.parse("AIEE No 14-1925")
         expect(id).to be_a(Pubid::Ieee::Aiee::Identifier)
         expect(id.number).to eq("14")
-        expect(id.year).to eq("1925")  # Year is stored as String for consistency with Base
+        expect(id.year).to eq("1925") # Year is stored as String for consistency with Base
         expect(id.to_s).to eq("AIEE No 14-1925")
       end
     end

@@ -32,10 +32,10 @@ RSpec.describe Pubid::Idf::Scheme do
       expect(typed_stages).to all(be_a(Pubid::Components::TypedStage))
 
       # Verify some known typed stages exist (using stage_code)
-      stage_codes = typed_stages.map(&:stage_code).compact
-      expect(stage_codes).to include("published")  # Published International Standard
-      expect(stage_codes).to include("pwi")  # PWI for International Standard
-      expect(stage_codes).to include("wd")  # Working Draft
+      stage_codes = typed_stages.filter_map(&:stage_code)
+      expect(stage_codes).to include("published") # Published International Standard
+      expect(stage_codes).to include("pwi") # PWI for International Standard
+      expect(stage_codes).to include("wd") # Working Draft
     end
   end
 

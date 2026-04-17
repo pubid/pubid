@@ -613,7 +613,7 @@ RSpec.describe "IEC v2 Implementation" do
 
     after(:all) do
       summary = @overall_results.summary
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "OVERALL IEC RESULTS: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
       puts "=" * 80
 

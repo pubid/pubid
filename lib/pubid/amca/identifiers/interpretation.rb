@@ -11,7 +11,8 @@ module Pubid
       class Interpretation < Base
         attr_reader :interpretation_code
 
-        def initialize(code:, year: nil, copublisher: nil, suffix: nil, reaffirmed: nil, interpretation_code: nil)
+        def initialize(code:, year: nil, copublisher: nil, suffix: nil,
+reaffirmed: nil, interpretation_code: nil)
           @code = Components::Code.new(value: code.to_s)
           @year = Components::Date.new(year: year.to_s) if year
           @copublisher = copublisher

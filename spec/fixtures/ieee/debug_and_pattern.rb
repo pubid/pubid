@@ -12,8 +12,8 @@ puts "\n1. Testing Base.parse (with 'and' handling):"
 begin
   result = Pubid::Ieee::Identifiers::Base.parse(input)
   puts "Success: #{result.class}"
-  puts "Result: #{result.to_s}"
-rescue => e
+  puts "Result: #{result}"
+rescue StandardError => e
   puts "Failed: #{e.class} - #{e.message[0..100]}"
 end
 
@@ -22,7 +22,7 @@ puts "\n2. Testing Parser.parse directly:"
 begin
   result = Pubid::Ieee::Parser.parse(input)
   puts "Success: #{result.inspect}"
-rescue => e
+rescue StandardError => e
   puts "Failed: #{e.class} - #{e.message[0..100]}"
 end
 
@@ -32,6 +32,6 @@ begin
   parser = Pubid::Ieee::Parser.new
   result = parser.parse(input)
   puts "Success: #{result.inspect}"
-rescue => e
+rescue StandardError => e
   puts "Failed: #{e.class} - #{e.message[0..100]}"
 end

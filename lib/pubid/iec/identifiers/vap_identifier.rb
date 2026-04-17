@@ -34,7 +34,7 @@ module Pubid
           end
 
           # Add edition after VAP suffix if present
-          parts << " #{edition}" if edition && edition.number
+          parts << " #{edition}" if edition&.number
 
           parts.compact.join
         end

@@ -46,7 +46,7 @@ original_separator: nil)
           end
 
           # Split by dots or dashes to get number and parts
-          components = remainder.split(/[.\-]/)
+          components = remainder.split(/[.-]/)
           number = components.shift
 
           new(
@@ -60,7 +60,7 @@ original_separator: nil)
         def to_s
           result = ""
           result += prefix if prefix
-          result += number if number  # Guard against nil number (e.g., "ANSI X")
+          result += number if number # Guard against nil number (e.g., "ANSI X")
 
           if parts && !parts.empty?
             # Use original separator if available

@@ -51,7 +51,7 @@ RSpec.describe "NIST Serialization" do
         flavor: "nist",
         publisher: "NIST",
         series: "SP",
-        number: "800-53"
+        number: "800-53",
       }
 
       id = Pubid::Serializable.from_h(hash)

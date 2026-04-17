@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Cen
     module Identifiers
@@ -11,7 +10,7 @@ module Pubid
 
         def to_s
           identifiers.map.with_index do |id, idx|
-            if idx == 0
+            if idx.zero?
               # First identifier renders normally
               id.to_s
             elsif id.is_a?(Amendment)

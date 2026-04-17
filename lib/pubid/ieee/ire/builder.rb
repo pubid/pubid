@@ -25,7 +25,7 @@ module Pubid
           if year_str
             year_int = year_str.to_i
             # Convert 2-digit years to 4-digit (12-63 => 1912-1963)
-            if year_int >= 12 && year_int <= 63
+            if year_int.between?(12, 63)
               year_int += 1900
             end
             attributes[:year] = year_int
@@ -48,12 +48,12 @@ module Pubid
           return nil if value.is_a?(Array) && value.empty?
 
           if value.is_a?(Array)
-            joined = value.map(&:to_s).join
-            return joined.length > 0 ? joined : nil
+            joined = value.join
+            return joined.length.positive? ? joined : nil
           end
 
           str_value = value.to_s.strip
-          str_value.length > 0 ? str_value : nil
+          str_value.length.positive? ? str_value : nil
         end
       end
     end

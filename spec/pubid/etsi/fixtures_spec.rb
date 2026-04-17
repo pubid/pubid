@@ -5,7 +5,9 @@ RSpec.describe "ETSI Fixture Round-trip Tests" do
     # Read from new V2 fixture structure
     fixtures = []
     Dir["spec/fixtures/etsi/identifiers/pass/*.txt"].each do |file|
-      fixtures += File.readlines(file).map(&:strip).reject(&:empty?).reject { |l| l.start_with?("#") }
+      fixtures += File.readlines(file).map(&:strip).reject(&:empty?).reject do |l|
+        l.start_with?("#")
+      end
     end
     fixtures
   end
@@ -39,7 +41,7 @@ RSpec.describe "ETSI Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n" + "=" * 80
+      puts "\n#{'=' * 80}"
       puts "ETSI ROUND-TRIP RESULTS"
       puts "=" * 80
       puts "Total identifiers: #{fixtures.size}"

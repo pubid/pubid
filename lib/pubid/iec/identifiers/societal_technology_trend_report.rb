@@ -15,12 +15,13 @@ module Pubid
             type_code: :sttr,
             abbr: ["Trend Report"],
             name: "Societal and Technology Trend Report",
-            harmonized_stages: %w[60.00 60.60]
-          )
+            harmonized_stages: %w[60.00 60.60],
+          ),
         ].freeze
 
         def self.type
-          { key: :sttr, title: "Societal and Technology Trend Report", short: "Trend Report" }
+          { key: :sttr, title: "Societal and Technology Trend Report",
+            short: "Trend Report" }
         end
 
         # Override publisher_portion to add Trend Report

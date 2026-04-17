@@ -12,7 +12,7 @@ module Pubid
           Pubid::Components::TypedStage.new(
             abbr: ["CIRC", "NBS CIRC"],
             stage_code: "published",
-            type_code: "circ"
+            type_code: "circ",
           ),
         ].freeze
 
@@ -48,16 +48,16 @@ module Pubid
         # Override to_s for CIRC-specific edition+year rendering
         # CIRC uses dot notation: "NBS CIRC 11e2.1915" instead of "NBS CIRC 11e2-1915"
         def to_s(format = nil)
-          result = super(format)
+          result = super
 
           # For CIRC edition patterns with additional_text (year), render with dot notation
           # "11e2-1915" format: edition.id="2", additional_text="1915" → render as "11e2.1915"
-          if edition && edition.type == "e" && edition.additional_text &&
-             edition.additional_text.match?(/^\d{4}$/)
+          if edition && edition.type == "e" && edition.additional_text&.match?(/^\d{4}$/)
             # Replace "11e1915" with "11e2.1915" format
             # Pattern: number + "e" + year (where year was stored in edition.id)
             # Need to reconstruct: number + "e" + edition.id + "." + additional_text
-            result = result.gsub(/e(\d{4})$/, "e#{edition.id || '?'}.#{edition.additional_text}")
+            result = result.gsub(/e(\d{4})$/,
+                                 "e#{edition.id || '?'}.#{edition.additional_text}")
           end
 
           result

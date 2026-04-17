@@ -88,7 +88,7 @@ module Pubid
           @iterations.times do
             ids.each do |id|
               # Linear search through array (simulating no hash)
-              ids.any? { |other| other == id }
+              ids.any?(id)
             end
           end
         end

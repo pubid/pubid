@@ -73,21 +73,17 @@ module Pubid
 
         # Part component (n1, pt1)
         if identifier.respond_to?(:part) && identifier.part
-          prt = if identifier.part.respond_to?(:to_s)
-                  identifier.part.to_s
-                else
-                  identifier.part.to_s
-                end
+          if identifier.part.respond_to?(:to_s)
+          end
+          prt = identifier.part.to_s
           identifier_parts << prt
         end
 
         # Volume + Issue number (v6n12 format)
-        if identifier.respond_to?(:volume) && identifier.respond_to?(:issue_number)
-          if identifier.volume && identifier.issue_number
-            vol_str = identifier.volume.respond_to?(:to_s) ? identifier.volume.to_s : "v#{identifier.volume}"
-            issue_str = identifier.issue_number.respond_to?(:to_s) ? identifier.issue_number.to_s : identifier.issue_number.to_s
-            identifier_parts << "#{vol_str}n#{issue_str}"
-          end
+        if identifier.respond_to?(:volume) && identifier.respond_to?(:issue_number) && identifier.volume && identifier.issue_number
+          vol_str = identifier.volume.respond_to?(:to_s) ? identifier.volume.to_s : "v#{identifier.volume}"
+          issue_str = identifier.issue_number.respond_to?(:to_s) ? identifier.issue_number.to_s : identifier.issue_number.to_s
+          identifier_parts << "#{vol_str}n#{issue_str}"
         end
 
         # Version component
@@ -108,11 +104,9 @@ module Pubid
 
         # Stage component (ipd, pd, etc.)
         if identifier.respond_to?(:stage) && identifier.stage
-          stg = if identifier.stage.respond_to?(:to_s)
-                  identifier.stage.to_s
-                else
-                  identifier.stage.to_s
-                end
+          if identifier.stage.respond_to?(:to_s)
+          end
+          stg = identifier.stage.to_s
           # Stage in MR format starts with dot: ".ipd"
           identifier_parts << stg
         end
@@ -149,7 +143,7 @@ module Pubid
         # Draft
         if identifier.respond_to?(:draft_number) && identifier.draft_number
           identifier_parts << "#{identifier.draft_number}pd"
-        elsif identifier.respond_to?(:draft) && identifier.draft && identifier.draft.to_s.include?("draft")
+        elsif identifier.respond_to?(:draft) && identifier.draft&.to_s&.include?("draft")
           identifier_parts << "-draft"
         end
 
@@ -174,10 +168,10 @@ module Pubid
         if identifier.respond_to?(:translation_component) && identifier.translation_component
           trans = identifier.translation_component
           lang = if trans.respond_to?(:language)
-                    trans.language
-                  elsif trans.is_a?(String)
-                    trans
-                  end
+                   trans.language
+                 elsif trans.is_a?(String)
+                   trans
+                 end
           parts << lang.downcase if lang
         elsif identifier.respond_to?(:translation) && identifier.translation
           parts << identifier.translation.downcase

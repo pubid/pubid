@@ -102,7 +102,7 @@ module Pubid
           base_parts = base_part.split(":")
 
           # Add publisher/type/number/part from base
-          parts.concat(base_parts[0..-1])
+          parts.concat(base_parts)
 
           # Add supplement type (amd, cor)
           if identifier.respond_to?(:typed_stage) && identifier.typed_stage

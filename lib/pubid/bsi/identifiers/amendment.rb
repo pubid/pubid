@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Bsi
     module Identifiers
@@ -16,25 +15,19 @@ module Pubid
           if base_identifier
             if amendment_year
               "#{base_identifier}#{separator}A#{amendment_number}:#{amendment_year}"
-            else
+            elsif amendment_number&.match?(/^[A-Z]+$/)
               # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
-              if amendment_number&.match?(/^[A-Z]+$/)
-                "#{base_identifier} AMD #{amendment_number}"
-              else
-                "#{base_identifier} AMD#{amendment_number}"
-              end
+              "#{base_identifier} AMD #{amendment_number}"
+            else
+              "#{base_identifier} AMD#{amendment_number}"
             end
+          elsif amendment_year
+            "#{separator}A#{amendment_number}:#{amendment_year}"
+          elsif amendment_number&.match?(/^[A-Z]+$/)
+            # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
+            "AMD #{amendment_number}"
           else
-            if amendment_year
-              "#{separator}A#{amendment_number}:#{amendment_year}"
-            else
-              # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
-              if amendment_number&.match?(/^[A-Z]+$/)
-                "AMD #{amendment_number}"
-              else
-                "AMD#{amendment_number}"
-              end
-            end
+            "AMD#{amendment_number}"
           end
         end
 
