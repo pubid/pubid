@@ -11,6 +11,38 @@ module Pubid
 
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
+            code: :pwi_amd,
+            stage_code: :pwi,
+            type_code: :amd,
+            abbr: ["PWI Amd"],
+            name: "Preliminary Work Item Amendment",
+            harmonized_stages: %w[00.00 00.20 00.60 00.98 00.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :np_amd,
+            stage_code: :np,
+            type_code: :amd,
+            abbr: ["NP Amd"],
+            name: "New Proposal Amendment",
+            harmonized_stages: %w[10.00 10.20 10.60 10.92 10.98],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :anw_amd,
+            stage_code: :anw,
+            type_code: :amd,
+            abbr: ["ANW Amd"],
+            name: "Approved New Work Item Amendment",
+            harmonized_stages: %w[10.99 20.00],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :wd_amd,
+            stage_code: :wd,
+            type_code: :amd,
+            abbr: ["WD Amd"],
+            name: "Working Draft Amendment",
+            harmonized_stages: %w[20.20 20.60 20.98 20.99],
+          ),
+          Pubid::Components::TypedStage.new(
             code: :cdamd,
             stage_code: :cd,
             type_code: :amd,
@@ -34,7 +66,7 @@ module Pubid
             code: :fdamd,
             stage_code: :fdamd,
             type_code: :amd,
-            abbr: ["FDAM"],
+            abbr: ["FDAM", "PRF Amd"],
             short_abbr: "FDIS",
             long_abbr: "FDIS",
             name: "Final Draft Amendment",
@@ -48,7 +80,7 @@ module Pubid
             short_abbr: "AMD",
             long_abbr: "Amd",
             name: "Amendment",
-            harmonized_stages: %w[60.00 60.60],
+            harmonized_stages: %w[60.00 60.60 90.20 90.60 90.92 90.93 90.99 95.20 95.60 95.92 95.99],
           ),
         ].freeze
 

@@ -12,12 +12,36 @@ module Pubid
         # From gems/pubid-iec/lib/pubid/iec/identifier/international_standard.rb
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
-            code: :is,
-            stage_code: :published,
+            code: :pwi,
+            stage_code: :pwi,
             type_code: :is,
-            abbr: [""],
-            name: "International Standard",
-            harmonized_stages: %w[60.00 60.60],
+            abbr: ["PWI"],
+            name: "Preliminary Work Item",
+            harmonized_stages: %w[00.00 00.20 00.60 00.98 00.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :np,
+            stage_code: :np,
+            type_code: :is,
+            abbr: ["NP"],
+            name: "New Proposal",
+            harmonized_stages: %w[10.00 10.20 10.60 10.92 10.98],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :anw,
+            stage_code: :anw,
+            type_code: :is,
+            abbr: ["ANW"],
+            name: "Approved New Work Item",
+            harmonized_stages: %w[10.99 20.00],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :wd,
+            stage_code: :wd,
+            type_code: :is,
+            abbr: ["WD"],
+            name: "Working Draft",
+            harmonized_stages: %w[20.20 20.60 20.98 20.99],
           ),
           Pubid::Components::TypedStage.new(
             code: :cd,
@@ -39,9 +63,17 @@ module Pubid
             code: :fdis,
             stage_code: :fdis,
             type_code: :is,
-            abbr: ["FDIS"],
+            abbr: ["FDIS", "PRF"],
             name: "Final Draft International Standard",
             harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :is,
+            stage_code: :published,
+            type_code: :is,
+            abbr: [""],
+            name: "International Standard",
+            harmonized_stages: %w[60.00 60.60 90.20 90.60 90.92 90.93 90.99 95.20 95.60 95.92 95.99],
           ),
         ].freeze
 

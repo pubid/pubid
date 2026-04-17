@@ -13,11 +13,43 @@ module Pubid
         # From gems/pubid-iec/lib/pubid/iec/identifier/interpretation_sheet.rb
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
+            code: :pwi_ish,
+            stage_code: :pwi,
+            type_code: :ish,
+            abbr: ["PWI ISH"],
+            name: "Preliminary Work Item Interpretation Sheet",
+            harmonized_stages: %w[00.00 00.20 00.60 00.98 00.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :np_ish,
+            stage_code: :np,
+            type_code: :ish,
+            abbr: ["NP ISH"],
+            name: "New Proposal Interpretation Sheet",
+            harmonized_stages: %w[10.00 10.20 10.60 10.92 10.98],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :anw_ish,
+            stage_code: :anw,
+            type_code: :ish,
+            abbr: ["ANW ISH"],
+            name: "Approved New Work Item Interpretation Sheet",
+            harmonized_stages: %w[10.99 20.00],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :wd_ish,
+            stage_code: :wd,
+            type_code: :ish,
+            abbr: ["WD ISH"],
+            name: "Working Draft Interpretation Sheet",
+            harmonized_stages: %w[20.20 20.60 20.98 20.99],
+          ),
+          Pubid::Components::TypedStage.new(
             code: :cdish,
-            stage_code: :circulated,
+            stage_code: :cd,
             type_code: :ish,
             abbr: ["CDISH"],
-            name: "Draft circulated as DISH",
+            name: "Committee Draft Interpretation Sheet",
             harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
           ),
           Pubid::Components::TypedStage.new(
@@ -34,7 +66,7 @@ module Pubid
             type_code: :ish,
             abbr: ["ISH"],
             name: "Interpretation Sheet",
-            harmonized_stages: %w[60.00 60.60],
+            harmonized_stages: %w[60.00 60.60 90.20 90.60 90.92 90.93 90.99 95.20 95.60 95.92 95.99],
           ),
         ].freeze
 

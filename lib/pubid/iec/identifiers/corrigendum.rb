@@ -11,6 +11,38 @@ module Pubid
 
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
+            code: :pwi_cor,
+            stage_code: :pwi,
+            type_code: :cor,
+            abbr: ["PWI Cor"],
+            name: "Preliminary Work Item Corrigendum",
+            harmonized_stages: %w[00.00 00.20 00.60 00.98 00.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :np_cor,
+            stage_code: :np,
+            type_code: :cor,
+            abbr: ["NP Cor"],
+            name: "New Proposal Corrigendum",
+            harmonized_stages: %w[10.00 10.20 10.60 10.92 10.98],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :anw_cor,
+            stage_code: :anw,
+            type_code: :cor,
+            abbr: ["ANW Cor"],
+            name: "Approved New Work Item Corrigendum",
+            harmonized_stages: %w[10.99 20.00],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :wdcor,
+            stage_code: :wd,
+            type_code: :cor,
+            abbr: ["WDCor"],
+            name: "Working Draft Corrigendum",
+            harmonized_stages: %w[20.20 20.60 20.98 20.99],
+          ),
+          Pubid::Components::TypedStage.new(
             code: :cdcor,
             stage_code: :cd,
             type_code: :cor,
@@ -34,7 +66,7 @@ module Pubid
             code: :fdcor,
             stage_code: :fdcor,
             type_code: :cor,
-            abbr: ["FDCOR"],
+            abbr: ["FDCOR", "PRF Cor"],
             short_abbr: "FDCOR",
             long_abbr: "FDCor",
             name: "Final Draft Corrigendum",
@@ -48,7 +80,7 @@ module Pubid
             short_abbr: "COR",
             long_abbr: "Cor",
             name: "Corrigendum",
-            harmonized_stages: %w[60.00 60.60],
+            harmonized_stages: %w[60.00 60.60 90.20 90.60 90.92 90.93 90.99 95.20 95.60 95.92 95.99],
           ),
         ].freeze
 

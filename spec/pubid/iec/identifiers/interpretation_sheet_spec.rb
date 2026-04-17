@@ -144,7 +144,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "provides stage code" do
-        expect(parsed.stage.stage_code).to eq("circulated")
+        expect(parsed.stage.stage_code).to eq("cd")
       end
 
       it "provides typed_stage with abbreviation CDISH" do

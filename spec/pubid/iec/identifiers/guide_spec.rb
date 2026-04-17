@@ -266,4 +266,88 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
       end
     end
   end
+
+  # Test early-stage typed stages from Excel reference
+  context "early-stage typed stages" do
+    context "CD Guide stage" do
+      describe "IEC/CD Guide 104" do
+        subject { "IEC/CD Guide 104" }
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses publisher" do
+          expect(parsed.publisher.body).to eq("IEC")
+        end
+
+        it "parses number" do
+          expect(parsed.number.number).to eq("104")
+        end
+
+        it "parses stage" do
+          expect(parsed.stage.stage_code).to eq("cd")
+        end
+
+        it "provides type code" do
+          expect(parsed.type.type_code).to eq("guide")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("IEC CD Guide 104")
+        end
+      end
+    end
+
+    context "WD Guide stage" do
+      describe "IEC/WD Guide 104" do
+        subject { "IEC/WD Guide 104" }
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses publisher" do
+          expect(parsed.publisher.body).to eq("IEC")
+        end
+
+        it "parses number" do
+          expect(parsed.number.number).to eq("104")
+        end
+
+        it "parses stage" do
+          expect(parsed.stage.stage_code).to eq("wd")
+        end
+
+        it "provides type code" do
+          expect(parsed.type.type_code).to eq("guide")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("IEC WD Guide 104")
+        end
+      end
+    end
+
+    context "NP Guide stage" do
+      describe "IEC/NP Guide 104" do
+        subject { "IEC/NP Guide 104" }
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses publisher" do
+          expect(parsed.publisher.body).to eq("IEC")
+        end
+
+        it "parses number" do
+          expect(parsed.number.number).to eq("104")
+        end
+
+        it "parses stage" do
+          expect(parsed.stage.stage_code).to eq("np")
+        end
+
+        it "provides type code" do
+          expect(parsed.type.type_code).to eq("guide")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("IEC NP Guide 104")
+        end
+      end
+    end
+  end
 end

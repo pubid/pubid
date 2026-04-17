@@ -250,4 +250,88 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
     end
   end
+
+  # Test early-stage typed stages from Excel reference
+  context "early-stage typed stages" do
+    context "NP TR stage" do
+      describe "IEC/NP TR 62048" do
+        subject { "IEC/NP TR 62048" }
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses publisher" do
+          expect(parsed.publisher.body).to eq("IEC")
+        end
+
+        it "parses number" do
+          expect(parsed.number.number).to eq("62048")
+        end
+
+        it "parses stage" do
+          expect(parsed.stage.stage_code).to eq("np")
+        end
+
+        it "provides type code" do
+          expect(parsed.type.type_code).to eq("tr")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("IEC NP TR 62048")
+        end
+      end
+    end
+
+    context "WD TR stage" do
+      describe "IEC/WD TR 62048" do
+        subject { "IEC/WD TR 62048" }
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses publisher" do
+          expect(parsed.publisher.body).to eq("IEC")
+        end
+
+        it "parses number" do
+          expect(parsed.number.number).to eq("62048")
+        end
+
+        it "parses stage" do
+          expect(parsed.stage.stage_code).to eq("wd")
+        end
+
+        it "provides type code" do
+          expect(parsed.type.type_code).to eq("tr")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("IEC WD TR 62048")
+        end
+      end
+    end
+
+    context "CD TR stage" do
+      describe "IEC/CD TR 62048" do
+        subject { "IEC/CD TR 62048" }
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses publisher" do
+          expect(parsed.publisher.body).to eq("IEC")
+        end
+
+        it "parses number" do
+          expect(parsed.number.number).to eq("62048")
+        end
+
+        it "parses stage" do
+          expect(parsed.stage.stage_code).to eq("cd")
+        end
+
+        it "provides type code" do
+          expect(parsed.type.type_code).to eq("tr")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("IEC CD TR 62048")
+        end
+      end
+    end
+  end
 end

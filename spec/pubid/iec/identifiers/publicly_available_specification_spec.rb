@@ -242,7 +242,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to eq("circulated")
+        expect(parsed.stage.stage_code).to eq("cd")
       end
 
       it "provides typed_stage with abbreviation CDPAS" do

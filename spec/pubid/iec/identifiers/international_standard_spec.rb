@@ -236,6 +236,75 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
         end
       end
 
+      context "new proposal" do
+        describe "IEC/NP 60038" do
+          subject { "IEC/NP 60038" }
+          let(:parsed) { described_class.parse(subject) }
+
+          it "parses publisher" do
+            expect(parsed.publisher.body).to eq("IEC")
+          end
+
+          it "parses number" do
+            expect(parsed.number.number).to eq("60038")
+          end
+
+          it "parses stage" do
+            expect(parsed.stage.stage_code).to eq("np")
+          end
+
+          it "round-trips" do
+            expect(parsed.to_s).to eq(subject)
+          end
+        end
+      end
+
+      context "approved new work" do
+        describe "IEC/ANW 60038" do
+          subject { "IEC/ANW 60038" }
+          let(:parsed) { described_class.parse(subject) }
+
+          it "parses publisher" do
+            expect(parsed.publisher.body).to eq("IEC")
+          end
+
+          it "parses number" do
+            expect(parsed.number.number).to eq("60038")
+          end
+
+          it "parses stage" do
+            expect(parsed.stage.stage_code).to eq("anw")
+          end
+
+          it "round-trips" do
+            expect(parsed.to_s).to eq(subject)
+          end
+        end
+      end
+
+      context "working draft" do
+        describe "IEC/WD 60038" do
+          subject { "IEC/WD 60038" }
+          let(:parsed) { described_class.parse(subject) }
+
+          it "parses publisher" do
+            expect(parsed.publisher.body).to eq("IEC")
+          end
+
+          it "parses number" do
+            expect(parsed.number.number).to eq("60038")
+          end
+
+          it "parses stage" do
+            expect(parsed.stage.stage_code).to eq("wd")
+          end
+
+          it "round-trips" do
+            expect(parsed.to_s).to eq(subject)
+          end
+        end
+      end
+
       context "final draft" do
         describe "IEC/FDIS 60038" do
           subject { "IEC/FDIS 60038" }
@@ -255,6 +324,33 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
 
           it "round-trips" do
             expect(parsed.to_s).to eq(subject)
+          end
+        end
+      end
+
+      context "proof" do
+        describe "IEC/PRF 60038" do
+          subject { "IEC/PRF 60038" }
+          let(:parsed) { described_class.parse(subject) }
+
+          it "parses publisher" do
+            expect(parsed.publisher.body).to eq("IEC")
+          end
+
+          it "parses number" do
+            expect(parsed.number.number).to eq("60038")
+          end
+
+          it "parses stage" do
+            expect(parsed.stage.stage_code).to eq("fdis")
+          end
+
+          it "provides typed_stage with PRF abbreviation" do
+            expect(parsed.typed_stage.abbr).to include("PRF")
+          end
+
+          it "round-trips to canonical FDIS form" do
+            expect(parsed.to_s).to eq("IEC/FDIS 60038")
           end
         end
       end
