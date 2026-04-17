@@ -24,9 +24,6 @@ module Pubid
         # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
         typed_stage_string = "" if typed_stage_string.nil?
 
-        # Handle FRAG as special fragment notation
-        return nil if typed_stage_string == "FRAG"
-
         @scheme.locate_typed_stage_by_abbr(typed_stage_string)
       end
 
@@ -104,11 +101,25 @@ module Pubid
         end
 
         # Extract FRAG/FRAGC indicator if present
-        is_fragment = ["FRAG", "FRAGC"].include?(parsed_hash[:type_with_stage])
+        frag_abbrs = Pubid::Iec::Identifiers::FragmentIdentifier::TYPED_STAGES
+                      .flat_map(&:abbr)
+        is_fragment = frag_abbrs.include?(parsed_hash[:type_with_stage]) ||
+                      parsed_hash[:type_with_stage] == "FRAGC"
+        fragment_typed_stage = nil
         fragment_number = nil
         fragment_edition = nil
 
         if is_fragment
+          # For FRAG typed stages, look up the fragment's own typed stage
+          begin
+            fragment_typed_stage = @scheme.locate_typed_stage_by_abbr(
+              parsed_hash[:type_with_stage].to_s
+            )
+          rescue ArgumentError
+            # FRAGC is a rendering notation, not a typed stage abbreviation
+            fragment_typed_stage = @scheme.locate_typed_stage_by_abbr("FRAG")
+          end
+
           # For FRAG/FRAGC, we need to build the base Amendment/Corrigendum
           # then wrap it with FragmentIdentifier
           if parsed_hash[:number_with_part]
@@ -122,7 +133,7 @@ module Pubid
           if parsed_hash[:base_identifier]
             base_id = build(parsed_hash[:base_identifier])
             return wrap_with_fragment(base_id, fragment_number,
-                                      fragment_edition)
+                                      fragment_edition, fragment_typed_stage)
           end
         end
 
@@ -228,7 +239,9 @@ module Pubid
 
         # After building base identifier, apply wrappers
         if fragment_type_data && fragment_number_data
-          identifier = wrap_with_fragment(identifier, fragment_number_data.to_s)
+          frag_ts = @scheme.locate_typed_stage_by_abbr("FRAG")
+          identifier = wrap_with_fragment(identifier, fragment_number_data.to_s,
+                                          nil, frag_ts)
         end
         # Note: sheet wrapping is now handled earlier in build method for sheet_identifier pattern
         if consolidated_supplements_data
@@ -245,13 +258,16 @@ module Pubid
 
       # Wrap identifier with FragmentIdentifier for /FRAGN notation
       def wrap_with_fragment(base_identifier, fragment_number,
-edition_data = nil)
+edition_data = nil, typed_stage = nil)
         require_relative "identifiers/fragment_identifier"
 
         fragment = Identifiers::FragmentIdentifier.new(
           base_identifier: base_identifier,
           fragment_number: fragment_number,
         )
+
+        # Set typed stage if provided
+        fragment.typed_stage = typed_stage if typed_stage
 
         # Set edition if provided
         if edition_data
@@ -438,8 +454,7 @@ edition_data = nil)
           # "WD"
           # "TS"
           # "Guide"
-          # Skip FRAG as it's handled specially
-          return nil if value == "FRAG"
+          # FRAG typed stages are handled in the is_fragment check above
 
           iteration = value.to_s.match(/(\d+)$/)
           value = value.to_s.sub(iteration.to_s, "")

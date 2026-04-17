@@ -46,6 +46,7 @@ module Pubid
       Identifiers::Amendment,
       Identifiers::Corrigendum,
       Identifiers::InterpretationSheet, # ISH can act as supplement (/ISH1:1996)
+      Identifiers::FragmentIdentifier,  # FRAG wraps amendments/corrigenda
     ].freeze
 
     # Create the Scheme registry with all identifier types

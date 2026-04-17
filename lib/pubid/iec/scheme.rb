@@ -6,6 +6,7 @@ require_relative "identifiers/publicly_available_specification"
 require_relative "identifiers/guide"
 require_relative "identifiers/amendment"
 require_relative "identifiers/corrigendum"
+require_relative "identifiers/fragment_identifier"
 
 module Pubid
   module Iec
@@ -25,6 +26,7 @@ module Pubid
           [
             Identifiers::Amendment,
             Identifiers::Corrigendum,
+            Identifiers::FragmentIdentifier,
           ]
         end
 

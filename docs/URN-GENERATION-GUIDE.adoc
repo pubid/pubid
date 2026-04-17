@@ -1,0 +1,213 @@
+= URN Generation Guide
+
+PubID generates RFC 5141-bis compliant URNs for ISO, IEC, and other standards identifiers. This guide covers URN format, usage, and round-trip guarantees.
+
+== Quick Start
+
+[source,ruby]
+----
+require 'pubid/iso'
+
+id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016")
+id.to_urn
+# => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3"
+----
+
+== Supported Flavors
+
+Flavors with URN generation:
+
+[cols="1,2"]
+|===
+| Flavor | Module
+
+| ISO | `Pubid::Iso`
+| IEC | `Pubid::Iec`
+| IEEE | `Pubid::Ieee`
+| NIST | `Pubid::Nist`
+| CEN | `Pubid::Cen`
+| BSI | `Pubid::Bsi`
+| CCSDS | `Pubid::Ccsds`
+| ITU | `Pubid::Itu`
+| ETSI | `Pubid::Etsi`
+| JIS | `Pubid::Jis`
+| PLATEAU | `Pubid::Plateau`
+| IDF | `Pubid::Idf`
+| ANSI | `Pubid::Ansi`
+| ASME | `Pubid::Asme`
+| ASTM | `Pubid::Astm`
+| OIML | `Pubid::Oiml`
+| CIE | `Pubid::Cie`
+| JCGM | `Pubid::Jcgm`
+| SAE | `Pubid::Sae`
+| AMCA | `Pubid::Amca`
+| CSA | `Pubid::Csa`
+| ASHRAE | `Pubid::Ashrae`
+|===
+
+== URN Format
+
+=== ISO URNs
+
+Format: `urn:iso:std:{publishers}:{type}:{number}:{part}:{year}:{stage}:{supplements}`
+
+|===
+| Component | Description | Example
+
+| `urn:iso:std:` | URN namespace | Always present
+| Publishers | Hyphen-separated, lowercase | `iso`, `iso-iec`, `iso-iec-ieee`
+| Type | Document type code | `tr`, `ts`, `guide`, `dir`, `dir-sup`
+| Number | Document number | `9001`, `13818`
+| Part | Prefixed with `-` | `-1`, `-90`
+| Stage | Typed stage or harmonized code | `DIS`, `stage-40.00`
+| Year | Publication year | `2015`
+| Edition | Prefixed with `ed-` | `ed-2`
+| Language | Comma-separated codes | `en`, `en,fr`
+| Supplement | Type:year:version | `amd:2016:v3`, `cor:2020:v1`
+|===
+
+Examples:
+
+[source,ruby]
+----
+# Simple standard
+Pubid::Iso.parse("ISO 9001:2015").to_urn
+# => "urn:iso:std:iso:9001"
+
+# With copublishers
+Pubid::Iso.parse("ISO/IEC 27001:2013").to_urn
+# => "urn:iso:std:iso-iec:27001"
+
+# With type and part
+Pubid::Iso.parse("ISO/IEC TR 13818-1:2015").to_urn
+# => "urn:iso:std:iso-iec:tr:13818:-1"
+
+# With supplement
+Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020").to_urn
+# => "urn:iso:std:iso:9001:amd:2020:v1"
+
+# Multi-level supplements
+Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020/Cor 1:2021").to_urn
+# => "urn:iso:std:iso:9001:amd:2020:v1:cor:2021:v1"
+
+# Draft stage
+Pubid::Iso.parse("ISO/DIS 9001").to_urn
+# => "urn:iso:std:iso:9001:DIS"
+
+# Harmonized stage code
+Pubid::Iso.parse("ISO/NP 9001").to_urn
+# => "urn:iso:std:iso:9001:stage-10.00"
+----
+
+=== IEC URNs
+
+Format: `urn:iec:std:{publisher}:{type}:{number}[-{part}[-{subpart}]]:{year}:{supplements}`
+
+|===
+| Component | Description | Example
+
+| `urn:iec:std:` | URN namespace | Always present
+| Publisher | Lowercase publisher | `iec`, `iso-iec`
+| Type | Document type code | `ts`, `tr`, `pas`
+| Number | Document number | `61666`
+| Part/Subpart | Prefixed with `-` | `-351`, `-90-12`
+| Year | Publication year | `2010`
+| Edition | Prefixed with `ed.` | `ed.1`
+| Supplement | Type:year:v{number} | `amd:2021:v1`
+|===
+
+Examples:
+
+[source,ruby]
+----
+# Simple standard
+Pubid::Iec.parse("IEC 60050-351:2013").to_urn
+# => "urn:iec:std:iec:60050-351:2013"
+
+# Technical Specification
+Pubid::Iec.parse("IEC TS 62257-9-5:2018").to_urn
+# => "urn:iec:std:iec:ts:62257-9-5:2018"
+
+# With amendment
+Pubid::Iec.parse("IEC 60050-351:2013/Amd 1:2016").to_urn
+# => "urn:iec:std:iec:60050-351:2013:amd:2016:v1"
+
+# VAP identifier (CSV, CMV, RLV)
+Pubid::Iec.parse("IEC 61666:2010+AMD1:2021 CSV").to_urn
+# => "urn:iec:std:iec:61666:2010:amd.1:2021:vap.csv"
+
+# Fragment identifier
+Pubid::Iec.parse("IEC 60050-191/AMD2/FRAG2 ED1").to_urn
+# => "urn:iec:std:iec:60050-191:amd.2:frag.2:ed.1"
+
+# Sheet identifier
+Pubid::Iec.parse("IEC 60695-2-1/1:1994").to_urn
+# => "urn:iec:std:iec:60695-2-1:sheet.1:1994"
+----
+
+== URN Round-Trip
+
+ISO and IEC support parsing URNs back to identifiers:
+
+[source,ruby]
+----
+# ISO URN round-trip
+id = Pubid::Iso.parse("urn:iso:std:iso:9001:amd:2020:v1")
+id.to_s  # => "ISO 9001/Amd 1:2020"
+
+# IEC URN round-trip
+id = Pubid::Iec.parse("urn:iec:std:iec:60050-351:2013:amd:2016:v1")
+id.to_s  # => "IEC 60050-351:2013/Amd 1:2016"
+----
+
+== Stage Codes in URNs
+
+=== Typed Stage Abbreviations
+
+Typed stages use RFC 5141-bis abbreviations in URNs:
+
+|===
+| Stage | URN Code | Description
+
+| WD | `WD` | Working Draft
+| CD | `CD` | Committee Draft
+| CDV | `CDV` | Committee Draft for Vote
+| DIS | `DIS` | Draft International Standard
+| FDIS | `FDIS` | Final Draft International Standard
+| PDAM | `PDAM` | Proposed Draft Amendment
+| DAM | `DAM` | Draft Amendment
+| FDAM | `FDAM` | Final Draft Amendment
+| DCOR | `DCOR` | Draft Corrigendum
+| FDCOR | `FDCOR` | Final Draft Corrigendum
+|===
+
+=== Harmonized Stage Codes
+
+For stages without typed abbreviations (PWI, NP, AWI, PRF), URNs use harmonized stage codes:
+
+|===
+| Stage | Harmonized Code | URN Example
+
+| PWI | `00.xx` | `stage-00.00`
+| NP | `10.xx` | `stage-10.00`
+| AWI | `10.99` | `stage-10.99`
+| WD | `20.xx` | `stage-20.00`
+| CD | `30.xx` | `stage-30.00`
+| CDV | `40.xx` | `stage-40.00`
+| FDIS | `50.xx` | `stage-50.00`
+| PRF | `60.00` | `stage-60.00` (proof stage)
+| Published | `60.60` | (omitted from URN)
+| Review | `90.xx` | `stage-90.00`
+| Withdrawal | `95.xx` | `stage-95.99`
+|===
+
+== Implementation
+
+Each flavor implements URN generation in `lib/pubid/{flavor}/urn_generator.rb`. The generator:
+
+1. Walks the identifier tree (base document + supplement chain)
+2. Maps components to URN segments (lowercase, hyphen-separated publishers)
+3. Handles special cases (VAP identifiers, fragments, sheets)
+4. Produces colon-separated URN string
+
+Flavors with URN parsing (`urn_parser.rb`) support round-trip URN-to-identifier conversion.

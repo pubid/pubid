@@ -1,6 +1,9 @@
 require "rake"
 require "fileutils"
 
+# Load additional rake tasks
+Dir["lib/tasks/*.rake"].each { |f| import f }
+
 # Get list of all gems
 GEMS = if Dir.exist?("gems")
          Dir["gems/*/"].map do |dir|

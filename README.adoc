@@ -44,6 +44,28 @@ image:https://img.shields.io/github/commits-since/metanorma/pubid/latest.svg["Co
 |
 |===
 
+== Quick Start
+
+[source,ruby]
+----
+gem install pubid-core
+
+require 'pubid/iso'
+
+# Parse an identifier
+id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
+
+# Access components
+id.publisher.body  # => "ISO"
+id.number.number   # => "9001"
+
+# Render back to string (round-trip)
+id.to_s  # => "ISO 9001:2015/Amd 1:2020"
+
+# Generate URN
+id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
+----
+
 == Overview
 
 The PubID project promotes the use of interoperable identifiers across various
@@ -319,36 +341,29 @@ releases.
 
 == Structure
 
-The monorepo is organized as follows:
+The repository is organized as follows:
 
 [source]
 ----
 .
 ├── lib/pubid/          # V2 implementation (ACTIVE)
-│   ├── iso/               # ISO V2 - Production ready
-│   ├── iec/               # IEC V2 - Production ready
-│   ├── cen/               # CEN V2 - Production ready
-│   ├── idf/               # IDF V2 - Production ready
-│   ├── ieee/              # IEEE V2 - Production ready
-│   ├── nist/              # NIST V2 - Production ready
-│   └── ...                # Other flavors
-├── gems/                   # V1 gems (remaining)
-│   ├── pubid/             # Meta-gem
-│   ├── pubid-core/        # Core functionality
-│   ├── pubid-bsi/         # BSI identifiers
-│   ├── pubid-cen/         # CEN identifiers (V1)
-│   └── ...                # Other V1 gems
-├── archived-gems/          # Archived V1 code
-│   ├── pubid-iso/         # ISO V1 (replaced by V2)
-│   ├── pubid-iec/         # IEC V1 (replaced by V2)
-│   ├── pubid-ieee/        # IEEE V1 (replaced by V2)
-│   └── pubid-nist/        # NIST V1 (replaced by V2)
-├── spec/                   # Integration tests
-│   ├── pubid/         # V2 tests (ACTIVE)
-│   └── integration/       # Cross-gem tests
+│   ├── core/               # Shared base classes and components
+│   ├── iso/                # ISO - Production ready
+│   ├── iec/                # IEC - Production ready
+│   ├── cen/                # CEN - Production ready
+│   ├── idf/                # IDF - Production ready
+│   ├── ieee/               # IEEE - Production ready
+│   ├── nist/               # NIST - Production ready
+│   └── ...                 # 22+ flavors total
+├── data/                   # Pre-parse normalization data
+│   ├── iso/update_codes.yaml
+│   ├── iec/update_codes.yaml
+│   └── ...
+├── spec/                   # Tests
+│   ├── pubid/              # Per-flavor tests
+│   ├── fixtures/           # Bulk test fixtures
+│   └── integration/        # Cross-gem tests
 ├── docs/                   # Documentation
-│   ├── ISO_V1_TO_V2_MIGRATION.adoc  # Migration guide
-│   └── ...                # Other documentation
 ├── .github/workflows/      # CI/CD workflows
 ├── Gemfile                 # Root Gemfile for development
 ├── Rakefile               # Monorepo management tasks
@@ -360,7 +375,7 @@ The monorepo is organized as follows:
 
 === General
 
-PubID V2 implements a completely redesigned parser architecture with clean separation of concerns and model-driven design. The V2 implementation is located in [`lib/pubid/`](lib/pubid/) while V1 code remains in [`gems/`](gems/) for backward compatibility.
+PubID V2 implements a completely redesigned parser architecture with clean separation of concerns and model-driven design. The implementation is located in [`lib/pubid/`](lib/pubid/).
 
 === Three-layer design
 
@@ -414,7 +429,7 @@ The V2 parsers have been tested against real-world identifier databases to ensur
 | **87.95%**
 | 8,388/9,537
 | ✅ Production Ready
-| Parser enhanced with 4 major patterns (Session 129), TYPED_STAGE architecture, Joint Development support, Pattern 4 Relationships
+| Parser with TYPED_STAGE architecture, Joint Development support, Pattern 4 Relationships
 
 | **ISO**
 | **90.0%**
@@ -637,13 +652,9 @@ ire.year      # => 1961
 - Compatible with Pattern 4 relationships (can be related identifiers)
 - Clean MODEL-DRIVEN implementation
 
-==== Session 138 Enhancements ✨
+==== Data Cleaning & Preprocessing
 
-**New in Version 2 (December 2024):**
-
-**Data Cleaning & Preprocessing:**
-
-The parser now automatically cleans common data quality issues:
+The IEEE parser automatically cleans common data quality issues:
 
 * HTML entity normalization (`&x2122;` → `™`, `&amp;` → `&`, `&x2019;` → `'`)
 * Number space correction (`C57.1 2.25` → `C57.12.25`)
@@ -967,9 +978,9 @@ BSI supports multiple document type prefixes:
 |**`BIP 2225:2022`**
 |===
 
-**New in Session 289:** AerospaceStandard identifier type handling 27 aerospace/specialized prefixes (A, AU, B, C, F, G, HC, L, M, MA, PL, SP, TA, X, 2A-2X, 3A-3TA, 4F-4S, 5S, 7S) with proper TYPED_STAGES integration.
+AerospaceStandard identifier type handles 27 aerospace/specialized prefixes (A, AU, B, C, F, G, HC, L, M, MA, PL, SP, TA, X, 2A-2X, 3A-3TA, 4F-4S, 5S, 7S) with proper TYPED_STAGES integration.
 
-**New in Session 285:** Handbook, PP (Practice Guide), and BIP (British Industrial Practice) identifier types with proper TYPED_STAGES integration.
+Handbook, PP (Practice Guide), and BIP (British Industrial Practice) identifier types with proper TYPED_STAGES integration.
 
 .BSI Adoption Patterns
 
@@ -1002,12 +1013,12 @@ na.supplements.first.year    # => "2012"
 ==== CEN (European Committee for Standardization)
 
 Status: ✅ 18/18 tests (100%)
-Architecture: Complete V2 with 4 NEW identifier types (Session 285)
+Architecture: Complete V2 with 4 identifier types
 Features: EN documents, technical specifications/reports, joint committee publications
 
 .CEN Document Types ✨
 
-**New identifier types added in Session 285:**
+**Identifier types:**
 
 [cols="1,3,2"]
 |===
@@ -1054,7 +1065,7 @@ cen.to_s  # => "CEN/TS 14972" (slash, not space!)
 clc = Pubid::Cen.parse("CLC/TR 62125:2008")
 clc.to_s  # => "CLC/TR 62125:2008"
 
-# Joint committee (NEW in Session 285)
+# Joint committee
 joint = Pubid::Cen.parse("CEN/CLC/TR 17602-80-12:2021")
 joint.publisher.copublisher  # => ["CLC"]
 joint.to_s  # => "CEN/CLC/TR 17602-80-12:2021"
@@ -1069,8 +1080,8 @@ env.to_s  # => "ENV ISO 11079:1999"
 
 ==== SAE (Society of Automotive Engineers) ✨
 
-Status: ✅ NEW in Session 285
-Architecture: Complete V2 implementation (18th flavor!)
+Status: Complete
+Architecture: Complete V2 implementation
 Features: 5 document types with letter suffix support
 
 .SAE Document Types
@@ -1475,67 +1486,39 @@ data/                       # Pre-parsing normalization data
 ├── ccsds/update_codes.yaml      # CCSDS legacy format mappings
 └── plateau/update_codes.yaml    # PLATEAU legacy format mappings
 
-lib/pubid/              # V2 implementation (ACTIVE)
+lib/pubid/              # V2 implementation
 ├── core/                   # Core module (UpdateCodes, Configuration)
-├── iso/                    # Production ready (92.84%)
+├── components/             # Shared value objects (Publisher, Code, etc.)
+├── rendering/              # Shared rendering helpers
+├── iso/                    # ISO flavor
 │   ├── parser.rb
 │   ├── builder.rb
 │   ├── scheme.rb
-│   ├── components/
-│   └── identifiers/
-├── iec/                    # Production ready (84.58%)
-├── idf/                    # Production ready (100%)
-├── ieee/                   # Production ready (100%)
-├── nist/                   # Production ready (100%)
-├── cen/                    # In progress (26%)
-└── ...                     # Not started
+│   ├── identifiers/
+│   ├── urn_generator.rb
+│   └── urn_parser.rb
+├── iec/                    # IEC flavor
+├── nist/                   # NIST flavor
+├── ieee/                   # IEEE flavor
+└── ...                     # 22+ flavors total
 
-spec/pubid/             # V2 tests (ACTIVE)
-├── iso/                    # 2,654/2,859 tests
-├── iec/                    # 823/973 tests
-├── cen/                    # 79/95 tests
-├── idf/                    # 26/26 tests
-├── ieee/                   # 35/35 tests
-└── nist/                   # 57/57 tests
-
-gems/                       # V1 gems (remaining)
-├── pubid/                  # Meta-gem
-├── pubid-core/             # Core (V1)
-├── pubid-bsi/              # BSI (V1)
-├── pubid-cen/              # CEN (V1)
-├── pubid-ccsds/            # CCSDS (V1)
-├── pubid-etsi/             # ETSI (V1)
-├── pubid-itu/              # ITU (V1)
-├── pubid-jis/              # JIS (V1)
-└── pubid-plateau/          # PLATEAU (V1)
-
-archived-gems/              # Archived V1 code
-├── pubid-iso/              # ✅ Replaced by V2
-├── pubid-iec/              # ✅ Replaced by V2
-├── pubid-ieee/             # ✅ Replaced by V2
-└── pubid-nist/             # ✅ Replaced by V2
-
-examples/
-├── patterns/
-│   ├── iso_guide_pas_component.rb
-│   ├── iso_trial_component.rb
-│   ├── iso_tr_component.rb
-│   ├── iso_ia_component.rb
-│   └── iso_ts_component.rb
-└── README.md
+spec/pubid/             # Tests
+├── iso/                    # ISO tests
+├── iec/                    # IEC tests
+└── ...                     # Per-flavor tests
 ----
 
 [[v2-migration-status]]
-== V2 Migration Status: ALL 18 FLAVORS COMPLETE ✅
+== V2 Migration Status: ALL 18 FLAVORS COMPLETE
 
-As of Session 285 (2026-01-07), **all 18 flavors are production-ready** with 99%+ overall success rate! 🎉
+As of January 2026, **all 18 flavors are production-ready** with 99%+ overall success rate.
 
 === Implementation Summary
 
-**Session 199: NIST 99.96%** ✨ - Fixed 29 FIPS month-year patterns
-**Sessions 135-136: OIML 15th Flavor** ✨ - Complete implementation with supplements
-**Sessions 207-211: CIE 16th Flavor** ✨ - Complete implementation with dual-style system
-**Session 285: BSI/CEN/SAE Enhancements** ✨ - 4 CEN types, 3 BSI types, SAE 18th flavor!
+**NIST:** 99.96% accuracy - Fixed 29 FIPS month-year patterns
+**OIML:** Complete implementation with 9 types and supplements
+**CIE:** Dual-style system with 11 types and 3 language formats
+**BSI/CEN/SAE:** 4 CEN types, 3 BSI types, SAE flavor added
 **Overall: 88,200+ identifiers validated** across all flavors
 
 === Detailed Status
@@ -1549,7 +1532,7 @@ As of Session 285 (2026-01-07), **all 18 flavors are production-ready** with 99%
 |19,820
 |**99.96%**
 |✅ Perfect
-|29 FIPS patterns fixed (Session 199), all series, NBS historical
+|All series, NBS historical patterns
 
 |**IEC**
 |12,289
@@ -1570,14 +1553,14 @@ As of Session 285 (2026-01-07), **all 18 flavors are production-ready** with 99%
 |80
 |100%
 |✅ Perfect
-|15th flavor! 9 types, edition support, supplements (Session 135)
+|9 types, edition support, supplements
 
 |**CIE** ✨
 |343
 |321
 |93.59%
 |✅ Excellent
-|16th flavor! Dual-style, 11 types, 3 language formats (Sessions 207-211)
+|Dual-style, 11 types, 3 language formats
 
 |**ISO**
 |7,572
@@ -1661,7 +1644,7 @@ As of Session 285 (2026-01-07), **all 18 flavors are production-ready** with 99%
 |N/A
 |100%
 |✅ Perfect
-|Society of Automotive Engineers (18th flavor! Session 285)
+|Society of Automotive Engineers
 
 |**Total**
 |**88,200+**
@@ -1680,17 +1663,12 @@ As of Session 285 (2026-01-07), **all 18 flavors are production-ready** with 99%
 * ✅ Component reuse (Publisher, Code, Date, etc.)
 * ✅ Round-trip fidelity (Parse → Object → String preserves format)
 
-**V1 Code Status:**
-* All V1 implementations archived to `archived-gems/`
-* V2 is sole source of truth
-* No V1 dependencies remaining
-
 [[v2-usage-examples]]
 === V2 Usage Examples
 
-==== NIST: 99.96% ✨
+==== NIST: 99.96%
 
-NIST parser handles all series withFIPS month-year patterns (Session 199):
+NIST parser handles all series including FIPS month-year patterns:
 
 [source,ruby]
 ----
@@ -1706,7 +1684,7 @@ id.revision  # => "r5"
 
 # Render to string
 id.to_s      # => "NIST SP 800-53r5"
-==== OIML: 15th Flavor ✨
+==== OIML
 
 OIML supports 9 identifier types with edition and supplement support:
 
@@ -1731,9 +1709,9 @@ amd.base_identifier.to_s  # => "OIML R 138 Edition 2007 (E)"
 amd.year                  # => "2009"
 ----
 
-==== CCSDS: Space Data Systems Standards ✨
+==== CCSDS: Space Data Systems Standards
 
-CCSDS (Consultative Committee for Space Data Systems) parser handles space data systems standards with lutaml-model architecture (Session 281 refactoring):
+CCSDS (Consultative Committee for Space Data Systems) parser handles space data systems standards with lutaml-model architecture:
 
 [source,ruby]
 ----
@@ -1764,11 +1742,11 @@ doc.language        # => "Chinese"
 doc.to_s            # => "CCSDS 211.0-B-5 (Chinese)"
 ----
 
-**Architecture Quality (Session 281):** ✨
+**Architecture Quality:**
 
-* ✅ **Lutaml::Model refactoring** - SupplementIdentifier inherits from `Identifiers::Base`
-* ✅ **Polymorphic attributes** - `attribute :base_identifier, Identifiers::Base, polymorphic: true`
-* ✅ **Type safety** - Corrigendum uses `attribute :cor_number, :integer`
+* **Lutaml::Model refactoring** - SupplementIdentifier inherits from `Identifiers::Base`
+* **Polymorphic attributes** - `attribute :base_identifier, Identifiers::Base, polymorphic: true`
+* **Type safety** - Corrigendum uses `attribute :cor_number, :integer`
 * ✅ **Serialization support** - Automatic JSON/YAML/XML via lutaml-model
 * ✅ **Zero breaking changes** - All 16 tests passing (100%)
 * ✅ **Consistent pattern** - Matches ISO, IEC, NIST architecture exactly

@@ -33,8 +33,8 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
         expect(parsed.fragment_number).to eq("2")
       end
 
-      it "provides type :fragment" do
-        expect(parsed.type).to eq(:fragment)
+      it "provides type :frag" do
+        expect(parsed.type).to eq(:frag)
       end
 
       it "round-trips" do
@@ -194,12 +194,15 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
         expect(parsed.date).to eq(parsed.base_identifier.date)
       end
 
-      it "delegates stage to base" do
-        expect(parsed.stage).to eq(parsed.base_identifier.stage)
+      it "has its own stage from FRAG typed stage" do
+        expect(parsed.stage).not_to be_nil
+        expect(parsed.stage.abbr).to eq("FRAG")
       end
 
-      it "delegates typed_stage to base" do
-        expect(parsed.typed_stage).to eq(parsed.base_identifier.typed_stage)
+      it "has its own FRAG typed stage" do
+        expect(parsed.typed_stage).not_to be_nil
+        expect(parsed.typed_stage.type_code).to eq("frag")
+        expect(parsed.typed_stage.abbr).to include("FRAG")
       end
     end
   end
@@ -241,6 +244,100 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       it "round-trips" do
         expect(parsed.to_s).to eq(subject)
       end
+    end
+  end
+
+  # Test FRAG typed stages registration
+  context "FRAG typed stages" do
+    let(:frag_stages) { described_class::TYPED_STAGES }
+
+    it "defines 8 typed stages" do
+      expect(frag_stages.length).to eq(8)
+    end
+
+    it "all typed stages have type_code :frag" do
+      expect(frag_stages.map(&:type_code).uniq).to eq(["frag"])
+    end
+
+    it "includes PWI Frag stage" do
+      stage = frag_stages.find { |s| s.abbr.include?("PWI Frag") }
+      expect(stage).not_to be_nil
+      expect(stage.name).to eq("Preliminary Work Item Fragment")
+      expect(stage.stage_code).to eq("pwi")
+      expect(stage.harmonized_stages).to include("00.00", "00.99")
+    end
+
+    it "includes NP Frag stage" do
+      stage = frag_stages.find { |s| s.abbr.include?("NP Frag") }
+      expect(stage).not_to be_nil
+      expect(stage.stage_code).to eq("np")
+      expect(stage.harmonized_stages).to include("10.00", "10.98")
+    end
+
+    it "includes CDFRAG stage" do
+      stage = frag_stages.find { |s| s.abbr.include?("CDFRAG") }
+      expect(stage).not_to be_nil
+      expect(stage.name).to eq("Committee Draft Fragment")
+      expect(stage.stage_code).to eq("cd")
+      expect(stage.harmonized_stages).to include("30.00", "30.99")
+    end
+
+    it "includes DFRAG stage" do
+      stage = frag_stages.find { |s| s.abbr.include?("DFRAG") }
+      expect(stage).not_to be_nil
+      expect(stage.name).to eq("Draft Fragment")
+      expect(stage.stage_code).to eq("dfrag")
+      expect(stage.harmonized_stages).to include("40.00", "40.99")
+    end
+
+    it "includes FDFRAG stage with PRF Frag alias" do
+      stage = frag_stages.find { |s| s.abbr.include?("FDFRAG") }
+      expect(stage).not_to be_nil
+      expect(stage.abbr).to include("FDFRAG", "PRF Frag")
+      expect(stage.harmonized_stages).to include("50.00", "50.99")
+    end
+
+    it "includes FRAG (published) stage" do
+      stage = frag_stages.find { |s| s.abbr.include?("FRAG") && s.stage_code == "published" }
+      expect(stage).not_to be_nil
+      expect(stage.name).to eq("Fragment")
+      expect(stage.harmonized_stages).to include("60.00", "90.99", "95.99")
+    end
+  end
+
+  # Test Scheme integration
+  context "Scheme integration" do
+    it "FragmentIdentifier is registered in Scheme supplement_identifiers" do
+      expect(Pubid::Iec::Scheme.supplement_identifiers).to include(described_class)
+    end
+
+    it "FRAG abbreviation is lookupable via Scheme" do
+      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("FRAG")
+      expect(ts.type_code).to eq("frag")
+      expect(ts.abbr).to include("FRAG")
+    end
+
+    it "CDFRAG abbreviation is lookupable via Scheme" do
+      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("CDFRAG")
+      expect(ts.type_code).to eq("frag")
+      expect(ts.name).to eq("Committee Draft Fragment")
+    end
+
+    it "DFRAG abbreviation is lookupable via Scheme" do
+      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("DFRAG")
+      expect(ts.type_code).to eq("frag")
+      expect(ts.name).to eq("Draft Fragment")
+    end
+
+    it "FDFRAG abbreviation is lookupable via Scheme" do
+      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("FDFRAG")
+      expect(ts.type_code).to eq("frag")
+      expect(ts.name).to eq("Final Draft Fragment")
+    end
+
+    it "FragmentIdentifier is lookupable by type_code :frag" do
+      klass = Pubid::Iec::Scheme.locate_identifier_klass_by_type_code(:frag)
+      expect(klass).to eq(described_class)
     end
   end
 end

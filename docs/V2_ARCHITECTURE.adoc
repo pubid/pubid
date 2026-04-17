@@ -1,0 +1,203 @@
+= V2 Architecture Guide
+
+This document describes the PubID V2 architecture: design principles, parse pipeline, identifier class hierarchy, and how flavors are structured.
+
+== Design Principles
+
+1. **Single gem**: All flavors live in one gem under `lib/pubid/{flavor}/`
+2. **Model-driven**: Identifier objects are Lutaml::Model serializable classes
+3. **Round-trip fidelity**: Parse then render produces the original string
+4. **Parslet PEG parsers**: Deterministic parsing with composable grammar rules
+5. **Pre-parse normalization**: Malformed/legacy identifiers are fixed before parsing
+
+== Parse Pipeline
+
+[source]
+----
+Input String
+    |
+    v
+Pre-parser Normalization (data/{flavor}/update_codes.yaml)
+    |
+    v
+Parser (Parslet PEG grammar -> parse tree)
+    |
+    v
+Builder (parse tree -> attribute hash)
+    |
+    v
+Identifier (Lutaml::Model object -> to_s / to_urn / to_h)
+----
+
+=== Pre-parser Normalization
+
+Applied *before* parsing. Maps malformed or legacy identifier strings to canonical form.
+
+- Data files: `data/{flavor}/update_codes.yaml`
+- Supports exact match and regex patterns
+- Handles legacy formats, typos, and historical variations
+- Currently available for: ISO, IEC, IEEE, NIST, CCSDS, PLATEAU
+
+=== Parser Layer
+
+Each flavor defines a Parslet PEG grammar in `parser.rb`:
+
+- Rules are composable and deterministic
+- `TYPED_STAGES` from identifier classes are flattened into parser rules
+- Abbreviations are sorted by length (longest first) for correct PEG matching
+- Parser returns a raw parse tree (hash)
+
+=== Builder Layer
+
+Transforms the parse tree into an attribute hash suitable for constructing identifier objects:
+
+- Maps typed stage abbreviations to `TypedStage` objects
+- Resolves identifier type (IS, TS, TR, etc.) from parsed components
+- Some flavors use a `transformer.rb` instead of `builder.rb`
+
+=== Identifier Layer
+
+Lutaml::Model-based classes with rendering logic:
+
+- `to_s` - human-readable string
+- `to_urn` - URN representation
+- `to_h` / `to_json` - machine-readable serialization
+- `root` - traverse supplement chain to base document
+
+== Directory Structure
+
+[source]
+----
+lib/pubid/
+|-- core/                   # Shared base classes
+|   |-- identifier.rb       # Base Identifier class
+|   |-- parser.rb           # Base parser (Parslet)
+|   |-- renderer/           # Shared rendering helpers
+|   |-- update_codes.rb     # Pre-parse normalization engine
+|   |-- scheme.rb           # Type registry
+|-- components/             # Shared value objects
+|   |-- code.rb             # Code (number, part)
+|   |-- date.rb             # Date
+|   |-- edition.rb          # Edition
+|   |-- language.rb         # Language code
+|   |-- publisher.rb        # Publisher
+|   |-- stage.rb            # Stage
+|   |-- type.rb             # Document type
+|   |-- typed_stage.rb      # Typed stage (stage + type)
+|-- iso/                    # ISO flavor
+|   |-- parser.rb           # PEG grammar
+|   |-- builder.rb          # Parse tree -> attributes
+|   |-- scheme.rb           # Type registry
+|   |-- identifiers/        # Type-specific classes
+|   |   |-- international_standard.rb
+|   |   |-- technical_report.rb
+|   |   |-- amendment.rb
+|   |   |-- corrigendum.rb
+|   |   +-- ...
+|   |-- urn_generator.rb    # URN output
+|   +-- urn_parser.rb       # URN input
+|-- iec/                    # IEC flavor (same structure)
+|-- nist/                   # NIST flavor
+|-- ieee/                   # IEEE flavor
++-- ...                     # 22+ flavors total
+
+data/                       # Pre-parse normalization data
+|-- iso/update_codes.yaml
+|-- iec/update_codes.yaml
+|-- ieee/update_codes.yaml
+|-- nist/update_codes.yaml
+|-- ccsds/update_codes.yaml
++-- plateau/update_codes.yaml
+----
+
+== Flavor Module Structure
+
+Each flavor under `lib/pubid/{flavor}/` follows this pattern:
+
+[source]
+----
+lib/pubid/{flavor}/
+|-- parser.rb          # Parslet PEG grammar
+|-- transformer.rb     # AST -> attribute hash (some flavors)
+|-- builder.rb         # Parse tree -> identifier object
+|-- scheme.rb          # Identifier type registry (some flavors)
+|-- identifier.rb      # Top-level entry point (parse method)
+|-- identifiers/       # Type-specific classes
+|   |-- international_standard.rb   # Defines TYPED_STAGES
+|   |-- technical_report.rb
+|   +-- ...
+|-- renderer/          # Output formatting (some flavors)
+|-- urn_generator.rb   # URN output (most flavors)
++-- urn_parser.rb      # URN input (ISO, IEC)
+----
+
+== Identifier Class Hierarchy
+
+[source]
+----
+Pubid::Identifier (Lutaml::Model base)
+|-- attributes: number, part, subpart, date, edition, languages,
+|              publisher, copublishers, type, stage
+|-- methods: to_h, to_json, root, exclude, new_edition_of?
+
+Flavor-specific (e.g., Pubid::Iso::SingleIdentifier)
+|-- methods: to_s, to_urn, publisher_portion, number_portion
+|-- uses: RenderingStyle for format variants
+
+Pubid::SupplementIdentifier
+|-- attributes: base_identifier, supplement_type
+|-- chained: amendment -> corrigendum -> ...
+----
+
+== Typed Stages
+
+Typed stages combine a document lifecycle stage with a document type. Defined as `TYPED_STAGES` arrays on identifier classes.
+
+[source,ruby]
+----
+# Example: IEC International Standard typed stages
+TYPED_STAGES = [
+  TypedStage.new(name: "Preliminary Work Item", stage_code: :pwi,
+                 abbr: ["PWI"], harmonized_stages: ["00.00"]),
+  TypedStage.new(name: "New Proposal", stage_code: :np,
+                 abbr: ["NP"], harmonized_stages: ["10.00"]),
+  TypedStage.new(name: "Working Draft", stage_code: :wd,
+                 abbr: ["WD"], harmonized_stages: ["20.00"]),
+  TypedStage.new(name: "Committee Draft", stage_code: :cd,
+                 abbr: ["CD"], harmonized_stages: ["30.00"]),
+  # ...
+]
+----
+
+Harmonized stage codes follow ISO/IEC harmonized stage numbering:
+
+|===
+| Code Range | Stage
+
+| 00.xx | Preliminary work item
+| 10.xx | New proposal
+| 20.xx | Working draft
+| 30.xx | Committee draft
+| 40.xx | Approval stage (CDV, etc.)
+| 50.xx | Final draft (FDIS, etc.)
+| 60.xx | Published
+| 90.xx | Review
+| 95.xx | Withdrawal
+|===
+
+== Testing
+
+Tests are organized per-flavor under `spec/pubid/{flavor}/`:
+
+- `spec/pubid/{flavor}/identifiers/` - per-type specs
+- `spec/pubid/{flavor}/fixtures/` - bulk pass/fail fixtures (one ID per line)
+- `spec/integration/` - cross-gem compatibility tests
+
+Run with:
+
+[source,bash]
+----
+bundle exec rspec spec/pubid/iec/              # All IEC tests
+bundle exec rspec spec/pubid/iso/identifiers/  # All ISO type tests
+bundle exec rake test:all                      # Full suite
+----
