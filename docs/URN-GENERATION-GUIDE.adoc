@@ -101,19 +101,22 @@ Pubid::Iso.parse("ISO/NP 9001").to_urn
 
 === IEC URNs
 
-Format: `urn:iec:std:{publisher}:{type}:{number}[-{part}[-{subpart}]]:{year}:{supplements}`
+Format: `urn:iec:std:{header}:{type}:{docnumber}:{date}:{deliverable}:{language}`
+
+Per the IEC URI Model (2019-12-10, 2020-03-24), the docnumber includes part and subpart
+as a single hyphenated field (e.g., `60068-2-2`), not as separate colon-separated fields.
 
 |===
 | Component | Description | Example
 
 | `urn:iec:std:` | URN namespace | Always present
-| Publisher | Lowercase publisher | `iec`, `iso-iec`
-| Type | Document type code | `ts`, `tr`, `pas`
-| Number | Document number | `61666`
-| Part/Subpart | Prefixed with `-` | `-351`, `-90-12`
-| Year | Publication year | `2010`
-| Edition | Prefixed with `ed.` | `ed.1`
-| Supplement | Type:year:v{number} | `amd:2021:v1`
+| Header | Lowercase publisher(s), hyphen-separated | `iec`, `iso-iec`, `iec-ieee`
+| Type | Document type code (blank for IS) | `ts`, `tr`, `pas`, `guide`
+| Docnumber | Number with part/subpart as single field | `61666`, `60068-2-2`
+| Date | Publication date (YYYY, YYYY-MM, YYYY-MM-DD) | `2010`, `2015-06`
+| Deliverable | Product type (blank for standard) | `csv`, `cmv`, `prv`, `rlv`
+| Language | Hyphen-separated language codes | `en`, `en-fr`
+| Supplement | Type:date:v{number} | `amd:2021:v1`, `cor:2020:v1`
 |===
 
 Examples:
@@ -121,16 +124,20 @@ Examples:
 [source,ruby]
 ----
 # Simple standard
-Pubid::Iec.parse("IEC 60050-351:2013").to_urn
-# => "urn:iec:std:iec:60050-351:2013"
+Pubid::Iec.parse("IEC 60050:2011").to_urn
+# => "urn:iec:std:iec:60050:2011"
 
-# Technical Specification
-Pubid::Iec.parse("IEC TS 62257-9-5:2018").to_urn
-# => "urn:iec:std:iec:ts:62257-9-5:2018"
+# Multipart document (part and subpart in single field)
+Pubid::Iec.parse("IEC 60068-2-2:1974").to_urn
+# => "urn:iec:std:iec:60068-2-2:1974"
+
+# Technical Report (copublished)
+Pubid::Iec.parse("ISO/IEC TR 11802-9901:2014").to_urn
+# => "urn:iec:std:iso-iec:tr:11802-9901:2014"
 
 # With amendment
-Pubid::Iec.parse("IEC 60050-351:2013/Amd 1:2016").to_urn
-# => "urn:iec:std:iec:60050-351:2013:amd:2016:v1"
+Pubid::Iec.parse("IEC 60050:2011/Amd 1:2015").to_urn
+# => "urn:iec:std:iec:60050:2011:amd:2015:v1"
 
 # VAP identifier (CSV, CMV, RLV)
 Pubid::Iec.parse("IEC 61666:2010+AMD1:2021 CSV").to_urn
@@ -145,19 +152,35 @@ Pubid::Iec.parse("IEC 60695-2-1/1:1994").to_urn
 # => "urn:iec:std:iec:60695-2-1:sheet.1:1994"
 ----
 
+==== Key Difference from ISO URNs
+
+In ISO URNs (RFC 5141), the part number is a separate colon-separated field:
+
+    urn:iso:std:iso:8601:-1:2019   (ISO: number=8601, part=-1)
+
+In IEC URNs, the part number is part of the docnumber field:
+
+    urn:iec:std:iec:60068-2-2:1974   (IEC: docnumber=60068-2-2)
+
 == URN Round-Trip
 
-ISO and IEC support parsing URNs back to identifiers:
+ISO and IEC support parsing URNs back to identifiers using `parse_urn`:
 
 [source,ruby]
 ----
 # ISO URN round-trip
-id = Pubid::Iso.parse("urn:iso:std:iso:9001:amd:2020:v1")
+id = Pubid::Iso.parse_urn("urn:iso:std:iso:9001:amd:2020:v1")
 id.to_s  # => "ISO 9001/Amd 1:2020"
+id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
 
 # IEC URN round-trip
-id = Pubid::Iec.parse("urn:iec:std:iec:60050-351:2013:amd:2016:v1")
-id.to_s  # => "IEC 60050-351:2013/Amd 1:2016"
+id = Pubid::Iec.parse_urn("urn:iec:std:iec:60050:2011")
+id.to_s  # => "IEC 60050:2011"
+id.to_urn  # => "urn:iec:std:iec:60050:2011"
+
+# Chained supplements (Corrigendum to Amendment)
+id = Pubid::Iso.parse_urn("urn:iso:std:iso-iec:13818:-1:amd:2016:v3:cor:2017:v1")
+id.to_urn  # => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3:cor:2017:v1"
 ----
 
 == Stage Codes in URNs

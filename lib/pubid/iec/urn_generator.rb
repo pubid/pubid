@@ -132,16 +132,9 @@ module Pubid
         type_comp = type_component
         parts << type_comp if type_comp
 
-        # Number
-        parts << identifier.number.to_s if identifier.number
-
-        # Part
-        part_comp = part_component
-        parts << part_comp if part_comp
-
-        # Subpart
-        subpart_comp = subpart_component
-        parts << subpart_comp if subpart_comp
+        # Docnumber (number with part and subpart as a single hyphenated field)
+        docnumber = docnumber_component
+        parts << docnumber if docnumber
 
         # Year
         parts << identifier.date.year.to_s if identifier.date
@@ -187,13 +180,8 @@ module Pubid
           type_comp = type_component(base_id)
           parts << type_comp if type_comp
 
-          parts << base_id.number.to_s if base_id.number
-
-          part_comp = part_component(base_id)
-          parts << part_comp if part_comp
-
-          subpart_comp = subpart_component(base_id)
-          parts << subpart_comp if subpart_comp
+          docnumber = docnumber_component(base_id)
+          parts << docnumber if docnumber
 
           parts << base_id.date.year.to_s if base_id.date
         end
@@ -239,18 +227,15 @@ module Pubid
         type_code.to_s
       end
 
-      # Generate part component
-      def part_component(id = identifier)
-        return nil unless id&.part
+      # Generate docnumber component (number with part and subpart as single field)
+      # IEC URN spec: docnumber is a single hyphenated field (e.g., "60068-2-2")
+      def docnumber_component(id = identifier)
+        return nil unless id&.number
 
-        "-#{id.part}"
-      end
-
-      # Generate subpart component
-      def subpart_component(id = identifier)
-        return nil unless id&.subpart
-
-        "-#{id.subpart}"
+        result = id.number.to_s
+        result += "-#{id.part}" if id.part
+        result += "-#{id.subpart}" if id.subpart
+        result
       end
     end
   end

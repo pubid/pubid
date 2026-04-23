@@ -1,0 +1,567 @@
+= URN Specification for the International Electrotechnical Commission (IEC)
+:doctype: article
+:toc: macro
+:toclevels: 4
+:source-highlighter: coderay
+
+toc::[]
+
+== Introduction
+
+This document specifies the Uniform Resource Name (URN) namespace for
+identifiers published by the International Electrotechnical Commission
+(IEC). The namespace ID (NID) is `iec`.
+
+IEC identifiers share structural similarities with the ISO URN namespace
+(RFC 5141) but differ in several key aspects:
+
+* **Date-based identification** -- IEC URNs use a date field (year,
+  year-month, or year-month-day) in the base document position, whereas
+  ISO URNs treat the year as metadata that is generally omitted.
+* **Deliverable types** -- IEC defines product-oriented deliverable
+  types (CSV, CMV, EXV, PRV, RLV) that indicate the form of the
+  published document.
+* **Adjunct model** -- Supplements (amendments, corrigenda,
+  interpretation sheets) are modelled as *adjuncts* to the base
+  document. A *relation* field distinguishes between a reference to
+  the adjunct itself versus a consolidation of the base document with
+  its adjuncts.
+* **Component references** -- A fragment identifier (`#`) syntax
+  references specific document elements (clauses, figures, tables,
+  terms, annexes, notes).
+* **Related assets** -- An asset identifier (`=`) syntax references
+  external resources (software supplements, voting reports, web pages,
+  forums).
+
+This specification is based on the IEC URI model documents dated
+2019-12-10 and 2020-03-24.
+
+== Namespace ID
+
+`iec`
+
+== Registration Information
+
+*Version:* 1.0 (2020-03-24)
+
+== Declaration of Structure
+
+=== Definition
+
+The Namespace Specific Strings (NSSs) of all URNs assigned by IEC
+conform to the syntax defined in Section 2.2 of RFC 2141.
+
+The NSS has the following ABNF specification:
+
+....
+NSS           = std-nss
+
+std-nss       = "std:" basedocument *( adjunct ) [ reference ]
+
+basedocument  = header ":" docnumber [":" date] [":" type]
+                [":" deliverable] [":" language]
+
+header        = publisher *("-" copublisher)
+
+publisher     = "iec" / "iso" / "cispr"
+
+copublisher   = "iso" / "ieee" / "itu" / "astm" / "sae"
+                / other-org
+
+other-org     = 1*(ALPHA / DIGIT)
+
+docnumber     = 1*DIGIT *( "-" 1*(DIGIT / ALPHA) )
+
+date          = year ["-" month ["-" day]]
+
+year          = 4DIGIT
+
+month         = 2DIGIT
+
+day           = 2DIGIT
+
+type          = "is" / "ts" / "tr" / "pas" / "guide" / "srd" / "ser"
+              / "data" / "isp" / "r" / "tta"
+
+deliverable   = "csv" / "cmv" / "exv" / "prv" / "rlv"
+
+language      = lang-code *("-" lang-code)
+
+lang-code     = 2ALPHA
+
+adjunct       = relation-marker adjunct-type ":" adjunct-number
+                [":" adjunct-date]
+
+relation-marker = ":" ":" / ":" "plus" ":"
+
+adjunct-type  = "amd" / "cor" / "ish"
+
+adjunct-number = DIGITS
+
+adjunct-date  = date
+
+reference     = "#" element-id
+              / "=" asset-name
+
+element-id    = element-type "-" element-number *( "-" element-number )
+
+element-type  = "sec" / "fig" / "tabl" / "anx" / "not" / "con"
+              / "term" / "clause"
+
+element-number = 1*(DIGIT / ALPHA / "." / "-")
+
+asset-name    = 1*(ALPHA / DIGIT / "-" / "." / "_")
+....
+
+=== General Rules
+
+If any field is absent, leave it empty (empty fields between colons are
+preserved)::
+
+    `urn:iec:std:iec:60601-1-1::::` (all optional fields empty)
+    vs `urn:iec:std:iec:60601-1-1:2005-10:tr:prv:fr` (all fields present)
+
+All values in lower-case:: URN elements use lowercase. Language codes
+are listed in alphabetical order (e.g., `en-fr-ru`, not `fr-en-ru`).
+
+Extensibility:: All URNs are extensible to define adjuncts (amendment,
+corrigendum, interpretation sheet) and to name consolidations (base
+edition plus its amendments).
+
+=== Separators
+
+[cols="1,3,3"]
+|===
+| Separator | Rule | Examples
+
+| `:`
+| Between fields in the URN
+| `urn:iec:std:iec:60601`
+
+| `-`
+| Within a field (part numbers, date components, copublishers, languages)
+| `urn:iec:std:iec-iso:60601-1-1`
+
+| `||`
+| Between base edition and adjunct (reference to adjunct itself)
+| `urn:iec:std:iec:60601-1-1:2015-10:::fr\|\|amd:1:2017-01`
+
+| `_`
+| Between base edition and adjunct in a consolidation
+| `urn:iec:std:iec:60601-1-1:2015-04:csv:_amd:1:2016-07_amd:2:2017-02`
+
+| `#`
+| Between URI and document element IDs
+| `urn:iec:std:iec:60601-1-1:2015-10:::#fig-1`
+
+| `=`
+| Between URI and related asset
+| `urn:iec:std:iec:60601-1-1:2015-10:tr:prv:fr=Human-body-model.pdf`
+|===
+
+=== Element Descriptions
+
+==== header (publisher/copublishers)
+
+The organization(s) from which a document emanates. The primary
+publisher is listed first, followed by copublishers joined by hyphens.
+
+Current values:
+
+[horizontal]
+iec:: International Electrotechnical Commission
+iso:: International Organization for Standardization
+cispr:: International Special Committee on Radio Interference
+iec-iso:: jointly developed by IEC and ISO
+iec-ieee:: jointly developed by IEC and IEEE
+iec-itu:: jointly developed by IEC and ITU
+iec-astm:: jointly developed by IEC and ASTM
+
+==== docnumber
+
+The project number assigned to the document. Multi-part documents use
+hyphens within the field:
+
+* `60445` -- single document
+* `60068-2-2` -- multipart document, part 2-2
+* `60050-121-10-34` -- database entry (e.g., IEV terminological entry)
+
+==== date
+
+The publication date of the document. May be:
+
+* **blank** -- undated reference
+* **YYYY** -- year only (e.g., `2010`)
+* **YYYY-MM** -- year-month (e.g., `2015-06`)
+* **YYYY-MM-DD** -- full date (e.g., `2010-10-11`)
+
+==== type
+
+Designates the IEC deliverable type. If the `type` element is blank or
+`is`, the classification is "International Standard".
+
+[horizontal]
+is:: International Standard (can be blank)
+ts:: Technical Specification
+tr:: Technical Report
+pas:: Publicly Available Specification
+guide:: Guide
+srd:: Systems Reference Deliverable
+ser:: Series (all parts)
+data:: Data (document type no longer published)
+isp:: International Standardized Profile
+r:: Recommendation (document type no longer published)
+tta:: Technology Trends Assessment
+
+==== deliverable
+
+Designates the product type (form in which the document is published).
+If blank, the document is in its standard form.
+
+[horizontal]
+csv:: Consolidated version (base + all supplements integrated)
+cmv:: Committee version
+exv:: Expert version
+prv:: Prerelease version
+rlv:: Redline version
+
+==== language
+
+One or more ISO 639-1 alpha-2 language codes. Multiple languages are
+joined by hyphens (not commas as in the ISO URN scheme), listed in
+alphabetical order.
+
+[horizontal]
+en:: English
+fr:: French
+ru:: Russian
+en-fr:: English and French bilingual
+en-fr-ru:: English, French, and Russian trilingual
+
+If blank, the document's default language applies.
+
+==== adjunct
+
+An adjunct is a document that modifies or supplements the base document.
+Adjuncts are appended to the base document URN.
+
+The *relation-marker* distinguishes two reference modes:
+
+*Empty (no `plus`)* -- Reference to the adjunct itself::
+
+    `urn:iec:std:iec:60068-2-2:1974:::amd:1:1993`
+    Amendment 1:1993 *to* IEC 60068-2-2:1974
+
+*`plus`* -- Reference to the consolidated document::
+
+    `urn:iec:std:iec:60068-2-2:1974::plus:amd:1:1993`
+    *Consolidation of* IEC 60068-2-2:1974 with Amendment 1:1993
+
+Adjunct types:
+
+[horizontal]
+amd:: Amendment -- alters and/or adds technical provisions; subject to ballot
+cor:: Technical Corrigendum -- corrects technical error or ambiguity; not balloted
+ish:: Interpretation Sheet -- official interpretation of a published standard
+
+Adjuncts may be chained. For example, a Corrigendum to an Amendment:
+
+....
+urn:iec:std:iec:60068-2-2:1974-01:::amd:2:1994-05||cor:1:2001-01
+// Corrigendum 1:2001 to Amendment 2:1994 to IEC 60068-2-2:1974
+....
+
+Consolidation with multiple adjuncts:
+
+....
+urn:iec:std:iec:60027-1:1992::csv:_amd:1:1997_amd:2:2005
+// Consolidated version of IEC 60027-1:1992 incorporating
+// Amendment 1:1997 and Amendment 2:2005
+....
+
+==== reference
+
+A reference identifies either a specific element within the document or
+an external asset associated with the document.
+
+Element references (`#`)::
+
+....
+urn:iec:std:iec:60601-1-1:2015-10:::#fig-1
+// Figure 1 in IEC 60601-1-1:2015-10
+
+urn:iec:std:iec:60050-121:2010-10:::#con-121-10-23
+// Concept 121-10-23 within IEC 60050-121:2010-10
+....
+
+Element types:
+
+[horizontal]
+sec:: Section / clause
+fig:: Figure
+tabl:: Table
+anx:: Annex
+not:: Note
+con:: Concept (terminological database entry)
+term:: Term
+clause:: Clause
+
+Asset references (`=`)::
+
+....
+urn:iec:std:iec:60601-1-1:2015-10:tr:prv:fr=Human-body-model.pdf
+// External asset associated with the document
+....
+
+Asset types (exterior asset scheme not yet fully defined):
+
+[horizontal]
+software supplement:: Software associated with the document
+voting report:: Voting results for the document
+webpage:: Web page related to the document
+forum:: Discussion forum related to the document
+
+=== Examples
+
+==== Basic identifiers
+
+....
+urn:iec:std:iec:60445
+// IEC 60445 (undated)
+
+urn:iec:std:iec:60445:2001
+// IEC 60445:2001
+
+urn:iec:std:iec:60068-2-2:1974
+// IEC 60068-2-2:1974
+....
+
+==== Copublishers
+
+....
+urn:iec:std:iso:14971:2000
+// ISO 14971:2000
+
+urn:iec:std:iso-iec:11801
+// ISO/IEC 11801 (undated)
+
+urn:iec:std:iec-ieee:80004
+// IEC/IEEE 80004 (undated)
+....
+
+==== Document types
+
+....
+urn:iec:std:iso-iec:tr:11802-9901:2014
+// ISO/IEC TR 11802-9901:2014
+
+urn:iec:std:iec::pas:62825
+// IEC PAS 62825 (undated)
+
+urn:iec:std:iec::guide:111:2004-07
+// IEC Guide 111:2004-07
+....
+
+==== Series references
+
+....
+urn:iec:std:iec:61076::ser
+// IEC 61076 series (all parts)
+
+urn:iec:std:iec:61076-7::ser
+// IEC 61076-7 series (all sub-parts)
+....
+
+==== Language
+
+....
+urn:iec:std:iec:60068-2-2:1974:::fr
+// IEC 60068-2-2:1974 in French
+....
+
+==== Adjuncts (amendments and corrigenda)
+
+....
+urn:iec:std:iec:60068-2-2:1974:::amd:1:1993
+// Amendment 1:1993 to IEC 60068-2-2:1974
+
+urn:iec:std:iec:60068-2-2:1974:::amd:2:1994
+// Amendment 2:1994 to IEC 60068-2-2:1974
+....
+
+==== Chained adjuncts (Corrigendum to Amendment)
+
+....
+urn:iec:std:iec:60068-2-2:1974-01:::amd:2:1994-05||cor:1:2001-01
+// Corrigendum 1:2001 to Amendment 2:1994 to IEC 60068-2-2:1974-01
+....
+
+==== Consolidations
+
+....
+urn:iec:std:iec:60068-2-2:1974::plus:amd:1:1993
+// Consolidation of Amendment 1:1993 with IEC 60068-2-2:1974
+
+urn:iec:std:iec:60027-1:1992::csv:_amd:1:1997_amd:2:2005
+// Consolidation of IEC 60027-1:1992 with
+// Amendment 1:1997 and Amendment 2:2005 (CSV)
+....
+
+==== Prerelease versions
+
+....
+urn:iec:std:iec:60601-2-63:2012:::amd:1:2017-03-01
+// Amendment 1:2017 to IEC 60601-2-63:2012
+
+urn:iec:std:iec:60601-2-63:2012::prv:amd:1:2017-03-01
+// Prerelease version of Amendment 1:2017 to IEC 60601-2-63:2012
+....
+
+==== Database entries
+
+....
+urn:iec:std:iec:60417
+// Entire IEC 60417 database (undated)
+
+urn:iec:std:iec:60417:2010-10
+// Entire IEC 60417 database (dated)
+
+urn:iec:std:iec:60417-5012:2010-10
+// Single graphical symbol entry (60417-5012) with its own date
+
+urn:iec:std:iec:60050-121-10-34:2016-11
+// Single terminological entry (IEV 121-10-34) with its own date
+
+urn:iec:std:iec:60050-121:2010-10::#con-121-10-23
+// Entry 121-10-23 within a dated set of IEV entries
+....
+
+==== CISPR documents
+
+....
+urn:iec:std:cispr:11:2015-06
+// CISPR 11:2015-06
+....
+
+==== Adopted documents
+
+....
+urn:xyz:std:iec:60065:2001
+// IEC 60065:2001 adopted by another organization XYZ
+// (uses different SDO namespace)
+....
+
+== Identifier Uniqueness Considerations
+
+Assignment of URNs for documents in the IEC namespace is managed by the
+IEC Central Office. Uniqueness is ensured by:
+
+* The combination of `header` (publisher), `docnumber`, and `date`
+  uniquely identifies a base document.
+* Adjunct numbering is consecutive per supplement type per document.
+* Database entries are identified by their extended project numbers
+  (e.g., `60417-5012`).
+
+== Identifier Persistence Considerations
+
+Assigned URNs will not be reused and will remain valid beyond the
+lifecycle of the referenced resources. The status of a referenced
+resource may change (e.g., from draft to published, or from published
+to withdrawn).
+
+== Process for Identifier Resolution
+
+A URN identifying an IEC document can be transformed to a valid HTTP
+URI by:
+
+. Replacing the URN namespace prefix (`urn:iec:`) and the `std:` prefix
+  with the IEC web domain.
+. Replacing occurrences of `:` within the identifier with `/`.
+. Converting characters to lowercase.
+
+== Rules for Lexical Equivalence
+
+URNs are lexically equivalent if they are octet-by-octet equal after
+the following preprocessing:
+
+. Normalize the case of the leading `urn:` token.
+. Normalize the case of the NID.
+. Normalize the case of any %-escaping.
+. Normalize the case of all elements.
+
+All elements use lowercase. Language codes are listed in alphabetical
+order to ensure deterministic equivalence.
+
+== Conformance with URN Syntax
+
+No special considerations beyond RFC 2141.
+
+== Validation Mechanism
+
+None specified.
+
+== Scope
+
+Global.
+
+== Differences from ISO URN (RFC 5141)
+
+[cols="1,3,3"]
+|===
+| Feature | ISO URN (RFC 5141) | IEC URN
+
+| Namespace ID
+| `iso`
+| `iec`
+
+| Date handling
+| Year in edition slot; undated URN omits year
+| Date field in `YYYY`, `YYYY-MM`, or `YYYY-MM-DD` format
+
+| Deliverable types
+| Not applicable
+| `csv`, `cmv`, `exv`, `prv`, `rlv`
+
+| Language separator
+| Comma (`en,fr`)
+| Hyphen (`en-fr`)
+
+| Supplement model
+| Appended with `:` separator
+| Adjunct model with `||` (adjunct ref) and `_` (consolidation)
+
+| Relation marker
+| Not applicable
+| `plus` for consolidations
+
+| Component references
+| `:clause:`, `:figure:` etc. via `docelement`
+| `#sec-1`, `#fig-1` via fragment identifier
+
+| Asset references
+| `:tech` and isodefined via `addition`
+| `=` asset name syntax
+
+| Interpretation sheets
+| Not defined
+| `ish` adjunct type
+|===
+
+== References
+
+=== Normative References
+
+* [[[ISODIR1,IEC/ISO Directives Part 1]]] -- Procedures for the
+  technical work.
+* [[[RFC2141,RFC 2141]]] -- Moats, R., "URN Syntax", May 1997.
+* [[[RFC5141,RFC 5141]]] -- Goodwin, J., Apel, H., "A URN Namespace
+  for ISO", March 2008.
+* [[[RFC5234,RFC 5234]]] -- Crocker, D., Overell, P., "Augmented BNF
+  for Syntax Specifications: ABNF", January 2008.
+
+=== Informative References
+
+* IEC URI Model, version 2019-12-10 (internal IEC document).
+* IEC URI Model, version 2020-03-24 (internal IEC document).
+* [[[ISO639,ISO 639-1:2002]]] -- "Codes for the representation of names
+  of languages -- Part 1: Alpha-2 code".

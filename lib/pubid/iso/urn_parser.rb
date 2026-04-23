@@ -159,7 +159,18 @@ module Pubid
             supp_type = SUPPLEMENT_TYPE_MAP[parts.shift.downcase]
           end
 
-          # Check for version (v1, v2, etc.) or number
+          # Check for year or supplement number
+          if parts.first&.match(/^\d+$/)
+            if parts.first&.match(/^\d{4}$/)
+              # 4 digits = year
+              supp_year = parts.shift
+            else
+              # 1-3 digits = supplement number
+              supp_number = parts.shift.to_i
+            end
+          end
+
+          # Check for version (v1, v2, etc.) after year or number
           if parts.first&.start_with?("v")
             version_str = parts.shift
             supp_number = version_str.sub("v", "").to_i
@@ -167,16 +178,6 @@ module Pubid
             if supp_number.to_s.include?(".")
               supp_number, = supp_number.to_s.split(".")
               supp_number = supp_number.to_i
-              # supp_iter not used in main parsing
-            end
-          elsif parts.first&.match(/^\d+$/)
-            # Could be year or supplement number
-            if parts.first&.match(/^\d{4}$/)
-              # 4 digits = year
-              supp_year = parts.shift
-            else
-              # 1-3 digits = supplement number
-              supp_number = parts.shift.to_i
             end
           end
 
@@ -346,8 +347,9 @@ module Pubid
           base_hash[:languages] = languages.join("/")
         end
 
-        # Build supplements recursively
-        supplements.reverse_each do |supp|
+        # Build supplements recursively (forward order: first supplement wraps base,
+        # second wraps first, etc. -- matching URN left-to-right semantics)
+        supplements.each do |supp|
           supp_hash = {}
 
           if supp[:stage]

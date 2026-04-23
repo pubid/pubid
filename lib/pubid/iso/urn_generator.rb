@@ -287,8 +287,8 @@ module Pubid
         return nil if !stage_code || stage_code == :published
 
         # Try typed stage abbreviations first (RFC 5141-bis explicit abbreviations)
-        if TYPED_STAGE_MAP.key?(stage_code)
-          stage_abbr = TYPED_STAGE_MAP[stage_code]
+        if TYPED_STAGE_MAP.key?(stage_code.to_sym)
+          stage_abbr = TYPED_STAGE_MAP[stage_code.to_sym]
 
           # Add iteration if present (no 'v' prefix for iterations)
           if identifier.stage_iteration
@@ -344,13 +344,11 @@ module Pubid
 
       # Generate language component
       # RFC 5141-bis: explicit specification guidance (explicit > implicit)
+      # URN spec: all values in lowercase
       def language_component
         return nil unless identifier.languages&.any?
 
-        # Always include language codes explicitly
-        # This follows the principle "explicit is better than implicit"
-        # Even for English documents, we include :en for clarity
-        identifier.languages.map(&:code).join(",")
+        identifier.languages.map(&:code).map(&:downcase).join(",")
       end
 
       # Generate supplement type component

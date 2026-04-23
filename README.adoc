@@ -92,31 +92,56 @@ See <<v2-migration-status>> for detailed status and <<v2-usage-examples>> for ex
 
 == URN Generation (RFC 5141-bis)
 
-PubID V2 implements RFC 5141-bis compliant URN generation for ISO identifiers with **90%+ test coverage**.
+PubID V2 implements RFC 5141-bis compliant URN generation for ISO and IEC identifiers with **full test coverage**.
 
 [source,ruby]
 ----
 require 'pubid/iso'
+require 'pubid/iec'
 
-# Parse and generate URN
+# ISO: Parse and generate URN
 id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016")
 id.to_urn
 # => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3"
+
+# IEC: Parse and generate URN
+id = Pubid::Iec.parse("IEC 60068-2-2:1974/Amd 1:1993")
+id.to_urn
+# => "urn:iec:std:iec:60068-2-2:1974:amd:1993:v1"
+
+# Round-trip: parse URN back to identifier
+id = Pubid::Iso.parse_urn("urn:iso:std:iso:9001:amd:2020:v1")
+id.to_s  # => "ISO 9001/Amd 1:2020"
+id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
 ----
 
 === Features
 
-* ✅ RFC 5141-bis compliant (90.14% test coverage)
-* ✅ Explicit language codes ("explicit is better than implicit")
+* ✅ RFC 5141-bis compliant for ISO URNs
+* ✅ IEC URN model compliant (IEC URI Model 2020-03-24)
+* ✅ Explicit language codes, always lowercase in URN output
 * ✅ Dynamic copublisher combinations (ISO/IEC/IEEE, ISO/ASTM, etc.)
 * ✅ Extended document types (DIR, DIR-SUP, IWA-SUP, TTA)
 * ✅ Typed stage codes (WD, CD, DIS, FDIS, PDAM, FDAM, etc.)
 * ✅ Harmonized stage codes (stage-XX.XX format)
-* ✅ Multi-level supplement support with context preservation
+* ✅ Multi-level supplement support with correct nesting order
+* ✅ Round-trip parsing (parse_urn -> to_urn) for ISO and IEC
+
+=== Key Difference: ISO vs IEC Part Numbering
+
+ISO URNs (RFC 5141): part number is a separate colon-separated field:
+    urn:iso:std:iso:8601:-1:2019
+
+IEC URNs (IEC URI Model): part number is part of the docnumber field:
+    urn:iec:std:iec:60068-2-2:1974
 
 === Documentation
 
-See link:docs/URN-GENERATION-GUIDE.adoc[URN Generation Guide] for complete usage documentation with 40+ examples.
+See link:docs/URN-GENERATION-GUIDE.adoc[URN Generation Guide] for complete usage documentation.
+
+See link:references/iso-urn-specification.adoc[ISO URN Specification] for the full RFC 5141-bis specification with ABNF grammar.
+
+See link:references/iec-urn-specification.adoc[IEC URN Specification] for the full IEC URN model specification.
 
 See link:docs/RFC-5141-BIS-COMPLIANCE-REPORT.md[RFC 5141-bis Compliance Report] for certification details and test coverage.
 

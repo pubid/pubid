@@ -23,10 +23,10 @@ PubID generates and parses URNs that comply with the ISO URN namespace specifica
 | Document type codes | Met | `tr`, `ts`, `pas`, `guide`, `dir`, `dir-sup`, `iwa-sup` |
 | Typed stage codes | Met | WD, CD, DIS, FDIS, PDAM, DAM, FDAM, DCOR, FDCOR, CDV, CDTS, DTS, FDTS |
 | Harmonized stage codes | Met | `stage-XX.XX` format for stages without typed abbreviations |
-| Supplement chain ordering | Met | Multi-level supplements (Amd/Cor) in correct order |
+| Supplement chain ordering | Met | Multi-level supplements (Amd/Cor) in correct nesting order (Cor wraps Amd wraps Base) |
 | Edition specification | Met | `ed-N` format for ISO, `ed.N` for IEC |
-| Explicit language codes | Met | Comma-separated language codes (`en`, `en,fr`) |
-| Part/subpart numbering | Met | Colon-dash prefix (`-1`, `-90-12`) |
+| Explicit language codes | Met | Comma-separated language codes (`en`, `en,fr`), always lowercase in URN output |
+| Part/subpart numbering | Met | Colon-dash prefix for ISO (`-1`), single hyphenated field for IEC (`60068-2-2`) |
 | Version numbering | Met | `vN` for supplements, `vN.M` for supplements with iterations |
 | Round-trip parsing | Met | ISO and IEC support URN-to-identifier parsing |
 

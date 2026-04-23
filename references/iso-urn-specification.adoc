@@ -1,0 +1,487 @@
+= URN Specification for the International Organization for Standardization (ISO)
+:doctype: article
+:toc: macro
+:toclevels: 4
+:source-highlighter: coderay
+
+toc::[]
+
+== Introduction
+
+This document specifies the Uniform Resource Name (URN) namespace for
+identifiers published by the International Organization for
+Standardization (ISO). It is based on RFC 5141 (the original ISO URN
+namespace registration) with extensions implemented in the PubID gem,
+referred to here as *RFC 5141-bis*.
+
+RFC 5141 assigned the namespace ID (NID) "iso" and defined the original
+syntax for identifying ISO documents, their editions, supplements, and
+extracted resources. This specification extends RFC 5141 to address the
+following gaps identified in practice:
+
+* **Copublishers** -- RFC 5141 defines a fixed set of originators.
+  This specification supports dynamic copublisher combinations (e.g.,
+  `iso-iec-ieee`, `iso-astm`).
+* **Extended document types** -- Additional deliverable types beyond
+  those in RFC 5141, including Directives (`dir`), Directive Supplements
+  (`dir-sup`), and IWA Supplements (`iwa-sup`).
+* **Typed stage abbreviations** -- RFC 5141 uses only harmonized stage
+  codes (`stage-XX.XX`). This specification also supports short stage
+  abbreviations (`WD`, `CD`, `DIS`, `FDIS`, `PDAM`, `DAM`, `FDAM`,
+  `DCOR`, `FDCOR`, `CDTS`, `DTS`, `FDTS`, `WDS`).
+* **Supplement chains** -- Nested supplements (e.g., a Corrigendum to
+  an Amendment) with explicit ordering semantics.
+* **Explicit language specification** -- Language codes are always
+  emitted explicitly rather than relying on a default.
+
+== Namespace ID
+
+`iso`
+
+== Registration Information
+
+*Version:* RFC 5141-bis (based on RFC 5141 Version 2.1, 2007-12-13)
+
+== Declared Registrant of the Namespace
+
+ISO Central Secretariat +
+International Organization for Standardization (ISO) +
+Case Postale 56 +
+CH-1211 Geneva 20 +
+Switzerland +
+E-mail: goodwin@iso.org
+
+== Declaration of Structure
+
+=== Definition
+
+The Namespace Specific Strings (NSSs) of all URNs assigned by ISO
+conform to the syntax defined in Section 2.2 of RFC 2141.
+
+The NSS has the following ABNF specification:
+
+....
+NSS           = std-nss
+
+std-nss       = "std:" docidentifier *supplement [addition]
+
+docidentifier = originator [":" type] ":" docnumber [":" partnumber]
+                [[":" status] ":" edition]
+                [":" docversion] [":" language]
+
+originator    = publisher *("-" copublisher)
+
+publisher     = "iso" / "iec"
+
+copublisher   = "iec" / "cie" / "astm" / "ieee" / "itu" / "sae"
+                / other-org
+
+other-org     = 1*(ALPHA / DIGIT)
+
+type          = "data" / "guide" / "isp" / "iwa" /
+                "pas" / "r" / "tr" / "ts" / "tta" /
+                "dir" / "dir-sup" / "iwa-sup"
+
+docnumber     = DIGITS
+
+partnumber    = "-" 1*( DIGIT / ALPHA / "-" )
+
+status        = ( "draft" / "cancelled" ) / stage
+
+stage         = "stage-" stagecode ["." iteration]
+              / stage-abbr ["." iteration]
+
+stage-abbr    = "WD" / "WDS" / "CD" / "CDV" / "DIS" / "FDIS"
+              / "PDAM" / "DAM" / "FDAM" / "DCOR" / "FDCOR"
+              / "CDTS" / "DTS" / "FDTS" / "PRF"
+              / "PWI" / "NP" / "AWI" / "NWIP"
+
+stagecode     = DIGIT DIGIT "." DIGIT DIGIT
+
+iteration     = "v" DIGITS
+
+edition       = "ed-" DIGITS
+
+docversion    = "v" (simpleversion / isoversion)
+
+simpleversion = DIGITS
+
+isoversion    = baseversion *includedsuppl
+
+baseversion   = DIGITS
+
+includedsuppl = "-" suppltype supplnumber ["." supplversion]
+
+language      = lang-code *("," lang-code)
+
+lang-code     = 1*2(ALPHA)
+
+supplement    = ":" suppltype ":" supplnumber
+                [":" supplversion] [":" language]
+
+suppltype     = "amd" / "cor" / "sup" / "add"
+
+supplnumber   = DIGITS
+
+supplversion  = "v" DIGITS
+
+addition      = techdefined / isodefined
+
+techdefined   = ":tech" *techelement
+
+techelement   = <unspecified>
+
+isodefined    = <unspecified>
+
+DIGITS        = DIGIT *DIGIT
+
+DIGIT         = %x30-39 ; 0-9
+
+ALPHA         = %x41-5A / %x61-7A ; A-Z / a-z
+....
+
+=== Element Descriptions
+
+==== originator
+
+The organization (or organizations) from which a document emanates.
+Unlike RFC 5141 which defines a fixed set of originator values, this
+specification uses a dynamic composition of publisher and copublishers
+joined by hyphens.
+
+Current values include but are not limited to:
+
+[horizontal]
+iso:: International Organization for Standardization
+iec:: International Electrotechnical Commission
+iso-iec:: jointly developed by ISO and IEC
+iso-cie:: jointly developed by ISO and CIE
+iso-astm:: jointly developed by ISO and ASTM International
+iso-ieee:: jointly developed by ISO and IEEE
+iso-iec-ieee:: jointly developed by ISO, IEC, and IEEE
+
+Additional copublisher combinations may be defined in future revisions.
+
+==== type
+
+Designates the ISO deliverable type. If the `type` element is not
+present, the classification is "International Standard".
+
+[horizontal]
+data:: Data (document type no longer published)
+guide:: Guide
+isp:: International Standardized Profile
+iwa:: International Workshop Agreement
+pas:: Publicly Available Specification
+r:: Recommendation (document type no longer published)
+tr:: Technical Report
+ts:: Technical Specification
+tta:: Technology Trends Assessment
+dir:: Directive
+dir-sup:: Directive Supplement
+iwa-sup:: IWA Supplement
+
+[NOTE]
+====
+RFC 5141 does not define `dir`, `dir-sup`, or `iwa-sup`.
+These are RFC 5141-bis extensions.
+====
+
+==== docnumber
+
+The reference number assigned to the document by ISO and/or IEC.
+
+==== partnumber
+
+The reference number that identifies a part of a multipart standard.
+Omitting `partnumber` designates a multipart document in its entirety.
+
+==== status / stage
+
+Indicates the publication status of the document. When the `status`
+element is not present, the NSS refers to a published document.
+
+RFC 5141-bis extends RFC 5141 by supporting *typed stage abbreviations*
+in addition to harmonized stage codes:
+
+Harmonized stage code notation::
+
+`stage-XX.XX` where `XX.XX` is the harmonized stage code per ISO
+Guide 69:1999. An optional iteration suffix `.vN` identifies a specific
+project iteration.
+
+[horizontal]
+stage-00.00:: Preliminary work item
+stage-20.00:: New work item proposal
+stage-30.00:: Committee draft
+stage-40.00:: Draft International Standard
+stage-50.00:: Final Draft International Standard
+stage-60.00:: Published (not emitted for published documents)
+
+Typed stage abbreviations (RFC 5141-bis)::
+
+[horizontal]
+PWI:: Preliminary Work Item
+NP:: New Proposal / New Work Item Proposal
+AWI:: Approved Work Item
+NWIP:: New Work Item Proposal
+WD:: Working Draft
+WDS:: Working Draft Study
+CD:: Committee Draft
+CDV:: Committee Draft for Vote
+DIS:: Draft International Standard
+FDIS:: Final Draft International Standard
+PDAM:: Proposed Draft Amendment
+DAM:: Draft Amendment
+FDAM:: Final Draft Amendment
+DCOR:: Draft Corrigendum
+FDCOR:: Final Draft Corrigendum
+CDTS:: Committee Draft Technical Specification
+DTS:: Draft Technical Specification
+FDTS:: Final Draft Technical Specification
+PRF:: Proof
+
+==== edition
+
+`ed-N` designates a specific edition of the document. If no `edition`
+is specified, the NSS refers to the latest edition.
+
+==== language
+
+One or more ISO 639-1 alpha-2 language codes, comma-separated. RFC
+5141-bis always emits language codes explicitly. Values include:
+
+[horizontal]
+en:: English
+fr:: French
+ru:: Russian
+es:: Spanish
+ar:: Arabic
+
+Combinations are expressed as comma-separated lists: `en,fr` for
+bilingual, `en,fr,ru` for trilingual.
+
+==== supplement
+
+Designates a technical alteration of or addition to an ISO standard
+that does not result in a new edition or version.
+
+Supplements are appended after the base document identifier and may be
+chained (e.g., a Corrigendum to an Amendment):
+
+....
+urn:iso:std:iso:9999:-1:ed-2:en:amd:1:cor:1
+....
+
+[horizontal]
+amd:: Amendment -- alters and/or adds technical provisions; subject to ballot
+cor:: Technical Corrigendum -- corrects technical error or ambiguity; not balloted
+sup:: Supplement -- generic supplement type
+add:: Addendum -- (document type no longer published)
+
+==== addition
+
+An optional element that identifies a representation, extract, or
+related information set of an ISO document.
+
+[horizontal]
+:tech...:: Committee-defined associated or embedded resource
+(other):: Reserved for ISO Central Secretariat definitions
+
+=== Examples
+
+==== Basic identifiers
+
+....
+urn:iso:std:iso:9999:-1:ed-1:en
+// 1st edition of ISO 9999-1, in English
+
+urn:iso:std:iso-iec:tr:9999:-1:ed-1:en
+// 1st edition of ISO/IEC TR 9999-1, in English
+....
+
+==== Undated references
+
+....
+urn:iso:std:iso:9001
+// ISO 9001 (no date, edition, or language specified)
+
+urn:iso:std:iso:8601:-1
+// ISO 8601-1 (undated, with part number)
+....
+
+==== Status and stages
+
+....
+urn:iso:std:iso-iec:9075:-3:stage-95.99:ed-2:en
+// Cancelled (withdrawn) 2nd edition of ISO/IEC 9075-3
+
+urn:iso:std:iso-iec:9075:-3:stage-30.60:ed-4:en
+// Draft 4th edition of ISO/IEC 9075-3
+
+urn:iso:std:iso-iec:9075:-3:DIS:ed-4:en
+// Same as above, using RFC 5141-bis typed stage abbreviation
+....
+
+==== Language handling
+
+....
+urn:iso:std:iso:9999:-1:ed-1:en
+// English
+
+urn:iso:std:iso:9999:-1:ed-1:en,fr
+// English/French bilingual
+
+urn:iso:std:iso:9999:-1:ed-1:en,fr,ru
+// English/French/Russian trilingual
+....
+
+==== Supplements
+
+....
+urn:iso:std:iso:9999:-1:ed-2:en:amd:1
+// Amendment 1 to the 2nd edition of ISO 9999-1, in English
+
+urn:iso:std:iso:9999:-1:ed-2:en:amd:1:v2
+// Corrected version (v2) of Amendment 1
+
+urn:iso:std:iso:9999:-1:ed-2:en:amd:1:cor:1
+// Corrigendum 1 to Amendment 1
+
+urn:iso:std:iso-iec:13818:-1:amd:2016:v3:cor:2017:v1
+// Amendment 3 (2016) with Corrigendum 1 (2017) to
+// ISO/IEC 13818-1
+....
+
+==== Extended types (RFC 5141-bis)
+
+....
+urn:iso:std:iso:dir:iso
+// ISO Directive
+
+urn:iso:std:iso:dir-sup:iso:1:en
+// ISO Directive Supplement, Part 1, in English
+....
+
+== Identifier Uniqueness Considerations
+
+Assignment of URNs for documents in the requested namespace is managed
+by the ISO Central Secretariat, which ensures that the assigned URNs
+are consistent with the ISO Directives for unique identification of ISO
+documents.
+
+RFC 5141-bis supplements this by requiring that:
+
+* Typed stage abbreviations map unambiguously to harmonized stage codes.
+* Supplement chains have a defined ordering (outer supplement last in
+  the NSS).
+* Language codes are always explicit, avoiding ambiguity from implicit
+  defaults.
+
+== Identifier Persistence Considerations
+
+Assigned URNs will not be reused and will remain valid beyond the
+lifecycle of the referenced resources. The status of a referenced
+resource may change (e.g., from draft to published, or from published
+to withdrawn).
+
+== Process for Identifier Resolution
+
+A URN identifying an ISO document can be transformed to a valid HTTP
+URI by:
+
+. Replacing the URN namespace prefix (`urn:iso:`) and the `std:` prefix
+  with the domain name `standards.iso.org`.
+. Replacing all occurrences of `:` within the identifier with `/`.
+. Converting characters to lowercase.
+
+Examples:
+
+....
+urn:iso:std:iso:9999:-1:ed-1:en
+  -> http://standards.iso.org/iso/9999/-1/ed-1/en/
+
+urn:iso:std:iso-iec:tr:9999:-1:ed-1:en
+  -> http://standards.iso.org/iso-iec/tr/9999/-1/ed-1/en/
+....
+
+== Rules for Lexical Equivalence
+
+URNs are lexically equivalent if they are octet-by-octet equal after
+the following preprocessing:
+
+. Normalize the case of the leading `urn:` token.
+. Normalize the case of the NID.
+. Normalize the case of any %-escaping.
+. Normalize the case of all elements.
+
+All URNs conforming to this specification use lowercase for all
+elements except typed stage abbreviations, which are case-insensitive
+per RFC 2141 Section 5.
+
+== Conformance with URN Syntax
+
+No special considerations beyond RFC 2141.
+
+== Validation Mechanism
+
+None specified.
+
+== Scope
+
+Global.
+
+== Differences from RFC 5141
+
+This specification extends RFC 5141 in the following ways:
+
+[cols="1,3,2"]
+|===
+| Feature | RFC 5141 | RFC 5141-bis
+
+| Copublishers
+| Fixed set: `iso`, `iec`, `iso-iec`, `iso-cie`, `iso-astm`, `iso-ieee`
+| Dynamic: `publisher *("-" copublisher)` with extensible values
+
+| Document types
+| `data`, `guide`, `isp`, `iwa`, `pas`, `r`, `tr`, `ts`, `tta`
+| Extended with `dir`, `dir-sup`, `iwa-sup`
+
+| Stage notation
+| Harmonized stage codes only (`stage-XX.XX`)
+| Harmonized codes *and* typed stage abbreviations (`WD`, `CD`, `DIS`, etc.)
+
+| Supplement chains
+| Single level (`amd`/`cor`/`add`)
+| Multi-level nesting (Corrigendum to Amendment)
+
+| Language
+| May be omitted (English assumed)
+| Always explicit
+
+| Supplement types
+| `amd`, `cor`, `add`
+| Extended with `sup` (generic supplement)
+|===
+
+== References
+
+=== Normative References
+
+* [[[ISODIR1,ISO/IEC Directives Part 1]]] -- International Organization
+  for Standardization, "Procedures for the technical work".
+* [[[ISODIR2,ISO/IEC Directives Part 2]]] -- International Organization
+  for Standardization, "Rules for the structure and drafting of
+  International Standards".
+* [[[RFC2141,RFC 2141]]] -- Moats, R., "URN Syntax", May 1997.
+* [[[RFC5141,RFC 5141]]] -- Goodwin, J., Apel, H., "A URN Namespace for
+  ISO", March 2008.
+* [[[RFC5234,RFC 5234]]] -- Crocker, D., Overell, P., "Augmented BNF for
+  Syntax Specifications: ABNF", January 2008.
+
+=== Informative References
+
+* [[[ISOGUIDE69,ISO Guide 69:1999]]] -- "Harmonized Stage Code system
+  (Edition 2) -- Principles and guidelines for use".
+* [[[ISO639,ISO 639-1:2002]]] -- "Codes for the representation of names
+  of languages -- Part 1: Alpha-2 code".
