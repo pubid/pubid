@@ -397,12 +397,16 @@ module Pubid
         DASH_CHARS.map { |char| str(char) }.reduce(:|)
       end
 
+      IEV_SHORTHAND = /\AIEV(?=\z|[\s\-])/.freeze
+
       # Preprocess input to normalize tab-separated editions and other formats
       def parse(input)
         # Normalize tab-separated editions: "IECEE AD-001\tED1.6" -> "IECEE AD-001 ED1.6"
         normalized = input.gsub(/\t/, " ")
         # Normalize comma-separated editions: "IEC CAB-G01:2025-02, Ed. 2.1" -> "IEC CAB-G01:2025-02 Ed. 2.1"
         normalized = normalized.gsub(/,\s+Ed\./, " Ed.")
+        # Expand IEV shorthand: "IEV" / "IEV-351" -> "IEC 60050" / "IEC 60050-351"
+        normalized = normalized.sub(IEV_SHORTHAND, "IEC 60050")
         super(normalized)
       end
     end
