@@ -1,9 +1,0 @@
-RFC 5141 missing
-
-
-Missing copublishers
-Missing ability to have corr of amd
-Missing type: supplement of guide, directive, directive supplement
-missing ability to state stage of base identifier
-missing ability for new stages WDS, CDTS
-missing ability for new doc types like IWA

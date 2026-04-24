@@ -431,6 +431,88 @@ None specified.
 
 Global.
 
+== Stage Code Evolution
+
+Stage definitions in ISO are not static. The ISO technical management system
+introduces new stage types over time to reflect evolving working practices.
+This has implications for URN generation and parsing.
+
+=== Dated Stage Codes
+
+Following the approach used in RDF-based code lists (e.g., ISO's published
+stage code vocabulary), stage definitions SHOULD be tracked with an effective
+date to distinguish when a stage was introduced.
+
+[cols="1,1,1,3"]
+|===
+| Stage | Abbreviation | Effective | Notes
+
+| Preliminary Work Item
+| PWI
+| 1999
+| ISO Guide 69:1999
+
+| New Proposal
+| NP
+| 1999
+| ISO Guide 69:1999
+
+| Approved Work Item
+| AWI
+| 1999
+| ISO Guide 69:1999
+
+| Working Draft
+| WD
+| 1999
+| ISO Guide 69:1999; harmonized codes 20.20, 20.60, 20.92, 20.93, 20.98, 20.99
+
+| Working Draft Study
+| WDS
+| 2025-06
+| Introduced June 2025; harmonized codes 20.20, 20.60 (overlaps with WD)
+
+| Committee Draft
+| CD
+| 1999
+| ISO Guide 69:1999
+
+| Committee Draft Technical Specification
+| CDTS
+| 1999
+| Stage code `cd` applied to type `ts`
+
+| Draft International Standard
+| DIS
+| 1999
+| ISO Guide 69:1999
+
+| Final Draft International Standard
+| FDIS
+| 1999
+| ISO Guide 69:1999
+|===
+
+=== Overlapping Harmonized Codes
+
+Some stages share harmonized stage codes. For example, both WD and WDS use
+code `20.20`. When parsing a URN that contains `stage-20.20`, implementations
+SHOULD resolve to the more general stage (WD) unless the typed abbreviation
+(`WDS`) is explicitly present in the URN.
+
+=== Parsing Disambiguation Rules
+
+When a harmonized stage code maps to multiple typed stages, the following
+rules apply:
+
+. If the URN contains a typed stage abbreviation (`stage-abbr`), use the
+  stage identified by that abbreviation directly.
+. If the URN contains a harmonized code (`stage-XX.XX`), prefer the stage
+  with the broader scope (more harmonized codes) over a specialized subset.
+. Published stage codes (`60.00`, `60.60`) resolve to "Proof" (PRF) or
+  "Published" depending on context. Non-published stages take precedence
+  over the published default for shared codes like `60.00`.
+
 == Differences from RFC 5141
 
 This specification extends RFC 5141 in the following ways:
@@ -463,6 +545,65 @@ This specification extends RFC 5141 in the following ways:
 | `amd`, `cor`, `add`
 | Extended with `sup` (generic supplement)
 |===
+
+== Gap Analysis: RFC 5141 Issues and Resolutions
+
+This appendix documents the issues identified in RFC 5141 and how RFC
+5141-bis addresses each one. This analysis is provided to assist ISO in
+evaluating the proposed extensions.
+
+[cols="1,1,5",options="header"]
+|===
+| # | Status | Issue and Resolution
+
+| 1 | Resolved
+| **Missing copublishers.** RFC 5141 defines a fixed set of originators
+(`iso`, `iec`, `iso-iec`, `iso-cie`, `iso-astm`, `iso-ieee`).
+RFC 5141-bis supports dynamic copublisher combinations via the
+`publisher *("-" copublisher)` pattern (see <<originator>>), enabling
+any combination (e.g., `iso-iec-ieee`, `iso-astm`, `iso-iec-ieee-itu`).
+
+| 2 | Resolved
+| **Missing ability to have Corrigendum of Amendment.** RFC 5141 only
+supports single-level supplements. RFC 5141-bis defines supplement
+chains with explicit ordering semantics (see <<supplement>>), enabling
+nested structures such as `amd:1:cor:1` (Corrigendum 1 to Amendment 1).
+
+| 3 | Resolved
+| **Missing supplement types for Guide, Directive, Directive Supplement.**
+RFC 5141 defines `amd`, `cor`, and `add` only. RFC 5141-bis extends
+the `type` field with `dir`, `dir-sup`, and `iwa-sup` (see <<type>>),
+and adds `sup` as a generic supplement type.
+
+| 4 | Resolved
+| **Missing ability to state stage of base identifier in supplements.**
+RFC 5141 provides no mechanism to include the base document's stage
+in a supplement URN. RFC 5141-bis supports typed stage abbreviations
+(see <<statusstage>>) and harmonized stage codes on the base document,
+preserving the stage information in supplement URNs.
+
+| 5 | Resolved
+| **Missing support for new stage types (WDS, CDTS).** RFC 5141 uses
+only harmonized stage codes. RFC 5141-bis adds typed stage
+abbreviations (see <<statusstage>>) including `WDS` (Working Draft
+Study, introduced 2025-06) and `CDTS` (Committee Draft Technical
+Specification), with dated stage code tracking (see <<Stage Code
+Evolution>>).
+
+| 6 | Resolved
+| **Missing support for new document types (IWA).** RFC 5141 lists
+`data`, `guide`, `isp`, `iwa`, `pas`, `r`, `tr`, `ts`, `tta`.
+RFC 5141-bis extends this with `dir`, `dir-sup`, and `iwa-sup`
+(see <<type>>).
+|===
+
+[NOTE]
+====
+All six identified gaps have been resolved in the RFC 5141-bis
+specification and implemented in the PubID software library with full
+test coverage. The implementation is available as open-source software
+to facilitate adoption by ISO Central Secretariat.
+====
 
 == References
 

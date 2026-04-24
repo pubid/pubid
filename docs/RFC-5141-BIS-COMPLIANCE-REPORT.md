@@ -21,7 +21,7 @@ PubID generates and parses URNs that comply with the ISO URN namespace specifica
 |------------|--------|-------|
 | Publisher identification | Met | Hyphen-separated lowercase copublishers (`iso-iec`, `iso-iec-ieee`) |
 | Document type codes | Met | `tr`, `ts`, `pas`, `guide`, `dir`, `dir-sup`, `iwa-sup` |
-| Typed stage codes | Met | WD, CD, DIS, FDIS, PDAM, DAM, FDAM, DCOR, FDCOR, CDV, CDTS, DTS, FDTS |
+| Typed stage codes | Met | WD, WDS, CD, DIS, FDIS, PDAM, DAM, FDAM, DCOR, FDCOR, CDV, CDTS, DTS, FDTS |
 | Harmonized stage codes | Met | `stage-XX.XX` format for stages without typed abbreviations |
 | Supplement chain ordering | Met | Multi-level supplements (Amd/Cor) in correct nesting order (Cor wraps Amd wraps Base) |
 | Edition specification | Met | `ed-N` format for ISO, `ed.N` for IEC |
@@ -58,10 +58,14 @@ URN generation is tested against real-world identifier databases:
 | Published stage omitted | By design | Published documents (60.60) don't include stage in URN per RFC |
 | Proof stage (60.00) included | Extension | PRF uses 60.00 harmonized code, included in URNs for clarity |
 | Non-ISO/IEC URNs | Extension | Other flavors use similar URN structure but are not RFC-defined |
+| Stage code evolution | Extension | WDS introduced 2025-06 shares harmonized codes with WD; disambiguation rules apply |
+| CDTS no-space variant | Extension | Both `CDTS` and `CD TS` parse correctly; URN uses `CDTS` abbreviation |
 
 ## References
 
-- RFC 5141-bis: A URN Namespace for ISO
+- [RFC 5141-bis Specification](../references/iso-urn-specification.adoc) - Full specification with ABNF grammar and gap analysis appendix
+- [IEC URN Specification](../references/iec-urn-specification.adoc) - IEC URN model specification
+- [URN Generation Guide](URN-GENERATION-GUIDE.adoc) - Usage documentation
 - `lib/pubid/iso/urn_generator.rb` - ISO URN generation
 - `lib/pubid/iso/urn_parser.rb` - ISO URN parsing
 - `lib/pubid/iec/urn_generator.rb` - IEC URN generation

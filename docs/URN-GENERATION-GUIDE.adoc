@@ -193,6 +193,7 @@ Typed stages use RFC 5141-bis abbreviations in URNs:
 | Stage | URN Code | Description
 
 | WD | `WD` | Working Draft
+| WDS | `WDS` | Working Draft Study (introduced 2025-06)
 | CD | `CD` | Committee Draft
 | CDV | `CDV` | Committee Draft for Vote
 | DIS | `DIS` | Draft International Standard
@@ -202,6 +203,9 @@ Typed stages use RFC 5141-bis abbreviations in URNs:
 | FDAM | `FDAM` | Final Draft Amendment
 | DCOR | `DCOR` | Draft Corrigendum
 | FDCOR | `FDCOR` | Final Draft Corrigendum
+| CDTS | `CDTS` | Committee Draft Technical Specification
+| DTS | `DTS` | Draft Technical Specification
+| FDTS | `FDTS` | Final Draft Technical Specification
 |===
 
 === Harmonized Stage Codes
