@@ -41,6 +41,15 @@ module Pubid
         it "returns IEC instance" do
           expect(subject).to be_a Pubid::Iec::Base
         end
+
+        context "with IEV shorthand" do
+          let(:pubid) { "IEV" }
+
+          it "returns IEC instance for IEC 60050" do
+            expect(subject).to be_a Pubid::Iec::Base
+            expect(subject.to_s).to eq("IEC 60050")
+          end
+        end
       end
 
       context "when CEN identifier provided" do

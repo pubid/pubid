@@ -536,5 +536,23 @@ module Pubid::Iec
         end
       end
     end
+
+    describe "IEV shorthand" do
+      it "parses bare 'IEV' as IEC 60050" do
+        expect(Pubid::Iec::Identifier.parse("IEV").to_s).to eq("IEC 60050")
+      end
+
+      it "parses 'IEV-351' as IEC 60050-351" do
+        expect(Pubid::Iec::Identifier.parse("IEV-351").to_s).to eq("IEC 60050-351")
+      end
+
+      it "reports 'IEV' as parseable" do
+        expect(Pubid::Iec::Identifier.parseable?("IEV")).to be(true)
+      end
+
+      it "does not swallow tokens that merely start with IEV" do
+        expect(Pubid::Iec::Identifier.parseable?("IEVERSION")).to be(false)
+      end
+    end
   end
 end
