@@ -165,8 +165,10 @@ module Pubid
         ) |
           # Legacy parts do not have subparts
           # the "/" to handle old style parts: "ISO 5843/6"
+          # Guard: don't match supplement type names (Amd, Cor, Sup, etc.)
           (
             str("/") >> space? >>
+            supplement_type_with_stage.absent? >>
             # matches a part
             match('\w').repeat(1)
           )
