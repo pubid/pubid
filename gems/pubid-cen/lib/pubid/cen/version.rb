@@ -1,5 +1,5 @@
 module Pubid
   module Cen
-    VERSION = "1.15.12".freeze
+    VERSION = "1.15.13".freeze
   end
 end
