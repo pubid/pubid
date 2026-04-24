@@ -52,6 +52,14 @@ module Pubid
             harmonized_stages: %w[20.20 20.60 20.92 20.93 20.98 20.99],
           ),
           ::Pubid::Components::TypedStage.new(
+            code: :wds,
+            stage_code: :wds,
+            type_code: :is,
+            abbr: ["WDS"],
+            name: "Working Draft Study",
+            harmonized_stages: %w[20.20 20.60],
+          ),
+          ::Pubid::Components::TypedStage.new(
             code: :pcdis,
             stage_code: :pcd,
             type_code: :is,
@@ -144,7 +152,7 @@ module Pubid
           short: "IS",
           abbr: ["", "IS"],
           base_class: "SingleIdentifier",
-          stage_codes: %i[dp pwi np awi wd pcd cd fcd dis
+          stage_codes: %i[dp pwi np awi wds wd pcd cd fcd dis
                           fdis prf wdr wda wdar],
           machine_codes: {
             iso_stage: ["40.60", "60.60"],

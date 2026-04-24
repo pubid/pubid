@@ -45,7 +45,7 @@ module Pubid
             code: :cdts,
             stage_code: :cd,
             type_code: :ts,
-            abbr: ["CD TS"],
+            abbr: ["CDTS", "CD TS"],
             name: "Committee Draft Technical Specification",
             harmonized_stages: %w[30.00 30.20 30.60 30.92 30.93 30.98 30.99],
           ),

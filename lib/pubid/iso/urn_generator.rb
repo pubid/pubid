@@ -286,9 +286,24 @@ module Pubid
         stage_code = identifier.typed_stage.stage_code
         return nil if !stage_code || stage_code == :published
 
-        # Try typed stage abbreviations first (RFC 5141-bis explicit abbreviations)
-        if TYPED_STAGE_MAP.key?(stage_code.to_sym)
+        # Try combined stage+type code first (e.g., "cdts" for CD+TS)
+        # This handles typed stages where stage_code differs from the full typed stage code
+        combined_key = nil
+        if identifier.typed_stage.type_code &&
+           identifier.typed_stage.type_code != "is" &&
+           identifier.typed_stage.type_code.to_s != ""
+          combined_key = "#{stage_code}#{identifier.typed_stage.type_code}".to_sym
+        end
+
+        if combined_key && TYPED_STAGE_MAP.key?(combined_key)
+          stage_abbr = TYPED_STAGE_MAP[combined_key]
+        elsif TYPED_STAGE_MAP.key?(stage_code.to_sym)
           stage_abbr = TYPED_STAGE_MAP[stage_code.to_sym]
+        else
+          stage_abbr = nil
+        end
+
+        if stage_abbr
 
           # Add iteration if present (no 'v' prefix for iterations)
           if identifier.stage_iteration

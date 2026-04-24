@@ -111,7 +111,10 @@ module Pubid
 
         # Parse language if present (2-letter codes like "en" or comma-separated)
         languages = nil
-        if parts.first && !parts.first.match(/^\d+$/) && !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-|ed-)/i)
+        if parts.first && !parts.first.match(/^\d+$/) &&
+           !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-|ed-)/i) &&
+           !TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase) &&
+           !parts.first.match?(/^[A-Z]+\.\d+$/i)
           languages = parse_languages(parts.shift)
         end
 
@@ -120,20 +123,26 @@ module Pubid
         stage_code = nil
         stage_iteration = nil
         harmonized_stage_code = nil # Track full harmonized code for lookup
+        stage_from_abbr = nil # Track stage code from typed abbreviation
         if parts.first&.start_with?("stage-")
           stage_str = parts.shift
           stage_code, stage_iteration = parse_stage_code(stage_str)
           # Set harmonized_stage_code AFTER parse_stage_code has stripped .vX suffix
           harmonized_stage_code = stage_str.sub("stage-", "").sub(/\.v\d+$/i,
                                                                   "")
-        elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase)
+        elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase) ||
+              (parts.first && parts.first.match?(/^[A-Za-z]+\.\d+$/) &&
+               TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase.split(".").first))
           stage_abbr = parts.shift.upcase
-          stage_code = TYPED_STAGE_REVERSE_MAP[stage_abbr]
           # Check for iteration (WD.2 format)
           if stage_abbr.include?(".")
-            stage_code, stage_iteration = stage_abbr.split(".")
-            stage_code = TYPED_STAGE_REVERSE_MAP[stage_code]
-            stage_iteration = stage_iteration.to_i
+            abbr_part, iteration_part = stage_abbr.split(".")
+            stage_code = TYPED_STAGE_REVERSE_MAP[abbr_part]
+            stage_from_abbr = stage_code
+            stage_iteration = iteration_part.to_i
+          else
+            stage_code = TYPED_STAGE_REVERSE_MAP[stage_abbr]
+            stage_from_abbr = stage_code
           end
         end
 
@@ -203,17 +212,29 @@ module Pubid
 
         # Build the identifier hash
         build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                         harmonized_stage_code, year, edition, languages, supplements)
+                         harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements)
       end
 
       private
 
       # Helper to find IS-type TypedStage by harmonized stage code
       # Used when URN doesn't specify a type code (defaults to IS)
+      # Prefers the most specific (non-published) stage
       def scheme_is_typed_stage_by_harmonized(harmonized_code)
-        Pubid::Iso::Scheme.instance.all_typed_stages.detect do |ts|
+        candidates = Pubid::Iso::Scheme.instance.all_typed_stages.select do |ts|
           ts.type_code.to_s == "is" && ts.harmonized_stages&.include?(harmonized_code)
         end
+
+        return nil if candidates.empty?
+
+        # Prefer non-published stages (stage_code != "published")
+        # This ensures PRF is preferred over published IS for 60.00
+        non_published = candidates.reject { |ts| ts.stage_code.to_s == "published" }
+        candidates = non_published unless non_published.empty?
+
+        # Among remaining candidates, prefer the stage with MORE harmonized codes (more general)
+        # WD covers 6 codes, WDS covers only 2 — WD should be preferred for shared codes
+        candidates.max_by { |ts| ts.harmonized_stages&.length || 0 }
       end
 
       # Parse publisher component (iso, iso-iec, etc.)
@@ -279,9 +300,7 @@ module Pubid
 
       # Build identifier from parsed components
       def build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                         harmonized_stage_code, year, edition, languages, supplements)
-        # Debug output
-        # puts "build_identifier: publishers=#{publishers.inspect}, number=#{number.inspect}, year=#{year.inspect}, edition=#{edition.inspect}"
+                         harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements)
 
         # Start with base document hash
         base_hash = {
@@ -309,25 +328,36 @@ module Pubid
 
         # Add stage if present
         if stage_code
-          # stage_code is the harmonized stage code (e.g., :"30.00"), not a stage_code symbol
-          # Look up by harmonized stage code
-          # When no type_code is specified (default IS), look for IS type first
-          if !type_code || type_code == :is
-            # Look for IS type with this harmonized stage
-            typed_stage = scheme_is_typed_stage_by_harmonized(stage_code.to_s)
-          end
+          typed_stage = nil
 
-          # Fall back to any typed stage if IS not found or type_code is specified
-          typed_stage ||= Scheme.locate_typed_stage_by_harmonized_code(stage_code.to_s)
-
-          # Special handling for stage "40.00": prefer DIS over FCD when parsing from URN
-          # This is because FCD is a legacy stage that maps to DIS in URN format
-          if stage_code.to_s == "40.00" && typed_stage && typed_stage.stage_code.to_s == "fcd"
-            # Look for DIS explicitly
-            dis_stage = Scheme.instance.all_typed_stages.detect do |ts|
-              ts.stage_code.to_s == "dis" && ts.harmonized_stages&.include?("40.00")
+          if stage_from_abbr
+            # Stage came from a typed abbreviation (e.g., WDS, DIS, CD)
+            # Look up by abbreviation directly for exact match
+            # The stage_from_abbr is the value from TYPED_STAGE_REVERSE_MAP
+            # We need to find the reverse to get the original abbreviation
+            abbr_str = TYPED_STAGE_REVERSE_MAP.key(stage_from_abbr)
+            typed_stage = Scheme.locate_typed_stage_by_abbr(abbr_str) if abbr_str
+            # If no exact match, fall back to stage_code lookup
+            typed_stage ||= Scheme.locate_typed_stage_by_stage_code(stage_from_abbr)
+          else
+            # Stage came from a harmonized code (e.g., stage-20.20)
+            # Look up by harmonized stage code
+            # When no type_code is specified (default IS), look for IS type first
+            if !type_code || type_code == :is
+              typed_stage = scheme_is_typed_stage_by_harmonized(stage_code.to_s)
             end
-            typed_stage = dis_stage if dis_stage
+
+            # Fall back to any typed stage if IS not found or type_code is specified
+            typed_stage ||= Scheme.locate_typed_stage_by_harmonized_code(stage_code.to_s)
+
+            # Special handling for stage "40.00": prefer DIS over FCD when parsing from URN
+            # This is because FCD is a legacy stage that maps to DIS in URN format
+            if stage_code.to_s == "40.00" && typed_stage && typed_stage.stage_code.to_s == "fcd"
+              dis_stage = Scheme.instance.all_typed_stages.detect do |ts|
+                ts.stage_code.to_s == "dis" && ts.harmonized_stages&.include?("40.00")
+              end
+              typed_stage = dis_stage if dis_stage
+            end
           end
 
           if typed_stage
