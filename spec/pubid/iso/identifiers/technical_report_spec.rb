@@ -451,7 +451,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
       describe "ISO/WD TR 23642" do
         subject { "ISO/WD TR 23642" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:tr:23642:stage-20.20" }
+        let(:urn) { "urn:iso:std:iso:tr:23642:WD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -480,7 +480,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
       describe "ISO/CD TR 12786.2" do
         subject { "ISO/CD TR 12786.2" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:tr:12786:stage-30.00.v2" }
+        let(:urn) { "urn:iso:std:iso:tr:12786:CD.2" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -750,7 +750,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
     describe "ISO/CD TR 22260-1.2" do
       subject { "ISO/CD TR 22260-1.2" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:tr:22260:-1:stage-30.00.v2" }
+      let(:urn) { "urn:iso:std:iso:tr:22260:-1:CD.2" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -788,7 +788,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
     describe "ISO/IEC PDTR 20943-5" do
       subject { "ISO/IEC PDTR 20943-5" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec:tr:20943:-5:stage-30.00" }
+      let(:urn) { "urn:iso:std:iso-iec:tr:20943:-5:CD" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")

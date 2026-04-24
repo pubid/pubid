@@ -319,7 +319,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
       describe "ISO/IEC WD ISP 10613-2" do
         subject { "ISO/IEC WD ISP 10613-2" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:stage-20.20" }
+        let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:WD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -595,7 +595,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     describe "ISO/IEC WD ISP 10613-2.2" do
       subject { "ISO/IEC WD ISP 10613-2.2" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:stage-20.20.v2" }
+      let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:WD.2" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")

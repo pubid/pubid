@@ -559,7 +559,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
     describe "ISO 10000:2020/WD Suppl 1" do
       subject { "ISO 10000:2020/WD Suppl 1" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:10000:stage-20.20:sup:1:v1" }
+      let(:urn) { "urn:iso:std:iso:10000:WD:sup:1:v1" }
 
       it "parses publisher" do
         expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
@@ -601,7 +601,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
     describe "ISO 10000:2020/CD Suppl 1" do
       subject { "ISO 10000:2020/CD Suppl 1" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:10000:stage-30.00:sup:1:v1" }
+      let(:urn) { "urn:iso:std:iso:10000:CD:sup:1:v1" }
 
       it "parses publisher" do
         expect(parsed.base_identifier.publisher.publisher).to eq("ISO")

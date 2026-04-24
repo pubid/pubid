@@ -248,7 +248,7 @@ RSpec.describe "ISO URN Generation and Parsing" do
 
       it "extracts edition from URN" do
         id = Pubid::Iso.parse_urn("urn:iso:std:iso:9001:ed-2")
-        expect(id.edition&.number).to eq("2")
+        expect(id.edition&.number&.value).to eq("2")
       end
 
       it "extracts language from URN" do

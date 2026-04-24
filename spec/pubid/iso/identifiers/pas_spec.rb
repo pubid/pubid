@@ -218,7 +218,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       describe "ISO/WD PAS 34507" do
         subject { "ISO/WD PAS 34507" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:pas:34507:stage-20.20" }
+        let(:urn) { "urn:iso:std:iso:pas:34507:WD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -247,7 +247,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       describe "ISO/CD PAS 22399" do
         subject { "ISO/CD PAS 22399" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:pas:22399:stage-30.00" }
+        let(:urn) { "urn:iso:std:iso:pas:22399:CD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")

@@ -714,7 +714,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       describe "ISO/IEC CD Guide 98-5" do
         subject { "ISO/IEC CD Guide 98-5" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso-iec:guide:98:-5:stage-30.00" }
+        let(:urn) { "urn:iso:std:iso-iec:guide:98:-5:CD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -753,7 +753,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         subject { "ISO/CD Guide 73" }
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:normalized) { "ISO CD Guide 73" }
-        let(:urn) { "urn:iso:std:iso:guide:73:stage-30.00" }
+        let(:urn) { "urn:iso:std:iso:guide:73:CD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -1201,7 +1201,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
     describe "ISO/IEC CD Guide 99.2" do
       subject { "ISO/IEC CD Guide 99.2" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec:guide:99:stage-30.00.v2" }
+      let(:urn) { "urn:iso:std:iso-iec:guide:99:CD.2" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")

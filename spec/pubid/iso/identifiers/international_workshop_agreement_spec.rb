@@ -224,7 +224,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       describe "WD IWA 19" do
         subject { "WD IWA 19" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:iwa:19:stage-20.20" }
+        let(:urn) { "urn:iso:std:iso:iwa:19:WD" }
 
         it "parses publisher" do
           expect(parsed.publisher).to be_nil
@@ -251,7 +251,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       describe "WD IWA 48(en)" do
         subject { "WD IWA 48(en)" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:iwa:48:stage-20.20:en" }
+        let(:urn) { "urn:iso:std:iso:iwa:48:WD:en" }
 
         it "parses publisher" do
           expect(parsed.publisher).to be_nil
@@ -280,7 +280,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       describe "CD IWA 37" do
         subject { "CD IWA 37" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:iwa:37:stage-30.00" }
+        let(:urn) { "urn:iso:std:iso:iwa:37:CD" }
 
         it "parses publisher" do
           expect(parsed.publisher).to be_nil
@@ -307,7 +307,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       describe "CD IWA 37-1" do
         subject { "CD IWA 37-1" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:iwa:37:-1:stage-30.00" }
+        let(:urn) { "urn:iso:std:iso:iwa:37:-1:CD" }
 
         it "parses publisher" do
           expect(parsed.publisher).to be_nil
@@ -371,7 +371,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     describe "WD IWA 48.2" do
       subject { "WD IWA 48.2" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:iwa:48:stage-20.20.v2" }
+      let(:urn) { "urn:iso:std:iso:iwa:48:WD.2" }
 
       it "parses publisher" do
         expect(parsed.publisher).to be_nil
@@ -406,7 +406,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       subject { "ISO/WD IWA 19" }
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "WD IWA 19" }
-      let(:urn) { "urn:iso:std:iso:iwa:19:stage-20.20" }
+      let(:urn) { "urn:iso:std:iso:iwa:19:WD" }
 
       # Publisher is not rendered but still exists
       it "parses publisher" do

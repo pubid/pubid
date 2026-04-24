@@ -327,7 +327,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       describe "ISO/IEC WD TS 25025" do
         subject { "ISO/IEC WD TS 25025" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso-iec:ts:25025:stage-20.20" }
+        let(:urn) { "urn:iso:std:iso-iec:ts:25025:WD" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -360,7 +360,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       describe "ISO/DTS 18759" do
         subject { "ISO/DTS 18759" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso:ts:18759:stage-40.00" }
+        let(:urn) { "urn:iso:std:iso:ts:18759:DTS" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -387,7 +387,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       describe "ISO/IEC DTS 5723" do
         subject { "ISO/IEC DTS 5723" }
         let(:parsed) { Pubid::Iso.parse(subject) }
-        let(:urn) { "urn:iso:std:iso-iec:ts:5723:stage-40.00" }
+        let(:urn) { "urn:iso:std:iso-iec:ts:5723:DTS" }
 
         it "parses publisher" do
           expect(parsed.publisher.publisher).to eq("ISO")
@@ -422,7 +422,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     describe "ISO/DTS 21328.4" do
       subject { "ISO/DTS 21328.4" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso:ts:21328:stage-40.00.v4" }
+      let(:urn) { "urn:iso:std:iso:ts:21328:DTS.4" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -453,7 +453,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     describe "ISO/IEC DTS 25052-1.2" do
       subject { "ISO/IEC DTS 25052-1.2" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec:ts:25052:-1:stage-40.00.v2" }
+      let(:urn) { "urn:iso:std:iso-iec:ts:25052:-1:DTS.2" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -495,7 +495,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     describe "ISO/IEC PDTS 19583-24" do
       subject { "ISO/IEC PDTS 19583-24" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec:ts:19583:-24:stage-30.00" }
+      let(:urn) { "urn:iso:std:iso-iec:ts:19583:-24:CDTS" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -530,7 +530,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     describe "ISO/IEC PDTS 27008" do
       subject { "ISO/IEC PDTS 27008" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec:ts:27008:stage-30.00" }
+      let(:urn) { "urn:iso:std:iso-iec:ts:27008:CDTS" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
@@ -564,7 +564,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     describe "ISO/IEC/IEEE DTS 17301-1-1:2016(en)" do
       subject { "ISO/IEC/IEEE DTS 17301-1-1:2016(en)" }
       let(:parsed) { Pubid::Iso.parse(subject) }
-      let(:urn) { "urn:iso:std:iso-iec-ieee:ts:17301:-1-1:stage-40.00:en" }
+      let(:urn) { "urn:iso:std:iso-iec-ieee:ts:17301:-1-1:DTS:en" }
 
       it "parses publisher" do
         expect(parsed.publisher.publisher).to eq("ISO")
