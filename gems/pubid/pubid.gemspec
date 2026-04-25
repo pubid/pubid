@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pubid-etsi", "= 1.15.13"
   spec.add_dependency "pubid-iec", "= 1.15.13"
   spec.add_dependency "pubid-ieee", "= 1.15.13"
+  spec.add_dependency "pubid-iho", "= 1.15.13"
   spec.add_dependency "pubid-iso", "= 1.15.13"
   spec.add_dependency "pubid-itu", "= 1.15.13"
   spec.add_dependency "pubid-jis", "= 1.15.13"

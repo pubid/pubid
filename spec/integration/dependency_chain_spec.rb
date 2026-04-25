@@ -24,6 +24,12 @@ RSpec.describe "Dependency chains" do
       expect(defined?(Pubid::Nist)).to be_truthy
       expect(defined?(Pubid::Core)).to be_truthy
     end
+
+    it "loads pubid-iho with pubid-core dependency" do
+      require "pubid-iho"
+      expect(defined?(Pubid::Iho)).to be_truthy
+      expect(defined?(Pubid::Core)).to be_truthy
+    end
   end
 
   describe "complex dependency chains" do
