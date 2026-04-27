@@ -1,0 +1,44 @@
+= IHO publication identifiers ("IHO PubID")
+
+== Purpose
+
+This gem implements a mechanism to parse and render IHO (International
+Hydrographic Organization) publication identifiers.
+
+== Usage
+
+=== Parsing
+
+[source,ruby]
+----
+require "pubid-iho"
+
+pubid = Pubid::Iho::Identifier.parse("IHO S-100 5.2.0")
+pubid.to_s
+# => "IHO S-100 5.2.0"
+
+pubid = Pubid::Iho::Identifier.parse("IHO S-100 Part 1 1.0.0")
+pubid.to_s
+# => "IHO S-100 Part 1 1.0.0"
+
+pubid = Pubid::Iho::Identifier.parse("IHO S-65 Ap. B 1.2.0")
+pubid.to_s
+# => "IHO S-65 Ap. B 1.2.0"
+----
+
+The `IHO` prefix is optional on input and added on render:
+
+[source,ruby]
+----
+Pubid::Iho::Identifier.parse("S-44 5.0.0").to_s
+# => "IHO S-44 5.0.0"
+----
+
+=== Identifier creation
+
+[source,ruby]
+----
+pubid = Pubid::Iho::Identifier.create(type: "S", number: "100", part: "1", version: "1.0.0")
+pubid.to_s
+# => "IHO S-100 Part 1 1.0.0"
+----
