@@ -36,7 +36,7 @@ module Pubid::Itu
       let(:pubid_ru) { "Рек. МСЭ-R SA.364-6" }
       let(:pubid_es) { "Rec. UIT-R SA.364-6" }
       let(:pubid_ar) { "ITU-R SA.364-6 التوصية" }
-      let(:pubid_cn) { "ITU-R SA.364-6建议书" }
+      let(:pubid_zh) { "ITU-R SA.364-6建议书" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to russian pubid"
@@ -183,7 +183,7 @@ module Pubid::Itu
       let(:pubid_es) { "Rec. UIT-T M.3016.1" }
       let(:pubid_fr) { "Rec. UIT-T M.3016.1" }
       let(:pubid_ru) { "Рек. МСЭ-T M.3016.1" }
-      let(:pubid_cn) { "ITU-T M.3016.1建议书" }
+      let(:pubid_zh) { "ITU-T M.3016.1建议书" }
       let(:pubid_ar) { "ITU-T M.3016.1 التوصية" }
 
       it_behaves_like "converts pubid to pubid"

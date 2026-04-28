@@ -9,5 +9,25 @@ type:
     ru: Рек.
     es: Rec.
     fr: Rec.
-    cn: 建议书
+    zh: 建议书
     ar: "التوصية"
+
+# Translation of the "Annex to" prefix used when an annex has no number
+# (i.e. the document IS the annex of a Special Publication, not a sub-annex).
+# For Arabic, the value is positioned as a postfix instead of a prefix.
+# Russian and Chinese intentionally have no entry here — both languages use
+# the long-form template for short rendering as well (see annex_long).
+annex_to:
+  es: Anexo al
+  fr: Annexe au
+  ar: "ملحق"
+
+# Long-form (title-style) templates for "Annex to ..." identifiers.
+# Used when format: :long is passed to to_s, and as the only form for
+# languages (ru, zh) where the short form is not separately defined.
+annex_long:
+  fr: "Annexe au BE de l'UIT %{number}"
+  es: "Anexo al BE de la UIT N.º %{number}"
+  ar: "ملحق ابلنشرة التشغيلية رقم %{number}"
+  ru: "Приложение к ОБ МСЭ %{number}"
+  zh: "国际电联操作公报附件 第 %{number} 期"

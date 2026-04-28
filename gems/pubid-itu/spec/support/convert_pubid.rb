@@ -18,7 +18,7 @@ end
 
 shared_examples "converts pubid to chinese pubid" do
   it "converts pubid to chinese pubid" do
-    expect(subject.to_s(language: :cn)).to eq(pubid_cn)
+    expect(subject.to_s(language: :zh)).to eq(pubid_zh)
   end
 end
 

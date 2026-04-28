@@ -110,6 +110,109 @@ module Pubid::Itu
           expect(subject.to_s).to eq("Annex to ITU-T OB No. 1")
         end
       end
+
+      # Fixtures from metanorma-itu PR #497 (spec/metanorma/i18n_spec.rb).
+      # Three forms per language: default English, short with language token
+      # translations, and long title-style template.
+      # Caller pattern from metanorma-itu front_id.rb#itu_id_lang:
+      # language is set on both the annex AND its base (recursively), so the
+      # language suffix is added to the rendered identifier.
+      describe "Annex to Special Publication with language" do
+        let(:series) { nil }
+        let(:number) { nil }
+        let(:base_id) do
+          Identifier.create(sector: "T", series: "OB", number: 1000,
+                            language: lang)
+        end
+
+        subject do
+          described_class.create(type: :annex, base: base_id, language: lang)
+        end
+
+        context "French (fr)" do
+          let(:lang) { "fr" }
+
+          it "renders short form" do
+            expect(subject.to_s(language: :fr))
+              .to eq("Annexe au UIT-T OB No. 1000-F")
+          end
+
+          it "renders long form" do
+            expect(subject.to_s(language: :fr, format: :long))
+              .to eq("Annexe au BE de l'UIT 1000-F")
+          end
+        end
+
+        context "Spanish (es)" do
+          let(:lang) { "es" }
+
+          it "renders short form" do
+            expect(subject.to_s(language: :es))
+              .to eq("Anexo al UIT-T OB No. 1000-S")
+          end
+
+          it "renders long form" do
+            expect(subject.to_s(language: :es, format: :long))
+              .to eq("Anexo al BE de la UIT N.º 1000-S")
+          end
+        end
+
+        context "Arabic (ar)" do
+          let(:lang) { "ar" }
+
+          it "renders short form" do
+            expect(subject.to_s(language: :ar))
+              .to eq("ITU-T OB No. 1000 ملحق-A")
+          end
+
+          it "renders long form" do
+            expect(subject.to_s(language: :ar, format: :long))
+              .to eq("ملحق ابلنشرة التشغيلية رقم 1000-A")
+          end
+        end
+
+        context "Russian (ru)" do
+          let(:lang) { "ru" }
+
+          it "renders short form (template-based)" do
+            expect(subject.to_s(language: :ru))
+              .to eq("Приложение к ОБ МСЭ 1000-R")
+          end
+
+          it "renders long form" do
+            expect(subject.to_s(language: :ru, format: :long))
+              .to eq("Приложение к ОБ МСЭ 1000-R")
+          end
+        end
+
+        context "Chinese (zh)" do
+          let(:lang) { "zh" }
+
+          it "renders short form (template-based)" do
+            expect(subject.to_s(language: :zh))
+              .to eq("国际电联操作公报附件 第 1000 期-C")
+          end
+
+          it "renders long form" do
+            expect(subject.to_s(language: :zh, format: :long))
+              .to eq("国际电联操作公报附件 第 1000 期-C")
+          end
+        end
+
+        context "default (no language) keeps English" do
+          let(:lang) { nil }
+          let(:base_id) do
+            Identifier.create(sector: "T", series: "OB", number: 1000)
+          end
+          subject do
+            described_class.create(type: :annex, base: base_id)
+          end
+
+          it "renders English form regardless of to_s language opt" do
+            expect(subject.to_s).to eq("Annex to ITU-T OB No. 1000")
+          end
+        end
+      end
     end
   end
 end
