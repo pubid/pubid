@@ -107,6 +107,46 @@ module Pubid::Iho
       it_behaves_like "converts pubid to pubid"
     end
 
+    # part with letter suffix (S-100 Part 4a/4b/4c, Part 17a, etc.)
+    context "IHO S-100 Part 4a 1.0.0" do
+      let(:pubid) { "IHO S-100 Part 4a 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-100 Part 4b 1.0.0" do
+      let(:pubid) { "IHO S-100 Part 4b 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-100 Part 4c 1.0.0" do
+      let(:pubid) { "IHO S-100 Part 4c 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-100 Part 17a 1.0.0" do
+      let(:pubid) { "IHO S-100 Part 17a 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    # letter-suffixed part without version
+    context "IHO S-100 Part 4a" do
+      let(:pubid) { "IHO S-100 Part 4a" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    # letter-suffixed part without IHO prefix on input
+    context "S-100 Part 4a 1.0.0 (without IHO prefix)" do
+      let(:original) { "S-100 Part 4a 1.0.0" }
+      let(:pubid) { "IHO S-100 Part 4a 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
     # IHO prefix is optional on input, always emitted on output
     context "S-44 5.0.0 (without IHO prefix)" do
       let(:original) { "S-44 5.0.0" }

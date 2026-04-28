@@ -17,7 +17,11 @@ module Pubid::Iho
     end
 
     rule(:part) do
-      space >> str("Part") >> space >> (digits | match("[A-Z]")).as(:part)
+      space >> str("Part") >> space >>
+        (
+          (digits >> match("[a-zA-Z]").repeat).as(:part) |
+          match("[A-Z]").as(:part)
+        )
     end
 
     rule(:version) do
