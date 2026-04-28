@@ -38,7 +38,7 @@ module Pubid::Itu::Renderer
     # Languages without an annex_to entry (ru, zh) use the long template for
     # the short form too.
     def render_annex_to_identifier(params, opts)
-      lang = opts[:language]&.to_s
+      lang = opts[:i18n_lang]&.to_s
       long_template = lang && Pubid::Itu::I18N["annex_long"]&.fetch(lang, nil)
 
       if opts[:format] == :long && long_template
@@ -65,11 +65,11 @@ module Pubid::Itu::Renderer
     end
 
     def type_translation_affixes(opts)
-      type_translation = opts[:language] &&
-        Pubid::Itu::I18N["type"][@params[:type]]&.fetch(opts[:language].to_s, nil)
+      type_translation = opts[:i18n_lang] &&
+        Pubid::Itu::I18N["type"][@params[:type]]&.fetch(opts[:i18n_lang].to_s, nil)
       return ["", ""] unless type_translation
 
-      case opts[:language]
+      case opts[:i18n_lang]
       when :zh then ["", type_translation]
       when :ar then ["", " #{type_translation}"]
       else ["#{type_translation} ", ""]
@@ -77,8 +77,8 @@ module Pubid::Itu::Renderer
     end
 
     def render_publisher(publisher, opts, params)
-      if opts[:language] &&
-          (publisher_translation = Pubid::Itu::I18N["publisher"][publisher]&.fetch(opts[:language].to_s, nil))
+      if opts[:i18n_lang] &&
+          (publisher_translation = Pubid::Itu::I18N["publisher"][publisher]&.fetch(opts[:i18n_lang].to_s, nil))
         return super(publisher_translation, opts, params)
       end
 

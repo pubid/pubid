@@ -30,7 +30,17 @@ module Pubid::Itu
         @range = range
       end
 
+      # Render identifier as a string.
+      #
+      # @param i18n_lang [Symbol, String] language for identifier text
+      #   translation (e.g. :fr renders "Annex to" as "Annexe au"). Distinct
+      #   from the identifier's `language` attribute, which is the document's
+      #   own language and produces the trailing suffix like "-F".
+      # @param language [Symbol, String] deprecated alias for i18n_lang.
+      # @param format [Symbol] :long for title-style rendering of supported
+      #   identifiers, otherwise the default short form.
       def to_s(**opts)
+        opts[:i18n_lang] = opts.delete(:language) if opts.key?(:language) && !opts.key?(:i18n_lang)
         self.class.get_renderer_class.new(to_h(deep: false)).render(**opts)
       end
 
