@@ -147,6 +147,32 @@ module Pubid::Iho
       it_behaves_like "converts pubid to pubid"
     end
 
+    # annex (S-100 Annex A "Terms and Definitions", S-98 Annex A/B/C)
+    context "IHO S-100 Annex A 5.2.0" do
+      let(:pubid) { "IHO S-100 Annex A 5.2.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-100 Annex A" do
+      let(:pubid) { "IHO S-100 Annex A" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-98 Annex C 1.0.0" do
+      let(:pubid) { "IHO S-98 Annex C 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "S-100 Annex A 5.2.0 (without IHO prefix)" do
+      let(:original) { "S-100 Annex A 5.2.0" }
+      let(:pubid) { "IHO S-100 Annex A 5.2.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
     # IHO prefix is optional on input, always emitted on output
     context "S-44 5.0.0 (without IHO prefix)" do
       let(:original) { "S-44 5.0.0" }
