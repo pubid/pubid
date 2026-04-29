@@ -1,18 +1,19 @@
 module Pubid::Iho
   module Identifier
     class Base < Pubid::Core::Identifier::Base
-      attr_accessor :version, :appendix, :annex
+      attr_accessor :version, :appendix, :annex, :supplement
 
       def self.type
         { key: :iho }
       end
 
-      def initialize(type:, publisher: "IHO", version: nil, part: nil, appendix: nil, annex: nil, **opts)
+      def initialize(type:, publisher: "IHO", version: nil, part: nil, appendix: nil, annex: nil, supplement: nil, **opts)
         super(**opts.merge(publisher: publisher))
         @part = part.to_s if part
         @version = version.to_s if version
         @appendix = appendix.to_s if appendix
         @annex = annex.to_s if annex
+        @supplement = supplement.to_s if supplement
         if type
           unless Identifier.config.type_names.map { |_, v| v[:short] }.include?(type.to_s)
             raise Pubid::Core::Errors::WrongTypeError, "Type '#{type}' is not available"

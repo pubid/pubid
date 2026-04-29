@@ -1,7 +1,7 @@
 module Pubid::Iho::Renderer
   class Base < Pubid::Core::Renderer::Base
     def render_identifier(params)
-      "%{publisher} %{type}-%{number}%{appendix}%{part}%{annex}%{version}" % params
+      "%{publisher} %{type}-%{number}%{appendix}%{part}%{annex}%{supplement}%{version}" % params
     end
 
     def render_part(part, _opts, _params)
@@ -14,6 +14,10 @@ module Pubid::Iho::Renderer
 
     def render_annex(annex, _opts, _params)
       " Annex #{annex}"
+    end
+
+    def render_supplement(supplement, _opts, _params)
+      " Suppl #{supplement}"
     end
 
     def render_version(version, _opts, _params)

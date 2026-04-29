@@ -13,7 +13,12 @@ module Pubid::Iho
     end
 
     rule(:appendix) do
-      space >> str("Ap.") >> space >> (digits | match("[A-Z]")).as(:appendix)
+      space >> (str("Appendix") | str("Ap.")) >> space >>
+        (
+          (match("[A-Z]") >> dash >> digits) |
+          digits |
+          match("[A-Z]")
+        ).as(:appendix)
     end
 
     rule(:part) do
@@ -28,13 +33,17 @@ module Pubid::Iho
       space >> str("Annex") >> space >> match("[A-Z]").as(:annex)
     end
 
+    rule(:supplement) do
+      space >> str("Suppl") >> space >> digits.as(:supplement)
+    end
+
     rule(:version) do
       space >> (digits >> dot >> digits >> dot >> digits).as(:version)
     end
 
     rule(:identifier) do
       (str("IHO") >> space).maybe >> series >> dash >> number >>
-        appendix.maybe >> part.maybe >> annex.maybe >> version.maybe
+        appendix.maybe >> part.maybe >> annex.maybe >> supplement.maybe >> version.maybe
     end
 
     rule(:root) { identifier }
