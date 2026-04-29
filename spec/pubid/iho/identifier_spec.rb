@@ -40,8 +40,13 @@ RSpec.describe Pubid::Iho::Identifier do
       "IHO S-100 Part 4c 1.0.0"      => "IHO S-100 Part 4c 1.0.0",
       "IHO S-100 Part 17a 1.0.0"     => "IHO S-100 Part 17a 1.0.0",
       "IHO S-100 Part 4a"            => "IHO S-100 Part 4a",
+      # annex (S-100 Annex A "Terms and Definitions", S-98 Annex A/B/C)
+      "IHO S-100 Annex A 5.2.0"      => "IHO S-100 Annex A 5.2.0",
+      "IHO S-100 Annex A"            => "IHO S-100 Annex A",
+      "IHO S-98 Annex C 1.0.0"       => "IHO S-98 Annex C 1.0.0",
       # IHO prefix is optional on input, always emitted on output
       "S-100 Part 4a 1.0.0"          => "IHO S-100 Part 4a 1.0.0",
+      "S-100 Annex A 5.2.0"          => "IHO S-100 Annex A 5.2.0",
       "S-44 5.0.0"                   => "IHO S-44 5.0.0",
     }.each do |input, canonical|
       context "with #{input.inspect}" do
