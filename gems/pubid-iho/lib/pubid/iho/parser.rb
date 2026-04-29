@@ -24,13 +24,17 @@ module Pubid::Iho
         )
     end
 
+    rule(:annex) do
+      space >> str("Annex") >> space >> match("[A-Z]").as(:annex)
+    end
+
     rule(:version) do
       space >> (digits >> dot >> digits >> dot >> digits).as(:version)
     end
 
     rule(:identifier) do
       (str("IHO") >> space).maybe >> series >> dash >> number >>
-        appendix.maybe >> part.maybe >> version.maybe
+        appendix.maybe >> part.maybe >> annex.maybe >> version.maybe
     end
 
     rule(:root) { identifier }
