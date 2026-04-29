@@ -8,7 +8,7 @@ module Pubid
       # Base class for all IHO identifiers.
       #
       # IHO identifiers have the form:
-      #   IHO {S|P|M|B|C}-{code}[ Ap. {appendix}][ Part {part}][ {version}]
+      #   IHO {S|P|M|B|C}-{code}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ {version}]
       #
       # The leading IHO publisher prefix is optional on input but always
       # emitted on output.
@@ -19,6 +19,7 @@ module Pubid
         attribute :code,      :string
         attribute :appendix,  :string
         attribute :part,      :string
+        attribute :annex,     :string
         attribute :version,   :string
 
         def self.parse(string)
@@ -36,6 +37,7 @@ module Pubid
           rendered = +"#{publisher} #{letter}-#{code}"
           rendered << " Ap. #{appendix}" if appendix
           rendered << " Part #{part}"    if part
+          rendered << " Annex #{annex}"  if annex
           rendered << " #{version}"      if version
           rendered
         end

@@ -35,6 +35,10 @@ module Pubid
           )
       end
 
+      rule(:annex) do
+        space >> str("Annex") >> space >> match("[A-Z]").as(:annex)
+      end
+
       rule(:version) do
         space >> (digits >> dot >> digits >> dot >> digits).as(:version)
       end
@@ -42,7 +46,7 @@ module Pubid
       rule(:identifier) do
         (str("IHO") >> space).maybe >>
           series >> dash >> code >>
-          appendix.maybe >> part.maybe >> version.maybe
+          appendix.maybe >> part.maybe >> annex.maybe >> version.maybe
       end
 
       root :identifier

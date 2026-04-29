@@ -12,6 +12,7 @@ module Pubid
           code:     stringify(hash[:code]),
           appendix: stringify(hash[:appendix]),
           part:     stringify(hash[:part]),
+          annex:    stringify(hash[:annex]),
           version:  stringify(hash[:version]),
         }.compact
 
