@@ -173,6 +173,48 @@ module Pubid::Iho
       it_behaves_like "converts pubid to pubid"
     end
 
+    # appendix with `D-2` value form (S-122/S-123 Appendix D-2 in metanorma-iho#344)
+    context "IHO S-122 Ap. D-2 1.0.0" do
+      let(:pubid) { "IHO S-122 Ap. D-2 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    # `Appendix` wording is accepted as an input alias and canonicalises to `Ap.`
+    context "IHO S-122 Appendix A 1.0.0 (Appendix wording → Ap.)" do
+      let(:original) { "IHO S-122 Appendix A 1.0.0" }
+      let(:pubid) { "IHO S-122 Ap. A 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-122 Appendix D-2 1.0.0 (Appendix wording → Ap.)" do
+      let(:original) { "IHO S-122 Appendix D-2 1.0.0" }
+      let(:pubid) { "IHO S-122 Ap. D-2 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    # supplement (S-66 Suppl 1..4 in metanorma-iho#344)
+    context "IHO S-66 Suppl 1 1.0.0" do
+      let(:pubid) { "IHO S-66 Suppl 1 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "IHO S-66 Suppl 4 1.0.0" do
+      let(:pubid) { "IHO S-66 Suppl 4 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "S-66 Suppl 1 1.0.0 (without IHO prefix)" do
+      let(:original) { "S-66 Suppl 1 1.0.0" }
+      let(:pubid) { "IHO S-66 Suppl 1 1.0.0" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
     # IHO prefix is optional on input, always emitted on output
     context "S-44 5.0.0 (without IHO prefix)" do
       let(:original) { "S-44 5.0.0" }
