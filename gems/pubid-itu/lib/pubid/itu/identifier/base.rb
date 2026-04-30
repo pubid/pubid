@@ -17,6 +17,11 @@ module Pubid::Itu
       def initialize(publisher: "ITU", series: nil, sector: nil, part: nil,
                      date: nil, amendment: nil, subseries: nil, number: nil,
                      second_number: nil, annex: nil, range: nil, **opts)
+        if series.to_s == "OB" && sector
+          raise ArgumentError,
+                "OB (Operational Bulletin) is a cross-bureau ITU publication; " \
+                "sector must not be set"
+        end
 
         super(**opts.merge(publisher: publisher, number: number))
         @series = series
@@ -77,6 +82,11 @@ module Pubid::Itu
           identifier_params = params.map do |k, v|
             get_transformer_class.new.apply(k => v)
           end.inject({}, :merge)
+
+          # OB is a cross-bureau ITU publication; legacy strings like
+          # "ITU-T OB.1096" round-trip by silently dropping the bureau here.
+          # Direct Identifier.create with sector+OB still raises.
+          identifier_params.delete(:sector) if identifier_params[:series].to_s == "OB"
 
           %i(supplement amendment corrigendum annex addendum appendix).each do |type|
             return transform_supplements(type, identifier_params) if identifier_params[type]

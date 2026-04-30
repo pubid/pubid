@@ -87,14 +87,21 @@ module Pubid::Itu
       end
 
       context "Special Publication" do
-        let(:sector) { "T" }
+        # OB is a cross-bureau ITU publication; no sector permitted.
+        let(:sector) { nil }
         let(:series) { "OB" }
         let(:params) { { date: { month: 0o1, year: 2024 } } }
-        # let(:params) { { number: 1, type: :supplement, base: Identifier.create(sector: "T", series: "H", number: 1) } }
 
-        # Annex to ITU-T OB.1283 (01/2024)
         it "renders identifier" do
-          expect(subject.to_s).to eq("ITU-T OB No. #{number} (01/2024)")
+          expect(subject.to_s).to eq("ITU OB No. #{number} (01/2024)")
+        end
+      end
+
+      context "Special Publication rejects sector" do
+        it "raises when sector is set with series=OB" do
+          expect do
+            Identifier.create(sector: "T", series: "OB", number: 1)
+          end.to raise_error(ArgumentError, /cross-bureau/)
         end
       end
 
@@ -103,11 +110,11 @@ module Pubid::Itu
         let(:number) { nil }
         let(:params) do
           { type: :annex,
-            base: Identifier.create(sector: "T", series: "OB", number: 1) }
+            base: Identifier.create(series: "OB", number: 1) }
         end
 
         it "renders annex to identifier" do
-          expect(subject.to_s).to eq("Annex to ITU-T OB No. 1")
+          expect(subject.to_s).to eq("Annex to ITU OB No. 1")
         end
       end
 
@@ -125,8 +132,7 @@ module Pubid::Itu
         let(:series) { nil }
         let(:number) { nil }
         let(:base_id) do
-          Identifier.create(sector: "T", series: "OB", number: 1000,
-                            language: lang)
+          Identifier.create(series: "OB", number: 1000, language: lang)
         end
 
         subject do
@@ -170,7 +176,7 @@ module Pubid::Itu
 
           it "renders short form" do
             expect(subject.to_s(i18n_lang: :ar))
-              .to eq("ITU-T OB No. 1000 ملحق-A")
+              .to eq("ITU OB No. 1000 ملحق-A")
           end
 
           it "renders long form" do
@@ -215,21 +221,21 @@ module Pubid::Itu
 
           it "renders short form with German prefix and no suffix" do
             expect(subject.to_s(i18n_lang: :de))
-              .to eq("Anhang zum ITU-T OB No. 1000")
+              .to eq("Anhang zum ITU OB No. 1000")
           end
         end
 
         context "default (no language) keeps English" do
           let(:lang) { nil }
           let(:base_id) do
-            Identifier.create(sector: "T", series: "OB", number: 1000)
+            Identifier.create(series: "OB", number: 1000)
           end
           subject do
             described_class.create(type: :annex, base: base_id)
           end
 
           it "renders English form regardless of to_s language opt" do
-            expect(subject.to_s).to eq("Annex to ITU-T OB No. 1000")
+            expect(subject.to_s).to eq("Annex to ITU OB No. 1000")
           end
         end
 
@@ -241,7 +247,7 @@ module Pubid::Itu
 
           it "renders English text with French suffix when i18n_lang=:en" do
             expect(subject.to_s(i18n_lang: :en))
-              .to eq("Annex to ITU-T OB No. 1000-F")
+              .to eq("Annex to ITU OB No. 1000-F")
           end
 
           it "still translates when i18n_lang matches document language" do

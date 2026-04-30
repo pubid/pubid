@@ -32,7 +32,7 @@ module Pubid::Itu::Renderer
 
     # Render "Annex to ..." identifier (annex of a Special Publication, where
     # the annex itself has no number). Three forms:
-    #   * default (no language): English structural, "Annex to ITU-T OB No. 1000"
+    #   * default (no language): English structural, "Annex to ITU OB No. 1000"
     #   * short with language: structural translation using annex_to
     #   * long with language: per-language annex_long template (title-style)
     # Languages without an annex_to entry (ru, zh) use the long template for
@@ -59,7 +59,8 @@ module Pubid::Itu::Renderer
     end
 
     def render_structural(params)
-      "%{publisher}-%{sector} #{render_type_series(params)}%{number}%{subseries}"\
+      pub_sector = params[:sector].to_s.empty? ? "%{publisher}" : "%{publisher}-%{sector}"
+      "#{pub_sector} #{render_type_series(params)}%{number}%{subseries}"\
       "%{part}%{second_number}%{range}%{annex}%{amendment}%{corrigendum}%{supplement}"\
       "%{addendum}%{appendix}%{date}" % params
     end
