@@ -8,19 +8,20 @@ module Pubid
       # Base class for all IHO identifiers.
       #
       # IHO identifiers have the form:
-      #   IHO {S|P|M|B|C}-{code}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ {version}]
+      #   IHO {S|P|M|B|C}-{code}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {version}]
       #
       # The leading IHO publisher prefix is optional on input but always
       # emitted on output.
       class Base < Lutaml::Model::Serializable
         include Pubid::Serializable
 
-        attribute :publisher, :string, default: "IHO"
-        attribute :code,      :string
-        attribute :appendix,  :string
-        attribute :part,      :string
-        attribute :annex,     :string
-        attribute :version,   :string
+        attribute :publisher,  :string, default: "IHO"
+        attribute :code,       :string
+        attribute :appendix,   :string
+        attribute :part,       :string
+        attribute :annex,      :string
+        attribute :supplement, :string
+        attribute :version,    :string
 
         def self.parse(string)
           Iho::Identifier.parse(string)
@@ -38,6 +39,7 @@ module Pubid
           rendered << " Ap. #{appendix}" if appendix
           rendered << " Part #{part}"    if part
           rendered << " Annex #{annex}"  if annex
+          rendered << " Suppl #{supplement}" if supplement
           rendered << " #{version}"      if version
           rendered
         end

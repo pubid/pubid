@@ -44,10 +44,19 @@ RSpec.describe Pubid::Iho::Identifier do
       "IHO S-100 Annex A 5.2.0"      => "IHO S-100 Annex A 5.2.0",
       "IHO S-100 Annex A"            => "IHO S-100 Annex A",
       "IHO S-98 Annex C 1.0.0"       => "IHO S-98 Annex C 1.0.0",
+      # appendix with letter-digit value form (S-122/S-123 Appendix D-2)
+      "IHO S-122 Ap. D-2 1.0.0"      => "IHO S-122 Ap. D-2 1.0.0",
+      # Appendix wording is accepted as input alias, canonicalises to Ap.
+      "IHO S-122 Appendix A 1.0.0"   => "IHO S-122 Ap. A 1.0.0",
+      "IHO S-122 Appendix D-2 1.0.0" => "IHO S-122 Ap. D-2 1.0.0",
+      # supplement (S-66 Suppl 1..4)
+      "IHO S-66 Suppl 1 1.0.0"       => "IHO S-66 Suppl 1 1.0.0",
+      "IHO S-66 Suppl 4 1.0.0"       => "IHO S-66 Suppl 4 1.0.0",
       # IHO prefix is optional on input, always emitted on output
       "S-100 Part 4a 1.0.0"          => "IHO S-100 Part 4a 1.0.0",
       "S-100 Annex A 5.2.0"          => "IHO S-100 Annex A 5.2.0",
       "S-44 5.0.0"                   => "IHO S-44 5.0.0",
+      "S-66 Suppl 1 1.0.0"           => "IHO S-66 Suppl 1 1.0.0",
     }.each do |input, canonical|
       context "with #{input.inspect}" do
         let(:input)     { input }
