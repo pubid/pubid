@@ -158,7 +158,8 @@ module Pubid::Itu::Renderer
     end
 
     def render_language(language, _opts, _params)
-      "-#{LANGUAGES[language]}"
+      code = LANGUAGES[language]
+      code ? "-#{code}" : nil
     end
   end
 end

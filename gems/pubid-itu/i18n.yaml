@@ -14,17 +14,20 @@ type:
 
 # Translation of the "Annex to" prefix used when an annex has no number
 # (i.e. the document IS the annex of a Special Publication, not a sub-annex).
-# For Arabic, the value is positioned as a postfix instead of a prefix.
-# Russian and Chinese intentionally have no entry here — both languages use
-# the long-form template for short rendering as well (see annex_long).
+# For Arabic the value is positioned as a postfix instead of a prefix.
+# Languages with an annex_long entry below (fr/es/ru/zh) intentionally have
+# no entry here — they use the long-form template for short rendering too,
+# so French short matches French long etc. This avoids mixing the English
+# "OB" abbreviation with localized text; ITU itself uses the localized
+# abbreviation (e.g. "BE" in French/Spanish).
+# German is not an official ITU language so no long template exists.
 annex_to:
-  es: Anexo al
-  fr: Annexe au
   ar: "ملحق"
+  de: Anhang zum
 
 # Long-form (title-style) templates for "Annex to ..." identifiers.
-# Used when format: :long is passed to to_s, and as the only form for
-# languages (ru, zh) where the short form is not separately defined.
+# Used both for to_s(format: :long) and for short rendering when no
+# annex_to entry exists for the language.
 annex_long:
   fr: "Annexe au BE de l'UIT %{number}"
   es: "Anexo al BE de la UIT N.º %{number}"

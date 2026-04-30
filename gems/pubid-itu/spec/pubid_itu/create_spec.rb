@@ -133,12 +133,16 @@ module Pubid::Itu
           described_class.create(type: :annex, base: base_id, language: lang)
         end
 
+        # French and Spanish use the long-form template for short rendering
+        # too (per @opoudjis PR #38 review): ITU itself uses the localized
+        # "BE" abbreviation rather than mixing the English "OB" into French
+        # or Spanish text. Short and long therefore produce the same string.
         context "French (fr)" do
           let(:lang) { "fr" }
 
-          it "renders short form" do
+          it "renders short form (matches long)" do
             expect(subject.to_s(i18n_lang: :fr))
-              .to eq("Annexe au UIT-T OB No. 1000-F")
+              .to eq("Annexe au BE de l'UIT 1000-F")
           end
 
           it "renders long form" do
@@ -150,9 +154,9 @@ module Pubid::Itu
         context "Spanish (es)" do
           let(:lang) { "es" }
 
-          it "renders short form" do
+          it "renders short form (matches long)" do
             expect(subject.to_s(i18n_lang: :es))
-              .to eq("Anexo al UIT-T OB No. 1000-S")
+              .to eq("Anexo al BE de la UIT N.º 1000-S")
           end
 
           it "renders long form" do
@@ -203,6 +207,18 @@ module Pubid::Itu
           end
         end
 
+        # German is not an official ITU language so there is no `annex_long`
+        # template and no language-suffix code. Only the "Annex to" prefix
+        # is translated; the rest keeps the structural English form.
+        context "German (de)" do
+          let(:lang) { "de" }
+
+          it "renders short form with German prefix and no suffix" do
+            expect(subject.to_s(i18n_lang: :de))
+              .to eq("Anhang zum ITU-T OB No. 1000")
+          end
+        end
+
         context "default (no language) keeps English" do
           let(:lang) { nil }
           let(:base_id) do
@@ -230,7 +246,7 @@ module Pubid::Itu
 
           it "still translates when i18n_lang matches document language" do
             expect(subject.to_s(i18n_lang: :fr))
-              .to eq("Annexe au UIT-T OB No. 1000-F")
+              .to eq("Annexe au BE de l'UIT 1000-F")
           end
         end
 
@@ -239,7 +255,7 @@ module Pubid::Itu
 
           it "treats language: as i18n_lang:" do
             expect(subject.to_s(language: :fr))
-              .to eq("Annexe au UIT-T OB No. 1000-F")
+              .to eq("Annexe au BE de l'UIT 1000-F")
           end
         end
       end
