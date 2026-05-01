@@ -89,5 +89,27 @@ RSpec.describe Pubid::Iec::Parser do
         expect(result[:date]).to eq("2012")
       end
     end
+
+    context "IEV shorthand for IEC 60050 (International Electrotechnical Vocabulary)" do
+      it "expands bare 'IEV' to 'IEC 60050'" do
+        result = subject.parse("IEV")
+        expect(result).to be_a(Hash)
+        expect(result[:publisher]).to eq("IEC")
+        expect(result[:number_with_part]).to eq("60050")
+      end
+
+      it "expands 'IEV-351' to 'IEC 60050-351'" do
+        result = subject.parse("IEV-351")
+        expect(result).to be_a(Hash)
+        expect(result[:publisher]).to eq("IEC")
+        expect(result[:number_with_part]).to eq("60050-351")
+      end
+
+      it "does not expand tokens that merely start with IEV" do
+        result = subject.parse("IEVERSION")
+        # Confirm the IEV prefix was not rewritten to IEC 60050
+        expect(result[:number_with_part].to_s).not_to start_with("60050")
+      end
+    end
   end
 end
