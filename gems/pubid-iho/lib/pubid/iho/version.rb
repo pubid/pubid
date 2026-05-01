@@ -1,5 +1,5 @@
 module Pubid
   module Iho
-    VERSION = "1.15.16".freeze
+    VERSION = "1.15.17".freeze
   end
 end
