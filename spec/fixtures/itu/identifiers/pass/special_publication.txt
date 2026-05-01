@@ -1,0 +1,17 @@
+# ITU Special Publication (Operational Bulletin) - Pass
+# Round-trip canonical forms only. Legacy forms (ITU-T OB.X,
+# Operational Bulletin No. X) normalize to "ITU OB No. X" and are
+# covered by special_publication_spec.rb instead of round-trip fixtures.
+
+ITU OB No. 1
+ITU OB No. 100
+ITU OB No. 1096
+ITU OB No. 1283
+ITU OB No. 1283 (01/2024)
+ITU OB No. 1096 (03/2016)
+ITU OB No. 1000-F
+ITU OB No. 1000-S
+ITU OB No. 1000-R
+ITU OB No. 1000-A
+ITU OB No. 1000-C
+ITU OB No. 1000-E

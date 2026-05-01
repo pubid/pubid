@@ -170,7 +170,50 @@ module Pubid
           language.maybe
       end
 
-      rule(:identifier) { supplement_identifier | with_series | without_series }
+      # OB (Operational Bulletin) — Special Publication.
+      # OB is a cross-bureau ITU publication; sector, when present in legacy
+      # strings like "ITU-T OB.1096", is silently dropped by the builder.
+      rule(:ob_series) { str("OB").as(:series) }
+
+      rule(:ob_dot_body) { dot >> number }
+      rule(:ob_no_body) { space >> str("No.") >> space >> number }
+
+      rule(:ob_with_sector) do
+        itu_prefix >>
+          (sector >> space).maybe >>
+          ob_series >>
+          (ob_dot_body | ob_no_body) >>
+          date_part.maybe >>
+          language.maybe
+      end
+
+      # Legacy long form: "ITU-T Operational Bulletin No. 1096".
+      # The :_op_bull marker tells the builder to set series=OB.
+      rule(:ob_long_form) do
+        itu_prefix >>
+          (sector >> space).maybe >>
+          str("Operational Bulletin").as(:_op_bull) >>
+          space >> str("No.") >> space >>
+          number >>
+          date_part.maybe >>
+          language.maybe
+      end
+
+      rule(:special_publication) { ob_with_sector | ob_long_form }
+
+      # "Annex to ..." — the document IS the annex of a Special Publication
+      # (no annex number). The :annex_to wrapping signals to the builder.
+      rule(:annex_to_identifier) do
+        str("Annex to") >> space >> special_publication.as(:annex_to)
+      end
+
+      rule(:identifier) do
+        annex_to_identifier |
+          special_publication |
+          supplement_identifier |
+          with_series |
+          without_series
+      end
 
       rule(:root) { identifier }
 
