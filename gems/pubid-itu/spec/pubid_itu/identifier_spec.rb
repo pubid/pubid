@@ -36,7 +36,7 @@ module Pubid::Itu
       let(:pubid_ru) { "Рек. МСЭ-R SA.364-6" }
       let(:pubid_es) { "Rec. UIT-R SA.364-6" }
       let(:pubid_ar) { "ITU-R SA.364-6 التوصية" }
-      let(:pubid_cn) { "ITU-R SA.364-6建议书" }
+      let(:pubid_zh) { "ITU-R SA.364-6建议书" }
 
       it_behaves_like "converts pubid to pubid"
       it_behaves_like "converts pubid to russian pubid"
@@ -123,27 +123,32 @@ module Pubid::Itu
       it_behaves_like "converts pubid to pubid"
     end
 
-    context "ITU-T OB.1096" do
+    # OB (Operational Bulletin) is a cross-bureau ITU publication and must
+    # not have a sector. Legacy strings like "ITU-T OB.1096" still parse
+    # successfully — the bureau is dropped during normalization.
+    context "ITU-T OB.1096 (legacy with sector normalizes)" do
       let(:original) { "ITU-T OB.1096" }
-      let(:pubid) { "ITU-T OB No. 1096" }
+      let(:pubid) { "ITU OB No. 1096" }
 
       it_behaves_like "converts pubid to pubid"
 
       it { expect(subject).to be_a(Identifier::SpecialPublication) }
+      it { expect(subject.sector).to be_nil }
     end
 
-    context "ITU-T OB.1096" do
+    context "ITU-T OB No. 1096 (legacy with sector normalizes)" do
       let(:original) { "ITU-T OB No. 1096" }
-      let(:pubid) { "ITU-T OB No. 1096" }
+      let(:pubid) { "ITU OB No. 1096" }
 
       it_behaves_like "converts pubid to pubid"
 
       it { expect(subject).to be_a(Identifier::SpecialPublication) }
+      it { expect(subject.sector).to be_nil }
     end
 
-    context "ITU-T Operational Bulletin No. 1096" do
+    context "ITU-T Operational Bulletin No. 1096 (legacy)" do
       let(:original) { "ITU-T Operational Bulletin No. 1096" }
-      let(:pubid) { "ITU-T OB No. 1096" }
+      let(:pubid) { "ITU OB No. 1096" }
 
       it_behaves_like "converts pubid to pubid"
 
@@ -152,7 +157,7 @@ module Pubid::Itu
 
     context "ITU-T OB.1096 - 15.III.2016" do
       let(:original) { "ITU-T OB.1096 - 15.III.2016" }
-      let(:pubid) { "ITU-T OB No. 1096 (03/2016)" }
+      let(:pubid) { "ITU OB No. 1096 (03/2016)" }
 
       it_behaves_like "converts pubid to pubid"
     end
@@ -183,7 +188,7 @@ module Pubid::Itu
       let(:pubid_es) { "Rec. UIT-T M.3016.1" }
       let(:pubid_fr) { "Rec. UIT-T M.3016.1" }
       let(:pubid_ru) { "Рек. МСЭ-T M.3016.1" }
-      let(:pubid_cn) { "ITU-T M.3016.1建议书" }
+      let(:pubid_zh) { "ITU-T M.3016.1建议书" }
       let(:pubid_ar) { "ITU-T M.3016.1 التوصية" }
 
       it_behaves_like "converts pubid to pubid"
@@ -323,9 +328,9 @@ module Pubid::Itu
       it { expect(subject).to be_a(Identifier::Appendix) }
     end
 
-    context "Annex to ITU-T OB.1283 (01/2024)" do
+    context "Annex to ITU-T OB.1283 (01/2024) (legacy with sector normalizes)" do
       let(:original) { "Annex to ITU-T OB.1283 (01/2024)" }
-      let(:pubid) { "Annex to ITU-T OB No. 1283 (01/2024)" }
+      let(:pubid) { "Annex to ITU OB No. 1283 (01/2024)" }
 
       it_behaves_like "converts pubid to pubid"
     end

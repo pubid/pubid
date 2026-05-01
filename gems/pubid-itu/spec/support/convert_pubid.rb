@@ -6,31 +6,31 @@ end
 
 shared_examples "converts pubid to french pubid" do
   it "converts pubid to french pubid" do
-    expect(subject.to_s(language: :fr)).to eq(pubid_fr)
+    expect(subject.to_s(i18n_lang: :fr)).to eq(pubid_fr)
   end
 end
 
 shared_examples "converts pubid to spanish pubid" do
   it "converts pubid to spanish pubid" do
-    expect(subject.to_s(language: :es)).to eq(pubid_es)
+    expect(subject.to_s(i18n_lang: :es)).to eq(pubid_es)
   end
 end
 
 shared_examples "converts pubid to chinese pubid" do
   it "converts pubid to chinese pubid" do
-    expect(subject.to_s(language: :cn)).to eq(pubid_cn)
+    expect(subject.to_s(i18n_lang: :zh)).to eq(pubid_zh)
   end
 end
 
 shared_examples "converts pubid to russian pubid" do
   it "converts pubid to russian pubid" do
-    expect(subject.to_s(language: :ru)).to eq(pubid_ru)
+    expect(subject.to_s(i18n_lang: :ru)).to eq(pubid_ru)
   end
 end
 
 shared_examples "converts pubid to arabic pubid" do
   it "converts pubid to arabic pubid" do
-    expect(subject.to_s(language: :ar)).to eq(pubid_ar)
+    expect(subject.to_s(i18n_lang: :ar)).to eq(pubid_ar)
   end
 end
 

@@ -2,6 +2,8 @@ module Pubid::Itu::Renderer
   class Base < Pubid::Core::Renderer::Base
     TYPE_PREFIX = "".freeze
 
+    LANGUAGES = Pubid::Core::Renderer::Base::LANGUAGES.merge("zh" => "C").freeze
+
     def render(**args)
       render_base_identifier(**args) + @prerendered_params[:language].to_s
     end
@@ -20,28 +22,64 @@ module Pubid::Itu::Renderer
     # can prepend entity, can postpend, can use item holder
 
     def render_identifier(params, opts)
-      postfix = prefix = ""
       if @params[:annex] && @params[:annex][:number].nil?
-        prefix += "Annex to "
-      elsif opts[:language] &&
-          (type_translation = Pubid::Itu::I18N["type"][@params[:type]]&.fetch(opts[:language].to_s, nil))
-        if opts[:language] == :cn
-          postfix =+ type_translation
-        elsif opts[:language] == :ar
-          postfix += " #{type_translation}"
-        else
-          prefix += "#{type_translation} "
-        end
+        return render_annex_to_identifier(params, opts)
       end
 
-      "#{prefix}%{publisher}-%{sector} #{render_type_series(params)}%{number}%{subseries}"\
+      prefix, postfix = type_translation_affixes(opts)
+      "#{prefix}#{render_structural(params)}#{postfix}"
+    end
+
+    # Render "Annex to ..." identifier (annex of a Special Publication, where
+    # the annex itself has no number). Three forms:
+    #   * default (no language): English structural, "Annex to ITU OB No. 1000"
+    #   * short with language: structural translation using annex_to
+    #   * long with language: per-language annex_long template (title-style)
+    # Languages without an annex_to entry (ru, zh) use the long template for
+    # the short form too.
+    def render_annex_to_identifier(params, opts)
+      lang = opts[:i18n_lang]&.to_s
+      long_template = lang && Pubid::Itu::I18N["annex_long"]&.fetch(lang, nil)
+
+      if opts[:format] == :long && long_template
+        return long_template % { number: @params[:number] }
+      end
+
+      annex_translation = lang && Pubid::Itu::I18N["annex_to"]&.fetch(lang, nil)
+
+      if annex_translation
+        return "#{render_structural(params)} #{annex_translation}" if lang == "ar"
+
+        return "#{annex_translation} #{render_structural(params)}"
+      end
+
+      return long_template % { number: @params[:number] } if long_template
+
+      "Annex to #{render_structural(params)}"
+    end
+
+    def render_structural(params)
+      pub_sector = params[:sector].to_s.empty? ? "%{publisher}" : "%{publisher}-%{sector}"
+      "#{pub_sector} #{render_type_series(params)}%{number}%{subseries}"\
       "%{part}%{second_number}%{range}%{annex}%{amendment}%{corrigendum}%{supplement}"\
-      "%{addendum}%{appendix}%{date}#{postfix}" % params
+      "%{addendum}%{appendix}%{date}" % params
+    end
+
+    def type_translation_affixes(opts)
+      type_translation = opts[:i18n_lang] &&
+        Pubid::Itu::I18N["type"][@params[:type]]&.fetch(opts[:i18n_lang].to_s, nil)
+      return ["", ""] unless type_translation
+
+      case opts[:i18n_lang]
+      when :zh then ["", type_translation]
+      when :ar then ["", " #{type_translation}"]
+      else ["#{type_translation} ", ""]
+      end
     end
 
     def render_publisher(publisher, opts, params)
-      if opts[:language] &&
-          (publisher_translation = Pubid::Itu::I18N["publisher"][publisher]&.fetch(opts[:language].to_s, nil))
+      if opts[:i18n_lang] &&
+          (publisher_translation = Pubid::Itu::I18N["publisher"][publisher]&.fetch(opts[:i18n_lang].to_s, nil))
         return super(publisher_translation, opts, params)
       end
 
@@ -121,7 +159,8 @@ module Pubid::Itu::Renderer
     end
 
     def render_language(language, _opts, _params)
-      "-#{LANGUAGES[language]}"
+      code = LANGUAGES[language]
+      code ? "-#{code}" : nil
     end
   end
 end
