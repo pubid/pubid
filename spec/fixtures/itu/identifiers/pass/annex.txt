@@ -1,0 +1,9 @@
+# ITU Annex-to-Special-Publication - Pass
+# Default English rendering only; localized renderings are not round-trip
+# (e.g. "Annexe au BE de l'UIT 1000-F" cannot be re-parsed).
+
+Annex to ITU OB No. 1
+Annex to ITU OB No. 1283
+Annex to ITU OB No. 1283 (01/2024)
+Annex to ITU OB No. 1000-F
+Annex to ITU OB No. 1000-S

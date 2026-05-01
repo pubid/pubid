@@ -9,6 +9,8 @@ require_relative "identifiers/combined_identifier"
 require_relative "identifiers/supplement"
 require_relative "identifiers/amendment"
 require_relative "identifiers/corrigendum"
+require_relative "identifiers/special_publication"
+require_relative "identifiers/annex"
 
 module Pubid
   module Itu
@@ -18,6 +20,17 @@ module Pubid
       end
 
       def build(data)
+        # "Annex to ..." identifier — wraps a Special Publication base
+        if data[:annex_to]
+          return build_annex(data[:annex_to])
+        end
+
+        # Operational Bulletin (Special Publication) — series == "OB" or
+        # legacy long form ("Operational Bulletin No. ...").
+        if data[:series].to_s == "OB" || data[:_op_bull]
+          return build_special_publication(data)
+        end
+
         # Check if this is a supplement identifier
         if data[:supplement_type]
           return build_supplement(data)
@@ -62,6 +75,28 @@ module Pubid
           code: code,
           date: date,
           language: data[:language]&.to_s,
+        )
+      end
+
+      # Build Special Publication (OB). Sector is silently dropped — OB is a
+      # cross-bureau publication and `Identifiers::Base` rejects sector+OB
+      # in its constructor.
+      def build_special_publication(data)
+        Identifiers::SpecialPublication.new(
+          series: Components::Series.new(series: "OB"),
+          code: data[:number] ? build_code(data) : nil,
+          date: data[:year] ? build_date(data) : nil,
+          language: data[:language]&.to_s,
+        )
+      end
+
+      # Build "Annex to ..." identifier. The inner data is the Special
+      # Publication; the annex inherits its language.
+      def build_annex(inner_data)
+        base = build_special_publication(inner_data)
+        Identifiers::Annex.new(
+          base: base,
+          language: inner_data[:language]&.to_s,
         )
       end
 

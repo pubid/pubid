@@ -1,0 +1,30 @@
+# Translations for ITU identifier rendering.
+#
+# Ported from v1 monorepo gems/pubid-itu/i18n.yaml — only the sections
+# required by the "Annex to ITU OB" feature are populated here. The
+# `type`/`publisher` sections used by the v1 recommendation renderer are
+# intentionally omitted on v2: the v2 rendering pipeline does not yet wire
+# them up (a separate effort).
+
+# Translation of the "Annex to" prefix used when an annex has no number
+# (i.e. the document IS the annex of a Special Publication, not a sub-annex).
+# For Arabic the value is positioned as a postfix instead of a prefix.
+# Languages with an annex_long entry below (fr/es/ru/zh) intentionally have
+# no entry here — they use the long-form template for short rendering too,
+# so French short matches French long etc. This avoids mixing the English
+# "OB" abbreviation with localized text; ITU itself uses the localized
+# abbreviation (e.g. "BE" in French/Spanish).
+# German is not an official ITU language so no long template exists.
+annex_to:
+  ar: "ملحق"
+  de: Anhang zum
+
+# Long-form (title-style) templates for "Annex to ..." identifiers.
+# Used both for to_s(format: :long) and for short rendering when no
+# annex_to entry exists for the language.
+annex_long:
+  fr: "Annexe au BE de l'UIT %{number}"
+  es: "Anexo al BE de la UIT N.º %{number}"
+  ar: "ملحق ابلنشرة التشغيلية رقم %{number}"
+  ru: "Приложение к ОБ МСЭ %{number}"
+  zh: "国际电联操作公报附件 第 %{number} 期"

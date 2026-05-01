@@ -6,6 +6,7 @@ require_relative "../../components/date"
 require_relative "../components/sector"
 require_relative "../components/series"
 require_relative "../components/code"
+require_relative "../i18n"
 
 module Pubid
   module Itu
@@ -13,6 +14,34 @@ module Pubid
       # Base class for all ITU identifiers
       class Base < Lutaml::Model::Serializable
         include Pubid::Serializable
+
+        # Long-form ↔ ITU single-letter language code map. The parser produces
+        # single-letter codes (E/F/S/R/A/C); API callers (e.g. metanorma-itu)
+        # pass long-form (en/fr/es/ru/ar/zh). Storage is normalized to the
+        # single-letter form. Languages with no canonical letter (e.g. "de")
+        # pass through unchanged and produce no trailing suffix.
+        LANGUAGES = {
+          "fr" => "F", "es" => "S", "ru" => "R",
+          "ar" => "A", "zh" => "C", "en" => "E",
+          "F" => "F", "S" => "S", "R" => "R",
+          "A" => "A", "C" => "C", "E" => "E"
+        }.freeze
+
+        attribute :sector, Pubid::Itu::Components::Sector
+        attribute :series, Pubid::Itu::Components::Series
+        attribute :code, Pubid::Itu::Components::Code
+        attribute :date, Pubid::Components::Date
+        attribute :language, :string
+
+        def initialize(**kwargs)
+          if kwargs[:language]
+            kwargs = kwargs.merge(language: normalize_language(kwargs[:language]))
+          end
+
+          super(**kwargs)
+
+          validate_ob_no_sector!
+        end
 
         # Generate URN for this identifier
         #
@@ -33,17 +62,25 @@ module Pubid
           hash
         end
 
-        attribute :sector, Pubid::Itu::Components::Sector
-        attribute :series, Pubid::Itu::Components::Series
-        attribute :code, Pubid::Itu::Components::Code
-        attribute :date, Pubid::Components::Date
-        attribute :language, :string
-
         def publisher
           "ITU"
         end
 
-        def to_s
+        # Render identifier as a string.
+        #
+        # @param i18n_lang [Symbol, String] language for identifier text
+        #   translation (e.g. :fr renders "Annex to" as "Annexe au"). Distinct
+        #   from the identifier's `language` attribute, which is the document's
+        #   own language and produces the trailing suffix like "-F".
+        # @param language [Symbol, String] deprecated alias for i18n_lang.
+        # @param format [Symbol] :long for title-style rendering of supported
+        #   identifiers, otherwise the default short form.
+        def to_s(**opts)
+          opts = self.class.normalize_to_s_opts(opts)
+          render_base(**opts) + render_language_suffix
+        end
+
+        def render_base(**_opts)
           result = "#{publisher}-#{sector}"
 
           # Add series and code
@@ -62,10 +99,30 @@ module Pubid
                       end
           end
 
-          # Add language
-          result += "-#{language}" if language
-
           result
+        end
+
+        def render_language_suffix
+          return "" unless language
+          # Only render canonical single-letter ITU language codes
+          # (e.g. "F", "S"). Languages with no mapping (e.g. "de") get
+          # no suffix — matches v1 PR #38 render_language behavior.
+          return "" unless LANGUAGES.values.include?(language)
+
+          "-#{language}"
+        end
+
+        # Translate `language:` opt to `i18n_lang:` opt. v1 PR #38 introduced
+        # `i18n_lang:` to disambiguate "rendering language" from the document
+        # language attribute; `language:` remains a deprecated alias.
+        def self.normalize_to_s_opts(opts)
+          opts = opts.dup
+          if opts.key?(:language) && !opts.key?(:i18n_lang)
+            opts[:i18n_lang] = opts.delete(:language)
+          else
+            opts.delete(:language)
+          end
+          opts
         end
 
         def ==(other)
@@ -76,6 +133,27 @@ module Pubid
             code == other.code &&
             date == other.date &&
             language == other.language
+        end
+
+        private
+
+        def normalize_language(value)
+          str = value.to_s
+          LANGUAGES[str] || str
+        end
+
+        # OB (Operational Bulletin) is a cross-bureau ITU publication and
+        # must not have a sector. Direct construction with both raises;
+        # the parser silently drops sector for legacy strings like
+        # "ITU-T OB.X" (handled in Builder).
+        def validate_ob_no_sector!
+          return unless series&.series == "OB"
+          return if sector.nil?
+          return if sector.respond_to?(:sector) && (sector.sector.nil? || sector.sector.to_s.empty?)
+
+          raise ArgumentError,
+                "OB (Operational Bulletin) is a cross-bureau ITU publication; " \
+                "sector must not be set"
         end
       end
     end
