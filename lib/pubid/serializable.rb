@@ -636,6 +636,8 @@ module Pubid
         :amca
       when "IDF"
         :idf
+      when "IHO"
+        :iho
       when "JCGM"
         :jcgm
       when "SAE"
