@@ -77,5 +77,6 @@ module Pubid
   autoload :Nist, "pubid/nist"
   autoload :Oiml, "pubid/oiml"
   autoload :Plateau, "pubid/plateau"
+  autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
 end

@@ -352,6 +352,207 @@ See link:docs/RENDERING_GUIDE.md[Advanced Rendering Styles Guide] for complete d
 * Architecture and implementation details
 * Format comparison tables
 
+== Metadata Export
+
+PubID includes a metadata export layer (`Pubid::Export`) that extracts structured
+schema information from all 22+ flavors — identifier types, typed stages,
+harmonized stage codes, abbreviations, and fixture examples — into a single
+JSON document suitable for website generation, tooling integration, and gap
+analysis.
+
+=== Rake Tasks
+
+[source,shell]
+----
+# Export metadata for all flavors to lib/tasks/website-data.json
+bundle exec rake export:website_data
+
+# Audit library data against website publishers
+bundle exec rake export:audit
+----
+
+The export task produces a JSON file covering 23 flavors and 148 identifier
+types. Each flavor's identifier classes, typed stages, abbreviations, and up to
+10 fixture examples are extracted automatically from the library source.
+
+=== Programmatic API
+
+[source,ruby]
+----
+require 'pubid/export'
+
+# Export all flavors
+data = Pubid::Export::Exporter.export_all
+# => { "iso" => { identifier_types: [...], attributes: [...] }, ... }
+
+# Export a single flavor
+exporter = Pubid::Export::SchemeExporter.new(:iso)
+result = exporter.export
+result.to_h  # => { identifier_types: [...], attributes: [...] }
+----
+
+=== Output Schema
+
+The exported JSON follows this structure:
+
+[source,json]
+----
+{
+  "<flavor>": {
+    "identifier_types": [
+      {
+        "key": "is",
+        "title": "International Standard",
+        "short": "IS",
+        "abbr": ["", "IS"],
+        "typed_stages": [
+          {
+            "stage_code": "dis",
+            "type_code": "is",
+            "abbr": ["DIS", "FPD"],
+            "name": "Draft International Standard",
+            "harmonized_stages": ["40.00", "40.20", "40.60", ...]
+          }
+        ],
+        "examples": ["ISO 9001:2015", "ISO/IEC 17031-1:2020", ...]
+      }
+    ],
+    "attributes": ["number", "part", "date", "edition", ...]
+  }
+}
+----
+
+.Schema fields
+[cols="1,1,4", options="header"]
+|===
+|Field |Type |Description
+
+|`key`
+|`string`
+|Machine-readable type key (e.g., `is`, `tr`, `amd`)
+
+|`title`
+|`string`
+|Human-readable type name (e.g., "International Standard")
+
+|`short`
+|`string\|null`
+|Short abbreviation if defined by the publisher
+
+|`abbr`
+|`string[]`
+|All recognized abbreviations for this type (parsed input variants)
+
+|`typed_stages`
+|`object[]`
+|Development stages specific to this document type
+
+|`typed_stages[].stage_code`
+|`string`
+|Stage code (e.g., `dis`, `cd`, `fdis`)
+
+|`typed_stages[].type_code`
+|`string`
+|Document type this stage applies to
+
+|`typed_stages[].abbr`
+|`string[]`
+|Abbreviations recognized for this typed stage
+
+|`typed_stages[].name`
+|`string`
+|Full name (e.g., "Draft International Standard")
+
+|`typed_stages[].harmonized_stages`
+|`string[]`
+|ISO harmonized stage codes (e.g., `40.00`, `50.60`)
+
+|`examples`
+|`string[]`
+|Up to 10 real-world identifiers from test fixtures
+
+|`attributes`
+|`string[]`
+|Lutaml::Model attribute names on the identifier class
+|===
+
+=== Extraction Strategies
+
+Different flavors use different internal architectures. The export layer uses
+the Strategy pattern to handle each without modifying existing code:
+
+.Strategy classes
+[cols="1,2,2", options="header"]
+|===
+|Strategy |Flavors |Pattern
+
+|`SchemeExporter`
+|ISO, IEC, ASTM, ASHRAE, ASME, CCSDS, CIE, CSA, JIS, JCGM, OIML, IDF, API, SAE, ANSI
+|`Scheme.identifiers` + per-class `def self.type` + `TYPED_STAGES`
+
+|`RegistryExporter`
+|BSI, CEN
+|`TYPED_STAGES_REGISTRY` on Scheme class (centralized registry)
+
+|`IeeeExporter`
+|IEEE
+|`KEY_IDENTIFIER_CLASSES` from Identifiers module + module-level typed stages
+
+|`NistExporter`
+|NIST
+|`Scheme.identifiers` + per-class `typed_stages` class method (not constant)
+
+|`ItuExporter`
+|ITU
+|Sector-based types with transform/model pattern
+
+|`DataClassExporter`
+|ETSI, Plateau
+|`Lutaml::Model::Serializable` as Scheme (no per-class identifiers)
+|===
+
+Adding a new flavor requires only registering it in `FLAVOR_STRATEGIES` within
+`Exporter` — no existing strategy code changes.
+
+=== Audit
+
+The `Pubid::Export::Auditor` compares library-generated metadata against
+website publisher data to identify gaps:
+
+* Identifier types present in the library but missing from the website
+* Identifier types present on the website but not in the library
+* Per-flavor summary of mismatches
+
+[source,ruby]
+----
+require 'pubid/export'
+
+data = Pubid::Export::Exporter.export_all
+auditor = Pubid::Export::Auditor.new(data)
+results = auditor.audit(website_publishers)
+puts auditor.summary(results)
+# => "Audit Summary: 2 missing, 14 extra"
+----
+
+=== File Layout
+
+[source]
+----
+lib/pubid/export.rb                  # Module entry point
+lib/pubid/export/
+├── result.rb                        # Immutable value objects (IdentifierTypeResult, TypedStageResult, FlavorResult)
+├── flavor_exporter.rb               # Abstract base class
+├── scheme_exporter.rb               # Strategy: Scheme.identifiers pattern
+├── registry_exporter.rb             # Strategy: TYPED_STAGES_REGISTRY pattern
+├── ieee_exporter.rb                 # Strategy: IEEE identifier discovery
+├── nist_exporter.rb                 # Strategy: NIST per-class typed_stages
+├── itu_exporter.rb                  # Strategy: ITU transform/model pattern
+├── data_class_exporter.rb           # Strategy: Lutaml::Model::Serializable Scheme
+├── exporter.rb                      # Orchestrator (FLAVOR_STRATEGIES dispatch)
+└── auditor.rb                       # Library vs website gap analysis
+lib/tasks/export.rake                # Rake tasks: export:website_data, export:audit
+----
+
 == Repository
 
 This repository is a monorepo for the PubID Ruby gems, which implement the PubID
