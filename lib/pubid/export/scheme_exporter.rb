@@ -33,10 +33,12 @@ module Pubid
         end.compact
 
         all_attrs = klasses.first ? extract_attributes(klasses.first) : []
+        wrapper_types = extract_wrapper_types
 
         FlavorResult.new(
           flavor: flavor,
           identifier_types: identifier_types,
+          wrapper_types: wrapper_types,
           attributes: all_attrs,
         )
       end

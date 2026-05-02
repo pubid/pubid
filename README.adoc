@@ -371,7 +371,7 @@ bundle exec rake export:website_data
 bundle exec rake export:audit
 ----
 
-The export task produces a JSON file covering 23 flavors and 148 identifier
+The export task produces a JSON file covering 23 flavors and 162 identifier
 types. Each flavor's identifier classes, typed stages, abbreviations, and up to
 10 fixture examples are extracted automatically from the library source.
 
@@ -474,6 +474,10 @@ The exported JSON follows this structure:
 |`attributes`
 |`string[]`
 |Lutaml::Model attribute names on the identifier class
+
+|`wrapper_types`
+|`object[]`
+|Value-added overlay types (VAP, Redline, etc.) — same schema as `identifier_types`
 |===
 
 === Extraction Strategies

@@ -65,20 +65,23 @@ module Pubid
 
     # Immutable value object for extracted flavor metadata.
     class FlavorResult
-      attr_reader :flavor, :identifier_types, :attributes
+      attr_reader :flavor, :identifier_types, :wrapper_types, :attributes
 
-      def initialize(flavor:, identifier_types:, attributes: [])
+      def initialize(flavor:, identifier_types:, wrapper_types: [], attributes: [])
         @flavor = flavor.to_s
         @identifier_types = identifier_types
+        @wrapper_types = wrapper_types
         @attributes = attributes
         freeze
       end
 
       def to_h
-        {
+        h = {
           identifier_types: @identifier_types.map(&:to_h),
           attributes: @attributes,
         }
+        h[:wrapper_types] = @wrapper_types.map(&:to_h) unless @wrapper_types.empty?
+        h
       end
     end
   end

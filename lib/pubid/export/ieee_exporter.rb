@@ -7,7 +7,7 @@ module Pubid
     # module constant list.
     class IeeeExporter < FlavorExporter
       KEY_IDENTIFIER_CLASSES = %i[
-        Standard ProjectDraftIdentifier Base
+        Standard ProjectDraftIdentifier Base RedlinedStandard
       ].freeze
 
       def export

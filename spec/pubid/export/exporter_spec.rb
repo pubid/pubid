@@ -60,7 +60,7 @@ RSpec.describe Pubid::Export::Exporter do
     end
 
     it "exports IEC with identifier types" do
-      expect(data["iec"][:identifier_types].size).to be > 0
+      expect(data["iec"][:identifier_types].size).to be >= 12
     end
 
     it "exports IEEE with identifier types" do
@@ -72,16 +72,16 @@ RSpec.describe Pubid::Export::Exporter do
     end
 
     it "exports BSI with identifier types" do
-      expect(data["bsi"][:identifier_types].size).to be > 0
+      expect(data["bsi"][:identifier_types].size).to be >= 23
     end
 
     it "exports ETSI with identifier types" do
       expect(data["etsi"][:identifier_types].size).to be > 0
     end
 
-    it "produces 148+ total identifier types" do
+    it "produces 162+ total identifier types" do
       total = data.values.sum { |f| f[:identifier_types]&.size || 0 }
-      expect(total).to be >= 148
+      expect(total).to be >= 162
     end
   end
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "set"
+
 module Pubid
   module Export
     # Abstract base class for per-flavor metadata extraction.
@@ -9,6 +11,12 @@ module Pubid
     # Single Responsibility: Each subclass extracts data for one Scheme pattern.
     class FlavorExporter
       attr_reader :flavor
+
+      # Wrapper classes to discover per flavor (overlay patterns that wrap base identifiers)
+      WRAPPER_CLASSES = {
+        iec: %i[VapIdentifier],
+        bsi: %i[ValueAddedPublication],
+      }.freeze
 
       def initialize(flavor)
         @flavor = flavor
@@ -67,20 +75,50 @@ module Pubid
 
       def resolve_identifier_classes
         scheme = scheme_class
-        return [] unless scheme
+        scheme_klasses = []
 
         # Pattern 1: Class methods (ISO, IEC, ASTM, etc.)
-        if scheme.respond_to?(:identifiers)
-          return scheme.identifiers
+        if scheme&.respond_to?(:identifiers)
+          scheme_klasses = scheme.identifiers
         end
 
         # Pattern 2: Instance-based (AMCA, BSI)
-        instance = scheme.respond_to?(:new) ? scheme.new : nil
-        if instance && instance.identifiers && !instance.identifiers.empty?
-          return instance.identifiers
+        if scheme_klasses.empty? && scheme
+          instance = scheme.respond_to?(:new) ? scheme.new : nil
+          if instance && instance.identifiers && !instance.identifiers.empty?
+            scheme_klasses = instance.identifiers
+          end
         end
 
-        []
+        # Supplement with any typed classes in the Identifiers module
+        # that weren't returned by Scheme (e.g., supplements, fragments)
+        scheme_klasses + discover_additional_typed_classes(scheme_klasses)
+      end
+
+      def discover_additional_typed_classes(known)
+        mod = scheme_module
+        return [] unless mod
+
+        idents_mod = mod.const_get(:Identifiers)
+        known_set = Set.new(known)
+
+        idents_mod.constants.filter_map do |c|
+          klass = idents_mod.const_get(c)
+        rescue NameError
+          # Some constants may be autoload stubs with typos
+          next
+        else
+          next unless klass.is_a?(Class)
+          next if known_set.include?(klass)
+          next if klass <= Exception # skip error classes
+
+          begin
+            has_type = klass.respond_to?(:type) && klass.type && klass.type[:key]
+          rescue NotImplementedError
+            next
+          end
+          has_type ? klass : nil
+        end
       end
 
       def extract_type_info(klass)
@@ -158,6 +196,30 @@ module Pubid
         klass.model_attributes.keys.map(&:to_s)
       rescue NoMethodError
         []
+      end
+
+      def extract_wrapper_types
+        names = WRAPPER_CLASSES[flavor]
+        return [] unless names
+
+        mod = scheme_module
+        return [] unless mod
+
+        identifiers_mod = mod.const_get(:Identifiers)
+        names.filter_map do |name|
+          klass = identifiers_mod.const_get(name)
+          info = extract_type_info(klass)
+          IdentifierTypeResult.new(
+            key: info[:key],
+            title: info[:title],
+            short: info[:short],
+            abbr: info[:abbr],
+            typed_stages: [],
+            examples: [],
+          )
+        rescue NameError
+          nil
+        end
       end
     end
   end
