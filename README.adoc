@@ -518,6 +518,85 @@ the Strategy pattern to handle each without modifying existing code:
 Adding a new flavor requires only registering it in `FLAVOR_STRATEGIES` within
 `Exporter` — no existing strategy code changes.
 
+=== Adding a New Flavor to Export
+
+When adding a new publisher flavor to PubID, follow these steps to integrate
+it with the export layer:
+
+. **Ensure identifier classes define `def self.type`** — Each identifier class
+  in `lib/pubid/{flavor}/identifiers/` should implement `def self.type`
+  returning `{ key: :sym, title: "Name", short: "Abbr" }`. This is the primary
+  source of metadata.
+
+. **Choose the right strategy** — Most flavors use one of the existing strategies:
+
+  * `SchemeExporter` — if the flavor has a `Scheme` class with a class-level
+    `identifiers` method that returns identifier classes. This is the most
+    common pattern (ISO, IEC, ASTM, ASHRAE, etc.).
+  * `RegistryExporter` — if the flavor uses a centralized `TYPED_STAGES_REGISTRY`
+    on the Scheme class instead of per-class `TYPED_STAGES` (BSI, CEN).
+  * `IeeeExporter` — only for IEEE, which has a unique constant-based discovery.
+  * `NistExporter` — if typed stages come from a class method (not constant).
+  * `ItuExporter` — for sector-based types with transform/model patterns.
+  * `DataClassExporter` — for flavors where Scheme inherits from
+    `Lutaml::Model::Serializable` (ETSI, Plateau).
+
+. **Register the flavor** in `lib/pubid/export/exporter.rb`:
+
+  [source,ruby]
+  ----
+  FLAVORS = %i[iso iec ... new_flavor].freeze
+
+  FLAVOR_STRATEGIES = {
+    iso: :scheme,
+    # ...
+    new_flavor: :scheme,  # or :registry, :data_class, etc.
+  }.freeze
+  ----
+
+. **Add the module mapping** in `FlavorExporter#scheme_module` (in
+  `lib/pubid/export/flavor_exporter.rb`):
+
+  [source,ruby]
+  ----
+  when "new_flavor" then Pubid::NewFlavor
+  ----
+
+. **If the flavor has wrapper types** (value-added formats like VAP, Redline),
+  add them to `WRAPPER_CLASSES` in `FlavorExporter`:
+
+  [source,ruby]
+  ----
+  WRAPPER_CLASSES = {
+    iec: %i[VapIdentifier],
+    bsi: %i[ValueAddedPublication],
+    new_flavor: %i[WrapperClassName],
+  }.freeze
+  ----
+
+. **Add fixture examples** (optional) — Create
+  `spec/fixtures/{flavor}/identifiers/pass/{type_key}.txt` with one identifier
+  per line. Up to 10 examples per type are automatically picked up during export.
+
+. **Write tests** — Add `spec/pubid/export/{flavor}_exporter_spec.rb`:
+
+  [source,ruby]
+  ----
+  require "spec_helper"
+  require "pubid/export"
+
+  RSpec.describe Pubid::Export::SchemeExporter, "for new_flavor" do
+    subject(:result) { described_class.new(:new_flavor).export }
+
+    it "exports identifier types" do
+      expect(result.identifier_types.size).to be > 0
+    end
+  end
+  ----
+
+. **Regenerate data** — Run `bundle exec rake export:website_data` to update
+  `lib/tasks/website-data.json`.
+
 === Audit
 
 The `Pubid::Export::Auditor` compares library-generated metadata against
