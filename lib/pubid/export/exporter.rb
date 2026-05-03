@@ -9,7 +9,7 @@ module Pubid
     # FLAVOR_STRATEGIES; no existing code changes.
     class Exporter
       FLAVORS = %i[
-        iso iec ieee nist bsi itu cen etsi ansi astm ashrae asme
+        iso iec ieee nist bsi itu cen_cenelec etsi ansi astm ashrae asme
         ccsds cie csa jis jcgm oiml idf api amca plateau sae
       ].freeze
 
@@ -22,7 +22,7 @@ module Pubid
         nist: :nist,
         bsi: :registry,
         itu: :itu,
-        cen: :registry,
+        cen_cenelec: :registry,
         etsi: :data_class,
         ansi: :scheme,
         astm: :scheme,

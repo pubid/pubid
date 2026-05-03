@@ -27,7 +27,7 @@ require_relative "../../lib/pubid/ccsds"
 require_relative "../../lib/pubid/itu"
 require_relative "../../lib/pubid/plateau"
 require_relative "../../lib/pubid/ansi"
-require_relative "../../lib/pubid/cen"
+require_relative "../../lib/pubid/cen_cenelec"
 require_relative "../../lib/pubid/bsi"
 
 # Get flavor from command line

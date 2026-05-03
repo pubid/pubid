@@ -19,8 +19,9 @@ module Pubid
 
         # Get the appropriate flavor module
         begin
-          flavor_module = Pubid.const_get(flavor.to_s.capitalize)
-        rescue NameError
+          flavor_module = Pubid::Registry.get(flavor)
+          raise ArgumentError unless flavor_module
+        rescue StandardError
           raise ArgumentError, "Unknown flavor: #{flavor}"
         end
 

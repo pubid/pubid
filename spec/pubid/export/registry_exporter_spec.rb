@@ -18,8 +18,8 @@ RSpec.describe Pubid::Export::RegistryExporter do
       end
     end
 
-    context "CEN flavor" do
-      let(:exporter) { described_class.new(:cen) }
+    context "CEN-CENELEC flavor" do
+      let(:exporter) { described_class.new(:cen_cenelec) }
       let(:result) { exporter.export }
 
       it "returns a FlavorResult" do

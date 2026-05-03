@@ -115,7 +115,8 @@ module Pubid
       flavor = detect_flavor_from_mr(mr_string)
 
       # Get the appropriate flavor module
-      flavor_module = Pubid.const_get(flavor.capitalize)
+      flavor_module = Pubid::Registry.get(flavor)
+      raise ArgumentError, "Unknown flavor: #{flavor}" unless flavor_module
 
       # Convert MR string to parseable format
       # "ISO.9001.2015" → "ISO 9001:2015"
@@ -296,13 +297,11 @@ module Pubid
 
     # Extract flavor from class name
     def extract_flavor
-      # Get class name and extract flavor (e.g., "Pubid::Iso::Identifiers::InternationalStandard" -> "iso")
       class_name = self.class.name.to_s
       parts = class_name.split("::")
 
-      # Find the flavor part (second position for namespaced identifiers)
       if parts.size >= 2
-        parts[1].downcase
+        parts[1].gsub(/([A-Z])/, '_\1').downcase.sub(/^_/, '')
       else
         "unknown"
       end
@@ -617,7 +616,7 @@ module Pubid
       when "BS"
         :bsi
       when "CEN"
-        :cen
+        :cen_cenelec
       when "JIS"
         :jis
       when "ETSI"

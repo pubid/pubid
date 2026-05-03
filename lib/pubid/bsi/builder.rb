@@ -1347,7 +1347,7 @@ module Pubid
 
           # Wrap ISO/IEC identifier in EN adoption
           if adopted_id
-            adopted_id = Pubid::Cen::Identifiers::AdoptedEuropeanNorm.new(
+            adopted_id = Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm.new(
               publisher: ["EN"],
               adopted_identifier: adopted_id,
             )
@@ -1364,7 +1364,7 @@ module Pubid
         # Check for EN patterns (double-level: BS EN or DD/PD CEN) or CEN types
         elsif adopted_str_clean.start_with?("EN", "CEN", "CLC", "CR", "ES",
                                             "ENV", "HD", "CWA")
-          adopted_id = Pubid::Cen.parse(adopted_str_clean)
+          adopted_id = Pubid::CenCenelec.parse(adopted_str_clean)
         # Check for CISPR
         elsif adopted_str_clean.start_with?("CISPR")
           adopted_id = Pubid::Iec.parse(adopted_str_clean)
@@ -1376,7 +1376,7 @@ module Pubid
         # Return appropriate wrapper based on adoption type
         if adopted_id
           # If adopted_id is a CEN identifier (in Cen module), use AdoptedEuropeanNorm
-          identifier = if adopted_id.class.name.start_with?("Pubid::Cen::")
+          identifier = if adopted_id.class.name.start_with?("Pubid::CenCenelec::")
                          Identifiers::AdoptedEuropeanNorm.new(
                            publisher: Components::Publisher.new(body: bsi_prefix),
                            adopted_identifier: adopted_id,
