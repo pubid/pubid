@@ -23,5 +23,5 @@ module Pubid
   end
 end
 
-# Register Uansi flavor with the registry
+# Register ANSI flavor with the registry
 Pubid::Registry.register(:ansi, Pubid::Ansi)

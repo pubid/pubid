@@ -27,7 +27,7 @@ module Pubid
           end
 
           def type
-            { key: :circ, title: "NBS Circular Supplement", short: "CIRC" }
+            { key: :circ_supp, title: "NBS Circular Supplement", short: "CIRC" }
           end
         end
 

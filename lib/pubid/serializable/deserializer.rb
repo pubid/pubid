@@ -20,6 +20,11 @@ module Pubid
         # Get the appropriate flavor module
         begin
           flavor_module = Pubid::Registry.get(flavor)
+          unless flavor_module
+            # Trigger autoload by referencing the module constant
+            mod_name = flavor.to_s.split("_").map(&:capitalize).join
+            flavor_module = Pubid.const_get(mod_name)
+          end
           raise ArgumentError unless flavor_module
         rescue StandardError
           raise ArgumentError, "Unknown flavor: #{flavor}"

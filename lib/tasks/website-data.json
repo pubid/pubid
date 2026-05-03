@@ -2,7 +2,7 @@
   "iso": {
     "identifier_types": [
       {
-        "key": "is",
+        "key": "international_standard",
         "title": "International Standard",
         "short": "IS",
         "abbr": [
@@ -252,7 +252,7 @@
         ]
       },
       {
-        "key": "tr",
+        "key": "technical_report",
         "title": "Technical Report",
         "short": "TR",
         "abbr": [],
@@ -428,7 +428,7 @@
         ]
       },
       {
-        "key": "ts",
+        "key": "technical_specification",
         "title": "Technical Specification",
         "short": "TS",
         "abbr": [],
@@ -774,7 +774,7 @@
         ]
       },
       {
-        "key": "pas",
+        "key": "publicly_available_specification",
         "title": "Publicly Available Specification",
         "short": "PAS",
         "abbr": [],
@@ -1039,7 +1039,7 @@
         "examples": []
       },
       {
-        "key": "tta",
+        "key": "technology_trends_assessments",
         "title": "Technology Trends Assessments",
         "short": "TTA",
         "abbr": [],
@@ -1197,7 +1197,7 @@
         ]
       },
       {
-        "key": "iwa",
+        "key": "international_workshop_agreement",
         "title": "International Workshop Agreement",
         "short": "IWA",
         "abbr": [],
@@ -1335,7 +1335,7 @@
         ]
       },
       {
-        "key": "isp",
+        "key": "international_standardized_profile",
         "title": "International Standardized Profile",
         "short": "ISP",
         "abbr": [],
@@ -1487,7 +1487,7 @@
         ]
       },
       {
-        "key": "rec",
+        "key": "recommendation",
         "title": "Recommendation",
         "short": "R",
         "abbr": [],
@@ -1564,7 +1564,7 @@
         ]
       },
       {
-        "key": "dir",
+        "key": "directives",
         "title": "Directives",
         "short": "DIR",
         "abbr": [],
@@ -1600,7 +1600,7 @@
         ]
       },
       {
-        "key": "amd",
+        "key": "amendment",
         "title": "Amendment",
         "short": "AMD",
         "abbr": [],
@@ -1791,7 +1791,7 @@
         ]
       },
       {
-        "key": "cor",
+        "key": "corrigendum",
         "title": "Corrigendum",
         "short": "COR",
         "abbr": [],
@@ -1951,7 +1951,7 @@
         ]
       },
       {
-        "key": "suppl",
+        "key": "supplement",
         "title": "Supplement",
         "short": "suppl",
         "abbr": [],
@@ -2079,7 +2079,7 @@
         "examples": []
       },
       {
-        "key": "ext",
+        "key": "extract",
         "title": "Extract",
         "short": "Ext",
         "abbr": [],
@@ -2100,7 +2100,7 @@
         "examples": []
       },
       {
-        "key": "dir-sup",
+        "key": "directives_supplement",
         "title": "Directives Supplement",
         "short": "SUP",
         "abbr": [],
@@ -2133,7 +2133,7 @@
         ]
       },
       {
-        "key": "add",
+        "key": "addendum",
         "title": "Addendum",
         "short": "ADD",
         "abbr": [],
@@ -2274,7 +2274,7 @@
         "examples": []
       },
       {
-        "key": "tc",
+        "key": "tc_document",
         "title": "Technical Committee Document",
         "short": "TC",
         "abbr": [],
@@ -2287,7 +2287,7 @@
   "iec": {
     "identifier_types": [
       {
-        "key": "is",
+        "key": "international_standard",
         "title": "International Standard",
         "short": null,
         "abbr": [],
@@ -2433,7 +2433,7 @@
         ]
       },
       {
-        "key": "tr",
+        "key": "technical_report",
         "title": "Technical Report",
         "short": "TR",
         "abbr": [],
@@ -2562,7 +2562,7 @@
         ]
       },
       {
-        "key": "ts",
+        "key": "technical_specification",
         "title": "Technical Specification",
         "short": "TS",
         "abbr": [],
@@ -2691,7 +2691,7 @@
         ]
       },
       {
-        "key": "pas",
+        "key": "publicly_available_specification",
         "title": "Publicly Available Specification",
         "short": "PAS",
         "abbr": [],
@@ -2970,7 +2970,7 @@
         ]
       },
       {
-        "key": "trf",
+        "key": "test_report_form",
         "title": "Test Report Form",
         "short": "TRF",
         "abbr": [],
@@ -3002,7 +3002,7 @@
         ]
       },
       {
-        "key": "ish",
+        "key": "interpretation_sheet",
         "title": "Interpretation Sheet",
         "short": "ISH",
         "abbr": [],
@@ -3131,7 +3131,7 @@
         ]
       },
       {
-        "key": "srd",
+        "key": "systems_reference_document",
         "title": "Systems Reference Document",
         "short": "SRD",
         "abbr": [],
@@ -3163,7 +3163,7 @@
         ]
       },
       {
-        "key": "wd",
+        "key": "working_document",
         "title": "Working Document",
         "short": "WD",
         "abbr": [],
@@ -3182,7 +3182,64 @@
         ]
       },
       {
-        "key": "frag",
+        "key": "societal_technology_trend_report",
+        "title": "Societal and Technology Trend Report",
+        "short": "Trend Report",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "sttr",
+            "abbr": [
+              "Trend Report"
+            ],
+            "name": "Societal and Technology Trend Report",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
+      },
+      {
+        "key": "white_paper",
+        "title": "White Paper",
+        "short": "White Paper",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "wp",
+            "abbr": [
+              "White Paper"
+            ],
+            "name": "White Paper",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
+      },
+      {
+        "key": "sheet_identifier",
+        "title": "Sheet Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEC 60695-2-1/0:1994",
+          "IEC 60695-2-1/1:1994",
+          "IEC 60695-2-1/2:1994",
+          "IEC 60695-2-1/3:1994",
+          "IEC 60695-2-4/1:1991",
+          "IEC TS 60695-2-4/2:1994"
+        ]
+      },
+      {
+        "key": "fragment_identifier",
         "title": "Fragment",
         "short": "FRAG",
         "abbr": [],
@@ -3328,7 +3385,7 @@
         ]
       },
       {
-        "key": "amd",
+        "key": "amendment",
         "title": "Amendment",
         "short": "AMD",
         "abbr": [],
@@ -3475,7 +3532,7 @@
         ]
       },
       {
-        "key": "cor",
+        "key": "corrigendum",
         "title": "Corrigendum",
         "short": "COR",
         "abbr": [],
@@ -3620,6 +3677,75 @@
           "IEC 60050-702:1992/COR1:1992",
           "IEC 60050-702:1992/COR2:1994"
         ]
+      },
+      {
+        "key": "consolidated_identifier",
+        "title": "Consolidated Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "vap_identifier",
+        "title": "Vap Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CISPR 11:1975+AMD1:1976 CSV",
+          "CISPR 11:1997+AMD1:1999 CSV",
+          "CISPR 11:2003+AMD1:2004 CSV",
+          "CISPR 11:2009+AMD1:2010 CSV",
+          "CISPR 11:2015+AMD1:2016+AMD2:2019 CSV",
+          "CISPR 12:2001+AMD1:2005 CSV",
+          "CISPR 12:2007+AMD1:2009 CSV",
+          "CISPR 13:1996+AMD1:1998 CSV",
+          "CISPR 13:2001+AMD1:2003+AMD2:2006 CSV",
+          "CISPR 13:2009+AMD1:2015 CSV"
+        ]
+      },
+      {
+        "key": "component_specification",
+        "title": "Component Specification",
+        "short": "CS",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "cs",
+            "abbr": [
+              "CS"
+            ],
+            "name": "Component Specification",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
+      },
+      {
+        "key": "operational_document",
+        "title": "Operational Document",
+        "short": "OD",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "od",
+            "abbr": [
+              "OD"
+            ],
+            "name": "Operational Document",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
       }
     ],
     "attributes": [],
@@ -3637,146 +3763,117 @@
   "ieee": {
     "identifier_types": [
       {
-        "key": "std",
-        "title": "Standard",
-        "short": "Std",
+        "key": "conformance_identifier",
+        "title": "Conformance Identifier",
+        "short": null,
         "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "standard",
-            "abbr": [
-              "Std"
-            ],
-            "name": "Published Standard",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "working_draft",
-            "type_code": "draft",
-            "abbr": [
-              "D1"
-            ],
-            "name": "Working Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "committee_draft",
-            "type_code": "draft",
-            "abbr": [
-              "D2",
-              "D3"
-            ],
-            "name": "Committee Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "draft_standard",
-            "type_code": "draft",
-            "abbr": [
-              "D4",
-              "D5",
-              "D6"
-            ],
-            "name": "Draft Standard",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "final_draft",
-            "type_code": "draft",
-            "abbr": [
-              "D7",
-              "D8",
-              "D9"
-            ],
-            "name": "Final Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "preliminary",
-            "type_code": "draft",
-            "abbr": [
-              "PWI"
-            ],
-            "name": "Preliminary Work Item",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "new_proposal",
-            "type_code": "draft",
-            "abbr": [
-              "NP"
-            ],
-            "name": "New Work Item Proposal",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "working_draft",
-            "type_code": "draft",
-            "abbr": [
-              "WD"
-            ],
-            "name": "Working Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "committee_draft",
-            "type_code": "draft",
-            "abbr": [
-              "CD",
-              "CD2",
-              "CD3"
-            ],
-            "name": "Committee Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "draft_international_standard",
-            "type_code": "draft",
-            "abbr": [
-              "DIS"
-            ],
-            "name": "Draft International Standard",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "final_draft",
-            "type_code": "draft",
-            "abbr": [
-              "FDIS"
-            ],
-            "name": "Final Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "published",
-            "type_code": "standard",
-            "abbr": [
-              "No",
-              "No."
-            ],
-            "name": "Published Standard",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "draft",
-            "type_code": "draft",
-            "abbr": [
-              "P"
-            ],
-            "name": "Draft",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "draft",
-            "type_code": "draft",
-            "abbr": [
-              "Draft"
-            ],
-            "name": "Draft",
-            "harmonized_stages": []
-          }
-        ],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 1904.1/Conformance02-2014",
+          "IEEE Std 1904.1/Conformance03-2014",
+          "IEEE Std 802.16/Conformance01-2003"
+        ]
+      },
+      {
+        "key": "csa_dual_published",
+        "title": "Csa Dual Published",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 844.1-2017/CSA C22.2 NO. 293.1-17",
+          "IEEE Std 844.2-2017/CSA C293.2-17",
+          "IEEE Std 844.3-2019/CSA C22.2 NO. 293.3:19",
+          "IEEE Std 844.4-2019/CSA C293.4:19"
+        ]
+      },
+      {
+        "key": "dual_identifier",
+        "title": "Dual Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "dual_published",
+        "title": "Dual Published",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE P1680.4/D1 and NSF/ANSI 426, August 2016",
+          "IEEE P1680.4/D2 and NSF/ANSI 426, January 2017",
+          "IEEE P1680.4/D3 and NSF/ANSI 426, May 2017",
+          "IEEE Std 108-1955 and AIEE No. 450, April 1955",
+          "IEEE Std 309-1999 and ANSI N42.3-1999",
+          "IEEE Std 802.10e-1993 and IEEE Std 802.10f-1993",
+          "IEEE Std 802.16e-2005 and IEEE Std 802.16-2004/Cor. 1-2005",
+          "IEEE Std 802.3u-1995 (Supplement to ISO/IEC 8802-3) and ANSI/IEEE 802.3-1993",
+          "IEEE Std 802.5r and IEEE Std 802.5j-1998 (ISO/IEC 8802-5:1998/Amd.1)",
+          "IEEE Std 960-1989 and IEEE Std 1177-1989"
+        ]
+      },
+      {
+        "key": "iec_ieee_copublished",
+        "title": "Iec Ieee Copublished",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEC/IEEE 60079-30-2/D5 IEC:2013 10/07",
+          "IEC/IEEE CD P62704-5 ED1",
+          "IEC/IEEE CDV P62704-2/D4",
+          "IEC/IEEE CDV 80005-3, 2016",
+          "IEC/IEEE FDIS 60079-30-2",
+          "IEC/IEEE FDIS P60079-30-1",
+          "IEC/IEEE FDIS P60780-323",
+          "IEC/IEEE 60076-16 Edition 2.0 2018-09",
+          "IEC/IEEE 60079-30-1 Edition 1.0 2015-09",
+          "IEC/IEEE 60079-30-2 Edition 1.0 2015-09"
+        ]
+      },
+      {
+        "key": "interpretation_identifier",
+        "title": "Interpretation Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 1003.1-1988/INT-1992",
+          "IEEE Std 1076/INT-1991"
+        ]
+      },
+      {
+        "key": "joint_development",
+        "title": "Joint Development",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEC/IEEE P60780.323/P-2014",
+          "IEC/IEEE P62582.6/P-2019",
+          "ISO/IEC/IEEE P21840/P-2019",
+          "IEC/IEEE P62704.3/D2",
+          "ISO/IEC/IEEE P11073.10417/D2-2015"
+        ]
+      },
+      {
+        "key": "multi_numbered_identifier",
+        "title": "Multi Numbered Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 1299 and IEEE Std"
+        ]
+      },
+      {
+        "key": "parenthetical_identifier",
+        "title": "Parenthetical Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
         "examples": []
       },
       {
@@ -3785,15 +3882,18 @@
         "short": null,
         "abbr": [],
         "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "base",
-        "title": "Base",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
+        "examples": [
+          "IEC/IEEE 62582.2.am1, July 2015 (Amendment to IEC/IEEE 62582-2: 2011)",
+          "IEEE P1031/D1+1, August, 2010",
+          "IEEE P1048/D6+1, May 2012",
+          "IEEE P1062/D.19, March, 2015",
+          "IEEE P1062/D.30, September, 2015",
+          "IEEE P1149.1/D2012.e27, September, 2012",
+          "IEEE P1149.1/D2012.e29, November, 2012",
+          "IEEE P1377/D11, March, 2012",
+          "IEEE P1609.12/D7, June 2012 (Approved Draft)",
+          "IEEE P1680.2/D7, May 2012 (Approved Draft)"
+        ]
       },
       {
         "key": "redlined_standard",
@@ -3802,6 +3902,87 @@
         "abbr": [],
         "typed_stages": [],
         "examples": []
+      },
+      {
+        "key": "si_standard",
+        "title": "Si Standard",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE/ASTM SI 10 -2010 (Revision of IEEE/ASTM SI 10 -2002)",
+          "IEEE/ASTM PSI 10/D2 , October 2015",
+          "IEEE/ASTM PSI 10/D3 , October 2010",
+          "IEEE/ASTM PSI 10/D3 , October 2015",
+          "IEEE/ASTM SI 10 -1997",
+          "IEEE/ASTM SI 10 -2002 (Revision of IEEE/ASTM SI 10 -1997)",
+          "IEEE/ASTM SI 10 -2016 (Revision of IEEE/ASTM SI 10 -2010)"
+        ]
+      },
+      {
+        "key": "standard",
+        "title": "Standard",
+        "short": "Std",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 1076.CONC-1990",
+          "ANSI/IEEE 101-1987 (Revision of IEEE Std 101-1972)",
+          "ANSI/IEEE 336-1980 (revision of ANSI/IEEE Std 336-1977)",
+          "ANSI/IEEE 488-1978 (Revision of IEEE Std (ANSI/IEEE 488-1975. Includes supplement IEEE Std 488A-19801))",
+          "ANSI/IEEE 500-1984 (P&V)",
+          "ANSI/IEEE 620-1981 (Issued April 1981 for trail use)",
+          "ANSI/IEEE 802.11-1999 (R2003)",
+          "ANSI/IEEE 802.12-1998 (incorporates IEEE Std (ANSI/IEEE Stds 802.122-1995) and ANSI/IEEE 802.12d-1997)",
+          "ANSI/IEEE 896.1-1994",
+          "C2-1997 National Electrical Safety Code"
+        ]
+      },
+      {
+        "key": "supplement_identifier",
+        "title": "Supplement Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std C37.09-2018/Cor. 1-2021",
+          "IEEE Std C62.21-2003/Cor. 1-2008",
+          "IEEE Std 802.3-2005/Cor. 2-2007",
+          "ANSI C63.5-2017/Cor. 1-2019",
+          "IEEE Std 1672-2006/Cor. 1-2008",
+          "IEEE Std 1003.1-2001/Cor. 2-2004",
+          "IEEE Std 1003.1-2008/Cor. 1-2013",
+          "IEEE Std 1015-2006/Cor. 1-2007",
+          "IEEE Std 11073-10418-2011/Cor. 1-2015",
+          "IEEE Std 11073-10424-2014/Cor. 1-2017"
+        ]
+      },
+      {
+        "key": "adopted_standard",
+        "title": "Adopted Standard",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "55 IRE 2.S1 (IEEE Std 147)",
+          "61 IRE 15.S1 (IEEE Std 182)",
+          "61 IRE 28 S1 (IEEE Std 216)",
+          "62 IRE 12.S1 (IEEE Std 174)",
+          "62 IRE 7.S2 (IEEE Std 161)",
+          "AIEE No 14-1925 (AESC C22-1925)",
+          "AIEE No 18-1934 (ASA C55-1934)",
+          "IEEE Std 159-1972 (52 IRE 7 S2)",
+          "IEEE Std 175-1960 (60 IRE 13 S1)",
+          "AIEE No 15-1944 (ASA C19.1-1943)"
+        ]
       }
     ],
     "attributes": []
@@ -3809,7 +3990,7 @@
   "nist": {
     "identifier_types": [
       {
-        "key": "sp",
+        "key": "special_publication",
         "title": "NIST Special Publication",
         "short": "SP",
         "abbr": [
@@ -3844,7 +4025,7 @@
         ]
       },
       {
-        "key": "fips",
+        "key": "federal_information_processing_standards",
         "title": "Federal Information Processing Standards",
         "short": "FIPS",
         "abbr": [
@@ -3877,7 +4058,7 @@
         ]
       },
       {
-        "key": "ir",
+        "key": "interagency_report",
         "title": "NIST Interagency Report",
         "short": "IR",
         "abbr": [
@@ -3912,7 +4093,7 @@
         ]
       },
       {
-        "key": "hb",
+        "key": "handbook",
         "title": "NIST Handbook",
         "short": "HB",
         "abbr": [
@@ -3947,7 +4128,7 @@
         ]
       },
       {
-        "key": "tn",
+        "key": "technical_note",
         "title": "NIST Technical Note",
         "short": "TN",
         "abbr": [
@@ -3982,7 +4163,7 @@
         ]
       },
       {
-        "key": "circ",
+        "key": "circular",
         "title": "NBS Circular",
         "short": "CIRC",
         "abbr": [
@@ -4015,7 +4196,7 @@
         ]
       },
       {
-        "key": "circ",
+        "key": "circular_supplement",
         "title": "NBS Circular Supplement",
         "short": "CIRC",
         "abbr": [
@@ -4048,7 +4229,7 @@
         ]
       },
       {
-        "key": "crpl",
+        "key": "crpl_report",
         "title": "NBS CRPL Report",
         "short": "CRPL",
         "abbr": [
@@ -4089,7 +4270,7 @@
         ]
       },
       {
-        "key": "rpt",
+        "key": "report",
         "title": "NBS Report",
         "short": "RPT",
         "abbr": [
@@ -4122,7 +4303,7 @@
         ]
       },
       {
-        "key": "mono",
+        "key": "monograph",
         "title": "Monograph",
         "short": "MONO",
         "abbr": [
@@ -4157,7 +4338,7 @@
         ]
       },
       {
-        "key": "mp",
+        "key": "miscellaneous_publication",
         "title": "Miscellaneous Publication",
         "short": "MP",
         "abbr": [
@@ -4190,7 +4371,7 @@
         ]
       },
       {
-        "key": "gcr",
+        "key": "grant_contractor_report",
         "title": "NIST Grant/Contractor Report",
         "short": "GCR",
         "abbr": [
@@ -4313,7 +4494,7 @@
         ]
       },
       {
-        "key": "lc",
+        "key": "letter_circular",
         "title": "Letter Circular",
         "short": "LCIRC",
         "abbr": [
@@ -4344,7 +4525,7 @@
         ]
       },
       {
-        "key": "cs",
+        "key": "commercial_standard",
         "title": "Commercial Standard",
         "short": "CS",
         "abbr": [
@@ -4377,7 +4558,7 @@
         ]
       },
       {
-        "key": "cse",
+        "key": "commercial_standard_emergency",
         "title": "NBS Commercial Standard Emergency",
         "short": "CS-E",
         "abbr": [
@@ -4405,7 +4586,7 @@
         ]
       },
       {
-        "key": "csm",
+        "key": "commercial_standards_monthly",
         "title": "Commercial Standards Monthly",
         "short": "CSM",
         "abbr": [
@@ -4443,7 +4624,7 @@
   "bsi": {
     "identifier_types": [
       {
-        "key": "bs",
+        "key": "british_standard",
         "title": "British Standard",
         "short": null,
         "abbr": [
@@ -4483,7 +4664,7 @@
         "examples": []
       },
       {
-        "key": "pd",
+        "key": "published_document",
         "title": "Published Document",
         "short": null,
         "abbr": [
@@ -4506,7 +4687,7 @@
         "examples": []
       },
       {
-        "key": "pas",
+        "key": "publicly_available_specification",
         "title": "Publicly Available Specification",
         "short": null,
         "abbr": [
@@ -4529,7 +4710,7 @@
         "examples": []
       },
       {
-        "key": "na",
+        "key": "national_annex",
         "title": "National Annex",
         "short": null,
         "abbr": [
@@ -4552,7 +4733,7 @@
         "examples": []
       },
       {
-        "key": "dd",
+        "key": "draft_document",
         "title": "Draft Document",
         "short": null,
         "abbr": [
@@ -4671,7 +4852,7 @@
         "examples": []
       },
       {
-        "key": "aerospace",
+        "key": "aerospace_standard",
         "title": "Aerospace/Specialized British Standard",
         "short": null,
         "abbr": [
@@ -4862,7 +5043,7 @@
         "examples": []
       },
       {
-        "key": "ts",
+        "key": "technical_specification",
         "title": "Technical Specification",
         "short": null,
         "abbr": [
@@ -4885,33 +5066,57 @@
         "examples": []
       },
       {
-        "key": "test_method",
-        "title": "Test Method",
+        "key": "addendum_document",
+        "title": "Addendum Document",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "consolidated_identifier",
+        "title": "Consolidated Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "adopted_international_standard",
+        "title": "British Standard",
         "short": "BS",
         "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "supplementary_index",
-        "title": "Supplementary Index",
+        "key": "adopted_european_norm",
+        "title": "British Standard",
         "short": "BS",
         "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "committee_document",
-        "title": "Committee Document",
-        "short": "DC",
+        "key": "british_industrial_practice",
+        "title": "British Industrial Practice",
+        "short": "BIP",
         "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "ep",
+        "key": "electronic_book",
         "title": "Electronic Publication",
         "short": "EP",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "expert_commentary",
+        "title": "Expert Commentary",
+        "short": null,
         "abbr": [],
         "typed_stages": [],
         "examples": []
@@ -4925,9 +5130,81 @@
         "examples": []
       },
       {
+        "key": "bundled_identifier",
+        "title": "Bundled Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "committee_document",
+        "title": "Committee Document",
+        "short": "DC",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "supplement_document",
+        "title": "Supplement Document",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "practice_guide",
+        "title": "Practice Guide",
+        "short": "PP",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "supplementary_index",
+        "title": "Supplementary Index",
+        "short": "BS",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "test_method",
+        "title": "Test Method",
+        "short": "BS",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
         "key": "standalone_amendment",
         "title": "Amendment",
         "short": "AMD",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "value_added_publication",
+        "title": "Value Added Publication",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "set",
+        "title": "Set",
+        "short": null,
         "abbr": [],
         "typed_stages": [],
         "examples": []
@@ -4951,31 +5228,85 @@
         "key": "recommendation",
         "title": "Recommendation",
         "short": null,
-        "abbr": [
-          "Recommendation"
-        ],
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "ITU-R 01-201",
+          "ITU-R 13-199",
+          "ITU-R 16-199",
+          "ITU-R 20-200",
+          "ITU-R 21-201",
+          "ITU-R 22-201",
+          "ITU-R 23-201",
+          "ITU-R 24-199",
+          "ITU-R 25-200",
+          "ITU-R 26-201"
+        ]
+      },
+      {
+        "key": "amendment",
+        "title": "Amendment",
+        "short": null,
+        "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "resolution",
-        "title": "Resolution",
+        "key": "corrigendum",
+        "title": "Corrigendum",
         "short": null,
-        "abbr": [
-          "Resolution"
-        ],
+        "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "handbook",
-        "title": "Handbook",
+        "key": "supplement",
+        "title": "Supplement",
         "short": null,
-        "abbr": [
-          "Handbook"
-        ],
+        "abbr": [],
         "typed_stages": [],
         "examples": []
+      },
+      {
+        "key": "annex",
+        "title": "Annex",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "Annex to ITU OB No. 1",
+          "Annex to ITU OB No. 1283",
+          "Annex to ITU OB No. 1283 (01/2024)",
+          "Annex to ITU OB No. 1000-F",
+          "Annex to ITU OB No. 1000-S"
+        ]
+      },
+      {
+        "key": "combined_identifier",
+        "title": "Combined Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "special_publication",
+        "title": "Special Publication",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "ITU OB No. 1",
+          "ITU OB No. 100",
+          "ITU OB No. 1096",
+          "ITU OB No. 1283",
+          "ITU OB No. 1283 (01/2024)",
+          "ITU OB No. 1096 (03/2016)",
+          "ITU OB No. 1000-F",
+          "ITU OB No. 1000-S",
+          "ITU OB No. 1000-R",
+          "ITU OB No. 1000-A"
+        ]
       }
     ],
     "attributes": []
@@ -4983,7 +5314,7 @@
   "cen_cenelec": {
     "identifier_types": [
       {
-        "key": "en",
+        "key": "european_norm",
         "title": "European Norm",
         "short": null,
         "abbr": [
@@ -5038,7 +5369,7 @@
         "examples": []
       },
       {
-        "key": "ts",
+        "key": "technical_specification",
         "title": "Technical Specification",
         "short": null,
         "abbr": [
@@ -5077,7 +5408,7 @@
         "examples": []
       },
       {
-        "key": "tr",
+        "key": "technical_report",
         "title": "Technical Report",
         "short": null,
         "abbr": [
@@ -5100,7 +5431,7 @@
         "examples": []
       },
       {
-        "key": "cwa",
+        "key": "cen_workshop_agreement",
         "title": "CEN Workshop Agreement",
         "short": null,
         "abbr": [
@@ -5146,7 +5477,7 @@
         "examples": []
       },
       {
-        "key": "hd",
+        "key": "harmonization_document",
         "title": "Harmonization Document",
         "short": null,
         "abbr": [
@@ -5169,7 +5500,7 @@
         "examples": []
       },
       {
-        "key": "es",
+        "key": "european_specification",
         "title": "European Specification",
         "short": null,
         "abbr": [
@@ -5192,7 +5523,7 @@
         "examples": []
       },
       {
-        "key": "cr",
+        "key": "cen_report",
         "title": "CEN Report",
         "short": null,
         "abbr": [
@@ -5215,7 +5546,7 @@
         "examples": []
       },
       {
-        "key": "env",
+        "key": "european_prestandard",
         "title": "European Prestandard",
         "short": null,
         "abbr": [
@@ -5236,6 +5567,46 @@
           }
         ],
         "examples": []
+      },
+      {
+        "key": "amendment",
+        "title": "Amendment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "adopted_european_norm",
+        "title": "European Norm",
+        "short": "EN",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "consolidated_identifier",
+        "title": "Consolidated Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "fragment",
+        "title": "Fragment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
       }
     ],
     "attributes": []
@@ -5243,64 +5614,69 @@
   "etsi": {
     "identifier_types": [
       {
-        "key": "en",
-        "title": "EN",
+        "key": "supplement_identifier",
+        "title": "Supplement Identifier",
         "short": null,
-        "abbr": [
-          "EN"
-        ],
+        "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "ts",
-        "title": "TS",
+        "key": "corrigendum",
+        "title": "Corrigendum",
         "short": null,
-        "abbr": [
-          "TS"
-        ],
+        "abbr": [],
         "typed_stages": [],
-        "examples": []
+        "examples": [
+          "ETSI ETR 053/C1 ed.2 (1997-03)",
+          "ETSI ETR 094/C1 ed.1 (1994-03)",
+          "ETSI ETR 283/C1 ed.1 (1997-03)",
+          "ETSI ETR 310/C1 ed.1 (1996-10)",
+          "ETSI ETS 300 012/C1 ed.1 (1993-08)",
+          "ETSI ETS 300 052-1/C1 ed.1 (1994-04)",
+          "ETSI ETS 300 055-1/C1 ed.1 (1994-04)",
+          "ETSI ETS 300 055-1/C2 ed.1 (1996-01)",
+          "ETSI ETS 300 058-1/C1 ed.1 (1994-04)",
+          "ETSI ETS 300 061-1/C1 ed.1 (1994-04)"
+        ]
       },
       {
-        "key": "tr",
-        "title": "TR",
+        "key": "amendment",
+        "title": "Amendment",
         "short": null,
-        "abbr": [
-          "TR"
-        ],
+        "abbr": [],
         "typed_stages": [],
-        "examples": []
+        "examples": [
+          "ETSI ETR 108/A1 ed.1 (1995-08)",
+          "ETSI ETS 300 011/A1 ed.1 (1994-12)",
+          "ETSI ETS 300 011/A2 ed.1 (1996-03)",
+          "ETSI ETS 300 012/A1 ed.1 (1994-12)",
+          "ETSI ETS 300 012/A2 ed.1 (1996-03)",
+          "ETSI ETS 300 019-1-3/A1 ed.1 (1997-06)",
+          "ETSI ETS 300 019-1-4/A1 ed.1 (1997-06)",
+          "ETSI ETS 300 019-2-3/A1 ed.1 (1997-06)",
+          "ETSI ETS 300 019-2-3/A2 ed.1 (1998-05)",
+          "ETSI ETS 300 019-2-4/A1 ed.1 (1997-06)"
+        ]
       },
       {
-        "key": "gs",
-        "title": "GS",
+        "key": "etsi_standard",
+        "title": "Etsi Standard",
         "short": null,
-        "abbr": [
-          "GS"
-        ],
+        "abbr": [],
         "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "eg",
-        "title": "EG",
-        "short": null,
-        "abbr": [
-          "EG"
-        ],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "sr",
-        "title": "SR",
-        "short": null,
-        "abbr": [
-          "SR"
-        ],
-        "typed_stages": [],
-        "examples": []
+        "examples": [
+          "ETSI EG 200 053 V1.5.1 (2004-06)",
+          "ETSI EG 200 234 V1.2.2 (2000-02)",
+          "ETSI EG 200 351 V2.2.2 (1998-09)",
+          "ETSI EG 200 351 V3.2.1 (2000-09)",
+          "ETSI EG 200 351 V4.1.1 (2001-10)",
+          "ETSI EG 201 013 V1.1.1 (1997-04)",
+          "ETSI EG 201 014 V1.1.1 (1997-05)",
+          "ETSI EG 201 015 V1.2.1 (1999-05)",
+          "ETSI EG 201 015 V2.1.1 (2012-02)",
+          "ETSI EG 201 017 V1.4.1 (2000-11)"
+        ]
       }
     ],
     "attributes": [
@@ -5317,7 +5693,7 @@
   "ansi": {
     "identifier_types": [
       {
-        "key": "ans",
+        "key": "standard",
         "title": "American National Standard",
         "short": "ANS",
         "abbr": [],
@@ -5781,7 +6157,7 @@
         ]
       },
       {
-        "key": "cor",
+        "key": "corrigendum",
         "title": "Corrigendum",
         "short": "Cor",
         "abbr": [],
@@ -5931,6 +6307,17 @@
         "typed_stages": [],
         "examples": [
           "CIE Tutorials Bundle 1"
+        ]
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE 198-SP1.4:2011/Cor1:2013",
+          "CIE 232:2019/Cor1:2020"
         ]
       }
     ],
@@ -6089,7 +6476,7 @@
   "jis": {
     "identifier_types": [
       {
-        "key": "jis",
+        "key": "standard",
         "title": "Japanese Industrial Standard",
         "short": "JIS",
         "abbr": [],
@@ -6107,7 +6494,7 @@
         "examples": []
       },
       {
-        "key": "tr",
+        "key": "technical_report",
         "title": "Technical Report",
         "short": "TR",
         "abbr": [],
@@ -6125,7 +6512,7 @@
         "examples": []
       },
       {
-        "key": "ts",
+        "key": "technical_specification",
         "title": "Technical Specification",
         "short": "TS",
         "abbr": [],
@@ -6141,6 +6528,41 @@
           }
         ],
         "examples": []
+      },
+      {
+        "key": "amendment",
+        "title": "Amendment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "explanation",
+        "title": "Explanation",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "japanese_industrial_standard",
+        "title": "Japanese Industrial Standard",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "JIS A 0001:1999",
+          "JIS A 0005:1966",
+          "JIS A 0015:1976",
+          "JIS A 0016:1979",
+          "JIS A 0017:2018",
+          "JIS A 0030:1994",
+          "JIS A 0101:2012",
+          "JIS A 0150:1999",
+          "JIS A 0202:2008",
+          "JIS A 0203:2019"
+        ]
       }
     ],
     "attributes": []
@@ -6318,6 +6740,30 @@
           "OIML V 2:2013",
           "OIML V 2:2013(E/F)"
         ]
+      },
+      {
+        "key": "amendment",
+        "title": "Amendment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "Amendment (2009) to OIML R 138 Edition 2007 (E)",
+          "Amendment (2009) to OIML R 138:2007 (E)",
+          "Amendment (2004) to OIML D 2 (E)"
+        ]
+      },
+      {
+        "key": "annex",
+        "title": "Annex",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "OIML R 60 Annexes Edition 2021 (E)",
+          "OIML R 60 Annexes:2021 (E)",
+          "OIML R 60 Annex A Edition 2013 (E)"
+        ]
       }
     ],
     "attributes": []
@@ -6325,7 +6771,7 @@
   "idf": {
     "identifier_types": [
       {
-        "key": "is",
+        "key": "international_standard",
         "title": "International Standard",
         "short": null,
         "abbr": [],
@@ -6532,7 +6978,7 @@
         ]
       },
       {
-        "key": "rm",
+        "key": "reviewed_method",
         "title": "Reviewed Method",
         "short": "RM",
         "abbr": [],
@@ -6708,27 +7154,7 @@
         ]
       },
       {
-        "key": "cor",
-        "title": "Corrigendum",
-        "short": "COR",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "cor",
-            "abbr": [
-              "COR"
-            ],
-            "name": "Corrigendum",
-            "harmonized_stages": []
-          }
-        ],
-        "examples": [
-          "IDF 148-1:2008/COR 1:2009"
-        ]
-      },
-      {
-        "key": "amd",
+        "key": "amendment",
         "title": "Amendment",
         "short": "AMD",
         "abbr": [],
@@ -6746,6 +7172,26 @@
         "examples": [
           "IDF 146:2003/AMD 1:2023",
           "IDF 140-1:2007/AMD 1:2012"
+        ]
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": "COR",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "cor",
+            "abbr": [
+              "COR"
+            ],
+            "name": "Corrigendum",
+            "harmonized_stages": []
+          }
+        ],
+        "examples": [
+          "IDF 148-1:2008/COR 1:2009"
         ]
       }
     ],
@@ -6976,19 +7422,45 @@
         "key": "handbook",
         "title": "Handbook",
         "short": null,
-        "abbr": [
-          "Handbook"
-        ],
+        "abbr": [],
         "typed_stages": [],
-        "examples": []
+        "examples": [
+          "PLATEAU Handbook #00 第1.0版",
+          "PLATEAU Handbook #00 第2.0版",
+          "PLATEAU Handbook #00 第3.0版",
+          "PLATEAU Handbook #00 第4.0版",
+          "PLATEAU Handbook #01 第1.0版",
+          "PLATEAU Handbook #01 第2.3版",
+          "PLATEAU Handbook #01 第3.5版",
+          "PLATEAU Handbook #01 第4.0版",
+          "PLATEAU Handbook #02 第1.0版",
+          "PLATEAU Handbook #02 第2.2版"
+        ]
       },
       {
         "key": "technical_report",
         "title": "Technical Report",
         "short": null,
-        "abbr": [
-          "Technical Report"
-        ],
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "PLATEAU Technical Report #00",
+          "PLATEAU Technical Report #01",
+          "PLATEAU Technical Report #02",
+          "PLATEAU Technical Report #03",
+          "PLATEAU Technical Report #11",
+          "PLATEAU Technical Report #14",
+          "PLATEAU Technical Report #15",
+          "PLATEAU Technical Report #16",
+          "PLATEAU Technical Report #17",
+          "PLATEAU Technical Report #18"
+        ]
+      },
+      {
+        "key": "annex",
+        "title": "Annex",
+        "short": null,
+        "abbr": [],
         "typed_stages": [],
         "examples": []
       }
@@ -7003,7 +7475,7 @@
   "sae": {
     "identifier_types": [
       {
-        "key": "base",
+        "key": "standard",
         "title": "Base",
         "short": null,
         "abbr": [],

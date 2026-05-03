@@ -90,59 +90,210 @@ module Pubid
           end
         end
 
+        # Build set of website keys from Scheme classes to avoid duplicates
+        known_website_keys = Set.new
+        scheme_klasses.each do |klass|
+          info = extract_type_info(klass)
+          known_website_keys << info[:key].to_s if info[:key]
+        end
+
         # Supplement with any typed classes in the Identifiers module
         # that weren't returned by Scheme (e.g., supplements, fragments)
-        scheme_klasses + discover_additional_typed_classes(scheme_klasses)
+        additional = discover_additional_typed_classes(scheme_klasses, known_website_keys)
+        scheme_klasses + additional
       end
 
-      def discover_additional_typed_classes(known)
+      # Classes to skip when discovering additional identifier types
+      SKIP_CLASSES = %w[Base].freeze
+
+      def discover_additional_typed_classes(known_classes, known_website_keys = Set.new)
         mod = scheme_module
         return [] unless mod
 
         idents_mod = mod.const_get(:Identifiers)
-        known_set = Set.new(known)
+        known_set = Set.new(known_classes)
 
         idents_mod.constants.filter_map do |c|
           klass = idents_mod.const_get(c)
         rescue NameError
-          # Some constants may be autoload stubs with typos
           next
         else
           next unless klass.is_a?(Class)
           next if known_set.include?(klass)
-          next if klass <= Exception # skip error classes
+          next if klass <= Exception
+          next if SKIP_CLASSES.include?(klass.name&.split("::")&.last)
 
-          begin
-            has_type = klass.respond_to?(:type) && klass.type && klass.type[:key]
-          rescue NotImplementedError
-            next
-          end
-          has_type ? klass : nil
+          # Check if this class produces a duplicate website key
+          info = extract_type_info(klass)
+          wkey = info[:key]&.to_s
+          next if wkey && known_website_keys.include?(wkey)
+
+          known_website_keys << wkey if wkey
+          klass
         end
       end
 
+      # Explicit overrides mapping (flavor, library_key) → website key
+      # for cases where derived key doesn't match the website convention.
+      WEBSITE_KEY_OVERRIDES = {
+        # ISO
+        [%i[iso], :is] => :international_standard,
+        [%i[iso], :tr] => :technical_report,
+        [%i[iso], :ts] => :technical_specification,
+        [%i[iso], :pas] => :publicly_available_specification,
+        [%i[iso], :tta] => :technology_trends_assessments,
+        [%i[iso], :iwa] => :international_workshop_agreement,
+        [%i[iso], :isp] => :international_standardized_profile,
+        [%i[iso], :rec] => :recommendation,
+        [%i[iso], :dir] => :directives,
+        [%i[iso], :"dir-sup"] => :directives_supplement,
+        [%i[iso], :amd] => :amendment,
+        [%i[iso], :cor] => :corrigendum,
+        [%i[iso], :suppl] => :supplement,
+        [%i[iso], :ext] => :extract,
+        [%i[iso], :add] => :addendum,
+        [%i[iso], :tc] => :tc_document,
+        # IEC
+        [%i[iec], :is] => :international_standard,
+        [%i[iec], :tr] => :technical_report,
+        [%i[iec], :ts] => :technical_specification,
+        [%i[iec], :pas] => :publicly_available_specification,
+        [%i[iec], :trf] => :test_report_form,
+        [%i[iec], :ish] => :interpretation_sheet,
+        [%i[iec], :srd] => :systems_reference_document,
+        [%i[iec], :wd] => :working_document,
+        [%i[iec], :frag] => :fragment_identifier,
+        [%i[iec], :amd] => :amendment,
+        [%i[iec], :cor] => :corrigendum,
+        [%i[iec], :cs] => :component_specification,
+        [%i[iec], :od] => :operational_document,
+        [%i[iec], :sttr] => :societal_technology_trend_report,
+        [%i[iec], :wp] => :white_paper,
+        # IEEE
+        [%i[ieee], :std] => :standard,
+        # NIST
+        [%i[nist], :sp] => :special_publication,
+        [%i[nist], :fips] => :federal_information_processing_standards,
+        [%i[nist], :ir] => :interagency_report,
+        [%i[nist], :hb] => :handbook,
+        [%i[nist], :tn] => :technical_note,
+        [%i[nist], :circ] => :circular,
+        [%i[nist], :circ_supp] => :circular_supplement,
+        [%i[nist], :crpl] => :crpl_report,
+        [%i[nist], :rpt] => :report,
+        [%i[nist], :mono] => :monograph,
+        [%i[nist], :mp] => :miscellaneous_publication,
+        [%i[nist], :gcr] => :grant_contractor_report,
+        [%i[nist], :lc] => :letter_circular,
+        [%i[nist], :cs] => :commercial_standard,
+        [%i[nist], :cse] => :commercial_standard_emergency,
+        [%i[nist], :csm] => :commercial_standards_monthly,
+        # BSI — adopted types share keys with base types, need unique mappings
+        [%i[bsi], :bs] => :british_standard,
+        [%i[bsi], :pd] => :published_document,
+        [%i[bsi], :pas] => :publicly_available_specification,
+        [%i[bsi], :na] => :national_annex,
+        [%i[bsi], :dd] => :draft_document,
+        [%i[bsi], :ep] => :electronic_book,
+        [%i[bsi], :ts] => :technical_specification,
+        [%i[bsi], :handbook] => :handbook,
+        [%i[bsi], :aerospace] => :aerospace_standard,
+        # CEN-CENELEC
+        [%i[cen_cenelec], :en] => :european_norm,
+        [%i[cen_cenelec], :ts] => :technical_specification,
+        [%i[cen_cenelec], :tr] => :technical_report,
+        [%i[cen_cenelec], :cwa] => :cen_workshop_agreement,
+        [%i[cen_cenelec], :hd] => :harmonization_document,
+        [%i[cen_cenelec], :es] => :european_specification,
+        [%i[cen_cenelec], :cr] => :cen_report,
+        [%i[cen_cenelec], :env] => :european_prestandard,
+        # IDF
+        [%i[idf], :is] => :international_standard,
+        [%i[idf], :rm] => :reviewed_method,
+        [%i[idf], :amd] => :amendment,
+        [%i[idf], :cor] => :corrigendum,
+        # CCSDS
+        [%i[ccsds], :base] => :base,
+        [%i[ccsds], :cor] => :corrigendum,
+        # JIS
+        [%i[jis], :jis] => :japanese_industrial_standard,
+        [%i[jis], :tr] => :technical_report,
+        [%i[jis], :ts] => :technical_specification,
+        # SAE
+        [%i[sae], :base] => :standard,
+        # ANSI
+        [%i[ansi], :ans] => :american_national_standard,
+      }.freeze
+
+      # Per-class overrides keyed by class name (for classes that share type keys)
+      CLASS_KEY_OVERRIDES = {
+        "Pubid::Bsi::Identifiers::AdoptedEuropeanNorm" => "adopted_european_norm",
+        "Pubid::Bsi::Identifiers::AdoptedInternationalStandard" => "adopted_international_standard",
+        "Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm" => "adopted_european_norm",
+        "Pubid::Ansi::Identifiers::Standard" => "standard",
+        "Pubid::Ansi::Identifiers::AmericanNationalStandard" => "american_national_standard",
+        "Pubid::Jis::Identifiers::Standard" => "standard",
+        "Pubid::Ieee::Identifiers::Nesc::Standard" => "nesc",
+        "Pubid::Ieee::Identifiers::Nesc::Draft" => "nesc",
+        "Pubid::Ieee::Identifiers::Nesc::Handbook" => "nesc",
+        "Pubid::Ieee::Identifiers::Nesc::Redline" => "nesc",
+      }.freeze
+
       def extract_type_info(klass)
-        type_info = klass.respond_to?(:type) ? klass.type : nil
+        # Per-class override takes highest priority
+        class_key = CLASS_KEY_OVERRIDES[klass.name]
+        if class_key
+          type_info = begin
+            klass.respond_to?(:type) ? klass.type : nil
+          rescue NotImplementedError
+            nil
+          end
+          metadata = klass.respond_to?(:metadata) ? klass.metadata : nil
+          return {
+            key: class_key,
+            title: type_info&.dig(:title) || metadata&.title || class_key.tr("_", " ").capitalize,
+            short: type_info&.dig(:short) || metadata&.short,
+            abbr: metadata&.abbr || [],
+          }
+        end
+
+        type_info = begin
+          klass.respond_to?(:type) ? klass.type : nil
+        rescue NotImplementedError
+          nil
+        end
         metadata = klass.respond_to?(:metadata) ? klass.metadata : nil
 
-        key = type_info&.dig(:key)
+        lib_key = type_info&.dig(:key)
         title = type_info&.dig(:title) || metadata&.title
         short = type_info&.dig(:short) || metadata&.short
         abbr = metadata&.abbr || []
 
-        # Fallback: derive from class name when def self.type is missing
-        unless key
+        # Derive from class name when def self.type is missing
+        unless lib_key
           class_name = klass.name&.split("::")&.last
-          key = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/, "")&.to_sym
+          lib_key = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/, "")&.to_sym
           title ||= class_name&.gsub(/([A-Z])/, ' \1')&.strip
         end
 
+        # Map library key to website-compatible key
+        website_key = resolve_website_key(lib_key)
+
         {
-          key: key,
+          key: website_key,
           title: title,
           short: short,
           abbr: abbr,
         }
+      end
+
+      def resolve_website_key(lib_key)
+        key_str = lib_key.to_s
+        WEBSITE_KEY_OVERRIDES.each do |(flavors, from_key), to_key|
+          next unless flavors.include?(flavor)
+          return to_key.to_s if from_key.to_s == key_str
+        end
+        key_str
       end
 
       def extract_typed_stages(klass)

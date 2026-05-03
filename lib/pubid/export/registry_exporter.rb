@@ -12,13 +12,14 @@ module Pubid
         registry = extract_registry
         return nil if registry.empty?
 
-        registry_keys = Set.new
+        known_website_keys = Set.new
 
         identifier_types = registry.group_by(&:type_code).map do |type_code, stages|
-          registry_keys << type_code.to_s
+          wkey = resolve_website_key(type_code).to_s
+          known_website_keys << wkey
           primary = stages.first
           IdentifierTypeResult.new(
-            key: type_code,
+            key: wkey,
             title: primary.name,
             short: nil,
             abbr: primary.abbr,
@@ -28,7 +29,7 @@ module Pubid
         end
 
         # Supplement with typed classes not in the registry
-        additional = discover_additional_from_identifiers(registry_keys)
+        additional = discover_additional_from_identifiers(known_website_keys)
         identifier_types.concat(additional)
 
         FlavorResult.new(
@@ -57,6 +58,7 @@ module Pubid
         return [] unless mod
 
         idents_mod = mod.const_get(:Identifiers)
+        skip = %w[Base]
 
         idents_mod.constants.filter_map do |c|
           klass = idents_mod.const_get(c)
@@ -64,22 +66,19 @@ module Pubid
           next
         else
           next unless klass.is_a?(Class)
+          next if skip.include?(klass.name&.split("::")&.last)
 
-          begin
-            type_info = klass.respond_to?(:type) ? klass.type : nil
-            next unless type_info && type_info[:key]
-          rescue NotImplementedError
-            next
-          end
+          info = extract_type_info(klass)
+          next unless info[:key]
 
-          key_str = type_info[:key].to_s
-          next if known_keys.include?(key_str)
+          website_key = info[:key].to_s
+          next if known_keys.include?(website_key)
 
-          known_keys << key_str
+          known_keys << website_key
           IdentifierTypeResult.new(
-            key: type_info[:key],
-            title: type_info[:title],
-            short: type_info[:short],
+            key: website_key,
+            title: info[:title],
+            short: info[:short],
             abbr: [],
             typed_stages: [],
             examples: [],
