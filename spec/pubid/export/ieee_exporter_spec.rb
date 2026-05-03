@@ -17,13 +17,13 @@ RSpec.describe Pubid::Export::IeeeExporter do
     end
 
     it "includes a Standard type" do
-      std = result.identifier_types.find { |t| t.key == "std" }
+      std = result.identifier_types.find { |t| t.key == "standard" }
       expect(std).not_to be_nil
     end
 
     it "assigns typed stages only to Standard" do
       result.identifier_types.each do |type|
-        if type.key == "std"
+        if type.key == "standard"
           expect(type.typed_stages.size).to be >= 0
         end
       end

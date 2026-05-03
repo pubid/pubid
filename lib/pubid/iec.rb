@@ -27,6 +27,12 @@ require_relative "iec/identifiers/sheet_identifier"
 require_relative "iec/identifiers/consolidated_identifier"
 require_relative "iec/identifiers/fragment_identifier"
 
+# Additional document types
+require_relative "iec/identifiers/component_specification"
+require_relative "iec/identifiers/operational_document"
+require_relative "iec/identifiers/societal_technology_trend_report"
+require_relative "iec/identifiers/white_paper"
+
 module Pubid
   module Iec
     # Primary document types (not supplements)
@@ -75,3 +81,5 @@ end
 require_relative "iec/urn_parser"
 require_relative "iec/builder"
 require_relative "iec/parser"
+
+Pubid::Registry.register(:iec, Pubid::Iec)

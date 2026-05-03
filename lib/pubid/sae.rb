@@ -15,3 +15,6 @@ module Pubid
     end
   end
 end
+
+
+Pubid::Registry.register(:sae, Pubid::Sae)

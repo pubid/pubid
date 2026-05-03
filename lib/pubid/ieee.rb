@@ -28,3 +28,6 @@ module Pubid
     end
   end
 end
+
+
+Pubid::Registry.register(:ieee, Pubid::Ieee)

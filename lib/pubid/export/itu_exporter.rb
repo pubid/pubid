@@ -5,49 +5,57 @@ module Pubid
     # Strategy for ITU, which uses a transform/model pattern without
     # traditional identifier classes or TYPED_STAGES.
     class ItuExporter < FlavorExporter
-      def export
-        scheme = scheme_class
-        return nil unless scheme
+      WEBSITE_KEY_OVERRIDES = {
+        "special_publication" => "special_publication",
+      }.freeze
 
-        attrs = extract_serializable_attributes(scheme)
+      def export
+        klasses = resolve_itu_identifiers
+        return nil if klasses.empty?
+
+        fixture_data = fixture_examples
+
+        identifier_types = klasses.map do |klass|
+          info = extract_type_info(klass)
+          type_key = info[:key]
+          examples = fixture_data[type_key] || fixture_data[type_key.to_s] || []
+
+          IdentifierTypeResult.new(
+            key: info[:key],
+            title: info[:title],
+            short: info[:short],
+            abbr: info[:abbr],
+            typed_stages: [],
+            examples: examples,
+          )
+        end
 
         FlavorResult.new(
           flavor: flavor,
-          identifier_types: itu_identifier_types,
-          attributes: extract_attribute_names(scheme),
+          identifier_types: identifier_types,
+          attributes: extract_attribute_names,
         )
       end
 
       private
 
-      def extract_serializable_attributes(klass)
-        return {} unless klass.respond_to?(:model_attributes)
-        klass.model_attributes
-      rescue NoMethodError
-        {}
+      def resolve_itu_identifiers
+        identifiers_mod = scheme_module::Identifiers
+        skip = %w[Base]
+        identifiers_mod.constants.filter_map do |c|
+          klass = begin; identifiers_mod.const_get(c); rescue NameError; next; end
+          next unless klass.is_a?(Class)
+          next if skip.include?(klass.name&.split("::")&.last)
+          klass
+        end
       end
 
-      def extract_attribute_names(scheme)
-        return [] unless scheme.respond_to?(:model_class)
-        model = scheme.model_class
-        return [] unless model && model.respond_to?(:model_attributes)
+      def extract_attribute_names
+        model = scheme_module::Identifier
+        return [] unless model&.respond_to?(:model_attributes)
         model.model_attributes.keys.map(&:to_s)
       rescue NoMethodError, NameError
         []
-      end
-
-      def itu_identifier_types
-        # ITU has sector-based types (Recommendation, Resolution, etc.)
-        %w[recommendation resolution handbook].map do |type_name|
-          IdentifierTypeResult.new(
-            key: type_name,
-            title: type_name.capitalize,
-            short: nil,
-            abbr: [type_name.capitalize],
-            typed_stages: [],
-            examples: [],
-          )
-        end
       end
     end
   end

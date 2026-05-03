@@ -88,7 +88,7 @@ RSpec.describe Pubid::Export::Exporter do
   describe "export data structure" do
     let(:data) { described_class.export_all }
     let(:iso_types) { data["iso"][:identifier_types] }
-    let(:is_type) { iso_types.find { |t| t[:key] == "is" } }
+    let(:is_type) { iso_types.find { |t| t[:key] == "international_standard" } }
 
     it "each identifier type has required fields" do
       iso_types.each do |type|

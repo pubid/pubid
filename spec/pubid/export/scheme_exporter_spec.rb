@@ -18,20 +18,20 @@ RSpec.describe Pubid::Export::SchemeExporter do
       end
 
       it "includes International Standard" do
-        is_type = result.identifier_types.find { |t| t.key == "is" }
+        is_type = result.identifier_types.find { |t| t.key == "international_standard" }
         expect(is_type).not_to be_nil
         expect(is_type.title).to eq("International Standard")
       end
 
       it "includes typed stages for International Standard" do
-        is_type = result.identifier_types.find { |t| t.key == "is" }
+        is_type = result.identifier_types.find { |t| t.key == "international_standard" }
         expect(is_type.typed_stages.size).to be > 0
         dis = is_type.typed_stages.find { |ts| ts.stage_code == "dis" }
         expect(dis).not_to be_nil
       end
 
       it "includes Amendment type" do
-        amd = result.identifier_types.find { |t| t.key == "amd" }
+        amd = result.identifier_types.find { |t| t.key == "amendment" }
         expect(amd).not_to be_nil
       end
     end

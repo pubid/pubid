@@ -13,17 +13,20 @@ module Pubid
         klasses = scheme.identifiers.reject { |k| k == scheme_module::Identifiers::Base }
         fixture_data = fixture_examples
 
-        identifier_types = klasses.map do |klass|
-          type_info = klass.respond_to?(:type) ? klass.type : nil
+        seen_keys = Set.new
+        identifier_types = klasses.filter_map do |klass|
+          info = extract_type_info(klass)
+          type_key = info[:key]
+          next if seen_keys.include?(type_key)
+          seen_keys << type_key
+
+          examples = match_nist_examples(fixture_data, type_key, klass)
           stages = klass.respond_to?(:typed_stages) ? klass.typed_stages : []
 
-          type_key = type_info&.dig(:key)
-          examples = match_nist_examples(fixture_data, type_key, klass)
-
           IdentifierTypeResult.new(
-            key: type_key,
-            title: type_info&.dig(:title),
-            short: type_info&.dig(:short),
+            key: info[:key],
+            title: info[:title],
+            short: info[:short],
             abbr: stages.flat_map(&:abbr),
             typed_stages: stages,
             examples: examples,

@@ -3,63 +3,54 @@
 module Pubid
   module Export
     # Strategy for flavors using Lutaml::Model::Serializable as their Scheme
-    # (ETSI, Plateau). These don't have per-class identifier types with
-    # TYPED_STAGES — the Scheme itself is the data model.
+    # (ETSI, Plateau). These have identifier classes in the Identifiers module
+    # that may not have def self.type.
     class DataClassExporter < FlavorExporter
       def export
+        klasses = resolve_identifier_classes_from_module
+        return nil if klasses.empty?
+
+        fixture_data = fixture_examples
+
+        identifier_types = klasses.map do |klass|
+          info = extract_type_info(klass)
+          type_key = info[:key]
+          examples = fixture_data[type_key] || fixture_data[type_key.to_s] || []
+
+          IdentifierTypeResult.new(
+            key: info[:key],
+            title: info[:title],
+            short: info[:short],
+            abbr: info[:abbr],
+            typed_stages: [],
+            examples: examples,
+          )
+        end
+
         scheme = scheme_class
-        return nil unless scheme
-
-        attrs = extract_serializable_attributes(scheme)
-        type_attr = find_type_attribute(attrs, scheme)
-
-        identifier_types = build_types_from_attribute(type_attr, scheme)
+        attrs = scheme&.respond_to?(:attributes) ? scheme.attributes.keys.map(&:to_s) : []
 
         FlavorResult.new(
           flavor: flavor,
           identifier_types: identifier_types,
-          attributes: attrs.keys.map(&:to_s),
+          attributes: attrs,
         )
       end
 
       private
 
-      def extract_serializable_attributes(klass)
-        return {} unless klass.respond_to?(:attributes)
+      def resolve_identifier_classes_from_module
+        mod = scheme_module
+        return [] unless mod
 
-        klass.attributes
-      rescue NoMethodError
-        {}
-      end
+        idents_mod = mod.const_get(:Identifiers)
+        skip = %w[Base Supplement]
 
-      def find_type_attribute(attrs, _scheme)
-        attrs[:type]
-      end
-
-      def build_types_from_attribute(type_attr, _scheme)
-        return [] unless type_attr
-
-        types = known_types_for_flavor
-        types.map do |type_name|
-          IdentifierTypeResult.new(
-            key: type_name.downcase.gsub(/\s+/, "_"),
-            title: type_name,
-            short: nil,
-            abbr: [type_name],
-            typed_stages: [],
-            examples: [],
-          )
-        end
-      end
-
-      def known_types_for_flavor
-        case flavor.to_s
-        when "etsi"
-          %w[EN TS TR GS EG SR]
-        when "plateau"
-          %w[Handbook Technical\ Report]
-        else
-          []
+        idents_mod.constants.filter_map do |c|
+          klass = begin; idents_mod.const_get(c); rescue NameError; next; end
+          next unless klass.is_a?(Class)
+          next if skip.include?(klass.name&.split("::")&.last)
+          klass
         end
       end
     end
