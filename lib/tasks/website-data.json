@@ -1,4 +1,12 @@
 {
+  "_metadata": {
+    "pubid_version": "2.0.0",
+    "git_commit": "dbcaf73c",
+    "git_branch": "rt-export-discovery-fix",
+    "exported_at": "2026-05-03T00:34:41Z",
+    "total_identifier_types": 162,
+    "total_flavors": 23
+  },
   "iso": {
     "identifier_types": [
       {
@@ -3182,6 +3190,152 @@
         ]
       },
       {
+        "key": "frag",
+        "title": "Fragment",
+        "short": "FRAG",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "frag",
+            "abbr": [
+              "PWI Frag"
+            ],
+            "name": "Preliminary Work Item Fragment",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "frag",
+            "abbr": [
+              "NP Frag"
+            ],
+            "name": "New Proposal Fragment",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "anw",
+            "type_code": "frag",
+            "abbr": [
+              "ANW Frag"
+            ],
+            "name": "Approved New Work Item Fragment",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "frag",
+            "abbr": [
+              "WD Frag"
+            ],
+            "name": "Working Draft Fragment",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "frag",
+            "abbr": [
+              "CDFRAG"
+            ],
+            "name": "Committee Draft Fragment",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "dfrag",
+            "type_code": "frag",
+            "abbr": [
+              "DFRAG"
+            ],
+            "name": "Draft Fragment",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fdfrag",
+            "type_code": "frag",
+            "abbr": [
+              "FDFRAG",
+              "PRF Frag"
+            ],
+            "name": "Final Draft Fragment",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "frag",
+            "abbr": [
+              "FRAG"
+            ],
+            "name": "Fragment",
+            "harmonized_stages": [
+              "60.00",
+              "60.60",
+              "90.20",
+              "90.60",
+              "90.92",
+              "90.93",
+              "90.99",
+              "95.20",
+              "95.60",
+              "95.92",
+              "95.99"
+            ]
+          }
+        ],
+        "examples": [
+          "IEC 60050-111/AMD1/FRAG1 ED2",
+          "IEC 60050-121/AMD2/FRAG1 ED2",
+          "IEC 60050-131/AMD1/FRAG1 ED2",
+          "IEC 60050-191/AMD1/FRAG1 ED1",
+          "IEC 60050-191/AMD2/FRAG2 ED1",
+          "IEC 60050-191/FRAG1 ED2",
+          "IEC 60050-447/FRAG3 ED2",
+          "IEC 60050-521/AMD1/FRAG1 ED1",
+          "IEC 60050-521/FRAG1 ED2",
+          "IEC 60050-604/AMD2/FRAG1 ED1"
+        ]
+      },
+      {
         "key": "amd",
         "title": "Amendment",
         "short": "AMD",
@@ -3473,152 +3627,6 @@
           "IEC 60050-351:1998/COR1:1999 ED2",
           "IEC 60050-702:1992/COR1:1992",
           "IEC 60050-702:1992/COR2:1994"
-        ]
-      },
-      {
-        "key": "frag",
-        "title": "Fragment",
-        "short": "FRAG",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "frag",
-            "abbr": [
-              "PWI Frag"
-            ],
-            "name": "Preliminary Work Item Fragment",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "frag",
-            "abbr": [
-              "NP Frag"
-            ],
-            "name": "New Proposal Fragment",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "anw",
-            "type_code": "frag",
-            "abbr": [
-              "ANW Frag"
-            ],
-            "name": "Approved New Work Item Fragment",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "frag",
-            "abbr": [
-              "WD Frag"
-            ],
-            "name": "Working Draft Fragment",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "frag",
-            "abbr": [
-              "CDFRAG"
-            ],
-            "name": "Committee Draft Fragment",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "dfrag",
-            "type_code": "frag",
-            "abbr": [
-              "DFRAG"
-            ],
-            "name": "Draft Fragment",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fdfrag",
-            "type_code": "frag",
-            "abbr": [
-              "FDFRAG",
-              "PRF Frag"
-            ],
-            "name": "Final Draft Fragment",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "frag",
-            "abbr": [
-              "FRAG"
-            ],
-            "name": "Fragment",
-            "harmonized_stages": [
-              "60.00",
-              "60.60",
-              "90.20",
-              "90.60",
-              "90.92",
-              "90.93",
-              "90.99",
-              "95.20",
-              "95.60",
-              "95.92",
-              "95.99"
-            ]
-          }
-        ],
-        "examples": [
-          "IEC 60050-111/AMD1/FRAG1 ED2",
-          "IEC 60050-121/AMD2/FRAG1 ED2",
-          "IEC 60050-131/AMD1/FRAG1 ED2",
-          "IEC 60050-191/AMD1/FRAG1 ED1",
-          "IEC 60050-191/AMD2/FRAG2 ED1",
-          "IEC 60050-191/FRAG1 ED2",
-          "IEC 60050-447/FRAG3 ED2",
-          "IEC 60050-521/AMD1/FRAG1 ED1",
-          "IEC 60050-521/FRAG1 ED2",
-          "IEC 60050-604/AMD2/FRAG1 ED1"
         ]
       }
     ],
@@ -4885,6 +4893,14 @@
         "examples": []
       },
       {
+        "key": "standalone_amendment",
+        "title": "Amendment",
+        "short": "AMD",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
         "key": "supplementary_index",
         "title": "Supplementary Index",
         "short": "BS",
@@ -4920,14 +4936,6 @@
         "key": "explanatory_supplement",
         "title": "Explanatory Supplement",
         "short": "BS",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "standalone_amendment",
-        "title": "Amendment",
-        "short": "AMD",
         "abbr": [],
         "typed_stages": [],
         "examples": []
