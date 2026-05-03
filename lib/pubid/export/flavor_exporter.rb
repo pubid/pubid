@@ -39,7 +39,7 @@ module Pubid
           when "nist" then Pubid::Nist
           when "bsi" then Pubid::Bsi
           when "itu" then Pubid::Itu
-          when "cen" then Pubid::Cen
+          when "cen_cenelec" then Pubid::CenCenelec
           when "etsi" then Pubid::Etsi
           when "ansi" then Pubid::Ansi
           when "astm" then Pubid::Astm
@@ -153,10 +153,15 @@ module Pubid
         []
       end
 
+      # Map flavor keys to fixture directory names when they differ
+      FIXTURE_DIR_ALIASES = {
+      }.freeze
+
       def fixture_examples
         # __dir__ = lib/pubid/export → go up 3 levels to gem root, then spec/fixtures
         gem_root = File.expand_path("../../..", __dir__)
-        base = File.join(gem_root, "spec", "fixtures", flavor.to_s, "identifiers", "pass")
+        dir_name = FIXTURE_DIR_ALIASES[flavor] || flavor.to_s
+        base = File.join(gem_root, "spec", "fixtures", dir_name, "identifiers", "pass")
         return {} unless Dir.exist?(base)
 
         examples = {}

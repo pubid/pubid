@@ -19,7 +19,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
       end
 
       it "adopted_identifier is CEN object" do
-        expect(parsed.adopted_identifier.class.name).to start_with("Pubid::Cen::")
+        expect(parsed.adopted_identifier.class.name).to start_with("Pubid::CenCenelec::")
       end
 
       it "delegates number to adopted identifier" do

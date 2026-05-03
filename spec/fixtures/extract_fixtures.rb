@@ -118,7 +118,7 @@ class FixturesExtractor
     when "itu" then Pubid::Itu.parse(id_str)
     when "plateau" then Pubid::Plateau.parse(id_str)
     when "ansi" then Pubid::Ansi.parse(id_str)
-    when "cen" then Pubid::Cen.parse(id_str)
+    when "cen_cenelec" then Pubid::CenCenelec.parse(id_str)
     when "bsi" then Pubid::Bsi.parse(id_str)
     when "idf" then Pubid::Idf.parse(id_str)
     else

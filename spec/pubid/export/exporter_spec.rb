@@ -156,8 +156,8 @@ RSpec.describe Pubid::Export::Exporter do
       expect(described_class::FLAVOR_STRATEGIES[:bsi]).to eq(:registry)
     end
 
-    it "uses RegistryExporter for CEN" do
-      expect(described_class::FLAVOR_STRATEGIES[:cen]).to eq(:registry)
+    it "uses RegistryExporter for CEN-CENELEC" do
+      expect(described_class::FLAVOR_STRATEGIES[:cen_cenelec]).to eq(:registry)
     end
 
     it "uses DataClassExporter for ETSI" do
