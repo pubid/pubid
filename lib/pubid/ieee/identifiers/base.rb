@@ -50,6 +50,7 @@ module Pubid
         attribute :ashrae_number, :string # ASHRAE Guideline number
         attribute :ashrae_year, :string # ASHRAE Guideline year
         attribute :crossref, :string # IEEE cross-reference (e.g., /C62.22.1-1996)
+        attribute :reaffirmed, :string # Reaffirmed year (e.g., "2010" for (R2010))
 
         # Store actual component objects
         attr_accessor :code_obj, :draft_obj
@@ -560,14 +561,9 @@ module Pubid
           # Handle multiple parenthetical clauses (reaffirmed + relationships/revision)
           parentheticals = []
 
-          # Reaffirmed as first parenthetical if present (and not in attributes hash)
-          reaff = begin
-            reaffirmed
-          rescue NoMethodError
-            nil
-          end
+          reaff = reaffirmed
           if reaff && !reaff.to_s.strip.empty?
-            parentheticals << "(R#{reaffirmed})"
+            parentheticals << "(R#{reaff})"
           end
 
           # Then add relationships/revision/amendment as second parenthetical
