@@ -85,13 +85,13 @@ module Pubid
               rescue NoMethodError
                 nil
               end
-              if ts_type == "version"
-                result += " (#{tl} version)"
-              elsif ts_type == "Translation"
-                result += " (#{tl} Translation)"
-              else
-                result += " (#{tl})"
-              end
+              result += if ts_type == "version"
+                          " (#{tl} version)"
+                        elsif ts_type == "Translation"
+                          " (#{tl} Translation)"
+                        else
+                          " (#{tl})"
+                        end
             else
               tu = begin
                 base_id.translation_upper
@@ -104,11 +104,11 @@ module Pubid
                 rescue NoMethodError
                   nil
                 end
-                if ts_type == "Translation"
-                  result += " (#{tu} Translation)"
-                else
-                  result += " (#{tu})"
-                end
+                result += if ts_type == "Translation"
+                            " (#{tu} Translation)"
+                          else
+                            " (#{tu})"
+                          end
               end
             end
 
@@ -159,27 +159,27 @@ module Pubid
 
         def year
           base = identifiers&.first
-          base.year if base && base.methods.include?(:year)
+          base.year if base&.methods&.include?(:year)
         end
 
         def date
           base = identifiers&.first
-          base.date if base && base.methods.include?(:date)
+          base.date if base&.methods&.include?(:date)
         end
 
         def parts
           base = identifiers&.first
-          base.parts if base && base.methods.include?(:parts)
+          base.parts if base&.methods&.include?(:parts)
         end
 
         def part
           base = identifiers&.first
-          base.part if base && base.methods.include?(:part)
+          base.part if base&.methods&.include?(:part)
         end
 
         def type
           base = identifiers&.first
-          base.type if base && base.methods.include?(:type)
+          base.type if base&.methods&.include?(:type)
         end
       end
     end

@@ -9,12 +9,12 @@ module Pubid
         type_letter = stringify(hash[:type])
 
         attrs = {
-          code:       stringify(hash[:code]),
-          appendix:   stringify(hash[:appendix]),
-          part:       stringify(hash[:part]),
-          annex:      stringify(hash[:annex]),
+          code: stringify(hash[:code]),
+          appendix: stringify(hash[:appendix]),
+          part: stringify(hash[:part]),
+          annex: stringify(hash[:annex]),
           supplement: stringify(hash[:supplement]),
-          version:    stringify(hash[:version]),
+          version: stringify(hash[:version]),
         }.compact
 
         Scheme.identifier_klass_for_type_letter(type_letter).new(**attrs)

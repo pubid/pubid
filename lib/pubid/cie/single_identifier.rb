@@ -18,12 +18,10 @@ module Pubid
     # - Identical (identical to ISO publications)
     # - TutorialBundle (tutorial bundles)
     class SingleIdentifier < Identifier
-
       # CIE uses a fixed publisher string
       def publisher
         "CIE"
       end
-
 
       attribute :year, :string
       attribute :date_separator, :string # "dash" or "colon"

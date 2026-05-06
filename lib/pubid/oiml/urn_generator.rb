@@ -5,18 +5,21 @@ module Pubid
     class UrnGenerator < Pubid::UrnGenerator::Base
       def urn_type
         return "r" unless identifier.type
+
         identifier.type.to_s.downcase
       end
 
       def urn_number
         return nil unless identifier.code
+
         identifier.code.to_s
       end
 
       def urn_year
-        if identifier.date
-          return identifier.date.year.to_s if identifier.date.year
+        if identifier.date&.year
+          return identifier.date.year.to_s
         end
+
         nil
       end
 

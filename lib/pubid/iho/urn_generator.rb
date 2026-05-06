@@ -21,7 +21,7 @@ module Pubid
         parts << "part.#{identifier.part}"       if identifier.part
         parts << "annex.#{identifier.annex}"     if identifier.annex
         parts << "suppl.#{identifier.supplement}" if identifier.supplement
-        parts << identifier.version.to_s         if identifier.version
+        parts << identifier.version.to_s if identifier.version
         parts.join(":")
       end
     end

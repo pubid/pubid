@@ -117,7 +117,8 @@ module Pubid
 
       # Format factory methods — replace RenderingStyle hierarchy
       def self.ref_num_short
-        new(with_language_code: :single, stage_format_long: false, with_date: true)
+        new(with_language_code: :single, stage_format_long: false,
+            with_date: true)
       end
 
       def self.ref_num_long
@@ -125,15 +126,18 @@ module Pubid
       end
 
       def self.ref_dated
-        new(with_language_code: :none, stage_format_long: false, with_date: true)
+        new(with_language_code: :none, stage_format_long: false,
+            with_date: true)
       end
 
       def self.ref_undated
-        new(with_language_code: :none, stage_format_long: false, with_date: false)
+        new(with_language_code: :none, stage_format_long: false,
+            with_date: false)
       end
 
       def self.ref_undated_long
-        new(with_language_code: :none, stage_format_long: true, with_date: false)
+        new(with_language_code: :none, stage_format_long: true,
+            with_date: false)
       end
 
       def self.from_format(format)

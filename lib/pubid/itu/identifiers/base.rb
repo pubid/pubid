@@ -11,7 +11,6 @@ module Pubid
     module Identifiers
       # Base class for all ITU identifiers
       class Base < Lutaml::Model::Serializable
-
         # Long-form ↔ ITU single-letter language code map. The parser produces
         # single-letter codes (E/F/S/R/A/C); API callers (e.g. metanorma-itu)
         # pass long-form (en/fr/es/ru/ar/zh). Storage is normalized to the
@@ -35,7 +34,7 @@ module Pubid
             kwargs = kwargs.merge(language: normalize_language(kwargs[:language]))
           end
 
-          super(**kwargs)
+          super
 
           validate_ob_no_sector!
         end
@@ -101,7 +100,7 @@ module Pubid
           # Only render canonical single-letter ITU language codes
           # (e.g. "F", "S"). Languages with no mapping (e.g. "de") get
           # no suffix — matches v1 PR #38 render_language behavior.
-          return "" unless LANGUAGES.values.include?(language)
+          return "" unless LANGUAGES.value?(language)
 
           "-#{language}"
         end

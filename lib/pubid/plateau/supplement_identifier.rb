@@ -7,7 +7,6 @@ module Pubid
     # Base class for PLATEAU supplements (Annex)
     # Supplements reference a base identifier
     class SupplementIdentifier < Lutaml::Model::Serializable
-
       attribute :base_identifier, Identifiers::Base
       attribute :letter, :string, default: -> {}
 

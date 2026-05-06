@@ -4,7 +4,7 @@ module Pubid
   module Iso
     class SupplementIdentifier < SingleIdentifier
       attribute :base_identifier, Identifier,
-        polymorphic: true
+                polymorphic: true
 
       key_value do
         map "base_identifier", to: :base_identifier, polymorphic: {
@@ -19,7 +19,8 @@ module Pubid
 
       def to_s(**opts)
         context = build_rendering_context(nil, format: :human, **opts)
-        Pubid::Renderers::SupplementRenderer.new(self).render(context:, **opts.slice(:with_edition))
+        Pubid::Renderers::SupplementRenderer.new(self).render(context:,
+                                                              **opts.slice(:with_edition))
       end
     end
   end

@@ -128,7 +128,7 @@ module Pubid
       end
 
       def publisher_component
-        pub = identifier.publisher ? identifier.publisher : "IEEE"
+        pub = identifier.publisher || "IEEE"
         pub = pub.to_s.downcase
 
         if identifier.copublisher&.any?

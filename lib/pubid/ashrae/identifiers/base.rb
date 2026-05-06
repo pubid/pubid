@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Ashrae
     module Identifiers
@@ -18,7 +17,6 @@ module Pubid
         def self.parse(string)
           Ashrae::Identifier.parse(string)
         end
-
       end
     end
   end

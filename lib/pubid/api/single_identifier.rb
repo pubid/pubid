@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Api
     class SingleIdentifier < Lutaml::Model::Serializable
-
       # Generate URN for this identifier
       #
       # @return [String] URN representation

@@ -111,9 +111,7 @@ module Pubid
         else
           copubs = maybe(:copublishers)
           if copubs&.any?
-            cp = copubs.map do |c|
-              c.to_s
-            end
+            cp = copubs.map(&:to_s)
             pub = "#{pub}-#{cp.join('-').downcase}"
           end
         end

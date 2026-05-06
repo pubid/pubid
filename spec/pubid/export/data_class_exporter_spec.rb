@@ -23,7 +23,9 @@ RSpec.describe Pubid::Export::DataClassExporter do
       end
 
       it "includes Supplement type" do
-        ts = result.identifier_types.find { |t| t.key == "supplement_identifier" }
+        ts = result.identifier_types.find do |t|
+          t.key == "supplement_identifier"
+        end
         expect(ts).not_to be_nil
       end
     end

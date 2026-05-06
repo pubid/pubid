@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module CenCenelec
     module Identifiers
       # Base CEN identifier
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
       class Base < Lutaml::Model::Serializable
-
         # Generate URN for this identifier
         #
         # @return [String] URN representation

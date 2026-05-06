@@ -26,14 +26,14 @@ RSpec.describe Pubid::Export::Exporter do
     it "maps every flavor to a strategy" do
       described_class::FLAVORS.each do |flavor|
         expect(described_class::FLAVOR_STRATEGIES).to have_key(flavor),
-          "FLAVOR_STRATEGIES missing key: #{flavor}"
+                                                      "FLAVOR_STRATEGIES missing key: #{flavor}"
       end
     end
 
     it "maps every strategy to a class" do
       described_class::FLAVOR_STRATEGIES.each_value do |strategy|
         expect(described_class::STRATEGY_CLASSES).to have_key(strategy),
-          "STRATEGY_CLASSES missing key: #{strategy}"
+                                                     "STRATEGY_CLASSES missing key: #{strategy}"
       end
     end
   end

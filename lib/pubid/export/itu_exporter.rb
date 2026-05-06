@@ -43,16 +43,20 @@ module Pubid
         identifiers_mod = scheme_module::Identifiers
         skip = %w[Base]
         identifiers_mod.constants.filter_map do |c|
-          klass = begin; identifiers_mod.const_get(c); rescue NameError; next; end
+          klass = begin
+            identifiers_mod.const_get(c); rescue NameError; next
+          end
           next unless klass.is_a?(Class)
           next if skip.include?(klass.name&.split("::")&.last)
+
           klass
         end
       end
 
       def extract_attribute_names
         model = scheme_module::Identifier
-        return [] unless model&.methods.include?(:model_attributes)
+        return [] unless model&.methods&.include?(:model_attributes)
+
         model.model_attributes.keys.map(&:to_s)
       rescue NoMethodError, NameError
         []

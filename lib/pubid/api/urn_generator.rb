@@ -9,16 +9,19 @@ module Pubid
 
       def urn_number
         return nil unless identifier.code
+
         identifier.code.value.to_s
       end
 
       def urn_part
         return nil unless identifier.part
+
         "-#{identifier.part}"
       end
 
       def urn_year
         return identifier.year.to_s if identifier.year
+
         nil
       end
 

@@ -18,11 +18,12 @@ module Pubid
 
         def to_s
           # Get the BSI prefix (BS, PD, DD)
-          prefix = if publisher.is_a?(Components::Publisher)
+          prefix = case publisher
+                   when Components::Publisher
                      publisher.body
-                   elsif publisher.is_a?(Array)
+                   when Array
                      publisher.join("/")
-                   elsif publisher.is_a?(String)
+                   when String
                      publisher
                    else
                      "BS"

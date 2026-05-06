@@ -5,11 +5,13 @@ module Pubid
     class UrnGenerator < Pubid::UrnGenerator::Base
       def urn_publisher_prefix
         return nil unless identifier.publisher_prefix
+
         identifier.publisher_prefix.to_s.downcase
       end
 
       def urn_number
         return nil unless identifier.code
+
         identifier.code.value.to_s
       end
 
@@ -27,6 +29,7 @@ module Pubid
 
       def urn_year_csa
         return nil unless identifier.year
+
         year = identifier.year.to_s
         year = year[-2..] if year.length == 4 && year.start_with?("20")
         year

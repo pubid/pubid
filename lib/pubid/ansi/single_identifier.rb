@@ -4,7 +4,6 @@ module Pubid
   module Ansi
     # Single ANSI identifier (non-bundled)
     class SingleIdentifier < Identifier
-
       # Generate URN for this identifier
       #
       # @return [String] URN representation

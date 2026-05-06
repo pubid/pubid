@@ -98,9 +98,9 @@ module Pubid
           end
         end
 
-        # Parse year if present (4-digit year)
+        # Parse date if present (year or year-month)
         date = nil
-        if parts.first&.match(/^\d{4}$/)
+        if parts.first&.match(/^\d{4}(-\d{2})?$/)
           date = parts.shift
         end
 
@@ -148,8 +148,13 @@ module Pubid
           end
 
           # Next part might be year if not already set
-          if supp_date.nil? && parts.first&.match(/^\d{4}$/)
+          if supp_date.nil? && parts.first&.match(/^\d{4}(-\d{2})?$/)
             supp_date = parts.shift
+          end
+
+          # Safety: consume unrecognized token to prevent infinite loop
+          unless supp_type || supp_number || supp_date || supp_stage
+            parts.shift
           end
 
           supplements << {

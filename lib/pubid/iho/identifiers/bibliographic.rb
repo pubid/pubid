@@ -7,7 +7,8 @@ module Pubid
       # Example: IHO B-4 2.19.0.
       class Bibliographic < Base
         def self.type
-          { key: :bibliographic, title: "Bibliographic Publication", short: "B" }
+          { key: :bibliographic, title: "Bibliographic Publication",
+            short: "B" }
         end
 
         def type

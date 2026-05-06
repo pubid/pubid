@@ -39,7 +39,9 @@ RSpec.describe Pubid::Iho::Scheme do
     end
 
     it "raises for an unknown letter" do
-      expect { described_class.identifier_klass_for_type_letter("X") }.to raise_error(KeyError)
+      expect do
+        described_class.identifier_klass_for_type_letter("X")
+      end.to raise_error(KeyError)
     end
   end
 

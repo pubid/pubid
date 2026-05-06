@@ -3,7 +3,7 @@
 module Pubid
   module FormatDetector
     URN_PATTERN = /\Aurn:/i
-    MR_STRING_PATTERN = /\A[A-Z]{2,}[\.\-]/
+    MR_STRING_PATTERN = /\A[A-Z]{2,}[.-]/
 
     def self.detect(string)
       case string

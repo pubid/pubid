@@ -21,11 +21,9 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |k, v|
-              begin
-                identifier.send("#{k}=", v)
-              rescue NoMethodError
-                nil
-              end
+              identifier.send("#{k}=", v)
+            rescue NoMethodError
+              nil
             end
           else
             begin

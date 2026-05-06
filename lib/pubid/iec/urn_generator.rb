@@ -90,7 +90,8 @@ module Pubid
         docnumber = docnumber_component
         parts << docnumber if docnumber
 
-        parts << identifier.date.year.to_s if identifier.date
+        date_str = urn_date_string(identifier.date)
+        parts << date_str if date_str
 
         if identifier.stage_iteration
           parts << "iter.#{identifier.stage_iteration}"
@@ -130,14 +131,16 @@ module Pubid
           docnumber = docnumber_component(base_id)
           parts << docnumber if docnumber
 
-          parts << base_id.date.year.to_s if base_id.date
+          base_date_str = urn_date_string(base_id.date)
+          parts << base_date_str if base_date_str
         end
 
         supplement_chain.each do |supp|
           suppl_type = supp.typed_stage&.type_code&.to_s
           parts << suppl_type if suppl_type
 
-          parts << supp.date.year.to_s if supp.date
+          supp_date_str = urn_date_string(supp.date)
+          parts << supp_date_str if supp_date_str
 
           if supp.number
             parts << "v#{supp.number}"
@@ -176,6 +179,14 @@ module Pubid
         result += "-#{id.part}" if id.part
         result += "-#{id.subpart}" if id.subpart
         result
+      end
+
+      def urn_date_string(date)
+        return nil unless date
+
+        s = date.year.to_s
+        s += "-#{date.month}" if date.month
+        s
       end
     end
   end

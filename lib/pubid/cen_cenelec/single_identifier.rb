@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module CenCenelec
     class SingleIdentifier < Lutaml::Model::Serializable
-
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "EN")
       }

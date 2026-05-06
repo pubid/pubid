@@ -3,7 +3,6 @@
 module Pubid
   module Oiml
     class SingleIdentifier < Identifier
-
       # Base class for OIML single identifiers (non-supplements)
       attribute :publisher, :string
       attribute :code, Oiml::Components::Code
