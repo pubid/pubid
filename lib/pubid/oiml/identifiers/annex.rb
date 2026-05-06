@@ -12,7 +12,7 @@ module Pubid
 
         def to_s(format: nil)
           # Determine base format from its parsed_format
-          base_format = if base_identifier.respond_to?(:parsed_format) && base_identifier.parsed_format == "long"
+          base_format = if base_identifier.methods.include?(:parsed_format) && base_identifier.parsed_format == "long"
                           :long
                         else
                           :short
@@ -21,7 +21,7 @@ module Pubid
           # Use format parameter or annex's own parsed_format
           annex_format = if format
                            format
-                         elsif respond_to?(:parsed_format) && parsed_format == "long"
+                         elsif methods.include?(:parsed_format) && parsed_format == "long"
                            :long
                          else
                            :short

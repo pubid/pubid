@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module CenCenelec
@@ -8,14 +7,10 @@ module Pubid
       # Base CEN identifier
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          CenCenelec::UrnGenerator.new(self).generate
-        end
 
         attribute :publisher, :string, collection: true # EN, CEN, CLC, etc.
         attribute :type, :string # TR, TS, Guide

@@ -34,7 +34,7 @@ module Pubid
           # The year is 2-digit (extracted from date or use current date format)
           # Note: Assumes 2000s for years 00-99 (Y2K assumption)
           year_str = if date
-                       if date.respond_to?(:year)
+                       if date.is_a?(Components::Date)
                          date.year.to_s[-2, 2]
                        else
                          date.to_s[-2, 2]

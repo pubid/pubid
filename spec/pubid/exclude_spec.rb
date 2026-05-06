@@ -5,15 +5,15 @@ require_relative "../../lib/pubid/iso"
 
 RSpec.describe Pubid::Identifier do
   describe "#exclude" do
-    it "excludes year" do
+    it "excludes date" do
       id = Pubid::Iso.parse("ISO 9001:2015")
-      excluded = id.exclude(:year)
+      excluded = id.exclude(:date)
       expect(excluded.to_s).to eq("ISO 9001")
     end
 
-    it "excludes year and part" do
+    it "excludes date and part" do
       id = Pubid::Iso.parse("ISO 8601-1:2019")
-      excluded = id.exclude(:year, :part)
+      excluded = id.exclude(:date, :part)
       expect(excluded.to_s).to eq("ISO 8601")
     end
 
@@ -27,16 +27,15 @@ RSpec.describe Pubid::Identifier do
 
     it "returns new identifier without modifying original" do
       id = Pubid::Iso.parse("ISO 9001:2015")
-      excluded = id.exclude(:year)
+      excluded = id.exclude(:date)
       expect(id.to_s).to eq("ISO 9001:2015")
       expect(excluded.to_s).to eq("ISO 9001")
     end
 
-    it "excludes year from hash representation" do
+    it "excludes date from hash representation" do
       id = Pubid::Iso.parse("ISO 9001:2015")
-      excluded = id.exclude(:year)
-      # The year is removed from the hash representation
-      expect(excluded.to_h[:year]).to be_nil
+      excluded = id.exclude(:date)
+      expect(excluded.to_hash["date"]).to be_nil
       expect(excluded.to_s).not_to include(":2015")
     end
 
@@ -44,7 +43,7 @@ RSpec.describe Pubid::Identifier do
       id = Pubid::Iso.parse("ISO 9001:2015(en)")
       excluded = id.exclude(:languages)
       expect(excluded.to_s).to eq("ISO 9001:2015")
-      expect(excluded.to_h[:languages]).to be_nil
+      expect(excluded.to_hash["languages"]).to be_nil
     end
   end
 end

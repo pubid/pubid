@@ -34,7 +34,7 @@ module Pubid
 
           # Number with part/subpart
           if number
-            number_str = if number.respond_to?(:value)
+            number_str = if number.is_a?(Components::Code)
                            number.value.to_s
                          else
                            number.to_s
@@ -42,7 +42,7 @@ module Pubid
 
             # Part and subpart
             if part
-              part_val = if part.respond_to?(:value)
+              part_val = if part.is_a?(Components::Code)
                            part.value
                          else
                            part
@@ -50,7 +50,7 @@ module Pubid
               number_str += "-#{part_val}"
             end
             if subpart
-              subpart_val = if subpart.respond_to?(:value)
+              subpart_val = if supart.is_a?(Components::Code)
                               subpart.value
                             else
                               subpart
@@ -65,7 +65,7 @@ module Pubid
 
           # Date
           if date
-            year_val = date.respond_to?(:year) ? date.year : date.to_i
+            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
             result += ":#{year_val}"
             # Month if present
             result += "-#{format('%02d', month)}" if month

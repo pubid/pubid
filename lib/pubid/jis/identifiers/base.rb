@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Jis
@@ -8,14 +7,10 @@ module Pubid
       # Base class for all JIS identifiers
       # Provides common attributes and behavior
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
 
         attribute :code, Pubid::Jis::Components::Code
         attribute :year, :integer

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
+require_relative "pubid/lutaml/no_store_registration"
 require "parslet"
 
 module Pubid
@@ -47,8 +48,12 @@ module Pubid
   autoload :IdentifierMetadata, "pubid/identifier_metadata"
   autoload :IdentifierRegistry, "pubid/identifier_registry"
   autoload :Rendering, "pubid/rendering"
+  autoload :Renderers, "pubid/renderers"
+  autoload :FormatDetector, "pubid/format_detector"
+  autoload :FormatRegistry, "pubid/format_registry"
   autoload :Scheme, "pubid/scheme"
-  autoload :Serializable, "pubid/serializable"
+
+  autoload :UrnGenerator, "pubid/urn_generator/base"
   autoload :Utils, "pubid/utils"
   autoload :Version, "pubid/version"
   autoload :Core, "pubid/core"
@@ -79,4 +84,51 @@ module Pubid
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
+
+  # Format infrastructure (loaded eagerly so Pubid::Renderers / Pubid::Parsers are always available)
+  require "pubid/renderers/base"
+  require "pubid/renderers/mr_string"
+  require "pubid/renderers/urn"
+  require "pubid/parsers/base"
+  require "pubid/parsers/mr_string"
+
+  # Initialize global format registry
+  Identifier.format_registry = FormatRegistry.new
+  Identifier.format_registry.register(:human, renderer: Renderers::HumanReadable)
+  Identifier.format_registry.register(:mr_string, renderer: Renderers::MrString)
+  Identifier.format_registry.register(:urn, renderer: Renderers::Urn)
+
+  # Unified parse entry point with auto-detection
+  #
+  # @param string [String] The identifier string to parse
+  # @param format [Symbol] :auto, :human, :mr_string, or :urn
+  # @return [Identifier] The parsed identifier
+  def self.parse(string, format: :auto)
+    format = FormatDetector.detect(string) if format == :auto
+
+    case format
+    when :mr_string
+      Parsers::MrString.parse(string)
+    when :urn
+      # URN auto-detection: extract flavor from URN namespace
+      # e.g., "urn:iso:std:..." → Pubid::Iso
+      flavor = detect_flavor_from_urn(string)
+      flavor_module = Registry.get(flavor)
+      raise ArgumentError, "Unknown flavor in URN: #{flavor}" unless flavor_module
+
+      urn_parser = flavor_module.const_get(:UrnParser)
+      urn_parser.parse(string)
+    else
+      # Default to MR string parser for MR format, human-readable otherwise
+      # The MR string parser converts to human-readable and delegates to flavor.parse
+      raise ArgumentError, "No flavor specified. Use Pubid::Iso.parse() or another flavor-specific parse method."
+    end
+  end
+
+  def self.detect_flavor_from_urn(urn)
+    # urn:iso:std:... → "iso"
+    # urn:iec:std:... → "iec"
+    parts = urn.downcase.split(":")
+    parts[1] # The namespace part after "urn"
+  end
 end

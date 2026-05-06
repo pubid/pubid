@@ -39,7 +39,7 @@ module Pubid
         if update
           # Check if this is an implicit supplement (no explicit "sup/supp" marker, just update)
           # For implicit supplements like "145r11/1925", don't add "sup" before the update
-          is_implicit = respond_to?(:implicit_supplement) && implicit_supplement == true
+          is_implicit = methods.include?(:implicit_supplement) && implicit_supplement == true
 
           if is_implicit
             # Implicit supplement: "{base}/{update}" (e.g., "145/Upd1-192511")

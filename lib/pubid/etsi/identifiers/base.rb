@@ -5,14 +5,10 @@ module Pubid
     module Identifiers
       # Base class for all ETSI identifiers
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
         attribute :type, :string
         attribute :code, Pubid::Etsi::Components::Code
         attribute :version, Pubid::Etsi::Components::Version

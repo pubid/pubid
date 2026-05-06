@@ -28,7 +28,7 @@ module Pubid
         end
 
         scheme = scheme_class
-        attrs = scheme&.respond_to?(:attributes) ? scheme.attributes.keys.map(&:to_s) : []
+        attrs = scheme&.methods.include?(:attributes) ? scheme.attributes.keys.map(&:to_s) : []
 
         FlavorResult.new(
           flavor: flavor,

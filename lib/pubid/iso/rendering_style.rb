@@ -46,7 +46,7 @@ module Pubid
         end
 
         # All parts notation (if applicable)
-        result << " (all parts)" if identifier.respond_to?(:all_parts) && identifier.all_parts
+        result << " (all parts)" if identifier.methods.include?(:all_parts) && identifier.all_parts
 
         result
       end

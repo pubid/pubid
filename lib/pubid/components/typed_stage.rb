@@ -31,6 +31,10 @@ module Pubid
         )
       end
 
+      def render(context: nil)
+        abbreviation(format_long: context&.stage_format_long || false)
+      end
+
       def abbreviation(format_long: true)
         # Use format preference
         if format_long && long_abbr

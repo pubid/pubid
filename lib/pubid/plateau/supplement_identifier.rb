@@ -7,7 +7,6 @@ module Pubid
     # Base class for PLATEAU supplements (Annex)
     # Supplements reference a base identifier
     class SupplementIdentifier < Lutaml::Model::Serializable
-      include Pubid::Serializable
 
       attribute :base_identifier, Identifiers::Base
       attribute :letter, :string, default: -> {}
@@ -29,15 +28,15 @@ module Pubid
       def base_hash
         hash = super
         # For Plateau supplements, edition comes from the base identifier
-        if base_identifier.respond_to?(:edition) && base_identifier.edition
+        if base_identifier.methods.include?(:edition) && base_identifier.edition
           hash[:edition] = base_identifier.edition
         end
         # Include type from base_identifier
-        if base_identifier.respond_to?(:type_string) && base_identifier.type_string
+        if base_identifier.methods.include?(:type_string) && base_identifier.type_string
           hash[:type] = base_identifier.type_string
         end
         # Include annex from base_identifier
-        if base_identifier.respond_to?(:annex) && base_identifier.annex
+        if base_identifier.methods.include?(:annex) && base_identifier.annex
           hash[:annex] = base_identifier.annex
         end
         hash

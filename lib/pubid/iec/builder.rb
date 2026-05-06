@@ -76,14 +76,24 @@ module Pubid
 
           # Create the supplement identifier
           supplement = identifier_class.new
-          if supplement.respond_to?(:number=)
+          begin
             supplement.number = Components::Code.new(value: supplement_number.to_s)
+          rescue NoMethodError
+            nil
           end
-          if supplement_date && supplement.respond_to?(:date=)
-            supplement.date = cast(:date, supplement_date)
+          if supplement_date
+            begin
+              supplement.date = cast(:date, supplement_date)
+            rescue NoMethodError
+              nil
+            end
           end
-          if supplement_edition && supplement.respond_to?(:edition=)
-            supplement.edition = cast(:edition, supplement_edition)
+          if supplement_edition
+            begin
+              supplement.edition = cast(:edition, supplement_edition)
+            rescue NoMethodError
+              nil
+            end
           end
           supplement.typed_stage = typed_stage
 
@@ -149,7 +159,11 @@ module Pubid
           # Set number via cast
           number_components = cast(:number_with_part, cispr_number)
           number_components.each_pair do |k, v|
-            cispr_id.send("#{k}=", v) if cispr_id.respond_to?("#{k}=")
+            begin
+              cispr_id.send("#{k}=", v)
+            rescue NoMethodError
+              nil
+            end
           end
           parsed_hash[:cispr_identifier] = cispr_id
         end
@@ -184,21 +198,23 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=",
-                                sub_value)
+              begin
+                identifier.send("#{sub_key}=", sub_value)
+              rescue NoMethodError
+                nil
               end
             end
           else
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=",
-                              realized_components)
+            begin
+              identifier.send("#{key}=", realized_components)
+            rescue NoMethodError
+              nil
             end
           end
         end
 
         # Detect rendering style from parsed abbreviation
-        if identifier.respond_to?(:rendering_style=) && identifier.respond_to?(:typed_stage) && identifier.typed_stage
+        if identifier.methods.include?(:rendering_style=) && identifier.typed_stage
           require_relative "rendering_style"
           ts = identifier.typed_stage
 
@@ -214,10 +230,15 @@ module Pubid
                               end
 
           # Detect language code format from parsed languages
-          with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
+          langs = begin
+            identifier.languages
+          rescue NoMethodError
+            nil
+          end
+          with_language_code = if langs&.any?
                                  # Check if original_code was single-char (E, F, R, A, S, D)
-                                 first_lang = identifier.languages.first
-                                 if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
+                                 first_lang = langs.first
+                                 if first_lang.is_a?(Components::Language) && first_lang.original_code && first_lang.original_code.length == 1
                                    :single
                                  else
                                    :iso # 2-char codes (en, fr, ru, ar, es, de)
@@ -342,13 +363,32 @@ edition_data = nil, typed_stage = nil)
         edition = nil
         if base_identifier.is_a?(Identifiers::ConsolidatedIdentifier)
           # Edition is on the first identifier (base document)
-          edition = base_identifier.identifiers.first.edition if base_identifier.identifiers.first.respond_to?(:edition)
-          # Clear it from base document
-          base_identifier.identifiers.first.edition = nil if base_identifier.identifiers.first.respond_to?(:edition=)
-        elsif base_identifier.respond_to?(:edition)
-          edition = base_identifier.edition
+          base_first = base_identifier.identifiers.first
+          if base_first
+            edition = begin
+              base_first.edition
+            rescue NoMethodError
+              nil
+            end
+            # Clear it from base document
+            begin
+              base_first.edition = nil
+            rescue NoMethodError
+              nil
+            end
+          end
+        else
+          edition = begin
+            base_identifier.edition
+          rescue NoMethodError
+            nil
+          end
           # Clear edition from base identifier since it moves to VAP level
-          base_identifier.edition = nil if base_identifier.respond_to?(:edition=)
+          begin
+            base_identifier.edition = nil
+          rescue NoMethodError
+            nil
+          end
         end
 
         Identifiers::VapIdentifier.new(

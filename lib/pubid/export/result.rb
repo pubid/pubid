@@ -27,6 +27,7 @@ module Pubid
           examples: @examples,
         }
       end
+      alias to_hash to_h
     end
 
     # Immutable value object for a single typed stage.
@@ -47,8 +48,8 @@ module Pubid
           stage_code: ts.stage_code,
           type_code: ts.type_code,
           abbr: ts.abbr,
-          name: ts.respond_to?(:name) ? ts.name : nil,
-          harmonized_stages: ts.respond_to?(:harmonized_stages) ? ts.harmonized_stages : [],
+          name: ts.is_a?(Components::TypedStage) ? ts.name : nil,
+          harmonized_stages: ts.is_a?(Components::TypedStage) ? ts.harmonized_stages : [],
         )
       end
 
@@ -83,6 +84,7 @@ module Pubid
         h[:wrapper_types] = @wrapper_types.map(&:to_h) unless @wrapper_types.empty?
         h
       end
+      alias to_hash to_h
     end
   end
 end

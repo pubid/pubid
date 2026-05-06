@@ -29,13 +29,13 @@ module Pubid
 
           # Type (PD) + number
           if number
-            number_str = if number.respond_to?(:value)
+            number_str = if number.is_a?(Components::Code)
                            number.value.to_s
                          else
                            number.to_s
                          end
             if part
-              part_val = part.respond_to?(:value) ? part.value : part
+              part_val = part.is_a?(Components::Code) ? part.value : part
               number_str += "-#{part_val.to_s.strip}"
             end
             parts << "PD #{number_str}"

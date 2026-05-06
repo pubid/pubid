@@ -2,112 +2,99 @@
 
 module Pubid
   module Astm
-    # Generates RFC 5141-bis compliant URNs from ASTM identifiers
-    #
-    # URN format: urn:astm:{code}:{year}:{sub_year}:{reapproval}:{edition}
-    # Example: urn:astm:f1862:2015:e1 for "ASTM F1862-15e1"
-    class UrnGenerator
-      attr_reader :identifier
-
-      def initialize(identifier)
-        @identifier = identifier
-      end
-
+    class UrnGenerator < Pubid::UrnGenerator::Base
       def generate
         parts = ["urn", "astm"]
 
-        # Type (standard, technical-report, etc.)
-        if identifier.respond_to?(:type) && identifier.type
-          type = identifier.type.respond_to?(:abbr) ? identifier.type.abbr : identifier.type.to_s
+        if identifier.type
+          type = identifier.type&.abbr || identifier.type.to_s
           parts << type.to_s.downcase
         else
           parts << "std"
         end
 
-        # Code (may include dual unit designation like F1862/F1862M)
-        if identifier.respond_to?(:code) && identifier.code
+        if identifier.code
           parts << identifier.code.to_s
         end
 
-        # Number (for standard types)
-        if identifier.respond_to?(:number) && identifier.number
-          number = identifier.number.respond_to?(:value) ? identifier.number.value : identifier.number.to_s
-          parts << number
+        number = maybe(:number)
+        if number
+          num = number.to_s
+          parts << num
         end
 
-        # Part
-        if identifier.respond_to?(:part) && identifier.part
-          part = identifier.part.respond_to?(:value) ? identifier.part.value : identifier.part.to_s
-          parts[-1] = "#{parts[-1]}-#{part}"
+        part = maybe(:part)
+        if part
+          p = part.to_s
+          parts[-1] = "#{parts[-1]}-#{p}"
         end
 
-        # Subpart
-        if identifier.respond_to?(:subpart) && identifier.subpart
-          subpart = identifier.subpart.respond_to?(:value) ? identifier.subpart.value : identifier.subpart.to_s
-          parts[-1] = "#{parts[-1]}-#{subpart}"
+        subpart = maybe(:subpart)
+        if subpart
+          sp = subpart.to_s
+          parts[-1] = "#{parts[-1]}-#{sp}"
         end
 
-        # Year (2-digit format for ASTM)
-        if identifier.respond_to?(:year) && identifier.year
-          year = identifier.year.to_s
-          # Convert to 2-digit format (e.g., 2015 -> 15)
-          year = year[-2..] if year.length == 4
-          parts << year
-        elsif identifier.respond_to?(:date) && identifier.date
-          date = identifier.date
-          if date.respond_to?(:year)
-            year = date.year.to_s
-            year = year[-2..] if year.length == 4
-            parts << year
+        year = extract_year
+        parts << year if year
+
+        sub_year = maybe(:sub_year)
+        parts << sub_year.to_s if sub_year
+
+        reapproval = maybe(:reapproval)
+        parts << "reapp.#{reapproval}" if reapproval
+
+        edition = maybe(:edition)
+        parts << "e#{edition}" if edition
+
+        wip = maybe(:work_in_progress)
+        parts << "wip" if wip
+
+        wk = maybe(:wk)
+        parts << "wk.#{wk}" if wk
+
+        pub = identifier.publisher
+        if pub
+          p = pub.to_s
+          parts[1] = p.to_s.downcase
+        end
+
+        copubs = maybe(:copublishers)
+        if copubs&.any?
+          cp = copubs.map do |c|
+            c.to_s
           end
+          parts[1] = "#{parts[1]}-#{cp.join('-').downcase}"
         end
 
-        # Sub-year (a, b, c for revisions within a year)
-        if identifier.respond_to?(:sub_year) && identifier.sub_year
-          parts << identifier.sub_year.to_s
-        end
-
-        # Reapproval
-        if identifier.respond_to?(:reapproval) && identifier.reapproval
-          parts << "reapp.#{identifier.reapproval}"
-        end
-
-        # Edition (e1, e2, etc.)
-        if identifier.respond_to?(:edition) && identifier.edition
-          parts << "e#{identifier.edition}"
-        end
-
-        # Work in progress
-        if identifier.respond_to?(:work_in_progress) && identifier.work_in_progress
-          parts << "wip"
-        end
-
-        # WK (work item) designation
-        if identifier.respond_to?(:wk) && identifier.wk
-          parts << "wk.#{identifier.wk}"
-        end
-
-        # Publisher
-        if identifier.respond_to?(:publisher) && identifier.publisher
-          pub = identifier.publisher.respond_to?(:body) ? identifier.publisher.body : identifier.publisher.to_s
-          parts[1] = pub.to_s.downcase
-        end
-
-        # Copublishers
-        if identifier.respond_to?(:copublishers) && identifier.copublishers&.any?
-          copubs = identifier.copublishers.map do |cp|
-            cp.respond_to?(:body) ? cp.body : cp.to_s
-          end
-          parts[1] = "#{parts[1]}-#{copubs.join('-').downcase}"
-        end
-
-        # Language codes
-        if identifier.respond_to?(:languages) && identifier.languages&.any?
+        if identifier.languages&.any?
           lang_codes = identifier.languages.map(&:code).join(",")
           parts << lang_codes
         end
 
         parts.join(":")
+      end
+
+      private
+
+      def extract_year
+        year = maybe(:year)
+        if year
+          y = year.to_s
+          y = y[-2..] if y.length == 4
+          return y
+        end
+
+        date = identifier.date
+        if date
+          y = date.year&.to_s
+          if y
+            y = y[-2..] if y.length == 4
+            return y
+          end
+        end
+
+        nil
       end
     end
   end

@@ -25,9 +25,14 @@ module Pubid
             base_id = identifiers.first
             parts_list = identifiers[1..].map do |id|
               # Extract just the part number
-              if id.respond_to?(:part)
-                part_val = id.part.respond_to?(:value) ? id.part.value : id.part
-                part_val.to_s
+              part_val = begin
+                id.part
+              rescue NoMethodError
+                nil
+              end
+              if part_val
+                pv = part_val.is_a?(Components::Code) ? part_val.value : part_val
+                pv.to_s
               else
                 id.to_s
               end
@@ -56,16 +61,21 @@ module Pubid
             elsif explicit_prefix
               # Prefix-only form: has explicit prefix but no publisher (e.g., "SP 138")
               abbrev_str = ""
-              if id.respond_to?(:prefix) && id.prefix && !id.prefix.to_s.empty?
-                abbrev_str = id.prefix.to_s
+              prefix = begin
+                id.prefix
+              rescue NoMethodError
+                nil
+              end
+              if prefix && !prefix.to_s.empty?
+                abbrev_str = prefix.to_s
               end
               if id.number
-                number_val = id.number.respond_to?(:value) ? id.number.value : id.number
+                number_val = id.number.is_a?(Components::Code) ? id.number.value : id.number
                 abbrev_str += " " if !abbrev_str.empty?
                 abbrev_str += number_val.to_s
               end
               if id.part
-                part_val = id.part.respond_to?(:value) ? id.part.value : id.part
+                part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
                 abbrev_str += "-#{part_val}"
               end
               parts << abbrev_str
@@ -73,11 +83,11 @@ module Pubid
               # Minimal form: no explicit markers (e.g., "125")
               abbrev_str = ""
               if id.number
-                number_val = id.number.respond_to?(:value) ? id.number.value : id.number
+                number_val = id.number.is_a?(Components::Code) ? id.number.value : id.number
                 abbrev_str = number_val.to_s
               end
               if id.part
-                part_val = id.part.respond_to?(:value) ? id.part.value : id.part
+                part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
                 abbrev_str += "-#{part_val}"
               end
               parts << abbrev_str

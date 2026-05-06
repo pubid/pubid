@@ -38,7 +38,7 @@ module Pubid
 
           # Number
           if number
-            number_str = if number.respond_to?(:value)
+            number_str = if number.is_a?(Components::Code)
                            number.value.to_s
                          else
                            number.to_s
@@ -55,7 +55,7 @@ module Pubid
 
           # Date
           if date
-            year_val = date.respond_to?(:year) ? date.year : date.to_i
+            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
             result += ":#{year_val}"
           end
 

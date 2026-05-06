@@ -12,7 +12,7 @@ module Pubid
           base_id = identifiers.first
 
           # Render base without suffixes (will add them after supplements)
-          result = if base_id.respond_to?(:to_s_without_suffixes)
+          result = if base_id.is_a?(Base) && base_id.methods.include?(:to_s_without_suffixes)
                      base_id.to_s_without_suffixes
                    else
                      # Temporarily remove suffixes for rendering
@@ -30,7 +30,7 @@ module Pubid
           identifiers[1..].each do |id|
             if id.is_a?(Amendment)
               if id.amendment_year
-                sep = id.respond_to?(:separator) && id.separator ? id.separator : "+"
+                sep = id.is_a?(Base) && id.separator ? id.separator : "+"
                 result += "#{sep}A#{id.amendment_number}:#{id.amendment_year}"
               else
                 # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
@@ -41,7 +41,7 @@ module Pubid
                           end
               end
             elsif id.is_a?(Corrigendum)
-              sep = id.respond_to?(:separator) && id.separator ? id.separator : "+"
+              sep = id.is_a?(Base) && id.separator ? id.separator : "+"
               result += "#{sep}C"
               result += id.corrigendum_number.to_s if id.corrigendum_number
               result += ":#{id.corrigendum_year}" if id.corrigendum_year
@@ -51,35 +51,74 @@ module Pubid
           end
 
           # Add suffixes from base identifier AFTER supplements
-          if base_id.respond_to?(:expert_commentary) && base_id.expert_commentary
-            if base_id.respond_to?(:expert_commentary_topic) && base_id.expert_commentary_topic
-              result += " ExComm (#{base_id.expert_commentary_topic})"
-            else
-              result += " ExComm"
+          if base_id.is_a?(Base)
+            ec = begin
+              base_id.expert_commentary
+            rescue NoMethodError
+              nil
             end
-          end
-          result += " - TC" if base_id.respond_to?(:tracked_changes) && base_id.tracked_changes
+            if ec
+              ect = begin
+                base_id.expert_commentary_topic
+              rescue NoMethodError
+                nil
+              end
+              result += ect ? " ExComm (#{ect})" : " ExComm"
+            end
 
-          # Translation - preserve the "version" or "Translation" suffix if present
-          if base_id.respond_to?(:translation_lang) && base_id.translation_lang
-            if base_id.respond_to?(:translation_suffix_type) && base_id.translation_suffix_type == "version"
-              result += " (#{base_id.translation_lang} version)"
-            elsif base_id.respond_to?(:translation_suffix_type) && base_id.translation_suffix_type == "Translation"
-              result += " (#{base_id.translation_lang} Translation)"
-            else
-              result += " (#{base_id.translation_lang})"
+            tc = begin
+              base_id.tracked_changes
+            rescue NoMethodError
+              nil
             end
-          elsif base_id.respond_to?(:translation_upper) && base_id.translation_upper
-            if base_id.respond_to?(:translation_suffix_type) && base_id.translation_suffix_type == "Translation"
-              result += " (#{base_id.translation_upper} Translation)"
-            else
-              result += " (#{base_id.translation_upper})"
-            end
-          end
+            result += " - TC" if tc
 
-          # Reaffirmation notation like (R2004)
-          if base_id.respond_to?(:reaffirmation_year) && base_id.reaffirmation_year
-            result += " (R#{base_id.reaffirmation_year})"
+            # Translation - preserve the "version" or "Translation" suffix if present
+            tl = begin
+              base_id.translation_lang
+            rescue NoMethodError
+              nil
+            end
+            if tl
+              ts_type = begin
+                base_id.translation_suffix_type
+              rescue NoMethodError
+                nil
+              end
+              if ts_type == "version"
+                result += " (#{tl} version)"
+              elsif ts_type == "Translation"
+                result += " (#{tl} Translation)"
+              else
+                result += " (#{tl})"
+              end
+            else
+              tu = begin
+                base_id.translation_upper
+              rescue NoMethodError
+                nil
+              end
+              if tu
+                ts_type = begin
+                  base_id.translation_suffix_type
+                rescue NoMethodError
+                  nil
+                end
+                if ts_type == "Translation"
+                  result += " (#{tu} Translation)"
+                else
+                  result += " (#{tu})"
+                end
+              end
+            end
+
+            # Reaffirmation notation like (R2004)
+            ry = begin
+              base_id.reaffirmation_year
+            rescue NoMethodError
+              nil
+            end
+            result += " (R#{ry})" if ry
           end
 
           result
@@ -89,7 +128,11 @@ module Pubid
           base = identifiers&.first
           return nil unless base
 
-          urn = base.to_urn if base.respond_to?(:to_urn)
+          urn = begin
+            base.to_urn
+          rescue NoMethodError
+            nil
+          end
           return urn unless urn
 
           # Append supplement info to URN
@@ -115,23 +158,28 @@ module Pubid
         end
 
         def year
-          identifiers&.first&.year if identifiers&.first.respond_to?(:year)
+          base = identifiers&.first
+          base.year if base && base.methods.include?(:year)
         end
 
         def date
-          identifiers&.first&.date if identifiers&.first.respond_to?(:date)
+          base = identifiers&.first
+          base.date if base && base.methods.include?(:date)
         end
 
         def parts
-          identifiers&.first&.parts if identifiers&.first.respond_to?(:parts)
+          base = identifiers&.first
+          base.parts if base && base.methods.include?(:parts)
         end
 
         def part
-          identifiers&.first&.part if identifiers&.first.respond_to?(:part)
+          base = identifiers&.first
+          base.part if base && base.methods.include?(:part)
         end
 
         def type
-          identifiers&.first&.type if identifiers&.first.respond_to?(:type)
+          base = identifiers&.first
+          base.type if base && base.methods.include?(:type)
         end
       end
     end

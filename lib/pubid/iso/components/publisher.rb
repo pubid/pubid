@@ -11,9 +11,13 @@ module Pubid
         attribute :publisher, :string, default: -> { "ISO" }
         attribute :copublisher, :string, collection: true
 
-        # Alias for compatibility with rendering code
         def body
           publisher
+        end
+
+        def render(context: nil)
+          return publisher unless copublisher&.any?
+          publisher + copublisher.map { |cp| "/#{cp}" }.join
         end
 
         def to_s
@@ -23,6 +27,10 @@ module Pubid
         end
 
         def has_copublisher?
+          copublisher&.any?
+        end
+
+        def copublished?
           copublisher&.any?
         end
 

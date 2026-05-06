@@ -23,7 +23,7 @@ module Pubid
           # For CAN3- identifiers, don't add CAN/ prefix (CAN3- is already complete)
           # For Series with CAN/CSA- prefix, don't add CAN/ (it's already complete)
           # For CAN/CSA- identifiers, CAN/ wraps CSA- part
-          if wrapped_identifier.respond_to?(:publisher_prefix)
+          if wrapped_identifier.methods.include?(:publisher_prefix)
             prefix = wrapped_identifier.publisher_prefix
             # CAN3- is standalone, just render wrapped identifier
             # CAN/CSA- is already complete for Series identifiers
@@ -39,12 +39,12 @@ module Pubid
           end
           # Only add reaffirmation from wrapper if wrapped_identifier doesn't have one
           # (to avoid duplicates - Identifier.parse sets it on both)
-          if reaffirmation && !(wrapped_identifier.respond_to?(:reaffirmation) && wrapped_identifier.reaffirmation)
+          if reaffirmation && !(wrapped_identifier.methods.include?(:reaffirmation) && wrapped_identifier.reaffirmation)
             # Determine if space is needed before reaffirmation
             # Space needed if year is 2-digit and reaffirmation is 4-digit (original format)
             # No space if both year and reaffirmation are 2-digit
             # Check original_year_4digit flag - if false, year was originally 2-digit
-            year_was_2digit = wrapped_identifier.respond_to?(:original_year_4digit) &&
+            year_was_2digit = wrapped_identifier.methods.include?(:original_year_4digit) &&
               !wrapped_identifier.original_year_4digit
             # Check original_reaffirmation_4digit flag
             reaffirmation_was_4digit = original_reaffirmation_4digit

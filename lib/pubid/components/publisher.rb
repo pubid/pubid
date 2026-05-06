@@ -12,6 +12,10 @@ module Pubid
         body
       end
 
+      def render(context: nil)
+        body
+      end
+
       # Returns hash code for publisher component
       # @return [Integer] hash code
       # @note Memoized for performance

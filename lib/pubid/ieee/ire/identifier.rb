@@ -27,7 +27,11 @@ module Pubid
           args.each do |key, value|
             next if key == :number
 
-            send("#{key}=", value) if respond_to?("#{key}=")
+            begin
+              send("#{key}=", value)
+            rescue NoMethodError
+              nil
+            end
           end
         end
 

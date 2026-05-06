@@ -1,17 +1,67 @@
 # frozen_string_literal: true
 
 module Pubid
-  # Identifier that
   module Iso
     class Identifier < ::Pubid::Identifier
-      def self.parse(string)
-        parsed = Pubid::Iso::Parser.new.parse(string)
-        if parsed.nil? || parsed.empty?
-          raise Pubid::Iso::Parser::ParseError,
-                "Invalid identifier format"
-        end
+      # Override base types with ISO-specific ones
+      attribute :publisher, ::Pubid::Iso::Components::Publisher
+      attribute :copublishers, ::Pubid::Iso::Components::Publisher, collection: true
+      attribute :number, ::Pubid::Iso::Components::Code
+      attribute :part, ::Pubid::Iso::Components::Code
+      attribute :subpart, ::Pubid::Iso::Components::Code
 
-        Pubid::Iso::Builder.new(Pubid::Iso::Scheme).build(parsed)
+      # Polymorphic type map for lutaml::Model key_value serialization
+      # Maps polymorphic_name → class name for deserialization
+      # Validated by spec to stay in sync with Scheme.identifiers
+      ISO_TYPE_MAP = {
+        "pubid:iso:international-standard" => "Pubid::Iso::Identifiers::InternationalStandard",
+        "pubid:iso:international-standardized-profile" => "Pubid::Iso::Identifiers::InternationalStandardizedProfile",
+        "pubid:iso:international-workshop-agreement" => "Pubid::Iso::Identifiers::InternationalWorkshopAgreement",
+        "pubid:iso:technical-report" => "Pubid::Iso::Identifiers::TechnicalReport",
+        "pubid:iso:technical-specification" => "Pubid::Iso::Identifiers::TechnicalSpecification",
+        "pubid:iso:pas" => "Pubid::Iso::Identifiers::Pas",
+        "pubid:iso:guide" => "Pubid::Iso::Identifiers::Guide",
+        "pubid:iso:recommendation" => "Pubid::Iso::Identifiers::Recommendation",
+        "pubid:iso:amendment" => "Pubid::Iso::Identifiers::Amendment",
+        "pubid:iso:corrigendum" => "Pubid::Iso::Identifiers::Corrigendum",
+        "pubid:iso:supplement" => "Pubid::Iso::Identifiers::Supplement",
+        "pubid:iso:addendum" => "Pubid::Iso::Identifiers::Addendum",
+        "pubid:iso:extract" => "Pubid::Iso::Identifiers::Extract",
+        "pubid:iso:directives" => "Pubid::Iso::Identifiers::Directives",
+        "pubid:iso:directives-supplement" => "Pubid::Iso::Identifiers::DirectivesSupplement",
+        "pubid:iso:data" => "Pubid::Iso::Identifiers::Data",
+        "pubid:iso:tc-document" => "Pubid::Iso::Identifiers::TcDocument",
+        "pubid:iso:technology-trends-assessments" => "Pubid::Iso::Identifiers::TechnologyTrendsAssessments",
+      }.freeze
+
+      # Build type map from Scheme.identifiers for validation
+      def self.build_type_map
+        Scheme.identifiers.each_with_object({}) do |klass, map|
+          map[klass.polymorphic_name] = klass.name
+        end
+      end
+
+      key_value do
+        map "_type", to: :_type, polymorphic_map: ISO_TYPE_MAP
+      end
+
+      def self.parse(string, format: :auto)
+        format = Pubid::FormatDetector.detect(string) if format == :auto
+
+        case format
+        when :urn
+          Pubid::Iso::UrnParser.parse(string)
+        when :mr_string
+          Pubid::Parsers::MrString.parse(string)
+        else
+          parsed = Pubid::Iso::Parser.new.parse(string)
+          if parsed.nil? || parsed.empty?
+            raise Pubid::Iso::Parser::ParseError,
+                  "Invalid identifier format"
+          end
+
+          Pubid::Iso::Builder.new(Pubid::Iso::Scheme).build(parsed)
+        end
       end
     end
   end

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Ieee
@@ -11,14 +10,10 @@ module Pubid
     module Identifiers
       # Base class for all IEEE identifiers
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
 
         attribute :publisher, :string, default: -> { "IEEE" }
         attribute :copublisher, :string, collection: true # IEC, ISO, ANSI, etc.
@@ -81,7 +76,7 @@ module Pubid
           # Handle draft as component object
           if args[:draft_obj]
             self.draft_obj = args[:draft_obj]
-            self.draft = args[:draft_obj].to_s if args[:draft_obj].respond_to?(:to_s)
+            self.draft = args[:draft_obj].to_s
           elsif args[:draft]
             # If draft is passed as string, try to create Draft object
             if args[:draft].is_a?(String)
@@ -98,15 +93,19 @@ module Pubid
               self.draft = draft_obj.to_s
             else
               self.draft_obj = args[:draft]
-              self.draft = args[:draft].to_s if args[:draft].respond_to?(:to_s)
+              self.draft = args[:draft].to_s
             end
           end
 
           # Set other attributes
           args.each do |key, value|
-            next if %i[code draft].include?(key)
+            next if %i[code draft draft_obj typed_stage].include?(key)
 
-            send("#{key}=", value) if respond_to?("#{key}=")
+            begin
+              send("#{key}=", value)
+            rescue NoMethodError
+              nil
+            end
           end
         end
 
@@ -121,7 +120,7 @@ module Pubid
 
         # Expose numeric month from draft if available
         def draft_month
-          return nil unless draft_obj.respond_to?(:numeric_month)
+          return nil unless draft_obj.is_a?(Components::Draft)
 
           draft_obj.numeric_month
         end
@@ -180,11 +179,11 @@ module Pubid
             # Parse the modified input
             result = parse_single(input_modified)
             # Add reaffirmed attribute
-            if result.respond_to?(:reaffirmed=)
-              result.instance_variable_set(:@reaffirmed,
-                                           year)
+            begin
+              result.reaffirmed = year
+            rescue NoMethodError
+              result.instance_variable_set(:@reaffirmed, year)
             end
-            result.reaffirmed = year if result.respond_to?(:reaffirmed=)
             return result
           end
 
@@ -201,11 +200,11 @@ module Pubid
             # Parse the modified input
             result = parse_single(input_modified)
             # Add reaffirmed attribute
-            if result.respond_to?(:reaffirmed=)
-              result.instance_variable_set(:@reaffirmed,
-                                           year)
+            begin
+              result.reaffirmed = year
+            rescue NoMethodError
+              result.instance_variable_set(:@reaffirmed, year)
             end
-            result.reaffirmed = year if result.respond_to?(:reaffirmed=)
             return result
           end
 
@@ -222,7 +221,11 @@ module Pubid
               # Parse main identifier
               ieee_id = parse_single(main_part)
               # Add reaffirmed year
-              ieee_id.reaffirmed = reaffirmed_year if ieee_id.respond_to?(:reaffirmed=)
+              begin
+                ieee_id.reaffirmed = reaffirmed_year
+              rescue NoMethodError
+                nil
+              end
 
               # Parse IRE identifier
               ire_id = parse_single(ire_part)
@@ -560,7 +563,12 @@ module Pubid
           parentheticals = []
 
           # Reaffirmed as first parenthetical if present (and not in attributes hash)
-          if respond_to?(:reaffirmed) && reaffirmed && !reaffirmed.to_s.strip.empty?
+          reaff = begin
+            self.reaffirmed
+          rescue NoMethodError
+            nil
+          end
+          if reaff && !reaff.to_s.strip.empty?
             parentheticals << "(R#{reaffirmed})"
           end
 

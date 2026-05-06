@@ -1,19 +1,13 @@
 # frozen_string_literal: true
 
-require_relative "../serializable"
-require_relative "urn_generator"
 
 module Pubid
   module Api
     class SingleIdentifier < Lutaml::Model::Serializable
-      include Pubid::Serializable
 
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        UrnGenerator.new(self).generate
-      end
 
       def publisher
         "API"
@@ -28,7 +22,7 @@ module Pubid
         parts = ["API"]
 
         # Add type if available
-        parts << type_string if respond_to?(:type_string) && type_string
+        parts << type_string if methods.include?(:type_string) && type_string
 
         # Add code/number with part as one token
         parts << code_portion if code_portion

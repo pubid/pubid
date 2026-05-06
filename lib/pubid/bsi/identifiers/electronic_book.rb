@@ -18,15 +18,15 @@ module Pubid
 
           # Number with part and subpart
           if number
-            number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+            number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
 
             # Part and subpart
             if part
-              part_val = part.respond_to?(:value) ? part.value : part
+              part_val = part.is_a?(Components::Code) ? part.value : part
               number_str += "-#{part_val.to_s.strip}"
             end
             if subpart
-              subpart_val = subpart.respond_to?(:value) ? subpart.value : subpart
+              subpart_val = subpart.is_a?(Components::Code) ? subpart.value : subpart
               number_str += "-#{subpart_val.to_s.strip}"
             end
 
@@ -37,7 +37,7 @@ module Pubid
 
           # Date
           if date
-            year_val = date.respond_to?(:year) ? date.year : date.to_i
+            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
             result += ":#{year_val}"
           end
 

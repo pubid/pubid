@@ -52,7 +52,7 @@ module Pubid
 
       def extract_attribute_names
         model = scheme_module::Identifier
-        return [] unless model&.respond_to?(:model_attributes)
+        return [] unless model&.methods.include?(:model_attributes)
         model.model_attributes.keys.map(&:to_s)
       rescue NoMethodError, NameError
         []

@@ -115,7 +115,7 @@ module Pubid
       # Export registry to machine-readable format (JSON)
       # @return [String] JSON representation
       def to_json(*args)
-        all_identifiers.values.map(&:to_h).to_json(*args)
+        all_identifiers.values.map(&:to_hash).to_json(*args)
       end
 
       # Export registry to machine-readable format (YAML)

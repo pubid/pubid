@@ -2,19 +2,8 @@
 
 module Pubid
   module Etsi
-    # Generates RFC 5141-bis compliant URNs from ETSI identifiers
-    #
-    # URN format: urn:etsi:{type}:{code}:{version}:{date}
-    # Example: urn:etsi:en:300001:v1.1.1:2022-12 for "ETSI EN 300 001 V1.1.1 (2022-12)"
-    class UrnGenerator
-      attr_reader :identifier
-
-      def initialize(identifier)
-        @identifier = identifier
-      end
-
+    class UrnGenerator < Pubid::UrnGenerator::Base
       def generate
-        # Check if identifier is a supplement by checking class name
         if identifier.class.name&.include?("SupplementIdentifier")
           generate_supplement_urn
         else
@@ -24,83 +13,59 @@ module Pubid
 
       private
 
+      def urn_type_for_base
+        return "en" unless identifier.type
+        identifier.type.to_s.downcase
+      end
+
+      def urn_code
+        identifier.code&.to_s
+      end
+
+      def urn_version
+        identifier.version&.to_s&.downcase
+      end
+
+      def urn_date
+        return nil unless identifier.date
+        date = identifier.date
+        if date.month
+          "#{date.year}-#{format('%02d', date.month)}"
+        else
+          date.year.to_s
+        end
+      end
+
       def generate_base_urn
         parts = ["urn", "etsi"]
-
-        # Type (EN, ES, EG, TS, ETR, ETS, I-ETS, TBR, TCRTR, NET, GR, GS, SR, TR, GTS)
-        parts << if identifier.respond_to?(:type) && identifier.type
-                   identifier.type.to_s.downcase
-                 else
-                   "en"
-                 end
-
-        # Code (may include series and number)
-        if identifier.respond_to?(:code) && identifier.code
-          parts << identifier.code.to_s
-        end
-
-        # Version
-        if identifier.respond_to?(:version) && identifier.version
-          parts << identifier.version.to_s.downcase
-        end
-
-        # Date (year-month format)
-        if identifier.respond_to?(:date) && identifier.date
-          date = identifier.date
-          if date.respond_to?(:year) && date.respond_to?(:month)
-            parts << "#{date.year}-#{format('%02d', date.month)}"
-          elsif date.respond_to?(:year)
-            parts << date.year.to_s
-          end
-        end
-
+        parts << urn_type_for_base
+        parts << urn_code if urn_code
+        parts << urn_version if urn_version
+        parts << urn_date if urn_date
         parts.join(":")
       end
 
       def generate_supplement_urn
-        # For supplements (amendments, corrigenda), include base and supplement info
         parts = ["urn", "etsi"]
 
-        if identifier.respond_to?(:base) && identifier.base
+        if identifier.base
           base_gen = self.class.new(identifier.base)
           base_urn = base_gen.send(:generate_base_urn)
 
-          # Extract base URN components (after "urn:etsi:")
           base_part = base_urn.sub(/^urn:etsi:/, "")
           base_parts = base_part.split(":")
 
-          # Add base identifier components
           parts.concat(base_parts)
         else
-          # Fallback to identifier's own type/code/version if no base
-          if identifier.respond_to?(:type) && identifier.type
-            parts << identifier.type.to_s.downcase
-          end
-          if identifier.respond_to?(:code) && identifier.code
-            parts << identifier.code.to_s
-          end
-          if identifier.respond_to?(:version) && identifier.version
-            parts << identifier.version.to_s.downcase
-          end
-          if identifier.respond_to?(:date) && identifier.date
-            date = identifier.date
-            if date.respond_to?(:year) && date.respond_to?(:month)
-              parts << "#{date.year}-#{format('%02d', date.month)}"
-            elsif date.respond_to?(:year)
-              parts << date.year.to_s
-            end
-          end
+          parts << urn_type_for_base if identifier.type
+          parts << urn_code if urn_code
+          parts << urn_version if urn_version
+          parts << urn_date if urn_date
         end
 
-        # Add supplement type (A for amendment, C for corrigendum)
-        if identifier.respond_to?(:supplement_notation)
-          parts << identifier.supplement_notation.to_s.downcase
-        end
+        parts << identifier.supplement_notation.to_s.downcase if identifier.supplement_notation
 
-        # Add supplement number
-        if identifier.respond_to?(:number) && identifier.number
-          parts << identifier.number.to_s
-        end
+        parts << identifier.number.to_s if identifier.number
 
         parts.join(":")
       end

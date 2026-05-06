@@ -4,14 +4,10 @@ module Pubid
   module Ansi
     # Single ANSI identifier (non-bundled)
     class SingleIdentifier < Identifier
-      include Pubid::Serializable
 
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        UrnGenerator.new(self).generate
-      end
 
       def to_s(lang: :en)
         [].tap do |parts|

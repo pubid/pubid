@@ -7,11 +7,9 @@ module Pubid
     module Identifiers
       # Base class for ISO identifiers
       class Base < ::Pubid::Identifier
-        # Inherit all attributes from parent: number, part, date, publisher, type, stage, etc.
-        # No need to redefine them here
-
-        # Only add ISO-specific attributes if needed
-        attribute :stage_iteration, ::Pubid::Components::Code
+        # Inherit most attributes from parent
+        # ISO-specific attributes
+        attribute :stage_iteration, ::Pubid::Iso::Components::Code
 
         # ISO rendering context singleton
         def self.rendering_context
@@ -53,13 +51,13 @@ module Pubid
 
           # Stage renders itself with context-aware separators
           if stage
-            has_copub = publisher.respond_to?(:has_copublisher?) && publisher.has_copublisher?
+            has_copub = publisher&.has_copublisher?
             parts << stage.to_s(context: context, has_copublisher: has_copub)
           end
 
           # Type renders itself with context-aware separators and default handling
           if type
-            has_prefix = stage || (publisher.respond_to?(:has_copublisher?) && publisher.has_copublisher?)
+            has_prefix = stage || publisher&.has_copublisher?
             type_render = type.to_s(context: context, has_prefix: has_prefix)
             parts << type_render if type_render != ""
           end

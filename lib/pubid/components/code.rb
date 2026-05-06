@@ -9,6 +9,10 @@ module Pubid
         value.to_s
       end
 
+      def render(context: nil)
+        value.to_s
+      end
+
       # Returns hash code for code component
       # @return [Integer] hash code
       # @note Memoized for performance

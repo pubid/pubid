@@ -1,18 +1,13 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Csa
     class SingleIdentifier < Lutaml::Model::Serializable
-      include Pubid::Serializable
 
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        UrnGenerator.new(self).generate
-      end
 
       attribute :code, Components::Code
       attribute :no_number, :string

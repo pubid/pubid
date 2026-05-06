@@ -26,34 +26,47 @@ module Pubid
         parts = []
 
         # Publisher/copublisher
-        if respond_to?(:publisher) && publisher
-          parts << render_publisher(publisher,
-                                    respond_to?(:copublishers) ? copublishers : nil, **options)
+        pub = maybe(:publisher)
+        if pub
+          parts << render_publisher(pub,
+                                    maybe(:copublishers), **options)
         end
 
         # Numbering (number, part, subpart)
-        if respond_to?(:number) && number
-          parts << render_numbering(number, respond_to?(:part) ? part : nil,
-                                    respond_to?(:subpart) ? subpart : nil, **options)
+        num = maybe(:number)
+        if num
+          parts << render_numbering(num, maybe(:part),
+                                    maybe(:subpart), **options)
         end
 
         # Date
-        if respond_to?(:date) && date
-          parts << render_date(date, **options)
+        d = maybe(:date)
+        if d
+          parts << render_date(d, **options)
         end
 
         # Stage and type
-        if respond_to?(:stage) && stage
-          parts << render_stage(stage, respond_to?(:type) ? type : nil,
-                                has_copublisher: respond_to?(:copublishers) && copublishers&.any?, **options)
+        stg = maybe(:stage)
+        if stg
+          parts << render_stage(stg, maybe(:type),
+                                has_copublisher: maybe(:copublishers)&.any?, **options)
         end
 
         # Language codes
-        if respond_to?(:languages) && languages&.any?
-          parts << render_languages(languages, **options)
+        langs = maybe(:languages)
+        if langs&.any?
+          parts << render_languages(langs, **options)
         end
 
         parts.compact.join
+      end
+
+      private
+
+      def maybe(method_name)
+        send(method_name)
+      rescue NoMethodError
+        nil
       end
     end
   end

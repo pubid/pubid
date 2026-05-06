@@ -35,7 +35,7 @@ module Pubid
 
           # Base number
           if number
-            number_str = if number.respond_to?(:value)
+            number_str = if number.is_a?(Components::Code)
                            number.value.to_s
                          else
                            number.to_s
@@ -45,7 +45,7 @@ module Pubid
 
           # Spec notation (N002 or C155-168)
           if spec_code
-            code_val = if spec_code.respond_to?(:value)
+            code_val = if spec_code.is_a?(Components::Code)
                          spec_code.value
                        else
                          spec_code
@@ -57,7 +57,7 @@ module Pubid
 
           # Date
           if date
-            year_val = date.respond_to?(:year) ? date.year : date.to_i
+            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
             result += ":#{year_val}"
           end
 

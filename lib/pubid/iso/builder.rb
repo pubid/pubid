@@ -117,68 +117,20 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=",
-                                sub_value)
-              end
+              identifier.send("#{sub_key}=", sub_value)
             end
           else
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=",
-                              realized_components)
-            end
+            identifier.send("#{key}=", realized_components)
           end
         end
 
         # If typed_stage, stage, or type are still nil after building,
         # set them to the default International Standard values
-        if identifier.respond_to?(:typed_stage) && identifier.typed_stage.nil?
+        if identifier.typed_stage.nil?
           default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
-          identifier.typed_stage = default_typed_stage if identifier.respond_to?(:typed_stage=)
-          identifier.stage = default_typed_stage.to_stage if identifier.respond_to?(:stage=)
-          identifier.type = default_typed_stage.to_type if identifier.respond_to?(:type=)
-        end
-
-        # Detect rendering style from parsed abbreviation
-        if identifier.respond_to?(:rendering_style=) && identifier.respond_to?(:typed_stage) && identifier.typed_stage
-          require_relative "rendering_style"
-          ts = identifier.typed_stage
-
-          # Detect stage format from parsed abbreviation
-          stage_format_long = if ts.long_abbr && ts.original_abbr&.start_with?(ts.long_abbr)
-                                true # Long form (starts with Amd, DAmd, FDAmd, Cor, DCor, FDCor)
-                              elsif ts.long_abbr && ts.original_abbr&.include?("Directives")
-                                # Special case for Directives: any form with "Directives" word is long form
-                                true # "Directives Part", "Directives, Part", "Directives,"
-                              elsif ts.short_abbr && ts.original_abbr&.start_with?(ts.short_abbr)
-                                false  # Short form (starts with AMD, DAM, FDAM, COR, DCOR, FDCOR, DIR)
-                              else
-                                false  # Default to short/canonical
-                              end
-
-          # Detect language code format from parsed languages
-          with_language_code = if identifier.respond_to?(:languages) && identifier.languages&.any?
-                                 # Check if original_code was single-char (E, F, R, A, S, D)
-                                 first_lang = identifier.languages.first
-                                 if first_lang.respond_to?(:original_code) && first_lang.original_code && first_lang.original_code.length == 1
-                                   :single
-                                 else
-                                   :iso # 2-char codes (en, fr, ru, ar, es, de)
-                                 end
-                               else
-                                 :none
-                               end
-
-          # with_date is always true for base identifiers (show the date if present)
-          # Only supplements might have undated references
-          with_date = true
-
-          # Create custom rendering style based on parsed format
-          identifier.rendering_style = RenderingStyle.new(
-            with_language_code: with_language_code,
-            stage_format_long: stage_format_long,
-            with_date: with_date,
-          )
+          identifier.typed_stage = default_typed_stage
+          identifier.stage = default_typed_stage.to_stage
+          identifier.type = default_typed_stage.to_type
         end
 
         identifier

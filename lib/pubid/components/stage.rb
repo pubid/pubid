@@ -30,6 +30,10 @@ module Pubid
         end
       end
 
+      def render(context: nil)
+        abbr.to_s
+      end
+
       # Returns hash code for stage component
       # @return [Integer] hash code
       # @note Memoized for performance

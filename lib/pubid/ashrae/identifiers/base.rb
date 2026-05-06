@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Ashrae
@@ -20,9 +19,6 @@ module Pubid
           Ashrae::Identifier.parse(string)
         end
 
-        def to_urn
-          Ashrae::UrnGenerator.new(self).generate
-        end
       end
     end
   end
