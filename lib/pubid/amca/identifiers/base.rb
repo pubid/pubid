@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # Base identifier class for ACMA identifiers
       # Single Responsibility: Common functionality for all ACMA identifier types
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Override base_hash to handle AMCA-specific copublisher format (string, not array)
         def base_hash
           hash = super

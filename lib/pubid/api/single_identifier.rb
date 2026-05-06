@@ -2,7 +2,7 @@
 
 module Pubid
   module Api
-    class SingleIdentifier < Lutaml::Model::Serializable
+    class SingleIdentifier < Pubid::Identifier
       # Generate URN for this identifier
       #
       # @return [String] URN representation

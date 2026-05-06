@@ -2,7 +2,7 @@
 
 module Pubid
   module Ashrae
-    class Scheme
+    class Scheme < Pubid::Scheme
       class << self
         def identifiers
           [

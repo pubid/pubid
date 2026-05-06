@@ -3,7 +3,7 @@
 module Pubid
   module Oiml
     module Identifiers
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         attribute :publisher, :string
         attribute :type, :string
         attribute :code, Oiml::Components::Code

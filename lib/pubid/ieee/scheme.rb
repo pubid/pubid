@@ -12,7 +12,7 @@ module Pubid
     # - TypedStage lookup by IEEE draft notation
     # - TypedStage lookup by ISO stage code
     # - Identifier class selection based on type code
-    class Scheme
+    class Scheme < Pubid::Scheme
       class << self
         # Locate typed stage by abbreviation
         # @param abbr [String, nil] stage abbreviation (e.g., "D1", "FDIS", "Std")

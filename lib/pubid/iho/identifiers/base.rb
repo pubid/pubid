@@ -10,7 +10,7 @@ module Pubid
       #
       # The leading IHO publisher prefix is optional on input but always
       # emitted on output.
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         attribute :publisher,  :string, default: "IHO"
         attribute :code,       :string
         attribute :appendix,   :string

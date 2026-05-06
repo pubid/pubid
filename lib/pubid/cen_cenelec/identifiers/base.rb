@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # Base CEN identifier
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Generate URN for this identifier
         #
         # @return [String] URN representation

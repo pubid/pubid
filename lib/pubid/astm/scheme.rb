@@ -12,7 +12,7 @@ require_relative "identifiers/iso_dual_published"
 
 module Pubid
   module Astm
-    class Scheme
+    class Scheme < Pubid::Scheme
       class << self
         def identifiers
           @identifiers ||= [

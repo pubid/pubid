@@ -10,7 +10,7 @@ require_relative "identifiers/fragment_identifier"
 
 module Pubid
   module Iec
-    class Scheme
+    class Scheme < Pubid::Scheme
       class << self
         def identifiers
           [
