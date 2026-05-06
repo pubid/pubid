@@ -14,11 +14,7 @@ module Pubid
     # Concrete classes should add their own default value like:
     #   attribute :type, Components::Type, default: -> { self.class.type[:key] }
     class SingleIdentifier < Identifier
-      include Pubid::Serializable
 
-      def to_urn
-        Idf::UrnGenerator.new(self).generate
-      end
     end
   end
 end

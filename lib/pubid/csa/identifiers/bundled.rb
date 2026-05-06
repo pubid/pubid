@@ -73,13 +73,13 @@ module Pubid
                   # Convert 4-digit year back to 2-digit
                   # Use original_year_4digit flag to determine original format
                   year_str = bundled.year.to_s
-                  bundled_part += if bundled.respond_to?(:original_year_4digit) && bundled.original_year_4digit
+                  bundled_part += if bundled.methods.include?(:original_year_4digit) && bundled.original_year_4digit
                                     # Preserve 4-digit format
                                     year_str
                                   elsif year_str.length == 4 && year_str.start_with?("20")
                                     # 2000s → convert to 2-digit
                                     year_str[2..3]
-                                  elsif year_str.length == 4 && year_str.start_with?("19") && bundled.respond_to?(:original_year_4digit) && !bundled.original_year_4digit
+                                  elsif year_str.length == 4 && year_str.start_with?("19") && bundled.methods.include?(:original_year_4digit) && !bundled.original_year_4digit
                                     # 1900s with no M/F prefix, but original was 2-digit (e.g., bundled identifier)
                                     # Convert back to 2-digit
                                     year_str[2..3]
@@ -100,7 +100,7 @@ module Pubid
           if reaffirmation
             # For bundled identifiers, check year format from base identifier
             # to determine spacing
-            year_was_2digit = base.respond_to?(:original_year_4digit) && !base.original_year_4digit
+            year_was_2digit = base.methods.include?(:original_year_4digit) && !base.original_year_4digit
 
             # Check if reaffirmation was originally 4-digit
             # Note: We need to track this at the Bundled level, but for now

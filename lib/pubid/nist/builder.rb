@@ -427,15 +427,17 @@ module Pubid
               # Skip assignment for second_number hashes - they'll be processed during compound number construction
               next if sub_key == :second_number && sub_value.is_a?(Hash) && sub_value[:number_only]
 
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=",
-                                sub_value)
+              begin
+                identifier.send("#{sub_key}=", sub_value)
+              rescue NoMethodError
+                nil
               end
             end
           else
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=",
-                              realized_components)
+            begin
+              identifier.send("#{key}=", realized_components)
+            rescue NoMethodError
+              nil
             end
           end
         end

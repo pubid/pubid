@@ -64,7 +64,7 @@ module Pubid
           flavor_result = exporter.export
           next unless flavor_result
 
-          result[flavor.to_s] = flavor_result.to_h
+          result[flavor.to_s] = flavor_result.to_hash
         rescue StandardError => e
           warn "Export warning (#{flavor}): #{e.message}"
         end

@@ -237,8 +237,7 @@ module Pubid
         # For identifiers like IWA that don't render publisher, default to "iso"
         return "iso" unless identifier.publisher
 
-        copubs = identifier.respond_to?(:copublishers) ? identifier.copublishers : []
-        copubs ||= []
+        copubs = identifier.copublishers || []
 
         # Collect all publishers in order
         publishers = [identifier.publisher] + copubs
@@ -263,7 +262,8 @@ module Pubid
         return extended_type if extended_type
 
         # Use urn_type_code override if available (e.g., Recommendation uses 'r')
-        return identifier.urn_type_code if identifier.respond_to?(:urn_type_code)
+        urn_override = identifier.urn_type_code
+        return urn_override if urn_override
 
         # Default: use type_code as-is (already a string)
         type_code.to_s
@@ -370,10 +370,9 @@ module Pubid
       def supplement_type_component
         return nil unless identifier.typed_stage
 
-        # Use urn_supplement_type override if available (for special cases)
-        return identifier.urn_supplement_type if identifier.respond_to?(:urn_supplement_type)
+        urn_override = identifier.urn_supplement_type
+        return urn_override if urn_override
 
-        # Default: use type_code from typed_stage
         identifier.typed_stage.type_code.to_s
       end
 

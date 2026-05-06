@@ -1,18 +1,13 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Asme
     class SingleIdentifier < Lutaml::Model::Serializable
-      include Pubid::Serializable
 
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        Asme::UrnGenerator.new(self).generate
-      end
 
       attribute :publisher, :string
       attribute :code, Components::Code

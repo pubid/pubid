@@ -133,12 +133,17 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |k, v|
-              identifier.send("#{k}=", v) if identifier.respond_to?("#{k}=")
+              begin
+                identifier.send("#{k}=", v)
+              rescue NoMethodError
+                nil
+              end
             end
           else
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=",
-                              realized_components)
+            begin
+              identifier.send("#{key}=", realized_components)
+            rescue NoMethodError
+              nil
             end
           end
         end
@@ -705,7 +710,7 @@ module Pubid
         # Extract values from nested hashes (parser returns {:number => {:number => "1000"}})
         number_val = data[:number][:number] if data[:number].is_a?(Hash)
         iteration_val = data[:iteration][:iteration][0][:iteration] if data[:iteration].is_a?(Hash) && data[:iteration][:iteration].is_a?(Array) && data[:iteration][:iteration].any?
-        iteration_val = nil if iteration_val.respond_to?(:empty?) && iteration_val.empty?
+        iteration_val = nil if iteration_val.is_a?(String) && iteration_val.empty?
         parts_val = data[:parts][:parts] if data[:parts].is_a?(Hash)
         flex_prefix_val = data[:flex_prefix].to_s if data[:flex_prefix]
 
@@ -755,7 +760,7 @@ module Pubid
         # Extract values from nested hashes (parser returns {:number => {:number => "1000"}})
         number_val = data[:number][:number] if data[:number].is_a?(Hash)
         iteration_val = data[:iteration][:iteration][0][:iteration] if data[:iteration].is_a?(Hash) && data[:iteration][:iteration].is_a?(Array) && data[:iteration][:iteration].any?
-        iteration_val = nil if iteration_val.respond_to?(:empty?) && iteration_val.empty?
+        iteration_val = nil if iteration_val.is_a?(String) && iteration_val.empty?
         parts_val = data[:parts][:parts] if data[:parts].is_a?(Hash)
         flex_prefix_val = data[:flex_prefix].to_s if data[:flex_prefix]
 
@@ -1437,9 +1442,19 @@ module Pubid
 expert_commentary: nil, expert_commentary_topic: nil)
         # If expert_commentary data is provided, set it on the base_identifier
         # This allows ConsolidatedIdentifier to render the ExComm suffix correctly
-        if expert_commentary && base_identifier.respond_to?(:expert_commentary=)
-          base_identifier.expert_commentary = expert_commentary
-          base_identifier.expert_commentary_topic = expert_commentary_topic if expert_commentary_topic && base_identifier.respond_to?(:expert_commentary_topic=)
+        if expert_commentary
+          begin
+            base_identifier.expert_commentary = expert_commentary
+          rescue NoMethodError
+            nil
+          end
+          if expert_commentary_topic
+            begin
+              base_identifier.expert_commentary_topic = expert_commentary_topic
+            rescue NoMethodError
+              nil
+            end
+          end
         end
 
         supplement_ids = supplements_data.map do |supp|

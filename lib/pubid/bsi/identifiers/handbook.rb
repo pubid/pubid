@@ -23,9 +23,9 @@ module Pubid
           # Use preserved original abbreviation, default to "Handbook"
           abbr = original_abbr || "Handbook"
 
-          number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+          number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
           if part
-            part_val = part.respond_to?(:value) ? part.value : part
+            part_val = part.is_a?(Components::Code) ? part.value : part
             number_str += "-#{part_val.to_s.strip}"
           end
 

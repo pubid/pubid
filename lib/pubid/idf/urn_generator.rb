@@ -2,90 +2,71 @@
 
 module Pubid
   module Idf
-    # Generates RFC 5141-bis compliant URNs from IDF identifiers
-    #
-    # URN format: urn:idf:{number}:{part}:{year}
-    # Example: urn:idf:1:2005 for "IDF 1:2005"
-    class UrnGenerator
-      attr_reader :identifier
+    class UrnGenerator < Pubid::UrnGenerator::Base
+      def urn_type
+        return nil unless identifier.type
+        identifier.type.abbr.to_s.downcase
+      end
 
-      def initialize(identifier)
-        @identifier = identifier
+      def urn_number
+        return nil unless identifier.number
+        identifier.number.value.to_s
+      end
+
+      def urn_part
+        return nil unless identifier.part
+        "-#{identifier.part.value}"
+      end
+
+      def urn_subpart
+        return nil unless identifier.subpart
+        "-#{identifier.subpart.value}"
+      end
+
+      def urn_year
+        if identifier.date
+          return identifier.date.year.to_s if identifier.date.year
+        end
+        identifier.year.to_s if identifier.year
+      end
+
+      def urn_edition
+        return nil unless identifier.edition
+        num = identifier.edition.number
+        return nil unless num
+        "ed.#{num}"
       end
 
       def generate
         parts = ["urn", "idf"]
+        parts << urn_number if urn_number
+        parts << urn_part if urn_part
+        parts << urn_subpart if urn_subpart
+        parts << urn_year if urn_year
+        parts << urn_edition if urn_edition
+        parts << urn_type if urn_type
 
-        # Number
-        if identifier.respond_to?(:number) && identifier.number
-          number = identifier.number.respond_to?(:value) ? identifier.number.value : identifier.number.to_s
-          parts << number
+        if identifier.publisher
+          parts[1] = identifier.publisher.body.to_s.downcase
         end
 
-        # Part
-        if identifier.respond_to?(:part) && identifier.part
-          part = identifier.part.respond_to?(:value) ? identifier.part.value : identifier.part.to_s
-          parts[-1] = "#{parts[-1]}-#{part}"
-        end
-
-        # Subpart
-        if identifier.respond_to?(:subpart) && identifier.subpart
-          subpart = identifier.subpart.respond_to?(:value) ? identifier.subpart.value : identifier.subpart.to_s
-          parts[-1] = "#{parts[-1]}-#{subpart}"
-        end
-
-        # Year
-        if identifier.respond_to?(:date) && identifier.date
-          year = identifier.date.respond_to?(:year) ? identifier.date.year : identifier.date.to_i
-          parts << year.to_s
-        elsif identifier.respond_to?(:year) && identifier.year
-          parts << identifier.year.to_s
-        end
-
-        # Edition
-        if identifier.respond_to?(:edition) && identifier.edition
-          edition = identifier.edition.respond_to?(:number) ? identifier.edition.number : identifier.edition.to_s
-          parts << "ed.#{edition}"
-        end
-
-        # Type
-        if identifier.respond_to?(:type) && identifier.type
-          type = identifier.type.respond_to?(:abbr) ? identifier.type.abbr : identifier.type.to_s
-          parts << type.to_s.downcase
-        end
-
-        # Publisher
-        if identifier.respond_to?(:publisher) && identifier.publisher
-          pub = identifier.publisher.respond_to?(:body) ? identifier.publisher.body : identifier.publisher.to_s
-          parts[1] = pub.to_s.downcase
-        end
-
-        # Copublishers
-        if identifier.respond_to?(:copublishers) && identifier.copublishers&.any?
-          copubs = identifier.copublishers.map do |cp|
-            cp.respond_to?(:body) ? cp.body : cp.to_s
-          end
+        if identifier.copublishers&.any?
+          copubs = identifier.copublishers.map(&:body)
           parts[1] = "#{parts[1]}-#{copubs.join('-').downcase}"
         end
 
-        # Language codes
-        if identifier.respond_to?(:languages) && identifier.languages&.any?
-          lang_codes = identifier.languages.map(&:code).join(",")
-          parts << lang_codes
+        if identifier.languages&.any?
+          parts << identifier.languages.map(&:code).join(",")
         end
 
-        # For supplements
         if identifier.is_a?(SupplementIdentifier)
-          # Add supplement type (amd, cor)
-          if identifier.respond_to?(:typed_stage) && identifier.typed_stage
+          if identifier.typed_stage
             supp_type = identifier.typed_stage.type_code.to_s
             parts << supp_type if supp_type
           end
 
-          # Add supplement number
-          if identifier.respond_to?(:number) && identifier.number
-            number = identifier.number.respond_to?(:value) ? identifier.number.value : identifier.number.to_s
-            parts << number
+          if identifier.number
+            parts << identifier.number.value.to_s
           end
         end
 

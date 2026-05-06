@@ -5,14 +5,10 @@ module Pubid
     module Identifiers
       # Base class for all PLATEAU identifiers
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
         attribute :number, :integer
         attribute :annex, :integer, default: -> {}
 
@@ -43,7 +39,7 @@ module Pubid
         # Include type_string and annex in serialization for round-trip compatibility
         def base_hash
           hash = super
-          hash[:type] = type_string if respond_to?(:type_string)
+          hash[:type] = type_string if methods.include?(:type_string)
           hash[:annex] = annex if annex
           hash
         end

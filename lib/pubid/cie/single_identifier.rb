@@ -18,16 +18,12 @@ module Pubid
     # - Identical (identical to ISO publications)
     # - TutorialBundle (tutorial bundles)
     class SingleIdentifier < Identifier
-      include Pubid::Serializable
 
       # CIE uses a fixed publisher string
       def publisher
         "CIE"
       end
 
-      def to_urn
-        Cie::UrnGenerator.new(self).generate
-      end
 
       attribute :year, :string
       attribute :date_separator, :string # "dash" or "colon"

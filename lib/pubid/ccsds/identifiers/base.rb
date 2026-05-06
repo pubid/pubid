@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Ccsds
@@ -9,7 +8,6 @@ module Pubid
       # Format: CCSDS NUMBER.PART-TYPE-EDITION[-SUFFIX]
       # Example: CCSDS 120.0-G-4, CCSDS 100.0-G-1-S
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # CCSDS uses a simple architecture without typed stages
         # TYPED_STAGES includes default stage for base identifiers
@@ -31,9 +29,6 @@ module Pubid
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          Ccsds::UrnGenerator.new(self).generate
-        end
 
         # Include CCSDS-specific attributes in serialization
         def base_hash

@@ -2,97 +2,62 @@
 
 module Pubid
   module Cie
-    # Generates RFC 5141-bis compliant URNs from CIE identifiers
-    #
-    # URN format: urn:cie:{s_prefix?}{code}:{year}:{language}:{stage}
-    # Example: urn:cie:s001:2008:en for "CIE S 001:2008 (E)"
-    class UrnGenerator
-      attr_reader :identifier
-
-      def initialize(identifier)
-        @identifier = identifier
-      end
-
+    class UrnGenerator < Pubid::UrnGenerator::Base
       def generate
         parts = ["urn", "cie"]
 
-        # Special identifier type component (comes before other components)
-        # This explicitly differentiates special identifier classes
         special_type = special_identifier_type_component
         parts << special_type if special_type
 
-        # S prefix
-        if identifier.respond_to?(:s_prefix) && identifier.s_prefix
+        if maybe(:s_prefix)
           parts << "s"
         end
 
-        # Publisher (with copublishers)
         parts << publisher_component
 
-        # Code
-        if identifier.respond_to?(:code) && identifier.code
+        if identifier.code
           parts << identifier.code.to_s
         end
 
-        # Year
-        if identifier.respond_to?(:year) && identifier.year
-          parts << identifier.year.to_s
-        elsif identifier.respond_to?(:date) && identifier.date
-          year = identifier.date.respond_to?(:year) ? identifier.date.year : identifier.date.to_i
-          parts << year.to_s
-        end
+        year = extract_year
+        parts << year.to_s if year
 
-        # Language (multiple formats: slash, slash_colon, parenthetical)
-        if identifier.respond_to?(:language) && identifier.language
-          lang = identifier.language
-          if lang.respond_to?(:code)
-            parts << lang.code.to_s.downcase
-            if lang.respond_to?(:format) && lang.format
-              parts << lang.format.to_s.downcase
+        language = maybe(:language)
+        if language
+          if language&.code
+            parts << language.code.to_s.downcase
+            if language&.format
+              parts << language.format.to_s.downcase
             end
           else
-            parts << lang.to_s.downcase
+            parts << language.to_s.downcase
           end
         end
 
-        # Stage (DIS, DS, etc.)
-        if identifier.respond_to?(:stage) && identifier.stage
-          parts << identifier.stage.to_s.downcase
-        end
+        stage = maybe(:stage)
+        parts << stage.to_s.downcase if stage
 
-        # Date separator
-        if identifier.respond_to?(:date_separator) && identifier.date_separator
-          parts << "sep.#{identifier.date_separator}"
-        end
+        date_separator = maybe(:date_separator)
+        parts << "sep.#{date_separator}" if date_separator
 
-        # IEC identifier (for DualPublished)
-        if identifier.respond_to?(:iec_identifier) && identifier.iec_identifier
-          parts << "iec.#{identifier.iec_identifier}"
-        end
+        iec_identifier = maybe(:iec_identifier)
+        parts << "iec.#{iec_identifier}" if iec_identifier
 
-        # ISO reference (for Identical)
-        if identifier.respond_to?(:iso_reference) && identifier.iso_reference
-          parts << "iso.#{identifier.iso_reference}"
-        end
+        iso_reference = maybe(:iso_reference)
+        parts << "iso.#{iso_reference}" if iso_reference
 
-        # Doc type (for JointPublished)
-        if identifier.respond_to?(:doc_type) && identifier.doc_type
-          parts << "doctype.#{identifier.doc_type}"
-        end
+        doc_type = maybe(:doc_type)
+        parts << "doctype.#{doc_type}" if doc_type
 
-        # Identifiers string (for Bundle)
-        if identifier.respond_to?(:identifiers_string) && identifier.identifiers_string
-          parts << "bundle.#{identifier.identifiers_string}"
-        end
+        identifiers_string = maybe(:identifiers_string)
+        parts << "bundle.#{identifiers_string}" if identifiers_string
 
-        # Bundle number (for TutorialBundle)
-        if identifier.respond_to?(:bundle_number) && identifier.bundle_number
-          parts << "tut-bundle.#{identifier.bundle_number}"
-        end
+        bundle_number = maybe(:bundle_number)
+        parts << "tut-bundle.#{bundle_number}" if bundle_number
 
-        # Language codes (collection)
-        if identifier.respond_to?(:languages) && identifier.languages&.any?
-          lang_codes = identifier.languages.map(&:code).join(",")
+        languages = maybe(:languages)
+        if languages&.any?
+          lang_codes = languages.map(&:code).join(",")
           parts << lang_codes
         end
 
@@ -101,9 +66,18 @@ module Pubid
 
       private
 
-      # Detect special identifier types for explicit URN differentiation
-      # This ensures DualPublished, Identical, JointPublished, Bundle, TutorialBundle
-      # have unique URN representations
+      def extract_year
+        year = maybe(:year)
+        return year if year
+
+        date = identifier.date
+        if date
+          return date.year
+        end
+
+        nil
+      end
+
       def special_identifier_type_component
         return nil unless identifier.class
 
@@ -123,23 +97,25 @@ module Pubid
       end
 
       def publisher_component
-        # Get publisher from identifier or default to "cie"
         pub = "cie"
 
-        if identifier.respond_to?(:publisher) && identifier.publisher
-          pub = identifier.publisher.respond_to?(:body) ? identifier.publisher.body : identifier.publisher.to_s
-          pub = pub.to_s.downcase
+        if identifier.publisher
+          p = identifier.publisher.to_s
+          pub = p.to_s.downcase
         end
 
-        # Add copublishers if present
-        if identifier.respond_to?(:copublisher) && identifier.copublisher
-          copub = identifier.copublisher.respond_to?(:body) ? identifier.copublisher.body : identifier.copublisher.to_s
-          pub = "#{pub}-#{copub.to_s.downcase}"
-        elsif identifier.respond_to?(:copublishers) && identifier.copublishers&.any?
-          copubs = identifier.copublishers.map do |cp|
-            cp.respond_to?(:body) ? cp.body : cp.to_s
+        copublisher = maybe(:copublisher)
+        if copublisher
+          cp = copublisher.to_s
+          pub = "#{pub}-#{cp.to_s.downcase}"
+        else
+          copubs = maybe(:copublishers)
+          if copubs&.any?
+            cp = copubs.map do |c|
+              c.to_s
+            end
+            pub = "#{pub}-#{cp.join('-').downcase}"
           end
-          pub = "#{pub}-#{copubs.join('-').downcase}"
         end
 
         pub

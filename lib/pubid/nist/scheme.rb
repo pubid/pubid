@@ -112,7 +112,7 @@ module Pubid
 
             # Check for CS-E (emergency) - e-prefix with 3+ digits
             # Handle Parslet::Slice by converting to string
-            first_num_str = first_num.respond_to?(:to_str) ? first_num.to_str : first_num.to_s
+            first_num_str = first_num.is_a?(String) ? first_num.to_str : first_num.to_s
 
             # Match e104 or e104 (when "e104-43" is split into first+second)
             if /^e\d{3,}/.match?(first_num_str)

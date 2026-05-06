@@ -3,7 +3,6 @@
 module Pubid
   module Jcgm
     class SingleIdentifier < Identifier
-      include Pubid::Serializable
 
       attribute :publisher, Jcgm::Components::Publisher
       attribute :typed_stage, Pubid::Components::TypedStage
@@ -16,9 +15,6 @@ module Pubid
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        UrnGenerator.new(self).generate
-      end
 
       def publisher_portion
         publisher.to_s

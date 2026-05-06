@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Nist
@@ -8,14 +7,10 @@ module Pubid
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
 
         attribute :publisher, Components::Publisher
         attribute :series, Components::Code # Set by Builder from parsed data
@@ -70,7 +65,11 @@ module Pubid
 
           # Set all provided attributes
           attributes.each do |key, value|
-            send("#{key}=", value) if respond_to?("#{key}=") && !value.nil?
+            begin
+              send("#{key}=", value) unless value.nil?
+            rescue NoMethodError
+              nil
+            end
           end
 
           # NOTE: Compound number building is handled by the Builder class
@@ -180,7 +179,7 @@ module Pubid
                              false
                            end
 
-            if should_merge && respond_to?("#{var_name}=")
+            if should_merge && methods.include?("#{var_name}=".to_sym)
               send("#{var_name}=",
                    new_val)
             end
@@ -286,7 +285,7 @@ module Pubid
 
           # Determine effective series - PREFER series_code if subclass defines it
           # This allows normalization (e.g., LCIRC → LC in LetterCircular)
-          effective_series = if respond_to?(:series_code) && series_code
+          effective_series = if methods.include?(:series_code) && series_code
                                series_code
                              elsif series
                                series.to_s
@@ -415,7 +414,7 @@ module Pubid
 
           # Determine effective series - PREFER series_code if subclass defines it
           # This allows normalization (e.g., LCIRC → LC in LetterCircular)
-          effective_series = if respond_to?(:series_code) && series_code
+          effective_series = if methods.include?(:series_code) && series_code
                                series_code
                              elsif series
                                series.to_s

@@ -3,7 +3,6 @@
 module Pubid
   module Oiml
     class SingleIdentifier < Identifier
-      include Pubid::Serializable
 
       # Base class for OIML single identifiers (non-supplements)
       attribute :publisher, :string

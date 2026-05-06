@@ -1,18 +1,13 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module Bsi
     class SingleIdentifier < Lutaml::Model::Serializable
-      include Pubid::Serializable
 
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        Bsi::UrnGenerator.new(self).generate
-      end
 
       attribute :publisher, Bsi::Components::Publisher, default: -> {
         Bsi::Components::Publisher.new(body: "BS")
@@ -51,18 +46,18 @@ module Pubid
 
         # Number with iteration, part, and subpart
         if number
-          number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+          number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
 
           # Collection (second number with slash)
           if second_number
-            second_val = second_number.respond_to?(:value) ? second_number.value : second_number
+            second_val = second_number.is_a?(Components::Code) ? second_number.value : second_number
             number_str += "/#{second_val}"
           end
 
           # Part and subpart - check if space-separated
           space_separated = instance_variable_get(:@space_separated_part)
           if part
-            part_val = part.respond_to?(:value) ? part.value : part
+            part_val = part.is_a?(Components::Code) ? part.value : part
             # Trim part value to remove leading/trailing spaces from parser
             part_str = part_val.to_s.strip
             # Use space for space-separated parts, dash otherwise
@@ -70,7 +65,7 @@ module Pubid
             number_str += "#{separator}#{part_str}"
           end
           if subpart
-            subpart_val = subpart.respond_to?(:value) ? subpart.value : subpart
+            subpart_val = subpart.is_a?(Components::Code) ? subpart.value : subpart
             subpart_str = subpart_val.to_s.strip
             number_str += "-#{subpart_str}"
           end
@@ -87,7 +82,7 @@ module Pubid
 
         # Date
         if date
-          year_val = date.respond_to?(:year) ? date.year : date.to_i
+          year_val = date.is_a?(Components::Date) ? date.year : date.to_i
           result += ":#{year_val}"
           # Month if present
           result += "-#{format('%02d', month)}" if month

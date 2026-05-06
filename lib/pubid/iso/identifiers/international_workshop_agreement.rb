@@ -3,7 +3,6 @@
 module Pubid
   module Iso
     module Identifiers
-      # International Workshop Agreement Identifier
       class InternationalWorkshopAgreement < SingleIdentifier
         attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
@@ -79,20 +78,9 @@ module Pubid
           { key: :iwa, title: "International Workshop Agreement", short: "IWA" }
         end
 
-        # AWI IWA 36
-        # CD IWA 37-2
-        # ISO/WD IWA 19
-        # IWA 8:2009
-        # IWA 14-1:2013
-        # PRF IWA 36
-        def to_s(lang: :en, lang_single: false)
-          [
-            # The publisher is omitted because it is an IWA
-            typed_stage.abbreviation,
-            number_portion(lang_single: lang_single),
-          ].compact.join(" ").tap do |s|
-            s << language_portion(lang_single: lang_single) if languages&.any?
-          end
+        def to_s(**opts)
+          context = build_rendering_context(nil, format: :human, **opts)
+          Pubid::Renderers::IwaRenderer.new(self).render(context:, **opts.slice(:with_edition))
         end
       end
     end

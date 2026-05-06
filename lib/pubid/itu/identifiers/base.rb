@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../../serializable"
-require_relative "../urn_generator"
 require_relative "../../components/date"
 require_relative "../components/sector"
 require_relative "../components/series"
@@ -13,7 +11,6 @@ module Pubid
     module Identifiers
       # Base class for all ITU identifiers
       class Base < Lutaml::Model::Serializable
-        include Pubid::Serializable
 
         # Long-form ↔ ITU single-letter language code map. The parser produces
         # single-letter codes (E/F/S/R/A/C); API callers (e.g. metanorma-itu)
@@ -46,9 +43,6 @@ module Pubid
         # Generate URN for this identifier
         #
         # @return [String] URN representation
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
 
         # Override base_hash to handle ITU-specific attributes
         def base_hash
@@ -149,7 +143,7 @@ module Pubid
         def validate_ob_no_sector!
           return unless series&.series == "OB"
           return if sector.nil?
-          return if sector.respond_to?(:sector) && (sector.sector.nil? || sector.sector.to_s.empty?)
+          return if sector.methods.include?(:sector) && (sector.sector.nil? || sector.sector.to_s.empty?)
 
           raise ArgumentError,
                 "OB (Operational Bulletin) is a cross-bureau ITU publication; " \

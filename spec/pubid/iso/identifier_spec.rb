@@ -177,4 +177,44 @@ RSpec.describe Pubid::Iso::Identifier do
       end
     end
   end
+
+  describe ".build_type_map" do
+    it "matches ISO_TYPE_MAP with Scheme.identifiers" do
+      generated = described_class.build_type_map
+      expect(described_class::ISO_TYPE_MAP).to eq(generated)
+    end
+  end
+
+  describe "unified parse with format auto-detection" do
+    context "human-readable format" do
+      it "auto-detects and parses human-readable strings" do
+        id = described_class.parse("ISO 9001:2015")
+        expect(id).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(id.to_s).to eq("ISO 9001:2015")
+      end
+    end
+
+    context "MR string format" do
+      it "auto-detects and parses MR string format" do
+        id = described_class.parse("ISO.9001.2015")
+        expect(id).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(id.to_s).to eq("ISO 9001:2015")
+      end
+    end
+
+    context "URN format" do
+      it "auto-detects and parses URN format" do
+        id = described_class.parse("urn:iso:std:iso:9001:ed-4")
+        expect(id).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(id.to_urn).to eq("urn:iso:std:iso:9001:ed-4")
+      end
+    end
+
+    context "explicit format" do
+      it "parses with explicit :human format" do
+        id = described_class.parse("ISO/IEC DIR 1:2022", format: :human)
+        expect(id).to be_a(Pubid::Iso::Identifiers::Directives)
+      end
+    end
+  end
 end

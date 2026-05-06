@@ -5,14 +5,18 @@ module Pubid
     # Base class for single (non-supplement) ACMA identifiers
     # Includes: Standard, Publication
     class SingleIdentifier < Identifiers::Base
-      include Pubid::Serializable
 
       def to_s
         parts = []
         parts << copublisher if copublisher
         # type is a hash, get the title
-        if respond_to?(:type) && type.is_a?(Hash) && type[:title]
-          parts << type[:title].to_s
+        t = begin
+          self.type
+        rescue NoMethodError
+          nil
+        end
+        if t.is_a?(Hash) && t[:title]
+          parts << t[:title].to_s
         end
         parts << code.to_s
         parts << "-#{year}" if year
@@ -21,7 +25,7 @@ module Pubid
 
         # Handle additional copublisher after year (e.g., /ASHRAE 51-16)
         if copublisher&.include?("/") && year
-          type_title = respond_to?(:type) && type.is_a?(Hash) ? type[:title].to_s : ""
+          type_title = t.is_a?(Hash) ? t[:title].to_s : ""
           result = "#{copublisher} #{type_title} #{code}-#{year}"
         end
 

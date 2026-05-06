@@ -18,15 +18,17 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=",
-                                sub_value)
+              begin
+                identifier.send("#{sub_key}=", sub_value)
+              rescue NoMethodError
+                nil
               end
             end
           else
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=",
-                              realized_components)
+            begin
+              identifier.send("#{key}=", realized_components)
+            rescue NoMethodError
+              nil
             end
           end
         end

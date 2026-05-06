@@ -17,6 +17,9 @@ module Pubid
       # @param _include_month [Boolean] include month in output
       #   (for future extensibility)
       # @return [String] rendered date string
+      def render(context: nil)
+        to_s
+      end
       def to_s(_context: nil, _include_month: false)
         return year.to_s unless month
 

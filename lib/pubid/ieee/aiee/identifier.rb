@@ -35,7 +35,11 @@ module Pubid
             # Skip :code and :number as they're handled above
             next if %i[code number].include?(key)
 
-            send("#{key}=", value) if respond_to?("#{key}=")
+            begin
+              send("#{key}=", value)
+            rescue NoMethodError
+              nil
+            end
           end
         end
 

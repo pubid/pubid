@@ -2,17 +2,7 @@
 
 module Pubid
   module Jcgm
-    # Generates RFC 5141-bis compliant URNs from JCGM identifiers
-    #
-    # URN format: urn:jcgm:{number}:{part}:{year}
-    # Example: urn:jcgm:100:2012 for "JCGM 100:2012"
-    class UrnGenerator
-      attr_reader :identifier
-
-      def initialize(identifier)
-        @identifier = identifier
-      end
-
+    class UrnGenerator < Pubid::UrnGenerator::Base
       def generate
         if identifier.is_a?(SupplementIdentifier)
           generate_supplement_urn
@@ -26,60 +16,54 @@ module Pubid
       def generate_base_urn
         parts = ["urn", "jcgm"]
 
-        # Number (handle both regular number and gum_number for GumGuide)
-        if identifier.respond_to?(:gum_number) && identifier.gum_number
-          # GumGuide uses gum_number attribute
-          number = identifier.gum_number.respond_to?(:value) ? identifier.gum_number.value : identifier.gum_number.to_s
+        gum_number = maybe(:gum_number)
+        if gum_number
+          number = gum_number.to_s
           parts << "gum.#{number}"
-        elsif identifier.respond_to?(:number) && identifier.number
-          number = identifier.number.respond_to?(:value) ? identifier.number.value : identifier.number.to_s
+        elsif identifier.number
+          number = identifier.number.to_s
           parts << number
         end
 
-        # Part
-        if identifier.respond_to?(:part) && identifier.part
-          part = identifier.part.respond_to?(:value) ? identifier.part.value : identifier.part.to_s
-          parts << "-#{part}"
+        part = maybe(:part)
+        if part
+          p = part.to_s
+          parts << "-#{p}"
         end
 
-        # Subpart
-        if identifier.respond_to?(:subpart) && identifier.subpart
-          subpart = identifier.subpart.respond_to?(:value) ? identifier.subpart.value : identifier.subpart.to_s
-          parts << "-#{subpart}"
+        subpart = maybe(:subpart)
+        if subpart
+          sp = subpart.to_s
+          parts << "-#{sp}"
         end
 
-        # Year
-        if identifier.respond_to?(:date) && identifier.date
-          year = identifier.date.respond_to?(:year) ? identifier.date.year : identifier.date.to_i
+        if identifier.date
+          year = identifier.date.year
           parts << year.to_s
-        elsif identifier.respond_to?(:year) && identifier.year
-          parts << identifier.year.to_s
+        elsif maybe(:year)
+          parts << maybe(:year).to_s
         end
 
-        # Edition
-        if identifier.respond_to?(:edition) && identifier.edition
-          edition = identifier.edition.respond_to?(:number) ? identifier.edition.number : identifier.edition.to_s
-          parts << "ed.#{edition}"
+        edition = maybe(:edition)
+        if edition
+          e = edition.number || edition.to_s
+          parts << "ed.#{e}"
         end
 
-        # Stage iteration
-        if identifier.respond_to?(:stage_iteration) && identifier.stage_iteration
-          iter = identifier.stage_iteration.respond_to?(:value) ? identifier.stage_iteration.value : identifier.stage_iteration.to_s
+        stage_iteration = maybe(:stage_iteration)
+        if stage_iteration
+          iter = stage_iteration.to_s
           parts << "iter.#{iter}"
         end
 
-        # Type (for non-Guide types and GumGuide)
-        if identifier.respond_to?(:typed_stage) && identifier.typed_stage
+        if identifier.typed_stage
           type_code = identifier.typed_stage.type_code
-          # Include type_code for all types except plain "guide"
-          # GumGuide uses "gum_guide" which should be included
           if type_code && type_code.to_s != "guide"
             parts << type_code.to_s
           end
         end
 
-        # Language codes
-        if identifier.respond_to?(:languages) && identifier.languages&.any?
+        if identifier.languages&.any?
           lang_codes = identifier.languages.map(&:code).join(",")
           parts << lang_codes
         end
@@ -88,39 +72,34 @@ module Pubid
       end
 
       def generate_supplement_urn
-        # For supplements (amendments, corrigenda), include base and supplement info
         parts = ["urn", "jcgm"]
 
-        if identifier.respond_to?(:base_identifier) && identifier.base_identifier
-          base_gen = self.class.new(identifier.base_identifier)
+        base_id = maybe(:base_identifier)
+        if base_id
+          base_gen = self.class.new(base_id)
           base_urn = base_gen.send(:generate_base_urn)
 
-          # Extract base URN components (after "urn:jcgm:")
           base_part = base_urn.sub(/^urn:jcgm:/, "")
           base_parts = base_part.split(":")
 
-          # Add base identifier components
           parts.concat(base_parts)
 
-          # Add supplement type (amd, cor)
-          if identifier.respond_to?(:typed_stage) && identifier.typed_stage
+          if identifier.typed_stage
             supp_type = identifier.typed_stage.type_code.to_s
             parts << supp_type if supp_type
           end
 
-          # Add supplement iteration
-          if identifier.respond_to?(:iteration) && identifier.iteration
-            iter = identifier.iteration.respond_to?(:value) ? identifier.iteration.value : identifier.iteration.to_s
+          iteration = maybe(:iteration)
+          if iteration
+            iter = iteration.to_s
             parts << iter
           end
 
-          # Add supplement year
-          if identifier.respond_to?(:date) && identifier.date
-            year = identifier.date.respond_to?(:year) ? identifier.date.year : identifier.date.to_i
+          if identifier.date
+            year = identifier.date.year
             parts << year.to_s
           end
         else
-          # Supplement without base (shouldn't happen in practice)
           parts << "unknown"
         end
 

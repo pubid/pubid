@@ -33,7 +33,7 @@ module Pubid
 
           # Number
           if number
-            number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+            number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
             parts << number_str
           end
 
@@ -50,7 +50,7 @@ module Pubid
 
           # Date
           if date
-            year_val = date.respond_to?(:year) ? date.year : date.to_i
+            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
             result += ":#{year_val}"
           end
 

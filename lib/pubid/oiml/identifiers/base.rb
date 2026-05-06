@@ -31,9 +31,6 @@ module Pubid
           result
         end
 
-        def to_urn
-          UrnGenerator.new(self).generate
-        end
       end
     end
   end

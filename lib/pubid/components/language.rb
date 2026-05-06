@@ -21,15 +21,16 @@ module Pubid
         # When multi-char format requested (lang_single: false) but original was
         # single-char, normalize to multi-char (for with_edition: true mode)
         if !lang_single && original_code&.length == 1
-          # Normalize single-char to multi-char
           code
         elsif original_code
-          # Preserve original format if requesting same format
           original_code
         else
-          # No original, use requested format
           lang_single ? CHAR_MAP.key(code) : code
         end
+      end
+
+      def render(context: nil, **opts)
+        to_s(**opts)
       end
     end
   end

@@ -2,65 +2,44 @@
 
 module Pubid
   module Amca
-    # Generates RFC 5141-bis compliant URNs from AMCA identifiers
-    #
-    # URN format: urn:amca:{code}:{year}:{suffix}:{reaffirmed}
-    # Example: urn:amca:210:2016 for "AMCA 210-2016"
-    class UrnGenerator
-      attr_reader :identifier
+    class UrnGenerator < Pubid::UrnGenerator::Base
+      def urn_number
+        return nil unless identifier.code
+        identifier.code.to_s
+      end
 
-      def initialize(identifier)
-        @identifier = identifier
+      def urn_year
+        return nil unless identifier.year
+        identifier.year.to_s
+      end
+
+      def urn_suffix
+        identifier.suffix&.to_s&.downcase
+      end
+
+      def urn_reaffirmed
+        "reaff.#{identifier.reaffirmed}" if identifier.reaffirmed
+      end
+
+      def urn_copublisher
+        "copub.#{identifier.copublisher.to_s.downcase}" if identifier.copublisher
+      end
+
+      def urn_type
+        identifier.type.to_s.downcase if identifier.type
       end
 
       def generate
         parts = ["urn", "amca"]
+        parts << urn_number if urn_number
+        parts << urn_year if urn_year
+        parts << urn_suffix if urn_suffix
+        parts << urn_reaffirmed if urn_reaffirmed
+        parts << urn_copublisher if urn_copublisher
 
-        # Code
-        if identifier.respond_to?(:code) && identifier.code
-          parts << identifier.code.to_s
-        end
+        parts[1] = identifier.publisher.to_s.downcase if identifier.publisher
 
-        # Year
-        if identifier.respond_to?(:year) && identifier.year
-          year = identifier.year.respond_to?(:value) ? identifier.year.value : identifier.year.to_s
-          parts << year
-        elsif identifier.respond_to?(:date) && identifier.date
-          year = identifier.date.respond_to?(:year) ? identifier.date.year : identifier.date.to_i
-          parts << year.to_s
-        end
-
-        # Suffix
-        if identifier.respond_to?(:suffix) && identifier.suffix
-          parts << identifier.suffix.to_s.downcase
-        end
-
-        # Reaffirmed
-        if identifier.respond_to?(:reaffirmed) && identifier.reaffirmed
-          parts << "reaff.#{identifier.reaffirmed}"
-        end
-
-        # Copublisher
-        if identifier.respond_to?(:copublisher) && identifier.copublisher
-          parts << "copub.#{identifier.copublisher.to_s.downcase}"
-        end
-
-        # Publisher
-        if identifier.respond_to?(:publisher) && identifier.publisher
-          pub = identifier.publisher.to_s.downcase
-          parts[1] = pub
-        end
-
-        # Type
-        if identifier.respond_to?(:type) && identifier.type
-          parts << identifier.type.to_s.downcase
-        end
-
-        # Language codes
-        if identifier.respond_to?(:languages) && identifier.languages&.any?
-          lang_codes = identifier.languages.map(&:code).join(",")
-          parts << lang_codes
-        end
+        parts << urn_type if urn_type
 
         parts.join(":")
       end

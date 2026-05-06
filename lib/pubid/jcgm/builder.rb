@@ -45,25 +45,27 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              if identifier.respond_to?("#{sub_key}=")
-                identifier.send("#{sub_key}=",
-                                sub_value)
+              begin
+                identifier.send("#{sub_key}=", sub_value)
+              rescue NoMethodError
+                nil
               end
             end
           else
-            if identifier.respond_to?("#{key}=")
-              identifier.send("#{key}=",
-                              realized_components)
+            begin
+              identifier.send("#{key}=", realized_components)
+            rescue NoMethodError
+              nil
             end
           end
         end
 
         # Set default typed_stage if still nil
-        if identifier.respond_to?(:typed_stage) && identifier.typed_stage.nil?
+        if identifier.methods.include?(:typed_stage) && identifier.typed_stage.nil?
           default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
           identifier.typed_stage = default_typed_stage
-          identifier.stage = default_typed_stage.to_stage if identifier.respond_to?(:stage=)
-          identifier.type = default_typed_stage.to_type if identifier.respond_to?(:type=)
+          identifier.stage = default_typed_stage.to_stage if identifier.methods.include?(:stage=)
+          identifier.type = default_typed_stage.to_type if identifier.methods.include?(:type=)
         end
 
         identifier

@@ -29,8 +29,9 @@ module Pubid
         return "" unless publisher
 
         result = publisher.to_s
-        if publisher.respond_to?(:copublisher) && publisher.copublisher&.any?
-          result += publisher.copublisher.map do |cp|
+        cops = publisher.is_a?(Components::Publisher) ? publisher.copublisher : nil
+        if cops&.any?
+          result += cops.map do |cp|
             "#{copublisher_separator}#{cp}"
           end.join
         end
@@ -144,7 +145,7 @@ part_separator: "-")
       # @param publisher [Components::Publisher] publisher component
       # @return [Boolean] true if has copublishers
       def publisher_has_copublisher?(publisher)
-        publisher.respond_to?(:has_copublisher?) && publisher.has_copublisher?
+        publisher.is_a?(Components::Publisher) && publisher.has_copublisher?
       end
 
       # Get publisher body/name
@@ -152,7 +153,7 @@ part_separator: "-")
       # @param publisher [Components::Publisher] publisher component
       # @return [String] publisher body
       def publisher_body(publisher)
-        publisher.respond_to?(:body) ? publisher.body : publisher.to_s
+        publisher.is_a?(Components::Publisher) ? publisher.body : publisher.to_s
       end
 
       # Get copublishers as array
@@ -160,7 +161,7 @@ part_separator: "-")
       # @param publisher [Components::Publisher] publisher component
       # @return [Array<String>] array of copublisher names
       def copublishers_list(publisher)
-        return [] unless publisher.respond_to?(:copublisher) && publisher.copublisher&.any?
+        return [] unless publisher.is_a?(Components::Publisher) && publisher.copublisher&.any?
 
         publisher.copublisher.map { |cp| publisher_body(cp) }
       end

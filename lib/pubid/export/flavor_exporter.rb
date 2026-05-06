@@ -78,15 +78,26 @@ module Pubid
         scheme_klasses = []
 
         # Pattern 1: Class methods (ISO, IEC, ASTM, etc.)
-        if scheme&.respond_to?(:identifiers)
-          scheme_klasses = scheme.identifiers
+        begin
+          scheme_klasses = scheme.identifiers if scheme
+        rescue NoMethodError
+          scheme_klasses = []
         end
 
         # Pattern 2: Instance-based (AMCA, BSI)
         if scheme_klasses.empty? && scheme
-          instance = scheme.respond_to?(:new) ? scheme.new : nil
-          if instance && instance.identifiers && !instance.identifiers.empty?
-            scheme_klasses = instance.identifiers
+          instance = begin
+            scheme.new
+          rescue NoMethodError
+            nil
+          end
+          if instance
+            ids = begin
+              instance.identifiers
+            rescue NoMethodError
+              nil
+            end
+            scheme_klasses = ids if ids && !ids.empty?
           end
         end
 
@@ -244,11 +255,15 @@ module Pubid
         class_key = CLASS_KEY_OVERRIDES[klass.name]
         if class_key
           type_info = begin
-            klass.respond_to?(:type) ? klass.type : nil
-          rescue NotImplementedError
+            klass.type
+          rescue NoMethodError, NotImplementedError
             nil
           end
-          metadata = klass.respond_to?(:metadata) ? klass.metadata : nil
+          metadata = begin
+            klass.metadata
+          rescue NoMethodError
+            nil
+          end
           return {
             key: class_key,
             title: type_info&.dig(:title) || metadata&.title || class_key.tr("_", " ").capitalize,
@@ -258,11 +273,15 @@ module Pubid
         end
 
         type_info = begin
-          klass.respond_to?(:type) ? klass.type : nil
-        rescue NotImplementedError
+          klass.type
+        rescue NoMethodError, NotImplementedError
           nil
         end
-        metadata = klass.respond_to?(:metadata) ? klass.metadata : nil
+        metadata = begin
+          klass.metadata
+        rescue NoMethodError
+          nil
+        end
 
         lib_key = type_info&.dig(:key)
         title = type_info&.dig(:title) || metadata&.title
@@ -347,8 +366,6 @@ module Pubid
       end
 
       def extract_attributes(klass)
-        return [] unless klass.respond_to?(:model_attributes)
-
         klass.model_attributes.keys.map(&:to_s)
       rescue NoMethodError
         []

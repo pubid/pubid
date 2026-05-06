@@ -22,10 +22,19 @@ module Pubid
 
     # Parse an ISO identifier string
     # @param identifier [String] the identifier string to parse
+    # @param format [Symbol] :auto, :human, :mr_string, or :urn
     # @return [Identifier] the parsed identifier
-    def self.parse(identifier)
-      # Use Scheme.parse for memoized parser/builder
-      Scheme.parse(identifier)
+    def self.parse(identifier, format: :auto)
+      format = Pubid::FormatDetector.detect(identifier) if format == :auto
+
+      case format
+      when :urn
+        UrnParser.parse(identifier)
+      when :mr_string
+        Pubid::Parsers::MrString.parse(identifier)
+      else
+        Scheme.parse(identifier)
+      end
     end
 
     # Parse an ISO URN string

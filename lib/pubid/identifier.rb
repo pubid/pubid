@@ -1,5 +1,6 @@
-require_relative "components/code"
 # frozen_string_literal: true
+
+require_relative "components/code"
 require_relative "components/date"
 require_relative "components/edition"
 require_relative "components/language"
@@ -7,13 +8,18 @@ require_relative "components/locality"
 require_relative "components/publisher"
 require_relative "components/stage"
 require_relative "components/type"
-require_relative "serializable"
 
 module Pubid
-  # Identifier that supports two-way machine-readable conversion
   class Identifier < Lutaml::Model::Serializable
-    include Pubid::Serializable
+    class << self
+      def format_registry
+        @format_registry || superclass&.format_registry
+      end
 
+      attr_writer :format_registry
+    end
+
+    attribute :_type, :string, polymorphic_class: true
     attribute :number, Components::Code
     attribute :part, Components::Code
     attribute :subpart, Components::Code
@@ -26,103 +32,154 @@ module Pubid
     attribute :type, Components::Type
     attribute :stage, Components::Stage
     attribute :locality, Components::Locality
+    attribute :typed_stage, Components::TypedStage
+    attribute :all_parts, Lutaml::Model::Type::Boolean, default: false
+    # base_identifier is declared by supplement subclasses with proper type
+    def base_identifier
+      nil
+    end
 
-    # Returns the root/base identifier by traversing supplement chain
-    #
-    # @return [Identifier] root identifier
-    #
-    # @example Get root from amendment
-    #   id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
-    #   id.root.to_s # => "ISO 9001:2015"
+    def initialize(attrs = {}, options = {})
+      attrs = attrs.dup
+      attrs[:_type] ||= self.class.polymorphic_name
+      super(attrs, options)
+    end
+
+    def self.polymorphic_name
+      parts = name.split("::")
+      flavor = parts[1]&.downcase
+      type_kebab = parts.last
+        .gsub(/([A-Z]+)([A-Z][a-z])/, '\1-\2')
+        .gsub(/([a-z\d])([A-Z])/, '\1-\2')
+        .downcase
+      "pubid:#{flavor}:#{type_kebab}"
+    end
+
+    klass_ref = self
+    key_value do
+      klass_ref.attributes.each_key do |name|
+        map name.to_s, to: name.to_sym
+      end
+    end
+
     def root
-      return base_identifier.root if respond_to?(:base_identifier) && base_identifier
+      return base_identifier.root if base_identifier
 
       self
     end
 
-    # Returns a new identifier without specified attributes
-    #
-    # @param args [Array<Symbol, Hash>] attributes to exclude
-    # @return [Identifier] new identifier without specified attributes
-    #
-    # @example Exclude year and edition
-    #   id = Pubid::Iso.parse("ISO 9001:2015")
-    #   id.exclude(:year, :edition)
-    #   # => #<Pubid::Iso::Identifiers::InternationalStandard number: 9001>
-    #
-    # @example Exclude nested attributes
-    #   id.exclude({ stage: [:abbr] })
-    def exclude(*args)
-      nested_exclusions, top_level_exclusions = args.partition do |arg|
-        arg.is_a?(Hash)
+    # Unified render — delegates to format registry
+    def render(format: :human, **opts)
+      registry = self.class.format_registry
+      unless registry
+        raise ArgumentError, "No format registry configured on #{self.class}"
       end
 
-      nested_exclusions = nested_exclusions.reduce({}, :merge)
+      renderer = registry.renderer_for(format)
+      unless renderer
+        raise ArgumentError, "No renderer registered for format: #{format}"
+      end
 
-      excluded_hash = to_h(include_metadata: false)
-        .except(*top_level_exclusions)
-        .each_with_object({}) do |(k, v), memo|
-          memo[k] = if v.is_a?(Hash) && nested_exclusions.key?(k)
-                      v.except(*nested_exclusions[k])
-                    else
-                      v
-                    end
-        end
-
-      # Use Deserializer to create new identifier
-      Pubid::Serializable.from_h(excluded_hash)
+      context = build_rendering_context(renderer, format:, **opts)
+      renderer.new(self).render(context:, **opts.slice(:with_edition))
     end
 
-    # Checks if another identifier is newer edition of the same document
-    #
-    # @param other [Identifier] identifier to compare with
-    # @return [Boolean] true if this identifier is newer edition
-    #
-    # @example Compare editions
-    #   id1 = Pubid::Iso.parse("ISO 9001:2015")
-    #   id2 = Pubid::Iso.parse("ISO 9001:2019")
-    #   id2.new_edition_of?(id1) # => true
-    #
-    # @raise [ArgumentError] if comparing different documents or undated identifiers
-    def new_edition_of?(other)
-      # Compare core attributes (publisher, number, part, type)
-      core_attrs = %i[publisher number part]
-      core_attrs.each do |attr|
-        next unless respond_to?(attr) && other.respond_to?(attr)
+    def to_s(**opts)
+      render(format: :human, **opts)
+    end
 
-        if send(attr) != other.send(attr)
-          raise ArgumentError,
-                "Cannot compare edition: different #{attr}"
-        end
+    def to_mr_string
+      render(format: :mr_string)
+    end
+
+    # MR string template methods — flavors override as needed
+    def mr_publisher
+      publisher&.to_s
+    end
+
+    def mr_type
+      return nil unless typed_stage
+      code = typed_stage.type_code
+      return nil if code.nil? || code.empty? || code == "is"
+      code
+    end
+
+    def mr_number_with_part
+      num = mr_number
+      return nil unless num
+
+      prt = mr_part
+      prt ? "#{num}-#{prt}" : num
+    end
+
+    def mr_number
+      number&.to_s
+    end
+
+    def mr_part
+      part&.to_s
+    end
+
+    def mr_year
+      date&.year&.to_s
+    end
+
+    # URN template methods — flavors override as needed
+    def urn_type_code
+      nil
+    end
+
+    def urn_supplement_type
+      nil
+    end
+
+    # Supplement rendering hook — flavors override for supplement-specific rendering
+    def to_supplement_s(**opts)
+      to_s(**opts)
+    end
+
+    # Default URN generation — resolves flavor's UrnGenerator class
+    def to_urn
+      resolve_urn_generator.new(self).generate
+    end
+
+    def resolve_urn_generator
+      flavor = self.class.name.split("::")[1]
+      Object.const_get("Pubid::#{flavor}::UrnGenerator")
+    rescue NameError
+      Pubid::UrnGenerator::Base
+    end
+
+    def exclude(*args)
+      attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
+        h[name] = args.include?(name) ? nil : send(name)
       end
+      self.class.new(attrs)
+    end
 
-      # Check if both have year
-      if !respond_to?(:date) || !date || !other.respond_to?(:date) || !other.date
+    def new_edition_of?(other)
+      raise ArgumentError, "Cannot compare edition: different publisher" unless publisher == other.publisher
+      raise ArgumentError, "Cannot compare edition: different number" unless number == other.number
+      raise ArgumentError, "Cannot compare edition: different part" unless part == other.part
+
+      unless date && other.date
         raise ArgumentError,
               "Cannot compare identifier without date/year"
       end
 
-      # Compare years
       return date.year > other.date.year if date.year != other.date.year
 
-      # Same year, compare edition if present
-      if respond_to?(:edition) && other.respond_to?(:edition) && edition && other.edition
+      if edition && other.edition
         return edition.number > other.edition.number
       end
 
       false
     end
 
-    # Returns hash code for identifier
-    # @return [Integer] hash code
-    # @note Memoized for performance
     def hash
       @hash ||= compute_hash
     end
 
-    # Checks equality with another identifier
-    # @param other [Object] object to compare with
-    # @return [Boolean] true if equal
     def eql?(other)
       return false unless other.is_a?(self.class)
 
@@ -131,10 +188,21 @@ module Pubid
 
     private
 
-    # Compute hash code from identifier attributes
-    # @return [Integer] hash code
+    def build_rendering_context(_renderer, format:, with_edition: false,
+                                lang: :en, lang_single: false,
+                                stage_format_long: nil, with_date: nil)
+      if format == :mr_string
+        nil
+      else
+        Rendering::RenderingContext.new(
+          with_language_code: lang_single ? :single : :none,
+          stage_format_long: stage_format_long || false,
+          with_date: with_date.nil? ? true : with_date,
+        )
+      end
+    end
+
     def compute_hash
-      # Use attributes that define identity
       attrs = [
         publisher,
         number,

@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
 
 module Pubid
   module CenCenelec
     class SingleIdentifier < Lutaml::Model::Serializable
-      include Pubid::Serializable
 
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "EN")
@@ -22,9 +20,6 @@ module Pubid
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        CenCenelec::UrnGenerator.new(self).generate
-      end
 
       def to_s(lang: :en, lang_single: false)
         parts = []
@@ -38,10 +33,12 @@ module Pubid
                        typed_stage.type_code.to_s.upcase # :en => "EN"
                      elsif type.is_a?(Components::Type)
                        type.abbr
-                     elsif self.class.respond_to?(:type)
-                       self.class.type[:short]
                      else
-                       "EN" # Default
+                       begin
+                         self.class.type[:short]
+                       rescue NoMethodError
+                         "EN" # Default
+                       end
                      end
 
         # Track if we should use slash before type
@@ -59,14 +56,14 @@ module Pubid
           # Draft stage prefix (prEN, FprEN) OR regular publisher
           parts << typed_stage.abbr.first
         elsif publisher
-          parts << (publisher.respond_to?(:body) ? publisher.body : publisher.to_s)
+          parts << (publisher.is_a?(Components::Publisher) ? publisher.body : publisher.to_s)
           use_slash_before_type = true # When publisher present, use slash before type
         end
 
         # Copublishers - add to last part (publisher) with slash
         if copublishers&.any?
           copub_str = copublishers.map do |cp|
-            cp.respond_to?(:body) ? cp.body : cp.to_s
+            cp.is_a?(Components::Publisher) ? cp.body : cp.to_s
           end.join("/")
           unless copub_str.empty?
             if parts.any?
@@ -92,9 +89,9 @@ module Pubid
 
         # Number with part (which may be multi-level like "5-1-1")
         if number
-          number_str = number.respond_to?(:value) ? number.value.to_s : number.to_s
+          number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
           if part
-            part_val = part.respond_to?(:value) ? part.value : part
+            part_val = part.is_a?(Components::Code) ? part.value : part
             number_str += "-#{part_val}"
           end
           parts << number_str
@@ -111,7 +108,7 @@ module Pubid
 
         # Date
         if date
-          year_val = date.respond_to?(:year) ? date.year : date.to_i
+          year_val = date.is_a?(Components::Date) ? date.year : date.to_i
           result += ":#{year_val}"
         end
 

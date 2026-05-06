@@ -11,9 +11,6 @@ module Pubid
       # Generate URN for this identifier
       #
       # @return [String] URN representation
-      def to_urn
-        UrnGenerator.new(self).generate
-      end
 
       def to_s(lang: :en, lang_single: false, with_edition: false)
         [].tap do |parts|

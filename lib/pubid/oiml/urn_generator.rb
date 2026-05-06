@@ -2,73 +2,55 @@
 
 module Pubid
   module Oiml
-    # Generates RFC 5141-bis compliant URNs from OIML identifiers
-    #
-    # URN format: urn:oiml:{type}:{number}:{year}:{stage}:{iteration}:{language}
-    # Example: urn:oiml:r:111-1:2004:d1:en for "OIML R 111-1 (2004) D1"
-    class UrnGenerator
-      attr_reader :identifier
+    class UrnGenerator < Pubid::UrnGenerator::Base
+      def urn_type
+        return "r" unless identifier.type
+        identifier.type.to_s.downcase
+      end
 
-      def initialize(identifier)
-        @identifier = identifier
+      def urn_number
+        return nil unless identifier.code
+        identifier.code.to_s
+      end
+
+      def urn_year
+        if identifier.date
+          return identifier.date.year.to_s if identifier.date.year
+        end
+        nil
+      end
+
+      def urn_stage
+        identifier.stage&.to_s&.downcase
+      end
+
+      def urn_iteration
+        identifier.iteration&.to_s
+      end
+
+      def urn_language
+        identifier.language&.to_s&.downcase
       end
 
       def generate
         parts = ["urn", "oiml"]
+        parts << urn_type
+        parts << urn_number if urn_number
+        parts << urn_year if urn_year
+        parts << urn_stage if urn_stage
+        parts << urn_iteration if urn_iteration
+        parts << urn_language if urn_language
 
-        # Type (R, D, etc.)
-        parts << if identifier.respond_to?(:type) && identifier.type
-                   identifier.type.to_s.downcase
-                 else
-                   "r"
-                 end
+        parts[1] = identifier.publisher.to_s.downcase if identifier.publisher
 
-        # Code (may include series and number)
-        if identifier.respond_to?(:code) && identifier.code
-          parts << identifier.code.to_s
-        end
-
-        # Date (year)
-        if identifier.respond_to?(:date) && identifier.date
-          year = identifier.date.respond_to?(:year) ? identifier.date.year : identifier.date.to_i
-          parts << year.to_s
-        elsif identifier.respond_to?(:year) && identifier.year
-          parts << identifier.year.to_s
-        end
-
-        # Draft stage (D, F, CD, CDV, etc.)
-        if identifier.respond_to?(:stage) && identifier.stage
-          parts << identifier.stage.to_s.downcase
-        end
-
-        # Draft iteration
-        if identifier.respond_to?(:iteration) && identifier.iteration
-          parts << identifier.iteration.to_s
-        end
-
-        # Language
-        if identifier.respond_to?(:language) && identifier.language
-          parts << identifier.language.to_s.downcase
-        end
-
-        # Publisher
-        if identifier.respond_to?(:publisher) && identifier.publisher
-          pub = identifier.publisher.to_s.downcase
-          parts[1] = pub
-        end
-
-        # For supplements
         if identifier.is_a?(SupplementIdentifier)
-          # Add supplement type (amd, cor)
-          if identifier.respond_to?(:typed_stage) && identifier.typed_stage
+          if identifier.typed_stage
             supp_type = identifier.typed_stage.type_code.to_s
             parts << supp_type if supp_type
           end
 
-          # Add supplement number
-          if identifier.respond_to?(:number) && identifier.number
-            number = identifier.number.respond_to?(:value) ? identifier.number.value : identifier.number.to_s
-            parts << number
+          if identifier.number
+            parts << identifier.number.to_s
           end
         end
 
