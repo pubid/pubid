@@ -2,7 +2,7 @@
 
 module Pubid
   module CenCenelec
-    class Builder
+    class Builder < Pubid::Builder::Base
       def initialize(scheme)
         @scheme = scheme
       end
@@ -12,7 +12,7 @@ module Pubid
       end
 
       def build(data)
-        data = data.inject({}) { |acc, h| acc.merge(h) } if data.is_a?(Array)
+        data = flatten_array(data) if data.is_a?(Array)
 
         # Store data for access in cast method
         @data = data
@@ -42,27 +42,7 @@ module Pubid
 
         # Determine identifier class using Scheme
         identifier = locate_identifier_klass(data).new
-
-        # Cast and assign each attribute
-        data.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-          next if realized_components.nil?
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |k, v|
-              identifier.send("#{k}=", v)
-            rescue NoMethodError
-              nil
-            end
-          else
-            begin
-              identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
-          end
-        end
+        assign_attributes(identifier, data)
 
         # Wrap with consolidated if supplements present (plus/bundled only)
         if supplements_data.any?
@@ -81,25 +61,7 @@ module Pubid
         base_data.delete(:fragment_number)
 
         base_identifier = locate_identifier_klass(base_data).new
-        base_data.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-          next if realized_components.nil?
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |k, v|
-              base_identifier.send("#{k}=", v)
-            rescue NoMethodError
-              nil
-            end
-          else
-            begin
-              base_identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
-          end
-        end
+        assign_attributes(base_identifier, base_data)
 
         # Build Amendment identifier wrapping the base
         amendment = Identifiers::Amendment.new(
@@ -335,26 +297,7 @@ module Pubid
         base_data = data.dup
         base_data.delete(:supplements)
         base_identifier = locate_identifier_klass(base_data).new
-
-        base_data.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-          next if realized_components.nil?
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |k, v|
-              base_identifier.send("#{k}=", v)
-            rescue NoMethodError
-              nil
-            end
-          else
-            begin
-              base_identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
-          end
-        end
+        assign_attributes(base_identifier, base_data)
 
         # Get the first supplement (slash means only one supplement)
         supp_array = data[:supplements]

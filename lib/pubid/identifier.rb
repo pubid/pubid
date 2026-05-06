@@ -46,6 +46,8 @@ module Pubid
     end
 
     def self.polymorphic_name
+      return nil unless name
+
       parts = name.split("::")
       flavor = parts[1]&.downcase
       type_kebab = parts.last
@@ -153,8 +155,12 @@ module Pubid
     end
 
     def exclude(*args)
+      excluded_args = args.dup
+      # Map :year to :date since identifiers store years inside date
+      excluded_args << :date if excluded_args.delete(:year)
+
       attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
-        h[name] = args.include?(name) ? nil : send(name)
+        h[name] = excluded_args.include?(name) ? nil : send(name)
       end
       self.class.new(attrs)
     end

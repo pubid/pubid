@@ -8,7 +8,7 @@ module Pubid
     # CRITICAL ARCHITECTURE PRINCIPLE:
     # Builder NEVER makes business logic decisions.
     # Builder ONLY casts parsed data to domain objects.
-    class Builder
+    class Builder < Pubid::Builder::Base
       # Translation normalization map (V1 compatibility)
       TRANSLATION_MAP = {
         "es" => "spa",
@@ -30,7 +30,7 @@ module Pubid
       # @return [Identifiers::Base] the constructed identifier object
       def build(parsed)
         # Parslet can return array of hashes - merge them
-        parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
+        parsed_hash = parsed.is_a?(Array) ? flatten_array(parsed) : parsed
 
         # NEW: Fix for update year captured as edition_e
         # Pattern: "800-53r4/Upd3-2015" where parser captures "-2015" as :edition_e
@@ -806,12 +806,6 @@ module Pubid
 
       private
 
-      # Merge an array of parsed hashes into a single hash
-      # @param parsed_array [Array<Hash>] array of parsed hashes
-      # @return [Hash] merged hash
-      def merge_parsed_array(parsed_array)
-        parsed_array.inject({}) { |result, hash| result.merge(hash) }
-      end
 
       # Cast parsed value to appropriate component type
       # ALL conversions happen in this single method
