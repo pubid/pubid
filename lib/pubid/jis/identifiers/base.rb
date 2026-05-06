@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # Base class for all JIS identifiers
       # Provides common attributes and behavior
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Generate URN for this identifier
         #
         # @return [String] URN representation

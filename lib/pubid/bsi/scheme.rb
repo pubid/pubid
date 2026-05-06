@@ -2,7 +2,7 @@
 
 module Pubid
   module Bsi
-    class Scheme
+    class Scheme < Pubid::Scheme
       # TYPED_STAGES_REGISTRY for native BSI types
       TYPED_STAGES_REGISTRY = [
         # British Standard (BS)

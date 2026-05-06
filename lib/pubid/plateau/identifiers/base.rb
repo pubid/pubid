@@ -4,7 +4,7 @@ module Pubid
   module Plateau
     module Identifiers
       # Base class for all PLATEAU identifiers
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Generate URN for this identifier
         #
         # @return [String] URN representation

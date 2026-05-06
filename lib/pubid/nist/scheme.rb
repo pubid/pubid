@@ -4,7 +4,7 @@ module Pubid
   module Nist
     # Scheme class for NIST identifier registry
     # Single Responsibility: Identifier class registry and series-to-class mapping
-    class Scheme
+    class Scheme < Pubid::Scheme
       class << self
         # Aggregate TYPED_STAGES from all identifier classes
         # @return [Array<Components::TypedStage>] all typed stages

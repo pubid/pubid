@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Generate URN for this identifier
         #
         # @return [String] URN representation

@@ -4,7 +4,7 @@ require_relative "model"
 
 module Pubid
   module Itu
-    class Scheme
+    class Scheme < Pubid::Scheme
       # Attribute mappings define how parsed data maps to model attributes
       ATTRIBUTE_MAPPINGS = {
         sector: :sector,

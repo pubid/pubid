@@ -4,7 +4,7 @@ module Pubid
   module Bsi
     module Identifiers
       # Base BSI identifier (module organization)
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
       end
     end
   end

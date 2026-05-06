@@ -4,7 +4,7 @@ module Pubid
   module Ashrae
     module Identifiers
       # Base class for all ASHRAE identifiers
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         attribute :publisher, :string, default: "ASHRAE"
         attribute :code, :string
         attribute :year, :string

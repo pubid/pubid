@@ -10,7 +10,7 @@ module Pubid
   module Itu
     module Identifiers
       # Base class for all ITU identifiers
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Long-form ↔ ITU single-letter language code map. The parser produces
         # single-letter codes (E/F/S/R/A/C); API callers (e.g. metanorma-itu)
         # pass long-form (en/fr/es/ru/ar/zh). Storage is normalized to the

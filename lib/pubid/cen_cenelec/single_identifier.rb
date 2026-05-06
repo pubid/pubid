@@ -2,18 +2,10 @@
 
 module Pubid
   module CenCenelec
-    class SingleIdentifier < Lutaml::Model::Serializable
+    class SingleIdentifier < Pubid::Identifier
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "EN")
       }
-      attribute :copublishers, Components::Publisher, collection: true
-      attribute :number, Components::Code
-      attribute :part, Components::Code
-      attribute :subpart, Components::Code
-      attribute :date, Components::Date
-      attribute :stage, Components::Stage
-      attribute :type, Components::Type
-      attribute :typed_stage, Components::TypedStage
 
       # Generate URN for this identifier
       #

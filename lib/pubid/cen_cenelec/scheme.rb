@@ -2,7 +2,7 @@
 
 module Pubid
   module CenCenelec
-    class Scheme
+    class Scheme < Pubid::Scheme
       # TYPED_STAGES_REGISTRY for native CEN types
       TYPED_STAGES_REGISTRY = [
         # European Norm (EN)

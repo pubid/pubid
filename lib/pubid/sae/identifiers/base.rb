@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # Base SAE Identifier
       # Handles all SAE document types (AMS, AIR, ARP, AS, MA)
-      class Base < Lutaml::Model::Serializable
+      class Base < Pubid::Identifier
         # Generate URN for this identifier
         #
         # @return [String] URN representation

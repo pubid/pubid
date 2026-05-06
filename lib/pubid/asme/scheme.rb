@@ -2,7 +2,7 @@
 
 module Pubid
   module Asme
-    class Scheme
+    class Scheme < Pubid::Scheme
       class << self
         def identifiers
           @identifiers ||= [
