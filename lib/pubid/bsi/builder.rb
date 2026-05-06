@@ -2,7 +2,7 @@
 
 module Pubid
   module Bsi
-    class Builder
+    class Builder < Pubid::Builder::Base
       def initialize(scheme)
         @scheme = scheme
       end
@@ -12,7 +12,7 @@ module Pubid
       end
 
       def build(data)
-        data = data.inject({}) { |acc, h| acc.merge(h) } if data.is_a?(Array)
+        data = flatten_array(data) if data.is_a?(Array)
 
         # Store original data to check if BSI prefix was present
         @original_data = data.dup
@@ -124,27 +124,7 @@ module Pubid
 
         # Determine identifier class using Scheme
         identifier = locate_identifier_klass(data).new
-
-        # Cast and assign each attribute
-        data.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-          next if realized_components.nil?
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |k, v|
-              identifier.send("#{k}=", v)
-            rescue NoMethodError
-              nil
-            end
-          else
-            begin
-              identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
-          end
-        end
+        assign_attributes(identifier, data)
 
         # Wrap with consolidated if supplements present
         if supplements_data.any?

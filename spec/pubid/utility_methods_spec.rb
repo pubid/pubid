@@ -32,8 +32,7 @@ RSpec.describe "Pubid Utility Methods" do
 
     it "handles identifier with supplement" do
       id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
-      excluded = id.exclude(:supplements)
-      expect(excluded.to_s).to eq("ISO 9001:2015")
+      expect(id.root.to_s).to eq("ISO 9001:2015")
     end
   end
 

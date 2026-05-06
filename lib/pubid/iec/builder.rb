@@ -5,26 +5,9 @@ require_relative "../components/date"
 
 module Pubid
   module Iec
-    class Builder
-      LANG_CHAR_MAP = {
-        "R" => "ru",
-        "F" => "fr",
-        "E" => "en",
-        "A" => "ar",
-        "S" => "es",
-        "D" => "de",
-      }.freeze
-
+    class Builder < Pubid::Builder::Base
       def initialize(scheme)
         @scheme = scheme
-        self
-      end
-
-      def locate_typed_stage(typed_stage_string)
-        # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
-        typed_stage_string = "" if typed_stage_string.nil?
-
-        @scheme.locate_typed_stage_by_abbr(typed_stage_string)
       end
 
       def locate_identifier_klass(parsed_hash)
@@ -181,33 +164,7 @@ module Pubid
           parsed_hash[:type_with_stage] = type_with_stage_fr
         end
 
-        parsed_hash.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-
-          next if realized_components.nil?
-
-          if key == :joint_identifier
-            # the realized component is an Identifier class to be added to a Combined Identifier
-            identifier.additional_identifiers ||= []
-            identifier.additional_identifiers << realized_components
-            next
-          end
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value)
-            rescue NoMethodError
-              nil
-            end
-          else
-            begin
-              identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
-          end
-        end
+        assign_attributes(identifier, parsed_hash)
 
         # Detect rendering style from parsed abbreviation
         if identifier.methods.include?(:rendering_style=) && identifier.typed_stage
@@ -272,6 +229,16 @@ module Pubid
         end
 
         identifier
+      end
+
+      def handle_key(identifier, key, value)
+        if key == :joint_identifier
+          identifier.additional_identifiers ||= []
+          identifier.additional_identifiers << value
+          true
+        else
+          false
+        end
       end
 
       # Wrap identifier with FragmentIdentifier for /FRAGN notation
@@ -394,37 +361,10 @@ edition_data = nil, typed_stage = nil)
         )
       end
 
-      # Convert roman numeral to integer
       def convert_roman_to_integer(roman_numeral)
-        return roman_numeral unless roman_numeral.to_s.match?(/^[IVXLCDM]+$/i)
-
-        # Don't convert single X - it's often used as a literal character in part numbers
         return roman_numeral if roman_numeral.to_s.upcase == "X"
 
-        roman_to_int_map = {
-          "I" => 1,
-          "V" => 5,
-          "X" => 10,
-          "L" => 50,
-          "C" => 100,
-          "D" => 500,
-          "M" => 1000,
-        }
-
-        result = 0
-        prev_value = 0
-
-        roman_numeral.to_s.upcase.chars.reverse.each do |char|
-          value = roman_to_int_map[char]
-          if value < prev_value
-            result -= value
-          else
-            result += value
-          end
-          prev_value = value
-        end
-
-        result.to_s
+        super
       end
 
       def cast(type, value)
@@ -509,17 +449,7 @@ edition_data = nil, typed_stage = nil)
           Components::Code.new(value: value.to_s)
 
         when :date
-          value = value.to_s
-          # If there is month, "2005-12"
-          if value.match?(/^\d{4}(-\d{2})?$/)
-            year, month = value.split("-")
-            Pubid::Components::Date.new(year: year, month: month || nil)
-          elsif value.is_a?(Integer) || (value.is_a?(String) && value.match?(/^\d{4}$/))
-            # If it's just a year, "2005"
-            Pubid::Components::Date.new(year: value)
-          else
-            raise ArgumentError, "Invalid date format: #{value.inspect}"
-          end
+          parse_date(value)
 
         when :edition
           Pubid::Components::Edition.new(number: value)
@@ -531,15 +461,7 @@ edition_data = nil, typed_stage = nil)
           value.to_s
 
         when :languages
-          # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
-          value = value.to_s.gsub("/", ",")
-
-          value.split(",").map do |lang|
-            # We need to convert these into 2 char language codes
-            lang = lang.strip
-            lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            Pubid::Components::Language.new(code: lang)
-          end
+          parse_languages(value)
 
         when :all_parts
           Pubid::Components::Locality.new(all_parts: true)

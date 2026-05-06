@@ -54,6 +54,7 @@ module Pubid
   autoload :Scheme, "pubid/scheme"
 
   autoload :UrnGenerator, "pubid/urn_generator/base"
+  autoload :Builder, "pubid/builder/base"
   autoload :Utils, "pubid/utils"
   autoload :Version, "pubid/version"
   autoload :Core, "pubid/core"

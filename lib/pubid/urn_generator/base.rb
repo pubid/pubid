@@ -32,9 +32,10 @@ module Pubid
       end
 
       def urn_publisher
-        return nil unless identifier.publisher
+        pub = maybe(:publisher)
+        return nil unless pub
 
-        identifier.publisher.to_s.downcase
+        pub.to_s.downcase
       end
 
       def urn_type
@@ -42,29 +43,30 @@ module Pubid
       end
 
       def urn_number
-        val = identifier.number
+        val = maybe(:number) || maybe(:code)
         return nil unless val
 
         val.is_a?(Components::Code) ? val.value.to_s : val.to_s
       end
 
       def urn_part
-        val = identifier.part
+        val = maybe(:part)
         return nil unless val
 
         "-#{val.is_a?(Components::Code) ? val.value : val}"
       end
 
       def urn_subpart
-        val = identifier.subpart
+        val = maybe(:subpart)
         return nil unless val
 
         "-#{val.is_a?(Components::Code) ? val.value : val}"
       end
 
       def urn_year
-        if identifier.date
-          year = identifier.date.is_a?(Components::Date) ? identifier.date.year : identifier.date.to_s
+        date = maybe(:date)
+        if date
+          year = date.is_a?(Components::Date) ? date.year : date.to_s
           return year.to_s if year
         end
         if maybe(:year)
@@ -75,9 +77,10 @@ module Pubid
       end
 
       def urn_edition
-        return nil unless identifier.edition
+        ed = maybe(:edition)
+        return nil unless ed
 
-        num = identifier.edition.is_a?(Components::Edition) ? identifier.edition.number : identifier.edition
+        num = ed.is_a?(Components::Edition) ? ed.number : ed
         return nil unless num
 
         "ed.#{num}"

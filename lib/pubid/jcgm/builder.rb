@@ -2,63 +2,28 @@
 
 module Pubid
   module Jcgm
-    class Builder
-      LANG_CHAR_MAP = {
-        "F" => "fr",
-        "E" => "en",
-        "R" => "ru",
-      }.freeze
-
+    class Builder < Pubid::Builder::Base
       def initialize(scheme)
         @scheme = scheme
-        self
-      end
-
-      def locate_typed_stage(typed_stage_string)
-        typed_stage_string = "" if typed_stage_string.nil?
-        @scheme.locate_typed_stage_by_abbr(typed_stage_string)
       end
 
       def locate_identifier_klass(parsed_hash)
-        # If there's a base_identifier, it's an amendment
         if parsed_hash[:base_identifier]
           return @scheme.locate_identifier_klass_by_type_code(:amendment)
         end
 
-        # Check for GUM number to determine if it's a GumGuide
         if parsed_hash[:gum_number]
           return @scheme.locate_identifier_klass_by_type_code(:gum_guide)
         end
 
-        # Otherwise it's a regular Guide
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
         @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
       end
 
       def build(parsed_hash)
         identifier = locate_identifier_klass(parsed_hash).new
+        assign_attributes(identifier, parsed_hash)
 
-        parsed_hash.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-          next if realized_components.nil?
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value)
-            rescue NoMethodError
-              nil
-            end
-          else
-            begin
-              identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
-          end
-        end
-
-        # Set default typed_stage if still nil
         if identifier.methods.include?(:typed_stage) && identifier.typed_stage.nil?
           default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
           identifier.typed_stage = default_typed_stage
@@ -69,27 +34,25 @@ module Pubid
         identifier
       end
 
+      private
+
+      def default_identifier_class
+        Identifiers::Guide
+      end
+
       def cast(type, value)
         case type
         when :base_identifier
-          # Build the base identifier recursively
           build(value)
-
         when :publisher
           Jcgm::Components::Publisher.new(publisher: value.to_s)
-
         when :number
           Pubid::Components::Code.new(value: value.to_s)
-
         when :gum_number
-          # GUM number as Code component
           Pubid::Components::Code.new(value: value.to_s)
-
         when :date
-          # Can be YYYY or YYYY-MM-DD
           date_str = value.to_s
           if date_str.include?("-")
-            # Full date: YYYY-MM-DD
             parts = date_str.split("-")
             Pubid::Components::Date.new(
               year: parts[0],
@@ -97,39 +60,27 @@ module Pubid
               day: parts[2],
             )
           else
-            # Year only
             Pubid::Components::Date.new(year: date_str)
           end
-
         when :iteration
-          # Amendment number
           Pubid::Components::Code.new(value: value.to_s)
-
         when :type_with_stage
-          # For amendments
           typed_stage = locate_typed_stage(value.to_s)
           {
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,
             typed_stage: typed_stage,
           }
-
         when :languages
-          # Can be: "F", "E", "E/F", "F/E"
           original_value = value.to_s
-
-          # Split on "/" if present
           langs = original_value.include?("/") ? original_value.split("/") : [original_value]
-
           langs.map do |lang|
             lang = lang.strip
             original_lang = lang
-            # Convert single-char to 2-char code
             lang = LANG_CHAR_MAP[lang] if lang.length == 1
             Pubid::Components::Language.new(code: lang,
                                             original_code: original_lang)
           end
-
         end
       end
     end

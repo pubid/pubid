@@ -1,28 +1,10 @@
 # frozen_string_literal: true
 
 module Pubid
-  # Identifier that
   module Iso
-    class Builder
-      LANG_CHAR_MAP = {
-        "R" => "ru",
-        "F" => "fr",
-        "E" => "en",
-        "A" => "ar",
-        "S" => "es",
-        "D" => "de",
-      }.freeze
-
+    class Builder < Pubid::Builder::Base
       def initialize(scheme)
         @scheme = scheme
-        self
-      end
-
-      def locate_typed_stage(typed_stage_string)
-        # if IS, then typed_stage_string will be nil (Parslet gives us ""@4 which somehow becomes nil here)
-        typed_stage_string = "" if typed_stage_string.nil?
-
-        @scheme.locate_typed_stage_by_abbr(typed_stage_string)
       end
 
       def locate_identifier_klass(parsed_hash)
@@ -102,27 +84,7 @@ module Pubid
           }
         end
 
-        parsed_hash.each_pair do |key, value|
-          realized_components = cast(key.to_sym, value)
-
-          next if realized_components.nil?
-
-          if key == :joint_identifier
-            # the realized component is an Identifier class to be added to a CombinedIdentifier
-            identifier.additional_identifiers ||= []
-            identifier.additional_identifiers << realized_components
-            next
-          end
-
-          case realized_components
-          when Hash
-            realized_components.each_pair do |sub_key, sub_value|
-              identifier.send("#{sub_key}=", sub_value)
-            end
-          else
-            identifier.send("#{key}=", realized_components)
-          end
-        end
+        assign_attributes(identifier, parsed_hash)
 
         # If typed_stage, stage, or type are still nil after building,
         # set them to the default International Standard values
@@ -136,34 +98,14 @@ module Pubid
         identifier
       end
 
-      # Convert roman numeral to integer
-      def convert_roman_to_integer(roman_numeral)
-        return roman_numeral unless roman_numeral.to_s.match?(/^[IVXLCDM]+$/i)
-
-        roman_to_int_map = {
-          "I" => 1,
-          "V" => 5,
-          "X" => 10,
-          "L" => 50,
-          "C" => 100,
-          "D" => 500,
-          "M" => 1000,
-        }
-
-        result = 0
-        prev_value = 0
-
-        roman_numeral.to_s.upcase.chars.reverse.each do |char|
-          value = roman_to_int_map[char]
-          if value < prev_value
-            result -= value
-          else
-            result += value
-          end
-          prev_value = value
+      def handle_key(identifier, key, value)
+        if key == :joint_identifier
+          identifier.additional_identifiers ||= []
+          identifier.additional_identifiers << value
+          true
+        else
+          false
         end
-
-        result.to_s
       end
 
       def cast(type, value)
@@ -279,17 +221,7 @@ module Pubid
           Pubid::Iso::Components::Code.new(number: value.to_s)
 
         when :date
-          value = value.to_s
-          # If there is month, "2005-12"
-          if value.match?(/^\d{4}(-\d{2})?$/)
-            year, month = value.split("-")
-            Pubid::Components::Date.new(year: year, month: month || nil)
-          elsif value.is_a?(Integer) || (value.is_a?(String) && value.match?(/^\d{4}$/))
-            # If it's just a year, "2005"
-            Pubid::Components::Date.new(year: value)
-          else
-            raise ArgumentError, "Invalid date format: #{value.inspect}"
-          end
+          parse_date(value)
 
         when :edition
           # value can be "Ed.2", "Ed 2", "ED1", "Edition 13", or just "Ed"
@@ -301,18 +233,7 @@ module Pubid
                                          original_text: original_text)
 
         when :languages
-          # Can be: :languages=>"E/F/R" or: :languages=>"en,fr,ru"
-          original_value = value.to_s
-          normalized_value = original_value.gsub("/", ",")
-
-          normalized_value.split(",").map.with_index do |lang, _idx|
-            # We need to convert these into 2 char language codes
-            lang = lang.strip
-            original_lang = lang # Store original format before conversion
-            lang = LANG_CHAR_MAP[lang] if lang.length == 1
-            Pubid::Components::Language.new(code: lang,
-                                            original_code: original_lang)
-          end
+          parse_languages(value)
 
         when :all_parts
           # Set all_parts boolean attribute directly on identifier

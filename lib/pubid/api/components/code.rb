@@ -1,17 +1,9 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
-
 module Pubid
   module Api
     module Components
-      class Code < Lutaml::Model::Serializable
-        attribute :value, :string
-
-        def to_s
-          value
-        end
-      end
+      Code = Pubid::Components::Code
     end
   end
 end
