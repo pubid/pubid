@@ -18,5 +18,4 @@ module Pubid
   end
 end
 
-
 Pubid::Registry.register(:etsi, Pubid::Etsi)

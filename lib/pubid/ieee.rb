@@ -29,5 +29,4 @@ module Pubid
   end
 end
 
-
 Pubid::Registry.register(:ieee, Pubid::Ieee)

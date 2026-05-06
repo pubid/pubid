@@ -260,11 +260,15 @@ RSpec.describe "ISO URN Generation and Parsing" do
     # --- Error handling ---
     context "error handling" do
       it "raises error for invalid URN namespace" do
-        expect { Pubid::Iso.parse_urn("urn:iec:std:iec:60445") }.to raise_error(ArgumentError)
+        expect do
+          Pubid::Iso.parse_urn("urn:iec:std:iec:60445")
+        end.to raise_error(ArgumentError)
       end
 
       it "raises error for missing std prefix" do
-        expect { Pubid::Iso.parse_urn("urn:iso:iso:9001") }.to raise_error(ArgumentError)
+        expect do
+          Pubid::Iso.parse_urn("urn:iso:iso:9001")
+        end.to raise_error(ArgumentError)
       end
     end
   end

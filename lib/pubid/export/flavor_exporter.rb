@@ -30,34 +30,32 @@ module Pubid
       protected
 
       def scheme_module
-        @scheme_module ||= begin
-          # const_get doesn't trigger autoload; reference the constant directly
-          case flavor.to_s
-          when "iso" then Pubid::Iso
-          when "iec" then Pubid::Iec
-          when "ieee" then Pubid::Ieee
-          when "nist" then Pubid::Nist
-          when "bsi" then Pubid::Bsi
-          when "itu" then Pubid::Itu
-          when "cen_cenelec" then Pubid::CenCenelec
-          when "etsi" then Pubid::Etsi
-          when "ansi" then Pubid::Ansi
-          when "astm" then Pubid::Astm
-          when "ashrae" then Pubid::Ashrae
-          when "asme" then Pubid::Asme
-          when "ccsds" then Pubid::Ccsds
-          when "cie" then Pubid::Cie
-          when "csa" then Pubid::Csa
-          when "jis" then Pubid::Jis
-          when "jcgm" then Pubid::Jcgm
-          when "oiml" then Pubid::Oiml
-          when "idf" then Pubid::Idf
-          when "api" then Pubid::Api
-          when "amca" then Pubid::Amca
-          when "plateau" then Pubid::Plateau
-          when "sae" then Pubid::Sae
-          end
-        end
+        # const_get doesn't trigger autoload; reference the constant directly
+        @scheme_module ||= case flavor.to_s
+                           when "iso" then Pubid::Iso
+                           when "iec" then Pubid::Iec
+                           when "ieee" then Pubid::Ieee
+                           when "nist" then Pubid::Nist
+                           when "bsi" then Pubid::Bsi
+                           when "itu" then Pubid::Itu
+                           when "cen_cenelec" then Pubid::CenCenelec
+                           when "etsi" then Pubid::Etsi
+                           when "ansi" then Pubid::Ansi
+                           when "astm" then Pubid::Astm
+                           when "ashrae" then Pubid::Ashrae
+                           when "asme" then Pubid::Asme
+                           when "ccsds" then Pubid::Ccsds
+                           when "cie" then Pubid::Cie
+                           when "csa" then Pubid::Csa
+                           when "jis" then Pubid::Jis
+                           when "jcgm" then Pubid::Jcgm
+                           when "oiml" then Pubid::Oiml
+                           when "idf" then Pubid::Idf
+                           when "api" then Pubid::Api
+                           when "amca" then Pubid::Amca
+                           when "plateau" then Pubid::Plateau
+                           when "sae" then Pubid::Sae
+                           end
       end
 
       def scheme_class
@@ -110,14 +108,16 @@ module Pubid
 
         # Supplement with any typed classes in the Identifiers module
         # that weren't returned by Scheme (e.g., supplements, fragments)
-        additional = discover_additional_typed_classes(scheme_klasses, known_website_keys)
+        additional = discover_additional_typed_classes(scheme_klasses,
+                                                       known_website_keys)
         scheme_klasses + additional
       end
 
       # Classes to skip when discovering additional identifier types
       SKIP_CLASSES = %w[Base].freeze
 
-      def discover_additional_typed_classes(known_classes, known_website_keys = Set.new)
+      def discover_additional_typed_classes(known_classes,
+known_website_keys = Set.new)
         mod = scheme_module
         return [] unless mod
 
@@ -266,7 +266,9 @@ module Pubid
           end
           return {
             key: class_key,
-            title: type_info&.dig(:title) || metadata&.title || class_key.tr("_", " ").capitalize,
+            title: type_info&.dig(:title) || metadata&.title || class_key.tr(
+              "_", " "
+            ).capitalize,
             short: type_info&.dig(:short) || metadata&.short,
             abbr: metadata&.abbr || [],
           }
@@ -291,7 +293,8 @@ module Pubid
         # Derive from class name when def self.type is missing
         unless lib_key
           class_name = klass.name&.split("::")&.last
-          lib_key = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/, "")&.to_sym
+          lib_key = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/,
+                                                                      "")&.to_sym
           title ||= class_name&.gsub(/([A-Z])/, ' \1')&.strip
         end
 
@@ -324,14 +327,14 @@ module Pubid
       end
 
       # Map flavor keys to fixture directory names when they differ
-      FIXTURE_DIR_ALIASES = {
-      }.freeze
+      FIXTURE_DIR_ALIASES = {}.freeze
 
       def fixture_examples
         # __dir__ = lib/pubid/export → go up 3 levels to gem root, then spec/fixtures
         gem_root = File.expand_path("../../..", __dir__)
         dir_name = FIXTURE_DIR_ALIASES[flavor] || flavor.to_s
-        base = File.join(gem_root, "spec", "fixtures", dir_name, "identifiers", "pass")
+        base = File.join(gem_root, "spec", "fixtures", dir_name, "identifiers",
+                         "pass")
         return {} unless Dir.exist?(base)
 
         examples = {}

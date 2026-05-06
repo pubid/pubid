@@ -27,7 +27,7 @@ namespace :export do
 
     # Build a minimal website representation from the generated data itself
     # (in production, this would parse the website's publishers.ts)
-    website_data = {}
+    {}
     summary = data.transform_values do |fd|
       { "doc_types" => fd[:identifier_types].map { |t| { "key" => t[:key] } } }
     end

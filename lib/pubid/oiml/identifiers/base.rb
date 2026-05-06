@@ -30,7 +30,6 @@ module Pubid
 
           result
         end
-
       end
     end
   end

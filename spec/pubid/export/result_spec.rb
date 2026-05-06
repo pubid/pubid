@@ -99,11 +99,11 @@ RSpec.describe Pubid::Export::TypedStageResult do
   describe ".from_typed_stage" do
     let(:typed_stage) do
       instance_double("TypedStage",
-        stage_code: :dis,
-        type_code: :is,
-        abbr: ["DIS", "FPD"],
-        name: "Draft International Standard",
-        harmonized_stages: ["40.00", "40.20", "40.60"])
+                      stage_code: :dis,
+                      type_code: :is,
+                      abbr: ["DIS", "FPD"],
+                      name: "Draft International Standard",
+                      harmonized_stages: ["40.00", "40.20", "40.60"])
     end
 
     it "extracts all attributes from a typed stage object" do
@@ -117,7 +117,7 @@ RSpec.describe Pubid::Export::TypedStageResult do
 
     it "handles typed stage without harmonized_stages" do
       ts = instance_double("TypedStage",
-        stage_code: :dis, type_code: :is, abbr: ["DIS"], name: "Draft")
+                           stage_code: :dis, type_code: :is, abbr: ["DIS"], name: "Draft")
       allow(ts).to receive(:respond_to?).with(:harmonized_stages).and_return(false)
       allow(ts).to receive(:respond_to?).with(:name).and_return(true)
 
@@ -127,7 +127,7 @@ RSpec.describe Pubid::Export::TypedStageResult do
 
     it "handles typed stage without name" do
       ts = instance_double("TypedStage",
-        stage_code: :dis, type_code: :is, abbr: ["DIS"], harmonized_stages: [])
+                           stage_code: :dis, type_code: :is, abbr: ["DIS"], harmonized_stages: [])
       allow(ts).to receive(:respond_to?).with(:name).and_return(false)
       allow(ts).to receive(:respond_to?).with(:harmonized_stages).and_return(true)
 
@@ -140,15 +140,15 @@ RSpec.describe Pubid::Export::TypedStageResult do
     it "produces a complete hash" do
       ts = described_class.new(
         stage_code: "dis", type_code: "is", abbr: ["DIS"],
-        name: "Draft International Standard", harmonized_stages: ["40.00"],
+        name: "Draft International Standard", harmonized_stages: ["40.00"]
       )
       expect(ts.to_h).to eq({
-        stage_code: "dis",
-        type_code: "is",
-        abbr: ["DIS"],
-        name: "Draft International Standard",
-        harmonized_stages: ["40.00"],
-      })
+                              stage_code: "dis",
+                              type_code: "is",
+                              abbr: ["DIS"],
+                              name: "Draft International Standard",
+                              harmonized_stages: ["40.00"],
+                            })
     end
   end
 end

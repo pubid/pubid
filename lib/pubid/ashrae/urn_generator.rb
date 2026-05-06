@@ -5,6 +5,7 @@ module Pubid
     class UrnGenerator < Pubid::UrnGenerator::Base
       def urn_number
         return nil unless identifier.code
+
         identifier.code.to_s
       end
 
@@ -12,6 +13,7 @@ module Pubid
         if identifier.year
           return identifier.year.to_s
         end
+
         nil
       end
 

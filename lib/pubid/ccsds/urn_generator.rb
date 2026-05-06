@@ -46,11 +46,11 @@ module Pubid
 
         edition = maybe(:edition)
         if edition
-          if true
-            e = edition.number || edition.value
-          else
-            e = edition.to_s
-          end
+          e = if true
+                edition.number || edition.value
+              else
+                edition.to_s
+              end
           identifier_parts << "-#{e}" if e && !e.to_s.empty?
         end
 
@@ -69,13 +69,13 @@ module Pubid
 
         language = maybe(:language)
         if language
-          if language&.code
-            lang_code = language.code
-          elsif language.is_a?(String)
-            lang_code = language
-          else
-            lang_code = language.to_s
-          end
+          lang_code = if language&.code
+                        language.code
+                      elsif language.is_a?(String)
+                        language
+                      else
+                        language.to_s
+                      end
           lang_code = lang_code.gsub(/ Translated$/, "").downcase if lang_code
           parts << lang_code if lang_code && !lang_code.empty?
         end

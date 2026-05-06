@@ -20,6 +20,7 @@ module Pubid
       def render(context: nil)
         to_s
       end
+
       def to_s(_context: nil, _include_month: false)
         return year.to_s unless month
 

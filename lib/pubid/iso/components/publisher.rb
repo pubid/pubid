@@ -17,6 +17,7 @@ module Pubid
 
         def render(context: nil)
           return publisher unless copublisher&.any?
+
           publisher + copublisher.map { |cp| "/#{cp}" }.join
         end
 

@@ -22,7 +22,10 @@ module Pubid
         parts << num_port
 
         parts << " #{render_edition_portion(context)}" if with_edition && @id.edition&.number
-        parts << render_language_portion(context, with_edition: with_edition) if @id.languages&.any?
+        if @id.languages&.any?
+          parts << render_language_portion(context,
+                                           with_edition: with_edition)
+        end
         parts.compact.join
       end
     end

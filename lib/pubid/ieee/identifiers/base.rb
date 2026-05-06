@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Ieee
     module Components
@@ -10,7 +9,6 @@ module Pubid
     module Identifiers
       # Base class for all IEEE identifiers
       class Base < Lutaml::Model::Serializable
-
         # Generate URN for this identifier
         #
         # @return [String] URN representation
@@ -564,7 +562,7 @@ module Pubid
 
           # Reaffirmed as first parenthetical if present (and not in attributes hash)
           reaff = begin
-            self.reaffirmed
+            reaffirmed
           rescue NoMethodError
             nil
           end

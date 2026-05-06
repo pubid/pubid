@@ -3,7 +3,6 @@
 module Pubid
   module Jcgm
     class SingleIdentifier < Identifier
-
       attribute :publisher, Jcgm::Components::Publisher
       attribute :typed_stage, Pubid::Components::TypedStage
       attribute :number, Pubid::Components::Code

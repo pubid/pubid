@@ -30,14 +30,17 @@ module Pubid
           if kwargs[:series].to_s == "OB"
             create_special_publication(**kwargs)
           else
-            raise ArgumentError, "Identifier.create without :type requires series: 'OB'"
+            raise ArgumentError,
+                  "Identifier.create without :type requires series: 'OB'"
           end
         else
-          raise ArgumentError, "Unsupported type for Identifier.create: #{type.inspect}"
+          raise ArgumentError,
+                "Unsupported type for Identifier.create: #{type.inspect}"
         end
       end
 
-      def self.create_special_publication(number:, series: "OB", date: nil, language: nil)
+      def self.create_special_publication(number:, series: "OB", date: nil,
+language: nil)
         Identifiers::SpecialPublication.new(
           series: Components::Series.new(series: series.to_s),
           code: Components::Code.new(number: number.to_s),

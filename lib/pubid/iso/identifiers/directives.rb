@@ -27,7 +27,8 @@ module Pubid
 
         def to_s(**opts)
           context = build_rendering_context(nil, format: :human, **opts)
-          Pubid::Renderers::DirectivesRenderer.new(self).render(context:, **opts.slice(:with_edition))
+          Pubid::Renderers::DirectivesRenderer.new(self).render(context:,
+                                                                **opts.slice(:with_edition))
         end
 
         # Directives use a different URN scheme: urn:iso:doc instead of urn:iso:std

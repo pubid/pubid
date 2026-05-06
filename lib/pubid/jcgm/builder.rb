@@ -45,11 +45,9 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              begin
-                identifier.send("#{sub_key}=", sub_value)
-              rescue NoMethodError
-                nil
-              end
+              identifier.send("#{sub_key}=", sub_value)
+            rescue NoMethodError
+              nil
             end
           else
             begin

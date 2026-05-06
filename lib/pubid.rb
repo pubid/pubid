@@ -114,14 +114,18 @@ module Pubid
       # e.g., "urn:iso:std:..." → Pubid::Iso
       flavor = detect_flavor_from_urn(string)
       flavor_module = Registry.get(flavor)
-      raise ArgumentError, "Unknown flavor in URN: #{flavor}" unless flavor_module
+      unless flavor_module
+        raise ArgumentError,
+              "Unknown flavor in URN: #{flavor}"
+      end
 
       urn_parser = flavor_module.const_get(:UrnParser)
       urn_parser.parse(string)
     else
       # Default to MR string parser for MR format, human-readable otherwise
       # The MR string parser converts to human-readable and delegates to flavor.parse
-      raise ArgumentError, "No flavor specified. Use Pubid::Iso.parse() or another flavor-specific parse method."
+      raise ArgumentError,
+            "No flavor specified. Use Pubid::Iso.parse() or another flavor-specific parse method."
     end
   end
 

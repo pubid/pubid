@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Jis
     module Identifiers
       # Base class for all JIS identifiers
       # Provides common attributes and behavior
       class Base < Lutaml::Model::Serializable
-
         # Generate URN for this identifier
         #
         # @return [String] URN representation

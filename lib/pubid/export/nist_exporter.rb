@@ -18,6 +18,7 @@ module Pubid
           info = extract_type_info(klass)
           type_key = info[:key]
           next if seen_keys.include?(type_key)
+
           seen_keys << type_key
 
           examples = match_nist_examples(fixture_data, type_key, klass)
@@ -48,8 +49,8 @@ module Pubid
         # NIST fixtures use series codes like "nist_sp", "nist_ir", etc.
         key_str = type_key.to_s
         examples = fixture_data["nist_#{key_str}"] ||
-                   fixture_data[key_str.to_s] ||
-                   []
+          fixture_data[key_str.to_s] ||
+          []
 
         return examples if examples.any?
 

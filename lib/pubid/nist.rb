@@ -33,5 +33,4 @@ module Pubid
   end
 end
 
-
 Pubid::Registry.register(:nist, Pubid::Nist)

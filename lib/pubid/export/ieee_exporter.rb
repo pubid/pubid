@@ -17,6 +17,7 @@ module Pubid
         identifier_types = klasses.filter_map do |klass|
           info = extract_type_info(klass)
           next if seen_keys.include?(info[:key])
+
           seen_keys << info[:key]
 
           type_key = info[:key]
@@ -56,6 +57,7 @@ module Pubid
             collect_classes(const, skip, result)
           elsif const.is_a?(Class)
             next if skip.include?(const.name&.split("::")&.last)
+
             result << const
           end
         end

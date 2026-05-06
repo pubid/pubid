@@ -42,7 +42,7 @@ module Pubid
     def initialize(attrs = {}, options = {})
       attrs = attrs.dup
       attrs[:_type] ||= self.class.polymorphic_name
-      super(attrs, options)
+      super
     end
 
     def self.polymorphic_name
@@ -99,8 +99,10 @@ module Pubid
 
     def mr_type
       return nil unless typed_stage
+
       code = typed_stage.type_code
       return nil if code.nil? || code.empty? || code == "is"
+
       code
     end
 
@@ -158,9 +160,18 @@ module Pubid
     end
 
     def new_edition_of?(other)
-      raise ArgumentError, "Cannot compare edition: different publisher" unless publisher == other.publisher
-      raise ArgumentError, "Cannot compare edition: different number" unless number == other.number
-      raise ArgumentError, "Cannot compare edition: different part" unless part == other.part
+      unless publisher == other.publisher
+        raise ArgumentError,
+              "Cannot compare edition: different publisher"
+      end
+      unless number == other.number
+        raise ArgumentError,
+              "Cannot compare edition: different number"
+      end
+      unless part == other.part
+        raise ArgumentError,
+              "Cannot compare edition: different part"
+      end
 
       unless date && other.date
         raise ArgumentError,
@@ -197,7 +208,7 @@ module Pubid
         Rendering::RenderingContext.new(
           with_language_code: lang_single ? :single : :none,
           stage_format_long: stage_format_long || false,
-          with_date: with_date.nil? ? true : with_date,
+          with_date: with_date.nil? || with_date,
         )
       end
     end

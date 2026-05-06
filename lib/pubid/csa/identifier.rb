@@ -410,7 +410,7 @@ module Pubid
         end
 
         # Set on combined identifier parts
-        if obj.methods.include?(:first) && obj.first && obj.first.methods.include?(:publisher_prefix=)
+        if obj.methods.include?(:first) && obj.first&.methods&.include?(:publisher_prefix=)
           obj.first.publisher_prefix = prefix
         end
         if obj.methods.include?(:second) && obj.second.methods.include?(:has_publisher) && obj.second.has_publisher && obj.second.methods.include?(:publisher_prefix=)

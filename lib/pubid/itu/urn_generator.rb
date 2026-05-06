@@ -38,7 +38,7 @@ module Pubid
 
         if identifier.date
           date = identifier.date
-          if date&.year && date&.month
+          if date&.year && date.month
             parts << "#{date.month}/#{date.year}"
           elsif date&.year
             parts << date.year.to_s
@@ -91,7 +91,7 @@ module Pubid
 
         if identifier.date
           date = identifier.date
-          if date&.year && date&.month
+          if date&.year && date.month
             parts << "#{date.month}/#{date.year}"
           elsif date&.year
             parts << date.year.to_s

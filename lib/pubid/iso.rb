@@ -47,6 +47,4 @@ module Pubid
   end
 end
 
-
-
 Pubid::Registry.register(:iso, Pubid::Iso)

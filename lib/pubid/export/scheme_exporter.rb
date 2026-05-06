@@ -14,7 +14,7 @@ module Pubid
 
         fixture_data = fixture_examples
 
-        identifier_types = klasses.map do |klass|
+        identifier_types = klasses.filter_map do |klass|
           info = extract_type_info(klass)
           stages = extract_typed_stages(klass)
           type_key = info[:key]&.to_s
@@ -30,7 +30,7 @@ module Pubid
             typed_stages: stages,
             examples: examples,
           )
-        end.compact
+        end
 
         all_attrs = klasses.first ? extract_attributes(klasses.first) : []
         wrapper_types = extract_wrapper_types
@@ -50,8 +50,9 @@ module Pubid
 
         # Try direct type key match first
         examples = fixture_data[map_fixture_key_to_type_key(type_key)] ||
-                   fixture_data[map_fixture_key_to_type_key(type_key.gsub(/_/, ""))] ||
-                   []
+          fixture_data[map_fixture_key_to_type_key(type_key.gsub("_",
+                                                                 ""))] ||
+          []
 
         return examples if examples.any?
 

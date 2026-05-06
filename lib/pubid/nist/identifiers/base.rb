@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Nist
     module Identifiers
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
       class Base < Lutaml::Model::Serializable
-
         # Generate URN for this identifier
         #
         # @return [String] URN representation
@@ -65,11 +63,9 @@ module Pubid
 
           # Set all provided attributes
           attributes.each do |key, value|
-            begin
-              send("#{key}=", value) unless value.nil?
-            rescue NoMethodError
-              nil
-            end
+            send("#{key}=", value) unless value.nil?
+          rescue NoMethodError
+            nil
           end
 
           # NOTE: Compound number building is handled by the Builder class
@@ -179,7 +175,7 @@ module Pubid
                              false
                            end
 
-            if should_merge && methods.include?("#{var_name}=".to_sym)
+            if should_merge && methods.include?(:"#{var_name}=")
               send("#{var_name}=",
                    new_val)
             end

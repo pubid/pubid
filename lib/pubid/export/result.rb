@@ -7,12 +7,15 @@ module Pubid
     class IdentifierTypeResult
       attr_reader :key, :title, :short, :abbr, :typed_stages, :examples
 
-      def initialize(key:, title:, short: nil, abbr: [], typed_stages: [], examples: [])
+      def initialize(key:, title:, short: nil, abbr: [], typed_stages: [],
+examples: [])
         @key = key.to_s
         @title = title
         @short = short
         @abbr = Array(abbr).map(&:to_s)
-        @typed_stages = typed_stages.map { |ts| TypedStageResult.from_typed_stage(ts) }
+        @typed_stages = typed_stages.map do |ts|
+          TypedStageResult.from_typed_stage(ts)
+        end
         @examples = examples
         freeze
       end
@@ -68,7 +71,8 @@ module Pubid
     class FlavorResult
       attr_reader :flavor, :identifier_types, :wrapper_types, :attributes
 
-      def initialize(flavor:, identifier_types:, wrapper_types: [], attributes: [])
+      def initialize(flavor:, identifier_types:, wrapper_types: [],
+attributes: [])
         @flavor = flavor.to_s
         @identifier_types = identifier_types
         @wrapper_types = wrapper_types
@@ -81,7 +85,10 @@ module Pubid
           identifier_types: @identifier_types.map(&:to_h),
           attributes: @attributes,
         }
-        h[:wrapper_types] = @wrapper_types.map(&:to_h) unless @wrapper_types.empty?
+        unless @wrapper_types.empty?
+          h[:wrapper_types] =
+            @wrapper_types.map(&:to_h)
+        end
         h
       end
       alias to_hash to_h

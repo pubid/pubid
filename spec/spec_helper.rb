@@ -28,5 +28,4 @@ RSpec.configure do |config|
     puts "=" * 60
     puts "Test suite completed"
   end
-
 end

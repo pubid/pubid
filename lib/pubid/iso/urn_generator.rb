@@ -290,18 +290,16 @@ module Pubid
         # This handles typed stages where stage_code differs from the full typed stage code
         combined_key = nil
         if identifier.typed_stage.type_code &&
-           identifier.typed_stage.type_code != "is" &&
-           identifier.typed_stage.type_code.to_s != ""
-          combined_key = "#{stage_code}#{identifier.typed_stage.type_code}".to_sym
+            identifier.typed_stage.type_code != "is" &&
+            identifier.typed_stage.type_code.to_s != ""
+          combined_key = :"#{stage_code}#{identifier.typed_stage.type_code}"
         end
 
-        if combined_key && TYPED_STAGE_MAP.key?(combined_key)
-          stage_abbr = TYPED_STAGE_MAP[combined_key]
-        elsif TYPED_STAGE_MAP.key?(stage_code.to_sym)
-          stage_abbr = TYPED_STAGE_MAP[stage_code.to_sym]
-        else
-          stage_abbr = nil
-        end
+        stage_abbr = if combined_key && TYPED_STAGE_MAP.key?(combined_key)
+                       TYPED_STAGE_MAP[combined_key]
+                     elsif TYPED_STAGE_MAP.key?(stage_code.to_sym)
+                       TYPED_STAGE_MAP[stage_code.to_sym]
+                     end
 
         if stage_abbr
 

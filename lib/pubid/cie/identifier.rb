@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Cie
     # Base Identifier class for CIE

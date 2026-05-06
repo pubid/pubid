@@ -67,7 +67,8 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
     end
 
     it "normalizes long-form language to single-letter on .create" do
-      identifier = Pubid::Itu::Identifier.create(series: "OB", number: 1000, language: :fr)
+      identifier = Pubid::Itu::Identifier.create(series: "OB", number: 1000,
+                                                 language: :fr)
       expect(identifier.language).to eq("F")
       expect(identifier.to_s).to eq("ITU OB No. 1000-F")
     end

@@ -27,13 +27,15 @@ module Pubid
 
         def render_base(**opts)
           lang = opts[:i18n_lang]&.to_s
-          long_template = lang && Pubid::Itu::I18N["annex_long"]&.fetch(lang, nil)
+          long_template = lang && Pubid::Itu::I18N["annex_long"]&.fetch(lang,
+                                                                        nil)
 
           if opts[:format] == :long && long_template
             return long_template % { number: base_number }
           end
 
-          annex_translation = lang && Pubid::Itu::I18N["annex_to"]&.fetch(lang, nil)
+          annex_translation = lang && Pubid::Itu::I18N["annex_to"]&.fetch(lang,
+                                                                          nil)
 
           if annex_translation
             base_str = base_render(**opts)

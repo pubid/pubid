@@ -6,7 +6,6 @@ module Pubid
       # Base identifier class for ACMA identifiers
       # Single Responsibility: Common functionality for all ACMA identifier types
       class Base < Lutaml::Model::Serializable
-
         # Override base_hash to handle AMCA-specific copublisher format (string, not array)
         def base_hash
           hash = super
@@ -32,7 +31,7 @@ module Pubid
           parts << copublisher if copublisher
           # type is a hash, get the title
           t = begin
-            self.type
+            type
           rescue NoMethodError
             nil
           end

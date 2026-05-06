@@ -15,6 +15,7 @@ module Pubid
 
       def urn_type_for_base
         return "en" unless identifier.type
+
         identifier.type.to_s.downcase
       end
 
@@ -28,6 +29,7 @@ module Pubid
 
       def urn_date
         return nil unless identifier.date
+
         date = identifier.date
         if date.month
           "#{date.year}-#{format('%02d', date.month)}"

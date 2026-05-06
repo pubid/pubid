@@ -28,7 +28,7 @@ module Pubid
         end
 
         scheme = scheme_class
-        attrs = scheme&.methods.include?(:attributes) ? scheme.attributes.keys.map(&:to_s) : []
+        attrs = scheme&.methods&.include?(:attributes) ? scheme.attributes.keys.map(&:to_s) : []
 
         FlavorResult.new(
           flavor: flavor,
@@ -50,6 +50,7 @@ module Pubid
           klass = begin; idents_mod.const_get(c); rescue NameError; next; end
           next unless klass.is_a?(Class)
           next if skip.include?(klass.name&.split("::")&.last)
+
           klass
         end
       end

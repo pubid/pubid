@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module Sae
     module Identifiers
       # Base SAE Identifier
       # Handles all SAE document types (AMS, AIR, ARP, AS, MA)
       class Base < Lutaml::Model::Serializable
-
         # Generate URN for this identifier
         #
         # @return [String] URN representation

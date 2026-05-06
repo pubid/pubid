@@ -112,9 +112,9 @@ module Pubid
         # Parse language if present (2-letter codes like "en" or comma-separated)
         languages = nil
         if parts.first && !parts.first.match(/^\d+$/) &&
-           !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-|ed-)/i) &&
-           !TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase) &&
-           !parts.first.match?(/^[A-Z]+\.\d+$/i)
+            !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-|ed-)/i) &&
+            !TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase) &&
+            !parts.first.match?(/^[A-Z]+\.\d+$/i)
           languages = parse_languages(parts.shift)
         end
 
@@ -131,8 +131,8 @@ module Pubid
           harmonized_stage_code = stage_str.sub("stage-", "").sub(/\.v\d+$/i,
                                                                   "")
         elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase) ||
-              (parts.first && parts.first.match?(/^[A-Za-z]+\.\d+$/) &&
-               TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase.split(".").first))
+            (parts.first&.match?(/^[A-Za-z]+\.\d+$/) &&
+             TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase.split(".").first))
           stage_abbr = parts.shift.upcase
           # Check for iteration (WD.2 format)
           if stage_abbr.include?(".")
@@ -229,7 +229,9 @@ module Pubid
 
         # Prefer non-published stages (stage_code != "published")
         # This ensures PRF is preferred over published IS for 60.00
-        non_published = candidates.reject { |ts| ts.stage_code.to_s == "published" }
+        non_published = candidates.reject do |ts|
+          ts.stage_code.to_s == "published"
+        end
         candidates = non_published unless non_published.empty?
 
         # Among remaining candidates, prefer the stage with MORE harmonized codes (more general)
@@ -301,7 +303,6 @@ module Pubid
       # Build identifier from parsed components
       def build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
                          harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements)
-
         # Start with base document hash
         base_hash = {
           publisher: publishers.first,

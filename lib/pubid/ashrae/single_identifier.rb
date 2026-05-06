@@ -5,7 +5,6 @@ module Pubid
     # Base class for single (non-supplement) ASHRAE identifiers
     # Includes: Guideline, Standard
     class SingleIdentifier < Identifiers::Base
-
       def to_s
         parts = []
         parts << publisher if publisher

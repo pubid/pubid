@@ -395,7 +395,7 @@ module Pubid
         DASH_CHARS.map { |char| str(char) }.reduce(:|)
       end
 
-      IEV_SHORTHAND = /\AIEV(?=\z|[\s\-])/.freeze
+      IEV_SHORTHAND = /\AIEV(?=\z|[\s-])/
 
       # Preprocess input to normalize tab-separated editions and other formats
       def parse(input)

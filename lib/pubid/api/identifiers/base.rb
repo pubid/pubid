@@ -12,7 +12,10 @@ module Pubid
         # Include type_string in serialization for round-trip compatibility
         def base_hash
           hash = super
-          hash[:type] = type_string if methods.include?(:type_string) && type_string
+          if methods.include?(:type_string) && type_string
+            hash[:type] =
+              type_string
+          end
           hash
         end
       end

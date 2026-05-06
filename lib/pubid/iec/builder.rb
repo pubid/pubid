@@ -159,11 +159,9 @@ module Pubid
           # Set number via cast
           number_components = cast(:number_with_part, cispr_number)
           number_components.each_pair do |k, v|
-            begin
-              cispr_id.send("#{k}=", v)
-            rescue NoMethodError
-              nil
-            end
+            cispr_id.send("#{k}=", v)
+          rescue NoMethodError
+            nil
           end
           parsed_hash[:cispr_identifier] = cispr_id
         end
@@ -198,11 +196,9 @@ module Pubid
           case realized_components
           when Hash
             realized_components.each_pair do |sub_key, sub_value|
-              begin
-                identifier.send("#{sub_key}=", sub_value)
-              rescue NoMethodError
-                nil
-              end
+              identifier.send("#{sub_key}=", sub_value)
+            rescue NoMethodError
+              nil
             end
           else
             begin

@@ -156,7 +156,9 @@ RSpec.describe "IEC URN Generation and Parsing" do
       end
 
       it "raises error for invalid URN namespace" do
-        expect { Pubid::Iec.parse_urn("urn:iso:std:iso:9001") }.to raise_error(StandardError)
+        expect do
+          Pubid::Iec.parse_urn("urn:iso:std:iso:9001")
+        end.to raise_error(StandardError)
       end
     end
   end

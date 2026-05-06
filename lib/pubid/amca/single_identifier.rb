@@ -5,13 +5,12 @@ module Pubid
     # Base class for single (non-supplement) ACMA identifiers
     # Includes: Standard, Publication
     class SingleIdentifier < Identifiers::Base
-
       def to_s
         parts = []
         parts << copublisher if copublisher
         # type is a hash, get the title
         t = begin
-          self.type
+          type
         rescue NoMethodError
           nil
         end

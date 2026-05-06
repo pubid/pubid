@@ -29,10 +29,12 @@ RSpec.describe "IHO Fixture Round-trip Tests" do
             if rendered == id_str
               successes += 1
             else
-              failures << { original: id_str, rendered: rendered, type: "mismatch" }
+              failures << { original: id_str, rendered: rendered,
+                            type: "mismatch" }
             end
           rescue StandardError => e
-            failures << { original: id_str, error: "#{e.class}: #{e.message}", type: "parse_error" }
+            failures << { original: id_str, error: "#{e.class}: #{e.message}",
+                          type: "parse_error" }
           end
 
           if failures.any?

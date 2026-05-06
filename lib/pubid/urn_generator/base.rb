@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Pubid
   module UrnGenerator
     # Base class for all flavor-specific URN generators.
@@ -32,6 +33,7 @@ module Pubid
 
       def urn_publisher
         return nil unless identifier.publisher
+
         identifier.publisher.to_s.downcase
       end
 
@@ -42,18 +44,21 @@ module Pubid
       def urn_number
         val = identifier.number
         return nil unless val
+
         val.is_a?(Components::Code) ? val.value.to_s : val.to_s
       end
 
       def urn_part
         val = identifier.part
         return nil unless val
+
         "-#{val.is_a?(Components::Code) ? val.value : val}"
       end
 
       def urn_subpart
         val = identifier.subpart
         return nil unless val
+
         "-#{val.is_a?(Components::Code) ? val.value : val}"
       end
 
@@ -65,19 +70,23 @@ module Pubid
         if maybe(:year)
           return identifier.year.to_s
         end
+
         nil
       end
 
       def urn_edition
         return nil unless identifier.edition
+
         num = identifier.edition.is_a?(Components::Edition) ? identifier.edition.number : identifier.edition
         return nil unless num
+
         "ed.#{num}"
       end
 
       def urn_language
         langs = maybe(:languages)
         return nil unless langs&.any?
+
         langs.map(&:code).join(",")
       end
 

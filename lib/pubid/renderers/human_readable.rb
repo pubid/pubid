@@ -46,9 +46,12 @@ module Pubid
 
       def render_language_portion(context, with_edition: false)
         return "" unless @id.languages&.any? && context.with_language_code != :none
+
         use_single = with_edition ? false : context.with_language_code == :single
-        rendered = @id.languages.map { |l| l.render(context:, lang_single: use_single) }
-        "(#{rendered.join(use_single ? "/" : ",")})"
+        rendered = @id.languages.map do |l|
+          l.render(context:, lang_single: use_single)
+        end
+        "(#{rendered.join(use_single ? '/' : ',')})"
       end
     end
   end

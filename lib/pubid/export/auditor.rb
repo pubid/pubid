@@ -33,6 +33,7 @@ module Pubid
         # Also check for website flavors not in generated data
         website_publishers.each_key do |flavor|
           next if results.key?(flavor)
+
           results[flavor] = { missing_from_library: true }
         end
 
@@ -46,13 +47,18 @@ module Pubid
 
         audit_results.each do |flavor, result|
           next if result.empty?
+
           missing = result[:missing_types] || []
           extra = result[:extra_types] || []
 
           if !missing.empty? || !extra.empty?
             lines << "#{flavor}:"
-            lines.concat(missing.map { |t| "  MISSING from website: #{t[:key]} (#{t[:title]})" })
-            lines.concat(extra.map { |t| "  EXTRA in website (not in library): #{t}" })
+            lines.concat(missing.map do |t|
+              "  MISSING from website: #{t[:key]} (#{t[:title]})"
+            end)
+            lines.concat(extra.map do |t|
+              "  EXTRA in website (not in library): #{t}"
+            end)
             total_missing += missing.size
             total_extra += extra.size
           end
@@ -64,14 +70,16 @@ module Pubid
 
       private
 
-      def audit_flavor(flavor, gen_data, website_data)
+      def audit_flavor(_flavor, gen_data, website_data)
         result = {}
         return result unless website_data
 
         gen_keys = (gen_data["identifier_types"] || []).map { |t| t["key"] }
         web_keys = (website_data["doc_types"] || []).map { |t| t["key"] }
 
-        result[:missing_types] = gen_data["identifier_types"].reject { |t| web_keys.include?(t["key"]) }
+        result[:missing_types] = gen_data["identifier_types"].reject do |t|
+          web_keys.include?(t["key"])
+        end
         result[:extra_types] = web_keys.reject { |k| gen_keys.include?(k) }
 
         result

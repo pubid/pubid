@@ -5,7 +5,8 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       # Override base types with ISO-specific ones
       attribute :publisher, ::Pubid::Iso::Components::Publisher
-      attribute :copublishers, ::Pubid::Iso::Components::Publisher, collection: true
+      attribute :copublishers, ::Pubid::Iso::Components::Publisher,
+                collection: true
       attribute :number, ::Pubid::Iso::Components::Code
       attribute :part, ::Pubid::Iso::Components::Code
       attribute :subpart, ::Pubid::Iso::Components::Code
@@ -36,8 +37,8 @@ module Pubid
 
       # Build type map from Scheme.identifiers for validation
       def self.build_type_map
-        Scheme.identifiers.each_with_object({}) do |klass, map|
-          map[klass.polymorphic_name] = klass.name
+        Scheme.identifiers.to_h do |klass|
+          [klass.polymorphic_name, klass.name]
         end
       end
 
