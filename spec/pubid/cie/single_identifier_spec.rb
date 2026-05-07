@@ -7,7 +7,7 @@ RSpec.describe Pubid::Cie::SingleIdentifier do
   describe "inheritance" do
     it "inherits from Identifier" do
       std = Pubid::Cie::Identifiers::Standard.new(code: "1")
-      expect(std).to be_a(Pubid::Cie::SingleIdentifier)
+      expect(std).to be_a(described_class)
       expect(std).to be_a(Pubid::Cie::Identifier)
     end
   end

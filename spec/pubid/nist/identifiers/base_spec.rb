@@ -6,7 +6,7 @@ RSpec.describe Pubid::Nist::Identifiers::Base do
     context "basic NIST identifiers" do
       it "parses NIST SP identifiers" do
         id = Pubid::Nist.parse("NIST SP 800-53")
-        expect(id).to be_a(Pubid::Nist::Identifiers::Base)
+        expect(id).to be_a(described_class)
         expect(id.to_s).to eq("NIST SP 800-53")
       end
 

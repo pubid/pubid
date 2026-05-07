@@ -172,7 +172,7 @@ class FixturesMigrator
   end
 
   def log(message)
-    puts message if @verbose
+     if @verbose
   end
 end
 
@@ -181,10 +181,10 @@ if __FILE__ == $PROGRAM_NAME
   flavor = ARGV[0]&.downcase
 
   if flavor.nil?
-    puts "Usage: ruby migrate_to_new_structure.rb <flavor>"
-    puts "Example: ruby migrate_to_new_structure.rb idf"
-    puts ""
-    puts "Valid flavors: #{FixturesMigrator::FLAVORS.join(', ')}"
+    
+    
+    
+    
     exit 1
   end
 

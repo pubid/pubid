@@ -1,6 +1,7 @@
 RSpec.describe Pubid::Ieee::Identifier do
   describe "creating new identifier" do
     subject { described_class.create(number: number, **params) }
+
     let(:number) { 123 }
     let(:params) { {} }
 
@@ -18,6 +19,7 @@ RSpec.describe Pubid::Ieee::Identifier do
 
     context "ISO identifier" do
       subject { described_class.create(**params) }
+
       let(:params) do
         { iso_identifier:
             [{ publisher: "IEC" },

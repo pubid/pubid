@@ -27,6 +27,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # ISO/R 125:1966
     describe "ISO/R 125:1966" do
       subject { "ISO/R 125:1966" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:125" }
 
@@ -73,6 +74,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # ISO/R 4
     describe "ISO/R 4" do
       subject { "ISO/R 4" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:4" }
 
@@ -119,6 +121,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
   context "parse legacy format with date" do
     describe "ISO/R 170-1960" do
       subject { "ISO/R 170-1960" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:170" }
 
@@ -161,6 +164,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # ISO/R 93-3:1969
     describe "ISO/R 93-3:1969" do
       subject { "ISO/R 93-3:1969" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:93:-3" }
 
@@ -208,6 +212,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # Test legacy format ISO/R 93/1-1963 normalizes to ISO/R 93-1:1963
     describe "ISO/R 93/1-1963" do
       subject { "ISO/R 93/1-1963" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/R 93-1:1963" }
       let(:urn) { "urn:iso:std:iso:r:93:-1" }
@@ -249,6 +254,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # Test roman numeral parts ISO/R 300/III-1968 normalizes to ISO/R 300-3:1968
     describe "ISO/R 300/III-1968" do
       subject { "ISO/R 300/III-1968" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/R 300-3:1968" }
       let(:urn) { "urn:iso:std:iso:r:300:-3" }
@@ -290,6 +296,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # update_codes normalizes ISO/R 657/IV to ISO/R 657-4:1969 (with date from update_codes.yaml)
     describe "ISO/R 657/IV" do
       subject { "ISO/R 657/IV" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/R 657-4:1969" }
       let(:urn) { "urn:iso:std:iso:r:657:-4" }
@@ -334,6 +341,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # ISO/R 105-1:1959
     describe "ISO/R 105-1:1959" do
       subject { "ISO/R 105-1:1959" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:105:-1" }
 
@@ -374,6 +382,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
     # ISO/R 355-8:1973
     describe "ISO/R 355-8:1973" do
       subject { "ISO/R 355-8:1973" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:r:355:-8" }
 

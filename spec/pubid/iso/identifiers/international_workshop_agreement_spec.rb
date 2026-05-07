@@ -29,6 +29,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 1:2001
     describe "IWA 1:2001" do
       subject { "IWA 1:2001" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:1" }
 
@@ -68,6 +69,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 32:2019(en)
     describe "IWA 32:2019(en)" do
       subject { "IWA 32:2019(en)" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:32:en" }
 
@@ -98,6 +100,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 8
     describe "IWA 8" do
       subject { "IWA 8" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:8" }
 
@@ -132,6 +135,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     # IWA 14-1:2013
     describe "IWA 14-1:2013" do
       subject { "IWA 14-1:2013" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:14:-1" }
 
@@ -167,6 +171,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # NP IWA 21
       describe "NP IWA 21" do
         subject { "NP IWA 21" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:21:stage-10.00" }
 
@@ -196,6 +201,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # AWI IWA 39
       describe "AWI IWA 39" do
         subject { "AWI IWA 39" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:39:stage-10.99" }
 
@@ -223,6 +229,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # WD IWA 19
       describe "WD IWA 19" do
         subject { "WD IWA 19" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:19:WD" }
 
@@ -250,6 +257,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # WD IWA 48(en)
       describe "WD IWA 48(en)" do
         subject { "WD IWA 48(en)" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:48:WD:en" }
 
@@ -279,6 +287,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # CD IWA 37
       describe "CD IWA 37" do
         subject { "CD IWA 37" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:37:CD" }
 
@@ -306,6 +315,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # CD IWA 37-1
       describe "CD IWA 37-1" do
         subject { "CD IWA 37-1" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:37:-1:CD" }
 
@@ -339,6 +349,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       # PRF IWA 36
       describe "PRF IWA 36" do
         subject { "PRF IWA 36" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:iwa:36:stage-50.00" }
 
@@ -370,6 +381,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     # WD IWA 48.2
     describe "WD IWA 48.2" do
       subject { "WD IWA 48.2" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:iwa:48:WD.2" }
 
@@ -404,6 +416,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
     # ISO/WD IWA 19 -> WD IWA 19
     describe "ISO/WD IWA 19" do
       subject { "ISO/WD IWA 19" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "WD IWA 19" }
       let(:urn) { "urn:iso:std:iso:iwa:19:WD" }

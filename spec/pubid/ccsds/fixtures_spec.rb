@@ -38,23 +38,11 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n#{'=' * 80}"
-      puts "CCSDS Base Publications Results"
-      puts "=" * 80
-      puts "Total: #{base_fixtures.size}"
-      puts "Successes: #{successes} (#{(successes.to_f / base_fixtures.size * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
-
       if failures.any?
-        puts "\nFirst 10 failures:"
+
         failures.first(10).each do |failure|
           if failure[:error]
-            puts "  #{failure[:original]}"
-            puts "    ERROR: #{failure[:error]}"
-          else
-            puts "  #{failure[:original]} (#{failure[:class]})"
-            puts "    Got: #{failure[:rendered]}"
+
           end
         end
       end
@@ -92,23 +80,11 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n#{'=' * 80}"
-      puts "CCSDS Corrigendum Publications Results"
-      puts "=" * 80
-      puts "Total: #{corrigendum_fixtures.size}"
-      puts "Successes: #{successes} (#{(successes.to_f / corrigendum_fixtures.size * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
-
       if failures.any?
-        puts "\nFirst 10 failures:"
+
         failures.first(10).each do |failure|
           if failure[:error]
-            puts "  #{failure[:original]}"
-            puts "    ERROR: #{failure[:error]}"
-          else
-            puts "  #{failure[:original]} (#{failure[:class]})"
-            puts "    Got: #{failure[:rendered]}"
+
           end
         end
       end
@@ -145,14 +121,6 @@ RSpec.describe "CCSDS Fixture Round-trip Tests" do
           }
         end
       end
-
-      puts "\n#{'=' * 80}"
-      puts "CCSDS OVERALL ROUND-TRIP RESULTS"
-      puts "=" * 80
-      puts "Total identifiers: #{all_fixtures.size}"
-      puts "Successes: #{successes} (#{(successes.to_f / all_fixtures.size * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
 
       # This test always passes - just reports statistics
       expect(all_fixtures.size).to be > 0

@@ -62,6 +62,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
   context "NBS CIRC 25insert" do
     let(:original_pubid) { "NBS CIRC 25insert" }
     let(:short_pubid) { "NBS CIRC 25ins" }
+
     it_behaves_like "converts pubid to different formats"
   end
 

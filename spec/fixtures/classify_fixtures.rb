@@ -28,7 +28,7 @@ class FixturesClassifier
     log "Classifying fixtures for #{flavor.upcase}..."
 
     unless Dir.exist?(fixtures_dir)
-      puts "⚠️  No fixtures directory found for #{flavor.upcase}"
+      
       return false
     end
 
@@ -36,7 +36,7 @@ class FixturesClassifier
     all_identifiers = collect_all_identifiers.uniq
 
     if all_identifiers.empty?
-      puts "⚠️  No identifiers found for #{flavor.upcase}"
+      
       return false
     end
 
@@ -389,16 +389,14 @@ class FixturesClassifier
       end
     end
 
-    puts
-    puts "=" * 70
-    puts "CLASSIFICATION COMPLETE: #{flavor.upcase}"
-    puts "=" * 70
-    puts "Total: #{@stats[:total]}"
-    puts "Pass:  #{@stats[:passing]} (#{percentage(@stats[:passing],
-                                                   @stats[:total])}%)"
-    puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing],
-                                                   @stats[:total])}%)"
-    puts "=" * 70
+    
+    
+    
+    
+    
+    
+    
+    
   end
 
   def percentage(part, whole)
@@ -416,6 +414,6 @@ class FixturesClassifier
   end
 
   def log(message)
-    puts message if verbose
+     if verbose
   end
 end

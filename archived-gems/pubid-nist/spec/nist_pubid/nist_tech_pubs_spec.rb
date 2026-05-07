@@ -1,4 +1,4 @@
-RSpec.describe Pubid::Nist::NistTechPubs, vcr: true do
+RSpec.describe Pubid::Nist::NistTechPubs, :vcr do
   describe "#fetch" do
     xit "fetch doc identifiers from nist_tech_pubs" do
       expect(described_class.fetch.map { |d| d[:id] })
@@ -105,6 +105,8 @@ RSpec.describe Pubid::Nist::NistTechPubs, vcr: true do
   end
 
   describe "#status" do
+    subject { described_class.status }
+
     let(:id) { "LCIRC 897" }
     let(:doi) { "NBS.LCIRC.897" }
     let(:mr) { "NBS.LC.897" }
@@ -121,8 +123,6 @@ RSpec.describe Pubid::Nist::NistTechPubs, vcr: true do
           title: title },
       ]
     end
-
-    subject { described_class.status }
 
     it do
       expect(subject.to_a)

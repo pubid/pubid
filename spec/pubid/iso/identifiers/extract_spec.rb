@@ -12,6 +12,7 @@ RSpec.describe Pubid::Iso::Identifiers::Extract do
     context "extract with base identifier" do
       describe "ISO 1101:1983/Ext 1:1983" do
         subject { "ISO 1101:1983/Ext 1:1983" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:1101:ext:1983:v1" }
 

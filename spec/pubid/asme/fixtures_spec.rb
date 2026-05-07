@@ -39,15 +39,11 @@ RSpec.describe "ASME Fixture Round-trip Tests" do
           total = identifiers.count
           pass_rate = total.positive? ? (successes.to_f / total * 100).round(2) : 0
 
-          puts "\n#{File.basename(fixture_file)}: #{successes}/#{total} (#{pass_rate}%)"
-
           if failures.any?
-            puts "\n  First 5 failures:"
+
             failures.first(5).each do |f|
               if f[:type] == "mismatch"
-                puts "    Mismatch: '#{f[:original]}' -> '#{f[:rendered]}'"
-              else
-                puts "    Error: '#{f[:original]}': #{f[:error]}"
+
               end
             end
           end

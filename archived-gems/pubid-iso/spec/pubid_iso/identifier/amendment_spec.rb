@@ -6,16 +6,15 @@ module Pubid
           let(:base) do
             Identifier.create(number: number, edition: 1, **params)
           end
+          let(:params) { { year: year } }
+          let(:number) { 123 }
+          let(:amendment_params) { {} }
+          let(:year) { 1999 }
+          let(:stage) { nil }
 
           subject do
             described_class.new(number: 1, base: base, **amendment_params)
           end
-          let(:params) { { year: year } }
-          let(:number) { 123 }
-
-          let(:amendment_params) { {} }
-          let(:year) { 1999 }
-          let(:stage) { nil }
 
           it "renders amendment with base document" do
             expect(subject.to_s).to eq("ISO 123:1999/Amd 1")

@@ -6,12 +6,12 @@ RSpec.describe Pubid::Bsi::Identifiers::TechnicalSpecification do
   describe "parsing" do
     it "parses TS 3:1993" do
       id = Pubid::Bsi.parse("TS 3:1993")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TechnicalSpecification)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses TS 1:1998" do
       id = Pubid::Bsi.parse("TS 1:1998")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TechnicalSpecification)
+      expect(id.class).to eq(described_class)
     end
   end
 

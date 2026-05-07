@@ -7,6 +7,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "basic JIS identifiers" do
       describe "JIS B 0001" do
         subject { "JIS B 0001" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as JapaneseIndustrialStandard" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS C 61000-3-2" do
         subject { "JIS C 61000-3-2" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses series" do
@@ -53,6 +55,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS C 61000-3-2:2011" do
         subject { "JIS C 61000-3-2:2011" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses year" do
@@ -68,6 +71,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "identifiers with language codes" do
       describe "JIS Z 8301:2019(J)" do
         subject { "JIS Z 8301:2019(J)" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses language as Japanese" do
@@ -81,6 +85,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS Z 8301:2019(E)" do
         subject { "JIS Z 8301:2019(E)" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses language as English" do
@@ -96,6 +101,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "all-parts notation (規格群)" do
       describe "JIS C 0617（規格群）" do
         subject { "JIS C 0617（規格群）" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses all_parts as true" do
@@ -133,6 +139,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS B 0060（規格群）" do
         subject { "JIS B 0060（規格群）" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "round-trips" do
@@ -144,6 +151,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "identifiers without whitespace (normalization)" do
       describe "JISX0902-1:2019" do
         subject { "JISX0902-1:2019" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes to standard format" do
@@ -153,6 +161,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JISX0836:2005" do
         subject { "JISX0836:2005" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes to standard format" do
@@ -164,6 +173,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "technical report identifiers" do
       describe "JIS TR Z 8301:2019" do
         subject { "JIS TR Z 8301:2019" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as TechnicalReport" do
@@ -177,6 +187,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS/TR X 0005:1998" do
         subject { "JIS/TR X 0005:1998" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes slash separator to space" do
@@ -186,6 +197,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "TR B 0035:2019" do
         subject { "TR B 0035:2019" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "adds missing JIS prefix" do
@@ -197,6 +209,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "technical specification identifiers" do
       describe "JIS TS Z 8301:2019" do
         subject { "JIS TS Z 8301:2019" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as TechnicalSpecification" do
@@ -210,6 +223,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "TS Z0030-1:2017" do
         subject { "TS Z0030-1:2017" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "adds missing JIS prefix and normalizes spacing" do
@@ -221,6 +235,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "amendment identifiers" do
       describe "JIS A 0001:1999/AMD 1:2000" do
         subject { "JIS A 0001:1999/AMD 1:2000" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Amendment" do
@@ -252,6 +267,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS X 0208:1997/AMENDMENT 1:2012" do
         subject { "JIS X 0208:1997/AMENDMENT 1:2012" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes AMENDMENT to AMD" do
@@ -263,6 +279,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "explanation identifiers" do
       describe "JIS K 2151:2004/EXPL" do
         subject { "JIS K 2151:2004/EXPL" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Explanation" do
@@ -286,6 +303,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "JIS K 2249-4:2011/EXPLANATION 4" do
         subject { "JIS K 2249-4:2011/EXPLANATION 4" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes EXPLANATION to EXPL" do
@@ -301,6 +319,7 @@ RSpec.describe Pubid::Jis::Identifier do
     context "Japanese character normalization" do
       describe "full-width dash" do
         subject { "JIS C 61000ｰ3ｰ2" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes to regular dash" do
@@ -310,6 +329,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "full-width space" do
         subject { "JIS　B　0001" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes to regular space" do
@@ -319,6 +339,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
       describe "full-width colon" do
         subject { "JIS C 61000-3-2：2011" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "normalizes to regular colon" do

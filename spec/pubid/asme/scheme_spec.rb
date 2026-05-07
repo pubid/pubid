@@ -6,8 +6,8 @@ require_relative "../../../lib/pubid/asme/scheme"
 RSpec.describe Pubid::Asme::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
-      expect(Pubid::Asme::Scheme.identifiers).to be_an(Array)
-      expect(Pubid::Asme::Scheme.identifiers).to include(Pubid::Asme::Identifiers::Standard)
+      expect(described_class.identifiers).to be_an(Array)
+      expect(described_class.identifiers).to include(Pubid::Asme::Identifiers::Standard)
     end
   end
 

@@ -7,6 +7,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
     context "series with series prefix" do
       describe "CSA Z240 MH SERIES:16 (R2025)" do
         subject { "CSA Z240 MH SERIES:16 (R2025)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Series" do
@@ -40,6 +41,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
 
       describe "CSA Z240 RV SERIES:23" do
         subject { "CSA Z240 RV SERIES:23" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Series" do
@@ -67,6 +69,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
     context "series without series prefix" do
       describe "CSA Z245.20 SERIES:22" do
         subject { "CSA Z245.20 SERIES:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Series" do
@@ -92,6 +95,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
 
       describe "CSA Z341 SERIES:22" do
         subject { "CSA Z341 SERIES:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Series" do
@@ -119,6 +123,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
     context "CAN/CSA prefixed series with dash year" do
       describe "CAN/CSA-A220 SERIES-06 (R2021)" do
         subject { "CAN/CSA-A220 SERIES-06 (R2021)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         # CAN/CSA- prefix creates CanadianAdopted wrapper around Series
@@ -157,6 +162,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
 
       describe "CAN/CSA-B45 SERIES-02 (R2013)" do
         subject { "CAN/CSA-B45 SERIES-02 (R2013)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         # CAN/CSA- prefix creates CanadianAdopted wrapper around Series
@@ -191,6 +197,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
 
       describe "CAN/CSA-C448 SERIES-13" do
         subject { "CAN/CSA-C448 SERIES-13" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         # CAN/CSA- prefix creates CanadianAdopted wrapper around Series
@@ -217,6 +224,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
 
       describe "CAN/CSA-F378 SERIES-11 (R2016)" do
         subject { "CAN/CSA-F378 SERIES-11 (R2016)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         # CAN/CSA- prefix creates CanadianAdopted wrapper around Series
@@ -249,6 +257,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
     context "CSA A165 SERIES:14 (R2024)" do
       describe "CSA A165 SERIES:14 (R2024)" do
         subject { "CSA A165 SERIES:14 (R2024)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Series" do
@@ -276,6 +285,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
     context "CSA B139 SERIES:19" do
       describe "CSA B139 SERIES:19" do
         subject { "CSA B139 SERIES:19" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code" do
@@ -295,6 +305,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
     context "CSA B139 SERIES:24" do
       describe "CSA B139 SERIES:24" do
         subject { "CSA B139 SERIES:24" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code" do

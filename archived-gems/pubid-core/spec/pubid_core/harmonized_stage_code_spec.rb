@@ -75,8 +75,8 @@ module Pubid
         let(:stage) { %w[20.00 20.20] }
 
         it "returns true when compare with stage included in fuzzy stage" do
-          expect(subject == HarmonizedStageCode.new("20.20",
-                                                    config: DummyTestIdentifier.config)).to be_truthy
+          expect(subject == described_class.new("20.20",
+                                                config: DummyTestIdentifier.config)).to be_truthy
         end
 
         it "returns true for #fuzzy?" do

@@ -256,7 +256,7 @@ module Pubid
 
           it_behaves_like "converts pubid to pubid"
 
-          it { expect(subject.base.number).to eq(nil) }
+          it { expect(subject.base.number).to be_nil }
           it { expect(subject).to be_a(Identifier::Supplement) }
         end
       end

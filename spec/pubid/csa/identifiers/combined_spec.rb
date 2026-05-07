@@ -7,6 +7,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "dual combined with slash separator" do
       describe "CSA A23.1:24/CSA A23.2:24" do
         subject { "CSA A23.1:24/CSA A23.2:24" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
@@ -34,6 +35,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
 
       describe "CSA A23.1:19/CSA A23.2:19" do
         subject { "CSA A23.1:19/CSA A23.2:19" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses first code" do
@@ -53,6 +55,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with continuation (no prefix on second)" do
       describe "CSA A123.1-05/A123.5-05 (R2015)" do
         subject { "CSA A123.1-05/A123.5-05 (R2015)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
@@ -81,6 +84,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
 
       describe "CSA B128.1:06/B128.2:06 (R2021)" do
         subject { "CSA B128.1:06/B128.2:06 (R2021)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses first identifier" do
@@ -106,6 +110,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "triple combined identifiers" do
       describe "CSA B44:19/B44.1:19/B44.2:19" do
         subject { "CSA B44:19/B44.1:19/B44.2:19" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
@@ -136,6 +141,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with CAN/CSA prefix" do
       describe "CAN/CSA-B138.1-17/CAN/CSA-B138.2-17 (R2022)" do
         subject { "CAN/CSA-B138.1-17/CAN/CSA-B138.2-17 (R2022)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
@@ -167,6 +173,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with SERIES" do
       describe "CSA N285.0:23/CSA N285.6 SERIES:23" do
         subject { "CSA N285.0:23/CSA N285.6 SERIES:23" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
@@ -192,6 +199,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with colon year format" do
       describe "CSA Z245.11:25/Z245.12:25" do
         subject { "CSA Z245.11:25/Z245.12:25" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses first identifier" do
@@ -214,6 +222,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with dash year format" do
       describe "CSA C22.10-10/C22.10-18" do
         subject { "CSA C22.10-10/C22.10-18" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses first with dash format" do
@@ -237,6 +246,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with decimal codes" do
       describe "CSA A440.2:22/CSA A440.3:22" do
         subject { "CSA A440.2:22/CSA A440.3:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses first decimal code" do
@@ -256,6 +266,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined continuation without CSA" do
       describe "CSA B140.1:22/B140.4:22" do
         subject { "CSA B140.1:22/B140.4:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Combined" do
@@ -279,6 +290,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with French year prefix" do
       describe "CSA B149.1:F20/B149.2:F20" do
         subject { "CSA B149.1:F20/B149.2:F20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses first as French" do
@@ -300,6 +312,7 @@ RSpec.describe Pubid::Csa::Identifiers::Combined do
     context "combined with mixed year formats" do
       describe "CSA A231.1:19/CSA A231.2:19 (R2024)" do
         subject { "CSA A231.1:19/CSA A231.2:19 (R2024)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses both identifiers" do

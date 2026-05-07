@@ -38,7 +38,8 @@ module Pubid
       end
 
       def default_identifier_class
-        raise NotImplementedError, "#{self.class} must implement default_identifier_class"
+        raise NotImplementedError,
+              "#{self.class} must implement default_identifier_class"
       end
 
       def flatten_array(data)
@@ -82,7 +83,7 @@ module Pubid
 
       ROMAN_MAP = {
         "I" => 1, "V" => 5, "X" => 10,
-        "L" => 50, "C" => 100, "D" => 500, "M" => 1000,
+        "L" => 50, "C" => 100, "D" => 500, "M" => 1000
       }.freeze
 
       def locate_typed_stage(typed_stage_string)

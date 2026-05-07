@@ -24,15 +24,11 @@ RSpec.describe "JIS Fixture Round-trip" do
       failed << { original: pubid, error: e.message }
     end
 
-    puts "\nJIS Results: #{passed}/#{identifiers.count} passing (#{(passed.to_f / identifiers.count * 100).round(2)}%)"
-
     if failed.any?
-      puts "\nFirst 10 failures:"
+
       failed.first(10).each do |f|
         if f[:error]
-          puts "  ✗ #{f[:original]} => ERROR: #{f[:error]}"
-        else
-          puts "  ~ #{f[:original]} => #{f[:rendered]}"
+
         end
       end
     end

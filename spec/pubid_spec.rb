@@ -2,6 +2,6 @@
 
 RSpec.describe Pubid do
   it "has a version number" do
-    expect(Pubid::VERSION).not_to be nil
+    expect(Pubid::VERSION).not_to be_nil
   end
 end

@@ -4,6 +4,8 @@ require "spec_helper"
 require "pubid/export"
 
 RSpec.describe Pubid::Export::Auditor do
+  subject { described_class.new(generated_data) }
+
   let(:generated_data) do
     {
       "iso" => {
@@ -35,8 +37,6 @@ RSpec.describe Pubid::Export::Auditor do
       },
     }
   end
-
-  subject { described_class.new(generated_data) }
 
   describe "#initialize" do
     it "stores generated data" do

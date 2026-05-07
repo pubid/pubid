@@ -9,6 +9,7 @@ RSpec.describe Pubid::Astm::Identifiers::Manual do
 
   describe "parses manual with edition" do
     subject { "ASTM MNL1-9TH-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -22,6 +23,7 @@ RSpec.describe Pubid::Astm::Identifiers::Manual do
 
   describe "parses manual without edition" do
     subject { "ASTM MNL9-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -34,13 +36,14 @@ RSpec.describe Pubid::Astm::Identifiers::Manual do
 
   describe "parses manual with supplement" do
     subject { "ASTM MNL20-2ND-SUP-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
       expect(parsed.code.number).to eq("20")
       expect(parsed.edition).to eq("2ND")
-      expect(parsed.supplement).to eq(true)
+      expect(parsed.supplement).to be(true)
       expect(parsed.to_s).to eq("ASTM MNL20-2ND-SUP-EB")
     end
   end

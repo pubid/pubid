@@ -7,6 +7,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "CSA ISO/IEC patterns" do
       describe "CSA ISO/IEC 8824-1:22" do
         subject { "CSA ISO/IEC 8824-1:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CsaAdopted" do
@@ -29,6 +30,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CSA ISO/IEC 9594-2:21" do
         subject { "CSA ISO/IEC 9594-2:21" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses multi-part number (number and part separately)" do
@@ -43,6 +45,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CSA ISO/IEC 9594-2:21/A1:22" do
         subject { "CSA ISO/IEC 9594-2:21/A1:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CsaAdopted with amendment" do
@@ -66,6 +69,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "CSA ISO/IEC TR patterns" do
       describe "CSA ISO/IEC TR 19758:04 (R2024)" do
         subject { "CSA ISO/IEC TR 19758:04 (R2024)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CsaAdopted" do
@@ -87,6 +91,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CSA ISO/IEC TR 19758:04/A1:06 (R2024)" do
         subject { "CSA ISO/IEC TR 19758:04/A1:06 (R2024)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses TR with amendment" do
@@ -108,6 +113,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CSA ISO/IEC TR 12785-3:15" do
         subject { "CSA ISO/IEC TR 12785-3:15" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses multi-part TR number (number and part separately)" do
@@ -124,6 +130,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "CAN/CSA-ISO patterns" do
       describe "CAN/CSA-ISO 10012:03 (R2023)" do
         subject { "CAN/CSA-ISO 10012:03 (R2023)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted wrapping CsaAdopted" do
@@ -149,6 +156,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CAN/CSA-ISO 10819:16" do
         subject { "CAN/CSA-ISO 10819:16" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses nested adoption structure" do
@@ -165,6 +173,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "CAN/CSA-IEC patterns" do
       describe "CAN/CSA-IEC 61000-4-2:12 (R2022)" do
         subject { "CAN/CSA-IEC 61000-4-2:12 (R2022)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
@@ -191,6 +200,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CAN/CSA-IEC 62443-2-4:17/A1:20 (R2022)" do
         subject { "CAN/CSA-IEC 62443-2-4:17/A1:20 (R2022)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses IEC with amendment" do
@@ -207,6 +217,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "CAN/CSA-CEI/IEC patterns (bilingual)" do
       describe "CAN/CSA-CEI/IEC 61000-4-28-01 (R2022)" do
         subject { "CAN/CSA-CEI/IEC 61000-4-28-01 (R2022)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
@@ -226,6 +237,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
 
       describe "CAN/CSA-CEI/IEC 61000-4-28-01/A1:03 (R2022)" do
         subject { "CAN/CSA-CEI/IEC 61000-4-28-01/A1:03 (R2022)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses amendment with CEI/IEC" do
@@ -244,6 +256,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "CSA ISO patterns (without IEC)" do
       describe "CAN/CSA-ISO 9001:16 (R2025)" do
         subject { "CAN/CSA-ISO 9001:16 (R2025)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
@@ -267,6 +280,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
     context "reaffirmation patterns" do
       describe "CSA ISO/IEC 8859-16:02 (R2021)" do
         subject { "CSA ISO/IEC 8859-16:02 (R2021)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses reaffirmation" do

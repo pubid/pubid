@@ -9,6 +9,7 @@ RSpec.describe Pubid::Astm::Identifiers::TechnicalReport do
 
   describe "parses ISO/ASTM technical report" do
     subject { "ISO/ASTMTR52916-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -20,6 +21,7 @@ RSpec.describe Pubid::Astm::Identifiers::TechnicalReport do
 
   describe "parses simple technical report" do
     subject { "TR1-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do

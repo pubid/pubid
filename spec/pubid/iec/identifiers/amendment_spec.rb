@@ -6,6 +6,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
   context "parse amendment identifier" do
     describe "IEC 60038:2009/Amd 1:2011" do
       subject { "IEC 60038:2009/Amd 1:2011" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -45,6 +46,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
   context "parse draft amendment" do
     describe "IEC/FDAM 60038-1" do
       subject { "IEC/FDAM 60038-1" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -76,6 +78,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
   context "parse ISO/IEC amendment" do
     describe "ISO/IEC 17025:2017/Amd 1:2020" do
       subject { "ISO/IEC 17025:2017/Amd 1:2020" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do

@@ -9,6 +9,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
     context "C22.2 NO. patterns" do
       describe "CSA C22.2 NO. 286:23" do
         subject { "CSA C22.2 NO. 286:23" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
@@ -34,6 +35,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
 
       describe "CSA C22.2 NO. 0:20" do
         subject { "CSA C22.2 NO. 0:20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
@@ -51,6 +53,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
 
       describe "CSA C22.2 NO. 60601-1-9:22" do
         subject { "CSA C22.2 NO. 60601-1-9:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses complex NO. number" do
@@ -66,6 +69,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
     context "other C22.x parts" do
       describe "CSA C22.3 NO. 7:20" do
         subject { "CSA C22.3 NO. 7:20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses C22.3 part" do
@@ -79,6 +83,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
 
       describe "CSA C22.4 NO. 1:18" do
         subject { "CSA C22.4 NO. 1:18" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses C22.4 part" do
@@ -88,6 +93,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
 
       describe "CSA C22.6 NO. 5:19" do
         subject { "CSA C22.6 NO. 5:19" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses C22.6 part" do
@@ -99,6 +105,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
     context "with dash year format" do
       describe "CSA C22.2 NO. 0.16-M92 (R2001)" do
         subject { "CSA C22.2 NO. 0.16-M92 (R2001)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses dotted NO. number" do
@@ -123,6 +130,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
     context "with French year prefix" do
       describe "CSA C22.2 NO. 144.1:F20" do
         subject { "CSA C22.2 NO. 144.1:F20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses dotted NO. number" do
@@ -143,6 +151,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
     context "wrapped in CanadianAdopted" do
       describe "CAN/CSA-C22.2 NO. 286:23" do
         subject { "CAN/CSA-C22.2 NO. 286:23" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do
@@ -160,6 +169,7 @@ RSpec.describe Pubid::Csa::Identifiers::Cec do
 
       describe "CAN3-C22.2 NO. 0.16-M92" do
         subject { "CAN3-C22.2 NO. 0.16-M92" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CanadianAdopted" do

@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   context "parse normal identifier dated" do
     describe "IEC TS 62257-9-5:2018" do
       subject { "IEC TS 62257-9-5:2018" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -51,6 +52,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   context "parse normal identifier undated" do
     describe "IEC TS 62600-3" do
       subject { "IEC TS 62600-3" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -87,6 +89,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   context "copublisher as ISO" do
     describe "ISO/IEC TS 29125:2010" do
       subject { "ISO/IEC TS 29125:2010" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -123,6 +126,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   context "draft technical specification" do
     describe "IEC/DTS 62600-104" do
       subject { "IEC/DTS 62600-104" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -155,6 +159,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   context "dated draft technical specification" do
     describe "IEC/DTS 62600-10:2014" do
       subject { "IEC/DTS 62600-10:2014" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -187,6 +192,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
   context "technical specification without part" do
     describe "IEC TS 62600:2016" do
       subject { "IEC TS 62600:2016" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -216,6 +222,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
     context "NP TS stage" do
       describe "IEC/NP TS 62600-3" do
         subject { "IEC/NP TS 62600-3" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
@@ -243,6 +250,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
     context "WD TS stage" do
       describe "IEC/WD TS 62600-3" do
         subject { "IEC/WD TS 62600-3" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
@@ -270,6 +278,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
     context "CD TS stage" do
       describe "IEC/CD TS 62600-3" do
         subject { "IEC/CD TS 62600-3" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do

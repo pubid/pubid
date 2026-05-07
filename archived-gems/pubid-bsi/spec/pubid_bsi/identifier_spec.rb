@@ -206,7 +206,7 @@ module Pubid
 
           it_behaves_like "converts pubid to pubid"
 
-          it "should have commentary identifier document type" do
+          it "has commentary identifier document type" do
             expect(subject).to be_a(Identifier::ExpertCommentary)
           end
         end
@@ -319,11 +319,11 @@ module Pubid
 
           it_behaves_like "converts pubid to pubid"
 
-          it "should have collection type" do
+          it "has collection type" do
             expect(subject).to be_a(Identifier::Collection)
           end
 
-          it "should have 2 separate identifiers" do
+          it "has 2 separate identifiers" do
             expect(subject.identifiers.first.to_s).to eq("PAS 2035")
             expect(subject.identifiers.last.to_s).to eq("PAS 2030")
           end

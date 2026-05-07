@@ -47,7 +47,7 @@ module Pubid
 
           it "has harmonized stage assigned" do
             expect(subject.stage.harmonized_code)
-              .to eq(Identifier.build_harmonized_stage_code("20", "20"))
+              .to eq(described_class.build_harmonized_stage_code("20", "20"))
           end
 
           it "renders separate stage for PubID" do
@@ -75,7 +75,7 @@ module Pubid
 
             it "has harmonized stage assigned" do
               expect(subject.stage.harmonized_code)
-                .to eq(Identifier.build_harmonized_stage_code("20", "20"))
+                .to eq(described_class.build_harmonized_stage_code("20", "20"))
             end
           end
 
@@ -84,7 +84,7 @@ module Pubid
 
             it "has harmonized stage assigned" do
               expect(subject.stage.harmonized_code)
-                .to eq(Identifier.build_harmonized_stage_code("20", "20"))
+                .to eq(described_class.build_harmonized_stage_code("20", "20"))
             end
           end
 
@@ -93,7 +93,7 @@ module Pubid
 
             it "has harmonized stage assigned" do
               expect(subject.stage.harmonized_code)
-                .to eq(Identifier.build_harmonized_stage_code("30", "20"))
+                .to eq(described_class.build_harmonized_stage_code("30", "20"))
             end
 
             it "renders identifier with associated stage" do
@@ -120,7 +120,8 @@ module Pubid
           context "when have harmonized code and abbr" do
             context "at stage PRF" do
               let(:stage) do
-                Identifier.build_stage(harmonized_code: "50.00", abbr: :PRF)
+                described_class.build_stage(harmonized_code: "50.00",
+                                            abbr: :PRF)
               end
 
               it "renders separate stage for PubID" do
@@ -252,7 +253,7 @@ module Pubid
             expect(subject.urn).to eq("urn:iso:std:iso:#{number}")
           end
 
-          it "should return IS class" do
+          it "returns IS class" do
             expect(subject).to be_a(Identifier::InternationalStandard)
           end
 
@@ -261,7 +262,7 @@ module Pubid
           end
 
           it "returns typed_stage_abbrev" do
-            expect(subject.typed_stage_abbrev).to eq(nil)
+            expect(subject.typed_stage_abbrev).to be_nil
           end
         end
 

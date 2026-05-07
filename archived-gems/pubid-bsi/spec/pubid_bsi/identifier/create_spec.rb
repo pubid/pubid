@@ -60,7 +60,8 @@ module Pubid
 
         context "supplements" do
           let(:params) do
-            { supplement: Identifier.create(type: type, number: 1, year: 1999) }
+            { supplement: described_class.create(type: type, number: 1,
+                                                 year: 1999) }
           end
 
           context "amendment" do
@@ -178,8 +179,8 @@ module Pubid
         context "collection" do
           let(:params) do
             { type: :collection,
-              identifiers: [Identifier.create(number: 1),
-                            Identifier.create(number: 2)],
+              identifiers: [described_class.create(number: 1),
+                            described_class.create(number: 2)],
               year: 1999,
               supplement: described_class.create(type: :amd, number: 1,
                                                  year: 2000) }

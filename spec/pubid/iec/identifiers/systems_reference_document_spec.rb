@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "parse normal identifier dated" do
     describe "IEC SRD 62600:2020" do
       subject { "IEC SRD 62600:2020" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -55,6 +56,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "parse normal identifier undated" do
     describe "IEC SRD 62600" do
       subject { "IEC SRD 62600" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -95,6 +97,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "parse normal identifier with part" do
     describe "IEC SRD 63119-1:2021" do
       subject { "IEC SRD 63119-1:2021" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -135,6 +138,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "parse identifier with part and subpart" do
     describe "IEC SRD 61850-90-12:2022" do
       subject { "IEC SRD 61850-90-12:2022" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -171,6 +175,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "copublisher as ISO" do
     describe "ISO/IEC SRD 12345:2020" do
       subject { "ISO/IEC SRD 12345:2020" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -207,6 +212,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "copublisher as IEEE" do
     describe "IEC/IEEE SRD 62582:2022" do
       subject { "IEC/IEEE SRD 62582:2022" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -239,6 +245,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "uppercase SRD" do
     describe "IEC SRD 62600:2020" do
       subject { "IEC SRD 62600:2020" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses correctly" do
@@ -255,6 +262,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "multi-digit number" do
     describe "IEC SRD 123456:2023" do
       subject { "IEC SRD 123456:2023" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do
@@ -275,6 +283,7 @@ RSpec.describe Pubid::Iec::Identifiers::SystemsReferenceDocument do
   context "multi-digit part" do
     describe "IEC SRD 62600-123:2024" do
       subject { "IEC SRD 62600-123:2024" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as SystemsReferenceDocument" do

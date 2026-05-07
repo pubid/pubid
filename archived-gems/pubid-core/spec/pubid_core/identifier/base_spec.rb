@@ -96,11 +96,13 @@ module Pubid
         context "with all parts" do
           context "when all_parts is not set" do
             let(:params) { { publisher: "ISO", number: 1234 } }
+
             it { expect(subject.all_parts).to be_nil }
           end
 
           context "when all_parts is set to true" do
             let(:params) { { publisher: "ISO", number: 1234, all_parts: true } }
+
             it { expect(subject.all_parts).to be true }
           end
         end
@@ -130,7 +132,7 @@ module Pubid
         let(:input) { [{ a: 1 }, { b: 2 }] }
 
         it "merges all hashes" do
-          is_expected.to eq({ a: 1, b: 2 })
+          expect(subject).to eq({ a: 1, b: 2 })
         end
 
         context "when same key repeating" do
@@ -286,7 +288,7 @@ module Pubid
           end
 
           it {
-            expect(DummyTechnicalReportType.resolve_typed_stage(harmonized_code)).to eq(nil)
+            expect(DummyTechnicalReportType.resolve_typed_stage(harmonized_code)).to be_nil
           }
         end
       end
@@ -319,18 +321,20 @@ module Pubid
       describe "#has_type?" do
         let(:type) { "TR" }
 
-        it { expect(DummyTechnicalReportType.has_type?(type)).to be_truthy }
+        it { expect(DummyTechnicalReportType).to have_type(type) }
+
         it {
-          expect(DummyInternationalStandardType.has_type?(type)).to be_falsey
+          expect(DummyInternationalStandardType).not_to have_type(type)
         }
       end
 
       describe "has_typed_stage?" do
         it {
-          expect(DummyTechnicalReportType.has_typed_stage?("DTR")).to be_truthy
+          expect(DummyTechnicalReportType).to have_typed_stage("DTR")
         }
+
         it {
-          expect(DummyTechnicalReportType.has_typed_stage?("DTS")).to be_falsey
+          expect(DummyTechnicalReportType).not_to have_typed_stage("DTS")
         }
       end
 

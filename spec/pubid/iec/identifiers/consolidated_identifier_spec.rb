@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "basic consolidated with amendment" do
     describe "IEC 60529:1989+AMD1:1999" do
       subject { "IEC 60529:1989+AMD1:1999" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -67,6 +68,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with multiple amendments" do
     describe "IEC 61666:2010+AMD1:2021+AMD2:2024" do
       subject { "IEC 61666:2010+AMD1:2021+AMD2:2024" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -107,6 +109,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with corrigendum" do
     describe "IEC 60034-1:2017+COR1:2018" do
       subject { "IEC 60034-1:2017+COR1:2018" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -139,6 +142,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with amendment and corrigendum" do
     describe "IEC 61869-6:2016+AMD1:2018+COR1:2019" do
       subject { "IEC 61869-6:2016+AMD1:2018+COR1:2019" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -171,6 +175,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with copublisher" do
     describe "ISO/IEC 27001:2013+AMD1:2014" do
       subject { "ISO/IEC 27001:2013+AMD1:2014" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -203,6 +208,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with parts" do
     describe "IEC 62443-3-3:2013+AMD1:2018" do
       subject { "IEC 62443-3-3:2013+AMD1:2018" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -231,6 +237,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "base_document accessor" do
     describe "IEC 60529:1989+AMD1:1999" do
       subject { "IEC 60529:1989+AMD1:1999" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "returns first identifier" do
@@ -251,6 +258,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "supplements accessor" do
     describe "IEC 60529:1989+AMD1:1999+AMD2:2001" do
       subject { "IEC 60529:1989+AMD1:1999+AMD2:2001" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "returns identifiers after first" do
@@ -271,6 +279,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "stage delegation to first identifier" do
     describe "IEC 60529:1989+AMD1:1999" do
       subject { "IEC 60529:1989+AMD1:1999" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "delegates stage to first identifier" do
@@ -287,6 +296,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated without dates" do
     describe "IEC 60529+AMD1" do
       subject { "IEC 60529+AMD1" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -311,6 +321,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with technical report base" do
     describe "IEC TR 61000-1-1:2005+AMD1:2010" do
       subject { "IEC TR 61000-1-1:2005+AMD1:2010" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -331,6 +342,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "consolidated with technical specification base" do
     describe "IEC TS 62600-3:2020+AMD1:2022" do
       subject { "IEC TS 62600-3:2020+AMD1:2022" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -351,6 +363,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "single part with consolidated" do
     describe "IEC 60034-1:2017+AMD1:2020" do
       subject { "IEC 60034-1:2017+AMD1:2020" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do
@@ -371,6 +384,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
   context "many supplements" do
     describe "IEC 60529:1989+AMD1:1999+AMD2:2013+COR1:2003" do
       subject { "IEC 60529:1989+AMD1:1999+AMD2:2013+COR1:2003" }
+
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses as ConsolidatedIdentifier" do

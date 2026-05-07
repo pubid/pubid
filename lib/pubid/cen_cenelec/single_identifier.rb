@@ -23,12 +23,10 @@ module Pubid
                        typed_stage.type_code.to_s.upcase # :en => "EN"
                      elsif type.is_a?(Components::Type)
                        type.abbr
+                     elsif self.class.respond_to?(:type) && self.class.type.is_a?(Hash)
+                       self.class.type[:short]
                      else
-                       if self.class.respond_to?(:type) && self.class.type.is_a?(Hash)
-                         self.class.type[:short]
-                       else
-                         "EN" # Default
-                       end
+                       "EN" # Default
                      end
 
         # Track if we should use slash before type

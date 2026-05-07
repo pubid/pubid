@@ -9,6 +9,7 @@ RSpec.describe Pubid::Astm::Identifiers::ResearchReport do
 
   describe "parses research report" do
     subject { "ASTM RR:A01-1001" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -21,6 +22,7 @@ RSpec.describe Pubid::Astm::Identifiers::ResearchReport do
 
   describe "parses research report with different committee" do
     subject { "ASTM RR:C09-2005" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do

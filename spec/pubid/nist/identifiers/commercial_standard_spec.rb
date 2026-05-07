@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
     context "basic CS identifiers" do
       describe "NBS CS 100-45" do
         subject { "NBS CS 100-45" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CommercialStandard" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
 
       describe "CS 190-58" do
         subject { "CS 190-58" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CommercialStandard" do
@@ -51,6 +53,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
     context "CS with letter suffix" do
       describe "NBS CS 102E-42" do
         subject { "NBS CS 102E-42" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CommercialStandard" do
@@ -68,6 +71,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
 
       describe "NBS CS 123A-50" do
         subject { "NBS CS 123A-50" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CommercialStandard" do
@@ -87,6 +91,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
     context "CS emergency variant normalization" do
       describe "NBS.CS.e104-43" do
         subject { "NBS.CS.e104-43" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "normalizes to CS-E (emergency class)" do
@@ -104,6 +109,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
 
       describe "NBS CS e104" do
         subject { "NBS CS e104" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as emergency variant" do
@@ -119,6 +125,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
     context "CS volume variant normalization" do
       describe "NBS CS v6n1" do
         subject { "NBS CS v6n1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "normalizes to CSM (monthly class)" do
@@ -137,6 +144,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
 
       describe "NBS CS v5n2" do
         subject { "NBS CS v5n2" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as monthly variant" do
@@ -152,6 +160,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
     context "CS with edition" do
       describe "NBS CS 123e2-50" do
         subject { "NBS CS 123e2-50" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CommercialStandard" do
@@ -175,6 +184,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
 
       describe "NBS CS 100e1" do
         subject { "NBS CS 100e1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CommercialStandard" do

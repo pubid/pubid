@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "parse published corrigendum" do
     describe "IEC 60038:2009/Cor 1:2011" do
       subject { "IEC 60038:2009/Cor 1:2011" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -47,6 +48,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "corrigendum to standard with part" do
     describe "IEC 60038-1:2009/Cor 2:2012" do
       subject { "IEC 60038-1:2009/Cor 2:2012" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -83,6 +85,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "parse ISO/IEC corrigendum" do
     describe "ISO/IEC 17025:2017/Cor 1:2020" do
       subject { "ISO/IEC 17025:2017/Cor 1:2020" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -119,6 +122,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "parse draft corrigendum" do
     describe "IEC/DCOR 60038-1" do
       subject { "IEC/DCOR 60038-1" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -155,6 +159,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "parse final draft corrigendum" do
     describe "IEC/FDCOR 60038-1" do
       subject { "IEC/FDCOR 60038-1" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -191,6 +196,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "parse committee draft corrigendum" do
     describe "IEC/CDCor 60038-1" do
       subject { "IEC/CDCor 60038-1" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
@@ -227,6 +233,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
   context "uppercase COR abbreviation" do
     describe "IEC 60038:2009/COR 1:2011" do
       subject { "IEC 60038:2009/COR 1:2011" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do

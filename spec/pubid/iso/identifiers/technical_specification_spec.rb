@@ -27,6 +27,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 10832:2009
     describe "ISO/TS 10832:2009" do
       subject { "ISO/TS 10832:2009" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:ts:10832" }
 
@@ -73,6 +74,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 16791
     describe "ISO/TS 16791" do
       subject { "ISO/TS 16791" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:ts:16791" }
 
@@ -119,6 +121,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 10303-1751:2014
     describe "ISO/TS 10303-1751:2014" do
       subject { "ISO/TS 10303-1751:2014" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/TS 10303-1751:2014" }
       let(:urn) { "urn:iso:std:iso:ts:10303:-1751" }
@@ -151,6 +154,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC TS 17021-2:2012
     describe "ISO/IEC TS 17021-2:2012" do
       subject { "ISO/IEC TS 17021-2:2012" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:17021:-2" }
 
@@ -190,6 +194,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       # ISO/IEC TS 17961:2013
       describe "ISO/IEC TS 17961:2013" do
         subject { "ISO/IEC TS 17961:2013" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:ts:17961" }
 
@@ -225,6 +230,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC/TS 17021-2 (extra slash)
     describe "ISO/IEC/TS 17021-2" do
       subject { "ISO/IEC/TS 17021-2" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC TS 17021-2" }
       let(:urn) { "urn:iso:std:iso-iec:ts:17021:-2" }
@@ -257,6 +263,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/TS 10303- 1751:2014 (extra space)
     describe "ISO/TS 10303- 1751:2014" do
       subject { "ISO/TS 10303- 1751:2014" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/TS 10303-1751:2014" }
       let(:urn) { "urn:iso:std:iso:ts:10303:-1751" }
@@ -293,6 +300,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       # ISO/NP TS 20594-1
       describe "ISO/NP TS 20594-1" do
         subject { "ISO/NP TS 20594-1" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:ts:20594:-1:stage-10.00" }
 
@@ -326,6 +334,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       # ISO/IEC WD TS 25025
       describe "ISO/IEC WD TS 25025" do
         subject { "ISO/IEC WD TS 25025" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:ts:25025:WD" }
 
@@ -359,6 +368,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       # ISO/DTS 18759
       describe "ISO/DTS 18759" do
         subject { "ISO/DTS 18759" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:ts:18759:DTS" }
 
@@ -386,6 +396,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
       # ISO/IEC DTS 5723
       describe "ISO/IEC DTS 5723" do
         subject { "ISO/IEC DTS 5723" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:ts:5723:DTS" }
 
@@ -421,6 +432,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/DTS 21328.4
     describe "ISO/DTS 21328.4" do
       subject { "ISO/DTS 21328.4" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:ts:21328:DTS.4" }
 
@@ -452,6 +464,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC DTS 25052-1.2
     describe "ISO/IEC DTS 25052-1.2" do
       subject { "ISO/IEC DTS 25052-1.2" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:25052:-1:DTS.2" }
 
@@ -494,6 +507,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC PDTS 19583-24
     describe "ISO/IEC PDTS 19583-24" do
       subject { "ISO/IEC PDTS 19583-24" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:19583:-24:CDTS" }
 
@@ -529,6 +543,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC PDTS 27008
     describe "ISO/IEC PDTS 27008" do
       subject { "ISO/IEC PDTS 27008" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:ts:27008:CDTS" }
 
@@ -563,6 +578,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalSpecification do
     # ISO/IEC/IEEE DTS 17301-1-1:2016(en)
     describe "ISO/IEC/IEEE DTS 17301-1-1:2016(en)" do
       subject { "ISO/IEC/IEEE DTS 17301-1-1:2016(en)" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec-ieee:ts:17301:-1-1:DTS:en" }
 

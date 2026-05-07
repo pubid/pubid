@@ -6,32 +6,32 @@ RSpec.describe Pubid::Bsi::Identifiers::TestMethod do
   describe "parsing" do
     it "parses BS 1006:B01C:LFS1:1982" do
       id = Pubid::Bsi.parse("BS 1006:B01C:LFS1:1982")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TestMethod)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 1006:B01C:LFS2:1985" do
       id = Pubid::Bsi.parse("BS 1006:B01C:LFS2:1985")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TestMethod)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 1006:B01C:LFS4:1990" do
       id = Pubid::Bsi.parse("BS 1006:B01C:LFS4:1990")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TestMethod)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 1006:B01C:LFS5:1988" do
       id = Pubid::Bsi.parse("BS 1006:B01C:LFS5:1988")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TestMethod)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 1006:B01C:LFS7:1985" do
       id = Pubid::Bsi.parse("BS 1006:B01C:LFS7:1985")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TestMethod)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 1006:B01C:LFS8:1987" do
       id = Pubid::Bsi.parse("BS 1006:B01C:LFS8:1987")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::TestMethod)
+      expect(id.class).to eq(described_class)
     end
   end
 

@@ -7,6 +7,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled identifiers with plus separator" do
       describe "CSA B149.1:20 + B149.2:20" do
         subject { "CSA B149.1:20 + B149.2:20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -31,6 +32,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
 
       describe "CSA Z245.1:22 + Z245.2:22" do
         subject { "CSA Z245.1:22 + Z245.2:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -54,6 +56,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled identifiers with reaffirmation" do
       describe "CSA A23.1:19 + A23.2:19 (R2024)" do
         subject { "CSA A23.1:19 + A23.2:19 (R2024)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -81,6 +84,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
 
       describe "CSA B108.1:23 + B108.2:23 (R2025)" do
         subject { "CSA B108.1:23 + B108.2:23 (R2025)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses base code" do
@@ -104,6 +108,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled identifiers with dash year format" do
       describe "CSA C22.1-15 + C22.2-15 (R2020)" do
         subject { "CSA C22.1-15 + C22.2-15 (R2020)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -131,6 +136,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled identifiers with French year prefix" do
       describe "CSA B149.1:F20 + B149.2:F20" do
         subject { "CSA B149.1:F20 + B149.2:F20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -154,6 +160,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "triple bundled identifiers" do
       describe "CSA A1:20 + A2:20 + A3:20" do
         subject { "CSA A1:20 + A2:20 + A3:20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -179,6 +186,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled identifiers with NO. notation" do
       describe "CSA C22.2 NO. 1:20 + C22.2 NO. 2:20" do
         subject { "CSA C22.2 NO. 1:20 + C22.2 NO. 2:20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -202,6 +210,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled with CAN/CSA prefix" do
       describe "CAN/CSA-B127.1:99 + B127.2:99 (R2014)" do
         subject { "CAN/CSA-B127.1:99 + B127.2:99 (R2014)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do
@@ -233,6 +242,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled decimal codes" do
       describe "CSA Z259.13:16 + Z259.14:16 (R2025)" do
         subject { "CSA Z259.13:16 + Z259.14:16 (R2025)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses base decimal code" do
@@ -252,6 +262,7 @@ RSpec.describe Pubid::Csa::Identifiers::Bundled do
     context "bundled with mixed year formats" do
       describe "CSA A440.2:22 + A440.3:22" do
         subject { "CSA A440.2:22 + A440.3:22" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Bundled" do

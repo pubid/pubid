@@ -6,7 +6,7 @@ RSpec.describe Pubid::Ieee::Identifiers::DualPublished do
     context "dual identifiers separated by 'and'" do
       it "parses ANSI and IEEE joint publication" do
         id = Pubid::Ieee.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
-        expect(id).to be_a(Pubid::Ieee::Identifiers::DualPublished)
+        expect(id).to be_a(described_class)
         expect(id.first_identifier.publisher).to eq("ANSI")
         expect(id.second_identifier.publisher).to eq("IEEE")
         expect(id.to_s).to eq("ANSI C37.61-1973 and IEEE Std 321-1973")
@@ -14,7 +14,7 @@ RSpec.describe Pubid::Ieee::Identifiers::DualPublished do
 
       it "parses IEC and IEEE joint publication" do
         id = Pubid::Ieee.parse("IEC 60255-24 Edition 2.0 2013-04 and IEEE Std C37.111-2013")
-        expect(id).to be_a(Pubid::Ieee::Identifiers::DualPublished)
+        expect(id).to be_a(described_class)
         expect(id.first_identifier.publisher).to eq("IEC")
         expect(id.second_identifier.publisher).to eq("IEEE")
         expect(id.to_s).to eq("IEC 60255-24 Edition 2.0 2013-04 and IEEE Std C37.111-2013")
@@ -24,7 +24,7 @@ RSpec.describe Pubid::Ieee::Identifiers::DualPublished do
     context "space-separated dual identifiers" do
       it "parses IEC and IEEE space-separated publication" do
         id = Pubid::Ieee.parse("IEC 62014-5 IEEE Std 1734-2011")
-        expect(id).to be_a(Pubid::Ieee::Identifiers::DualPublished)
+        expect(id).to be_a(described_class)
         expect(id.first_identifier.publisher).to eq("IEC")
         expect(id.second_identifier.publisher).to eq("IEEE")
         expect(id.to_s).to eq("IEC 62014-5 and IEEE Std 1734-2011")
@@ -32,7 +32,7 @@ RSpec.describe Pubid::Ieee::Identifiers::DualPublished do
 
       it "parses ANSI and IEEE space-separated publication" do
         id = Pubid::Ieee.parse("ANSI C37.61-1973 IEEE Std 321-1973")
-        expect(id).to be_a(Pubid::Ieee::Identifiers::DualPublished)
+        expect(id).to be_a(described_class)
         expect(id.first_identifier.publisher).to eq("ANSI")
         expect(id.second_identifier.publisher).to eq("IEEE")
         expect(id.to_s).to eq("ANSI C37.61-1973 and IEEE Std 321-1973")
@@ -42,12 +42,12 @@ RSpec.describe Pubid::Ieee::Identifiers::DualPublished do
     context "distinguishing from co-published" do
       it "does not treat IEC/IEEE as dual published" do
         id = Pubid::Ieee.parse("IEC/IEEE 62582-1 Edition 1.0 2011-05")
-        expect(id).not_to be_a(Pubid::Ieee::Identifiers::DualPublished)
+        expect(id).not_to be_a(described_class)
       end
 
       it "does not treat IEEE/IEC copublisher as dual published" do
         id = Pubid::Ieee.parse("IEEE/IEC Std 62582-1-2011")
-        expect(id).not_to be_a(Pubid::Ieee::Identifiers::DualPublished)
+        expect(id).not_to be_a(described_class)
         expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
       end
     end

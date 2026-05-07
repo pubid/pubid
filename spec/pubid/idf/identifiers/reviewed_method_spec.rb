@@ -27,6 +27,7 @@ RSpec.describe Pubid::Idf::Identifiers::ReviewedMethod do
   # IDF/RM 254:2022
   describe "parse IDF/RM 254:2022" do
     subject { "IDF/RM 254:2022" }
+
     let (:parsed) { described_class.parse(subject) }
 
     it "parses publisher" do
@@ -53,6 +54,7 @@ RSpec.describe Pubid::Idf::Identifiers::ReviewedMethod do
   # IDF/RM 233-1:2017
   describe "parse IDF/RM 233-1:2017" do
     subject { "IDF/RM 233-1:2017" }
+
     let (:parsed) { described_class.parse(subject) }
 
     it "parses publisher" do

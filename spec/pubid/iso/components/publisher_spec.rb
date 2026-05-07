@@ -62,12 +62,12 @@ RSpec.describe Pubid::Iso::Components::Publisher do
   describe "#has_copublisher?" do
     it "returns falsy when no copublisher" do
       publisher = described_class.new(publisher: "ISO")
-      expect(publisher.has_copublisher?).to be_falsy
+      expect(publisher).not_to have_copublisher
     end
 
     it "returns falsy when copublisher is nil" do
       publisher = described_class.new(publisher: "ISO", copublisher: nil)
-      expect(publisher.has_copublisher?).to be_falsy
+      expect(publisher).not_to have_copublisher
     end
 
     it "returns false when copublisher is empty array" do

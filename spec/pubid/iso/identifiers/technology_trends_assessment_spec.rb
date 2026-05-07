@@ -29,6 +29,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 1:1994
     describe "ISO/TTA 1:1994" do
       subject { "ISO/TTA 1:1994" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:1" }
 
@@ -75,6 +76,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 2
     describe "ISO/TTA 2" do
       subject { "ISO/TTA 2" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:2" }
 
@@ -121,6 +123,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 5:2006
     describe "ISO/TTA 5:2006" do
       subject { "ISO/TTA 5:2006" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:5" }
 
@@ -148,6 +151,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
     # ISO/TTA 5:2007 (updated version)
     describe "ISO/TTA 5:2007" do
       subject { "ISO/TTA 5:2007" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:tta:5" }
 

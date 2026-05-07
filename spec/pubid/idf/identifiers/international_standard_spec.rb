@@ -27,6 +27,7 @@ RSpec.describe Pubid::Idf::Identifiers::InternationalStandard do
   # IDF 125A:1988
   describe "parse IDF 125A:1988" do
     subject { "IDF 125A:1988" }
+
     let (:parsed) { described_class.parse(subject) }
 
     it "parses publisher" do
@@ -49,6 +50,7 @@ RSpec.describe Pubid::Idf::Identifiers::InternationalStandard do
   # IDF 124-2:2005
   describe "parse IDF 124-2:2005" do
     subject { "IDF 124-2:2005" }
+
     let (:parsed) { described_class.parse(subject) }
 
     it "parses publisher" do
@@ -75,6 +77,7 @@ RSpec.describe Pubid::Idf::Identifiers::InternationalStandard do
   # IDF 259
   describe "parse IDF 259" do
     subject { "IDF 259" }
+
     let (:parsed) { described_class.parse(subject) }
 
     it "parses publisher" do

@@ -8,6 +8,7 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
   describe "ISO/ASTM dual-published standards (5xxxx series)" do
     describe "parses normal identifier" do
       subject { "ASTM 52303-24e1" }
+
       let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 52303-24e1" do
@@ -23,6 +24,7 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
 
     describe "parses reapproval identifier" do
       subject { "ASTM 52921-13(2018)e1" }
+
       let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 52921-13(2018)e1" do
@@ -37,6 +39,7 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
 
     describe "parses identifier with edition" do
       subject { "ASTM 51956-19e1" }
+
       let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 51956-19e1" do
@@ -50,6 +53,7 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
 
     describe "parses identifier without edition" do
       subject { "ASTM 52900-15" }
+
       let(:parsed) { Pubid::Astm.parse(subject) }
 
       it "parses ASTM 52900-15" do

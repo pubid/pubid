@@ -30,6 +30,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     context "dated ISP" do
       describe "ISO/IEC ISP 10611-3:2003" do
         subject { "ISO/IEC ISP 10611-3:2003" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:10611:-3" }
 
@@ -76,6 +77,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
 
       describe "ISO/IEC ISP 12345:2020" do
         subject { "ISO/IEC ISP 12345:2020" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:12345" }
 
@@ -125,6 +127,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     context "undated ISP" do
       describe "ISO/IEC ISP 12062-3" do
         subject { "ISO/IEC ISP 12062-3" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:12062:-3" }
 
@@ -171,6 +174,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
 
       describe "ISO/IEC ISP 10000" do
         subject { "ISO/IEC ISP 10000" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:10000" }
 
@@ -222,6 +226,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     context "ISO only publisher" do
       describe "ISO ISP 12066-1" do
         subject { "ISO ISP 12066-1" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:pubid) { "ISO/ISP 12066-1" }
         let(:urn) { "urn:iso:std:iso:isp:12066:-1" }
@@ -274,6 +279,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     context "proposal" do
       describe "ISO/IEC NP ISP 29110-4-2" do
         subject { "ISO/IEC NP ISP 29110-4-2" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:29110:-4-2:stage-10.00" }
 
@@ -318,6 +324,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     context "preparatory" do
       describe "ISO/IEC WD ISP 10613-2" do
         subject { "ISO/IEC WD ISP 10613-2" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:WD" }
 
@@ -358,6 +365,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
     context "enquiry" do
       describe "ISO/IEC DISP 12069" do
         subject { "ISO/IEC DISP 12069" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-iec:isp:12069:stage-40.00" }
 
@@ -392,6 +400,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
 
       describe "ISO/DISP 12066-1" do
         subject { "ISO/DISP 12066-1" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:isp:12066:-1:stage-40.00" }
 
@@ -434,6 +443,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
   context "complex parts" do
     describe "ISO/IEC ISP 11183-1-1:2001" do
       subject { "ISO/IEC ISP 11183-1-1:2001" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:isp:11183:-1-1" }
 
@@ -487,6 +497,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
   context "languages" do
     describe "ISO/IEC ISP 10611-3:2003(en)" do
       subject { "ISO/IEC ISP 10611-3:2003(en)" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:isp:10611:-3:en" }
 
@@ -537,6 +548,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
 
     describe "ISO/IEC ISP 12062-3(E/F)" do
       subject { "ISO/IEC ISP 12062-3(E/F)" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       # V2 preserves original language format
       let(:normalized) do
@@ -594,6 +606,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandardizedProfile do
   context "stage iterations" do
     describe "ISO/IEC WD ISP 10613-2.2" do
       subject { "ISO/IEC WD ISP 10613-2.2" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso-iec:isp:10613:-2:WD.2" }
 

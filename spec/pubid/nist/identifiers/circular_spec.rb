@@ -139,7 +139,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(Pubid::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier).to be_a(described_class)
           expect(parsed.base_identifier.number.value).to eq("25")
         end
 
@@ -161,7 +161,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "parses base identifier with edition" do
-          expect(parsed.base_identifier).to be_a(Pubid::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier).to be_a(described_class)
           expect(parsed.base_identifier.number.value).to eq("101")
           expect(parsed.base_identifier.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.base_identifier.edition.type).to eq("e")
@@ -201,7 +201,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(Pubid::Nist::Identifiers::Circular)
+          expect(parsed.base_identifier).to be_a(described_class)
           expect(parsed.base_identifier.number.value).to eq("24")
         end
 

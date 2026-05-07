@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "basic SP identifiers" do
       describe "NIST SP 800-53" do
         subject { "NIST SP 800-53" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 250-1039" do
         subject { "NIST SP 250-1039" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -47,6 +49,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "SP with revision" do
       describe "NIST SP 800-53r4" do
         subject { "NIST SP 800-53r4" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -66,6 +69,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-90r" do
         subject { "NIST SP 800-90r" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -85,6 +89,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-57pt1r4" do
         subject { "NIST SP 800-57pt1r4" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -106,6 +111,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-56Ar2" do
         subject { "NIST SP 800-56Ar2" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -129,6 +135,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 260-126 rev 2013" do
         subject { "NIST SP 260-126 rev 2013" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -150,6 +157,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "SP with edition year" do
       describe "NIST SP 330-2019" do
         subject { "NIST SP 330-2019" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -169,6 +177,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 304a-2017" do
         subject { "NIST SP 304a-2017" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -192,6 +201,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 260-162 2006ed." do
         subject { "NIST SP 260-162 2006ed." }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -213,6 +223,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "SP with update" do
       describe "NIST SP 800-53r4/Upd3-2015" do
         subject { "NIST SP 800-53r4/Upd3-2015" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -234,6 +245,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 500-300-upd" do
         subject { "NIST SP 500-300-upd" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -253,6 +265,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "SP with version" do
       describe "NIST SP 500-268v1.1" do
         subject { "NIST SP 500-268v1.1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -271,6 +284,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP 800-60 Ver. 2.0" do
         subject { "NIST SP 800-60 Ver. 2.0" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -291,6 +305,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "SP with stage" do
       describe "NIST SP(IPD) 800-53r5" do
         subject { "NIST SP(IPD) 800-53r5" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -311,6 +326,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
 
       describe "NIST SP(IPD) 800-53e5" do
         subject { "NIST SP(IPD) 800-53e5" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do
@@ -333,6 +349,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
     context "SP with language" do
       describe "NIST SP 1262es" do
         subject { "NIST SP 1262es" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as SpecialPublication" do

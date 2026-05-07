@@ -7,12 +7,13 @@ module Pubid
           described_class.create(type: type, number: number, part: part,
                                  published: published, **params)
         end
-        subject { base }
         let(:type) { "EN" }
         let(:number) { 1234 }
         let(:part) { 4 }
         let(:published) { "1999-01" }
         let(:params) { { version: "1.2.3" } }
+
+        subject { base }
 
         it "renders default publisher" do
           expect(subject.to_s).to eq("ETSI EN 1234-4 V1.2.3 (1999-01)")

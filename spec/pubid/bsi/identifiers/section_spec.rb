@@ -6,22 +6,22 @@ RSpec.describe Pubid::Bsi::Identifiers::Section do
   describe "parsing" do
     it "parses DD 51:Section 0:1977" do
       id = Pubid::Bsi.parse("DD 51:Section 0:1977")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Section)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses DD 51:Section 1:1977" do
       id = Pubid::Bsi.parse("DD 51:Section 1:1977")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Section)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 3224 Section B2:1970" do
       id = Pubid::Bsi.parse("BS 3224 Section B2:1970")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Section)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 3224 Section C1:1963" do
       id = Pubid::Bsi.parse("BS 3224 Section C1:1963")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Section)
+      expect(id.class).to eq(described_class)
     end
   end
 

@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
     context "basic CRPL identifiers" do
       describe "NBS CRPL 4-4" do
         subject { "NBS CRPL 4-4" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL c4-4" do
         subject { "NBS CRPL c4-4" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -51,6 +53,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
     context "CRPL with month notation" do
       describe "NBS CRPL 4-m-5" do
         subject { "NBS CRPL 4-m-5" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -68,6 +71,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL 4-M-5" do
         subject { "NBS CRPL 4-M-5" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -87,6 +91,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
     context "CRPL with underscore range notation" do
       describe "NBS CRPL 1-2_3-1" do
         subject { "NBS CRPL 1-2_3-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -104,6 +109,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL 1-2pt3-1" do
         subject { "NBS CRPL 1-2pt3-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -121,6 +127,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL 1-2_3-1A" do
         subject { "NBS CRPL 1-2_3-1A" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -139,6 +146,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL 1-2pt3-1supA" do
         subject { "NBS CRPL 1-2pt3-1supA" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -159,6 +167,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
     context "CRPL-F series (Solar-Geophysical Data)" do
       describe "NBS CRPL-F-B 150" do
         subject { "NBS CRPL-F-B 150" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -176,6 +185,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL-F-B150" do
         subject { "NBS CRPL-F-B150" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -193,6 +203,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL-F-B 245" do
         subject { "NBS CRPL-F-B 245" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -210,6 +221,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL-F-B245" do
         subject { "NBS CRPL-F-B245" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do
@@ -223,6 +235,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
       describe "NBS CRPL-F-A 135B" do
         subject { "NBS CRPL-F-A 135B" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as CrplReport" do

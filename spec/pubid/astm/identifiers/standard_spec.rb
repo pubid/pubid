@@ -9,6 +9,7 @@ RSpec.describe Pubid::Astm::Identifiers::Standard do
 
   describe "parses simple standard" do
     subject { "ASTM E2938-15" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -23,6 +24,7 @@ RSpec.describe Pubid::Astm::Identifiers::Standard do
 
   describe "parses standard with reapproval" do
     subject { "ASTM E2938-15(2023)" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -36,6 +38,7 @@ RSpec.describe Pubid::Astm::Identifiers::Standard do
 
   describe "parses dual unit standard" do
     subject { "ASTM F1862/F1862M-17" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -43,13 +46,14 @@ RSpec.describe Pubid::Astm::Identifiers::Standard do
       expect(parsed.publisher).to eq("ASTM")
       expect(parsed.code.letter).to eq("F")
       expect(parsed.code.number).to eq("1862")
-      expect(parsed.code.dual_m).to eq(true)
+      expect(parsed.code.dual_m).to be(true)
       expect(parsed.to_s).to eq("ASTM F1862/F1862M-17")
     end
   end
 
   describe "parses standard with edition notation" do
     subject { "ASTM C1028-07e1" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -63,6 +67,7 @@ RSpec.describe Pubid::Astm::Identifiers::Standard do
 
   describe "parses standard without ASTM prefix" do
     subject { "ASTM 51608-15(2022)e1" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do

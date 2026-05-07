@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::Owmwp do
     context "OWMWP with date-based format" do
       describe "NIST OWMWP 06-13-2018" do
         subject { "NIST OWMWP 06-13-2018" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Owmwp" do
@@ -36,6 +37,7 @@ RSpec.describe Pubid::Nist::Identifiers::Owmwp do
 
       describe "NIST OWMWP 01-01-2020" do
         subject { "NIST OWMWP 01-01-2020" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Owmwp" do
@@ -57,6 +59,7 @@ RSpec.describe Pubid::Nist::Identifiers::Owmwp do
 
       describe "NIST OWMWP 12-25-2019" do
         subject { "NIST OWMWP 12-25-2019" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Owmwp" do

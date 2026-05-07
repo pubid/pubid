@@ -11,10 +11,10 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
   end
 
   describe "ISO" do
-    include_examples "a round-trippable identifier", :Iso, "ISO 9001:2015"
-    include_examples "a round-trippable identifier", :Iso,
-                     "ISO/IEC 17031-1:2020"
-    include_examples "a round-trippable identifier", :Iso, "ISO 4"
+    it_behaves_like "a round-trippable identifier", :Iso, "ISO 9001:2015"
+    it_behaves_like "a round-trippable identifier", :Iso,
+                    "ISO/IEC 17031-1:2020"
+    it_behaves_like "a round-trippable identifier", :Iso, "ISO 4"
   end
 
   describe "supplements (nested base_identifier)" do

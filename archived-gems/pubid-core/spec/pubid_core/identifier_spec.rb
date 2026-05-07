@@ -132,7 +132,7 @@ module Pubid
         end
       end
 
-      it "should assign current module name as default identifier prefix" do
+      it "assigns current module name as default identifier prefix" do
         expect(described_class.config.prefixes).to eq(["CORE"])
       end
     end

@@ -51,6 +51,7 @@ module Pubid
         }
         config
       end
+
       context "when abbreviation" do
         subject { described_class.new(config: config, abbr: abbrev) }
         let(:abbrev) { :WD }
@@ -105,7 +106,7 @@ module Pubid
             let(:harmonized_code) { "60.00" }
 
             it "returns abbreviated code" do
-              expect(subject.abbr).to eq(nil)
+              expect(subject.abbr).to be_nil
             end
           end
 
@@ -145,7 +146,7 @@ module Pubid
             let(:harmonized_code) { "60.60" }
 
             it "returns abbreviated code" do
-              expect(subject.abbr).to eq(nil)
+              expect(subject.abbr).to be_nil
             end
           end
         end

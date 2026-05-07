@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
     context "basic FIPS identifiers" do
       describe "FIPS 1" do
         subject { "FIPS 1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 140" do
         subject { "FIPS 140" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -51,6 +53,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
     context "FIPS with edition" do
       describe "FIPS 14-1971" do
         subject { "FIPS 14-1971" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -70,6 +73,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 107e198503" do
         subject { "FIPS 107e198503" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -89,6 +93,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 107-Mar1985" do
         subject { "FIPS 107-Mar1985" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -108,6 +113,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 11-1-Sep30/1977" do
         subject { "FIPS 11-1-Sep30/1977" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -127,6 +133,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 46e1993" do
         subject { "FIPS 46e1993" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -146,6 +153,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 46-1977" do
         subject { "FIPS 46-1977" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -167,6 +175,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
     context "FIPS with parts" do
       describe "FIPS 140-1" do
         subject { "FIPS 140-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -184,6 +193,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 140-2" do
         subject { "FIPS 140-2" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -201,6 +211,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 140-3" do
         subject { "FIPS 140-3" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -220,6 +231,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
     context "FIPS with letter suffix" do
       describe "FIPS 46a" do
         subject { "FIPS 46a" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -237,6 +249,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS 81A" do
         subject { "FIPS 81A" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -256,6 +269,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
     context "FIPS with revision" do
       describe "FIPS 197r2001" do
         subject { "FIPS 197r2001" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -277,6 +291,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
     context "FIPS dotted format" do
       describe "FIPS.140-2" do
         subject { "FIPS.140-2" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do
@@ -294,6 +309,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
 
       describe "FIPS.46e1993" do
         subject { "FIPS.46e1993" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as FederalInformationProcessingStandards" do

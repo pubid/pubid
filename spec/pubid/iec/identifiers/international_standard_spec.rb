@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
   context "parse normal identifier dated" do
     describe "IEC 60038:2009" do
       subject { "IEC 60038:2009" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -47,6 +48,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
   context "parse normal identifier undated" do
     describe "IEC 60038" do
       subject { "IEC 60038" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -87,6 +89,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
   context "parse normal identifier with part" do
     describe "IEC 60038-1:2009" do
       subject { "IEC 60038-1:2009" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -127,6 +130,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
   context "copublisher as ISO" do
     describe "ISO/IEC 17025:2017" do
       subject { "ISO/IEC 17025:2017" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -166,6 +170,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
         # NOTE: Parser doesn't support PWI (preliminary work item) stage yet
         describe "IEC/PWI 60038" do
           subject { "IEC/PWI 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -189,6 +194,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "committee draft" do
         describe "IEC/CD 60038" do
           subject { "IEC/CD 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -212,6 +218,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "committee draft for vote" do
         describe "IEC/CDV 60038" do
           subject { "IEC/CDV 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -235,6 +242,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "new proposal" do
         describe "IEC/NP 60038" do
           subject { "IEC/NP 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -258,6 +266,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "approved new work" do
         describe "IEC/ANW 60038" do
           subject { "IEC/ANW 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -281,6 +290,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "working draft" do
         describe "IEC/WD 60038" do
           subject { "IEC/WD 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -304,6 +314,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "final draft" do
         describe "IEC/FDIS 60038" do
           subject { "IEC/FDIS 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do
@@ -327,6 +338,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       context "proof" do
         describe "IEC/PRF 60038" do
           subject { "IEC/PRF 60038" }
+
           let(:parsed) { described_class.parse(subject) }
 
           it "parses publisher" do

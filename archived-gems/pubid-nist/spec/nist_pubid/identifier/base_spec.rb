@@ -32,6 +32,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:abbrev_pubid) do
         "Natl. Inst. Stand. Technol. Spec. Publ. 800-53, Rev. 5"
       end
+
       it_behaves_like "converts pubid to different formats"
 
       context "when JSON output format" do
@@ -248,7 +249,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     end
 
     context "NIST LC 1136" do
-      it "should raise error" do
+      it "raises error" do
         expect { described_class.parse("LCIRC 1136") }
           .to raise_error(Pubid::Core::Errors::ParseError)
       end
@@ -315,7 +316,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     end
 
     context "when cannot parse serie" do
-      it "should raise error" do
+      it "raises error" do
         expect { described_class.parse("NIST WRONG-SERIE 800-11") }
           .to raise_error(Pubid::Core::Errors::ParseError)
       end
@@ -434,6 +435,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:original_pubid) { "NBS CRPL c4-4" }
       # has doi NBS.FIPS.11-1-Sep30/1977
       let(:short_pubid) { "NBS CRPL 4-4" }
+
       it_behaves_like "converts pubid to different formats"
     end
 
@@ -954,7 +956,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       it { expect(subject.stage.to_s).to eq("fpd") }
     end
 
-    context "identifier from NIST Tech Pubs", vcr: true do
+    context "identifier from NIST Tech Pubs", :vcr do
       it "parse identifiers successfully" do
         documents = Pubid::Nist::NistTechPubs.status
         documents.each do |doc|
@@ -971,7 +973,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
     end
 
     context "when cannot parse code" do
-      it "should raise error" do
+      it "raises error" do
         expect { described_class.parse("NIST SP WRONG-CODE") }
           .to raise_error(Pubid::Core::Errors::ParseError)
       end
@@ -1027,7 +1029,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
   end
 
   describe "returns weight of PubID object" do
-    it "should return more weight for more complete PubID" do
+    it "returns more weight for more complete PubID" do
       expect(described_class.parse("NIST SP 260-162").weight).to be <
         described_class.parse("NIST SP 260-162 2006ed.").weight
     end
@@ -1038,7 +1040,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       let(:id1) { described_class.parse("NIST SP 800-66r2 IPD") }
       let(:id2) { described_class.parse("NIST SP 800-66r2 IPD") }
 
-      it "should return equal" do
+      it "returns equal" do
         expect(id1).to eq(id2)
       end
     end
