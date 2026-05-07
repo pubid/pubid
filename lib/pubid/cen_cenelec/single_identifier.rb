@@ -24,9 +24,9 @@ module Pubid
                      elsif type.is_a?(Components::Type)
                        type.abbr
                      else
-                       begin
+                       if self.class.respond_to?(:type) && self.class.type.is_a?(Hash)
                          self.class.type[:short]
-                       rescue NoMethodError
+                       else
                          "EN" # Default
                        end
                      end

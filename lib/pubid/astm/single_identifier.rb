@@ -14,7 +14,7 @@ module Pubid
       def to_s
         parts = []
         parts << publisher if publisher
-        parts << prefix if methods.include?(:prefix) && prefix
+        parts << prefix if self.class.attributes.key?(:prefix) && prefix
         parts << code.to_s if code
         parts << "-#{year}" if year
         parts << format_suffix if format_suffix

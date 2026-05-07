@@ -23,7 +23,7 @@ module Pubid
       def to_s(with_publisher: true)
         parts = []
         parts << publisher if with_publisher
-        parts << type_prefix if methods.include?(:type_prefix) && type_prefix
+        parts << type_prefix if self.class.method_defined?(:type_prefix) && type_prefix
         result = parts.join(" ")
         result += " " if result.length.positive?
         result += code.to_s

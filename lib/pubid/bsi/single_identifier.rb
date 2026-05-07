@@ -25,6 +25,9 @@ module Pubid
       attribute :month, :integer
       attribute :translation_lang, :string
       attribute :translation_upper, :string
+      attribute :explicit_prefix, :boolean, default: -> { false }
+      attribute :explicit_publisher, :boolean, default: -> { false }
+      attribute :space_separated_part, :boolean, default: -> { false }
 
       def to_s(lang: :en, lang_single: false)
         # Build string representation
@@ -53,7 +56,7 @@ module Pubid
           end
 
           # Part and subpart - check if space-separated
-          space_separated = instance_variable_get(:@space_separated_part)
+          space_separated = space_separated_part
           if part
             part_val = part.is_a?(Components::Code) ? part.value : part
             # Trim part value to remove leading/trailing spaces from parser

@@ -24,11 +24,11 @@ module Pubid
         identifier = locate_identifier_klass(parsed_hash).new
         assign_attributes(identifier, parsed_hash)
 
-        if identifier.methods.include?(:typed_stage) && identifier.typed_stage.nil?
+        if identifier.class.attributes.key?(:typed_stage) && identifier.typed_stage.nil?
           default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
           identifier.typed_stage = default_typed_stage
-          identifier.stage = default_typed_stage.to_stage if identifier.methods.include?(:stage=)
-          identifier.type = default_typed_stage.to_type if identifier.methods.include?(:type=)
+          identifier.stage = default_typed_stage.to_stage if identifier.class.attributes.key?(:stage)
+          identifier.type = default_typed_stage.to_type if identifier.class.attributes.key?(:type)
         end
 
         identifier

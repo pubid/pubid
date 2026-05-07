@@ -56,7 +56,7 @@ stage_format_long: nil, with_date: nil)
         # CEN-style supplements (AC, A) without base_identifier use "+" (no space before)
         # Other ISO supplements with base_identifier use " + " (space before)
         if supplement.class.name&.include?("DirectivesSupplement") ||
-            (supplement.methods.include?(:base_identifier) && !supplement.base_identifier.nil?)
+            (supplement.class.attributes.key?(:base_identifier) && !supplement.base_identifier.nil?)
           result += " + #{supplement.to_s(lang: lang, lang_single: lang_single,
                                           with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
         else
@@ -82,7 +82,7 @@ stage_format_long: nil, with_date: nil)
         # For DirectivesSupplement: add organization and "sup" (not "dir-sup")
         if supplement.class.name&.include?("DirectivesSupplement")
           # Add organization (e.g., "IEC")
-          if supplement.methods.include?(:supplement_publisher) && supplement.supplement_publisher
+          if supplement.class.attributes.key?(:supplement_publisher) && supplement.supplement_publisher
             parts << supplement.supplement_publisher.body.downcase
           end
 

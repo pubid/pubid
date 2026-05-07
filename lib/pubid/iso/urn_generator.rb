@@ -58,7 +58,7 @@ module Pubid
         end
       end
 
-      private
+      protected
 
       # Generate URN for base identifier (SingleIdentifier)
       def generate_base_urn
@@ -119,17 +119,17 @@ module Pubid
           base_gen = self.class.new(base_id)
 
           # Publisher
-          parts << base_gen.send(:originator_component)
+          parts << base_gen.originator_component
 
           # Type (for non-IS types like TR, TS, Guide)
-          type_comp = base_gen.send(:type_component)
+          type_comp = base_gen.type_component
           parts << type_comp if type_comp
 
           # Number
           parts << base_id.number.value if base_id.number
 
           # Part
-          part_comp = base_gen.send(:part_component)
+          part_comp = base_gen.part_component
           parts << part_comp if part_comp
 
           # Collect ALL editions (base + supplements) and add them here
@@ -137,7 +137,7 @@ module Pubid
           all_editions = []
 
           # Base edition first
-          edition_comp = base_gen.send(:edition_component)
+          edition_comp = base_gen.edition_component
           all_editions << edition_comp if edition_comp
 
           # Then supplement editions
@@ -154,12 +154,12 @@ module Pubid
           # - Include if base is proposal stage (10.xx) and supplement has different stage
           # - Don't include if base is approval/publication stage (50.xx, 60.xx)
           # - Don't include if supplement has same stage as base
-          base_stage_comp = base_gen.send(:stage_component)
+          base_stage_comp = base_gen.stage_component
           if base_stage_comp
             # Check if any supplement has a stage
             supplement_stages = supplement_chain.filter_map do |supp|
               supp_gen = self.class.new(supp)
-              supp_gen.send(:stage_component)
+              supp_gen.stage_component
             end
 
             # Only include base stage if:
@@ -185,11 +185,11 @@ module Pubid
 
           # Supplement stage (for draft supplements)
           # Note: editions are added at base level, not here
-          stage_comp = supp_gen.send(:stage_component)
+          stage_comp = supp_gen.stage_component
           parts << stage_comp if stage_comp
 
           # Supplement type code (amd, cor, sup)
-          suppl_type = supp_gen.send(:supplement_type_component)
+          suppl_type = supp_gen.supplement_type_component
           parts << suppl_type if suppl_type
 
           # Year and version (following RFC 5141-bis supplement semantics)

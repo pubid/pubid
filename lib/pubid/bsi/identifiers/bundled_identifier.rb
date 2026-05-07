@@ -25,11 +25,7 @@ module Pubid
             base_id = identifiers.first
             parts_list = identifiers[1..].map do |id|
               # Extract just the part number
-              part_val = begin
-                id.part
-              rescue NoMethodError
-                nil
-              end
+              part_val = id.class.attributes.key?(:part) ? id.part : nil
               if part_val
                 pv = part_val.is_a?(Components::Code) ? part_val.value : part_val
                 pv.to_s
@@ -49,8 +45,8 @@ module Pubid
 
           identifiers.each_with_index do |id, i|
             # Check metadata flags for how item was parsed
-            explicit_prefix = id.instance_variable_get(:@explicit_prefix)
-            explicit_publisher = id.instance_variable_get(:@explicit_publisher)
+            explicit_prefix = id.explicit_prefix
+            explicit_publisher = id.explicit_publisher
 
             if i.zero?
               # First item always uses full form
@@ -61,11 +57,7 @@ module Pubid
             elsif explicit_prefix
               # Prefix-only form: has explicit prefix but no publisher (e.g., "SP 138")
               abbrev_str = ""
-              prefix = begin
-                id.prefix
-              rescue NoMethodError
-                nil
-              end
+              prefix = id.class.attributes.key?(:prefix) ? id.prefix : nil
               if prefix && !prefix.to_s.empty?
                 abbrev_str = prefix.to_s
               end

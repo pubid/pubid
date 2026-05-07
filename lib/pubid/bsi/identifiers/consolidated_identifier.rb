@@ -12,7 +12,7 @@ module Pubid
           base_id = identifiers.first
 
           # Render base without suffixes (will add them after supplements)
-          result = if base_id.is_a?(Base) && base_id.methods.include?(:to_s_without_suffixes)
+          result = if base_id.is_a?(Base) && base_id.class.method_defined?(:to_s_without_suffixes)
                      base_id.to_s_without_suffixes
                    else
                      # Temporarily remove suffixes for rendering
@@ -52,39 +52,20 @@ module Pubid
 
           # Add suffixes from base identifier AFTER supplements
           if base_id.is_a?(Base)
-            ec = begin
-              base_id.expert_commentary
-            rescue NoMethodError
-              nil
-            end
+            base_attrs = base_id.class.attributes
+            ec = base_attrs.key?(:expert_commentary) ? base_id.expert_commentary : nil
             if ec
-              ect = begin
-                base_id.expert_commentary_topic
-              rescue NoMethodError
-                nil
-              end
+              ect = base_attrs.key?(:expert_commentary_topic) ? base_id.expert_commentary_topic : nil
               result += ect ? " ExComm (#{ect})" : " ExComm"
             end
 
-            tc = begin
-              base_id.tracked_changes
-            rescue NoMethodError
-              nil
-            end
+            tc = base_attrs.key?(:tracked_changes) ? base_id.tracked_changes : nil
             result += " - TC" if tc
 
             # Translation - preserve the "version" or "Translation" suffix if present
-            tl = begin
-              base_id.translation_lang
-            rescue NoMethodError
-              nil
-            end
+            tl = base_attrs.key?(:translation_lang) ? base_id.translation_lang : nil
             if tl
-              ts_type = begin
-                base_id.translation_suffix_type
-              rescue NoMethodError
-                nil
-              end
+              ts_type = base_attrs.key?(:translation_suffix_type) ? base_id.translation_suffix_type : nil
               result += if ts_type == "version"
                           " (#{tl} version)"
                         elsif ts_type == "Translation"
@@ -93,17 +74,9 @@ module Pubid
                           " (#{tl})"
                         end
             else
-              tu = begin
-                base_id.translation_upper
-              rescue NoMethodError
-                nil
-              end
+              tu = base_attrs.key?(:translation_upper) ? base_id.translation_upper : nil
               if tu
-                ts_type = begin
-                  base_id.translation_suffix_type
-                rescue NoMethodError
-                  nil
-                end
+                ts_type = base_attrs.key?(:translation_suffix_type) ? base_id.translation_suffix_type : nil
                 result += if ts_type == "Translation"
                             " (#{tu} Translation)"
                           else
@@ -113,11 +86,7 @@ module Pubid
             end
 
             # Reaffirmation notation like (R2004)
-            ry = begin
-              base_id.reaffirmation_year
-            rescue NoMethodError
-              nil
-            end
+            ry = base_attrs.key?(:reaffirmation_year) ? base_id.reaffirmation_year : nil
             result += " (R#{ry})" if ry
           end
 
@@ -128,11 +97,7 @@ module Pubid
           base = identifiers&.first
           return nil unless base
 
-          urn = begin
-            base.to_urn
-          rescue NoMethodError
-            nil
-          end
+          urn = base.to_urn if base.class.method_defined?(:to_urn)
           return urn unless urn
 
           # Append supplement info to URN
@@ -159,27 +124,27 @@ module Pubid
 
         def year
           base = identifiers&.first
-          base.year if base&.methods&.include?(:year)
+          base.year if base&.class&.attributes&.key?(:year)
         end
 
         def date
           base = identifiers&.first
-          base.date if base&.methods&.include?(:date)
+          base.date if base&.class&.attributes&.key?(:date)
         end
 
         def parts
           base = identifiers&.first
-          base.parts if base&.methods&.include?(:parts)
+          base.parts if base&.class&.attributes&.key?(:parts)
         end
 
         def part
           base = identifiers&.first
-          base.part if base&.methods&.include?(:part)
+          base.part if base&.class&.attributes&.key?(:part)
         end
 
         def type
           base = identifiers&.first
-          base.type if base&.methods&.include?(:type)
+          base.type if base&.class&.attributes&.key?(:type)
         end
       end
     end

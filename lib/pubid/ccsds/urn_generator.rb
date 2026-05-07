@@ -11,7 +11,7 @@ module Pubid
         end
       end
 
-      private
+      protected
 
       def generate_base_urn
         parts = ["urn", "ccsds"]
@@ -46,7 +46,7 @@ module Pubid
 
         edition = maybe(:edition)
         if edition
-          e = if edition.respond_to?(:number)
+          e = if edition.is_a?(Pubid::Components::Edition)
                 edition.number || edition.value
               else
                 edition.to_s
@@ -95,7 +95,7 @@ module Pubid
         end
 
         base_gen = self.class.new(current)
-        base_urn = base_gen.send(:generate_base_urn)
+        base_urn = base_gen.generate_base_urn
 
         base_identifier_part = base_urn.sub(/^urn:ccsds:/, "")
         parts << base_identifier_part

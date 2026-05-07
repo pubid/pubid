@@ -43,7 +43,7 @@ module Pubid
           if reaffirmation
             # For combined identifiers, check year format from first identifier
             # to determine spacing
-            year_was_2digit = first.methods.include?(:original_year_4digit) && !first.original_year_4digit
+            year_was_2digit = first.class.attributes.key?(:original_year_4digit) && !first.original_year_4digit
 
             # Check if reaffirmation was originally 4-digit
             # Note: We need to track this at the Combined level, but for now

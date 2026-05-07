@@ -6,6 +6,11 @@ module Pubid
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
       class Base < Pubid::Identifier
+        # Default: no typed stages. Subclasses override as needed.
+        def self.typed_stages
+          []
+        end
+
         # Generate URN for this identifier
         #
         # @return [String] URN representation
@@ -58,14 +63,19 @@ module Pubid
         attribute :draft, :string
         attribute :draft_number, :string # For -draft N → N pd rendering
 
+        # Default series_code — subclasses override to provide a normalized series name.
+        def series_code
+          nil
+        end
+
         def initialize(**attributes)
           super()
 
-          # Set all provided attributes
+          attrs = self.class.attributes
           attributes.each do |key, value|
-            send("#{key}=", value) unless value.nil?
-          rescue NoMethodError
-            nil
+            next if value.nil?
+            setter = :"#{key}="
+            public_send(setter, value) if attrs.key?(key)
           end
 
           # NOTE: Compound number building is handled by the Builder class
@@ -125,9 +135,8 @@ module Pubid
         # Used for ranking identifiers by specificity for conflict resolution
         # @return [Integer] weight score (higher = more specific)
         def weight
-          instance_variables.inject(0) do |sum, var|
-            val = instance_variable_get(var)
-            # Count non-nil, non-false values
+          self.class.attributes.keys.inject(0) do |sum, key|
+            val = public_send(key)
             val && !val.to_s.empty? ? sum + 1 : sum
           end
         end
@@ -139,46 +148,31 @@ module Pubid
         def merge(document)
           return self unless document.is_a?(Base)
 
-          # For each attribute, prefer more specific value:
-          # 1. New value if current is nil
-          # 2. New value if it's longer/more specific
-          # 3. New value for certain attributes (series, publisher)
-          document.instance_variables.each do |var|
-            next if var == :@rendering_style # Skip non-data attributes
-            next if var == :@parsed_format
+          attrs = self.class.attributes
+          attrs.each_key do |var_name|
+            next if var_name == :rendering_style
+            next if var_name == :parsed_format
 
-            var_name = var.to_s.sub("@", "").to_sym
-            current_val = instance_variable_get(var)
-
-            new_val = document.instance_variable_get(var)
+            current_val = public_send(var_name)
+            new_val = document.public_send(var_name)
             next unless new_val
 
-            # Apply merge rules
             should_merge = case var_name
                            when :publisher, :series, :number
-                             # Always take new value for core identifying attributes
                              true
                            when :edition
-                             # Compare edition numerically (extract number from r3, r5, etc.)
-                             current_val.nil? || edition_greater?(new_val,
-                                                                  current_val)
+                             current_val.nil? || edition_greater?(new_val, current_val)
                            when :volume, :part, :version, :revision
-                             # Prefer longer/more specific value for these
                              current_val.nil? || (new_val.to_s.length > current_val.to_s.length)
                            when :supplement, :errata, :index, :insert, :section, :appendix, :translation
-                             # Always merge these if present
                              true
                            when :year, :month, :update, :draft
-                             # Prefer new value
                              true
                            else
                              false
                            end
 
-            if should_merge && methods.include?(:"#{var_name}=")
-              send("#{var_name}=",
-                   new_val)
-            end
+            public_send(:"#{var_name}=", new_val) if should_merge
           end
 
           self
@@ -281,7 +275,7 @@ module Pubid
 
           # Determine effective series - PREFER series_code if subclass defines it
           # This allows normalization (e.g., LCIRC → LC in LetterCircular)
-          effective_series = if methods.include?(:series_code) && series_code
+          effective_series = if series_code
                                series_code
                              elsif series
                                series.to_s
@@ -410,7 +404,7 @@ module Pubid
 
           # Determine effective series - PREFER series_code if subclass defines it
           # This allows normalization (e.g., LCIRC → LC in LetterCircular)
-          effective_series = if methods.include?(:series_code) && series_code
+          effective_series = if series_code
                                series_code
                              elsif series
                                series.to_s

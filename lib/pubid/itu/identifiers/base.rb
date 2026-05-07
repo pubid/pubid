@@ -142,7 +142,7 @@ module Pubid
         def validate_ob_no_sector!
           return unless series&.series == "OB"
           return if sector.nil?
-          return if sector.methods.include?(:sector) && (sector.sector.nil? || sector.sector.to_s.empty?)
+          return if sector.is_a?(Components::Sector) && (sector.sector.nil? || sector.sector.to_s.empty?)
 
           raise ArgumentError,
                 "OB (Operational Bulletin) is a cross-bureau ITU publication; " \

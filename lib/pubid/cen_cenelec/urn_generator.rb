@@ -11,7 +11,7 @@ module Pubid
         end
       end
 
-      private
+      protected
 
       def generate_base_urn
         parts = ["urn", "cen"]
@@ -80,7 +80,7 @@ module Pubid
         base_id = maybe(:base_identifier)
         if base_id
           base_gen = self.class.new(base_id)
-          base_urn = base_gen.send(:generate_base_urn)
+          base_urn = base_gen.generate_base_urn
 
           base_part = base_urn.sub(/^urn:cen:/, "")
           base_parts = base_part.split(":")

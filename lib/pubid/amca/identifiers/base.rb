@@ -30,11 +30,7 @@ module Pubid
           parts = []
           parts << copublisher if copublisher
           # type is a hash, get the title
-          t = begin
-            type
-          rescue NoMethodError
-            nil
-          end
+          t = self.class.attributes.key?(:type) ? type : nil
           if t.is_a?(Hash) && t[:title]
             parts << t[:title].to_s
           end

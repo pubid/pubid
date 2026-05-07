@@ -17,7 +17,7 @@ module Pubid
     def self.parse(identifier)
       # Use the Parser class's preprocessing method
       # Note: We call the class method directly to ensure preprocessing is applied
-      parsed = Parser.send(:class_parse_with_preprocessing, identifier)
+      parsed = Parser.class_parse_with_preprocessing(identifier)
 
       # Use Scheme and Builder for clean architecture
       # ONE CLASS PER SERIES TYPE (like ISO)

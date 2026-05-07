@@ -22,7 +22,7 @@ module Pubid
           seen_keys << type_key
 
           examples = match_nist_examples(fixture_data, type_key, klass)
-          stages = klass.methods.include?(:typed_stages) ? klass.typed_stages : []
+          stages = klass.typed_stages
 
           IdentifierTypeResult.new(
             key: info[:key],

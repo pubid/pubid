@@ -20,7 +20,7 @@ module Pubid
         parts = ["API"]
 
         # Add type if available
-        parts << type_string if methods.include?(:type_string) && type_string
+        parts << type_string if self.class.attributes.key?(:type_string) && type_string
 
         # Add code/number with part as one token
         parts << code_portion if code_portion

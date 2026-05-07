@@ -38,7 +38,7 @@ module Pubid
         # Include type_string and annex in serialization for round-trip compatibility
         def base_hash
           hash = super
-          hash[:type] = type_string if methods.include?(:type_string)
+          hash[:type] = type_string if self.class.attributes.key?(:type_string) && type_string
           hash[:annex] = annex if annex
           hash
         end

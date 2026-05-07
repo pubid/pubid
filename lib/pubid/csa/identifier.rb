@@ -44,7 +44,7 @@ module Pubid
               set_publisher_prefix(result, "CAN/CSA-")
 
               # Handle reaffirmation if present
-              if (wrapped_input =~ /\(R(\d{4})\)/) && result.methods.include?(:reaffirmation=)
+              if (wrapped_input =~ /\(R(\d{4})\)/) && result.class.attributes.key?(:reaffirmation)
                 result.reaffirmation = $1
               end
             end
@@ -92,14 +92,14 @@ module Pubid
           # Set publisher prefix on wrapped identifier
           # For Series identifiers with CAN/ wrapper, use full "CAN/CSA-" prefix
           # For other identifiers, use the detected original_prefix ("CSA-" or "CSA")
-          if wrapped_identifier.methods.include?(:publisher_prefix=)
+          if wrapped_identifier.class.attributes.key?(:publisher_prefix)
             if is_can_csa && wrapped_identifier.is_a?(Identifiers::Series)
               # Series gets full "CAN/CSA-" prefix for proper rendering
               wrapped_identifier.publisher_prefix = "CAN/CSA-"
             elsif original_prefix
               # For Combined identifiers, set on first identifier
-              if wrapped_identifier.methods.include?(:first) && wrapped_identifier.first
-                wrapped_identifier.first.publisher_prefix = original_prefix if wrapped_identifier.first.methods.include?(:publisher_prefix=)
+              if wrapped_identifier.is_a?(Identifiers::Combined) && wrapped_identifier.first
+                wrapped_identifier.first.publisher_prefix = original_prefix if wrapped_identifier.first.class.attributes.key?(:publisher_prefix)
               else
                 # For non-Combined identifiers, set directly
                 wrapped_identifier.publisher_prefix = original_prefix
@@ -108,9 +108,9 @@ module Pubid
           end
 
           # Set reaffirmation on wrapped_identifier if it has the attribute
-          if wrapped_identifier.methods.include?(:reaffirmation=) && reaffirm_year
+          if wrapped_identifier.class.attributes.key?(:reaffirmation) && reaffirm_year
             wrapped_identifier.reaffirmation = reaffirm_year
-            if wrapped_identifier.methods.include?(:original_reaffirmation_4digit=)
+            if wrapped_identifier.class.attributes.key?(:original_reaffirmation_4digit)
               wrapped_identifier.original_reaffirmation_4digit = reaffirmation_was_4digit
             end
           end
@@ -152,10 +152,10 @@ module Pubid
           return nil unless wrapped_identifier
 
           # Set year_format for dash format identifiers (preserve original 2-digit year)
-          if has_dash_year && wrapped_identifier.methods.include?(:year_format=)
+          if has_dash_year && wrapped_identifier.class.attributes.key?(:year_format)
             wrapped_identifier.year_format = "dash"
             # Mark original year as 2-digit so renderer converts back (1986 → 86)
-            if wrapped_identifier.methods.include?(:original_year_4digit=)
+            if wrapped_identifier.class.attributes.key?(:original_year_4digit)
               wrapped_identifier.original_year_4digit = false
             end
           end
@@ -171,14 +171,14 @@ module Pubid
           end
 
           # Set CAN3- as publisher prefix on wrapped identifier
-          if wrapped_identifier.methods.include?(:publisher_prefix=)
+          if wrapped_identifier.class.attributes.key?(:publisher_prefix)
             wrapped_identifier.publisher_prefix = "CAN3-"
           end
 
           # Set reaffirmation on wrapped_identifier if it has the attribute
-          if wrapped_identifier.methods.include?(:reaffirmation=) && reaffirm_year
+          if wrapped_identifier.class.attributes.key?(:reaffirmation) && reaffirm_year
             wrapped_identifier.reaffirmation = reaffirm_year
-            if wrapped_identifier.methods.include?(:original_reaffirmation_4digit=)
+            if wrapped_identifier.class.attributes.key?(:original_reaffirmation_4digit)
               wrapped_identifier.original_reaffirmation_4digit = reaffirmation_was_4digit
             end
           end
@@ -403,25 +403,25 @@ module Pubid
 
       def self.set_publisher_prefix(obj, prefix)
         # Set on main object if it has the attribute
-        begin
+        if obj.class.attributes.key?(:publisher_prefix)
           obj.publisher_prefix = prefix
-        rescue NoMethodError
-          nil
         end
 
         # Set on combined identifier parts
-        if obj.methods.include?(:first) && obj.first&.methods&.include?(:publisher_prefix=)
-          obj.first.publisher_prefix = prefix
-        end
-        if obj.methods.include?(:second) && obj.second.methods.include?(:has_publisher) && obj.second.has_publisher && obj.second.methods.include?(:publisher_prefix=)
-          obj.second.publisher_prefix = prefix
-        end
-        if obj.methods.include?(:third) && obj.third.methods.include?(:has_publisher) && obj.third.has_publisher && obj.third.methods.include?(:publisher_prefix=)
-          obj.third.publisher_prefix = prefix
+        if obj.is_a?(Identifiers::Combined)
+          if obj.first&.class&.attributes&.key?(:publisher_prefix)
+            obj.first.publisher_prefix = prefix
+          end
+          if obj.second && obj.second.class.attributes.key?(:has_publisher) && obj.second.has_publisher && obj.second.class.attributes.key?(:publisher_prefix)
+            obj.second.publisher_prefix = prefix
+          end
+          if obj.third && obj.third.class.attributes.key?(:has_publisher) && obj.third.has_publisher && obj.third.class.attributes.key?(:publisher_prefix)
+            obj.third.publisher_prefix = prefix
+          end
         end
 
         # Set on bundled identifier base
-        if obj.methods.include?(:base) && obj.base
+        if obj.is_a?(Identifiers::Bundled) && obj.base
           set_publisher_prefix(obj.base, prefix)
         end
       end

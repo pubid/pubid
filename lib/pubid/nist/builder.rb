@@ -427,18 +427,14 @@ module Pubid
               # Skip assignment for second_number hashes - they'll be processed during compound number construction
               next if sub_key == :second_number && sub_value.is_a?(Hash) && sub_value[:number_only]
 
-              begin
-                identifier.send("#{sub_key}=", sub_value)
-              rescue NoMethodError
-                nil
-              end
+              attrs = identifier.class.attributes
+              setter = "#{sub_key}="
+              identifier.public_send(setter, sub_value) if attrs.key?(sub_key.to_sym)
             end
           else
-            begin
-              identifier.send("#{key}=", realized_components)
-            rescue NoMethodError
-              nil
-            end
+            attrs = identifier.class.attributes
+            setter = "#{key}="
+            identifier.public_send(setter, realized_components) if attrs.key?(key.to_sym)
           end
         end
 

@@ -636,11 +636,8 @@ module Pubid
         id.prefix = prefix_val if prefix_val && !prefix_val.empty?
         id.number = Components::Code.new(value: number_val) if number_val
 
-        # Store explicit flags for rendering (use instance variables since it's metadata)
-        # Track both publisher and prefix explicitly
-        id.instance_variable_set(:@explicit_prefix,
-                                 has_explicit_publisher || has_explicit_prefix)
-        id.instance_variable_set(:@explicit_publisher, has_explicit_publisher)
+        id.explicit_prefix = has_explicit_publisher || has_explicit_prefix
+        id.explicit_publisher = has_explicit_publisher
 
         # Handle dash-separated parts (from parts array)
         if parts_val.is_a?(Hash) && parts_val[:parts].is_a?(Array)
@@ -653,7 +650,7 @@ module Pubid
         elsif space_separated_part_val
           id.part = Components::Code.new(value: space_separated_part_val.to_s)
           # Mark this part as space-separated for rendering
-          id.instance_variable_set(:@space_separated_part, true)
+          id.space_separated_part = true
         end
 
         id
@@ -1421,17 +1418,12 @@ expert_commentary: nil, expert_commentary_topic: nil)
         # If expert_commentary data is provided, set it on the base_identifier
         # This allows ConsolidatedIdentifier to render the ExComm suffix correctly
         if expert_commentary
-          begin
+          base_attrs = base_identifier.class.attributes
+          if base_attrs.key?(:expert_commentary)
             base_identifier.expert_commentary = expert_commentary
-          rescue NoMethodError
-            nil
           end
-          if expert_commentary_topic
-            begin
-              base_identifier.expert_commentary_topic = expert_commentary_topic
-            rescue NoMethodError
-              nil
-            end
+          if expert_commentary_topic && base_attrs.key?(:expert_commentary_topic)
+            base_identifier.expert_commentary_topic = expert_commentary_topic
           end
         end
 
