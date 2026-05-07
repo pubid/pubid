@@ -48,7 +48,7 @@ module Pubid
             let(:sector) { "T" }
             let(:params) do
               { number: 1, type: :supplement,
-                base: Identifier.create(sector: "T", series: "H") }
+                base: described_class.create(sector: "T", series: "H") }
             end
 
             it "renders series supplement" do
@@ -60,7 +60,7 @@ module Pubid
             let(:sector) { "T" }
             let(:params) do
               { number: 1, type: :supplement,
-                base: Identifier.create(sector: "T", series: "H", number: 1) }
+                base: described_class.create(sector: "T", series: "H", number: 1) }
             end
 
             it "renders series supplement" do
@@ -104,7 +104,8 @@ module Pubid
           let(:number) { nil }
           let(:params) do
             { type: :annex,
-              base: Identifier.create(sector: "T", series: "OB", number: 1) }
+              base: described_class.create(sector: "T", series: "OB",
+                                           number: 1) }
           end
 
           it "renders annex to identifier" do

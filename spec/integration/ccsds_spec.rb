@@ -14,14 +14,14 @@ RSpec.describe "CCSDS Integration" do
     end
 
     context "basic formats" do
-      include_examples "parses and renders correctly", "CCSDS 120.0-G-4"
-      include_examples "parses and renders correctly", "CCSDS 121.0-B-3"
-      include_examples "parses and renders correctly", "CCSDS 130.0-G-4"
+      it_behaves_like "parses and renders correctly", "CCSDS 120.0-G-4"
+      it_behaves_like "parses and renders correctly", "CCSDS 121.0-B-3"
+      it_behaves_like "parses and renders correctly", "CCSDS 130.0-G-4"
     end
 
     context "with corrigenda" do
-      include_examples "parses and renders correctly", "CCSDS 123.0-B-2 Cor. 1"
-      include_examples "parses and renders correctly", "CCSDS 123.0-B-2 Cor. 2"
+      it_behaves_like "parses and renders correctly", "CCSDS 123.0-B-2 Cor. 1"
+      it_behaves_like "parses and renders correctly", "CCSDS 123.0-B-2 Cor. 2"
     end
   end
 

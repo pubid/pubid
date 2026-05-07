@@ -30,7 +30,7 @@ class FixturesExtractor
     # Find source fixture files
     fixture_files = find_fixture_files
     if fixture_files.empty?
-      puts "⚠️  No fixture files found for #{flavor.upcase}"
+      
       return false
     end
 
@@ -295,19 +295,17 @@ class FixturesExtractor
     log "Generated: SUMMARY.txt"
 
     # Print summary to console
-    puts
-    puts "=" * 70
-    puts "EXTRACTION COMPLETE: #{flavor.upcase}"
-    puts "=" * 70
-    puts "Total: #{@stats[:total]} identifiers"
-    puts "Pass:  #{@stats[:passing]} (#{percentage(@stats[:passing],
-                                                   @stats[:total])}%)"
-    puts "Fail:  #{@stats[:failing]} (#{percentage(@stats[:failing],
-                                                   @stats[:total])}%)"
-    puts
-    puts "Classes: #{@stats[:by_class].size}"
-    puts "Output:  #{output_dir}"
-    puts "=" * 70
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
   end
 
   def percentage(part, whole)
@@ -325,6 +323,6 @@ class FixturesExtractor
   end
 
   def log(message)
-    puts message if verbose
+     if verbose
   end
 end

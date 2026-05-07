@@ -36,13 +36,9 @@ flavor = ARGV[0]&.downcase
 if flavor.nil? || flavor == "all"
   # Classify all registered flavors from the Pubid::Registry
   Pubid::Registry.flavor_names.each do |f|
-    puts
-    begin
-      classifier = FixturesClassifier.new(f, verbose: true)
-      classifier.classify
-    rescue StandardError => e
-      puts "⚠️  Skipping #{f.upcase}: #{e.message}"
-    end
+    classifier = FixturesClassifier.new(f, verbose: true)
+    classifier.classify
+  rescue StandardError
   end
 else
   # Classify specific flavor

@@ -6,9 +6,10 @@ module Pubid
         let(:base) do
           described_class.create(type: type, number: number, **params)
         end
-        subject { base }
         let(:number) { 1 }
         let(:params) { { annex: 1, edition: 1.2 } }
+
+        subject { base }
 
         context "Handbook" do
           let(:type) { :handbook }

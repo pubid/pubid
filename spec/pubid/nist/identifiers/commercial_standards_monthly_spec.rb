@@ -6,7 +6,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandardsMonthly do
     context "CSM v#n# format" do
       it "parses basic v#n# format" do
         id = Pubid::Nist.parse("NBS CSM v6n1")
-        expect(id).to be_a(Pubid::Nist::Identifiers::CommercialStandardsMonthly)
+        expect(id).to be_a(described_class)
         expect(id.to_s).to eq("NBS CSM v6n1")
       end
 

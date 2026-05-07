@@ -41,23 +41,11 @@ RSpec.describe "ETSI Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n#{'=' * 80}"
-      puts "ETSI ROUND-TRIP RESULTS"
-      puts "=" * 80
-      puts "Total identifiers: #{fixtures.size}"
-      puts "Successes: #{successes} (#{(successes.to_f / fixtures.size * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
-
       if failures.any?
-        puts "\nFirst 20 failures:"
+
         failures.first(20).each do |failure|
           if failure[:error]
-            puts "  #{failure[:original]}"
-            puts "    ERROR: #{failure[:error]}"
-          else
-            puts "  #{failure[:original]} (#{failure[:class]})"
-            puts "    Got: #{failure[:rendered]}"
+
           end
         end
       end

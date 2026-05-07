@@ -42,7 +42,7 @@ module Pubid
         it_behaves_like "converts pubid to pubid"
 
         it "has all-parts attribute" do
-          expect(subject.all_parts?).to be_truthy
+          expect(subject).to be_all_parts
         end
 
         context "when compare with identifier with part" do

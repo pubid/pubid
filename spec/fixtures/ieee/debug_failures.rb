@@ -25,22 +25,8 @@ test_cases = [
   "IEEE Std 960-1989, Std 1177-1989",
 ]
 
-puts "Testing IEEE Parser Failures"
-puts "=" * 80
-
 test_cases.each do |identifier|
-  puts "\nTesting: #{identifier}"
-  puts "-" * 80
-
-  begin
-    result = Pubid::Ieee.parse(identifier)
-    puts "✓ SUCCESS: Parsed as #{result.class}"
-    puts "  Result: #{result}"
-  rescue Parslet::ParseFailed => e
-    puts "✗ FAILED: #{e.message}"
-  rescue StandardError => e
-    puts "✗ ERROR: #{e.class} - #{e.message}"
-  end
+  Pubid::Ieee.parse(identifier)
+rescue Parslet::ParseFailed
+rescue StandardError
 end
-
-puts "\n#{'=' * 80}"

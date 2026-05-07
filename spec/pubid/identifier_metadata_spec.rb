@@ -65,7 +65,7 @@ RSpec.describe Pubid::IdentifierMetadata do
 end
 
 RSpec.describe Pubid::IdentifierRegistry do
-  before(:each) do
+  before do
     # Clear registry before each test
     described_class.clear!
   end

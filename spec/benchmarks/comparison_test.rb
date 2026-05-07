@@ -13,21 +13,12 @@ module Pubid
       end
 
       def run_all
-        puts "=" * 80
-        puts "PubID v2 Optimization Comparison (Before vs After)"
-        puts "=" * 80
-        puts
-
         compare_registry_lookup
-        puts
+
         compare_hash_operations
-        puts
       end
 
       def compare_registry_lookup
-        puts "1. REGISTRY LOOKUP COMPARISON"
-        puts "-" * 80
-
         scheme = Pubid::Iso::Scheme.instance
         abbrs = ["WD", "CD", "FDIS", "Amd", "Cor", "PWI", "NP", "IS", "", "FDAM", "CDAMD",
                  "PWI Guide", "NP Guide", "AWI", "DAmd", "DAnnex", "DEx"]
@@ -51,27 +42,12 @@ module Pubid
           end
         end
 
-        speedup = linear_time / hash_time
-        ops_before = total_lookups / linear_time
-        ops_after = total_lookups / hash_time
-
-        puts "BEFORE (Linear Search):"
-        puts "  Total time: #{linear_time.round(4)}s"
-        puts "  Operations: #{total_lookups}"
-        puts "  Ops/sec: #{ops_before.round(0)}"
-        puts
-        puts "AFTER (Hash-based Index):"
-        puts "  Total time: #{hash_time.round(4)}s"
-        puts "  Operations: #{total_lookups}"
-        puts "  Ops/sec: #{ops_after.round(0)}"
-        puts
-        puts "Speedup: #{speedup.round(2)}x faster"
+        linear_time / hash_time
+        total_lookups / linear_time
+        total_lookups / hash_time
       end
 
       def compare_hash_operations
-        puts "2. HASH OPERATIONS COMPARISON"
-        puts "-" * 80
-
         ids = [
           Pubid::Iso.parse("ISO 9001:2015"),
           Pubid::Iso.parse("ISO 14001:2015"),
@@ -100,21 +76,9 @@ module Pubid
           end
         end
 
-        speedup = compare_time / hash_time
-        ops_before = (@iterations * ids.size) / compare_time
-        ops_after = (@iterations * ids.size) / hash_time
-
-        puts "BEFORE (Linear Comparison):"
-        puts "  Total time: #{compare_time.round(4)}s"
-        puts "  Operations: #{@iterations * ids.size}"
-        puts "  Ops/sec: #{ops_before.round(0)}"
-        puts
-        puts "AFTER (Hash-based Set):"
-        puts "  Total time: #{hash_time.round(4)}s"
-        puts "  Operations: #{@iterations * ids.size}"
-        puts "  Ops/sec: #{ops_after.round(0)}"
-        puts
-        puts "Speedup: #{speedup.round(2)}x faster"
+        compare_time / hash_time
+        (@iterations * ids.size) / compare_time
+        (@iterations * ids.size) / hash_time
       end
     end
   end

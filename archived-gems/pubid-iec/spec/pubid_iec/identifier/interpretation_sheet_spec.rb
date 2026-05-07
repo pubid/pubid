@@ -17,6 +17,7 @@ module Pubid
 
           context "with hash base parameter" do
             let(:base_params) { { number: 60050, part: 351, year: 2013 } }
+
             subject { described_class.new(base: base_params, number: 123) }
 
             it "creates Identifier from hash" do
@@ -39,6 +40,7 @@ module Pubid
             let(:base_identifier) do
               Identifier.create(number: 60050, part: 351, year: 2013)
             end
+
             subject { described_class.new(base: base_identifier, number: 456) }
 
             it "uses the provided Identifier directly" do
@@ -52,6 +54,7 @@ module Pubid
 
           context "with various keyword arguments" do
             let(:base_identifier) { Identifier.create(number: 60050) }
+
             subject do
               described_class.new(
                 base: base_identifier,
@@ -84,6 +87,7 @@ module Pubid
                 language: "fr",
               }
             end
+
             subject { described_class.new(base: base_params, number: 456) }
 
             it "creates base identifier with all attributes" do
@@ -97,6 +101,7 @@ module Pubid
 
           context "with Base subclass as base parameter" do
             let(:base_tr) { TechnicalReport.new(number: 60083, year: 2015) }
+
             subject { described_class.new(base: base_tr, number: 123) }
 
             it "accepts Base subclass instances" do

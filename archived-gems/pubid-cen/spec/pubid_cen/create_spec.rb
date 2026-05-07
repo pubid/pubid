@@ -86,8 +86,8 @@ module Pubid
 
         context "incorporated supplements" do
           let(:params) do
-            { incorporated_supplements: [Identifier.create(type: type, number: 1,
-                                                           year: 1999)] }
+            { incorporated_supplements: [described_class.create(type: type, number: 1,
+                                                                year: 1999)] }
           end
 
           context "amendment" do
@@ -110,7 +110,7 @@ module Pubid
         context "supplement" do
           let(:params) do
             { type: type, number: supplement_number, year: 1999,
-              base: Identifier.create(number: number) }
+              base: described_class.create(number: number) }
           end
           let(:supplement_number) { 1 }
 

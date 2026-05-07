@@ -5,7 +5,7 @@ module Pubid
     RSpec.describe Type do
       let(:config) do
         config = Pubid::Core::Configuration.new
-        config.type_class = Type
+        config.type_class = described_class
         config.default_type = DummyDefaultType
         config.type_names = { default: { long: "Default Type", short: "DEF" },
                               tr: { long: "Technical Report", short: "TR" },

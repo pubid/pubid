@@ -17,14 +17,14 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
       end
     end
 
-    include_examples "parses and normalizes",
-                     "ITU OB No. 1283", "ITU OB No. 1283"
-    include_examples "parses and normalizes",
-                     "ITU-T OB.1096", "ITU OB No. 1096"
-    include_examples "parses and normalizes",
-                     "ITU-T OB No. 1096", "ITU OB No. 1096"
-    include_examples "parses and normalizes",
-                     "ITU-T Operational Bulletin No. 1096", "ITU OB No. 1096"
+    it_behaves_like "parses and normalizes",
+                    "ITU OB No. 1283", "ITU OB No. 1283"
+    it_behaves_like "parses and normalizes",
+                    "ITU-T OB.1096", "ITU OB No. 1096"
+    it_behaves_like "parses and normalizes",
+                    "ITU-T OB No. 1096", "ITU OB No. 1096"
+    it_behaves_like "parses and normalizes",
+                    "ITU-T Operational Bulletin No. 1096", "ITU OB No. 1096"
 
     it "preserves date" do
       identifier = Pubid::Itu.parse("ITU OB No. 1283 (01/2024)")

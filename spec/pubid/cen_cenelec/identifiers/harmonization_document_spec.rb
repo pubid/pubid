@@ -6,6 +6,7 @@ RSpec.describe Pubid::CenCenelec::Identifiers::HarmonizationDocument do
   context "basic HD identifiers" do
     describe "HD 123:2020" do
       subject { "HD 123:2020" }
+
       let(:parsed) { Pubid::CenCenelec.parse(subject) }
 
       it "parses as HarmonizationDocument" do
@@ -35,6 +36,7 @@ RSpec.describe Pubid::CenCenelec::Identifiers::HarmonizationDocument do
 
     describe "HD 456" do
       subject { "HD 456" }
+
       let(:parsed) { Pubid::CenCenelec.parse(subject) }
 
       it "parses as HarmonizationDocument" do
@@ -54,6 +56,7 @@ RSpec.describe Pubid::CenCenelec::Identifiers::HarmonizationDocument do
   context "HD with part number" do
     describe "HD 789-1:2019" do
       subject { "HD 789-1:2019" }
+
       let(:parsed) { Pubid::CenCenelec.parse(subject) }
 
       it "parses as HarmonizationDocument" do
@@ -79,6 +82,7 @@ RSpec.describe Pubid::CenCenelec::Identifiers::HarmonizationDocument do
 
     describe "HD 321-5:2021" do
       subject { "HD 321-5:2021" }
+
       let(:parsed) { Pubid::CenCenelec.parse(subject) }
 
       it "parses part" do
@@ -94,6 +98,7 @@ RSpec.describe Pubid::CenCenelec::Identifiers::HarmonizationDocument do
   context "multi-digit numbers" do
     describe "HD 12345:2022" do
       subject { "HD 12345:2022" }
+
       let(:parsed) { Pubid::CenCenelec.parse(subject) }
 
       it "parses as HarmonizationDocument" do

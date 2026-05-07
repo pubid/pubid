@@ -8,6 +8,7 @@ RSpec.describe Pubid::Astm::Identifiers::DataSeries do
   # ========================================
   describe "parses simple data series" do
     subject { "ASTM DS4B-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -20,6 +21,7 @@ RSpec.describe Pubid::Astm::Identifiers::DataSeries do
 
   describe "parses data series with subseries" do
     subject { "ASTM DS7-S1-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -32,12 +34,13 @@ RSpec.describe Pubid::Astm::Identifiers::DataSeries do
 
   describe "parses data series with HOL suffix" do
     subject { "ASTM DS51HOL-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
       expect(parsed).to be_a(described_class)
       expect(parsed.code.number).to eq("51")
-      expect(parsed.hol_suffix).to eq(true)
+      expect(parsed.hol_suffix).to be(true)
       expect(parsed.to_s).to eq("ASTM DS51HOL-EB")
     end
   end

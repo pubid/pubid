@@ -162,9 +162,11 @@ RSpec.describe Pubid::Ieee::Parser do
       expect(subject.iso_part_stage_iteration_matcher).to parse("-2-DIS",
                                                                 trace: true)
     }
+
     it {
       expect(subject.iso_part_stage_iteration_matcher).to parse("-DIS-1403")
     }
+
     it { expect(subject.iso_part_stage_iteration_matcher).to parse("/FDIS") }
   end
 

@@ -12,8 +12,8 @@ File.foreach("#{base_dir}/spec/fixtures/iso/identifiers/pass/directives.txt") do
   begin
     parsed = Pubid::Iso.parse(id)
     roundtrip = parsed.to_s
-    puts "FAIL: #{id} -> #{roundtrip}" if roundtrip != id
+     if roundtrip != id
   rescue StandardError => e
-    puts "ERROR: #{id} - #{e.message}"
+    
   end
 end

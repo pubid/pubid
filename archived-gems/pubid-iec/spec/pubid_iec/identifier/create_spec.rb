@@ -27,7 +27,7 @@ module Pubid
 
           context "ISH type" do
             let(:params) do
-              { type: :ish, base: Identifier.create(number: number) }
+              { type: :ish, base: described_class.create(number: number) }
             end
 
             it "renders ISH document type" do
@@ -143,7 +143,7 @@ module Pubid
         context "ISH" do
           let(:params) do
             { type: "ISH", stage: stage,
-              base: Identifier.create(number: number) }
+              base: described_class.create(number: number) }
           end
           let(:stage) { "50.60" }
 

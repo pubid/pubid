@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "basic IR identifiers" do
       describe "NBS IR 73-212" do
         subject { "NBS IR 73-212" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 84-2946" do
         subject { "NIST IR 84-2946" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -53,6 +55,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS IR 80-2073.3" do
         subject { "NBS IR 80-2073.3" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -70,6 +73,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NISTIR 8115" do
         subject { "NISTIR 8115" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -83,6 +87,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS.IR.73-212" do
         subject { "NBS.IR.73-212" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -98,6 +103,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "IR with revision" do
       describe "NBS IR 73-197r" do
         subject { "NBS IR 73-197r" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -117,6 +123,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 6945r" do
         subject { "NIST IR 6945r" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -138,6 +145,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "IR with update" do
       describe "NISTIR 8115r1/upd" do
         subject { "NISTIR 8115r1/upd" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -165,6 +173,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NISTIR 8170-upd" do
         subject { "NISTIR 8170-upd" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -182,6 +191,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 4743rJun1992" do
         subject { "NIST IR 4743rJun1992" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -201,6 +211,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 4335rNov1990" do
         subject { "NIST IR 4335rNov1990" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -219,6 +230,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST.IR.8170-upd" do
         subject { "NIST.IR.8170-upd" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -232,6 +244,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NISTIR 8211-upd" do
         subject { "NISTIR 8211-upd" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -247,6 +260,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "IR with language" do
       describe "NIST IR 8115chi" do
         subject { "NIST IR 8115chi" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -264,6 +278,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 8118r1es" do
         subject { "NIST IR 8118r1es" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -284,6 +299,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST.IR.8115viet" do
         subject { "NIST.IR.8115viet" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -301,6 +317,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST.IR.8178port" do
         subject { "NIST.IR.8178port" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -318,6 +335,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 8115(esp)" do
         subject { "NIST IR 8115(esp)" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -335,6 +353,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NISTIR 8259Aes" do
         subject { "NISTIR 8259Aes" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -355,6 +374,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "IR with letter suffix" do
       describe "NIST IR 6529-a" do
         subject { "NIST IR 6529-a" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -372,6 +392,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 5443-A" do
         subject { "NIST IR 5443-A" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -389,6 +410,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 7297-B" do
         subject { "NIST IR 7297-B" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -406,6 +428,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 6099a" do
         subject { "NIST IR 6099a" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -423,6 +446,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 7103b" do
         subject { "NIST IR 7103b" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -440,6 +464,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 7356-CAS" do
         subject { "NIST IR 7356-CAS" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -459,6 +484,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "IR with edition year" do
       describe "NIST IR 5672-2018" do
         subject { "NIST IR 5672-2018" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -478,6 +504,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 6969-2018" do
         subject { "NIST IR 6969-2018" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -497,6 +524,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NIST IR 8200-2018" do
         subject { "NIST IR 8200-2018" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -518,6 +546,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
     context "IR with parts" do
       describe "NBS IR 73-285p1" do
         subject { "NBS IR 73-285p1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -535,6 +564,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS IR 79-1591-1" do
         subject { "NBS IR 79-1591-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -552,6 +582,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS IR 80-2111-1" do
         subject { "NBS IR 80-2111-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -565,6 +596,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS IR 80-2111-11" do
         subject { "NBS IR 80-2111-11" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -582,6 +614,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS IR 84-2857-1" do
         subject { "NBS IR 84-2857-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do
@@ -595,6 +628,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
 
       describe "NBS IR 74-577-1" do
         subject { "NBS IR 74-577-1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as InteragencyReport" do

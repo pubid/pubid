@@ -24,7 +24,7 @@ module Pubid
           end
         end
 
-        context "#to_s" do
+        describe "#to_s" do
           it "returns string representation" do
             expect(subject.to_s).to eq("DTR")
           end

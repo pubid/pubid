@@ -6,7 +6,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
     context "basic IEEE identifiers" do
       it "parses IEEE Std identifiers" do
         id = Pubid::Ieee.parse("IEEE Std 623-1976")
-        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id).to be_a(described_class)
 
         expect(id.code.to_s).to eq("623")
         expect(id.year).to eq("1976")
@@ -17,7 +17,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
       it "parses IEEE Std with letter prefix codes" do
         id = Pubid::Ieee.parse("IEEE Std C37.111-2013")
 
-        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id).to be_a(described_class)
         expect(id.code.to_s).to eq("C37.111")
         expect(id.year).to eq("2013")
 
@@ -27,7 +27,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
       it "parses IEEE P (project) identifiers" do
         id = Pubid::Ieee.parse("IEEE P11073-10404/D10")
 
-        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id).to be_a(described_class)
         expect(id.code.to_s).to eq("11073-10404")
         expect(id.draft_obj.version).to eq("10")
 
@@ -79,7 +79,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
         expect(ansi_identifier.part.value).to eq("1976")
 
         ncta_identifier = adopted_identifiers.last
-        expect(ncta_identifier).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(ncta_identifier).to be_a(described_class)
         expect(ncta_identifier.to_s).to eq("NCTA 006-0975")
 
         expect(id.to_s).to match("IEEE Std 623-1976 (ANSI Y32.21-1976 and NCTA 006-0975)")
@@ -108,7 +108,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
 
     context "relationships" do
       let(:related_id) do
-        Pubid::Ieee::Identifiers::Base.new(
+        described_class.new(
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
@@ -122,7 +122,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
           related_identifiers: [related_id],
         )
 
-        id = Pubid::Ieee::Identifiers::Base.new(
+        id = described_class.new(
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
@@ -141,7 +141,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
 
         inc_rel = Pubid::Ieee::Components::Relationship.new(
           relationship_type: Pubid::Ieee::Components::Relationship::INCORPORATES,
-          related_identifiers: [Pubid::Ieee::Identifiers::Base.new(
+          related_identifiers: [described_class.new(
             publisher: "IEEE",
             type: "Std",
             code: "802.11a",
@@ -149,7 +149,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
           )],
         )
 
-        id = Pubid::Ieee::Identifiers::Base.new(
+        id = described_class.new(
           publisher: "IEEE",
           type: "Std",
           code: "802.11",
@@ -161,14 +161,14 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
       end
 
       it "renders relationship with multiple identifiers" do
-        id1 = Pubid::Ieee::Identifiers::Base.new(
+        id1 = described_class.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232",
           year: "1995",
         )
 
-        id2 = Pubid::Ieee::Identifiers::Base.new(
+        id2 = described_class.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232.1",
@@ -180,7 +180,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Base do
           related_identifiers: [id1, id2],
         )
 
-        id = Pubid::Ieee::Identifiers::Base.new(
+        id = described_class.new(
           publisher: "IEEE",
           type: "Std",
           code: "1232",

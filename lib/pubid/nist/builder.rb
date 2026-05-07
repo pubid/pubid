@@ -429,12 +429,18 @@ module Pubid
 
               attrs = identifier.class.attributes
               setter = "#{sub_key}="
-              identifier.public_send(setter, sub_value) if attrs.key?(sub_key.to_sym)
+              if attrs.key?(sub_key.to_sym)
+                identifier.public_send(setter,
+                                       sub_value)
+              end
             end
           else
             attrs = identifier.class.attributes
             setter = "#{key}="
-            identifier.public_send(setter, realized_components) if attrs.key?(key.to_sym)
+            if attrs.key?(key.to_sym)
+              identifier.public_send(setter,
+                                     realized_components)
+            end
           end
         end
 
@@ -801,7 +807,6 @@ module Pubid
       end
 
       private
-
 
       # Cast parsed value to appropriate component type
       # ALL conversions happen in this single method

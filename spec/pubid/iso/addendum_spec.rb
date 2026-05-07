@@ -43,22 +43,22 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
   describe "parsing" do
     it "parses published addendum abbreviation" do
       id = Pubid::Iso.parse("ISO 9001:2015/Add 1:2020")
-      expect(id.class).to eq(Pubid::Iso::Identifiers::Addendum)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses ADD abbreviation" do
       id = Pubid::Iso.parse("ISO 9001:2015/ADD 1:2020")
-      expect(id.class).to eq(Pubid::Iso::Identifiers::Addendum)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses DAdd abbreviation" do
       id = Pubid::Iso.parse("ISO 9001:2015/DAdd 1:2020")
-      expect(id.class).to eq(Pubid::Iso::Identifiers::Addendum)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses FDAdd abbreviation" do
       id = Pubid::Iso.parse("ISO 9001:2015/FDAdd 1:2020")
-      expect(id.class).to eq(Pubid::Iso::Identifiers::Addendum)
+      expect(id.class).to eq(described_class)
     end
   end
 end

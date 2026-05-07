@@ -6,22 +6,22 @@ require_relative "../../../lib/pubid/oiml/scheme"
 RSpec.describe Pubid::Oiml::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
-      expect(Pubid::Oiml::Scheme.identifiers).to be_an(Array)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::BasicPublication)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::Document)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::ExpertReport)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::Guide)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::Recommendation)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::SeminarReport)
-      expect(Pubid::Oiml::Scheme.identifiers).to include(Pubid::Oiml::Identifiers::Vocabulary)
+      expect(described_class.identifiers).to be_an(Array)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::BasicPublication)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::Document)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::ExpertReport)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::Guide)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::Recommendation)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::SeminarReport)
+      expect(described_class.identifiers).to include(Pubid::Oiml::Identifiers::Vocabulary)
     end
   end
 
   describe ".supplement_identifiers" do
     it "returns array of registered supplement identifier classes" do
-      expect(Pubid::Oiml::Scheme.supplement_identifiers).to be_an(Array)
-      expect(Pubid::Oiml::Scheme.supplement_identifiers).to include(Pubid::Oiml::Identifiers::Amendment)
-      expect(Pubid::Oiml::Scheme.supplement_identifiers).to include(Pubid::Oiml::Identifiers::Annex)
+      expect(described_class.supplement_identifiers).to be_an(Array)
+      expect(described_class.supplement_identifiers).to include(Pubid::Oiml::Identifiers::Amendment)
+      expect(described_class.supplement_identifiers).to include(Pubid::Oiml::Identifiers::Annex)
     end
   end
 

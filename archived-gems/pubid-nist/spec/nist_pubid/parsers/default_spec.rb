@@ -26,7 +26,7 @@ RSpec.describe Pubid::Nist::Parsers::Default do
       expect(described_class.new.edition.parse("e5")).to eq(edition: "5")
     end
 
-    it " 800-53e5" do
+    it "800-53e5" do
       expect(described_class.new).to parse(" 800-53e5")
     end
   end

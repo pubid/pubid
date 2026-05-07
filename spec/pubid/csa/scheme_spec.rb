@@ -6,15 +6,15 @@ require_relative "../../../lib/pubid/csa/scheme"
 RSpec.describe Pubid::Csa::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
-      expect(Pubid::Csa::Scheme.identifiers).to be_an(Array)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::Standard)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::Bundled)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::CanadianAdopted)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::CsaAdopted)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::Package)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::Series)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::Cec)
-      expect(Pubid::Csa::Scheme.identifiers).to include(Pubid::Csa::Identifiers::Combined)
+      expect(described_class.identifiers).to be_an(Array)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::Standard)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::Bundled)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::CanadianAdopted)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::CsaAdopted)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::Package)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::Series)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::Cec)
+      expect(described_class.identifiers).to include(Pubid::Csa::Identifiers::Combined)
     end
   end
 

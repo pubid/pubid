@@ -98,7 +98,7 @@ RSpec.describe Pubid::Export::TypedStageResult do
 
   describe ".from_typed_stage" do
     let(:typed_stage) do
-      instance_double("TypedStage",
+      instance_double(TypedStage,
                       stage_code: :dis,
                       type_code: :is,
                       abbr: ["DIS", "FPD"],
@@ -116,7 +116,7 @@ RSpec.describe Pubid::Export::TypedStageResult do
     end
 
     it "handles typed stage without harmonized_stages" do
-      ts = instance_double("TypedStage",
+      ts = instance_double(TypedStage,
                            stage_code: :dis, type_code: :is, abbr: ["DIS"], name: "Draft")
       allow(ts).to receive(:respond_to?).with(:harmonized_stages).and_return(false)
       allow(ts).to receive(:respond_to?).with(:name).and_return(true)
@@ -126,7 +126,7 @@ RSpec.describe Pubid::Export::TypedStageResult do
     end
 
     it "handles typed stage without name" do
-      ts = instance_double("TypedStage",
+      ts = instance_double(TypedStage,
                            stage_code: :dis, type_code: :is, abbr: ["DIS"], harmonized_stages: [])
       allow(ts).to receive(:respond_to?).with(:name).and_return(false)
       allow(ts).to receive(:respond_to?).with(:harmonized_stages).and_return(true)

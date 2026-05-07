@@ -6,27 +6,27 @@ RSpec.describe Pubid::Bsi::Identifiers::Index do
   describe "parsing" do
     it "parses BS 5000:Index:1981" do
       id = Pubid::Bsi.parse("BS 5000:Index:1981")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Index)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 185:Index:1973" do
       id = Pubid::Bsi.parse("BS 185:Index:1973")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Index)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 185 Index:1964" do
       id = Pubid::Bsi.parse("BS 185 Index:1964")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Index)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 5000 Index Issue 4:1980" do
       id = Pubid::Bsi.parse("BS 5000 Index Issue 4:1980")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Index)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses BS 4999 Index Issue 1:1972" do
       id = Pubid::Bsi.parse("BS 4999 Index Issue 1:1972")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Index)
+      expect(id.class).to eq(described_class)
     end
   end
 

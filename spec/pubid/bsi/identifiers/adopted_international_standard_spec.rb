@@ -8,6 +8,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
   context "BS ISO adoption" do
     describe "BS ISO 8601:2019" do
       subject { "BS ISO 8601:2019" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -37,6 +38,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS ISO 9001:2015" do
       subject { "BS ISO 9001:2015" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -58,6 +60,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS ISO 1234" do
       subject { "BS ISO 1234" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -77,6 +80,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
   context "BS IEC adoption" do
     describe "BS IEC 62600:2020" do
       subject { "BS IEC 62600:2020" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -106,6 +110,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS IEC 60050-113:2011" do
       subject { "BS IEC 60050-113:2011" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -129,6 +134,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
   context "BS ISO/IEC copublisher adoption" do
     describe "BS ISO/IEC 27001:2013" do
       subject { "BS ISO/IEC 27001:2013" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -162,6 +168,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
 
     describe "BS ISO/IEC 15693-3:2019" do
       subject { "BS ISO/IEC 15693-3:2019" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do
@@ -189,6 +196,7 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
   context "multi-digit numbers" do
     describe "BS ISO 10000:2022" do
       subject { "BS ISO 10000:2022" }
+
       let(:parsed) { Pubid::Bsi.parse(subject) }
 
       it "parses as AdoptedInternationalStandard" do

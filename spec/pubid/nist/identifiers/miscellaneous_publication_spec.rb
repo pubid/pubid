@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::MiscellaneousPublication do
     context "basic MP identifiers" do
       describe "NBS MP 39e1" do
         subject { "NBS MP 39e1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as MiscellaneousPublication" do
@@ -41,6 +42,7 @@ RSpec.describe Pubid::Nist::Identifiers::MiscellaneousPublication do
 
       describe "NBS.MP.39e1" do
         subject { "NBS.MP.39e1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as MiscellaneousPublication" do

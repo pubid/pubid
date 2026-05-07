@@ -20,12 +20,8 @@ RSpec.configure do |config|
 
   # Shared context for all specs
   config.before(:suite) do
-    puts "PubID v2 Test Suite - Testing all flavors"
-    puts "=" * 60
   end
 
   config.after(:suite) do
-    puts "=" * 60
-    puts "Test suite completed"
   end
 end

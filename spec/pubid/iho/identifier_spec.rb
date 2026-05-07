@@ -4,7 +4,7 @@ require "spec_helper"
 
 RSpec.describe Pubid::Iho::Identifier do
   shared_examples "round-trips an IHO identifier" do
-    it "parses  and renders the canonical form" do
+    it "parses and renders the canonical form" do
       expect(Pubid::Iho.parse(input).to_s).to eq(canonical)
     end
   end

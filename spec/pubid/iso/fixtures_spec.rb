@@ -48,20 +48,16 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
         total = fixture_ids.count
         pass_rate = (successes.to_f / total * 100).round(2)
 
-        puts "\n#{fixture_file}: #{successes}/#{total} (#{pass_rate}%)"
-
         if failures.any?
-          puts "\nFirst 10 failures:"
+
           failures.first(10).each do |f|
             if f[:type] == "mismatch"
-              puts "  Mismatch: '#{f[:original]}' -> '#{f[:rendered]}'"
-            else
-              puts "  Parse error: '#{f[:original]}' (#{f[:error]})"
+
             end
           end
 
           if failures.count > 10
-            puts "  ... and #{failures.count - 10} more failures"
+
           end
         end
 
@@ -95,14 +91,6 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
       end
 
       overall_pass_rate = (total_successes.to_f / total_identifiers * 100).round(2)
-      puts "\n#{'=' * 60}"
-      puts "OVERALL ISO FIXTURES VALIDATION"
-      puts "=" * 60
-      puts "Total identifiers: #{total_identifiers}"
-      puts "Successes: #{total_successes}"
-      puts "Failures: #{total_identifiers - total_successes}"
-      puts "Pass rate: #{overall_pass_rate}%"
-      puts "=" * 60
 
       expect(overall_pass_rate).to be >= 95.0,
                                    "Expected ≥95% overall but got #{overall_pass_rate}%"

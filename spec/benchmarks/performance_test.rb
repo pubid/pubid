@@ -38,25 +38,16 @@ module Pubid
       end
 
       def run_all
-        puts "=" * 80
-        puts "PubID v2 Performance Benchmark"
-        puts "=" * 80
-        puts
-
         benchmark_parsing
-        puts
+
         benchmark_registry_lookup
-        puts
+
         benchmark_hash_operations
-        puts
+
         benchmark_set_operations
-        puts
       end
 
       def benchmark_parsing
-        puts "1. PARSING PERFORMANCE (#{@iterations} iterations)"
-        puts "-" * 80
-
         # Warm up JIT - only ISO for now
         10.times { ISO_IDENTIFIERS.each { |id| Pubid::Iso.parse(id) } }
 
@@ -67,12 +58,7 @@ module Pubid
           end
         end
 
-        ops_per_sec = (@iterations * ISO_IDENTIFIERS.size) / iso_time
-        puts "ISO Parsing:"
-        puts "  Total time: #{iso_time.round(4)}s"
-        puts "  Operations: #{@iterations * ISO_IDENTIFIERS.size}"
-        puts "  Ops/sec: #{ops_per_sec.round(0)}"
-        puts "  Avg parse: #{(iso_time / (@iterations * ISO_IDENTIFIERS.size) * 1_000_000).round(2)}μs"
+        (@iterations * ISO_IDENTIFIERS.size) / iso_time
 
         # NIST parsing - skip if identifiers can't be parsed
         begin
@@ -96,24 +82,14 @@ module Pubid
               end
             end
 
-            ops_per_sec = (@iterations * valid_nist.size) / nist_time
-            puts "NIST Parsing:"
-            puts "  Total time: #{nist_time.round(4)}s"
-            puts "  Operations: #{@iterations * valid_nist.size}"
-            puts "  Ops/sec: #{ops_per_sec.round(0)}"
-            puts "  Avg parse: #{(nist_time / (@iterations * valid_nist.size) * 1_000_000).round(2)}μs"
-          else
-            puts "NIST Parsing: Skipped (no valid identifiers)"
+            (@iterations * valid_nist.size) / nist_time
+
           end
-        rescue StandardError => e
-          puts "NIST Parsing: Skipped (#{e.message})"
+        rescue StandardError
         end
       end
 
       def benchmark_registry_lookup
-        puts "2. REGISTRY LOOKUP PERFORMANCE (#{@iterations} iterations)"
-        puts "-" * 80
-
         scheme = Pubid::Iso::Scheme.instance
 
         # Warm up
@@ -129,18 +105,10 @@ module Pubid
           end
         end
 
-        ops_per_sec = total_lookups / lookup_time
-        puts "Typed Stage Lookup:"
-        puts "  Total time: #{lookup_time.round(4)}s"
-        puts "  Operations: #{total_lookups}"
-        puts "  Ops/sec: #{ops_per_sec.round(0)}"
-        puts "  Avg lookup: #{(lookup_time / total_lookups * 1_000_000).round(2)}μs"
+        total_lookups / lookup_time
       end
 
       def benchmark_hash_operations
-        puts "3. HASH OPERATIONS PERFORMANCE (#{@iterations} iterations)"
-        puts "-" * 80
-
         id1 = Pubid::Iso.parse("ISO 9001:2015")
         id2 = Pubid::Iso.parse("ISO 14001:2015")
         id3 = Pubid::Iso.parse("ISO 9001:2015")
@@ -154,18 +122,10 @@ module Pubid
           end
         end
 
-        ops_per_sec = (@iterations * 3) / hash_time
-        puts "Hash Code Computation:"
-        puts "  Total time: #{hash_time.round(4)}s"
-        puts "  Operations: #{@iterations * 3}"
-        puts "  Ops/sec: #{ops_per_sec.round(0)}"
-        puts "  Avg hash: #{(hash_time / (@iterations * 3) * 1_000_000).round(2)}μs"
+        (@iterations * 3) / hash_time
       end
 
       def benchmark_set_operations
-        puts "4. SET OPERATIONS PERFORMANCE (#{@iterations} iterations)"
-        puts "-" * 80
-
         ids = ISO_IDENTIFIERS.map { |id| Pubid::Iso.parse(id) }
         set = ids.to_set
 
@@ -179,12 +139,7 @@ module Pubid
           end
         end
 
-        ops_per_sec = (@iterations * ids.size) / membership_time
-        puts "Set Membership:"
-        puts "  Total time: #{membership_time.round(4)}s"
-        puts "  Operations: #{@iterations * ids.size}"
-        puts "  Ops/sec: #{ops_per_sec.round(0)}"
-        puts "  Avg lookup: #{(membership_time / (@iterations * ids.size) * 1_000_000).round(2)}μs"
+        (@iterations * ids.size) / membership_time
 
         # Set union
         set2 = ids.take(5).to_set
@@ -192,11 +147,7 @@ module Pubid
           @iterations.times { set | set2 }
         end
 
-        ops_per_sec = @iterations / union_time
-        puts "Set Union:"
-        puts "  Total time: #{union_time.round(4)}s"
-        puts "  Operations: #{@iterations}"
-        puts "  Ops/sec: #{ops_per_sec.round(0)}"
+        @iterations / union_time
       end
     end
   end

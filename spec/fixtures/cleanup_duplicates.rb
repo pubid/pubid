@@ -19,8 +19,8 @@ class FixturesCleaner
   end
 
   def clean_all
-    puts "Cleaning up duplicate fixtures..."
-    puts "=" * 70
+    
+    
 
     FLAVORS.each do |flavor|
       clean_flavor(flavor)
@@ -140,19 +140,19 @@ class FixturesCleaner
   end
 
   def print_summary
-    puts
-    puts "=" * 70
-    puts "CLEANUP COMPLETE"
-    puts "=" * 70
-    puts "Files processed:           #{@stats[:files_processed]}"
-    puts "Files deleted:             #{@stats[:files_deleted]}"
-    puts "Duplicate lines removed:   #{@stats[:lines_removed]}"
-    puts "Total in pass/fail:        #{@stats[:identifiers_in_pass_fail]}"
-    puts "=" * 70
+    
+    
+    
+    
+    
+    
+    
+    
+    
   end
 
   def log(message)
-    puts message if @verbose
+     if @verbose
   end
 end
 
@@ -161,11 +161,11 @@ if __FILE__ == $PROGRAM_NAME
   verbose = ARGV.include?("--verbose") || ARGV.include?("-v")
 
   unless ARGV.include?("--confirm")
-    puts "This will remove duplicate identifiers from old fixture files."
-    puts "Files will be deleted if all identifiers have been moved to pass/fail."
-    puts
-    puts "Run with --confirm to proceed:"
-    puts "  ruby cleanup_duplicates.rb --confirm [--verbose]"
+    
+    
+    
+    
+    
     exit 1
   end
 

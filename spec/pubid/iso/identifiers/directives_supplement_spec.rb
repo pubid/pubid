@@ -26,6 +26,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
   context "basic directives supplement identifiers" do
     describe "ISO/IEC DIR 1 ISO SUP:2022" do
       subject { "ISO/IEC DIR 1 ISO SUP:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso:2022" }
 
@@ -72,6 +73,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR IEC SUP:2022" do
       subject { "ISO/IEC DIR IEC SUP:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec:2022" }
 
@@ -114,6 +116,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR 1 IEC SUP" do
       subject { "ISO/IEC DIR 1 IEC SUP" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iec" }
 
@@ -160,6 +163,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR IEC SUP" do
       subject { "ISO/IEC DIR IEC SUP" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec" }
 
@@ -202,6 +206,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR 1 ISO SUP" do
       subject { "ISO/IEC DIR 1 ISO SUP" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
 
@@ -251,6 +256,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
   context "JTC variations" do
     describe "ISO/IEC DIR JTC 1 SUP:2021" do
       subject { "ISO/IEC DIR JTC 1 SUP:2021" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:jtc:1:sup:2021" }
 
@@ -293,6 +299,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC DIR JTC 1 SUP" do
       subject { "ISO/IEC DIR JTC 1 SUP" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:jtc:1:sup" }
 
@@ -338,6 +345,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
   context "format normalization" do
     describe "ISO/IEC Directives, IEC Supplement:2022" do
       subject { "ISO/IEC Directives, IEC Supplement:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR IEC SUP:2022" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:sup:iec:2022" }
@@ -381,6 +389,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
 
     describe "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" do
       subject { "ISO/IEC Directives, Part 1 -- Consolidated ISO Supplement" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR 1 ISO SUP" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso" }
@@ -431,6 +440,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
   context "editions" do
     describe "ISO/IEC DIR 1 ISO SUP Edition 13" do
       subject { "ISO/IEC DIR 1 ISO SUP Edition 13" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:sup:iso:ed-13" }
 

@@ -4,17 +4,12 @@
 require_relative "../../../lib/pubid"
 
 input = "IEEE Std 960-1989, Std 1177-1989"
-puts "Input: #{input}"
 
 # Test preprocessing
-test = input.gsub(/(\d{4}),\s+Std\s/, '\1 and IEEE Std ')
-puts "After preprocessing: #{test}"
+input.gsub(/(\d{4}),\s+Std\s/, '\1 and IEEE Std ')
 
 # Try parsing
 begin
-  result = Pubid::Ieee.parse(input)
-  puts "Success: #{result.class}"
-  puts "Result: #{result}"
-rescue StandardError => e
-  puts "Failed: #{e.class} - #{e.message}"
+  Pubid::Ieee.parse(input)
+rescue StandardError
 end

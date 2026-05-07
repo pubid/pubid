@@ -9,6 +9,7 @@ RSpec.describe Pubid::Astm::Identifiers::WorkInProgress do
 
   describe "parses work in progress" do
     subject { "ASTM WK91249" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -20,6 +21,7 @@ RSpec.describe Pubid::Astm::Identifiers::WorkInProgress do
 
   describe "parses work in progress without prefix" do
     subject { "ASTM WK95199" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do

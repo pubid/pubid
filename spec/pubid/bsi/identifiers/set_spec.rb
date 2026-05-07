@@ -6,7 +6,7 @@ RSpec.describe Pubid::Bsi::Identifiers::Set do
   describe "parsing" do
     it "parses BS ISO 20400 + BS ISO 44001+BS ISO 44002" do
       id = Pubid::Bsi.parse("BS ISO 20400 + BS ISO 44001+BS ISO 44002")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::Set)
+      expect(id.class).to eq(described_class)
     end
   end
 

@@ -6,17 +6,17 @@ RSpec.describe Pubid::Bsi::Identifiers::CommitteeDocument do
   describe "parsing" do
     it "parses 14/30300822 DC" do
       id = Pubid::Bsi.parse("14/30300822 DC")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::CommitteeDocument)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses 21/30445138 DC" do
       id = Pubid::Bsi.parse("21/30445138 DC")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::CommitteeDocument)
+      expect(id.class).to eq(described_class)
     end
 
     it "parses 24/30488529 DC" do
       id = Pubid::Bsi.parse("24/30488529 DC")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::CommitteeDocument)
+      expect(id.class).to eq(described_class)
     end
   end
 

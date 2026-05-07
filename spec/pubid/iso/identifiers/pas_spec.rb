@@ -27,6 +27,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
     # ISO/PAS 5643:2021
     describe "ISO/PAS 5643:2021" do
       subject { "ISO/PAS 5643:2021" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:pas:5643" }
 
@@ -73,6 +74,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
     # ISO/PAS 23678-3
     describe "ISO/PAS 23678-3" do
       subject { "ISO/PAS 23678-3" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:pas:23678:-3" }
 
@@ -119,6 +121,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
     # ISO/PAS 17208-1:2012
     describe "ISO/PAS 17208-1:2012" do
       subject { "ISO/PAS 17208-1:2012" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:std:iso:pas:17208:-1" }
 
@@ -154,6 +157,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/SAE PAS 22736:2021
       describe "ISO/SAE PAS 22736:2021" do
         subject { "ISO/SAE PAS 22736:2021" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-sae:pas:22736" }
 
@@ -190,6 +194,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/AWI PAS 24499
       describe "ISO/AWI PAS 24499" do
         subject { "ISO/AWI PAS 24499" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:24499:stage-10.99" }
 
@@ -217,6 +222,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/WD PAS 34507
       describe "ISO/WD PAS 34507" do
         subject { "ISO/WD PAS 34507" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:34507:WD" }
 
@@ -246,6 +252,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/CD PAS 22399
       describe "ISO/CD PAS 22399" do
         subject { "ISO/CD PAS 22399" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:22399:CD" }
 
@@ -275,6 +282,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/DPAS 45007
       describe "ISO/DPAS 45007" do
         subject { "ISO/DPAS 45007" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:45007:stage-40.00" }
 
@@ -302,6 +310,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/DPAS 5643:2021(E)
       describe "ISO/DPAS 5643:2021(E)" do
         subject { "ISO/DPAS 5643:2021(E)" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         # V2 preserves original format
         let(:normalized) do
@@ -337,6 +346,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/DPAS 5474-6
       describe "ISO/DPAS 5474-6" do
         subject { "ISO/DPAS 5474-6" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:5474:-6:stage-40.00" }
 
@@ -370,6 +380,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/PRF PAS 22596
       describe "ISO/PRF PAS 22596" do
         subject { "ISO/PRF PAS 22596" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:22596:stage-60.00" }
 
@@ -397,6 +408,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/PRF PAS 5643:2021
       describe "ISO/PRF PAS 5643:2021" do
         subject { "ISO/PRF PAS 5643:2021" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:pas:5643:stage-60.00" }
 
@@ -428,6 +440,7 @@ RSpec.describe Pubid::Iso::Identifiers::Pas do
       # ISO/SAE PRF PAS 22736:2021
       describe "ISO/SAE PRF PAS 22736:2021" do
         subject { "ISO/SAE PRF PAS 22736:2021" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso-sae:pas:22736:stage-60.00" }
 

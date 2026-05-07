@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "parse normal identifier dated" do
     describe "IEC TR 62048:2014" do
       subject { "IEC TR 62048:2014" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -47,6 +48,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "parse normal identifier undated" do
     describe "IEC TR 62048" do
       subject { "IEC TR 62048" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -83,6 +85,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "parse normal identifier with part" do
     describe "IEC TR 61850-90-12:2015" do
       subject { "IEC TR 61850-90-12:2015" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -123,6 +126,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "copublisher as ISO" do
     describe "ISO/IEC TR 13066-1:2011" do
       subject { "ISO/IEC TR 13066-1:2011" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -163,6 +167,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "draft technical report" do
     describe "IEC/DTR 62048" do
       subject { "IEC/DTR 62048" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -191,6 +196,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "dated draft technical report" do
     describe "IEC/DTR 62048:2014" do
       subject { "IEC/DTR 62048:2014" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -219,6 +225,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
   context "draft technical report with part" do
     describe "IEC/DTR 61850-90-12:2015" do
       subject { "IEC/DTR 61850-90-12:2015" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -256,6 +263,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
     context "NP TR stage" do
       describe "IEC/NP TR 62048" do
         subject { "IEC/NP TR 62048" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
@@ -283,6 +291,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
     context "WD TR stage" do
       describe "IEC/WD TR 62048" do
         subject { "IEC/WD TR 62048" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
@@ -310,6 +319,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
     context "CD TR stage" do
       describe "IEC/CD TR 62048" do
         subject { "IEC/CD TR 62048" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do

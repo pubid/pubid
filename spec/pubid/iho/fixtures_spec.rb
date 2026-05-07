@@ -38,12 +38,10 @@ RSpec.describe "IHO Fixture Round-trip Tests" do
           end
 
           if failures.any?
-            puts "\n#{File.basename(fixture_file)}: #{successes}/#{identifiers.size}"
+
             failures.first(5).each do |f|
               if f[:type] == "mismatch"
-                puts "    Mismatch: '#{f[:original]}' -> '#{f[:rendered]}'"
-              else
-                puts "    Error:    '#{f[:original]}': #{f[:error]}"
+
               end
             end
           end

@@ -74,6 +74,7 @@ module Pubid
           attrs = self.class.attributes
           attributes.each do |key, value|
             next if value.nil?
+
             setter = :"#{key}="
             public_send(setter, value) if attrs.key?(key)
           end
@@ -161,7 +162,8 @@ module Pubid
                            when :publisher, :series, :number
                              true
                            when :edition
-                             current_val.nil? || edition_greater?(new_val, current_val)
+                             current_val.nil? || edition_greater?(new_val,
+                                                                  current_val)
                            when :volume, :part, :version, :revision
                              current_val.nil? || (new_val.to_s.length > current_val.to_s.length)
                            when :supplement, :errata, :index, :insert, :section, :appendix, :translation

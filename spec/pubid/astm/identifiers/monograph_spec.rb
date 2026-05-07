@@ -9,6 +9,7 @@ RSpec.describe Pubid::Astm::Identifiers::Monograph do
 
   describe "parses monograph with edition" do
     subject { "ASTM MONO6-2ND-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do
@@ -21,6 +22,7 @@ RSpec.describe Pubid::Astm::Identifiers::Monograph do
 
   describe "parses monograph without edition" do
     subject { "ASTM MONO1-EB" }
+
     let(:parsed) { Pubid::Astm.parse(subject) }
 
     it "parses" do

@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
     # ISO 4214:2022 | IDF/RM 254:2022
     describe "ISO 4214:2022 | IDF/RM 254:2022" do
       subject { "ISO 4214:2022 | IDF/RM 254:2022" }
+
       let(:parsed) { described_class.parse(subject) }
       let(:base_identifier) { parsed.base_identifier }
       let(:additional_identifier) { parsed.additional_identifiers.first }
@@ -60,6 +61,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
     # ISO/CD 24191.3 | IDF 263
     describe "ISO/CD 24191.3 | IDF 263" do
       subject { "ISO/CD 24191.3 | IDF 263" }
+
       let(:parsed) { described_class.parse(subject) }
       let(:base_identifier) { parsed.base_identifier }
       let(:additional_identifier) { parsed.additional_identifiers.first }
@@ -117,6 +119,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
     # ISO/WD 14501 | IDF 171:2017
     describe "ISO/WD 14501 | IDF 171:2017" do
       subject { "ISO/WD 14501 | IDF 171:2017" }
+
       let(:parsed) { described_class.parse(subject) }
       let(:base_identifier) { parsed.base_identifier }
       let(:additional_identifier) { parsed.additional_identifiers.first }
@@ -170,6 +173,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
     # ISO 8262-2 | IDF 124-2:2005
     describe "ISO 8262-2 | IDF 124-2:2005" do
       subject { "ISO 8262-2 | IDF 124-2:2005" }
+
       let(:parsed) { described_class.parse(subject) }
       let(:base_identifier) { parsed.base_identifier }
       let(:additional_identifier) { parsed.additional_identifiers.first }

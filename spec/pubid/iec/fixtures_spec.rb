@@ -14,7 +14,6 @@ RSpec.describe "IEC V2 Fixtures Tests" do
   describe "IEC fixtures (iec-pubid.txt)" do
     it "has identifiers to test" do
       expect(fixture_ids.count).to be > 0
-      puts "\nTotal IEC identifiers in fixture: #{fixture_ids.count}"
     end
 
     it "reports success rate" do
@@ -35,17 +34,9 @@ RSpec.describe "IEC V2 Fixtures Tests" do
       total = fixture_ids.count
       pass_rate = (successes.to_f / total * 100).round(2)
 
-      puts "\n#{'=' * 70}"
-      puts "IEC Fixtures Test Results (REAL IDENTIFIERS ONLY):"
-      puts "=" * 70
-      puts "Total identifiers: #{total}"
-      puts "Successes: #{successes} (#{pass_rate}%)"
-      puts "Failures: #{failures.count}"
-      puts "=" * 70
-
       if failures.any?
-        puts "\nFirst 30 failures:"
-        failures.first(30).each { |f| puts "  #{f}" }
+
+        failures.first(30).each { |f| }
       end
 
       expect(pass_rate).to be >= 80.0,

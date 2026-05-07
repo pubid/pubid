@@ -11,6 +11,22 @@ RSpec.describe "IEC v2 Implementation" do
       @overall_results = FixtureLoader::TestResults.new
     end
 
+    after(:all) do
+      summary = @overall_results.summary
+
+      # Show first 20 failures overall
+      if @overall_results.errors.any?
+
+        @overall_results.errors.first(20).each do |error|
+          if error[:type] == :mismatch
+
+          end
+        end
+      end
+
+      expect(summary[:pass_rate]).to be >= 90.0
+    end
+
     context "CSV identifiers" do
       let(:test_cases) { load_gem_fixture(:iec, "csv-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
@@ -32,19 +48,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC CSV: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -72,19 +83,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC Standard: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -112,19 +118,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC IECEE TRF: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -152,19 +153,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC IECEx TRF: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -192,19 +188,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC IECQ: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -232,19 +223,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC ISH: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -272,19 +258,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC ISO/IEC: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -312,19 +293,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC Sheets: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -352,19 +328,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC TC1: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -392,19 +363,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC TR: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -432,19 +398,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC TS: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -472,19 +433,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC VAP: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -512,19 +468,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC WD Special Groups: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -552,19 +503,14 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC Working Documents: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
@@ -592,46 +538,18 @@ RSpec.describe "IEC v2 Implementation" do
           @overall_results.record_error(test_case, e)
         end
 
-        summary = results.summary
-        puts "\nIEC Working Programmes: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        results.summary
 
         # Show first 10 failures for this category
         if results.errors.any?
-          puts "  First 10 failures:"
+
           results.errors.first(10).each do |error|
             if error[:type] == :mismatch
-              puts "    ~ #{error[:test]}"
-              puts "      => #{error[:actual]}"
-            else
-              puts "    ✗ #{error[:test]}"
-              puts "      => #{error[:error]}"
+
             end
           end
         end
       end
-    end
-
-    after(:all) do
-      summary = @overall_results.summary
-      puts "\n#{'=' * 80}"
-      puts "OVERALL IEC RESULTS: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
-      puts "=" * 80
-
-      # Show first 20 failures overall
-      if @overall_results.errors.any?
-        puts "\nFirst 20 failures overall:"
-        @overall_results.errors.first(20).each do |error|
-          if error[:type] == :mismatch
-            puts "  ~ #{error[:test]}"
-            puts "    => #{error[:actual]}"
-          else
-            puts "  ✗ #{error[:test]}"
-            puts "    => #{error[:error]}"
-          end
-        end
-      end
-
-      expect(summary[:pass_rate]).to be >= 90.0
     end
   end
 

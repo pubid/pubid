@@ -6,7 +6,7 @@ RSpec.describe Pubid::Amca::Scheme do
   describe "initialization" do
     it "creates a new scheme instance" do
       scheme = described_class.new
-      expect(scheme).to be_a(Pubid::Amca::Scheme)
+      expect(scheme).to be_a(described_class)
       expect(scheme).to be_a(Pubid::Scheme)
     end
   end

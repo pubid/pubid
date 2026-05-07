@@ -43,6 +43,7 @@ module Pubid
           let(:base) do
             { number: number, book_color: book_color, edition: edition }
           end
+
           subject do
             described_class.create(type: :corrigendum, number: 1, base: base)
           end

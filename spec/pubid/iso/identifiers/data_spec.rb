@@ -12,6 +12,7 @@ RSpec.describe Pubid::Iso::Identifiers::Data do
     context "dated data" do
       describe "ISO/DATA 1:1978" do
         subject { "ISO/DATA 1:1978" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:data:1" }
 
@@ -57,6 +58,7 @@ RSpec.describe Pubid::Iso::Identifiers::Data do
     context "undated data" do
       describe "ISO/DATA 9" do
         subject { "ISO/DATA 9" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:std:iso:data:9" }
 

@@ -14,13 +14,13 @@ RSpec.describe "ITU Integration" do
     end
 
     context "ITU-R recommendations" do
-      include_examples "parses and renders correctly", "ITU-R BO.600-1"
-      include_examples "parses and renders correctly", "ITU-R BO.791-0"
-      include_examples "parses and renders correctly", "ITU-R V.1234-1"
+      it_behaves_like "parses and renders correctly", "ITU-R BO.600-1"
+      it_behaves_like "parses and renders correctly", "ITU-R BO.791-0"
+      it_behaves_like "parses and renders correctly", "ITU-R V.1234-1"
     end
 
     context "with subseries" do
-      include_examples "parses and renders correctly", "ITU-R BO.1234.5-2"
+      it_behaves_like "parses and renders correctly", "ITU-R BO.1234.5-2"
     end
   end
 

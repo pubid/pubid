@@ -7,6 +7,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "basic standards with colon year format" do
       describe "CSA B149.1:20" do
         subject { "CSA B149.1:20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA B149.3:25" do
         subject { "CSA B149.3:25" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -53,6 +55,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA Z462:24" do
         subject { "CSA Z462:24" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -76,6 +79,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "standards with dash year format" do
       describe "CSA C22.1-15" do
         subject { "CSA C22.1-15" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -101,6 +105,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA C22.1-18" do
         subject { "CSA C22.1-18" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code" do
@@ -120,6 +125,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "standards with reaffirmation" do
       describe "CSA A123.17-05 (R2019)" do
         subject { "CSA A123.17-05 (R2019)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -145,6 +151,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA C22.2 NO. 1-04 (R2009)" do
         subject { "CSA C22.2 NO. 1-04 (R2009)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
@@ -176,6 +183,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "standards with NO. notation" do
       describe "CSA C22.2 NO. 286:23" do
         subject { "CSA C22.2 NO. 286:23" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
@@ -201,6 +209,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA C22.2 NO. 144.1-16 (R2020)" do
         subject { "CSA C22.2 NO. 144.1-16 (R2020)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as CecIdentifier" do
@@ -232,6 +241,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "HB suffix patterns (Session 225 fix)" do
       describe "CSA C22.1HB-18" do
         subject { "CSA C22.1HB-18" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -253,6 +263,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA 15189HB:25" do
         subject { "CSA 15189HB:25" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -278,6 +289,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
 
       describe "CSA B149HB:15" do
         subject { "CSA B149HB:15" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code with HB" do
@@ -297,6 +309,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "French year prefix" do
       describe "CSA B149.1:F20" do
         subject { "CSA B149.1:F20" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses as Standard" do
@@ -324,6 +337,7 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
     context "complex decimal codes" do
       describe "CSA Z259.2.4:15 (R2020)" do
         subject { "CSA Z259.2.4:15 (R2020)" }
+
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses multi-part code" do

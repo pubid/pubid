@@ -7,6 +7,7 @@ RSpec.describe Pubid::Core::Transformer do
 
     context "should return false if no all parts is presented'" do
       let(:tree) { {} }
+
       it { expect(described_class.new.apply(tree)).to eq({}) }
     end
   end

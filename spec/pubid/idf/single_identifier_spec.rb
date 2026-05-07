@@ -54,7 +54,7 @@ RSpec.describe Pubid::Idf::SingleIdentifier do
 
     it "can be instantiated" do
       identifier = concrete_class.new
-      expect(identifier).to be_a(Pubid::Idf::SingleIdentifier)
+      expect(identifier).to be_a(described_class)
     end
 
     it "has the type method" do

@@ -9,6 +9,7 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
     context "IEEE-led format (P prefix)" do
       describe "ISO/IEC/IEEE P26511/D8-2018" do
         subject { "ISO/IEC/IEEE P26511/D8-2018" }
+
         let(:parsed) { Pubid::Ieee.parse(subject) }
 
         it "parses as JointDevelopment" do
@@ -36,6 +37,7 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
     context "ISO-led format (stage codes)" do
       describe "ISO/IEC/IEEE FDIS 26511:2018" do
         subject { "ISO/IEC/IEEE FDIS 26511:2018" }
+
         let(:parsed) { Pubid::Ieee.parse(subject) }
 
         it "parses as JointDevelopment" do
@@ -61,6 +63,7 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
 
       describe "ISO/IEC/IEEE DIS 16326:2008" do
         subject { "ISO/IEC/IEEE DIS 16326:2008" }
+
         let(:parsed) { Pubid::Ieee.parse(subject) }
 
         it "parses as JointDevelopment" do
@@ -141,6 +144,7 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
     context "ISO/IEEE (without IEC)" do
       describe "ISO/IEEE P1003.1-2008" do
         subject { "ISO/IEEE P1003.1-2008" }
+
         let(:parsed) { Pubid::Ieee.parse(subject) }
 
         it "parses correctly" do
@@ -153,6 +157,7 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
     context "IEC/IEEE (without ISO)" do
       describe "IEC/IEEE P62582-1-2011" do
         subject { "IEC/IEEE P62582-1-2011" }
+
         let(:parsed) { Pubid::Ieee.parse(subject) }
 
         it "parses correctly" do

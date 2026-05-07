@@ -133,7 +133,7 @@ class FlavorsMigrator
   end
 
   def log(message)
-    puts message if @verbose
+     if @verbose
   end
 end
 

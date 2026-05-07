@@ -6,7 +6,7 @@ RSpec.describe Pubid::Bsi::Identifiers::SupplementaryIndex do
   describe "parsing" do
     it "parses BS 185 Supplementary Index:1965" do
       id = Pubid::Bsi.parse("BS 185 Supplementary Index:1965")
-      expect(id.class).to eq(Pubid::Bsi::Identifiers::SupplementaryIndex)
+      expect(id.class).to eq(described_class)
     end
   end
 

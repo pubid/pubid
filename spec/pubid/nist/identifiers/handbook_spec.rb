@@ -7,6 +7,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
     context "basic HB identifiers" do
       describe "NBS HB 131" do
         subject { "NBS HB 131" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -32,6 +33,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS HB 105-8" do
         subject { "NBS HB 105-8" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -51,6 +53,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
     context "HB with edition" do
       describe "NBS HB 44e2-1955" do
         subject { "NBS HB 44e2-1955" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -75,6 +78,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS HB 44e4" do
         subject { "NBS HB 44e4" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -94,6 +98,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS HB 130-1979" do
         subject { "NBS HB 130-1979" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -115,6 +120,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
     context "HB with parts and editions" do
       describe "NBS HB 105-1-1990" do
         subject { "NBS HB 105-1-1990" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -138,6 +144,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS.HB.28pt1e1969" do
         subject { "NBS.HB.28pt1e1969" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -164,6 +171,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
     context "HB with revisions" do
       describe "NBS HB 105-3r1979" do
         subject { "NBS HB 105-3r1979" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -187,6 +195,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS HB 111r1977" do
         subject { "NBS HB 111r1977" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -206,6 +215,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS.HB.105-1r1990" do
         subject { "NBS.HB.105-1r1990" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -227,6 +237,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
     context "HB with supplements" do
       describe "NBS HB 28supp1957pt1" do
         subject { "NBS HB 28supp1957pt1" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -249,6 +260,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS HB 67suppFeb1965" do
         subject { "NBS HB 67suppFeb1965" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do
@@ -266,6 +278,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
       describe "NBS HB 67suppJune1965" do
         subject { "NBS HB 67suppJune1965" }
+
         let(:parsed) { Pubid::Nist.parse(subject) }
 
         it "parses as Handbook" do

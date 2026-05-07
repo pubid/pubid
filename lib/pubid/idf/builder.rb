@@ -12,10 +12,6 @@ module Pubid
         "D" => "de",
       }.freeze
 
-      def initialize
-        super()
-      end
-
       def build(parsed_hash)
         typed_stage = Scheme.locate_typed_stage_by_abbr(parsed_hash[:type_with_stage])
         identifier = Scheme.locate_identifier_klass_by_type_code(typed_stage.type_code).new

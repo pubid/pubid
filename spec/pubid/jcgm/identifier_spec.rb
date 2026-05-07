@@ -8,6 +8,7 @@ RSpec.describe Pubid::Jcgm do
     context "standard guides" do
       describe "JCGM 100:2008" do
         subject { "JCGM 100:2008" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Guide" do
@@ -33,6 +34,7 @@ RSpec.describe Pubid::Jcgm do
 
       describe "JCGM 100:2008(E)" do
         subject { "JCGM 100:2008(E)" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses language" do
@@ -48,6 +50,7 @@ RSpec.describe Pubid::Jcgm do
 
       describe "JCGM 200:2012(E/F)" do
         subject { "JCGM 200:2012(E/F)" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses multiple languages" do
@@ -65,6 +68,7 @@ RSpec.describe Pubid::Jcgm do
     context "standard guides with language codes" do
       describe "JCGM 200:2007(F)" do
         subject { "JCGM 200:2007(F)" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Guide" do
@@ -96,6 +100,7 @@ RSpec.describe Pubid::Jcgm do
 
       describe "JCGM 200:2008(F)" do
         subject { "JCGM 200:2008(F)" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "round-trips" do
@@ -107,6 +112,7 @@ RSpec.describe Pubid::Jcgm do
     context "GUM guides" do
       describe "JCGM GUM-6:2020" do
         subject { "JCGM GUM-6:2020" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as GumGuide" do
@@ -132,6 +138,7 @@ RSpec.describe Pubid::Jcgm do
 
       describe "JCGM GUM-1:2022-11-28" do
         subject { "JCGM GUM-1:2022-11-28" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as GumGuide" do
@@ -161,6 +168,7 @@ RSpec.describe Pubid::Jcgm do
     context "amendments" do
       describe "JCGM 100:2008/Amd 1" do
         subject { "JCGM 100:2008/Amd 1" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Amendment" do
@@ -188,6 +196,7 @@ RSpec.describe Pubid::Jcgm do
 
       describe "JCGM 100:2008/Amd 1:2025-07-25" do
         subject { "JCGM 100:2008/Amd 1:2025-07-25" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses as Amendment" do

@@ -55,23 +55,11 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n#{'=' * 80}"
-      puts "IEEE pubid-to-parse.txt Results"
-      puts "=" * 80
-      puts "Total: #{total_tested}"
-      puts "Successes: #{successes} (#{(successes.to_f / total_tested * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
-
       if failures.any?
-        puts "\nFirst 10 failures:"
+
         failures.first(10).each do |failure|
           if failure[:error]
-            puts "  #{failure[:original]} → #{failure[:expected]}"
-            puts "    ERROR: #{failure[:error]}"
-          else
-            puts "  #{failure[:original]} → #{failure[:expected]} (#{failure[:class]})"
-            puts "    Got: #{failure[:rendered]}"
+
           end
         end
       end
@@ -122,23 +110,11 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n#{'=' * 80}"
-      puts "IEEE unapproved.txt Results"
-      puts "=" * 80
-      puts "Total: #{unapproved_fixtures.size}"
-      puts "Successes: #{successes} (#{(successes.to_f / unapproved_fixtures.size * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
-
       if failures.any?
-        puts "\nFirst 10 failures:"
+
         failures.first(10).each do |failure|
           if failure[:error]
-            puts "  #{failure[:original]} → #{failure[:expected]}"
-            puts "    ERROR: #{failure[:error]}"
-          else
-            puts "  #{failure[:original]} → #{failure[:expected]} (#{failure[:class]})"
-            puts "    Got: #{failure[:rendered]}"
+
           end
         end
       end
@@ -183,22 +159,11 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      puts "\n#{'=' * 80}"
-      puts "IEEE pubid-parsed.txt Results"
-      puts "=" * 80
-      puts "Total: #{total_tested}"
-      puts "Successes: #{successes} (#{(successes.to_f / total_tested * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
-
       if failures.any?
-        puts "\nFirst 10 failures:"
+
         failures.first(10).each do |failure|
           if failure[:error]
-            puts "  #{failure[:original]}"
-            puts "    ERROR: #{failure[:error]}"
-          else
-            puts "  #{failure[:original]} → #{failure[:rendered]} (#{failure[:class]})"
+
           end
         end
       end
@@ -237,14 +202,6 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
           }
         end
       end
-
-      puts "\n#{'=' * 80}"
-      puts "IEEE OVERALL ROUND-TRIP RESULTS"
-      puts "=" * 80
-      puts "Total identifiers: #{all_fixtures.size}"
-      puts "Successes: #{successes} (#{(successes.to_f / all_fixtures.size * 100).round(2)}%)"
-      puts "Failures: #{failures.size}"
-      puts "=" * 80
 
       # This test always passes - just reports statistics
       expect(all_fixtures.size).to be > 0

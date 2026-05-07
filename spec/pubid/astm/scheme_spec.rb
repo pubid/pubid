@@ -6,16 +6,16 @@ require_relative "../../../lib/pubid/astm/scheme"
 RSpec.describe Pubid::Astm::Scheme do
   describe ".identifiers" do
     it "returns array of registered identifier classes" do
-      expect(Pubid::Astm::Scheme.identifiers).to be_an(Array)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Standard)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Manual)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::ResearchReport)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::DataSeries)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::TechnicalReport)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Monograph)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::Adjunct)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::WorkInProgress)
-      expect(Pubid::Astm::Scheme.identifiers).to include(Pubid::Astm::Identifiers::IsoDualPublished)
+      expect(described_class.identifiers).to be_an(Array)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::Standard)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::Manual)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::ResearchReport)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::DataSeries)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::TechnicalReport)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::Monograph)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::Adjunct)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::WorkInProgress)
+      expect(described_class.identifiers).to include(Pubid::Astm::Identifiers::IsoDualPublished)
     end
   end
 

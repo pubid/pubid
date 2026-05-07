@@ -12,7 +12,7 @@ RSpec.describe Pubid::Cie::SupplementIdentifier do
         cor_number: "1",
         cor_year: "2020",
       )
-      expect(cor).to be_a(Pubid::Cie::SupplementIdentifier)
+      expect(cor).to be_a(described_class)
       expect(cor).to be_a(Pubid::Cie::Identifier)
     end
 
@@ -22,7 +22,7 @@ RSpec.describe Pubid::Cie::SupplementIdentifier do
         supplement_number: "1",
         year: "2009",
       )
-      expect(sup).to be_a(Pubid::Cie::SupplementIdentifier)
+      expect(sup).to be_a(described_class)
       expect(sup).to be_a(Pubid::Cie::Identifier)
     end
   end

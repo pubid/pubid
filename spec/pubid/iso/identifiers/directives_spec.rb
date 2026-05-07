@@ -28,6 +28,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
     context "dated directives" do
       describe "ISO DIR 1:2022" do
         subject { "ISO DIR 1:2022" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:doc:iso:dir:1:2022" }
 
@@ -70,6 +71,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
       describe "ISO/IEC DIR 1:2022" do
         subject { "ISO/IEC DIR 1:2022" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:doc:iso-iec:dir:1:2022" }
 
@@ -115,6 +117,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
     context "undated directives" do
       describe "ISO DIR 1" do
         subject { "ISO DIR 1" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:doc:iso:dir:1" }
 
@@ -157,6 +160,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
       describe "ISO/IEC DIR 1" do
         subject { "ISO/IEC DIR 1" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:doc:iso-iec:dir:1" }
 
@@ -199,6 +203,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
       describe "ISO/IEC DIR 2" do
         subject { "ISO/IEC DIR 2" }
+
         let(:parsed) { Pubid::Iso.parse(subject) }
         let(:urn) { "urn:iso:doc:iso-iec:dir:2" }
 
@@ -245,6 +250,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
   context "format normalization" do
     describe "ISO/IEC Directives Part 1" do
       subject { "ISO/IEC Directives Part 1" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR 1" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1" }
@@ -288,6 +294,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
     describe "ISO/IEC Directives, Part 1:2022" do
       subject { "ISO/IEC Directives, Part 1:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:normalized) { "ISO/IEC DIR 1:2022" }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:2022" }
@@ -334,6 +341,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
   context "JTC variations" do
     describe "ISO/IEC JTC 1 DIR" do
       subject { "ISO/IEC JTC 1 DIR" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:jtc:1:dir" }
 
@@ -371,6 +379,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
   context "organization-specific variations" do
     describe "ISO/IEC DIR 2 ISO" do
       subject { "ISO/IEC DIR 2 ISO" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:2:iso" }
 
@@ -409,6 +418,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
     describe "ISO/IEC DIR 2 IEC" do
       subject { "ISO/IEC DIR 2 IEC" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:2:iec" }
 
@@ -447,6 +457,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
     describe "ISO/IEC DIR 2 IEC:2022" do
       subject { "ISO/IEC DIR 2 IEC:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:2:iec:2022" }
 
@@ -492,6 +503,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
   context "combined identifiers" do
     describe "ISO/IEC DIR 1:2022 + IEC SUP:2022" do
       subject { "ISO/IEC DIR 1:2022 + IEC SUP:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:2022:iec:sup:2022" }
 
@@ -537,6 +549,7 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
   context "combined identifiers" do
     describe "ISO/IEC DIR 1:2022 + IEC SUP:2022" do
       subject { "ISO/IEC DIR 1:2022 + IEC SUP:2022" }
+
       let(:parsed) { Pubid::Iso.parse(subject) }
       let(:urn) { "urn:iso:doc:iso-iec:dir:1:2022:iec:sup:2022" }
 

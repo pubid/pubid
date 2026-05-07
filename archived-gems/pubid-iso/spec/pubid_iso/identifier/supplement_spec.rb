@@ -4,16 +4,15 @@ module Pubid
       RSpec.describe Supplement do
         context "when create supplement identifier" do
           let(:base) { Identifier.create(number: number, **params) }
+          let(:params) { { year: year } }
+          let(:number) { 123 }
+          let(:supplement_params) { {} }
+          let(:year) { 1999 }
+          let(:stage) { nil }
 
           subject do
             described_class.new(number: 1, base: base, **supplement_params)
           end
-          let(:params) { { year: year } }
-          let(:number) { 123 }
-
-          let(:supplement_params) { {} }
-          let(:year) { 1999 }
-          let(:stage) { nil }
 
           it "renders supplement with base document" do
             expect(subject.to_s).to eq("ISO 123:1999/Suppl 1")

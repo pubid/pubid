@@ -13,8 +13,8 @@ RSpec.describe "ISO Parser Performance" do
         1000.times { Pubid::Iso::Identifier.parse(simple_id) }
       end
 
-      avg_ms = (time.real / 1000 * 1000).round(2)
-      puts "\nSimple: #{avg_ms}ms average (1000 iterations)"
+      (time.real / 1000 * 1000).round(2)
+
       expect(time.real).to be < 5.0  # <5ms per parse (allows for CI variability)
     end
 
@@ -23,8 +23,8 @@ RSpec.describe "ISO Parser Performance" do
         1000.times { Pubid::Iso::Identifier.parse(complex_id) }
       end
 
-      avg_ms = (time.real / 1000 * 1000).round(2)
-      puts "Complex: #{avg_ms}ms average (1000 iterations)"
+      (time.real / 1000 * 1000).round(2)
+
       expect(time.real).to be < 8.0  # <8ms per parse (allows for CI variability)
     end
 
@@ -33,8 +33,8 @@ RSpec.describe "ISO Parser Performance" do
         1000.times { Pubid::Iso::Identifier.parse(multilevel_id) }
       end
 
-      avg_ms = (time.real / 1000 * 1000).round(2)
-      puts "Multi-level: #{avg_ms}ms average (1000 iterations)"
+      (time.real / 1000 * 1000).round(2)
+
       expect(time.real).to be < 8.0  # <8ms per parse (allows for CI variability)
     end
 
@@ -43,8 +43,8 @@ RSpec.describe "ISO Parser Performance" do
         1000.times { Pubid::Iso::Identifier.parse(dir_sup_id) }
       end
 
-      avg_ms = (time.real / 1000 * 1000).round(2)
-      puts "Special: #{avg_ms}ms average (1000 iterations)"
+      (time.real / 1000 * 1000).round(2)
+
       expect(time.real).to be < 5.0  # <5ms per parse (allows for CI variability)
     end
   end
@@ -59,8 +59,8 @@ RSpec.describe "ISO Parser Performance" do
         end
       end
 
-      avg_ms = (time.real / 500 * 1000).round(2)
-      puts "Round-trip: #{avg_ms}ms average (500 cycles)"
+      (time.real / 500 * 1000).round(2)
+
       expect(time.real).to be < 5.0  # round-trip is 3 operations, needs more time
     end
   end
@@ -80,7 +80,6 @@ RSpec.describe "ISO Parser Performance" do
       mem_after = `ps -o rss= -p #{Process.pid}`.to_i
 
       growth_kb = mem_after - mem_before
-      puts "Memory growth: #{growth_kb} KB (20,000 parses)"
 
       # Allow reasonable growth (<200MB for 20k parses with lutaml-model)
       expect(growth_kb).to be < 200_000

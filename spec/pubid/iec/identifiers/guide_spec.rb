@@ -7,6 +7,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "parse normal identifier dated" do
     describe "IEC Guide 51:2014" do
       subject { "IEC Guide 51:2014" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -47,6 +48,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "parse normal identifier undated" do
     describe "IEC Guide 104" do
       subject { "IEC Guide 104" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -83,6 +85,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "parse identifier with part" do
     describe "IEC Guide 115-1:2021" do
       subject { "IEC Guide 115-1:2021" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -119,6 +122,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "copublisher as ISO" do
     describe "ISO/IEC Guide 51:2014" do
       subject { "ISO/IEC Guide 51:2014" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -155,6 +159,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "draft guide" do
     describe "IEC DGuide 104" do
       subject { "IEC DGuide 104" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -183,6 +188,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "final draft guide" do
     describe "IEC FDGuide 104" do
       subject { "IEC FDGuide 104" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -211,6 +217,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "dated draft guide" do
     describe "IEC DGuide 104:2020" do
       subject { "IEC DGuide 104:2020" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -239,6 +246,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
   context "uppercase GUIDE abbreviation" do
     describe "IEC GUIDE 108:2006" do
       subject { "IEC GUIDE 108:2006" }
+
       let(:parsed) { described_class.parse(subject) }
 
       it "parses publisher" do
@@ -272,6 +280,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
     context "CD Guide stage" do
       describe "IEC/CD Guide 104" do
         subject { "IEC/CD Guide 104" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
@@ -299,6 +308,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
     context "WD Guide stage" do
       describe "IEC/WD Guide 104" do
         subject { "IEC/WD Guide 104" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
@@ -326,6 +336,7 @@ RSpec.describe Pubid::Iec::Identifiers::Guide do
     context "NP Guide stage" do
       describe "IEC/NP Guide 104" do
         subject { "IEC/NP Guide 104" }
+
         let(:parsed) { described_class.parse(subject) }
 
         it "parses publisher" do
