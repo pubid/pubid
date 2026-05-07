@@ -98,12 +98,13 @@ RSpec.describe Pubid::Export::TypedStageResult do
 
   describe ".from_typed_stage" do
     let(:typed_stage) do
-      instance_double(TypedStage,
-                      stage_code: :dis,
-                      type_code: :is,
-                      abbr: ["DIS", "FPD"],
-                      name: "Draft International Standard",
-                      harmonized_stages: ["40.00", "40.20", "40.60"])
+      Pubid::Components::TypedStage.new(
+        stage_code: "dis",
+        type_code: "is",
+        abbr: ["DIS", "FPD"],
+        name: "Draft International Standard",
+        harmonized_stages: ["40.00", "40.20", "40.60"],
+      )
     end
 
     it "extracts all attributes from a typed stage object" do
@@ -116,20 +117,19 @@ RSpec.describe Pubid::Export::TypedStageResult do
     end
 
     it "handles typed stage without harmonized_stages" do
-      ts = instance_double(TypedStage,
-                           stage_code: :dis, type_code: :is, abbr: ["DIS"], name: "Draft")
-      allow(ts).to receive(:respond_to?).with(:harmonized_stages).and_return(false)
-      allow(ts).to receive(:respond_to?).with(:name).and_return(true)
+      ts = Pubid::Components::TypedStage.new(
+        stage_code: "dis", type_code: "is", abbr: ["DIS"], name: "Draft",
+        harmonized_stages: [],
+      )
 
       result = described_class.from_typed_stage(ts)
       expect(result.harmonized_stages).to eq([])
     end
 
     it "handles typed stage without name" do
-      ts = instance_double(TypedStage,
-                           stage_code: :dis, type_code: :is, abbr: ["DIS"], harmonized_stages: [])
-      allow(ts).to receive(:respond_to?).with(:name).and_return(false)
-      allow(ts).to receive(:respond_to?).with(:harmonized_stages).and_return(true)
+      ts = Pubid::Components::TypedStage.new(
+        stage_code: "dis", type_code: "is", abbr: ["DIS"], harmonized_stages: [],
+      )
 
       result = described_class.from_typed_stage(ts)
       expect(result.name).to be_nil
