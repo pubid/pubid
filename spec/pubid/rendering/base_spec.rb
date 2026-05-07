@@ -6,8 +6,14 @@ RSpec.describe Pubid::Rendering::Base do
   class TestIdentifier
     include Pubid::Rendering::Base
 
+    ATTR_KEYS = %i[publisher copublishers number part subpart date stage type languages].freeze
+
     attr_accessor :publisher, :copublishers, :number, :part, :subpart, :date,
                   :stage, :type, :languages
+
+    def self.attributes
+      ATTR_KEYS.each_with_object({}) { |k, h| h[k] = true }
+    end
 
     def initialize(publisher: nil, copublishers: nil, number: nil, part: nil,
 subpart: nil, date: nil, stage: nil, type: nil, languages: nil)
@@ -20,12 +26,6 @@ subpart: nil, date: nil, stage: nil, type: nil, languages: nil)
       @stage = stage
       @type = type
       @languages = languages
-    end
-
-    def respond_to?(method)
-      # Mock respond_to for all attributes
-      %i[publisher copublishers number part subpart date stage
-         type languages].include?(method)
     end
   end
 
