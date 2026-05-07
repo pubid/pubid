@@ -13,14 +13,14 @@ RSpec.describe "ISO Integration" do
       end
     end
 
-    it_behaves_like "parses correctly", "ISO 123"
-    it_behaves_like "parses correctly", "ISO 123:2020"
-    it_behaves_like "parses correctly", "ISO 123-1:2020"
-    it_behaves_like "parses correctly", "ISO/IEC 13818-1:2015"
-    it_behaves_like "parses correctly", "ISO Guide 71:2014"
-    it_behaves_like "parses correctly", "ISO GUIDE 1:1972"
-    it_behaves_like "parses correctly", "ISO/TR 1234:2020"
-    it_behaves_like "parses correctly", "ISO/TS 1234:2020"
+    include_examples "parses correctly", "ISO 123"
+    include_examples "parses correctly", "ISO 123:2020"
+    include_examples "parses correctly", "ISO 123-1:2020"
+    include_examples "parses correctly", "ISO/IEC 13818-1:2015"
+    include_examples "parses correctly", "ISO Guide 71:2014"
+    include_examples "parses correctly", "ISO GUIDE 1:1972"
+    include_examples "parses correctly", "ISO/TR 1234:2020"
+    include_examples "parses correctly", "ISO/TS 1234:2020"
   end
 
   describe "parsing all basic fixtures" do
@@ -38,8 +38,8 @@ RSpec.describe "ISO Integration" do
         failed << line
       end
 
-       if failed.any?
-      failed.first(10).each { |f|  } if failed.any?
+      puts "\n\nFailed to parse #{failed.size}/#{lines.size} identifiers" if failed.any?
+      failed.first(10).each { |f| puts "  - #{f}" } if failed.any?
 
       expect(failed.size).to eq(0), "Failed to parse #{failed.size} identifiers"
     end

@@ -119,10 +119,10 @@ RSpec.describe "IEEE identifiers" do
       end
 
       pass_rate = (passed.to_f / total * 100).round(1)
-      
-       if failed.any?
-       if failed.any?
-      failed.first(20).each { |f|  } if failed.any?
+      puts "\n\nIEEE Fixture Results: #{passed}/#{total} (#{pass_rate}%)"
+      puts "Failed: #{failed.length}" if failed.any?
+      puts "\nFirst 20 failures:" if failed.any?
+      failed.first(20).each { |f| puts "  #{f}" } if failed.any?
 
       expect(pass_rate).to be >= 85.0
     end

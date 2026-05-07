@@ -28,19 +28,19 @@ RSpec.describe "NIST v2 Implementation" do
         end
 
         summary = results.summary
-        
-         if summary[:failed] > 0
+        puts "\nNIST All Records: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        puts "Failed: #{summary[:failed]}" if summary[:failed] > 0
 
         # Show first 20 failures for analysis
         if results.errors.any?
-          
+          puts "\nFirst 20 failures:"
           results.errors.first(20).each do |error|
             if error[:type] == :mismatch
-              
-              
+              puts "  ~ #{error[:test]}"
+              puts "    => #{error[:actual]}"
             else
-              
-              
+              puts "  ✗ #{error[:test]}"
+              puts "    => #{error[:error]}"
             end
           end
         end
@@ -70,18 +70,18 @@ RSpec.describe "NIST v2 Implementation" do
         end
 
         summary = results.summary
-        
+        puts "\nNIST Pubs Export: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
 
         # Show first 20 failures for analysis
         if results.errors.any?
-          
+          puts "\nFirst 20 failures:"
           results.errors.first(20).each do |error|
             if error[:type] == :mismatch
-              
-              
+              puts "  ~ #{error[:test]}"
+              puts "    => #{error[:actual]}"
             else
-              
-              
+              puts "  ✗ #{error[:test]}"
+              puts "    => #{error[:error]}"
             end
           end
         end
@@ -111,19 +111,19 @@ RSpec.describe "NIST v2 Implementation" do
         end
 
         summary = results.summary
-        
-         if summary[:failed] > 0
+        puts "\nNIST Sept 2024: #{summary[:passed]}/#{summary[:total]} (#{summary[:pass_rate]}%)"
+        puts "Failed: #{summary[:failed]}" if summary[:failed] > 0
 
         # Show first 20 failures for analysis
         if results.errors.any?
-          
+          puts "\nFirst 20 failures:"
           results.errors.first(20).each do |error|
             if error[:type] == :mismatch
-              
-              
+              puts "  ~ #{error[:test]}"
+              puts "    => #{error[:actual]}"
             else
-              
-              
+              puts "  ✗ #{error[:test]}"
+              puts "    => #{error[:error]}"
             end
           end
         end

@@ -51,7 +51,7 @@ module Pubid
           end
 
           # Add suffixes from base identifier AFTER supplements
-          if base_id.is_a?(Base)
+          if base_id.is_a?(Pubid::Identifier)
             base_attrs = base_id.class.attributes
             ec = base_attrs.key?(:expert_commentary) ? base_id.expert_commentary : nil
             if ec
