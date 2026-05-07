@@ -94,9 +94,9 @@ module Pubid
       end
 
       def maybe(method_name)
-        identifier.send(method_name)
-      rescue NoMethodError
-        nil
+        return nil unless identifier.class.attributes.key?(method_name)
+
+        identifier.public_send(method_name)
       end
 
       private

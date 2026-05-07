@@ -24,14 +24,12 @@ module Pubid
           end
 
           # Set other attributes
+          attrs = self.class.attributes
           args.each do |key, value|
             next if key == :number
 
-            begin
-              send("#{key}=", value)
-            rescue NoMethodError
-              nil
-            end
+            setter = :"#{key}="
+            public_send(setter, value) if attrs.key?(key)
           end
         end
 

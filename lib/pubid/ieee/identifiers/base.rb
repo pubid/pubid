@@ -97,14 +97,12 @@ module Pubid
           end
 
           # Set other attributes
+          attrs = self.class.attributes
           args.each do |key, value|
             next if %i[code draft draft_obj typed_stage].include?(key)
 
-            begin
-              send("#{key}=", value)
-            rescue NoMethodError
-              nil
-            end
+            setter = :"#{key}="
+            public_send(setter, value) if attrs.key?(key)
           end
         end
 
@@ -178,10 +176,8 @@ module Pubid
             # Parse the modified input
             result = parse_single(input_modified)
             # Add reaffirmed attribute
-            begin
+            if result.class.attributes.key?(:reaffirmed)
               result.reaffirmed = year
-            rescue NoMethodError
-              result.instance_variable_set(:@reaffirmed, year)
             end
             return result
           end
@@ -199,10 +195,8 @@ module Pubid
             # Parse the modified input
             result = parse_single(input_modified)
             # Add reaffirmed attribute
-            begin
+            if result.class.attributes.key?(:reaffirmed)
               result.reaffirmed = year
-            rescue NoMethodError
-              result.instance_variable_set(:@reaffirmed, year)
             end
             return result
           end
@@ -220,11 +214,7 @@ module Pubid
               # Parse main identifier
               ieee_id = parse_single(main_part)
               # Add reaffirmed year
-              begin
-                ieee_id.reaffirmed = reaffirmed_year
-              rescue NoMethodError
-                nil
-              end
+              ieee_id.reaffirmed = reaffirmed_year if ieee_id.class.attributes.key?(:reaffirmed)
 
               # Parse IRE identifier
               ire_id = parse_single(ire_part)
@@ -462,7 +452,7 @@ module Pubid
           parsed = Parser.parse(normalized) # Use class method for preprocessing
           builder = Builder.new(Base)
           # Pass the original input string to builder for context
-          builder.instance_variable_set(:@original_input, input)
+          builder.original_input = input
           builder.build(parsed)
         end
 

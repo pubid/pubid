@@ -48,6 +48,7 @@ module Pubid
       end
 
       def assign_attributes(identifier, data)
+        attrs = identifier.class.attributes
         data.each_pair do |key, value|
           realized = cast(key.to_sym, value)
           next if realized.nil?
@@ -56,16 +57,12 @@ module Pubid
 
           if realized.is_a?(Hash)
             realized.each_pair do |k, v|
-              identifier.send("#{k}=", v)
-            rescue NoMethodError
-              nil
+              setter = "#{k}="
+              identifier.public_send(setter, v) if attrs.key?(k.to_sym)
             end
           else
-            begin
-              identifier.send("#{key}=", realized)
-            rescue NoMethodError
-              nil
-            end
+            setter = "#{key}="
+            identifier.public_send(setter, realized) if attrs.key?(key.to_sym)
           end
         end
       end

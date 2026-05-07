@@ -27,15 +27,15 @@ module Pubid
       def base_hash
         hash = super
         # For Plateau supplements, edition comes from the base identifier
-        if base_identifier.methods.include?(:edition) && base_identifier.edition
+        if base_identifier.class.attributes.key?(:edition) && base_identifier.edition
           hash[:edition] = base_identifier.edition
         end
         # Include type from base_identifier
-        if base_identifier.methods.include?(:type_string) && base_identifier.type_string
+        if base_identifier.class.attributes.key?(:type_string) && base_identifier.type_string
           hash[:type] = base_identifier.type_string
         end
         # Include annex from base_identifier
-        if base_identifier.methods.include?(:annex) && base_identifier.annex
+        if base_identifier.class.attributes.key?(:annex) && base_identifier.annex
           hash[:annex] = base_identifier.annex
         end
         hash

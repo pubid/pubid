@@ -5,6 +5,7 @@ module Pubid
     # Builder class for constructing IEEE identifier scheme from parsed data
     # Single Responsibility: Transform parsed data into Scheme objects
     class Builder
+      attr_accessor :original_input
       attr_reader :identifier_class
 
       def initialize(identifier_class = Identifiers::Base)
@@ -643,7 +644,7 @@ module Pubid
         end
 
         # Rule 2: Check for IEEE draft notation in original input (IEEE-led)
-        if @original_input&.match?(/\/D\d+/)
+        if original_input&.match?(/\/D\d+/)
           return "IEEE"
         end
 
@@ -658,7 +659,7 @@ module Pubid
         end
 
         # Rule 4: Check for colon before year in original input (ISO-led)
-        if @original_input&.match?(/:\d{4}/)
+        if original_input&.match?(/:\d{4}/)
           return "ISO"
         end
 
@@ -716,12 +717,12 @@ module Pubid
         # Handle case where parser captured number without "P" prefix
         # Check original input to see if there was a P before the number
         # The ieee_p_identifier rule consumes P without capturing it
-        if !type_value && @original_input&.match?(/IEEE\s+P/)
+        if !type_value && original_input&.match?(/IEEE\s+P/)
           type_value = "P"
         end
 
         # Handle ANSI P prefix patterns (e.g., "ANSI PN42.34-2015")
-        if !type_value && @original_input&.match?(/ANSI\s+P/)
+        if !type_value && original_input&.match?(/ANSI\s+P/)
           # Extract P as type since it was in the original but parser stripped it
           type_value = "P"
         end
@@ -732,7 +733,7 @@ module Pubid
 
         # Special case: For IEEE/CSA dual published patterns, strip P prefix from code
         # Pattern: "IEEE/CSA P844.1-2017" -> code should be "844.1" not "P844.1"
-        if code_str&.start_with?("P") && @original_input&.include?("/CSA")
+        if code_str&.start_with?("P") && original_input&.include?("/CSA")
           # Check if the copublisher attribute indicates CSA
           pub_data = parsed[:publishers]
           has_csa_copub = if pub_data && pub_data[:copublishers]
@@ -742,7 +743,7 @@ module Pubid
                               extract_value(cp[:copublisher])&.include?("CSA")
                             end
                           else
-                            @original_input&.include?("/CSA")
+                            original_input&.include?("/CSA")
                           end
 
           if has_csa_copub
@@ -965,14 +966,14 @@ module Pubid
           day = extract_value(draft_data[:day]) if draft_data[:day]
 
           # Detect comma before month and space before draft by checking the original input
-          if @original_input
+          if original_input
             if month
               # Look for ", Month" pattern in the original input
-              comma_before_month = @original_input.match?(/,\s+#{Regexp.escape(month)}/i)
+              comma_before_month = original_input.match?(/,\s+#{Regexp.escape(month)}/i)
             end
 
             # Check if there's a space before /D in the original input
-            if version && @original_input.match?(/\s+\/D#{Regexp.escape(version)}/i)
+            if version && original_input.match?(/\s+\/D#{Regexp.escape(version)}/i)
               attributes[:space_before_draft] = true
             end
           end

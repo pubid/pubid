@@ -157,7 +157,7 @@ module Pubid
           # For adopted documents, render the adopted identifier
           # but suppress its year if we have our own year
           adopted_str = adopted.to_s
-          if year && adopted.methods.include?(:year)
+          if year && adopted.class.attributes.key?(:year)
             # Remove year from adopted if we have our own
             adopted_str = adopted_str.sub(/:#{adopted.year}/, "")
           end

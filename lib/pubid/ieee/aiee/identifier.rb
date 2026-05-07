@@ -31,15 +31,12 @@ module Pubid
           end
 
           # Set other attributes
+          attrs = self.class.attributes
           args.each do |key, value|
-            # Skip :code and :number as they're handled above
             next if %i[code number].include?(key)
 
-            begin
-              send("#{key}=", value)
-            rescue NoMethodError
-              nil
-            end
+            setter = :"#{key}="
+            public_send(setter, value) if attrs.key?(key)
           end
         end
 

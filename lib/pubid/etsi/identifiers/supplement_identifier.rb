@@ -77,7 +77,7 @@ module Pubid
         def base_hash
           hash = super
           # ETSI supplements need the type (e.g., "ETS", "TR") from the base document
-          hash[:type] = base.type if base.methods.include?(:type) && base.type
+          hash[:type] = base.type if base.class.attributes.key?(:type) && base.type
           hash[:supplement_notation] = supplement_notation
           hash[:supplement_type] = self.class.name.split("::").last.downcase
           hash

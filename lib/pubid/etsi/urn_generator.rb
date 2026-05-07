@@ -11,7 +11,7 @@ module Pubid
         end
       end
 
-      private
+      protected
 
       def urn_type_for_base
         return "en" unless identifier.type
@@ -52,7 +52,7 @@ module Pubid
 
         if identifier.base
           base_gen = self.class.new(identifier.base)
-          base_urn = base_gen.send(:generate_base_urn)
+          base_urn = base_gen.generate_base_urn
 
           base_part = base_urn.sub(/^urn:etsi:/, "")
           base_parts = base_part.split(":")

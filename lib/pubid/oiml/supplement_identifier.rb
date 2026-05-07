@@ -16,7 +16,7 @@ module Pubid
         # Determine base format: explicit parameter takes priority, else use parsed format
         base_format = if format && format != :short
                         format # Use explicit override
-                      elsif base_identifier.methods.include?(:parsed_format) && base_identifier.parsed_format == "long"
+                      elsif base_identifier.class.attributes.key?(:parsed_format) && base_identifier.parsed_format == "long"
                         :long
                       else
                         :short

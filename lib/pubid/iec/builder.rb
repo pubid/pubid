@@ -59,24 +59,15 @@ module Pubid
 
           # Create the supplement identifier
           supplement = identifier_class.new
-          begin
+          supp_attrs = identifier_class.attributes
+          if supp_attrs.key?(:number)
             supplement.number = Components::Code.new(value: supplement_number.to_s)
-          rescue NoMethodError
-            nil
           end
-          if supplement_date
-            begin
-              supplement.date = cast(:date, supplement_date)
-            rescue NoMethodError
-              nil
-            end
+          if supplement_date && supp_attrs.key?(:date)
+            supplement.date = cast(:date, supplement_date)
           end
-          if supplement_edition
-            begin
-              supplement.edition = cast(:edition, supplement_edition)
-            rescue NoMethodError
-              nil
-            end
+          if supplement_edition && supp_attrs.key?(:edition)
+            supplement.edition = cast(:edition, supplement_edition)
           end
           supplement.typed_stage = typed_stage
 
@@ -141,10 +132,9 @@ module Pubid
           )
           # Set number via cast
           number_components = cast(:number_with_part, cispr_number)
+          attrs = cispr_id.class.attributes
           number_components.each_pair do |k, v|
-            cispr_id.send("#{k}=", v)
-          rescue NoMethodError
-            nil
+            cispr_id.public_send("#{k}=", v) if attrs.key?(k.to_sym)
           end
           parsed_hash[:cispr_identifier] = cispr_id
         end
@@ -167,7 +157,7 @@ module Pubid
         assign_attributes(identifier, parsed_hash)
 
         # Detect rendering style from parsed abbreviation
-        if identifier.methods.include?(:rendering_style=) && identifier.typed_stage
+        if identifier.class.attributes.key?(:rendering_style) && identifier.typed_stage
           require_relative "rendering_style"
           ts = identifier.typed_stage
 
@@ -183,11 +173,9 @@ module Pubid
                               end
 
           # Detect language code format from parsed languages
-          langs = begin
-            identifier.languages
-          rescue NoMethodError
-            nil
-          end
+          langs = if identifier.class.attributes.key?(:languages)
+                    identifier.languages
+                  end
           with_language_code = if langs&.any?
                                  # Check if original_code was single-char (E, F, R, A, S, D)
                                  first_lang = langs.first
@@ -327,31 +315,13 @@ edition_data = nil, typed_stage = nil)
         if base_identifier.is_a?(Identifiers::ConsolidatedIdentifier)
           # Edition is on the first identifier (base document)
           base_first = base_identifier.identifiers.first
-          if base_first
-            edition = begin
-              base_first.edition
-            rescue NoMethodError
-              nil
-            end
-            # Clear it from base document
-            begin
-              base_first.edition = nil
-            rescue NoMethodError
-              nil
-            end
+          if base_first && base_first.class.attributes.key?(:edition)
+            edition = base_first.edition
+            base_first.edition = nil
           end
-        else
-          edition = begin
-            base_identifier.edition
-          rescue NoMethodError
-            nil
-          end
-          # Clear edition from base identifier since it moves to VAP level
-          begin
-            base_identifier.edition = nil
-          rescue NoMethodError
-            nil
-          end
+        elsif base_identifier.class.attributes.key?(:edition)
+          edition = base_identifier.edition
+          base_identifier.edition = nil
         end
 
         Identifiers::VapIdentifier.new(

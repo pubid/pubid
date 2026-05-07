@@ -205,7 +205,7 @@ module Pubid
           # Standard CSA identifier
           wrapped_identifier = build_single(wrapped_data)
         end
-        wrapped_identifier.publisher_prefix = original_prefix if original_prefix && wrapped_identifier.methods.include?(:publisher_prefix=)
+        wrapped_identifier.publisher_prefix = original_prefix if original_prefix && wrapped_identifier.class.attributes.key?(:publisher_prefix)
 
         canadian_adopted.wrapped_identifier = wrapped_identifier
 
