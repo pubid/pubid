@@ -956,7 +956,7 @@ RSpec.describe Pubid::Nist::Identifier::Base do
       it { expect(subject.stage.to_s).to eq("fpd") }
     end
 
-    context "identifier from NIST Tech Pubs", :vcr do
+    context "identifier from NIST Tech Pubs", vcr: { cassette_name: "nist_tech_pubs" } do
       it "parse identifiers successfully" do
         documents = Pubid::Nist::NistTechPubs.status
         documents.each do |doc|
