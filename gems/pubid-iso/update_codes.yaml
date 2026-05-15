@@ -11,3 +11,15 @@ ISO/NP 10303-2xx: ISO/NP 10303-2XX
 # with the publisher prefix preserved.
 "/^(ISO[\\w/]*) DIS (TR|TS|PAS|ISP) /": '\1 D\2 '
 "/^(ISO[\\w/]*) FDIS (TR|TS|PAS|ISP) /": '\1 FD\2 '
+# Long-form draft supplements (DIS Amd → DAM, DIS Cor → DCOR, DIS Suppl →
+# DSuppl, DIS Add → DAD; FDIS Amd → FDAM, FDIS Cor → FDCOR). Applies in
+# supplement position (after `/`), so the prefix has already been parsed.
+"//DIS Amd /": '/DAM '
+"//FDIS Amd /": '/FDAM '
+"//DIS Cor /": '/DCOR '
+"//FDIS Cor /": '/FDCOR '
+"//DIS Suppl /": '/DSuppl '
+"//DIS Add /": '/DAD '
+# `DAdd` is a legacy long-form spelling of the canonical `DAD` (Draft
+# Addendum) staged-addendum token.
+"//DAdd /": '/DAD '

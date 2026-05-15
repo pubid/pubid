@@ -98,8 +98,13 @@ module Pubid::Iso
     rule(:part_matcher) do
       year_digits.absent? >>
         supplements.absent? >>
+        staged_supplement.absent? >>
         staged_addenda.absent? >>
         (str("Add") | str("ADD")).absent? >>
+        # Stage-prefixed supplements like `WD Amd`, `DIS Cor`, `PWI Add`
+        # must reach the supplement/addendum rules, not be greedily eaten
+        # here as a part code.
+        ((stage | typed_stage) >> space >> (supplements | str("Add") | str("ADD"))).absent? >>
         ((roman_numerals >> digits.absent? >> match['[A-Z]'].absent?) | match['[\dA-Z]'].repeat(1)).as(:part)
     end
 
@@ -132,7 +137,9 @@ module Pubid::Iso
 
     rule(:addendum) do
       (
-        (((str("/") >> (str("Add") | str("ADD")).as(:type)) | (str(" — ") >> str("Addendum").as(:type))) |
+        (((str("/") >> (stage.as(:typed_stage) >> space).maybe >>
+          (str("Add") | str("ADD")).as(:type)) |
+          (str(" — ") >> str("Addendum").as(:type))) |
          (str("/") >> staged_addenda.as(:typed_stage))) >>
           space >> digits.as(:number) >> (str(":") >> digits.as(:year)).maybe
       ).repeat(1).as(:supplements)
