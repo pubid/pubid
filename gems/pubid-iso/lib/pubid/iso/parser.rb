@@ -190,8 +190,11 @@ module Pubid::Iso
 
     rule(:std_document_body) do
       (type | (stage.as(:stage) >> digits.as(:iteration).maybe)).maybe >>
-        # for ISO/IEC WD TS 25025
-        space? >> ((stage.as(:stage) | typed_stage.as(:stage) | type) >> space).maybe >>
+        # for ISO/IEC WD TS 25025 and ISO/IEC DIS ISP 12060-6 — both shapes
+        # `<stage> <type>` and `<typed_stage> <type>` need to fit before the
+        # number, so allow an optional stage/typed_stage followed by an
+        # optional type.
+        space? >> (((stage.as(:stage) | typed_stage.as(:stage)) >> space).maybe >> (type >> space).maybe) >>
         digits.as(:number) >>
         # for identifiers like ISO 5537/IDF 26
         (str("|") >> (str("IDF").as(:publisher) >> space >> digits.as(:number)).as(:joint_document)).maybe >>

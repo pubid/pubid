@@ -2,3 +2,12 @@ ISO/R 657/IV: ISO/R 657-4:1969
 ISO/IEC/IEEE 8802-22.2:2015/Amd.2:2017(E): ISO/IEC/IEEE 8802-22:2015/Amd.2:2017(E)
 ISO/TR 17716.2: ISO/TR 17716
 ISO/TR 17716.2(E): ISO/TR 17716(E)
+ISO/NP 10303-5a: ISO/NP 10303-5A
+ISO/NP 10303-5b: ISO/NP 10303-5B
+ISO/NP 10303-1xx: ISO/NP 10303-1XX
+ISO/NP 10303-2xx: ISO/NP 10303-2XX
+# Long-form draft typed stages (DIS TR, FDIS PAS, ...) → canonical short
+# typed-stage abbrs (DTR, FDPAS, ...). Pattern matches at start of string
+# with the publisher prefix preserved.
+"/^(ISO[\\w/]*) DIS (TR|TS|PAS|ISP) /": '\1 D\2 '
+"/^(ISO[\\w/]*) FDIS (TR|TS|PAS|ISP) /": '\1 FD\2 '

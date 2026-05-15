@@ -611,6 +611,53 @@ module Pubid::Iso
       it_behaves_like "converts urn to pubid", "ISO/IEC DTS 25025"
     end
 
+    context "ISO/IEC WD ISP 11182-3" do
+      let(:pubid) { "ISO/IEC WD ISP 11182-3" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/IEC NP ISP 29110-4-2" do
+      let(:pubid) { "ISO/IEC NP ISP 29110-4-2" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/IEC DIS ISP 12060-6" do
+      let(:original) { "ISO/IEC DIS ISP 12060-6" }
+      let(:pubid) { "ISO/IEC DISP 12060-6" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/IEC DIS TR 14143-5" do
+      let(:original) { "ISO/IEC DIS TR 14143-5" }
+      let(:pubid) { "ISO/IEC DTR 14143-5" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/IEC FDIS PAS 1" do
+      let(:original) { "ISO/IEC FDIS PAS 1" }
+      let(:pubid) { "ISO/IEC FDPAS 1" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/NP 10303-5a" do
+      let(:original) { "ISO/NP 10303-5a" }
+      let(:pubid) { "ISO/NP 10303-5A" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/NP 10303-2xx" do
+      let(:original) { "ISO/NP 10303-2xx" }
+      let(:pubid) { "ISO/NP 10303-2XX" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
     context "ISO 19110:2005/Amd 1:2011" do
       let(:original) { "ISO 19110:2005/Amd 1:2011 ED1" }
       let(:pubid) { "ISO 19110:2005/Amd 1:2011" }
