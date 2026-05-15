@@ -98,7 +98,9 @@ module Pubid::Iso
     rule(:part_matcher) do
       year_digits.absent? >>
         supplements.absent? >>
-        staged_addenda.absent? >> ((roman_numerals >> digits.absent?) | match['[\dA-Z]'].repeat(1)).as(:part)
+        staged_addenda.absent? >>
+        (str("Add") | str("ADD")).absent? >>
+        ((roman_numerals >> digits.absent? >> match['[A-Z]'].absent?) | match['[\dA-Z]'].repeat(1)).as(:part)
     end
 
     rule(:part) do
