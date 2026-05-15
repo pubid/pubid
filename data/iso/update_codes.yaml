@@ -2,3 +2,20 @@ ISO/R 657/IV: ISO/R 657-4:1969
 ISO/IEC/IEEE 8802-22.2:2015/Amd.2:2017(E): ISO/IEC/IEEE 8802-22:2015/Amd.2:2017(E)
 ISO/TR 17716.2: ISO/TR 17716
 ISO/TR 17716.2(E): ISO/TR 17716(E)
+# Long-form draft typed stages (DIS TR, FDIS PAS, ...) → canonical short
+# typed-stage abbrs (DTR, FDPAS, ...). DIS/FDIS are typed-stages of the
+# IS class only — for TR/TS/PAS/ISP they have dedicated D<type>/FD<type>
+# typed-stage abbrs. Pattern matches at start of string with the
+# publisher prefix preserved.
+"/^(ISO[\\w/]*) DIS (TR|TS|PAS|ISP) /": '\1 D\2 '
+"/^(ISO[\\w/]*) FDIS (TR|TS|PAS|ISP) /": '\1 FD\2 '
+# Long-form draft supplements (DIS Amd → DAM, DIS Cor → DCOR, DIS Suppl
+# → DSuppl, DIS Add → DAD; FDIS Amd → FDAM, FDIS Cor → FDCOR). Applies
+# in supplement position (after `/`). FDIS Suppl is already the
+# canonical form so it is not rewritten.
+"//DIS Amd /": '/DAM '
+"//FDIS Amd /": '/FDAM '
+"//DIS Cor /": '/DCOR '
+"//FDIS Cor /": '/FDCOR '
+"//DIS Suppl /": '/DSuppl '
+"//DIS Add /": '/DAD '
