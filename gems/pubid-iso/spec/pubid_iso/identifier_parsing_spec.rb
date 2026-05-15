@@ -875,6 +875,18 @@ module Pubid::Iso
       it_behaves_like "converts urn to pubid", "ISO/R 194/Suppl 4"
     end
 
+    context "ISO/R 194-CS:1964" do
+      let(:pubid) { "ISO/R 194-CS:1964" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 1656/Add 1" do
+      let(:pubid) { "ISO 1656/Add 1" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
     context "ISO/R 91-1970 — Addendum 1" do
       let(:original) { "ISO/R 91-1970 — Addendum 1" }
       let(:pubid) { "ISO/R 91:1970/Add 1" }
