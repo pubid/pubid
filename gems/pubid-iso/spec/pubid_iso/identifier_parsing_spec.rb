@@ -934,6 +934,54 @@ module Pubid::Iso
       it_behaves_like "converts pubid to pubid"
     end
 
+    context "ISO 1151-1:1988/WD Add 1" do
+      let(:pubid) { "ISO 1151-1:1988/WD Add 1" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 1750:1981/PWI Add 8" do
+      let(:pubid) { "ISO 1750:1981/PWI Add 8" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 8327:1987/DIS Add 2" do
+      let(:original) { "ISO 8327:1987/DIS Add 2" }
+      let(:pubid) { "ISO 8327:1987/DAD 2" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 8403:1991/DAdd 1" do
+      let(:original) { "ISO 8403:1991/DAdd 1" }
+      let(:pubid) { "ISO 8403:1991/DAD 1" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/IEC Guide 98:1993/DIS Suppl 1.2" do
+      let(:original) { "ISO/IEC Guide 98:1993/DIS Suppl 1.2" }
+      let(:pubid) { "ISO/IEC Guide 98:1993/DSuppl 1.2" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO/IEC 19757-2:2003/Amd 1:2006/DIS Cor 1" do
+      let(:original) { "ISO/IEC 19757-2:2003/Amd 1:2006/DIS Cor 1" }
+      let(:pubid) { "ISO/IEC 19757-2:2003/Amd 1:2006/DCOR 1" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
+    context "ISO 9000/WD Amd 1 — stage prefix on bare number" do
+      # Regression for the part_matcher misparse: pre-fix the stage `WD`
+      # was greedily eaten as a part code, yielding `ISO 9000-WD/Amd 1`.
+      let(:pubid) { "ISO 9000/WD Amd 1" }
+
+      it_behaves_like "converts pubid to pubid"
+    end
+
     context "ISO/R 91-1970 — Addendum 1" do
       let(:original) { "ISO/R 91-1970 — Addendum 1" }
       let(:pubid) { "ISO/R 91:1970/Add 1" }
