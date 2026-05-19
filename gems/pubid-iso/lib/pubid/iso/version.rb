@@ -1,5 +1,5 @@
 module Pubid
   module Iso
-    VERSION = "1.15.17".freeze
+    VERSION = "1.15.18".freeze
   end
 end
