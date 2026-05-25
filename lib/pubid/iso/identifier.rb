@@ -64,6 +64,98 @@ module Pubid
           Pubid::Iso::Builder.new(Pubid::Iso::Scheme).build(parsed)
         end
       end
+
+      # Factory mirroring pubid 1.x's `Pubid::Iso::Identifier.create` API.
+      #
+      # Accepts 1.x-style primitive kwargs and dispatches to the correct
+      # 2.x `Identifiers::*` subclass via {Pubid::Iso::Scheme}. Coerces
+      # primitives into ISO-specific Component objects.
+      #
+      # Dispatch rules:
+      #   * `type:` (e.g. `:tr`, `:amd`)        → lookup via Scheme
+      #   * else `stage:` (e.g. `"DIS"`, `"AMD"`) → lookup via Scheme
+      #   * else                                → InternationalStandard
+      #
+      # @param type    [Symbol, String, nil] type key (`:is`, `:tr`, `:amd`, …)
+      # @param stage   [String, Symbol, nil] typed-stage abbreviation
+      # @param opts    [Hash] remaining attribute primitives:
+      #   :publisher (String), :number, :part, :subpart, :year, :edition,
+      #   :language
+      # @return [Pubid::Iso::Identifier]
+      def self.create(type: nil, stage: nil, **opts)
+        klass = resolve_create_class(type: type, stage: stage)
+        attrs = coerce_create_attrs(opts)
+        ts = resolve_create_typed_stage(klass, stage)
+        attrs[:typed_stage] = ts if ts
+        klass.new(**attrs)
+      end
+
+      # When `stage:` is explicit, look up the matching TypedStage via
+      # Scheme. Otherwise default to the chosen class's "published"
+      # TypedStage (so e.g. TR renders the "/TR" prefix). Returns nil if
+      # neither is available; the renderer then omits the stage prefix.
+      def self.resolve_create_typed_stage(klass, stage)
+        if stage
+          Scheme.locate_typed_stage_by_abbr(stage.to_s)
+        elsif klass.const_defined?(:TYPED_STAGES)
+          klass.const_get(:TYPED_STAGES).find do |ts|
+            ts.stage_code.to_sym == :published
+          end
+        end
+      end
+
+      def self.resolve_create_class(type:, stage:)
+        klass =
+          if type
+            Scheme.locate_identifier_klass_by_type_code(type)
+          elsif stage
+            ts = Scheme.locate_typed_stage_by_abbr(stage.to_s)
+            ts && Scheme.locate_identifier_klass_by_type_code(ts.type_code)
+          end
+        return klass if klass && !supplement_klass?(klass)
+
+        if klass
+          # TODO(create-shim): supplement identifiers (Amendment, Corrigendum,
+          # Supplement, Extract, Addendum, DirectivesSupplement) require a
+          # base_identifier to render. Wire `base:` kwarg through once a
+          # caller needs it.
+          raise ArgumentError, "#{klass} requires a base_identifier; " \
+                               "Identifier.create cannot build supplements yet"
+        end
+        Identifiers::InternationalStandard
+      end
+
+      def self.supplement_klass?(klass)
+        Array(Scheme.instance.supplement_identifiers).include?(klass)
+      end
+
+      def self.coerce_create_attrs(opts)
+        out = {}
+        if (v = opts[:publisher])
+          out[:publisher] = Components::Publisher.new(publisher: v.to_s)
+        end
+        %i[number part subpart].each do |k|
+          v = opts[k]
+          out[k] = Components::Code.new(number: v.to_s) unless v.nil?
+        end
+        if (v = opts[:year])
+          out[:date] = ::Pubid::Components::Date.new(year: v.to_s)
+        end
+        if (v = opts[:edition])
+          out[:edition] = ::Pubid::Components::Edition.new(number: v)
+        end
+        if (v = opts[:language])
+          out[:languages] =
+            [::Pubid::Components::Language.new(code: v.to_s)]
+        end
+        # TODO(create-shim): 1.x also accepted joint_document, tctype,
+        # sctype, wgtype, tcnumber, scnumber, wgnumber, dirtype, iteration,
+        # base, supplements, amendments, corrigendums, addendum, month,
+        # jtc_dir, dir. Add as relaton call sites require them.
+        out
+      end
+      private_class_method :resolve_create_class, :supplement_klass?,
+                           :resolve_create_typed_stage, :coerce_create_attrs
     end
   end
 end
