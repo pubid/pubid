@@ -2,7 +2,10 @@
 
 module Pubid
   module Ccsds
-    class SingleIdentifier < Identifier
+    # Qualified as ::Pubid::Identifier to avoid resolving to the local
+    # Pubid::Ccsds::Identifier module, which is a parser entry point
+    # (`self.parse`) — not the base class.
+    class SingleIdentifier < ::Pubid::Identifier
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "CCSDS")
       }
