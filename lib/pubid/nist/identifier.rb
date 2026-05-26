@@ -6,6 +6,12 @@ module Pubid
     # historical reasons; this module hosts `.create` for API consistency
     # with the other pubid flavors.
     module Identifier
+      # Delegate to the flavor module so callers can use
+      # `Pubid::Nist::Identifier.parse` consistently with other flavors.
+      def self.parse(identifier)
+        Pubid::Nist.parse(identifier)
+      end
+
       # Factory mirroring pubid 1.x's `Pubid::Nist::Identifier.create` API.
       #
       # Dispatch is by `:series` (e.g. "SP", "FIPS", "IR", "HB", "TN")
