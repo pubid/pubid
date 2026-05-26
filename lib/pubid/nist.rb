@@ -5,6 +5,7 @@ module Pubid
     autoload :Builder, "#{__dir__}/nist/builder"
     autoload :Components, "#{__dir__}/nist/components"
     autoload :Configuration, "#{__dir__}/nist/configuration"
+    autoload :Identifier, "#{__dir__}/nist/identifier"
     autoload :Identifiers, "#{__dir__}/nist/identifiers"
     autoload :Parser, "#{__dir__}/nist/parser"
     autoload :Scheme, "#{__dir__}/nist/scheme"
