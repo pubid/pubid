@@ -64,6 +64,66 @@ module Pubid
 
         Pubid::Idf::Builder.new.build(parsed)
       end
+
+      # Factory mirroring pubid 1.x's `Pubid::Idf::Identifier.create` API.
+      # Default subclass is {Identifiers::InternationalStandard}.
+      #
+      # IDF's renderer requires `typed_stage` to be set (calls
+      # `.abbreviation` without a nil check); factory auto-resolves the
+      # "published" TypedStage for the chosen subclass.
+      TYPE_KEY_TO_KLASS = {
+        is:              "InternationalStandard",
+        reviewed_method: "ReviewedMethod",
+      }.freeze
+
+      def self.create(type: nil, stage: nil, **opts)
+        klass = resolve_create_class(type)
+        attrs = coerce_create_attrs(opts)
+        ts = resolve_create_typed_stage(klass, stage)
+        attrs[:typed_stage] = ts if ts
+        klass.new(**attrs)
+      end
+
+      def self.resolve_create_class(type)
+        return Identifiers::InternationalStandard if type.nil?
+
+        klass_name = TYPE_KEY_TO_KLASS[type.to_sym]
+        raise ArgumentError, "Unknown IDF type: #{type.inspect}" unless klass_name
+
+        Identifiers.const_get(klass_name)
+      end
+
+      def self.resolve_create_typed_stage(klass, stage)
+        return nil unless klass.const_defined?(:TYPED_STAGES)
+
+        if stage
+          klass.const_get(:TYPED_STAGES).find do |ts|
+            ts.abbr.include?(stage.to_s)
+          end
+        else
+          klass.const_get(:TYPED_STAGES).find do |ts|
+            ts.stage_code&.to_sym == :published
+          end
+        end
+      end
+
+      def self.coerce_create_attrs(opts)
+        attrs = {
+          publisher: Pubid::Components::Publisher.new(
+            body: (opts[:publisher] || "IDF").to_s,
+          ),
+        }
+        if (v = opts[:number])
+          attrs[:number] = Pubid::Components::Code.new(value: v.to_s)
+        end
+        if (v = opts[:year])
+          attrs[:date] = Pubid::Components::Date.new(year: v.to_s)
+        end
+        attrs
+      end
+      private_class_method :resolve_create_class,
+                           :resolve_create_typed_stage,
+                           :coerce_create_attrs
     end
   end
 end
