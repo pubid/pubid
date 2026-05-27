@@ -24,6 +24,17 @@ module Pubid
           { key: :base, title: "Base Standard", short: nil }
         end
 
+        # Return a copy of this identifier with the named attributes
+        # nil'd. Mirrors the {Pubid::Identifier#exclude} convenience.
+        # CCSDS Base extends Lutaml::Model::Serializable directly (not
+        # Pubid::Identifier), so the method is defined here too.
+        def exclude(*args)
+          attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
+            h[name] = args.include?(name) ? nil : send(name)
+          end
+          self.class.new(attrs)
+        end
+
         # Generate URN for this identifier
         #
         # @return [String] URN representation
