@@ -123,7 +123,10 @@ module Pubid
       def self.resolve_create_class(type:, stage:)
         klass =
           if type
-            Scheme.locate_identifier_klass_by_type_code(type)
+            located = Scheme.locate_identifier_klass_by_type_code(type)
+            raise ArgumentError, "Unknown ISO type: #{type.inspect}" unless located
+
+            located
           elsif stage
             ts = Scheme.locate_typed_stage_by_abbr(stage.to_s)
             ts && Scheme.locate_identifier_klass_by_type_code(ts.type_code)
