@@ -46,8 +46,8 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
         expect(parsed.to_s).to eq(subject)
       end
 
-      it "provides type :consolidated" do
-        expect(parsed.type).to eq(:consolidated)
+      it "is a ConsolidatedIdentifier" do
+        expect(parsed).to be_a(described_class)
       end
 
       it "delegates publisher to first identifier" do

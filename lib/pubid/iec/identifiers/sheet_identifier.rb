@@ -49,10 +49,6 @@ module Pubid
           base_identifier&.date
         end
 
-        def type
-          :sheet
-        end
-
         def stage
           base_identifier&.stage
         end

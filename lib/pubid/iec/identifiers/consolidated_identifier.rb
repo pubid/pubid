@@ -59,10 +59,6 @@ module Pubid
           identifiers&.first&.date
         end
 
-        def type
-          :consolidated
-        end
-
         def stage
           identifiers&.first&.stage
         end

@@ -34,8 +34,8 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
         expect(parsed.fragment_number).to eq("2")
       end
 
-      it "provides type :frag" do
-        expect(parsed.type).to eq(:frag)
+      it "is a FragmentIdentifier" do
+        expect(parsed).to be_a(described_class)
       end
 
       it "round-trips" do

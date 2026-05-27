@@ -1,10 +1,11 @@
 require "lutaml/model"
+require_relative "../../components/publisher"
 # frozen_string_literal: true
 
 module Pubid
   module Iec
     module Components
-      class Publisher < Lutaml::Model::Serializable
+      class Publisher < ::Pubid::Components::Publisher
         PUBLISHERS = {
           "IEC" => "International Electrotechnical Commission",
           "ISO/IEC" => "ISO/IEC Joint Technical Committee",

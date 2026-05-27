@@ -34,8 +34,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.to_s).to eq(subject)
       end
 
-      it "provides type :vap" do
-        expect(parsed.type).to eq(:vap)
+      it "is a VapIdentifier" do
+        expect(parsed).to be_a(described_class)
       end
 
       it "delegates publisher to base" do

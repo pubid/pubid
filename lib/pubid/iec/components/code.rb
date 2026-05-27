@@ -1,10 +1,11 @@
 require "lutaml/model"
+require_relative "../../components/code"
 # frozen_string_literal: true
 
 module Pubid
   module Iec
     module Components
-      class Code < Lutaml::Model::Serializable
+      class Code < ::Pubid::Components::Code
         attribute :prefix, :string, default: -> {}
         attribute :number, :string
         attribute :part, :string, default: -> {}
