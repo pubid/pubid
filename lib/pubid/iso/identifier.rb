@@ -86,7 +86,23 @@ module Pubid
         klass = resolve_create_class(type: type, stage: stage)
         attrs = coerce_create_attrs(opts)
         ts = resolve_create_typed_stage(klass, stage)
-        attrs[:typed_stage] = ts if ts
+        if ts
+          attrs[:typed_stage] = ts
+          # Parse fills `type` and `stage` Components derived from
+          # typed_stage; mirror that here so .create round-trips through
+          # Pubid::Identifier#== with a parsed identifier.
+          attrs[:type] ||= ::Pubid::Components::Type.new(
+            name:      ts.name,
+            abbr:      Array(ts.abbr).first.to_s,
+            type_code: ts.type_code&.to_s,
+          )
+          attrs[:stage] ||= ::Pubid::Components::Stage.new(
+            name:              ts.name,
+            stage_code:        ts.stage_code&.to_s,
+            abbr:              Array(ts.abbr).first.to_s,
+            harmonized_stages: Array(ts.harmonized_stages),
+          )
+        end
         klass.new(**attrs)
       end
 
@@ -132,7 +148,11 @@ module Pubid
       def self.coerce_create_attrs(opts)
         out = {}
         if (v = opts[:publisher])
-          out[:publisher] = Components::Publisher.new(publisher: v.to_s)
+          # Parse sets copublisher to []; mirror that for hash/equality
+          # parity with parsed identifiers.
+          out[:publisher] = Components::Publisher.new(
+            publisher: v.to_s, copublisher: [],
+          )
         end
         %i[number part subpart].each do |k|
           v = opts[k]
