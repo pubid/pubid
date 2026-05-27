@@ -123,7 +123,7 @@ module Pubid
       def self.resolve_create_class(type:, stage:)
         klass =
           if type
-            located = Scheme.locate_identifier_klass_by_type_code(type)
+            located = locate_klass_by_type_or_short(type)
             raise ArgumentError, "Unknown ISO type: #{type.inspect}" unless located
 
             located
@@ -142,6 +142,15 @@ module Pubid
                                "Identifier.create cannot build supplements yet"
         end
         Identifiers::InternationalStandard
+      end
+
+      # Try direct key lookup, then fall back to matching the class's
+      # :short letter (e.g. type "R" → Recommendation, whose key is :rec
+      # and short is "R"). Indexes and legacy data sometimes carry the
+      # short form rather than the key.
+      def self.locate_klass_by_type_or_short(type)
+        Scheme.locate_identifier_klass_by_type_code(type) ||
+          Scheme.identifiers.detect { |k| k.type&.dig(:short)&.to_s == type.to_s }
       end
 
       def self.supplement_klass?(klass)
