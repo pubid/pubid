@@ -9,10 +9,6 @@ module Pubid
         def self.type
           { key: :circular_letter, title: "Circular Letter", short: "C" }
         end
-
-        def type
-          self.class.type
-        end
       end
     end
   end

@@ -15,7 +15,7 @@ module Pubid
 
       def generate
         parts = ["urn", "iho"]
-        parts << identifier.type[:short].to_s.downcase
+        parts << identifier.class.type[:short].to_s.downcase
         parts << identifier.code.to_s
         parts << "ap.#{identifier.appendix}"     if identifier.appendix
         parts << "part.#{identifier.part}"       if identifier.part

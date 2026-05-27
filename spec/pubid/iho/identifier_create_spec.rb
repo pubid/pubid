@@ -35,7 +35,7 @@ RSpec.describe Pubid::Iho::Identifier do
       %w[S P M B C].each do |letter|
         it "dispatches type: '#{letter}' (series letter)" do
           id = described_class.create(type: letter, code: "1")
-          expect(id.type[:short]).to eq(letter)
+          expect(id.class.type[:short]).to eq(letter)
         end
       end
 

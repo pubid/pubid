@@ -9,10 +9,6 @@ module Pubid
         def self.type
           { key: :publication, title: "Publication", short: "P" }
         end
-
-        def type
-          self.class.type
-        end
       end
     end
   end

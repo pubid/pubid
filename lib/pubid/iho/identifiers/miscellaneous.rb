@@ -10,10 +10,6 @@ module Pubid
           { key: :miscellaneous, title: "Miscellaneous Publication",
             short: "M" }
         end
-
-        def type
-          self.class.type
-        end
       end
     end
   end
