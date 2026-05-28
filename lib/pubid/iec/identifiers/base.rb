@@ -38,6 +38,10 @@ module Pubid
           # Database flag
           parts << " DB" if database
 
+          # All-parts marker — rendered the same as the generic
+          # HumanReadable renderer for parity (see Pubid::Renderers::HumanReadable#render).
+          parts << " (all parts)" if all_parts
+
           parts.compact.join
         end
 

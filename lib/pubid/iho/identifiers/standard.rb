@@ -9,10 +9,6 @@ module Pubid
         def self.type
           { key: :standard, title: "Standards and Specifications", short: "S" }
         end
-
-        def type
-          self.class.type
-        end
       end
     end
   end

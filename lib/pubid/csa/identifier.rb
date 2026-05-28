@@ -3,6 +3,62 @@
 module Pubid
   module Csa
     class Identifier
+      # Factory that builds a CSA identifier from a hash of primitives.
+      # Default is {Identifiers::Standard}.
+      TYPE_KEY_TO_KLASS = {
+        standard:         "Standard",
+        bundled:          "Bundled",
+        canadian_adopted: "CanadianAdopted",
+        cec:              "Cec",
+        combined:         "Combined",
+        csa_adopted:      "CsaAdopted",
+        package:          "Package",
+        series:           "Series",
+      }.freeze
+
+      def self.create(type: nil, **opts)
+        klass = resolve_create_class(type)
+        klass.new(**coerce_create_attrs(opts, klass: klass))
+      end
+
+      def self.resolve_create_class(type)
+        return Identifiers::Standard if type.nil?
+
+        klass_name = TYPE_KEY_TO_KLASS[type.to_sym]
+        raise ArgumentError, "Unknown CSA type: #{type.inspect}" unless klass_name
+
+        Identifiers.const_get(klass_name)
+      end
+
+      def self.coerce_create_attrs(opts, klass:)
+        attrs = {}
+
+        if (v = opts[:code] || opts[:number])
+          attrs[:code] = Pubid::Components::Code.new(value: v.to_s)
+        end
+
+        if opts[:year]
+          year_str = opts[:year].to_s
+          attrs[:year] = year_str
+          # Preserve 4-digit year rendering (e.g. "B51:2024") rather than
+          # collapsing to "B51:24".
+          attrs[:original_year_4digit] = year_str.length == 4 unless opts.key?(:original_year_4digit)
+        end
+        attrs[:original_year_4digit] = opts[:original_year_4digit] if opts.key?(:original_year_4digit)
+        attrs[:year_format] = opts[:year_format].to_s if opts[:year_format]
+        attrs[:year_prefix] = opts[:year_prefix].to_s if opts[:year_prefix]
+        attrs[:reaffirmation] = opts[:reaffirmation].to_s if opts[:reaffirmation]
+        attrs[:french] = opts[:french] if opts.key?(:french)
+        attrs[:has_publisher] = opts.fetch(:has_publisher, true)
+        attrs[:publisher_prefix] = opts[:publisher_prefix].to_s if opts[:publisher_prefix]
+        attrs[:series_prefix] = opts[:series_prefix].to_s if opts[:series_prefix]
+        attrs[:series] = opts[:series] if opts.key?(:series) && [true, false].include?(opts[:series])
+        attrs[:package] = opts[:package].to_s if opts[:package]
+        attrs[:no_number] = opts[:no_number].to_s if opts[:no_number]
+        attrs
+      end
+      private_class_method :resolve_create_class, :coerce_create_attrs
+
       def self.parse(input)
         # Filter out comments
         return nil if input.start_with?("#")

@@ -5,6 +5,7 @@ require "parslet"
 module Pubid
   module Plateau
     autoload :Builder, "#{__dir__}/plateau/builder"
+    autoload :Identifier, "#{__dir__}/plateau/identifier"
     autoload :Identifiers, "#{__dir__}/plateau/identifiers"
     autoload :Parser, "#{__dir__}/plateau/parser"
     autoload :Scheme, "#{__dir__}/plateau/scheme"

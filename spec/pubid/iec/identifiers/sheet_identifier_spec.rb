@@ -42,8 +42,8 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
         expect(parsed.to_s).to eq(subject)
       end
 
-      it "provides type :sheet" do
-        expect(parsed.type).to eq(:sheet)
+      it "is a SheetIdentifier" do
+        expect(parsed).to be_a(described_class)
       end
 
       it "delegates publisher to base" do

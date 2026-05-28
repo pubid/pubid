@@ -1,6 +1,21 @@
 require "spec_helper"
 
 RSpec.describe Pubid::Ccsds do
+  describe "SingleIdentifier superclass resolution" do
+    # Regression: Pubid::Ccsds::Identifier is a module (with self.parse),
+    # so an unqualified `class SingleIdentifier < Identifier` resolves to
+    # the local module and raises TypeError. The superclass must be
+    # qualified as ::Pubid::Identifier.
+    it "inherits directly from ::Pubid::Identifier" do
+      expect(Pubid::Ccsds::SingleIdentifier.superclass)
+        .to eq(::Pubid::Identifier)
+    end
+
+    it "does not raise on first load" do
+      expect { Pubid::Ccsds::SingleIdentifier }.not_to raise_error
+    end
+  end
+
   describe ".parse" do
     context "basic CCSDS identifiers" do
       it "parses CCSDS 120.0-G-4" do

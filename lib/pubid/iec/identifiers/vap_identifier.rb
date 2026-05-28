@@ -60,10 +60,6 @@ module Pubid
           base_identifier&.date
         end
 
-        def type
-          :vap
-        end
-
         def stage
           base_identifier&.stage
         end

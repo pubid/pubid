@@ -86,6 +86,16 @@ module Pubid
           if edition
             result += "#{edition.type}#{edition.id}"
           end
+
+          # Mirror Base#to_short_style update rendering — FIPS overrides
+          # to_short_style entirely, so update (e.g. /Upd2) would otherwise
+          # be dropped.
+          if update_component
+            result += update_component.to_s(:short)
+          elsif update
+            result += "-upd#{update}"
+          end
+
           result
         end
       end

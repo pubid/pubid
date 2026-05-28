@@ -10,10 +10,6 @@ module Pubid
           { key: :bibliographic, title: "Bibliographic Publication",
             short: "B" }
         end
-
-        def type
-          self.class.type
-        end
       end
     end
   end

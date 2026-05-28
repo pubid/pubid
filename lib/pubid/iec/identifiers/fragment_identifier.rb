@@ -128,10 +128,6 @@ module Pubid
           base_identifier&.date
         end
 
-        def type
-          :frag
-        end
-
         def stage
           typed_stage&.to_stage || base_identifier&.stage
         end
