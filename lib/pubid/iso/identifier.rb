@@ -82,11 +82,17 @@ module Pubid
       #   :publisher (String), :number, :part, :subpart, :year, :edition,
       #   :language
       # @return [Pubid::Iso::Identifier]
-      def self.create(type: nil, stage: nil, **opts)
+      def self.create(type: nil, stage: nil, base: nil, **opts)
         klass = resolve_create_class(type: type, stage: stage)
         attrs = coerce_create_attrs(opts)
         ts = resolve_create_typed_stage(klass, stage)
         if ts
+          # dup the (shared) TYPED_STAGES element before tweaking, and set
+          # original_abbr to the canonical abbr so rendering matches a
+          # parsed identifier (parse records the spelled abbr, e.g. "Amd"
+          # not the upcased short_abbr "AMD").
+          ts = ts.dup
+          ts.original_abbr ||= Array(ts.abbr).first&.to_s
           attrs[:typed_stage] = ts
           # Parse fills `type` and `stage` Components derived from
           # typed_stage; mirror that here so .create round-trips through
@@ -103,7 +109,22 @@ module Pubid
             harmonized_stages: Array(ts.harmonized_stages),
           )
         end
+        if supplement_klass?(klass)
+          raise ArgumentError, "#{klass} requires a base: identifier" if base.nil?
+
+          attrs[:base_identifier] = build_base_identifier(base)
+        end
         klass.new(**attrs)
+      end
+
+      # Build the base_identifier for a supplement from either an already
+      # constructed identifier or a 1.x-style attribute hash (the nested
+      # `:base` entry in a structured index). Recurses so supplement-of-
+      # supplement chains (e.g. a Corrigendum to an Amendment) build cleanly.
+      def self.build_base_identifier(base)
+        return base if base.is_a?(::Pubid::Identifier)
+
+        create(**base.transform_keys(&:to_sym))
       end
 
       # When `stage:` is explicit, look up the matching TypedStage via
@@ -131,25 +152,17 @@ module Pubid
             ts = Scheme.locate_typed_stage_by_abbr(stage.to_s)
             ts && Scheme.locate_identifier_klass_by_type_code(ts.type_code)
           end
-        return klass if klass && !supplement_klass?(klass)
-
-        if klass
-          # TODO(create-shim): supplement identifiers (Amendment, Corrigendum,
-          # Supplement, Extract, Addendum, DirectivesSupplement) require a
-          # base_identifier to render. Wire `base:` kwarg through once a
-          # caller needs it.
-          raise ArgumentError, "#{klass} requires a base_identifier; " \
-                               "Identifier.create cannot build supplements yet"
-        end
-        Identifiers::InternationalStandard
+        klass || Identifiers::InternationalStandard
       end
 
-      # Try direct key lookup, then fall back to matching the class's
-      # :short letter (e.g. type "R" → Recommendation, whose key is :rec
-      # and short is "R"). Indexes and legacy data sometimes carry the
-      # short form rather than the key.
+      # Try direct key lookup, then a case-insensitive key lookup (indexes
+      # store e.g. "DATA" but the registry key is :data), then fall back to
+      # matching the class's :short letter (e.g. type "R" → Recommendation,
+      # whose key is :rec and short is "R"). Indexes and legacy data carry
+      # either the key, an upper-cased key, or the short form.
       def self.locate_klass_by_type_or_short(type)
         Scheme.locate_identifier_klass_by_type_code(type) ||
+          Scheme.locate_identifier_klass_by_type_code(type.to_s.downcase) ||
           Scheme.identifiers.detect { |k| k.type&.dig(:short)&.to_s == type.to_s }
       end
 

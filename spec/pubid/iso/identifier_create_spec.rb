@@ -38,11 +38,21 @@ RSpec.describe Pubid::Iso::Identifier do
         expect(id.to_s).to eq("ISO Guide 19115:2014")
       end
 
-      it "raises ArgumentError for supplement types (Amendment et al)" do
+      it "raises ArgumentError for supplement types without a base:" do
         expect do
           described_class.create(type: :amd, publisher: "ISO",
                                  number: "19115")
-        end.to raise_error(ArgumentError, /requires a base_identifier/)
+        end.to raise_error(ArgumentError, /requires a base/)
+      end
+
+      it "builds supplement types when given a base:" do
+        id = described_class.create(
+          type: "AMD", publisher: "", number: "1", year: 1998,
+          base: { publisher: "ISO", number: "1000", year: 1992 },
+        )
+        expect(id).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(id.to_s).to eq("ISO 1000:1992/Amd 1:1998")
+        expect(id).to eq(described_class.parse("ISO 1000:1992/Amd 1:1998"))
       end
     end
 
