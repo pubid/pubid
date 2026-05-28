@@ -49,6 +49,22 @@ module Pubid
           end
         end
 
+        # Identity ignores original_prefix: it records how the edition was
+        # spelled in the source ("Rev. " vs "r") for round-trip rendering
+        # only. "r1" and "Rev. 1" are the same edition.
+        def ==(other)
+          return false unless other.is_a?(self.class)
+
+          type == other.type && id == other.id &&
+            additional_text == other.additional_text
+        end
+
+        alias eql? ==
+
+        def hash
+          [self.class, type, id, additional_text].hash
+        end
+
         private
 
         # Build short format: "e2", "e2.June1908", "e2.1908", "e2.50", "r1963", "-April1909", "r1a"
