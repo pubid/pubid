@@ -84,6 +84,37 @@ module Pubid
           # See lib/pubid/nist/builder.rb lines 368-472 for compound number logic
         end
 
+        # Attributes that are build artifacts or rendering aliases, not part
+        # of an identifier's logical identity. They diverge between equally-
+        # valid spellings of the same id (e.g. long "Rev. 1" vs short "r1"):
+        #   - edition_component: redundant alias of :edition
+        #   - first_number/second_number: decomposed parts of the canonical
+        #     :number, retained from the parse for building
+        #   - parsed_format: records the input format for round-trip rendering
+        EQUALITY_IGNORED_ATTRS = %i[
+          edition_component first_number second_number parsed_format
+        ].freeze
+
+        # Logical identity comparison: equal when every attribute except the
+        # build artifacts/aliases above matches. (Edition#== already ignores
+        # its rendering-only original_prefix.)
+        def ==(other)
+          return false unless other.instance_of?(self.class)
+
+          self.class.attributes.each_key.all? do |name|
+            EQUALITY_IGNORED_ATTRS.include?(name) || send(name) == other.send(name)
+          end
+        end
+
+        alias eql? ==
+
+        def hash
+          vals = self.class.attributes.each_key.reject do |name|
+            EQUALITY_IGNORED_ATTRS.include?(name)
+          end.map { |name| send(name) }
+          [self.class, *vals].hash
+        end
+
         # Return a copy with the named attributes nil'd. Overrides
         # Pubid::Identifier#exclude because NIST's initialize is keyword-only
         # (initialize(**attributes)) while the inherited exclude rebuilds via
