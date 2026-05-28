@@ -349,11 +349,14 @@ module Pubid
             end
           end
 
-          # V2: Use version_component if available, else use version string
+          # V2: Use version_component if available, else use version string.
+          # Attach directly (no leading space) to match edition rendering
+          # (e.g. "800-53r5"), so version reads "800-45ver2" not
+          # "800-45 ver2".
           if version_component
-            result += " #{version_component.to_s(:short)}"
+            result += version_component.to_s(:short)
           elsif version
-            result += " Ver. #{version}"
+            result += "ver#{version}"
           end
 
           # Add supplement with date range support - FIX: proper spacing
