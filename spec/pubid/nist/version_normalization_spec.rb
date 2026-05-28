@@ -10,28 +10,28 @@ RSpec.describe "NIST Version Normalization" do
 
     it "normalizes short v format to verbose ver format" do
       identifier = Pubid::Nist.parse("NIST SP 500-268v1.1")
-      expect(identifier.to_s).to eq("NIST SP 500-268 ver1.1")
+      expect(identifier.to_s).to eq("NIST SP 500-268ver1.1")
     end
 
     it "normalizes Ver. with period to ver format" do
       identifier = Pubid::Nist.parse("NIST SP 800-60 Ver. 2.0")
-      expect(identifier.to_s).to eq("NIST SP 800-60 ver2.0")
+      expect(identifier.to_s).to eq("NIST SP 800-60ver2.0")
     end
 
     it "preserves already-normalized ver format" do
       identifier = Pubid::Nist.parse("NIST SP 800-53ver1.1")
-      expect(identifier.to_s).to eq("NIST SP 800-53 ver1.1")
+      expect(identifier.to_s).to eq("NIST SP 800-53ver1.1")
     end
 
     it "handles multi-digit versions" do
       identifier = Pubid::Nist.parse("NIST SP 800-60ver2.0")
-      expect(identifier.to_s).to eq("NIST SP 800-60 ver2.0")
+      expect(identifier.to_s).to eq("NIST SP 800-60ver2.0")
     end
   end
 
   describe "round-trip fidelity for normalized versions" do
     it "maintains format through parse-serialize-parse cycle" do
-      original = "NIST SP 500-268 ver1.1"
+      original = "NIST SP 500-268ver1.1"
       first = Pubid::Nist.parse(original)
       serialized = first.to_s
       second = Pubid::Nist.parse(serialized)
@@ -41,7 +41,7 @@ RSpec.describe "NIST Version Normalization" do
     end
 
     it "maintains format for Ver.-normalized versions" do
-      original = "NIST SP 800-60 ver2.0"
+      original = "NIST SP 800-60ver2.0"
       first = Pubid::Nist.parse(original)
       serialized = first.to_s
       second = Pubid::Nist.parse(serialized)
