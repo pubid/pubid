@@ -84,6 +84,22 @@ module Pubid
           # See lib/pubid/nist/builder.rb lines 368-472 for compound number logic
         end
 
+        # Return a copy with the named attributes nil'd. Overrides
+        # Pubid::Identifier#exclude because NIST's initialize is keyword-only
+        # (initialize(**attributes)) while the inherited exclude rebuilds via
+        # the positional self.class.new(attrs) form — passing a positional
+        # hash to a keyword-only initializer raises ArgumentError. Rebuild
+        # with the keyword splat instead.
+        def exclude(*args)
+          excluded_args = args.dup
+          excluded_args << :date if excluded_args.delete(:year)
+
+          attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
+            h[name] = excluded_args.include?(name) ? nil : send(name)
+          end
+          self.class.new(**attrs)
+        end
+
         # Compute revision from edition component for backward compatibility
         # @return [String, nil] revision string (e.g., "r5") or nil
         def revision
