@@ -361,6 +361,12 @@ module Pubid
         # Fix verbose "Revision" format: " Revision (r)" → " r"
         cleaned = cleaned.gsub(/\s+Revision\s+\(r\)/, " r")
 
+        # Fix verbose "Part N" → short "ptN": "800-57 Part 2 Rev. 1" →
+        # "800-57pt2 Rev. 1". The grammar already accepts short "ptN" (and
+        # "ptN Rev. M"); only the verbose spelling was unsupported. Attaches
+        # to the preceding number so the existing part rule applies.
+        cleaned = cleaned.gsub(/\s+Part\s+(\d+)/, 'pt\1')
+
         # Fix verbose "rev YYYY" format: "126 rev 2013" → "126r2013"
         # Removes space between number and "rev", and converts to "r" prefix
         # Handles patterns like "NIST SP 260-126 rev 2013" → "NIST SP 260-126r2013"
