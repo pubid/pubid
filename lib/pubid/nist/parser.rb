@@ -370,6 +370,15 @@ module Pubid
         # to the preceding number so the existing part rule applies.
         cleaned = cleaned.gsub(/\s+Part\s+(\d+)/, 'pt\1')
 
+        # Normalize verbose addendum " Add"/" add" (with or without period)
+        # to the canonical " Add." the grammar accepts, and uppercase a
+        # doc-number letter that immediately precedes it ("800-38a Add" →
+        # "800-38A Add.") — NIST doc-number letters are canonically uppercase
+        # and the letter_number grammar rule only splits the uppercase form.
+        # Scoped to the addendum context so bare markers like "800-90r"
+        # (revision) are left untouched.
+        cleaned = cleaned.gsub(/(\d[a-z]?)\s+Add\b\.?/i) { "#{Regexp.last_match(1).upcase} Add." }
+
         # Fix verbose "rev YYYY" format: "126 rev 2013" → "126r2013"
         # Removes space between number and "rev", and converts to "r" prefix
         # Handles patterns like "NIST SP 260-126 rev 2013" → "NIST SP 260-126r2013"
