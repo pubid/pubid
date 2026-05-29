@@ -204,9 +204,12 @@ module Pubid
         # FIXED: Pattern must start with "v" or digit to avoid matching "rev 2013" as "v" + " 2013"
         # CRITICAL: Added word boundary \b to prevent matching "v" within "rev"
         # CRITICAL FIX: Use \b to ensure match starts at word boundary
-        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*[-A-Z]*)\s+(\d+)\s+(\d+)/, '\1.\2.\3') # Three parts
-        # CRITICAL FIX: Use \b to ensure match starts at word boundary
-        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*)\s+(\d+)/, '\1.\2') # Two parts
+        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*[-A-Z]*)\s+(\d+)(?!(?i:pd|wd|prd)\b)\s+(\d+)(?!(?i:pd|wd|prd)\b)/, '\1.\2.\3') # Three parts
+        # CRITICAL FIX: Use \b to ensure match starts at word boundary.
+        # Negative lookahead: don't swallow the digit of a numeric draft
+        # stage ("189 2pd" must stay split, not become "189.2pd"); letter
+        # stages ("ipd") already don't match the trailing \d+.
+        cleaned = cleaned.gsub(/(\b(?:v|\d)[v\d]*)\s+(\d+)(?!(?i:pd|wd|prd)\b)/, '\1.\2') # Two parts
 
         # Fix update patterns: ensure space before -upd or /upd (not just at end)
         # Enhanced to handle optional digits after upd: -upd, -upd1, /upd, /upd1
