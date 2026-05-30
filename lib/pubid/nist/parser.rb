@@ -643,6 +643,11 @@ module Pubid
           # NEW: Exclude "draft" keyword
           str("draft").absent? >>
           (
+            # Trailing bare supplement marker on a compound second number
+            # (e.g. "800-53sup") so it isn't split into "53s" + "up". Builder
+            # strips the marker and sets supplement="" (canonical "sup").
+            (digits >> (str("supp") | str("sup")) >>
+              (digit.absent? >> letter.absent?)) |
             # NEW: Revision pattern with U+letter suffix (e.g., "22r1Ua", "38Ua")
             # MUST come BEFORE general letter suffix to avoid matching just "U" from "Ua"
             (digits >> str("r") >> digits >> str("U") >> lower_letter) |

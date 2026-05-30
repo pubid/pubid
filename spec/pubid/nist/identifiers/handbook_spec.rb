@@ -27,7 +27,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -92,7 +92,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -189,7 +189,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -209,7 +209,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -254,7 +254,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
 
         it "round-trips with V2 format" do
           # V2 rendering: Part component comes before supplement
-          expect(parsed.to_s).to eq("NBS HB 28pt1supp-1957")
+          expect(parsed.to_s).to eq("NBS HB 28pt1sup1957")
         end
       end
 
@@ -272,7 +272,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -290,7 +290,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "round-trips" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end

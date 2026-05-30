@@ -41,53 +41,53 @@ RSpec.describe Pubid::Nist::Components::Supplement do
     context "short format with number" do
       it "renders supp2" do
         supplement = described_class.new(number: "2")
-        expect(supplement.to_s(:short)).to eq("supp2")
+        expect(supplement.to_s(:short)).to eq("sup2")
       end
 
       it "renders supp3" do
         supplement = described_class.new(number: "3")
-        expect(supplement.to_s(:short)).to eq("supp3")
+        expect(supplement.to_s(:short)).to eq("sup3")
       end
 
       it "renders supp1" do
         supplement = described_class.new(number: "1")
-        expect(supplement.to_s(:short)).to eq("supp1")
+        expect(supplement.to_s(:short)).to eq("sup1")
       end
     end
 
     context "short format with year" do
       it "renders supp-1925" do
         supplement = described_class.new(year: "1925")
-        expect(supplement.to_s(:short)).to eq("supp-1925")
+        expect(supplement.to_s(:short)).to eq("sup1925")
       end
 
       it "renders supp-1937" do
         supplement = described_class.new(year: "1937")
-        expect(supplement.to_s(:short)).to eq("supp-1937")
+        expect(supplement.to_s(:short)).to eq("sup1937")
       end
     end
 
     context "short format with number and year" do
       it "renders supp3/1926" do
         supplement = described_class.new(number: "3", year: "1926")
-        expect(supplement.to_s(:short)).to eq("supp3/1926")
+        expect(supplement.to_s(:short)).to eq("sup3/1926")
       end
 
       it "renders supp1/1926" do
         supplement = described_class.new(number: "1", year: "1926")
-        expect(supplement.to_s(:short)).to eq("supp1/1926")
+        expect(supplement.to_s(:short)).to eq("sup1/1926")
       end
     end
 
     context "short format with month and year" do
       it "renders suppJan1924" do
         supplement = described_class.new(month: "Jan", year: "1924")
-        expect(supplement.to_s(:short)).to eq("suppJan1924")
+        expect(supplement.to_s(:short)).to eq("supJan1924")
       end
 
       it "renders suppJun1925" do
         supplement = described_class.new(month: "Jun", year: "1925")
-        expect(supplement.to_s(:short)).to eq("suppJun1925")
+        expect(supplement.to_s(:short)).to eq("supJun1925")
       end
     end
 
@@ -97,7 +97,7 @@ RSpec.describe Pubid::Nist::Components::Supplement do
           month_start: "Jan", year_start: "1924",
           month_end: "Jan", year_end: "1926"
         )
-        expect(supplement.to_s(:short)).to eq("suppJan1924-Jan1926")
+        expect(supplement.to_s(:short)).to eq("supJan1924-Jan1926")
       end
 
       it "renders suppJun1925-Jun1927" do
@@ -105,21 +105,21 @@ RSpec.describe Pubid::Nist::Components::Supplement do
           month_start: "Jun", year_start: "1925",
           month_end: "Jun", year_end: "1927"
         )
-        expect(supplement.to_s(:short)).to eq("suppJun1925-Jun1927")
+        expect(supplement.to_s(:short)).to eq("supJun1925-Jun1927")
       end
     end
 
     context "short format with has_revision" do
       it "renders supprev" do
         supplement = described_class.new(has_revision: true)
-        expect(supplement.to_s(:short)).to eq("supprev")
+        expect(supplement.to_s(:short)).to eq("suprev")
       end
     end
 
     context "short format with suffix" do
       it "renders supp with suffix" do
         supplement = described_class.new(suffix: "x")
-        expect(supplement.to_s(:short)).to eq("suppx")
+        expect(supplement.to_s(:short)).to eq("supx")
       end
     end
 
@@ -153,14 +153,14 @@ RSpec.describe Pubid::Nist::Components::Supplement do
     context "mr format" do
       it "renders same as short format" do
         supplement = described_class.new(number: "2")
-        expect(supplement.to_s(:mr)).to eq("supp2")
+        expect(supplement.to_s(:mr)).to eq("sup2")
       end
     end
 
     context "default format" do
       it "uses short format when no format specified" do
         supplement = described_class.new(number: "2")
-        expect(supplement.to_s).to eq("supp2")
+        expect(supplement.to_s).to eq("sup2")
       end
     end
 
@@ -175,17 +175,17 @@ RSpec.describe Pubid::Nist::Components::Supplement do
   describe "common supplement patterns" do
     it "handles numeric supplement" do
       supplement = described_class.new(number: "1")
-      expect(supplement.to_s).to eq("supp1")
+      expect(supplement.to_s).to eq("sup1")
     end
 
     it "handles year supplement" do
       supplement = described_class.new(year: "1940")
-      expect(supplement.to_s).to eq("supp-1940")
+      expect(supplement.to_s).to eq("sup1940")
     end
 
     it "handles supplement with revision" do
       supplement = described_class.new(has_revision: true)
-      expect(supplement.to_s).to eq("supprev")
+      expect(supplement.to_s).to eq("suprev")
     end
   end
 end

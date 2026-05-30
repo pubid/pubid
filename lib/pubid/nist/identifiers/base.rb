@@ -390,22 +390,17 @@ module Pubid
             result += "ver#{version}"
           end
 
-          # Add supplement with date range support - FIX: proper spacing
+          # Add supplement. NIST/NBS canonical short form is single-p "sup"
+          # with the suffix attached directly, no dash (relaton-data-nist
+          # uses "sup2", "sup1940", "supA"); date-range keeps its inner dash.
           if supplement_date_range_start && supplement_date_range_end
-            result += "supp#{supplement_date_range_start}-#{supplement_date_range_end}"
+            result += "sup#{supplement_date_range_start}-#{supplement_date_range_end}"
           elsif supplement_has_revision
-            result += "supprev"
+            result += "suprev"
           elsif supplement && !supplement.empty?
-            # Smart dash logic:
-            # - If supplement starts with letter (month like "Jan1924"), NO dash
-            # - If supplement is digits only (year like "1924"), WITH dash
-            result += if supplement.match?(/^[A-Z]/)
-                        "supp#{supplement}"
-                      else
-                        "supp-#{supplement}"
-                      end
+            result += "sup#{supplement}"
           elsif supplement
-            result += "supp"
+            result += "sup"
           end
 
           # Add other attributes

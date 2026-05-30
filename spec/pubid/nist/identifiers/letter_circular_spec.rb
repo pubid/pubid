@@ -254,7 +254,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
 
         it "normalizes to LC with supp" do
           # Note: "sup" is normalized to "supp" for single definition of truth
-          expect(parsed.to_s).to eq("NBS LC 118supp")
+          expect(parsed.to_s).to eq("NBS LC 118sup")
         end
       end
 

@@ -544,6 +544,13 @@ module Pubid
 
               identifier.number = Components::Code.new(number: number_part)
               identifier.supplement = year_part
+            elsif second_num.value.to_s.match?(/^(\d+)supp?$/)
+              # Pattern: "800-53sup"/"800-53supp" - bare marker on the compound
+              # second number. Strip it and isolate as supplement="" (single-p).
+              second_part = second_num.value.to_s.match(/^(\d+)supp?$/)[1]
+              compound = "#{first_num.value}-#{second_part}"
+              identifier.number = Components::Code.new(number: compound)
+              identifier.supplement = ""
             elsif identifier.is_a?(Identifiers::TechnicalNote) &&
                 second_num.value.to_s.match?(/^(19|20)\d{2}$/)
               # SPECIAL CASE FOR TN: second_num is edition year
@@ -1066,9 +1073,12 @@ module Pubid
               end
             end
 
-            # NEW: Pattern "9350sup" - number with "sup" suffix (no year)
-            # This handles RPT supplements like "NBS RPT 9350sup"
-            if str_value =~ /^(\d+)sup$/
+            # Pattern "9350sup"/"5893supp" - number with bare supplement marker
+            # (no trailing payload). Accept both single-p "sup" and double-p
+            # "supp" so the marker is isolated as supplement="" and rendered as
+            # canonical single-p "sup", instead of staying baked into the number
+            # as an opaque suffix. E.g. "NBS RPT 5893supp", "NBS MONO 32supp".
+            if str_value =~ /^(\d+)supp?$/
               return {
                 first_number: Components::Code.new(number: $1),
                 supplement: "",

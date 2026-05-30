@@ -28,7 +28,7 @@ module Pubid
       def to_s(format = :short)
         # Handle date range supplements (no base identifier)
         if supplement_date_range_start && supplement_date_range_end
-          return "NBS CIRC supp#{supplement_date_range_start}-#{supplement_date_range_end}"
+          return "NBS CIRC sup#{supplement_date_range_start}-#{supplement_date_range_end}"
         end
 
         return super unless base_identifier
@@ -37,34 +37,18 @@ module Pubid
 
         # NEW: Handle update attribute (e.g., "Upd12-1926" for supplement patterns)
         if update
-          # Check if this is an implicit supplement (no explicit "sup/supp" marker, just update)
-          # For implicit supplements like "145r11/1925", don't add "sup" before the update
+          # Implicit supplements (e.g. "145r11/1925") have no explicit marker;
+          # everything else uses the canonical single-p "sup" marker
+          # (relaton-data-nist uses "sup" across all series).
           is_implicit = self.class.attributes.key?(:implicit_supplement) && implicit_supplement == true
-
-          if is_implicit
-            # Implicit supplement: "{base}/{update}" (e.g., "145/Upd1-192511")
-          else
-            # Explicit supplement: "{base}sup/{update}" (e.g., "118sup/Upd12-1926")
-            is_circ_supplement = ["LCIRC", "CIRC"].include?(series.to_s)
-            result += is_circ_supplement ? "sup" : "supp"
-          end
+          result += "sup" unless is_implicit
           result += "/#{update}"
           return result
         end
 
-        # Original supplement rendering
-        # For LCIRC/CIRC supplements with update, use "sup"
-        # For LCIRC/CIRC supplements without update, normalize "sup" to "supp" for consistency
-        is_circ_supplement = ["LCIRC", "CIRC"].include?(series.to_s)
-        # When update is present, use "sup" (e.g., "118sup/Upd1-192612")
-        # When update is not present, use "supp" (e.g., "378Gsupp" - normalized from "sup")
-        result += if is_circ_supplement && !update
-                    "supp"
-                  elsif is_circ_supplement
-                    "sup"
-                  else
-                    "supp"
-                  end
+        # Canonical supplement marker is single-p "sup" across all NIST/NBS
+        # series (relaton-data-nist: SP/CIRC/HB/RPT/LC/IR/MONO/BMS all use "sup").
+        result += "sup"
 
         # Add edition information if present (just ID, not type prefix)
         if edition&.id

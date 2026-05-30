@@ -27,7 +27,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -43,7 +43,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end
@@ -123,7 +123,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end
@@ -149,7 +149,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -173,7 +173,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -189,7 +189,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -211,7 +211,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "renders correctly" do
-          expect(parsed.to_s).to eq("NBS CIRC 24suppJan1924")
+          expect(parsed.to_s).to eq("NBS CIRC 24supJan1924")
         end
       end
 
@@ -229,7 +229,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end
@@ -249,7 +249,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -265,7 +265,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -281,7 +281,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
 
@@ -297,7 +297,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject)
+          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
         end
       end
     end
