@@ -30,17 +30,17 @@ RSpec.describe "Pubid::Nist identifier parsing" do
     context "supplement with revision" do
       it "parses and renders supprev notation" do
         id = Pubid::Nist.parse("NBS CIRC 154supprev")
-        expect(id.to_s).to eq("NBS CIRC 154supprev")
+        expect(id.to_s).to eq("NBS CIRC 154suprev")
       end
 
       it "parses and renders supplement with date" do
         id = Pubid::Nist.parse("NBS CIRC 25suppJan1924")
-        expect(id.to_s).to eq("NBS CIRC 25suppJan1924")
+        expect(id.to_s).to eq("NBS CIRC 25supJan1924")
       end
 
       it "parses and renders supplement with edition" do
         id = Pubid::Nist.parse("NBS CIRC 24e4supp")
-        expect(id.to_s).to eq("NBS CIRC 24e4supp")
+        expect(id.to_s).to eq("NBS CIRC 24e4sup")
       end
     end
 
@@ -102,7 +102,7 @@ RSpec.describe "Pubid::Nist identifier parsing" do
           { input: "NIST SP 800-53r5", expected: "NIST SP 800-53r5" },
           { input: "NBS LCIRC 1019r1963", expected: "NBS LC 1019r1963" },
           { input: "NBS CSM v6n1", expected: "NBS CSM v6n1" },
-          { input: "NBS CIRC 154supprev", expected: "NBS CIRC 154supprev" },
+          { input: "NBS CIRC 154supprev", expected: "NBS CIRC 154suprev" },
           # Canonical format uses DOT separator, not "rev"
           { input: "NBS CIRC 13e2revJune1908",
             expected: "NBS CIRC 13e2.June1908" },

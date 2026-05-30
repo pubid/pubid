@@ -38,7 +38,7 @@ module Pubid
         def to_s(format = :short)
           # Handle date range supplements (no base identifier)
           if supplement_date_range_start && supplement_date_range_end
-            return "NBS CIRC supp#{supplement_date_range_start}-#{supplement_date_range_end}"
+            return "NBS CIRC sup#{supplement_date_range_start}-#{supplement_date_range_end}"
           end
 
           # Use parent's rendering for base + supplement

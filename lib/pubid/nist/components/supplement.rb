@@ -9,11 +9,11 @@ module Pubid
       # Represents supplement notation with number, year, month, or revision
       #
       # Examples:
-      #   Supplement.new(number: "2").to_s(:short)              # => "supp2"
-      #   Supplement.new(year: "1925").to_s(:short)              # => "supp-1925"
-      #   Supplement.new(number: "3", year: "1926").to_s(:short) # => "supp3/1926"
-      #   Supplement.new(month: "Jan", year: "1924").to_s(:short) # => "suppJan1924"
-      #   Supplement.new(has_revision: true).to_s(:short)        # => "supprev"
+      #   Supplement.new(number: "2").to_s(:short)              # => "sup2"
+      #   Supplement.new(year: "1925").to_s(:short)              # => "sup1925"
+      #   Supplement.new(number: "3", year: "1926").to_s(:short) # => "sup3/1926"
+      #   Supplement.new(month: "Jan", year: "1924").to_s(:short) # => "supJan1924"
+      #   Supplement.new(has_revision: true).to_s(:short)        # => "suprev"
       class Supplement < Lutaml::Model::Serializable
         attribute :number, :string           # Supplement number (e.g., "2" in "supp2")
         attribute :year, :string             # Year (4 digits)
@@ -46,10 +46,12 @@ module Pubid
 
         private
 
-        # Build short format: "supp2", "supp-1925", "supp3/1926", "suppJan1924", "supprev"
+        # Build short format: "sup2", "sup1925", "sup3/1926", "supJan1924", "suprev"
+        # NIST/NBS canonical short form is single-p "sup" with the suffix
+        # attached directly (relaton-data-nist uses "sup2", "sup1940", "supA").
         def build_short_format
-          return "supprev" if has_revision
-          return "supp#{suffix}" if suffix
+          return "suprev" if has_revision
+          return "sup#{suffix}" if suffix
           return build_date_range_format if date_range?
           return build_month_year_format if month && year
           return build_number_year_format if number && year
@@ -77,23 +79,23 @@ module Pubid
         end
 
         def build_date_range_format
-          "supp#{month_start}#{year_start}-#{month_end}#{year_end}"
+          "sup#{month_start}#{year_start}-#{month_end}#{year_end}"
         end
 
         def build_month_year_format
-          "supp#{month}#{year}"
+          "sup#{month}#{year}"
         end
 
         def build_number_year_format
-          "supp#{number}/#{year}"
+          "sup#{number}/#{year}"
         end
 
         def build_year_format
-          "supp-#{year}"
+          "sup#{year}"
         end
 
         def build_number_format
-          "supp#{number}"
+          "sup#{number}"
         end
 
         def build_long_date_range_format
