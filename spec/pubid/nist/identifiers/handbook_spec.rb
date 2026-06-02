@@ -247,7 +247,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         it "parses supplement" do
           # V2: Part component is properly separated from supplement
           # "pt1" is a Part component, "1957" is the supplement year
-          expect(parsed.supplement).to eq("1957")
+          expect(parsed.supplement.year).to eq("1957")
           expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.value).to eq("1")
         end
@@ -268,7 +268,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses supplement date" do
-          expect(parsed.supplement).to eq("Feb1965")
+          expect(parsed.supplement.value_string).to eq("Feb1965")
         end
 
         it "round-trips" do
@@ -286,7 +286,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses supplement date" do
-          expect(parsed.supplement).to eq("June1965")
+          expect(parsed.supplement.value_string).to eq("June1965")
         end
 
         it "round-trips" do

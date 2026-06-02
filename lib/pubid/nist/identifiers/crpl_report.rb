@@ -121,10 +121,7 @@ module Pubid
           result += part.to_s if part
 
           # Add supplement with "sup" prefix for CRPL identifiers
-          if supplement
-            # Check if supplement already has "sup" prefix (for backward compatibility)
-            result += (supplement.start_with?("sup") ? supplement : "sup#{supplement}")
-          end
+          result += supplement_short
 
           result += range_notation if range_notation
           result

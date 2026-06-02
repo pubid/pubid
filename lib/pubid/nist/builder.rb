@@ -369,10 +369,30 @@ module Pubid
         part_num = nil
         extracted_revision = nil
 
+        # Accumulate supplement signals from the casts (a flat value string,
+        # the has_revision flag, and date-range start/end) and fold them into a
+        # single Components::Supplement at the end. They are intercepted (not
+        # assigned) because :supplement is now a component attribute, so a raw
+        # string must never be written to it directly.
+        supp = { value: nil, has_revision: false, range_start: nil,
+                 range_end: nil, present: false }
+        capture_supplement = lambda do |k, v|
+          case k
+          when :supplement then supp[:value] = v
+          when :supplement_has_revision then supp[:has_revision] = !!v
+          when :supplement_date_range_start then supp[:range_start] = v
+          when :supplement_date_range_end then supp[:range_end] = v
+          else return false
+          end
+          supp[:present] = true
+          true
+        end
+
         # Cast and assign all attributes
         parsed_hash.each_pair do |key, value|
           realized_components = cast(key.to_sym, value, parsed_hash) # Pass parsed_hash for context
           next if realized_components.nil?
+          next if !realized_components.is_a?(Hash) && capture_supplement.call(key.to_sym, realized_components)
 
           # Track number components
           if key == :first_number && realized_components.is_a?(Components::Code)
@@ -426,6 +446,10 @@ module Pubid
               end
               # Skip assignment for second_number hashes - they'll be processed during compound number construction
               next if sub_key == :second_number && sub_value.is_a?(Hash) && sub_value[:number_only]
+
+              # Intercept supplement signals into the accumulator instead of
+              # assigning them (supplement is now a component built at the end).
+              next if capture_supplement.call(sub_key, sub_value)
 
               attrs = identifier.class.attributes
               setter = "#{sub_key}="
@@ -543,14 +567,16 @@ module Pubid
               year_part = second_num.value.to_s
 
               identifier.number = Components::Code.new(number: number_part)
-              identifier.supplement = year_part
+              supp[:value] = year_part
+              supp[:present] = true
             elsif second_num.value.to_s.match?(/^(\d+)supp?$/)
               # Pattern: "800-53sup"/"800-53supp" - bare marker on the compound
               # second number. Strip it and isolate as supplement="" (single-p).
               second_part = second_num.value.to_s.match(/^(\d+)supp?$/)[1]
               compound = "#{first_num.value}-#{second_part}"
               identifier.number = Components::Code.new(number: compound)
-              identifier.supplement = ""
+              supp[:value] = ""
+              supp[:present] = true
             elsif identifier.is_a?(Identifiers::TechnicalNote) &&
                 second_num.value.to_s.match?(/^(19|20)\d{2}$/)
               # SPECIAL CASE FOR TN: second_num is edition year
@@ -640,7 +666,39 @@ module Pubid
           identifier.revision_month = nil
         end
 
+        # Fold the accumulated supplement signals into the single structured
+        # supplement component (the source of truth).
+        if (supp[:present] || supp[:has_revision]) &&
+            identifier.respond_to?(:supplement=)
+          identifier.supplement = supplement_from(
+            value: supp[:value], has_revision: supp[:has_revision],
+            range_start: supp[:range_start], range_end: supp[:range_end]
+          )
+        end
+
         identifier
+      end
+
+      # Build a Components::Supplement from the builder's accumulated raw signals
+      # (flat value string, has_revision flag, fused date-range start/end). This
+      # is the one place raw supplement text becomes the structured component.
+      def supplement_from(value:, has_revision:, range_start:, range_end:)
+        if range_start || range_end
+          component = Components::Supplement.new
+          # Split the fused "Jun1925"/"Jun1926" strings into isolated start/end
+          # month+year nodes (start reuses :month/:year, end uses *_end).
+          if range_start && (m = range_start.match(/\A([A-Za-z]{3,9})(\d{4})\z/))
+            component.month = m[1]
+            component.year = m[2]
+          end
+          if range_end && (m = range_end.match(/\A([A-Za-z]{3,9})(\d{4})\z/))
+            component.month_end = m[1]
+            component.year_end = m[2]
+          end
+          component
+        else
+          Components::Supplement.from_raw(value, has_revision: has_revision)
+        end
       end
 
       # Convert month name to month number
@@ -666,8 +724,109 @@ module Pubid
 
       # Build CircularSupplement with base_identifier wrapping
       # @param parsed_hash [Hash] the parsed supplement data
-      # @return [Identifiers::CircularSupplement] the supplement identifier
+      # Build a CIRC/LCIRC supplement. Most forms collapse onto the base
+      # identifier's normal class (Circular / LetterCircular) with isolated
+      # supplement attributes, so they share one model with every other series
+      # and are queryable by part. The V1-compat update forms (slash-year
+      # "118supp3/1926" → ".../Upd1-192603"; implicit revision "145r11/1925")
+      # render through an Update component the flat supplement model can't
+      # express, so they stay on the CircularSupplement wrapper for now.
       def build_circular_supplement(parsed_hash)
+        if parsed_hash[:supplement_slash_year].is_a?(Hash) ||
+            parsed_hash[:implicit_supplement].is_a?(Hash)
+          return build_circular_supplement_wrapper(parsed_hash)
+        end
+
+        series_value = if parsed_hash[:circ_series].is_a?(Hash)
+                         parsed_hash[:circ_series][:series]
+                       else
+                         parsed_hash[:series]
+                       end
+
+        # Date-range supplement (no base document): a plain base identifier with
+        # no number, carrying the range. parsed_format is left at the default so
+        # a dotted MR input still normalizes to the spaced short form.
+        if parsed_hash[:supplement_date_range].is_a?(Hash)
+          range = parsed_hash[:supplement_date_range]
+          identifier = build({ series: series_value })
+          ms = range[:supp_month_start]&.to_s
+          ys = range[:supp_year_start]&.to_s
+          me = range[:supp_month_end]&.to_s
+          ye = range[:supp_year_end]&.to_s
+          identifier.supplement = supplement_from(
+            value: nil, has_revision: false,
+            range_start: (ms && ys ? "#{ms}#{ys}" : nil),
+            range_end: (me && ye ? "#{me}#{ye}" : nil)
+          )
+          return identifier
+        end
+
+        # Based supplement: build the base, then attach the supplement as an
+        # isolated component on that normal class.
+        identifier = build_circular_supplement_base(parsed_hash, series_value)
+        raw = if parsed_hash[:supplement_month_year]
+                parsed_hash[:supplement_month_year].to_s
+              elsif parsed_hash[:supplement_year]
+                parsed_hash[:supplement_year].to_s
+              else
+                "" # supplement_empty or bare marker
+              end
+        identifier.supplement = Components::Supplement.from_raw(raw)
+        identifier
+      end
+
+      # Build just the base identifier for a based CIRC/LCIRC supplement, from
+      # base_portion (number, optional edition "101e2" or letter suffix "378G")
+      # or the merged first_number fallback. Returns the normal class.
+      def build_circular_supplement_base(parsed_hash, series_value)
+        base_portion = parsed_hash[:base_portion]
+        unless base_portion
+          return build({
+                         publisher: parsed_hash[:publisher],
+                         series: series_value || parsed_hash[:series],
+                         first_number: parsed_hash[:first_number],
+                         parsed_format: parsed_hash[:parsed_format],
+                       })
+        end
+
+        base_number = if base_portion.is_a?(Hash)
+                        base_portion[:simple_number] || base_portion[:base_number]
+                      else
+                        base_portion
+                      end
+
+        letter_suffix = nil
+        if base_portion.is_a?(Hash) && base_portion[:letter_suffix]
+          letter_suffix = base_portion[:letter_suffix].to_s.upcase
+        end
+
+        publisher_value = nil
+        if parsed_hash[:circ_series].is_a?(Hash) && parsed_hash[:circ_series][:series]
+          series_str = parsed_hash[:circ_series][:series].to_s
+          publisher_value = series_str.split.first if series_str.include?(" ")
+        end
+
+        has_edition = base_portion.is_a?(Hash) && base_portion[:edition_number]
+
+        base_number_with_suffix = base_number.to_s
+        base_number_with_suffix += letter_suffix if letter_suffix
+        if has_edition
+          base_number_with_suffix += "e#{base_portion[:edition_number]}"
+        end
+
+        base_hash = {
+          series: series_value,
+          first_number: base_number_with_suffix,
+          parsed_format: parsed_hash[:parsed_format],
+        }
+        base_hash[:publisher] = publisher_value if publisher_value
+        base_hash[:edition_e] = { edition_id: base_portion[:edition_number] } if has_edition
+
+        build(base_hash)
+      end
+
+      # @return [Identifiers::CircularSupplement] the supplement identifier
+      def build_circular_supplement_wrapper(parsed_hash)
         supplement = Identifiers::CircularSupplement.new
 
         # Extract series from circ_series if present (nested structure from parser)

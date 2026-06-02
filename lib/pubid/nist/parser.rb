@@ -243,6 +243,16 @@ module Pubid
         # Normalize "sup" to "supp" for LCIRC patterns to match circ_supplement_identifier rule
         cleaned = cleaned.gsub(/(\d+)sup(\d+\/\d{4})/, '\1supp\2') # 118sup12/1926 → 118supp12/1926
 
+        # Unify dashed/undashed year supplements: "supp-YYYY" → "suppYYYY".
+        # A bare dash before a 4-digit year is not semantic — "25supp-1924" and
+        # "25supp1924" denote the same publication (the genuine edition marker is
+        # explicit "e", e.g. "25suppe1924"). Collapsing the dash here gives both
+        # spellings ONE parse tree (the normal first_number path), so they build
+        # to an identical Circular with supplement=<year>, with equal ==/URN.
+        # Guard: 4 digits NOT followed by another digit or a slash, so the
+        # dash-slash form "supp-12/1926" (supplement_dash_slash_year) is untouched.
+        cleaned = cleaned.gsub(/(\d)(supp?)-(\d{4})(?![\d\/])/, '\1\2\3') # 25supp-1924 → 25supp1924
+
         # REMOVED: Revision letter patterns that add space before revision with letter
         # These conflicted with the fix at lines 131-142 which keeps "22r1a" together
         # for second_number pattern matching. The comprehensive fix now handles:

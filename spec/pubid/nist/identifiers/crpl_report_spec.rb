@@ -140,7 +140,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
         it "parses part and supplement" do
           expect(parsed.part.value).to eq("3-1")
-          expect(parsed.supplement).to eq("A")
+          expect(parsed.supplement.value_string).to eq("A")
         end
       end
 
@@ -155,7 +155,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
 
         it "parses part and supplement" do
           expect(parsed.part.value).to eq("3-1")
-          expect(parsed.supplement).to eq("A")
+          expect(parsed.supplement.value_string).to eq("A")
         end
 
         it "round-trips" do

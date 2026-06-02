@@ -243,13 +243,17 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
 
         let(:parsed) { Pubid::Nist.parse(subject) }
 
-        it "parses as CircularSupplement with LetterCircular base" do
-          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
-          expect(parsed.base_identifier).to be_a(described_class)
+        # Collapsed onto a plain LetterCircular with an empty (present)
+        # supplement part, instead of a CircularSupplement wrapper.
+        it "parses as a plain LetterCircular" do
+          expect(parsed).to be_a(described_class)
+          expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses supplement without date" do
-          expect(parsed.base_identifier).not_to be_nil
+        it "carries the supplement as an isolated (empty) part" do
+          expect(parsed.number.value).to eq("118")
+          expect(parsed.supplement).not_to be_nil
+          expect(parsed.supplement.value_string).to eq("")
         end
 
         it "normalizes to LC with supp" do

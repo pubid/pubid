@@ -61,18 +61,24 @@ module Pubid
           identifier_parts << identifier.stage.to_s
         end
 
+        # Supplement is now a structured component. Preserve the existing URN
+        # branching exactly: range → "supp{start}-{end}", revision → "supprev",
+        # a valued supplement → "suppX"/"supp-X" (dash unless it starts with an
+        # uppercase letter), and — quirk retained — a nil (absent) supplement
+        # still emits "supp", while a present-but-empty one emits nothing.
         supp = identifier.supplement
-        if identifier.supplement_date_range_start && identifier.supplement_date_range_end
-          identifier_parts << "supp#{identifier.supplement_date_range_start}-#{identifier.supplement_date_range_end}"
-        elsif identifier.supplement_has_revision
+        if supp&.range?
+          identifier_parts << "supp#{supp.month}#{supp.year}-#{supp.month_end}#{supp.year_end}"
+        elsif supp&.has_revision
           identifier_parts << "supprev"
-        elsif supp && !supp.empty?
-          identifier_parts << if supp.match?(/^[A-Z]/)
-                                "supp#{supp}"
+        elsif supp && !supp.value_string.empty?
+          value = supp.value_string
+          identifier_parts << if value.match?(/^[A-Z]/)
+                                "supp#{value}"
                               else
-                                "supp-#{supp}"
+                                "supp-#{value}"
                               end
-        elsif !supp
+        elsif supp.nil?
           identifier_parts << "supp"
         end
 

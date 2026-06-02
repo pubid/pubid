@@ -134,42 +134,51 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
       describe "NBS CIRC 25supp-1924" do
         subject { "NBS CIRC 25supp-1924" }
 
-        it "parses as CircularSupplement" do
-          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+        # A bare dash before a 4-digit year is not semantic: "25supp-1924"
+        # and "25supp1924" are the same publication, unified at the pre-parser
+        # into a single tree. Both build a plain Circular with supplement=year
+        # (the genuine edition marker is explicit "e", e.g. "25suppe1924").
+        it "parses as a plain Circular, not a CircularSupplement wrapper" do
+          expect(parsed).to be_a(described_class)
+          expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(described_class)
-          expect(parsed.base_identifier.number.value).to eq("25")
+        it "carries the year as the supplement attribute" do
+          expect(parsed.number.value).to eq("25")
+          expect(parsed.supplement.year).to eq("1924")
         end
 
-        it "parses supplement edition" do
-          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
-          expect(parsed.edition.id).to eq("1924")
+        it "round-trips to the undashed canonical form" do
+          expect(parsed.to_s).to eq("NBS CIRC 25sup1924")
         end
 
-        it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
+        it "is identical to the undashed spelling" do
+          undashed = Pubid::Nist.parse("NBS CIRC 25supp1924")
+          expect(parsed).to eq(undashed)
+          expect(parsed.to_urn).to eq(undashed.to_urn)
         end
       end
 
       describe "NBS CIRC 101e2supp" do
         subject { "NBS CIRC 101e2supp" }
 
-        it "parses as CircularSupplement" do
-          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+        # Collapsed onto a plain Circular: the edition sits directly on the
+        # identifier and the supplement is an isolated (here empty) part.
+        it "parses as a plain Circular" do
+          expect(parsed).to be_a(described_class)
+          expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses base identifier with edition" do
-          expect(parsed.base_identifier).to be_a(described_class)
-          expect(parsed.base_identifier.number.value).to eq("101")
-          expect(parsed.base_identifier.edition).to be_a(Pubid::Nist::Components::Edition)
-          expect(parsed.base_identifier.edition.type).to eq("e")
-          expect(parsed.base_identifier.edition.id).to eq("2")
+        it "carries number and edition directly" do
+          expect(parsed.number.value).to eq("101")
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
+          expect(parsed.edition.type).to eq("e")
+          expect(parsed.edition.id).to eq("2")
         end
 
-        it "has no supplement edition (base has edition)" do
-          expect(parsed.edition).to be_nil
+        it "marks the supplement as present (empty)" do
+          expect(parsed.supplement).not_to be_nil
+          expect(parsed.supplement.value_string).to eq("")
         end
 
         it "round-trips correctly" do
@@ -185,7 +194,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "parses supplement with revision" do
-          expect(parsed.supplement_has_revision).to be true
+          expect(parsed.supplement.has_revision).to be true
         end
 
         it "round-trips correctly" do
@@ -196,18 +205,18 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
       describe "NBS CIRC 24suppJan1924" do
         subject { "NBS CIRC 24suppJan1924" }
 
-        it "parses as CircularSupplement" do
-          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+        # Collapsed onto a plain Circular: the month+year are isolated nodes on
+        # the structured supplement_component (no longer fused into an edition).
+        it "parses as a plain Circular" do
+          expect(parsed).to be_a(described_class)
+          expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+          expect(parsed.number.value).to eq("24")
         end
 
-        it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(described_class)
-          expect(parsed.base_identifier.number.value).to eq("24")
-        end
-
-        it "parses supplement edition with month+year" do
-          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
-          expect(parsed.edition.id).to eq("Jan1924")
+        it "isolates the supplement month and year" do
+          expect(parsed.supplement).to be_a(Pubid::Nist::Components::Supplement)
+          expect(parsed.supplement.month).to eq("Jan")
+          expect(parsed.supplement.year).to eq("1924")
         end
 
         it "renders correctly" do
@@ -218,14 +227,17 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
       describe "NBS CIRC suppJun1925-Jun1926" do
         subject { "NBS CIRC suppJun1925-Jun1926" }
 
-        it "parses as CircularSupplement (not Circular)" do
-          # NOTE: This is a supplement-only identifier, parsed as CircularSupplement
-          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+        it "parses as a plain Circular (no base number)" do
+          # A supplement-only identifier: collapsed onto Circular with the date
+          # range carried as isolated start/end nodes.
+          expect(parsed).to be_a(described_class)
+          expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
         end
 
-        it "parses supplement date range" do
-          expect(parsed.supplement_date_range_start).to eq("Jun1925")
-          expect(parsed.supplement_date_range_end).to eq("Jun1926")
+        it "isolates the date-range month/year start and end" do
+          c = parsed.supplement
+          expect([c.month, c.year, c.month_end, c.year_end])
+            .to eq(["Jun", "1925", "Jun", "1926"])
         end
 
         it "round-trips correctly" do
