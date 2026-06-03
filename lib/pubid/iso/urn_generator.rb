@@ -78,9 +78,10 @@ module Pubid
         part_comp = part_component
         parts << part_comp if part_comp
 
-        # Stage (only for non-published documents)
+        # Stage (only for non-published documents); an all-parts series
+        # reference carries no specific stage.
         stage_comp = stage_component
-        parts << stage_comp if stage_comp
+        parts << stage_comp if stage_comp && !identifier.all_parts
 
         # Year (for published documents and when edition is present)
         year_comp = year_component
