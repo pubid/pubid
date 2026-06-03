@@ -434,7 +434,8 @@ edition_data = nil, typed_stage = nil)
           parse_languages(value)
 
         when :all_parts
-          Pubid::Components::Locality.new(all_parts: true)
+          # Set all_parts boolean attribute directly on identifier (matches ISO builder)
+          true
 
         when :database
           # Database flag - return true if DB suffix present

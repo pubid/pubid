@@ -106,6 +106,16 @@ module Pubid
           parts << lang_codes
         end
 
+        if identifier.all_parts
+          # Series ("ser") occupies the deliverable slot of the IEC positional
+          # URN layout (publisher:[type]:number:[date]:[deliverable]). Pad the
+          # absent date and type positions as empty so the bare base renders
+          # urn:iec:std:iec:80000:::ser.
+          parts << "" unless date_str
+          parts << "" unless type_comp
+          parts << "ser"
+        end
+
         parts.join(":")
       end
 

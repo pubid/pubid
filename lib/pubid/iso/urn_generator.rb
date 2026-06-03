@@ -94,6 +94,9 @@ module Pubid
         lang_comp = language_component
         parts << lang_comp if lang_comp
 
+        # Series suffix for all-parts identifiers (compact, no padding)
+        parts << "ser" if identifier.all_parts
+
         parts.join(":")
       end
 
@@ -227,6 +230,9 @@ module Pubid
             parts << lang_comp
           end
         end
+
+        # Series suffix for all-parts identifiers (compact, no padding)
+        parts << "ser" if identifier.all_parts
 
         parts.join(":")
       end

@@ -71,6 +71,15 @@ module Pubid
 
         parts = urn.sub("urn:iso:std:", "").split(":")
 
+        # Series suffix: a trailing "ser" marks an all-parts identifier. Strip
+        # it before component parsing so it is not misread as a language or
+        # supplement token (which previously rendered as "(SER)").
+        all_parts = false
+        if parts.last == "ser"
+          parts.pop
+          all_parts = true
+        end
+
         # Parse publisher(s) - first part
         publishers = parse_publisher(parts.shift)
 
@@ -212,7 +221,8 @@ module Pubid
 
         # Build the identifier hash
         build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                         harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements)
+                         harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements,
+                         all_parts)
       end
 
       private
@@ -302,7 +312,8 @@ module Pubid
 
       # Build identifier from parsed components
       def build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                         harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements)
+                         harmonized_stage_code, stage_from_abbr, year, edition, languages, supplements,
+                         all_parts = false)
         # Start with base document hash
         base_hash = {
           publisher: publishers.first,
@@ -413,6 +424,9 @@ typed_stage
             **supp_hash,
           }
         end
+
+        # all_parts belongs on the outermost identifier (after any supplement wrapping)
+        base_hash[:all_parts] = true if all_parts
 
         # Build the final identifier
         builder = Pubid::Iso::Builder.new(Pubid::Iso::Scheme.new)

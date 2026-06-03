@@ -70,6 +70,17 @@ module Pubid
 
         parts = urn.sub("urn:iec:std:", "").split(":")
 
+        # Series suffix: a trailing "ser" in the deliverable slot marks an
+        # all-parts identifier. Strip it, then drop the empty positional
+        # padding ("...:80000:::ser") so the rest of the parser sees a clean
+        # base document instead of treating the empties as bogus supplements.
+        all_parts = false
+        if parts.last == "ser"
+          parts.pop
+          all_parts = true
+        end
+        parts.reject!(&:empty?)
+
         # Parse publisher(s) - first part
         publishers = parse_publisher(parts.shift)
 
@@ -167,7 +178,7 @@ module Pubid
 
         # Build the identifier hash
         build_identifier(publishers, number, part, subpart, type_code, stage_code, stage_iteration,
-                         date, edition, supplements)
+                         date, edition, supplements, all_parts)
       end
 
       private
@@ -211,12 +222,13 @@ module Pubid
 
       # Build identifier from parsed components
       def build_identifier(publishers, number, part, subpart, type_code, stage_code, _stage_iteration,
-                         date, edition, supplements)
+                         date, edition, supplements, all_parts = false)
         # Start with base document hash
         base_hash = {
           publisher: publishers.first,
           copublishers: publishers[1..]&.map { |c| { copublisher: c } },
         }
+        base_hash[:all_parts] = true if all_parts
 
         # Build number_with_part (expected by Builder)
         if part || subpart
