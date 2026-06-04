@@ -131,6 +131,18 @@ module Pubid
       end
     end
 
+    # Locate a TypedStage by its unique per-typed-stage code
+    # @param code [String, Symbol] The code to find (e.g. :dtr, :fdisp)
+    # @return [TypedStage, nil] The matching TypedStage, or nil if not found
+    # @note Uses linear search for code lookup
+    def locate_typed_stage_by_code(code)
+      code_sym = code.to_sym
+
+      all_typed_stages.detect do |ts|
+        ts.code&.to_sym == code_sym
+      end
+    end
+
     # Locate a TypedStage by harmonized stage code
     # @param harmonized_code [String] The harmonized stage code to find (e.g., "00.00", "10.00")
     # @return [TypedStage, nil] The matching TypedStage, or nil if not found

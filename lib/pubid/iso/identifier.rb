@@ -133,12 +133,21 @@ module Pubid
       # neither is available; the renderer then omits the stage prefix.
       def self.resolve_create_typed_stage(klass, stage)
         if stage
-          Scheme.locate_typed_stage_by_abbr(stage.to_s)
+          locate_create_typed_stage(stage)
         elsif klass.const_defined?(:TYPED_STAGES)
           klass.const_get(:TYPED_STAGES).find do |ts|
             ts.stage_code.to_sym == :published
           end
         end
+      end
+
+      # Resolve a TypedStage from a create() :stage value. The index may
+      # supply it as an abbreviation ("DIS"), a generic stage_code (:dis),
+      # or a unique per-typed-stage code (:dtr, :fdisp). Try each in turn.
+      def self.locate_create_typed_stage(stage)
+        Scheme.locate_typed_stage_by_abbr(stage.to_s) ||
+          Scheme.locate_typed_stage_by_stage_code(stage) ||
+          Scheme.locate_typed_stage_by_code(stage)
       end
 
       def self.resolve_create_class(type:, stage:)
@@ -149,7 +158,7 @@ module Pubid
 
             located
           elsif stage
-            ts = Scheme.locate_typed_stage_by_abbr(stage.to_s)
+            ts = locate_create_typed_stage(stage)
             ts && Scheme.locate_identifier_klass_by_type_code(ts.type_code)
           end
         klass || Identifiers::InternationalStandard

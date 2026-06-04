@@ -63,6 +63,60 @@ RSpec.describe Pubid::Iso::Identifier do
         expect(id).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
         expect(id.to_s).to eq("ISO/DIS 19115:2014")
       end
+
+      # The relaton-data-iso index serializes some draft stages as
+      # stage_code symbols (:dis, :damd, :fdamd, :dguide) rather than
+      # abbreviations. .create must resolve those too, falling back to a
+      # stage_code lookup when the abbr lookup misses.
+      it "dispatches stage_code symbol :dis → InternationalStandard" do
+        id = described_class.create(publisher: "ISO", number: "2382",
+                                    part: "13", stage: :dis)
+        expect(id).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(id.typed_stage.stage_code.to_sym).to eq(:dis)
+      end
+
+      it "dispatches stage_code symbol :dguide → Guide" do
+        id = described_class.create(publisher: "ISO", number: "1",
+                                    stage: :dguide)
+        expect(id).to be_a(Pubid::Iso::Identifiers::Guide)
+        expect(id.typed_stage.stage_code.to_sym).to eq(:dguide)
+      end
+
+      # Some index rows serialize the unique per-typed-stage code (:dtr,
+      # :fdisp) rather than the generic stage_code or an abbr. .create must
+      # resolve those via a code lookup and pick the right class.
+      it "dispatches per-typed-stage code :dtr → TechnicalReport" do
+        id = described_class.create(publisher: "ISO", number: "2382",
+                                    part: "13", stage: :dtr)
+        expect(id).to be_a(Pubid::Iso::Identifiers::TechnicalReport)
+        expect(id.typed_stage.code.to_sym).to eq(:dtr)
+        expect(id.to_s).to eq("ISO/DTR 2382-13")
+      end
+
+      it "dispatches per-typed-stage code :fdisp → " \
+         "InternationalStandardizedProfile" do
+        id = described_class.create(publisher: "ISO", number: "2382",
+                                    part: "13", stage: :fdisp)
+        expect(id)
+          .to be_a(Pubid::Iso::Identifiers::InternationalStandardizedProfile)
+        expect(id.typed_stage.code.to_sym).to eq(:fdisp)
+      end
+
+      it "resolves amendment stage_code symbols (:damd, :fdamd)" do
+        damd = described_class.create(
+          type: "AMD", publisher: "", number: "1", year: 1998, stage: :damd,
+          base: { publisher: "ISO", number: "1000", year: 1992 },
+        )
+        expect(damd).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(damd.typed_stage.stage_code.to_sym).to eq(:damd)
+
+        fdamd = described_class.create(
+          type: "AMD", publisher: "", number: "1", year: 1998, stage: :fdamd,
+          base: { publisher: "ISO", number: "1000", year: 1992 },
+        )
+        expect(fdamd).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(fdamd.typed_stage.stage_code.to_sym).to eq(:fdamd)
+      end
     end
 
     context "primitive coercion" do
