@@ -16,10 +16,12 @@ module Pubid
       #   Supplement.new(has_revision: true).to_s(:short)        # => "suprev"
       class Supplement < Lutaml::Model::Serializable
         attribute :number, :string           # Supplement number (e.g., "2" in "supp2")
-        attribute :year, :string             # Year (4 digits)
-        attribute :month, :string            # Month abbreviation (Jan, Feb, etc.)
-        attribute :month_start, :string       # Date range start month
-        attribute :year_start, :string        # Date range start year
+        attribute :year, :string             # Year (4 digits); range START year
+        attribute :month, :string            # Month abbreviation; range START month
+        # Date ranges reuse :month/:year as the start and add the end below. A
+        # present :month_end/:year_end is what marks a value as a range, so a
+        # lone month-year supplement is just a range with no end — and :year is
+        # the single field to filter on for both.
         attribute :month_end, :string         # Date range end month
         attribute :year_end, :string          # Date range end year
         attribute :has_revision, :boolean, default: -> {
@@ -27,12 +29,36 @@ module Pubid
         } # "supprev" pattern
         attribute :suffix, :string # General suffix for other patterns
 
+        # Build a Supplement from the flat string the parser/builder produces
+        # ("1924" year, "Jan1924" month+year, "1" number, "A" suffix, "" bare).
+        # has_revision is supplied separately. Returns a present-but-empty
+        # Supplement for an empty/nil value so callers can distinguish a bare
+        # supplement ("sup") from no supplement (nil).
+        def self.from_raw(value, has_revision: false)
+          supp = new
+          if has_revision
+            supp.has_revision = true
+          elsif value.nil? || value.to_s.empty?
+            # bare marker: present but no isolated parts
+          elsif (m = value.to_s.match(/\A([A-Za-z]{3,9})(\d{4})\z/))
+            supp.month = m[1]
+            supp.year = m[2]
+          elsif value.to_s.match?(/\A(?:18|19|20)\d{2}\z/)
+            supp.year = value.to_s
+          elsif value.to_s.match?(/\A\d+\z/)
+            supp.number = value.to_s
+          else
+            supp.suffix = value.to_s
+          end
+          supp
+        end
+
         # Render supplement in specified format
         # @param format [:short, :mr, :long] The output format
         # @return [String] The formatted supplement representation
         def to_s(format = :short)
-          return "" if number.nil? && year.nil? && !has_revision && suffix.nil? &&
-            month_start.nil? && year_start.nil? && month_end.nil? && year_end.nil?
+          return "" if number.nil? && year.nil? && month.nil? && !has_revision &&
+            suffix.nil? && month_end.nil? && year_end.nil?
 
           case format
           when :short, :mr
@@ -42,6 +68,44 @@ module Pubid
           else
             build_short_format
           end
+        end
+
+        # True when this supplement is a date range (start reuses month/year).
+        def range?
+          date_range?
+        end
+
+        # The text after the "sup" marker for the simple (non-range, non-rev)
+        # forms: "1924" / "Jan1924" / "1" / "A"; "" for a bare supplement. Used
+        # by URN rendering, which handles range/revision separately.
+        def value_string
+          return "" if has_revision || date_range?
+          return suffix.to_s if suffix
+          return "#{month}#{year}" if month && year
+          return "#{number}/#{year}" if number && year
+          return year.to_s if year
+          return number.to_s if number
+
+          ""
+        end
+
+        # Value equality over the isolated parts, so a structured supplement
+        # participates correctly in Identifier#== and #matches? (two supplements
+        # with the same number/year/month/range/revision are the same).
+        IDENTITY_FIELDS = %i[
+          number year month month_end year_end has_revision suffix
+        ].freeze
+
+        def ==(other)
+          return false unless other.is_a?(self.class)
+
+          IDENTITY_FIELDS.all? { |f| send(f) == other.send(f) }
+        end
+
+        alias eql? ==
+
+        def hash
+          [self.class, *IDENTITY_FIELDS.map { |f| send(f) }].hash
         end
 
         private
@@ -74,12 +138,13 @@ module Pubid
           ""
         end
 
+        # A range is marked by the presence of an END; START reuses month/year.
         def date_range?
-          month_start && year_start && month_end && year_end
+          month && year && month_end && year_end
         end
 
         def build_date_range_format
-          "sup#{month_start}#{year_start}-#{month_end}#{year_end}"
+          "sup#{month}#{year}-#{month_end}#{year_end}"
         end
 
         def build_month_year_format
@@ -99,7 +164,7 @@ module Pubid
         end
 
         def build_long_date_range_format
-          "Supplement #{month_start} #{year_start}-#{month_end} #{year_end}"
+          "Supplement #{month} #{year}-#{month_end} #{year_end}"
         end
 
         def build_long_month_year_format

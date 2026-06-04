@@ -10,9 +10,12 @@ module Pubid
           with_edition: with_edition,
           stage_format_long: context.stage_format_long,
           with_date: context.with_date,
+          annotated: context.annotated,
         )
 
-        stage_str = @id.typed_stage.render(context:)
+        stage_str = annotate(@id.typed_stage.render(context:),
+                             typed_stage_css(@id.typed_stage),
+                             annotated: context.annotated)
         parts << "#{base_str}/#{stage_str}"
 
         num_port = render_number_portion(context)

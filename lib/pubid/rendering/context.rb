@@ -22,7 +22,8 @@ module Pubid
       attr_reader :stage_separator, :stage_separator_with_copublisher,
                   :type_separator, :type_separator_with_prefix,
                   :default_type_abbr, :lang, :lang_single,
-                  :with_language_code, :stage_format_long, :with_date
+                  :with_language_code, :stage_format_long, :with_date,
+                  :annotated
 
       # Initialize a new rendering context
       #
@@ -42,7 +43,8 @@ module Pubid
                      lang_single: false,
                      with_language_code: :none,
                      stage_format_long: false,
-                     with_date: true)
+                     with_date: true,
+                     annotated: false)
         @stage_separator = stage_separator
         @stage_separator_with_copublisher = stage_separator_with_copublisher
         @type_separator = type_separator
@@ -53,6 +55,7 @@ module Pubid
         @with_language_code = with_language_code
         @stage_format_long = stage_format_long
         @with_date = with_date
+        @annotated = annotated
       end
 
       # Get the appropriate stage separator based on whether there's a copublisher

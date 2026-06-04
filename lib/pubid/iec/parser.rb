@@ -136,8 +136,13 @@ module Pubid
       end
 
       rule(:number) do
-        # Special case for VIM publication
-        str("VIM") |
+        # ISO/IEC Directives: "DIR", "DIR 1", "DIR 1 IEC SUP", "DIR 2 IEC", "DIR IEC SUP"
+        # Captured as a flat number (no part/subpart) so it round-trips to the input
+        # and class-matches the IEC index. Must come before the IECEE [A-Z]{2,4} branch,
+        # which would otherwise match "DIR" alone and leave the trailing tokens unconsumed.
+        (str("DIR") >> (space >> match('[A-Z\d]').repeat(1)).repeat) |
+          # Special case for VIM publication
+          str("VIM") |
           # Special case for SYMBOL publication
           str("SYMBOL") |
           # IECEx TRF version notation: 62784v1a_ds, 62784v1A

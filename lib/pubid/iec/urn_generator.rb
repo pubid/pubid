@@ -2,191 +2,77 @@
 
 module Pubid
   module Iec
+    # Generates IEC URNs in the legacy positional format used as ground truth
+    # by relaton-data-iec:
+    #
+    #   urn:iec:std:{publisher}:{number}[-{part}]:{date}:{type}:{deliverable}:{language}[:{adjuncts}]
+    #
+    # e.g. +urn:iec:std:iec:60050-102:2007:::+ (type after date; trailing empty
+    # type/deliverable/language slots). This is a port of relaton-iec's
+    # +Relaton::Iec.code_to_urn+ operating on +identifier.to_s+, which
+    # round-trips faithfully. The all-parts series URN is the one exception: it
+    # omits the language slot (8 fields), so it has a dedicated branch.
     class UrnGenerator < Pubid::UrnGenerator::Base
+      # Deliverable markers occupying the positional deliverable slot.
+      DELIVERABLES = /cmv|csv|exv|prv|rlv|ser/.freeze
+
       def generate
-        case identifier
-        when Identifiers::VapIdentifier
-          generate_vap_urn
-        when Identifiers::FragmentIdentifier
-          generate_fragment_urn
-        when Identifiers::SheetIdentifier
-          generate_sheet_urn
-        when SupplementIdentifier
-          generate_supplement_urn
-        else
-          generate_base_urn
-        end
+        return series_urn if identifier.respond_to?(:all_parts) && identifier.all_parts
+
+        code_to_urn(identifier.to_s, urn_language)
       end
 
       private
 
-      def generate_vap_urn
-        base_gen = self.class.new(identifier.base_identifier)
-        base_urn = base_gen.generate
+      # Hyphen-joined language codes (e.g. "en-fr"), or nil when unset.
+      def urn_language
+        return nil unless identifier.respond_to?(:languages)
 
-        base_part = base_urn.sub(/^urn:iec:std:/, "")
+        langs = identifier.languages
+        return nil unless langs&.any?
 
-        parts = ["urn", "iec", "std", base_part]
-
-        if identifier.vap_suffix
-          suffix = identifier.vap_suffix.to_s
-          parts << "vap.#{suffix.downcase}"
-        end
-
-        if identifier.edition&.number
-          parts << "ed.#{identifier.edition.number}"
-        end
-
-        parts.join(":")
+        langs.map(&:code).join("-")
       end
 
-      def generate_fragment_urn
-        base_gen = self.class.new(identifier.base_identifier)
-        base_urn = base_gen.generate
-
-        base_part = base_urn.sub(/^urn:iec:std:/, "")
-
-        parts = ["urn", "iec", "std", base_part]
-
-        if identifier.fragment_number
-          frag_type = identifier.base_identifier.is_a?(Identifiers::Corrigendum) ? "fragc" : "frag"
-          parts << "#{frag_type}.#{identifier.fragment_number}"
-        end
-
-        if identifier.edition&.number
-          parts << "ed.#{identifier.edition.number}"
-        end
-
-        parts.join(":")
+      # The all-parts series URN drops the language slot and carries no part or
+      # date: urn:iec:std:iec:80000:::ser.
+      def series_urn
+        code = identifier.to_s.sub(/\s*\(all parts\)\s*\z/, "")
+        m = code.downcase.match(/(?<head>\S+)\s+(?<pnum>[\d-]+)/)
+        head = m[:head].split("/").join("-")
+        ["urn", "iec", "std", head, m[:pnum], "", "", "ser"].join(":")
       end
 
-      def generate_sheet_urn
-        base_gen = self.class.new(identifier.base_identifier)
-        base_urn = base_gen.generate
+      # Port of Relaton::Iec.code_to_urn.
+      def code_to_urn(code, lang = nil)
+        rest = code.downcase.sub(%r{
+          (?<head>[^\s]+)\s
+          (?<type>is|ts|tr|pas|srd|guide|tec|wp)?(?(<type>)\s)
+          (?<pnum>[\d-]+)\s?
+          (?<_dd>:)?(?(<_dd>)(?<date>[\d-]+)\s?)
+        }x, "")
+        m = $~
+        return unless m && m[:head] && m[:pnum]
 
-        base_part = base_urn.sub(/^urn:iec:std:/, "")
-
-        parts = ["urn", "iec", "std", base_part]
-
-        if identifier.sheet_number
-          parts << "sheet.#{identifier.sheet_number}"
-        end
-
-        if identifier.year
-          parts << identifier.year
-        end
-
-        parts.join(":")
+        deliv = DELIVERABLES.match(code.downcase).to_s
+        urn = ["urn", "iec", "std", m[:head].split("/").join("-"), m[:pnum],
+               m[:date], m[:type], deliv, lang]
+        (urn + adjunct_to_urn(rest)).join(":")
       end
 
-      def generate_base_urn
-        parts = ["urn", "iec", "std"]
+      # Port of Relaton::Iec.ajunct_to_urn — recursively emits amd/cor/ish
+      # adjuncts, prefixing "plus" for the "+" (consolidated) relation.
+      def adjunct_to_urn(rest)
+        r = rest.sub(%r{
+          (?<pl>\+|/)(?(<pl>)(?<adjunct>(?:amd|cor|ish))(?<adjnum>\d+)\s?)
+          (?<_d2>:)?(?(<_d2>)(?<adjdt>[\d-]+)\s?)
+        }x, "")
+        m = $~ || {}
+        return [] unless m[:adjunct]
 
-        parts << publisher_component
-
-        type_comp = type_component
-        parts << type_comp if type_comp
-
-        docnumber = docnumber_component
-        parts << docnumber if docnumber
-
-        date_str = urn_date_string(identifier.date)
-        parts << date_str if date_str
-
-        if identifier.stage_iteration
-          parts << "iter.#{identifier.stage_iteration}"
-        end
-
-        if identifier.edition&.number
-          parts << "ed.#{identifier.edition.number}"
-        end
-
-        if identifier.languages&.any?
-          lang_codes = identifier.languages.map(&:code).join(",")
-          parts << lang_codes
-        end
-
-        parts.join(":")
-      end
-
-      def generate_supplement_urn
-        current = identifier
-        supplement_chain = []
-
-        while current.is_a?(SupplementIdentifier)
-          supplement_chain.unshift(current)
-          current = current.base_identifier
-        end
-
-        base_id = current
-
-        parts = ["urn", "iec", "std"]
-
-        if base_id
-          parts << publisher_component(base_id)
-
-          type_comp = type_component(base_id)
-          parts << type_comp if type_comp
-
-          docnumber = docnumber_component(base_id)
-          parts << docnumber if docnumber
-
-          base_date_str = urn_date_string(base_id.date)
-          parts << base_date_str if base_date_str
-        end
-
-        supplement_chain.each do |supp|
-          suppl_type = supp.typed_stage&.type_code&.to_s
-          parts << suppl_type if suppl_type
-
-          supp_date_str = urn_date_string(supp.date)
-          parts << supp_date_str if supp_date_str
-
-          if supp.number
-            parts << "v#{supp.number}"
-          end
-
-          if supp.stage_iteration
-            parts << "iter.#{supp.stage_iteration}"
-          end
-        end
-
-        parts.join(":")
-      end
-
-      def publisher_component(id = identifier)
-        return "iec" unless id&.publisher
-
-        copubs = id.copublishers || []
-
-        publishers = [id.publisher] + copubs
-        publishers.map(&:to_s).map(&:downcase).join("-")
-      end
-
-      def type_component(id = identifier)
-        return nil unless id&.typed_stage
-
-        type_code = id.typed_stage.type_code
-        return nil if !type_code || type_code.to_s == "is"
-
-        type_code.to_s
-      end
-
-      def docnumber_component(id = identifier)
-        return nil unless id&.number
-
-        result = id.number.to_s
-        result += "-#{id.part}" if id.part
-        result += "-#{id.subpart}" if id.subpart
-        result
-      end
-
-      def urn_date_string(date)
-        return nil unless date
-
-        s = date.year.to_s
-        s += "-#{date.month}" if date.month
-        s
+        plus = "plus" if m[:pl] == "+"
+        urn = [plus, m[:adjunct], m[:adjnum], m[:adjdt]]
+        urn + adjunct_to_urn(r)
       end
     end
   end

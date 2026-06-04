@@ -94,7 +94,7 @@ RSpec.describe Pubid::Nist::Components::Supplement do
     context "short format with date range" do
       it "renders suppJan1924-Jan1926" do
         supplement = described_class.new(
-          month_start: "Jan", year_start: "1924",
+          month: "Jan", year: "1924",
           month_end: "Jan", year_end: "1926"
         )
         expect(supplement.to_s(:short)).to eq("supJan1924-Jan1926")
@@ -102,7 +102,7 @@ RSpec.describe Pubid::Nist::Components::Supplement do
 
       it "renders suppJun1925-Jun1927" do
         supplement = described_class.new(
-          month_start: "Jun", year_start: "1925",
+          month: "Jun", year: "1925",
           month_end: "Jun", year_end: "1927"
         )
         expect(supplement.to_s(:short)).to eq("supJun1925-Jun1927")

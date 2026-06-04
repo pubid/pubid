@@ -6,6 +6,10 @@ module Pubid
   module Components
     class TypedStage < Lutaml::Model::Serializable
       attribute :name, :string
+      # Unique per-typed-stage code (e.g. :dtr, :fdisp). Distinct from the
+      # generic stage_code (e.g. :draft, :fdis) which is shared across types.
+      # Some index data serializes this code, so it must be resolvable.
+      attribute :code, :string
       attribute :type_code, :string
       attribute :stage_code, :string
       attribute :abbr, :string, collection: true

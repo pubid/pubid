@@ -78,9 +78,10 @@ module Pubid
         part_comp = part_component
         parts << part_comp if part_comp
 
-        # Stage (only for non-published documents)
+        # Stage (only for non-published documents); an all-parts series
+        # reference carries no specific stage.
         stage_comp = stage_component
-        parts << stage_comp if stage_comp
+        parts << stage_comp if stage_comp && !identifier.all_parts
 
         # Year (for published documents and when edition is present)
         year_comp = year_component
@@ -93,6 +94,9 @@ module Pubid
         # Language (RFC 5141-bis: explicit specification)
         lang_comp = language_component
         parts << lang_comp if lang_comp
+
+        # Series suffix for all-parts identifiers (compact, no padding)
+        parts << "ser" if identifier.all_parts
 
         parts.join(":")
       end
@@ -227,6 +231,9 @@ module Pubid
             parts << lang_comp
           end
         end
+
+        # Series suffix for all-parts identifiers (compact, no padding)
+        parts << "ser" if identifier.all_parts
 
         parts.join(":")
       end

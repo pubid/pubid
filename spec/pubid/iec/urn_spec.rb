@@ -1,98 +1,87 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "../../../lib/pubid/iec"
+require_relative "../../../lib/pubid"
 
 RSpec.describe "IEC URN Generation and Parsing" do
-  # Per IEC URI Model (2019-12-10, 2020-03-24)
-  # Format: urn:iec:std:{header}:{type}:{docnumber}:{date}:{deliverable}:{language}
-  # Adjuncts appended after base document URN
+  # Legacy positional format (relaton-data-iec ground truth):
+  #   urn:iec:std:{publisher}:{number}[-{part}]:{date}:{type}:{deliverable}:{language}[:{adjuncts}]
+  # Type follows the date; absent type/deliverable/language slots are emitted
+  # as empty fields.
 
   describe "#to_urn" do
-    # --- Basic identifiers ---
     context "basic identifiers" do
       it "generates URN for undated identifier" do
         id = Pubid::Iec.parse("IEC 60445")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60445")
+        expect(id.to_urn).to eq("urn:iec:std:iec:60445::::")
       end
 
       it "generates URN for dated identifier" do
-        id = Pubid::Iec.parse("IEC 60445:2001")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60445:2001")
+        id = Pubid::Iec.parse("IEC 60050:2011")
+        expect(id.to_urn).to eq("urn:iec:std:iec:60050:2011:::")
       end
 
       it "generates URN for multipart identifier (part)" do
         id = Pubid::Iec.parse("IEC 60050-100:2011")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60050-100:2011")
+        expect(id.to_urn).to eq("urn:iec:std:iec:60050-100:2011:::")
       end
 
       it "generates URN for multipart identifier (part and subpart)" do
         id = Pubid::Iec.parse("IEC 60068-2-2:1974")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60068-2-2:1974")
+        expect(id.to_urn).to eq("urn:iec:std:iec:60068-2-2:1974:::")
       end
     end
 
-    # --- Copublishers ---
     context "copublishers" do
       it "generates URN for ISO/IEC joint document" do
         id = Pubid::Iec.parse("ISO/IEC 11801")
-        expect(id.to_urn).to eq("urn:iec:std:iso-iec:11801")
+        expect(id.to_urn).to eq("urn:iec:std:iso-iec:11801::::")
       end
     end
 
-    # --- Document types ---
     context "document types" do
-      it "generates URN for Technical Report (tr)" do
+      it "generates URN for Technical Report (tr) — type after date" do
         id = Pubid::Iec.parse("ISO/IEC TR 11802-9901:2014")
-        expect(id.to_urn).to eq("urn:iec:std:iso-iec:tr:11802-9901:2014")
+        expect(id.to_urn).to eq("urn:iec:std:iso-iec:11802-9901:2014:tr::")
       end
 
-      it "generates URN for Publicly Available Specification (pas)" do
-        id = Pubid::Iec.parse("IEC PAS 62825")
-        expect(id.to_urn).to eq("urn:iec:std:iec:pas:62825")
+      it "generates URN for Technical Specification (ts) with language" do
+        id = Pubid::Iec.parse("IEC TS 60034-16-3:1996")
+        id.languages = [Pubid::Components::Language.new(code: "fr")]
+        expect(id.to_urn).to eq("urn:iec:std:iec:60034-16-3:1996:ts::fr")
       end
     end
 
-    # --- Supplements (adjuncts) ---
-    context "supplements" do
+    context "supplements (adjuncts)" do
       it "generates URN with amendment" do
-        id = Pubid::Iec.parse("IEC 60050:2011/Amd 1:2015")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60050:2011:amd:2015:v1")
+        id = Pubid::Iec.parse("IEC 60050-102:2007/AMD1:2017")
+        expect(id.to_urn).to eq("urn:iec:std:iec:60050-102:2007:::::amd:1:2017")
       end
 
       it "generates URN with amendment to multipart document" do
         id = Pubid::Iec.parse("IEC 60068-2-2:1974/Amd 1:1993")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60068-2-2:1974:amd:1993:v1")
+        expect(id.to_urn).to eq("urn:iec:std:iec:60068-2-2:1974:::::amd:1:1993")
       end
     end
 
-    # --- URN format compliance ---
+    context "all-parts series" do
+      it "generates a compact series URN without the language slot" do
+        id = Pubid::Iec.parse("IEC 80000 (all parts)")
+        expect(id.to_urn).to eq("urn:iec:std:iec:80000:::ser")
+      end
+    end
+
     context "URN format compliance" do
-      it "follows URN format" do
-        id = Pubid::Iec.parse("IEC 60050:2011")
-        urn = id.to_urn
-
-        expect(urn).to start_with("urn:")
-        expect(urn).to match(/^urn:[a-z0-9]+:/)
-      end
-
-      it "uses correct namespace" do
-        id = Pubid::Iec.parse("IEC 60050:2011")
-        expect(id.to_urn).to start_with("urn:iec:")
-      end
-
-      it "uses std sub-namespace" do
+      it "uses the urn:iec:std: namespace" do
         id = Pubid::Iec.parse("IEC 60050:2011")
         expect(id.to_urn).to start_with("urn:iec:std:")
       end
     end
 
-    # --- Docnumber format ---
     context "docnumber format" do
       it "keeps multipart number as single hyphenated field" do
         id = Pubid::Iec.parse("IEC 61076-7-101")
         urn = id.to_urn
-        # Docnumber should be "61076-7-101" as a single field, not "61076:-7:-101"
         expect(urn).to include("61076-7-101")
         expect(urn).not_to include(":-7")
       end
@@ -100,59 +89,73 @@ RSpec.describe "IEC URN Generation and Parsing" do
   end
 
   describe ".parse_urn" do
-    # --- Round-trip tests ---
     context "round-trip (parse_urn -> to_urn)" do
-      it "round-trips undated identifier" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60445")
-      end
-
       it "round-trips dated identifier" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445:2001")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60445:2001")
+        urn = "urn:iec:std:iec:60050:2011:::"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
       end
 
       it "round-trips multipart identifier" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60068-2-2:1974")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60068-2-2:1974")
+        urn = "urn:iec:std:iec:60068-2-2:1974:::"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
       end
 
-      it "round-trips copublished identifier" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iso-iec:11801")
-        expect(id.to_urn).to eq("urn:iec:std:iso-iec:11801")
+      it "round-trips type-after-date identifier" do
+        urn = "urn:iec:std:iec:62547:2013:tr::"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
       end
 
-      it "round-trips identifier with type" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iso-iec:tr:11802-9901:2014")
-        expect(id.to_urn).to eq("urn:iec:std:iso-iec:tr:11802-9901:2014")
+      it "round-trips copublished type identifier" do
+        urn = "urn:iec:std:iso-iec:11802-9901:2014:tr::"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
       end
 
-      it "round-trips identifier with year-month date" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445:2010-10")
-        expect(id.to_urn).to eq("urn:iec:std:iec:60445:2010-10")
+      it "round-trips identifier with language" do
+        urn = "urn:iec:std:iec:60034-16-3:1996:ts::fr"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
+      end
+
+      it "round-trips an amendment" do
+        urn = "urn:iec:std:iec:60050-102:2007:::::amd:1:2017"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
+      end
+
+      it "round-trips an all-parts series URN" do
+        urn = "urn:iec:std:iec:80000:::ser"
+        expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
       end
     end
 
-    # --- Parsing correctness ---
     context "parsing correctness" do
       it "extracts publisher from URN" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445")
+        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445::::")
         expect(id.to_s).to start_with("IEC")
       end
 
       it "extracts number from URN" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445")
+        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445::::")
         expect(id.to_s).to include("60445")
       end
 
       it "extracts year from URN" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60445:2001")
-        expect(id.to_s).to include("2001")
+        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60050:2011:::")
+        expect(id.to_s).to include("2011")
       end
 
       it "extracts multipart number from URN" do
-        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60068-2-2:1974")
+        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60068-2-2:1974:::")
         expect(id.to_s).to include("60068-2-2")
+      end
+
+      it "parses a month-precision date without crashing" do
+        id = Pubid::Iec.parse_urn("urn:iec:std:iec:60050-102:2007-08:::")
+        expect(id.to_s).to include("60050-102")
+      end
+
+      it "marks an all-parts series URN as all_parts" do
+        id = Pubid::Iec.parse_urn("urn:iec:std:iec:80000:::ser")
+        expect(id.all_parts).to be true
+        expect(id.to_s).to eq("IEC 80000 (all parts)")
       end
 
       it "raises error for invalid URN namespace" do

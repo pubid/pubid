@@ -83,7 +83,7 @@ module Pubid
       #   :language
       # @return [Pubid::Iso::Identifier]
       def self.create(type: nil, stage: nil, base: nil, **opts)
-        klass = resolve_create_class(type: type, stage: stage)
+        klass = resolve_create_class(type: type, stage: stage, base: base)
         attrs = coerce_create_attrs(opts)
         ts = resolve_create_typed_stage(klass, stage)
         if ts
@@ -109,10 +109,23 @@ module Pubid
             harmonized_stages: Array(ts.harmonized_stages),
           )
         end
-        if supplement_klass?(klass)
-          raise ArgumentError, "#{klass} requires a base: identifier" if base.nil?
-
+        # Build the base_identifier whenever a `base:` is supplied, regardless
+        # of whether the resolved class is registered as a supplement (e.g.
+        # DirectivesSupplement holds a base but is not in
+        # Scheme#supplement_identifiers). Only classes that *require* a base
+        # and were given none raise.
+        if base
           attrs[:base_identifier] = build_base_identifier(base)
+        elsif supplement_klass?(klass)
+          raise ArgumentError, "#{klass} requires a base: identifier"
+        end
+        # For a DirectivesSupplement the top-level `publisher:` names the
+        # supplement's own publisher ("… ISO SUP"), not the document's — the
+        # document publisher lives on the base. Mirror parse, which records it
+        # as `supplement_publisher`.
+        if klass <= Identifiers::DirectivesSupplement && attrs.key?(:publisher)
+          attrs[:supplement_publisher] = attrs.delete(:publisher)
+          attrs.delete(:copublishers)
         end
         klass.new(**attrs)
       end
@@ -133,7 +146,7 @@ module Pubid
       # neither is available; the renderer then omits the stage prefix.
       def self.resolve_create_typed_stage(klass, stage)
         if stage
-          Scheme.locate_typed_stage_by_abbr(stage.to_s)
+          locate_create_typed_stage(stage)
         elsif klass.const_defined?(:TYPED_STAGES)
           klass.const_get(:TYPED_STAGES).find do |ts|
             ts.stage_code.to_sym == :published
@@ -141,7 +154,16 @@ module Pubid
         end
       end
 
-      def self.resolve_create_class(type:, stage:)
+      # Resolve a TypedStage from a create() :stage value. The index may
+      # supply it as an abbreviation ("DIS"), a generic stage_code (:dis),
+      # or a unique per-typed-stage code (:dtr, :fdisp). Try each in turn.
+      def self.locate_create_typed_stage(stage)
+        Scheme.locate_typed_stage_by_abbr(stage.to_s) ||
+          Scheme.locate_typed_stage_by_stage_code(stage) ||
+          Scheme.locate_typed_stage_by_code(stage)
+      end
+
+      def self.resolve_create_class(type:, stage:, base: nil)
         klass =
           if type
             located = locate_klass_by_type_or_short(type)
@@ -149,9 +171,13 @@ module Pubid
 
             located
           elsif stage
-            ts = Scheme.locate_typed_stage_by_abbr(stage.to_s)
+            ts = locate_create_typed_stage(stage)
             ts && Scheme.locate_identifier_klass_by_type_code(ts.type_code)
           end
+        # A bare `base:` with no type/stage is still a supplement; fall back to
+        # the generic Supplement (which can hold a base) rather than
+        # InternationalStandard (which cannot).
+        klass ||= Identifiers::Supplement if base
         klass || Identifiers::InternationalStandard
       end
 
@@ -173,11 +199,19 @@ module Pubid
       def self.coerce_create_attrs(opts)
         out = {}
         if (v = opts[:publisher])
-          # Parse sets copublisher to []; mirror that for hash/equality
-          # parity with parsed identifiers.
+          # Mirror parse: the publisher carries its copublishers in its own
+          # copublisher list, and each copublisher is also a standalone entry
+          # in the copublishers collection. No copublisher → [] (parity with
+          # parsed plain-ISO identifiers).
+          cops = Array(opts[:copublisher]).map(&:to_s)
           out[:publisher] = Components::Publisher.new(
-            publisher: v.to_s, copublisher: [],
+            publisher: v.to_s, copublisher: cops,
           )
+        end
+        if opts[:copublisher]
+          out[:copublishers] = Array(opts[:copublisher]).map do |c|
+            Components::Publisher.new(publisher: c.to_s)
+          end
         end
         %i[number part subpart].each do |k|
           v = opts[k]

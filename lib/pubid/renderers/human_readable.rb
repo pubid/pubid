@@ -17,12 +17,16 @@ module Pubid
       private
 
       def render_publisher_and_stage(context)
-        pub_str = @id.publisher.render(context:) if @id.publisher
+        ann = context.annotated
+        pub_str = annotate(@id.publisher.render(context:), "publisher",
+                           annotated: ann) if @id.publisher
         stage_str = @id.typed_stage.render(context:) if @id.typed_stage
 
         if stage_str && !stage_str.empty?
           has_copub = @id.publisher&.copublished?
           sep = has_copub ? " " : "/"
+          stage_str = annotate(stage_str, typed_stage_css(@id.typed_stage),
+                               annotated: ann)
           "#{pub_str}#{sep}#{stage_str}"
         else
           pub_str
@@ -30,18 +34,25 @@ module Pubid
       end
 
       def render_number_portion(context)
+        ann = context.annotated
         parts = []
-        parts << @id.number.render(context:) if @id.number
-        parts << "-#{@id.part.render(context:)}" if @id.part
-        parts << "-#{@id.subpart.render(context:)}" if @id.subpart
-        parts << ".#{@id.stage_iteration.render(context:)}" if @id.stage_iteration
+        parts << annotate(@id.number.render(context:), "docnumber",
+                          annotated: ann) if @id.number
+        parts << "-#{annotate(@id.part.render(context:), 'part', annotated: ann)}" if @id.part
+        parts << "-#{annotate(@id.subpart.render(context:), 'part', annotated: ann)}" if @id.subpart
+        if @id.stage_iteration
+          parts << ".#{annotate(@id.stage_iteration.render(context:), 'iteration', annotated: ann)}"
+        end
         date_str = @id.date.render(context:) if @id.date && context.with_date
-        parts << ":#{date_str}" if date_str
+        parts << ":#{annotate(date_str, 'year', annotated: ann)}" if date_str
         parts.join
       end
 
       def render_edition_portion(context)
-        @id.edition.render(context:) if @id.edition&.number
+        return unless @id.edition&.number
+
+        annotate(@id.edition.render(context:), "edition",
+                 annotated: context.annotated)
       end
 
       def render_language_portion(context, with_edition: false)
@@ -49,7 +60,8 @@ module Pubid
 
         use_single = with_edition ? false : context.with_language_code == :single
         rendered = @id.languages.map do |l|
-          l.render(context:, lang_single: use_single)
+          annotate(l.render(context:, lang_single: use_single), "language",
+                   annotated: context.annotated)
         end
         "(#{rendered.join(use_single ? '/' : ',')})"
       end

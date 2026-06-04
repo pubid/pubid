@@ -50,10 +50,13 @@ module Pubid
         attribute :update_year, :string
         attribute :addendum, :string
         attribute :addendum_number, :string
-        attribute :supplement, :string
-        attribute :supplement_date_range_start, :string # For date ranges like Jan1924-Jan1926
-        attribute :supplement_date_range_end, :string
-        attribute :supplement_has_revision, :boolean, default: -> { false }
+        # Single source of truth for the supplement: a structured component with
+        # isolated parts (number / year / month / date-range / revision), so a
+        # supplement's year is queryable independently of its number. Presence
+        # (non-nil) means "is a supplement"; an all-empty component is a bare
+        # "sup" marker. Replaces the former flat :supplement string plus the
+        # separate date-range/has_revision fields.
+        attribute :supplement, Components::Supplement
         attribute :errata, :string
         attribute :index, :string
         attribute :insert, :string
@@ -115,6 +118,30 @@ module Pubid
           [self.class, *vals].hash
         end
 
+        # Wildcard / partial-identifier match. Treats +self+ as a QUERY pattern
+        # and +candidate+ as a concrete document: every ID part SET on the query
+        # must equal the candidate's, while parts left unset (nil/empty) are
+        # wildcards that match any value. So a query carrying no edition and no
+        # supplement matches that document across ALL editions, years, and
+        # supplements — the basis for "select docs by ID parts".
+        #
+        # Asymmetric (unlike ==): "NBS CIRC 25".matches?("NBS CIRC 25sup1924")
+        # is true, but not the reverse. The candidate must be the same class or
+        # a subclass so series-level identity still holds.
+        def matches?(candidate)
+          return false unless candidate.is_a?(self.class)
+
+          self.class.attributes.each_key.all? do |name|
+            next true if EQUALITY_IGNORED_ATTRS.include?(name)
+
+            query_val = public_send(name)
+            next true if query_val.nil? ||
+              (query_val.respond_to?(:empty?) && query_val.empty?)
+
+            query_val == candidate.public_send(name)
+          end
+        end
+
         # Return a copy with the named attributes nil'd. Overrides
         # Pubid::Identifier#exclude because NIST's initialize is keyword-only
         # (initialize(**attributes)) while the inherited exclude rebuilds via
@@ -129,6 +156,19 @@ module Pubid
             h[name] = excluded_args.include?(name) ? nil : send(name)
           end
           self.class.new(**attrs)
+        end
+
+        # Short-form supplement fragment ("sup", "sup1924", "supJan1924",
+        # "suprev", " supJun1925-Jun1926"), rendered from the structured
+        # component. A present-but-empty component is the bare "sup" marker; a
+        # number-less date range gets the leading space the number would have
+        # supplied. Shared by base and the per-series to_short_style overrides.
+        def supplement_short
+          return "" unless supplement
+
+          prefix = (supplement.range? && !number) ? " " : ""
+          rendered = supplement.to_s(:short)
+          prefix + (rendered.empty? ? "sup" : rendered)
         end
 
         # Compute revision from edition component for backward compatibility
@@ -393,15 +433,9 @@ module Pubid
           # Add supplement. NIST/NBS canonical short form is single-p "sup"
           # with the suffix attached directly, no dash (relaton-data-nist
           # uses "sup2", "sup1940", "supA"); date-range keeps its inner dash.
-          if supplement_date_range_start && supplement_date_range_end
-            result += "sup#{supplement_date_range_start}-#{supplement_date_range_end}"
-          elsif supplement_has_revision
-            result += "suprev"
-          elsif supplement && !supplement.empty?
-            result += "sup#{supplement}"
-          elsif supplement
-            result += "sup"
-          end
+          # Rendered from the structured component; a present-but-empty
+          # component is the bare "sup" marker.
+          result += supplement_short
 
           # Add other attributes
           result += errata.to_s if errata

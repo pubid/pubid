@@ -36,6 +36,12 @@ module Pubid
           instance.locate_typed_stage_by_stage_code(stage_code)
         end
 
+        # @param code [String, Symbol] the per-typed-stage code to find
+        # @return [TypedStage, nil] the matching typed stage
+        def locate_typed_stage_by_code(code)
+          instance.locate_typed_stage_by_code(code)
+        end
+
         # @param harmonized_code [String] the harmonized stage code to find
         # @return [TypedStage, nil] the matching typed stage
         def locate_typed_stage_by_harmonized_code(harmonized_code)

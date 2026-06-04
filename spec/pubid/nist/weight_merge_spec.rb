@@ -77,7 +77,7 @@ RSpec.describe Pubid::Nist::Identifiers::Base do
 
         merged = id1.merge(id2)
         expect(merged.supplement).not_to be_nil
-        expect(merged.supplement).not_to be_empty
+        expect(merged.supplement.value_string).not_to be_empty
       end
 
       it "merges errata attribute" do

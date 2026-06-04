@@ -63,5 +63,23 @@ RSpec.describe Pubid::Iso::Identifiers::Base do
         expect(id1.to_s).not_to eq(id2.to_s)
       end
     end
+
+    context "series URN (compact :ser suffix)" do
+      it "generates a series URN for all parts" do
+        id = Pubid::Iso.parse("ISO 9000 (all parts)")
+        expect(id.to_urn).to eq("urn:iso:std:iso:9000:ser")
+      end
+
+      it "parses a series URN back to all parts" do
+        id = Pubid::Iso::Identifier.parse("urn:iso:std:iso:9000:ser")
+        expect(id.all_parts).to be true
+        expect(id.to_s).to eq("ISO 9000 (all parts)")
+      end
+
+      it "round-trips a series URN" do
+        urn = "urn:iso:std:iso:9000:ser"
+        expect(Pubid::Iso::Identifier.parse(urn).to_urn).to eq(urn)
+      end
+    end
   end
 end

@@ -52,8 +52,7 @@ module Pubid
         def to_short_style
           result = "#{default_publisher} #{series_code}"
           result += " #{number}" if number
-          result += "sup#{supplement}" if supplement && !supplement.empty?
-          result += "sup" if supplement == ""
+          result += supplement_short
           result
         end
 
