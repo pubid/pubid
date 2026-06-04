@@ -45,7 +45,9 @@ module Pubid
       #             ISO/JTC 1 N 456
       #             ISO/TC 184/SC 4 N 789 (TC and SC only, no WG)
       rule(:tc_document) do
-        prefix_sole_publisher >> str("/") >> tc_type >> space >> tc_number.as(:tc_number) >>
+        # Accept either "ISO/TC 184…" or the lenient space form "ISO TC 184…"
+        # (the latter was valid in pubid 1.x via an optional slash).
+        prefix_sole_publisher >> (str("/") | space) >> tc_type >> space >> tc_number.as(:tc_number) >>
           tc_subcommittee_part.maybe >>
           space >> str("N") >> space? >> digits.as(:number) >>
           (str(":") >> year_digits.as(:year)).maybe

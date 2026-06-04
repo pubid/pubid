@@ -146,12 +146,34 @@ module Pubid
       # neither is available; the renderer then omits the stage prefix.
       def self.resolve_create_typed_stage(klass, stage)
         if stage
-          locate_create_typed_stage(stage)
+          ts = locate_create_typed_stage(stage)
+          ts && retype_stage_for_class(klass, ts)
         elsif klass.const_defined?(:TYPED_STAGES)
           klass.const_get(:TYPED_STAGES).find do |ts|
             ts.stage_code.to_sym == :published
           end
         end
+      end
+
+      # Indexes store a supplement's stage as the bare review-stage abbr
+      # ("CD", "WD", "AWI") plus a separate type ("AMD"), so the global lookup
+      # resolves the stage to the IS-typed variant (cdis) rather than the
+      # amendment-typed one (committee_draft_amd). When the resolved stage's
+      # type differs from the class chosen via `type:`, re-pick the equivalent
+      # stage from the class's own TYPED_STAGES. harmonized_stages is the
+      # stable cross-type key (stage_code/abbr diverge between IS and amd:
+      # IS "WD" is :working_draft, the amendment is :wd_amd).
+      def self.retype_stage_for_class(klass, ts)
+        return ts unless klass.const_defined?(:TYPED_STAGES)
+        return ts unless klass.respond_to?(:type) && klass.type
+        return ts if ts.type_code.to_s == klass.type[:key].to_s
+
+        harmonized = Array(ts.harmonized_stages)
+        return ts if harmonized.empty?
+
+        klass.const_get(:TYPED_STAGES).find do |s|
+          (Array(s.harmonized_stages) & harmonized).any?
+        end || ts
       end
 
       # Resolve a TypedStage from a create() :stage value. The index may
@@ -227,10 +249,19 @@ module Pubid
           out[:languages] =
             [::Pubid::Components::Language.new(code: v.to_s)]
         end
-        # TODO(create-shim): 1.x also accepted joint_document, tctype,
-        # sctype, wgtype, tcnumber, scnumber, wgnumber, dirtype, iteration,
-        # base, supplements, amendments, corrigendums, addendum, month,
-        # jtc_dir, dir. Add as relaton call sites require them.
+        # TcDocument committee fields: the 1.x/index shape is the flat
+        # tctype/tcnumber/… keys, but the 2.x model stores underscored Code
+        # components (mirrors the parser's builder). Without this mapping a
+        # TC document round-trips to a bare "ISO N <num>".
+        { tctype: :tc_type, tcnumber: :tc_number,
+          sctype: :sc_type, scnumber: :sc_number,
+          wgtype: :wg_type, wgnumber: :wg_number }.each do |src, dest|
+          v = opts[src]
+          out[dest] = Components::Code.new(number: v.to_s) unless v.nil?
+        end
+        # TODO(create-shim): 1.x also accepted joint_document, dirtype,
+        # iteration, base, supplements, amendments, corrigendums, addendum,
+        # month, jtc_dir, dir. Add as relaton call sites require them.
         out
       end
       private_class_method :resolve_create_class, :supplement_klass?,

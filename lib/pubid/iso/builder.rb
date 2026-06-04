@@ -125,7 +125,11 @@ module Pubid
               copublisher: value[:copublisher],
             )
           else
-            Pubid::Iso::Components::Publisher.new(publisher: value)
+            # Default copublisher to [] (not nil) so a bare-string publisher
+            # (e.g. a TC document, which skips the copublisher merge) matches
+            # the [] convention used by copublisher-merged parses and by
+            # Identifier.create. Otherwise equality fails on [] vs nil.
+            Pubid::Iso::Components::Publisher.new(publisher: value, copublisher: [])
           end
 
         when :copublishers
