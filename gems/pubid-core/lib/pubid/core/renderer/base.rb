@@ -88,7 +88,15 @@ module Pubid::Core::Renderer
                    else
                      value
                    end
-        rendered = annotate_value(key, rendered) if opts[:annotated] && rendered
+        # Only annotate values that have been rendered to their final String
+        # form here. Some flavors (e.g. Pubid::Iso) defer rendering of certain
+        # keys to a second phase in their overridden #render_identifier: their
+        # render_<key> returns the domain object (e.g. a Stage) unchanged so it
+        # can be inspected and rendered later. Wrapping such an object in a span
+        # now would (a) stringify it prematurely and (b) replace the object with
+        # a String, breaking the second phase (which calls Stage methods like
+        # #empty_abbr?). Those keys are annotated by the subclass in phase two.
+        rendered = annotate_value(key, rendered) if opts[:annotated] && rendered.is_a?(String)
         [key, rendered]
       end.compact.to_h
     end
