@@ -182,11 +182,19 @@ module Pubid
       def self.coerce_create_attrs(opts)
         out = {}
         if (v = opts[:publisher])
-          # Parse sets copublisher to []; mirror that for hash/equality
-          # parity with parsed identifiers.
+          # Mirror parse: the publisher carries its copublishers in its own
+          # copublisher list, and each copublisher is also a standalone entry
+          # in the copublishers collection. No copublisher → [] (parity with
+          # parsed plain-ISO identifiers).
+          cops = Array(opts[:copublisher]).map(&:to_s)
           out[:publisher] = Components::Publisher.new(
-            publisher: v.to_s, copublisher: [],
+            publisher: v.to_s, copublisher: cops,
           )
+        end
+        if opts[:copublisher]
+          out[:copublishers] = Array(opts[:copublisher]).map do |c|
+            Components::Publisher.new(publisher: c.to_s)
+          end
         end
         %i[number part subpart].each do |k|
           v = opts[k]

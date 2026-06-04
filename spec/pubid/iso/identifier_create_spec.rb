@@ -147,6 +147,35 @@ RSpec.describe Pubid::Iso::Identifier do
       end
     end
 
+    context "copublisher" do
+      it "renders ISO/IEC for a single copublisher" do
+        id = described_class.create(publisher: "ISO", number: "2382",
+                                    copublisher: ["IEC"], year: 2015)
+        expect(id.to_s).to eq("ISO/IEC 2382:2015")
+      end
+
+      it "renders ISO/IEC/IEEE for multiple copublishers" do
+        id = described_class.create(publisher: "ISO", number: "9945",
+                                    copublisher: %w[IEC IEEE], year: 2009)
+        expect(id.to_s).to eq("ISO/IEC/IEEE 9945:2009")
+      end
+
+      it "round-trips equal to the parsed identifier" do
+        id = described_class.create(publisher: "ISO", number: "2382",
+                                    copublisher: ["IEC"], year: 2015)
+        parsed = described_class.parse("ISO/IEC 2382:2015")
+        expect(id.exclude(:date, :all_parts))
+          .to eq(parsed.exclude(:date, :all_parts))
+      end
+
+      it "leaves plain-ISO identifiers unaffected" do
+        id = described_class.create(publisher: "ISO", number: "2382",
+                                    year: 2015)
+        expect(id.to_s).to eq("ISO 2382:2015")
+        expect(id.copublishers).to be_nil
+      end
+    end
+
     context "graceful handling of 1.x-only kwargs" do
       it "ignores unmapped kwargs without raising" do
         id = described_class.create(publisher: "ISO", number: "19115",
@@ -166,6 +195,12 @@ RSpec.describe Pubid::Iso::Identifier do
          { type: :tr, publisher: "ISO", number: "19115", year: "2014" }],
         ["ISO/TS 19115:2014",
          { type: :ts, publisher: "ISO", number: "19115", year: "2014" }],
+        ["ISO/IEC 2382:2015",
+         { publisher: "ISO", number: "2382", copublisher: ["IEC"],
+           year: "2015" }],
+        ["ISO/IEC/IEEE 9945:2009",
+         { publisher: "ISO", number: "9945", copublisher: %w[IEC IEEE],
+           year: "2009" }],
       ].each do |string, opts|
         it "round-trips #{string}" do
           created = described_class.create(**opts)
