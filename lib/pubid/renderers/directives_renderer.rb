@@ -27,17 +27,12 @@ module Pubid
       private
 
       def render_publisher_portion(context)
-        pub_str = @id.publisher.render(context:) if @id.publisher
+        ann = context.annotated
+        pub_str = annotate(@id.publisher.render(context:), "publisher",
+                           annotated: ann) if @id.publisher
         abbr = @id.typed_stage ? @id.typed_stage.abbreviation(format_long: false) : ""
+        abbr = annotate(abbr, typed_stage_css(@id.typed_stage), annotated: ann) unless abbr.empty?
         subgroup_str = @id.subgroup.render(context:) if @id.subgroup
-
-        unless @id.publisher&.copublished?
-          return [
-            pub_str,
-            (subgroup_str ? " #{subgroup_str}" : ""),
-            (abbr.empty? ? "" : " #{abbr}"),
-          ].join
-        end
 
         [
           pub_str,
@@ -47,13 +42,17 @@ module Pubid
       end
 
       def render_number_portion(context)
+        ann = context.annotated
         parts = []
-        parts << @id.number.render(context:) if @id.number
-        parts << " #{@id.part.render(context:)}" if @id.part
-        parts << "-#{@id.subpart.render(context:)}" if @id.subpart
-        parts << ".#{@id.stage_iteration.render(context:)}" if @id.stage_iteration
+        parts << annotate(@id.number.render(context:), "docnumber",
+                          annotated: ann) if @id.number
+        parts << " #{annotate(@id.part.render(context:), 'part', annotated: ann)}" if @id.part
+        parts << "-#{annotate(@id.subpart.render(context:), 'part', annotated: ann)}" if @id.subpart
+        if @id.stage_iteration
+          parts << ".#{annotate(@id.stage_iteration.render(context:), 'iteration', annotated: ann)}"
+        end
         date_str = @id.date.render(context:) if @id.date && context.with_date
-        parts << ":#{date_str}" if date_str
+        parts << ":#{annotate(date_str, 'year', annotated: ann)}" if date_str
         result = parts.join.strip
         result.empty? ? nil : result
       end

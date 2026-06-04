@@ -207,7 +207,8 @@ module Pubid
 
     def build_rendering_context(_renderer, format:, with_edition: false,
                                 lang: :en, lang_single: false,
-                                stage_format_long: nil, with_date: nil)
+                                stage_format_long: nil, with_date: nil,
+                                annotated: false)
       if format == :mr_string
         nil
       else
@@ -215,6 +216,7 @@ module Pubid
           with_language_code: lang_single ? :single : :none,
           stage_format_long: stage_format_long || false,
           with_date: with_date.nil? || with_date,
+          annotated: annotated,
         )
       end
     end
