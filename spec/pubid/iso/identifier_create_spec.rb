@@ -54,6 +54,26 @@ RSpec.describe Pubid::Iso::Identifier do
         expect(id.to_s).to eq("ISO 1000:1992/Amd 1:1998")
         expect(id).to eq(described_class.parse("ISO 1000:1992/Amd 1:1998"))
       end
+
+      # DirectivesSupplement holds a base but is NOT registered in
+      # Scheme#supplement_identifiers, so the old gate dropped its base. The
+      # top-level publisher names the supplement publisher ("… ISO SUP"), not
+      # the document publisher (which lives on the base). The base must
+      # round-trip so index narrowing keys (base_identifier.number) match parse.
+      it "builds a DirectivesSupplement with its base from type: 'SUP'" do
+        id = described_class.create(
+          type: "SUP", publisher: "ISO", year: 2021,
+          base: { publisher: "ISO", number: "1", copublisher: ["IEC"],
+                  type: "DIR" },
+        )
+        expect(id).to be_a(Pubid::Iso::Identifiers::DirectivesSupplement)
+        expect(id.base_identifier).to be_a(Pubid::Iso::Identifiers::Directives)
+        expect(id.base_identifier.number.value).to eq("1")
+        expect(id.supplement_publisher.body).to eq("ISO")
+        expect(id.to_s).to eq("ISO/IEC DIR 1 ISO SUP:2021")
+        expect(id.to_s)
+          .to eq(described_class.parse("ISO/IEC DIR 1 ISO SUP:2021").to_s)
+      end
     end
 
     context "stage-based dispatch" do

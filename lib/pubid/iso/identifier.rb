@@ -83,7 +83,7 @@ module Pubid
       #   :language
       # @return [Pubid::Iso::Identifier]
       def self.create(type: nil, stage: nil, base: nil, **opts)
-        klass = resolve_create_class(type: type, stage: stage)
+        klass = resolve_create_class(type: type, stage: stage, base: base)
         attrs = coerce_create_attrs(opts)
         ts = resolve_create_typed_stage(klass, stage)
         if ts
@@ -109,10 +109,23 @@ module Pubid
             harmonized_stages: Array(ts.harmonized_stages),
           )
         end
-        if supplement_klass?(klass)
-          raise ArgumentError, "#{klass} requires a base: identifier" if base.nil?
-
+        # Build the base_identifier whenever a `base:` is supplied, regardless
+        # of whether the resolved class is registered as a supplement (e.g.
+        # DirectivesSupplement holds a base but is not in
+        # Scheme#supplement_identifiers). Only classes that *require* a base
+        # and were given none raise.
+        if base
           attrs[:base_identifier] = build_base_identifier(base)
+        elsif supplement_klass?(klass)
+          raise ArgumentError, "#{klass} requires a base: identifier"
+        end
+        # For a DirectivesSupplement the top-level `publisher:` names the
+        # supplement's own publisher ("… ISO SUP"), not the document's — the
+        # document publisher lives on the base. Mirror parse, which records it
+        # as `supplement_publisher`.
+        if klass <= Identifiers::DirectivesSupplement && attrs.key?(:publisher)
+          attrs[:supplement_publisher] = attrs.delete(:publisher)
+          attrs.delete(:copublishers)
         end
         klass.new(**attrs)
       end
@@ -150,7 +163,7 @@ module Pubid
           Scheme.locate_typed_stage_by_code(stage)
       end
 
-      def self.resolve_create_class(type:, stage:)
+      def self.resolve_create_class(type:, stage:, base: nil)
         klass =
           if type
             located = locate_klass_by_type_or_short(type)
@@ -161,6 +174,10 @@ module Pubid
             ts = locate_create_typed_stage(stage)
             ts && Scheme.locate_identifier_klass_by_type_code(ts.type_code)
           end
+        # A bare `base:` with no type/stage is still a supplement; fall back to
+        # the generic Supplement (which can hold a base) rather than
+        # InternationalStandard (which cannot).
+        klass ||= Identifiers::Supplement if base
         klass || Identifiers::InternationalStandard
       end
 
