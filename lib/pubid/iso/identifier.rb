@@ -83,6 +83,14 @@ module Pubid
       #   :language
       # @return [Pubid::Iso::Identifier]
       def self.create(type: nil, stage: nil, base: nil, **opts)
+        # A bundled directive (e.g. "ISO/IEC DIR 1 + IEC SUP") is stored by the
+        # 1.x index as the base document's fields plus a nested joint_document
+        # (or a supplements array). The 2.x model is a separate
+        # BundledIdentifier; build that so .create round-trips parse.
+        if opts[:joint_document] || opts[:supplements]
+          return build_bundled(type: type, stage: stage, base: base, **opts)
+        end
+
         klass = resolve_create_class(type: type, stage: stage, base: base)
         attrs = coerce_create_attrs(opts)
         ts = resolve_create_typed_stage(klass, stage)
@@ -128,6 +136,35 @@ module Pubid
           attrs.delete(:copublishers)
         end
         klass.new(**attrs)
+      end
+
+      # Build a BundledIdentifier (base document + supplements) from the 1.x
+      # index shape: the top-level fields are the base document, and each
+      # joint_document/supplements entry is a joined supplement.
+      def self.build_bundled(type:, stage:, base:, **opts)
+        raw = opts.delete(:joint_document) || opts.delete(:supplements)
+        entries = raw.is_a?(Array) ? raw : [raw]
+        base_document = create(type: type, stage: stage, base: base, **opts)
+        supplements = entries.map { |j| build_joint_supplement(j) }
+        BundledIdentifier.new(base_document: base_document,
+                              supplements: supplements)
+      end
+
+      # Map a 1.x joint_document hash to a 2.x supplement matching parse. The
+      # index nests the supplement's publisher under joint_document.base.publisher
+      # (e.g. "IEC" for "+ IEC SUP"), while parse records it as the supplement's
+      # own publisher; move it and drop the nested base + empty top publisher.
+      def self.build_joint_supplement(joint)
+        j = joint.transform_keys(&:to_sym)
+        b = (j[:base] || {}).transform_keys(&:to_sym)
+        publisher = b[:publisher].to_s.empty? ? j[:publisher] : b[:publisher]
+        create(
+          type: j[:type],
+          publisher: publisher,
+          copublisher: b[:copublisher] || j[:copublisher],
+          number: (j[:number] unless j[:number].to_s.empty?),
+          year: j[:year],
+        )
       end
 
       # Build the base_identifier for a supplement from either an already
@@ -270,13 +307,14 @@ module Pubid
           )
           out.delete(:number)
         end
-        # TODO(create-shim): 1.x also accepted joint_document, iteration, base,
-        # supplements, amendments, corrigendums, addendum, month, dir. Add as
-        # relaton call sites require them.
+        # TODO(create-shim): 1.x also accepted iteration, amendments,
+        # corrigendums, addendum, month, dir. Add as relaton call sites
+        # require them.
         out
       end
       private_class_method :resolve_create_class, :supplement_klass?,
-                           :resolve_create_typed_stage, :coerce_create_attrs
+                           :resolve_create_typed_stage, :coerce_create_attrs,
+                           :build_bundled, :build_joint_supplement
     end
   end
 end
