@@ -280,7 +280,17 @@ module Pubid
           out[:date] = ::Pubid::Components::Date.new(year: v.to_s)
         end
         if (v = opts[:edition])
-          out[:edition] = ::Pubid::Components::Edition.new(number: v)
+          if v.is_a?(Hash)
+            # 1.x stored a directive org-variant ("ISO/IEC DIR 2 ISO" /
+            # "ISO/IEC DIR 1 IEC:2023") as edition: {publisher:, year:}; parse
+            # models the org as `part` and the year as `date`. Map it so create
+            # round-trips parse.
+            eh = v.transform_keys(&:to_sym)
+            out[:part] ||= Components::Code.new(number: eh[:publisher].to_s) if eh[:publisher]
+            out[:date] ||= ::Pubid::Components::Date.new(year: eh[:year].to_s) if eh[:year]
+          else
+            out[:edition] = ::Pubid::Components::Edition.new(number: v)
+          end
         end
         if (v = opts[:language])
           out[:languages] =
