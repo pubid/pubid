@@ -39,6 +39,11 @@ module Pubid
       nil
     end
 
+    # @return [String, nil] publication year from the date component
+    def year
+      date&.year&.to_s
+    end
+
     def initialize(attrs = {}, options = {})
       attrs = attrs.dup
       attrs[:_type] ||= self.class.polymorphic_name

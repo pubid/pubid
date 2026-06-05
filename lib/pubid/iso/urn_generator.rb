@@ -333,7 +333,14 @@ module Pubid
         end
 
         # Format as stage-XX.XX
-        stage_part = "stage-#{harmonized_code}"
+        # An iterated PRF (Proof) stage (e.g. "PRF TR 17716.2") renders as the
+        # symbolic "draft" stage in the URN rather than its harmonized numeric
+        # code; a plain PRF without an iteration keeps the harmonized code.
+        stage_part = if stage_code.to_s == "prf" && identifier.stage_iteration
+                       "stage-draft"
+                     else
+                       "stage-#{harmonized_code}"
+                     end
 
         # For base identifiers (not supplements), include iteration in stage code
         # For supplements, iteration goes in the version part (v1.2)

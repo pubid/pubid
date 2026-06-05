@@ -259,9 +259,20 @@ module Pubid
           v = opts[src]
           out[dest] = Components::Code.new(number: v.to_s) unless v.nil?
         end
-        # TODO(create-shim): 1.x also accepted joint_document, dirtype,
-        # iteration, base, supplements, amendments, corrigendums, addendum,
-        # month, jtc_dir, dir. Add as relaton call sites require them.
+        # Directives subgroup (e.g. "ISO/IEC JTC 1 DIR"): the 1.x/index shape
+        # is dirtype: "JTC", jtc_dir: "DIR", number: "1"; the 2.x model folds
+        # the subgroup into a single `subgroup` Code ("JTC 1") with no
+        # directive number, mirroring parse. Without this, .create drops the
+        # subgroup and collapses the id into a plain "DIR 1".
+        if opts[:dirtype]
+          out[:subgroup] = Components::Code.new(
+            number: [opts[:dirtype], opts[:number]].compact.join(" "),
+          )
+          out.delete(:number)
+        end
+        # TODO(create-shim): 1.x also accepted joint_document, iteration, base,
+        # supplements, amendments, corrigendums, addendum, month, dir. Add as
+        # relaton call sites require them.
         out
       end
       private_class_method :resolve_create_class, :supplement_klass?,

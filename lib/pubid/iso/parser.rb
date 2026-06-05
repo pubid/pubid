@@ -380,7 +380,7 @@ module Pubid
 
       DIRECTIVES_TYPED_STAGES = Identifiers::Directives::TYPED_STAGES.map(&:abbr).flatten.sort_by(&:length).reverse
       rule(:directives_identifier_no_third) do
-        prefix_with_copublishers >> space >>
+        prefix_with_copublishers >> space? >>
           (directives_publisher_subgroup >> space).maybe >>
           array_to_str(DIRECTIVES_TYPED_STAGES).as(:type_with_stage) >>
           (
