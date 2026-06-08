@@ -347,5 +347,42 @@ RSpec.describe Pubid::Jis::Identifier do
         end
       end
     end
+
+    context "corrigenda" do
+      describe "JIS B 3700-11:1996/CORRIGENDUM 1:2002" do
+        subject { "JIS B 3700-11:1996/CORRIGENDUM 1:2002" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses as Corrigendum" do
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::Corrigendum)
+        end
+
+        it "inherits the code from the base document" do
+          expect(parsed.code.series).to eq("B")
+          expect(parsed.code.number).to eq(3700)
+          expect(parsed.base.year).to eq(1996)
+        end
+
+        it "parses the corrigendum number and year" do
+          expect(parsed.number).to eq(1)
+          expect(parsed.year).to eq(2002)
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "CORR abbreviation" do
+        subject { "JIS A 0001:1999/CORR 1:2002" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "normalizes to CORRIGENDUM" do
+          expect(parsed.to_s).to eq("JIS A 0001:1999/CORRIGENDUM 1:2002")
+        end
+      end
+    end
   end
 end

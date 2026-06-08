@@ -78,9 +78,20 @@ module Pubid
           (space >> digits.as(:expl_number)).maybe
       end
 
-      # Supplements (AMD or EXPL, only one for JIS)
+      # Corrigendum supplement
+      rule(:corrigendum) do
+        str("/") >>
+          (str("CORRIGENDUM") | str("CORR")).as(:corr_type) >>
+          space >>
+          digits.as(:corr_number) >>
+          colon >>
+          digits.as(:corr_year)
+      end
+
+      # Supplements (AMD, EXPL or CORRIGENDUM, only one for JIS)
       rule(:supplement) do
-        amendment.as(:amendment) | explanation.as(:explanation)
+        amendment.as(:amendment) | explanation.as(:explanation) |
+          corrigendum.as(:corrigendum)
       end
 
       # Main identifier

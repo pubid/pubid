@@ -13,6 +13,8 @@ module Pubid
           return build_amendment(data)
         elsif data[:explanation]
           return build_explanation(data)
+        elsif data[:corrigendum]
+          return build_corrigendum(data)
         end
 
         # Build regular identifier
@@ -74,6 +76,21 @@ module Pubid
           base: base,
           number: expl_data[:expl_number]&.to_i,
           year: base.year,
+        )
+      end
+
+      def build_corrigendum(data)
+        corr_data = data[:corrigendum]
+
+        # Build base document (without supplement)
+        base_data = data.except(:corrigendum)
+        base = build_single_identifier(base_data)
+
+        # Build corrigendum
+        Identifiers::Corrigendum.new(
+          base: base,
+          number: corr_data[:corr_number].to_i,
+          year: corr_data[:corr_year].to_i,
         )
       end
 

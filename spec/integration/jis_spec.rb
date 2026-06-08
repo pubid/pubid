@@ -71,6 +71,14 @@ RSpec.describe "JIS Integration" do
                       "JIS K 2249-4:2011/EXPLANATION 4", "JIS K 2249-4:2011/EXPL 4"
     end
 
+    context "corrigenda" do
+      it_behaves_like "parses and renders correctly",
+                      "JIS B 3700-11:1996/CORRIGENDUM 1:2002"
+      it_behaves_like "parses and renders correctly",
+                      "JIS A 0001:1999/CORR 1:2002",
+                      "JIS A 0001:1999/CORRIGENDUM 1:2002"
+    end
+
     context "Japanese characters" do
       it_behaves_like "parses and renders correctly", "JIS　B　0001",
                       "JIS B 0001"
