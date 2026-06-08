@@ -90,6 +90,21 @@ RSpec.describe "JIS Integration" do
                       "JIS L 4107:2000R/AMD 1:2020"
     end
 
+    context "graphical-symbol sub-reference (SYMBOL)" do
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8210:2017 SYMBOL 61700"
+      it_behaves_like "parses and renders correctly",
+                      "JIS L 0001:2024 SYMBOL New and revised"
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8211-1:2025 SYMBOL"
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8210:2017/AMENDMENT 1:2019 SYMBOL 51590",
+                      "JIS Z 8210:2017/AMD 1:2019 SYMBOL 51590"
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8210:2017/AMENDMENT 2:2019R SYMBOL JE210",
+                      "JIS Z 8210:2017/AMD 2:2019R SYMBOL JE210"
+    end
+
     context "Japanese characters" do
       it_behaves_like "parses and renders correctly", "JIS　B　0001",
                       "JIS B 0001"

@@ -8,20 +8,27 @@ module Pubid
       end
 
       def build(data)
-        # Handle supplement case first
-        if data[:amendment]
-          return build_amendment(data)
-        elsif data[:explanation]
-          return build_explanation(data)
-        elsif data[:corrigendum]
-          return build_corrigendum(data)
-        end
-
-        # Build regular identifier
-        build_single_identifier(data)
+        # Handle supplement case first; the SYMBOL clause (if any) attaches to
+        # the outermost identifier, be it the base or the supplement.
+        identifier = if data[:amendment]
+                       build_amendment(data)
+                     elsif data[:explanation]
+                       build_explanation(data)
+                     elsif data[:corrigendum]
+                       build_corrigendum(data)
+                     else
+                       build_single_identifier(data)
+                     end
+        attach_symbol(identifier, data)
       end
 
       private
+
+      # nil => no SYMBOL clause; "" => bare "SYMBOL" keyword; otherwise value.
+      def attach_symbol(identifier, data)
+        identifier.symbol = data[:symbol_value]&.to_s || "" if data[:symbol_present]
+        identifier
+      end
 
       def build_single_identifier(data)
         # Build code component

@@ -99,6 +99,15 @@ module Pubid
           corrigendum.as(:corrigendum)
       end
 
+      # Graphical-symbol sub-reference (e.g. JIS Z 8210 safety signs):
+      # "SYMBOL <id>" where <id> runs to the end of the string and may be a
+      # number, an alphanumeric code or a free-text phrase. The keyword may
+      # also appear bare with no value.
+      rule(:symbol_clause) do
+        space >> str("SYMBOL").as(:symbol_present) >>
+          (space >> match["^\n"].repeat(1).as(:symbol_value)).maybe
+      end
+
       # Main identifier
       rule(:identifier) do
         jis_prefix.maybe >>
@@ -111,7 +120,8 @@ module Pubid
           year.maybe >>
           language.maybe >>
           all_parts.maybe >>
-          supplement.maybe
+          supplement.maybe >>
+          symbol_clause.maybe
       end
 
       rule(:root) { identifier }

@@ -30,6 +30,7 @@ module Pubid
         result += ":#{year_with_reaffirmation}" if year
         result += "(#{language})" if language
         result += "（規格群）" if all_parts?
+        result += symbol_suffix
         result
       end
     end

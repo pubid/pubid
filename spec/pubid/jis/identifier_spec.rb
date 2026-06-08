@@ -434,5 +434,60 @@ RSpec.describe Pubid::Jis::Identifier do
         end
       end
     end
+
+    context "graphical-symbol sub-reference (SYMBOL)" do
+      describe "numeric symbol on a base document" do
+        subject { "JIS Z 8210:2017 SYMBOL 61700" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "captures the symbol value" do
+          expect(parsed.symbol).to eq("61700")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "free-text symbol value" do
+        subject { "JIS L 0001:2024 SYMBOL New and revised" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "captures the whole phrase" do
+          expect(parsed.symbol).to eq("New and revised")
+        end
+      end
+
+      describe "bare SYMBOL keyword" do
+        subject { "JIS Z 8211-1:2025 SYMBOL" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "records an empty symbol value" do
+          expect(parsed.symbol).to eq("")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "symbol on an amendment" do
+        subject { "JIS Z 8210:2017/AMENDMENT 1:2019 SYMBOL 51590" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "attaches the symbol to the amendment, not the base" do
+          expect(parsed.symbol).to eq("51590")
+          expect(parsed.base.symbol).to be_nil
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("JIS Z 8210:2017/AMD 1:2019 SYMBOL 51590")
+        end
+      end
+    end
   end
 end

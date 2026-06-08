@@ -17,10 +17,14 @@ module Pubid
         # Reaffirmation (再確認): a trailing "R" on the year marks an edition
         # that was reaffirmed without revision (e.g. ":2019R").
         attribute :reaffirmed, :boolean, default: -> { false }
+        # Graphical-symbol sub-reference (JIS Z 8210 etc.): the value after
+        # "SYMBOL". nil means no SYMBOL clause; an empty string means a bare
+        # "SYMBOL" keyword with no value.
+        attribute :symbol, :string
 
         def initialize(code: nil, series: nil, number: nil, parts: nil,
                       year: nil, language: nil, all_parts: false,
-                      reaffirmed: false)
+                      reaffirmed: false, symbol: nil)
           if code
             @code = code
           elsif series && number
@@ -34,6 +38,7 @@ module Pubid
           @language = language
           @all_parts = all_parts
           @reaffirmed = reaffirmed
+          @symbol = symbol
         end
 
         # Publisher is always JIS
@@ -54,6 +59,13 @@ module Pubid
           "#{year}#{'R' if reaffirmed?}"
         end
 
+        # Render the trailing " SYMBOL[ <value>]" clause, or "" when absent.
+        def symbol_suffix
+          return "" if symbol.nil?
+
+          symbol.empty? ? " SYMBOL" : " SYMBOL #{symbol}"
+        end
+
         # Comparison with all_parts logic
         # When either identifier has all_parts=true, compare only series and number
         def ==(other)
@@ -70,7 +82,8 @@ module Pubid
             year == other.year &&
             language == other.language &&
             all_parts == other.all_parts &&
-            reaffirmed == other.reaffirmed
+            reaffirmed == other.reaffirmed &&
+            symbol == other.symbol
         end
 
         # Basic string representation (override in subclasses)
@@ -79,7 +92,7 @@ module Pubid
           parts << ":#{year_with_reaffirmation}" if year
           parts << "(#{language})" if language
           parts << "（規格群）" if all_parts?
-          parts.join(" ")
+          "#{parts.join(' ')}#{symbol_suffix}"
         end
       end
     end
