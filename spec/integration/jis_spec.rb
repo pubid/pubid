@@ -79,6 +79,17 @@ RSpec.describe "JIS Integration" do
                       "JIS A 0001:1999/CORRIGENDUM 1:2002"
     end
 
+    context "reaffirmation (R suffix)" do
+      it_behaves_like "parses and renders correctly", "JIS C 9901:2019R"
+      it_behaves_like "parses and renders correctly", "JIS L 4107:2000R"
+      it_behaves_like "parses and renders correctly",
+                      "JIS K 6912:1995/AMENDMENT 2:2006R",
+                      "JIS K 6912:1995/AMD 2:2006R"
+      it_behaves_like "parses and renders correctly",
+                      "JIS L 4107:2000R/AMENDMENT 1:2020",
+                      "JIS L 4107:2000R/AMD 1:2020"
+    end
+
     context "Japanese characters" do
       it_behaves_like "parses and renders correctly", "JIS　B　0001",
                       "JIS B 0001"

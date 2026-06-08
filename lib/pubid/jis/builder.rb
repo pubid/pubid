@@ -33,6 +33,7 @@ module Pubid
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
           all_parts: data[:all_parts] ? true : false,
+          reaffirmed: data[:reaffirmed] ? true : false,
         }
 
         # Determine identifier class from type
@@ -61,6 +62,7 @@ module Pubid
           base: base,
           number: amd_data[:amd_number].to_i,
           year: amd_data[:amd_year].to_i,
+          reaffirmed: amd_data[:amd_reaffirmed] ? true : false,
         )
       end
 
@@ -91,6 +93,7 @@ module Pubid
           base: base,
           number: corr_data[:corr_number].to_i,
           year: corr_data[:corr_year].to_i,
+          reaffirmed: corr_data[:corr_reaffirmed] ? true : false,
         )
       end
 

@@ -384,5 +384,55 @@ RSpec.describe Pubid::Jis::Identifier do
         end
       end
     end
+
+    context "reaffirmation (R suffix)" do
+      describe "JIS C 9901:2019R" do
+        subject { "JIS C 9901:2019R" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "marks the identifier as reaffirmed" do
+          expect(parsed.reaffirmed?).to be true
+        end
+
+        it "parses the year without the R marker" do
+          expect(parsed.year).to eq(2019)
+        end
+
+        it "round-trips with the R marker" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "JIS L 4107:2000R/AMENDMENT 1:2020" do
+        subject { "JIS L 4107:2000R/AMENDMENT 1:2020" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "reaffirms the base document only" do
+          expect(parsed.base.reaffirmed?).to be true
+          expect(parsed.reaffirmed?).to be false
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("JIS L 4107:2000R/AMD 1:2020")
+        end
+      end
+
+      describe "JIS Z 2248:2022/AMENDMENT 1:2022R" do
+        subject { "JIS Z 2248:2022/AMENDMENT 1:2022R" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "reaffirms the amendment only" do
+          expect(parsed.reaffirmed?).to be true
+          expect(parsed.base.reaffirmed?).to be false
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("JIS Z 2248:2022/AMD 1:2022R")
+        end
+      end
+    end
   end
 end

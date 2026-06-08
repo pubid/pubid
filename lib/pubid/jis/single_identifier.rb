@@ -27,7 +27,7 @@ module Pubid
         result = parts.join(" ")
         result += " " if result.length.positive?
         result += code.to_s
-        result += ":#{year}" if year
+        result += ":#{year_with_reaffirmation}" if year
         result += "(#{language})" if language
         result += "（規格群）" if all_parts?
         result
