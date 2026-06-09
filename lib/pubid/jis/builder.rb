@@ -39,8 +39,8 @@ module Pubid
           code: code,
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
-          all_parts: data[:all_parts] ? true : false,
-          reaffirmed: data[:reaffirmed] ? true : false,
+          all_parts: (true if data[:all_parts]),
+          reaffirmed: (true if data[:reaffirmed]),
         }
 
         # Determine identifier class from type
@@ -69,7 +69,7 @@ module Pubid
           base: base,
           number: amd_data[:amd_number].to_i,
           year: amd_data[:amd_year].to_i,
-          reaffirmed: amd_data[:amd_reaffirmed] ? true : false,
+          reaffirmed: (true if amd_data[:amd_reaffirmed]),
         )
       end
 
@@ -100,51 +100,26 @@ module Pubid
           base: base,
           number: corr_data[:corr_number].to_i,
           year: corr_data[:corr_year].to_i,
-          reaffirmed: corr_data[:corr_reaffirmed] ? true : false,
+          reaffirmed: (true if corr_data[:corr_reaffirmed]),
         )
       end
 
       def build_code(data)
-        series = data[:series].to_s
-        number_str = data[:number].to_s
-        number = number_str.to_i
-
-        # Extract parts with both integer values and original strings
-        parts_result = extract_parts(data[:parts])
-        parts = parts_result[:parts]
-        part_strings = parts_result[:part_strings]
-
         Components::Code.new(
-          series: series,
-          number: number,
-          parts: parts,
-          number_string: number_str,
-          part_strings: part_strings,
+          series: data[:series].to_s,
+          number: data[:number].to_s,
+          parts: extract_part_strings(data[:parts]),
         )
       end
 
-      def extract_parts(parts_data)
-        parts = []
-        part_strings = []
-
-        return { parts: parts, part_strings: part_strings } unless parts_data
-
-        # parts_data is an array of hashes with :part key
-        if parts_data.is_a?(Array)
-          parts_data.each do |part_hash|
-            if part_hash[:part]
-              part_str = part_hash[:part].to_s
-              parts << part_str.to_i
-              part_strings << part_str
-            end
-          end
-        elsif parts_data.is_a?(Hash) && parts_data[:part]
-          part_str = parts_data[:part].to_s
-          parts << part_str.to_i
-          part_strings << part_str
+      # parts_data is an array of `{ part: "1" }` hashes (or a single hash for
+      # a one-level part); return the part numbers as strings.
+      def extract_part_strings(parts_data)
+        case parts_data
+        when Array then parts_data.filter_map { |h| h[:part]&.to_s }
+        when Hash then [parts_data[:part]&.to_s].compact
+        else []
         end
-
-        { parts: parts, part_strings: part_strings }
       end
     end
   end

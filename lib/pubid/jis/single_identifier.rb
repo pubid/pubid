@@ -4,7 +4,7 @@ module Pubid
   module Jis
     # Base class for single (non-supplement) JIS identifiers
     # Includes: JapaneseIndustrialStandard, TechnicalReport, TechnicalSpecification
-    class SingleIdentifier < Identifiers::Base
+    class SingleIdentifier < Identifier
       # Type prefix to identifier class mapping
       TYPE_CLASSES = {
         "TR" => "TechnicalReport",
@@ -22,7 +22,7 @@ module Pubid
 
       def to_s(with_publisher: true)
         parts = []
-        parts << publisher if with_publisher
+        parts << PUBLISHER if with_publisher
         parts << type_prefix if self.class.method_defined?(:type_prefix) && type_prefix
         result = parts.join(" ")
         result += " " if result.length.positive?

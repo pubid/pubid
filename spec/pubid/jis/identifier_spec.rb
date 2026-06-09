@@ -19,7 +19,7 @@ RSpec.describe Pubid::Jis::Identifier do
         end
 
         it "parses number" do
-          expect(parsed.code.number).to eq(1)
+          expect(parsed.code.number).to eq("0001")
         end
 
         it "round-trips" do
@@ -41,11 +41,11 @@ RSpec.describe Pubid::Jis::Identifier do
         end
 
         it "parses number" do
-          expect(parsed.code.number).to eq(61000)
+          expect(parsed.code.number).to eq("61000")
         end
 
         it "parses parts" do
-          expect(parsed.code.parts).to eq([3, 2])
+          expect(parsed.code.parts).to eq(%w[3 2])
         end
 
         it "round-trips" do
@@ -244,7 +244,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
         it "parses base identifier" do
           expect(parsed.base.code.series).to eq("A")
-          expect(parsed.base.code.number).to eq(1)
+          expect(parsed.base.code.number).to eq("0001")
           expect(parsed.base.year).to eq(1999)
         end
 
@@ -288,7 +288,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
         it "parses base identifier" do
           expect(parsed.base.code.series).to eq("K")
-          expect(parsed.base.code.number).to eq(2151)
+          expect(parsed.base.code.number).to eq("2151")
           expect(parsed.base.year).to eq(2004)
         end
 
@@ -360,7 +360,7 @@ RSpec.describe Pubid::Jis::Identifier do
 
         it "inherits the code from the base document" do
           expect(parsed.code.series).to eq("B")
-          expect(parsed.code.number).to eq(3700)
+          expect(parsed.code.number).to eq("3700")
           expect(parsed.base.year).to eq(1996)
         end
 
