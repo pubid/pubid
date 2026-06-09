@@ -14,9 +14,17 @@ module Pubid
         attribute :year, :integer
         attribute :language, :string # "E" or "J"
         attribute :all_parts, :boolean, default: -> { false }
+        # Reaffirmation (再確認): a trailing "R" on the year marks an edition
+        # that was reaffirmed without revision (e.g. ":2019R").
+        attribute :reaffirmed, :boolean, default: -> { false }
+        # Graphical-symbol sub-reference (JIS Z 8210 etc.): the value after
+        # "SYMBOL". nil means no SYMBOL clause; an empty string means a bare
+        # "SYMBOL" keyword with no value.
+        attribute :symbol, :string
 
         def initialize(code: nil, series: nil, number: nil, parts: nil,
-                      year: nil, language: nil, all_parts: false)
+                      year: nil, language: nil, all_parts: false,
+                      reaffirmed: false, symbol: nil)
           if code
             @code = code
           elsif series && number
@@ -29,6 +37,8 @@ module Pubid
           @year = year
           @language = language
           @all_parts = all_parts
+          @reaffirmed = reaffirmed
+          @symbol = symbol
         end
 
         # Publisher is always JIS
@@ -38,6 +48,22 @@ module Pubid
 
         def all_parts?
           all_parts == true
+        end
+
+        def reaffirmed?
+          reaffirmed == true
+        end
+
+        # Render a year with its reaffirmation marker, e.g. "2019R".
+        def year_with_reaffirmation
+          "#{year}#{'R' if reaffirmed?}"
+        end
+
+        # Render the trailing " SYMBOL[ <value>]" clause, or "" when absent.
+        def symbol_suffix
+          return "" if symbol.nil?
+
+          symbol.empty? ? " SYMBOL" : " SYMBOL #{symbol}"
         end
 
         # Comparison with all_parts logic
@@ -55,16 +81,18 @@ module Pubid
           code == other.code &&
             year == other.year &&
             language == other.language &&
-            all_parts == other.all_parts
+            all_parts == other.all_parts &&
+            reaffirmed == other.reaffirmed &&
+            symbol == other.symbol
         end
 
         # Basic string representation (override in subclasses)
         def to_s
           parts = [publisher, code.to_s]
-          parts << ":#{year}" if year
+          parts << ":#{year_with_reaffirmation}" if year
           parts << "(#{language})" if language
           parts << "（規格群）" if all_parts?
-          parts.join(" ")
+          "#{parts.join(' ')}#{symbol_suffix}"
         end
       end
     end

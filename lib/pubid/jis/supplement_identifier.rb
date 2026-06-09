@@ -26,6 +26,7 @@ module Pubid
       def to_s(with_publisher: true)
         result = base.to_s(with_publisher: with_publisher)
         result += "/#{supplement_notation}"
+        result += symbol_suffix
         result
       end
 

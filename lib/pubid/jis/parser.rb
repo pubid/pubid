@@ -43,9 +43,12 @@ module Pubid
 
       rule(:parts) { part.repeat(0).as(:parts) }
 
+      # Reaffirmation marker (再確認): trailing "R" on a year
+      rule(:reaffirmed) { str("R").maybe.as(:reaffirmed) }
+
       # Year
       rule(:year) do
-        colon >> digits.as(:year)
+        colon >> digits.as(:year) >> reaffirmed
       end
 
       # Language code
@@ -68,7 +71,8 @@ module Pubid
           space >>
           digits.as(:amd_number) >>
           colon >>
-          digits.as(:amd_year)
+          digits.as(:amd_year) >>
+          str("R").maybe.as(:amd_reaffirmed)
       end
 
       # Explanation supplement
@@ -78,9 +82,30 @@ module Pubid
           (space >> digits.as(:expl_number)).maybe
       end
 
-      # Supplements (AMD or EXPL, only one for JIS)
+      # Corrigendum supplement
+      rule(:corrigendum) do
+        str("/") >>
+          (str("CORRIGENDUM") | str("CORR")).as(:corr_type) >>
+          space >>
+          digits.as(:corr_number) >>
+          colon >>
+          digits.as(:corr_year) >>
+          str("R").maybe.as(:corr_reaffirmed)
+      end
+
+      # Supplements (AMD, EXPL or CORRIGENDUM, only one for JIS)
       rule(:supplement) do
-        amendment.as(:amendment) | explanation.as(:explanation)
+        amendment.as(:amendment) | explanation.as(:explanation) |
+          corrigendum.as(:corrigendum)
+      end
+
+      # Graphical-symbol sub-reference (e.g. JIS Z 8210 safety signs):
+      # "SYMBOL <id>" where <id> runs to the end of the string and may be a
+      # number, an alphanumeric code or a free-text phrase. The keyword may
+      # also appear bare with no value.
+      rule(:symbol_clause) do
+        space >> str("SYMBOL").as(:symbol_present) >>
+          (space >> match["^\n"].repeat(1).as(:symbol_value)).maybe
       end
 
       # Main identifier
@@ -95,7 +120,8 @@ module Pubid
           year.maybe >>
           language.maybe >>
           all_parts.maybe >>
-          supplement.maybe
+          supplement.maybe >>
+          symbol_clause.maybe
       end
 
       rule(:root) { identifier }

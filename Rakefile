@@ -1,540 +1,88 @@
+# frozen_string_literal: true
+
 require "rake"
 require "fileutils"
+require "rspec/core/rake_task"
+require "rubocop/rake_task"
+require "bundler/gem_tasks"
 
-# Load additional rake tasks
+# Load additional rake tasks (docs, export)
 Dir["lib/tasks/*.rake"].each { |f| import f }
 
-# Get list of all gems
-GEMS = if Dir.exist?("gems")
-         Dir["gems/*/"].map do |dir|
-           File.basename(dir)
-         end.freeze
-       else
-         [].freeze
-       end
-
-# Helper to convert gem name to namespace (pubid-core -> pubid_core)
-def gem_to_namespace(gem_name)
-  gem_name.tr("-", "_").to_sym
+# Single source of truth for the gem version.
+def current_version
+  require_relative "lib/pubid/version"
+  Pubid::VERSION
 end
 
-# Helper to run command in gem directory
-def in_gem_dir(gem_name, &)
-  Dir.chdir("gems/#{gem_name}", &)
-end
-
-# Define tasks for each gem
-GEMS.each do |gem_name|
-  namespace_name = gem_to_namespace(gem_name)
-
-  namespace :test do
-    desc "Run specs for #{gem_name}"
-    task namespace_name do
-      puts "Testing #{gem_name}..."
-      success = Bundler.with_unbundled_env do
-        system("cd gems/#{gem_name} && rm -f Gemfile.lock && bundle && bundle exec rake")
-      end
-      raise "Test failed for #{gem_name}" unless success
-    end
-  end
-
-  namespace :build do
-    desc "Build #{gem_name}"
-    task namespace_name do
-      puts "Building #{gem_name}..."
-      in_gem_dir(gem_name) { sh "gem build *.gemspec" }
-    end
-  end
-
-  namespace :install do
-    desc "Install #{gem_name} locally"
-    task namespace_name => "build:#{namespace_name}" do
-      puts "Installing #{gem_name}..."
-      in_gem_dir(gem_name) do
-        gem_file = Dir["*.gem"].first
-        sh "gem install #{gem_file}"
-      end
-    end
-  end
-
-  namespace :clean do
-    desc "Clean built files for #{gem_name}"
-    task namespace_name do
-      puts "Cleaning #{gem_name}..."
-      in_gem_dir(gem_name) do
-        FileUtils.rm_f(Dir["*.gem"])
-      end
-    end
-  end
-
-  namespace :release do
-    desc "Release #{gem_name} to RubyGems"
-    task namespace_name => "build:#{namespace_name}" do
-      puts "Releasing #{gem_name}..."
-      in_gem_dir(gem_name) do
-        gem_file = Dir["*.gem"].first
-        sh "gem push #{gem_file}"
-      end
-    end
-  end
-
-  namespace :rubocop do
-    desc "Run RuboCop for #{gem_name}"
-    task namespace_name do
-      puts "Running RuboCop for #{gem_name}..."
-      in_gem_dir(gem_name) { sh "bundle exec rubocop" }
-    end
-  end
-end
-
-# Aggregate tasks
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
 namespace :test do
-  desc "Run all gem specs"
+  desc "Run all unit specs"
   task :all do
-    GEMS.each do |gem_name|
-      Rake::Task["test:#{gem_to_namespace(gem_name)}"].invoke
-    end
+    sh "bundle exec rspec spec/pubid spec/pubid_spec.rb"
   end
 
   desc "Run integration tests"
   task :integration do
-    puts "Running integration tests..."
     sh "bundle exec rspec spec/integration"
   end
 end
 
-namespace :build do
-  desc "Build all gems"
-  task :all do
-    GEMS.each do |gem_name|
-      Rake::Task["build:#{gem_to_namespace(gem_name)}"].invoke
-    end
-  end
-end
+desc "Run the full spec suite (alias of test:all)"
+task spec: "test:all"
 
-namespace :install do
-  desc "Install all gems locally"
-  task :all do
-    GEMS.each do |gem_name|
-      Rake::Task["install:#{gem_to_namespace(gem_name)}"].invoke
-    end
-  end
-end
-
-namespace :clean do
-  desc "Clean all built files"
-  task :all do
-    GEMS.each do |gem_name|
-      Rake::Task["clean:#{gem_to_namespace(gem_name)}"].invoke
-    end
-  end
-end
+# ---------------------------------------------------------------------------
+# RuboCop
+# ---------------------------------------------------------------------------
+RuboCop::RakeTask.new(:rubocop)
 
 namespace :rubocop do
-  desc "Run RuboCop for all gems"
-  task :all do
-    GEMS.each do |gem_name|
-      Rake::Task["rubocop:#{gem_to_namespace(gem_name)}"].invoke
-    end
-  end
+  desc "Run RuboCop (alias of :rubocop)"
+  task all: :rubocop
 end
 
-namespace :release do
-  desc "Generate release order JSON file"
-  task :generate_order do
-    require "json"
-
-    puts "Generating release order..."
-
-    # Start with pubid-core as it's the base dependency
-    release_order = ["pubid-core"]
-
-    # Add all other gems except the main pubid gem
-    other_gems = GEMS.reject { |gem| ["pubid", "pubid-core"].include?(gem) }
-    release_order.concat(other_gems.sort)
-
-    # Add main pubid gem last (it depends on all others)
-    release_order << "pubid"
-
-    # Create the JSON structure
-    release_config = {
-      "release_order" => release_order,
-    }
-
-    # Write to file
-    File.write("release-order.json", JSON.pretty_generate(release_config))
-    puts "✓ Generated release-order.json with #{release_order.length} gems"
-    puts "Release order: #{release_order.join(' -> ')}"
-  end
-
-  desc "Validate release order"
-  task :validate_order do
-    require "json"
-
-    unless File.exist?("release-order.json")
-      puts "✗ release-order.json not found. Run 'rake release:generate_order' first."
-      exit 1
-    end
-
-    begin
-      config = JSON.parse(File.read("release-order.json"))
-      release_order = config["release_order"]
-
-      puts "Validating release order..."
-
-      # Check that all gems are included
-      missing_gems = GEMS - release_order
-      extra_gems = release_order - GEMS
-
-      if missing_gems.any?
-        puts "✗ Missing gems in release order: #{missing_gems.join(', ')}"
-        exit 1
-      end
-
-      if extra_gems.any?
-        puts "✗ Extra gems in release order: #{extra_gems.join(', ')}"
-        exit 1
-      end
-
-      # Check that pubid-core comes before pubid
-      core_index = release_order.index("pubid-core")
-      pubid_index = release_order.index("pubid")
-
-      if core_index.nil?
-        puts "✗ pubid-core not found in release order"
-        exit 1
-      end
-
-      if pubid_index.nil?
-        puts "✗ pubid not found in release order"
-        exit 1
-      end
-
-      if core_index >= pubid_index
-        puts "✗ pubid-core must come before pubid in release order"
-        exit 1
-      end
-
-      puts "✓ Release order is valid"
-      puts "Release order: #{release_order.join(' -> ')}"
-    rescue JSON::ParserError => e
-      puts "✗ Invalid JSON in release-order.json: #{e.message}"
-      exit 1
-    end
-  end
-
-  desc "Show release order"
-  task :show_order do
-    require "json"
-
-    unless File.exist?("release-order.json")
-      puts "✗ release-order.json not found. Run 'rake release:generate_order' first."
-      exit 1
-    end
-
-    begin
-      config = JSON.parse(File.read("release-order.json"))
-      release_order = config["release_order"]
-
-      puts "Current release order:"
-      release_order.each_with_index do |gem, index|
-        puts "  #{index + 1}. #{gem}"
-      end
-    rescue JSON::ParserError => e
-      puts "✗ Invalid JSON in release-order.json: #{e.message}"
-      exit 1
-    end
-  end
-
-  desc "Show release status for the monorepo"
-  task :status do
-    master_version = File.read("VERSION").strip
-
-    puts "Release Status Summary"
-    puts "======================"
-    puts
-
-    # Repository-level checks
-    puts "Repository Status:"
-
-    # Check git status from repository root
-    clean_repo = !system("git status --porcelain | grep -q .", out: File::NULL,
-                                                               err: File::NULL)
-    if clean_repo
-      puts "  ✓ Clean working directory"
-    else
-      puts "  ✗ Has uncommitted changes"
-    end
-
-    puts "  📦 Master version: v#{master_version}"
-
-    # Check version synchronization by running a simplified version of version:check
-    puts "  🔄 Checking version synchronization..."
-    all_synced = true
-    sync_issues = []
-
-    # Check gem versions
-    GEMS.each do |gem_name|
-      in_gem_dir(gem_name) do
-        gemspec_file = Dir["*.gemspec"].first
-        if gemspec_file
-          begin
-            spec = Gem::Specification.load(gemspec_file)
-            gem_version = spec.version.to_s
-            unless gem_version == master_version
-              all_synced = false
-              sync_issues << "#{gem_name}: #{gem_version} (expected #{master_version})"
-            end
-          rescue StandardError
-            all_synced = false
-            sync_issues << "#{gem_name}: Error reading version"
-          end
-        else
-          all_synced = false
-          sync_issues << "#{gem_name}: No gemspec found"
-        end
-      end
-    end
-
-    if all_synced
-      puts "  ✓ All #{GEMS.length} gems synchronized to master version"
-    else
-      puts "  ✗ Version synchronization issues found:"
-      sync_issues.first(3).each { |issue| puts "    - #{issue}" }
-      puts "    ... (run 'rake version:check' for full details)" if sync_issues.length > 3
-    end
-
-    # Check if master version is tagged
-    version_tag = "v#{master_version}"
-    if system("git tag -l #{version_tag} | grep -q #{version_tag}",
-              out: File::NULL, err: File::NULL)
-      puts "  ✓ Version v#{master_version} is tagged"
-      version_tagged = true
-    else
-      puts "  ! Version v#{master_version} not yet tagged"
-      version_tagged = false
-    end
-
-    # Show latest tag
-    latest_tag = `git tag -l | grep -E '^v[0-9]' | sort -V | tail -1`.strip
-    if latest_tag.empty?
-      puts "  ! No version tags found"
-    else
-      puts "  📋 Latest tag: #{latest_tag}"
-    end
-
-    puts
-
-    # Release readiness assessment
-    puts "Release Readiness:"
-    if clean_repo && all_synced && version_tagged
-      puts "  ✅ Ready for release"
-      puts "     All conditions met for coordinated gem release"
-    elsif clean_repo && all_synced && !version_tagged
-      puts "  🚀 Ready to release v#{master_version}"
-      puts "     Use GitHub Actions workflow or 'rake version:bump' to release"
-    else
-      puts "  ⚠️  Not ready for release"
-      puts "     Issues need to be resolved first:"
-      puts "     - Commit changes" unless clean_repo
-      puts "     - Run 'rake version:sync'" unless all_synced
-    end
-
-    puts
-    puts "Quick Commands:"
-    puts "  rake version:check      - Detailed version synchronization status"
-    puts "  rake version:sync       - Synchronize all versions and dependencies"
-    puts "  rake release:show_order - Show gem release order"
-    puts "  rake test:all           - Run all tests before release"
-  end
-end
-
-def get_master_version
-  File.read("VERSION").strip
-end
-
+# ---------------------------------------------------------------------------
+# Version
+#
+# The gem version lives in lib/pubid/version.rb (Pubid::VERSION).
+# ---------------------------------------------------------------------------
 namespace :version do
-  desc "Show current master version"
+  desc "Show current version"
   task :show do
-    puts "Master version: #{get_master_version}"
+    puts "Version: #{current_version}"
   end
 
-  desc "Check if all gem versions and dependencies are synchronized with master version"
-  task :check do
-    master_version = get_master_version
-    puts "Checking version synchronization..."
-    puts "Master version: #{master_version}"
-
-    all_synced = true
-
-    # Check gem versions
-    puts "\nChecking gem versions:"
-    GEMS.each do |gem_name|
-      in_gem_dir(gem_name) do
-        gemspec_file = Dir["*.gemspec"].first
-        if gemspec_file
-          spec = Gem::Specification.load(gemspec_file)
-          gem_version = spec.version.to_s
-          if gem_version == master_version
-            puts "  ✓ #{gem_name}: #{gem_version}"
-          else
-            puts "  ✗ #{gem_name}: #{gem_version} (expected #{master_version})"
-            all_synced = false
-          end
-        else
-          puts "  ✗ #{gem_name}: No gemspec found"
-          all_synced = false
-        end
-      rescue StandardError => e
-        puts "  ✗ #{gem_name}: Error reading version: #{e.message}"
-        all_synced = false
-      end
-    end
-
-    # Check dependencies
-    puts "\nChecking pubid-* dependencies:"
-    GEMS.each do |gem_name|
-      gemspec_file = "gems/#{gem_name}/#{gem_name}.gemspec"
-
-      if File.exist?(gemspec_file)
-        content = File.read(gemspec_file)
-
-        # Find all pubid-* dependencies
-        pubid_deps = content.scan(/spec\.add_dependency "pubid-([^"]+)", "([^"]*)"/)
-
-        if pubid_deps.any?
-          gem_deps_synced = true
-          pubid_deps.each do |dep_name, dep_version|
-            dep_gem = "pubid-#{dep_name}"
-            if GEMS.include?(dep_gem)
-              if dep_version == "= #{master_version}"
-                puts "  ✓ #{gem_name} -> #{dep_gem}: #{dep_version}"
-              else
-                puts "  ✗ #{gem_name} -> #{dep_gem}: #{dep_version} (expected = #{master_version})"
-                gem_deps_synced = false
-                all_synced = false
-              end
-            end
-          end
-        else
-          puts "  - #{gem_name}: No pubid-* dependencies"
-        end
-      else
-        puts "  ✗ #{gem_name}: Gemspec not found"
-        all_synced = false
-      end
-    end
-
-    if all_synced
-      puts "\n✓ All gems and dependencies are synchronized with master version"
-    else
-      puts "\n✗ Some gems or dependencies are not synchronized"
-      puts "Run 'rake version:sync' to fix synchronization issues"
-      exit 1
-    end
-  end
-
-  desc "Sync master version to all gem version files and dependencies"
-  task :sync do
-    master_version = File.read("VERSION").strip
-    puts "Syncing master version #{master_version} to all gems..."
-
-    # Update version files
-    GEMS.each do |gem_name|
-      # Handle special case for main pubid gem
-      if gem_name == "pubid"
-        version_file = "gems/pubid/lib/pubid/version.rb"
-      else
-        # Convert gem name to module path (pubid-core -> core, pubid-bsi -> bsi)
-        module_name = gem_name.sub(/^pubid-/, "")
-        version_file = "gems/#{gem_name}/lib/pubid/#{module_name}/version.rb"
-      end
-
-      if File.exist?(version_file)
-        content = File.read(version_file)
-
-        # Update the VERSION constant
-        new_content = content.gsub(/VERSION = "[^"]*"\.freeze/,
-                                   "VERSION = \"#{master_version}\".freeze")
-
-        if content == new_content
-          puts "  - #{gem_name} version already at #{master_version}"
-        else
-          File.write(version_file, new_content)
-          puts "  ✓ Updated #{gem_name} version"
-        end
-      else
-        puts "  ✗ Version file not found for #{gem_name}: #{version_file}"
-      end
-    end
-
-    # Update gemspec dependencies
-    puts "\nSyncing pubid-* dependencies in gemspecs..."
-    GEMS.each do |gem_name|
-      gemspec_file = "gems/#{gem_name}/#{gem_name}.gemspec"
-
-      if File.exist?(gemspec_file)
-        content = File.read(gemspec_file)
-        original_content = content.dup
-
-        # Update all pubid-* dependencies to use exact version
-        content = content.gsub(/spec\.add_dependency "pubid-([^"]+)", "[^"]*"/) do |match|
-          dep_gem = "pubid-#{$1}"
-          # Only update if this dependency gem exists in our monorepo
-          if GEMS.include?(dep_gem)
-            "spec.add_dependency \"#{dep_gem}\", \"= #{master_version}\""
-          else
-            match # Keep original if not in our monorepo
-          end
-        end
-
-        if content == original_content
-          puts "  - #{gem_name} dependencies already synchronized"
-        else
-          File.write(gemspec_file, content)
-          puts "  ✓ Updated #{gem_name} dependencies"
-        end
-      else
-        puts "  ✗ Gemspec not found: #{gemspec_file}"
-      end
-    end
-
-    puts "\nVersion sync complete!"
-  end
-
-  desc "Bump version and sync to all gems"
+  desc "Bump version (major|minor|patch) in lib/pubid/version.rb"
   task :bump, [:type] do |_t, args|
     bump_type = args[:type] || "patch"
     unless %w[major minor patch].include?(bump_type)
-      puts "Error: bump type must be major, minor, or patch"
-      exit 1
+      abort "Error: bump type must be major, minor, or patch"
     end
 
-    current_version = Gem::Version.new(get_master_version)
-    segments = current_version.segments
+    version_file = "lib/pubid/version.rb"
+    content = File.read(version_file)
+    old_string = content[/VERSION\s*=\s*"([^"]+)"/, 1]
+    abort "Error: could not find VERSION in #{version_file}" unless old_string
 
-    case bump_type
-    when "major"
-      new_version = "#{segments[0] + 1}.0.0"
-    when "minor"
-      new_version = "#{segments[0]}.#{segments[1] + 1}.0"
-    when "patch"
-      new_version = "#{segments[0]}.#{segments[1]}.#{segments[2] + 1}"
-    end
+    # Bump the numeric release portion, dropping any pre-release suffix.
+    major, minor, patch = old_string.split(".").first(3).map(&:to_i)
+    new_version =
+      case bump_type
+      when "major" then "#{major + 1}.0.0"
+      when "minor" then "#{major}.#{minor + 1}.0"
+      when "patch" then "#{major}.#{minor}.#{patch + 1}"
+      end
 
-    puts "Bumping version from #{current_version} to #{new_version}"
-
-    # Update master version file
-    master_version_file = "VERSION"
-    File.write(master_version_file, new_version)
-    puts "  ✓ Updated master version"
-
-    # Sync to all gems
-    Rake::Task["version:sync"].invoke
+    File.write(version_file, content.sub(old_string, new_version))
+    puts "Bumped version from #{old_string} to #{new_version}"
   end
 end
 
-# Default task
+# ---------------------------------------------------------------------------
+# Default
+# ---------------------------------------------------------------------------
 task default: ["test:all", "test:integration"]
 
 # Validation tasks for V2 implementations
@@ -666,9 +214,3 @@ namespace :validation do
     puts
   end
 end
-
-# Convenience tasks
-task test: "test:all"
-task build: "build:all"
-task install: "install:all"
-task clean: "clean:all"

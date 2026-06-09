@@ -71,6 +71,40 @@ RSpec.describe "JIS Integration" do
                       "JIS K 2249-4:2011/EXPLANATION 4", "JIS K 2249-4:2011/EXPL 4"
     end
 
+    context "corrigenda" do
+      it_behaves_like "parses and renders correctly",
+                      "JIS B 3700-11:1996/CORRIGENDUM 1:2002"
+      it_behaves_like "parses and renders correctly",
+                      "JIS A 0001:1999/CORR 1:2002",
+                      "JIS A 0001:1999/CORRIGENDUM 1:2002"
+    end
+
+    context "reaffirmation (R suffix)" do
+      it_behaves_like "parses and renders correctly", "JIS C 9901:2019R"
+      it_behaves_like "parses and renders correctly", "JIS L 4107:2000R"
+      it_behaves_like "parses and renders correctly",
+                      "JIS K 6912:1995/AMENDMENT 2:2006R",
+                      "JIS K 6912:1995/AMD 2:2006R"
+      it_behaves_like "parses and renders correctly",
+                      "JIS L 4107:2000R/AMENDMENT 1:2020",
+                      "JIS L 4107:2000R/AMD 1:2020"
+    end
+
+    context "graphical-symbol sub-reference (SYMBOL)" do
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8210:2017 SYMBOL 61700"
+      it_behaves_like "parses and renders correctly",
+                      "JIS L 0001:2024 SYMBOL New and revised"
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8211-1:2025 SYMBOL"
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8210:2017/AMENDMENT 1:2019 SYMBOL 51590",
+                      "JIS Z 8210:2017/AMD 1:2019 SYMBOL 51590"
+      it_behaves_like "parses and renders correctly",
+                      "JIS Z 8210:2017/AMENDMENT 2:2019R SYMBOL JE210",
+                      "JIS Z 8210:2017/AMD 2:2019R SYMBOL JE210"
+    end
+
     context "Japanese characters" do
       it_behaves_like "parses and renders correctly", "JIS　B　0001",
                       "JIS B 0001"

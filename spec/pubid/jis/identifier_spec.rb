@@ -347,5 +347,147 @@ RSpec.describe Pubid::Jis::Identifier do
         end
       end
     end
+
+    context "corrigenda" do
+      describe "JIS B 3700-11:1996/CORRIGENDUM 1:2002" do
+        subject { "JIS B 3700-11:1996/CORRIGENDUM 1:2002" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses as Corrigendum" do
+          expect(parsed).to be_a(Pubid::Jis::Identifiers::Corrigendum)
+        end
+
+        it "inherits the code from the base document" do
+          expect(parsed.code.series).to eq("B")
+          expect(parsed.code.number).to eq(3700)
+          expect(parsed.base.year).to eq(1996)
+        end
+
+        it "parses the corrigendum number and year" do
+          expect(parsed.number).to eq(1)
+          expect(parsed.year).to eq(2002)
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "CORR abbreviation" do
+        subject { "JIS A 0001:1999/CORR 1:2002" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "normalizes to CORRIGENDUM" do
+          expect(parsed.to_s).to eq("JIS A 0001:1999/CORRIGENDUM 1:2002")
+        end
+      end
+    end
+
+    context "reaffirmation (R suffix)" do
+      describe "JIS C 9901:2019R" do
+        subject { "JIS C 9901:2019R" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "marks the identifier as reaffirmed" do
+          expect(parsed.reaffirmed?).to be true
+        end
+
+        it "parses the year without the R marker" do
+          expect(parsed.year).to eq(2019)
+        end
+
+        it "round-trips with the R marker" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "JIS L 4107:2000R/AMENDMENT 1:2020" do
+        subject { "JIS L 4107:2000R/AMENDMENT 1:2020" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "reaffirms the base document only" do
+          expect(parsed.base.reaffirmed?).to be true
+          expect(parsed.reaffirmed?).to be false
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("JIS L 4107:2000R/AMD 1:2020")
+        end
+      end
+
+      describe "JIS Z 2248:2022/AMENDMENT 1:2022R" do
+        subject { "JIS Z 2248:2022/AMENDMENT 1:2022R" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "reaffirms the amendment only" do
+          expect(parsed.reaffirmed?).to be true
+          expect(parsed.base.reaffirmed?).to be false
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("JIS Z 2248:2022/AMD 1:2022R")
+        end
+      end
+    end
+
+    context "graphical-symbol sub-reference (SYMBOL)" do
+      describe "numeric symbol on a base document" do
+        subject { "JIS Z 8210:2017 SYMBOL 61700" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "captures the symbol value" do
+          expect(parsed.symbol).to eq("61700")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "free-text symbol value" do
+        subject { "JIS L 0001:2024 SYMBOL New and revised" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "captures the whole phrase" do
+          expect(parsed.symbol).to eq("New and revised")
+        end
+      end
+
+      describe "bare SYMBOL keyword" do
+        subject { "JIS Z 8211-1:2025 SYMBOL" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "records an empty symbol value" do
+          expect(parsed.symbol).to eq("")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "symbol on an amendment" do
+        subject { "JIS Z 8210:2017/AMENDMENT 1:2019 SYMBOL 51590" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "attaches the symbol to the amendment, not the base" do
+          expect(parsed.symbol).to eq("51590")
+          expect(parsed.base.symbol).to be_nil
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq("JIS Z 8210:2017/AMD 1:2019 SYMBOL 51590")
+        end
+      end
+    end
   end
 end

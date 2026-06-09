@@ -8,18 +8,27 @@ module Pubid
       end
 
       def build(data)
-        # Handle supplement case first
-        if data[:amendment]
-          return build_amendment(data)
-        elsif data[:explanation]
-          return build_explanation(data)
-        end
-
-        # Build regular identifier
-        build_single_identifier(data)
+        # Handle supplement case first; the SYMBOL clause (if any) attaches to
+        # the outermost identifier, be it the base or the supplement.
+        identifier = if data[:amendment]
+                       build_amendment(data)
+                     elsif data[:explanation]
+                       build_explanation(data)
+                     elsif data[:corrigendum]
+                       build_corrigendum(data)
+                     else
+                       build_single_identifier(data)
+                     end
+        attach_symbol(identifier, data)
       end
 
       private
+
+      # nil => no SYMBOL clause; "" => bare "SYMBOL" keyword; otherwise value.
+      def attach_symbol(identifier, data)
+        identifier.symbol = data[:symbol_value]&.to_s || "" if data[:symbol_present]
+        identifier
+      end
 
       def build_single_identifier(data)
         # Build code component
@@ -31,6 +40,7 @@ module Pubid
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
           all_parts: data[:all_parts] ? true : false,
+          reaffirmed: data[:reaffirmed] ? true : false,
         }
 
         # Determine identifier class from type
@@ -59,6 +69,7 @@ module Pubid
           base: base,
           number: amd_data[:amd_number].to_i,
           year: amd_data[:amd_year].to_i,
+          reaffirmed: amd_data[:amd_reaffirmed] ? true : false,
         )
       end
 
@@ -74,6 +85,22 @@ module Pubid
           base: base,
           number: expl_data[:expl_number]&.to_i,
           year: base.year,
+        )
+      end
+
+      def build_corrigendum(data)
+        corr_data = data[:corrigendum]
+
+        # Build base document (without supplement)
+        base_data = data.except(:corrigendum)
+        base = build_single_identifier(base_data)
+
+        # Build corrigendum
+        Identifiers::Corrigendum.new(
+          base: base,
+          number: corr_data[:corr_number].to_i,
+          year: corr_data[:corr_year].to_i,
+          reaffirmed: corr_data[:corr_reaffirmed] ? true : false,
         )
       end
 

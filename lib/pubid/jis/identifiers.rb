@@ -5,6 +5,7 @@ module Pubid
     module Identifiers
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Base, "#{__dir__}/identifiers/base"
+      autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
       autoload :Explanation, "#{__dir__}/identifiers/explanation"
       autoload :JapaneseIndustrialStandard,
                "#{__dir__}/identifiers/japanese_industrial_standard"
