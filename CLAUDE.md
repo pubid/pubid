@@ -15,23 +15,21 @@ bundle install
 # Run all tests
 bundle exec rake test:all
 
-# Run integration tests (cross-gem)
+# Run integration tests (cross-flavor)
 bundle exec rake test:integration
 
-# Run all quality checks (tests + rubocop)
+# Run the default suite (test:all + test:integration)
 bundle exec rake
 
 # Lint all code
-bundle exec rake rubocop:all
+bundle exec rake rubocop        # rubocop:all is an alias
 
-# Build all gems
-bundle exec rake build:all
+# Build the gem (into pkg/)
+bundle exec rake build
 
-# Version management
-bundle exec rake version:show       # Show master version
-bundle exec rake version:check      # Verify all gems synchronized
-bundle exec rake version:sync       # Sync master version to all gems
-bundle exec rake version:bump[patch|minor|major]  # Bump and sync
+# Version management (version lives in lib/pubid/version.rb)
+bundle exec rake version:show                     # Show gem version
+bundle exec rake version:bump[patch|minor|major]  # Bump version
 
 # Validation (per-flavor parser accuracy)
 bundle exec rake validation:report             # Summary for all flavors
