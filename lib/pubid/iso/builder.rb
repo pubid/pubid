@@ -129,7 +129,8 @@ module Pubid
             # (e.g. a TC document, which skips the copublisher merge) matches
             # the [] convention used by copublisher-merged parses and by
             # Identifier.create. Otherwise equality fails on [] vs nil.
-            Pubid::Iso::Components::Publisher.new(publisher: value, copublisher: [])
+            Pubid::Iso::Components::Publisher.new(publisher: value, 
+                                                  copublisher: [])
           end
 
         when :copublishers

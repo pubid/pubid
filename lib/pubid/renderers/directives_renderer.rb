@@ -28,10 +28,15 @@ module Pubid
 
       def render_publisher_portion(context)
         ann = context.annotated
-        pub_str = annotate(@id.publisher.render(context:), "publisher",
-                           annotated: ann) if @id.publisher
+        if @id.publisher
+          pub_str = annotate(@id.publisher.render(context:), "publisher",
+                             annotated: ann)
+        end
         abbr = @id.typed_stage ? @id.typed_stage.abbreviation(format_long: false) : ""
-        abbr = annotate(abbr, typed_stage_css(@id.typed_stage), annotated: ann) unless abbr.empty?
+        unless abbr.empty?
+          abbr = annotate(abbr, typed_stage_css(@id.typed_stage), 
+                          annotated: ann)
+        end
         subgroup_str = @id.subgroup.render(context:) if @id.subgroup
 
         [
@@ -44,12 +49,21 @@ module Pubid
       def render_number_portion(context)
         ann = context.annotated
         parts = []
-        parts << annotate(@id.number.render(context:), "docnumber",
-                          annotated: ann) if @id.number
-        parts << " #{annotate(@id.part.render(context:), 'part', annotated: ann)}" if @id.part
-        parts << "-#{annotate(@id.subpart.render(context:), 'part', annotated: ann)}" if @id.subpart
+        if @id.number
+          parts << annotate(@id.number.render(context:), "docnumber",
+                            annotated: ann)
+        end
+        if @id.part
+          parts << " #{annotate(@id.part.render(context:), 'part', 
+                                annotated: ann)}"
+        end
+        if @id.subpart
+          parts << "-#{annotate(@id.subpart.render(context:), 'part', 
+                                annotated: ann)}"
+        end
         if @id.stage_iteration
-          parts << ".#{annotate(@id.stage_iteration.render(context:), 'iteration', annotated: ann)}"
+          parts << ".#{annotate(@id.stage_iteration.render(context:), 
+                                'iteration', annotated: ann)}"
         end
         date_str = @id.date.render(context:) if @id.date && context.with_date
         parts << ":#{annotate(date_str, 'year', annotated: ann)}" if date_str

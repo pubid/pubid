@@ -166,7 +166,7 @@ module Pubid
         def supplement_short
           return "" unless supplement
 
-          prefix = (supplement.range? && !number) ? " " : ""
+          prefix = supplement.range? && !number ? " " : ""
           rendered = supplement.to_s(:short)
           prefix + (rendered.empty? ? "sup" : rendered)
         end

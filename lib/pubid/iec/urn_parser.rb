@@ -65,7 +65,7 @@ module Pubid
         # "ser" marks an all-parts series rather than a deliverable suffix; it
         # is signalled out-of-band (the code built from a series URN carries no
         # part or date, so to_s renders "IEC NNNN (all parts)").
-        if deliv && deliv.casecmp("SER").zero?
+        if deliv&.casecmp("SER")&.zero?
           all_parts = true
         elsif deliv && !deliv.empty?
           code += " #{deliv}"

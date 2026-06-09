@@ -26,7 +26,7 @@ module Pubid
 
       # nil => no SYMBOL clause; "" => bare "SYMBOL" keyword; otherwise value.
       def attach_symbol(identifier, data)
-        identifier.symbol = data[:symbol_value]&.to_s || "" if data[:symbol_present]
+        identifier.symbol = data[:symbol_value].to_s if data[:symbol_present]
         identifier
       end
 

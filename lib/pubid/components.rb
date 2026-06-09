@@ -5,7 +5,6 @@ module Pubid
     autoload :Code, "pubid/components/code"
     autoload :Date, "pubid/components/date"
     autoload :Edition, "pubid/components/edition"
-    autoload :Factory, "pubid/components/factory"
     autoload :Language, "pubid/components/language"
     autoload :Locality, "pubid/components/locality"
     autoload :Publisher, "pubid/components/publisher"

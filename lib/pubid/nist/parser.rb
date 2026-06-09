@@ -387,7 +387,9 @@ module Pubid
         # and the letter_number grammar rule only splits the uppercase form.
         # Scoped to the addendum context so bare markers like "800-90r"
         # (revision) are left untouched.
-        cleaned = cleaned.gsub(/(\d[a-z]?)\s+Add\b\.?/i) { "#{Regexp.last_match(1).upcase} Add." }
+        cleaned = cleaned.gsub(/(\d[a-z]?)\s+Add\b\.?/i) do
+          "#{Regexp.last_match(1).upcase} Add."
+        end
 
         # Fix verbose "rev YYYY" format: "126 rev 2013" → "126r2013"
         # Removes space between number and "rev", and converts to "r" prefix

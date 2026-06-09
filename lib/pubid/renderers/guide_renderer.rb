@@ -7,8 +7,10 @@ module Pubid
 
       def render_publisher_and_stage(context)
         ann = context.annotated
-        pub_str = annotate(@id.publisher.render(context:), "publisher",
-                           annotated: ann) if @id.publisher
+        if @id.publisher
+          pub_str = annotate(@id.publisher.render(context:), "publisher",
+                             annotated: ann)
+        end
         stage_str = @id.typed_stage.render(context:) if @id.typed_stage
 
         if stage_str && !stage_str.empty?

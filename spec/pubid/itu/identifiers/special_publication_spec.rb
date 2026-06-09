@@ -59,16 +59,23 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
     end
   end
 
-  describe ".create factory" do
-    it "builds SpecialPublication via Identifier.create" do
-      identifier = Pubid::Itu::Identifier.create(series: "OB", number: 1000)
+  describe "direct construction" do
+    def ob(number:, language: nil)
+      described_class.new(
+        series: Pubid::Itu::Components::Series.new(series: "OB"),
+        code: Pubid::Itu::Components::Code.new(number: number.to_s),
+        language: language&.to_s,
+      )
+    end
+
+    it "builds SpecialPublication via .new" do
+      identifier = ob(number: 1000)
       expect(identifier).to be_a(described_class)
       expect(identifier.to_s).to eq("ITU OB No. 1000")
     end
 
-    it "normalizes long-form language to single-letter on .create" do
-      identifier = Pubid::Itu::Identifier.create(series: "OB", number: 1000,
-                                                 language: :fr)
+    it "normalizes long-form language to single-letter" do
+      identifier = ob(number: 1000, language: :fr)
       expect(identifier.language).to eq("F")
       expect(identifier.to_s).to eq("ITU OB No. 1000-F")
     end

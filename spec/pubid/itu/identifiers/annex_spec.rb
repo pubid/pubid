@@ -12,6 +12,21 @@ require_relative "../../../../lib/pubid/itu"
 # Fixtures sourced from metanorma-itu PR #497 spec/metanorma/i18n_spec.rb;
 # treated as the authoritative source per @opoudjis on PR #38.
 RSpec.describe Pubid::Itu::Identifiers::Annex do
+  # Construct identifiers directly (pubid 2.x has no `Identifier.create`
+  # factory); mirrors what parse produces for an OB Special Publication and
+  # its Annex.
+  def ob(number:, language: nil)
+    Pubid::Itu::Identifiers::SpecialPublication.new(
+      series: Pubid::Itu::Components::Series.new(series: "OB"),
+      code: Pubid::Itu::Components::Code.new(number: number.to_s),
+      language: language&.to_s,
+    )
+  end
+
+  def annex_of(base, language: nil)
+    Pubid::Itu::Identifiers::Annex.new(base: base, language: language&.to_s)
+  end
+
   describe "round-trip parsing and rendering" do
     it "parses 'Annex to ITU OB No. 1'" do
       identifier = Pubid::Itu.parse("Annex to ITU OB No. 1")
@@ -27,10 +42,10 @@ RSpec.describe Pubid::Itu::Identifiers::Annex do
 
   describe "i18n rendering with language" do
     let(:base_id) do
-      Pubid::Itu::Identifier.create(series: "OB", number: 1000, language: lang)
+      ob(number: 1000, language: lang)
     end
     let(:annex) do
-      Pubid::Itu::Identifier.create(type: :annex, base: base_id, language: lang)
+      annex_of(base_id, language: lang)
     end
 
     # French and Spanish use the long-form template for short rendering too
@@ -121,9 +136,9 @@ RSpec.describe Pubid::Itu::Identifiers::Annex do
   end
 
   describe "default (no language)" do
-    let(:base_id) { Pubid::Itu::Identifier.create(series: "OB", number: 1000) }
+    let(:base_id) { ob(number: 1000) }
     let(:annex) do
-      Pubid::Itu::Identifier.create(type: :annex, base: base_id)
+      annex_of(base_id)
     end
 
     it "renders English form regardless of i18n_lang opt absence" do
@@ -136,10 +151,10 @@ RSpec.describe Pubid::Itu::Identifiers::Annex do
     # are distinct concerns. A French-language document may be cited in
     # English text with the "-F" suffix preserved.
     let(:base_id) do
-      Pubid::Itu::Identifier.create(series: "OB", number: 1000, language: "fr")
+      ob(number: 1000, language: "fr")
     end
     let(:annex) do
-      Pubid::Itu::Identifier.create(type: :annex, base: base_id, language: "fr")
+      annex_of(base_id, language: "fr")
     end
 
     it "renders English text with French suffix when i18n_lang=:en" do
@@ -155,10 +170,10 @@ RSpec.describe Pubid::Itu::Identifiers::Annex do
 
   describe "deprecated `language:` kwarg on to_s" do
     let(:base_id) do
-      Pubid::Itu::Identifier.create(series: "OB", number: 1000, language: "fr")
+      ob(number: 1000, language: "fr")
     end
     let(:annex) do
-      Pubid::Itu::Identifier.create(type: :annex, base: base_id, language: "fr")
+      annex_of(base_id, language: "fr")
     end
 
     it "treats language: as i18n_lang:" do

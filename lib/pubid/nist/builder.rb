@@ -392,7 +392,9 @@ module Pubid
         parsed_hash.each_pair do |key, value|
           realized_components = cast(key.to_sym, value, parsed_hash) # Pass parsed_hash for context
           next if realized_components.nil?
-          next if !realized_components.is_a?(Hash) && capture_supplement.call(key.to_sym, realized_components)
+          next if !realized_components.is_a?(Hash) && capture_supplement.call(
+            key.to_sym, realized_components
+          )
 
           # Track number components
           if key == :first_number && realized_components.is_a?(Components::Code)
@@ -820,7 +822,8 @@ module Pubid
           parsed_format: parsed_hash[:parsed_format],
         }
         base_hash[:publisher] = publisher_value if publisher_value
-        base_hash[:edition_e] = { edition_id: base_portion[:edition_number] } if has_edition
+        base_hash[:edition_e] = 
+          { edition_id: base_portion[:edition_number] } if has_edition
 
         build(base_hash)
       end

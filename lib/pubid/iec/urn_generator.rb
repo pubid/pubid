@@ -14,7 +14,7 @@ module Pubid
     # omits the language slot (8 fields), so it has a dedicated branch.
     class UrnGenerator < Pubid::UrnGenerator::Base
       # Deliverable markers occupying the positional deliverable slot.
-      DELIVERABLES = /cmv|csv|exv|prv|rlv|ser/.freeze
+      DELIVERABLES = /cmv|csv|exv|prv|rlv|ser/
 
       def generate
         return series_urn if identifier.respond_to?(:all_parts) && identifier.all_parts
