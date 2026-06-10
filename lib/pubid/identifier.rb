@@ -62,12 +62,6 @@ module Pubid
       "pubid:#{flavor}:#{type_kebab}"
     end
 
-    klass_ref = self
-    key_value do
-      klass_ref.attributes.each_key do |name|
-        map name.to_s, to: name.to_sym
-      end
-    end
 
     def root
       return base_identifier.root if base_identifier

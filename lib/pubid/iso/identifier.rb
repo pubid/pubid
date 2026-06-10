@@ -42,8 +42,27 @@ module Pubid
         end
       end
 
+      # The base Pubid::Identifier no longer auto-maps attributes, so each
+      # flavor's top class must declare its own key_value mapping. Subclasses
+      # merge their own blocks on top of this one (e.g. SupplementIdentifier
+      # adds base_identifier; Directives adds subgroup), so list every base
+      # attribute ISO serializes here once.
       key_value do
         map "_type", to: :_type, polymorphic_map: ISO_TYPE_MAP
+        map "number", to: :number
+        map "part", to: :part
+        map "subpart", to: :subpart
+        map "stage_iteration", to: :stage_iteration
+        map "date", to: :date
+        map "edition", to: :edition
+        map "languages", to: :languages
+        map "publisher", to: :publisher
+        map "copublishers", to: :copublishers
+        map "type", to: :type
+        map "stage", to: :stage
+        map "locality", to: :locality
+        map "typed_stage", to: :typed_stage
+        map "all_parts", to: :all_parts
       end
 
       def self.parse(string, format: :auto)

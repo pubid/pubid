@@ -7,6 +7,12 @@ module Pubid
         attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
         attribute :subgroup, ::Pubid::Components::Code
 
+        # Merges with Identifier's block (base attributes); only adds the
+        # Directives-specific subgroup so it survives to_hash/from_hash.
+        key_value do
+          map "subgroup", to: :subgroup
+        end
+
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(
             code: :pubguide,
