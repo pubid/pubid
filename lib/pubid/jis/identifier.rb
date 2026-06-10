@@ -7,7 +7,13 @@ module Pubid
     # Pubid::Jis::Identifiers descend from this class, so a parsed JIS id is an
     # instance of Pubid::Jis::Identifier.
     class Identifier < ::Pubid::Identifier
-      attribute :code, Pubid::Jis::Components::Code
+      # JIS keeps its number flat at the top level (string, to preserve leading
+      # zeros like "0205"), with the division letter in `series` and any
+      # multi-level part numbers in `parts`. Supplements override `number` with
+      # their integer sequence number; the document number then lives on `base`.
+      attribute :number, :string
+      attribute :series, :string # Division letter A-Z
+      attribute :parts, :string, collection: true # Optional multi-level parts
       attribute :year, :integer
       attribute :language, :string # "E" or "J"
       # Boolean flags carry no default, so they stay nil (and are omitted from
@@ -39,7 +45,9 @@ module Pubid
 
       key_value do
         map "_type", to: :_type, polymorphic_map: JIS_TYPE_MAP
-        map "code", to: :code
+        map "series", to: :series
+        map "number", to: :number
+        map "parts", to: :parts
         map "year", to: :year
         map "language", to: :language
         map "all_parts", to: :all_parts
@@ -74,6 +82,15 @@ module Pubid
         symbol.empty? ? " SYMBOL" : " SYMBOL #{symbol}"
       end
 
+      # The rendered document code, e.g. "B 0205-1" (series, number, parts).
+      # A convenience for rendering; the underlying data is the flat
+      # series/number/parts attributes.
+      def code
+        result = "#{series} #{number}"
+        result += parts.map { |p| "-#{p}" }.join if parts&.any?
+        result
+      end
+
       # Comparison with all_parts logic
       # When either identifier has all_parts=true, compare only series and number
       def ==(other)
@@ -81,12 +98,13 @@ module Pubid
 
         if all_parts? || other.all_parts?
           # Compare only series and number, ignore year, parts, all_parts
-          return code.series == other.code.series &&
-              code.number == other.code.number
+          return series == other.series && number == other.number
         end
 
         # Normal full comparison
-        code == other.code &&
+        series == other.series &&
+          number == other.number &&
+          (parts || []) == (other.parts || []) &&
           year == other.year &&
           language == other.language &&
           all_parts? == other.all_parts? &&

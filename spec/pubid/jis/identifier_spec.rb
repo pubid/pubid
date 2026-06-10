@@ -15,11 +15,11 @@ RSpec.describe Pubid::Jis::Identifier do
         end
 
         it "parses series" do
-          expect(parsed.code.series).to eq("B")
+          expect(parsed.series).to eq("B")
         end
 
         it "parses number" do
-          expect(parsed.code.number).to eq("0001")
+          expect(parsed.number).to eq("0001")
         end
 
         it "round-trips" do
@@ -37,15 +37,15 @@ RSpec.describe Pubid::Jis::Identifier do
         let(:parsed) { described_class.parse(subject) }
 
         it "parses series" do
-          expect(parsed.code.series).to eq("C")
+          expect(parsed.series).to eq("C")
         end
 
         it "parses number" do
-          expect(parsed.code.number).to eq("61000")
+          expect(parsed.number).to eq("61000")
         end
 
         it "parses parts" do
-          expect(parsed.code.parts).to eq(%w[3 2])
+          expect(parsed.parts).to eq(%w[3 2])
         end
 
         it "round-trips" do
@@ -243,8 +243,8 @@ RSpec.describe Pubid::Jis::Identifier do
         end
 
         it "parses base identifier" do
-          expect(parsed.base.code.series).to eq("A")
-          expect(parsed.base.code.number).to eq("0001")
+          expect(parsed.base.series).to eq("A")
+          expect(parsed.base.number).to eq("0001")
           expect(parsed.base.year).to eq(1999)
         end
 
@@ -287,8 +287,8 @@ RSpec.describe Pubid::Jis::Identifier do
         end
 
         it "parses base identifier" do
-          expect(parsed.base.code.series).to eq("K")
-          expect(parsed.base.code.number).to eq("2151")
+          expect(parsed.base.series).to eq("K")
+          expect(parsed.base.number).to eq("2151")
           expect(parsed.base.year).to eq(2004)
         end
 
@@ -359,8 +359,8 @@ RSpec.describe Pubid::Jis::Identifier do
         end
 
         it "inherits the code from the base document" do
-          expect(parsed.code.series).to eq("B")
-          expect(parsed.code.number).to eq("3700")
+          expect(parsed.base.series).to eq("B")
+          expect(parsed.base.number).to eq("3700")
           expect(parsed.base.year).to eq(1996)
         end
 

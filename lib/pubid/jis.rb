@@ -3,7 +3,6 @@
 module Pubid
   module Jis
     autoload :Builder, "#{__dir__}/jis/builder"
-    autoload :Components, "#{__dir__}/jis/components"
     autoload :Identifier, "#{__dir__}/jis/identifier"
     autoload :Identifiers, "#{__dir__}/jis/identifiers"
     autoload :Parser, "#{__dir__}/jis/parser"

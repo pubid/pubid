@@ -31,12 +31,10 @@ module Pubid
       end
 
       def build_single_identifier(data)
-        # Build code component
-        code = build_code(data)
-
-        # Extract other attributes
         attrs = {
-          code: code,
+          series: data[:series].to_s,
+          number: data[:number].to_s,
+          parts: extract_part_strings(data[:parts]),
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
           all_parts: (true if data[:all_parts]),
@@ -101,14 +99,6 @@ module Pubid
           number: corr_data[:corr_number].to_i,
           year: corr_data[:corr_year].to_i,
           reaffirmed: (true if corr_data[:corr_reaffirmed]),
-        )
-      end
-
-      def build_code(data)
-        Components::Code.new(
-          series: data[:series].to_s,
-          number: data[:number].to_s,
-          parts: extract_part_strings(data[:parts]),
         )
       end
 
