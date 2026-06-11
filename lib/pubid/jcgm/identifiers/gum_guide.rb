@@ -22,16 +22,8 @@ module Pubid
           { key: :gum_guide, title: "GUM Guide", short: "GUM" }
         end
 
-        def to_s(lang: :en, lang_single: false, with_edition: false,
-format: nil, stage_format_long: nil, with_date: nil)
-          parts = []
-          parts << publisher.publisher if publisher
-          parts << "GUM-#{gum_number.value}" if gum_number
-
-          result = parts.join(" ")
-          result += ":#{date}" if date
-          result += language_portion if languages&.any?
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         private

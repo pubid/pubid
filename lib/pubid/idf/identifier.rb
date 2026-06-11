@@ -7,11 +7,8 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       attribute :typed_stage, Components::TypedStage
 
-      def to_s(lang: :en, lang_single: false, with_edition: false)
-        [
-          publisher_portion(lang: lang),
-          number_portion(lang_single: lang_single),
-        ].join
+      def to_s(**opts)
+        render(format: :human, **opts)
       end
 
       def publisher_portion(lang: :en)

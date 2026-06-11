@@ -26,14 +26,7 @@ module Pubid
         # Render the identifier as a string in canonical IHO form.
         # @return [String]
         def to_s
-          letter = self.class.type[:short]
-          rendered = "#{publisher} #{letter}-#{code}"
-          rendered << " Ap. #{appendix}" if appendix
-          rendered << " Part #{part}"    if part
-          rendered << " Annex #{annex}"  if annex
-          rendered << " Suppl #{supplement}" if supplement
-          rendered << " #{version}" if version
-          rendered
+          render(format: :human)
         end
       end
     end
