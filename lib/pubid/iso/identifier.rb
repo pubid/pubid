@@ -49,11 +49,16 @@ module Pubid
       # attribute ISO serializes here once.
       key_value do
         map "_type", to: :_type, polymorphic_map: ISO_TYPE_MAP
-        map "number", to: :number
-        map "part", to: :part
-        map "subpart", to: :subpart
-        map "stage_iteration", to: :stage_iteration
-        map "date", to: :date
+        # Code components serialize as their plain string value, not {value,number}.
+        map "number", with: { to: :number_to_kv, from: :number_from_kv }
+        map "part", with: { to: :part_to_kv, from: :part_from_kv }
+        map "subpart", with: { to: :subpart_to_kv, from: :subpart_from_kv }
+        map "stage_iteration",
+            with: { to: :stage_iteration_to_kv, from: :stage_iteration_from_kv }
+        # date serialized flat as year/month/day, nils omitted.
+        map "year", with: { to: :year_to_kv, from: :year_from_kv }
+        map "month", with: { to: :month_to_kv, from: :month_from_kv }
+        map "day", with: { to: :day_to_kv, from: :day_from_kv }
         map "edition", to: :edition
         map "languages", to: :languages
         map "publisher", to: :publisher
@@ -97,6 +102,51 @@ module Pubid
         model.typed_stage = ts
         model.stage = ts.to_stage
         model.type = ts.to_type
+      end
+
+      # --- Code components <-> plain string ---
+      def number_to_kv(model, doc) = emit_code(doc, "number", model.number)
+      def number_from_kv(model, value) = model.number = build_code(value)
+      def part_to_kv(model, doc) = emit_code(doc, "part", model.part)
+      def part_from_kv(model, value) = model.part = build_code(value)
+      def subpart_to_kv(model, doc) = emit_code(doc, "subpart", model.subpart)
+      def subpart_from_kv(model, value) = model.subpart = build_code(value)
+
+      def stage_iteration_to_kv(model, doc)
+        emit_code(doc, "stage_iteration", model.stage_iteration)
+      end
+
+      def stage_iteration_from_kv(model, value)
+        model.stage_iteration = build_code(value)
+      end
+
+      def emit_code(doc, key, code)
+        v = code.respond_to?(:value) ? code.value : code
+        return if v.nil? || v.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new(key, v.to_s))
+      end
+
+      def build_code(value)
+        ::Pubid::Iso::Components::Code.new(number: value.to_s)
+      end
+
+      # --- date serialized flat as year/month/day ---
+      def year_to_kv(model, doc) = emit_date_part(doc, "year", model.date&.year)
+      def year_from_kv(model, value) = date_for(model).year = value.to_s
+      def month_to_kv(model, doc) = emit_date_part(doc, "month", model.date&.month)
+      def month_from_kv(model, value) = date_for(model).month = value.to_s
+      def day_to_kv(model, doc) = emit_date_part(doc, "day", model.date&.day)
+      def day_from_kv(model, value) = date_for(model).day = value.to_s
+
+      def emit_date_part(doc, key, val)
+        return if val.nil? || val.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new(key, val.to_s))
+      end
+
+      def date_for(model)
+        model.date ||= ::Pubid::Components::Date.new
       end
 
       def self.parse(string, format: :auto)

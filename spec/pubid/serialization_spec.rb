@@ -24,7 +24,7 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
 
       expect(hash).to have_key("base_identifier")
       expect(hash["base_identifier"]["_type"]).to eq("pubid:iso:international-standard")
-      expect(hash["base_identifier"]["number"]["value"]).to eq("9001")
+      expect(hash["base_identifier"]["number"]).to eq("9001")
     end
 
     it "round-trips Amendment with base_identifier" do

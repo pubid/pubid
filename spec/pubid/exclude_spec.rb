@@ -35,7 +35,7 @@ RSpec.describe Pubid::Identifier do
     it "excludes date from hash representation" do
       id = Pubid::Iso.parse("ISO 9001:2015")
       excluded = id.exclude(:date)
-      expect(excluded.to_hash["date"]).to be_nil
+      expect(excluded.to_hash["year"]).to be_nil
       expect(excluded.to_s).not_to include(":2015")
     end
 
