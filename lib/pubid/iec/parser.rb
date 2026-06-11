@@ -12,10 +12,9 @@ module Pubid
       DASH_CHARS = ["-", "‑", "‐"].freeze
 
       # We need to sort by length to match longest first because that's how Parslet works
-      TYPED_STAGES = Pubid::Iec::Scheme.typed_stages
+      TYPED_STAGES = Pubid::Iec.all_typed_stages
         .map(&:abbr).flatten.sort_by(&:length).reverse
-      TYPED_STAGES_SUPPLEMENTS = Pubid::Iec::Scheme.supplement_typed_stages
-        .map(&:abbr).flatten.sort_by(&:length).reverse
+      TYPED_STAGES_SUPPLEMENTS = TYPED_STAGES
 
       root :identifier
 

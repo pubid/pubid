@@ -3,8 +3,15 @@
 module Pubid
   module Iso
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
+      def initialize
+        # No state needed: lookups are delegated to the Pubid::Iso module.
+      end
+
+      # Override the base implementation to avoid relying on @scheme.
+      # @param typed_stage_string [String, nil]
+      # @return [Pubid::Components::TypedStage, nil]
+      def locate_typed_stage(typed_stage_string)
+        Pubid::Iso.locate_stage(typed_stage_string.to_s)
       end
 
       def locate_identifier_klass(parsed_hash)
@@ -37,7 +44,7 @@ module Pubid
 
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
 
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+        Pubid::Iso.locate_type(typed_stage.type_code)
       end
 
       def build(parsed_hash)
@@ -89,7 +96,7 @@ module Pubid
         # If typed_stage, stage, or type are still nil after building,
         # set them to the default International Standard values
         if identifier.typed_stage.nil?
-          default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
+          default_typed_stage = Pubid::Iso.locate_stage("")
           identifier.typed_stage = default_typed_stage
           identifier.stage = default_typed_stage.to_stage
           identifier.type = default_typed_stage.to_type
@@ -293,7 +300,7 @@ module Pubid
           # Raw stage code from URN parser (e.g., "10.00", "50.00")
           # Convert to type_with_stage format for builder
           # Look up the typed stage from stage code
-          typed_stage = Scheme.locate_typed_stage_by_stage_code(value.to_s)
+          typed_stage = Pubid::Iso.locate_stage_by_stage_code(value.to_s)
           if typed_stage
             typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
           else

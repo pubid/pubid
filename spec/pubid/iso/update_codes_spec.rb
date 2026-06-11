@@ -3,7 +3,7 @@
 require "spec_helper"
 
 # Verifies the `data/iso/update_codes.yaml` regex normalizations applied
-# by `Pubid::Iso.parse` (via `Pubid::Iso::Scheme.parse`).
+# by `Pubid::Iso.parse` (via `Pubid::Iso::Normalizer.apply`).
 #
 # `DIS` and `FDIS` are typed-stages of the IS class only — for TR/TS/PAS/ISP
 # they have dedicated `D<type>` / `FD<type>` typed-stage abbrs (e.g. `DTR`,

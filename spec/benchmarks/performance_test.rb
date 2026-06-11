@@ -90,10 +90,8 @@ module Pubid
       end
 
       def benchmark_registry_lookup
-        scheme = Pubid::Iso::Scheme.instance
-
         # Warm up
-        100.times { scheme.locate_typed_stage_by_abbr("WD") }
+        100.times { Pubid::Iso.locate_stage("WD") }
 
         # Test various abbreviations
         abbrs = ["WD", "CD", "FDIS", "Amd", "Cor", "PWI", "NP", "IS", ""]
@@ -101,7 +99,7 @@ module Pubid
 
         lookup_time = ::Benchmark.realtime do
           @iterations.times do
-            abbrs.each { |abbr| scheme.locate_typed_stage_by_abbr(abbr) }
+            abbrs.each { |abbr| Pubid::Iso.locate_stage(abbr) }
           end
         end
 

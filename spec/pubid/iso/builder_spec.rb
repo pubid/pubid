@@ -1,97 +1,97 @@
 require "spec_helper"
 
 RSpec.describe Pubid::Iso::Builder do
-  let(:scheme) { Pubid::Iso::Scheme.new }
-  let(:builder) { described_class.new(scheme) }
+  let(:builder) { described_class.new }
 
   # ============================================================================
   # V2 ARCHITECTURE TESTS
   # ============================================================================
   #
-  # V2 uses Scheme-based registry lookups instead of V1's private helper methods:
-  # - scheme.locate_typed_stage_by_abbr()      → Returns TypedStage with type/stage codes
-  # - scheme.locate_identifier_klass_by_type_code() → Returns identifier class
-  # - builder.cast(type, value)                → Single method for ALL conversions
-  # - builder.build(parsed_hash)               → Main build method (public)
+  # V2 uses Pubid::Iso registry lookups on the module instead of a Scheme
+  # instance:
+  # - Pubid::Iso.locate_stage(abbr) -> Returns TypedStage
+  # - Pubid::Iso.locate_type(type_code) -> Returns identifier class
+  # - builder.cast(type, value)      -> Single method for ALL conversions
+  # - builder.build(parsed_hash)     -> Main build method (public)
   #
   # These tests validate V2's clean architecture while preserving the test intent.
   # ============================================================================
 
-  describe "scheme.locate_identifier_klass_by_type_code" do
+  describe "Pubid::Iso.locate_type" do
     it "returns InternationalStandard for 'is' type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("is")
+      klass = Pubid::Iso.locate_type("is")
       expect(klass).to eq(Pubid::Iso::Identifiers::InternationalStandard)
     end
 
     it "returns Guide for guide type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("guide")
+      klass = Pubid::Iso.locate_type("guide")
       expect(klass).to eq(Pubid::Iso::Identifiers::Guide)
     end
 
     it "returns TechnicalReport for tr type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("tr")
+      klass = Pubid::Iso.locate_type("tr")
       expect(klass).to eq(Pubid::Iso::Identifiers::TechnicalReport)
     end
 
     it "returns TechnicalSpecification for ts type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("ts")
+      klass = Pubid::Iso.locate_type("ts")
       expect(klass).to eq(Pubid::Iso::Identifiers::TechnicalSpecification)
     end
 
     it "returns Pas for pas type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("pas")
+      klass = Pubid::Iso.locate_type("pas")
       expect(klass).to eq(Pubid::Iso::Identifiers::Pas)
     end
 
     it "returns TechnologyTrendsAssessments for tta type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("tta")
+      klass = Pubid::Iso.locate_type("tta")
       expect(klass).to eq(Pubid::Iso::Identifiers::TechnologyTrendsAssessments)
     end
 
     it "returns InternationalWorkshopAgreement for iwa type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("iwa")
+      klass = Pubid::Iso.locate_type("iwa")
       expect(klass).to eq(Pubid::Iso::Identifiers::InternationalWorkshopAgreement)
     end
 
     it "returns InternationalStandardizedProfile for isp type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("isp")
+      klass = Pubid::Iso.locate_type("isp")
       expect(klass).to eq(Pubid::Iso::Identifiers::InternationalStandardizedProfile)
     end
 
     it "returns Directives for dir type_code" do
-      klass = scheme.locate_identifier_klass_by_type_code("dir")
+      klass = Pubid::Iso.locate_type("dir")
       expect(klass).to eq(Pubid::Iso::Identifiers::Directives)
     end
   end
 
   describe "TypedStage attributes" do
     it "extracts type code from DTR typed_stage" do
-      typed_stage = scheme.locate_typed_stage_by_abbr("DTR")
+      typed_stage = Pubid::Iso.locate_stage("DTR")
       expect(typed_stage.type_code).to eq("tr")
     end
 
     it "extracts type code from DTS typed_stage" do
-      typed_stage = scheme.locate_typed_stage_by_abbr("DTS")
+      typed_stage = Pubid::Iso.locate_stage("DTS")
       expect(typed_stage.type_code).to eq("ts")
     end
 
     it "extracts stage code from DTR typed_stage" do
-      typed_stage = scheme.locate_typed_stage_by_abbr("DTR")
+      typed_stage = Pubid::Iso.locate_stage("DTR")
       expect(typed_stage.stage_code).to eq("draft")
     end
 
     it "extracts harmonized stage code from DIS typed_stage" do
-      typed_stage = scheme.locate_typed_stage_by_abbr("DIS")
+      typed_stage = Pubid::Iso.locate_stage("DIS")
       expect(typed_stage.stage_code).to eq("dis")
     end
 
     it "extracts harmonized stage code from FDIS typed_stage" do
-      typed_stage = scheme.locate_typed_stage_by_abbr("FDIS")
+      typed_stage = Pubid::Iso.locate_stage("FDIS")
       expect(typed_stage.stage_code).to eq("fdis")
     end
 
     it "returns harmonized stage code for supplement stages" do
-      typed_stage = scheme.locate_typed_stage_by_abbr("FDAM")
+      typed_stage = Pubid::Iso.locate_stage("FDAM")
       expect(typed_stage.stage_code).to eq("fdamd")
     end
   end

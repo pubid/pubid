@@ -2,12 +2,12 @@
 
 require "spec_helper"
 
-RSpec.describe Pubid::Iso::Scheme do
-  describe ".identifiers" do
+RSpec.describe Pubid::Iso do
+  describe ".identifier_types" do
     it "returns array of registered identifier classes" do
-      expect(described_class.identifiers).to be_an(Array)
-      expect(described_class.identifiers).to all(be_a(Class))
-      expect(described_class.identifiers).to include(Pubid::Iso::Identifiers::InternationalStandard)
+      expect(described_class.identifier_types).to be_an(Array)
+      expect(described_class.identifier_types).to all(be_a(Class))
+      expect(described_class.identifier_types).to include(Pubid::Iso::Identifiers::InternationalStandard)
     end
 
     it "includes all expected identifier types" do
@@ -21,81 +21,73 @@ RSpec.describe Pubid::Iso::Scheme do
         Pubid::Iso::Identifiers::Corrigendum,
       ]
       expected_classes.each do |klass|
-        expect(described_class.identifiers).to include(klass)
+        expect(described_class.identifier_types).to include(klass)
       end
     end
   end
 
-  describe ".typed_stages" do
+  describe ".all_typed_stages" do
     it "returns array of TYPED_STAGES from all identifiers" do
-      stages = described_class.typed_stages
+      stages = described_class.all_typed_stages
       expect(stages).to be_an(Array)
       expect(stages).to all(be_a(Pubid::Components::TypedStage))
     end
 
     it "includes stages from all identifier classes" do
-      stages = described_class.typed_stages
+      stages = described_class.all_typed_stages
       expect(stages).not_to be_empty
     end
   end
 
-  describe ".supplement_typed_stages" do
-    it "returns array of TYPED_STAGES from supplement identifiers" do
-      stages = described_class.supplement_typed_stages
-      expect(stages).to be_an(Array)
-      expect(stages).to all(be_a(Pubid::Components::TypedStage))
-    end
-  end
-
-  describe ".locate_typed_stage_by_abbr" do
+  describe ".locate_stage" do
     it "returns the correct typed stage for known abbreviations" do
-      stage = described_class.locate_typed_stage_by_abbr("")
+      stage = described_class.locate_stage("")
       expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("is")
     end
 
     it "returns typed stage for IS abbreviation" do
-      stage = described_class.locate_typed_stage_by_abbr("IS")
+      stage = described_class.locate_stage("IS")
       expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("is")
     end
 
     it "returns typed stage for TR abbreviation" do
-      stage = described_class.locate_typed_stage_by_abbr("TR")
+      stage = described_class.locate_stage("TR")
       expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("tr")
     end
 
     it "returns typed stage for Amd abbreviation" do
-      stage = described_class.locate_typed_stage_by_abbr("Amd")
+      stage = described_class.locate_stage("Amd")
       expect(stage).to be_a(Pubid::Components::TypedStage)
       expect(stage.type_code).to eq("amd")
     end
 
     it "returns nil for unknown abbreviations" do
-      stage = described_class.locate_typed_stage_by_abbr("UNKNOWN")
+      stage = described_class.locate_stage("UNKNOWN")
       expect(stage).to be_nil
     end
   end
 
-  describe ".locate_identifier_klass_by_type_code" do
+  describe ".locate_type" do
     it "returns the correct identifier class for is type code" do
-      klass = described_class.locate_identifier_klass_by_type_code("is")
+      klass = described_class.locate_type("is")
       expect(klass).to eq(Pubid::Iso::Identifiers::InternationalStandard)
     end
 
     it "returns the correct identifier class for tr type code" do
-      klass = described_class.locate_identifier_klass_by_type_code("tr")
+      klass = described_class.locate_type("tr")
       expect(klass).to eq(Pubid::Iso::Identifiers::TechnicalReport)
     end
 
     it "returns the correct identifier class for amd type code" do
-      klass = described_class.locate_identifier_klass_by_type_code("amd")
+      klass = described_class.locate_type("amd")
       expect(klass).to eq(Pubid::Iso::Identifiers::Amendment)
     end
 
     it "returns nil for unknown type codes" do
-      klass = described_class.locate_identifier_klass_by_type_code(:unknown_type_code)
+      klass = described_class.locate_type(:unknown_type_code)
       expect(klass).to be_nil
     end
   end

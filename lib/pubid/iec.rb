@@ -15,7 +15,6 @@ module Pubid
     autoload :Identifier, "#{__dir__}/iec/identifier"
     autoload :SingleIdentifier, "#{__dir__}/iec/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/iec/supplement_identifier"
-    autoload :Scheme, "#{__dir__}/iec/scheme"
     autoload :Parser, "#{__dir__}/iec/parser"
     autoload :Builder, "#{__dir__}/iec/builder"
     autoload :UrnParser, "#{__dir__}/iec/urn_parser"
@@ -23,37 +22,10 @@ module Pubid
     autoload :RenderingStyle, "#{__dir__}/iec/rendering_style"
     autoload :Renderer, "#{__dir__}/iec/renderer"
 
-    # Primary document types (not supplements)
-    IDENTIFIER_TYPES = [
-      Identifiers::InternationalStandard,
-      Identifiers::TechnicalReport,
-      Identifiers::TechnicalSpecification,
-      Identifiers::PubliclyAvailableSpecification,
-      Identifiers::Guide,
-      Identifiers::TestReportForm,
-      Identifiers::InterpretationSheet,
-      Identifiers::SystemsReferenceDocument,
-      Identifiers::WorkingDocument,
-    ].freeze
-
-    # Supplement types (can appear with / notation)
-    SUPPLEMENT_IDENTIFIER_TYPES = [
-      Identifiers::Amendment,
-      Identifiers::Corrigendum,
-      Identifiers::InterpretationSheet, # ISH can act as supplement (/ISH1:1996)
-      Identifiers::FragmentIdentifier,  # FRAG wraps amendments/corrigenda
-    ].freeze
-
-    # Create the Scheme registry with all identifier types
-    Scheme = Pubid::Scheme.new(
-      identifiers: IDENTIFIER_TYPES,
-      supplement_identifiers: SUPPLEMENT_IDENTIFIER_TYPES,
-    )
-
     # Main entry point for IEC identifiers
     def self.parse(identifier_string)
       parsed = Parser.new.parse(identifier_string)
-      Builder.new(Scheme).build(parsed)
+      Builder.new.build(parsed)
     end
 
     # Parse an IEC URN string

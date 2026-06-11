@@ -231,7 +231,7 @@ module Pubid
       # Used when URN doesn't specify a type code (defaults to IS)
       # Prefers the most specific (non-published) stage
       def scheme_is_typed_stage_by_harmonized(harmonized_code)
-        candidates = Pubid::Iso::Scheme.instance.all_typed_stages.select do |ts|
+        candidates = Pubid::Iso.all_typed_stages.select do |ts|
           ts.type_code.to_s == "is" && ts.harmonized_stages&.include?(harmonized_code)
         end
 
@@ -348,9 +348,9 @@ module Pubid
             # The stage_from_abbr is the value from TYPED_STAGE_REVERSE_MAP
             # We need to find the reverse to get the original abbreviation
             abbr_str = TYPED_STAGE_REVERSE_MAP.key(stage_from_abbr)
-            typed_stage = Scheme.locate_typed_stage_by_abbr(abbr_str) if abbr_str
+            typed_stage = Pubid::Iso.locate_stage(abbr_str) if abbr_str
             # If no exact match, fall back to stage_code lookup
-            typed_stage ||= Scheme.locate_typed_stage_by_stage_code(stage_from_abbr)
+            typed_stage ||= Pubid::Iso.locate_stage_by_stage_code(stage_from_abbr)
           else
             # Stage came from a harmonized code (e.g., stage-20.20)
             # Look up by harmonized stage code
@@ -360,12 +360,12 @@ module Pubid
             end
 
             # Fall back to any typed stage if IS not found or type_code is specified
-            typed_stage ||= Scheme.locate_typed_stage_by_harmonized_code(stage_code.to_s)
+            typed_stage ||= Pubid::Iso.locate_stage_by_harmonized_code(stage_code.to_s)
 
             # Special handling for stage "40.00": prefer DIS over FCD when parsing from URN
             # This is because FCD is a legacy stage that maps to DIS in URN format
             if stage_code.to_s == "40.00" && typed_stage && typed_stage.stage_code.to_s == "fcd"
-              dis_stage = Scheme.instance.all_typed_stages.detect do |ts|
+              dis_stage = Pubid::Iso.all_typed_stages.detect do |ts|
                 ts.stage_code.to_s == "dis" && ts.harmonized_stages&.include?("40.00")
               end
               typed_stage = dis_stage if dis_stage
@@ -395,7 +395,7 @@ module Pubid
           supp_hash = {}
 
           if supp[:stage]
-            typed_stage = Scheme.locate_typed_stage_by_stage_code(supp[:stage])
+            typed_stage = Pubid::Iso.locate_stage_by_stage_code(supp[:stage])
             supp_hash[:type_with_stage] = if
 typed_stage
                                             typed_stage.abbr.is_a?(Array) ? typed_stage.abbr.first : typed_stage.abbr
@@ -429,7 +429,7 @@ typed_stage
         base_hash[:all_parts] = true if all_parts
 
         # Build the final identifier
-        builder = Pubid::Iso::Builder.new(Pubid::Iso::Scheme.new)
+        builder = Pubid::Iso::Builder.new
         builder.build(base_hash)
       end
     end

@@ -9,10 +9,19 @@ module Pubid
 
       DASH_CHARS = ["-", "‑", "‐"].freeze
 
+      # Supplement identifier type keys (kept as a hard-coded list to match
+      # the previous Scheme.split; only the base identifier registry
+      # is auto-discovered from the Identifiers namespace).
+      SUPPLEMENT_TYPE_KEYS = %i[amd cor suppl ext add].freeze
+
       # We need to sort by length to match longest first because that's how Parslet works
-      TYPED_STAGES = Pubid::Iso::Scheme.typed_stages
+      TYPED_STAGES = Pubid::Iso.identifier_types
+        .reject { |k| SUPPLEMENT_TYPE_KEYS.include?(k.type[:key]) }
+        .flat_map { |k| k.const_defined?(:TYPED_STAGES) ? k.const_get(:TYPED_STAGES) : [] }
         .map(&:abbr).flatten.sort_by(&:length).reverse
-      TYPED_STAGES_SUPPLEMENTS = Pubid::Iso::Scheme.supplement_typed_stages
+      TYPED_STAGES_SUPPLEMENTS = Pubid::Iso.identifier_types
+        .select { |k| SUPPLEMENT_TYPE_KEYS.include?(k.type[:key]) }
+        .flat_map { |k| k.const_defined?(:TYPED_STAGES) ? k.const_get(:TYPED_STAGES) : [] }
         .map(&:abbr).flatten.sort_by(&:length).reverse
 
       root :identifier
