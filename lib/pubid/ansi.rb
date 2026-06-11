@@ -6,6 +6,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/ansi/identifier"
     autoload :Identifiers, "#{__dir__}/ansi/identifiers/standard"
     autoload :Parser, "#{__dir__}/ansi/parser"
+    autoload :Renderer, "#{__dir__}/ansi/renderer"
     autoload :Scheme, "#{__dir__}/ansi/scheme"
     autoload :SingleIdentifier, "#{__dir__}/ansi/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/ansi/urn_generator"
@@ -20,6 +21,10 @@ module Pubid
       parsed = parser.parse(identifier)
       builder.build(parsed)
     end
+
+    # Per-flavor format registry: inherits global formats, overrides :human
+    Identifier.format_registry = FormatRegistry.new(parent: Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Ansi::Renderer)
   end
 end
 

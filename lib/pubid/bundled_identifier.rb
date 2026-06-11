@@ -1,4 +1,3 @@
-require_relative "identifier"
 # frozen_string_literal: true
 
 module Pubid

@@ -1,14 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "components/code"
-require_relative "components/date"
-require_relative "components/edition"
-require_relative "components/language"
-require_relative "components/locality"
-require_relative "components/publisher"
-require_relative "components/stage"
-require_relative "components/type"
-
 module Pubid
   class Identifier < Lutaml::Model::Serializable
     class << self

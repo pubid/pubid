@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "american_national_standard"
-
 module Pubid
   module Ansi
     module Identifiers

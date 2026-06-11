@@ -427,9 +427,6 @@ module Pubid
       end
 
       def self.parse_external_standard(input)
-        # Ensure full Pubid is loaded (handles Scheme and all flavors)
-        require_relative "../../pubid" unless defined?(Pubid::Iso) && defined?(Pubid::Iec)
-
         # Try ISO/IEC first (most common)
         if input.match?(/^(ISO\/IEC|ISO|IEC|CEI|CEI\/IEC)\s/)
           begin
