@@ -166,9 +166,16 @@ id.to_json  # => JSON string of the hash above
 
 ## Implementation
 
-Rendering is implemented in:
+Rendering is implemented via the **Renderer pattern**:
 
-- `lib/pubid/rendering/` - shared rendering helpers
-- `lib/pubid/{flavor}/single_identifier.rb` - per-flavor `to_s` with `publisher_portion`, `number_portion`
-- `lib/pubid/{flavor}/urn_generator.rb` - URN rendering
-- `lib/pubid/serializable.rb` - `to_h` and `to_json`
+- `lib/pubid/renderers/base.rb` — abstract base class with annotation helpers, shared by all flavor renderers
+- `lib/pubid/renderers/human_readable.rb` — ISO's dedicated human-readable renderer
+- `lib/pubid/renderers/mr_string.rb` — MR string renderer
+- `lib/pubid/renderers/urn.rb` — URN renderer
+- `lib/pubid/{flavor}/renderer.rb` — per-flavor human-readable renderer (19 flavors)
+- `lib/pubid/{flavor}/urn_generator.rb` — URN generation
+- `lib/pubid/format_registry.rb` — maps format symbols (`:human`, `:urn`, `:mr_string`) to renderer classes
+
+Each flavor registers its `:human` renderer via a per-flavor `FormatRegistry` that inherits from the global `Pubid::Identifier.format_registry`. Adding a new output format (BibXML, JSON-LD, annotated HTML) requires only a new Renderer class and a single `register` call — no changes to identifier classes.
+
+For flavors with type-specific rendering logic (BSI's 30+ identifier types, CEN/CENELEC's draft stages, NIST's 4 output formats), the per-flavor renderer dispatches internally based on the identifier's class or type.
