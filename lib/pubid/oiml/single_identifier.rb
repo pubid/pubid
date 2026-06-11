@@ -20,51 +20,10 @@ module Pubid
         type_string
       end
 
-      def to_s(format: nil)
-        # Use parsed format if not explicitly overridden
-        format ||= (parsed_format == "long" ? :long : :short)
-
-        result = "#{publisher} #{type_string} #{code}"
-
-        # Track if we're using Edition format for language spacing
-        using_edition_format = false
-
-        # Add edition/date portion
-        if edition && date
-          # Has edition number: "6th Edition 2015"
-          result += " #{edition} Edition #{date.year}"
-          using_edition_format = true
-        elsif edition
-          # Edition without year (shouldn't happen but handle it)
-          result += " #{edition}"
-          using_edition_format = true
-        elsif date
-          # Date without edition number
-          if format == :long
-            result += " Edition #{date.year}"
-            using_edition_format = true
-          else
-            result += ":#{date.year}"
-          end
-        end
-
-        # Add draft stage if present (iteration + stage)
-        if stage || iteration
-          result += " "
-          result += iteration.to_s if iteration
-          result += stage.to_s if stage
-        end
-
-        # Add language portion - depends on format
-        if language
-          result += if using_edition_format || parsed_format == "short_with_space"
-                      " (#{language})"
-                    else
-                      "(#{language})"
-                    end
-        end
-
-        result
+      def to_s(format: nil, **opts)
+        # Store requested format so the renderer can access it
+        @requested_format = format
+        render(format: :human, **opts)
       end
 
       def edition_portion

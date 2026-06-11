@@ -20,7 +20,7 @@ module Pubid
       end
 
       def to_s
-        "#{base_identifier} #{supplement_string}"
+        render(format: :human)
       end
 
       # Override base_hash to extract edition, type, and annex from base_identifier
