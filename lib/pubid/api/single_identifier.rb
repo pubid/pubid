@@ -17,19 +17,7 @@ module Pubid
       attribute :reaffirmation, :string
 
       def to_s
-        parts = ["API"]
-
-        # Add type if available
-        parts << type_string if self.class.attributes.key?(:type_string) && type_string
-
-        # Add code/number with part as one token
-        parts << code_portion if code_portion
-
-        # Build result - join with space, then add dash+year as one token
-        result = parts.join(" ")
-        result += "-#{year}" if year
-        result += " (R#{reaffirmation})" if reaffirmation
-        result
+        render(format: :human)
       end
 
       private
