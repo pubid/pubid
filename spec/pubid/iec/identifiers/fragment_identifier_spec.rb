@@ -296,38 +296,38 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
     end
   end
 
-  # Test Scheme integration
-  context "Scheme integration" do
-    it "FragmentIdentifier is registered in Scheme supplement_identifiers" do
-      expect(Pubid::Iec::Scheme.supplement_identifiers).to include(described_class)
+  # Test self-describing module integration
+  context "Module integration" do
+    it "FragmentIdentifier is discoverable as an IEC identifier type" do
+      expect(Pubid::Iec.identifier_types).to include(described_class)
     end
 
-    it "FRAG abbreviation is lookupable via Scheme" do
-      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("FRAG")
+    it "FRAG abbreviation is lookupable via Pubid::Iec" do
+      ts = Pubid::Iec.locate_stage("FRAG")
       expect(ts.type_code).to eq("frag")
       expect(ts.abbr).to include("FRAG")
     end
 
-    it "CDFRAG abbreviation is lookupable via Scheme" do
-      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("CDFRAG")
+    it "CDFRAG abbreviation is lookupable via Pubid::Iec" do
+      ts = Pubid::Iec.locate_stage("CDFRAG")
       expect(ts.type_code).to eq("frag")
       expect(ts.name).to eq("Committee Draft Fragment")
     end
 
-    it "DFRAG abbreviation is lookupable via Scheme" do
-      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("DFRAG")
+    it "DFRAG abbreviation is lookupable via Pubid::Iec" do
+      ts = Pubid::Iec.locate_stage("DFRAG")
       expect(ts.type_code).to eq("frag")
       expect(ts.name).to eq("Draft Fragment")
     end
 
-    it "FDFRAG abbreviation is lookupable via Scheme" do
-      ts = Pubid::Iec::Scheme.locate_typed_stage_by_abbr("FDFRAG")
+    it "FDFRAG abbreviation is lookupable via Pubid::Iec" do
+      ts = Pubid::Iec.locate_stage("FDFRAG")
       expect(ts.type_code).to eq("frag")
       expect(ts.name).to eq("Final Draft Fragment")
     end
 
     it "FragmentIdentifier is lookupable by type_code :frag" do
-      klass = Pubid::Iec::Scheme.locate_identifier_klass_by_type_code(:frag)
+      klass = Pubid::Iec.locate_type(:frag)
       expect(klass).to eq(described_class)
     end
   end

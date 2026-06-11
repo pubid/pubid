@@ -19,7 +19,6 @@ module Pubid
       end
 
       def compare_registry_lookup
-        scheme = Pubid::Iso::Scheme.instance
         abbrs = ["WD", "CD", "FDIS", "Amd", "Cor", "PWI", "NP", "IS", "", "FDAM", "CDAMD",
                  "PWI Guide", "NP Guide", "AWI", "DAmd", "DAnnex", "DEx"]
         total_lookups = @iterations * abbrs.size
@@ -29,7 +28,7 @@ module Pubid
           @iterations.times do
             abbrs.each do |abbr|
               # Simulate old linear search
-              all_stages = scheme.all_typed_stages
+              all_stages = Pubid::Iso.all_typed_stages
               all_stages.detect { |ts| ts.abbr.include?(abbr) }
             end
           end
@@ -38,7 +37,7 @@ module Pubid
         # AFTER: Hash-based index lookup
         hash_time = ::Benchmark.realtime do
           @iterations.times do
-            abbrs.each { |abbr| scheme.locate_typed_stage_by_abbr(abbr) }
+            abbrs.each { |abbr| Pubid::Iso.locate_stage(abbr) }
           end
         end
 

@@ -11,9 +11,9 @@ module Pubid
     autoload :FormatResolver, "#{__dir__}/iso/format_resolver"
     autoload :Identifier, "#{__dir__}/iso/identifier"
     autoload :Identifiers, "#{__dir__}/iso/identifiers"
+    autoload :Normalizer, "#{__dir__}/iso/normalizer"
     autoload :Parser, "#{__dir__}/iso/parser"
     autoload :RenderingStyle, "#{__dir__}/iso/rendering_style"
-    autoload :Scheme, "#{__dir__}/iso/scheme"
     autoload :SingleIdentifier, "#{__dir__}/iso/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/iso/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/iso/urn_generator"
@@ -33,7 +33,7 @@ module Pubid
       when :mr_string
         Pubid::Parsers::MrString.parse(identifier)
       else
-        Scheme.parse(identifier)
+        Normalizer.apply(identifier)
       end
     end
 
@@ -66,6 +66,18 @@ module Pubid
       end
     end
 
+    # Memoized builder instance used by Normalizer / URN parser
+    # @return [Pubid::Iso::Builder]
+    def self.builder
+      @builder ||= Builder.new
+    end
+
+    # Memoized parser instance used by Normalizer
+    # @return [Pubid::Iso::Parser]
+    def self.parser
+      @parser ||= Parser.new
+    end
+
     # Lookup: type code -> identifier class
     # @param code [String, Symbol] the type key to find
     # @return [Class, nil] the matching identifier class
@@ -79,6 +91,37 @@ module Pubid
     def self.locate_stage(abbr)
       abbr_str = abbr.to_s.upcase
       all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
+    end
+
+    # Lookup: stage code -> typed stage
+    # @param stage_code [String, Symbol]
+    # @return [Pubid::Components::TypedStage, nil]
+    def self.locate_stage_by_stage_code(stage_code)
+      stage_code_sym = stage_code.to_sym
+      all_typed_stages.find { |s| s.stage_code.to_sym == stage_code_sym }
+    end
+
+    # Lookup: per-typed-stage code -> typed stage
+    # @param code [String, Symbol]
+    # @return [Pubid::Components::TypedStage, nil]
+    def self.locate_stage_by_code(code)
+      code_sym = code.to_sym
+      all_typed_stages.find { |s| s.code&.to_sym == code_sym }
+    end
+
+    # Lookup: harmonized stage code -> typed stage
+    # @param harmonized_code [String]
+    # @return [Pubid::Components::TypedStage, nil]
+    def self.locate_stage_by_harmonized_code(harmonized_code)
+      harmonized_str = harmonized_code.to_s
+      all_typed_stages.find { |s| s.harmonized_stages&.include?(harmonized_str) }
+    end
+
+    # Default typed stage used when no type_with_stage is present
+    # (e.g., the bare International Standard published stage)
+    # @return [Pubid::Components::TypedStage]
+    def self.default_typed_stage
+      locate_stage("") || all_typed_stages.first
     end
   end
 end

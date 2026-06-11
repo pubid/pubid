@@ -17,7 +17,7 @@ module Pubid
                 "Invalid identifier format"
         end
 
-        Pubid::Iec::Builder.new(Pubid::Iec::Scheme).build(parsed)
+        Pubid::Iec::Builder.new.build(parsed)
       end
     end
   end

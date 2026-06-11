@@ -75,9 +75,9 @@ module Pubid
         "pubid:iso:bundled-identifier" => "Pubid::Iso::BundledIdentifier",
       }.freeze
 
-      # Build type map from Scheme.identifiers for validation
+      # Build type map from Pubid::Iso.identifier_types for validation
       def self.build_type_map
-        Scheme.identifiers.to_h do |klass|
+        Pubid::Iso.identifier_types.to_h do |klass|
           [klass.polymorphic_name, klass.name]
         end
       end
@@ -249,7 +249,7 @@ module Pubid
                   "Invalid identifier format"
           end
 
-          Pubid::Iso::Builder.new(Pubid::Iso::Scheme).build(parsed)
+          Pubid::Iso::Builder.new.build(parsed)
         end
       end
 

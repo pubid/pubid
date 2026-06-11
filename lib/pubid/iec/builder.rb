@@ -3,10 +3,6 @@
 module Pubid
   module Iec
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
-      end
-
       def locate_identifier_klass(parsed_hash)
         # Check for working programme
         if parsed_hash[:wp_stage]
@@ -22,7 +18,8 @@ module Pubid
         # :type_with_stage will be nil if it is an IS.
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
 
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+        Pubid::Iec.locate_type(typed_stage.type_code) ||
+          raise(ArgumentError, "Unknown type code: #{typed_stage.type_code}")
       end
 
       def build(parsed_hash)
@@ -50,7 +47,8 @@ module Pubid
 
           # Locate the supplement identifier class
           typed_stage = locate_typed_stage(supplement_type)
-          identifier_class = @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+          identifier_class = Pubid::Iec.locate_type(typed_stage.type_code) ||
+            raise(ArgumentError, "Unknown type code: #{typed_stage.type_code}")
 
           # Create the supplement identifier
           supplement = identifier_class.new
@@ -91,14 +89,11 @@ module Pubid
 
         if is_fragment
           # For FRAG typed stages, look up the fragment's own typed stage
-          begin
-            fragment_typed_stage = @scheme.locate_typed_stage_by_abbr(
-              parsed_hash[:type_with_stage].to_s,
-            )
-          rescue ArgumentError
-            # FRAGC is a rendering notation, not a typed stage abbreviation
-            fragment_typed_stage = @scheme.locate_typed_stage_by_abbr("FRAG")
-          end
+          fragment_typed_stage = Pubid::Iec.locate_stage(parsed_hash[:type_with_stage])
+
+          # FRAGC is a rendering notation, not a typed stage abbreviation;
+          # fall back to the canonical "FRAG" typed stage
+          fragment_typed_stage ||= Pubid::Iec.locate_stage("FRAG")
 
           # For FRAG/FRAGC, we need to build the base Amendment/Corrigendum
           # then wrap it with FragmentIdentifier
@@ -196,7 +191,7 @@ module Pubid
 
         # After building base identifier, apply wrappers
         if fragment_type_data && fragment_number_data
-          frag_ts = @scheme.locate_typed_stage_by_abbr("FRAG")
+          frag_ts = Pubid::Iec.locate_stage("FRAG")
           identifier = wrap_with_fragment(identifier, fragment_number_data.to_s,
                                           nil, frag_ts)
         end
@@ -221,6 +216,22 @@ module Pubid
         else
           false
         end
+      end
+
+      # The IEC builder's own `build` method drives identifier construction
+      # (it locates the right class per parsed hash), so the parent class's
+      # `@identifier_class` slot is never read. Provide a placeholder so
+      # `Builder.new` doesn't fail with NotImplementedError.
+      def default_identifier_class
+        Identifiers::InternationalStandard
+      end
+
+      # Look up a typed stage by abbreviation via the self-describing
+      # `Pubid::Iec` module instead of an injected scheme instance.
+      def locate_typed_stage(typed_stage_string)
+        typed_stage_string = "" if typed_stage_string.nil?
+        Pubid::Iec.locate_stage(typed_stage_string) ||
+          raise(ArgumentError, "Unknown type abbreviation: '#{typed_stage_string}'")
       end
 
       # Wrap identifier with FragmentIdentifier for /FRAGN notation
@@ -428,7 +439,7 @@ module Pubid
           case value[:publisher]
           when "ISO"
             require_relative "../iso/builder"
-            Iso::Builder.new(Iso::Scheme).build(value)
+            Iso::Builder.new.build(value)
           end
 
         else
