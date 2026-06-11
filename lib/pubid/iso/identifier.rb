@@ -42,6 +42,7 @@ module Pubid
         "pubid:iso:data" => "Pubid::Iso::Identifiers::Data",
         "pubid:iso:tc-document" => "Pubid::Iso::Identifiers::TcDocument",
         "pubid:iso:technology-trends-assessments" => "Pubid::Iso::Identifiers::TechnologyTrendsAssessments",
+        "pubid:iso:bundled-identifier" => "Pubid::Iso::BundledIdentifier",
       }.freeze
 
       # Build type map from Scheme.identifiers for validation

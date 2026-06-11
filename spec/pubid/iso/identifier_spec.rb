@@ -199,8 +199,13 @@ RSpec.describe Pubid::Iso::Identifier do
   end
 
   describe ".build_type_map" do
-    it "matches ISO_TYPE_MAP with Scheme.identifiers" do
-      generated = described_class.build_type_map
+    it "matches ISO_TYPE_MAP with Scheme.identifiers (plus the bundled type)" do
+      # BundledIdentifier is a serialization-only composite (not a parseable
+      # base type in Scheme.identifiers), but it needs a type-map entry so
+      # from_hash can route it.
+      generated = described_class.build_type_map.merge(
+        "pubid:iso:bundled-identifier" => "Pubid::Iso::BundledIdentifier",
+      )
       expect(described_class::ISO_TYPE_MAP).to eq(generated)
     end
   end

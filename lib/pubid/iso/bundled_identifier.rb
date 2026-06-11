@@ -10,6 +10,57 @@ module Pubid
                                                    collection: true
       attribute :type, :string, default: -> { "bundled_identifier" }
 
+      # Serialize the bundle structure. The inherited common-field maps read the
+      # delegated base_document values; suppress them (base_document carries
+      # them) and serialize base_document + the supplements collection instead,
+      # routing each through from_hash on load.
+      key_value do
+        # Serialized key is "base" (consistent with supplements); the attribute
+        # stays base_document.
+        map "base",
+            with: { to: :base_document_to_kv, from: :base_document_from_kv }
+        map "supplements",
+            with: { to: :supplements_to_kv, from: :supplements_from_kv }
+      end
+
+      def base_document_to_kv(model, doc)
+        return unless model.base_document
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new(
+                        "base", model.base_document.to_hash
+                      ))
+      end
+
+      def base_document_from_kv(model, value)
+        model.base_document = ::Pubid::Iso::Identifier.from_hash(value) if value
+      end
+
+      def supplements_to_kv(model, doc)
+        return unless model.supplements&.any?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new(
+                        "supplements", model.supplements.map(&:to_hash)
+                      ))
+      end
+
+      def supplements_from_kv(model, value)
+        model.supplements = Array(value).map do |h|
+          ::Pubid::Iso::Identifier.from_hash(h)
+        end
+      end
+
+      # The delegated common fields are carried by base_document; don't duplicate
+      # them at the bundle level.
+      def number_to_kv(_model, _doc); end
+      def part_to_kv(_model, _doc); end
+      def subpart_to_kv(_model, _doc); end
+      def year_to_kv(_model, _doc); end
+      def month_to_kv(_model, _doc); end
+      def day_to_kv(_model, _doc); end
+      def publisher_to_kv(_model, _doc); end
+      def copublishers_to_kv(_model, _doc); end
+      def stage_to_kv(_model, _doc); end
+
       # Delegate key attributes to base_document for easier access in tests
       def publisher
         base_document&.publisher
