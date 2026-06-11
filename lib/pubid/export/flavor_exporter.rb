@@ -72,30 +72,36 @@ module Pubid
       end
 
       def resolve_identifier_classes
-        scheme = scheme_class
+        mod = scheme_module
         scheme_klasses = []
 
-        # Pattern 1: Class methods (ISO, IEC, ASTM, etc.)
-        begin
-          scheme_klasses = scheme.identifiers if scheme
-        rescue NoMethodError
-          scheme_klasses = []
+        # Primary: Use flavor module's self-describing identifier_types
+        if mod&.respond_to?(:identifier_types)
+          types = mod.identifier_types
+          scheme_klasses = types if types && !types.empty?
         end
 
-        # Pattern 2: Instance-based (AMCA, BSI)
-        if scheme_klasses.empty? && scheme
-          instance = begin
-            scheme.new
-          rescue NoMethodError
-            nil
-          end
-          if instance
-            ids = begin
-              instance.identifiers
+        # Fallback: Scheme class methods or instance
+        if scheme_klasses.empty?
+          scheme = scheme_class
+          if scheme
+            begin
+              scheme_klasses = scheme.identifiers
             rescue NoMethodError
-              nil
+              instance = begin
+                scheme.new
+              rescue NoMethodError
+                nil
+              end
+              if instance
+                ids = begin
+                  instance.identifiers
+                rescue NoMethodError
+                  nil
+                end
+                scheme_klasses = ids if ids && !ids.empty?
+              end
             end
-            scheme_klasses = ids if ids && !ids.empty?
           end
         end
 
