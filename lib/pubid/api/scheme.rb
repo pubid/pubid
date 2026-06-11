@@ -1,16 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "identifiers/base"
-require_relative "identifiers/bulletin"
-require_relative "identifiers/continuous_operations_standard"
-require_relative "identifiers/mpms"
-require_relative "identifiers/publication"
-require_relative "identifiers/recommended_practice"
-require_relative "identifiers/specification"
-require_relative "identifiers/standard"
-require_relative "identifiers/technical_report"
-require_relative "identifiers/typeless_standard"
-
 module Pubid
   module Api
     class Scheme < Pubid::Scheme

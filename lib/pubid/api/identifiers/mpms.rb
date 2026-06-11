@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "base"
-
 module Pubid
   module Api
     module Identifiers
@@ -15,21 +13,7 @@ module Pubid
         end
 
         def to_s
-          parts = ["API", "MPMS"]
-
-          # Add chapter
-          parts << "CH #{chapter}" if chapter
-
-          # Add section/subsection
-          if section
-            parts << ".#{section}"
-            parts << ".#{subsection}" if subsection
-          end
-
-          # Add year
-          parts << "-#{year}" if year
-
-          parts.join(" ").gsub(" .", ".")
+          render(format: :human)
         end
 
         private

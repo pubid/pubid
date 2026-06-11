@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "parser"
-require_relative "builder"
-require_relative "single_identifier"
-require_relative "scheme"
-
 module Pubid
   module Api
     class Identifier
