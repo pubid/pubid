@@ -8,9 +8,12 @@ module Pubid
         attribute :supplement_publisher, ::Pubid::Components::Publisher
 
         # supplement_publisher (e.g. "IEC" in "ISO/IEC DIR 1 IEC SUP") is needed
-        # by to_s/to_urn; serialize its body so it survives from_hash.
+        # by to_s/to_urn; serialize its body under "publisher" (the supplement's
+        # own publisher; the base's publisher lives in the nested base). This
+        # overrides the inherited publisher map, whose delegated value is nil or
+        # the omitted ISO default here.
         key_value do
-          map "supplement_publisher",
+          map "publisher",
               with: { to: :supplement_publisher_to_kv, from: :supplement_publisher_from_kv }
         end
 
@@ -19,13 +22,17 @@ module Pubid
           return if body.nil? || body.to_s.empty?
 
           doc.add_child(
-            Lutaml::KeyValue::DataModel::Element.new("supplement_publisher", body.to_s),
+            Lutaml::KeyValue::DataModel::Element.new("publisher", body.to_s),
           )
         end
 
         def supplement_publisher_from_kv(model, value)
           model.supplement_publisher = ::Pubid::Components::Publisher.new(body: value.to_s)
         end
+
+        # copublishers here is the base's (delegated), redundant with the nested
+        # base; don't duplicate it at the supplement level.
+        def copublishers_to_kv(_model, _doc); end
 
         # Delegate base identifier attributes for easier access
         def copublishers
