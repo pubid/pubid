@@ -27,19 +27,8 @@ module Pubid
             short: "Addenda" }
         end
 
-        def to_s
-          return base_identifier.to_s unless base_identifier
-
-          base_type = base_identifier.type || "Standard"
-          if addendum_codes
-            # Format: ASHRAE Addenda c and d to Standard 15-1994
-            result = "ASHRAE Addenda #{addendum_codes} to #{base_type} #{base_identifier.code}"
-          else
-            # Format: ASHRAE Addenda to Standard 15-1994 (no specific codes)
-            result = "ASHRAE Addenda to #{base_type} #{base_identifier.code}"
-          end
-          result += "-#{base_identifier.year}" if base_identifier.year
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         def copublisher

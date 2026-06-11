@@ -25,14 +25,8 @@ module Pubid
           { key: :errata, title: "ASHRAE Errata", short: "Errata" }
         end
 
-        def to_s
-          return base_identifier.to_s unless base_identifier
-
-          # Format: ASHRAE Guideline 0-2005 Errata (September 28, 2011)
-          result = base_identifier.to_s
-          result += " Errata"
-          result += " (#{errata_date})" if errata_date
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
       end
     end
