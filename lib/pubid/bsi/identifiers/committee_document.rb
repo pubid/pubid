@@ -30,20 +30,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          # Committee documents use a unique format: YY/NNNNNNNN DC
-          # The year is 2-digit (extracted from date or use current date format)
-          # Note: Assumes 2000s for years 00-99 (Y2K assumption)
-          year_str = if date
-                       if date.is_a?(Components::Date)
-                         date.year.to_s[-2, 2]
-                       else
-                         date.to_s[-2, 2]
-                       end
-                     else
-                       "00" # Default if no date
-                     end
-
-          "#{year_str}/#{document_number} DC"
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

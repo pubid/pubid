@@ -30,36 +30,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          # Test Method format: BS {number}:{test_series}:{test_id}:{year}
-          parts = []
-
-          # Publisher (BS)
-          parts << "BS"
-
-          # Number
-          if number
-            number_str = if number.is_a?(Components::Code)
-                           number.value.to_s
-                         else
-                           number.to_s
-                         end
-            parts << number_str
-          end
-
-          result = parts.join(" ")
-
-          # Test series and test ID suffixes
-          if test_series && test_id
-            result += ":#{test_series}:#{test_id}"
-          end
-
-          # Date
-          if date
-            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
-            result += ":#{year_val}"
-          end
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

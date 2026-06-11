@@ -16,18 +16,7 @@ module Pubid
         attribute :format, :string, values: ["PDF", "TC", "BOOK"]
 
         def to_s(lang: :en, lang_single: false)
-          base_str = base_identifier.to_s(lang: lang, lang_single: lang_single)
-
-          case format
-          when "TC"
-            "#{base_str} - TC"
-          when "PDF"
-            "#{base_str} PDF"
-          when "BOOK"
-            "#{base_str} BOOK"
-          else
-            base_str
-          end
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
 
         # Delegate common attributes to base_identifier

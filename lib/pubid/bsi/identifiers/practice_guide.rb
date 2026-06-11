@@ -17,9 +17,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          result = "PP #{number}"
-          result += ":#{date.year}" if date
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

@@ -20,18 +20,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          # Use preserved original abbreviation, default to "Handbook"
-          abbr = original_abbr || "Handbook"
-
-          number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
-          if part
-            part_val = part.is_a?(Components::Code) ? part.value : part
-            number_str += "-#{part_val.to_s.strip}"
-          end
-
-          result = "#{abbr} #{number_str}"
-          result += ":#{date.year}" if date
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

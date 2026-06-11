@@ -28,40 +28,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          parts = []
-
-          # Publisher prefix
-          parts << "BS"
-
-          # Base number
-          if number
-            number_str = if number.is_a?(Components::Code)
-                           number.value.to_s
-                         else
-                           number.to_s
-                         end
-            parts << number_str
-          end
-
-          # Spec notation (N002 or C155-168)
-          if spec_code
-            code_val = if spec_code.is_a?(Components::Code)
-                         spec_code.value
-                       else
-                         spec_code
-                       end
-            result = "#{parts.join(' ')} #{code_val}"
-          else
-            result = parts.join(" ")
-          end
-
-          # Date
-          if date
-            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
-            result += ":#{year_val}"
-          end
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

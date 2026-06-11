@@ -17,43 +17,7 @@ module Pubid
         attribute :expert_commentary_topic, :string
 
         def to_s
-          # Get the BSI prefix (BS, PD, DD)
-          prefix = case publisher
-                   when Components::Publisher
-                     publisher.body
-                   when Array
-                     publisher.join("/")
-                   when String
-                     publisher
-                   else
-                     "BS"
-                   end
-
-          result = prefix
-          result += " #{adopted_identifier}" if adopted_identifier
-          result += " ED#{edition}" if edition
-
-          # Reaffirmation notation like (R2004)
-          result += " (R#{reaffirmation_year})" if reaffirmation_year
-
-          # Translation - normalize to just "(Language)" format
-          # "(French version)", "(French Translation)", "(French)" all become "(French)"
-          if translation_lang
-            result += " (#{translation_lang})"
-          elsif translation_upper
-            result += " (#{translation_upper})"
-          end
-
-          # ExpertCommentary suffix
-          if expert_commentary
-            result += if expert_commentary_topic
-                        " ExComm (#{expert_commentary_topic})"
-                      else
-                        " ExComm"
-                      end
-          end
-
-          result
+          render(format: :human)
         end
 
         # Delegate common methods to adopted identifier

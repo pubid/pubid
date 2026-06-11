@@ -26,13 +26,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          base = if corrigendum
-                   "AMD Corrigendum #{amendment_number}"
-                 else
-                   "AMD #{amendment_number}"
-                 end
-
-          parenthesized ? "(#{base})" : base
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

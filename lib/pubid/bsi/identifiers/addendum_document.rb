@@ -22,37 +22,7 @@ module Pubid
         } # Separator before Addendum (":" or " ")
 
         def to_s(lang: :en, lang_single: false)
-          result = base_identifier.to_s(lang: lang, lang_single: lang_single)
-
-          # Determine separator - if separator is explicitly ":", use it
-          # Otherwise if base has year and doesn't already have double colon, use space
-          base_has_year = base_identifier.to_s =~ /:(\d{4})$/
-
-          sep = if separator == ":"
-                  ":"
-                elsif base_has_year && base_identifier.to_s !~ /:\d{4}:/
-                  " "
-                else
-                  separator
-                end
-
-          # Format: "BASE:Addendum No. N:YEAR" or "BASE Addendum No. N:YEAR" or "BASE:Addendum N:YEAR"
-          result += sep
-          result += "Addendum"
-
-          # Add space after "Addendum" if there's a type prefix (like "No.")
-          if addendum_type.empty?
-            # No type prefix, but still need space before number
-          else
-            result += " #{addendum_type}"
-          end
-          result += " "
-          result += " "
-
-          result += addendum_number.to_s
-          result += ":#{addendum_year}" if addendum_year
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
 
         def publisher

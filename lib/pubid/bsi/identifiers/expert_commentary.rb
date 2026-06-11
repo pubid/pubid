@@ -15,19 +15,7 @@ module Pubid
         attribute :topic, :string # e.g., "Fire"
 
         def to_s
-          base_str = base_identifier.to_s
-          # Ensure suffix appears only once at the end
-          base_str = base_str.sub(/ (Expert Commentary|ExComm(\s*\(.*\))?)$/,
-                                  "")
-
-          case format
-          when "full"
-            "#{base_str} Expert Commentary"
-          when "abbr_with_topic"
-            "#{base_str} ExComm (#{topic})"
-          else # "abbr" (default)
-            "#{base_str} ExComm"
-          end
+          render(format: :human)
         end
 
         def publisher
