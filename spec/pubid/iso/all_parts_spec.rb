@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Pubid::Iso::Identifiers::Base do
+RSpec.describe "ISO all parts notation" do
   describe "#all_parts" do
     context "with all parts notation" do
       it "parses ISO identifier with (all parts)" do

@@ -2,8 +2,6 @@
 
 module Pubid
   module Rendering
-    autoload :Base, "pubid/rendering/base"
-    autoload :Common, "pubid/rendering/common"
     autoload :Date, "pubid/rendering/date"
     autoload :Format, "pubid/rendering/format"
     autoload :Language, "pubid/rendering/language"
