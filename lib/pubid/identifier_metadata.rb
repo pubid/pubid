@@ -102,7 +102,7 @@ module Pubid
       # Get the metadata for this class
       # @return [Metadata, nil]
       def metadata
-        @metadata ||= if superclass.is_a?(Class) && superclass.respond_to?(:metadata)
+        @metadata ||= if superclass.is_a?(Class) && superclass.ancestors.include?(Pubid::IdentifierMetadata)
                         superclass.metadata
                       end
       end
