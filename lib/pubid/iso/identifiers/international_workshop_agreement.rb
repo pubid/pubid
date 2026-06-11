@@ -8,8 +8,8 @@ module Pubid
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(
-            code: :npiwa,
-            stage_code: :np,
+            code: :pwiiwa,
+            stage_code: :pwi,
             type_code: :iwa,
             abbr: ["PWI IWA"],
             name: "Proposed Work Item for International Workshop Agreement",
