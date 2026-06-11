@@ -1729,9 +1729,13 @@ The V2 implementation strictly follows these design principles:
 
 Object-Oriented Design:: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
 MECE Organization:: Mutually Exclusive (no overlap), Collectively Exhaustive (full coverage), clear boundaries
-Separation of Concerns:: Parser handles syntax only, Builder handles transformation only, Identifier handles rendering only
+Separation of Concerns:: Parser handles syntax only, Builder handles transformation only, Renderer handles formatting only
+Self-Describing Types:: Each identifier class IS the type definition — no central registry required for type metadata
+Renderer Pattern:: Dedicated per-flavor Renderer classes handle human-readable output; identifier `to_s` delegates to `render(format: :human)` via `FormatRegistry`
+Single Source of Truth:: Series matching, type metadata, and rendering logic live in exactly one place per concern
 Extensibility:: Use inheritance and polymorphism, plugin/registry architecture, avoid hardcoding
 Test Quality:: Each class has dedicated spec file, no lowering pass thresholds, test actual behavior
+Autoload Everywhere:: Ruby autoload replaces `require_relative` for internal library code — lazy loading, no circular dependency risk
 
 === Pre-parser Normalization (update_codes.yaml)
 

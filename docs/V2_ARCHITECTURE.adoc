@@ -1,4 +1,4 @@
-= V2 Architecture Guide
+# V2 Architecture Guide
 
 This document describes the PubID V2 architecture: design principles, parse pipeline, identifier class hierarchy, and how flavors are structured.
 
@@ -6,9 +6,14 @@ This document describes the PubID V2 architecture: design principles, parse pipe
 
 1. **Single gem**: All flavors live in one gem under `lib/pubid/{flavor}/`
 2. **Model-driven**: Identifier objects are Lutaml::Model serializable classes
-3. **Round-trip fidelity**: Parse then render produces the original string
-4. **Parslet PEG parsers**: Deterministic parsing with composable grammar rules
-5. **Pre-parse normalization**: Malformed/legacy identifiers are fixed before parsing
+3. **Self-describing types**: Each identifier class IS the type definition; no central registry required
+4. **Renderer pattern**: Output formatting is separated into dedicated Renderer classes
+5. **Single source of truth**: Series matching, type metadata, and rendering live in one place
+6. **Open/Closed**: New flavors add files, not modify existing ones
+7. **Round-trip fidelity**: Parse then render produces the original string
+8. **Parslet PEG parsers**: Deterministic parsing with composable grammar rules
+9. **Pre-parse normalization**: Malformed/legacy identifiers are fixed before parsing
+10. **Autoload**: Lazy loading via Ruby autoload defined in parent namespace files
 
 == Parse Pipeline
 
@@ -26,7 +31,7 @@ Parser (Parslet PEG grammar -> parse tree)
 Builder (parse tree -> attribute hash)
     |
     v
-Identifier (Lutaml::Model object -> to_s / to_urn / to_h)
+Identifier (Lutaml::Model object -> render(format:) -> to_s / to_urn / to_h)
 ----
 
 === Pre-parser Normalization
@@ -49,59 +54,126 @@ Each flavor defines a Parslet PEG grammar in `parser.rb`:
 
 === Builder Layer
 
-Transforms the parse tree into an attribute hash suitable for constructing identifier objects:
+Builders transform parse trees into attribute hashes and instantiate identifier objects:
 
-- Maps typed stage abbreviations to `TypedStage` objects
-- Resolves identifier type (IS, TS, TR, etc.) from parsed components
-- Some flavors use a `transformer.rb` instead of `builder.rb`
+- Each flavor has a `builder.rb` that delegates to model classes
+- NIST's builder is split into three: `Builder` (orchestrator), `Router` (series-to-class routing), `Caster` (type coercion) — single source of truth for series matching
+- Builders accept parsed hash and construct identifiers with correct attribute assignment
 
-=== Identifier Layer
+=== Rendering Layer (Renderer Pattern)
 
-Lutaml::Model-based classes with rendering logic:
+All flavors use the Renderer pattern for human-readable output:
 
-- `to_s` - human-readable string
-- `to_urn` - URN representation
-- `to_h` / `to_json` - machine-readable serialization
-- `root` - traverse supplement chain to base document
+- Each flavor registers a dedicated `Renderer` class via `FormatRegistry`
+- Per-flavor registries inherit from the global `Pubid::Identifier.format_registry` (shared `:mr_string` and `:urn` formats; overridden `:human`)
+- Identifier `to_s(**opts)` delegates to `render(format: :human, **opts)`
+- Adding a new output format (e.g., BibXML, JSON-LD) requires only a new Renderer class and registry entry — zero changes to identifier classes
 
-== Directory Structure
+[source,ruby]
+----
+# lib/pubid/iec/renderer.rb
+module Pubid::Iec
+  class Renderer < Pubid::Renderers::Base
+    def render(context: nil, **opts)
+      # IEC-specific composition
+    end
+  end
+end
+
+# lib/pubid/iec.rb — registry setup
+Iec::Identifier.format_registry = FormatRegistry.new(parent: Identifier.format_registry)
+Iec::Identifier.format_registry.register(:human, renderer: Iec::Renderer)
+----
+
+== Self-Describing Types
+
+Each identifier type class IS the type definition. No central Scheme registry required.
+
+[source,ruby]
+----
+# lib/pubid/iso/identifiers/international_standard.rb
+class InternationalStandard < SingleIdentifier
+  def self.type
+    { key: :is, title: "International Standard", short: "IS" }
+  end
+
+  TYPED_STAGES = [
+    TypedStage.new(abbr: "DIS", name: "Draft International Standard", ...),
+    # ...
+  ]
+end
+----
+
+Each flavor module exposes model-driven lookup methods:
+
+[source,ruby]
+----
+module Pubid::Iso
+  def self.identifier_types
+    @identifier_types ||= Identifiers.constants
+      .map { |c| Identifiers.const_get(c) }
+      .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+      .select { |c| c.type.is_a?(Hash) }
+  end
+
+  def self.all_typed_stages
+    @all_typed_stages ||= identifier_types.flat_map do |klass|
+      klass.const_defined?(:TYPED_STAGES) ? klass.const_get(:TYPED_STAGES) : []
+    end
+  end
+
+  def self.locate_type(code)
+    identifier_types.find { |t| t.type[:key].to_s == code.to_s }
+  end
+
+  def self.locate_stage(abbr)
+    all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr.to_s.upcase } }
+  end
+end
+----
+
+Adding a new identifier type requires: (a) creating the class, (b) adding it to the `Identifiers` namespace. No other files modified.
+
+== Repository Layout
 
 [source]
 ----
-lib/pubid/
-|-- core/                   # Shared base classes
-|   |-- identifier.rb       # Base Identifier class
-|   |-- parser.rb           # Base parser (Parslet)
-|   |-- renderer/           # Shared rendering helpers
-|   |-- update_codes.rb     # Pre-parse normalization engine
-|   |-- scheme.rb           # Type registry
-|-- components/             # Shared value objects
-|   |-- code.rb             # Code (number, part)
-|   |-- date.rb             # Date
-|   |-- edition.rb          # Edition
-|   |-- language.rb         # Language code
-|   |-- publisher.rb        # Publisher
-|   |-- stage.rb            # Stage
-|   |-- type.rb             # Document type
-|   |-- typed_stage.rb      # Typed stage (stage + type)
-|-- iso/                    # ISO flavor
-|   |-- parser.rb           # PEG grammar
-|   |-- builder.rb          # Parse tree -> attributes
-|   |-- scheme.rb           # Type registry
-|   |-- identifiers/        # Type-specific classes
-|   |   |-- international_standard.rb
-|   |   |-- technical_report.rb
-|   |   |-- amendment.rb
-|   |   |-- corrigendum.rb
-|   |   +-- ...
-|   |-- urn_generator.rb    # URN output
-|   +-- urn_parser.rb       # URN input
-|-- iec/                    # IEC flavor (same structure)
-|-- nist/                   # NIST flavor
-|-- ieee/                   # IEEE flavor
-+-- ...                     # 22+ flavors total
+lib/pubid/                       # Root module
+|-- identifier.rb                # Lutaml::Model base
+|-- identifier_metadata.rb       # Optional metadata mixin
+|-- format_registry.rb           # Format -> renderer/parser mapping
+|-- format_detector.rb           # Auto-detect format
+|-- renderers/                   # Shared renderer infrastructure
+|   |-- base.rb                  # Abstract base with annotation helpers
+|   |-- human_readable.rb        # ISO's human-readable renderer
+|   |-- mr_string.rb             # MR string renderer
+|   +-- urn.rb                   # URN renderer
+|-- builders/                    # Shared builder infrastructure
+|-- components/                  # Shared component classes (Code, Date, ...)
+|-- serializable/                # Serialization support
+|-- urn_generator/               # Shared URN generator
+|-- parser/                      # Shared parser rules
+|-- utils/                       # Utilities
+|-- lutaml/                      # Lutaml integration
+|-- core/                        # Core normalization
+|-- export/                      # Metadata export pipeline
+|   |-- exporter.rb              # Top-level orchestrator
+|   |-- flavor_exporter.rb       # Per-flavor strategy base
+|   |-- scheme_exporter.rb       # Scheme-based flavors
+|   |-- registry_exporter.rb     # TYPED_STAGES_REGISTRY flavors
+|   |-- data_class_exporter.rb   # Lutaml data class flavors
+|   |-- ieee_exporter.rb         # IEEE-specific strategy
+|   |-- nist_exporter.rb         # NIST-specific strategy
+|   |-- itu_exporter.rb          # ITU-specific strategy
+|   |-- result.rb                # Value objects
+|   +-- auditor.rb               # Library vs website data audit
+|-- iso/                         # ISO flavor
+|-- iec/                         # IEC flavor
+|-- nist/                        # NIST flavor (with Router + Caster split)
+|-- ieee/                        # IEEE flavor
++-- ...                          # 22+ flavors total
 
-data/                       # Pre-parse normalization data
+data/                            # Pre-parse normalization data
 |-- iso/update_codes.yaml
 |-- iec/update_codes.yaml
 |-- ieee/update_codes.yaml
@@ -117,18 +189,21 @@ Each flavor under `lib/pubid/{flavor}/` follows this pattern:
 [source]
 ----
 lib/pubid/{flavor}/
-|-- parser.rb          # Parslet PEG grammar
-|-- transformer.rb     # AST -> attribute hash (some flavors)
-|-- builder.rb         # Parse tree -> identifier object
-|-- scheme.rb          # Identifier type registry (some flavors)
-|-- identifier.rb      # Top-level entry point (parse method)
-|-- identifiers/       # Type-specific classes
-|   |-- international_standard.rb   # Defines TYPED_STAGES
+|-- parser.rb            # Parslet PEG grammar
+|-- transformer.rb       # AST -> attribute hash (some flavors)
+|-- builder.rb           # Parse tree -> identifier object
+|-- identifier.rb        # Top-level entry point (parse method)
+|-- identifiers.rb       # Namespace module with autoload entries
+|-- identifiers/         # Type-specific classes (each is self-describing)
+|   |-- base.rb
+|   |-- international_standard.rb   # Defines .type, TYPED_STAGES
 |   |-- technical_report.rb
 |   +-- ...
-|-- renderer/          # Output formatting (some flavors)
-|-- urn_generator.rb   # URN output (most flavors)
-+-- urn_parser.rb      # URN input (ISO, IEC)
+|-- components.rb        # Namespace module with autoload entries
+|-- components/          # Flavor-specific component classes
+|-- renderer.rb          # Dedicated Renderer for human-readable output
+|-- urn_generator.rb     # URN output
++-- urn_parser.rb        # URN input (ISO, IEC)
 ----
 
 == Identifier Class Hierarchy
@@ -138,16 +213,43 @@ lib/pubid/{flavor}/
 Pubid::Identifier (Lutaml::Model base)
 |-- attributes: number, part, subpart, date, edition, languages,
 |              publisher, copublishers, type, stage
-|-- methods: to_h, to_json, root, exclude, new_edition_of?
+|-- methods: to_h, to_json, root, exclude, new_edition_of?, render(format:, **opts)
 
 Flavor-specific (e.g., Pubid::Iso::SingleIdentifier)
-|-- methods: to_s, to_urn, publisher_portion, number_portion
-|-- uses: RenderingStyle for format variants
+|-- to_s delegates to render(format: :human, **opts)
+|-- uses dedicated Renderer for output composition
 
 Pubid::SupplementIdentifier
 |-- attributes: base_identifier, supplement_type
 |-- chained: amendment -> corrigendum -> ...
 ----
+
+== Autoload Structure
+
+Ruby autoload is used throughout for lazy loading:
+
+- Autoload entries are defined in the **immediate parent namespace's file**
+- A new identifier class only needs to be added to its namespace's autoload list
+- Autoload triggers on first constant reference, so removing `require_relative` calls has no runtime impact
+- Cross-flavor `require_relative` is replaced with public API calls (where available)
+
+== NIST Special Structure
+
+The NIST flavor's builder is split into three classes for separation of concerns:
+
+[source]
+----
+lib/pubid/nist/
+|-- builder.rb    # 952 lines — orchestrator (was 2272)
+|-- router.rb     # 143 lines — series-to-class routing (single source of truth)
+|-- caster.rb     # 1337 lines — type coercion (extracted from cast())
++-- scheme.rb     #  97 lines — registry + delegations (was 199)
+----
+
+* **Router** owns series-to-class matching, supplement detection, and `VALID_SERIES`. Both Builder and Scheme delegate to it.
+* **Caster** handles the massive type coercion logic that was previously inlined in Builder's `cast()` method.
+* **Builder** is a slim orchestrator that calls Router for class resolution and Caster for type assignment.
+* **Scheme** retains the identifier class registry (`identifiers`, `typed_stages`) and delegates routing to Router.
 
 == Typed Stages
 
