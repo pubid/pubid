@@ -1,17 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../components/date"
-require_relative "components/sector"
-require_relative "components/series"
-require_relative "components/code"
-require_relative "identifiers/recommendation"
-require_relative "identifiers/combined_identifier"
-require_relative "identifiers/supplement"
-require_relative "identifiers/amendment"
-require_relative "identifiers/corrigendum"
-require_relative "identifiers/special_publication"
-require_relative "identifiers/annex"
-
 module Pubid
   module Itu
     class Builder

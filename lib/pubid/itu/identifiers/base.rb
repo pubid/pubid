@@ -1,11 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../../components/date"
-require_relative "../components/sector"
-require_relative "../components/series"
-require_relative "../components/code"
-require_relative "../i18n"
-
 module Pubid
   module Itu
     module Identifiers

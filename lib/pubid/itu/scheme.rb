@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "model"
-
 module Pubid
   module Itu
     class Scheme < Pubid::Scheme
