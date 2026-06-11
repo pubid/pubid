@@ -12,23 +12,7 @@ module Pubid
         attribute :separator, :string, default: -> { "+" }
 
         def to_s
-          if base_identifier
-            if amendment_year
-              "#{base_identifier}#{separator}A#{amendment_number}:#{amendment_year}"
-            elsif amendment_number&.match?(/^[A-Z]+$/)
-              # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
-              "#{base_identifier} AMD #{amendment_number}"
-            else
-              "#{base_identifier} AMD#{amendment_number}"
-            end
-          elsif amendment_year
-            "#{separator}A#{amendment_number}:#{amendment_year}"
-          elsif amendment_number&.match?(/^[A-Z]+$/)
-            # Letter suffixes (AA, AB, etc.) have a space, numeric suffixes don't
-            "AMD #{amendment_number}"
-          else
-            "AMD#{amendment_number}"
-          end
+          render(format: :human)
         end
 
         def publisher

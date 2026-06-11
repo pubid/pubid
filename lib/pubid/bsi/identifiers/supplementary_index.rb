@@ -30,50 +30,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          # Supplementary Index format: BS {number} Supplementary Index:{year}
-          parts = []
-          parts << "BS"
-
-          # Number with part/subpart
-          if number
-            number_str = if number.is_a?(Components::Code)
-                           number.value.to_s
-                         else
-                           number.to_s
-                         end
-
-            # Part and subpart
-            if part
-              part_val = if part.is_a?(Components::Code)
-                           part.value
-                         else
-                           part
-                         end
-              number_str += "-#{part_val}"
-            end
-            if subpart
-              subpart_val = if supart.is_a?(Components::Code)
-                              subpart.value
-                            else
-                              subpart
-                            end
-              number_str += "-#{subpart_val}"
-            end
-
-            parts << number_str
-          end
-
-          result = parts.join(" ")
-
-          # Date
-          if date
-            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
-            result += " Supplementary Index:#{year_val}"
-            # Month if present
-            result += "-#{format('%02d', month)}" if month
-          end
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

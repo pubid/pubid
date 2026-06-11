@@ -42,30 +42,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          result = "NA"
-
-          # Add NA supplements if present
-          if na_supplements&.any?
-            na_supplements.each do |supp|
-              if supp.is_a?(Amendment)
-                result += "+A#{supp.amendment_number}:#{supp.amendment_year}"
-              elsif supp.is_a?(Corrigendum)
-                result += "+C#{supp.corrigendum_number}:#{supp.corrigendum_year}"
-              end
-            end
-          end
-
-          result += " to "
-
-          # Render the base identifier (what this NA is for)
-          result += if base_doc
-                      base_doc.to_s
-                    else
-                      # Fallback to parent rendering
-                      super
-                    end
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

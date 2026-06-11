@@ -59,58 +59,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          parts = []
-          parts << "BS" # Always BS for aerospace
-          parts << prefix if prefix
-
-          # Number with part/subpart and letter suffix edition
-          if number
-            number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
-
-            # Part and subpart
-            if part
-              part_val = part.is_a?(Components::Code) ? part.value : part
-              number_str += "-#{part_val}"
-            end
-            if subpart
-              subpart_val = subpart.is_a?(Components::Code) ? subpart.value : subpart
-              number_str += "-#{subpart_val}"
-            end
-
-            parts << number_str
-          end
-
-          result = parts.join(" ")
-
-          # Letter suffix edition (for aerospace/specialized standards)
-          # Append directly to number/part without space or v prefix
-          # e.g., BS AU 145e:2018, BS AU 200-1a:1984
-          if edition&.match?(/^[a-zA-Z]$/)
-            result += edition
-          end
-
-          # Date
-          if date
-            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
-            result += ":#{year_val}"
-            # Month if present
-            result += "-#{format('%02d', month)}" if month
-          end
-
-          # Regular edition (non-letter suffix, like v1.0)
-          # Only add if edition is not a single letter (already handled above)
-          if edition && !edition.match?(/^[a-zA-Z]$/)
-            result += " v#{edition}"
-          end
-
-          # Translation
-          if translation_lang
-            result += " (#{translation_lang})"
-          elsif translation_upper
-            result += " (#{translation_upper})"
-          end
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

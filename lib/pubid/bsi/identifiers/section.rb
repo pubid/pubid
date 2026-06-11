@@ -27,34 +27,7 @@ module Pubid
         end
 
         def to_s(lang: :en, lang_single: false)
-          # Build string representation - Section has two formats
-          parts = []
-
-          # Publisher (DD, BS, etc.)
-          parts << publisher.to_s if publisher
-
-          # Number
-          if number
-            number_str = number.is_a?(Components::Code) ? number.value.to_s : number.to_s
-            parts << number_str
-          end
-
-          result = parts.join(" ")
-
-          # Section suffix with colon or space format
-          result += if section_format == "colon"
-                      ":Section #{section_id}"
-                    else
-                      " Section #{section_id}"
-                    end
-
-          # Date
-          if date
-            year_val = date.is_a?(Components::Date) ? date.year : date.to_i
-            result += ":#{year_val}"
-          end
-
-          result
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
       end
     end

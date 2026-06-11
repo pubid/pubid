@@ -17,21 +17,7 @@ module Pubid
         attribute :separators, :string, collection: true # Should all be " + "
 
         def to_s(lang: :en, lang_single: false)
-          return "" if identifiers.nil? || identifiers.empty?
-
-          parts = []
-
-          identifiers.each_with_index do |id, i|
-            # Render each identifier
-            parts << id.to_s
-
-            # Add separator (always " + " between identifiers)
-            if i < identifiers.length - 1
-              parts << " + "
-            end
-          end
-
-          parts.join
+          render(format: :human, lang: lang, lang_single: lang_single)
         end
 
         def <=>(other)

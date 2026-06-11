@@ -21,25 +21,7 @@ module Pubid
         } # Separator before Supplement (":" or " ")
 
         def to_s
-          base_str = base_identifier.to_s
-
-          if reverse_format
-            # Reverse format: "Supplement No. 1 (1970) to BS 1831:1969"
-            supplement_str = if supplement_type == "No."
-                               "Supplement No. #{supplement_number} (#{supplement_year})"
-                             else
-                               "Supplement #{supplement_number} (#{supplement_year})"
-                             end
-            "#{supplement_str} to #{base_str}"
-          else
-            # Forward format: "BS 1000:Supplement No. 1:1972" or "BS 1722-1 Supplement No. 1:1974"
-            supplement_str = if supplement_type == "No."
-                               "#{separator}Supplement No. #{supplement_number}:#{supplement_year}"
-                             else
-                               "#{separator}Supplement #{supplement_number}:#{supplement_year}"
-                             end
-            "#{base_str}#{supplement_str}"
-          end
+          render(format: :human)
         end
 
         def publisher

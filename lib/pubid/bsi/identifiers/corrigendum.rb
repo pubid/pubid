@@ -12,11 +12,7 @@ module Pubid
         attribute :separator, :string, default: -> { "+" }
 
         def to_s
-          result = base_identifier ? base_identifier.to_s : ""
-          result += "#{separator}C"
-          result += corrigendum_number.to_s if corrigendum_number
-          result += ":#{corrigendum_year}" if corrigendum_year
-          result
+          render(format: :human)
         end
 
         def publisher
