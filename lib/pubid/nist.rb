@@ -4,11 +4,13 @@ module Pubid
   module Nist
     autoload :Builder, "#{__dir__}/nist/builder"
     autoload :Caster, "#{__dir__}/nist/caster"
+    autoload :CircularSupplementBuilder, "#{__dir__}/nist/circular_supplement_builder"
     autoload :Components, "#{__dir__}/nist/components"
     autoload :Configuration, "#{__dir__}/nist/configuration"
     autoload :Identifier, "#{__dir__}/nist/identifier"
     autoload :Identifiers, "#{__dir__}/nist/identifiers"
     autoload :Parser, "#{__dir__}/nist/parser"
+    autoload :ParserOutputNormalizer, "#{__dir__}/nist/parser_output_normalizer"
     autoload :Renderer, "#{__dir__}/nist/renderer"
     autoload :Router, "#{__dir__}/nist/router"
     autoload :Scheme, "#{__dir__}/nist/scheme"
