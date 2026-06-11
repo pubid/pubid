@@ -14,9 +14,7 @@ module Pubid
         end
 
         def to_s
-          result = "#{publisher} #{type_string} #{formatted_number}#{formatted_annex}"
-          result += " #{formatted_edition}" if edition
-          result
+          render(format: :human)
         end
 
         def formatted_edition

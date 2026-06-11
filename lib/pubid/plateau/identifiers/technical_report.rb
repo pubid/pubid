@@ -12,7 +12,7 @@ module Pubid
         end
 
         def to_s
-          "#{publisher} #{type_string} #{formatted_number}#{formatted_annex}"
+          render(format: :human)
         end
       end
     end

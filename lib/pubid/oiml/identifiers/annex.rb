@@ -10,51 +10,9 @@ module Pubid
           letter ? "Annex #{letter}" : "Annexes"
         end
 
-        def to_s(format: nil)
-          # Determine base format from its parsed_format
-          base_format = if base_identifier.class.attributes.key?(:parsed_format) && base_identifier.parsed_format == "long"
-                          :long
-                        else
-                          :short
-                        end
-
-          # Use format parameter or annex's own parsed_format
-          annex_format = if format
-                           format
-                         elsif self.class.attributes.key?(:parsed_format) && parsed_format == "long"
-                           :long
-                         else
-                           :short
-                         end
-
-          # Annexes have different pattern than amendments
-          base_str = base_identifier.to_s(format: base_format)
-          result = base_str.sub(/:.*/, "").sub(/\s+Edition\s+\d{4}/, "").sub(
-            /\(.*\)/, ""
-          ).strip
-          if letter
-            # Specific annex: "OIML R 60 Annex A Edition 2013 (E)"
-            result += " Annex #{letter}"
-
-            result += " Edition #{year}" if year
-
-          # Supplements ALWAYS use space before language
-
-          else
-            # General annexes: "OIML R 60 Annexes Edition 2021 (E)" or "OIML R 60 Annexes:2021 (E)"
-            result += " Annexes"
-
-            if year
-              result += annex_format == :long ? " Edition #{year}" : ":#{year}"
-            elsif base_identifier.date
-              result += annex_format == :long ? " Edition #{base_identifier.date.year}" : ":#{base_identifier.date.year}"
-            end
-
-            # Supplements ALWAYS use space before language
-
-          end
-          result += " (#{language})" if language
-          result
+        def to_s(format: nil, **opts)
+          @requested_format = format
+          render(format: :human, **opts)
         end
       end
     end

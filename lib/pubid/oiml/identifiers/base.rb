@@ -12,23 +12,8 @@ module Pubid
         attribute :iteration, :string
         attribute :language, :string
 
-        def to_s
-          result = "#{publisher} #{type} #{code}"
-
-          # Add date if present
-          result += ":#{date.year}" if date
-
-          # Add draft stage if present (iteration + stage)
-          if stage || iteration
-            result += " "
-            result += iteration.to_s if iteration
-            result += stage.to_s if stage
-          end
-
-          # Add language portion if present
-          result += "(#{language})" if language
-
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
       end
     end

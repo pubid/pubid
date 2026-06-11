@@ -15,22 +15,8 @@ module Pubid
         attribute :number, Sae::Components::Code
         attribute :date, Sae::Components::Date
 
-        def to_s
-          parts = []
-
-          # Publisher and type
-          parts << publisher if publisher
-          parts << type.to_s if type
-
-          # Number
-          parts << number.to_s if number
-
-          result = parts.join(" ")
-
-          # Date
-          result += ":#{date.year}" if date
-
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         def year
