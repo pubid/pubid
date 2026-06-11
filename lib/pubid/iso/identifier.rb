@@ -83,6 +83,21 @@ module Pubid
           Pubid::Iso::Builder.new(Pubid::Iso::Scheme).build(parsed)
         end
       end
+
+      # lutaml's polymorphic key_value mapping reads `_type` only to validate;
+      # it does not re-instantiate the concrete subclass on deserialization. So
+      # `Identifier.from_hash(corrigendum_hash)` would return a bare Identifier
+      # and drop `base_identifier`. Route by `_type` to the right subclass and
+      # let its (inherited) from_hash do the real work, mirroring JIS.
+      def self.from_hash(data, options = {})
+        type = data["_type"] || data[:_type]
+        klass_name = ISO_TYPE_MAP[type]
+        if klass_name
+          klass = Object.const_get(klass_name)
+          return klass.from_hash(data, options) unless klass == self
+        end
+        super
+      end
     end
   end
 end
