@@ -24,14 +24,8 @@ module Pubid
             short: "Interpretations" }
         end
 
-        def to_s
-          return base_identifier.to_s unless base_identifier
-
-          # Format: Interpretations for Standard 15.2-2022
-          base_type = base_identifier.type || "Standard"
-          result = "Interpretations for #{base_type} #{base_identifier.code}"
-          result += "-#{base_identifier.year}" if base_identifier.year
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
       end
     end

@@ -27,14 +27,8 @@ module Pubid
             short: "Addenda Package" }
         end
 
-        def to_s
-          return base_identifier.to_s unless base_identifier
-
-          # Format: ASHRAE Standard 52.2-1999: Addenda Supplement Package
-          result = "ASHRAE #{base_identifier.type || 'Standard'} #{base_identifier.code}"
-          result += "-#{base_identifier.year}" if base_identifier.year
-          result += ": Addenda #{package_description}" if package_description
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         def copublisher
