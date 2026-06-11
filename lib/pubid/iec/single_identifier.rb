@@ -1,25 +1,16 @@
-require_relative "identifier"
 # frozen_string_literal: true
-require_relative "../components/typed_stage"
-require_relative "urn_generator"
 
 module Pubid
   module Iec
     class SingleIdentifier < Identifier
-      attribute :typed_stage, Components::TypedStage
+      attribute :typed_stage, ::Pubid::Components::TypedStage
 
       # Generate URN for this identifier
       #
       # @return [String] URN representation
 
-      def to_s(lang: :en, lang_single: false, with_edition: false)
-        [].tap do |parts|
-          parts << publisher_portion(lang: lang)
-          parts << number_portion(lang_single: lang_single)
-          parts << edition_portion(lang: lang) if with_edition
-        end.compact.join(" ").tap do |s|
-          s << language_portion(lang_single: lang_single) if languages&.any?
-        end
+      def to_s(**opts)
+        render(format: :human, **opts)
       end
 
       def publisher_portion(lang: :en)

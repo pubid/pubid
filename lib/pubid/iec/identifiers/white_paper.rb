@@ -1,5 +1,4 @@
-require_relative "base"
-require_relative "../../components/typed_stage"
+# frozen_string_literal: true
 
 module Pubid
   module Iec

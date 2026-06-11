@@ -1,7 +1,4 @@
-require_relative "../components/publisher"
 # frozen_string_literal: true
-require_relative "../components/code"
-require_relative "../components/date"
 
 module Pubid
   module Iec
@@ -13,13 +10,11 @@ module Pubid
       def locate_identifier_klass(parsed_hash)
         # Check for working programme
         if parsed_hash[:wp_stage]
-          require_relative "identifiers/working_document"
           return Identifiers::WorkingDocument
         end
 
         # Check for working document
         if parsed_hash[:technical_committee] && parsed_hash[:wd_number]
-          require_relative "identifiers/working_document"
           return Identifiers::WorkingDocument
         end
 
@@ -158,7 +153,6 @@ module Pubid
 
         # Detect rendering style from parsed abbreviation
         if identifier.class.attributes.key?(:rendering_style) && identifier.typed_stage
-          require_relative "rendering_style"
           ts = identifier.typed_stage
 
           # Detect IEC format from parsed abbreviation
@@ -179,7 +173,7 @@ module Pubid
           with_language_code = if langs&.any?
                                  # Check if original_code was single-char (E, F, R, A, S, D)
                                  first_lang = langs.first
-                                 if first_lang.is_a?(Components::Language) && first_lang.original_code && first_lang.original_code.length == 1
+                                 if first_lang.is_a?(::Pubid::Components::Language) && first_lang.original_code && first_lang.original_code.length == 1
                                    :single
                                  else
                                    :iso # 2-char codes (en, fr, ru, ar, es, de)
@@ -231,9 +225,7 @@ module Pubid
 
       # Wrap identifier with FragmentIdentifier for /FRAGN notation
       def wrap_with_fragment(base_identifier, fragment_number,
-edition_data = nil, typed_stage = nil)
-        require_relative "identifiers/fragment_identifier"
-
+      edition_data = nil, typed_stage = nil)
         fragment = Identifiers::FragmentIdentifier.new(
           base_identifier: base_identifier,
           fragment_number: fragment_number,
@@ -252,8 +244,6 @@ edition_data = nil, typed_stage = nil)
 
       # Wrap identifier with SheetIdentifier for /N:YEAR notation
       def wrap_with_sheet(base_identifier, sheet_number, sheet_year)
-        require_relative "identifiers/sheet_identifier"
-
         # Only pass year if it's present
         year_value = sheet_year&.to_s
 
@@ -272,10 +262,6 @@ edition_data = nil, typed_stage = nil)
 
       # Wrap identifier with ConsolidatedIdentifier for +AMD chains
       def wrap_with_consolidated(base_identifier, supplements_data)
-        require_relative "identifiers/consolidated_identifier"
-        require_relative "identifiers/amendment"
-        require_relative "identifiers/corrigendum"
-
         supplements = supplements_data.filter_map do |supp|
           type = supp[:supplement_type].to_s
           number = supp[:supplement_number].to_s
@@ -304,10 +290,6 @@ edition_data = nil, typed_stage = nil)
 
       # Wrap identifier with VapIdentifier for CSV/CMV/RLV/SER suffix
       def wrap_with_vap(base_identifier, vap_suffix_data)
-        require_relative "identifiers/vap_identifier"
-        require_relative "identifiers/consolidated_identifier"
-        require_relative "components/vap_suffix"
-
         vap_suffix = Components::VapSuffix.new(code: vap_suffix_data.to_s)
 
         # Extract edition - need to go deep for ConsolidatedIdentifier

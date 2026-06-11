@@ -1,5 +1,3 @@
-require_relative "identifier"
-require_relative "single_identifier"
 # frozen_string_literal: true
 
 module Pubid
@@ -83,7 +81,6 @@ module Pubid
 
         # Create typed_stage for the base - use "IS" (International Standard) type
         # not the supplement type
-        require_relative "../components/typed_stage"
         base.typed_stage = Pubid::Components::TypedStage.new(
           abbr: ["IS"],
           type_code: :is,
@@ -107,54 +104,8 @@ module Pubid
         @synthetic_base ||= false
       end
 
-      def to_s(lang: :en, lang_single: false, with_edition: false)
-        # Ensure we have a base_identifier for standalone supplements
-        ensure_base_identifier
-
-        # For standalone supplements (synthetic base), use standalone format
-        # IEC/FDAM 60038-1, not IEC/IS 60038/FDAM1
-        if synthetic_base?
-          parts = []
-
-          # Publisher portion
-          if publisher
-            parts << publisher.body
-            parts << "/#{copublishers.map(&:body).join('/')}" if copublishers&.any?
-          end
-
-          # Supplement type and number with part (use base number)
-          abbr = typed_stage.abbr.first
-          number_str = base_identifier.number.to_s
-          number_str += "-#{number}" if number # supplement number
-          number_str += "-#{subpart}" if subpart
-          parts << "#{abbr} #{number_str}"
-
-          result = parts.join("/")
-          result += ":#{date.year}" if date
-          result += " #{edition}" if edition&.number
-          result
-        elsif base_identifier
-          # Normal supplement with real base identifier
-          # Format: "IEC 60050-102:2007/AMD1:2017"
-          parts = []
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
-                                        with_edition: with_edition)
-
-          # Supplement notation
-          # Use uppercase abbreviation without space: /AMD1, /COR1
-          abbr = typed_stage.abbr.first.upcase
-          supp_part = "/#{abbr}#{number}"
-          supp_part += ":#{date.year}" if date
-          parts << supp_part
-
-          # Add edition if present
-          parts << " #{edition}" if edition&.number
-
-          parts.join
-        else
-          # Fallback - shouldn't happen
-          super
-        end
+      def to_s(**opts)
+        render(format: :human, **opts)
       end
     end
   end

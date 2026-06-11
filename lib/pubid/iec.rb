@@ -5,36 +5,24 @@ module Pubid
   end
 end
 
-# Require scheme first
-require_relative "scheme"
+# Namespace files (autoload their children)
+require_relative "iec/components"
+require_relative "iec/identifiers"
 
-# Require all identifier classes
-require_relative "iec/identifiers/international_standard"
-require_relative "iec/identifiers/technical_report"
-require_relative "iec/identifiers/technical_specification"
-require_relative "iec/identifiers/publicly_available_specification"
-require_relative "iec/identifiers/guide"
-require_relative "iec/identifiers/test_report_form"
-require_relative "iec/identifiers/interpretation_sheet"
-require_relative "iec/identifiers/systems_reference_document"
-require_relative "iec/identifiers/working_document"
-require_relative "iec/identifiers/amendment"
-require_relative "iec/identifiers/corrigendum"
-
-# Wrapper identifier types
-require_relative "iec/identifiers/vap_identifier"
-require_relative "iec/identifiers/sheet_identifier"
-require_relative "iec/identifiers/consolidated_identifier"
-require_relative "iec/identifiers/fragment_identifier"
-
-# Additional document types
-require_relative "iec/identifiers/component_specification"
-require_relative "iec/identifiers/operational_document"
-require_relative "iec/identifiers/societal_technology_trend_report"
-require_relative "iec/identifiers/white_paper"
-
+# Autoload top-level IEC constants
 module Pubid
   module Iec
+    autoload :Identifier, "#{__dir__}/iec/identifier"
+    autoload :SingleIdentifier, "#{__dir__}/iec/single_identifier"
+    autoload :SupplementIdentifier, "#{__dir__}/iec/supplement_identifier"
+    autoload :Scheme, "#{__dir__}/iec/scheme"
+    autoload :Parser, "#{__dir__}/iec/parser"
+    autoload :Builder, "#{__dir__}/iec/builder"
+    autoload :UrnParser, "#{__dir__}/iec/urn_parser"
+    autoload :UrnGenerator, "#{__dir__}/iec/urn_generator"
+    autoload :RenderingStyle, "#{__dir__}/iec/rendering_style"
+    autoload :Renderer, "#{__dir__}/iec/renderer"
+
     # Primary document types (not supplements)
     IDENTIFIER_TYPES = [
       Identifiers::InternationalStandard,
@@ -75,11 +63,46 @@ module Pubid
     def self.parse_urn(urn)
       UrnParser.parse(urn)
     end
+    # Per-flavor format registry: inherits global formats, overrides :human
+    Identifier.format_registry = FormatRegistry.new(parent: Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Iec::Renderer)
+
+    # Auto-discover all identifier types from the Identifiers namespace
+    # @return [Array<Class>] identifier classes that define a self.type Hash
+    def self.identifier_types
+      @identifier_types ||= Identifiers.constants
+        .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
+        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| begin; c.type.is_a?(Hash); rescue NotImplementedError; false; end }
+    end
+
+    # Build typed stage index from identifier types
+    # @return [Array<Pubid::Components::TypedStage>] all typed stages
+    def self.all_typed_stages
+      @all_typed_stages ||= identifier_types.flat_map do |klass|
+        if klass.const_defined?(:TYPED_STAGES)
+          klass.const_get(:TYPED_STAGES)
+        else
+          []
+        end
+      end
+    end
+
+    # Lookup: type code -> identifier class
+    # @param code [String, Symbol] the type key to find
+    # @return [Class, nil] the matching identifier class
+    def self.locate_type(code)
+      identifier_types.find { |t| t.type[:key].to_s == code.to_s }
+    end
+
+    # Lookup: abbreviation -> typed stage
+    # @param abbr [String, Symbol] the abbreviation to find
+    # @return [Pubid::Components::TypedStage, nil] the matching typed stage
+    def self.locate_stage(abbr)
+      abbr_str = abbr.to_s.upcase
+      all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
+    end
   end
 end
-
-require_relative "iec/urn_parser"
-require_relative "iec/builder"
-require_relative "iec/parser"
 
 Pubid::Registry.register(:iec, Pubid::Iec)

@@ -1,6 +1,4 @@
-require_relative "../identifier"
 # frozen_string_literal: true
-require_relative "../components/vap_suffix"
 
 module Pubid
   module Iec
@@ -21,22 +19,8 @@ module Pubid
           "SER" => "Serial version",
         }.freeze
 
-        def to_s(lang: :en, lang_single: false, with_edition: false)
-          parts = []
-
-          # Render base identifier WITHOUT edition (edition goes at VAP level)
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
-                                        with_edition: false)
-
-          # Add VAP suffix with space
-          if vap_suffix
-            parts << " #{vap_suffix}"
-          end
-
-          # Add edition after VAP suffix if present
-          parts << " #{edition}" if edition&.number
-
-          parts.compact.join
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         # Delegate common attributes to base_identifier

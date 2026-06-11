@@ -1,9 +1,4 @@
-require_relative "../single_identifier"
 # frozen_string_literal: true
-require_relative "../components/publisher"
-require_relative "../components/code"
-require_relative "../components/vap_suffix"
-require_relative "../components/trf_info"
 
 module Pubid
   module Iec
@@ -20,29 +15,8 @@ module Pubid
         attribute :version, :string, default: -> {}
         attribute :decision_sheet, :string, default: -> {}
 
-        def to_s(_format = :short)
-          parts = []
-
-          # Publisher and type portion (from typed_stage) - uses inherited method
-          parts << publisher_portion
-
-          # Number portion (number with part/subpart)
-          parts << number_portion
-
-          # Edition if present - add space before edition
-          parts << " #{edition}" if edition&.number
-
-          # VAP suffix
-          parts << vap_suffix.render_with_space if vap_suffix
-
-          # Database flag
-          parts << " DB" if database
-
-          # All-parts marker — rendered the same as the generic
-          # HumanReadable renderer for parity (see Pubid::Renderers::HumanReadable#render).
-          parts << " (all parts)" if all_parts
-
-          parts.compact.join
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         def number_portion

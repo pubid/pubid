@@ -1,6 +1,4 @@
-require_relative "../identifier"
 # frozen_string_literal: true
-require_relative "../../components/typed_stage"
 
 module Pubid
   module Iec
@@ -87,24 +85,8 @@ module Pubid
           { key: :frag, title: "Fragment", short: "FRAG" }
         end
 
-        def to_s(lang: :en, lang_single: false, with_edition: false)
-          parts = []
-
-          # Render base identifier (the amendment/corrigendum)
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
-                                        with_edition: with_edition)
-
-          # Add fragment notation /FRAGN or /FRAGCN depending on base type
-          parts << if base_identifier.is_a?(Identifiers::Corrigendum)
-                     "/FRAGC#{fragment_number}"
-                   else
-                     "/FRAG#{fragment_number}"
-                   end
-
-          # Add edition if present
-          parts << " #{edition}" if edition&.number
-
-          parts.join
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         # Delegate common attributes to base_identifier
