@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "parser"
-require_relative "builder"
-require_relative "identifiers"
-require_relative "components/sector"
-require_relative "components/series"
-require_relative "components/code"
-
 module Pubid
   module Itu
     module Identifier
