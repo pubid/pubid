@@ -5,7 +5,6 @@ module Pubid
     module Identifiers
       autoload :Addendum, "#{__dir__}/identifiers/addendum"
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
-      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
       autoload :Data, "#{__dir__}/identifiers/data"
       autoload :Directives, "#{__dir__}/identifiers/directives"

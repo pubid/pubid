@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../lib/pubid/identifier_registry"
 
 RSpec.describe Pubid::IdentifierMetadata do
   describe "Metadata" do
@@ -58,120 +57,7 @@ RSpec.describe Pubid::IdentifierMetadata do
   describe "InstanceMethods" do
     it "provides metadata access on instances" do
       id = Pubid::Iso.parse("ISO 9001:2015")
-      # The metadata should be accessible if the class has it defined
       expect(id.class).to respond_to(:metadata)
-    end
-  end
-end
-
-RSpec.describe Pubid::IdentifierRegistry do
-  before do
-    # Clear registry before each test
-    described_class.clear!
-  end
-
-  describe ".register" do
-    it "registers an identifier class" do
-      described_class.register(
-        Pubid::Iso::Identifiers::InternationalStandard,
-        flavor: :iso,
-        type_key: :is,
-        title: "International Standard",
-      )
-
-      expect(described_class.all_identifiers.size).to eq(1)
-    end
-  end
-
-  describe ".find_by_type" do
-    before do
-      described_class.register(
-        Pubid::Iso::Identifiers::InternationalStandard,
-        flavor: :iso,
-        type_key: :is,
-        title: "International Standard",
-        abbr: ["", "IS"],
-      )
-    end
-
-    it "finds identifier by flavor and type key" do
-      found = described_class.find_by_type(:iso, :is)
-      expect(found).to eq(Pubid::Iso::Identifiers::InternationalStandard)
-    end
-
-    it "returns nil for unknown type" do
-      found = described_class.find_by_type(:iso, :unknown)
-      expect(found).to be_nil
-    end
-  end
-
-  describe ".find_by_abbr" do
-    before do
-      described_class.register(
-        Pubid::Iso::Identifiers::InternationalStandard,
-        flavor: :iso,
-        type_key: :is,
-        title: "International Standard",
-        abbr: ["", "IS", "is"],
-      )
-    end
-
-    it "finds identifier by abbreviation" do
-      found = described_class.find_by_abbr(:iso, "IS")
-      expect(found).to include(Pubid::Iso::Identifiers::InternationalStandard)
-    end
-
-    it "is case-insensitive" do
-      found = described_class.find_by_abbr(:iso, "is")
-      expect(found).to include(Pubid::Iso::Identifiers::InternationalStandard)
-    end
-  end
-
-  describe ".search" do
-    before do
-      described_class.register(
-        Pubid::Iso::Identifiers::InternationalStandard,
-        flavor: :iso,
-        type_key: :is,
-        title: "International Standard",
-        abbr: ["IS"],
-        base_class: "SingleIdentifier",
-      )
-    end
-
-    it "searches by flavor" do
-      results = described_class.search(flavor: :iso)
-      expect(results.size).to eq(1)
-      expect(results.first[:class]).to eq(Pubid::Iso::Identifiers::InternationalStandard)
-    end
-
-    it "searches by title" do
-      results = described_class.search(title: "International")
-      expect(results.size).to eq(1)
-    end
-
-    it "searches by base_class status" do
-      results = described_class.search(base_class: true)
-      expect(results.size).to eq(1)
-    end
-  end
-
-  describe ".metadata_for" do
-    before do
-      described_class.register(
-        Pubid::Iso::Identifiers::InternationalStandard,
-        flavor: :iso,
-        type_key: :is,
-        title: "International Standard",
-        abbr: ["IS"],
-      )
-    end
-
-    it "returns metadata for a registered class" do
-      metadata = described_class.metadata_for(Pubid::Iso::Identifiers::InternationalStandard)
-      expect(metadata).to be_a(Pubid::IdentifierMetadata::Metadata)
-      expect(metadata.type_key).to eq(:is)
-      expect(metadata.title).to eq("International Standard")
     end
   end
 end

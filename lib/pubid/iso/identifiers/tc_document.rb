@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # Technical Committee Document
       # Format: TC 184/SC 4/WG 3 N 123, JTC 1 N 456, TC 184 N 100
-      class TcDocument < Base
+      class TcDocument < Identifier
         # TC type (TC, JTC, PC, IT, etc.)
         attribute :tc_type, ::Pubid::Components::Code
         # TC number

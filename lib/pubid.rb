@@ -46,7 +46,6 @@ module Pubid
   autoload :BundledIdentifier, "pubid/bundled_identifier"
   autoload :Identifier, "pubid/identifier"
   autoload :IdentifierMetadata, "pubid/identifier_metadata"
-  autoload :IdentifierRegistry, "pubid/identifier_registry"
   autoload :Rendering, "pubid/rendering"
   autoload :Renderers, "pubid/renderers"
   autoload :FormatDetector, "pubid/format_detector"
