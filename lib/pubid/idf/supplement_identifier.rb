@@ -27,16 +27,8 @@ module Pubid
       # @param lang_single [Boolean] Use single-char language codes (default: false)
       # @param with_edition [Boolean] Include edition (default: false)
       # @return [String] String representation of supplement
-      def to_s(lang: :en, lang_single: false, with_edition: false)
-        [
-          base_identifier.to_s(lang: lang, lang_single: lang_single,
-                               with_edition: with_edition),
-          "/",
-          typed_stage.abbreviation,
-          " ",
-          number.value,
-          (date ? ":#{date.year}" : ""),
-        ].join
+      def to_s(**opts)
+        render(format: :human, **opts)
       end
     end
   end

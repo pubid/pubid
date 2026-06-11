@@ -27,11 +27,9 @@ module Pubid
       end
 
       # Render as base + supplement notation
-      def to_s(with_publisher: true)
-        result = base.to_s(with_publisher: with_publisher)
-        result += "/#{supplement_notation}"
-        result += symbol_suffix
-        result
+      def to_s(with_publisher: true, **opts)
+        @with_publisher = with_publisher
+        render(format: :human, **opts)
       end
 
       # Override in subclasses

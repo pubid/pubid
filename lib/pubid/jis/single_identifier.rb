@@ -20,18 +20,9 @@ module Pubid
         Identifiers.const_get(class_name)
       end
 
-      def to_s(with_publisher: true)
-        parts = []
-        parts << PUBLISHER if with_publisher
-        parts << type_prefix if self.class.method_defined?(:type_prefix) && type_prefix
-        result = parts.join(" ")
-        result += " " if result.length.positive?
-        result += code.to_s
-        result += ":#{year_with_reaffirmation}" if year
-        result += "(#{language})" if language
-        result += "（規格群）" if all_parts?
-        result += symbol_suffix
-        result
+      def to_s(with_publisher: true, **opts)
+        @with_publisher = with_publisher
+        render(format: :human, **opts)
       end
     end
   end

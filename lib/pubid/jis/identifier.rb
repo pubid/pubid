@@ -112,16 +112,9 @@ module Pubid
           symbol == other.symbol
       end
 
-      # Basic string representation. SingleIdentifier/SupplementIdentifier
-      # refine this, but it must render a plain standard correctly on its own
-      # because lutaml rebuilds nested base documents as bare Identifier
-      # instances.
-      def to_s
-        result = "#{PUBLISHER} #{code}"
-        result += ":#{year_with_reaffirmation}" if year
-        result += "(#{language})" if language
-        result += "（規格群）" if all_parts?
-        result + symbol_suffix
+      # Basic string representation. Delegates to renderer.
+      def to_s(**opts)
+        render(format: :human, **opts)
       end
 
       # Dispatch deserialization to the concrete identifier class named by the

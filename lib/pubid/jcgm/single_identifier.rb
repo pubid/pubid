@@ -37,11 +37,7 @@ module Pubid
       end
 
       def to_s
-        parts = [publisher_portion]
-        parts << number_portion unless number_portion.empty?
-        result = parts.join(" ")
-        result += language_portion
-        result
+        render(format: :human)
       end
     end
   end
