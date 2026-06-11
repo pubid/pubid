@@ -1,6 +1,4 @@
-require_relative "../identifier"
 # frozen_string_literal: true
-require_relative "../components/typed_stage"
 
 module Pubid
   module Iec

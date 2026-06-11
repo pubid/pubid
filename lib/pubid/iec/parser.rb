@@ -2,8 +2,6 @@ require "parslet"
 # frozen_string_literal: true
 require_relative "../parser/common_parse_rules"
 require_relative "../parser/common_parse_methods"
-require_relative "identifier"
-require_relative "supplement_identifier"
 
 module Pubid
   module Iec

@@ -1,4 +1,3 @@
-require_relative "../identifier"
 # frozen_string_literal: true
 
 module Pubid
@@ -11,31 +10,8 @@ module Pubid
       class ConsolidatedIdentifier < Identifier
         attribute :identifiers, Identifier, polymorphic: true, collection: true
 
-        def to_s(lang: :en, lang_single: false, with_edition: false)
-          identifiers.map.with_index do |id, idx|
-            if idx.zero?
-              # First identifier renders normally
-              id.to_s(lang: lang, lang_single: lang_single,
-                      with_edition: with_edition)
-            elsif id.is_a?(Amendment)
-              # Subsequent identifiers render with + prefix
-              # For amendments, just show +AMDn:year part (or +AMDn if no date)
-              if id.date&.year && !id.date.year.empty?
-                "+AMD#{id.number}:#{id.date.year}"
-              else
-                "+AMD#{id.number}"
-              end
-            elsif id.is_a?(Corrigendum)
-              if id.date&.year && !id.date.year.empty?
-                "+COR#{id.number}:#{id.date.year}"
-              else
-                "+COR#{id.number}"
-              end
-            else
-              "+#{id.to_s(lang: lang, lang_single: lang_single,
-                          with_edition: with_edition)}"
-            end
-          end.join
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         # Delegate common attributes to first identifier (base document)

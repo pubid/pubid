@@ -1,6 +1,4 @@
-require_relative "base"
 # frozen_string_literal: true
-require_relative "../../components/stage"
 
 module Pubid
   module Iec
@@ -44,51 +42,8 @@ module Pubid
           @stage ||= ::Pubid::Components::Stage.new(stage_code: stage_code)
         end
 
-        def to_s(_format = :short)
-          # Working Programme format: "PWI TR 100-36 ED1" or "IEC/PWI 60038"
-          if wp_stage
-            parts = []
-            # Include publisher if present (for IEC/PWI format)
-            if publisher
-              parts << publisher.body
-              if copublishers&.any?
-                parts << "/#{copublishers.map(&:body).join('/')}"
-              end
-              parts << "/"
-            end
-            parts << wp_stage
-            # Only add wp_type if it exists and is not empty/whitespace
-            if wp_type && !wp_type.strip.empty?
-              parts << " #{wp_type.strip}"
-            end
-
-            # Render full number with parts
-            if number
-              num_str = number.to_s
-              num_str += "-#{part}" if part && part.to_s != ""
-              num_str += "-#{subpart}" if subpart && subpart.to_s != ""
-              parts << " #{num_str}"
-            end
-
-            parts << " #{edition}" if edition&.number
-            return parts.join
-          end
-
-          # Working Document format: "100/3705(F)/FDIS"
-          parts = []
-
-          parts << technical_committee if technical_committee
-
-          # Number with optional language
-          if wd_number
-            num_part = wd_number.to_s
-            num_part += "(#{wd_language})" if wd_language
-            parts << num_part
-          end
-
-          parts << wd_stage if wd_stage
-
-          parts.join("/")
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
       end
     end

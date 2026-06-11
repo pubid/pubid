@@ -1,4 +1,3 @@
-require_relative "../identifier"
 # frozen_string_literal: true
 
 module Pubid
@@ -12,20 +11,8 @@ module Pubid
         attribute :sheet_number, :string
         attribute :year, :string, default: -> {}
 
-        def to_s(lang: :en, lang_single: false, with_edition: false)
-          parts = []
-
-          # Render base identifier
-          parts << base_identifier.to_s(lang: lang, lang_single: lang_single,
-                                        with_edition: with_edition)
-
-          # Add sheet notation /N
-          parts << "/#{sheet_number}"
-
-          # Add year if present
-          parts << ":#{year}" if year
-
-          parts.join
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         # Delegate common attributes to base_identifier
