@@ -1,15 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "identifiers/standard"
-require_relative "identifiers/manual"
-require_relative "identifiers/research_report"
-require_relative "identifiers/data_series"
-require_relative "identifiers/technical_report"
-require_relative "identifiers/monograph"
-require_relative "identifiers/adjunct"
-require_relative "identifiers/work_in_progress"
-require_relative "identifiers/iso_dual_published"
-
 module Pubid
   module Astm
     class Scheme < Pubid::Scheme
