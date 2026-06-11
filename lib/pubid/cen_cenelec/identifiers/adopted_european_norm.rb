@@ -8,10 +8,8 @@ module Pubid
       class AdoptedEuropeanNorm < EuropeanNorm
         attribute :adopted_identifier, Base, polymorphic: true # ISO/IEC/IEEE object
 
-        def to_s
-          result = publisher.is_a?(Array) ? publisher.join("/") : publisher.join("/")
-          result += " #{adopted_identifier}" if adopted_identifier
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         # Delegate common methods to adopted identifier

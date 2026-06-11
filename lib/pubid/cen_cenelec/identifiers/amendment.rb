@@ -10,14 +10,8 @@ module Pubid
         attribute :amendment_number, :string
         attribute :amendment_year, :integer
 
-        def to_s
-          result = if base_identifier
-                     "#{base_identifier}/A#{amendment_number}"
-                   else
-                     "/A#{amendment_number}"
-                   end
-          result += ":#{amendment_year}" if amendment_year
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         def publisher
