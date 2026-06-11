@@ -2,432 +2,6 @@
   "iso": {
     "identifier_types": [
       {
-        "key": "international_standard",
-        "title": "International Standard",
-        "short": "IS",
-        "abbr": [
-          "",
-          "IS"
-        ],
-        "typed_stages": [
-          {
-            "stage_code": "dp",
-            "type_code": "is",
-            "abbr": [
-              "DP"
-            ],
-            "name": "Draft Proposal",
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "pwi",
-            "type_code": "is",
-            "abbr": [
-              "PWI"
-            ],
-            "name": "Proposed Work Item for International Standard",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.92",
-              "00.93",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "is",
-            "abbr": [
-              "NP",
-              "NWIP"
-            ],
-            "name": "New Work Item Proposal for International Standard",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.93",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "awi",
-            "type_code": "is",
-            "abbr": [
-              "AWI"
-            ],
-            "name": "Approved Work Item for International Standard",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "is",
-            "abbr": [
-              "WD"
-            ],
-            "name": "Working Draft for International Standard",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.92",
-              "20.93",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "wds",
-            "type_code": "is",
-            "abbr": [
-              "WDS"
-            ],
-            "name": "Working Draft Study",
-            "harmonized_stages": [
-              "20.20",
-              "20.60"
-            ]
-          },
-          {
-            "stage_code": "pcd",
-            "type_code": "is",
-            "abbr": [
-              "preCD",
-              "PreCD"
-            ],
-            "name": "Pre-Committee Draft for International Standard",
-            "harmonized_stages": [
-              "29.00",
-              "29.20",
-              "29.60",
-              "29.92",
-              "29.93",
-              "29.98",
-              "29.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "is",
-            "abbr": [
-              "CD"
-            ],
-            "name": "Committee Draft for International Standard",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "dis",
-            "type_code": "is",
-            "abbr": [
-              "DIS",
-              "FPD"
-            ],
-            "name": "Draft International Standard",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fcd",
-            "type_code": "is",
-            "abbr": [
-              "FCD"
-            ],
-            "name": "Final Committee Draft for International Standard",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fdis",
-            "type_code": "is",
-            "abbr": [
-              "FDIS"
-            ],
-            "name": "Final Draft International Standard",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "prf",
-            "type_code": "is",
-            "abbr": [
-              "PRF",
-              "Fpr"
-            ],
-            "name": "Proof International Standard",
-            "harmonized_stages": [
-              "60.00"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "is",
-            "abbr": [
-              "",
-              "IS"
-            ],
-            "name": "International Standard",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          },
-          {
-            "stage_code": "wdr",
-            "type_code": "is",
-            "abbr": [
-              "WDR"
-            ],
-            "name": "Proposed for Withdrawal",
-            "harmonized_stages": [
-              "90.92"
-            ]
-          },
-          {
-            "stage_code": "wda",
-            "type_code": "is",
-            "abbr": [
-              "WDA"
-            ],
-            "name": "Withdrawal Approved",
-            "harmonized_stages": [
-              "90.93"
-            ]
-          },
-          {
-            "stage_code": "wdar",
-            "type_code": "is",
-            "abbr": [
-              "WDAR"
-            ],
-            "name": "Withdrawal Archived",
-            "harmonized_stages": [
-              "95.99"
-            ]
-          }
-        ],
-        "examples": [
-          "ISO/Guide 34:2009",
-          "ISO/CEI Guide 37:1995",
-          "ISO/CEI Guide 50",
-          "ISO/CEI Guide 51:1999",
-          "ISO/CEI Guide 71:2001(F)",
-          "ISO/IEC Guide 59:1994",
-          "IEC 31010:2019(en,fr)",
-          "IEC 80601-2-60",
-          "IEC 80601-2-60:2019(en,fr)",
-          "IEC/CD 80000-15"
-        ]
-      },
-      {
-        "key": "technical_report",
-        "title": "Technical Report",
-        "short": "TR",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "tr",
-            "abbr": [
-              "PWI TR"
-            ],
-            "name": "Proposed Work Item for Technical Report",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.92",
-              "00.93",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "tr",
-            "abbr": [
-              "NP TR"
-            ],
-            "name": "New Work Item Proposal for Technical Report",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.93",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "awi",
-            "type_code": "tr",
-            "abbr": [
-              "AWI TR"
-            ],
-            "name": "Approved Work Item for Technical Report",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "tr",
-            "abbr": [
-              "WD TR"
-            ],
-            "name": "Working Draft Technical Report",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.92",
-              "20.93",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "tr",
-            "abbr": [
-              "CD TR"
-            ],
-            "name": "Committee Draft Technical Report",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "tr",
-            "abbr": [
-              "PDTR"
-            ],
-            "name": "Proposed Draft Technical Report",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "draft",
-            "type_code": "tr",
-            "abbr": [
-              "DTR"
-            ],
-            "name": "Draft Technical Report",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "final_draft",
-            "type_code": "tr",
-            "abbr": [
-              "FDTR"
-            ],
-            "name": "Final Draft Technical Report",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "prf",
-            "type_code": "tr",
-            "abbr": [
-              "PRF TR"
-            ],
-            "name": "Proof Technical Report",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "tr",
-            "abbr": [
-              "TR"
-            ],
-            "name": "Published Technical Report",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "ISO/ASTM DTR 52905",
-          "ISO/ASTM TR 52906",
-          "ISO/CIE DTR 21783.2",
-          "ISO/CIE TR 21783",
-          "ISO/DTR 22126-3",
-          "ISO/DTR 22126-5",
-          "ISO/DTR 22351",
-          "ISO/DTR 22514-9.2",
-          "ISO/DTR 23148",
-          "ISO/DTR 4763"
-        ]
-      },
-      {
         "key": "technical_specification",
         "title": "Technical Specification",
         "short": "TS",
@@ -605,440 +179,6 @@
         ]
       },
       {
-        "key": "guide",
-        "title": "Guide",
-        "short": "GUIDE",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "guide",
-            "abbr": [
-              "PWI Guide"
-            ],
-            "name": "Proposed Work Item for International Standard",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.92",
-              "00.93",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "guide",
-            "abbr": [
-              "NP Guide",
-              "NP GUIDE"
-            ],
-            "name": "New Work Item Proposal for Guide",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.93",
-              "10.98",
-              "10.99"
-            ]
-          },
-          {
-            "stage_code": "awi",
-            "type_code": "guide",
-            "abbr": [
-              "AWI Guide",
-              "AWI GUIDE"
-            ],
-            "name": "Approved Work Item for Guide",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "guide",
-            "abbr": [
-              "WD Guide",
-              "WD GUIDE"
-            ],
-            "name": "Working Draft for Guide",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.92",
-              "20.93",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "guide",
-            "abbr": [
-              "CD Guide",
-              "CD GUIDE"
-            ],
-            "name": "Committee Draft for Guide",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "dguide",
-            "type_code": "guide",
-            "abbr": [
-              "DGuide",
-              "DGUIDE"
-            ],
-            "name": "Draft Guide",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fdguide",
-            "type_code": "guide",
-            "abbr": [
-              "FDGuide",
-              "FD Guide",
-              "FD GUIDE"
-            ],
-            "name": "Final Draft Guide",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "prf",
-            "type_code": "guide",
-            "abbr": [
-              "PRF Guide",
-              "PRF GUIDE"
-            ],
-            "name": "Proof Guide",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "guide",
-            "abbr": [
-              "Guide",
-              "GUIDE"
-            ],
-            "name": "Published Guide",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "ISO Guide 73:2009(fr)",
-          "ISO Guide 1:1972",
-          "ISO Guide 2:1976",
-          "ISO Guide 2:1978",
-          "ISO/IEC Guide 17:2016",
-          "ISO/IEC Guide 2:2004(E/F/R)",
-          "ISO/IEC Guide 38:1983",
-          "ISO/IEC Guide 39:1988",
-          "ISO/IEC Guide 41:2003",
-          "ISO/IEC Guide 46:2017"
-        ]
-      },
-      {
-        "key": "publicly_available_specification",
-        "title": "Publicly Available Specification",
-        "short": "PAS",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "pas",
-            "abbr": [
-              "PWI PAS"
-            ],
-            "name": "Proposed Work Item for Publicly Available Specification",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.92",
-              "00.93",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "pas",
-            "abbr": [
-              "NP PAS"
-            ],
-            "name": "New Work Item Proposal for Publicly Available Specification",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.93",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "awi",
-            "type_code": "pas",
-            "abbr": [
-              "AWI PAS"
-            ],
-            "name": "Approved Work Item for Publicly Available Specification",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "pas",
-            "abbr": [
-              "WD PAS"
-            ],
-            "name": "Working Draft for Publicly Available Specification",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.92",
-              "20.93",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "pas",
-            "abbr": [
-              "CD PAS"
-            ],
-            "name": "Committee Draft for Publicly Available Specification",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "dpas",
-            "type_code": "pas",
-            "abbr": [
-              "DPAS"
-            ],
-            "name": "Draft Publicly Available Specification",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "final_draft",
-            "type_code": "pas",
-            "abbr": [
-              "FDPAS"
-            ],
-            "name": "Final Draft Publicly Available Specification",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "prf",
-            "type_code": "pas",
-            "abbr": [
-              "PRF PAS"
-            ],
-            "name": "Proof Publicly Available Specification",
-            "harmonized_stages": [
-              "60.00"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "pas",
-            "abbr": [
-              "PAS"
-            ],
-            "name": "Publicly Available Specification",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "ISO/AWI PAS 14018",
-          "ISO/AWI PAS 24499",
-          "ISO/AWI PAS 5672",
-          "ISO/AWI PAS 8329",
-          "ISO/AWI PAS 8800",
-          "ISO/AWI PAS 8926",
-          "ISO/CD PAS 22399",
-          "ISO/CD PAS 24019",
-          "ISO/PAS 11856:2003",
-          "ISO/PAS 12868:2009"
-        ]
-      },
-      {
-        "key": "data",
-        "title": "Data",
-        "short": "PAS",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "np",
-            "type_code": "data",
-            "abbr": [
-              "NP DATA"
-            ],
-            "name": "New Work Item Proposal for Data",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.92",
-              "00.93",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "awi",
-            "type_code": "data",
-            "abbr": [
-              "AWI DATA"
-            ],
-            "name": "Approved Work Item for Data",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "data",
-            "abbr": [
-              "WD DATA"
-            ],
-            "name": "Working Draft for Data",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.92",
-              "20.93",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "data",
-            "abbr": [
-              "CD DATA"
-            ],
-            "name": "Committee Draft for Data",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "ddata",
-            "type_code": "data",
-            "abbr": [
-              "D DATA"
-            ],
-            "name": "Draft Data",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "prf",
-            "type_code": "data",
-            "abbr": [
-              "PRF DATA"
-            ],
-            "name": "Proof Data",
-            "harmonized_stages": [
-              "60.00"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "data",
-            "abbr": [
-              "DATA"
-            ],
-            "name": "Data",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": []
-      },
-      {
         "key": "technology_trends_assessments",
         "title": "Technology Trends Assessments",
         "short": "TTA",
@@ -1197,18 +337,18 @@
         ]
       },
       {
-        "key": "international_workshop_agreement",
-        "title": "International Workshop Agreement",
-        "short": "IWA",
+        "key": "data",
+        "title": "Data",
+        "short": "PAS",
         "abbr": [],
         "typed_stages": [
           {
             "stage_code": "np",
-            "type_code": "iwa",
+            "type_code": "data",
             "abbr": [
-              "PWI IWA"
+              "NP DATA"
             ],
-            "name": "Proposed Work Item for International Workshop Agreement",
+            "name": "New Work Item Proposal for Data",
             "harmonized_stages": [
               "00.00",
               "00.20",
@@ -1220,28 +360,12 @@
             ]
           },
           {
-            "stage_code": "np",
-            "type_code": "iwa",
-            "abbr": [
-              "NP IWA"
-            ],
-            "name": "New Work Item Proposal for International Workshop Agreement",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.93",
-              "10.98"
-            ]
-          },
-          {
             "stage_code": "awi",
-            "type_code": "iwa",
+            "type_code": "data",
             "abbr": [
-              "AWI IWA"
+              "AWI DATA"
             ],
-            "name": "Approved Work Item for International Workshop Agreement",
+            "name": "Approved Work Item for Data",
             "harmonized_stages": [
               "10.99",
               "20.00"
@@ -1249,11 +373,11 @@
           },
           {
             "stage_code": "wd",
-            "type_code": "iwa",
+            "type_code": "data",
             "abbr": [
-              "WD IWA"
+              "WD DATA"
             ],
-            "name": "Working Draft for International Workshop Agreement",
+            "name": "Working Draft for Data",
             "harmonized_stages": [
               "20.20",
               "20.60",
@@ -1265,11 +389,11 @@
           },
           {
             "stage_code": "cd",
-            "type_code": "iwa",
+            "type_code": "data",
             "abbr": [
-              "CD IWA"
+              "CD DATA"
             ],
-            "name": "Committee Draft for International Workshop Agreement",
+            "name": "Committee Draft for Data",
             "harmonized_stages": [
               "30.00",
               "30.20",
@@ -1281,12 +405,12 @@
             ]
           },
           {
-            "stage_code": "diwa",
-            "type_code": "iwa",
+            "stage_code": "ddata",
+            "type_code": "data",
             "abbr": [
-              "DIWA"
+              "D DATA"
             ],
-            "name": "Draft International Workshop Agreement",
+            "name": "Draft Data",
             "harmonized_stages": [
               "40.00",
               "40.20",
@@ -1299,206 +423,43 @@
           },
           {
             "stage_code": "prf",
-            "type_code": "iwa",
+            "type_code": "data",
             "abbr": [
-              "PRF IWA"
+              "PRF DATA"
             ],
-            "name": "Proof International Workshop Agreement",
-            "harmonized_stages": [
-              "50.00"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "iwa",
-            "abbr": [
-              "IWA"
-            ],
-            "name": "International Workshop Agreement",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "AWI IWA 36",
-          "AWI IWA 39",
-          "AWI IWA 41",
-          "CD IWA 37",
-          "CD IWA 37-1",
-          "CD IWA 37-2",
-          "CD IWA 37-3",
-          "WD IWA 19",
-          "IWA 1:2001",
-          "IWA 1:2005"
-        ]
-      },
-      {
-        "key": "international_standardized_profile",
-        "title": "International Standardized Profile",
-        "short": "ISP",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "isp",
-            "abbr": [
-              "PWI ISP"
-            ],
-            "name": "Proposed Work Item for International Standardized Profile",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.92",
-              "00.93",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "isp",
-            "abbr": [
-              "NP ISP"
-            ],
-            "name": "New Work Item Proposal for International Standardized Profile",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.93",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "awi",
-            "type_code": "isp",
-            "abbr": [
-              "AWI ISP"
-            ],
-            "name": "Approved Work Item for International Standardized Profile",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "isp",
-            "abbr": [
-              "WD ISP"
-            ],
-            "name": "Working Draft for International Standardized Profile",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.92",
-              "20.93",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "isp",
-            "abbr": [
-              "CD ISP"
-            ],
-            "name": "Committee Draft for International Standardized Profile",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.93",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "disp",
-            "type_code": "isp",
-            "abbr": [
-              "DISP"
-            ],
-            "name": "Draft International Standardized Profile",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.93",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fdis",
-            "type_code": "isp",
-            "abbr": [
-              "FDISP"
-            ],
-            "name": "Final Draft International Standardized Profile",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92"
-            ]
-          },
-          {
-            "stage_code": "prf",
-            "type_code": "isp",
-            "abbr": [
-              "PRF ISP"
-            ],
-            "name": "Proof International Standardized Profile",
+            "name": "Proof Data",
             "harmonized_stages": [
               "60.00"
             ]
           },
           {
             "stage_code": "published",
-            "type_code": "isp",
+            "type_code": "data",
             "abbr": [
-              "ISP"
+              "DATA"
             ],
-            "name": "International Standardized Profile",
+            "name": "Data",
             "harmonized_stages": [
               "60.00",
               "60.60"
             ]
           }
         ],
-        "examples": [
-          "ISO/IEC ISP 10611-3:2003",
-          "ISO/IEC ISP 10611-4:2003",
-          "ISO/IEC ISP 10613-5:1994",
-          "ISO/IEC ISP 11186-3:2000",
-          "ISO/IEC ISP 11188-1:1995",
-          "ISO/IEC ISP 12062-1:1995",
-          "ISO/IEC ISP 12062-1:2003",
-          "ISO/IEC ISP 12062-2:2003",
-          "ISO/IEC ISP 12062-3",
-          "ISO/IEC ISP 12062-4:2003"
-        ]
+        "examples": []
       },
       {
-        "key": "recommendation",
-        "title": "Recommendation",
-        "short": "R",
+        "key": "addendum",
+        "title": "Addendum",
+        "short": "ADD",
         "abbr": [],
         "typed_stages": [
           {
-            "stage_code": "np",
-            "type_code": "rec",
+            "stage_code": "proposal",
+            "type_code": "add",
             "abbr": [
-              "DP"
+              "PWI Add"
             ],
-            "name": "Draft Proposal",
+            "name": "Proposed Work Item for Addendum",
             "harmonized_stages": [
               "00.00",
               "00.20",
@@ -1506,28 +467,81 @@
               "00.92",
               "00.93",
               "00.98",
-              "00.99",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "proposal",
+            "type_code": "add",
+            "abbr": [
+              "NP Add"
+            ],
+            "name": "New Work Item Proposal for Addendum",
+            "harmonized_stages": [
               "10.00",
               "10.20",
               "10.60",
               "10.92",
               "10.93",
-              "10.98",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "preliminary",
+            "type_code": "add",
+            "abbr": [
+              "AWI Add"
+            ],
+            "name": "Approved Work Item for Addendum",
+            "harmonized_stages": [
               "10.99",
-              "20.00",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "working_draft",
+            "type_code": "add",
+            "abbr": [
+              "WD Add"
+            ],
+            "name": "Working Draft for Addendum",
+            "harmonized_stages": [
               "20.20",
               "20.60",
               "20.92",
               "20.93",
               "20.98",
-              "20.99",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "add",
+            "abbr": [
+              "CD Add"
+            ],
+            "name": "Committee Draft for Addendum",
+            "harmonized_stages": [
               "30.00",
               "30.20",
               "30.60",
               "30.92",
               "30.93",
               "30.98",
-              "30.99",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "dad",
+            "type_code": "add",
+            "abbr": [
+              "DAD",
+              "DAdd",
+              "D ADD",
+              "Dad"
+            ],
+            "name": "Draft Addendum",
+            "harmonized_stages": [
               "40.00",
               "40.20",
               "40.60",
@@ -1538,66 +552,41 @@
             ]
           },
           {
-            "stage_code": "published",
-            "type_code": "rec",
+            "stage_code": "fdad",
+            "type_code": "add",
             "abbr": [
-              "R"
+              "FDAD",
+              "FDAdd",
+              "FD ADD",
+              "FDad"
             ],
-            "name": "Recommendation",
+            "name": "Final Draft Addendum",
             "harmonized_stages": [
-              "60.00",
-              "60.60"
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
             ]
-          }
-        ],
-        "examples": [
-          "ISO/R 1:1951",
-          "ISO/R 101:1959",
-          "ISO/R 105-1:1959",
-          "ISO/R 105-2:1963",
-          "ISO/R 105-3:1963",
-          "ISO/R 105-6:1972",
-          "ISO/R 105-7:1975",
-          "ISO/R 106:1959",
-          "ISO/R 107:1959",
-          "ISO/R 1156:1969"
-        ]
-      },
-      {
-        "key": "directives",
-        "title": "Directives",
-        "short": "DIR",
-        "abbr": [],
-        "typed_stages": [
+          },
           {
             "stage_code": "published",
-            "type_code": "dir",
+            "type_code": "add",
             "abbr": [
-              "DIR",
-              "Directives Part",
-              "Directives, Part",
-              "Directives,",
-              "Directives"
+              "Add",
+              "ADD",
+              "Add.",
+              "Addendum"
             ],
-            "name": "Directives",
+            "name": "Addendum",
             "harmonized_stages": [
               "60.00",
               "60.60"
             ]
           }
         ],
-        "examples": [
-          "ISO/IEC DIR 1",
-          "ISO/IEC DIR 1:2022",
-          "ISO/IEC DIR 2",
-          "ISO/IEC DIR 2 IEC",
-          "ISO/IEC DIR 2 IEC:2022",
-          "ISO/IEC DIR 2 ISO",
-          "ISO/IEC DIR 2 ISO:2022",
-          "ISO/IEC DIR 2:2021",
-          "ISO/IEC JTC 1 DIR",
-          "ISO/IEC JTC 1 DIR:2004"
-        ]
+        "examples": []
       },
       {
         "key": "amendment",
@@ -1951,6 +940,1036 @@
         ]
       },
       {
+        "key": "directives",
+        "title": "Directives",
+        "short": "DIR",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "dir",
+            "abbr": [
+              "DIR",
+              "Directives Part",
+              "Directives, Part",
+              "Directives,",
+              "Directives"
+            ],
+            "name": "Directives",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/IEC DIR 1",
+          "ISO/IEC DIR 1:2022",
+          "ISO/IEC DIR 2",
+          "ISO/IEC DIR 2 IEC",
+          "ISO/IEC DIR 2 IEC:2022",
+          "ISO/IEC DIR 2 ISO",
+          "ISO/IEC DIR 2 ISO:2022",
+          "ISO/IEC DIR 2:2021",
+          "ISO/IEC JTC 1 DIR",
+          "ISO/IEC JTC 1 DIR:2004"
+        ]
+      },
+      {
+        "key": "directives_supplement",
+        "title": "Directives Supplement",
+        "short": "SUP",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "dir-sup",
+            "abbr": [
+              "DIR SUP",
+              "SUP",
+              "Supplement"
+            ],
+            "name": "Directives Supplement",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/IEC DIR 1 IEC SUP",
+          "ISO/IEC DIR 1 ISO SUP",
+          "ISO/IEC DIR 1 ISO SUP Edition 13",
+          "ISO/IEC DIR 1 ISO SUP:2022",
+          "ISO/IEC DIR IEC SUP",
+          "ISO/IEC DIR ISO SUP",
+          "ISO/IEC DIR JTC 1 SUP",
+          "ISO/IEC DIR JTC 1 SUP:2021",
+          "ISO/IEC DIR IEC SUP:2022"
+        ]
+      },
+      {
+        "key": "extract",
+        "title": "Extract",
+        "short": "Ext",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "ext",
+            "abbr": [
+              "Ext"
+            ],
+            "name": "Extract",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
+      },
+      {
+        "key": "guide",
+        "title": "Guide",
+        "short": "GUIDE",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "guide",
+            "abbr": [
+              "PWI Guide"
+            ],
+            "name": "Proposed Work Item for International Standard",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.92",
+              "00.93",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "guide",
+            "abbr": [
+              "NP Guide",
+              "NP GUIDE"
+            ],
+            "name": "New Work Item Proposal for Guide",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.93",
+              "10.98",
+              "10.99"
+            ]
+          },
+          {
+            "stage_code": "awi",
+            "type_code": "guide",
+            "abbr": [
+              "AWI Guide",
+              "AWI GUIDE"
+            ],
+            "name": "Approved Work Item for Guide",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "guide",
+            "abbr": [
+              "WD Guide",
+              "WD GUIDE"
+            ],
+            "name": "Working Draft for Guide",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.92",
+              "20.93",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "guide",
+            "abbr": [
+              "CD Guide",
+              "CD GUIDE"
+            ],
+            "name": "Committee Draft for Guide",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "dguide",
+            "type_code": "guide",
+            "abbr": [
+              "DGuide",
+              "DGUIDE"
+            ],
+            "name": "Draft Guide",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fdguide",
+            "type_code": "guide",
+            "abbr": [
+              "FDGuide",
+              "FD Guide",
+              "FD GUIDE"
+            ],
+            "name": "Final Draft Guide",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "prf",
+            "type_code": "guide",
+            "abbr": [
+              "PRF Guide",
+              "PRF GUIDE"
+            ],
+            "name": "Proof Guide",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "guide",
+            "abbr": [
+              "Guide",
+              "GUIDE"
+            ],
+            "name": "Published Guide",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO Guide 73:2009(fr)",
+          "ISO Guide 1:1972",
+          "ISO Guide 2:1976",
+          "ISO Guide 2:1978",
+          "ISO/IEC Guide 17:2016",
+          "ISO/IEC Guide 2:2004(E/F/R)",
+          "ISO/IEC Guide 38:1983",
+          "ISO/IEC Guide 39:1988",
+          "ISO/IEC Guide 41:2003",
+          "ISO/IEC Guide 46:2017"
+        ]
+      },
+      {
+        "key": "international_standard",
+        "title": "International Standard",
+        "short": "IS",
+        "abbr": [
+          "",
+          "IS"
+        ],
+        "typed_stages": [
+          {
+            "stage_code": "dp",
+            "type_code": "is",
+            "abbr": [
+              "DP"
+            ],
+            "name": "Draft Proposal",
+            "harmonized_stages": []
+          },
+          {
+            "stage_code": "pwi",
+            "type_code": "is",
+            "abbr": [
+              "PWI"
+            ],
+            "name": "Proposed Work Item for International Standard",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.92",
+              "00.93",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "is",
+            "abbr": [
+              "NP",
+              "NWIP"
+            ],
+            "name": "New Work Item Proposal for International Standard",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.93",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "awi",
+            "type_code": "is",
+            "abbr": [
+              "AWI"
+            ],
+            "name": "Approved Work Item for International Standard",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "is",
+            "abbr": [
+              "WD"
+            ],
+            "name": "Working Draft for International Standard",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.92",
+              "20.93",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "wds",
+            "type_code": "is",
+            "abbr": [
+              "WDS"
+            ],
+            "name": "Working Draft Study",
+            "harmonized_stages": [
+              "20.20",
+              "20.60"
+            ]
+          },
+          {
+            "stage_code": "pcd",
+            "type_code": "is",
+            "abbr": [
+              "preCD",
+              "PreCD"
+            ],
+            "name": "Pre-Committee Draft for International Standard",
+            "harmonized_stages": [
+              "29.00",
+              "29.20",
+              "29.60",
+              "29.92",
+              "29.93",
+              "29.98",
+              "29.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "is",
+            "abbr": [
+              "CD"
+            ],
+            "name": "Committee Draft for International Standard",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "dis",
+            "type_code": "is",
+            "abbr": [
+              "DIS",
+              "FPD"
+            ],
+            "name": "Draft International Standard",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fcd",
+            "type_code": "is",
+            "abbr": [
+              "FCD"
+            ],
+            "name": "Final Committee Draft for International Standard",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fdis",
+            "type_code": "is",
+            "abbr": [
+              "FDIS"
+            ],
+            "name": "Final Draft International Standard",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "prf",
+            "type_code": "is",
+            "abbr": [
+              "PRF",
+              "Fpr"
+            ],
+            "name": "Proof International Standard",
+            "harmonized_stages": [
+              "60.00"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "is",
+            "abbr": [
+              "",
+              "IS"
+            ],
+            "name": "International Standard",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          },
+          {
+            "stage_code": "wdr",
+            "type_code": "is",
+            "abbr": [
+              "WDR"
+            ],
+            "name": "Proposed for Withdrawal",
+            "harmonized_stages": [
+              "90.92"
+            ]
+          },
+          {
+            "stage_code": "wda",
+            "type_code": "is",
+            "abbr": [
+              "WDA"
+            ],
+            "name": "Withdrawal Approved",
+            "harmonized_stages": [
+              "90.93"
+            ]
+          },
+          {
+            "stage_code": "wdar",
+            "type_code": "is",
+            "abbr": [
+              "WDAR"
+            ],
+            "name": "Withdrawal Archived",
+            "harmonized_stages": [
+              "95.99"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/Guide 34:2009",
+          "ISO/CEI Guide 37:1995",
+          "ISO/CEI Guide 50",
+          "ISO/CEI Guide 51:1999",
+          "ISO/CEI Guide 71:2001(F)",
+          "ISO/IEC Guide 59:1994",
+          "IEC 31010:2019(en,fr)",
+          "IEC 80601-2-60",
+          "IEC 80601-2-60:2019(en,fr)",
+          "IEC/CD 80000-15"
+        ]
+      },
+      {
+        "key": "international_standardized_profile",
+        "title": "International Standardized Profile",
+        "short": "ISP",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "isp",
+            "abbr": [
+              "PWI ISP"
+            ],
+            "name": "Proposed Work Item for International Standardized Profile",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.92",
+              "00.93",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "isp",
+            "abbr": [
+              "NP ISP"
+            ],
+            "name": "New Work Item Proposal for International Standardized Profile",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.93",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "awi",
+            "type_code": "isp",
+            "abbr": [
+              "AWI ISP"
+            ],
+            "name": "Approved Work Item for International Standardized Profile",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "isp",
+            "abbr": [
+              "WD ISP"
+            ],
+            "name": "Working Draft for International Standardized Profile",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.92",
+              "20.93",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "isp",
+            "abbr": [
+              "CD ISP"
+            ],
+            "name": "Committee Draft for International Standardized Profile",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "disp",
+            "type_code": "isp",
+            "abbr": [
+              "DISP"
+            ],
+            "name": "Draft International Standardized Profile",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fdis",
+            "type_code": "isp",
+            "abbr": [
+              "FDISP"
+            ],
+            "name": "Final Draft International Standardized Profile",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92"
+            ]
+          },
+          {
+            "stage_code": "prf",
+            "type_code": "isp",
+            "abbr": [
+              "PRF ISP"
+            ],
+            "name": "Proof International Standardized Profile",
+            "harmonized_stages": [
+              "60.00"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "isp",
+            "abbr": [
+              "ISP"
+            ],
+            "name": "International Standardized Profile",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/IEC ISP 10611-3:2003",
+          "ISO/IEC ISP 10611-4:2003",
+          "ISO/IEC ISP 10613-5:1994",
+          "ISO/IEC ISP 11186-3:2000",
+          "ISO/IEC ISP 11188-1:1995",
+          "ISO/IEC ISP 12062-1:1995",
+          "ISO/IEC ISP 12062-1:2003",
+          "ISO/IEC ISP 12062-2:2003",
+          "ISO/IEC ISP 12062-3",
+          "ISO/IEC ISP 12062-4:2003"
+        ]
+      },
+      {
+        "key": "international_workshop_agreement",
+        "title": "International Workshop Agreement",
+        "short": "IWA",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "np",
+            "type_code": "iwa",
+            "abbr": [
+              "PWI IWA"
+            ],
+            "name": "Proposed Work Item for International Workshop Agreement",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.92",
+              "00.93",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "iwa",
+            "abbr": [
+              "NP IWA"
+            ],
+            "name": "New Work Item Proposal for International Workshop Agreement",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.93",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "awi",
+            "type_code": "iwa",
+            "abbr": [
+              "AWI IWA"
+            ],
+            "name": "Approved Work Item for International Workshop Agreement",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "iwa",
+            "abbr": [
+              "WD IWA"
+            ],
+            "name": "Working Draft for International Workshop Agreement",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.92",
+              "20.93",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "iwa",
+            "abbr": [
+              "CD IWA"
+            ],
+            "name": "Committee Draft for International Workshop Agreement",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "diwa",
+            "type_code": "iwa",
+            "abbr": [
+              "DIWA"
+            ],
+            "name": "Draft International Workshop Agreement",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "prf",
+            "type_code": "iwa",
+            "abbr": [
+              "PRF IWA"
+            ],
+            "name": "Proof International Workshop Agreement",
+            "harmonized_stages": [
+              "50.00"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "iwa",
+            "abbr": [
+              "IWA"
+            ],
+            "name": "International Workshop Agreement",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "AWI IWA 36",
+          "AWI IWA 39",
+          "AWI IWA 41",
+          "CD IWA 37",
+          "CD IWA 37-1",
+          "CD IWA 37-2",
+          "CD IWA 37-3",
+          "WD IWA 19",
+          "IWA 1:2001",
+          "IWA 1:2005"
+        ]
+      },
+      {
+        "key": "publicly_available_specification",
+        "title": "Publicly Available Specification",
+        "short": "PAS",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "pas",
+            "abbr": [
+              "PWI PAS"
+            ],
+            "name": "Proposed Work Item for Publicly Available Specification",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.92",
+              "00.93",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "pas",
+            "abbr": [
+              "NP PAS"
+            ],
+            "name": "New Work Item Proposal for Publicly Available Specification",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.93",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "awi",
+            "type_code": "pas",
+            "abbr": [
+              "AWI PAS"
+            ],
+            "name": "Approved Work Item for Publicly Available Specification",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "pas",
+            "abbr": [
+              "WD PAS"
+            ],
+            "name": "Working Draft for Publicly Available Specification",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.92",
+              "20.93",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "pas",
+            "abbr": [
+              "CD PAS"
+            ],
+            "name": "Committee Draft for Publicly Available Specification",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "dpas",
+            "type_code": "pas",
+            "abbr": [
+              "DPAS"
+            ],
+            "name": "Draft Publicly Available Specification",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "final_draft",
+            "type_code": "pas",
+            "abbr": [
+              "FDPAS"
+            ],
+            "name": "Final Draft Publicly Available Specification",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "prf",
+            "type_code": "pas",
+            "abbr": [
+              "PRF PAS"
+            ],
+            "name": "Proof Publicly Available Specification",
+            "harmonized_stages": [
+              "60.00"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "pas",
+            "abbr": [
+              "PAS"
+            ],
+            "name": "Publicly Available Specification",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/AWI PAS 14018",
+          "ISO/AWI PAS 24499",
+          "ISO/AWI PAS 5672",
+          "ISO/AWI PAS 8329",
+          "ISO/AWI PAS 8800",
+          "ISO/AWI PAS 8926",
+          "ISO/CD PAS 22399",
+          "ISO/CD PAS 24019",
+          "ISO/PAS 11856:2003",
+          "ISO/PAS 12868:2009"
+        ]
+      },
+      {
+        "key": "recommendation",
+        "title": "Recommendation",
+        "short": "R",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "np",
+            "type_code": "rec",
+            "abbr": [
+              "DP"
+            ],
+            "name": "Draft Proposal",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.92",
+              "00.93",
+              "00.98",
+              "00.99",
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.93",
+              "10.98",
+              "10.99",
+              "20.00",
+              "20.20",
+              "20.60",
+              "20.92",
+              "20.93",
+              "20.98",
+              "20.99",
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99",
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.93",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "rec",
+            "abbr": [
+              "R"
+            ],
+            "name": "Recommendation",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/R 1:1951",
+          "ISO/R 101:1959",
+          "ISO/R 105-1:1959",
+          "ISO/R 105-2:1963",
+          "ISO/R 105-3:1963",
+          "ISO/R 105-6:1972",
+          "ISO/R 105-7:1975",
+          "ISO/R 106:1959",
+          "ISO/R 107:1959",
+          "ISO/R 1156:1969"
+        ]
+      },
+      {
         "key": "supplement",
         "title": "Supplement",
         "short": "suppl",
@@ -2079,72 +2098,26 @@
         "examples": []
       },
       {
-        "key": "extract",
-        "title": "Extract",
-        "short": "Ext",
+        "key": "tc_document",
+        "title": "Technical Committee Document",
+        "short": "TC",
         "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "ext",
-            "abbr": [
-              "Ext"
-            ],
-            "name": "Extract",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
+        "typed_stages": [],
         "examples": []
       },
       {
-        "key": "directives_supplement",
-        "title": "Directives Supplement",
-        "short": "SUP",
+        "key": "technical_report",
+        "title": "Technical Report",
+        "short": "TR",
         "abbr": [],
         "typed_stages": [
           {
-            "stage_code": "published",
-            "type_code": "dir-sup",
+            "stage_code": "pwi",
+            "type_code": "tr",
             "abbr": [
-              "DIR SUP",
-              "SUP",
-              "Supplement"
+              "PWI TR"
             ],
-            "name": "Directives Supplement",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "ISO/IEC DIR 1 IEC SUP",
-          "ISO/IEC DIR 1 ISO SUP",
-          "ISO/IEC DIR 1 ISO SUP Edition 13",
-          "ISO/IEC DIR 1 ISO SUP:2022",
-          "ISO/IEC DIR IEC SUP",
-          "ISO/IEC DIR ISO SUP",
-          "ISO/IEC DIR JTC 1 SUP",
-          "ISO/IEC DIR JTC 1 SUP:2021",
-          "ISO/IEC DIR IEC SUP:2022"
-        ]
-      },
-      {
-        "key": "addendum",
-        "title": "Addendum",
-        "short": "ADD",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "proposal",
-            "type_code": "add",
-            "abbr": [
-              "PWI Add"
-            ],
-            "name": "Proposed Work Item for Addendum",
+            "name": "Proposed Work Item for Technical Report",
             "harmonized_stages": [
               "00.00",
               "00.20",
@@ -2156,12 +2129,12 @@
             ]
           },
           {
-            "stage_code": "proposal",
-            "type_code": "add",
+            "stage_code": "np",
+            "type_code": "tr",
             "abbr": [
-              "NP Add"
+              "NP TR"
             ],
-            "name": "New Work Item Proposal for Addendum",
+            "name": "New Work Item Proposal for Technical Report",
             "harmonized_stages": [
               "10.00",
               "10.20",
@@ -2172,24 +2145,24 @@
             ]
           },
           {
-            "stage_code": "preliminary",
-            "type_code": "add",
+            "stage_code": "awi",
+            "type_code": "tr",
             "abbr": [
-              "AWI Add"
+              "AWI TR"
             ],
-            "name": "Approved Work Item for Addendum",
+            "name": "Approved Work Item for Technical Report",
             "harmonized_stages": [
               "10.99",
               "20.00"
             ]
           },
           {
-            "stage_code": "working_draft",
-            "type_code": "add",
+            "stage_code": "wd",
+            "type_code": "tr",
             "abbr": [
-              "WD Add"
+              "WD TR"
             ],
-            "name": "Working Draft for Addendum",
+            "name": "Working Draft Technical Report",
             "harmonized_stages": [
               "20.20",
               "20.60",
@@ -2201,11 +2174,11 @@
           },
           {
             "stage_code": "cd",
-            "type_code": "add",
+            "type_code": "tr",
             "abbr": [
-              "CD Add"
+              "CD TR"
             ],
-            "name": "Committee Draft for Addendum",
+            "name": "Committee Draft Technical Report",
             "harmonized_stages": [
               "30.00",
               "30.20",
@@ -2217,15 +2190,29 @@
             ]
           },
           {
-            "stage_code": "dad",
-            "type_code": "add",
+            "stage_code": "cd",
+            "type_code": "tr",
             "abbr": [
-              "DAD",
-              "DAdd",
-              "D ADD",
-              "Dad"
+              "PDTR"
             ],
-            "name": "Draft Addendum",
+            "name": "Proposed Draft Technical Report",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.93",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "draft",
+            "type_code": "tr",
+            "abbr": [
+              "DTR"
+            ],
+            "name": "Draft Technical Report",
             "harmonized_stages": [
               "40.00",
               "40.20",
@@ -2237,15 +2224,28 @@
             ]
           },
           {
-            "stage_code": "fdad",
-            "type_code": "add",
+            "stage_code": "final_draft",
+            "type_code": "tr",
             "abbr": [
-              "FDAD",
-              "FDAdd",
-              "FD ADD",
-              "FDad"
+              "FDTR"
             ],
-            "name": "Final Draft Addendum",
+            "name": "Final Draft Technical Report",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "prf",
+            "type_code": "tr",
+            "abbr": [
+              "PRF TR"
+            ],
+            "name": "Proof Technical Report",
             "harmonized_stages": [
               "50.00",
               "50.20",
@@ -2257,14 +2257,48 @@
           },
           {
             "stage_code": "published",
-            "type_code": "add",
+            "type_code": "tr",
             "abbr": [
-              "Add",
-              "ADD",
-              "Add.",
-              "Addendum"
+              "TR"
             ],
-            "name": "Addendum",
+            "name": "Published Technical Report",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/ASTM DTR 52905",
+          "ISO/ASTM TR 52906",
+          "ISO/CIE DTR 21783.2",
+          "ISO/CIE TR 21783",
+          "ISO/DTR 22126-3",
+          "ISO/DTR 22126-5",
+          "ISO/DTR 22351",
+          "ISO/DTR 22514-9.2",
+          "ISO/DTR 23148",
+          "ISO/DTR 4763"
+        ]
+      }
+    ],
+    "attributes": []
+  },
+  "iec": {
+    "identifier_types": [
+      {
+        "key": "operational_document",
+        "title": "Operational Document",
+        "short": "OD",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "od",
+            "abbr": [
+              "OD"
+            ],
+            "name": "Operational Document",
             "harmonized_stages": [
               "60.00",
               "60.60"
@@ -2274,163 +2308,46 @@
         "examples": []
       },
       {
-        "key": "tc_document",
-        "title": "Technical Committee Document",
-        "short": "TC",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      }
-    ],
-    "attributes": []
-  },
-  "iec": {
-    "identifier_types": [
-      {
-        "key": "international_standard",
-        "title": "International Standard",
-        "short": null,
+        "key": "societal_technology_trend_report",
+        "title": "Societal and Technology Trend Report",
+        "short": "Trend Report",
         "abbr": [],
         "typed_stages": [
           {
-            "stage_code": "pwi",
-            "type_code": "is",
-            "abbr": [
-              "PWI"
-            ],
-            "name": "Preliminary Work Item",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "is",
-            "abbr": [
-              "NP"
-            ],
-            "name": "New Proposal",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "anw",
-            "type_code": "is",
-            "abbr": [
-              "ANW"
-            ],
-            "name": "Approved New Work Item",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "is",
-            "abbr": [
-              "WD"
-            ],
-            "name": "Working Draft",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "is",
-            "abbr": [
-              "CD"
-            ],
-            "name": "Committee Draft",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "cdv",
-            "type_code": "is",
-            "abbr": [
-              "CDV"
-            ],
-            "name": "Committee Draft for Vote",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fdis",
-            "type_code": "is",
-            "abbr": [
-              "FDIS",
-              "PRF"
-            ],
-            "name": "Final Draft International Standard",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
             "stage_code": "published",
-            "type_code": "is",
+            "type_code": "sttr",
             "abbr": [
-              ""
+              "Trend Report"
             ],
-            "name": "International Standard",
+            "name": "Societal and Technology Trend Report",
             "harmonized_stages": [
               "60.00",
-              "60.60",
-              "90.20",
-              "90.60",
-              "90.92",
-              "90.93",
-              "90.99",
-              "95.20",
-              "95.60",
-              "95.92",
-              "95.99"
+              "60.60"
             ]
           }
         ],
-        "examples": [
-          "CISPR 12 ED7",
-          "CISPR 12:2007",
-          "CISPR 16-1-1:2019",
-          "CISPR 16-1-2:2014",
-          "CISPR 16-1-3:2004",
-          "CISPR 16-1-4 ED5",
-          "CISPR 16-1-4:2019",
-          "CISPR 16-1-5:2014",
-          "CISPR 16-1-6:2014",
-          "CISPR 16-2-1:2014"
-        ]
+        "examples": []
+      },
+      {
+        "key": "tec",
+        "title": "Technology Report",
+        "short": "Technology Report",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "tec",
+            "abbr": [
+              "Technology Report"
+            ],
+            "name": "Technology Report",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
       },
       {
         "key": "technical_report",
@@ -2691,6 +2608,27 @@
         ]
       },
       {
+        "key": "white_paper",
+        "title": "White Paper",
+        "short": "White Paper",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "wp",
+            "abbr": [
+              "White Paper"
+            ],
+            "name": "White Paper",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": []
+      },
+      {
         "key": "publicly_available_specification",
         "title": "Publicly Available Specification",
         "short": "PAS",
@@ -2817,571 +2755,6 @@
           "IEC PAS 63267-3-30:2021",
           "IEC PAS 63267-3-31:2020",
           "IEC PAS 63325:2020"
-        ]
-      },
-      {
-        "key": "guide",
-        "title": "Guide",
-        "short": [
-          "Guide",
-          "GUIDE"
-        ],
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "guide",
-            "abbr": [
-              "PWI Guide"
-            ],
-            "name": "Preliminary Work Item Guide",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "guide",
-            "abbr": [
-              "NP Guide"
-            ],
-            "name": "New Proposal Guide",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "anw",
-            "type_code": "guide",
-            "abbr": [
-              "ANW Guide"
-            ],
-            "name": "Approved New Work Item Guide",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "guide",
-            "abbr": [
-              "WD Guide"
-            ],
-            "name": "Working Draft Guide",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "guide",
-            "abbr": [
-              "CD Guide"
-            ],
-            "name": "Committee Draft Guide",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "draft",
-            "type_code": "guide",
-            "abbr": [
-              "DGuide"
-            ],
-            "name": "Draft Guide",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "final_draft",
-            "type_code": "guide",
-            "abbr": [
-              "FDGuide",
-              "PRF Guide"
-            ],
-            "name": "Final Draft Guide",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "guide",
-            "abbr": [
-              "GUIDE",
-              "Guide"
-            ],
-            "name": "Guide",
-            "harmonized_stages": [
-              "60.00",
-              "60.60",
-              "90.20",
-              "90.60",
-              "90.92",
-              "90.93",
-              "90.99",
-              "95.20",
-              "95.60",
-              "95.92",
-              "95.99"
-            ]
-          }
-        ],
-        "examples": [
-          "IEC GUIDE 103:1980",
-          "IEC GUIDE 108:2019",
-          "IEC GUIDE 115:2021",
-          "ISO/IEC GUIDE 13:1977",
-          "ISO/IEC GUIDE 14:2003",
-          "ISO/IEC GUIDE 14:2018",
-          "ISO/IEC GUIDE 15:1977",
-          "ISO/IEC GUIDE 16:1978",
-          "ISO/IEC GUIDE 17:2016",
-          "ISO/IEC GUIDE 2:1986"
-        ]
-      },
-      {
-        "key": "test_report_form",
-        "title": "Test Report Form",
-        "short": "TRF",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "trf",
-            "abbr": [
-              "TRF"
-            ],
-            "name": "Test Report Form",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "IECEE TRF 10079-1A:2020",
-          "IECEE TRF 60034-2-1A:2016",
-          "IECEE TRF 60044-1A:2010",
-          "IECEE TRF 60044-7B:2018",
-          "IECEE TRF 60044-8B:2018",
-          "IECEE TRF 60065C:1998",
-          "IECEE TRF 60065D:2002",
-          "IECEE TRF 60065E:2004",
-          "IECEE TRF 60065I:2008",
-          "IECEE TRF 60065J:2010"
-        ]
-      },
-      {
-        "key": "interpretation_sheet",
-        "title": "Interpretation Sheet",
-        "short": "ISH",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "ish",
-            "abbr": [
-              "PWI ISH"
-            ],
-            "name": "Preliminary Work Item Interpretation Sheet",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "ish",
-            "abbr": [
-              "NP ISH"
-            ],
-            "name": "New Proposal Interpretation Sheet",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "anw",
-            "type_code": "ish",
-            "abbr": [
-              "ANW ISH"
-            ],
-            "name": "Approved New Work Item Interpretation Sheet",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "ish",
-            "abbr": [
-              "WD ISH"
-            ],
-            "name": "Working Draft Interpretation Sheet",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "ish",
-            "abbr": [
-              "CDISH"
-            ],
-            "name": "Committee Draft Interpretation Sheet",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "draft",
-            "type_code": "ish",
-            "abbr": [
-              "DISH"
-            ],
-            "name": "Draft Interpretation Sheet",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "ish",
-            "abbr": [
-              "ISH"
-            ],
-            "name": "Interpretation Sheet",
-            "harmonized_stages": [
-              "60.00",
-              "60.60",
-              "90.20",
-              "90.60",
-              "90.92",
-              "90.93",
-              "90.99",
-              "95.20",
-              "95.60",
-              "95.92",
-              "95.99"
-            ]
-          }
-        ],
-        "examples": [
-          "CISPR 14-1:2016/ISH1:2017",
-          "CISPR 14-1:2016/ISH2:2017",
-          "CISPR 15:2005/ISH1:2013",
-          "CISPR 15:2005/ISH2:2013",
-          "CISPR 15:2013/ISH1:2013",
-          "CISPR 15:2013/ISH2:2013",
-          "CISPR 15:2018/ISH1:2019",
-          "CISPR 16-1-1:2015/ISH1:2018",
-          "CISPR 22:2008/ISH1:2009",
-          "CISPR 22:2008/ISH2:2010"
-        ]
-      },
-      {
-        "key": "systems_reference_document",
-        "title": "Systems Reference Document",
-        "short": "SRD",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "srd",
-            "abbr": [
-              "SRD"
-            ],
-            "name": "Systems Reference Document",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": [
-          "IEC SRD 62559-4:2020",
-          "IEC SRD 62913-1:2019",
-          "IEC SRD 62913-2-1:2019",
-          "IEC SRD 62913-2-2:2019",
-          "IEC SRD 62913-2-3:2019",
-          "IEC SRD 62913-2-4:2019",
-          "IEC SRD 63199:2020",
-          "IEC SRD 63200:2021",
-          "IEC SRD 63219:2022",
-          "IEC SRD 63234-1:2020"
-        ]
-      },
-      {
-        "key": "working_document",
-        "title": "Working Document",
-        "short": "WD",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "1/2457/FDIS",
-          "1/2458/FDIS",
-          "1/2459/INF",
-          "1/2460/AC",
-          "1/2461/AC",
-          "1/2462/INF",
-          "1/2463/INF",
-          "1/2464/INF",
-          "1/2465/INF",
-          "1/2466/INF"
-        ]
-      },
-      {
-        "key": "societal_technology_trend_report",
-        "title": "Societal and Technology Trend Report",
-        "short": "Trend Report",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "sttr",
-            "abbr": [
-              "Trend Report"
-            ],
-            "name": "Societal and Technology Trend Report",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": []
-      },
-      {
-        "key": "white_paper",
-        "title": "White Paper",
-        "short": "White Paper",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "wp",
-            "abbr": [
-              "White Paper"
-            ],
-            "name": "White Paper",
-            "harmonized_stages": [
-              "60.00",
-              "60.60"
-            ]
-          }
-        ],
-        "examples": []
-      },
-      {
-        "key": "sheet_identifier",
-        "title": "Sheet Identifier",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "IEC 60695-2-1/0:1994",
-          "IEC 60695-2-1/1:1994",
-          "IEC 60695-2-1/2:1994",
-          "IEC 60695-2-1/3:1994",
-          "IEC 60695-2-4/1:1991",
-          "IEC TS 60695-2-4/2:1994"
-        ]
-      },
-      {
-        "key": "fragment_identifier",
-        "title": "Fragment",
-        "short": "FRAG",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "pwi",
-            "type_code": "frag",
-            "abbr": [
-              "PWI Frag"
-            ],
-            "name": "Preliminary Work Item Fragment",
-            "harmonized_stages": [
-              "00.00",
-              "00.20",
-              "00.60",
-              "00.98",
-              "00.99"
-            ]
-          },
-          {
-            "stage_code": "np",
-            "type_code": "frag",
-            "abbr": [
-              "NP Frag"
-            ],
-            "name": "New Proposal Fragment",
-            "harmonized_stages": [
-              "10.00",
-              "10.20",
-              "10.60",
-              "10.92",
-              "10.98"
-            ]
-          },
-          {
-            "stage_code": "anw",
-            "type_code": "frag",
-            "abbr": [
-              "ANW Frag"
-            ],
-            "name": "Approved New Work Item Fragment",
-            "harmonized_stages": [
-              "10.99",
-              "20.00"
-            ]
-          },
-          {
-            "stage_code": "wd",
-            "type_code": "frag",
-            "abbr": [
-              "WD Frag"
-            ],
-            "name": "Working Draft Fragment",
-            "harmonized_stages": [
-              "20.20",
-              "20.60",
-              "20.98",
-              "20.99"
-            ]
-          },
-          {
-            "stage_code": "cd",
-            "type_code": "frag",
-            "abbr": [
-              "CDFRAG"
-            ],
-            "name": "Committee Draft Fragment",
-            "harmonized_stages": [
-              "30.00",
-              "30.20",
-              "30.60",
-              "30.92",
-              "30.98",
-              "30.99"
-            ]
-          },
-          {
-            "stage_code": "dfrag",
-            "type_code": "frag",
-            "abbr": [
-              "DFRAG"
-            ],
-            "name": "Draft Fragment",
-            "harmonized_stages": [
-              "40.00",
-              "40.20",
-              "40.60",
-              "40.92",
-              "40.98",
-              "40.99"
-            ]
-          },
-          {
-            "stage_code": "fdfrag",
-            "type_code": "frag",
-            "abbr": [
-              "FDFRAG",
-              "PRF Frag"
-            ],
-            "name": "Final Draft Fragment",
-            "harmonized_stages": [
-              "50.00",
-              "50.20",
-              "50.60",
-              "50.92",
-              "50.98",
-              "50.99"
-            ]
-          },
-          {
-            "stage_code": "published",
-            "type_code": "frag",
-            "abbr": [
-              "FRAG"
-            ],
-            "name": "Fragment",
-            "harmonized_stages": [
-              "60.00",
-              "60.60",
-              "90.20",
-              "90.60",
-              "90.92",
-              "90.93",
-              "90.99",
-              "95.20",
-              "95.60",
-              "95.92",
-              "95.99"
-            ]
-          }
-        ],
-        "examples": [
-          "IEC 60050-111/AMD1/FRAG1 ED2",
-          "IEC 60050-121/AMD2/FRAG1 ED2",
-          "IEC 60050-131/AMD1/FRAG1 ED2",
-          "IEC 60050-191/AMD1/FRAG1 ED1",
-          "IEC 60050-191/AMD2/FRAG2 ED1",
-          "IEC 60050-191/FRAG1 ED2",
-          "IEC 60050-447/FRAG3 ED2",
-          "IEC 60050-521/AMD1/FRAG1 ED1",
-          "IEC 60050-521/FRAG1 ED2",
-          "IEC 60050-604/AMD2/FRAG1 ED1"
         ]
       },
       {
@@ -3679,30 +3052,657 @@
         ]
       },
       {
-        "key": "consolidated_identifier",
-        "title": "Consolidated Identifier",
-        "short": null,
+        "key": "systems_reference_document",
+        "title": "Systems Reference Document",
+        "short": "SRD",
         "abbr": [],
-        "typed_stages": [],
-        "examples": []
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "srd",
+            "abbr": [
+              "SRD"
+            ],
+            "name": "Systems Reference Document",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "IEC SRD 62559-4:2020",
+          "IEC SRD 62913-1:2019",
+          "IEC SRD 62913-2-1:2019",
+          "IEC SRD 62913-2-2:2019",
+          "IEC SRD 62913-2-3:2019",
+          "IEC SRD 62913-2-4:2019",
+          "IEC SRD 63199:2020",
+          "IEC SRD 63200:2021",
+          "IEC SRD 63219:2022",
+          "IEC SRD 63234-1:2020"
+        ]
       },
       {
-        "key": "vap_identifier",
-        "title": "Vap Identifier",
+        "key": "interpretation_sheet",
+        "title": "Interpretation Sheet",
+        "short": "ISH",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "ish",
+            "abbr": [
+              "PWI ISH"
+            ],
+            "name": "Preliminary Work Item Interpretation Sheet",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "ish",
+            "abbr": [
+              "NP ISH"
+            ],
+            "name": "New Proposal Interpretation Sheet",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "anw",
+            "type_code": "ish",
+            "abbr": [
+              "ANW ISH"
+            ],
+            "name": "Approved New Work Item Interpretation Sheet",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "ish",
+            "abbr": [
+              "WD ISH"
+            ],
+            "name": "Working Draft Interpretation Sheet",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "ish",
+            "abbr": [
+              "CDISH"
+            ],
+            "name": "Committee Draft Interpretation Sheet",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "draft",
+            "type_code": "ish",
+            "abbr": [
+              "DISH"
+            ],
+            "name": "Draft Interpretation Sheet",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "ish",
+            "abbr": [
+              "ISH"
+            ],
+            "name": "Interpretation Sheet",
+            "harmonized_stages": [
+              "60.00",
+              "60.60",
+              "90.20",
+              "90.60",
+              "90.92",
+              "90.93",
+              "90.99",
+              "95.20",
+              "95.60",
+              "95.92",
+              "95.99"
+            ]
+          }
+        ],
+        "examples": [
+          "CISPR 14-1:2016/ISH1:2017",
+          "CISPR 14-1:2016/ISH2:2017",
+          "CISPR 15:2005/ISH1:2013",
+          "CISPR 15:2005/ISH2:2013",
+          "CISPR 15:2013/ISH1:2013",
+          "CISPR 15:2013/ISH2:2013",
+          "CISPR 15:2018/ISH1:2019",
+          "CISPR 16-1-1:2015/ISH1:2018",
+          "CISPR 22:2008/ISH1:2009",
+          "CISPR 22:2008/ISH2:2010"
+        ]
+      },
+      {
+        "key": "fragment_identifier",
+        "title": "Fragment",
+        "short": "FRAG",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "frag",
+            "abbr": [
+              "PWI Frag"
+            ],
+            "name": "Preliminary Work Item Fragment",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "frag",
+            "abbr": [
+              "NP Frag"
+            ],
+            "name": "New Proposal Fragment",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "anw",
+            "type_code": "frag",
+            "abbr": [
+              "ANW Frag"
+            ],
+            "name": "Approved New Work Item Fragment",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "frag",
+            "abbr": [
+              "WD Frag"
+            ],
+            "name": "Working Draft Fragment",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "frag",
+            "abbr": [
+              "CDFRAG"
+            ],
+            "name": "Committee Draft Fragment",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "dfrag",
+            "type_code": "frag",
+            "abbr": [
+              "DFRAG"
+            ],
+            "name": "Draft Fragment",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fdfrag",
+            "type_code": "frag",
+            "abbr": [
+              "FDFRAG",
+              "PRF Frag"
+            ],
+            "name": "Final Draft Fragment",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "frag",
+            "abbr": [
+              "FRAG"
+            ],
+            "name": "Fragment",
+            "harmonized_stages": [
+              "60.00",
+              "60.60",
+              "90.20",
+              "90.60",
+              "90.92",
+              "90.93",
+              "90.99",
+              "95.20",
+              "95.60",
+              "95.92",
+              "95.99"
+            ]
+          }
+        ],
+        "examples": [
+          "IEC 60050-111/AMD1/FRAG1 ED2",
+          "IEC 60050-121/AMD2/FRAG1 ED2",
+          "IEC 60050-131/AMD1/FRAG1 ED2",
+          "IEC 60050-191/AMD1/FRAG1 ED1",
+          "IEC 60050-191/AMD2/FRAG2 ED1",
+          "IEC 60050-191/FRAG1 ED2",
+          "IEC 60050-447/FRAG3 ED2",
+          "IEC 60050-521/AMD1/FRAG1 ED1",
+          "IEC 60050-521/FRAG1 ED2",
+          "IEC 60050-604/AMD2/FRAG1 ED1"
+        ]
+      },
+      {
+        "key": "guide",
+        "title": "Guide",
+        "short": [
+          "Guide",
+          "GUIDE"
+        ],
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "guide",
+            "abbr": [
+              "PWI Guide"
+            ],
+            "name": "Preliminary Work Item Guide",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "guide",
+            "abbr": [
+              "NP Guide"
+            ],
+            "name": "New Proposal Guide",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "anw",
+            "type_code": "guide",
+            "abbr": [
+              "ANW Guide"
+            ],
+            "name": "Approved New Work Item Guide",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "guide",
+            "abbr": [
+              "WD Guide"
+            ],
+            "name": "Working Draft Guide",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "guide",
+            "abbr": [
+              "CD Guide"
+            ],
+            "name": "Committee Draft Guide",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "draft",
+            "type_code": "guide",
+            "abbr": [
+              "DGuide"
+            ],
+            "name": "Draft Guide",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "final_draft",
+            "type_code": "guide",
+            "abbr": [
+              "FDGuide",
+              "PRF Guide"
+            ],
+            "name": "Final Draft Guide",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "guide",
+            "abbr": [
+              "GUIDE",
+              "Guide"
+            ],
+            "name": "Guide",
+            "harmonized_stages": [
+              "60.00",
+              "60.60",
+              "90.20",
+              "90.60",
+              "90.92",
+              "90.93",
+              "90.99",
+              "95.20",
+              "95.60",
+              "95.92",
+              "95.99"
+            ]
+          }
+        ],
+        "examples": [
+          "IEC GUIDE 103:1980",
+          "IEC GUIDE 108:2019",
+          "IEC GUIDE 115:2021",
+          "ISO/IEC GUIDE 13:1977",
+          "ISO/IEC GUIDE 14:2003",
+          "ISO/IEC GUIDE 14:2018",
+          "ISO/IEC GUIDE 15:1977",
+          "ISO/IEC GUIDE 16:1978",
+          "ISO/IEC GUIDE 17:2016",
+          "ISO/IEC GUIDE 2:1986"
+        ]
+      },
+      {
+        "key": "international_standard",
+        "title": "International Standard",
         "short": null,
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "pwi",
+            "type_code": "is",
+            "abbr": [
+              "PWI"
+            ],
+            "name": "Preliminary Work Item",
+            "harmonized_stages": [
+              "00.00",
+              "00.20",
+              "00.60",
+              "00.98",
+              "00.99"
+            ]
+          },
+          {
+            "stage_code": "np",
+            "type_code": "is",
+            "abbr": [
+              "NP"
+            ],
+            "name": "New Proposal",
+            "harmonized_stages": [
+              "10.00",
+              "10.20",
+              "10.60",
+              "10.92",
+              "10.98"
+            ]
+          },
+          {
+            "stage_code": "anw",
+            "type_code": "is",
+            "abbr": [
+              "ANW"
+            ],
+            "name": "Approved New Work Item",
+            "harmonized_stages": [
+              "10.99",
+              "20.00"
+            ]
+          },
+          {
+            "stage_code": "wd",
+            "type_code": "is",
+            "abbr": [
+              "WD"
+            ],
+            "name": "Working Draft",
+            "harmonized_stages": [
+              "20.20",
+              "20.60",
+              "20.98",
+              "20.99"
+            ]
+          },
+          {
+            "stage_code": "cd",
+            "type_code": "is",
+            "abbr": [
+              "CD"
+            ],
+            "name": "Committee Draft",
+            "harmonized_stages": [
+              "30.00",
+              "30.20",
+              "30.60",
+              "30.92",
+              "30.98",
+              "30.99"
+            ]
+          },
+          {
+            "stage_code": "cdv",
+            "type_code": "is",
+            "abbr": [
+              "CDV"
+            ],
+            "name": "Committee Draft for Vote",
+            "harmonized_stages": [
+              "40.00",
+              "40.20",
+              "40.60",
+              "40.92",
+              "40.98",
+              "40.99"
+            ]
+          },
+          {
+            "stage_code": "fdis",
+            "type_code": "is",
+            "abbr": [
+              "FDIS",
+              "PRF"
+            ],
+            "name": "Final Draft International Standard",
+            "harmonized_stages": [
+              "50.00",
+              "50.20",
+              "50.60",
+              "50.92",
+              "50.98",
+              "50.99"
+            ]
+          },
+          {
+            "stage_code": "published",
+            "type_code": "is",
+            "abbr": [
+              ""
+            ],
+            "name": "International Standard",
+            "harmonized_stages": [
+              "60.00",
+              "60.60",
+              "90.20",
+              "90.60",
+              "90.92",
+              "90.93",
+              "90.99",
+              "95.20",
+              "95.60",
+              "95.92",
+              "95.99"
+            ]
+          }
+        ],
+        "examples": [
+          "ISO/IEC DIR",
+          "ISO/IEC DIR 1",
+          "ISO/IEC DIR 1 IEC SUP",
+          "ISO/IEC DIR 2 IEC",
+          "ISO/IEC DIR IEC SUP",
+          "CISPR 12 ED7",
+          "CISPR 12:2007",
+          "CISPR 16-1-1:2019",
+          "CISPR 16-1-2:2014",
+          "CISPR 16-1-3:2004"
+        ]
+      },
+      {
+        "key": "working_document",
+        "title": "Working Document",
+        "short": "WD",
         "abbr": [],
         "typed_stages": [],
         "examples": [
-          "CISPR 11:1975+AMD1:1976 CSV",
-          "CISPR 11:1997+AMD1:1999 CSV",
-          "CISPR 11:2003+AMD1:2004 CSV",
-          "CISPR 11:2009+AMD1:2010 CSV",
-          "CISPR 11:2015+AMD1:2016+AMD2:2019 CSV",
-          "CISPR 12:2001+AMD1:2005 CSV",
-          "CISPR 12:2007+AMD1:2009 CSV",
-          "CISPR 13:1996+AMD1:1998 CSV",
-          "CISPR 13:2001+AMD1:2003+AMD2:2006 CSV",
-          "CISPR 13:2009+AMD1:2015 CSV"
+          "1/2457/FDIS",
+          "1/2458/FDIS",
+          "1/2459/INF",
+          "1/2460/AC",
+          "1/2461/AC",
+          "1/2462/INF",
+          "1/2463/INF",
+          "1/2464/INF",
+          "1/2465/INF",
+          "1/2466/INF"
+        ]
+      },
+      {
+        "key": "test_report_form",
+        "title": "Test Report Form",
+        "short": "TRF",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "trf",
+            "abbr": [
+              "TRF"
+            ],
+            "name": "Test Report Form",
+            "harmonized_stages": [
+              "60.00",
+              "60.60"
+            ]
+          }
+        ],
+        "examples": [
+          "IECEE TRF 10079-1A:2020",
+          "IECEE TRF 60034-2-1A:2016",
+          "IECEE TRF 60044-1A:2010",
+          "IECEE TRF 60044-7B:2018",
+          "IECEE TRF 60044-8B:2018",
+          "IECEE TRF 60065C:1998",
+          "IECEE TRF 60065D:2002",
+          "IECEE TRF 60065E:2004",
+          "IECEE TRF 60065I:2008",
+          "IECEE TRF 60065J:2010"
         ]
       },
       {
@@ -3727,18 +3727,18 @@
         "examples": []
       },
       {
-        "key": "operational_document",
-        "title": "Operational Document",
-        "short": "OD",
+        "key": "ca",
+        "title": "Conformity Assessment",
+        "short": "CA",
         "abbr": [],
         "typed_stages": [
           {
             "stage_code": "published",
-            "type_code": "od",
+            "type_code": "ca",
             "abbr": [
-              "OD"
+              "CA"
             ],
-            "name": "Operational Document",
+            "name": "Conformity Assessment",
             "harmonized_stages": [
               "60.00",
               "60.60"
@@ -3746,6 +3746,48 @@
           }
         ],
         "examples": []
+      },
+      {
+        "key": "consolidated_identifier",
+        "title": "Consolidated Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "sheet_identifier",
+        "title": "Sheet Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEC 60695-2-1/0:1994",
+          "IEC 60695-2-1/1:1994",
+          "IEC 60695-2-1/2:1994",
+          "IEC 60695-2-1/3:1994",
+          "IEC 60695-2-4/1:1991",
+          "IEC TS 60695-2-4/2:1994"
+        ]
+      },
+      {
+        "key": "vap_identifier",
+        "title": "Vap Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CISPR 11:1975+AMD1:1976 CSV",
+          "CISPR 11:1997+AMD1:1999 CSV",
+          "CISPR 11:2003+AMD1:2004 CSV",
+          "CISPR 11:2009+AMD1:2010 CSV",
+          "CISPR 11:2015+AMD1:2016+AMD2:2019 CSV",
+          "CISPR 12:2001+AMD1:2005 CSV",
+          "CISPR 12:2007+AMD1:2009 CSV",
+          "CISPR 13:1996+AMD1:1998 CSV",
+          "CISPR 13:2001+AMD1:2003+AMD2:2006 CSV",
+          "CISPR 13:2009+AMD1:2015 CSV"
+        ]
       }
     ],
     "attributes": [],
@@ -3762,88 +3804,6 @@
   },
   "ieee": {
     "identifier_types": [
-      {
-        "key": "conformance_identifier",
-        "title": "Conformance Identifier",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "IEEE Std 1904.1/Conformance02-2014",
-          "IEEE Std 1904.1/Conformance03-2014",
-          "IEEE Std 802.16/Conformance01-2003"
-        ]
-      },
-      {
-        "key": "csa_dual_published",
-        "title": "Csa Dual Published",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "IEEE Std 844.1-2017/CSA C22.2 NO. 293.1-17",
-          "IEEE Std 844.2-2017/CSA C293.2-17",
-          "IEEE Std 844.3-2019/CSA C22.2 NO. 293.3:19",
-          "IEEE Std 844.4-2019/CSA C293.4:19"
-        ]
-      },
-      {
-        "key": "dual_identifier",
-        "title": "Dual Identifier",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "dual_published",
-        "title": "Dual Published",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "IEEE P1680.4/D1 and NSF/ANSI 426, August 2016",
-          "IEEE P1680.4/D2 and NSF/ANSI 426, January 2017",
-          "IEEE P1680.4/D3 and NSF/ANSI 426, May 2017",
-          "IEEE Std 108-1955 and AIEE No. 450, April 1955",
-          "IEEE Std 309-1999 and ANSI N42.3-1999",
-          "IEEE Std 802.10e-1993 and IEEE Std 802.10f-1993",
-          "IEEE Std 802.16e-2005 and IEEE Std 802.16-2004/Cor. 1-2005",
-          "IEEE Std 802.3u-1995 (Supplement to ISO/IEC 8802-3) and ANSI/IEEE 802.3-1993",
-          "IEEE Std 802.5r and IEEE Std 802.5j-1998 (ISO/IEC 8802-5:1998/Amd.1)",
-          "IEEE Std 960-1989 and IEEE Std 1177-1989"
-        ]
-      },
-      {
-        "key": "iec_ieee_copublished",
-        "title": "Iec Ieee Copublished",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "IEC/IEEE 60079-30-2/D5 IEC:2013 10/07",
-          "IEC/IEEE CD P62704-5 ED1",
-          "IEC/IEEE CDV P62704-2/D4",
-          "IEC/IEEE CDV 80005-3, 2016",
-          "IEC/IEEE FDIS 60079-30-2",
-          "IEC/IEEE FDIS P60079-30-1",
-          "IEC/IEEE FDIS P60780-323",
-          "IEC/IEEE 60076-16 Edition 2.0 2018-09",
-          "IEC/IEEE 60079-30-1 Edition 1.0 2015-09",
-          "IEC/IEEE 60079-30-2 Edition 1.0 2015-09"
-        ]
-      },
-      {
-        "key": "interpretation_identifier",
-        "title": "Interpretation Identifier",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "IEEE Std 1003.1-1988/INT-1992",
-          "IEEE Std 1076/INT-1991"
-        ]
-      },
       {
         "key": "joint_development",
         "title": "Joint Development",
@@ -3966,6 +3926,14 @@
         ]
       },
       {
+        "key": "nesc",
+        "title": "Nesc",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
         "key": "adopted_standard",
         "title": "Adopted Standard",
         "short": null,
@@ -3982,6 +3950,88 @@
           "IEEE Std 159-1972 (52 IRE 7 S2)",
           "IEEE Std 175-1960 (60 IRE 13 S1)",
           "AIEE No 15-1944 (ASA C19.1-1943)"
+        ]
+      },
+      {
+        "key": "conformance_identifier",
+        "title": "Conformance Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 1904.1/Conformance02-2014",
+          "IEEE Std 1904.1/Conformance03-2014",
+          "IEEE Std 802.16/Conformance01-2003"
+        ]
+      },
+      {
+        "key": "csa_dual_published",
+        "title": "Csa Dual Published",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 844.1-2017/CSA C22.2 NO. 293.1-17",
+          "IEEE Std 844.2-2017/CSA C293.2-17",
+          "IEEE Std 844.3-2019/CSA C22.2 NO. 293.3:19",
+          "IEEE Std 844.4-2019/CSA C293.4:19"
+        ]
+      },
+      {
+        "key": "dual_identifier",
+        "title": "Dual Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "dual_published",
+        "title": "Dual Published",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE P1680.4/D1 and NSF/ANSI 426, August 2016",
+          "IEEE P1680.4/D2 and NSF/ANSI 426, January 2017",
+          "IEEE P1680.4/D3 and NSF/ANSI 426, May 2017",
+          "IEEE Std 108-1955 and AIEE No. 450, April 1955",
+          "IEEE Std 309-1999 and ANSI N42.3-1999",
+          "IEEE Std 802.10e-1993 and IEEE Std 802.10f-1993",
+          "IEEE Std 802.16e-2005 and IEEE Std 802.16-2004/Cor. 1-2005",
+          "IEEE Std 802.3u-1995 (Supplement to ISO/IEC 8802-3) and ANSI/IEEE 802.3-1993",
+          "IEEE Std 802.5r and IEEE Std 802.5j-1998 (ISO/IEC 8802-5:1998/Amd.1)",
+          "IEEE Std 960-1989 and IEEE Std 1177-1989"
+        ]
+      },
+      {
+        "key": "iec_ieee_copublished",
+        "title": "Iec Ieee Copublished",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEC/IEEE 60079-30-2/D5 IEC:2013 10/07",
+          "IEC/IEEE CD P62704-5 ED1",
+          "IEC/IEEE CDV P62704-2/D4",
+          "IEC/IEEE CDV 80005-3, 2016",
+          "IEC/IEEE FDIS 60079-30-2",
+          "IEC/IEEE FDIS P60079-30-1",
+          "IEC/IEEE FDIS P60780-323",
+          "IEC/IEEE 60076-16 Edition 2.0 2018-09",
+          "IEC/IEEE 60079-30-1 Edition 1.0 2015-09",
+          "IEC/IEEE 60079-30-2 Edition 1.0 2015-09"
+        ]
+      },
+      {
+        "key": "interpretation_identifier",
+        "title": "Interpretation Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "IEEE Std 1003.1-1988/INT-1992",
+          "IEEE Std 1076/INT-1991"
         ]
       }
     ],
@@ -4216,16 +4266,16 @@
           }
         ],
         "examples": [
-          "NBS CIRC 101e2supp",
-          "NBS CIRC 154supp",
-          "NBS CIRC 19supp",
-          "NBS CIRC 24e4supp",
-          "NBS CIRC 24suppJan1924",
-          "NBS CIRC 24suppJuly1922",
-          "NBS CIRC 25supp",
-          "NBS CIRC 25supp-1924",
-          "NBS CIRC 25supp-1925",
-          "NBS CIRC 25supp-1927"
+          "NBS CIRC 101e2sup",
+          "NBS CIRC 154sup",
+          "NBS CIRC 19sup",
+          "NBS CIRC 24e4sup",
+          "NBS CIRC 24supJan1924",
+          "NBS CIRC 24supJuly1922",
+          "NBS CIRC 25sup",
+          "NBS CIRC 25sup1924",
+          "NBS CIRC 25sup1925",
+          "NBS CIRC 25sup1927"
         ]
       },
       {
@@ -5066,14 +5116,6 @@
         "examples": []
       },
       {
-        "key": "addendum_document",
-        "title": "Addendum Document",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
         "key": "consolidated_identifier",
         "title": "Consolidated Identifier",
         "short": null,
@@ -5082,7 +5124,111 @@
         "examples": []
       },
       {
-        "key": "adopted_international_standard",
+        "key": "electronic_book",
+        "title": "Electronic Publication",
+        "short": "EP",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "explanatory_supplement",
+        "title": "Explanatory Supplement",
+        "short": "BS",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "expert_commentary",
+        "title": "Expert Commentary",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "practice_guide",
+        "title": "Practice Guide",
+        "short": "PP",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "standalone_amendment",
+        "title": "Amendment",
+        "short": "AMD",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "supplementary_index",
+        "title": "Supplementary Index",
+        "short": "BS",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "supplement_document",
+        "title": "Supplement Document",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "test_method",
+        "title": "Test Method",
+        "short": "BS",
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "value_added_publication",
+        "title": "Value Added Publication",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "bundled_identifier",
+        "title": "Bundled Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "set",
+        "title": "Set",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "addendum_document",
+        "title": "Addendum Document",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "adopted_european_norm",
         "title": "British Standard",
         "short": "BS",
         "abbr": [],
@@ -5090,7 +5236,7 @@
         "examples": []
       },
       {
-        "key": "adopted_european_norm",
+        "key": "adopted_international_standard",
         "title": "British Standard",
         "short": "BS",
         "abbr": [],
@@ -5106,105 +5252,9 @@
         "examples": []
       },
       {
-        "key": "electronic_book",
-        "title": "Electronic Publication",
-        "short": "EP",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "expert_commentary",
-        "title": "Expert Commentary",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "explanatory_supplement",
-        "title": "Explanatory Supplement",
-        "short": "BS",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "bundled_identifier",
-        "title": "Bundled Identifier",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
         "key": "committee_document",
         "title": "Committee Document",
         "short": "DC",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "supplement_document",
-        "title": "Supplement Document",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "corrigendum",
-        "title": "Corrigendum",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "practice_guide",
-        "title": "Practice Guide",
-        "short": "PP",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "supplementary_index",
-        "title": "Supplementary Index",
-        "short": "BS",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "test_method",
-        "title": "Test Method",
-        "short": "BS",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "standalone_amendment",
-        "title": "Amendment",
-        "short": "AMD",
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "value_added_publication",
-        "title": "Value Added Publication",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "set",
-        "title": "Set",
-        "short": null,
         "abbr": [],
         "typed_stages": [],
         "examples": []
@@ -5225,49 +5275,6 @@
   "itu": {
     "identifier_types": [
       {
-        "key": "recommendation",
-        "title": "Recommendation",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "ITU-R 01-201",
-          "ITU-R 13-199",
-          "ITU-R 16-199",
-          "ITU-R 20-200",
-          "ITU-R 21-201",
-          "ITU-R 22-201",
-          "ITU-R 23-201",
-          "ITU-R 24-199",
-          "ITU-R 25-200",
-          "ITU-R 26-201"
-        ]
-      },
-      {
-        "key": "amendment",
-        "title": "Amendment",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "corrigendum",
-        "title": "Corrigendum",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "supplement",
-        "title": "Supplement",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
         "key": "annex",
         "title": "Annex",
         "short": null,
@@ -5282,8 +5289,16 @@
         ]
       },
       {
-        "key": "combined_identifier",
-        "title": "Combined Identifier",
+        "key": "amendment",
+        "title": "Amendment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
         "short": null,
         "abbr": [],
         "typed_stages": [],
@@ -5307,6 +5322,41 @@
           "ITU OB No. 1000-R",
           "ITU OB No. 1000-A"
         ]
+      },
+      {
+        "key": "combined_identifier",
+        "title": "Combined Identifier",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "recommendation",
+        "title": "Recommendation",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "ITU-R 01-201",
+          "ITU-R 13-199",
+          "ITU-R 16-199",
+          "ITU-R 20-200",
+          "ITU-R 21-201",
+          "ITU-R 22-201",
+          "ITU-R 23-201",
+          "ITU-R 24-199",
+          "ITU-R 25-200",
+          "ITU-R 26-201"
+        ]
+      },
+      {
+        "key": "supplement",
+        "title": "Supplement",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
       }
     ],
     "attributes": []
@@ -5569,16 +5619,24 @@
         "examples": []
       },
       {
-        "key": "amendment",
-        "title": "Amendment",
+        "key": "consolidated_identifier",
+        "title": "Consolidated Identifier",
         "short": null,
         "abbr": [],
         "typed_stages": [],
         "examples": []
       },
       {
-        "key": "corrigendum",
-        "title": "Corrigendum",
+        "key": "fragment",
+        "title": "Fragment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
+      {
+        "key": "amendment",
+        "title": "Amendment",
         "short": null,
         "abbr": [],
         "typed_stages": [],
@@ -5593,16 +5651,8 @@
         "examples": []
       },
       {
-        "key": "consolidated_identifier",
-        "title": "Consolidated Identifier",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
-      },
-      {
-        "key": "fragment",
-        "title": "Fragment",
+        "key": "corrigendum",
+        "title": "Corrigendum",
         "short": null,
         "abbr": [],
         "typed_stages": [],
@@ -5622,25 +5672,6 @@
         "examples": []
       },
       {
-        "key": "corrigendum",
-        "title": "Corrigendum",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "ETSI ETR 053/C1 ed.2 (1997-03)",
-          "ETSI ETR 094/C1 ed.1 (1994-03)",
-          "ETSI ETR 283/C1 ed.1 (1997-03)",
-          "ETSI ETR 310/C1 ed.1 (1996-10)",
-          "ETSI ETS 300 012/C1 ed.1 (1993-08)",
-          "ETSI ETS 300 052-1/C1 ed.1 (1994-04)",
-          "ETSI ETS 300 055-1/C1 ed.1 (1994-04)",
-          "ETSI ETS 300 055-1/C2 ed.1 (1996-01)",
-          "ETSI ETS 300 058-1/C1 ed.1 (1994-04)",
-          "ETSI ETS 300 061-1/C1 ed.1 (1994-04)"
-        ]
-      },
-      {
         "key": "amendment",
         "title": "Amendment",
         "short": null,
@@ -5657,6 +5688,25 @@
           "ETSI ETS 300 019-2-3/A1 ed.1 (1997-06)",
           "ETSI ETS 300 019-2-3/A2 ed.1 (1998-05)",
           "ETSI ETS 300 019-2-4/A1 ed.1 (1997-06)"
+        ]
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "ETSI ETR 053/C1 ed.2 (1997-03)",
+          "ETSI ETR 094/C1 ed.1 (1994-03)",
+          "ETSI ETR 283/C1 ed.1 (1997-03)",
+          "ETSI ETR 310/C1 ed.1 (1996-10)",
+          "ETSI ETS 300 012/C1 ed.1 (1993-08)",
+          "ETSI ETS 300 052-1/C1 ed.1 (1994-04)",
+          "ETSI ETS 300 055-1/C1 ed.1 (1994-04)",
+          "ETSI ETS 300 055-1/C2 ed.1 (1996-01)",
+          "ETSI ETS 300 058-1/C1 ed.1 (1994-04)",
+          "ETSI ETS 300 061-1/C1 ed.1 (1994-04)"
         ]
       },
       {
@@ -5875,51 +5925,33 @@
   "ashrae": {
     "identifier_types": [
       {
-        "key": "guideline",
-        "title": "ASHRAE Guideline",
-        "short": "Guideline",
+        "key": "addendum",
+        "title": "ASHRAE Addendum",
+        "short": "Addendum",
         "abbr": [],
         "typed_stages": [
           {
             "stage_code": "published",
-            "type_code": "guideline",
+            "type_code": "addendum",
             "abbr": [
-              "Guideline",
-              "ASHRAE"
-            ],
-            "name": null,
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "proposed",
-            "type_code": "guideline",
-            "abbr": [
-              "P"
-            ],
-            "name": null,
-            "harmonized_stages": []
-          },
-          {
-            "stage_code": "revision",
-            "type_code": "guideline",
-            "abbr": [
-              "R"
+              "Addendum",
+              "Addenda"
             ],
             "name": null,
             "harmonized_stages": []
           }
         ],
         "examples": [
-          "ASHRAE Guideline 14-2023",
-          "ASHRAE Guideline 0-2019",
-          "ASHRAE Guideline 0.2-2015",
-          "ASHRAE Guideline 1.1-2025",
-          "ASHRAE Guideline 1.2-2019",
-          "ASHRAE Guideline 1.3-2018",
-          "ASHRAE Guideline 1.4-2019",
-          "ASHRAE Guideline 1.5",
-          "ASHRAE Guideline 1.5-2025",
-          "ASHRAE Guideline 10-2023"
+          "ASHRAE Addendum a to Guideline 1.4-2019",
+          "ASHRAE Addendum e to Guideline 10-2011",
+          "ASHRAE Addendum f to Guideline 10-2011",
+          "ASHRAE Addendum g to Guideline 10-2011",
+          "ASHRAE Addendum a to Guideline 10-2023",
+          "ASHRAE Addendum a to Guideline 12-2020",
+          "ASHRAE Addendum b to Guideline 12-2020",
+          "ASHRAE Addendum c to Guideline 12-2020",
+          "ASHRAE Addendum a to Guideline 13-2000",
+          "ASHRAE Addendum c to Guideline 13-2000"
         ]
       },
       {
@@ -5971,71 +6003,33 @@
         ]
       },
       {
-        "key": "addendum",
-        "title": "ASHRAE Addendum",
-        "short": "Addendum",
+        "key": "addenda_package",
+        "title": "ASHRAE Addenda Package",
+        "short": "Addenda Package",
         "abbr": [],
         "typed_stages": [
           {
             "stage_code": "published",
-            "type_code": "addendum",
+            "type_code": "addenda_package",
             "abbr": [
-              "Addendum",
-              "Addenda"
+              "Addenda Supplement Package",
+              "Addenda Package"
             ],
             "name": null,
             "harmonized_stages": []
           }
         ],
         "examples": [
-          "ASHRAE Addendum a to Guideline 1.4-2019",
-          "ASHRAE Addendum e to Guideline 10-2011",
-          "ASHRAE Addendum f to Guideline 10-2011",
-          "ASHRAE Addendum g to Guideline 10-2011",
-          "ASHRAE Addendum a to Guideline 10-2023",
-          "ASHRAE Addendum a to Guideline 12-2020",
-          "ASHRAE Addendum b to Guideline 12-2020",
-          "ASHRAE Addendum c to Guideline 12-2020",
-          "ASHRAE Addendum a to Guideline 13-2000",
-          "ASHRAE Addendum c to Guideline 13-2000"
-        ]
-      },
-      {
-        "key": "interpretation",
-        "title": "ASHRAE Interpretations",
-        "short": "Interpretations",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "interpretation",
-            "abbr": [
-              "Interpretations"
-            ],
-            "name": null,
-            "harmonized_stages": []
-          }
-        ],
-        "examples": []
-      },
-      {
-        "key": "errata",
-        "title": "ASHRAE Errata",
-        "short": "Errata",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "errata",
-            "abbr": [
-              "Errata"
-            ],
-            "name": null,
-            "harmonized_stages": []
-          }
-        ],
-        "examples": [
-          "ASHRAE Standard  Errata"
+          "ASHRAE Standard 15-2007: Addenda Supplement Package",
+          "ASHRAE Standard 15-2010: Addenda Supplement",
+          "ASHRAE Standard 34-2004: Addenda Supplement Package",
+          "ASHRAE Standard 52.2-1999: Addenda Supplement Package",
+          "ASHRAE Standard 52.2-2007: Addenda Supplement Package",
+          "ASHRAE Standard 52.2-2012: Addenda Supplement Package",
+          "ASHRAE Standard 62.1-2007: Addenda Supplement Package",
+          "ASHRAE Standard 62.1-2010: Addenda Supplement Package",
+          "ASHRAE Standard 62.1-2013: Addenda Supplement Package",
+          "ASHRAE Standard 62.2-2004: Addenda Supplement Package"
         ]
       },
       {
@@ -6069,34 +6063,90 @@
         ]
       },
       {
-        "key": "addenda_package",
-        "title": "ASHRAE Addenda Package",
-        "short": "Addenda Package",
+        "key": "errata",
+        "title": "ASHRAE Errata",
+        "short": "Errata",
         "abbr": [],
         "typed_stages": [
           {
             "stage_code": "published",
-            "type_code": "addenda_package",
+            "type_code": "errata",
             "abbr": [
-              "Addenda Supplement Package",
-              "Addenda Package"
+              "Errata"
             ],
             "name": null,
             "harmonized_stages": []
           }
         ],
         "examples": [
-          "ASHRAE Standard 15-2007: Addenda Supplement Package",
-          "ASHRAE Standard 15-2010: Addenda Supplement",
-          "ASHRAE Standard 34-2004: Addenda Supplement Package",
-          "ASHRAE Standard 52.2-1999: Addenda Supplement Package",
-          "ASHRAE Standard 52.2-2007: Addenda Supplement Package",
-          "ASHRAE Standard 52.2-2012: Addenda Supplement Package",
-          "ASHRAE Standard 62.1-2007: Addenda Supplement Package",
-          "ASHRAE Standard 62.1-2010: Addenda Supplement Package",
-          "ASHRAE Standard 62.1-2013: Addenda Supplement Package",
-          "ASHRAE Standard 62.2-2004: Addenda Supplement Package"
+          "ASHRAE Standard  Errata"
         ]
+      },
+      {
+        "key": "guideline",
+        "title": "ASHRAE Guideline",
+        "short": "Guideline",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "guideline",
+            "abbr": [
+              "Guideline",
+              "ASHRAE"
+            ],
+            "name": null,
+            "harmonized_stages": []
+          },
+          {
+            "stage_code": "proposed",
+            "type_code": "guideline",
+            "abbr": [
+              "P"
+            ],
+            "name": null,
+            "harmonized_stages": []
+          },
+          {
+            "stage_code": "revision",
+            "type_code": "guideline",
+            "abbr": [
+              "R"
+            ],
+            "name": null,
+            "harmonized_stages": []
+          }
+        ],
+        "examples": [
+          "ASHRAE Guideline 14-2023",
+          "ASHRAE Guideline 0-2019",
+          "ASHRAE Guideline 0.2-2015",
+          "ASHRAE Guideline 1.1-2025",
+          "ASHRAE Guideline 1.2-2019",
+          "ASHRAE Guideline 1.3-2018",
+          "ASHRAE Guideline 1.4-2019",
+          "ASHRAE Guideline 1.5",
+          "ASHRAE Guideline 1.5-2025",
+          "ASHRAE Guideline 10-2023"
+        ]
+      },
+      {
+        "key": "interpretation",
+        "title": "ASHRAE Interpretations",
+        "short": "Interpretations",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "interpretation",
+            "abbr": [
+              "Interpretations"
+            ],
+            "name": null,
+            "harmonized_stages": []
+          }
+        ],
+        "examples": []
       }
     ],
     "attributes": []
@@ -6128,35 +6178,6 @@
   "ccsds": {
     "identifier_types": [
       {
-        "key": "base",
-        "title": "Base Standard",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "base",
-            "abbr": [
-              ""
-            ],
-            "name": null,
-            "harmonized_stages": []
-          }
-        ],
-        "examples": [
-          "CCSDS 100.0-G-1-S",
-          "CCSDS 101.0-B-1-S",
-          "CCSDS 101.0-B-3-S",
-          "CCSDS 101.0-B-4-S",
-          "CCSDS 101.0-B-5-S",
-          "CCSDS 101.0-B-6-S",
-          "CCSDS 102.0-B-4-S",
-          "CCSDS 102.0-B-5-S",
-          "CCSDS 102.1-B-1-S",
-          "CCSDS 103.0-B-1-S"
-        ]
-      },
-      {
         "key": "corrigendum",
         "title": "Corrigendum",
         "short": "Cor",
@@ -6185,108 +6206,41 @@
           "CCSDS 131.2-O-1-S Cor. 1",
           "CCSDS 131.21-O-1 Cor. 1"
         ]
+      },
+      {
+        "key": "base",
+        "title": "Base Standard",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "base",
+            "abbr": [
+              ""
+            ],
+            "name": null,
+            "harmonized_stages": []
+          }
+        ],
+        "examples": [
+          "CCSDS 100.0-G-1-S",
+          "CCSDS 101.0-B-1-S",
+          "CCSDS 101.0-B-3-S",
+          "CCSDS 101.0-B-4-S",
+          "CCSDS 101.0-B-5-S",
+          "CCSDS 101.0-B-6-S",
+          "CCSDS 102.0-B-4-S",
+          "CCSDS 102.0-B-5-S",
+          "CCSDS 102.1-B-1-S",
+          "CCSDS 103.0-B-1-S"
+        ]
       }
     ],
     "attributes": []
   },
   "cie": {
     "identifier_types": [
-      {
-        "key": "standard",
-        "title": "Standard",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "CIE S 004/E-2001",
-          "CIE S 007/G-1998",
-          "CIE S 009/G:2002",
-          "CIE S 013/E:2003",
-          "CIE S 014-3/E:2011",
-          "CIE S 014-4/E:2007",
-          "CIE S 014-5/E:2009",
-          "CIE S 014-6/E:2013",
-          "CIE S 015/E:2005",
-          "CIE S 017/E:2011"
-        ]
-      },
-      {
-        "key": "conference",
-        "title": "Conference",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "CIE x005-1992",
-          "CIE x006-1991",
-          "CIE x007-1993",
-          "CIE x008-1994",
-          "CIE x009-1995",
-          "CIE x010-1996",
-          "CIE x011-1996",
-          "CIE x012-1997",
-          "CIE x013-1997",
-          "CIE x014-1998"
-        ]
-      },
-      {
-        "key": "bundle",
-        "title": "Bundle",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "CIE 198-SP1.1:2011,198-SP1.2:2011,198-SP1.3:2011,198-SP1.4:2011"
-        ]
-      },
-      {
-        "key": "dual_published",
-        "title": "Dual Published",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "CIE S 009:2002/IEC 62471:2006"
-        ]
-      },
-      {
-        "key": "identical",
-        "title": "Identical",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "CIE S 006.1/1998 (ISO 16508:1999)",
-          "CIE S 007/1998 (ISO 17166:1999)",
-          "CIE S 008/E:2001 (ISO 8995-1:2002(E))",
-          "CIE S 010/E:2004 (ISO 23539:2005)",
-          "CIE S 011/E:2003 (ISO 15469:2004(E))",
-          "CIE S 012/E:2004 (ISO 23603:2005(E))",
-          "CIE S 014-1/E:2006 (ISO 10527:2007(E))",
-          "CIE S 014-1/E:2006 (ISO 11664-1:2007(E))",
-          "CIE S 014-2/E:2006 (ISO 10526:2007(E))",
-          "CIE S 014-2/E:2006 (ISO 11664-2:2007(E))"
-        ]
-      },
-      {
-        "key": "joint_published",
-        "title": "Joint Published",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "CIE ISO 10916:2024",
-          "CIE ISO 11664-1:2019",
-          "CIE ISO 11664-2:2022",
-          "CIE ISO 11664-3:2019",
-          "CIE ISO 11664-4:2019",
-          "CIE ISO 11664-5:2016",
-          "CIE ISO 11664-5:2024",
-          "CIE ISO 11664-6:2014",
-          "CIE ISO 11664-6:2022",
-          "CIE ISO 17166:2019"
-        ]
-      },
       {
         "key": "supplement",
         "title": "Supplement",
@@ -6318,6 +6272,102 @@
         "examples": [
           "CIE 198-SP1.4:2011/Cor1:2013",
           "CIE 232:2019/Cor1:2020"
+        ]
+      },
+      {
+        "key": "standard",
+        "title": "Standard",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE S 004/E-2001",
+          "CIE S 007/G-1998",
+          "CIE S 009/G:2002",
+          "CIE S 013/E:2003",
+          "CIE S 014-3/E:2011",
+          "CIE S 014-4/E:2007",
+          "CIE S 014-5/E:2009",
+          "CIE S 014-6/E:2013",
+          "CIE S 015/E:2005",
+          "CIE S 017/E:2011"
+        ]
+      },
+      {
+        "key": "bundle",
+        "title": "Bundle",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE 198-SP1.1:2011,198-SP1.2:2011,198-SP1.3:2011,198-SP1.4:2011"
+        ]
+      },
+      {
+        "key": "conference",
+        "title": "Conference",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE x005-1992",
+          "CIE x006-1991",
+          "CIE x007-1993",
+          "CIE x008-1994",
+          "CIE x009-1995",
+          "CIE x010-1996",
+          "CIE x011-1996",
+          "CIE x012-1997",
+          "CIE x013-1997",
+          "CIE x014-1998"
+        ]
+      },
+      {
+        "key": "identical",
+        "title": "Identical",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE S 006.1/1998 (ISO 16508:1999)",
+          "CIE S 007/1998 (ISO 17166:1999)",
+          "CIE S 008/E:2001 (ISO 8995-1:2002(E))",
+          "CIE S 010/E:2004 (ISO 23539:2005)",
+          "CIE S 011/E:2003 (ISO 15469:2004(E))",
+          "CIE S 012/E:2004 (ISO 23603:2005(E))",
+          "CIE S 014-1/E:2006 (ISO 10527:2007(E))",
+          "CIE S 014-1/E:2006 (ISO 11664-1:2007(E))",
+          "CIE S 014-2/E:2006 (ISO 10526:2007(E))",
+          "CIE S 014-2/E:2006 (ISO 11664-2:2007(E))"
+        ]
+      },
+      {
+        "key": "dual_published",
+        "title": "Dual Published",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE S 009:2002/IEC 62471:2006"
+        ]
+      },
+      {
+        "key": "joint_published",
+        "title": "Joint Published",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "CIE ISO 10916:2024",
+          "CIE ISO 11664-1:2019",
+          "CIE ISO 11664-2:2022",
+          "CIE ISO 11664-3:2019",
+          "CIE ISO 11664-4:2019",
+          "CIE ISO 11664-5:2016",
+          "CIE ISO 11664-5:2024",
+          "CIE ISO 11664-6:2014",
+          "CIE ISO 11664-6:2022",
+          "CIE ISO 17166:2019"
         ]
       }
     ],
@@ -6476,6 +6526,24 @@
   "jis": {
     "identifier_types": [
       {
+        "key": "technical_specification",
+        "title": "Technical Specification",
+        "short": "TS",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "ts",
+            "abbr": [
+              "TS"
+            ],
+            "name": "Technical Specification",
+            "harmonized_stages": []
+          }
+        ],
+        "examples": []
+      },
+      {
         "key": "standard",
         "title": "Japanese Industrial Standard",
         "short": "JIS",
@@ -6512,21 +6580,11 @@
         "examples": []
       },
       {
-        "key": "technical_specification",
-        "title": "Technical Specification",
-        "short": "TS",
+        "key": "explanation",
+        "title": "Explanation",
+        "short": null,
         "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "ts",
-            "abbr": [
-              "TS"
-            ],
-            "name": "Technical Specification",
-            "harmonized_stages": []
-          }
-        ],
+        "typed_stages": [],
         "examples": []
       },
       {
@@ -6538,8 +6596,8 @@
         "examples": []
       },
       {
-        "key": "explanation",
-        "title": "Explanation",
+        "key": "corrigendum",
+        "title": "Corrigendum",
         "short": null,
         "abbr": [],
         "typed_stages": [],
@@ -6569,30 +6627,6 @@
   },
   "jcgm": {
     "identifier_types": [
-      {
-        "key": "guide",
-        "title": "Guide",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "guide",
-            "abbr": [
-              ""
-            ],
-            "name": null,
-            "harmonized_stages": []
-          }
-        ],
-        "examples": [
-          "JCGM 100:2008",
-          "JCGM 100:2008(E)",
-          "JCGM 200:2007(F)",
-          "JCGM 200:2008(F)",
-          "JCGM 200:2012(E/F)"
-        ]
-      },
       {
         "key": "gum_guide",
         "title": "GUM Guide",
@@ -6639,6 +6673,30 @@
         "examples": [
           "JCGM 100:2008/Amd 1",
           "JCGM 100:2008/Amd 1:2025-07-25"
+        ]
+      },
+      {
+        "key": "guide",
+        "title": "Guide",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "guide",
+            "abbr": [
+              ""
+            ],
+            "name": null,
+            "harmonized_stages": []
+          }
+        ],
+        "examples": [
+          "JCGM 100:2008",
+          "JCGM 100:2008(E)",
+          "JCGM 200:2007(F)",
+          "JCGM 200:2008(F)",
+          "JCGM 200:2012(E/F)"
         ]
       }
     ],
@@ -6742,18 +6800,6 @@
         ]
       },
       {
-        "key": "amendment",
-        "title": "Amendment",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "Amendment (2009) to OIML R 138 Edition 2007 (E)",
-          "Amendment (2009) to OIML R 138:2007 (E)",
-          "Amendment (2004) to OIML D 2 (E)"
-        ]
-      },
-      {
         "key": "annex",
         "title": "Annex",
         "short": null,
@@ -6763,6 +6809,18 @@
           "OIML R 60 Annexes Edition 2021 (E)",
           "OIML R 60 Annexes:2021 (E)",
           "OIML R 60 Annex A Edition 2013 (E)"
+        ]
+      },
+      {
+        "key": "amendment",
+        "title": "Amendment",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "Amendment (2009) to OIML R 138 Edition 2007 (E)",
+          "Amendment (2009) to OIML R 138:2007 (E)",
+          "Amendment (2004) to OIML D 2 (E)"
         ]
       }
     ],
@@ -6978,6 +7036,47 @@
         ]
       },
       {
+        "key": "amendment",
+        "title": "Amendment",
+        "short": "AMD",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "amd",
+            "abbr": [
+              "AMD"
+            ],
+            "name": "Amendment",
+            "harmonized_stages": []
+          }
+        ],
+        "examples": [
+          "IDF 146:2003/AMD 1:2023",
+          "IDF 140-1:2007/AMD 1:2012"
+        ]
+      },
+      {
+        "key": "corrigendum",
+        "title": "Corrigendum",
+        "short": "COR",
+        "abbr": [],
+        "typed_stages": [
+          {
+            "stage_code": "published",
+            "type_code": "cor",
+            "abbr": [
+              "COR"
+            ],
+            "name": "Corrigendum",
+            "harmonized_stages": []
+          }
+        ],
+        "examples": [
+          "IDF 148-1:2008/COR 1:2009"
+        ]
+      },
+      {
         "key": "reviewed_method",
         "title": "Reviewed Method",
         "short": "RM",
@@ -7152,47 +7251,6 @@
           "IDF/AWI RM 270:2023",
           "IDF/AWI RM 210:2024"
         ]
-      },
-      {
-        "key": "amendment",
-        "title": "Amendment",
-        "short": "AMD",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "amd",
-            "abbr": [
-              "AMD"
-            ],
-            "name": "Amendment",
-            "harmonized_stages": []
-          }
-        ],
-        "examples": [
-          "IDF 146:2003/AMD 1:2023",
-          "IDF 140-1:2007/AMD 1:2012"
-        ]
-      },
-      {
-        "key": "corrigendum",
-        "title": "Corrigendum",
-        "short": "COR",
-        "abbr": [],
-        "typed_stages": [
-          {
-            "stage_code": "published",
-            "type_code": "cor",
-            "abbr": [
-              "COR"
-            ],
-            "name": "Corrigendum",
-            "harmonized_stages": []
-          }
-        ],
-        "examples": [
-          "IDF 148-1:2008/COR 1:2009"
-        ]
       }
     ],
     "attributes": []
@@ -7362,25 +7420,6 @@
   "amca": {
     "identifier_types": [
       {
-        "key": "standard",
-        "title": "Standard",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": [
-          "ANSI/AMCA Standard 210-16",
-          "ANSI/AMCA Standard 220-21",
-          "ANSI/AMCA Standard 230-23",
-          "ANSI/AMCA Standard 240-22",
-          "ANSI/AMCA Standard 250-22",
-          "ANSI/AMCA Standard 260-20",
-          "ANSI/AMCA Standard 300-14",
-          "ANSI/AMCA Standard 500-D-18",
-          "ANSI/AMCA Standard 500-L-23",
-          "ANSI/AMCA Standard 610-19"
-        ]
-      },
-      {
         "key": "publication",
         "title": "Publication",
         "short": null,
@@ -7412,12 +7451,39 @@
           "AMCA 208 – AH",
           "AMCA 511"
         ]
+      },
+      {
+        "key": "standard",
+        "title": "Standard",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": [
+          "ANSI/AMCA Standard 210-16",
+          "ANSI/AMCA Standard 220-21",
+          "ANSI/AMCA Standard 230-23",
+          "ANSI/AMCA Standard 240-22",
+          "ANSI/AMCA Standard 250-22",
+          "ANSI/AMCA Standard 260-20",
+          "ANSI/AMCA Standard 300-14",
+          "ANSI/AMCA Standard 500-D-18",
+          "ANSI/AMCA Standard 500-L-23",
+          "ANSI/AMCA Standard 610-19"
+        ]
       }
     ],
     "attributes": []
   },
   "plateau": {
     "identifier_types": [
+      {
+        "key": "annex",
+        "title": "Annex",
+        "short": null,
+        "abbr": [],
+        "typed_stages": [],
+        "examples": []
+      },
       {
         "key": "handbook",
         "title": "Handbook",
@@ -7455,14 +7521,6 @@
           "PLATEAU Technical Report #17",
           "PLATEAU Technical Report #18"
         ]
-      },
-      {
-        "key": "annex",
-        "title": "Annex",
-        "short": null,
-        "abbr": [],
-        "typed_stages": [],
-        "examples": []
       }
     ],
     "attributes": [
