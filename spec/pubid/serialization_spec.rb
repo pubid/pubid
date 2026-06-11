@@ -22,9 +22,9 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
       id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
       hash = id.to_hash
 
-      expect(hash).to have_key("base_identifier")
-      expect(hash["base_identifier"]["_type"]).to eq("pubid:iso:international-standard")
-      expect(hash["base_identifier"]["number"]).to eq("9001")
+      expect(hash).to have_key("base")
+      expect(hash["base"]["_type"]).to eq("pubid:iso:international-standard")
+      expect(hash["base"]["number"]).to eq("9001")
     end
 
     it "round-trips Amendment with base_identifier" do
@@ -53,8 +53,8 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
       hash = id.to_hash
 
       expect(hash["_type"]).to eq("pubid:iso:corrigendum")
-      expect(hash["base_identifier"]["_type"]).to eq("pubid:iso:amendment")
-      expect(hash["base_identifier"]["base_identifier"]["_type"]).to eq("pubid:iso:international-standard")
+      expect(hash["base"]["_type"]).to eq("pubid:iso:amendment")
+      expect(hash["base"]["base"]["_type"]).to eq("pubid:iso:international-standard")
     end
   end
 

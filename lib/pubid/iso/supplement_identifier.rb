@@ -7,7 +7,9 @@ module Pubid
                 polymorphic: true
 
       key_value do
-        map "base_identifier", to: :base_identifier, polymorphic: {
+        # Serialized key is "base" (matches JIS); the attribute/method stays
+        # `base_identifier`, which relaton-index's get_id_number depends on.
+        map "base", to: :base_identifier, polymorphic: {
           attribute: "_type",
           class_map: Identifier::ISO_TYPE_MAP,
         }

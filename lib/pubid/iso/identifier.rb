@@ -3,10 +3,19 @@
 module Pubid
   module Iso
     class Identifier < ::Pubid::Identifier
-      # Override base types with ISO-specific ones
-      attribute :publisher, ::Pubid::Iso::Components::Publisher
+      # Override base types with ISO-specific ones.
+      # Defaults to the type's implied publisher (ISO for most; IWA has none),
+      # so an omitted publisher key reconstructs correctly on from_hash.
+      attribute :publisher, ::Pubid::Iso::Components::Publisher,
+                default: -> { self.class.default_publisher }
       attribute :copublishers, ::Pubid::Iso::Components::Publisher,
                 collection: true
+
+      # The publisher implied when none is serialized. ISO for most types;
+      # publisher-less types (IWA) override this to nil.
+      def self.default_publisher
+        ::Pubid::Iso::Components::Publisher.new
+      end
       attribute :number, ::Pubid::Iso::Components::Code
       attribute :part, ::Pubid::Iso::Components::Code
       attribute :subpart, ::Pubid::Iso::Components::Code
@@ -61,8 +70,10 @@ module Pubid
         map "day", with: { to: :day_to_kv, from: :day_from_kv }
         map "edition", to: :edition
         map "languages", to: :languages
-        map "publisher", to: :publisher
-        map "copublishers", to: :copublishers
+        # publisher emitted only when the primary isn't the type default;
+        # copublishers (the other bodies) as an array, omitted when empty.
+        map "publisher", with: { to: :publisher_to_kv, from: :publisher_from_kv }
+        map "copublishers", with: { to: :copublishers_to_kv, from: :copublishers_from_kv }
         map "locality", to: :locality
         # `type` and generic `stage` are fully derived from `typed_stage`
         # (builder sets them via to_type/to_stage), so we serialize only the
@@ -147,6 +158,36 @@ module Pubid
 
       def date_for(model)
         model.date ||= ::Pubid::Components::Date.new
+      end
+
+      # --- publisher: primary only when non-default; copublishers as a list ---
+      def publisher_to_kv(model, doc)
+        pub = model.publisher&.publisher
+        return if pub.nil? || pub == model.class.default_publisher&.publisher
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("publisher", pub))
+      end
+
+      def publisher_from_kv(model, value)
+        publisher_for(model).publisher = value.to_s
+      end
+
+      def copublishers_to_kv(model, doc)
+        cp = model.publisher&.copublisher
+        return unless cp&.any?
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new("copublishers", cp.map(&:to_s)),
+        )
+      end
+
+      def copublishers_from_kv(model, value)
+        list = Array(value).map(&:to_s)
+        publisher_for(model).copublisher = list if list.any?
+      end
+
+      def publisher_for(model)
+        model.publisher ||= ::Pubid::Iso::Components::Publisher.new
       end
 
       def self.parse(string, format: :auto)

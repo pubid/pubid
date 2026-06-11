@@ -6,6 +6,12 @@ module Pubid
       class InternationalWorkshopAgreement < SingleIdentifier
         attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
+        # IWA identifiers have no publisher prefix (rendered "IWA 1", not
+        # "ISO IWA 1"), so there is no implied publisher to default on load.
+        def self.default_publisher
+          nil
+        end
+
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(
             code: :pwiiwa,
