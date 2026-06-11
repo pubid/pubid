@@ -31,15 +31,7 @@ reaffirmed: nil, revision: nil)
 
         # @return [String] the rendered publication identifier
         def to_s
-          parts = []
-          parts << @copublisher if @copublisher
-          parts << "Publication"
-          parts << @code.to_s
-          parts << "-#{@year}" if @year
-          parts << " (Rev. #{@revision})" if @revision
-          parts << " (#{@reaffirmed})" if @reaffirmed && !@revision
-
-          parts.join(" ").squeeze(" ")
+          render(format: :human)
         end
       end
     end

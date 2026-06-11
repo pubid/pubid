@@ -31,19 +31,7 @@ reaffirmed: nil, interpretation_code: nil)
 
         # @return [String] the rendered interpretation identifier
         def to_s
-          parts = []
-          parts << @copublisher if @copublisher
-          parts << @code.to_s
-
-          if @interpretation_code
-            parts << "– #{@interpretation_code}"
-          elsif @year
-            parts << "-#{@year}"
-          end
-
-          parts << " #{@suffix}" if @suffix
-
-          parts.join(" ").squeeze(" ")
+          render(format: :human)
         end
       end
     end
