@@ -7,6 +7,26 @@ module Pubid
         attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
         attribute :supplement_publisher, ::Pubid::Components::Publisher
 
+        # supplement_publisher (e.g. "IEC" in "ISO/IEC DIR 1 IEC SUP") is needed
+        # by to_s/to_urn; serialize its body so it survives from_hash.
+        key_value do
+          map "supplement_publisher",
+              with: { to: :supplement_publisher_to_kv, from: :supplement_publisher_from_kv }
+        end
+
+        def supplement_publisher_to_kv(model, doc)
+          body = model.supplement_publisher&.body
+          return if body.nil? || body.to_s.empty?
+
+          doc.add_child(
+            Lutaml::KeyValue::DataModel::Element.new("supplement_publisher", body.to_s),
+          )
+        end
+
+        def supplement_publisher_from_kv(model, value)
+          model.supplement_publisher = ::Pubid::Components::Publisher.new(body: value.to_s)
+        end
+
         # Delegate base identifier attributes for easier access
         def copublishers
           base_identifier&.copublishers
