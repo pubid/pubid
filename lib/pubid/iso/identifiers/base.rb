@@ -6,8 +6,10 @@ module Pubid
   module Iso
     module Identifiers
       # Base class for ISO identifiers
-      class Base < ::Pubid::Identifier
-        # Inherit most attributes from parent
+      # Inherit the ISO Identifier (ISO publisher type, default publisher, and the
+      # lean key_value), so TcDocument is recognized as a Pubid::Iso::Identifier
+      # by relaton-index and serializes leanly rather than as a raw object.
+      class Base < ::Pubid::Iso::Identifier
         # ISO-specific attributes
         attribute :stage_iteration, ::Pubid::Iso::Components::Code
 

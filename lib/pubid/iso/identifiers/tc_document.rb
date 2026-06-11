@@ -33,6 +33,33 @@ module Pubid
         # TC documents don't use typed stages like other identifiers
         TYPED_STAGES = [].freeze
 
+        # Serialize the committee structure (all plain-string Codes) on top of
+        # the inherited ISO mapping; TC documents have no stage.
+        key_value do
+          map "tc_type", with: { to: :tc_type_to_kv, from: :tc_type_from_kv }
+          map "tc_number", with: { to: :tc_number_to_kv, from: :tc_number_from_kv }
+          map "sc_type", with: { to: :sc_type_to_kv, from: :sc_type_from_kv }
+          map "sc_number", with: { to: :sc_number_to_kv, from: :sc_number_from_kv }
+          map "wg_type", with: { to: :wg_type_to_kv, from: :wg_type_from_kv }
+          map "wg_number", with: { to: :wg_number_to_kv, from: :wg_number_from_kv }
+        end
+
+        # TC documents have no stage; suppress the inherited stage emission.
+        def stage_to_kv(_model, _doc); end
+
+        def tc_type_to_kv(m, doc) = emit_code(doc, "tc_type", m.tc_type)
+        def tc_type_from_kv(m, v) = m.tc_type = build_code(v)
+        def tc_number_to_kv(m, doc) = emit_code(doc, "tc_number", m.tc_number)
+        def tc_number_from_kv(m, v) = m.tc_number = build_code(v)
+        def sc_type_to_kv(m, doc) = emit_code(doc, "sc_type", m.sc_type)
+        def sc_type_from_kv(m, v) = m.sc_type = build_code(v)
+        def sc_number_to_kv(m, doc) = emit_code(doc, "sc_number", m.sc_number)
+        def sc_number_from_kv(m, v) = m.sc_number = build_code(v)
+        def wg_type_to_kv(m, doc) = emit_code(doc, "wg_type", m.wg_type)
+        def wg_type_from_kv(m, v) = m.wg_type = build_code(v)
+        def wg_number_to_kv(m, doc) = emit_code(doc, "wg_number", m.wg_number)
+        def wg_number_from_kv(m, v) = m.wg_number = build_code(v)
+
         def self.type
           { key: :tc, title: "Technical Committee Document", short: "TC" }
         end
