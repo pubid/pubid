@@ -58,11 +58,45 @@ module Pubid
         map "languages", to: :languages
         map "publisher", to: :publisher
         map "copublishers", to: :copublishers
-        map "type", to: :type
-        map "stage", to: :stage
         map "locality", to: :locality
-        map "typed_stage", to: :typed_stage
+        # `type` and generic `stage` are fully derived from `typed_stage`
+        # (builder sets them via to_type/to_stage), so we serialize only the
+        # unique typed-stage `code` under "stage" and recompute the rest on
+        # load. _type already pins the document type.
+        map "stage", with: { to: :stage_to_kv, from: :stage_from_kv }
         map "all_parts", to: :all_parts
+      end
+
+      # Serialize typed_stage as just its unique code (e.g. "is", "dis",
+      # "committee_draft_amd"). type/stage are recomputed from it on load.
+      def stage_to_kv(model, doc)
+        ts = model.typed_stage
+        return unless ts&.code
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new("stage", ts.code.to_s),
+        )
+      end
+
+      # Resolve the typed-stage code back to the full TypedStage within this
+      # identifier's class, then derive type/stage from it.
+      def stage_from_kv(model, value)
+        return if value.nil? || value.to_s.empty?
+
+        ts = (model.class.const_defined?(:TYPED_STAGES) &&
+              model.class::TYPED_STAGES.find { |t| t.code.to_s == value.to_s }) ||
+             Pubid::Iso::Scheme.locate_typed_stage_by_code(value)
+        return unless ts
+
+        # The renderer prefers `original_abbr` (the parsed surface form); without
+        # it the supplement renderer falls back to `short_abbr` (e.g. "AMD").
+        # Resolving from a code has no surface form, so render the canonical
+        # abbreviation (`abbr.first`, e.g. "Amd").
+        ts = ts.dup
+        ts.original_abbr = ts.canonical_abbreviation
+        model.typed_stage = ts
+        model.stage = ts.to_stage
+        model.type = ts.to_type
       end
 
       def self.parse(string, format: :auto)
