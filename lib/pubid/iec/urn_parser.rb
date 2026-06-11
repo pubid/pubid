@@ -38,8 +38,8 @@ module Pubid
         raise Errors::ParseError, "Invalid IEC URN: #{urn}" unless code
 
         id = Pubid::Iec::Identifier.parse(code)
-        id.all_parts = true if all_parts && id.respond_to?(:all_parts=)
-        if lang && !lang.empty? && id.respond_to?(:languages=)
+        id.all_parts = true if all_parts && id.class.attributes.key?(:all_parts)
+        if lang && !lang.empty? && id.class.attributes.key?(:languages)
           id.languages = [::Pubid::Components::Language.new(code: lang)]
         end
         id

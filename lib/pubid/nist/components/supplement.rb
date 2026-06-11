@@ -99,13 +99,13 @@ module Pubid
         def ==(other)
           return false unless other.is_a?(self.class)
 
-          IDENTITY_FIELDS.all? { |f| send(f) == other.send(f) }
+          IDENTITY_FIELDS.all? { |f| public_send(f) == other.public_send(f) }
         end
 
         alias eql? ==
 
         def hash
-          [self.class, *IDENTITY_FIELDS.map { |f| send(f) }].hash
+          [self.class, *IDENTITY_FIELDS.map { |f| public_send(f) }].hash
         end
 
         private

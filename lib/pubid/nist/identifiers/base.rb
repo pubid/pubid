@@ -105,7 +105,7 @@ module Pubid
           return false unless other.instance_of?(self.class)
 
           self.class.attributes.each_key.all? do |name|
-            EQUALITY_IGNORED_ATTRS.include?(name) || send(name) == other.send(name)
+            EQUALITY_IGNORED_ATTRS.include?(name) || public_send(name) == other.public_send(name)
           end
         end
 
@@ -114,7 +114,7 @@ module Pubid
         def hash
           vals = self.class.attributes.each_key.reject do |name|
             EQUALITY_IGNORED_ATTRS.include?(name)
-          end.map { |name| send(name) }
+          end.map { |name| public_send(name) }
           [self.class, *vals].hash
         end
 
@@ -135,8 +135,9 @@ module Pubid
             next true if EQUALITY_IGNORED_ATTRS.include?(name)
 
             query_val = public_send(name)
-            next true if query_val.nil? ||
-              (query_val.respond_to?(:empty?) && query_val.empty?)
+            next true if query_val.nil?
+            next true if query_val.is_a?(String) && query_val.empty?
+            next true if query_val.is_a?(Array) && query_val.empty?
 
             query_val == candidate.public_send(name)
           end
@@ -153,7 +154,7 @@ module Pubid
           excluded_args << :date if excluded_args.delete(:year)
 
           attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
-            h[name] = excluded_args.include?(name) ? nil : send(name)
+            h[name] = excluded_args.include?(name) ? nil : public_send(name)
           end
           self.class.new(**attrs)
         end
@@ -194,6 +195,23 @@ module Pubid
           translation_component
         end
 
+        # Override parent render to pass NIST-specific format option through
+        # to the renderer. Pubid::Identifier#render only forwards
+        # :with_edition; NIST needs :nist_format for multi-format support.
+        def render(format: :human, **opts)
+          registry = self.class.format_registry
+          unless registry
+            raise ArgumentError, "No format registry configured on #{self.class}"
+          end
+
+          renderer = registry.renderer_for(format)
+          unless renderer
+            raise ArgumentError, "No renderer registered for format: #{format}"
+          end
+
+          renderer.new(self).render(**opts)
+        end
+
         # Generate identifier string in specified format
         # @param format [:full, :long, :abbreviated, :short, :mr] output format
         def to_s(format = nil)
@@ -203,20 +221,7 @@ module Pubid
           # Default to parsed_format if available (preserves input format on round-trip)
           # Falls back to :short format for output (normalization)
           # Explicit format parameter always overrides parsed_format
-          effective_format = format || parsed_format&.to_sym || :short
-          effective_format = effective_format.to_sym if effective_format.is_a?(String)
-          case effective_format
-          when :full, :long
-            to_full_style
-          when :abbreviated, :abbrev
-            to_abbreviated_style
-          when :short
-            to_short_style
-          when :mr
-            to_mr_style
-          else
-            to_short_style
-          end
+          render(format: :human, nist_format: format || parsed_format&.to_sym || :short)
         end
 
         # Returns weight based on amount of defined attributes

@@ -17,7 +17,7 @@ module Pubid
       DELIVERABLES = /cmv|csv|exv|prv|rlv|ser/
 
       def generate
-        return series_urn if identifier.respond_to?(:all_parts) && identifier.all_parts
+        return series_urn if identifier.class.attributes.key?(:all_parts) && identifier.all_parts
 
         code_to_urn(identifier.to_s, urn_language)
       end
@@ -26,7 +26,7 @@ module Pubid
 
       # Hyphen-joined language codes (e.g. "en-fr"), or nil when unset.
       def urn_language
-        return nil unless identifier.respond_to?(:languages)
+        return nil unless identifier.class.attributes.key?(:languages)
 
         langs = identifier.languages
         return nil unless langs&.any?
