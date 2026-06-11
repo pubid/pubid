@@ -1,5 +1,4 @@
 require "lutaml/model"
-require_relative "../../components/publisher"
 # frozen_string_literal: true
 
 module Pubid
