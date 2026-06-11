@@ -3,10 +3,8 @@
 module Pubid
   module Iso
     module Components
-      # ISO-specific components
+      autoload :Code, "#{__dir__}/components/code"
+      autoload :Publisher, "#{__dir__}/components/publisher"
     end
   end
 end
-
-require_relative "components/code"
-require_relative "components/publisher"

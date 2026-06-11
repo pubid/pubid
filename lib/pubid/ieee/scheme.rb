@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "typed_stages"
-
 module Pubid
   module Ieee
     # Scheme provides registry access for IEEE identifiers
