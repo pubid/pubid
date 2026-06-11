@@ -8,31 +8,8 @@ module Pubid
       class ConsolidatedIdentifier < Base
         attribute :identifiers, Base, polymorphic: true, collection: true
 
-        def to_s
-          identifiers.map.with_index do |id, idx|
-            if idx.zero?
-              # First identifier renders normally
-              id.to_s
-            elsif id.is_a?(Amendment)
-              # Supplements render with "+" prefix (bundled/consolidated format)
-              result = "+A#{id.amendment_number}"
-              result += ":#{id.amendment_year}" if id.amendment_year
-              result
-            # Only render the amendment portion, not the full id.to_s
-            elsif id.is_a?(Corrigendum)
-              # Only render the corrigendum portion
-              result = "+AC"
-              result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
-              if id.corrigendum_year
-                result += ":#{id.corrigendum_year}"
-                result += "-#{id.corrigendum_month}" if id.corrigendum_month && !id.corrigendum_month.empty?
-              end
-              result
-            else
-              # Other identifiers (should not happen in typical bundles) render with +
-              "+#{id}"
-            end
-          end.compact.join
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         # Delegate to first identifier (base document)

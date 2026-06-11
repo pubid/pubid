@@ -24,12 +24,8 @@ module Pubid
           { key: :env, title: "European Prestandard", short: "ENV" }
         end
 
-        def to_s(lang: :en, lang_single: false)
-          if adopted_identifier
-            "ENV #{adopted_identifier}"
-          else
-            super
-          end
+        def to_s(lang: :en, lang_single: false, **opts)
+          render(format: :human, lang: lang, lang_single: lang_single, **opts)
         end
       end
     end

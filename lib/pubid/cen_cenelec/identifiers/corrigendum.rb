@@ -11,19 +11,8 @@ module Pubid
         attribute :corrigendum_year, :integer
         attribute :corrigendum_month, :string
 
-        def to_s
-          if base_identifier
-            result = base_identifier.to_s
-            result += "/AC"
-            result += corrigendum_number if corrigendum_number && !corrigendum_number.empty?
-          else
-            result = "/AC#{corrigendum_number}"
-          end
-          if corrigendum_year
-            result += ":#{corrigendum_year}"
-            result += "-#{corrigendum_month}" if corrigendum_month && !corrigendum_month.empty?
-          end
-          result
+        def to_s(**opts)
+          render(format: :human, **opts)
         end
 
         def publisher
