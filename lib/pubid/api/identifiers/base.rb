@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../single_identifier"
-
 module Pubid
   module Api
     module Identifiers
