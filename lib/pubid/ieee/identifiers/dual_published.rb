@@ -15,7 +15,7 @@ module Pubid
         attribute :second_identifier, Base, polymorphic: true
 
         def to_s
-          "#{first_identifier} and #{second_identifier}"
+          render(format: :human)
         end
 
         def publisher

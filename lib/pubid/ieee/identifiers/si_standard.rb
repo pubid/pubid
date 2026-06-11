@@ -31,41 +31,7 @@ module Pubid
         attr_accessor :draft_obj
 
         def to_s
-          parts = []
-
-          # Publisher (IEEE/ASTM)
-          parts << "IEEE/ASTM"
-
-          # Type (SI or PSI based on typed_stage)
-          parts << if typed_stage&.abbr&.include?("PSI")
-                     "PSI"
-                   else
-                     "SI"
-                   end
-
-          # Code (number) with draft version for PSI
-          code_part = code.to_s
-          if draft_obj
-            # Use Draft component's version attribute
-            code_part += "/D#{draft_obj.version}"
-          end
-          parts << code_part if code
-
-          # Date
-          if month && year
-            parts << ", #{month} #{year}"
-          elsif year
-            parts << "-#{year}"
-          end
-
-          # Relationships (if present)
-          result = parts.join(" ")
-          if relationships && !relationships.empty?
-            rel_strs = relationships.map(&:to_s)
-            result += " (#{rel_strs.join(' / ')})"
-          end
-
-          result
+          render(format: :human)
         end
       end
     end

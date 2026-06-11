@@ -18,10 +18,7 @@ module Pubid
         attribute :redline, :boolean, default: -> { true }
 
         def to_s
-          result = base_identifier.to_s
-          result += " (Revision of #{revision_of})" if revision_of
-          result += " - Redline" if redline
-          result
+          render(format: :human)
         end
 
         def publisher

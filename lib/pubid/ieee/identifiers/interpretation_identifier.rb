@@ -20,13 +20,7 @@ module Pubid
         ].freeze
 
         def to_s
-          return base_identifier.to_s unless base_identifier
-
-          # Format: BASE/INT or BASE/INT-YEAR
-          result = base_identifier.to_s
-          result += "/INT"
-          result += "-#{int_year}" if int_year
-          result
+          render(format: :human)
         end
       end
     end

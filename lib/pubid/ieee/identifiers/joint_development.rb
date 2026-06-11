@@ -79,6 +79,8 @@ module Pubid
         end
 
         # Convert to string representation
+        # JointDevelopment has its own dual-format logic (IEEE vs ISO)
+        # that doesn't go through the format registry renderer.
         # @param format [Symbol] :ieee or :iso (defaults to canonical_format)
         # @return [String] formatted identifier
         def to_s(format: canonical_format)

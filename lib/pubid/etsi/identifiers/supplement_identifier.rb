@@ -25,16 +25,9 @@ module Pubid
           base.date
         end
 
-        # Render as: ETSI TYPE CODE/SUPPLEMENTS VERSION (DATE)
-        # When multiple supplements are present, they appear in order: /A1/C1
+        # Render via renderer
         def to_s
-          supplement_notations = collect_supplement_notations(self, [])
-          # Get the actual base ETSI standard (not supplements)
-          actual_base = find_actual_base(base)
-          code_with_supplements = "#{actual_base.code}#{supplement_notations.join}"
-          "#{actual_base.publisher} #{actual_base.type} #{code_with_supplements} #{actual_base.version} (#{actual_base.date.year}-#{actual_base.date.month.to_s.rjust(
-            2, '0'
-          )})"
+          render(format: :human)
         end
 
         # Recursively collect supplement notations from the supplement chain
