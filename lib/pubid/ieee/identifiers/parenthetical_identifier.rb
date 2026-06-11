@@ -10,9 +10,7 @@ module Pubid
         attribute :parenthetical_identifier, Base, polymorphic: true
 
         def to_s
-          result = base_identifier.to_s
-          result += " (#{parenthetical_identifier})" if parenthetical_identifier
-          result
+          render(format: :human)
         end
       end
     end

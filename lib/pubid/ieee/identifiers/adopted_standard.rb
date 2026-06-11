@@ -16,12 +16,7 @@ module Pubid
                                               collection: true
 
         def to_s
-          result = ieee_identifier.to_s
-          if adopted_identifiers && !adopted_identifiers.empty?
-            adopted_strs = adopted_identifiers.map(&:to_s)
-            result += " (#{adopted_strs.join(' and ')})"
-          end
-          result
+          render(format: :human)
         end
 
         def publisher

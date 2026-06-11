@@ -21,13 +21,7 @@ module Pubid
         ].freeze
 
         def to_s
-          return base_identifier.to_s unless base_identifier
-
-          # Format: BASE/ConformanceNN-YEAR
-          result = base_identifier.to_s
-          result += "/Conformance#{conf_number}" if conf_number
-          result += "-#{conf_year}" if conf_year
-          result
+          render(format: :human)
         end
       end
     end

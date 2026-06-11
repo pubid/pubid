@@ -17,21 +17,7 @@ module Pubid
         attr_accessor :secondary_identifier
 
         def to_s
-          # Format: PRIMARY/SECONDARY or PRIMARY, SECONDARY
-          # The format depends on the original input
-          return primary_identifier.to_s unless secondary_identifier
-
-          # Check if the secondary identifier starts with "C" (like C62.22.1)
-          # If so, use slash format (cross-reference style)
-          secondary_code = secondary_identifier.code.to_s
-          if secondary_code.start_with?("C") && secondary_code.match?(/^C\d+\./)
-            # Cross-reference format: IEEE Std 1299/C62.22.1-1996
-            "#{primary_identifier}/#{secondary_identifier}"
-          else
-            # Comma format: IEEE Std 960-1989, Std 1177-1989
-            # But we normalize to "and" format for consistency
-            "#{primary_identifier} and #{secondary_identifier}"
-          end
+          render(format: :human)
         end
 
         def publisher

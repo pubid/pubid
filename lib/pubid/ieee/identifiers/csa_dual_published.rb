@@ -33,13 +33,7 @@ module Pubid
         end
 
         def to_s
-          # Format: IEEE_IDENTIFIER/CSA CSA_IDENTIFIER
-          # The CSA identifier should render with "CSA" prefix
-          csa_str = csa_identifier.to_s
-          # Ensure CSA prefix is present
-          csa_str = "CSA #{csa_str}" unless csa_str.start_with?("CSA", "CAN/")
-
-          "#{ieee_identifier}/#{csa_str}"
+          render(format: :human)
         end
 
         def self.parse(string)

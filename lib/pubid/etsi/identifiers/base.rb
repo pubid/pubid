@@ -18,10 +18,7 @@ module Pubid
         end
 
         def to_s
-          result = "#{publisher} #{type} #{code}"
-          result += " #{version} (#{date.year}-#{date.month.to_s.rjust(2,
-                                                                       '0')})"
-          result
+          render(format: :human)
         end
 
         def ==(other)

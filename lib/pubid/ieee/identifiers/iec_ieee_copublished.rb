@@ -14,12 +14,7 @@ module Pubid
         attribute :date_info, :string           # Date information like "(10/07)"
 
         def to_s
-          result = "IEC/IEEE"
-          result += " #{copublished_number}" if copublished_number
-          result += draft_info if draft_info
-          result += " IEC:#{iec_year}" if iec_year
-          result += " #{date_info}" if date_info
-          result
+          render(format: :human)
         end
       end
     end
