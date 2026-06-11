@@ -4,7 +4,6 @@ module Pubid
   module Iso
     module Identifiers
       class Addendum < SupplementIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         # Override URN supplement type to use generic "sup" instead of "add"
         # This matches the ISO URN specification where addendums use "sup"

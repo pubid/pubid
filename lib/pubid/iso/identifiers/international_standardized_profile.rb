@@ -5,7 +5,6 @@ module Pubid
     module Identifiers
       # International Standardized Profile Identifier
       class InternationalStandardizedProfile < SingleIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(

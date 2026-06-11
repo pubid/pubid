@@ -5,7 +5,6 @@ module Pubid
     module Identifiers
       # Publicly Available Specification", Identifier
       class Pas < SingleIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(

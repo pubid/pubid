@@ -5,7 +5,6 @@ module Pubid
     module Identifiers
       # Data Identifier
       class Data < SingleIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(

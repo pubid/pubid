@@ -8,7 +8,6 @@ module Pubid
         include IdentifierMetadata
 
         # Note: type attribute uses shared Components::Type from Pubid namespace
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(

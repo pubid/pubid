@@ -4,7 +4,6 @@ module Pubid
   module Iso
     module Identifiers
       class TechnicalReport < SingleIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(

@@ -4,7 +4,6 @@ module Pubid
   module Iso
     module Identifiers
       class DirectivesSupplement < SupplementIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
         attribute :supplement_publisher, ::Pubid::Components::Publisher
 
         # supplement_publisher (e.g. "IEC" in "ISO/IEC DIR 1 IEC SUP") is needed

@@ -16,6 +16,36 @@ module Pubid
       def self.default_publisher
         ::Pubid::Iso::Components::Publisher.new
       end
+
+      # typed_stage is the single source of truth for stage (and, with the class,
+      # the doctype). Default to the class's published typed_stage, so an omitted
+      # "stage" key reconstructs the published state on from_hash.
+      attribute :typed_stage, ::Pubid::Components::TypedStage,
+                default: -> { self.class.published_typed_stage }
+
+      # The class's published typed_stage (canonical surface form), or nil for
+      # types with no stages (e.g. TC documents).
+      def self.published_typed_stage
+        return nil unless const_defined?(:TYPED_STAGES)
+
+        ts = self::TYPED_STAGES.find { |t| t.stage_code.to_s == "published" }
+        return nil unless ts
+
+        ts = ts.dup
+        ts.original_abbr = ts.canonical_abbreviation
+        ts
+      end
+
+      # type and stage are derived from typed_stage, never stored — so the
+      # doctype (fixed by the class / _type) can't be lost when "stage" is
+      # omitted for the published default.
+      def type
+        typed_stage&.to_type
+      end
+
+      def stage
+        typed_stage&.to_stage
+      end
       attribute :number, ::Pubid::Iso::Components::Code
       attribute :part, ::Pubid::Iso::Components::Code
       attribute :subpart, ::Pubid::Iso::Components::Code
@@ -89,6 +119,8 @@ module Pubid
       def stage_to_kv(model, doc)
         ts = model.typed_stage
         return unless ts&.code
+        # Omit the published default (recomputed from the class on load).
+        return if ts.stage_code.to_s == "published"
 
         doc.add_child(
           Lutaml::KeyValue::DataModel::Element.new("stage", ts.code.to_s),
@@ -112,8 +144,6 @@ module Pubid
         ts = ts.dup
         ts.original_abbr = ts.canonical_abbreviation
         model.typed_stage = ts
-        model.stage = ts.to_stage
-        model.type = ts.to_type
       end
 
       # --- Code components <-> plain string ---

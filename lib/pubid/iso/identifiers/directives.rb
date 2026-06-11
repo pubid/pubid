@@ -4,7 +4,6 @@ module Pubid
   module Iso
     module Identifiers
       class Directives < SingleIdentifier
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.type[:key] }
         attribute :subgroup, ::Pubid::Components::Code
 
         # Merges with Identifier's block (base attributes); only adds the
