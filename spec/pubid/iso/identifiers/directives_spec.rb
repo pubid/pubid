@@ -24,6 +24,12 @@ RSpec.describe Pubid::Iso::Identifiers::Directives do
 
   # Test basic identifiers
   context "basic identifiers" do
+    it "normalises the subgroup-after-type variant 'ISO/IEC DIR JTC 1'" do
+      id = Pubid::Iso.parse("ISO/IEC DIR JTC 1")
+      expect(id).to be_a(described_class)
+      expect(id.to_s).to eq("ISO/IEC JTC 1 DIR")
+    end
+
     # Test normal dated directives
     context "dated directives" do
       describe "ISO DIR 1:2022" do

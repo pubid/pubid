@@ -66,7 +66,9 @@ module Pubid
       end
 
       rule(:sc_type) do
-        str("SC").as(:sc_type)
+        # "SC" plus the "SC/QC" quality-committee variant
+        # (e.g. ISO/TC 184/SC/QC 4 N 246). Longest first for Parslet.
+        (str("SC/QC") | str("SC")).as(:sc_type)
       end
 
       rule(:wg_type) do
@@ -385,6 +387,11 @@ module Pubid
         prefix_with_copublishers >> space? >>
           (directives_publisher_subgroup >> space).maybe >>
           array_to_str(DIRECTIVES_TYPED_STAGES).as(:type_with_stage) >>
+          # The subgroup may also follow the type, e.g. "ISO/IEC DIR JTC 1"
+          # (canonical form is "ISO/IEC JTC 1 DIR"). Guard against a trailing
+          # supplement, where "JTC 1" is the supplement publisher instead
+          # (e.g. "ISO/IEC DIR JTC 1 SUP").
+          (space >> directives_publisher_subgroup >> (space >> str("SUP")).absent?).maybe >>
           (
             (space >> directives_number_with_part).maybe >>
             (str(":") >> date).maybe

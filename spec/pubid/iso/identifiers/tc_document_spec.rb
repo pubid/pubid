@@ -17,6 +17,15 @@ RSpec.describe Pubid::Iso::Identifiers::TcDocument do
       expect(id.number.value).to eq("123")
     end
 
+    it "parses the SC/QC subcommittee variant" do
+      id = Pubid::Iso.parse("ISO/TC 184/SC/QC 4 N246")
+      expect(id).to be_a(described_class)
+      expect(id.sc_type.value).to eq("SC/QC")
+      expect(id.sc_number.value).to eq("4")
+      expect(id.number.value).to eq("246")
+      expect(id.to_s).to eq("ISO/TC 184/SC/QC 4 N 246")
+    end
+
     it "parses simple TC document" do
       id = Pubid::Iso.parse("ISO/TC 184 N 100")
       expect(id).to be_a(described_class)
