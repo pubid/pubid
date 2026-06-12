@@ -64,7 +64,7 @@ module Pubid
           ),
           ::Pubid::Components::TypedStage.new(
             code: :dad,
-            abbr: ["DAD", "DAdd", "D ADD", "Dad"],
+            abbr: ["DAD", "DAdd", "D ADD", "Dad", "DIS Add"],
             short_abbr: "DAD",
             long_abbr: "DAdd",
             type_code: :add,
@@ -74,7 +74,7 @@ module Pubid
           ),
           ::Pubid::Components::TypedStage.new(
             code: :fdad,
-            abbr: ["FDAD", "FDAdd", "FD ADD", "FDad"],
+            abbr: ["FDAD", "FDAdd", "FD ADD", "FDad", "FDIS Add"],
             short_abbr: "FDAD",
             long_abbr: "FDAdd",
             type_code: :add,

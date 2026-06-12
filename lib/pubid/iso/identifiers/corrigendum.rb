@@ -58,7 +58,7 @@ module Pubid
           ),
           ::Pubid::Components::TypedStage.new(
             code: :dcor,
-            abbr: ["DCor", "DCOR"],
+            abbr: ["DCor", "DCOR", "DIS Cor"],
             short_abbr: "DCOR",
             long_abbr: "DCor",
             type_code: :cor,
@@ -68,7 +68,7 @@ module Pubid
           ),
           ::Pubid::Components::TypedStage.new(
             code: :fdcor,
-            abbr: ["FDCor", "FDCOR", "FCOR"],
+            abbr: ["FDCor", "FDCOR", "FCOR", "FDIS Cor"],
             short_abbr: "FDCOR",
             long_abbr: "FDCor",
             type_code: :cor,

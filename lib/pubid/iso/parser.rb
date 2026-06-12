@@ -327,7 +327,9 @@ module Pubid
       rule(:supplement_identifier_no_third) do
         identifier_copublishers_no_third.as(:base_identifier) >>
           str("/") >> supplement_type_with_stage >>
-          ((space? >> second_part) | (str(".") >> digits.as(:number)) | (space? >> date))
+          # The trailing number/date is optional: some draft supplements have no
+          # number yet, e.g. "ISO/IEC 9579/WD Amd".
+          ((space? >> second_part) | (str(".") >> digits.as(:number)) | (space? >> date)).maybe
       end
 
       rule(:supplement_identifier) do

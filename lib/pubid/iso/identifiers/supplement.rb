@@ -7,6 +7,14 @@ module Pubid
 
         TYPED_STAGES = [
           ::Pubid::Components::TypedStage.new(
+            code: :pwisuppl,
+            stage_code: :pwi,
+            type_code: :suppl,
+            abbr: ["PWI Suppl"],
+            name: "Proposed Work Item for Supplement",
+            harmonized_stages: %w[00.00 00.20 00.60 00.92 00.93 00.98 00.99],
+          ),
+          ::Pubid::Components::TypedStage.new(
             code: :npsuppl,
             stage_code: :np,
             type_code: :suppl,
@@ -42,7 +50,7 @@ module Pubid
             code: :dsuppl,
             stage_code: :dsuppl,
             type_code: :suppl,
-            abbr: ["DSuppl"],
+            abbr: ["DSuppl", "DIS Suppl"],
             name: "Draft Supplement",
             harmonized_stages: %w[40.00 40.20 40.60 40.92 40.93 40.98 40.99],
           ),
