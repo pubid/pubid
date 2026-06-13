@@ -38,14 +38,18 @@ module Pubid
         def ==(other)
           return false unless other.is_a?(Publisher)
 
-          publisher == other.publisher && copublisher == other.copublisher
+          # copublisher is a collection: parsing yields [] while building via
+          # .create (e.g. from an index hash) leaves it nil. Treat the empty
+          # collection and "no collection" as equal so both forms compare.
+          publisher == other.publisher &&
+            copublisher.to_a == other.copublisher.to_a
         end
 
         # Returns hash code for publisher component
         # @return [Integer] hash code
         # @note Memoized for performance
         def hash
-          @hash ||= [publisher, copublisher].compact.map(&:hash).hash
+          @hash ||= [publisher, copublisher.to_a].map(&:hash).hash
         end
 
         # Checks equality using hash for consistency
