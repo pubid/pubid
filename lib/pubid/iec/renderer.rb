@@ -68,12 +68,12 @@ module Pubid
         end
 
         # VAP suffix (Identifiers::Base only)
-        if id.respond_to?(:vap_suffix) && id.vap_suffix
+        if id.is_a?(Identifiers::Base) && id.vap_suffix
           parts << id.vap_suffix.render_with_space
         end
 
         # Database flag (Identifiers::Base only)
-        if id.respond_to?(:database) && id.database
+        if id.is_a?(Identifiers::Base) && id.database
           parts << " DB"
         end
 

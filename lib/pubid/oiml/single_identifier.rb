@@ -15,6 +15,8 @@ module Pubid
         "short"
       } # Track parsed format
 
+      attr_reader :requested_format
+
       # Type is determined by the subclass
       def type
         type_string

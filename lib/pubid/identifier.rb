@@ -150,7 +150,7 @@ module Pubid
       excluded_args << :date if excluded_args.delete(:year)
 
       attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
-        h[name] = excluded_args.include?(name) ? nil : send(name)
+        h[name] = excluded_args.include?(name) ? nil : public_send(name)
       end
       self.class.new(attrs)
     end

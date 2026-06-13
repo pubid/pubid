@@ -55,7 +55,7 @@ module Pubid
           result
         end
 
-        private
+        public
 
         def to_short_style
           # FIPS format: "FIPS 14e1971" or "NIST FIPS 140-3" (preserve publisher if set)

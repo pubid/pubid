@@ -5,7 +5,7 @@ module Pubid
     # Human-readable renderer for NIST identifiers.
     #
     # NIST supports multiple output formats (:full, :long, :abbreviated,
-    # :short, :mr). Each series class overrides the private style methods
+    # :short, :mr). Each series class defines public style methods
     # (to_short_style, to_mr_style, etc.) with series-specific formatting
     # logic, so this renderer delegates to those methods rather than
     # reimplementing them.
@@ -27,15 +27,15 @@ module Pubid
 
         case effective_format
         when :full, :long
-          id.send(:to_full_style)
+          id.public_send(:to_full_style)
         when :abbreviated, :abbrev
-          id.send(:to_abbreviated_style)
+          id.public_send(:to_abbreviated_style)
         when :short
-          id.send(:to_short_style)
+          id.public_send(:to_short_style)
         when :mr
-          id.send(:to_mr_style)
+          id.public_send(:to_mr_style)
         else
-          id.send(:to_short_style)
+          id.public_send(:to_short_style)
         end
       end
     end

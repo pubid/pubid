@@ -12,6 +12,8 @@ module Pubid
         nil => "JapaneseIndustrialStandard", # Default
       }.freeze
 
+      attr_reader :with_publisher
+
       # Determine identifier class from type prefix
       def self.identifier_class_for_type(type)
         class_name = TYPE_CLASSES[type]

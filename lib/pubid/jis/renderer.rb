@@ -31,7 +31,7 @@ module Pubid
       private
 
       def with_publisher?(id)
-        id.instance_variable_get(:@with_publisher) != false
+        id.with_publisher != false
       end
 
       def render_base(id)
