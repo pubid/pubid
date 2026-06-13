@@ -123,7 +123,7 @@ RSpec.describe "annotated rendering" do
     it "annotates a draft amendment" do
       expect(annotated("ISO 9001:2015/DAmd 1:2020")).to eq(
         '<span class="publisher">ISO</span> <span class="docnumber">9001</span>:' \
-        '<span class="year">2015</span>/<span class="amendment">DAmd</span> ' \
+        '<span class="year">2015</span>/<span class="amendment">DAM</span> ' \
         '<span class="docnumber">1</span>:<span class="year">2020</span>',
       )
     end

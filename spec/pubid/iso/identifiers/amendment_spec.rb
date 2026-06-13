@@ -709,9 +709,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         subject { "ISO/IEC/IEEE 8802-3:2021/FDAmd 11" }
 
         let(:parsed) { Pubid::Iso.parse(subject) }
-        # V2 preserves original format
+        # Draft amendment renders the canonical short form (FDAM), matching v1.
         let(:normalized) do
-          "ISO/IEC/IEEE 8802-3:2021/FDAmd 11"
+          "ISO/IEC/IEEE 8802-3:2021/FDAM 11"
         end
         let(:urn) { "urn:iso:std:iso-iec-ieee:8802:-3:FDAM:amd:11:v1" }
 
@@ -1039,9 +1039,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       subject { "ISO 10993-18:2020/DAmd 1" }
 
       let(:parsed) { Pubid::Iso.parse(subject) }
-      # V2 preserves original format
+      # Draft amendment renders the canonical short form (DAM), matching v1.
       let(:normalized) do
-        "ISO 10993-18:2020/DAmd 1"
+        "ISO 10993-18:2020/DAM 1"
       end
       let(:urn) { "urn:iso:std:iso:10993:-18:stage-40.00:amd:1:v1" }
 
@@ -1334,9 +1334,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       subject { "ISO 3245:2015/FDAmd 1" }
 
       let(:parsed) { Pubid::Iso.parse(subject) }
-      # V2 preserves original format
+      # Draft amendment renders the canonical short form (FDAM), matching v1.
       let(:normalized) do
-        "ISO 3245:2015/FDAmd 1"
+        "ISO 3245:2015/FDAM 1"
       end
       let(:urn) { "urn:iso:std:iso:3245:FDAM:amd:1:v1" }
 
@@ -1704,9 +1704,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       subject { "ISO/IEC DIS 23008-1/DAmd 2(en)" }
 
       let(:parsed) { Pubid::Iso.parse(subject) }
-      # V2 preserves original format
+      # Draft amendment renders the canonical short form (DAM), matching v1.
       let(:normalized) do
-        "ISO/IEC DIS 23008-1/DAmd 2(en)"
+        "ISO/IEC DIS 23008-1/DAM 2(en)"
       end
       let(:urn) { "urn:iso:std:iso-iec:23008:-1:stage-40.00:amd:2:v1:en" }
 
@@ -2221,9 +2221,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       subject { "ISO 11137-2:2013/FDAmd 1 ED3" }
 
       let(:parsed) { Pubid::Iso.parse(subject) }
-      # V2 preserves original format
+      # Draft amendment renders the canonical short form (FDAM), matching v1.
       let(:normalized) do
-        "ISO 11137-2:2013/FDAmd 1 ED3"
+        "ISO 11137-2:2013/FDAM 1 ED3"
       end
       let(:urn) { "urn:iso:std:iso:11137:-2:ed-3:FDAM:amd:1:v1" }
 
@@ -2276,9 +2276,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       subject { "ISO/IEC 14496-30:2018/FDAmd 1 ED2" }
 
       let(:parsed) { Pubid::Iso.parse(subject) }
-      # V2 preserves original format
+      # Draft amendment renders the canonical short form (FDAM), matching v1.
       let(:normalized) do
-        "ISO/IEC 14496-30:2018/FDAmd 1 ED2"
+        "ISO/IEC 14496-30:2018/FDAM 1 ED2"
       end
       let(:urn) { "urn:iso:std:iso-iec:14496:-30:ed-2:FDAM:amd:1:v1" }
 
@@ -2389,9 +2389,9 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       subject { "ISO/IEC FDIS 23090-14/DAmd 1" }
 
       let(:parsed) { Pubid::Iso.parse(subject) }
-      # V2 preserves original format
+      # Draft amendment renders the canonical short form (DAM), matching v1.
       let(:normalized) do
-        "ISO/IEC FDIS 23090-14/DAmd 1"
+        "ISO/IEC FDIS 23090-14/DAM 1"
       end
       let(:urn) { "urn:iso:std:iso-iec:23090:-14:stage-40.00:amd:1:v1" }
 

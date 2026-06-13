@@ -11,13 +11,15 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
     end
 
     it "renders draft addendum" do
+      # "DAdd" parses, but renders the canonical short form "DAD" (v1 parity).
       id = Pubid::Iso.parse("ISO 9001:2015/DAdd 1:2020")
-      expect(id.to_s).to eq("ISO 9001:2015/DAdd 1:2020")
+      expect(id.to_s).to eq("ISO 9001:2015/DAD 1:2020")
     end
 
     it "renders final draft addendum" do
+      # "FDAdd" parses, but renders the canonical short form "FDAD" (v1 parity).
       id = Pubid::Iso.parse("ISO 9001:2015/FDAdd 1:2020")
-      expect(id.to_s).to eq("ISO 9001:2015/FDAdd 1:2020")
+      expect(id.to_s).to eq("ISO 9001:2015/FDAD 1:2020")
     end
 
     it "renders addendum with part" do

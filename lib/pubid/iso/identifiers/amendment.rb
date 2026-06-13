@@ -70,7 +70,10 @@ module Pubid
             code: :damd,
             abbr: ["DAM", "DAmd"],
             short_abbr: "DAM",
-            long_abbr: "DAmd",
+            # "DAmd" stays in `abbr` so it still parses, but render the canonical
+            # "DAM" (matches pubid v1's legacy_abbr semantics: parse the long
+            # spelling, emit the short one). No long_abbr → no long rendering.
+            long_abbr: nil,
             type_code: :amd,
             stage_code: :damd,
             name: "Draft Amendment",
@@ -80,7 +83,8 @@ module Pubid
             code: :fdamd,
             abbr: ["FDAM", "FDAmd"],
             short_abbr: "FDAM",
-            long_abbr: "FDAmd",
+            # See :damd — parse "FDAmd", render canonical "FDAM" (v1 parity).
+            long_abbr: nil,
             type_code: :amd,
             stage_code: :fdamd,
             name: "Final Draft Amendment",

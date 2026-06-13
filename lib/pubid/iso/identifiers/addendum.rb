@@ -66,7 +66,9 @@ module Pubid
             code: :dad,
             abbr: ["DAD", "DAdd", "D ADD", "Dad", "DIS Add"],
             short_abbr: "DAD",
-            long_abbr: "DAdd",
+            # "DAdd" stays in `abbr` so it still parses, but render the canonical
+            # "DAD" (pubid v1 legacy_abbr parity). No long_abbr → no long render.
+            long_abbr: nil,
             type_code: :add,
             stage_code: :dad,
             name: "Draft Addendum",
@@ -76,7 +78,8 @@ module Pubid
             code: :fdad,
             abbr: ["FDAD", "FDAdd", "FD ADD", "FDad", "FDIS Add"],
             short_abbr: "FDAD",
-            long_abbr: "FDAdd",
+            # See :dad — parse "FDAdd", render canonical "FDAD" (v1 parity).
+            long_abbr: nil,
             type_code: :add,
             stage_code: :fdad,
             name: "Final Draft Addendum",
