@@ -6,7 +6,7 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       def self.parse(string)
         parsed = Pubid::Ansi::Parser.new.parse(string)
-        Pubid::Ansi::Builder.new(Pubid::Ansi::Scheme).build(parsed)
+        Pubid::Ansi::Builder.new.build(parsed)
       end
     end
   end

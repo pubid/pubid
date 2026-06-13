@@ -8,7 +8,6 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/jcgm/identifiers"
     autoload :Parser, "#{__dir__}/jcgm/parser"
     autoload :Renderer, "#{__dir__}/jcgm/renderer"
-    autoload :Scheme, "#{__dir__}/jcgm/scheme"
     autoload :SingleIdentifier, "#{__dir__}/jcgm/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/jcgm/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/jcgm/urn_generator"
@@ -18,7 +17,7 @@ module Pubid
     # @return [Identifier] the parsed identifier
     def self.parse(identifier)
       parser = Parser.new
-      builder = Builder.new(Scheme)
+      builder = Builder.new
 
       parsed = parser.parse(identifier)
       builder.build(parsed)
@@ -33,7 +32,7 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 

@@ -13,8 +13,7 @@ module Pubid
     # - Router: series-to-class mapping (which identifier class to instantiate)
     # - Caster: type coercion (parsed values -> domain component objects)
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
+      def initialize
         @router = Router.new
         @caster = Caster.new
         @normalizer = ParserOutputNormalizer.new

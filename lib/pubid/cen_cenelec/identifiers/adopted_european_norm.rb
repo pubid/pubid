@@ -8,6 +8,17 @@ module Pubid
       class AdoptedEuropeanNorm < EuropeanNorm
         attribute :adopted_identifier, Base, polymorphic: true # ISO/IEC/IEEE object
 
+        # Override self.type to return nil so that AdoptedEuropeanNorm is NOT
+        # registered as a type in CenCenelec.identifier_types. The class is a
+        # polymorphic wrapper that wraps an adopted ISO/IEC identifier under an
+        # EN publisher; it is constructed explicitly by Builder#build_adopted_identifier,
+        # not selected via type-code lookup. Returning nil here prevents
+        # identifier_types auto-discovery from shadowing EuropeanNorm (which
+        # also reports :en) in CenCenelec.locate_type(:en).
+        def self.type
+          nil
+        end
+
         def to_s(**opts)
           render(format: :human, **opts)
         end

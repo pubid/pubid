@@ -15,10 +15,9 @@ module Pubid
         end
 
         parser = Parser.new
-        scheme = Scheme.new
 
         parsed = parser.parse(string)
-        Builder.build(parsed, scheme)
+        Builder.build(parsed)
       rescue Parslet::ParseFailed => e
         raise StandardError, "Failed to parse '#{string}': #{e.message}"
       end

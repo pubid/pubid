@@ -3,21 +3,22 @@
 module Pubid
   module Jcgm
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
-      end
-
       def locate_identifier_klass(parsed_hash)
         if parsed_hash[:base_identifier]
-          return @scheme.locate_identifier_klass_by_type_code(:amendment)
+          return Jcgm.locate_type(:amendment)
         end
 
         if parsed_hash[:gum_number]
-          return @scheme.locate_identifier_klass_by_type_code(:gum_guide)
+          return Jcgm.locate_type(:gum_guide)
         end
 
+        # Standard guide (no type_with_stage, no gum_number).
+        # Don't use locate_stage("") — Guide and GumGuide both have
+        # abbr: [""], so the result depends on constant iteration order.
+        return Jcgm.locate_type(:guide) unless parsed_hash[:type_with_stage]
+
         typed_stage = locate_typed_stage(parsed_hash[:type_with_stage])
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+        Jcgm.locate_type(typed_stage.type_code)
       end
 
       def build(parsed_hash)
@@ -25,7 +26,8 @@ module Pubid
         assign_attributes(identifier, parsed_hash)
 
         if identifier.class.attributes.key?(:typed_stage) && identifier.typed_stage.nil?
-          default_typed_stage = @scheme.locate_typed_stage_by_abbr("")
+          default_typed_stage = Jcgm.locate_stage("") ||
+            raise(ArgumentError, "Unknown type abbreviation: ''")
           identifier.typed_stage = default_typed_stage
           identifier.stage = default_typed_stage.to_stage if identifier.class.attributes.key?(:stage)
           identifier.type = default_typed_stage.to_type if identifier.class.attributes.key?(:type)
@@ -38,6 +40,12 @@ module Pubid
 
       def default_identifier_class
         Identifiers::Guide
+      end
+
+      def locate_typed_stage(typed_stage_string)
+        typed_stage_string = "" if typed_stage_string.nil?
+        Jcgm.locate_stage(typed_stage_string) ||
+          raise(ArgumentError, "Unknown type abbreviation: '#{typed_stage_string}'")
       end
 
       def cast(type, value)

@@ -3,12 +3,19 @@
 module Pubid
   module Bsi
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
-      end
+      # Default typed stage used when an abbreviation lookup yields no match.
+      # Empty/unknown abbreviations fall back to the published British Standard.
+      DEFAULT_TYPED_STAGE = Pubid::Components::TypedStage.new(
+        code: :pubbs,
+        stage_code: :published,
+        type_code: :bs,
+        abbr: ["BS"],
+        name: "British Standard",
+        harmonized_stages: %w[60.00 60.60],
+      ).freeze
 
-      def self.build(parsed_data, scheme = Scheme.new)
-        new(scheme).build(parsed_data)
+      def self.build(parsed_data)
+        new.build(parsed_data)
       end
 
       def build(data)
@@ -122,7 +129,7 @@ module Pubid
           return identifier
         end
 
-        # Determine identifier class using Scheme
+        # Determine identifier class using the module's lookup helpers
         identifier = locate_identifier_klass(data).new
         assign_attributes(identifier, data)
 
@@ -934,17 +941,19 @@ module Pubid
         return Identifiers::AdoptedEuropeanNorm if parsed_hash[:adopted_string]&.match?(/^EN\s+\d/)
         return Identifiers::AdoptedInternationalStandard if parsed_hash[:adopted_string]
 
-        # Use type to determine class via Scheme
+        # Use type to determine class via Pubid::Bsi.locate_stage / locate_type.
+        # Unknown abbreviations fall back to DEFAULT_TYPED_STAGE (published BS).
         type_str = parsed_hash[:type] || parsed_hash[:stage] || ""
-        typed_stage = @scheme.locate_typed_stage_by_abbr(type_str)
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+        typed_stage = Bsi.locate_stage(type_str.to_s.upcase) || DEFAULT_TYPED_STAGE
+        Bsi.locate_type(typed_stage.type_code) || Identifiers::BritishStandard
       end
 
       def cast(type, value)
         case type
         when :type
-          # Lookup from register
-          typed_stage = @scheme.locate_typed_stage_by_abbr(value || "")
+          # Lookup from register via Pubid::Bsi.locate_stage.
+          # Unknown abbreviations fall back to DEFAULT_TYPED_STAGE (published BS).
+          typed_stage = Bsi.locate_stage(value.to_s.upcase) || DEFAULT_TYPED_STAGE
           {
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,

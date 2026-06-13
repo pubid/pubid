@@ -3,12 +3,8 @@
 module Pubid
   module CenCenelec
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
-      end
-
-      def self.build(parsed_data, scheme = Scheme.new)
-        new(scheme).build(parsed_data)
+      def self.build(parsed_data)
+        new.build(parsed_data)
       end
 
       def build(data)
@@ -40,7 +36,7 @@ module Pubid
         # Extract supplements before building base identifier (only plus/bundled)
         supplements_data = extract_supplements(data)
 
-        # Determine identifier class using Scheme
+        # Determine identifier class using the module's lookup helpers
         identifier = locate_identifier_klass(data).new
         assign_attributes(identifier, data)
 
@@ -83,21 +79,23 @@ module Pubid
         # Check if publisher is actually a type code (CWA, HD, ES, CR, ENV act as publisher)
         publisher_str = parsed_hash[:publisher].to_s
         if %w[CWA HD ES CR ENV].include?(publisher_str)
-          typed_stage = @scheme.locate_typed_stage_by_abbr(publisher_str)
-          return @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+          typed_stage = CenCenelec.locate_stage(publisher_str)
+          if (klass = CenCenelec.locate_type(typed_stage.type_code))
+            return klass
+          end
         end
 
-        # Use type or stage to determine class via Scheme
+        # Use type or stage to determine class via the module's registry
         type_or_stage = parsed_hash[:type_with_stage] || parsed_hash[:type] || parsed_hash[:stage] || ""
-        typed_stage = @scheme.locate_typed_stage_by_abbr(type_or_stage)
-        @scheme.locate_identifier_klass_by_type_code(typed_stage.type_code)
+        typed_stage = CenCenelec.locate_stage(type_or_stage) || CenCenelec::DEFAULT_TYPED_STAGE
+        CenCenelec.locate_type(typed_stage.type_code) || Identifiers::EuropeanNorm
       end
 
       def cast(type, value)
         case type
         when :type_with_stage
           # Lookup from register
-          typed_stage = @scheme.locate_typed_stage_by_abbr(value || "")
+          typed_stage = CenCenelec.locate_stage(value.to_s) || CenCenelec::DEFAULT_TYPED_STAGE
           {
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,
@@ -150,7 +148,7 @@ module Pubid
 
         when :stage
           # Lookup stage in TYPED_STAGES register
-          typed_stage = @scheme.locate_typed_stage_by_abbr(value.to_s)
+          typed_stage = CenCenelec.locate_stage(value.to_s) || CenCenelec::DEFAULT_TYPED_STAGE
           {
             stage: typed_stage.to_stage,
             typed_stage: typed_stage,

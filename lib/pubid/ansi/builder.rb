@@ -3,9 +3,11 @@
 module Pubid
   module Ansi
     class Builder < Pubid::Builder::Base
-      def initialize(scheme)
-        @scheme = scheme
-        super(Identifiers::Standard)
+      def build(data)
+        data = flatten_array(data) if data.is_a?(Array)
+        identifier = default_identifier_class.new
+        assign_attributes(identifier, data)
+        identifier
       end
 
       private

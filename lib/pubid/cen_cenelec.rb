@@ -7,11 +7,137 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/cen_cenelec/identifiers"
     autoload :Parser, "#{__dir__}/cen_cenelec/parser"
     autoload :Renderer, "#{__dir__}/cen_cenelec/renderer"
-    autoload :Scheme, "#{__dir__}/cen_cenelec/scheme"
     autoload :SingleIdentifier, "#{__dir__}/cen_cenelec/single_identifier"
     autoload :SupplementIdentifier,
              "#{__dir__}/cen_cenelec/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/cen_cenelec/urn_generator"
+
+    # TYPED_STAGES_REGISTRY for native CEN types
+    TYPED_STAGES_REGISTRY = [
+      # European Norm (EN)
+      Pubid::Components::TypedStage.new(
+        code: :puben,
+        stage_code: :published,
+        type_code: :en,
+        abbr: ["EN"],
+        name: "European Norm",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+      Pubid::Components::TypedStage.new(
+        code: :pren,
+        stage_code: :proposal,
+        type_code: :en,
+        abbr: ["prEN"],
+        name: "Proposal European Norm",
+        harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+      ),
+      Pubid::Components::TypedStage.new(
+        code: :fpren,
+        stage_code: :final_proposal,
+        type_code: :en,
+        abbr: ["FprEN"],
+        name: "Final Proposal European Norm",
+        harmonized_stages: %w[40.00 40.20 40.60 40.92 40.98 40.99],
+      ),
+
+      # Technical Specification (TS)
+      Pubid::Components::TypedStage.new(
+        code: :pubts,
+        stage_code: :published,
+        type_code: :ts,
+        abbr: ["TS"],
+        name: "Technical Specification",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+      Pubid::Components::TypedStage.new(
+        code: :prts,
+        stage_code: :proposal,
+        type_code: :ts,
+        abbr: ["prTS"],
+        name: "Proposal Technical Specification",
+        harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+      ),
+
+      # Technical Report (TR)
+      Pubid::Components::TypedStage.new(
+        code: :pubtr,
+        stage_code: :published,
+        type_code: :tr,
+        abbr: ["TR"],
+        name: "Technical Report",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+
+      # CEN Workshop Agreement (CWA)
+      Pubid::Components::TypedStage.new(
+        code: :pubcwa,
+        stage_code: :published,
+        type_code: :cwa,
+        abbr: ["CWA"],
+        name: "CEN Workshop Agreement",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+
+      # Guide
+      Pubid::Components::TypedStage.new(
+        code: :pubguide,
+        stage_code: :published,
+        type_code: :guide,
+        abbr: ["Guide"],
+        name: "Guide",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+
+      # Harmonization Document (HD)
+      Pubid::Components::TypedStage.new(
+        code: :pubhd,
+        stage_code: :published,
+        type_code: :hd,
+        abbr: ["HD"],
+        name: "Harmonization Document",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+
+      # European Specification (ES)
+      Pubid::Components::TypedStage.new(
+        code: :pubes,
+        stage_code: :published,
+        type_code: :es,
+        abbr: ["ES"],
+        name: "European Specification",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+
+      # CEN Report (CR)
+      Pubid::Components::TypedStage.new(
+        code: :pubcr,
+        stage_code: :published,
+        type_code: :cr,
+        abbr: ["CR"],
+        name: "CEN Report",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+
+      # European Prestandard (ENV)
+      Pubid::Components::TypedStage.new(
+        code: :pubenv,
+        stage_code: :published,
+        type_code: :env,
+        abbr: ["ENV"],
+        name: "European Prestandard",
+        harmonized_stages: %w[60.00 60.60],
+      ),
+    ].freeze
+
+    # Default typed stage for when no match is found
+    DEFAULT_TYPED_STAGE = Pubid::Components::TypedStage.new(
+      code: :puben,
+      stage_code: :published,
+      type_code: :en,
+      abbr: ["EN"],
+      name: "European Norm",
+      harmonized_stages: %w[60.00 60.60],
+    ).freeze
 
     def self.parse(identifier)
       CenCenelec::Identifier.parse(identifier)
@@ -22,14 +148,14 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 
-    # Build typed stage index from the Scheme's TYPED_STAGES_REGISTRY
+    # Build typed stage index from the module's TYPED_STAGES_REGISTRY
     # @return [Array<Pubid::Components::TypedStage>] all typed stages
     def self.all_typed_stages
-      @all_typed_stages ||= Scheme::TYPED_STAGES_REGISTRY
+      TYPED_STAGES_REGISTRY
     end
 
     # Lookup: type code -> identifier class
