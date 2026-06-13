@@ -22,22 +22,6 @@ RSpec.describe Pubid::Export::Exporter do
     end
   end
 
-  describe "FLAVOR_STRATEGIES" do
-    it "maps every flavor to a strategy" do
-      described_class::FLAVORS.each do |flavor|
-        expect(described_class::FLAVOR_STRATEGIES).to have_key(flavor),
-                                                      "FLAVOR_STRATEGIES missing key: #{flavor}"
-      end
-    end
-
-    it "maps every strategy to a class" do
-      described_class::FLAVOR_STRATEGIES.each_value do |strategy|
-        expect(described_class::STRATEGY_CLASSES).to have_key(strategy),
-                                                     "STRATEGY_CLASSES missing key: #{strategy}"
-      end
-    end
-  end
-
   describe ".export_all" do
     let(:data) { described_class.export_all }
 
@@ -136,40 +120,6 @@ RSpec.describe Pubid::Export::Exporter do
       iso_types.each do |type|
         expect(type[:examples].size).to be <= 10
       end
-    end
-  end
-
-  describe "strategy dispatch" do
-    it "uses SchemeExporter for ISO" do
-      expect(described_class::FLAVOR_STRATEGIES[:iso]).to eq(:scheme)
-    end
-
-    it "uses IeeeExporter for IEEE" do
-      expect(described_class::FLAVOR_STRATEGIES[:ieee]).to eq(:ieee)
-    end
-
-    it "uses NistExporter for NIST" do
-      expect(described_class::FLAVOR_STRATEGIES[:nist]).to eq(:nist)
-    end
-
-    it "uses RegistryExporter for BSI" do
-      expect(described_class::FLAVOR_STRATEGIES[:bsi]).to eq(:registry)
-    end
-
-    it "uses RegistryExporter for CEN-CENELEC" do
-      expect(described_class::FLAVOR_STRATEGIES[:cen_cenelec]).to eq(:registry)
-    end
-
-    it "uses DataClassExporter for ETSI" do
-      expect(described_class::FLAVOR_STRATEGIES[:etsi]).to eq(:data_class)
-    end
-
-    it "uses DataClassExporter for Plateau" do
-      expect(described_class::FLAVOR_STRATEGIES[:plateau]).to eq(:data_class)
-    end
-
-    it "uses ItuExporter for ITU" do
-      expect(described_class::FLAVOR_STRATEGIES[:itu]).to eq(:itu)
     end
   end
 end

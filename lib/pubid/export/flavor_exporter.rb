@@ -4,11 +4,14 @@ require "set"
 
 module Pubid
   module Export
-    # Abstract base class for per-flavor metadata extraction.
-    # Subclasses implement strategy for different Scheme patterns.
+    # Unified metadata extractor for all flavors.
     #
-    # Open/Closed: New flavors add a subclass; no existing code changes.
-    # Single Responsibility: Each subclass extracts data for one Scheme pattern.
+    # Uses the self-describing type interface (identifier_types, all_typed_stages,
+    # locate_type, locate_stage) on each flavor module. No Scheme dependency (Scheme class removed).
+    #
+    # Open/Closed: Adding a new flavor requires only adding it to Exporter::FLAVORS.
+    # Single Responsibility: Extracts metadata from flavor modules into value objects.
+    # Single Source of Truth: Each identifier class IS the type definition.
     class FlavorExporter
       attr_reader :flavor
 
@@ -22,136 +25,105 @@ module Pubid
         @flavor = flavor
       end
 
-      # Subclasses must override
       def export
-        raise NotImplementedError
+        mod = flavor_module
+        return nil unless mod
+
+        klasses = resolve_identifier_classes(mod)
+        return nil if klasses.empty?
+
+        fixture_data = fixture_examples
+        seen_keys = Set.new
+
+        identifier_types = klasses.filter_map do |klass|
+          info = extract_type_info(klass)
+          next if seen_keys.include?(info[:key])
+
+          seen_keys << info[:key]
+
+          stages = extract_typed_stages(klass)
+          examples = match_examples(fixture_data, info[:key]&.to_s, klass)
+
+          IdentifierTypeResult.new(
+            key: info[:key],
+            title: info[:title],
+            short: info[:short],
+            abbr: info[:abbr],
+            typed_stages: stages,
+            examples: examples,
+          )
+        end
+
+        FlavorResult.new(
+          flavor: flavor,
+          identifier_types: identifier_types,
+          wrapper_types: extract_wrapper_types,
+          attributes: extract_attributes(klasses.first),
+        )
       end
 
       protected
 
-      def scheme_module
-        # const_get doesn't trigger autoload; reference the constant directly
-        @scheme_module ||= case flavor.to_s
-                           when "iso" then Pubid::Iso
-                           when "iec" then Pubid::Iec
-                           when "ieee" then Pubid::Ieee
-                           when "nist" then Pubid::Nist
-                           when "bsi" then Pubid::Bsi
-                           when "itu" then Pubid::Itu
-                           when "cen_cenelec" then Pubid::CenCenelec
-                           when "etsi" then Pubid::Etsi
-                           when "ansi" then Pubid::Ansi
-                           when "astm" then Pubid::Astm
-                           when "ashrae" then Pubid::Ashrae
-                           when "asme" then Pubid::Asme
-                           when "ccsds" then Pubid::Ccsds
-                           when "cie" then Pubid::Cie
-                           when "csa" then Pubid::Csa
-                           when "jis" then Pubid::Jis
-                           when "jcgm" then Pubid::Jcgm
-                           when "oiml" then Pubid::Oiml
-                           when "idf" then Pubid::Idf
-                           when "api" then Pubid::Api
-                           when "amca" then Pubid::Amca
-                           when "plateau" then Pubid::Plateau
-                           when "sae" then Pubid::Sae
-                           end
+      # Resolve identifier classes from the flavor module.
+      # Primary: use the module's self-describing identifier_types method.
+      # Fallback: scan the Identifiers namespace directly for Pubid::Identifier
+      # subclasses (handles ETSI, ITU, and other non-standard patterns).
+      def resolve_identifier_classes(mod)
+        klasses = mod.identifier_types
+        return klasses if klasses && !klasses.empty?
+
+        discover_from_namespace(mod)
       end
 
-      def scheme_class
-        @scheme_class ||= begin
-          mod = scheme_module
-          mod&.const_get(:Scheme)
+      # Scan Identifiers namespace for all Pubid::Identifier subclasses,
+      # excluding structural base classes.
+      def discover_from_namespace(mod)
+        return [] unless mod.const_defined?(:Identifiers)
+
+        idents_mod = mod.const_get(:Identifiers)
+        collect_identifier_classes(idents_mod)
+      end
+
+      # Recursively collect all Pubid::Identifier subclasses from a module,
+      # descending into submodules (e.g., IEEE's Nesc namespace).
+      def collect_identifier_classes(mod)
+        result = []
+        mod.constants.each do |c|
+          const = begin; mod.const_get(c); rescue NameError; next; end
+          if const.is_a?(Module) && !const.is_a?(Class)
+            result.concat(collect_identifier_classes(const))
+          elsif const.is_a?(Class) && const < Pubid::Identifier
+            result << const
+          end
+        end
+        result
+      end
+
+      # Map flavor symbol to the flavor module.
+      def flavor_module
+        @flavor_module ||= begin
+          mod_name = flavor.to_s.gsub(/(?:^|_)(.)/) { $1.upcase }
+          Pubid.const_get(mod_name)
         rescue NameError
           nil
         end
       end
 
-      def identifier_classes
-        resolve_identifier_classes
-      end
-
-      def resolve_identifier_classes
-        mod = scheme_module
-        scheme_klasses = []
-
-        # Primary: Use flavor module's self-describing identifier_types
-        if mod&.respond_to?(:identifier_types)
-          types = mod.identifier_types
-          scheme_klasses = types if types && !types.empty?
-        end
-
-        # Fallback: Scheme class methods or instance
-        if scheme_klasses.empty?
-          scheme = scheme_class
-          if scheme
-            begin
-              scheme_klasses = scheme.identifiers
-            rescue NoMethodError
-              instance = begin
-                scheme.new
-              rescue NoMethodError
-                nil
-              end
-              if instance
-                ids = begin
-                  instance.identifiers
-                rescue NoMethodError
-                  nil
-                end
-                scheme_klasses = ids if ids && !ids.empty?
-              end
-            end
-          end
-        end
-
-        # Build set of website keys from Scheme classes to avoid duplicates
-        known_website_keys = Set.new
-        scheme_klasses.each do |klass|
-          info = extract_type_info(klass)
-          known_website_keys << info[:key].to_s if info[:key]
-        end
-
-        # Supplement with any typed classes in the Identifiers module
-        # that weren't returned by Scheme (e.g., supplements, fragments)
-        additional = discover_additional_typed_classes(scheme_klasses,
-                                                       known_website_keys)
-        scheme_klasses + additional
-      end
-
-      # Classes to skip when discovering additional identifier types
-      SKIP_CLASSES = %w[Base].freeze
-
-      def discover_additional_typed_classes(known_classes,
-known_website_keys = Set.new)
-        mod = scheme_module
-        return [] unless mod
-
-        idents_mod = mod.const_get(:Identifiers)
-        known_set = Set.new(known_classes)
-
-        idents_mod.constants.filter_map do |c|
-          klass = idents_mod.const_get(c)
-        rescue NameError
-          next
-        else
-          next unless klass.is_a?(Class)
-          next if known_set.include?(klass)
-          next if klass <= Exception
-          next if SKIP_CLASSES.include?(klass.name&.split("::")&.last)
-
-          # Check if this class produces a duplicate website key
-          info = extract_type_info(klass)
-          wkey = info[:key]&.to_s
-          next if wkey && known_website_keys.include?(wkey)
-
-          known_website_keys << wkey if wkey
-          klass
-        end
-      end
+      # Per-class overrides keyed by class name (for classes that share type keys)
+      CLASS_KEY_OVERRIDES = {
+        "Pubid::Bsi::Identifiers::AdoptedEuropeanNorm" => "adopted_european_norm",
+        "Pubid::Bsi::Identifiers::AdoptedInternationalStandard" => "adopted_international_standard",
+        "Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm" => "adopted_european_norm",
+        "Pubid::Ansi::Identifiers::Standard" => "standard",
+        "Pubid::Ansi::Identifiers::AmericanNationalStandard" => "american_national_standard",
+        "Pubid::Jis::Identifiers::Standard" => "standard",
+        "Pubid::Ieee::Identifiers::Nesc::Standard" => "nesc",
+        "Pubid::Ieee::Identifiers::Nesc::Draft" => "nesc",
+        "Pubid::Ieee::Identifiers::Nesc::Handbook" => "nesc",
+        "Pubid::Ieee::Identifiers::Nesc::Redline" => "nesc",
+      }.freeze
 
       # Explicit overrides mapping (flavor, library_key) → website key
-      # for cases where derived key doesn't match the website convention.
       WEBSITE_KEY_OVERRIDES = {
         # ISO
         [%i[iso], :is] => :international_standard,
@@ -205,7 +177,7 @@ known_website_keys = Set.new)
         [%i[nist], :cs] => :commercial_standard,
         [%i[nist], :cse] => :commercial_standard_emergency,
         [%i[nist], :csm] => :commercial_standards_monthly,
-        # BSI — adopted types share keys with base types, need unique mappings
+        # BSI
         [%i[bsi], :bs] => :british_standard,
         [%i[bsi], :pd] => :published_document,
         [%i[bsi], :pas] => :publicly_available_specification,
@@ -242,54 +214,23 @@ known_website_keys = Set.new)
         [%i[ansi], :ans] => :american_national_standard,
       }.freeze
 
-      # Per-class overrides keyed by class name (for classes that share type keys)
-      CLASS_KEY_OVERRIDES = {
-        "Pubid::Bsi::Identifiers::AdoptedEuropeanNorm" => "adopted_european_norm",
-        "Pubid::Bsi::Identifiers::AdoptedInternationalStandard" => "adopted_international_standard",
-        "Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm" => "adopted_european_norm",
-        "Pubid::Ansi::Identifiers::Standard" => "standard",
-        "Pubid::Ansi::Identifiers::AmericanNationalStandard" => "american_national_standard",
-        "Pubid::Jis::Identifiers::Standard" => "standard",
-        "Pubid::Ieee::Identifiers::Nesc::Standard" => "nesc",
-        "Pubid::Ieee::Identifiers::Nesc::Draft" => "nesc",
-        "Pubid::Ieee::Identifiers::Nesc::Handbook" => "nesc",
-        "Pubid::Ieee::Identifiers::Nesc::Redline" => "nesc",
-      }.freeze
-
       def extract_type_info(klass)
         # Per-class override takes highest priority
         class_key = CLASS_KEY_OVERRIDES[klass.name]
         if class_key
-          type_info = begin
-            klass.type
-          rescue NoMethodError, NotImplementedError
-            nil
-          end
-          metadata = begin
-            klass.metadata
-          rescue NoMethodError
-            nil
-          end
+          type_info = safe_type(klass)
+          metadata = safe_metadata(klass)
           return {
             key: class_key,
-            title: type_info&.dig(:title) || metadata&.title || class_key.tr(
-              "_", " "
-            ).capitalize,
+            title: type_info&.dig(:title) || metadata&.title ||
+                     class_key.tr("_", " ").capitalize,
             short: type_info&.dig(:short) || metadata&.short,
             abbr: metadata&.abbr || [],
           }
         end
 
-        type_info = begin
-          klass.type
-        rescue NoMethodError, NotImplementedError
-          nil
-        end
-        metadata = begin
-          klass.metadata
-        rescue NoMethodError
-          nil
-        end
+        type_info = safe_type(klass)
+        metadata = safe_metadata(klass)
 
         lib_key = type_info&.dig(:key)
         title = type_info&.dig(:title) || metadata&.title
@@ -299,8 +240,7 @@ known_website_keys = Set.new)
         # Derive from class name when def self.type is missing
         unless lib_key
           class_name = klass.name&.split("::")&.last
-          lib_key = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/,
-                                                                      "")&.to_sym
+          lib_key = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/, "")&.to_sym
           title ||= class_name&.gsub(/([A-Z])/, ' \1')&.strip
         end
 
@@ -319,6 +259,7 @@ known_website_keys = Set.new)
         key_str = lib_key.to_s
         WEBSITE_KEY_OVERRIDES.each do |(flavors, from_key), to_key|
           next unless flavors.include?(flavor)
+
           return to_key.to_s if from_key.to_s == key_str
         end
         key_str
@@ -332,14 +273,10 @@ known_website_keys = Set.new)
         []
       end
 
-      # Map flavor keys to fixture directory names when they differ
-      FIXTURE_DIR_ALIASES = {}.freeze
-
+      # Fixture example extraction
       def fixture_examples
-        # __dir__ = lib/pubid/export → go up 3 levels to gem root, then spec/fixtures
         gem_root = File.expand_path("../../..", __dir__)
-        dir_name = FIXTURE_DIR_ALIASES[flavor] || flavor.to_s
-        base = File.join(gem_root, "spec", "fixtures", dir_name, "identifiers",
+        base = File.join(gem_root, "spec", "fixtures", flavor.to_s, "identifiers",
                          "pass")
         return {} unless Dir.exist?(base)
 
@@ -357,10 +294,8 @@ known_website_keys = Set.new)
         File.readlines(path, chomp: true).each do |line|
           next if line.start_with?("#") || line.strip.empty?
 
-          # Format: "!Type input!expected" or just "input"
           if line.start_with?("!")
             parts = line.split("!")
-            # ["", "Type", "input", "expected"] or ["", "Type", "input"]
             input = parts[2]&.strip
             identifiers << input if input && !input.empty?
           else
@@ -370,8 +305,24 @@ known_website_keys = Set.new)
         identifiers.uniq.first(10)
       end
 
-      def map_fixture_key_to_type_key(fixture_key)
-        fixture_key
+      def match_examples(fixture_data, type_key, klass)
+        return [] unless type_key
+
+        # Try direct type key match first
+        examples = fixture_data[type_key] ||
+          fixture_data[type_key.gsub("_", "")] ||
+          []
+
+        return examples if examples.any?
+
+        # Try class name match
+        class_name = klass.name&.split("::")&.last
+        snake_name = class_name&.gsub(/([A-Z])/, '_\1')&.downcase&.sub(/^_/, "")
+        if snake_name && fixture_data.key?(snake_name)
+          fixture_data[snake_name]
+        else
+          []
+        end
       end
 
       def extract_attributes(klass)
@@ -384,7 +335,7 @@ known_website_keys = Set.new)
         names = WRAPPER_CLASSES[flavor]
         return [] unless names
 
-        mod = scheme_module
+        mod = flavor_module
         return [] unless mod
 
         identifiers_mod = mod.const_get(:Identifiers)
@@ -402,6 +353,20 @@ known_website_keys = Set.new)
         rescue NameError
           nil
         end
+      end
+
+      private
+
+      def safe_type(klass)
+        klass.type
+      rescue NoMethodError, NotImplementedError
+        nil
+      end
+
+      def safe_metadata(klass)
+        klass.metadata
+      rescue NoMethodError
+        nil
       end
     end
   end
