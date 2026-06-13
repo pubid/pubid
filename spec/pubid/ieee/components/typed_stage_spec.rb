@@ -3,7 +3,6 @@
 require "spec_helper"
 require_relative "../../../../lib/pubid/ieee/components/typed_stage"
 require_relative "../../../../lib/pubid/ieee/typed_stages"
-require_relative "../../../../lib/pubid/ieee/scheme"
 
 RSpec.describe Pubid::Ieee::Components::TypedStage do
   describe "TypedStage component" do
@@ -137,29 +136,30 @@ RSpec.describe Pubid::Ieee::Components::TypedStage do
     end
   end
 
-  describe "Scheme class" do
-    describe ".locate_typed_stage_by_abbr" do
+  describe "Flavor module lookup" do
+    describe ".locate_stage" do
       it "finds stage by abbreviation" do
-        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_abbr("D5")
+        ts = Pubid::Ieee.locate_stage("D5")
         expect(ts.abbr).to include("D5")
       end
 
-      it "returns default for empty abbreviation" do
-        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_abbr("")
-        expect(ts).to eq(Pubid::Ieee::DEFAULT_TYPED_STAGE)
+      it "returns nil for empty abbreviation" do
+        ts = Pubid::Ieee.locate_stage("")
+        expect(ts).to be_nil
       end
     end
 
-    describe ".locate_typed_stage_by_ieee_draft" do
+    describe ".locate_stage_by_ieee_draft" do
       it "finds stage by IEEE draft notation" do
-        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_ieee_draft("D1")
+        ts = Pubid::Ieee.locate_stage_by_ieee_draft("D1")
+        expect(ts).not_to be_nil
         expect(ts.abbr).to include("D1")
       end
     end
 
-    describe ".locate_typed_stage_by_iso_stage" do
+    describe ".locate_stage_by_iso_stage" do
       it "finds stage by ISO stage code" do
-        ts = Pubid::Ieee::Scheme.locate_typed_stage_by_iso_stage("FDIS")
+        ts = Pubid::Ieee.locate_stage_by_iso_stage("FDIS")
         expect(ts.iso_stage_equivalent).to eq("FDIS")
       end
     end

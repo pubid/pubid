@@ -3,7 +3,7 @@
 module Pubid
   module Ashrae
     # Builder class for constructing ASHRAE identifier scheme from parsed data
-    # Single Responsibility: Transform parsed data into Scheme objects
+    # Single Responsibility: Transform parsed data into identifier objects
     class Builder
       attr_reader :identifier_class
 
@@ -13,7 +13,7 @@ module Pubid
 
       # Build a scheme object from parsed data
       # @param parsed [Hash, Array] the parsed identifier data
-      # @return [Scheme] the constructed scheme object
+      # @return [identifier] the constructed scheme object
       def build(parsed)
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
@@ -71,7 +71,7 @@ module Pubid
 
       # Extract and normalize attributes from parsed data
       # @param parsed [Hash] the parsed data
-      # @return [Hash] normalized attributes for Scheme
+      # @return [Hash] normalized attributes for identifier
       def extract_attributes(parsed)
         attributes = {}
 

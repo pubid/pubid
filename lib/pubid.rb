@@ -50,7 +50,6 @@ module Pubid
   autoload :Renderers, "pubid/renderers"
   autoload :FormatDetector, "pubid/format_detector"
   autoload :FormatRegistry, "pubid/format_registry"
-  autoload :Scheme, "pubid/scheme"
 
   autoload :UrnGenerator, "pubid/urn_generator/base"
   autoload :Builder, "pubid/builder/base"

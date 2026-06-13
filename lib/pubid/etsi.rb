@@ -10,7 +10,6 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/etsi/identifiers"
     autoload :Parser, "#{__dir__}/etsi/parser"
     autoload :Renderer, "#{__dir__}/etsi/renderer"
-    autoload :Scheme, "#{__dir__}/etsi/scheme"
     autoload :UrnGenerator, "#{__dir__}/etsi/urn_generator"
 
     def self.parse(identifier)
@@ -22,12 +21,12 @@ module Pubid
     Identifiers::Base.format_registry.register(:human, renderer: Etsi::Renderer)
 
     # Auto-discover all identifier types from the Identifiers namespace
-    # @return [Array<Class>] identifier classes that define a self.type Hash
+    # @return [Array<Class>] identifier classes (Pubid::Identifier subclasses)
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
-        .select { |c| c.type.is_a?(Hash) }
+        .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
+        .reject { |c| c.name&.split("::")&.last == "Base" }
     end
 
     # Build typed stage index from identifier types

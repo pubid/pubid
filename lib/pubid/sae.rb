@@ -8,20 +8,19 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/sae/identifiers"
     autoload :Parser, "#{__dir__}/sae/parser"
     autoload :Renderer, "#{__dir__}/sae/renderer"
-    autoload :Scheme, "#{__dir__}/sae/scheme"
     autoload :UrnGenerator, "#{__dir__}/sae/urn_generator"
 
     def self.parse(input)
       Identifier.parse(input)
     end
 
-    # Auto-discover all identifier types from the Identifiers namespace
-    # @return [Array<Class>] identifier classes that define a self.type Hash
+    # Auto-discover all identifier types from the Identifiers namespace.
+    # SAE has only one identifier class (Base), which IS the document type.
+    # @return [Array<Class>] identifier classes (Pubid::Identifier subclasses)
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
-        .select { |c| c.type.is_a?(Hash) }
+        .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
     end
 
     # Build typed stage index from identifier types

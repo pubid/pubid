@@ -10,7 +10,7 @@ module Pubid
       DASH_CHARS = ["-", "‑", "‐"].freeze
 
       # Supplement identifier type keys (kept as a hard-coded list to match
-      # the previous Scheme.split; only the base identifier registry
+      # the previous identifier split; only the base identifier registry
       # is auto-discovered from the Identifiers namespace).
       SUPPLEMENT_TYPE_KEYS = %i[amd cor suppl ext add].freeze
 

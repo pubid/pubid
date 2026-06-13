@@ -10,7 +10,6 @@ module Pubid
     autoload :Nesc, "#{__dir__}/ieee/nesc"
     autoload :Parser, "#{__dir__}/ieee/parser"
     autoload :Renderer, "#{__dir__}/ieee/renderer"
-    autoload :Scheme, "#{__dir__}/ieee/scheme"
     autoload :TypedStages, "#{__dir__}/ieee/typed_stages"
     autoload :UrnGenerator, "#{__dir__}/ieee/urn_generator"
 
@@ -32,7 +31,7 @@ module Pubid
       def identifier_types
         @identifier_types ||= Identifiers.constants
           .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-          .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+          .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
           .select { |c| c.type.is_a?(Hash) }
       end
 
@@ -55,6 +54,31 @@ module Pubid
       def locate_stage(abbr)
         abbr_str = abbr.to_s.upcase
         all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
+      end
+
+      # Lookup: IEEE draft notation -> typed stage
+      # @param draft [String] IEEE draft notation (e.g., "D1", "D5", "P")
+      # @return [Pubid::Components::TypedStage, nil] the matching typed stage
+      def locate_stage_by_ieee_draft(draft)
+        return nil if draft.nil? || draft.to_s.strip.empty?
+
+        draft_str = draft.to_s.strip
+
+        # Try exact match on abbreviation first
+        ts = all_typed_stages.find { |t| t.abbr.include?(draft_str) }
+        return ts if ts
+
+        # Try match on ieee_draft_equivalent
+        all_typed_stages.find { |t| t.ieee_draft_equivalent == draft_str }
+      end
+
+      # Lookup: ISO stage code -> typed stage
+      # @param stage [String] ISO stage code (e.g., "WD", "CD", "DIS", "FDIS")
+      # @return [Pubid::Components::TypedStage, nil] the matching typed stage
+      def locate_stage_by_iso_stage(stage)
+        return nil if stage.nil? || stage.to_s.strip.empty?
+
+        all_typed_stages.find { |ts| ts.iso_stage_equivalent == stage.to_s.strip }
       end
     end
   end

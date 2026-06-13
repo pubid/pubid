@@ -7,7 +7,6 @@ module Pubid
     autoload :Identifiers,  "#{__dir__}/iho/identifiers"
     autoload :Parser,       "#{__dir__}/iho/parser"
     autoload :Renderer,     "#{__dir__}/iho/renderer"
-    autoload :Scheme,       "#{__dir__}/iho/scheme"
     autoload :UrnGenerator, "#{__dir__}/iho/urn_generator"
 
     # Parse an IHO identifier string into an identifier object
@@ -21,13 +20,13 @@ module Pubid
     Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
     Identifiers::Base.format_registry.register(:human, renderer: Iho::Renderer)
 
-    # Auto-discover all identifier types from the Identifiers namespace
-    # @return [Array<Class>] identifier classes that define a self.type Hash
+    # Auto-discover all identifier types from the Identifiers namespace.
+    # @return [Array<Class>] identifier classes (Pubid::Identifier subclasses)
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
-        .select { |c| c.type.is_a?(Hash) }
+        .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
+        .reject { |c| c.name&.split("::")&.last == "Base" }
     end
 
     # Build typed stage index from identifier types
@@ -55,6 +54,14 @@ module Pubid
     def self.locate_stage(abbr)
       abbr_str = abbr.to_s.upcase
       all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
+    end
+
+    # Look up an identifier class by its IHO series letter (S/P/M/B/C).
+    # @param letter [String]
+    # @return [Class<Identifiers::Base>]
+    def self.identifier_klass_for_type_letter(letter)
+      @by_letter ||= identifier_types.to_h { |klass| [klass.type[:short], klass] }
+      @by_letter.fetch(letter.to_s)
     end
   end
 end

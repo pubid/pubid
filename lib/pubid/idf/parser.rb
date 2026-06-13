@@ -9,9 +9,10 @@ module Pubid
       include ::Pubid::Parser::CommonParseMethods
 
       # We need to sort by length to match longest first because that's how Parslet works
-      TYPED_STAGES = Pubid::Idf::Scheme.typed_stages
+      TYPED_STAGES = Pubid::Idf.all_typed_stages
         .map(&:abbr).flatten.sort_by(&:length).reverse
-      TYPED_STAGES_SUPPLEMENTS = Pubid::Idf::Scheme.supplement_typed_stages
+      TYPED_STAGES_SUPPLEMENTS = Pubid::Idf.all_typed_stages
+        .select { |ts| %w[amd cor].include?(ts.type_code.to_s) }
         .map(&:abbr).flatten.sort_by(&:length).reverse
 
       root :identifier

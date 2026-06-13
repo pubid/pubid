@@ -9,7 +9,6 @@ module Pubid
     autoload :Identifier, "#{__dir__}/itu/identifier"
     autoload :Identifiers, "#{__dir__}/itu/identifiers"
     autoload :Parser, "#{__dir__}/itu/parser"
-    autoload :Scheme, "#{__dir__}/itu/scheme"
     autoload :UrnGenerator, "#{__dir__}/itu/urn_generator"
     autoload :Model, "#{__dir__}/itu/model"
 
@@ -22,12 +21,12 @@ module Pubid
     end
 
     # Auto-discover all identifier types from the Identifiers namespace
-    # @return [Array<Class>] identifier classes that define a self.type Hash
+    # @return [Array<Class>] identifier classes (Pubid::Identifier subclasses)
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
-        .select { |c| c.type.is_a?(Hash) }
+        .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
+        .reject { |c| c.name&.split("::")&.last == "Base" }
     end
 
     # Build typed stage index from identifier types

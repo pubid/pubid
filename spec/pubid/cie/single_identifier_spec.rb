@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../../lib/pubid/cie/scheme"
+require "pubid"
 
 RSpec.describe Pubid::Cie::SingleIdentifier do
   describe "inheritance" do

@@ -7,7 +7,6 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/csa/identifiers"
     autoload :Parser, "#{__dir__}/csa/parser"
     autoload :Renderer, "#{__dir__}/csa/renderer"
-    autoload :Scheme, "#{__dir__}/csa/scheme"
     autoload :SingleIdentifier, "#{__dir__}/csa/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/csa/urn_generator"
     autoload :WrapperIdentifier, "#{__dir__}/csa/wrapper_identifier"
@@ -23,7 +22,7 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 
