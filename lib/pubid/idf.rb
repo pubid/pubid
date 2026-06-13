@@ -7,7 +7,6 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/idf/identifiers"
     autoload :Parser, "#{__dir__}/idf/parser"
     autoload :Renderer, "#{__dir__}/idf/renderer"
-    autoload :Scheme, "#{__dir__}/idf/scheme"
     autoload :SingleIdentifier, "#{__dir__}/idf/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/idf/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/idf/urn_generator"
@@ -29,7 +28,7 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 

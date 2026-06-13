@@ -52,7 +52,7 @@ module Pubid
 
       # Polymorphic type map for lutaml::Model key_value serialization
       # Maps polymorphic_name → class name for deserialization
-      # Validated by spec to stay in sync with Scheme.identifiers
+      # Validated by spec to stay in sync with identifier_types
       ISO_TYPE_MAP = {
         "pubid:iso:international-standard" => "Pubid::Iso::Identifiers::InternationalStandard",
         "pubid:iso:international-standardized-profile" => "Pubid::Iso::Identifiers::InternationalStandardizedProfile",

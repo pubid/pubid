@@ -17,7 +17,7 @@ module Pubid
           version: stringify(hash[:version]),
         }.compact
 
-        Scheme.identifier_klass_for_type_letter(type_letter).new(**attrs)
+        Pubid::Iho.identifier_klass_for_type_letter(type_letter).new(**attrs)
       end
 
       def self.build(parsed)

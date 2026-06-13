@@ -11,7 +11,6 @@ module Pubid
     autoload :Identifier, "#{__dir__}/cie/identifier"
     autoload :Identifiers, "#{__dir__}/cie/identifiers"
     autoload :Parser, "#{__dir__}/cie/parser"
-    autoload :Scheme, "#{__dir__}/cie/scheme"
     autoload :SingleIdentifier, "#{__dir__}/cie/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/cie/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/cie/urn_generator"
@@ -33,16 +32,10 @@ module Pubid
         .select { |c| c.is_a?(Class) && (c < SingleIdentifier || c < SupplementIdentifier) }
     end
 
-    # Build typed stage index from the Scheme's explicit lists
+    # Build typed stage index from identifier types.
     # @return [Array<Pubid::Components::TypedStage>] all typed stages
     def self.all_typed_stages
-      @all_typed_stages ||= Scheme.identifiers.flat_map do |klass|
-        if klass.const_defined?(:TYPED_STAGES)
-          klass.const_get(:TYPED_STAGES)
-        else
-          []
-        end
-      end + Scheme.supplement_identifiers.flat_map do |klass|
+      @all_typed_stages ||= identifier_types.flat_map do |klass|
         if klass.const_defined?(:TYPED_STAGES)
           klass.const_get(:TYPED_STAGES)
         else

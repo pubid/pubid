@@ -163,5 +163,5 @@ module Pubid
   end
 end
 
-# NOTE: Identifiers are now registered in the ISO Scheme class
-# The global registry has been removed in favor of per-flavor Schemes
+# NOTE: Identifiers are now registered in the ISO flavor module
+# The global registry has been removed in favor of self-describing types

@@ -17,13 +17,14 @@ module Pubid
     class Base
       attr_reader :identifier
 
-      def initialize(identifier_class = default_identifier_class)
+      def initialize(identifier_class = nil)
         @identifier_class = identifier_class
       end
 
       def build(data)
         data = flatten_array(data) if data.is_a?(Array)
-        identifier = @identifier_class.new
+        identifier_class = @identifier_class || default_identifier_class
+        identifier = identifier_class.new
         assign_attributes(identifier, data)
         identifier
       end
@@ -87,8 +88,9 @@ module Pubid
       }.freeze
 
       def locate_typed_stage(typed_stage_string)
-        typed_stage_string = "" if typed_stage_string.nil?
-        @scheme.locate_typed_stage_by_abbr(typed_stage_string)
+        raise NotImplementedError,
+              "#{self.class} must implement locate_typed_stage " \
+              "(rely on the flavor module's locate_stage method)"
       end
 
       def convert_roman_to_integer(roman_numeral)

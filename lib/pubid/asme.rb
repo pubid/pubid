@@ -8,7 +8,6 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/asme/identifiers"
     autoload :Parser, "#{__dir__}/asme/parser"
     autoload :Renderer, "#{__dir__}/asme/renderer"
-    autoload :Scheme, "#{__dir__}/asme/scheme"
     autoload :SingleIdentifier, "#{__dir__}/asme/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/asme/urn_generator"
 
@@ -25,7 +24,7 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 

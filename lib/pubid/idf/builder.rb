@@ -13,8 +13,8 @@ module Pubid
       }.freeze
 
       def build(parsed_hash)
-        typed_stage = Scheme.locate_typed_stage_by_abbr(parsed_hash[:type_with_stage])
-        identifier = Scheme.locate_identifier_klass_by_type_code(typed_stage.type_code).new
+        typed_stage = Pubid::Idf.locate_stage(parsed_hash[:type_with_stage])
+        identifier = Pubid::Idf.locate_type(typed_stage.type_code).new
 
         if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
           parsed_hash[:type_with_stage] = type_with_stage_fr
@@ -48,7 +48,7 @@ module Pubid
         when :type_with_stage
           iteration = value.to_s.match(/(\d+)$/)
           value = value.to_s.sub(iteration.to_s, "")
-          typed_stage = Scheme.locate_typed_stage_by_abbr(value || "")
+          typed_stage = Pubid::Idf.locate_stage(value || "")
           {
             stage: typed_stage.to_stage,
             type: typed_stage.to_type,

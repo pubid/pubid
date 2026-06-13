@@ -8,7 +8,6 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/oiml/identifiers"
     autoload :Parser, "#{__dir__}/oiml/parser"
     autoload :Renderer, "#{__dir__}/oiml/renderer"
-    autoload :Scheme, "#{__dir__}/oiml/scheme"
     autoload :SingleIdentifier, "#{__dir__}/oiml/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/oiml/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/oiml/urn_generator"
@@ -30,7 +29,7 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 

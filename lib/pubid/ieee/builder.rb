@@ -3,7 +3,7 @@
 module Pubid
   module Ieee
     # Builder class for constructing IEEE identifier scheme from parsed data
-    # Single Responsibility: Transform parsed data into Scheme objects
+    # Single Responsibility: Transform parsed data into identifier objects
     class Builder
       attr_accessor :original_input
       attr_reader :identifier_class
@@ -14,7 +14,7 @@ module Pubid
 
       # Build a scheme object from parsed data
       # @param parsed [Hash, Array] the parsed identifier data
-      # @return [Scheme] the constructed scheme object
+      # @return [identifier] the constructed identifier object
       def build(parsed)
         # Handle CSA dual published patterns
         if parsed[:ieee_portion] && parsed[:csa_portion]
@@ -458,7 +458,7 @@ module Pubid
           stage_abbr = attributes[:iso_stage]
           if stage_abbr
             attributes[:typed_stage] =
-              Ieee::Scheme.locate_typed_stage_by_abbr(stage_abbr)
+              Pubid::Ieee.locate_stage(stage_abbr)
           end
         else
           # IEEE format - lead party is IEEE
@@ -477,7 +477,7 @@ module Pubid
 
           # Create typed_stage for IEEE project
           attributes[:typed_stage] =
-            Ieee::Scheme.locate_typed_stage_by_abbr("P")
+            Pubid::Ieee.locate_stage("P")
         end
 
         Identifiers::JointDevelopment.new(**attributes)
@@ -575,7 +575,7 @@ module Pubid
       end
 
       # Determine which identifier class to use based on attributes
-      # CRITICAL: Use Scheme for type-based decisions, NOT hardcoded logic here
+      # CRITICAL: Use flavor module for type-based decisions, NOT hardcoded logic here
       # Builder's job is ONLY to cast types, not make business decisions
       def determine_identifier_class(attributes)
         # Check for AIEE publisher FIRST (AIEE has its own identifier class)
@@ -584,12 +584,12 @@ module Pubid
           return Ieee::Aiee::Identifier
         end
 
-        # Get type from attributes and use Scheme to locate class
+        # Get type from attributes and use flavor module to locate class
         type_code = attributes[:type]
 
-        # Use Scheme registry for type-to-class mapping
+        # Use flavor module for type-to-class mapping
         if type_code
-          klass = Ieee::Scheme.locate_identifier_klass_by_type_code(type_code)
+          klass = Pubid::Ieee.locate_type(type_code)
           return klass if klass
         end
 
@@ -678,7 +678,7 @@ module Pubid
 
       # Extract and normalize attributes from parsed data
       # @param parsed [Hash] the parsed data
-      # @return [Hash] normalized attributes for Scheme
+      # @return [Hash] normalized attributes for identifier
       def extract_attributes(parsed)
         attributes = {}
 
@@ -785,7 +785,7 @@ module Pubid
         end
 
         # Set type attribute for backward compatibility (after P extraction)
-        # NOTE: "P" IS a type code that maps to ProjectDraftIdentifier via Scheme
+        # NOTE: "P" IS a type code that maps to ProjectDraftIdentifier via flavor module
         # Type can be: "Std", "No", "P" (project draft), etc.
         attributes[:type] = type_value if type_value
 
@@ -794,7 +794,7 @@ module Pubid
                                                 parsed)
         if typed_stage_abbr
           attributes[:typed_stage] =
-            Ieee::Scheme.locate_typed_stage_by_abbr(typed_stage_abbr)
+            Pubid::Ieee.locate_stage(typed_stage_abbr)
         end
 
         attributes[:draft_status] = draft_status_value
@@ -880,7 +880,7 @@ module Pubid
             if version
               draft_abbr = "D#{version}"
               # Check if this specific draft stage is in registry
-              stage = Ieee::Scheme.locate_typed_stage_by_abbr(draft_abbr)
+              stage = Pubid::Ieee.locate_stage(draft_abbr)
               return draft_abbr if stage&.abbr&.include?(draft_abbr)
             end
           end

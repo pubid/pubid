@@ -10,7 +10,6 @@ module Pubid
     autoload :Ire, "#{__dir__}/ire"
     autoload :Nesc, "#{__dir__}/nesc"
     autoload :Parser, "#{__dir__}/parser"
-    autoload :Scheme, "#{__dir__}/scheme"
     autoload :TypedStages, "#{__dir__}/typed_stages"
     autoload :UrnGenerator, "#{__dir__}/urn_generator"
 
