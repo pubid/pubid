@@ -1,9 +1,8 @@
 require "spec_helper"
 
 RSpec.describe Pubid::CenCenelec::Identifiers::CenWorkshopAgreement do
-  let(:scheme) { Pubid::CenCenelec::Scheme.new }
   let(:parser) { Pubid::CenCenelec::Parser.new }
-  let(:builder) { Pubid::CenCenelec::Builder.new(scheme) }
+  let(:builder) { Pubid::CenCenelec::Builder.new }
 
   describe "#to_s" do
     context "basic CWA identifiers" do

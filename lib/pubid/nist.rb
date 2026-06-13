@@ -13,9 +13,37 @@ module Pubid
     autoload :ParserOutputNormalizer, "#{__dir__}/nist/parser_output_normalizer"
     autoload :Renderer, "#{__dir__}/nist/renderer"
     autoload :Router, "#{__dir__}/nist/router"
-    autoload :Scheme, "#{__dir__}/nist/scheme"
     autoload :SupplementIdentifier, "#{__dir__}/nist/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/nist/urn_generator"
+
+    # Explicit registry of NIST identifier classes.
+    #
+    # NIST identifier classes use `typed_stages` (not the `self.type` Hash
+    # pattern used by CEN/JCGM/ANSI), so they cannot be auto-discovered.
+    # Identifiers::Base is the fallback for unmapped series (e.g. AMS, VTS)
+    # and must be excluded from typed-stage aggregation.
+    IDENTIFIER_TYPES = [
+      Identifiers::SpecialPublication,
+      Identifiers::FederalInformationProcessingStandards,
+      Identifiers::InteragencyReport,
+      Identifiers::Handbook,
+      Identifiers::TechnicalNote,
+      Identifiers::Circular,
+      Identifiers::CircularSupplement,
+      Identifiers::CrplReport,
+      Identifiers::Report,
+      Identifiers::Monograph,
+      Identifiers::MiscellaneousPublication,
+      Identifiers::GrantContractorReport,
+      Identifiers::Ncstar,
+      Identifiers::Owmwp,
+      Identifiers::Nsrds,
+      Identifiers::LetterCircular,
+      Identifiers::CommercialStandard,
+      Identifiers::CommercialStandardEmergency,
+      Identifiers::CommercialStandardsMonthly,
+      Identifiers::Base, # Fallback for unmapped series
+    ].freeze
 
     # Parse a NIST identifier string
     # @param identifier [String] the identifier string to parse
@@ -25,9 +53,8 @@ module Pubid
       # Note: We call the class method directly to ensure preprocessing is applied
       parsed = Parser.class_parse_with_preprocessing(identifier)
 
-      # Use Scheme and Builder for clean architecture
-      # ONE CLASS PER SERIES TYPE (like ISO)
-      builder = Builder.new(Scheme)
+      # Builder is stateless — lookups go through this module (Pubid::Nist)
+      builder = Builder.new
       builder.build(parsed)
     end
 
@@ -41,34 +68,37 @@ module Pubid
     Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
     Identifiers::Base.format_registry.register(:human, renderer: Nist::Renderer)
 
-    # Auto-discover all identifier types via Scheme registry
-    # NIST identifier classes use typed_stages (not self.type Hash),
-    # so we delegate to the Scheme's explicit list.
-    # @return [Array<Class>] identifier classes registered in the Scheme
+    # All identifier classes for external consumption (export, website).
+    # Identifiers::Base is the fallback for unmapped series and is excluded
+    # from external type listings.
+    # @return [Array<Class>] identifier classes
     def self.identifier_types
-      @identifier_types ||= Scheme.identifiers
+      IDENTIFIER_TYPES.reject { |klass| klass == Identifiers::Base }
     end
 
-    # Build typed stage index from Scheme
+    # Aggregate TYPED_STAGES from all identifier classes.
+    # Identifiers::Base is excluded because it has no typed stages and acts
+    # as the fallback for unmapped series.
     # @return [Array<Pubid::Components::TypedStage>] all typed stages
     def self.all_typed_stages
-      @all_typed_stages ||= Scheme.typed_stages
+      @all_typed_stages ||= identifier_types
+        .reject { |klass| klass == Identifiers::Base }
+        .flat_map(&:typed_stages)
+        .freeze
     end
 
-    # Lookup: type code -> identifier class
-    # Delegates to Scheme for NIST-specific lookup (uses typed_stages.type_code)
+    # Lookup: type code -> identifier class.
+    # Identifiers::Base is excluded so it never gets selected by type code.
     # @param code [String, Symbol] the type code to find
-    # @return [Class, nil] the matching identifier class
+    # @return [Class, nil] the matching identifier class, or nil
     def self.locate_type(code)
-      begin
-        Scheme.locate_identifier_klass_by_type_code(code)
-      rescue ArgumentError
-        nil
-      end
+      type_str = code.to_s
+      identifier_types
+        .reject { |klass| klass == Identifiers::Base }
+        .find { |klass| klass.typed_stages.any? { |ts| ts.type_code.to_s == type_str } }
     end
 
     # Lookup: abbreviation -> typed stage
-    # Delegates to Scheme for NIST-specific lookup
     # @param abbr [String, Symbol] the abbreviation to find
     # @return [Pubid::Components::TypedStage, nil] the matching typed stage
     def self.locate_stage(abbr)

@@ -5,9 +5,8 @@ module Pubid
     # Router class for NIST series-to-class mapping
     # Single Responsibility: Resolve parsed data to the correct identifier class
     #
-    # Extracted from Scheme to isolate routing logic from registry concerns.
-    # Router depends on Scheme for registry lookups (typed_stages, identifiers)
-    # but is independently testable.
+    # Delegates to Pubid::Nist.locate_stage / Pubid::Nist.locate_type
+    # for series-to-class resolution.
     class Router
       # All valid series codes (comprehensive list)
       VALID_SERIES = [
@@ -118,11 +117,12 @@ module Pubid
 
         # Look up using TYPED_STAGES registry (replaces series_to_class_map)
         # This handles simple series, compound series (via abbr array), and all variants
-        begin
-          typed_stage = Scheme.locate_typed_stage_by_abbr(series)
-          type_code = typed_stage.type_code
-          Scheme.locate_identifier_klass_by_type_code(type_code)
-        rescue ArgumentError
+        # Delegates to Pubid::Nist.locate_stage / Pubid::Nist.locate_type
+        # instead of an injected dependency.
+        typed_stage = Pubid::Nist.locate_stage(series)
+        if typed_stage
+          Pubid::Nist.locate_type(typed_stage.type_code) || Identifiers::Base
+        else
           # Fallback to Base for unmapped series (e.g., "AMS", "VTS")
           Identifiers::Base
         end

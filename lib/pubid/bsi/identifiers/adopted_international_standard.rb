@@ -16,6 +16,15 @@ module Pubid
         attribute :expert_commentary, :boolean
         attribute :expert_commentary_topic, :string
 
+        # Override self.type to return nil so this polymorphic wrapper is not
+        # registered as a base type. Inherits `:bs` from BritishStandard which
+        # would otherwise shadow it in Bsi.locate_type(:bs) auto-discovery.
+        # AdoptedInternationalStandard is constructed explicitly by the builder,
+        # not selected by type-code lookup.
+        def self.type
+          nil
+        end
+
         def to_s
           render(format: :human)
         end

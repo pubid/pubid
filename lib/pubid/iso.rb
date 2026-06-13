@@ -50,7 +50,7 @@ module Pubid
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
-        .select { |c| c.is_a?(Class) && c.respond_to?(:type) }
+        .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
 
