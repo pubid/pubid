@@ -66,7 +66,7 @@ module Pubid
           super
         end
 
-        private
+        public
 
         def to_short_style
           # Call parent implementation

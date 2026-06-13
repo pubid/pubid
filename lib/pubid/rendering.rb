@@ -3,7 +3,6 @@
 module Pubid
   module Rendering
     autoload :Date, "pubid/rendering/date"
-    autoload :Format, "pubid/rendering/format"
     autoload :Language, "pubid/rendering/language"
     autoload :Numbering, "pubid/rendering/numbering"
     autoload :Publisher, "pubid/rendering/publisher"

@@ -44,7 +44,7 @@ module Pubid
           end
         end
 
-        private
+        public
 
         def to_short_style
           result = "#{default_publisher} #{series_code}"

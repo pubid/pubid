@@ -12,6 +12,8 @@ module Pubid
         "short"
       } # Track supplement's parsed format
 
+      attr_reader :requested_format
+
       def to_s(format: nil, **opts)
         @requested_format = format
         render(format: :human, **opts)

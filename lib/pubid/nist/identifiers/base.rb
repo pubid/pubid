@@ -290,7 +290,7 @@ module Pubid
           match ? match[1].to_i : nil
         end
 
-        private
+        public
 
         def to_full_style
           # "National Institute of Standards and Technology Special Publication 800-27, Revision A"

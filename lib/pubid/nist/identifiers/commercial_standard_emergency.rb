@@ -30,7 +30,7 @@ module Pubid
           "CS-E"
         end
 
-        private
+        public
 
         def to_short_style
           result = ""

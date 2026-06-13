@@ -33,7 +33,7 @@ module Pubid
       private
 
       def effective_format(id)
-        id.instance_variable_get(:@requested_format) ||
+        id.requested_format ||
           (id.parsed_format == "long" ? :long : :short)
       end
 
