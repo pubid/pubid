@@ -46,6 +46,16 @@ module Pubid
       def stage
         typed_stage&.to_stage
       end
+
+      # Return a copy with the lifecycle stage set from an ISO harmonized stage
+      # code (e.g. "90.92"). typed_stage is the single source of truth, so this
+      # is all that is needed to surface the stage in #to_s and #to_urn. Returns
+      # an unchanged copy if the code is not recognised.
+      def with_harmonized_stage(harmonized_code)
+        ts = Pubid::Iso.locate_stage_by_harmonized_code(harmonized_code)
+        ts ? dup.tap { |id| id.typed_stage = ts } : dup
+      end
+
       attribute :number, ::Pubid::Iso::Components::Code
       attribute :part, ::Pubid::Iso::Components::Code
       attribute :subpart, ::Pubid::Iso::Components::Code

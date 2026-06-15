@@ -242,4 +242,23 @@ RSpec.describe Pubid::Iso::Identifier do
       end
     end
   end
+
+  describe "#with_harmonized_stage" do
+    let(:id) { described_class.parse("ISO 19115-1") }
+
+    it "returns a copy with the stage set from a harmonized code" do
+      expect(id.with_harmonized_stage("90.92").to_urn)
+        .to eq("urn:iso:std:iso:19115:-1:stage-90.92")
+    end
+
+    it "does not mutate the receiver" do
+      id.with_harmonized_stage("90.92")
+      expect(id.to_urn).to eq("urn:iso:std:iso:19115:-1")
+    end
+
+    it "returns an unchanged copy when the code is unknown" do
+      expect(id.with_harmonized_stage("99.99").to_urn)
+        .to eq("urn:iso:std:iso:19115:-1")
+    end
+  end
 end
