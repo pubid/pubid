@@ -273,6 +273,64 @@ RSpec.describe "ISO URN Generation and Parsing" do
     end
   end
 
+  # --- Regression: document type vs. stage (relaton-iso #184) ---
+  #
+  # The document type is owned by the identifier class; in a URN, type and
+  # stage are separate fields. A stage stamped from a shared harmonized code
+  # (e.g. 90.93, which only exists as the IS-typed "WDA" stage) must not drop
+  # or change the document type token. relaton-iso stamps the authoritative
+  # stage from ISO Open Data's `currentStage` by assigning such a typed_stage,
+  # which previously turned `iso-iec:tr:...` into `iso-iec:...` (lost `tr`).
+  describe "document type is independent of stamped stage" do
+    # The only typed stage covering harmonized 90.93 is the IS-typed "WDA".
+    let(:withdrawal_stage) do
+      Pubid::Iso.all_typed_stages.find do |s|
+        Array(s.harmonized_stages).include?("90.93")
+      end
+    end
+
+    {
+      "ISO/IEC TR 12382:1992" => "urn:iso:std:iso-iec:tr:12382:stage-90.93",
+      "ISO/IEC TS 17021" => "urn:iso:std:iso-iec:ts:17021:stage-90.93",
+      "ISO/IEC PAS 12345" => "urn:iso:std:iso-iec:pas:12345:stage-90.93",
+      "ISO/IEC Guide 99" => "urn:iso:std:iso-iec:guide:99:stage-90.93",
+      "ISO/R 102:1959" => "urn:iso:std:iso:r:102:stage-90.93",
+    }.each do |ref, expected_urn|
+      it "keeps the type token for #{ref} when a 90.93 stage is stamped" do
+        id = Pubid::Iso.parse(ref)
+        id.typed_stage = withdrawal_stage
+        expect(id.to_urn).to eq(expected_urn)
+      end
+    end
+
+    it "renders the reported #184 identifier with the tr token" do
+      id = Pubid::Iso.parse("ISO/IEC TR 12382")
+      id.typed_stage = withdrawal_stage
+      expect(id.to_urn).to eq("urn:iso:std:iso-iec:tr:12382:stage-90.93")
+    end
+  end
+
+  describe "round-trips a typed URN carrying a cross-type stage" do
+    {
+      "urn:iso:std:iso-iec:tr:12382:stage-90.93" =>
+        Pubid::Iso::Identifiers::TechnicalReport,
+      "urn:iso:std:iso-iec:ts:17021:stage-90.93" =>
+        Pubid::Iso::Identifiers::TechnicalSpecification,
+      "urn:iso:std:iso-iec:pas:12345:stage-90.93" =>
+        Pubid::Iso::Identifiers::Pas,
+      "urn:iso:std:iso:guide:99:stage-90.93" =>
+        Pubid::Iso::Identifiers::Guide,
+      "urn:iso:std:iso:r:102:stage-90.93" =>
+        Pubid::Iso::Identifiers::Recommendation,
+    }.each do |urn, klass|
+      it "parses #{urn} as #{klass.name.split('::').last} and round-trips" do
+        id = Pubid::Iso.parse_urn(urn)
+        expect(id).to be_a(klass)
+        expect(id.to_urn).to eq(urn)
+      end
+    end
+  end
+
   # --- RFC 5141 examples ---
   describe "RFC 5141 examples" do
     # These examples are from RFC 5141 §2.4.2

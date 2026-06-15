@@ -32,6 +32,16 @@ module Pubid
           return Identifiers::TcDocument
         end
 
+        # An explicit document type (e.g. from a URN's `:tr:`/`:ts:` token) pins
+        # the class regardless of the stage. The stage and type are separate URN
+        # fields, but the stage is later folded into `:type_with_stage` (e.g.
+        # "WDA" for 90.93), which would otherwise mis-resolve the class to the
+        # stage's owning type (IS). Consume the hint here, before assign_attributes.
+        if (doc_type = parsed_hash.delete(:document_type))
+          type_stage = locate_typed_stage(doc_type)
+          return Pubid::Iso.locate_type(type_stage.type_code) if type_stage
+        end
+
         # Check the `:type_with_stage` to determine the identifier class
         # 1. :type_with_stage will be nil if:
         # a) It is an IS.
