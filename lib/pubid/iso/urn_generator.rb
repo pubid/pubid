@@ -254,12 +254,28 @@ module Pubid
         publishers.map(&:body).map(&:downcase).join("-")
       end
 
+      # The document type code is owned by the identifier's *class*, not by the
+      # attached typed_stage. In a URN, type and stage are separate fields
+      # (e.g. `:tr:` and `:stage-90.93`), so a stage stamped from another type
+      # — e.g. the shared harmonized stage 90.93, which only exists as the
+      # IS-typed "WDA" stage — must not change the rendered document type.
+      # Falls back to the typed_stage's type_code for classes that declare no
+      # document type (e.g. BundledIdentifier).
+      def document_type_code
+        klass = identifier.class
+        if klass.respond_to?(:type) && klass.type.is_a?(Hash) && klass.type[:key]
+          klass.type[:key]
+        else
+          identifier.typed_stage&.type_code
+        end
+      end
+
       # Generate type component
       # RFC 5141-bis: supports extended document types (dir, dir-sup, iwa-sup)
       def type_component
         return nil unless identifier.typed_stage
 
-        type_code = identifier.typed_stage.type_code
+        type_code = document_type_code
         # International Standard is default (skip it)
         return nil if !type_code || type_code.to_s == "is"
 
@@ -294,12 +310,12 @@ module Pubid
         return nil if !stage_code || stage_code == :published
 
         # Try combined stage+type code first (e.g., "cdts" for CD+TS)
-        # This handles typed stages where stage_code differs from the full typed stage code
+        # This handles typed stages where stage_code differs from the full typed stage code.
+        # Use the class-owned document type so a cross-type stage can't mislabel it.
         combined_key = nil
-        if identifier.typed_stage.type_code &&
-            identifier.typed_stage.type_code != "is" &&
-            identifier.typed_stage.type_code.to_s != ""
-          combined_key = :"#{stage_code}#{identifier.typed_stage.type_code}"
+        dtc = document_type_code&.to_s
+        if dtc && dtc != "is" && dtc != ""
+          combined_key = :"#{stage_code}#{dtc}"
         end
 
         stage_abbr = if combined_key && TYPED_STAGE_MAP.key?(combined_key)
@@ -385,7 +401,7 @@ module Pubid
         urn_override = identifier.urn_supplement_type
         return urn_override if urn_override
 
-        identifier.typed_stage.type_code.to_s
+        document_type_code.to_s
       end
 
       # Generate supplement year/version components

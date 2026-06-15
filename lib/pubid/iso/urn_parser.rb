@@ -336,6 +336,11 @@ module Pubid
         # Add type_with_stage if type_code is present
         if type_code && type_code != :is
           base_hash[:type_with_stage] = type_code.to_s.upcase
+          # Pin the document class to the explicit URN type token. The stage
+          # block below may overwrite :type_with_stage with the stage's abbr
+          # (e.g. "WDA" for 90.93, which only exists as an IS-typed stage), so
+          # the builder needs this hint to keep e.g. TR a TechnicalReport.
+          base_hash[:document_type] = type_code.to_s.upcase
         end
 
         # Add stage if present
