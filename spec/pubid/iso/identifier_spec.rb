@@ -261,4 +261,21 @@ RSpec.describe Pubid::Iso::Identifier do
         .to eq("urn:iso:std:iso:19115:-1")
     end
   end
+
+  describe "copublisher round-trip" do
+    # from_hash must restore the top-level `copublishers` collection the same
+    # way parse builds it, otherwise a deserialized id never == a parsed one
+    # (== compares `copublishers`). See Iso index matching for ISO/IEC docs.
+    it "from_hash(to_hash) equals parse for a copublished id" do
+      id = described_class.parse("ISO/IEC 2382:2015")
+      expect(described_class.from_hash(id.to_hash)).to eq(id)
+    end
+
+    it "from_hash restores the copublishers collection" do
+      id = described_class.from_hash(
+        described_class.parse("ISO/IEC 2382:2015").to_hash,
+      )
+      expect(id.copublishers.map { |c| c.publisher.to_s }).to eq(["IEC"])
+    end
+  end
 end

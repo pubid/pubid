@@ -237,7 +237,16 @@ module Pubid
 
       def copublishers_from_kv(model, value)
         list = Array(value).map(&:to_s)
-        publisher_for(model).copublisher = list if list.any?
+        return unless list.any?
+
+        # Mirror Builder#parse: copublishers live both on the primary
+        # publisher (as strings) and as the top-level `copublishers`
+        # collection of Publisher objects. `==` compares the latter, so
+        # populate both or a deserialized id never equals a parsed one.
+        publisher_for(model).copublisher = list
+        model.copublishers = list.map do |cp|
+          ::Pubid::Iso::Components::Publisher.new(publisher: cp)
+        end
       end
 
       def publisher_for(model)
