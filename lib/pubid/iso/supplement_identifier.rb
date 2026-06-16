@@ -15,15 +15,19 @@ module Pubid
         }
       end
 
+      # A supplement carries the publisher/copublishers of the document it
+      # supplements. Delegate to the root rather than the immediate base so a
+      # nested supplement (e.g. ".../Amd 1/Cor 1") reads identity from the
+      # underlying standard in one hop, regardless of chain depth. This keeps a
+      # parsed supplement and a from_hash-deserialized one in agreement (== and
+      # index matching compare both). Guard on base_identifier: `root` returns
+      # self when there is no base, which would otherwise recurse forever.
       def publisher
-        base_identifier&.publisher
+        root.publisher if base_identifier
       end
 
-      # A supplement's copublishers are the base's — delegate like #publisher,
-      # so a parsed supplement and a from_hash-deserialized one agree (== and
-      # index matching compare the copublishers collection).
       def copublishers
-        base_identifier&.copublishers
+        root.copublishers if base_identifier
       end
 
       def to_s(**opts)

@@ -287,5 +287,11 @@ RSpec.describe Pubid::Iso::Identifier do
       id = described_class.parse("ISO/IEC 23008-1/WD Amd 1")
       expect(id.copublishers.map { |c| c.publisher.to_s }).to eq(["IEC"])
     end
+
+    it "resolves copublishers from the root for a nested supplement" do
+      id = described_class.parse("ISO/IEC 23008-1:2023/Amd 1/Cor 1")
+      expect(id.copublishers.map { |c| c.publisher.to_s }).to eq(["IEC"])
+      expect(described_class.from_hash(id.to_hash)).to eq(id)
+    end
   end
 end
