@@ -277,5 +277,15 @@ RSpec.describe Pubid::Iso::Identifier do
       )
       expect(id.copublishers.map { |c| c.publisher.to_s }).to eq(["IEC"])
     end
+
+    it "round-trips a copublished supplement (copublishers delegate to base)" do
+      id = described_class.parse("ISO/IEC 23008-1/WD Amd 1")
+      expect(described_class.from_hash(id.to_hash)).to eq(id)
+    end
+
+    it "exposes the base copublishers on a supplement" do
+      id = described_class.parse("ISO/IEC 23008-1/WD Amd 1")
+      expect(id.copublishers.map { |c| c.publisher.to_s }).to eq(["IEC"])
+    end
   end
 end
