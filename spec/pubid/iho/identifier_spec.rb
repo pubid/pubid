@@ -86,4 +86,47 @@ RSpec.describe Pubid::Iho::Identifier do
       end
     end
   end
+
+  describe "key_value serialization" do
+    # Used by the relaton index: each id is stored as #to_hash and rebuilt via
+    # .from_hash, so the round-trip must be lossless and the hash must be lean.
+    [
+      "IHO S-100 5.2.0",
+      "IHO S-100 Part 4b 5.2.0",
+      "IHO S-122 Ap. D-2 1.0.0",
+      "IHO S-100 Annex A 5.2.0",
+      "IHO S-66 Suppl 1 2.0.0",
+      "IHO B-1 1.0.0",
+      "IHO P-1/21 1.0.0",
+      "IHO M-3 2.0.0",
+      "IHO C-13 1.0.0",
+    ].each do |canonical|
+      context "with #{canonical.inspect}" do
+        let(:pubid) { Pubid::Iho.parse(canonical) }
+
+        it "round-trips losslessly through to_hash/from_hash" do
+          expect(Pubid::Iho::Identifier.from_hash(pubid.to_hash).to_s)
+            .to eq(canonical)
+        end
+
+        it "stores the document number under :number" do
+          expect(pubid.to_hash["number"]).to eq(pubid.number)
+        end
+
+        it "omits the derived :code and default :publisher keys" do
+          expect(pubid.to_hash).not_to include("code", "publisher")
+        end
+      end
+    end
+
+    it "exposes the document number via #number for index narrowing" do
+      expect(Pubid::Iho.parse("IHO S-100 Part 5").number).to eq("100")
+    end
+
+    it "covers every identifier type in IHO_TYPE_MAP" do
+      expected = Pubid::Iho.identifier_types.map(&:polymorphic_name).sort
+      expect(Pubid::Iho::Identifiers::Base::IHO_TYPE_MAP.keys.sort)
+        .to eq(expected)
+    end
+  end
 end

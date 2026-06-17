@@ -14,6 +14,14 @@ module Pubid
       rescue Parslet::ParseFailed => e
         raise "Failed to parse IHO identifier '#{identifier}': #{e.message}"
       end
+
+      # Reconstruct an IHO identifier from its key_value hash (e.g. a relaton
+      # index row). Routes to the concrete subclass via `_type`.
+      # @param data [Hash] the serialized identifier hash
+      # @return [Pubid::Iho::Identifiers::Base]
+      def self.from_hash(data, options = {})
+        Identifiers::Base.from_hash(data, options)
+      end
     end
   end
 end

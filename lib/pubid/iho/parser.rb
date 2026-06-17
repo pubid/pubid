@@ -19,8 +19,8 @@ module Pubid
         (str(":") >> digits) | (str("/") >> digits) | (dash >> digits) | match("[A-Z]")
       end
 
-      rule(:code) do
-        (digits >> number_suffix.maybe).as(:code)
+      rule(:number) do
+        (digits >> number_suffix.maybe).as(:number)
       end
 
       rule(:appendix) do
@@ -54,7 +54,7 @@ module Pubid
 
       rule(:identifier) do
         (str("IHO") >> space).maybe >>
-          series >> dash >> code >>
+          series >> dash >> number >>
           appendix.maybe >> part.maybe >> annex.maybe >> supplement.maybe >> version.maybe
       end
 
