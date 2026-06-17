@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
-require_relative "../rendering/context" if File.exist?(File.join(__dir__,
-                                                                 "../../rendering/context.rb"))
 
 module Pubid
   module Components

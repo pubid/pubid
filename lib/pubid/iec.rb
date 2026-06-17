@@ -2,17 +2,9 @@
 
 module Pubid
   module Iec
-  end
-end
-
-# Namespace files (autoload their children)
-require_relative "iec/components"
-require_relative "iec/identifiers"
-
-# Autoload top-level IEC constants
-module Pubid
-  module Iec
+    autoload :Components, "#{__dir__}/iec/components"
     autoload :Identifier, "#{__dir__}/iec/identifier"
+    autoload :Identifiers, "#{__dir__}/iec/identifiers"
     autoload :SingleIdentifier, "#{__dir__}/iec/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/iec/supplement_identifier"
     autoload :Parser, "#{__dir__}/iec/parser"
@@ -22,25 +14,18 @@ module Pubid
     autoload :RenderingStyle, "#{__dir__}/iec/rendering_style"
     autoload :Renderer, "#{__dir__}/iec/renderer"
 
-    # Main entry point for IEC identifiers
     def self.parse(identifier_string)
       parsed = Parser.new.parse(identifier_string)
       Builder.new.build(parsed)
     end
 
-    # Parse an IEC URN string
-    # @param urn [String] the URN string to parse
-    # @return [Identifier] the parsed identifier
-    # @raise [Errors::ParseError] if URN is invalid
     def self.parse_urn(urn)
       UrnParser.parse(urn)
     end
-    # Per-flavor format registry: inherits global formats, overrides :human
+
     Identifier.format_registry = FormatRegistry.new(parent: Identifier.format_registry)
     Identifier.format_registry.register(:human, renderer: Iec::Renderer)
 
-    # Auto-discover all identifier types from the Identifiers namespace
-    # @return [Array<Class>] identifier classes that define a self.type Hash
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
@@ -48,8 +33,6 @@ module Pubid
         .select { |c| begin; c.type.is_a?(Hash); rescue NotImplementedError; false; end }
     end
 
-    # Build typed stage index from identifier types
-    # @return [Array<Pubid::Components::TypedStage>] all typed stages
     def self.all_typed_stages
       @all_typed_stages ||= identifier_types.flat_map do |klass|
         if klass.const_defined?(:TYPED_STAGES)
@@ -60,16 +43,10 @@ module Pubid
       end
     end
 
-    # Lookup: type code -> identifier class
-    # @param code [String, Symbol] the type key to find
-    # @return [Class, nil] the matching identifier class
     def self.locate_type(code)
       identifier_types.find { |t| t.type[:key].to_s == code.to_s }
     end
 
-    # Lookup: abbreviation -> typed stage
-    # @param abbr [String, Symbol] the abbreviation to find
-    # @return [Pubid::Components::TypedStage, nil] the matching typed stage
     def self.locate_stage(abbr)
       abbr_str = abbr.to_s.upcase
       all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }

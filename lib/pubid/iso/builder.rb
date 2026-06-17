@@ -265,7 +265,6 @@ module Pubid
         when :joint_identifier
           case value[:publisher]
           when "IDF"
-            require_relative "../idf/builder"
             Idf::Builder.new.build(value)
           end
 

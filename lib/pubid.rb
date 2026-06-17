@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
-require_relative "pubid/lutaml/no_store_registration"
 require "parslet"
+
+# Eagerly load the Lutaml::Model patch (disables reference store to avoid
+# unbounded memory growth during bulk parsing, and adds a default +to_urn+
+# implementation to every Serializable). This must apply before any Pubid
+# code runs.
+require "pubid/lutaml/no_store_registration"
 
 module Pubid
   # Registry for tracking all loaded flavors

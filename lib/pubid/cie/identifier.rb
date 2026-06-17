@@ -2,12 +2,14 @@
 
 module Pubid
   module Cie
-    # Base Identifier class for CIE
-    # Provides parse() entry point
-    class Identifier < Lutaml::Model::Serializable
+    # Base Identifier class for CIE.
+    #
+    # Inherits the shared Pubid::Identifier contract (format_registry, render,
+    # to_urn, exclude, hash, eql?) while allowing CIE-specific attributes
+    # such as +style+ ("legacy" vs "current" date separator).
+    class Identifier < ::Pubid::Identifier
       attribute :style, :string # "legacy" or "current"
 
-      # Parse CIE identifier string
       def self.parse(input)
         parsed = Parser.parse(input)
         builder = Builder.new

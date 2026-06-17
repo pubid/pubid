@@ -3,12 +3,15 @@
 module Pubid
   module Ccsds
     module Identifiers
-      # CCSDS identifier
-      # Format: CCSDS NUMBER.PART-TYPE-EDITION[-SUFFIX]
-      # Example: CCSDS 120.0-G-4, CCSDS 100.0-G-1-S
-      class Base < Lutaml::Model::Serializable
-        # CCSDS uses a simple architecture without typed stages
-        # TYPED_STAGES includes default stage for base identifiers
+      # CCSDS base identifier.
+      #
+      # Format: CCSDS NUMBER.PART-TYPE-EDITION[-SUFFIX][ - LANGUAGE Translated]
+      # Examples: CCSDS 120.0-G-4, CCSDS 100.0-G-1-S, CCSDS 551.1-O-2 - Russian Translated
+      #
+      # CCSDS uses plain strings for `type` (book-color letter: B, G, M, R, Y, O),
+      # `suffix`, and `language` (language name) because they are CCSDS-specific
+      # semantics that do not map cleanly onto the shared Components model.
+      class Base < ::Pubid::Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: [""],
@@ -17,71 +20,29 @@ module Pubid
           ),
         ].freeze
 
-        # Type information for this identifier class
-        #
-        # @return [Hash] Type information with key, title, and short form
+        # CCSDS-specific attributes. `type` overrides the inherited
+        # Components::Type because CCSDS uses single book-color letters
+        # (B/G/M/R/Y/O) rather than the shared Type component.
+        attribute :type, :string
+        attribute :suffix, :string
+        attribute :language, :string
+
         def self.type
           { key: :base, title: "Base Standard", short: nil }
         end
-
-        # Return a copy of this identifier with the named attributes
-        # nil'd. Mirrors the {Pubid::Identifier#exclude} convenience.
-        # CCSDS Base extends Lutaml::Model::Serializable directly (not
-        # Pubid::Identifier), so the method is defined here too.
-        def exclude(*args)
-          attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
-            h[name] = args.include?(name) ? nil : public_send(name)
-          end
-          self.class.new(attrs)
-        end
-
-        # Generate URN for this identifier
-        #
-        # @return [String] URN representation
-
-        # Include CCSDS-specific attributes in serialization
-        def base_hash
-          hash = super
-          # CCSDS uses plain strings for type, edition, suffix
-          hash[:type] = type if type
-          hash[:suffix] = suffix if suffix
-          hash[:language] = language if language
-          hash
-        end
-
-        attribute :number, :string
-        attribute :part, :string
-        attribute :type, :string # B, G, M, R, Y, O, etc.
-        attribute :edition, :string
-        attribute :suffix, :string # Optional suffix like -S
-        attribute :language, :string # Language metadata (e.g., "French", "Russian")
 
         def publisher
           "CCSDS"
         end
 
-        def to_s
+        def to_s(**_opts)
           result = "#{publisher} #{number}"
           result += ".#{part}" if part
           result += "-#{type}" if type
           result += "-#{edition}" if edition
           result += "-#{suffix}" if suffix
-
-          # Add language metadata
           result += " - #{language} Translated" if language
-
           result
-        end
-
-        def ==(other)
-          return false unless other.is_a?(Base)
-
-          number == other.number &&
-            part == other.part &&
-            type == other.type &&
-            edition == other.edition &&
-            suffix == other.suffix &&
-            language == other.language
         end
       end
     end

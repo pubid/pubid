@@ -438,7 +438,6 @@ module Pubid
         when :joint_identifier
           case value[:publisher]
           when "ISO"
-            require_relative "../iso/builder"
             Iso::Builder.new.build(value)
           end
 

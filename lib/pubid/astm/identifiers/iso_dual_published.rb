@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../../iso/components/publisher"
-require_relative "../../components/date"
-
 module Pubid
   module Astm
     module Identifiers
@@ -36,10 +33,6 @@ module Pubid
         #   iso = astm.to_iso_identifier
         #   iso.to_s # => "ISO/ASTM 52303:2024"
         def to_iso_identifier
-          require_relative "../../iso/identifiers/international_standard"
-          require_relative "../../iso/components/code"
-          require_relative "../../components/publisher"
-
           iso = Pubid::Iso::Identifiers::InternationalStandard.new
 
           # Set publisher as ISO with ASTM as copublisher (in Publisher component)
