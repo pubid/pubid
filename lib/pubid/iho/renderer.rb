@@ -17,7 +17,7 @@ module Pubid
         id = @id
 
         letter = id.class.type[:short]
-        rendered = "#{id.publisher} #{letter}-#{id.code}"
+        rendered = "#{id.publisher} #{letter}-#{id.number}"
         rendered << " Ap. #{id.appendix}" if id.appendix
         rendered << " Part #{id.part}" if id.part
         rendered << " Annex #{id.annex}" if id.annex

@@ -9,7 +9,7 @@ module Pubid
         type_letter = stringify(hash[:type])
 
         attrs = {
-          code: stringify(hash[:code]),
+          number: stringify(hash[:number]),
           appendix: stringify(hash[:appendix]),
           part: stringify(hash[:part]),
           annex: stringify(hash[:annex]),

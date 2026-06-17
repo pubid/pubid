@@ -4,7 +4,7 @@ module Pubid
   module Iho
     # Generates URN strings for IHO identifiers.
     #
-    # Format: urn:iho:{type-letter-lowercase}:{code}[:ap.{appendix}][:part.{part}][:annex.{annex}][:suppl.{supplement}][:{version}]
+    # Format: urn:iho:{type-letter-lowercase}:{number}[:ap.{appendix}][:part.{part}][:annex.{annex}][:suppl.{supplement}][:{version}]
     # Example: urn:iho:s:44:5.0.0 for "IHO S-44 5.0.0".
     class UrnGenerator
       attr_reader :identifier
@@ -16,7 +16,7 @@ module Pubid
       def generate
         parts = ["urn", "iho"]
         parts << identifier.class.type[:short].to_s.downcase
-        parts << identifier.code.to_s
+        parts << identifier.number.to_s
         parts << "ap.#{identifier.appendix}"     if identifier.appendix
         parts << "part.#{identifier.part}"       if identifier.part
         parts << "annex.#{identifier.annex}"     if identifier.annex
