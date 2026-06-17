@@ -15,7 +15,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses date" do
@@ -52,7 +52,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses date" do
@@ -85,11 +85,11 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62257")
+        expect(parsed.number.value).to eq("62257")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("9")
+        expect(parsed.part.value).to eq("9")
       end
 
       it "parses date" do
@@ -114,15 +114,15 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62257")
+        expect(parsed.number.value).to eq("62257")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("9")
+        expect(parsed.part.value).to eq("9")
       end
 
       it "parses subpart" do
-        expect(parsed.subpart.number).to eq("5")
+        expect(parsed.subpart.value).to eq("5")
       end
 
       it "parses date" do
@@ -151,7 +151,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("29119")
+        expect(parsed.number.value).to eq("29119")
       end
 
       it "parses date" do
@@ -184,7 +184,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses stage" do
@@ -213,11 +213,11 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("10")
+        expect(parsed.part.value).to eq("10")
       end
 
       it "parses date" do
@@ -246,7 +246,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses stage" do
@@ -279,7 +279,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("29119")
+        expect(parsed.number.value).to eq("29119")
       end
 
       it "parses stage" do
@@ -300,7 +300,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses correctly" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "round-trips maintaining uppercase" do
@@ -321,7 +321,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62443")
+        expect(parsed.number.value).to eq("62443")
       end
 
       it "parses date as nil" do

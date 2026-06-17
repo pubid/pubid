@@ -186,14 +186,14 @@ module Pubid
       end
 
       def emit_code(doc, key, code)
-        v = code.respond_to?(:value) ? code.value : code
+        v = code.is_a?(::Pubid::Components::Code) ? code.value : code
         return if v.nil? || v.to_s.empty?
 
         doc.add_child(Lutaml::KeyValue::DataModel::Element.new(key, v.to_s))
       end
 
       def build_code(value)
-        ::Pubid::Iso::Components::Code.new(number: value.to_s)
+        ::Pubid::Iso::Components::Code.new(value: value.to_s)
       end
 
       # --- date serialized flat as year/month/day ---

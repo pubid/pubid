@@ -47,8 +47,7 @@ module Pubid
 
           # Set code number (same as ASTM) - use ISO Code component
           if code
-            iso_code = Pubid::Iso::Components::Code.new
-            iso_code.number = code.number
+            iso_code = Pubid::Iso::Components::Code.new(value: code.number)
             iso.number = iso_code
           end
 

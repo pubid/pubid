@@ -125,6 +125,29 @@ module Pubid
         end
       end
 
+      # ISO normalizes em/en dashes, slashes, and spaces to hyphens so that
+      # "4037/1979", "4037-1979", and "ISO/IEC DIR 1 IEC" all split cleanly.
+      def normalize_number_with_part(value)
+        value.to_s
+             .tr("#{Parser::DASH_CHARS.join}/", "-")
+             .gsub(" ", "-")
+      end
+
+      # LEGACY: "ISO 4037-1979" used a hyphen where the modern form is
+      # "ISO 4037:1979". When the part looks like a 4-digit year in a
+      # plausible range, treat it as a date instead of a part number.
+      def extract_legacy_year(number, part, code_class)
+        return nil unless part&.match?(/^\d{4}$/)
+
+        year_value = part.to_i
+        return nil unless year_value.between?(1900, 2099)
+
+        {
+          number: code_class.new(value: number),
+          date: ::Pubid::Components::Date.new(year: part),
+        }
+      end
+
       def cast(type, value)
         case type
         when :base_identifier
@@ -174,45 +197,7 @@ module Pubid
           # or "105/F" ('F' is part)
           # or "5843/6" ('6' is part)
           # LEGACY: "4037-1979" (number-year, year should become date)
-
-          # Split the number into parts
-          normalized_value = value.to_s.tr("#{Parser::DASH_CHARS.join}/", "-")
-
-          # for "1 IEC" ('IEC' is part) (in case of "ISO/IEC DIR 1 IEC")
-          normalized_value.gsub!(" ", "-")
-
-          parts = normalized_value.split("-").reject(&:empty?)
-          number = parts.shift # The first part is always the number
-          part = parts.shift&.strip # The second part is the part, if present
-          subpart = parts.any? ? parts.join("-") : nil # The remaining parts form the subpart, if present
-
-          # LEGACY FORMAT FIX: If "part" is a 4-digit year (1900-2099), move it to date field
-          # This handles legacy formats like "ISO 4037-1979" where hyphen was used instead of colon
-          if part&.match?(/^\d{4}$/)
-            year_value = part.to_i
-            # Only treat as year if in reasonable year range (excludes part numbers like "1751")
-            if year_value.between?(1900, 2099)
-              return {
-                number: Pubid::Iso::Components::Code.new(number: number),
-                date: Pubid::Components::Date.new(year: part),
-              }
-            end
-          end
-
-          part = convert_roman_to_integer(part)
-
-          code_hash = { number: Pubid::Iso::Components::Code.new(number: number) }
-
-          if part
-            code_hash[:part] = Pubid::Iso::Components::Code.new(number: part)
-          end
-
-          if subpart
-            code_hash[:subpart] =
-              Pubid::Iso::Components::Code.new(number: subpart)
-          end
-
-          code_hash
+          parse_number_with_part(value, code_class: Pubid::Iso::Components::Code)
 
         when :directives_type
           # nothing to do here, just return nil
@@ -240,7 +225,7 @@ module Pubid
           }
         when :stage_iteration
           # "1" or "2"
-          Pubid::Iso::Components::Code.new(number: value.to_s)
+          Pubid::Iso::Components::Code.new(value: value.to_s)
 
         when :date
           parse_date(value)
@@ -250,7 +235,7 @@ module Pubid
           original_text = value.to_s
           # Extract just the digit(s) for the number field
           number_string = original_text.match(/\d+/)&.to_s
-          number_code = number_string ? Pubid::Iso::Components::Code.new(number: number_string) : nil
+          number_code = number_string ? Pubid::Iso::Components::Code.new(value: number_string) : nil
           Pubid::Components::Edition.new(number: number_code,
                                          original_text: original_text)
 
@@ -271,7 +256,7 @@ module Pubid
         when :subgroup
           # Handle JTC 1 subgroup in directives (ISO/IEC JTC 1 DIR)
           # Store as a component for potential use in rendering
-          Pubid::Iso::Components::Code.new(number: value.to_s)
+          Pubid::Iso::Components::Code.new(value: value.to_s)
 
         when :supplements
           # Handle bundled supplements (+ operator)
@@ -285,11 +270,11 @@ module Pubid
         # TC Document attributes
         when :tc_type, :sc_type, :wg_type
           # TC, SC, WG types are code components
-          Pubid::Iso::Components::Code.new(number: value.to_s)
+          Pubid::Iso::Components::Code.new(value: value.to_s)
 
         when :tc_number, :sc_number, :wg_number
           # TC, SC, WG numbers are code components
-          Pubid::Iso::Components::Code.new(number: value.to_s)
+          Pubid::Iso::Components::Code.new(value: value.to_s)
 
         when :year
           # For TC documents with year, convert to Date
@@ -300,7 +285,7 @@ module Pubid
           # For regular identifiers, this is handled in :number_with_part
           if value.is_a?(Parslet::Slice) || value.is_a?(String) ||
               value.is_a?(Integer)
-            Pubid::Iso::Components::Code.new(number: value.to_s)
+            Pubid::Iso::Components::Code.new(value: value.to_s)
           else
             value
           end

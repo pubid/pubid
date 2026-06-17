@@ -69,7 +69,7 @@ module Pubid
 
         base_number, edition_type, edition_id = match_data[1], match_data[2].downcase, match_data[3]
 
-        parsed_hash[:first_number] = Components::Code.new(number: base_number)
+        parsed_hash[:first_number] = Components::Code.new(value: base_number)
         parsed_hash[:edition_with_year] = Components::Edition.new(
           type: edition_type,
           id: edition_id,
@@ -94,7 +94,7 @@ module Pubid
 
         base_number, edition_type, edition_id = match_data[1], match_data[2].downcase, match_data[3]
 
-        parsed_hash[:first_number] = Components::Code.new(number: base_number)
+        parsed_hash[:first_number] = Components::Code.new(value: base_number)
         parsed_hash[:edition_with_year] = Components::Edition.new(
           type: edition_type,
           id: edition_id,
@@ -158,10 +158,10 @@ module Pubid
         has_embedded_edition = parsed_hash[:edition_e]
 
         if is_valid_year && !has_embedded_edition
-          parsed_hash[:first_number] = Components::Code.new(number: first_num)
+          parsed_hash[:first_number] = Components::Code.new(value: first_num)
           parsed_hash[:edition] = Components::Edition.new(type: "e", id: dash_year)
         else
-          parsed_hash[:first_number] = Components::Code.new(number: "#{first_num}-#{dash_year}")
+          parsed_hash[:first_number] = Components::Code.new(value: "#{first_num}-#{dash_year}")
         end
         parsed_hash.delete(:edition_dash_year)
       end
@@ -186,7 +186,7 @@ module Pubid
         if series == "RPT"
           # RPT date ranges: "1946-1947" -> "1946-1947"
           parsed_hash[:first_number] =
-            Components::Code.new(number: "#{parsed_hash[:first_number]}-#{dash_year}")
+            Components::Code.new(value: "#{parsed_hash[:first_number]}-#{dash_year}")
           parsed_hash.delete(:edition_dash_year)
         elsif series == "GCR"
           # GCR always converts dash-year to edition

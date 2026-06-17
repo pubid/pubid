@@ -15,7 +15,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("60038")
+        expect(parsed.number.value).to eq("60038")
       end
 
       it "parses part" do
@@ -56,7 +56,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("60038")
+        expect(parsed.number.value).to eq("60038")
       end
 
       it "parses part" do
@@ -97,11 +97,11 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("60038")
+        expect(parsed.number.value).to eq("60038")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("1")
+        expect(parsed.part.value).to eq("1")
       end
 
       it "parses date" do
@@ -142,7 +142,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("17025")
+        expect(parsed.number.value).to eq("17025")
       end
 
       it "parses date" do
@@ -178,7 +178,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -202,7 +202,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -226,7 +226,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -250,7 +250,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -274,7 +274,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -298,7 +298,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -322,7 +322,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do
@@ -346,7 +346,7 @@ RSpec.describe Pubid::Iec::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.number).to eq("60038")
+            expect(parsed.number.value).to eq("60038")
           end
 
           it "parses stage" do

@@ -50,10 +50,10 @@ module Pubid
           if publisher_extracted
             {
               publisher: Components::Publisher.new(publisher: publisher_extracted),
-              series: Components::Code.new(number: str_value),
+              series: Components::Code.new(value: str_value),
             }
           else
-            Components::Code.new(number: str_value)
+            Components::Code.new(value: str_value)
           end
 
         when :volume_number
@@ -143,7 +143,7 @@ module Pubid
           number_part = "#{value[:owmwp_month]}-#{value[:owmwp_day]}"
           edition_part = Components::Edition.new(type: "e",
                                                  id: value[:owmwp_year])
-          { first_number: Components::Code.new(number: number_part), edition: edition_part }
+          { first_number: Components::Code.new(value: number_part), edition: edition_part }
 
         when :first_number, :second_number
           return nil if value.nil? || value.to_s.strip.empty?
@@ -156,7 +156,7 @@ module Pubid
             number_part = "#{owmwp_hash[:owmwp_month]}-#{owmwp_hash[:owmwp_day]}"
             edition_part = Components::Edition.new(type: "e",
                                                    id: owmwp_hash[:owmwp_year])
-            return { type => Components::Code.new(number: number_part), edition: edition_part }
+            return { type => Components::Code.new(value: number_part), edition: edition_part }
           end
 
           # NEW: Handle second_number with edition (hash with :number_only and :edition_id)
@@ -176,7 +176,7 @@ module Pubid
             number_only = revision_data[:number_only].to_s
             letter = revision_data[:letter].to_s.upcase
             # Return as second_number with combined format "27rA"
-            return { second_number: Components::Code.new(number: "#{number_only}r#{letter}") }
+            return { second_number: Components::Code.new(value: "#{number_only}r#{letter}") }
           end
 
           # Handle v#n# pattern (CSM series) - comes as hash from parser
@@ -201,7 +201,7 @@ module Pubid
               number_part = value[:number_with_rev_year][:number].to_s
               revision_year = value[:number_with_rev_year][:revision_year].to_s
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "rv", id: revision_year),
               }
             end
@@ -214,7 +214,7 @@ module Pubid
               # Apply normalization map (es -> spa, pt -> por, etc.)
               normalized_code = TRANSLATION_MAP[language_code] || language_code
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 translation_component: Components::Translation.new(code: normalized_code),
               }
             end
@@ -227,7 +227,7 @@ module Pubid
               part_number = value[:part_number].to_s
               edition_year = value[:edition_year].to_s
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 part: Components::Part.new(type: "pt", value: part_number),
                 edition: Components::Edition.new(type: "e", id: edition_year),
               }
@@ -240,7 +240,7 @@ module Pubid
               edition_id = $2
               year_part = parsed_hash[:edition_year_separate].to_s
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id,
                                                  additional_text: year_part),
               }
@@ -253,7 +253,7 @@ module Pubid
               number_part = value[:number_with_volume][:number].to_s
               volume_value = value[:number_with_volume][:volume_suffix].to_s
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 volume: Components::Volume.new(value: volume_value),
               }
             end
@@ -266,7 +266,7 @@ module Pubid
               # Check if str_value is just a number (the part before dash)
               if /^\d+$/.match?(str_value)
                 return {
-                  first_number: Components::Code.new(number: str_value),
+                  first_number: Components::Code.new(value: str_value),
                   edition: Components::Edition.new(type: "-",
                                                    additional_text: "#{month_part}#{year_part}"),
                 }
@@ -286,7 +286,7 @@ module Pubid
             # as an opaque suffix. E.g. "NBS RPT 5893supp", "NBS MONO 32supp".
             if str_value =~ /^(\d+)supp?$/
               return {
-                first_number: Components::Code.new(number: $1),
+                first_number: Components::Code.new(value: $1),
                 supplement: "",
               }
             end
@@ -297,7 +297,7 @@ module Pubid
               number_part = $1
               year_part = parsed_hash[:supplement_year].to_s
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 supplement: year_part,
               }
             end
@@ -305,7 +305,7 @@ module Pubid
             # Pattern: "154supprev" - supplement with revision
             if str_value =~ /^(\d+)supprev$/
               return {
-                first_number: Components::Code.new(number: $1),
+                first_number: Components::Code.new(value: $1),
                 supplement: "",
                 supplement_has_revision: true,
               }
@@ -317,7 +317,7 @@ module Pubid
               edition_id = $2
               year_part = $3
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id,
                                                  additional_text: year_part),
               }
@@ -339,13 +339,13 @@ module Pubid
               # Extract emergency number: e104 -> 104 (only when no second_number)
               emergency_num = str_value.sub(/^e/, "")
               return {
-                first_number: Components::Code.new(number: emergency_num),
+                first_number: Components::Code.new(value: emergency_num),
               }
             # If e104-43 pattern (with second_number), keep e prefix for compound number logic
             elsif /^e(\d{3,})$/.match?(str_value) && parsed_hash[:second_number]
               # Keep e104 as-is, let compound number logic handle it
               return {
-                first_number: Components::Code.new(number: str_value),
+                first_number: Components::Code.new(value: str_value),
               }
             # NEW: Bare edition pattern like "100e1" (CS series without year)
             # ONLY when NO second_number present (to avoid conflict with "123e2-50")
@@ -357,7 +357,7 @@ module Pubid
               edition_id = $2
 
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id),
               }
             # NEW: Bare edition pattern "e2" - just edition without number prefix
@@ -378,7 +378,7 @@ module Pubid
               edition_id_part = $2
               year_part = $3
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "e",
                                                  id: edition_id_part, additional_text: year_part),
               }
@@ -393,7 +393,7 @@ module Pubid
               # Strip "rev" prefix from additional_text - store only "June1908" or "1908"
               additional_text = rev_part.sub(/^rev/, "")
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "e",
                                                  id: edition_id_part, additional_text: additional_text),
               }
@@ -404,7 +404,7 @@ module Pubid
               month_part = $2
               year_part = $3
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 supplement: "#{month_part}#{year_part}",
               }
             # NEW: Pattern "25supp1924" - supplement with year (no dash, no month)
@@ -414,7 +414,7 @@ module Pubid
               number_part = $1
               year_part = $2
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 supplement: year_part,
               }
             # NEW: Pattern "25supp-1924" - supplement with dash-year (inline match)
@@ -424,7 +424,7 @@ module Pubid
               number_part = $1
               year_part = $2
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 supplement: year_part,
               }
             # NEW: Pattern "101e2supp" - edition + supplement
@@ -434,7 +434,7 @@ module Pubid
               number_part = $1
               edition_id = $2
               return {
-                first_number: Components::Code.new(number: number_part),
+                first_number: Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "e", id: edition_id),
                 supplement: "",
               }
@@ -446,7 +446,7 @@ module Pubid
             part_value = value[:part_value]&.to_s
             revision_value = value[:revision_value]&.to_s
             return {
-              first_number: Components::Code.new(number: number_part),
+              first_number: Components::Code.new(value: number_part),
               part: Components::Part.new(value: part_value),
               edition: Components::Edition.new(type: "r", id: revision_value),
             }
@@ -465,7 +465,7 @@ module Pubid
             part_value = $2
             revision_value = $3
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               part: Components::Part.new(type: "pt", value: part_value),
               edition: Components::Edition.new(type: "r", id: revision_value),
             }
@@ -473,7 +473,7 @@ module Pubid
             number_part = $1
             part_value = $2
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               part: Components::Part.new(type: "pt", value: part_value),
             }
           end
@@ -484,7 +484,7 @@ module Pubid
             number_part = $1
             volume_part = $2
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               volume: volume_part,
             }
           end
@@ -500,7 +500,7 @@ module Pubid
               revision_id = $1
               year_part = $2
               return {
-                type => Components::Code.new(number: number_part),
+                type => Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "r", id: revision_id,
                                                  additional_text: year_part),
               }
@@ -510,7 +510,7 @@ module Pubid
             number_part = $1
             year_value = $2.sub(/^r/, "") # Strip 'r' prefix
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               edition: Components::Edition.new(type: "r", id: year_value),
             }
           when /^(.+?)(r[A-Za-z]{3,9}\d{4})$/i
@@ -522,7 +522,7 @@ module Pubid
               month_part = $1
               year_part = $2
               return {
-                type => Components::Code.new(number: number_part),
+                type => Components::Code.new(value: number_part),
                 edition: Components::Edition.new(type: "r",
                                                  id: "#{month_part}#{year_part}"),
               }
@@ -532,7 +532,7 @@ module Pubid
             number_part = $1
             revision_value = $2.sub(/^r/, "") # Strip 'r' prefix
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               edition: Components::Edition.new(type: "r", id: revision_value),
             }
           when /^(.+?)(?<![a-zA-Z])(r)$/i
@@ -540,7 +540,7 @@ module Pubid
             # Negative lookbehind ensures r is NOT preceded by a letter (avoids matching Ur, Ua, etc.)
             number_part = $1
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               edition: Components::Edition.new(type: "r", id: "1"),
             }
           end
@@ -556,7 +556,7 @@ module Pubid
             letter_part = $2
             revision_part = $3.sub(/^r/, "")
             return {
-              type => Components::Code.new(number: number_part),
+              type => Components::Code.new(value: number_part),
               part: Components::Part.new(type: "", value: letter_part),
               edition: Components::Edition.new(type: "r", id: revision_part),
             }
@@ -608,17 +608,17 @@ module Pubid
 
             if parsed_hash[:parsed_format] == :mr || is_report || is_fips || is_ir || is_crpl || is_lc || is_mono || is_mp
               # For MR format, Report, FIPS, IR, CRPL, LC, MONO, and MP, preserve letter suffix as part of number
-              return { type => Components::Code.new(number: str_value) }
+              return { type => Components::Code.new(value: str_value) }
             else
               # For other formats, extract letter suffix as separate Part component
               return {
-                type => Components::Code.new(number: number_part),
+                type => Components::Code.new(value: number_part),
                 part: Components::Part.new(type: "", value: letter_part),
               }
             end
           end
 
-          Components::Code.new(number: str_value)
+          Components::Code.new(value: str_value)
 
         when :crpl_range
           return nil if value.nil? || value.to_s.strip.empty?
@@ -639,7 +639,7 @@ module Pubid
 
             # Return second_number, Part, and Supplement
             {
-              second_number: Components::Code.new(number: second_num_part),
+              second_number: Components::Code.new(value: second_num_part),
               part: Components::Part.new(type: "pt", value: part_value),
               supplement: supplement_letter,
             }
@@ -650,12 +650,12 @@ module Pubid
 
             # Return second_number and Part
             {
-              second_number: Components::Code.new(number: second_num_part),
+              second_number: Components::Code.new(value: second_num_part),
               part: Components::Part.new(type: "pt", value: part_value),
             }
           else
             # Fallback: treat entire value as second_number (shouldn't happen with valid CRPL patterns)
-            Components::Code.new(number: str_value)
+            Components::Code.new(value: str_value)
           end
 
         # ========== V2 COMPONENT CASTING ==========
