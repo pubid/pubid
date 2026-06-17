@@ -27,7 +27,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.identifiers.first.number.number).to eq("60529")
+        expect(parsed.identifiers.first.number.value).to eq("60529")
       end
 
       it "parses base identifier date" do
@@ -35,7 +35,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "parses amendment number" do
-        expect(parsed.identifiers.last.number.number).to eq("1")
+        expect(parsed.identifiers.last.number.value).to eq("1")
       end
 
       it "parses amendment date" do
@@ -55,7 +55,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "delegates number to first identifier" do
-        expect(parsed.number.number).to eq("60529")
+        expect(parsed.number.value).to eq("60529")
       end
 
       it "delegates date to first identifier" do
@@ -92,11 +92,11 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "parses first amendment number" do
-        expect(parsed.identifiers[1].number.number).to eq("1")
+        expect(parsed.identifiers[1].number.value).to eq("1")
       end
 
       it "parses second amendment number" do
-        expect(parsed.identifiers[2].number.number).to eq("2")
+        expect(parsed.identifiers[2].number.value).to eq("2")
       end
 
       it "round-trips" do
@@ -125,7 +125,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.identifiers.last.number.number).to eq("1")
+        expect(parsed.identifiers.last.number.value).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -216,15 +216,15 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "parses base number" do
-        expect(parsed.identifiers.first.number.number).to eq("62443")
+        expect(parsed.identifiers.first.number.value).to eq("62443")
       end
 
       it "parses base part" do
-        expect(parsed.identifiers.first.part.number).to eq("3")
+        expect(parsed.identifiers.first.part.value).to eq("3")
       end
 
       it "parses base subpart" do
-        expect(parsed.identifiers.first.subpart.number).to eq("3")
+        expect(parsed.identifiers.first.subpart.value).to eq("3")
       end
 
       it "round-trips" do
@@ -249,7 +249,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "base_document has correct number" do
-        expect(parsed.base_document.number.number).to eq("60529")
+        expect(parsed.base_document.number.value).to eq("60529")
       end
     end
   end
@@ -371,7 +371,7 @@ RSpec.describe Pubid::Iec::Identifiers::ConsolidatedIdentifier do
       end
 
       it "base has part" do
-        expect(parsed.base_document.part.number).to eq("1")
+        expect(parsed.base_document.part.value).to eq("1")
       end
 
       it "round-trips" do

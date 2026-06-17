@@ -124,6 +124,40 @@ module Pubid
         end
       end
 
+      # Splits a compound document number ("1234", "1234-1", "1234-1-2")
+      # into number/part/subpart Code components. Flavor-specific dash/slash
+      # normalization lives in +normalize_number_with_part+; legacy year
+      # extraction (e.g. ISO "4037-1979") lives in +extract_legacy_year+.
+      def parse_number_with_part(value, code_class:)
+        normalized = normalize_number_with_part(value)
+        parts = normalized.split("-").reject(&:empty?)
+        number = parts.shift
+        part = parts.shift&.strip
+        subpart = parts.any? ? parts.join("-") : nil
+
+        legacy = extract_legacy_year(number, part, code_class)
+        return legacy if legacy
+
+        part = convert_roman_to_integer(part) if part
+
+        code_hash = { number: code_class.new(value: number) }
+        code_hash[:part] = code_class.new(value: part) if part
+        code_hash[:subpart] = code_class.new(value: subpart) if subpart
+        code_hash
+      end
+
+      # Hook: normalize the raw number_with_part string before splitting.
+      # Override in subclasses for flavor-specific dash/slash/space handling.
+      def normalize_number_with_part(value)
+        value.to_s
+      end
+
+      # Hook: detect a year masquerading as a part (e.g. "4037-1979") and
+      # return a number+date hash, or nil to continue normal splitting.
+      def extract_legacy_year(_number, _part, _code_class)
+        nil
+      end
+
       def parse_languages(value)
         original_value = value.to_s
         normalized_value = original_value.gsub("/", ",")

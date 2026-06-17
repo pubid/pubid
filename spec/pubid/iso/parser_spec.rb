@@ -186,7 +186,7 @@ RSpec.describe Pubid::Iso::Parser do
       it "parses Amd with number and year" do
         id = Pubid::Iso.parse("ISO 19110:2005/Amd 1:2011")
         expect(id).to be_a(Pubid::Iso::Identifiers::Amendment)
-        expect(id.number.number).to eq("1")
+        expect(id.number.value).to eq("1")
         expect(id.date.year).to eq("2011")
         expect(id.to_s).to eq("ISO 19110:2005/Amd 1:2011")
       end
@@ -194,7 +194,7 @@ RSpec.describe Pubid::Iso::Parser do
       it "parses Cor with number and year" do
         id = Pubid::Iso.parse("ISO/IEC 8802-21:2018/Cor 1:2018")
         expect(id).to be_a(Pubid::Iso::Identifiers::Corrigendum)
-        expect(id.number.number).to eq("1")
+        expect(id.number.value).to eq("1")
         expect(id.date.year).to eq("2018")
         expect(id.to_s).to eq("ISO/IEC 8802-21:2018/Cor 1:2018")
       end
@@ -237,7 +237,7 @@ RSpec.describe Pubid::Iso::Parser do
       it "parses supplement without year" do
         id = Pubid::Iso.parse("ISO 12345:2020/Amd 1")
         expect(id).to be_a(Pubid::Iso::Identifiers::Amendment)
-        expect(id.number.number).to eq("1")
+        expect(id.number.value).to eq("1")
         expect(id.date).to be_nil
         expect(id.to_s).to eq("ISO 12345:2020/Amd 1")
       end
@@ -247,14 +247,14 @@ RSpec.describe Pubid::Iso::Parser do
       it "parses directives supplement with ISO publisher" do
         id = Pubid::Iso.parse("ISO/IEC DIR 1 ISO SUP:2022")
         expect(id.type.abbr).to eq("DIR SUP")
-        expect(id.base_identifier.number.number).to eq("1")
+        expect(id.base_identifier.number.value).to eq("1")
         expect(id.to_s).to eq("ISO/IEC DIR 1 ISO SUP:2022")
       end
 
       it "parses directives supplement with IEC copublisher" do
         id = Pubid::Iso.parse("ISO/IEC DIR 2 ISO/IEC SUP:2023")
         expect(id.type.abbr).to eq("DIR SUP")
-        expect(id.base_identifier.number.number).to eq("2")
+        expect(id.base_identifier.number.value).to eq("2")
         expect(id.to_s).to eq("ISO/IEC DIR 2 ISO/IEC SUP:2023")
       end
     end
@@ -263,15 +263,15 @@ RSpec.describe Pubid::Iso::Parser do
       it "parses standalone IWA" do
         id = Pubid::Iso.parse("IWA 14-1:2013")
         expect(id.type.abbr).to eq("IWA")
-        expect(id.number.number).to eq("14")
+        expect(id.number.value).to eq("14")
         expect(id.to_s).to eq("IWA 14-1:2013")
       end
 
       it "parses IWA with part" do
         id = Pubid::Iso.parse("IWA 14-1:2013")
         expect(id.type.abbr).to eq("IWA")
-        expect(id.number.number).to eq("14")
-        expect(id.part.number).to eq("1")
+        expect(id.number.value).to eq("14")
+        expect(id.part.value).to eq("1")
         expect(id.to_s).to eq("IWA 14-1:2013")
       end
 
@@ -286,29 +286,29 @@ RSpec.describe Pubid::Iso::Parser do
     context "number and parts" do
       it "parses basic number" do
         id = Pubid::Iso.parse("ISO 19115:2003")
-        expect(id.number.number).to eq("19115")
+        expect(id.number.value).to eq("19115")
         expect(id.to_s).to eq("ISO 19115:2003")
       end
 
       it "parses with single part" do
         id = Pubid::Iso.parse("ISO/IEC 13818-1:2015")
-        expect(id.number.number).to eq("13818")
-        expect(id.part.number).to eq("1")
+        expect(id.number.value).to eq("13818")
+        expect(id.part.value).to eq("1")
         expect(id.to_s).to eq("ISO/IEC 13818-1:2015")
       end
 
       it "parses with multiple parts" do
         id = Pubid::Iso.parse("ISO 12345-1-2:2020")
-        expect(id.number.number).to eq("12345")
-        expect(id.part.number).to eq("1")
-        expect(id.subpart.number).to eq("2")
+        expect(id.number.value).to eq("12345")
+        expect(id.part.value).to eq("1")
+        expect(id.subpart.value).to eq("2")
         expect(id.to_s).to eq("ISO 12345-1-2:2020")
       end
 
       it "parses alphanumeric part" do
         id = Pubid::Iso.parse("ISO 12345-A01:2020")
-        expect(id.number.number).to eq("12345")
-        expect(id.part.number).to eq("A01")
+        expect(id.number.value).to eq("12345")
+        expect(id.part.value).to eq("A01")
         expect(id.to_s).to eq("ISO 12345-A01:2020")
       end
     end
@@ -394,8 +394,8 @@ RSpec.describe Pubid::Iso::Parser do
         expect(id.publisher.body).to eq("ISO")
         expect(id.copublishers.first.body).to eq("IEC")
         expect(id.type.abbr).to eq("TR")
-        expect(id.number.number).to eq("29186")
-        expect(id.part.number).to eq("1")
+        expect(id.number.value).to eq("29186")
+        expect(id.part.value).to eq("1")
         expect(id.date.year).to eq("2012")
         expect(id.languages.map(&:original_code)).to eq(["E", "F"])
         expect(id.to_s).to eq("ISO/IEC TR 29186-1:2012(E/F)")

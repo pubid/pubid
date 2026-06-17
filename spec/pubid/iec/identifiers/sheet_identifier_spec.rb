@@ -19,15 +19,15 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("60695")
+        expect(parsed.base_identifier.number.value).to eq("60695")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.number).to eq("2")
+        expect(parsed.base_identifier.part.value).to eq("2")
       end
 
       it "parses base identifier subpart" do
-        expect(parsed.base_identifier.subpart.number).to eq("1")
+        expect(parsed.base_identifier.subpart.value).to eq("1")
       end
 
       it "parses sheet_number" do
@@ -51,7 +51,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "delegates number to base" do
-        expect(parsed.number.number).to eq("60695")
+        expect(parsed.number.value).to eq("60695")
       end
     end
   end
@@ -68,7 +68,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("60695")
+        expect(parsed.base_identifier.number.value).to eq("60695")
       end
 
       it "parses sheet_number" do
@@ -198,11 +198,11 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("60034")
+        expect(parsed.base_identifier.number.value).to eq("60034")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.number).to eq("1")
+        expect(parsed.base_identifier.part.value).to eq("1")
       end
 
       it "parses sheet_number" do
@@ -231,7 +231,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("60529")
+        expect(parsed.base_identifier.number.value).to eq("60529")
       end
 
       it "base has no part" do

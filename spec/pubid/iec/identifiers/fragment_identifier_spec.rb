@@ -19,15 +19,15 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       end
 
       it "parses base number" do
-        expect(parsed.base_identifier.base_identifier.number.number).to eq("60050")
+        expect(parsed.base_identifier.base_identifier.number.value).to eq("60050")
       end
 
       it "parses base part" do
-        expect(parsed.base_identifier.base_identifier.part.number).to eq("191")
+        expect(parsed.base_identifier.base_identifier.part.value).to eq("191")
       end
 
       it "parses amendment number" do
-        expect(parsed.base_identifier.number.number).to eq("2")
+        expect(parsed.base_identifier.number.value).to eq("2")
       end
 
       it "parses fragment number" do
@@ -210,7 +210,7 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       end
 
       it "parses multi-digit amendment number" do
-        expect(parsed.base_identifier.number.number).to eq("10")
+        expect(parsed.base_identifier.number.value).to eq("10")
       end
 
       it "round-trips" do

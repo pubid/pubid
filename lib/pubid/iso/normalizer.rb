@@ -73,7 +73,7 @@ module Pubid
 
           addendum = Identifiers::Addendum.new
           addendum.base_identifier = base_identifier
-          addendum.number = Iso::Components::Code.new(number: supplement_number)
+          addendum.number = Iso::Components::Code.new(value: supplement_number)
           addendum.date = Pubid::Components::Date.new(year: supplement_year) if supplement_year
 
           typed_stage = Pubid::Iso.locate_stage(stage_abbr)

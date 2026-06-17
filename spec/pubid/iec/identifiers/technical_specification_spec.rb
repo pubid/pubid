@@ -15,15 +15,15 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62257")
+        expect(parsed.number.value).to eq("62257")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("9")
+        expect(parsed.part.value).to eq("9")
       end
 
       it "parses subpart" do
-        expect(parsed.subpart.number).to eq("5")
+        expect(parsed.subpart.value).to eq("5")
       end
 
       it "parses date" do
@@ -60,11 +60,11 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("3")
+        expect(parsed.part.value).to eq("3")
       end
 
       it "parses date" do
@@ -101,7 +101,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("29125")
+        expect(parsed.number.value).to eq("29125")
       end
 
       it "parses date" do
@@ -134,11 +134,11 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("104")
+        expect(parsed.part.value).to eq("104")
       end
 
       it "parses stage" do
@@ -167,11 +167,11 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("10")
+        expect(parsed.part.value).to eq("10")
       end
 
       it "parses date" do
@@ -200,7 +200,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62600")
+        expect(parsed.number.value).to eq("62600")
       end
 
       it "parses part" do
@@ -230,7 +230,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
         end
 
         it "parses number" do
-          expect(parsed.number.number).to eq("62600")
+          expect(parsed.number.value).to eq("62600")
         end
 
         it "parses stage" do
@@ -258,7 +258,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
         end
 
         it "parses number" do
-          expect(parsed.number.number).to eq("62600")
+          expect(parsed.number.value).to eq("62600")
         end
 
         it "parses stage" do
@@ -286,7 +286,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalSpecification do
         end
 
         it "parses number" do
-          expect(parsed.number.number).to eq("62600")
+          expect(parsed.number.value).to eq("62600")
         end
 
         it "parses stage" do

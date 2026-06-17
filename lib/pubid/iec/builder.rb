@@ -330,6 +330,12 @@ module Pubid
         super
       end
 
+      # IEC normalizes em/en dashes to hyphens but preserves slashes and
+      # spaces, which can be semantically meaningful in IEC identifiers.
+      def normalize_number_with_part(value)
+        value.to_s.tr(Parser::DASH_CHARS.join, "-")
+      end
+
       def cast(type, value)
         case type
         when :base_identifier
@@ -367,28 +373,7 @@ module Pubid
           # or "60038-1" ('1' is part)
           # or "60038-1-2" ('1' is part, '2' is subpart)
           # or "29110-5-1-1" ('5' is part, '1-1' is subpart)
-
-          # Split the number into parts
-          normalized_value = value.to_s.tr(Parser::DASH_CHARS.join, "-")
-
-          parts = normalized_value.split("-")
-          number = parts.shift # The first part is always the number
-          part = parts.shift # The second part is the part, if present
-          subpart = parts.any? ? parts.join("-") : nil # The remaining parts form the subpart, if present
-
-          part = convert_roman_to_integer(part)
-
-          code_hash = { number: Components::Code.new(value: number) }
-
-          if part
-            code_hash[:part] = Components::Code.new(value: part)
-          end
-
-          if subpart
-            code_hash[:subpart] = Components::Code.new(value: subpart)
-          end
-
-          code_hash
+          parse_number_with_part(value, code_class: Components::Code)
 
         when :type_with_stage
           # "WD"

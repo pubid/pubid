@@ -90,7 +90,7 @@ RSpec.describe Pubid::Astm::Identifiers::IsoDualPublished do
         # ISO publishes as: ISO/ASTM 52303:2024
         iso_version = astm_version.to_iso_identifier
         expect(iso_version).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
-        expect(iso_version.number.number).to eq("52303")
+        expect(iso_version.number.value).to eq("52303")
         expect(iso_version.date.year).to eq("2024")
         expect(iso_version.publisher.copublisher.first).to eq("ASTM")
         expect(iso_version.to_s).to eq("ISO/ASTM 52303:2024")

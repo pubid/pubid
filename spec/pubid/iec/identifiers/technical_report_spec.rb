@@ -15,7 +15,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62048")
+        expect(parsed.number.value).to eq("62048")
       end
 
       it "parses part" do
@@ -56,7 +56,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62048")
+        expect(parsed.number.value).to eq("62048")
       end
 
       it "parses part" do
@@ -93,15 +93,15 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("61850")
+        expect(parsed.number.value).to eq("61850")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("90")
+        expect(parsed.part.value).to eq("90")
       end
 
       it "parses subpart" do
-        expect(parsed.subpart.number).to eq("12")
+        expect(parsed.subpart.value).to eq("12")
       end
 
       it "parses date" do
@@ -138,11 +138,11 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("13066")
+        expect(parsed.number.value).to eq("13066")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("1")
+        expect(parsed.part.value).to eq("1")
       end
 
       it "parses date" do
@@ -175,7 +175,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62048")
+        expect(parsed.number.value).to eq("62048")
       end
 
       it "parses stage" do
@@ -204,7 +204,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("62048")
+        expect(parsed.number.value).to eq("62048")
       end
 
       it "parses date" do
@@ -233,15 +233,15 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
       end
 
       it "parses number" do
-        expect(parsed.number.number).to eq("61850")
+        expect(parsed.number.value).to eq("61850")
       end
 
       it "parses part" do
-        expect(parsed.part.number).to eq("90")
+        expect(parsed.part.value).to eq("90")
       end
 
       it "parses subpart" do
-        expect(parsed.subpart.number).to eq("12")
+        expect(parsed.subpart.value).to eq("12")
       end
 
       it "parses date" do
@@ -271,7 +271,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
         end
 
         it "parses number" do
-          expect(parsed.number.number).to eq("62048")
+          expect(parsed.number.value).to eq("62048")
         end
 
         it "parses stage" do
@@ -299,7 +299,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
         end
 
         it "parses number" do
-          expect(parsed.number.number).to eq("62048")
+          expect(parsed.number.value).to eq("62048")
         end
 
         it "parses stage" do
@@ -327,7 +327,7 @@ RSpec.describe Pubid::Iec::Identifiers::TechnicalReport do
         end
 
         it "parses number" do
-          expect(parsed.number.number).to eq("62048")
+          expect(parsed.number.value).to eq("62048")
         end
 
         it "parses stage" do

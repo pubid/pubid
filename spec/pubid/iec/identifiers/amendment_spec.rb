@@ -14,7 +14,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("60038")
+        expect(parsed.base_identifier.number.value).to eq("60038")
       end
 
       it "parses base identifier date" do
@@ -22,7 +22,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.number).to eq("1")
+        expect(parsed.number.value).to eq("1")
       end
 
       it "parses amendment date" do
@@ -54,11 +54,11 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("60038")
+        expect(parsed.base_identifier.number.value).to eq("60038")
       end
 
       it "parses amendment number" do
-        expect(parsed.number.number).to eq("1")
+        expect(parsed.number.value).to eq("1")
       end
 
       it "provides type code" do
@@ -90,7 +90,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.number).to eq("17025")
+        expect(parsed.base_identifier.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -98,7 +98,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.number).to eq("1")
+        expect(parsed.number.value).to eq("1")
       end
 
       it "parses amendment date" do

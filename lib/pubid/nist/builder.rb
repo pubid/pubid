@@ -48,7 +48,7 @@ module Pubid
 
             # Update first_number to exclude letter suffix
             parsed_hash[:first_number] =
-              Components::Code.new(number: base_number)
+              Components::Code.new(value: base_number)
 
             # Store Part component for later (after identifier is initialized)
             letter_suffix_part = Components::Part.new(type: "",
@@ -75,7 +75,7 @@ module Pubid
 
             # Update second_number and create Edition component
             parsed_hash[:second_number] =
-              Components::Code.new(number: base_number)
+              Components::Code.new(value: base_number)
             # Store Edition component for later (after identifier is initialized)
             edition_from_embedded = Components::Edition.new(
               type: edition_letter, id: edition_id,
@@ -249,7 +249,7 @@ module Pubid
           elsif decimal_num
             decimal_base = decimal_num[:decimal_base].to_s
             decimal_suffix = decimal_num[:decimal_suffix].to_s
-            identifier.number = Components::Code.new(number: "#{first_num.value}-#{decimal_base}.#{decimal_suffix}")
+            identifier.number = Components::Code.new(value: "#{first_num.value}-#{decimal_base}.#{decimal_suffix}")
           # NEW: Handle letter number pattern (e.g., 1-1A, 1-3B for NCSTAR identifiers)
           # letter_num is {:letter_base => "1", :letter_suffix => "A"}
           # Also handles IR series "R" suffix: "79-1786R" -> "79-1786r1"
@@ -262,7 +262,7 @@ module Pubid
             is_ir = parsed_hash[:series]&.to_s == "IR"
             if is_ir && letter_suffix == "R"
               # IR "R" suffix converts to revision format "r1"
-              identifier.number = Components::Code.new(number: "#{first_num.value}-#{letter_base}")
+              identifier.number = Components::Code.new(value: "#{first_num.value}-#{letter_base}")
               edition_obj = Components::Edition.new(type: "r", id: "1")
               identifier.edition = edition_obj
               identifier.edition_component = edition_obj
@@ -272,10 +272,10 @@ module Pubid
             # Otherwise, letter_suffix is part of the number (e.g., NCSTAR "1-1A" -> number="1-1A")
             elsif identifier.part
               # SpecialPublication pattern: letter_suffix is separate Part component
-              identifier.number = Components::Code.new(number: "#{first_num.value}-#{letter_base}")
+              identifier.number = Components::Code.new(value: "#{first_num.value}-#{letter_base}")
             else
               # NCSTAR pattern: letter_suffix is part of the number
-              identifier.number = Components::Code.new(number: "#{first_num.value}-#{letter_base}#{letter_suffix}")
+              identifier.number = Components::Code.new(value: "#{first_num.value}-#{letter_base}#{letter_suffix}")
             end
           elsif second_num
             # Check for special patterns first
@@ -289,7 +289,7 @@ module Pubid
               # Create Edition component
               edition_obj = Components::Edition.new(type: "r", id: edition_id)
 
-              identifier.number = Components::Code.new(number: "#{first_num.value}-#{number_part}")
+              identifier.number = Components::Code.new(value: "#{first_num.value}-#{number_part}")
               identifier.edition = edition_obj
               identifier.edition_component = edition_obj
               identifier.revision = "r#{edition_id}"
@@ -306,7 +306,7 @@ module Pubid
               # Create Edition component
               edition_obj = Components::Edition.new(type: "e", id: edition_year)
 
-              identifier.number = Components::Code.new(number: number_part)
+              identifier.number = Components::Code.new(value: number_part)
               identifier.edition = edition_obj
               identifier.edition_component = edition_obj
             elsif first_num.value.to_s.match?(/^(\d+)e(\d+)$/) &&
@@ -321,7 +321,7 @@ module Pubid
               # Expand 2-digit year to 4-digit (50 -> 1950)
               year_part = "19#{year_part}" if year_part.length == 2
 
-              identifier.number = Components::Code.new(number: number_part)
+              identifier.number = Components::Code.new(value: number_part)
 
               # For edition+year patterns, handling depends on identifier type:
               # - CIRC: edition number + year as additional_text, rendered with dot ("11e2-1915" -> "11e2.1915")
@@ -337,7 +337,7 @@ module Pubid
               number_part = first_num.value.to_s.match(/^(\d+)supp?$/)[1]
               year_part = second_num.value.to_s
 
-              identifier.number = Components::Code.new(number: number_part)
+              identifier.number = Components::Code.new(value: number_part)
               supp[:value] = year_part
               supp[:present] = true
             elsif second_num.value.to_s.match?(/^(\d+)supp?$/)
@@ -345,7 +345,7 @@ module Pubid
               # second number. Strip it and isolate as supplement="" (single-p).
               second_part = second_num.value.to_s.match(/^(\d+)supp?$/)[1]
               compound = "#{first_num.value}-#{second_part}"
-              identifier.number = Components::Code.new(number: compound)
+              identifier.number = Components::Code.new(value: compound)
               supp[:value] = ""
               supp[:present] = true
             elsif identifier.is_a?(Identifiers::TechnicalNote) &&
@@ -363,13 +363,13 @@ module Pubid
               # For IR identifiers, part_number should be a Part component (type="pt"), not in compound number
               identifier.part = Components::Part.new(type: "pt",
                                                      value: part_num)
-              identifier.number = Components::Code.new(number: "#{first_num.value}-#{second_num.value}")
+              identifier.number = Components::Code.new(value: "#{first_num.value}-#{second_num.value}")
             # For IR, create Part component with type="pt"
             else
               # For GCR and others, include part number in compound number
               compound_value = "#{first_num.value}-#{second_num.value}"
               compound_value += "-#{part_num}" if part_num
-              identifier.number = Components::Code.new(number: compound_value)
+              identifier.number = Components::Code.new(value: compound_value)
             end
           else
             # No second_num, use first_num directly
@@ -399,7 +399,7 @@ module Pubid
           year_part = match_data[2] # "2946"
 
           # Convert to compound number format
-          identifier.number = Components::Code.new(number: "#{number_part}-#{year_part}")
+          identifier.number = Components::Code.new(value: "#{number_part}-#{year_part}")
 
           # Clear the edition that was incorrectly set from the year
           identifier.edition = nil

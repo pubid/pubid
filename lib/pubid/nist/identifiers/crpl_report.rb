@@ -83,7 +83,7 @@ module Pubid
           end
 
           # Return new Code object with normalized value
-          Components::Code.new(number: num_value)
+          Components::Code.new(value: num_value)
         end
 
         def to_s
