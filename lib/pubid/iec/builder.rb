@@ -423,7 +423,7 @@ module Pubid
         when :joint_identifier
           case value[:publisher]
           when "ISO"
-            Iso::Builder.new.build(value)
+            Pubid::Iso.build_from_parse(value)
           end
 
         else

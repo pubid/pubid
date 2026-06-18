@@ -113,6 +113,30 @@ module Pubid
       UrnParser.parse(urn)
     end
 
+    # Build an ISO identifier from a Parslet parse-tree hash (used by other
+    # flavors when parsing joint identifiers, e.g. IEC's `IEC … | ISO …` form).
+    #
+    # This is the public seam: callers should never reach into
+    # `Pubid::Iso::Builder` directly.
+    #
+    # @param hash [Hash] parse tree for an ISO identifier
+    # @return [Pubid::Iso::Identifier]
+    def self.build_from_parse(hash)
+      builder.build(hash)
+    end
+
+    # Return the named Parslet rule atom from the ISO parser, for embedding in
+    # another flavor's grammar (e.g. IEC joint identifiers).
+    #
+    # This is the public seam: callers should never instantiate
+    # `Pubid::Iso::Parser` directly.
+    #
+    # @param rule_name [Symbol] the parser rule to expose
+    # @return [Parslet::Atoms::Base]
+    def self.joint_grammar_atom(rule_name)
+      parser.public_send(rule_name)
+    end
+
     # Auto-discover all identifier types from the Identifiers namespace
     # @return [Array<Class>] identifier classes that define a self.type Hash
     def self.identifier_types
