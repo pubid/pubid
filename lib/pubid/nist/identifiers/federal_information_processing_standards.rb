@@ -22,7 +22,8 @@ module Pubid
           end
 
           def type
-            { key: :fips, title: "Federal Information Processing Standards",
+            { key: :fips,
+            web: :federal_information_processing_standards, title: "Federal Information Processing Standards",
               short: "FIPS" }
           end
         end

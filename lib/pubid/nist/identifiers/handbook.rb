@@ -22,7 +22,8 @@ module Pubid
           end
 
           def type
-            { key: :hb, title: "NIST Handbook", short: "HB" }
+            { key: :hb,
+            web: :handbook, title: "NIST Handbook", short: "HB" }
           end
         end
 

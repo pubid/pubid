@@ -20,7 +20,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :es, title: "European Specification", short: "ES" }
+          { key: :es,
+            web: :european_specification, title: "European Specification", short: "ES" }
         end
       end
     end

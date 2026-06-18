@@ -23,7 +23,8 @@ module Pubid
           end
 
           def type
-            { key: :ir, title: "NIST Interagency Report", short: "IR" }
+            { key: :ir,
+            web: :interagency_report, title: "NIST Interagency Report", short: "IR" }
           end
         end
 

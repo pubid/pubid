@@ -21,7 +21,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :na, title: "National Annex", short: "NA" }
+          { key: :na,
+            web: :national_annex, title: "National Annex", short: "NA" }
         end
 
         # Delegation methods to access wrapped base_doc attributes

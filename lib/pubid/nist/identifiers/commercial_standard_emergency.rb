@@ -21,7 +21,8 @@ module Pubid
           end
 
           def type
-            { key: :cse, title: "NBS Commercial Standard Emergency",
+            { key: :cse,
+            web: :commercial_standard_emergency, title: "NBS Commercial Standard Emergency",
               short: "CS-E" }
           end
         end

@@ -98,7 +98,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :add, title: "Addendum", short: "ADD" }
+          { key: :add,
+            web: :addendum, title: "Addendum", short: "ADD" }
         end
       end
     end

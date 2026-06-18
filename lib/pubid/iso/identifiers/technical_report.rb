@@ -94,7 +94,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :tr, title: "Technical Report", short: "TR" }
+          { key: :tr,
+            web: :technical_report, title: "Technical Report", short: "TR" }
         end
       end
     end

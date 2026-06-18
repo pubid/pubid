@@ -92,7 +92,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :rm, title: "Reviewed Method", short: "RM" }
+          { key: :rm,
+            web: :reviewed_method, title: "Reviewed Method", short: "RM" }
         end
       end
     end

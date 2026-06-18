@@ -24,7 +24,8 @@ module Pubid
         PROJECT_STAGES = {}.freeze
 
         def self.type
-          { key: :wd, title: "Working Document", short: "WD" }
+          { key: :wd,
+            web: :working_document, title: "Working Document", short: "WD" }
         end
 
         # Return stage object for PWI/PNW stage

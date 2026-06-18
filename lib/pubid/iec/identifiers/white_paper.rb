@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :wp, title: "White Paper", short: "White Paper" }
+          { key: :wp,
+            web: :white_paper, title: "White Paper", short: "White Paper" }
         end
 
         # Override publisher_portion to add White Paper

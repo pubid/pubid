@@ -25,7 +25,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :bs, title: "British Standard", short: "BS" }
+          { key: :bs,
+            web: :british_standard, title: "British Standard", short: "BS" }
         end
       end
     end

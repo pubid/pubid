@@ -61,7 +61,8 @@ module Pubid
         def wg_number_from_kv(m, v) = m.wg_number = build_code(v)
 
         def self.type
-          { key: :tc, title: "Technical Committee Document", short: "TC" }
+          { key: :tc,
+            web: :tc_document, title: "Technical Committee Document", short: "TC" }
         end
 
         def self.typed_stages

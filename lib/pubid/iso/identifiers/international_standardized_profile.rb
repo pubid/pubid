@@ -84,7 +84,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :isp, title: "International Standardized Profile",
+          { key: :isp,
+            web: :international_standardized_profile, title: "International Standardized Profile",
             short: "ISP" }
         end
       end

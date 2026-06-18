@@ -86,7 +86,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :tta, title: "Technology Trends Assessments", short: "TTA" }
+          { key: :tta,
+            web: :technology_trends_assessments, title: "Technology Trends Assessments", short: "TTA" }
         end
       end
     end

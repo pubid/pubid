@@ -84,7 +84,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :cor, title: "Corrigendum", short: "COR" }
+          { key: :cor,
+            web: :corrigendum, title: "Corrigendum", short: "COR" }
         end
       end
     end

@@ -80,7 +80,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :iwa, title: "International Workshop Agreement", short: "IWA" }
+          { key: :iwa,
+            web: :international_workshop_agreement, title: "International Workshop Agreement", short: "IWA" }
         end
 
         def to_s(**opts)

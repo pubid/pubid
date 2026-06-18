@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :ts, title: "Technical Specification", short: "TS" }
+          { key: :ts,
+            web: :technical_specification, title: "Technical Specification", short: "TS" }
         end
 
         def type_prefix

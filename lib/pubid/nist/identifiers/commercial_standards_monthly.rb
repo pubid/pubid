@@ -21,7 +21,8 @@ module Pubid
           end
 
           def type
-            { key: :csm, title: "Commercial Standards Monthly", short: "CSM" }
+            { key: :csm,
+            web: :commercial_standards_monthly, title: "Commercial Standards Monthly", short: "CSM" }
           end
         end
 

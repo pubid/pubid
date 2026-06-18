@@ -26,7 +26,8 @@ module Pubid
           end
 
           def type
-            { key: :lc, title: "Letter Circular", short: "LCIRC" }
+            { key: :lc,
+            web: :letter_circular, title: "Letter Circular", short: "LCIRC" }
           end
         end
 

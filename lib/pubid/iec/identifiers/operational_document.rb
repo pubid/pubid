@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :od, title: "Operational Document", short: "OD" }
+          { key: :od,
+            web: :operational_document, title: "Operational Document", short: "OD" }
         end
 
         # Override publisher_portion to add OD

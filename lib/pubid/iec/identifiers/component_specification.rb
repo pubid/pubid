@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :cs, title: "Component Specification", short: "CS" }
+          { key: :cs,
+            web: :component_specification, title: "Component Specification", short: "CS" }
         end
 
         # Override publisher_portion to add CS

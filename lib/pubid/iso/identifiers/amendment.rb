@@ -123,7 +123,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :amd, title: "Amendment", short: "AMD" }
+          { key: :amd,
+            web: :amendment, title: "Amendment", short: "AMD" }
         end
       end
     end

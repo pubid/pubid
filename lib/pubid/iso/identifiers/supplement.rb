@@ -86,7 +86,8 @@ module Pubid
         end
 
         def self.type
-          { key: :suppl, title: "Supplement", short: "suppl" }
+          { key: :suppl,
+            web: :supplement, title: "Supplement", short: "suppl" }
         end
       end
     end

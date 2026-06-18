@@ -17,7 +17,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :ext, title: "Extract", short: "Ext" }
+          { key: :ext,
+            web: :extract, title: "Extract", short: "Ext" }
         end
 
         # def self.get_renderer_class

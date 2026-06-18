@@ -24,7 +24,8 @@ module Pubid
           end
 
           def type
-            { key: :crpl, title: "NBS CRPL Report", short: "CRPL" }
+            { key: :crpl,
+            web: :crpl_report, title: "NBS CRPL Report", short: "CRPL" }
           end
         end
 

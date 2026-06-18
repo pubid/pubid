@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :cwa, title: "CEN Workshop Agreement", short: "CWA" }
+          { key: :cwa,
+            web: :cen_workshop_agreement, title: "CEN Workshop Agreement", short: "CWA" }
         end
       end
     end

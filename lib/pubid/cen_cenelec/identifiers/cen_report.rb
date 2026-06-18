@@ -20,7 +20,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :cr, title: "CEN Report", short: "CR" }
+          { key: :cr,
+            web: :cen_report, title: "CEN Report", short: "CR" }
         end
       end
     end

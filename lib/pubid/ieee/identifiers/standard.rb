@@ -29,7 +29,7 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :std, title: "Standard", short: "Std" }
+          { key: :std, web: :standard, title: "Standard", short: "Std" }
         end
 
         # Render standard IEEE format

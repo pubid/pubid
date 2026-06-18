@@ -54,7 +54,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :aerospace, title: "Aerospace/Specialized Standard",
+          { key: :aerospace,
+            web: :aerospace_standard, title: "Aerospace/Specialized Standard",
             short: "BS" }
         end
 

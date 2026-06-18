@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :srd, title: "Systems Reference Document", short: "SRD" }
+          { key: :srd,
+            web: :systems_reference_document, title: "Systems Reference Document", short: "SRD" }
         end
 
         # Override publisher_portion to add SRD

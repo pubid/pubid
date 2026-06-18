@@ -17,7 +17,8 @@ module Pubid
         #
         # @return [Hash] Type information with key, title, and short form
         def self.type
-          { key: :cor, title: "Corrigendum", short: "Cor" }
+          { key: :cor,
+            web: :corrigendum, title: "Corrigendum", short: "Cor" }
         end
 
         # The corrigendum sequence number is stored in the inherited `number`
