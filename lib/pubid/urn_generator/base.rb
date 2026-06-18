@@ -6,6 +6,9 @@ module Pubid
     # Provides template methods for common URN parts.
     # Flavors subclass and override only what differs.
     class Base
+      URN_CONTEXT = Rendering::RenderingContext.urn.freeze
+      private_constant :URN_CONTEXT
+
       attr_reader :identifier
 
       def initialize(identifier)
@@ -35,7 +38,7 @@ module Pubid
         pub = maybe(:publisher)
         return nil unless pub
 
-        pub.to_s.downcase
+        pub.is_a?(Components::Publisher) ? pub.render(context: URN_CONTEXT) : pub.to_s.downcase
       end
 
       def urn_type
@@ -46,34 +49,31 @@ module Pubid
         val = maybe(:number) || maybe(:code)
         return nil unless val
 
-        val.is_a?(Components::Code) ? val.value.to_s : val.to_s
+        val.is_a?(Components::Code) ? val.render(context: URN_CONTEXT) : val.to_s
       end
 
       def urn_part
         val = maybe(:part)
         return nil unless val
 
-        "-#{val.is_a?(Components::Code) ? val.value : val}"
+        "-#{val.is_a?(Components::Code) ? val.render(context: URN_CONTEXT) : val}"
       end
 
       def urn_subpart
         val = maybe(:subpart)
         return nil unless val
 
-        "-#{val.is_a?(Components::Code) ? val.value : val}"
+        "-#{val.is_a?(Components::Code) ? val.render(context: URN_CONTEXT) : val}"
       end
 
       def urn_year
         date = maybe(:date)
-        if date
-          year = date.is_a?(Components::Date) ? date.year : date.to_s
-          return year.to_s if year
+        if date.is_a?(Components::Date)
+          return date.render(context: URN_CONTEXT) if date.present?
+        elsif date
+          return date.to_s
         end
-        if maybe(:year)
-          return identifier.year.to_s
-        end
-
-        nil
+        maybe(:year)&.to_s
       end
 
       def urn_edition

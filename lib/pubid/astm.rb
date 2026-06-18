@@ -8,6 +8,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/astm/single_identifier"
     autoload :Parser, "#{__dir__}/astm/parser"
     autoload :Builder, "#{__dir__}/astm/builder"
+    autoload :Renderer, "#{__dir__}/astm/renderer"
 
     def self.parse(str)
       Identifier.parse(str)
@@ -42,3 +43,6 @@ module Pubid
 end
 
 Pubid::Registry.register(:astm, Pubid::Astm)
+
+Pubid::Astm::SingleIdentifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
+Pubid::Astm::SingleIdentifier.format_registry.register(:human, renderer: Pubid::Astm::Renderer)

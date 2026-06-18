@@ -10,17 +10,16 @@ module Pubid
       end
 
       def urn_year
-        if identifier.date&.year
-          return identifier.date.year.to_s
-        end
+        return identifier.date.render(context: URN_CONTEXT) if identifier.date&.present?
+        return identifier.year&.to_s if maybe(:year)
 
-        identifier.year&.to_s
+        nil
       end
 
       def urn_number
         return nil unless identifier.number
 
-        identifier.number.value.to_s
+        identifier.number.render(context: URN_CONTEXT)
       end
 
       def generate
@@ -29,7 +28,7 @@ module Pubid
         parts << urn_number if urn_number
         parts << urn_year if urn_year
 
-        parts[1] = identifier.publisher.to_s.downcase if identifier.publisher
+        parts[1] = urn_publisher if urn_publisher
 
         parts.join(":")
       end

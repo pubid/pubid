@@ -28,11 +28,6 @@ reaffirmed: nil, revision: nil)
         def type
           Publication.type
         end
-
-        # @return [String] the rendered publication identifier
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

@@ -37,9 +37,8 @@ module Pubid
           parts << "-#{sp}"
         end
 
-        if identifier.date
-          year = identifier.date.year
-          parts << year.to_s
+        if identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
+          parts << identifier.date.render(context: URN_CONTEXT)
         elsif maybe(:year)
           parts << maybe(:year).to_s
         end
@@ -95,9 +94,8 @@ module Pubid
             parts << iter
           end
 
-          if identifier.date
-            year = identifier.date.year
-            parts << year.to_s
+          if identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
+            parts << identifier.date.render(context: URN_CONTEXT)
           end
         else
           parts << "unknown"

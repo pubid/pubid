@@ -47,7 +47,7 @@ module Pubid
         edition = maybe(:edition)
         if edition
           e = if edition.is_a?(Pubid::Components::Edition)
-                edition.number || edition.value
+                edition.number
               else
                 edition.to_s
               end

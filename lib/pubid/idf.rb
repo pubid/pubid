@@ -19,6 +19,15 @@ module Pubid
       builder.build(parsed)
     end
 
+    # Build an IDF identifier from a parse-tree hash (used by ISO joint-identifier
+    # parsing). This is the public seam: callers should never reach into
+    # `Idf::Builder` directly.
+    # @param hash [Hash] parse tree for the joint identifier
+    # @return [Pubid::Idf::Identifier]
+    def self.build_from_parse(hash)
+      Builder.new.build(hash)
+    end
+
     # Per-flavor format registry: inherits global formats, overrides :human
     Identifier.format_registry = FormatRegistry.new(parent: Identifier.format_registry)
     Identifier.format_registry.register(:human, renderer: Idf::Renderer)

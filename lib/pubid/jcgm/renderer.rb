@@ -17,9 +17,9 @@ module Pubid
 
         case id
         when Identifiers::Amendment
-          render_amendment(id)
+          render_amendment(id, context)
         when Identifiers::GumGuide
-          render_gum_guide(id)
+          render_gum_guide(id, context)
         else
           render_single(id)
         end
@@ -35,18 +35,18 @@ module Pubid
         result
       end
 
-      def render_amendment(id)
+      def render_amendment(id, context)
         result = id.base_identifier.to_s if id.base_identifier
         result += "/Amd"
-        result += " #{id.iteration.value}" if id.iteration
+        result += " #{id.iteration.render(context:)}" if id.iteration
         result += ":#{id.date}" if id.date
         result
       end
 
-      def render_gum_guide(id)
+      def render_gum_guide(id, context)
         parts = []
         parts << id.publisher.publisher if id.publisher
-        parts << "GUM-#{id.gum_number.value}" if id.gum_number
+        parts << "GUM-#{id.gum_number.render(context:)}" if id.gum_number
 
         result = parts.join(" ")
         result += ":#{id.date}" if id.date

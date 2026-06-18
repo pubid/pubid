@@ -250,7 +250,7 @@ module Pubid
         when :joint_identifier
           case value[:publisher]
           when "IDF"
-            Idf::Builder.new.build(value)
+            Pubid::Idf.build_from_parse(value)
           end
 
         when :subgroup

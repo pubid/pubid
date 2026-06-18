@@ -23,10 +23,6 @@ module Pubid
           { key: :interpretation, title: "ASHRAE Interpretations",
             short: "Interpretations" }
         end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end

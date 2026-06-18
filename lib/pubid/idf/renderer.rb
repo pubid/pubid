@@ -17,37 +17,37 @@ module Pubid
 
         case id
         when SupplementIdentifier
-          render_supplement(id, opts)
+          render_supplement(id, opts, context)
         else
-          render_single(id, opts)
+          render_single(id, opts, context)
         end
       end
 
       private
 
-      def render_single(id, opts)
+      def render_single(id, opts, context)
         [
-          publisher_portion(id),
-          number_portion(id, opts),
+          publisher_portion(id, context),
+          number_portion(id, opts, context),
         ].join
       end
 
-      def publisher_portion(id)
+      def publisher_portion(id, context)
         [
-          id.publisher.body,
+          id.publisher.render(context:),
           (id.typed_stage.abbreviation.empty? ? "" : "/#{id.typed_stage.abbreviation}"),
         ].join
       end
 
-      def number_portion(id, opts)
+      def number_portion(id, opts, context)
         lang_single = opts[:lang_single] || false
 
         [
-          (id.number ? " #{id.number.value}" : ""),
-          (id.part ? "-#{id.part.value}" : ""),
-          (id.subpart ? "-#{id.subpart.value}" : ""),
-          (id.stage_iteration ? ".#{id.stage_iteration.value}" : ""),
-          (id.date ? ":#{id.date.year}" : ""),
+          (id.number ? " #{id.number.render(context:)}" : ""),
+          (id.part ? "-#{id.part.render(context:)}" : ""),
+          (id.subpart ? "-#{id.subpart.render(context:)}" : ""),
+          (id.stage_iteration ? ".#{id.stage_iteration.render(context:)}" : ""),
+          (id.date ? ":#{id.date.render(context:)}" : ""),
           language_portion(id, lang_single: lang_single),
         ].join
       end
@@ -64,7 +64,7 @@ module Pubid
         ].join
       end
 
-      def render_supplement(id, opts)
+      def render_supplement(id, opts, context)
         lang = opts[:lang] || :en
         lang_single = opts[:lang_single] || false
         with_edition = opts[:with_edition] || false
@@ -75,8 +75,8 @@ module Pubid
           "/",
           id.typed_stage.abbreviation,
           " ",
-          id.number.value,
-          (id.date ? ":#{id.date.year}" : ""),
+          id.number.render(context:),
+          (id.date ? ":#{id.date.render(context:)}" : ""),
         ].join
       end
     end

@@ -6,10 +6,14 @@ module Pubid
   module Asme
     module Components
       class Code < Lutaml::Model::Serializable
-        attribute :designator, :string    # B, Y, BPVC, etc.
-        attribute :number, :string        # 16.5, 14.43, III.1.NB, etc.
+        attribute :designator, :string
+        attribute :number, :string
 
         def to_s
+          render
+        end
+
+        def render(context: nil)
           "#{designator}#{number}"
         end
       end

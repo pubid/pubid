@@ -19,6 +19,7 @@ module Pubid
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **_opts)
         id = @id
+        @context = context
 
         case id
         when Identifiers::Series
@@ -139,13 +140,13 @@ module Pubid
         parts << prefix unless prefix == ""
 
         # CEC Part (C22.2, C22.3, etc.)
-        parts << id.cec_part.value if id.cec_part
+        parts << id.cec_part.render(context: @context) if id.cec_part
 
         # NO. notation - this is the key semantic component
         parts << "NO."
 
         # Number after NO.
-        parts << id.no_number.value if id.no_number
+        parts << id.no_number.render(context: @context) if id.no_number
 
         # Determine separator based on prefix ending
         result = if prefix == ""

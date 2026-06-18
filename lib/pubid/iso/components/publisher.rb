@@ -16,6 +16,10 @@ module Pubid
         end
 
         def render(context: nil)
+          if context&.urn?
+            return publisher&.downcase
+          end
+
           return publisher unless copublisher&.any?
 
           publisher + copublisher.map { |cp| "/#{cp}" }.join
@@ -45,16 +49,10 @@ module Pubid
             copublisher.to_a == other.copublisher.to_a
         end
 
-        # Returns hash code for publisher component
-        # @return [Integer] hash code
-        # @note Memoized for performance
         def hash
           @hash ||= [publisher, copublisher.to_a].map(&:hash).hash
         end
 
-        # Checks equality using hash for consistency
-        # @param other [Object] object to compare with
-        # @return [Boolean] true if equal
         def eql?(other)
           hash == other.hash && self == other
         end

@@ -50,9 +50,10 @@ module Pubid
         end
 
         date = maybe(:date)
-        if date
-          year = date.year
-          parts << year.to_s
+        if date&.is_a?(::Pubid::Components::Date) && date.present?
+          parts << date.render(context: URN_CONTEXT)
+        elsif date
+          parts << date.to_s
         elsif identifier.year
           parts << identifier.year.to_s
         end
@@ -104,9 +105,8 @@ module Pubid
           amendment_year = maybe(:amendment_year)
           if amendment_year
             parts << amendment_year.to_s
-          elsif identifier.date
-            year = identifier.date.year
-            parts << year.to_s
+          elsif identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
+            parts << identifier.date.render(context: URN_CONTEXT)
           end
         else
           parts << "unknown"

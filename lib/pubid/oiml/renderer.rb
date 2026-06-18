@@ -15,6 +15,7 @@ module Pubid
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **opts)
         id = @id
+        @context = context
 
         case id
         when Identifiers::Annex
@@ -45,17 +46,17 @@ module Pubid
         using_edition_format = false
 
         if id.edition && id.date
-          result += " #{id.edition} Edition #{id.date.year}"
+          result += " #{id.edition} Edition #{id.date.render(context: @context)}"
           using_edition_format = true
         elsif id.edition
           result += " #{id.edition}"
           using_edition_format = true
         elsif id.date
           if format == :long
-            result += " Edition #{id.date.year}"
+            result += " Edition #{id.date.render(context: @context)}"
             using_edition_format = true
           else
-            result += ":#{id.date.year}"
+            result += ":#{id.date.render(context: @context)}"
           end
         end
 
@@ -134,7 +135,7 @@ module Pubid
           if id.year
             result += annex_format == :long ? " Edition #{id.year}" : ":#{id.year}"
           elsif id.base_identifier.date
-            result += annex_format == :long ? " Edition #{id.base_identifier.date.year}" : ":#{id.base_identifier.date.year}"
+            result += annex_format == :long ? " Edition #{id.base_identifier.date.render(context: @context)}" : ":#{id.base_identifier.date.render(context: @context)}"
           end
         end
 
@@ -144,7 +145,7 @@ module Pubid
 
       def render_base_identifier(id)
         result = "#{id.publisher} #{id.type} #{id.code}"
-        result += ":#{id.date.year}" if id.date
+        result += ":#{id.date.render(context: @context)}" if id.date
 
         if id.stage || id.iteration
           result += " "

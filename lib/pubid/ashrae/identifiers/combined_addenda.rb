@@ -27,10 +27,6 @@ module Pubid
             short: "Addenda" }
         end
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         def copublisher
           base_identifier&.copublisher
         end

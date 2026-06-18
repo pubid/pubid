@@ -12,7 +12,7 @@ module Pubid
       def urn_number
         return nil unless identifier.code
 
-        identifier.code.value.to_s
+        identifier.code.render(context: URN_CONTEXT)
       end
 
       def urn_no_number

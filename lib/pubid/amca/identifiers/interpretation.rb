@@ -28,11 +28,6 @@ reaffirmed: nil, interpretation_code: nil)
         def type
           Interpretation.type
         end
-
-        # @return [String] the rendered interpretation identifier
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

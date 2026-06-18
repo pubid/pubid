@@ -17,6 +17,7 @@ module Pubid
     # dispatches to type-specific rendering methods.
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **opts)
+        @context = context
         id = @id
 
         case id
@@ -108,22 +109,22 @@ module Pubid
         end
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.second_number
-            second_val = id.second_number.is_a?(Components::Code) ? id.second_number.value : id.second_number
+            second_val = id.second_number.render(context: @context)
             number_str += "/#{second_val}"
           end
 
           space_separated = id.space_separated_part
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             part_str = part_val.to_s.strip
             separator = space_separated ? " " : "-"
             number_str += "#{separator}#{part_str}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             subpart_str = subpart_val.to_s.strip
             number_str += "-#{subpart_str}"
           end
@@ -138,7 +139,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -191,7 +192,7 @@ module Pubid
       def render_adopted_european_norm(id)
         prefix = case id.publisher
                  when Components::Publisher
-                   id.publisher.body
+                   id.publisher.render(context: @context)
                  when Array
                    id.publisher.join("/")
                  when String
@@ -216,7 +217,7 @@ module Pubid
       def render_adopted_international_standard(id)
         prefix = case id.publisher
                  when Components::Publisher
-                   id.publisher.body
+                   id.publisher.render(context: @context)
                  when Array
                    id.publisher.join("/")
                  when String
@@ -248,14 +249,14 @@ module Pubid
         parts << id.prefix if id.prefix
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val}"
           end
 
@@ -269,7 +270,7 @@ module Pubid
         end
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -307,7 +308,7 @@ module Pubid
 
       def render_british_industrial_practice(id)
         result = "BIP #{id.number}"
-        result += ":#{id.date.year}" if id.date
+        result += ":#{id.date.render(context: @context)}" if id.date
         result
       end
 
@@ -319,7 +320,7 @@ module Pubid
           parts_list = id.identifiers[1..].map do |idd|
             part_val = idd.class.attributes.key?(:part) ? idd.part : nil
             if part_val
-              pv = part_val.is_a?(Components::Code) ? part_val.value : part_val
+              pv = part_val.render(context: @context)
               pv.to_s
             else
               idd.to_s
@@ -327,7 +328,7 @@ module Pubid
           end.join(" and ")
 
           result = "#{base_id.to_s.sub(/:.*$/, '')}:#{id.bundle_type} #{parts_list}"
-          result += ":#{id.common_year.year}" if id.common_year
+          result += ":#{id.common_year.render(context: @context)}" if id.common_year
           return result
         end
 
@@ -348,23 +349,23 @@ module Pubid
               abbrev_str = prefix.to_s
             end
             if idd.number
-              number_val = idd.number.is_a?(Components::Code) ? idd.number.value : idd.number
+              number_val = idd.number.render(context: @context)
               abbrev_str += " " if !abbrev_str.empty?
               abbrev_str += number_val.to_s
             end
             if idd.part
-              part_val = idd.part.is_a?(Components::Code) ? idd.part.value : idd.part
+              part_val = idd.part.render(context: @context)
               abbrev_str += "-#{part_val}"
             end
             parts << abbrev_str
           else
             abbrev_str = ""
             if idd.number
-              number_val = idd.number.is_a?(Components::Code) ? idd.number.value : idd.number
+              number_val = idd.number.render(context: @context)
               abbrev_str = number_val.to_s
             end
             if idd.part
-              part_val = idd.part.is_a?(Components::Code) ? idd.part.value : idd.part
+              part_val = idd.part.render(context: @context)
               abbrev_str += "-#{part_val}"
             end
             parts << abbrev_str
@@ -378,8 +379,8 @@ module Pubid
 
         result = parts.join
 
-        if id.common_year && !result.match?(/:#{id.common_year.year}$/)
-          result += ":#{id.common_year.year}"
+        if id.common_year && !result.match?(/:#{id.common_year.render(context: @context)}$/)
+          result += ":#{id.common_year.render(context: @context)}"
         end
 
         result
@@ -387,11 +388,7 @@ module Pubid
 
       def render_committee_document(id)
         year_str = if id.date
-                     if id.date.is_a?(Components::Date)
-                       id.date.year.to_s[-2, 2]
-                     else
-                       id.date.to_s[-2, 2]
-                     end
+                     id.date.render(context: @context).to_s[-2, 2]
                    else
                      "00"
                    end
@@ -402,7 +399,7 @@ module Pubid
       def render_consolidated_identifier(id, opts)
         base_id = id.identifiers.first
 
-        result = if base_id.is_a?(Base) && base_id.class.method_defined?(:to_s_without_suffixes)
+        result = if base_id.is_a?(Identifiers::Base) && base_id.class.method_defined?(:to_s_without_suffixes)
                    base_id.to_s_without_suffixes
                  else
                    base_str = base_id.to_s
@@ -417,7 +414,7 @@ module Pubid
         id.identifiers[1..].each do |idd|
           if idd.is_a?(Identifiers::Amendment)
             if idd.amendment_year
-              sep = idd.is_a?(Base) && idd.separator ? idd.separator : "+"
+              sep = idd.is_a?(Identifiers::Base) && idd.separator ? idd.separator : "+"
               result += "#{sep}A#{idd.amendment_number}:#{idd.amendment_year}"
             else
               result += if idd.amendment_number&.match?(/^[A-Z]+$/)
@@ -427,7 +424,7 @@ module Pubid
                         end
             end
           elsif idd.is_a?(Identifiers::Corrigendum)
-            sep = idd.is_a?(Base) && idd.separator ? idd.separator : "+"
+            sep = idd.is_a?(Identifiers::Base) && idd.separator ? idd.separator : "+"
             result += "#{sep}C"
             result += idd.corrigendum_number.to_s if idd.corrigendum_number
             result += ":#{idd.corrigendum_year}" if idd.corrigendum_year
@@ -489,19 +486,19 @@ module Pubid
         parts << "BS"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           parts << number_str
         end
 
         if id.spec_code
-          code_val = id.spec_code.is_a?(Components::Code) ? id.spec_code.value : id.spec_code
+          code_val = id.spec_code.render(context: @context)
           result = "#{parts.join(' ')} #{code_val}"
         else
           result = parts.join(" ")
         end
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 
@@ -513,9 +510,9 @@ module Pubid
         parts << "DISC"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val.to_s.strip}"
           end
           parts << "PD #{number_str}"
@@ -535,14 +532,14 @@ module Pubid
         parts << type_abbr
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val.to_s.strip}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val.to_s.strip}"
           end
 
@@ -552,7 +549,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 
@@ -568,14 +565,14 @@ module Pubid
         parts << "EP"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val.to_s.strip}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val.to_s.strip}"
           end
 
@@ -585,7 +582,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 
@@ -613,14 +610,14 @@ module Pubid
         parts << "BS"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val}"
           end
 
@@ -630,7 +627,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":Explanatory Supplement:#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -643,13 +640,13 @@ module Pubid
         parts << "BSI Flex"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val}"
           end
           parts << number_str
@@ -660,7 +657,7 @@ module Pubid
         result += " v#{id.edition}" if id.edition
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -671,14 +668,14 @@ module Pubid
       def render_handbook(id)
         abbr = id.original_abbr || "Handbook"
 
-        number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+        number_str = id.number.render(context: @context)
         if id.part
-          part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+          part_val = id.part.render(context: @context)
           number_str += "-#{part_val.to_s.strip}"
         end
 
         result = "#{abbr} #{number_str}"
-        result += ":#{id.date.year}" if id.date
+        result += ":#{id.date.render(context: @context)}" if id.date
         result
       end
 
@@ -687,7 +684,7 @@ module Pubid
         parts << id.publisher.to_s if id.publisher
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           parts << number_str
         end
 
@@ -702,7 +699,7 @@ module Pubid
         end
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 
@@ -714,9 +711,9 @@ module Pubid
         parts << id.publisher.to_s if id.publisher
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val}"
           end
           parts << number_str
@@ -734,7 +731,7 @@ module Pubid
         end
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 
@@ -767,7 +764,7 @@ module Pubid
 
       def render_practice_guide(id)
         result = "PP #{id.number}"
-        result += ":#{id.date.year}" if id.date
+        result += ":#{id.date.render(context: @context)}" if id.date
         result
       end
 
@@ -777,19 +774,19 @@ module Pubid
         parts << type_abbr
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.second_number
-            second_val = id.second_number.is_a?(Components::Code) ? id.second_number.value : id.second_number
+            second_val = id.second_number.render(context: @context)
             number_str += "/#{second_val}"
           end
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val.to_s.strip}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val.to_s.strip}"
           end
 
@@ -799,7 +796,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -817,19 +814,19 @@ module Pubid
         parts << type_abbr
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.second_number
-            second_val = id.second_number.is_a?(Components::Code) ? id.second_number.value : id.second_number
+            second_val = id.second_number.render(context: @context)
             number_str += "/#{second_val}"
           end
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val.to_s.strip}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val.to_s.strip}"
           end
 
@@ -839,7 +836,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -856,7 +853,7 @@ module Pubid
         parts << id.publisher.to_s if id.publisher
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           parts << number_str
         end
 
@@ -869,7 +866,7 @@ module Pubid
         end
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 
@@ -925,14 +922,14 @@ module Pubid
         parts << "BS"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val}"
           end
 
@@ -942,7 +939,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += " Supplementary Index:#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -955,14 +952,14 @@ module Pubid
         parts << "TS"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
 
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
+            part_val = id.part.render(context: @context)
             number_str += "-#{part_val}"
           end
           if id.subpart
-            subpart_val = id.subpart.is_a?(Components::Code) ? id.subpart.value : id.subpart
+            subpart_val = id.subpart.render(context: @context)
             number_str += "-#{subpart_val}"
           end
 
@@ -972,7 +969,7 @@ module Pubid
         result = parts.join(" ")
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
           result += "-#{format('%02d', id.month)}" if id.month
         end
@@ -985,7 +982,7 @@ module Pubid
         parts << "BS"
 
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           parts << number_str
         end
 
@@ -996,7 +993,7 @@ module Pubid
         end
 
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.render(context: @context)
           result += ":#{year_val}"
         end
 

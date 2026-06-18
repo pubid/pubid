@@ -4,6 +4,8 @@ module Pubid
   module Iec
     # Human-readable renderer for IEC identifiers.
     #
+    # Components are accessed only through `component.render(context:)`.
+    #
     # Produces strings like:
     #   "IEC 60038:2009"
     #   "IEC/CD 60038"
@@ -24,129 +26,105 @@ module Pubid
       def render(context: nil, **opts)
         id = @id
 
-        # Dispatch to type-specific renderers for wrapper types that
-        # compose other identifiers.  These have unique rendering rules
-        # that differ substantially from the base single-identifier pattern.
         case id
         when Identifiers::ConsolidatedIdentifier
-          render_consolidated(id, opts)
+          render_consolidated(id, opts, context)
         when Identifiers::VapIdentifier
-          render_vap(id, opts)
+          render_vap(id, opts, context)
         when Identifiers::SheetIdentifier
-          render_sheet(id, opts)
+          render_sheet(id, opts, context)
         when Identifiers::FragmentIdentifier
-          render_fragment(id, opts)
+          render_fragment(id, opts, context)
         when Identifiers::WorkingDocument
-          render_working_document(id)
+          render_working_document(id, context)
         when Identifiers::TestReportForm
-          render_test_report_form(id)
+          render_test_report_form(id, context)
         when SupplementIdentifier
-          render_supplement(id, opts)
+          render_supplement(id, opts, context)
         else
-          render_single(id, opts)
+          render_single(id, opts, context)
         end
       end
 
       private
 
-      # ------------------------------------------------------------------
-      # Core rendering for single (non-wrapper) identifiers.
-      # Delegates to the identifier's own publisher_portion / number_portion.
-      # ------------------------------------------------------------------
-
-      def render_single(id, opts)
+      def render_single(id, opts, context)
         parts = []
         parts << id.publisher_portion
         parts << id.number_portion
 
-        # Edition: always rendered for Identifiers::Base (and subclasses);
-        # for plain SingleIdentifier only when with_edition is requested.
         if id.is_a?(Identifiers::Base)
-          parts << " #{id.edition}" if id.edition&.number
+          parts << " #{id.edition.render(context:)}" if id.edition&.number
         elsif opts[:with_edition] && id.edition&.number
-          parts << " #{id.edition}"
+          parts << " #{id.edition.render(context:)}"
         end
 
-        # VAP suffix (Identifiers::Base only)
         if id.is_a?(Identifiers::Base) && id.vap_suffix
           parts << id.vap_suffix.render_with_space
         end
 
-        # Database flag (Identifiers::Base only)
         if id.is_a?(Identifiers::Base) && id.database
           parts << " DB"
         end
 
-        # All-parts marker
         parts << " (all parts)" if id.all_parts
 
         result = parts.compact.join
 
-        # Language portion
         result << id.language_portion(lang_single: opts[:lang_single]) if id.languages&.any?
 
         result
       end
 
-      # ------------------------------------------------------------------
-      # Supplement rendering (Amendment, Corrigendum, ISH)
-      # ------------------------------------------------------------------
-
-      def render_supplement(id, opts)
-        # Ensure synthetic base exists for standalone supplements
+      def render_supplement(id, opts, context)
         id.ensure_base_identifier
 
         if id.synthetic_base?
-          render_supplement_standalone(id)
+          render_supplement_standalone(id, context)
         elsif id.base_identifier
-          render_supplement_attached(id, opts)
+          render_supplement_attached(id, opts, context)
         else
-          render_single(id, opts)
+          render_single(id, opts, context)
         end
       end
 
-      def render_supplement_standalone(id)
+      def render_supplement_standalone(id, context)
         parts = []
 
-        # Publisher portion
         if id.publisher
-          parts << id.publisher.body
-          parts << "/#{id.copublishers.map(&:body).join('/')}" if id.copublishers&.any?
+          parts << id.publisher.render(context:)
+          if id.copublishers&.any?
+            parts << "/#{id.copublishers.map { |c| c.render(context:) }.join('/')}"
+          end
         end
 
-        # Supplement type and number with part (use base number)
         abbr = id.typed_stage.abbr.first
         number_str = id.base_identifier.number.to_s
-        number_str += "-#{id.number}" if id.number # supplement number
+        number_str += "-#{id.number}" if id.number
         number_str += "-#{id.subpart}" if id.subpart
         parts << "#{abbr} #{number_str}"
 
         result = parts.join("/")
-        result += ":#{id.date.year}" if id.date
-        result += " #{id.edition}" if id.edition&.number
+        result += ":#{id.date.render(context:)}" if id.date
+        result += " #{id.edition.render(context:)}" if id.edition&.number
         result
       end
 
-      def render_supplement_attached(id, opts)
+      def render_supplement_attached(id, opts, context)
         parts = []
         parts << id.base_identifier.to_s(**opts)
 
-        # Supplement notation: /AMD1, /COR1, /ISH1
         abbr = id.typed_stage.abbr.first.upcase
         supp_part = "/#{abbr}#{id.number}"
-        supp_part += ":#{id.date.year}" if id.date
+        supp_part += ":#{id.date.render(context:)}" if id.date
         parts << supp_part
 
-        parts << " #{id.edition}" if id.edition&.number
+        parts << " #{id.edition.render(context:)}" if id.edition&.number
 
         parts.join
       end
 
-      # ------------------------------------------------------------------
-      # Consolidated identifier: "IEC 60529:1989+AMD1:1999"
-      # ------------------------------------------------------------------
-
-      def render_consolidated(id, opts)
+      def render_consolidated(id, opts, _context)
         id.identifiers.map.with_index do |sub_id, idx|
           if idx.zero?
             sub_id.to_s(**opts)
@@ -161,45 +139,32 @@ module Pubid
       end
 
       def render_consolidated_amendment(id)
-        if id.date&.year && !id.date.year.empty?
-          "+AMD#{id.number}:#{id.date.year}"
+        if id.date&.present?
+          "+AMD#{id.number}:#{id.date.render}"
         else
           "+AMD#{id.number}"
         end
       end
 
       def render_consolidated_corrigendum(id)
-        if id.date&.year && !id.date.year.empty?
-          "+COR#{id.number}:#{id.date.year}"
+        if id.date&.present?
+          "+COR#{id.number}:#{id.date.render}"
         else
           "+COR#{id.number}"
         end
       end
 
-      # ------------------------------------------------------------------
-      # VAP identifier: "IEC 61666:2010+AMD1:2021 CSV"
-      # ------------------------------------------------------------------
-
-      def render_vap(id, opts)
+      def render_vap(id, opts, context)
         parts = []
 
-        # Render base identifier WITHOUT edition (edition goes at VAP level)
         parts << id.base_identifier.to_s(**opts.merge(with_edition: false))
-
-        # Add VAP suffix with space
         parts << " #{id.vap_suffix}" if id.vap_suffix
-
-        # Add edition after VAP suffix if present
-        parts << " #{id.edition}" if id.edition&.number
+        parts << " #{id.edition.render(context:)}" if id.edition&.number
 
         parts.compact.join
       end
 
-      # ------------------------------------------------------------------
-      # Sheet identifier: "IEC 60695-2-1/1:1994"
-      # ------------------------------------------------------------------
-
-      def render_sheet(id, opts)
+      def render_sheet(id, opts, context)
         parts = []
         parts << id.base_identifier.to_s(**opts)
         parts << "/#{id.sheet_number}"
@@ -207,39 +172,28 @@ module Pubid
         parts.join
       end
 
-      # ------------------------------------------------------------------
-      # Fragment identifier: "IEC 60050-191/AMD2/FRAG2 ED1"
-      # ------------------------------------------------------------------
-
-      def render_fragment(id, opts)
+      def render_fragment(id, opts, context)
         parts = []
         parts << id.base_identifier.to_s(**opts)
 
-        # Add fragment notation /FRAGN or /FRAGCN depending on base type
         parts << if id.base_identifier.is_a?(Identifiers::Corrigendum)
                    "/FRAGC#{id.fragment_number}"
                  else
                    "/FRAG#{id.fragment_number}"
                  end
 
-        # Add edition if present
-        parts << " #{id.edition}" if id.edition&.number
+        parts << " #{id.edition.render(context:)}" if id.edition&.number
 
         parts.join
       end
 
-      # ------------------------------------------------------------------
-      # Working document: "100/3705(F)/FDIS" or "PWI TR 100-36 ED1"
-      # ------------------------------------------------------------------
-
-      def render_working_document(id)
-        # Working Programme format: "PWI TR 100-36 ED1" or "IEC/PWI 60038"
+      def render_working_document(id, context)
         if id.wp_stage
           parts = []
           if id.publisher
-            parts << id.publisher.body
+            parts << id.publisher.render(context:)
             if id.copublishers&.any?
-              parts << "/#{id.copublishers.map(&:body).join('/')}"
+              parts << "/#{id.copublishers.map { |c| c.render(context:) }.join('/')}"
             end
             parts << "/"
           end
@@ -255,11 +209,10 @@ module Pubid
             parts << " #{num_str}"
           end
 
-          parts << " #{id.edition}" if id.edition&.number
+          parts << " #{id.edition.render(context:)}" if id.edition&.number
           return parts.join
         end
 
-        # Working Document format: "100/3705(F)/FDIS"
         parts = []
         parts << id.technical_committee if id.technical_committee
 
@@ -274,35 +227,26 @@ module Pubid
         parts.join("/")
       end
 
-      # ------------------------------------------------------------------
-      # Test Report Form: "IECEE TRF CISPR 14-1:2023"
-      # ------------------------------------------------------------------
-
-      def render_test_report_form(id)
+      def render_test_report_form(id, context)
         parts = []
-
-        # Publisher and type portion (uses identifier's own publisher_portion)
         parts << id.publisher_portion
 
-        # If CISPR identifier embedded, render it with TRF date
         if id.cispr_identifier
           cispr_parts = []
-          cispr_parts << id.cispr_identifier.publisher.body
+          cispr_parts << id.cispr_identifier.publisher.render(context:)
 
           num_str = id.cispr_identifier.number.to_s
           num_str += "-#{id.cispr_identifier.part}" if id.cispr_identifier.part && id.cispr_identifier.part.to_s != ""
           cispr_parts << num_str
 
           cispr_str = cispr_parts.join(" ")
-          cispr_str += ":#{id.date.year}" if id.date
+          cispr_str += ":#{id.date.render(context:)}" if id.date
 
           parts << " #{cispr_str}"
         else
-          # Normal TRF: number portion (uses identifier's own number_portion)
           parts << id.number_portion
         end
 
-        # TRF info if present
         parts << id.trf_info.to_s if id.trf_info && !id.trf_info.empty?
 
         parts.compact.join

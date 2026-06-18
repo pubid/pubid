@@ -15,10 +15,6 @@ module Pubid
         attribute :number, Sae::Components::Code
         attribute :date, Sae::Components::Date
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         def year
           date&.year
         end
