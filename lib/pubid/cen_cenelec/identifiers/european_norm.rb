@@ -33,7 +33,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :en, title: "European Norm", short: "EN" }
+          { key: :en,
+            web: :european_norm, title: "European Norm", short: "EN" }
         end
       end
     end

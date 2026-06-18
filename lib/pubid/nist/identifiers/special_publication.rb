@@ -23,7 +23,8 @@ module Pubid
           end
 
           def type
-            { key: :sp, title: "NIST Special Publication", short: "SP" }
+            { key: :sp,
+            web: :special_publication, title: "NIST Special Publication", short: "SP" }
           end
         end
 

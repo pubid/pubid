@@ -21,7 +21,7 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :base, title: "Base Standard", short: nil }
+          { key: :base, web: :base, title: "Base Standard", short: nil }
         end
 
         def to_s(**_opts)

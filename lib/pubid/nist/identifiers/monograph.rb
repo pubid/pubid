@@ -25,7 +25,8 @@ module Pubid
           end
 
           def type
-            { key: :mono, title: "Monograph", short: "MONO" }
+            { key: :mono,
+            web: :monograph, title: "Monograph", short: "MONO" }
           end
         end
 

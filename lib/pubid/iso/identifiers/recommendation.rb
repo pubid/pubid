@@ -31,7 +31,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :rec, title: "Recommendation", short: "R" }
+          { key: :rec,
+            web: :recommendation, title: "Recommendation", short: "R" }
         end
 
         # Override URN type code - Recommendation uses 'r' in URN (RFC 5141)

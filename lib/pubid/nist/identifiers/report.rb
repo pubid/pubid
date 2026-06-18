@@ -26,7 +26,8 @@ module Pubid
           end
 
           def type
-            { key: :rpt, title: "NBS Report", short: "RPT" }
+            { key: :rpt,
+            web: :report, title: "NBS Report", short: "RPT" }
           end
         end
 

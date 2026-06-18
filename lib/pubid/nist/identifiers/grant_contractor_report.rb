@@ -22,7 +22,8 @@ module Pubid
           end
 
           def type
-            { key: :gcr, title: "NIST Grant/Contractor Report", short: "GCR" }
+            { key: :gcr,
+            web: :grant_contractor_report, title: "NIST Grant/Contractor Report", short: "GCR" }
           end
         end
 

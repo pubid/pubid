@@ -24,7 +24,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :trf, title: "Test Report Form", short: "TRF" }
+          { key: :trf,
+            web: :test_report_form, title: "Test Report Form", short: "TRF" }
         end
 
         # Override publisher_portion to add TRF with space

@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :jis, title: "Japanese Industrial Standard", short: "JIS" }
+          { key: :jis,
+            web: :japanese_industrial_standard, title: "Japanese Industrial Standard", short: "JIS" }
         end
       end
     end

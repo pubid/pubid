@@ -141,7 +141,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :is, title: "International Standard", short: nil }
+          { key: :is,
+            web: :international_standard, title: "International Standard", short: nil }
         end
 
         # Define machine-readable metadata

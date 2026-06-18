@@ -94,7 +94,8 @@ module Pubid
         }.freeze
 
         def self.type
-          { key: :ish, title: "Interpretation Sheet", short: "ISH" }
+          { key: :ish,
+            web: :interpretation_sheet, title: "Interpretation Sheet", short: "ISH" }
         end
       end
     end

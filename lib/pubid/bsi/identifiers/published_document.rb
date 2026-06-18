@@ -17,7 +17,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :pd, title: "Published Document", short: "PD" }
+          { key: :pd,
+            web: :published_document, title: "Published Document", short: "PD" }
         end
 
         def to_s(lang: :en, lang_single: false)

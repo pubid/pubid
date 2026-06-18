@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :sttr, title: "Societal and Technology Trend Report",
+          { key: :sttr,
+            web: :societal_technology_trend_report, title: "Societal and Technology Trend Report",
             short: "Trend Report" }
         end
 

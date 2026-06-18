@@ -82,7 +82,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :frag, title: "Fragment", short: "FRAG" }
+          { key: :frag,
+            web: :fragment_identifier, title: "Fragment", short: "FRAG" }
         end
 
         def to_s(**opts)

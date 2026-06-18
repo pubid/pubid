@@ -22,7 +22,8 @@ module Pubid
           end
 
           def type
-            { key: :tn, title: "NIST Technical Note", short: "TN" }
+            { key: :tn,
+            web: :technical_note, title: "NIST Technical Note", short: "TN" }
           end
         end
 

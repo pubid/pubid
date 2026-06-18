@@ -19,7 +19,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :hd, title: "Harmonization Document", short: "HD" }
+          { key: :hd,
+            web: :harmonization_document, title: "Harmonization Document", short: "HD" }
         end
       end
     end

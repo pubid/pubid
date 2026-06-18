@@ -54,7 +54,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :"dir-sup", title: "Directives Supplement", short: "SUP" }
+          { key: :"dir-sup",
+            web: :directives_supplement, title: "Directives Supplement", short: "SUP" }
         end
 
         # def render_directives_supplement_identifier(identifier)

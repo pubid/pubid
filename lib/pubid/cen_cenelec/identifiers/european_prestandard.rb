@@ -21,7 +21,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :env, title: "European Prestandard", short: "ENV" }
+          { key: :env,
+            web: :european_prestandard, title: "European Prestandard", short: "ENV" }
         end
 
         def to_s(lang: :en, lang_single: false, **opts)

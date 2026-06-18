@@ -24,7 +24,8 @@ module Pubid
           end
 
           def type
-            { key: :cs, title: "Commercial Standard", short: "CS" }
+            { key: :cs,
+            web: :commercial_standard, title: "Commercial Standard", short: "CS" }
           end
         end
 

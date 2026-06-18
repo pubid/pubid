@@ -27,7 +27,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :dir, title: "Directives", short: "DIR" }
+          { key: :dir,
+            web: :directives, title: "Directives", short: "DIR" }
         end
 
         def to_s(**opts)

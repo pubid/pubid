@@ -15,6 +15,10 @@ module Pubid
         attribute :number, Sae::Components::Code
         attribute :date, Sae::Components::Date
 
+        def self.type
+          { key: :base, web: :standard, title: "Standard", short: "SAE" }
+        end
+
         def year
           date&.year
         end

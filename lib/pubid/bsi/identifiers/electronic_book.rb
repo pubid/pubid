@@ -6,7 +6,8 @@ module Pubid
       # Electronic Publication (EP) identifier
       class ElectronicBook < SingleIdentifier
         def self.type
-          { key: :ep, title: "Electronic Publication", short: "EP" }
+          { key: :ep,
+            web: :electronic_book, title: "Electronic Publication", short: "EP" }
         end
 
         def to_s(lang: :en, lang_single: false)

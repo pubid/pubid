@@ -23,7 +23,8 @@ module Pubid
           end
 
           def type
-            { key: :mp, title: "Miscellaneous Publication", short: "MP" }
+            { key: :mp,
+            web: :miscellaneous_publication, title: "Miscellaneous Publication", short: "MP" }
           end
         end
 

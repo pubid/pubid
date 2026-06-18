@@ -84,7 +84,8 @@ module Pubid
         ].freeze
 
         def self.type
-          { key: :pas, title: "Publicly Available Specification", short: "PAS" }
+          { key: :pas,
+            web: :publicly_available_specification, title: "Publicly Available Specification", short: "PAS" }
         end
       end
     end
