@@ -7,24 +7,6 @@ module Pubid
         "std"
       end
 
-      def urn_number
-        return nil unless identifier.code
-
-        identifier.code.render(context: URN_CONTEXT)
-      end
-
-      def urn_part
-        return nil unless identifier.part
-
-        "-#{identifier.part}"
-      end
-
-      def urn_year
-        return identifier.year.to_s if identifier.year
-
-        nil
-      end
-
       def generate
         parts = ["urn", "api"]
         parts << urn_type

@@ -9,14 +9,6 @@ module Pubid
         identifier.code.to_s
       end
 
-      def urn_year
-        if identifier.year
-          return identifier.year.to_s
-        end
-
-        nil
-      end
-
       def urn_suffix
         identifier.suffix&.to_s&.downcase
       end

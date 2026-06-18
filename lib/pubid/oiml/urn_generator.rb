@@ -15,12 +15,6 @@ module Pubid
         identifier.code.to_s
       end
 
-      def urn_year
-        return identifier.date.render(context: URN_CONTEXT) if identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
-
-        nil
-      end
-
       def urn_stage
         identifier.stage&.to_s&.downcase
       end
