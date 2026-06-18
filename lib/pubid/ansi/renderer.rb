@@ -16,8 +16,8 @@ module Pubid
         id = @id
 
         parts = []
-        parts << publisher_portion(id)
-        parts << number_portion(id)
+        parts << publisher_portion(id, context)
+        parts << number_portion(id, context)
         result = parts.compact.join(" ")
 
         result << language_portion(id) if id.languages&.any?
@@ -27,19 +27,19 @@ module Pubid
 
       private
 
-      def publisher_portion(id)
+      def publisher_portion(id, context)
         if id.copublishers&.any?
-          ([id.publisher] + id.copublishers).map(&:body).join("/")
+          ([id.publisher] + id.copublishers).map { |p| p.render(context:) }.join("/")
         else
-          id.publisher.body
+          id.publisher.render(context:)
         end
       end
 
-      def number_portion(id)
+      def number_portion(id, context)
         [
-          id.number.value,
-          (id.part ? "-#{id.part.value}" : ""),
-          (id.date ? ":#{id.date.year}" : ""),
+          id.number.render(context:),
+          (id.part ? "-#{id.part.render(context:)}" : ""),
+          (id.date ? ":#{id.date.render(context:)}" : ""),
         ].join
       end
 

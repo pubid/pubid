@@ -25,40 +25,23 @@ module Pubid
         # Rendering is identical to Standard
         # Example: ASTM 52303-24e1
 
-        # Convert to ISO/ASTM dual-published format
-        # @return [Pubid::Iso::Identifiers::InternationalStandard] ISO version
+        # Convert to ISO/ASTM dual-published format.
+        # Uses Pubid::Iso.build so this flavor never reaches into ISO's
+        # internal class hierarchy.
+        # @return [Pubid::Iso::Identifier] ISO version
         #
         # @example Convert ASTM to ISO format
         #   astm = Pubid::Astm.parse("ASTM 52303-24e1")
         #   iso = astm.to_iso_identifier
         #   iso.to_s # => "ISO/ASTM 52303:2024"
         def to_iso_identifier
-          iso = Pubid::Iso::Identifiers::InternationalStandard.new
-
-          # Set publisher as ISO with ASTM as copublisher (in Publisher component)
-          iso.publisher = Pubid::Iso::Components::Publisher.new(
+          Pubid::Iso.build(
+            type: :is,
             publisher: "ISO",
-            copublisher: ["ASTM"],
+            copublishers: ["ASTM"],
+            number: code&.number,
+            year: year&.to_s,
           )
-
-          # Also set copublishers attribute (array of Publisher objects) for rendering
-          astm_publisher = ::Pubid::Components::Publisher.new(body: "ASTM")
-          iso.copublishers = [astm_publisher]
-
-          # Set code number (same as ASTM) - use ISO Code component
-          if code
-            iso_code = Pubid::Iso::Components::Code.new(value: code.number)
-            iso.number = iso_code
-          end
-
-          # Set year as date component - use base Date component
-          if year
-            iso_date = ::Pubid::Components::Date.new
-            iso_date.year = year.to_s
-            iso.date = iso_date
-          end
-
-          iso
         end
       end
     end

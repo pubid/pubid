@@ -16,9 +16,7 @@ module Pubid
       end
 
       def urn_year
-        if identifier.date&.year
-          return identifier.date.year.to_s
-        end
+        return identifier.date.render(context: URN_CONTEXT) if identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
 
         nil
       end

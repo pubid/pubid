@@ -37,6 +37,74 @@ module Pubid
       end
     end
 
+    # Build an ISO identifier from attributes.
+    #
+    # This is the public seam: callers in other flavors should never reach
+    # into `Pubid::Iso::Identifiers::*` or `Pubid::Iso::Components::*`
+    # directly — go through this method so the internal class registry can
+    # change without breaking callers.
+    #
+    # Accepts either raw values (Strings/Integers) or pre-built components.
+    # Raw values are wrapped in the appropriate ISO component internally.
+    #
+    # @param type [Symbol] the type key (e.g. :is, :tr, :ts, :guide)
+    # @param publisher [String, Pubid::Iso::Components::Publisher] primary publisher
+    # @param copublishers [Array<String>, Array<Pubid::Components::Publisher>]
+    # @param number [String, Integer, Pubid::Iso::Components::Code]
+    # @param year [String, Integer, Pubid::Components::Date, nil]
+    # @param attrs [Hash] additional identifier attributes
+    # @return [Pubid::Iso::Identifier]
+    def self.build(type:, publisher: nil, copublishers: nil, number: nil,
+                   year: nil, **attrs)
+      klass = locate_type(type) || raise(ArgumentError, "unknown ISO type: #{type.inspect}")
+
+      copub_list = Array(copublishers)
+      attrs[:publisher] = build_publisher(publisher, copub_list) if publisher || copub_list.any?
+      attrs[:copublishers] = build_copublishers(copub_list) if copub_list.any?
+      attrs[:number] = build_code(number) if number
+      attrs[:date] = build_date(year) if year
+
+      klass.new(attrs)
+    end
+
+    # @!visibility private
+    def self.build_publisher(value, copublishers = [])
+      return value if value.is_a?(Components::Publisher) && copublishers.empty?
+
+      copub_strings = copublishers.map { |cp| cp.is_a?(Components::Publisher) ? cp.publisher : cp.to_s }
+      Components::Publisher.new(
+        publisher: value.is_a?(Components::Publisher) ? value.publisher : value.to_s,
+        copublisher: copub_strings,
+      )
+    end
+    private_class_method :build_publisher
+
+    # @!visibility private
+    def self.build_copublishers(list)
+      Array(list).map do |cp|
+        next cp if cp.is_a?(Components::Publisher)
+
+        Components::Publisher.new(publisher: cp.to_s)
+      end
+    end
+    private_class_method :build_copublishers
+
+    # @!visibility private
+    def self.build_code(value)
+      return value if value.is_a?(Components::Code)
+
+      Components::Code.new(value: value.to_s)
+    end
+    private_class_method :build_code
+
+    # @!visibility private
+    def self.build_date(value)
+      return value if value.is_a?(::Pubid::Components::Date)
+
+      ::Pubid::Components::Date.new(year: value.to_s)
+    end
+    private_class_method :build_date
+
     # Parse an ISO URN string
     # @param urn [String] the URN string to parse
     # @return [Identifier] the parsed identifier

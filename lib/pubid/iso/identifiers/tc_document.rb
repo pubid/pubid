@@ -72,26 +72,26 @@ module Pubid
           result = publisher.to_s if publisher
 
           # Add TC type and number
-          result += "/#{tc_type.value} " if tc_type&.value
-          result += tc_number.value.to_s if tc_number&.value
+          result += "/#{tc_type.render} " if tc_type&.value
+          result += tc_number.render.to_s if tc_number&.value
 
           # Add SC type and number
           if sc_type&.value && sc_number&.value
-            result += "/#{sc_type.value} "
-            result += sc_number.value.to_s
+            result += "/#{sc_type.render} "
+            result += sc_number.render.to_s
           end
 
           # Add WG type and number
           if wg_type&.value && wg_number&.value
-            result += "/#{wg_type.value} "
-            result += wg_number.value.to_s
+            result += "/#{wg_type.render} "
+            result += wg_number.render.to_s
           end
 
           # Add document number
-          result += " N #{number.value}" if number&.value
+          result += " N #{number.render}" if number&.value
 
           # Add year if present
-          result += ":#{date.year}" if date&.year
+          result += ":#{date.render}" if date&.year
 
           result
         end
@@ -99,20 +99,21 @@ module Pubid
         # Generate URN for TC document
         # Format: urn:iso:doc:iso:tc:184:sc-4:wg-3:123
         def to_urn
+          urn_ctx = Rendering::RenderingContext.urn
           parts = ["urn:iso:doc"]
-          parts << publisher.to_s.downcase if publisher
+          parts << publisher.render(context: urn_ctx) if publisher
 
           # Add TC
-          parts << "tc:#{tc_number.value}" if tc_number&.value
+          parts << "tc:#{tc_number.render(context: urn_ctx)}" if tc_number&.value
 
           # Add SC
-          parts << "sc-#{sc_number.value}" if sc_number&.value
+          parts << "sc-#{sc_number.render(context: urn_ctx)}" if sc_number&.value
 
           # Add WG
-          parts << "wg-#{wg_number.value}" if wg_number&.value
+          parts << "wg-#{wg_number.render(context: urn_ctx)}" if wg_number&.value
 
           # Add document number
-          parts << number.value if number&.value
+          parts << number.render(context: urn_ctx) if number&.value
 
           parts.join(":")
         end

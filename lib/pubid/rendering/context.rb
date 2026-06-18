@@ -2,31 +2,20 @@
 
 module Pubid
   module Rendering
-    # Context object for flavor-specific rendering rules
+    # Context object for flavor-specific and format-specific rendering rules
     #
-    # This encapsulates the rendering rules that vary between flavors,
-    # allowing components to render themselves correctly based on context.
-    #
-    # == Usage
-    #
-    #   context = RenderingContext.new(
-    #     stage_separator: "/",
-    #     stage_separator_with_copublisher: " ",
-    #     type_separator: "/",
-    #     type_separator_with_prefix: " ",
-    #     default_type_abbr: "IS"
-    #   )
-    #   identifier.to_s(context: context)
-    #
+    # Encapsulates rendering rules that vary between flavors and between
+    # output formats (human-readable, URN, MR string). Components receive
+    # this context and render themselves accordingly — renderers and
+    # URN generators never reach into component internals.
     class RenderingContext
-      attr_reader :stage_separator, :stage_separator_with_copublisher,
+      attr_reader :format, :stage_separator, :stage_separator_with_copublisher,
                   :type_separator, :type_separator_with_prefix,
                   :default_type_abbr, :lang, :lang_single,
                   :with_language_code, :stage_format_long, :with_date,
                   :annotated
 
-      # Initialize a new rendering context
-      #
+      # @param format [Symbol] output format: :human, :urn, or :mr
       # @param stage_separator [String] separator before stage without copublisher
       # @param stage_separator_with_copublisher [String] separator before stage with copublisher
       # @param type_separator [String] separator before type (default)
@@ -34,7 +23,8 @@ module Pubid
       # @param default_type_abbr [String] default type abbreviation to skip rendering
       # @param lang [Symbol] language for rendering (:en or :fr)
       # @param lang_single [Boolean] use single char language format
-      def initialize(stage_separator: "/",
+      def initialize(format: :human,
+                     stage_separator: "/",
                      stage_separator_with_copublisher: " ",
                      type_separator: "/",
                      type_separator_with_prefix: " ",
@@ -45,6 +35,7 @@ module Pubid
                      stage_format_long: false,
                      with_date: true,
                      annotated: false)
+        @format = format
         @stage_separator = stage_separator
         @stage_separator_with_copublisher = stage_separator_with_copublisher
         @type_separator = type_separator
@@ -56,6 +47,18 @@ module Pubid
         @stage_format_long = stage_format_long
         @with_date = with_date
         @annotated = annotated
+      end
+
+      def urn?
+        @format == :urn
+      end
+
+      def human?
+        @format == :human
+      end
+
+      def mr?
+        @format == :mr
       end
 
       # Get the appropriate stage separator based on whether there's a copublisher
@@ -116,6 +119,12 @@ module Pubid
           type_separator_with_prefix: " ",
           default_type_abbr: "",
         )
+      end
+
+      # URN rendering context: components emit URN-format fragments
+      # @return [RenderingContext] URN-specific context
+      def self.urn
+        @urn ||= new(format: :urn)
       end
 
       # Format factory methods — replace RenderingStyle hierarchy

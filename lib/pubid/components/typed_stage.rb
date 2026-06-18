@@ -2,19 +2,20 @@
 
 module Pubid
   module Components
+    # TypedStage component (combined stage + type, e.g. "DTR", "FDIS")
+    #
+    # Human render: typed-stage abbreviation with flavor-specific separator.
+    # URN render: stage code (RFC 5141-bis: stage-XX.XX format handled by urn_generator).
     class TypedStage < Lutaml::Model::Serializable
       attribute :name, :string
-      # Unique per-typed-stage code (e.g. :dtr, :fdisp). Distinct from the
-      # generic stage_code (e.g. :draft, :fdis) which is shared across types.
-      # Some index data serializes this code, so it must be resolvable.
       attribute :code, :string
       attribute :type_code, :string
       attribute :stage_code, :string
       attribute :abbr, :string, collection: true
       attribute :harmonized_stages, :string, collection: true
-      attribute :original_abbr, :string # Store the actual parsed abbreviation
-      attribute :short_abbr, :string  # Short form: DAM, COR, FDAM
-      attribute :long_abbr, :string   # Long form: DAmd, Cor, FDAmd
+      attribute :original_abbr, :string
+      attribute :short_abbr, :string
+      attribute :long_abbr, :string
 
       def to_stage
         Stage.new(
@@ -34,21 +35,21 @@ module Pubid
       end
 
       def render(context: nil)
+        return code.to_s if context&.urn? && code
+
         abbreviation(format_long: context&.stage_format_long || false)
       end
 
       def abbreviation(format_long: true)
-        # Use format preference
         if format_long && long_abbr
           long_abbr
         elsif !format_long && short_abbr
           short_abbr
         else
-          abbr.first # Fallback to canonical
+          abbr.first
         end
       end
 
-      # Returns the canonical (normalized) abbreviation, always abbr.first
       def canonical_abbreviation
         abbr.first
       end

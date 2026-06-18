@@ -27,7 +27,7 @@ module Pubid
 
       def render_base(id)
         result = "#{id.publisher} #{id.type} #{id.code}"
-        result += " #{id.version} (#{id.date.year}-#{id.date.month.to_s.rjust(2, '0')})"
+        result += " #{id.version} (#{id.date.render})"
         result
       end
 
@@ -35,7 +35,7 @@ module Pubid
         supplement_notations = id.collect_supplement_notations(id, [])
         actual_base = id.find_actual_base(id.base)
         code_with_supplements = "#{actual_base.code}#{supplement_notations.join}"
-        "#{actual_base.publisher} #{actual_base.type} #{code_with_supplements} #{actual_base.version} (#{actual_base.date.year}-#{actual_base.date.month.to_s.rjust(2, '0')})"
+        "#{actual_base.publisher} #{actual_base.type} #{code_with_supplements} #{actual_base.version} (#{actual_base.date.render})"
       end
     end
   end

@@ -10,7 +10,15 @@ module Pubid
       class Date < Lutaml::Model::Serializable
         attribute :year, :integer
 
+        def present?
+          !year.nil?
+        end
+
         def to_s
+          render
+        end
+
+        def render(context: nil)
           year.to_s
         end
       end

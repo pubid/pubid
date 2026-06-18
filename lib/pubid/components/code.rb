@@ -2,6 +2,11 @@
 
 module Pubid
   module Components
+    # Document code/number component
+    #
+    # Renders as its bare value regardless of format (human, URN, MR).
+    # Subclasses (ISO, IEC, NIST) extend the model with prefixes or
+    # subparts but inherit the rendering seam.
     class Code < Lutaml::Model::Serializable
       attribute :value, :string
 
@@ -9,20 +14,16 @@ module Pubid
         value.to_s
       end
 
+      # Format-aware render seam. Same output for every format today;
+      # components with format-specific shapes override this.
       def render(context: nil)
         value.to_s
       end
 
-      # Returns hash code for code component
-      # @return [Integer] hash code
-      # @note Memoized for performance
       def hash
         @hash ||= value.hash
       end
 
-      # Checks equality with another code component
-      # @param other [Object] object to compare with
-      # @return [Boolean] true if equal
       def eql?(other)
         return false unless other.is_a?(self.class)
 

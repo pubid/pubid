@@ -18,6 +18,7 @@ module Pubid
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **opts)
         id = @id
+        @context = context
 
         case id
         when Identifiers::AdoptedEuropeanNorm
@@ -79,15 +80,13 @@ module Pubid
           # Draft stage prefix (prEN, FprEN) OR regular publisher
           parts << id.typed_stage.abbr.first
         elsif id.publisher
-          parts << (id.publisher.is_a?(Components::Publisher) ? id.publisher.body : id.publisher.to_s)
+          parts << id.publisher.render(context: @context)
           use_slash_before_type = true # When publisher present, use slash before type
         end
 
         # Copublishers - add to last part (publisher) with slash
         if id.copublishers&.any?
-          copub_str = id.copublishers.map do |cp|
-            cp.is_a?(Components::Publisher) ? cp.body : cp.to_s
-          end.join("/")
+          copub_str = id.copublishers.map { |cp| cp.render(context: @context) }.join("/")
           unless copub_str.empty?
             if parts.any?
               parts[-1] = "#{parts[-1]}/#{copub_str}"
@@ -112,10 +111,9 @@ module Pubid
 
         # Number with part (which may be multi-level like "5-1-1")
         if id.number
-          number_str = id.number.is_a?(Components::Code) ? id.number.value.to_s : id.number.to_s
+          number_str = id.number.render(context: @context)
           if id.part
-            part_val = id.part.is_a?(Components::Code) ? id.part.value : id.part
-            number_str += "-#{part_val}"
+            number_str += "-#{id.part.render(context: @context)}"
           end
           parts << number_str
         end
@@ -131,7 +129,7 @@ module Pubid
 
         # Date
         if id.date
-          year_val = id.date.is_a?(Components::Date) ? id.date.year : id.date.to_i
+          year_val = id.date.is_a?(::Pubid::Components::Date) ? id.date.render(context: @context) : id.date.to_i
           result += ":#{year_val}"
         end
 

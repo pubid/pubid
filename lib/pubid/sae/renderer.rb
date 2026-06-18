@@ -27,7 +27,7 @@ module Pubid
         result = parts.join(" ")
 
         # Date
-        result += ":#{id.date.year}" if id.date
+        result += ":#{id.date.render(context:)}" if id.date
 
         result
       end

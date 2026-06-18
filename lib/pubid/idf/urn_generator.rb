@@ -12,27 +12,26 @@ module Pubid
       def urn_number
         return nil unless identifier.number
 
-        identifier.number.value.to_s
+        identifier.number.render(context: URN_CONTEXT)
       end
 
       def urn_part
         return nil unless identifier.part
 
-        "-#{identifier.part.value}"
+        "-#{identifier.part.render(context: URN_CONTEXT)}"
       end
 
       def urn_subpart
         return nil unless identifier.subpart
 
-        "-#{identifier.subpart.value}"
+        "-#{identifier.subpart.render(context: URN_CONTEXT)}"
       end
 
       def urn_year
-        if identifier.date&.year
-          return identifier.date.year.to_s
-        end
+        return identifier.date.render(context: URN_CONTEXT) if identifier.date&.present?
+        return identifier.year&.to_s if maybe(:year)
 
-        identifier.year&.to_s
+        nil
       end
 
       def urn_edition
@@ -54,12 +53,12 @@ module Pubid
         parts << urn_type if urn_type
 
         if identifier.publisher
-          parts[1] = identifier.publisher.body.to_s.downcase
+          parts[1] = identifier.publisher.render(context: URN_CONTEXT)
         end
 
         if identifier.copublishers&.any?
-          copubs = identifier.copublishers.map(&:body)
-          parts[1] = "#{parts[1]}-#{copubs.join('-').downcase}"
+          copubs = identifier.copublishers.map { |cp| cp.render(context: URN_CONTEXT) }
+          parts[1] = "#{parts[1]}-#{copubs.join('-')}"
         end
 
         if identifier.languages&.any?
@@ -73,7 +72,7 @@ module Pubid
           end
 
           if identifier.number
-            parts << identifier.number.value.to_s
+            parts << identifier.number.render(context: URN_CONTEXT)
           end
         end
 

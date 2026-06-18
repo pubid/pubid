@@ -73,10 +73,10 @@ format: nil, stage_format_long: nil, with_date: nil)
             [
               base_identifier.to_s(lang: lang, lang_single: lang_single,
                                    with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date),
-              " #{supplement_publisher.body}",
+              " #{supplement_publisher.render}",
               " SUP", # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
-              (date ? ":#{date.year}" : ""),
-              (edition ? " Edition #{edition.number.value}" : ""),
+              (date ? ":#{date.render}" : ""),
+              (edition ? " Edition #{edition.value}" : ""),
             ].join
           else
             # Simplified rendering for bundled identifiers (just the supplement part)
@@ -89,13 +89,13 @@ format: nil, stage_format_long: nil, with_date: nil)
 format: nil, stage_format_long: nil, with_date: nil)
           date_str = if date
                        month_part = date.month ? "-#{date.month}" : ""
-                       ":#{date.year}#{month_part}"
+                       ":#{date.render}#{month_part}"
                      else
                        ""
                      end
 
           [
-            supplement_publisher.body,
+            supplement_publisher.render,
             " SUP",
             date_str,
           ].join
@@ -104,13 +104,15 @@ format: nil, stage_format_long: nil, with_date: nil)
         # DirectivesSupplement use urn:iso:doc scheme (not urn:iso:std)
         # Format: urn:iso:doc:{base_urn_parts}:jtc:X:sup[:{year}][:{edition}]
         def to_urn
+          urn_ctx = Rendering::RenderingContext.urn
+
           # If this is a standalone supplement (no base_identifier), build URN directly
           unless base_identifier
             parts = ["urn", "iso", "doc"]
-            parts << supplement_publisher.body.downcase if supplement_publisher
+            parts << supplement_publisher.render(context: urn_ctx) if supplement_publisher
             parts << "sup"
-            parts << date.year.to_s if date
-            parts << "ed-#{edition.number}" if edition&.number
+            parts << date.render(context: urn_ctx) if date
+            parts << edition.render(context: urn_ctx) if edition&.number
             return parts.join(":")
           end
 
@@ -120,7 +122,7 @@ format: nil, stage_format_long: nil, with_date: nil)
           # Handle JTC pattern specially
           if supplement_publisher&.body&.match?(/^JTC\s+(\d+)$/i)
             # Extract JTC number: "JTC 1" -> ["jtc", "1"]
-            jtc_parts = supplement_publisher.body.downcase.split
+            jtc_parts = supplement_publisher.render(context: urn_ctx).split
             # Insert JTC parts before "sup"
             parts = base_urn.split(":")
             parts.concat(jtc_parts) # Add "jtc" and "1"
@@ -128,14 +130,14 @@ format: nil, stage_format_long: nil, with_date: nil)
           else
             # Normal supplement
             parts = [base_urn, "sup"]
-            parts << supplement_publisher.body.downcase if supplement_publisher
+            parts << supplement_publisher.render(context: urn_ctx) if supplement_publisher
           end
 
           # Year (if present)
-          parts << date.year.to_s if date
+          parts << date.render(context: urn_ctx) if date
 
           # Edition (if present)
-          parts << "ed-#{edition.number}" if edition&.number
+          parts << edition.render(context: urn_ctx) if edition&.number
 
           parts.join(":")
         end

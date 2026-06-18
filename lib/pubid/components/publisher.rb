@@ -5,6 +5,9 @@ require "lutaml/model"
 module Pubid
   module Components
     # Publisher ISO, IEC, etc.
+    #
+    # Human render: the publisher body (e.g. "ISO").
+    # URN render: lowercase body (e.g. "iso") per RFC 5141-bis.
     class Publisher < Lutaml::Model::Serializable
       attribute :body, :string
 
@@ -13,19 +16,19 @@ module Pubid
       end
 
       def render(context: nil)
+        return body&.downcase if context&.urn?
+
         body
       end
 
-      # Returns hash code for publisher component
-      # @return [Integer] hash code
-      # @note Memoized for performance
+      def copublished?
+        false
+      end
+
       def hash
         @hash ||= body.hash
       end
 
-      # Checks equality with another publisher component
-      # @param other [Object] object to compare with
-      # @return [Boolean] true if equal
       def eql?(other)
         return false unless other.is_a?(self.class)
 

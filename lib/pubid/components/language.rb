@@ -3,6 +3,9 @@
 module Pubid
   module Components
     # Language component (typically a language code)
+    #
+    # Human render: language code, optionally single-char.
+    # URN render: lowercase ISO 639-1 code (RFC 5141-bis).
     class Language < Lutaml::Model::Serializable
       CHAR_MAP = {
         "R" => "ru",
@@ -13,13 +16,10 @@ module Pubid
         "D" => "de",
       }.freeze
 
-      # code is always an ISO 639-1 two-letter code
       attribute :code, :string, values: CHAR_MAP.values
-      attribute :original_code, :string # Store the actual parsed format
+      attribute :original_code, :string
 
       def to_s(lang_single: false)
-        # When multi-char format requested (lang_single: false) but original was
-        # single-char, normalize to multi-char (for with_edition: true mode)
         if !lang_single && original_code&.length == 1
           code
         elsif original_code
@@ -30,6 +30,8 @@ module Pubid
       end
 
       def render(context: nil, **opts)
+        return code&.downcase if context&.urn?
+
         to_s(**opts)
       end
     end

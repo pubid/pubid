@@ -44,9 +44,8 @@ module Pubid
           parts << "/#{second}"
         end
 
-        if identifier.date
-          year = identifier.date.year
-          parts << year.to_s
+        if identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
+          parts << identifier.date.render(context: URN_CONTEXT)
         elsif identifier.year
           parts << identifier.year.to_s
         end

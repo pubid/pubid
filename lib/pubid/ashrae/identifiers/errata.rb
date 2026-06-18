@@ -24,10 +24,6 @@ module Pubid
         def self.type
           { key: :errata, title: "ASHRAE Errata", short: "Errata" }
         end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end

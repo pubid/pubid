@@ -25,11 +25,6 @@ module Pubid
           "AMCA"
         end
 
-        # Render the identifier as a string
-        def to_s
-          render(format: :human)
-        end
-
         def self.parse(string)
           Amca::Identifier.parse(string)
         end
