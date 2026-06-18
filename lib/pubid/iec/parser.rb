@@ -353,7 +353,7 @@ module Pubid
       end
 
       rule(:iso_identifier) do
-        Iso::Parser.new.identifier
+        Pubid::Iso.joint_grammar_atom(:identifier)
       end
 
       rule(:supplement_type_with_stage) do
