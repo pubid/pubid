@@ -3,40 +3,6 @@
 module Pubid
   module Ansi
     class UrnGenerator < Pubid::UrnGenerator::Base
-      def urn_number
-        return nil unless identifier.number
-
-        identifier.number.render(context: URN_CONTEXT)
-      end
-
-      def urn_part
-        return nil unless identifier.part
-
-        "-#{identifier.part.render(context: URN_CONTEXT)}"
-      end
-
-      def urn_subpart
-        return nil unless identifier.subpart
-
-        "-#{identifier.subpart.render(context: URN_CONTEXT)}"
-      end
-
-      def urn_year
-        return identifier.date.render(context: URN_CONTEXT) if identifier.date&.present?
-        return identifier.year&.to_s if maybe(:year)
-
-        nil
-      end
-
-      def urn_edition
-        return nil unless identifier.edition
-
-        num = identifier.edition.number
-        return nil unless num
-
-        "ed.#{num}"
-      end
-
       def urn_typed_stage
         return nil unless identifier.typed_stage
 

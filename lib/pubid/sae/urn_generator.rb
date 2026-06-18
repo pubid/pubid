@@ -9,13 +9,6 @@ module Pubid
         identifier.type.abbr.to_s.downcase
       end
 
-      def urn_year
-        return identifier.date.render(context: URN_CONTEXT) if identifier.date&.present?
-        return identifier.year&.to_s if maybe(:year)
-
-        nil
-      end
-
       def urn_number
         return nil unless identifier.number
 
