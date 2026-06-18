@@ -9,6 +9,21 @@ module Pubid
       # This is distinct from a StandardIdentifier - the "P" indicates project status,
       # not a code prefix like "C" in "C57.12"
       class ProjectDraftIdentifier < Base
+        TYPED_STAGES = [
+          Components::TypedStage.new(
+            abbr: ["P"],
+            stage_code: "draft",
+            type_code: "draft",
+            ieee_draft_equivalent: "P",
+            approval_status: "unapproved",
+            project_status: true,
+          ),
+        ].freeze
+
+        def self.type
+          { key: :P, title: "Project Draft", short: "P" }
+        end
+
         # Override initialize to strip "P" prefix from code before creating Code object
         # The "P" is reflected in the typed_stage, not in the Code component itself
         def initialize(**args)
