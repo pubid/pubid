@@ -414,6 +414,6 @@ class FixturesClassifier
   end
 
   def log(message)
-     if verbose
+    puts message if @verbose
   end
 end
