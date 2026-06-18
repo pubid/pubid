@@ -10,6 +10,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/jis/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/jis/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/jis/urn_generator"
+    autoload :UrnParser, "#{__dir__}/jis/urn_parser"
 
     # Parse a JIS identifier string
     def self.parse(identifier)

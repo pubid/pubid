@@ -9,6 +9,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/ansi/renderer"
     autoload :SingleIdentifier, "#{__dir__}/ansi/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/ansi/urn_generator"
+    autoload :UrnParser, "#{__dir__}/ansi/urn_parser"
 
     # Parse an ANSI identifier string
     # @param identifier [String] the identifier string to parse

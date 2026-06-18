@@ -57,10 +57,12 @@ module Pubid
   autoload :FormatRegistry, "pubid/format_registry"
 
   autoload :UrnGenerator, "pubid/urn_generator/base"
+  autoload :UrnParser, "pubid/urn_parser"
   autoload :Builder, "pubid/builder/base"
   autoload :Utils, "pubid/utils"
   autoload :Version, "pubid/version"
   autoload :Core, "pubid/core"
+
 
   # Require all flavor modules
   autoload :Amca, "pubid/amca"
@@ -114,8 +116,7 @@ module Pubid
     when :mr_string
       Parsers::MrString.parse(string)
     when :urn
-      # URN auto-detection: extract flavor from URN namespace
-      # e.g., "urn:iso:std:..." → Pubid::Iso
+      eager_load_flavors!
       flavor = detect_flavor_from_urn(string)
       flavor_module = Registry.get(flavor)
       unless flavor_module
@@ -124,8 +125,7 @@ module Pubid
       end
 
       urn_parser = flavor_module.const_get(:UrnParser)
-      urn_parser.parse(string)
-    else
+      urn_parser.parse(string)    else
       # Default to MR string parser for MR format, human-readable otherwise
       # The MR string parser converts to human-readable and delegates to flavor.parse
       raise ArgumentError,
@@ -138,5 +138,23 @@ module Pubid
     # urn:iec:std:... → "iec"
     parts = urn.downcase.split(":")
     parts[1] # The namespace part after "urn"
+  end
+
+  # Trigger autoloads for every declared flavor module so that
+  # Registry is populated before URN dispatch needs it. Safe to call
+  # repeatedly; no-op after the first invocation.
+  def self.eager_load_flavors!
+    return if @flavors_loaded
+
+    constants.each do |c|
+      next unless c.to_s.match?(/\A[A-Z][a-zA-Z]+\z/)
+
+      begin
+        const_get(c)
+      rescue StandardError
+        nil
+      end
+    end
+    @flavors_loaded = true
   end
 end

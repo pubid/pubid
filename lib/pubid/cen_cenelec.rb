@@ -11,6 +11,7 @@ module Pubid
     autoload :SupplementIdentifier,
              "#{__dir__}/cen_cenelec/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/cen_cenelec/urn_generator"
+    autoload :UrnParser, "#{__dir__}/cen_cenelec/urn_parser"
 
     # TYPED_STAGES_REGISTRY for native CEN types
     TYPED_STAGES_REGISTRY = [
@@ -176,6 +177,7 @@ module Pubid
 end
 
 Pubid::Registry.register(:cen_cenelec, Pubid::CenCenelec)
+Pubid::Registry.register(:cen, Pubid::CenCenelec)
 
 # Per-flavor format registry: inherits global formats, overrides :human
 # Register on both root hierarchies: SingleIdentifier and Identifiers::Base

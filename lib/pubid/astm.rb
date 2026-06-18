@@ -9,6 +9,8 @@ module Pubid
     autoload :Parser, "#{__dir__}/astm/parser"
     autoload :Builder, "#{__dir__}/astm/builder"
     autoload :Renderer, "#{__dir__}/astm/renderer"
+    autoload :UrnGenerator, "#{__dir__}/astm/urn_generator"
+    autoload :UrnParser, "#{__dir__}/astm/urn_parser"
 
     def self.parse(str)
       Identifier.parse(str)

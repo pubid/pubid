@@ -12,6 +12,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/ieee/renderer"
     autoload :TypedStages, "#{__dir__}/ieee/typed_stages"
     autoload :UrnGenerator, "#{__dir__}/ieee/urn_generator"
+    autoload :UrnParser, "#{__dir__}/ieee/urn_parser"
 
     # Components submodule
     module Components

@@ -10,6 +10,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/itu/identifiers"
     autoload :Parser, "#{__dir__}/itu/parser"
     autoload :UrnGenerator, "#{__dir__}/itu/urn_generator"
+    autoload :UrnParser, "#{__dir__}/itu/urn_parser"
     autoload :Model, "#{__dir__}/itu/model"
 
     # I18N is a YAML-loaded constant (not a class), so autoload cannot be used.

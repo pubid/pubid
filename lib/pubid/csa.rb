@@ -9,6 +9,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/csa/renderer"
     autoload :SingleIdentifier, "#{__dir__}/csa/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/csa/urn_generator"
+    autoload :UrnParser, "#{__dir__}/csa/urn_parser"
     autoload :WrapperIdentifier, "#{__dir__}/csa/wrapper_identifier"
     autoload :CompositeIdentifier, "#{__dir__}/csa/composite_identifier"
     autoload :Components, "#{__dir__}/csa/components"

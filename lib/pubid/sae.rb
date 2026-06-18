@@ -9,6 +9,7 @@ module Pubid
     autoload :Parser, "#{__dir__}/sae/parser"
     autoload :Renderer, "#{__dir__}/sae/renderer"
     autoload :UrnGenerator, "#{__dir__}/sae/urn_generator"
+    autoload :UrnParser, "#{__dir__}/sae/urn_parser"
 
     def self.parse(input)
       Identifier.parse(input)

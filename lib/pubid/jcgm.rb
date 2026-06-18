@@ -11,6 +11,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/jcgm/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/jcgm/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/jcgm/urn_generator"
+    autoload :UrnParser, "#{__dir__}/jcgm/urn_parser"
 
     # Parse a JCGM identifier string
     # @param identifier [String] the identifier string to parse
