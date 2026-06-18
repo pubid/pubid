@@ -15,6 +15,7 @@ module Pubid
     autoload :Router, "#{__dir__}/nist/router"
     autoload :SupplementIdentifier, "#{__dir__}/nist/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/nist/urn_generator"
+    autoload :UrnParser, "#{__dir__}/nist/urn_parser"
 
     # Explicit registry of NIST identifier classes.
     #

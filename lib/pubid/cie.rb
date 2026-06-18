@@ -14,6 +14,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/cie/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/cie/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/cie/urn_generator"
+    autoload :UrnParser, "#{__dir__}/cie/urn_parser"
 
     # Main entry point for CIE identifiers
     # Delegates to Identifier.parse

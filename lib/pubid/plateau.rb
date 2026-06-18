@@ -11,6 +11,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/plateau/renderer"
     autoload :SupplementIdentifier, "#{__dir__}/plateau/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/plateau/urn_generator"
+    autoload :UrnParser, "#{__dir__}/plateau/urn_parser"
 
     def self.parse(input)
       # Apply legacy update_codes normalization first

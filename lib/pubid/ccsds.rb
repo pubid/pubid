@@ -9,6 +9,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/ccsds/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/ccsds/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/ccsds/urn_generator"
+    autoload :UrnParser, "#{__dir__}/ccsds/urn_parser"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

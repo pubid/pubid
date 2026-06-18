@@ -9,6 +9,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/amca/renderer"
     autoload :SingleIdentifier, "#{__dir__}/amca/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/amca/urn_generator"
+    autoload :UrnParser, "#{__dir__}/amca/urn_parser"
 
     # Parse an ACMA identifier string into an identifier object
     # @param identifier [String] The ACMA identifier string to parse

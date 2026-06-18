@@ -8,6 +8,8 @@ module Pubid
     autoload :Parser, "#{__dir__}/api/parser"
     autoload :Renderer, "#{__dir__}/api/renderer"
     autoload :SingleIdentifier, "#{__dir__}/api/single_identifier"
+    autoload :UrnGenerator, "#{__dir__}/api/urn_generator"
+    autoload :UrnParser, "#{__dir__}/api/urn_parser"
 
     def self.parse(input)
       Identifier.parse(input)

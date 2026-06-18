@@ -11,6 +11,7 @@ module Pubid
     autoload :Parser, "#{__dir__}/etsi/parser"
     autoload :Renderer, "#{__dir__}/etsi/renderer"
     autoload :UrnGenerator, "#{__dir__}/etsi/urn_generator"
+    autoload :UrnParser, "#{__dir__}/etsi/urn_parser"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

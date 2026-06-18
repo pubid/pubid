@@ -10,6 +10,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/ashrae/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/ashrae/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/ashrae/urn_generator"
+    autoload :UrnParser, "#{__dir__}/ashrae/urn_parser"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

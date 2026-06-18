@@ -11,6 +11,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/oiml/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/oiml/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/oiml/urn_generator"
+    autoload :UrnParser, "#{__dir__}/oiml/urn_parser"
 
     def self.parse(identifier)
       parser = Parser.new

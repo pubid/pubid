@@ -10,6 +10,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/idf/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/idf/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/idf/urn_generator"
+    autoload :UrnParser, "#{__dir__}/idf/urn_parser"
 
     def self.parse(identifier)
       parser = Parser.new
