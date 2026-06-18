@@ -93,4 +93,31 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
       expect(excluded.number.value).to eq("9001")
     end
   end
+
+  describe "cross-flavor round-trip" do
+    [
+      [:Iso, "ISO 9001:2015"],
+      [:Iso, "ISO/IEC 17031-1:2020"],
+      [:Bsi, "BS 490:1972"],
+      [:CenCenelec, "EN 1:1977"],
+      [:Jis, "JIS A 0001:1999"],
+      [:Sae, "SAE J300:2019"],
+      [:Ansi, "ANSI X3.4:1963"],
+      [:Idf, "IDF 1:2018"],
+    ].each do |flavor, ref|
+      it "round-trips #{ref} (#{flavor}) through to_hash/from_hash" do
+        original = Pubid.const_get(flavor).parse(ref)
+        hash = original.to_hash
+        restored = original.class.from_hash(hash)
+        expect(restored.to_s).to eq(original.to_s)
+      end
+
+      it "round-trips #{ref} (#{flavor}) through to_json/from_json" do
+        original = Pubid.const_get(flavor).parse(ref)
+        json = original.to_json
+        restored = original.class.from_json(json)
+        expect(restored.to_s).to eq(original.to_s)
+      end
+    end
+  end
 end
