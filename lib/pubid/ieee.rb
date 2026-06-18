@@ -9,6 +9,7 @@ module Pubid
     autoload :Ire, "#{__dir__}/ieee/ire"
     autoload :Nesc, "#{__dir__}/ieee/nesc"
     autoload :Parser, "#{__dir__}/ieee/parser"
+    autoload :PreParser, "#{__dir__}/ieee/pre_parser"
     autoload :Renderer, "#{__dir__}/ieee/renderer"
     autoload :TypedStages, "#{__dir__}/ieee/typed_stages"
     autoload :UrnGenerator, "#{__dir__}/ieee/urn_generator"

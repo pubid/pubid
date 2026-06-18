@@ -42,6 +42,20 @@ day: nil)
           self.day = day
         end
 
+        # Parse a draft string like "D5", "D3.4", or "5" into a Draft object.
+        # @param value [String, Draft] the value to coerce
+        # @return [Draft]
+        def self.parse(value)
+          return value if value.is_a?(Draft)
+
+          str = value.to_s
+          if str =~ /^D(\d+)(?:\.(\d+))?/
+            new(version: $1, revision: $2)
+          else
+            new(version: str)
+          end
+        end
+
         # Convert month name to numeric value
         def convert_month(month_name)
           return nil unless month_name
