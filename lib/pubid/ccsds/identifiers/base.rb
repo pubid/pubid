@@ -3,15 +3,15 @@
 module Pubid
   module Ccsds
     module Identifiers
-      # CCSDS base identifier.
+      # CCSDS base identifier (a published standard).
       #
       # Format: CCSDS NUMBER.PART-TYPE-EDITION[-SUFFIX][ - LANGUAGE Translated]
       # Examples: CCSDS 120.0-G-4, CCSDS 100.0-G-1-S, CCSDS 551.1-O-2 - Russian Translated
       #
-      # CCSDS uses plain strings for `type` (book-color letter: B, G, M, R, Y, O),
-      # `suffix`, and `language` (language name) because they are CCSDS-specific
-      # semantics that do not map cleanly onto the shared Components model.
-      class Base < ::Pubid::Identifier
+      # Attributes, the key_value mapping and from_hash dispatch live on the
+      # abstract root Pubid::Ccsds::Identifier; this concrete type only carries
+      # its typed stage and rendering.
+      class Base < Pubid::Ccsds::Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: [""],
@@ -20,19 +20,8 @@ module Pubid
           ),
         ].freeze
 
-        # CCSDS-specific attributes. `type` overrides the inherited
-        # Components::Type because CCSDS uses single book-color letters
-        # (B/G/M/R/Y/O) rather than the shared Type component.
-        attribute :type, :string
-        attribute :suffix, :string
-        attribute :language, :string
-
         def self.type
           { key: :base, title: "Base Standard", short: nil }
-        end
-
-        def publisher
-          "CCSDS"
         end
 
         def to_s(**_opts)

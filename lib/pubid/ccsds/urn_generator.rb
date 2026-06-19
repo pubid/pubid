@@ -101,8 +101,8 @@ module Pubid
         parts << base_identifier_part
 
         supplement_chain.each do |supp|
-          if supp.number&.value
-            parts << "cor.#{supp.number.value}"
+          if supp.number && !supp.number.to_s.empty?
+            parts << "cor.#{supp.number}"
           elsif supp.typed_stage
             parts << supp.typed_stage.type_code.to_s
           end

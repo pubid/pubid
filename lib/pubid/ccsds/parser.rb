@@ -25,8 +25,10 @@ module Pubid
       # Type (all possible type letters)
       rule(:type) { dash >> match["A-Z"].as(:type) }
 
-      # Edition (can have dots like 4.1)
-      rule(:edition) { dash >> match["0-9."].repeat(1).as(:edition) }
+      # Edition (can have dots like 4.1, and a trailing draft letter like 1.99h)
+      rule(:edition) do
+        dash >> (match["0-9."].repeat(1) >> match["A-Za-z"].maybe).as(:edition)
+      end
 
       # Suffix (like -S)
       rule(:suffix) { dash >> match["A-Z"].as(:suffix) }

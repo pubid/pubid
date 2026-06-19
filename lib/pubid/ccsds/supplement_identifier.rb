@@ -2,18 +2,22 @@
 
 module Pubid
   module Ccsds
-    # Base class for CCSDS supplements (corrigenda, amendments, etc.)
-    # Following ISO pattern: inherits from Base and uses Lutaml::Model
-    class SupplementIdentifier < Identifiers::Base
-      attribute :base_identifier, Identifiers::Base, polymorphic: true
+    # Base class for CCSDS supplements (corrigenda, amendments, etc.).
+    # Descends from the abstract root (not the concrete Base) and points
+    # `base_identifier` at the root, so the polymorphic attribute never
+    # resolves to its own superclass — which is what prevents lutaml from
+    # recursing forever while building a supplement from a hash.
+    class SupplementIdentifier < Identifier
+      attribute :base_identifier, Identifier, polymorphic: true
 
-      # Delegate methods to base_identifier for convenient access
-      def publisher
-        base_identifier&.publisher
-      end
-
-      def number
-        base_identifier&.number
+      # Serialize the supplemented identifier under "base" (matches ISO/JIS).
+      # The key stays `base_identifier` for the attribute/getter, which
+      # relaton-index's get_id_number relies on. A supplement's own code
+      # attributes (number/part/edition/...) stay nil — they live inside
+      # `base` — so the merged root key_value omits them here, keeping the
+      # serialization lean and non-duplicated.
+      key_value do
+        map "base", to: :base_identifier
       end
 
       def <=>(other)
