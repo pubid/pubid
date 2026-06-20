@@ -5,8 +5,8 @@ module Pubid
     module Identifiers
       # Corrigendum Identifier
       # Contains a base identifier plus corrigendum parameters
-      class Corrigendum < Base
-        attribute :base_identifier, Base, polymorphic: true
+      class Corrigendum < SingleIdentifier
+        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
         attribute :corrigendum_number, :string
         attribute :corrigendum_year, :integer
         attribute :separator, :string, default: -> { "+" }

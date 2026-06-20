@@ -11,8 +11,8 @@ module Pubid
       #   PD 5500:2018+A3:2020 PDF
       #   PAS 96:2017 - TC
       #   PP 7722:2006 BOOK
-      class ValueAddedPublication < Base
-        attribute :base_identifier, Base, polymorphic: true
+      class ValueAddedPublication < SingleIdentifier
+        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
         attribute :format, :string, values: ["PDF", "TC", "BOOK"]
 
         def to_s(lang: :en, lang_single: false)

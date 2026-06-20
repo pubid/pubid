@@ -7,7 +7,7 @@ module Pubid
       # Example: "BS ISO 8601:2019" where ISO 8601:2019 is an ISO identifier object
       # Example: "BS IEC 62600:2020" where IEC 62600:2020 is an IEC identifier object
       class AdoptedInternationalStandard < BritishStandard
-        attribute :adopted_identifier, Base, polymorphic: true # ISO/IEC object
+        attribute :adopted_identifier, ::Pubid::Identifier, polymorphic: true # ISO/IEC object
         attribute :edition, :string
         attribute :translation_lang, :string
         attribute :translation_upper, :string

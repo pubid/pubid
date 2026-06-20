@@ -399,22 +399,17 @@ module Pubid
       def render_consolidated_identifier(id, opts)
         base_id = id.identifiers.first
 
-        result = if base_id.is_a?(Identifiers::Base) && base_id.class.method_defined?(:to_s_without_suffixes)
-                   base_id.to_s_without_suffixes
-                 else
-                   base_str = base_id.to_s
-                   base_str = base_str.sub(/ ExComm \(.*?\)$/, "")
-                     .sub(/ ExComm$/, "")
-                     .sub(/ - TC$/, "")
-                     .sub(/ PDF$/, "")
-                     .sub(/ \([A-Z][a-z]+\)$/, "")
-                   base_str
-                 end
+        base_str = base_id.to_s
+        result = base_str.sub(/ ExComm \(.*?\)$/, "")
+                .sub(/ ExComm$/, "")
+                .sub(/ - TC$/, "")
+                .sub(/ PDF$/, "")
+                .sub(/ \([A-Z][a-z]+\)$/, "")
 
         id.identifiers[1..].each do |idd|
           if idd.is_a?(Identifiers::Amendment)
             if idd.amendment_year
-              sep = idd.is_a?(Identifiers::Base) && idd.separator ? idd.separator : "+"
+              sep = idd.separator || "+"
               result += "#{sep}A#{idd.amendment_number}:#{idd.amendment_year}"
             else
               result += if idd.amendment_number&.match?(/^[A-Z]+$/)
@@ -424,7 +419,7 @@ module Pubid
                         end
             end
           elsif idd.is_a?(Identifiers::Corrigendum)
-            sep = idd.is_a?(Identifiers::Base) && idd.separator ? idd.separator : "+"
+            sep = idd.separator || "+"
             result += "#{sep}C"
             result += idd.corrigendum_number.to_s if idd.corrigendum_number
             result += ":#{idd.corrigendum_year}" if idd.corrigendum_year
