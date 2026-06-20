@@ -10,8 +10,8 @@ module Pubid
       # "BS 1902-2.3:Addendum No. 1:1976"
       # "BS 2000-0:Addendum 1:1983"
       # "BS 6034:1981:Addendum No. 1:1986"
-      class AddendumDocument < Base
-        attribute :base_identifier, Base, polymorphic: true
+      class AddendumDocument < SingleIdentifier
+        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
         attribute :addendum_number, :string
         attribute :addendum_year, :integer
         attribute :addendum_type, :string, default: -> {

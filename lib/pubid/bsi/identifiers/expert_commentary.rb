@@ -9,8 +9,8 @@ module Pubid
       # 1. "Expert Commentary" (full form)
       # 2. "ExComm" (abbreviated form)
       # 3. "ExComm (Fire)" (with optional topic suffix)
-      class ExpertCommentary < Base
-        attribute :base_identifier, Base, polymorphic: true
+      class ExpertCommentary < SingleIdentifier
+        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
         attribute :format, :string # "full", "abbr", "abbr_with_topic"
         attribute :topic, :string # e.g., "Fire"
 

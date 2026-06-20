@@ -8,8 +8,8 @@ module Pubid
       # Supports both forward and reverse formats:
       # Forward: "BS 1000:Supplement No. 1:1972", "BS 1722-1 Supplement No. 1:1974"
       # Reverse: "Supplement No. 1 (1970) to BS 1831:1969"
-      class SupplementDocument < Base
-        attribute :base_identifier, Base, polymorphic: true
+      class SupplementDocument < SingleIdentifier
+        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
         attribute :supplement_number, :string
         attribute :supplement_year, :integer
         attribute :supplement_type, :string, default: -> {

@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # BSI Handbook
       # Examples: "Handbook 17:1963", "HB 10146:1998"
-      class Handbook < Base
+      class Handbook < SingleIdentifier
         attribute :number, Bsi::Components::Code
         attribute :part, Bsi::Components::Code
         attribute :date, Bsi::Components::Date

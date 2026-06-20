@@ -247,7 +247,9 @@ end
 # Register Ubsi flavor with the registry
 Pubid::Registry.register(:bsi, Pubid::Bsi)
 
-# Per-flavor format registry: inherits global formats, overrides :human
-Pubid::Bsi::Identifiers::Base.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
-Pubid::Bsi::Identifiers::Base.format_registry.register(:human, renderer: Pubid::Bsi::Renderer)
-Pubid::Bsi::SingleIdentifier.format_registry = Pubid::Bsi::Identifiers::Base.format_registry
+# Per-flavor format registry: inherits global formats, overrides :human.
+# SingleIdentifier is the abstract base for every concrete BSI identifier
+# (including Amendment and Corrigendum), so wiring the registry here covers
+# the whole flavor in one shot.
+Pubid::Bsi::SingleIdentifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
+Pubid::Bsi::SingleIdentifier.format_registry.register(:human, renderer: Pubid::Bsi::Renderer)

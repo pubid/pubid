@@ -6,8 +6,8 @@ module Pubid
       # National Annex (NA) identifier
       # Can have own supplements: "NA+A1:2012 to BASE"
       class NationalAnnex < SingleIdentifier
-        attribute :na_supplements, Base, polymorphic: true, collection: true # Supplements on the NA itself
-        attribute :base_doc, Base, polymorphic: true # The identifier after "to"
+        attribute :na_supplements, ::Pubid::Identifier, polymorphic: true, collection: true # Supplements on the NA itself
+        attribute :base_doc, ::Pubid::Identifier, polymorphic: true # The identifier after "to"
 
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(

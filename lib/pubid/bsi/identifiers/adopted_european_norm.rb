@@ -7,7 +7,7 @@ module Pubid
       # Example: "BS EN 10077-1:2006" where EN 10077-1:2006 is a CEN identifier object
       # Example: "BS EN ISO 8601:2019" where EN ISO 8601:2019 is a CEN AdoptedEuropeanNorm wrapping ISO
       class AdoptedEuropeanNorm < BritishStandard
-        attribute :adopted_identifier, Base, polymorphic: true # CEN object
+        attribute :adopted_identifier, ::Pubid::Identifier, polymorphic: true # CEN object
         attribute :edition, :string
         attribute :translation_lang, :string
         attribute :translation_upper, :string

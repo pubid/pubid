@@ -10,7 +10,6 @@ module Pubid
                "#{__dir__}/identifiers/adopted_international_standard"
       autoload :AerospaceStandard, "#{__dir__}/identifiers/aerospace_standard"
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
-      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :BritishIndustrialPractice,
                "#{__dir__}/identifiers/british_industrial_practice"
       autoload :BritishStandard, "#{__dir__}/identifiers/british_standard"
