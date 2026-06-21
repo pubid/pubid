@@ -2,72 +2,38 @@
 
 module Pubid
   module Api
-    class Builder
-      def build(parsed_hash)
-        # Determine identifier class based on type
-        identifier_class = case parsed_hash[:type]&.to_s
-                           when "BULL"
-                             Identifiers::Bulletin
-                           when "MPMS"
-                             Identifiers::Mpms
-                           when "RP"
-                             Identifiers::RecommendedPractice
-                           when "SPEC"
-                             Identifiers::Specification
-                           when "STD"
-                             Identifiers::Standard
-                           when "TR"
-                             Identifiers::TechnicalReport
-                           when "COS"
-                             Identifiers::ContinuousOperationsStandard
-                           when "PUBL"
-                             Identifiers::Publication
-                           else
-                             # No type = typeless standard
-                             Identifiers::TypelessStandard
-                           end
+    class Builder < Pubid::Builder::Base
+      TYPE_CLASS_MAP = {
+        "BULL" => Identifiers::Bulletin,
+        "MPMS" => Identifiers::Mpms,
+        "RP" => Identifiers::RecommendedPractice,
+        "SPEC" => Identifiers::Specification,
+        "STD" => Identifiers::Standard,
+        "TR" => Identifiers::TechnicalReport,
+        "COS" => Identifiers::ContinuousOperationsStandard,
+        "PUBL" => Identifiers::Publication,
+      }.freeze
 
-        identifier = identifier_class.new
+      private
 
-        # Number (for non-MPMS)
-        if parsed_hash[:number]
-          identifier.code = Components::Code.new(value: parsed_hash[:number].to_s)
+      def default_identifier_class
+        Identifiers::TypelessStandard
+      end
+
+      def select_class(data)
+        TYPE_CLASS_MAP[data[:type]&.to_s] || default_identifier_class
+      end
+
+      def cast(key, value)
+        case key
+        when :number then Components::Code.new(value: value.to_s)
+        when :reaffirmation
+          value.is_a?(Hash) ? (value[:year] || value).to_s : value.to_s
+        when :part, :chapter, :section, :subsection, :year
+          value.to_s
+        else
+          super
         end
-
-        # Part
-        if parsed_hash[:part]
-          identifier.part = parsed_hash[:part].to_s
-        end
-
-        # MPMS-specific attributes
-        if parsed_hash[:chapter]
-          identifier.chapter = parsed_hash[:chapter].to_s
-        end
-
-        if parsed_hash[:section]
-          identifier.section = parsed_hash[:section].to_s
-        end
-
-        if parsed_hash[:subsection]
-          identifier.subsection = parsed_hash[:subsection].to_s
-        end
-
-        # Year
-        if parsed_hash[:year]
-          identifier.year = parsed_hash[:year].to_s
-        end
-
-        # Reaffirmation (nested hash with year inside)
-        if parsed_hash[:reaffirmation]
-          reaffirm_data = parsed_hash[:reaffirmation]
-          identifier.reaffirmation = if reaffirm_data.is_a?(Hash) && reaffirm_data[:year]
-                                       reaffirm_data[:year].to_s
-                                     else
-                                       reaffirm_data.to_s
-                                     end
-        end
-
-        identifier
       end
     end
   end
