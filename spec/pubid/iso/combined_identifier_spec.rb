@@ -100,7 +100,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       end
 
       it "parses ISO stage iteration" do
-        expect(base_identifier.stage_iteration.value).to eq("3")
+        expect(base_identifier.stage_iteration.number).to eq("3")
       end
 
       it "parses ISO date" do

@@ -398,7 +398,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("2")
+        expect(parsed.stage_iteration.number).to eq("2")
       end
 
       it "round-trips" do

@@ -394,7 +394,7 @@ module Pubid
           }
         when :stage_iteration
           # "1" or "2"
-          Components::Code.new(value: value.to_s)
+          Pubid::Components::Iteration.new(number: value.to_s)
 
         when :date
           parse_date(value)
