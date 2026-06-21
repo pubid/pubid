@@ -206,6 +206,24 @@ module Pubid
               }
             end
 
+            # Handle first_number with letter suffix and revision (e.g., "8278Ar1", "256Ar1930")
+            # Parser returns: {:number_with_letter_revision=>{:number=>"8278", :letter_suffix=>"A", :revision_id=>"1"}}
+            # Splits into number + Part(letter) + Edition(r, id) to mirror how :letter_number
+            # (dash-separated "56Ar2") is decomposed for SpecialPublication and similar series.
+            if value.is_a?(Hash) && value[:number_with_letter_revision]
+              data = value[:number_with_letter_revision]
+              return {
+                first_number: Components::Code.new(value: data[:number].to_s),
+                part: Components::Part.new(type: "",
+                                           value: data[:letter_suffix].to_s.upcase),
+                edition: Components::Edition.new(type: "r",
+                                                 id: data[:revision_id].to_s),
+                edition_component: Components::Edition.new(type: "r",
+                                                            id: data[:revision_id].to_s),
+                revision: "r#{data[:revision_id]}",
+              }
+            end
+
             # NEW: Handle first_number hash with language_code (e.g., "1262es")
             # Parser returns: {:number=>"1262", :language_code=>"es"}
             if value.is_a?(Hash) && value[:number] && value[:language_code]

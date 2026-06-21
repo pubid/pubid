@@ -1,35 +1,32 @@
 Flavor: NIST
-Classified: 2026-01-17 15:45:32
+Classified: 2026-06-20 16:36:34
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 19826
-Pass: 19812 (99.93%)
-Fail: 14 (0.07%)
+Total: 21359
+Pass: 21359 (100.0%)
+Fail: 0 (0.0%)
 
 BY CLASS
 ----------------------------------------------------------------------
-base                                     Pass: 1284/1284 (100.0%)
-circular                                 Pass: 848/848 (100.0%)
-circular_supplement                      Pass: 22/22 (100.0%)
+base                                     Pass: 906/906 (100.0%)
+circular                                 Pass: 874/874 (100.0%)
+circular_supplement                      Pass: 11/11 (100.0%)
 commercial_standard                      Pass: 277/277 (100.0%)
-commercial_standard_emergency            Pass: 5/5 (100.0%)
+commercial_standard_emergency            Pass: 11/11 (100.0%)
 commercial_standards_monthly             Pass: 99/99 (100.0%)
-crpl_report                              Pass: 36/36 (100.0%)
-federal_information_processing_standards Pass: 363/363 (100.0%)
-fips                                     Pass: 0/4 (0.0%)
+crpl_report                              Pass: 417/417 (100.0%)
+federal_information_processing_standards Pass: 369/369 (100.0%)
 grant_contractor_report                  Pass: 116/116 (100.0%)
-handbook                                 Pass: 357/357 (100.0%)
-interagency_report                       Pass: 7820/7820 (100.0%)
-letter_circular                          Pass: 1117/1117 (100.0%)
+handbook                                 Pass: 362/362 (100.0%)
+interagency_report                       Pass: 8099/8099 (100.0%)
+letter_circular                          Pass: 2233/2233 (100.0%)
 miscellaneous_publication                Pass: 299/299 (100.0%)
-monograph                                Pass: 249/249 (100.0%)
-ncstar                                   Pass: 62/62 (100.0%)
-nsrds                                    Pass: 110/110 (100.0%)
+monograph                                Pass: 252/252 (100.0%)
+ncstar                                   Pass: 89/89 (100.0%)
+nsrds                                    Pass: 118/118 (100.0%)
 owmwp                                    Pass: 1/1 (100.0%)
-report                                   Pass: 1803/1803 (100.0%)
-sp                                       Pass: 0/2 (0.0%)
-special_publication                      Pass: 2829/2829 (100.0%)
-technical_note                           Pass: 2115/2115 (100.0%)
-unknown                                  Pass: 0/8 (0.0%)
+report                                   Pass: 1815/1815 (100.0%)
+special_publication                      Pass: 2887/2887 (100.0%)
+technical_note                           Pass: 2124/2124 (100.0%)

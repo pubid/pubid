@@ -83,6 +83,30 @@ RSpec.describe Pubid::Nist::Parser do
       end
     end
 
+    context "letter suffix followed by revision" do
+      it "parses LCIRC with letter suffix and 4-digit revision year" do
+        expect { Pubid::Nist.parse("NBS LCIRC 256Ar1930") }.not_to raise_error
+        expect { Pubid::Nist.parse("NBS LC 256Ar1930") }.not_to raise_error
+      end
+
+      it "parses IR with letter suffix and short revision" do
+        expect { Pubid::Nist.parse("NIST IR 8278Ar1 ipd") }.not_to raise_error
+      end
+
+      it "round-trips the rendered identifier" do
+        id = Pubid::Nist::Identifier.parse("NBS LCIRC 256Ar1930")
+        expect(id.to_s).to eq("NBS LC 256Ar1930")
+      end
+
+      it "does not regress on plain number + 4-digit revision" do
+        expect { Pubid::Nist.parse("NBS LCIRC 256r1930") }.not_to raise_error
+      end
+
+      it "does not regress on dash-separated letter suffix + revision" do
+        expect { Pubid::Nist.parse("NIST SP 800-56Ar2") }.not_to raise_error
+      end
+    end
+
     context "NBS historical identifiers" do
       it "parses NBS CIRC" do
         expect { Pubid::Nist.parse("NBS CIRC 13") }.not_to raise_error
