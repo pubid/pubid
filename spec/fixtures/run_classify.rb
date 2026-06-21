@@ -5,8 +5,7 @@ require "bundler/setup"
 require_relative "classify_fixtures"
 
 # Load Pubid base classes first
-require_relative "../../lib/pubid/scheme"
-require_relative "../../lib/pubid/identifier"
+require_relative "../../lib/pubid"
 
 # Load all PubID V2 implementations
 # Explicitly load all 19 flavors

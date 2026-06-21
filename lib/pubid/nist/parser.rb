@@ -652,6 +652,14 @@ module Pubid
           # Note: Preprocessing converts content inside parentheses to uppercase
           # Use specific patterns to avoid consuming other parenthetical content
           (digits.as(:number) >> str("(") >> (str("SP") | str("PT") | str("ES")).as(:language_code) >> str(")")) |
+          # Number with letter suffix followed by revision (e.g., "8278Ar1", "256Ar1930")
+          # CRITICAL: Must come BEFORE digits_with_suffix because number_suffix's
+          # str("r").absent? guard rejects any letter followed by 'r' (would
+          # otherwise drop the letter and parse "256" + "Ar1930" as garbage).
+          (digits.as(:number) >>
+           upper_letter.as(:letter_suffix) >>
+           str("r") >>
+           digits.as(:revision_id)).as(:number_with_letter_revision) |
           # Regular number with optional suffix (original) - includes letters like "A"
           digits_with_suffix
         ).as(:first_number)
