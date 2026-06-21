@@ -178,11 +178,16 @@ module Pubid
       def subpart_from_kv(model, value) = model.subpart = build_code(value)
 
       def stage_iteration_to_kv(model, doc)
-        emit_code(doc, "stage_iteration", model.stage_iteration)
+        iter = model.stage_iteration
+        v = iter.is_a?(::Pubid::Components::Iteration) ? iter.number : iter
+        return if v.nil? || v.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("stage_iteration",
+                                                                v.to_s))
       end
 
       def stage_iteration_from_kv(model, value)
-        model.stage_iteration = build_code(value)
+        model.stage_iteration = ::Pubid::Components::Iteration.new(number: value.to_s)
       end
 
       def emit_code(doc, key, code)

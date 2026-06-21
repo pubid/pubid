@@ -251,9 +251,9 @@ RSpec.describe Pubid::Iso::Builder do
 
         result = builder.build(data)
         expect(result.stage).to be_a(Pubid::Components::Stage)
-        # stage_iteration is set as a Code component via cast
-        expect(result.stage_iteration).to be_a(Pubid::Iso::Components::Code)
-        expect(result.stage_iteration.value).to eq("2")
+        # stage_iteration is set as an Iteration component via cast
+        expect(result.stage_iteration).to be_a(Pubid::Components::Iteration)
+        expect(result.stage_iteration.number).to eq("2")
       end
     end
 

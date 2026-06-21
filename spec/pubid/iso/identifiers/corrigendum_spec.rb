@@ -989,7 +989,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do
@@ -1040,7 +1040,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do
@@ -1095,7 +1095,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do
@@ -1146,7 +1146,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do
@@ -1201,7 +1201,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do
@@ -1252,7 +1252,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do
@@ -1307,7 +1307,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "normalizes format" do

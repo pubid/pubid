@@ -1520,7 +1520,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("2")
+        expect(parsed.stage_iteration.number).to eq("2")
       end
 
       it "round-trips" do
@@ -1571,7 +1571,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("2")
+        expect(parsed.stage_iteration.number).to eq("2")
       end
 
       it "round-trips" do
@@ -1622,7 +1622,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("3")
+        expect(parsed.stage_iteration.number).to eq("3")
       end
 
       it "round-trips" do

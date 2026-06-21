@@ -20,6 +20,48 @@ RSpec.describe Pubid::Components::Code do
   end
 end
 
+RSpec.describe Pubid::Components::Iteration do
+  describe "#render" do
+    let(:iteration) { described_class.new(number: "2") }
+    let(:human_ctx) { Pubid::Rendering::RenderingContext.new }
+    let(:urn_ctx) { Pubid::Rendering::RenderingContext.urn }
+
+    it "renders the number for human context" do
+      expect(iteration.render(context: human_ctx)).to eq("2")
+    end
+
+    it "renders the number for URN context" do
+      expect(iteration.render(context: urn_ctx)).to eq("2")
+    end
+
+    it "renders the number with no context" do
+      expect(iteration.render).to eq("2")
+    end
+  end
+
+  describe "#to_s" do
+    it "returns the bare number" do
+      expect(described_class.new(number: "3").to_s).to eq("3")
+    end
+  end
+
+  describe "#eql?" do
+    it "matches another Iteration with the same number" do
+      expect(described_class.new(number: "2")).to eq(described_class.new(number: "2"))
+    end
+
+    it "does not match a different number" do
+      expect(described_class.new(number: "2")).not_to eq(described_class.new(number: "3"))
+    end
+  end
+
+  describe "#hash" do
+    it "is stable across equal instances" do
+      expect(described_class.new(number: "2").hash).to eq(described_class.new(number: "2").hash)
+    end
+  end
+end
+
 RSpec.describe Pubid::Components::Publisher do
   describe "#render" do
     let(:publisher) { described_class.new(body: "ISO") }

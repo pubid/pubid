@@ -14,7 +14,7 @@ module Pubid
     attribute :number, Components::Code
     attribute :part, Components::Code
     attribute :subpart, Components::Code
-    attribute :stage_iteration, Components::Code
+    attribute :stage_iteration, Components::Iteration
     attribute :date, Components::Date
     attribute :edition, Components::Edition
     attribute :languages, Components::Language, collection: true

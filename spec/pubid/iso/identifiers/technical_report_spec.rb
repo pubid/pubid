@@ -509,7 +509,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
         end
 
         it "parses iteration" do
-          expect(parsed.stage_iteration.value).to eq("2")
+          expect(parsed.stage_iteration.number).to eq("2")
         end
 
         it "round-trips" do
@@ -755,7 +755,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("2")
+        expect(parsed.stage_iteration.number).to eq("2")
       end
 
       it "round-trips" do
@@ -791,7 +791,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnicalReport do
       end
 
       it "parses iteration" do
-        expect(parsed.stage_iteration.value).to eq("2")
+        expect(parsed.stage_iteration.number).to eq("2")
       end
 
       it "round-trips" do

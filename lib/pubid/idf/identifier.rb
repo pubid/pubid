@@ -28,7 +28,7 @@ module Pubid
           (subpart ? "-#{subpart.value}" : ""),
 
           # Stage iteration is optional
-          (stage_iteration ? ".#{stage_iteration.value}" : ""),
+          (stage_iteration ? ".#{stage_iteration.number}" : ""),
 
           # Date is optional
           (date ? ":#{date.year}" : ""),
