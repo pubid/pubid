@@ -5,15 +5,19 @@ module Pubid
     # Base class for all flavor-specific builders.
     #
     # Provides the shared build loop that converts parsed data into identifier
-    # objects. Flavors subclass and override only `cast` and optionally
-    # `default_identifier_class`.
+    # objects. Flavors subclass and override:
+    # - +select_class(data)+ to dispatch by data shape (default returns
+    #   +default_identifier_class+).
+    # - +cast(key, value)+ to transform raw parsed values into components.
+    # - +handle_key(identifier, key, value)+ for non-attribute side effects.
     #
     # The build loop:
     # 1. Flattens array-of-hashes input (from Parslet transforms)
-    # 2. Iterates each key-value pair
-    # 3. Calls `cast(key, value)` to convert raw values to component objects
-    # 4. Assigns the result to the identifier via `send`
-    # 5. Silently skips unknown attributes (rescue NoMethodError)
+    # 2. Asks +select_class(data)+ for the identifier class
+    # 3. Iterates each key-value pair
+    # 4. Calls +cast(key, value)+ to convert raw values to component objects
+    # 5. Assigns the result to the identifier via setter
+    # 6. Silently skips unknown attributes
     class Base
       attr_reader :identifier
 
@@ -23,13 +27,20 @@ module Pubid
 
       def build(data)
         data = flatten_array(data) if data.is_a?(Array)
-        identifier_class = @identifier_class || default_identifier_class
+        identifier_class = @identifier_class || select_class(data)
         identifier = identifier_class.new
         assign_attributes(identifier, data)
         identifier
       end
 
       private
+
+      # Override in subclasses to dispatch to a specific identifier class
+      # based on the shape of the parsed data (type code, supplement marker,
+      # etc.). Defaults to +default_identifier_class+.
+      def select_class(_data)
+        default_identifier_class
+      end
 
       # Override in subclasses to convert raw parsed values to component objects.
       # Return a Hash to assign multiple attributes, or a single value.
