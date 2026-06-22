@@ -94,6 +94,10 @@ module Pubid
         # Locate the appropriate identifier class via Router
         identifier = @router.locate_identifier_klass(parsed_hash).new
 
+        # Resolve the series policy once — every series-specific decision
+        # flows through this object instead of branching on the parsed shape.
+        series = Series.for(parsed_hash)
+
         # NEW: If we extracted a letter suffix Part, assign it now (after identifier initialization)
         if letter_suffix_part
           identifier.part = letter_suffix_part
@@ -257,19 +261,11 @@ module Pubid
             letter_base = letter_num[:letter_base].to_s
             letter_suffix = letter_num[:letter_suffix].to_s
 
-            # SPECIAL CASE: IR series with "R" suffix means "r1" (revision 1)
-            # "79-1786R" -> number="79-1786", edition="r1"
-            is_ir = parsed_hash[:series]&.to_s == "IR"
-            if is_ir && letter_suffix == "R"
-              # IR "R" suffix converts to revision format "r1"
-              identifier.number = Components::Code.new(value: "#{first_num.value}-#{letter_base}")
-              edition_obj = Components::Edition.new(type: "r", id: "1")
-              identifier.edition = edition_obj
-              identifier.edition_component = edition_obj
-              identifier.revision = "r1"
-            # If a Part component was already set (from cast handler), the letter_suffix
-            # is a separate Part component (e.g., SpecialPublication "800-56A" -> number="800-56", part="A")
-            # Otherwise, letter_suffix is part of the number (e.g., NCSTAR "1-1A" -> number="1-1A")
+            if series.handle_letter_num_compound?(identifier,
+                                                   first_num: first_num,
+                                                   letter_base: letter_base,
+                                                   letter_suffix: letter_suffix)
+              # Series-specific handler took ownership (e.g., IR "R" → r1)
             elsif identifier.part
               # SpecialPublication pattern: letter_suffix is separate Part component
               identifier.number = Components::Code.new(value: "#{first_num.value}-#{letter_base}")
@@ -358,13 +354,12 @@ module Pubid
               identifier.edition_component = edition_obj
               identifier.edition = edition_obj
               identifier.edition_year = second_num.value.to_s
-            elsif part_num && parsed_hash[:series].to_s.include?("IR")
-              # Normal compound number
-              # For IR identifiers, part_number should be a Part component (type="pt"), not in compound number
+            elsif part_num && series.part_num_as_component?
+              # IR pattern: part_num becomes a Part component (type="pt"),
+              # not folded into the compound number.
               identifier.part = Components::Part.new(type: "pt",
                                                      value: part_num)
               identifier.number = Components::Code.new(value: "#{first_num.value}-#{second_num.value}")
-            # For IR, create Part component with type="pt"
             else
               # For GCR and others, include part number in compound number
               compound_value = "#{first_num.value}-#{second_num.value}"
@@ -384,27 +379,9 @@ module Pubid
                                                        id: extracted_revision.to_s)
         end
 
-        # IR-SPECIFIC: Handle compound numbers that were converted to edition+year format
-        # For IR identifiers, "84-2946" should remain as compound number, not become "84e2946"
-        # The preprocessing converts "84-2946" to "84e2946", so we need to convert it back for IR
-        is_ir = begin
-          parsed_hash[:series].to_s.include?("IR")
-        rescue StandardError
-          false
-        end
-        if is_ir && identifier.number && identifier.number.value.to_s.match?(/^(\d+)e(\d{4})$/)
-          # Extract the compound number parts from the edition+year format
-          match_data = identifier.number.value.to_s.match(/^(\d+)e(\d{4})$/)
-          number_part = match_data[1] # "84"
-          year_part = match_data[2] # "2946"
-
-          # Convert to compound number format
-          identifier.number = Components::Code.new(value: "#{number_part}-#{year_part}")
-
-          # Clear the edition that was incorrectly set from the year
-          identifier.edition = nil
-          identifier.edition_component = nil
-        end
+        # Series-specific post-processing (e.g., IR reverses the "84e2946"
+        # form that preprocessing produced back to "84-2946").
+        series.finalize_identifier(identifier, parsed_hash)
 
         # Set publisher_was_parsed flag if publisher was set
         # This includes cases where publisher was explicitly parsed or extracted from series prefix

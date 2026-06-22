@@ -76,56 +76,12 @@ module Pubid
           value # Return raw value to be tracked in builder
 
         when :letter_number
-          # Letter number pattern (e.g., 800-56A, 1-1A for NCSTAR, 73-197Ur for IR)
-          # Parser returns: {:letter_base=>"56", :letter_suffix=>"A"} or
-          # {:letter_base=>"197", :letter_suffix=>"U", :letter_suffix_extra=>"r"}
-          # For SpecialPublication, create Part component with letter suffix as value
-          # For MONO and NCSTAR, preserve letter suffix as part of the number (return raw value)
+          # Letter suffix from a dashed pattern (e.g., 800-56A → {:letter_base=>"56", :letter_suffix=>"A"}).
+          # Series policy decides whether the suffix becomes a Part component
+          # (default) or stays in the number (MONO/NCSTAR/IR-with-R-or-Ur).
           return nil if value.nil? || !value.is_a?(Hash)
 
-          letter_suffix = value[:letter_suffix]&.to_s&.strip
-          letter_suffix_extra = value[:letter_suffix_extra]&.to_s&.strip
-
-          # Combine letter_suffix and letter_suffix_extra (e.g., "U" + "r" = "Ur")
-          full_suffix = if letter_suffix_extra && !letter_suffix_extra.empty?
-                          letter_suffix + letter_suffix_extra
-                        else
-                          letter_suffix
-                        end
-
-          return nil if full_suffix.nil? || full_suffix.empty?
-
-          # Check if this is a MONO or NCSTAR series
-          # For these series, the letter suffix should be part of the number, not a separate Part component
-          # For IR with "R" or "Ur" suffix, also return raw value so builder can convert to edition "r1"
-          is_mono = begin
-            parsed_hash[:series].to_s.include?("MONO")
-          rescue StandardError
-            false
-          end
-          is_ncstar = begin
-            parsed_hash[:series].to_s.include?("NCSTAR")
-          rescue StandardError
-            false
-          end
-          # IR with "R" suffix needs special handling (convert to edition "r1")
-          # Also handle "Ur" which combines uppercase U with lowercase r
-          is_ir_with_r = begin
-            parsed_hash[:series].to_s.include?("IR") && (letter_suffix == "R" || full_suffix == "Ur")
-          rescue StandardError
-            false
-          end
-
-          if is_mono || is_ncstar || is_ir_with_r
-            # For MONO and NCSTAR, preserve letter suffix as part of the number
-            # For IR with "R" or "Ur", return raw value so builder can convert "79-1786R" to "79-1786r1"
-            # Return raw value so builder can construct proper format
-            value[:letter_suffix] = full_suffix
-            value
-          else
-            # For SpecialPublication and others, create Part component
-            { part: Components::Part.new(type: "", value: full_suffix.upcase) }
-          end
+          Series.for(parsed_hash).cast_letter_number(value, parsed_hash)
 
         when :fips_part
           # Part number from FIPS date pattern (e.g., 11-1-Sep30/1977)
@@ -579,56 +535,16 @@ module Pubid
               edition: Components::Edition.new(type: "r", id: revision_part),
             }
           # Pattern: bare UPPERCASE letter suffix (e.g., "800-56A" -> number + Part("", "A"))
-          # Only matches uppercase letters - won't match revision markers
-          # IMPORTANT: For MR format preservation, keep letter suffix as part of number
-          # IMPORTANT: For Report, FIPS, IR, and LC series, preserve letter suffix as part of number
+          # Only matches uppercase letters - won't match revision markers.
+          # Series policy decides whether the letter stays in the number
+          # (MR format, RPT/FIPS/IR/CRPL/LC/MONO/MP) or becomes a Part.
           elsif str_value =~ /^(.+?)([A-Z])$/
             number_part = $1
             letter_part = $2
-            # Check if we should preserve letter suffix in number
-            # Check for specific series that need letter suffix preserved
-            is_report = begin
-              parsed_hash[:series].to_s.include?("RPT")
-            rescue StandardError
-              false
-            end
-            is_fips = begin
-              parsed_hash[:series].to_s.include?("FIPS")
-            rescue StandardError
-              false
-            end
-            is_ir = begin
-              parsed_hash[:series].to_s.include?("IR")
-            rescue StandardError
-              false
-            end
-            is_crpl = begin
-              parsed_hash[:series].to_s.include?("CRPL")
-            rescue StandardError
-              false
-            end
-            is_mono = begin
-              parsed_hash[:series].to_s.include?("MONO")
-            rescue StandardError
-              false
-            end
-            is_mp = begin
-              parsed_hash[:series].to_s.include?("MP")
-            rescue StandardError
-              false
-            end
-            # Check for LC but exclude LCIRC (Letter Circular uses LC, not LCIRC)
-            is_lc = begin
-              parsed_hash[:series].to_s.include?("LC") && !parsed_hash[:series].to_s.include?("LCIRC")
-            rescue StandardError
-              false
-            end
 
-            if parsed_hash[:parsed_format] == :mr || is_report || is_fips || is_ir || is_crpl || is_lc || is_mono || is_mp
-              # For MR format, Report, FIPS, IR, CRPL, LC, MONO, and MP, preserve letter suffix as part of number
+            if Series.for(parsed_hash).preserve_letter_suffix?(parsed_hash)
               return { type => Components::Code.new(value: str_value) }
             else
-              # For other formats, extract letter suffix as separate Part component
               return {
                 type => Components::Code.new(value: number_part),
                 part: Components::Part.new(type: "", value: letter_part),
@@ -1135,10 +1051,10 @@ module Pubid
               Date::MONTHNAMES.index(month_str) ||
               month_str.to_i
             if month_num&.positive?
-              # Check if this is FIPS series - FIPS uses number format (e198503), not month abbreviations
-              # For historical NBS documents, preserve month name: "April1909" not "190904"
-              is_fips = parsed_hash[:series]&.to_s == "FIPS"
-              if !is_fips && month_str.match?(/^[A-Z][a-z]+/) && edition_id.to_s.match?(/^\d{4}$/)
+              # FIPS uses modern (numeric) date format; historical NBS keeps
+              # month names like "April1909" instead of "190904".
+              modern = Series.for(parsed_hash).modern_edition_date?
+              if !modern && month_str.match?(/^[A-Z][a-z]+/) && edition_id.to_s.match?(/^\d{4}$/)
                 # Historical NBS month+year format: preserve month name, use "-" type for special rendering
                 edition_obj = Components::Edition.new(
                   type: "-",
@@ -1155,7 +1071,7 @@ module Pubid
                 edition_id = "#{edition_id}#{format('%02d', month_num)}"
 
                 # For FIPS with day, append day as well: "Sep30/1977" -> "19770930"
-                if is_fips && parsed_hash[:edition_day]
+                if modern && parsed_hash[:edition_day]
                   day_num = parsed_hash[:edition_day].to_s.to_i
                   if day_num.positive? && day_num <= 31
                     edition_id = "#{edition_id}#{format('%02d', day_num)}"
@@ -1230,14 +1146,6 @@ module Pubid
             str_value
           end
 
-        when :update
-          handle_update_cast(value)
-
-        when :update_number, :update_year
-          return nil if value.nil? || value.to_s.strip.empty?
-
-          value.to_s
-
         when :addendum
           handle_addendum_cast(value)
 
@@ -1309,23 +1217,6 @@ module Pubid
         if value.is_a?(Array) && value.empty?
           # Empty array means "supp" was present but no suffix
           ""
-        else
-          str_value = value.to_s.strip
-          str_value.empty? ? nil : str_value
-        end
-      end
-
-      # Handle update casting (number and year)
-      def handle_update_cast(value)
-        if value.is_a?(Hash)
-          {
-            update_number: value[:update_number]&.to_s,
-            update_year: value[:update_year]&.to_s,
-          }.compact
-        elsif value.to_s.strip.empty?
-          # Empty update string (just "-upd" with no details)
-          # Don't create update component - not enough data
-          nil
         else
           str_value = value.to_s.strip
           str_value.empty? ? nil : str_value

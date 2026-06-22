@@ -13,6 +13,7 @@ module Pubid
     autoload :ParserOutputNormalizer, "#{__dir__}/nist/parser_output_normalizer"
     autoload :Renderer, "#{__dir__}/nist/renderer"
     autoload :Router, "#{__dir__}/nist/router"
+    autoload :Series, "#{__dir__}/nist/series"
     autoload :SupplementIdentifier, "#{__dir__}/nist/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/nist/urn_generator"
     autoload :UrnParser, "#{__dir__}/nist/urn_parser"
