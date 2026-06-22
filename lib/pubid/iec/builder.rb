@@ -400,7 +400,11 @@ module Pubid
           parse_date(value)
 
         when :edition
-          Pubid::Components::Edition.new(number: value)
+          # Coerce to String: the parsed value may be a Parslet::Slice, which
+          # Edition.number (Type::Value) would store verbatim and serialize as a
+          # !ruby/object:Parslet::Slice node — unloadable by the index reader's
+          # YAML.safe_load(permitted_classes: [Symbol]).
+          Pubid::Components::Edition.new(number: value&.to_s)
 
         when :sheet_number
           value.to_s
