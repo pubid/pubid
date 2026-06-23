@@ -34,7 +34,7 @@ module Pubid
           "CSM"
         end
 
-        def to_s
+        def to_s(format = nil)
           result = "#{publisher} #{series}"
 
           # Proper Volume and Part components

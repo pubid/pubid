@@ -87,7 +87,7 @@ module Pubid
           Components::Code.new(value: num_value)
         end
 
-        def to_s
+        def to_s(format = nil)
           # Use actual series attribute if it contains subseries (e.g., "CRPL-F-B")
           # Otherwise use default series_code ("CRPL")
           series_to_render = if series&.value&.include?("CRPL-F-")
