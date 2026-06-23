@@ -41,10 +41,18 @@ module Pubid
           str_value = value.to_s
           publisher_extracted = nil
 
-          # For compound series like "NBS CIRC", extract publisher and series separately
-          if str_value.start_with?("NBS ")
-            publisher_extracted = "NBS"
-            str_value = str_value.sub("NBS ", "")
+          # Compound series carry the publisher inside the series token (e.g.
+          # "NBS CIRC", "NIST DCI") because the bare series code isn't recognized
+          # by the grammar on its own. Split the leading publisher out so
+          # `series` holds just the code and `publisher` is populated — matching
+          # how standalone series (NIST SP, NBS CS) already parse, and avoiding a
+          # nil publisher (which renders fine via the series string but would
+          # otherwise force a misleading publisher_was_parsed: false). Routing
+          # already ran on the raw compound series, so stripping here can't
+          # change the identifier class.
+          if (m = str_value.match(/\A(NBS|NIST) (.+)\z/))
+            publisher_extracted = m[1]
+            str_value = m[2]
           end
 
           # Return composite hash with both publisher and series if extracted
