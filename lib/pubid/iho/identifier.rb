@@ -3,7 +3,15 @@
 module Pubid
   module Iho
     # Entry point for parsing IHO identifiers.
+    #
+    # `extend Pubid::IdentifierFacade` provides polymorphic `from_hash` (routing
+    # to the concrete subclass via the `_type` discriminator) and pairs with
+    # `include Pubid::Iho::Identifier` in Identifiers::Base for identity
+    # (`is_a?`/`===`), so a consumer handed this module can both deserialize and
+    # identity-check IHO ids through it.
     module Identifier
+      extend Pubid::IdentifierFacade
+
       # Parse an IHO identifier string into an identifier object
       # @param identifier [String] The IHO identifier string to parse
       # @return [Pubid::Iho::Identifiers::Base] The appropriate identifier object
@@ -13,14 +21,6 @@ module Pubid
         Builder.build(parsed)
       rescue Parslet::ParseFailed => e
         raise "Failed to parse IHO identifier '#{identifier}': #{e.message}"
-      end
-
-      # Reconstruct an IHO identifier from its key_value hash (e.g. a relaton
-      # index row). Routes to the concrete subclass via `_type`.
-      # @param data [Hash] the serialized identifier hash
-      # @return [Pubid::Iho::Identifiers::Base]
-      def self.from_hash(data, options = {})
-        Identifiers::Base.from_hash(data, options)
       end
     end
   end

@@ -3,6 +3,11 @@
 module Pubid
   module Bsi
     class SingleIdentifier < Pubid::Identifier
+      # Identity for the Pubid::Bsi::Identifier facade: SingleIdentifier is the
+      # common ancestor of every concrete BSI identifier, so including the
+      # facade module here makes them all `is_a?(Pubid::Bsi::Identifier)`.
+      include Pubid::Bsi::Identifier
+
       # Generate URN for this identifier
       #
       # @return [String] URN representation

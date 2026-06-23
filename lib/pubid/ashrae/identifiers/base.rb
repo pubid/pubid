@@ -5,6 +5,9 @@ module Pubid
     module Identifiers
       # Base class for all ASHRAE identifiers
       class Base < Pubid::Identifier
+        # Identity for the Pubid::Ashrae::Identifier facade (see its comment).
+        include Pubid::Ashrae::Identifier
+
         attribute :publisher, :string, default: "ASHRAE"
         attribute :code, :string
         attribute :year, :string

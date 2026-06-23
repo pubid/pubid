@@ -3,6 +3,12 @@
 module Pubid
   module CenCenelec
     class SingleIdentifier < Pubid::Identifier
+      # Identity for the Pubid::CenCenelec::Identifier facade. CEN/CENELEC
+      # identifiers split between two roots (Identifiers::Base and this
+      # SingleIdentifier), both direct subclasses of Pubid::Identifier, so the
+      # facade module is included into each to cover every concrete type.
+      include Pubid::CenCenelec::Identifier
+
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "EN")
       }

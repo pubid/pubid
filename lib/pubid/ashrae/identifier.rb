@@ -2,7 +2,13 @@
 
 module Pubid
   module Ashrae
+    # `extend Pubid::IdentifierFacade` adds polymorphic `from_hash` and pairs
+    # with `include Pubid::Ashrae::Identifier` in Identifiers::Base for identity
+    # (`is_a?`/`===`), so a consumer handed this module can deserialize and
+    # identity-check ASHRAE ids through it.
     module Identifier
+      extend Pubid::IdentifierFacade
+
       # Parse an ASHRAE identifier string into an identifier object
       # @param identifier [String] The ASHRAE identifier string to parse
       # @return [Identifiers::Base] The appropriate identifier object

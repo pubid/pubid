@@ -6,6 +6,13 @@ module Pubid
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
       class Base < Pubid::Identifier
+        # Mark every NIST identifier as a member of the Pubid::Nist::Identifier
+        # facade module so `id.is_a?(Pubid::Nist::Identifier)` and
+        # `Pubid::Nist::Identifier === id` hold. The module carries only
+        # singleton methods (parse/from_hash), so this adds ancestry for the
+        # identity check without injecting any instance behavior.
+        include Pubid::Nist::Identifier
+
         # Default: no typed stages. Subclasses override as needed.
         def self.typed_stages
           []
