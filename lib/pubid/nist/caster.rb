@@ -611,8 +611,12 @@ module Pubid
           nil
 
         when :parsed_format
-          # Format detection result from parser
-          value&.to_s
+          # Format detection result from parser. :short is the render default
+          # (a nil parsed_format renders short — see Identifiers::Base#to_s), so
+          # store only non-default formats (e.g. "mr"); "short" stays unset and
+          # is omitted from to_hash. detect_format only emits :mr or :short.
+          v = value&.to_s
+          v unless v == "short"
 
         when :translation
           # V1 TRANSLATION NORMALIZATION
