@@ -383,9 +383,11 @@ module Pubid
         # form that preprocessing produced back to "84-2946").
         series.finalize_identifier(identifier, parsed_hash)
 
-        # Set publisher_was_parsed flag if publisher was set
-        # This includes cases where publisher was explicitly parsed or extracted from series prefix
-        identifier.publisher_was_parsed = true if identifier.publisher
+        # publisher_was_parsed defaults to true (see Identifiers::Base), so only
+        # the prefix-less case needs recording: assign false when no publisher
+        # was parsed/extracted, and leave it unset (default true, omitted from
+        # to_hash) when one was. Keeps the common publisher-bearing id lean.
+        identifier.publisher_was_parsed = false unless identifier.publisher
 
         # NEW: Convert revision with month+year to update component (V1 compatibility)
         # Patterns like "NIST IR 4743rJun1992" should be rendered as "NIST IR 4743/Upd1-199206"

@@ -32,7 +32,8 @@ module Pubid
         when :publisher
           return nil if value.nil? || value.to_s.strip.empty?
 
-          Components::Publisher.new(publisher: value.to_s)
+          # publisher is a plain string attribute (see Identifiers::Base).
+          value.to_s
 
         when :series
           return nil if value.nil? || value.to_s.strip.empty?
@@ -40,16 +41,24 @@ module Pubid
           str_value = value.to_s
           publisher_extracted = nil
 
-          # For compound series like "NBS CIRC", extract publisher and series separately
-          if str_value.start_with?("NBS ")
-            publisher_extracted = "NBS"
-            str_value = str_value.sub("NBS ", "")
+          # Compound series carry the publisher inside the series token (e.g.
+          # "NBS CIRC", "NIST DCI") because the bare series code isn't recognized
+          # by the grammar on its own. Split the leading publisher out so
+          # `series` holds just the code and `publisher` is populated — matching
+          # how standalone series (NIST SP, NBS CS) already parse, and avoiding a
+          # nil publisher (which renders fine via the series string but would
+          # otherwise force a misleading publisher_was_parsed: false). Routing
+          # already ran on the raw compound series, so stripping here can't
+          # change the identifier class.
+          if (m = str_value.match(/\A(NBS|NIST) (.+)\z/))
+            publisher_extracted = m[1]
+            str_value = m[2]
           end
 
           # Return composite hash with both publisher and series if extracted
           if publisher_extracted
             {
-              publisher: Components::Publisher.new(publisher: publisher_extracted),
+              publisher: publisher_extracted,
               series: Components::Code.new(value: str_value),
             }
           else
@@ -610,8 +619,12 @@ module Pubid
           nil
 
         when :parsed_format
-          # Format detection result from parser
-          value&.to_s
+          # Format detection result from parser. :short is the render default
+          # (a nil parsed_format renders short — see Identifiers::Base#to_s), so
+          # store only non-default formats (e.g. "mr"); "short" stays unset and
+          # is omitted from to_hash. detect_format only emits :mr or :short.
+          v = value&.to_s
+          v unless v == "short"
 
         when :translation
           # V1 TRANSLATION NORMALIZATION

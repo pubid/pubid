@@ -6,6 +6,13 @@ module Pubid
       # Base NIST/NBS identifier class
       # Each series type inherits from this and overrides series_code
       class Base < Pubid::Identifier
+        # Mark every NIST identifier as a member of the Pubid::Nist::Identifier
+        # facade module so `id.is_a?(Pubid::Nist::Identifier)` and
+        # `Pubid::Nist::Identifier === id` hold. The module carries only
+        # singleton methods (parse/from_hash), so this adds ancestry for the
+        # identity check without injecting any instance behavior.
+        include Pubid::Nist::Identifier
+
         # Default: no typed stages. Subclasses override as needed.
         def self.typed_stages
           []
@@ -15,7 +22,11 @@ module Pubid
         #
         # @return [String] URN representation
 
-        attribute :publisher, Components::Publisher
+        # Plain string ("NIST"/"NBS"), not a Components::Publisher wrapper: the
+        # value is a single token, so a string serializes flat
+        # (`publisher: NBS`, not `publisher: {publisher: NBS}`) and accepts the
+        # raw string the circular/supplement builders pass straight through.
+        attribute :publisher, :string
         attribute :series, Components::Code # Set by Builder from parsed data
         attribute :number, Components::Code
 
@@ -30,7 +41,13 @@ module Pubid
         attribute :translation_component, Components::Translation
         attribute :issue_number, Components::IssueNumber
         attribute :parsed_format, :string  # :mr, :short, :long, :abbrev
-        attribute :publisher_was_parsed, :boolean, default: -> { false }
+        # Whether the publisher prefix (NIST/NBS) should be rendered. Defaults
+        # to true so the common publisher-bearing id need not serialize the
+        # flag at all — the Builder only assigns it (false) for prefix-less
+        # inputs, so `to_hash` carries `publisher_was_parsed: false` only in
+        # that case and omits it otherwise. (lutaml emits a boolean iff it was
+        # explicitly assigned; an omitted key loads as this default.)
+        attribute :publisher_was_parsed, :boolean, default: -> { true }
 
         # LEGACY attributes (keep for backward compatibility during migration)
         attribute :parts, Components::Code, collection: true

@@ -6,6 +6,9 @@ module Pubid
       # Base CEN identifier
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
       class Base < Pubid::Identifier
+        # Identity for the Pubid::CenCenelec::Identifier facade (see its comment).
+        include Pubid::CenCenelec::Identifier
+
         # Generate URN for this identifier
         #
         # @return [String] URN representation

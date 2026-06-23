@@ -11,6 +11,9 @@ module Pubid
       # The leading IHO publisher prefix is optional on input but always
       # emitted on output.
       class Base < Pubid::Identifier
+        # Identity for the Pubid::Iho::Identifier facade (see its comment).
+        include Pubid::Iho::Identifier
+
         # `number` overrides the generic Components::Code attribute with a plain
         # string (same pattern as `part` below); it holds the IHO document
         # number (e.g. "100", "1/21"). Kept as the generic `number` so the
