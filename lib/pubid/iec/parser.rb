@@ -272,16 +272,22 @@ module Pubid
       # EXV = Example version
       # PAC = Package
       # PRV = Preview version
-      rule(:vap_suffix) do
-        space >> (
-          str("CSV") |
+      # Internal helper (no `.as`): a single VAP code. The capture key stays
+      # :vap_suffix below; this rule just lets the suffix be one or more codes.
+      rule(:vap_code) do
+        str("CSV") |
           str("CMV") |
           str("RLV") |
           str("SER") |
           str("EXV") |
           str("PAC") |
           str("PRV")
-        ).as(:vap_suffix)
+      end
+
+      # One or more VAP codes joined by "-", captured whole, e.g. "CSV" or
+      # "EXV-CMV"; the builder splits it into the VapIdentifier `vap` array.
+      rule(:vap_suffix) do
+        space >> (vap_code >> (str("-") >> vap_code).repeat).as(:vap_suffix)
       end
 
       # Database suffix: " DB"

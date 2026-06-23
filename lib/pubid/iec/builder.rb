@@ -299,9 +299,10 @@ module Pubid
         )
       end
 
-      # Wrap identifier with VapIdentifier for CSV/CMV/RLV/SER suffix
+      # Wrap identifier with VapIdentifier for one or more VAP codes
+      # (e.g. "CSV" or "EXV-CMV").
       def wrap_with_vap(base_identifier, vap_suffix_data)
-        vap_suffix = Components::VapSuffix.new(code: vap_suffix_data.to_s)
+        vap = vap_suffix_data.to_s.split("-")
 
         # Extract edition - need to go deep for ConsolidatedIdentifier
         edition = nil
@@ -319,7 +320,7 @@ module Pubid
 
         Identifiers::VapIdentifier.new(
           base_identifier: base_identifier,
-          vap_suffix: vap_suffix,
+          vap: vap,
           edition: edition,
         )
       end

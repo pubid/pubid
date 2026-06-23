@@ -59,9 +59,7 @@ module Pubid
           parts << " #{id.edition.render(context:)}"
         end
 
-        if id.is_a?(Identifiers::Base) && id.vap_suffix
-          parts << id.vap_suffix.render_with_space
-        end
+        # VAP codes live on VapIdentifier (rendered in render_vap), not Base.
 
         if id.is_a?(Identifiers::Base) && id.database
           parts << " DB"
@@ -158,7 +156,7 @@ module Pubid
         parts = []
 
         parts << id.base_identifier.to_s(**opts.merge(with_edition: false))
-        parts << " #{id.vap_suffix}" if id.vap_suffix
+        parts << " #{id.vap.join('-')}" if id.vap&.any?
         parts << " #{id.edition.render(context:)}" if id.edition&.number
 
         parts.compact.join

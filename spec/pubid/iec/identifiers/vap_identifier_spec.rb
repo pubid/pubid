@@ -26,8 +26,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.date.year).to eq("2010")
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("CSV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["CSV"])
       end
 
       it "round-trips" do
@@ -75,8 +75,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.date.year).to eq("2017")
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("CMV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["CMV"])
       end
 
       it "round-trips" do
@@ -108,8 +108,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.subpart.value).to eq("3")
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("RLV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["RLV"])
       end
 
       it "round-trips" do
@@ -137,8 +137,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.date.year).to eq("1989")
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("SER")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["SER"])
       end
 
       it "round-trips" do
@@ -162,8 +162,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::ConsolidatedIdentifier)
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("CSV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["CSV"])
       end
 
       it "round-trips" do
@@ -216,8 +216,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.copublishers.first.body).to eq("IEC")
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("CSV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["CSV"])
       end
 
       it "delegates publisher to base" do
@@ -253,8 +253,8 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.date).to be_nil
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("CSV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["CSV"])
       end
 
       it "round-trips" do
@@ -299,8 +299,29 @@ RSpec.describe Pubid::Iec::Identifiers::VapIdentifier do
         expect(parsed.base_identifier.number.value).to eq("62443")
       end
 
-      it "parses vap_suffix" do
-        expect(parsed.vap_suffix.to_s).to eq("CSV")
+      it "parses vap" do
+        expect(parsed.vap).to eq(["CSV"])
+      end
+
+      it "round-trips" do
+        expect(parsed.to_s).to eq(subject)
+      end
+    end
+  end
+
+  # Test multiple VAP codes joined by "-" (e.g. "EXV-CMV")
+  context "multiple VAP codes" do
+    describe "IEC 61000-4-17:1999+AMD1:2001 EXV-CMV" do
+      subject { "IEC 61000-4-17:1999+AMD1:2001 EXV-CMV" }
+
+      let(:parsed) { Pubid::Iec.parse(subject) }
+
+      it "parses as VapIdentifier" do
+        expect(parsed).to be_a(described_class)
+      end
+
+      it "parses both vap codes into the array" do
+        expect(parsed.vap).to eq(%w[EXV CMV])
       end
 
       it "round-trips" do

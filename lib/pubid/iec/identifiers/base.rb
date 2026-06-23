@@ -7,8 +7,7 @@ module Pubid
       # Inherits from SingleIdentifier to get common functionality
       # Single Responsibility: Common IEC identifier attributes and behavior
       class Base < SingleIdentifier
-        # IEC-specific attributes
-        attribute :vap_suffix, Components::VapSuffix, default: -> {}
+        # IEC-specific attributes. VAP codes live on VapIdentifier, not here.
         attribute :trf_info, Components::TrfInfo, default: -> {}
         attribute :database, :boolean, default: -> { false }
         attribute :fragment, :string, default: -> {}
@@ -43,9 +42,6 @@ module Pubid
         # Validate IEC-specific constraints
         def validate!
           super if defined?(super)
-
-          # Validate VAP suffix if present
-          vap_suffix&.validate!
 
           # Validate TRF info if present
           trf_info&.validate! if trf_info && !trf_info.empty?

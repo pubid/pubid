@@ -8,7 +8,8 @@ module Pubid
       # Examples: "IEC 61666:2010+AMD1:2021 CSV"
       class VapIdentifier < Identifier
         attribute :base_identifier, Identifier, polymorphic: true
-        attribute :vap_suffix, Components::VapSuffix
+        # One or more VAP codes (e.g. ["CSV"] or ["EXV", "CMV"]). Plain strings.
+        attribute :vap, :string, collection: true
         attribute :edition, ::Pubid::Components::Edition, default: -> {}
 
         # VAP types mapping
