@@ -10,6 +10,31 @@ module Pubid
       class ConsolidatedIdentifier < Identifier
         attribute :identifiers, Identifier, polymorphic: true, collection: true
 
+        # Common fields are delegated to identifiers.first, so suppress the
+        # inherited common maps and serialize the wrapped identifiers (base
+        # document + supplements) instead. Route each nested hash back through
+        # Identifier.from_hash so its concrete subclass is reconstructed.
+        include Pubid::Iec::DelegatedFieldSuppression
+
+        key_value do
+          map "identifiers",
+              with: { to: :identifiers_to_kv, from: :identifiers_from_kv }
+        end
+
+        def identifiers_to_kv(model, doc)
+          return unless model.identifiers&.any?
+
+          doc.add_child(Lutaml::KeyValue::DataModel::Element.new(
+                          "identifiers", model.identifiers.map(&:to_hash)
+                        ))
+        end
+
+        def identifiers_from_kv(model, value)
+          model.identifiers = Array(value).map do |h|
+            ::Pubid::Iec::Identifier.from_hash(h)
+          end
+        end
+
         def to_s(**opts)
           render(format: :human, **opts)
         end

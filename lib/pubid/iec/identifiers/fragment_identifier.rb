@@ -11,7 +11,39 @@ module Pubid
         attribute :base_identifier, Identifier, polymorphic: true
         attribute :fragment_number, :string
         attribute :edition, ::Pubid::Components::Edition, default: -> {}
-        attribute :typed_stage, ::Pubid::Components::TypedStage
+        # Fragments have their own lifecycle; default to the published FRAG stage
+        # so an omitted "stage" reconstructs it on from_hash.
+        attribute :typed_stage, ::Pubid::Components::TypedStage,
+                  default: -> { self.class.published_typed_stage }
+
+        # number/date/publisher delegate to base_identifier, but the fragment's
+        # stage and edition are its own. Serialize the wrapped identifier under
+        # "base" plus the fragment number; suppress only the truly-delegated
+        # common maps (keep stage/edition from the inherited block).
+        key_value do
+          map "base", with: { to: :base_to_kv, from: :base_from_kv }
+          map "fragment_number", to: :fragment_number, render_default: false
+        end
+
+        def number_to_kv(_model, _doc); end
+        def part_to_kv(_model, _doc); end
+        def subpart_to_kv(_model, _doc); end
+        def stage_iteration_to_kv(_model, _doc); end
+        def year_to_kv(_model, _doc); end
+        def publisher_to_kv(_model, _doc); end
+        def copublishers_to_kv(_model, _doc); end
+
+        def base_to_kv(model, doc)
+          base = model.base_identifier
+          return unless base
+
+          doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
+                                                                base.to_hash))
+        end
+
+        def base_from_kv(model, value)
+          model.base_identifier = ::Pubid::Iec::Identifier.from_hash(value) if value
+        end
 
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(

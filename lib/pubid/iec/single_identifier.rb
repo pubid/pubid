@@ -3,7 +3,10 @@
 module Pubid
   module Iec
     class SingleIdentifier < Identifier
-      attribute :typed_stage, ::Pubid::Components::TypedStage
+      # Default to the class's published typed_stage so an omitted "stage" key
+      # reconstructs the published state on from_hash.
+      attribute :typed_stage, ::Pubid::Components::TypedStage,
+                default: -> { self.class.published_typed_stage }
 
       # Generate URN for this identifier
       #

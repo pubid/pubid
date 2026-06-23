@@ -14,6 +14,12 @@ module Pubid
         attribute :version, :string, default: -> {}
         attribute :decision_sheet, :string, default: -> {}
 
+        # database is the only Base-specific serialized key (emitted when set);
+        # merged onto the common map inherited from Identifier.
+        key_value do
+          map "database", to: :database, render_default: false
+        end
+
         def to_s(**opts)
           render(format: :human, **opts)
         end

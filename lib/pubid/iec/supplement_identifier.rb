@@ -6,6 +6,55 @@ module Pubid
     class SupplementIdentifier < SingleIdentifier
       attribute :base_identifier, Identifier, polymorphic: true
 
+      # Serialize the supplemented document under "base". The supplement's own
+      # number/date/stage come from the inherited common maps; route the nested
+      # base hash back through Identifier.from_hash so its concrete subclass (and
+      # any further nesting) is reconstructed.
+      key_value do
+        map "base", with: { to: :base_to_kv, from: :base_from_kv }
+      end
+
+      def base_to_kv(model, doc)
+        base = model.base_identifier
+        return unless base
+
+        # `base_identifier` synthesises a base for a supplement that has none
+        # (e.g. a bare "+AMD1:2008" nested in a consolidation): a fake doc whose
+        # number equals the supplement's own. It renders nothing and the getter
+        # recreates it identically on load, so don't persist it. A standalone
+        # supplement ("IEC/FDAM 60038-1") instead moves the real base number into
+        # the synthetic base (base.number != own number), which must be kept.
+        return if model.synthetic_base? && base.number.to_s == model.number.to_s
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
+                                                              base.to_hash))
+      end
+
+      def base_from_kv(model, value)
+        return unless value
+
+        base = ::Pubid::Iec::Identifier.from_hash(value)
+        model.base_identifier = base
+
+        # A base of the exact SingleIdentifier class is the synthetic self-base
+        # of a standalone supplement ("IEC/FDAM 60038-1"); a real attached base
+        # is always a concrete type (InternationalStandard, etc.). Re-engage the
+        # synthetic-base state so the supplement renders in standalone form
+        # (publisher/TYPE base-number-supp-number) instead of attached form.
+        if base.instance_of?(::Pubid::Iec::SingleIdentifier)
+          model.mark_synthetic_standalone!
+        end
+      end
+
+      # Re-engage the standalone synthetic-base state on a deserialized
+      # supplement. At this point `number` already holds the supplement number
+      # (set from the "number" key before "base"), so preserve it as the
+      # supplement number and flag the synthetic base.
+      def mark_synthetic_standalone!
+        @synthetic_base = true
+        @supplement_number = @number
+      end
+
       # Override base_identifier getter to ensure it's always created for standalone supplements
       def base_identifier
         @base_identifier || ensure_base_identifier
@@ -36,17 +85,21 @@ module Pubid
         end
       end
 
-      # Delegate publisher and copublishers to base_identifier if not set
+      # Delegate publisher and copublishers to base_identifier whenever there is
+      # a base (a supplement carries the publisher of the document it
+      # supplements). Checking base first — rather than `@publisher || base` — is
+      # required now that the publisher attribute has an IEC default, which would
+      # otherwise mask the delegation.
       def publisher
         return @publisher if @ensuring_base
 
-        @publisher || base_identifier&.publisher
+        base_identifier ? base_identifier.publisher : @publisher
       end
 
       def copublishers
         return @copublishers if @ensuring_base
 
-        @copublishers || base_identifier&.copublishers
+        base_identifier ? base_identifier.copublishers : @copublishers
       end
 
       # Ensure we have a base_identifier for standalone supplements

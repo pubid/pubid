@@ -12,6 +12,28 @@ module Pubid
         attribute :vap, :string, collection: true
         attribute :edition, ::Pubid::Components::Edition, default: -> {}
 
+        # number/date/publisher/stage are delegated to base_identifier, so
+        # serialize the wrapped identifier under "base" plus the vap array; the
+        # common fields live inside "base", not at the top level.
+        include Pubid::Iec::DelegatedFieldSuppression
+
+        key_value do
+          map "base", with: { to: :base_to_kv, from: :base_from_kv }
+          map "vap", to: :vap, render_default: false
+        end
+
+        def base_to_kv(model, doc)
+          base = model.base_identifier
+          return unless base
+
+          doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
+                                                                base.to_hash))
+        end
+
+        def base_from_kv(model, value)
+          model.base_identifier = ::Pubid::Iec::Identifier.from_hash(value) if value
+        end
+
         # VAP types mapping
         TYPE_MAP = {
           "CSV" => "Consolidated version (with Supplements)",
