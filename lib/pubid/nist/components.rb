@@ -7,7 +7,6 @@ module Pubid
       autoload :Edition, "#{__dir__}/components/edition"
       autoload :IssueNumber, "#{__dir__}/components/issue_number"
       autoload :Part, "#{__dir__}/components/part"
-      autoload :Publisher, "#{__dir__}/components/publisher"
       autoload :Stage, "#{__dir__}/components/stage"
       autoload :Supplement, "#{__dir__}/components/supplement"
       autoload :Translation, "#{__dir__}/components/translation"

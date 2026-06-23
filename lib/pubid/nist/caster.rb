@@ -32,7 +32,8 @@ module Pubid
         when :publisher
           return nil if value.nil? || value.to_s.strip.empty?
 
-          Components::Publisher.new(publisher: value.to_s)
+          # publisher is a plain string attribute (see Identifiers::Base).
+          value.to_s
 
         when :series
           return nil if value.nil? || value.to_s.strip.empty?
@@ -49,7 +50,7 @@ module Pubid
           # Return composite hash with both publisher and series if extracted
           if publisher_extracted
             {
-              publisher: Components::Publisher.new(publisher: publisher_extracted),
+              publisher: publisher_extracted,
               series: Components::Code.new(value: str_value),
             }
           else

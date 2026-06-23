@@ -22,7 +22,11 @@ module Pubid
         #
         # @return [String] URN representation
 
-        attribute :publisher, Components::Publisher
+        # Plain string ("NIST"/"NBS"), not a Components::Publisher wrapper: the
+        # value is a single token, so a string serializes flat
+        # (`publisher: NBS`, not `publisher: {publisher: NBS}`) and accepts the
+        # raw string the circular/supplement builders pass straight through.
+        attribute :publisher, :string
         attribute :series, Components::Code # Set by Builder from parsed data
         attribute :number, Components::Code
 
