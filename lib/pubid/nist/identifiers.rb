@@ -12,6 +12,7 @@ module Pubid
       autoload :CommercialStandardsMonthly,
                "#{__dir__}/identifiers/commercial_standards_monthly"
       autoload :CrplReport, "#{__dir__}/identifiers/crpl_report"
+      autoload :DatedDocument, "#{__dir__}/identifiers/dated_document"
       autoload :FederalInformationProcessingStandards,
                "#{__dir__}/identifiers/federal_information_processing_standards"
       autoload :GrantContractorReport,

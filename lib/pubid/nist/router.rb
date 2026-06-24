@@ -38,6 +38,11 @@ module Pubid
       # @param parsed_hash [Hash] the parsed identifier data
       # @return [Class] the identifier class
       def locate_identifier_klass(parsed_hash)
+        # Date-style identifier (no series) dispatches here, not via series lookup.
+        if parsed_hash[:dated_date] && parsed_hash[:dated_seq]
+          return Identifiers::DatedDocument
+        end
+
         series = parsed_hash[:series]&.to_s
 
         # Handle compound series that include publisher (both space and dot separated)

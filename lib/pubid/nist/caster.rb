@@ -35,6 +35,19 @@ module Pubid
           # publisher is a plain string attribute (see Identifiers::Base).
           value.to_s
 
+        when :dated_date
+          # Date-style identifier (DatedDocument): carry the YYYY-MM-DD parts
+          # as string attributes.
+          return nil unless value.is_a?(Hash)
+
+          { date_year: value[:date_year]&.to_s, date_month: value[:date_month]&.to_s,
+            date_day: value[:date_day]&.to_s }
+
+        when :dated_seq
+          return nil if value.to_s.strip.empty?
+
+          { dated_seq: value.to_s }
+
         when :series
           return nil if value.nil? || value.to_s.strip.empty?
 
@@ -488,7 +501,7 @@ module Pubid
                                                  additional_text: year_part),
               }
             end
-          when /^(.+?)(r\d{4})$/i
+          when /^(.*\d)(r\d{4})$/i
             # Pattern: r1963 (revision as 4-digit year)
             number_part = $1
             year_value = $2.sub(/^r/, "") # Strip 'r' prefix
@@ -510,7 +523,7 @@ module Pubid
                                                  id: "#{month_part}#{year_part}"),
               }
             end
-          when /^(.+?)(r\d+[a-z]?)$/i
+          when /^(.*\d)(r\d+[a-z]?)$/i
             # Pattern: r5, r1a (simple revision)
             number_part = $1
             revision_value = $2.sub(/^r/, "") # Strip 'r' prefix

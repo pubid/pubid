@@ -44,6 +44,7 @@ module Pubid
       Identifiers::CommercialStandard,
       Identifiers::CommercialStandardEmergency,
       Identifiers::CommercialStandardsMonthly,
+      Identifiers::DatedDocument,
       Identifiers::Base, # Fallback for unmapped series
     ].freeze
 

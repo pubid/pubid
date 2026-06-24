@@ -799,6 +799,22 @@ module Pubid
         ).as(:date)
       end
 
+      # ISO date token (YYYY-MM-DD) for date-style identifiers
+      rule(:iso_date) do
+        (match("[0-9]").repeat(4, 4).as(:date_year) >> dash >>
+         match("[0-9]").repeat(2, 2).as(:date_month) >> dash >>
+         match("[0-9]").repeat(2, 2).as(:date_day))
+      end
+
+      # Date-style identifier with no series (e.g. "NIST 2022-04-15 001",
+      # "NIST.2022-04-15.001" — DOI 10.6028/NIST.2022-04-15.001)
+      rule(:dated_identifier) do
+        hash_prefix.maybe >>
+          publisher >> (space | dot) >>
+          iso_date.as(:dated_date) >> (space | dot) >>
+          match("[0-9]").repeat(1).as(:dated_seq)
+      end
+
       # LEGACY EDITION PATTERNS (for backward compatibility during migration)
       # These will be gradually replaced as we migrate to proper Edition/Date components
       rule(:legacy_edition) do
@@ -835,6 +851,8 @@ module Pubid
       rule(:report_number) do
         first_number >>
           (
+            # Underscore edition-year (space-form mirror of mr_identifier): "1648_2009"
+            (str("_") >> digits.as(:edition_year)) |
             # Month abbreviation as edition (e.g., 107-Mar1985, 11-Jan1925)
             # MUST BE FIRST to catch -MonthYear patterns before they're
             # incorrectly parsed as other alternatives
@@ -1105,6 +1123,7 @@ module Pubid
       # Try compound series first (longest match), then publisher + simple series
       rule(:identifier) do
         circ_supplement_identifier |
+          dated_identifier |
           mr_identifier |
           (
             # Compound series (includes publisher in series name)
