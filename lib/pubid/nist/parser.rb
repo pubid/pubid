@@ -62,6 +62,19 @@ module Pubid
         # 3-9 letter requirement leaves the year-only form "13e2.1908" untouched.
         cleaned = cleaned.gsub(/(\d+e\d+)\.([A-Za-z]{3,9}\d{4})/, '\1rev\2')
 
+        # IR revision with slash+year is a V1 Update, not a revision:
+        # "5058r04/98" → "5058/Upd1-199804" (mirrors the archived v1 NistIr
+        # parser, which mapped r{month}/{year} to Update.new(number:1, month, year)
+        # and rendered "/Upd1-{YYYY}{MM}"). A 2-digit year normalizes to 19YY.
+        # MUST run before the LCIRC slash rule below so it never adds a space here.
+        if cleaned =~ /\bIR\b/ && !cleaned.include?("CIRC")
+          cleaned = cleaned.gsub(%r{(\d)r(\d{1,2})/(\d{2,4})}) do
+            num, mon, yr = $1, $2, $3
+            yyyy = yr.length == 2 ? "19#{yr}" : yr
+            "#{num}/Upd1-#{yyyy}#{format('%02d', mon.to_i)}"
+          end
+        end
+
         # Fix LCIRC revision with slash and year: "145r6/1925" → "145 r6/1925"
         # BUT NOT for LCIRC series (keep "NBS LCIRC 145r11/1925" as-is for parser)
         # The circ_supplement_identifier rule expects "145r11" (no space)
@@ -275,6 +288,14 @@ module Pubid
 
         # Fix number with letter suffix followed by standalone 'r': "56ar" → "56a r" (NEW)
         cleaned = cleaned.gsub(/(\d[a-z])r\b/, '\1 r')
+
+        # Trailing bare 'r' glued to a digit is a V1 empty-revision → normalize to r1
+        # (e.g. GCR part form "85-3273-14r" → "85-3273-14r1" → renders "85-3273pt14r1").
+        # A plain number already does this via second_number ("75-947r" → "r1"); this
+        # extends the same normalization to the dash-separated part form, whose
+        # part_number grammar rejects a trailing 'r'. Guarded to digit+'r' at end of
+        # string, so it leaves "5058r04", "800-56a r", and month abbreviations untouched.
+        cleaned = cleaned.gsub(/(\d)r\z/, '\1r1')
 
         # Fix revision followed by language code: "r1es" → "r1 es", "r1pt" → "r1 pt" (NEW)
         cleaned = cleaned.gsub(/(r\d+)(es|pt|chi|viet|port|esp)\b/, '\1 \2')
