@@ -1,3 +1,28 @@
+# NIST pre-parser normalization rules.
+#
+# This file is applied to every NIST identifier string BEFORE any Ruby
+# preprocessing (see lib/pubid/nist/preprocessor.rb). Each entry is one
+# of:
+#
+#   "plain string": "replacement"
+#       Full-line match (^...$), literal. Use for specific malformed IDs
+#       that have a single canonical form.
+#
+#   "/regex/": "replacement"          (no flags)
+#   "/regex/imx": "replacement"       (i = IGNORECASE, m = MULTILINE,
+#                                       x = EXTENDED)
+#       Applied via gsub. Use for general patterns that are pure
+#       string→string substitutions.
+#
+# Design split (MECE):
+#   - This file: data-driven lookups and pure subs that any maintainer
+#     (including non-Rubyists) can extend safely.
+#   - Preprocessor (Ruby): stateful or interdependent transformations
+#     where stage order, conditional logic, or external state (e.g.,
+#     Roman numeral conversion, year-range reverts) make YAML unsuitable.
+#
+# Reorder entries with care — later entries often match patterns produced
+# by earlier ones. Run `bundle exec rspec spec/pubid/nist/` after edits.
 NBS MN: NBS MONO
 NIST MN: NIST MONO
 NIST MP: NBS MP

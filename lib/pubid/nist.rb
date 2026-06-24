@@ -11,6 +11,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/nist/identifiers"
     autoload :Parser, "#{__dir__}/nist/parser"
     autoload :ParserOutputNormalizer, "#{__dir__}/nist/parser_output_normalizer"
+    autoload :Preprocessor, "#{__dir__}/nist/preprocessor"
     autoload :Renderer, "#{__dir__}/nist/renderer"
     autoload :Router, "#{__dir__}/nist/router"
     autoload :Series, "#{__dir__}/nist/series"
