@@ -298,6 +298,40 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
       end
 
+      # Single-digit revision: year+revision fuse into an unpadded 5-digit Upd
+      # suffix (1925 + 6 -> "19256", not "192506"). Regression guard for the
+      # round-trip fix — this generated output previously raised
+      # Parslet::ParseFailed when fed back in.
+      describe "NBS.LC.145r6/1925" do
+        subject { "NBS.LC.145r6/1925" }
+
+        let(:parsed) { Pubid::Nist.parse(subject) }
+
+        it "parses as CircularSupplement with LetterCircular base" do
+          expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+          expect(parsed.base_identifier).to be_a(described_class)
+        end
+
+        it "normalizes revision with date to an unpadded Upd format" do
+          expect(parsed.to_s).to eq("NBS LC 145/Upd1-19256")
+        end
+
+        it "parses number" do
+          expect(parsed.base_identifier.number.value).to eq("145")
+        end
+
+        it "round-trips its generated short form" do
+          out = parsed.to_s
+          expect(Pubid::Nist.parse(out).to_s).to eq(out)
+        end
+
+        it "round-trips its generated MR form" do
+          out = parsed.to_s(:mr)
+          expect(out).to eq("NBS.LC.145-upd1-19256")
+          expect(Pubid::Nist.parse(out).to_s(:mr)).to eq(out)
+        end
+      end
+
       describe "NBS LC 145r1926" do
         subject { "NBS LC 145r1926" }
 
