@@ -833,6 +833,13 @@ module Pubid
               (str("U") >> lower_letter.as(:letter_suffix_extra)) |
               upper_letter
             ).as(:letter_suffix)).as(:letter_number) |
+            # Dash-SEPARATED letter suffix on a numbered part (e.g., 21-4-B,
+            # 173-1-B for FIPS, and the reparseable form of letter_number's own
+            # rendered output 200-30-B). The month_abbrev guard keeps FIPS date
+            # forms like 11-1-Sep1977 with the earlier patterns; the trailing
+            # guard restricts to a single clean letter so GCR -200-30B is unaffected.
+            (dash >> digits.as(:letter_base) >> dash >> month_abbrev.absent? >>
+             upper_letter.as(:letter_suffix) >> (letter | digit).absent?).as(:letter_number) |
             # Edition dash-year pattern (e.g., -1979 for handbooks like "NBS HB 130-1979")
             # Matches any 4-digit sequence - the builder decides if it's a year or second_number
             (dash >> match("[0-9]").repeat(4,
