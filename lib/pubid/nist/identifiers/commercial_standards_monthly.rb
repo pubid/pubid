@@ -30,8 +30,14 @@ module Pubid
           "NBS"
         end
 
+        # Always the normalized "CSM" code, regardless of the parsed series
+        # (CS vNnN variants are routed here and stored with series "CS", but
+        # must still render/serialize as CSM). Returns a Components::Code (not a
+        # bare String): the lutaml-model key-value serializer reads attributes
+        # through this public getter, so a String breaks to_hash for the
+        # Code-typed :series attribute.
         def series
-          "CSM"
+          Components::Code.new(value: "CSM")
         end
 
         def to_s(format = nil)

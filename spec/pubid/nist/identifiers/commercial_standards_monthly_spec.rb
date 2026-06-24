@@ -43,7 +43,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandardsMonthly do
       end
 
       it "has correct series" do
-        expect(id.series).to eq("CSM")
+        expect(id.series.to_s).to eq("CSM")
       end
     end
   end
