@@ -918,8 +918,18 @@ module Pubid
           (
             digits.as(:update_number).maybe >>
             (dash >>
-              match("[0-9]").repeat(4, 4).as(:update_year) >>
-              match("[0-9]").repeat(2, 2).as(:update_month).maybe
+              (
+                # Real updates: 4-digit year + optional 2-digit month
+                # (e.g. /Upd1-2015, /Upd3-202102).
+                (match("[0-9]").repeat(4, 4).as(:update_year) >>
+                 match("[0-9]").repeat(2, 2).as(:update_month)) |
+                # Fallback: capture the whole digit run as the year. Handles the
+                # unpadded CIRC/LCIRC supplement form pubid emits, where year and
+                # revision are fused without a 2-digit month boundary
+                # (e.g. /Upd1-19256 = 1925 + revision 6). Keeps these strings
+                # re-parseable so generated ids round-trip.
+                match("[0-9]").repeat(4).as(:update_year)
+              )
             ).maybe
           ).as(:update)
       end
