@@ -42,8 +42,12 @@ module Pubid
           super&.to_s || default_publisher
         end
 
+        # Return the stored Code, or a default Code built from series_code when
+        # unset. Must return Components::Code (not a String): the lutaml-model
+        # key-value serializer reads attributes through this public getter, so a
+        # String here breaks to_hash for the Code-typed :series attribute.
         def series
-          super&.to_s || series_code
+          super || Components::Code.new(value: series_code)
         end
 
         # Override to_s for CIRC-specific edition+year rendering

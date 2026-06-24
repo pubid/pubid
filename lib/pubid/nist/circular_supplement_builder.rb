@@ -224,10 +224,16 @@ module Pubid
             revision_number = base_portion[:revision_number].to_s
             supplement_year = parsed_hash[:implicit_supplement][:implicit_supplement_year].to_s
 
-            # Create Update component for revision+supplement pattern
-            # Format: Upd1-{year}{revision_number} (always use "1" and concatenate year+revision)
-            update_value = "Upd1-#{supplement_year}#{revision_number}"
-            supplement.update = update_value
+            # Create Update component for revision+supplement pattern.
+            # Renders "/Upd1-{year}{revision_number}" via Update#to_s(:short).
+            # The year+revision are fused into the year field (month left nil) so
+            # the revision is NOT zero-padded (e.g. "145r6/1925" -> "Upd1-19256",
+            # not "192506"). Must be a Components::Update (not a String) so
+            # :update serializes.
+            supplement.update = Components::Update.new(
+              number: "1", year: "#{supplement_year}#{revision_number}",
+              prefix: "slash"
+            )
             supplement.implicit_supplement = true # Mark as implicit supplement for rendering
           end
         elsif parsed_hash[:first_number]
@@ -264,10 +270,15 @@ module Pubid
           # Pad supplement number to 2 digits for single-digit numbers
           supp_number_padded = supp_number.rjust(2, "0")
 
-          # Create Update component for supplement (V1 compatibility uses Update for supplements)
-          # Format: Upd1-{year}{padded_number} (always use "1" and concatenate year+padded_number)
-          update_value = "Upd1-#{supp_year}#{supp_number_padded}"
-          supplement.update = update_value
+          # Create Update component for supplement (V1 compatibility uses Update for supplements).
+          # Renders "/Upd1-{year}{padded_number}" via Update#to_s(:short). The
+          # year and already-padded number are fused into the year field (month
+          # left nil) so rendering reproduces the V1 string exactly. Must be a
+          # Components::Update (not a String) so :update serializes.
+          supplement.update = Components::Update.new(
+            number: "1", year: "#{supp_year}#{supp_number_padded}",
+            prefix: "slash"
+          )
         elsif parsed_hash[:supplement_empty]
           # Empty supplement - no edition
           # supplement.edition remains nil

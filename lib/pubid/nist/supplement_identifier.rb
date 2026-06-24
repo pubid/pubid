@@ -42,7 +42,9 @@ module Pubid
           # (relaton-data-nist uses "sup" across all series).
           is_implicit = self.class.attributes.key?(:implicit_supplement) && implicit_supplement == true
           result += "sup" unless is_implicit
-          result += "/#{update}"
+          # Update#to_s emits its own leading separator (/Upd… short, -upd… mr),
+          # so append it directly instead of hardcoding the slash.
+          result += update.to_s(format)
           return result
         end
 
