@@ -159,6 +159,40 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
       end
 
+      describe "NBS CIRC 25sup-1925" do
+        subject { "NBS CIRC 25sup-1925" }
+
+        # Single-"p" "sup-YYYY" is the same publication as the double-"p"
+        # "supp-YYYY" spelling. The pre-parser normalizes single-"p" to the
+        # canonical "supp" and collapses the non-semantic dash, so both spellings
+        # share one parse tree: a plain Circular with supplement=year.
+        it "parses as a plain Circular, not a CircularSupplement wrapper" do
+          expect(parsed).to be_a(described_class)
+          expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
+        end
+
+        it "carries the year as the supplement attribute" do
+          expect(parsed.number.value).to eq("25")
+          expect(parsed.supplement.year).to eq("1925")
+        end
+
+        it "round-trips to the undashed canonical form" do
+          expect(parsed.to_s).to eq("NBS CIRC 25sup1925")
+        end
+
+        it "is identical to the double-p and undashed spellings" do
+          [
+            "NBS CIRC 25supp-1925",
+            "NBS CIRC 25supp1925",
+            "NBS CIRC 25sup1925",
+          ].each do |other|
+            twin = Pubid::Nist.parse(other)
+            expect(parsed).to eq(twin)
+            expect(parsed.to_urn).to eq(twin.to_urn)
+          end
+        end
+      end
+
       describe "NBS CIRC 101e2supp" do
         subject { "NBS CIRC 101e2supp" }
 
