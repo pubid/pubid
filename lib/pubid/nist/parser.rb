@@ -52,6 +52,16 @@ module Pubid
         # BUT preserve edition+revision patterns: "e2rev1908" stays as-is
         cleaned = cleaned.gsub(/(?<!e)(\d)(rev\d{4})/, '\1 \2')
 
+        # Normalize dotted edition-date back to the canonical "rev" form so pubid
+        # can re-parse its own output: "13e2.June1908" → "13e2revJune1908". This
+        # closes a round-trip gap: "13e2revJune1908" renders as "13e2.June1908"
+        # (Edition type:"e" id:"2" additional_text:"June1908"), but after the
+        # "13e2" first_number + dot the grammar takes the "dot >> second_number"
+        # branch, and second_number rejects a leading month_abbrev. Folding back
+        # to the "rev" form routes it through the existing caster path. The
+        # 3-9 letter requirement leaves the year-only form "13e2.1908" untouched.
+        cleaned = cleaned.gsub(/(\d+e\d+)\.([A-Za-z]{3,9}\d{4})/, '\1rev\2')
+
         # Fix LCIRC revision with slash and year: "145r6/1925" → "145 r6/1925"
         # BUT NOT for LCIRC series (keep "NBS LCIRC 145r11/1925" as-is for parser)
         # The circ_supplement_identifier rule expects "145r11" (no space)
