@@ -998,8 +998,8 @@ module Pubid
         (str("(") >> match('\w').repeat(3, 3).as(:translation) >> str(")")) |
           # Space-prefix format: " spa"
           (space >> match('\w').repeat(3, 3).as(:translation)) |
-          # Dot-prefix format: ".spa" (machine-readable)
-          (dot >> match('\w').repeat(3, 3).as(:translation))
+          # Dot-prefix format: ".spa" (machine-readable), optional leading space: " .spa"
+          (space.maybe >> dot >> match('\w').repeat(3, 3).as(:translation))
       end
 
       # Public draft suffix - for patterns like 2pd, 3pd
