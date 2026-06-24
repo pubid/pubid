@@ -109,6 +109,24 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
       end
 
+      describe "NBS CIRC 13e2.June1908 (rendered dotted form)" do
+        subject { "NBS CIRC 13e2.June1908" }
+
+        it "parses as Circular" do
+          expect(parsed).to be_a(described_class)
+        end
+
+        it "parses edition with month+year additional text" do
+          expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
+          expect(parsed.edition.id).to eq("2")
+          expect(parsed.edition.additional_text).to eq("June1908")
+        end
+
+        it "round-trips correctly" do
+          expect(parsed.to_s).to eq("NBS CIRC 13e2.June1908")
+        end
+      end
+
       describe "NBS CIRC 15-April1909" do
         subject { "NBS CIRC 15-April1909" }
 
