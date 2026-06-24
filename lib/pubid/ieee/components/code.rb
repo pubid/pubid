@@ -11,6 +11,10 @@ module Pubid
       #   802.15.4     - dotted parts
       #   C57.12.00    - prefix with parts
       #   11073-10404  - dashed parts
+      #
+      # Stays independent of Pubid::Components::Code because IEEE tracks
+      # +original_separator+ to round-trip dot vs dash notation, and uses
+      # +number+ rather than +value+.
       class Code < Lutaml::Model::Serializable
         attribute :prefix, :string             # C, P for some identifiers
         attribute :number, :string             # Main number (802, 1234, etc.)
@@ -95,6 +99,10 @@ original_separator: nil)
           end
 
           result
+        end
+
+        def render(context: nil)
+          to_s
         end
       end
     end

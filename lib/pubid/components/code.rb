@@ -2,33 +2,46 @@
 
 module Pubid
   module Components
-    # Document code/number component
+    # Document code/number component.
     #
-    # Renders as its bare value regardless of format (human, URN, MR).
-    # Subclasses (ISO, IEC, NIST) extend the model with prefixes or
-    # subparts but inherit the rendering seam.
+    # Holds the structured fields that recur across flavors: the main +value+
+    # (always present), plus optional +prefix+ (series/type designator),
+    # +part+, +subpart+, and free-form +parts+. Subclasses own their
+    # composition rules — flavor-specific separators and orderings live in
+    # the subclass #to_s / #render override.
     class Code < Lutaml::Model::Serializable
       attribute :value, :string
+      attribute :prefix, :string
+      attribute :part, :string
+      attribute :subpart, :string
+      attribute :parts, :string, collection: true
 
       def to_s
         value.to_s
       end
 
-      # Format-aware render seam. Same output for every format today;
-      # components with format-specific shapes override this.
+      # Format-aware render seam. Default returns the bare value; subclasses
+      # override to compose flavor-specific shapes (e.g. ISO joins parts
+      # with "-", NIST joins subpart with ".").
       def render(context: nil)
         value.to_s
       end
 
       def hash
-        @hash ||= value.hash
+        [value, prefix, part, subpart, parts].hash
       end
 
+      # rubocop:disable Metrics/AbcSize
       def eql?(other)
         return false unless other.is_a?(self.class)
 
-        value == other.value
+        value == other.value &&
+          prefix == other.prefix &&
+          part == other.part &&
+          subpart == other.subpart &&
+          parts == other.parts
       end
+      # rubocop:enable Metrics/AbcSize
     end
   end
 end

@@ -10,9 +10,12 @@ module Pubid
       #   Simple: 012, 123, 456
       #   GSM: GSM 02.01, 02.01
       #   Complex: ABC 123, ABC-DEF 123
+      #
+      # Stays independent of Pubid::Components::Code because ETSI uses
+      # +minor+ (a flavor-specific sub-number) plus +parts+.
       class Code < Lutaml::Model::Serializable
-        attribute :number, :string  # Main number (can contain dots, letters, etc.)
-        attribute :minor, :string   # Optional minor part
+        attribute :number, :string # Main number
+        attribute :minor, :string # Optional minor part
         attribute :parts, :string, collection: true # Parts array
 
         def initialize(number:, minor: nil, parts: nil)
@@ -27,6 +30,10 @@ module Pubid
           result += " #{minor}" if minor
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
           result
+        end
+
+        def render(context: nil)
+          to_s
         end
 
         def ==(other)

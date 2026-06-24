@@ -5,6 +5,10 @@ require "lutaml/model"
 module Pubid
   module Asme
     module Components
+      # Code component for ASME identifiers.
+      #
+      # Stays independent of Pubid::Components::Code because ASME uses
+      # +designator+ (a flavor-specific letter prefix) plus +number+.
       class Code < Lutaml::Model::Serializable
         attribute :designator, :string
         attribute :number, :string
