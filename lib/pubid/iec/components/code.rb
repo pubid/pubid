@@ -1,14 +1,13 @@
-require "lutaml/model"
 # frozen_string_literal: true
 
 module Pubid
   module Iec
     module Components
       # Code component for IEC identifiers.
-      # Adds a +prefix+ (e.g. "TR", "TS") to the shared Code's +value+.
+      #
+      # Inherits +value+ and +prefix+ from the shared Code; overrides
+      # rendering to place the prefix (e.g. "TR", "TS") before the value.
       class Code < ::Pubid::Components::Code
-        attribute :prefix, :string, default: -> {}
-
         def to_s
           result = ""
           result += "#{prefix} " if prefix

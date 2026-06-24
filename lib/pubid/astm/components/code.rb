@@ -5,6 +5,11 @@ require "lutaml/model"
 module Pubid
   module Astm
     module Components
+      # Code component for ASTM identifiers.
+      #
+      # Stays independent of Pubid::Components::Code because ASTM has a
+      # rich taxonomy: +letter+ (A-G for standards), +suffix+ (A/B/C for
+      # data series), +subseries+ (S1/S4/S10), and +dual_m+ (metric flag).
       class Code < Lutaml::Model::Serializable
         attribute :letter, :string       # A-G for standards
         attribute :number, :string       # Main number
@@ -26,6 +31,10 @@ module Pubid
             result += "-S#{subseries}" if subseries
           end
           result
+        end
+
+        def render(context: nil)
+          to_s
         end
       end
     end

@@ -8,6 +8,10 @@ module Pubid
       # ITU Code component
       # Format: NUMBER[.SUBSERIES][-PART]
       # Examples: 1234, 1234.5, 1234-1, 1234.5-2
+      #
+      # Stays independent of Pubid::Components::Code because ITU uses
+      # +subseries+ (dot-separated, flavor-specific) and +parts+
+      # (dash-separated).
       class Code < Lutaml::Model::Serializable
         attribute :number, :string
         attribute :subseries, :string
@@ -24,6 +28,10 @@ module Pubid
           result += ".#{subseries}" if subseries
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
           result
+        end
+
+        def render(context: nil)
+          to_s
         end
 
         def ==(other)

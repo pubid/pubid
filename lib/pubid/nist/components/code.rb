@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
-require "lutaml/model"
-
 module Pubid
   module Nist
     module Components
       # Code component for NIST identifiers.
-      # Inherits +value+ from the shared Pubid::Components::Code and adds a
-      # NIST-specific +subpart+ (used to render compound numbers like "1234.5").
+      #
+      # Inherits +value+ and +subpart+ from the shared Code; overrides
+      # rendering to compose compound numbers like "1234.5" (subpart
+      # joined with "." per NIST convention).
       class Code < ::Pubid::Components::Code
-        attribute :subpart, :string
-
         def to_s
           result = value.to_s
           result += ".#{subpart}" if subpart

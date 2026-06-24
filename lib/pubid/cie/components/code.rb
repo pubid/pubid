@@ -7,6 +7,10 @@ module Pubid
     module Components
       # Code component for CIE identifiers
       # Handles number-part-iteration with style awareness
+      #
+      # Stays independent of Pubid::Components::Code because CIE tracks
+      # +style+ ("legacy" / "current") and +part_separator+ to round-trip
+      # slash vs dash notation, plus an +iteration+ sub-field.
       class Code < Lutaml::Model::Serializable
         attribute :number, :string        # "013", "170", "198"
         attribute :part, :string          # "1", "2", "3"
@@ -65,6 +69,10 @@ module Pubid
           else
             new(number: code_str, style: style)
           end
+        end
+
+        def render(context: nil)
+          to_s
         end
       end
     end
