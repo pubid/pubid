@@ -15,18 +15,24 @@ module Pubid
     #
     # Format in YAML files:
     #   plain string match: "IEC 60285-/1:1989"  →  "IEC 60285-1:1989"
-    #   regex match:        "/^NBS CIRC sup$/"  →  "NBS CIRC 24e7sup"
+    #   regex match:        "/^NBS CIRC sup$/"   →  "NBS CIRC 24e7sup"
+    #   regex with flags:   "/^nbs\\b/i"          →  "NBS"
     #
     # Plain strings use full-line anchoring (^pattern$).
-    # Regex patterns are wrapped in /.../ slashes.
+    # Regex patterns are wrapped in /.../ slashes with optional trailing flags
+    # (i = IGNORECASE, m = MULTILINE, x = EXTENDED) and applied via gsub.
     class UpdateCodes
       DATA_DIR = Pathname.new(__dir__).join("../../../data").expand_path
+
+      # Regex literal: /body/flags  where flags is optional (i, m, x).
+      REGEX_LITERAL = %r{\A/(.*)/([imx]*)\z}m
 
       class << self
         # Apply update_codes substitutions for the given flavor.
         #
         # @param code [String] identifier string to normalize
-        # @param flavor [Symbol, String] flavor name (e.g., :iso, :iec, :ieee, :nist)
+        # @param flavor [Symbol, String] flavor name
+        #   (e.g., :iso, :iec, :ieee, :nist)
         # @return [String] normalized identifier string
         #
         # @example
@@ -37,9 +43,7 @@ module Pubid
           return code if codes.nil? || codes.empty?
 
           codes.each do |from, to|
-            code = code.gsub(
-              from.match?(%r{^/.*/$}) ? Regexp.new(from[1..-2]) : /^#{Regexp.escape(from)}$/, to
-            )
+            code = code.gsub(compile_pattern(from), to.to_s)
           end
           code
         end
@@ -56,11 +60,28 @@ module Pubid
 
         # Available flavors that have update_codes files.
         #
-        # @return [Array<Symbol>] list of flavors with data/{flavor}/update_codes.yaml
+        # @return [Array<Symbol>] flavors with data/{flavor}/update_codes.yaml
         def flavors
           @flavors ||= DATA_DIR.children.select(&:directory?).map do |dir|
             dir.basename.to_s.to_sym
           end.select { |f| (DATA_DIR / f.to_s / "update_codes.yaml").exist? }
+        end
+
+        # Compile a YAML key into a Regexp. Plain strings are anchored to the
+        # full line; regex literals support optional trailing flags.
+        def compile_pattern(from)
+          match = from.to_s.match(REGEX_LITERAL)
+          return /^#{Regexp.escape(from.to_s)}$/ unless match
+
+          Regexp.new(match[1], compile_options(match[2]))
+        end
+
+        def compile_options(flags)
+          options = 0
+          options |= Regexp::IGNORECASE if flags.include?("i")
+          options |= Regexp::MULTILINE if flags.include?("m")
+          options |= Regexp::EXTENDED if flags.include?("x")
+          options
         end
 
         private
