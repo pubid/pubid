@@ -118,11 +118,10 @@ module Pubid
             result += " #{num_value}"
           end
 
-          # Add part component (pt3-1)
-          result += part.to_s if part
-
-          # Add supplement with "sup" prefix for CRPL identifiers
-          result += supplement_short
+          # Append the shared component tail (part, supplement, edition,
+          # index, section, ...) so distinct CRPL reports do not collide.
+          # range_notation is CRPL-specific and always trails the identifier.
+          result += append_short_components
 
           result += range_notation if range_notation
           result

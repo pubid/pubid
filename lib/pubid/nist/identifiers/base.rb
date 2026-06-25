@@ -409,15 +409,37 @@ module Pubid
           result += " #{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-          # NEW: Use Volume and Part components (v6n1 notation for CSM, pt1 for SP)
-          if volume.is_a?(Components::Volume) && part.is_a?(Components::Part)
+          # Append every optional component the parser may have attached
+          # (volume, part, edition, version, supplement, update, stage, ...).
+          # Shared with the lossy subclasses so they cannot silently drop a
+          # distinguishing component and collide with another document.
+          result += append_short_components
+
+          result
+        end
+
+        # Render the optional component "tail" that follows
+        # publisher/series/number in short (human) form. Extracted from
+        # #to_short_style so subclasses that build a series-specific prefix can
+        # reuse it instead of hand-listing components (and forgetting some).
+        #
+        # skip_part: true lets a series that renders its part differently
+        # (e.g. FIPS uses dash "-1", not "pt1") emit the part itself and skip
+        # the generic part rendering here, while still getting volume/edition/
+        # supplement/etc.
+        def append_short_components(skip_part: false)
+          result = ""
+          effective_part = skip_part ? nil : part
+
+          # Volume and Part components (v6n1 notation for CSM, pt1 for SP)
+          if volume.is_a?(Components::Volume) && effective_part.is_a?(Components::Part)
             # CSM series: v#n# notation
-            result += " #{volume}#{part}"
-          elsif part.is_a?(Components::Part)
+            result += " #{volume}#{effective_part}"
+          elsif effective_part.is_a?(Components::Part)
             # SP and other series: use Part.type to determine format
-            result += part.to_s
+            result += effective_part.to_s
           # Legacy: Render standalone volume (not part of v#n#)
-          elsif volume && !issue_number && !part
+          elsif volume && !issue_number && !effective_part
             vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
             result += vol_str
           elsif volume && issue_number
@@ -426,7 +448,7 @@ module Pubid
             result += "#{vol_str}n#{issue_number.number}"
           end
 
-          # NEW: Use edition component properly (e2, e2021, r5, -3)
+          # Use edition component properly (e2, e2021, r5, -3)
           # NO space before edition when number present (per NIST spec)
           # Only add space for bare edition (no number case) or if original_prefix has specific format
           if edition
@@ -442,7 +464,7 @@ module Pubid
             end
           end
 
-          # V2: Use version_component if available, else use version string.
+          # Use version_component if available, else use version string.
           # Attach directly (no leading space) to match edition rendering
           # (e.g. "800-53r5"), so version reads "800-45ver2" not
           # "800-45 ver2".
@@ -471,7 +493,7 @@ module Pubid
             result += " Add."
           end
 
-          # V2: Use update_component if available, else use update string
+          # Use update_component if available, else use update string
           if update_component
             result += update_component.to_s(:short)
           elsif update
@@ -485,12 +507,12 @@ module Pubid
             result += "-draft"
           end
 
-          # V2: Add stage component (at end, before translation)
+          # Add stage component (at end, before translation)
           if stage
             result += " #{stage.to_s(:short)}"
           end
 
-          # V2: Use translation_component if available, else use translation string
+          # Use translation_component if available, else use translation string
           # Note: translation_component.to_s already includes the space prefix
           if translation_component
             result += translation_component.to_s(:short)
@@ -517,25 +539,44 @@ module Pubid
           result += ".#{number}" if number
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-          # Part component (pt1, v6n1, etc.)
-          result += part.to_s if part.is_a?(Components::Part)
+          result += append_mr_components
 
-          # NEW: Use edition component - NO space before edition in MR format (per NIST spec)
-          if edition
-            # If edition has original_prefix set (e.g., verbose " Rev. "), use it as-is
-            # Otherwise, no space needed in MR format: ".800-53r5"
-            if edition.original_prefix && !edition.original_prefix.empty?
-            end
-            result += edition.to_s
+          result
+        end
+
+        # Render the optional component tail for machine-readable (MR) form.
+        # Mirrors #append_short_components so the MR output is just as lossless;
+        # subclasses that override #to_mr_style reuse this instead of
+        # hand-listing components. skip_part: behaves as in the short helper.
+        def append_mr_components(skip_part: false)
+          result = ""
+          effective_part = skip_part ? nil : part
+
+          # Volume / Part components (pt1, v6n1, etc.)
+          if volume.is_a?(Components::Volume) && effective_part.is_a?(Components::Part)
+            result += "#{volume}#{effective_part}"
+          elsif effective_part.is_a?(Components::Part)
+            result += effective_part.to_s
+          elsif volume && !issue_number && !effective_part
+            result += (volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}")
+          elsif volume && issue_number
+            vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
+            result += "#{vol_str}n#{issue_number.number}"
           end
 
-          # V2: Use version_component
+          # Use edition component - NO space before edition in MR format (per NIST spec)
+          result += edition.to_s if edition
+
+          # Use version_component
           result += version_component.to_s(:mr) if version_component
 
-          # V2: Use update_component
+          # Supplement (e.g. ".9981sup7") - keep distinct documents distinct
+          result += supplement_short
+
+          # Use update_component
           result += update_component.to_s(:mr) if update_component
 
-          # V2: Use stage
+          # Use stage
           result += ".#{stage.to_s(:mr)}" if stage
 
           # Add addendum - render as ".Add." suffix in MR format
@@ -543,7 +584,7 @@ module Pubid
             result += ".Add."
           end
 
-          # V2: Use translation_component
+          # Use translation_component
           result += translation_component.to_s(:mr) if translation_component
 
           result

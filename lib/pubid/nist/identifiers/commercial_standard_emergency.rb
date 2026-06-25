@@ -46,8 +46,9 @@ module Pubid
           # Number (already extracted from e104 → 104 in builder)
           result += " #{number.value}" if number
 
-          # Edition (e1943 for e104-43 pattern)
-          result += edition.to_s if edition
+          # Edition (e1943 for e104-43 pattern) plus any other component the
+          # parser attached (volume, supplement, version, ...).
+          result += append_short_components
 
           result
         end

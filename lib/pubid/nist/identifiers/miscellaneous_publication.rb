@@ -50,14 +50,14 @@ module Pubid
         def to_short_style
           result = "#{default_publisher} #{series_code}"
           result += " #{number.value}" if number
-          result += edition.to_s if edition
+          result += append_short_components
           result
         end
 
         def to_mr_style
           result = "#{default_publisher}.#{series_code}"
           result += ".#{number.value}" if number
-          result += edition.to_s if edition
+          result += append_mr_components
           result
         end
       end

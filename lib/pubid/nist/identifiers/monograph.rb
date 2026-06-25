@@ -60,8 +60,11 @@ module Pubid
           result = (publisher || default_publisher).to_s
           result += ".MN" # MR format uses MN per spec
           result += ".#{number}" if number
-          # Part is already included in compound number (e.g., "1-1B")
-          result += "v#{volume}" if volume
+          # Append the shared component tail (part, volume, supplement,
+          # edition, ...) so distinct monographs do not collide. Letter-suffix
+          # variants (e.g. "1-1F") carry the letter inside the compound number
+          # and have no separate Part component, so this does not double them.
+          result += append_mr_components
           result
         end
       end

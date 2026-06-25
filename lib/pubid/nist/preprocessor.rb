@@ -307,13 +307,20 @@ module Pubid
       # Trailing "-YYYY" → "eYYYY" edition marker, but only when the
       # four-digit group is plausibly a year (1901–2099). Part numbers
       # outside that range (e.g. SP 250-1039) are left untouched.
+      #
+      # The letter suffix may be lower- or uppercase (e.g. SP 800-38b-2005);
+      # it is upcased so the year edition splits off cleanly and the letter
+      # becomes a Part component ("800-38Be2005"), matching how a letter
+      # suffix without a year (800-38a → 800-38A) is already normalized.
+      # "e"/"E" are excluded from the letter so they cannot be confused with
+      # the edition marker itself.
       def convert_dashyear_to_edition!
         @cleaned = @cleaned.gsub(
-          /(?<!e\d)(?<![eE-])(\d(?:[A-DF-Z]?))-(\d{4})(?=\s|$)/,
+          /(?<!e\d)(?<![eE-])(\d(?:[A-DF-Za-df-z]?))-(\d{4})(?=\s|$)/,
         ) do |match|
           prefix = Regexp.last_match(1)
           year = Regexp.last_match(2).to_i
-          year.between?(1901, 2099) ? "#{prefix}e#{year}" : match
+          year.between?(1901, 2099) ? "#{prefix.upcase}e#{year}" : match
         end
       end
 

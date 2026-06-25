@@ -42,16 +42,15 @@ module Pubid
           # "FIPS.46e1977" (machine-readable with dots, no publisher prefix)
           # Note: edition is appended directly to number without dot for FIPS
           result = series_code
+          result += ".#{number}" if number
 
-          if number
-            result += ".#{number}"
-            # Append edition directly to number (no dot) for FIPS MR format
-            if edition
-              result += edition.to_s
-            end
-          end
-
+          # FIPS uses dash notation for parts; render here and skip the generic
+          # part rendering in the shared tail (which appends volume, edition,
+          # supplement, version, update, etc.).
+          result += "-#{part.value}" if part.is_a?(Components::Part)
           result += parts.map { |p| "-#{p}" }.join if parts&.any?
+
+          result += append_mr_components(skip_part: true)
 
           result
         end
@@ -78,24 +77,15 @@ module Pubid
             end
           end
 
-          # FIPS uses dash notation for parts: -1, -2, -3 (not pt1, pt2, pt3)
+          # FIPS uses dash notation for parts: -1, -2, -3 (not pt1, pt2, pt3),
+          # so render the part here and skip the generic part rendering in the
+          # shared tail. The tail still appends volume, edition, version,
+          # supplement, update, etc. — components FIPS previously dropped.
           if part.is_a?(Components::Part)
             result += "-#{part.value}"
           end
-          # Render edition for FIPS
-          # FIPS editions use "e" prefix: e1971, e198503, e19770930
-          if edition
-            result += "#{edition.type}#{edition.id}"
-          end
 
-          # Mirror Base#to_short_style update rendering — FIPS overrides
-          # to_short_style entirely, so update (e.g. /Upd2) would otherwise
-          # be dropped.
-          if update_component
-            result += update_component.to_s(:short)
-          elsif update
-            result += "-upd#{update}"
-          end
+          result += append_short_components(skip_part: true)
 
           result
         end
