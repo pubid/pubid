@@ -279,7 +279,7 @@ module Pubid
         @cleaned = @cleaned.gsub(/(\d)(sup\d+\b)/, '\1 \2')
         @cleaned = @cleaned.gsub(/(\d+[A-Z])sup(\b)/, '\1supp\2')
         @cleaned = @cleaned.gsub(/(\d+)sup(\d+\/\d{4})/, '\1supp\2')
-        @cleaned = @cleaned.gsub(/(\d)(supp?)-(\d{4})(?![\d\/])/, '\1\2\3')
+        @cleaned = @cleaned.gsub(/(\d)(supp?)-(\d{4})(?![\d\/])/, '\1supp\3')
       end
 
       # Standalone "r" between number-letter and revision, bare trailing
