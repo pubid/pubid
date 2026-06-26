@@ -19,17 +19,18 @@ namespace :export do
   desc "Audit library data against website publishers"
   task :audit do
     require "pubid/export"
-    data = Pubid::Export::Exporter.export_all
 
-    # Parse website publishers to extract doc type keys
-    # For now, read the generated JSON and provide a summary
+    # Auditor compares string-keyed, JSON-shaped data (see Auditor.from_file and
+    # auditor_spec.rb), so roundtrip the export through JSON to convert the
+    # symbol keys (:identifier_types) into the string keys it expects.
+    data = JSON.parse(JSON.generate(Pubid::Export::Exporter.export_all))
     auditor = Pubid::Export::Auditor.new(data)
 
     # Build a minimal website representation from the generated data itself
     # (in production, this would parse the website's publishers.ts)
-    {}
     summary = data.transform_values do |fd|
-      { "doc_types" => fd[:identifier_types].map { |t| { "key" => t[:key] } } }
+      keys = fd["identifier_types"].map { |t| { "key" => t["key"] } }
+      { "doc_types" => keys }
     end
 
     results = auditor.audit(summary)
