@@ -216,9 +216,7 @@ module Pubid::Iso
       let(:pubid) { "ISO 10231:2003/Amd 1:2015" }
       let(:urn) { "urn:iso:std:iso:10231:amd:2015:v1" }
 
-      it "should raise an error when converting to URN" do
-        expect { subject.urn }.to raise_exception(Errors::NoEditionError)
-      end
+      it_behaves_like "converts pubid to urn"
 
       it "shoud have type :amd" do
         expect(subject.type[:key]).to eq(:amd)
@@ -256,6 +254,7 @@ module Pubid::Iso
       let(:pubid) { "ISO 10360-1/Cor 1:2002" }
       let(:urn) { "urn:iso:std:iso:10360:-1:cor:2002:v1" }
 
+      it_behaves_like "converts pubid to urn"
       it_behaves_like "converts urn to pubid"
     end
 
