@@ -2,7 +2,6 @@
 
 require "rake"
 require "fileutils"
-require "rspec/core/rake_task"
 require "rubocop/rake_task"
 require "bundler/gem_tasks"
 
@@ -91,13 +90,13 @@ namespace :validation do
   task :classify_all do
     puts "Running classification for all V2 flavors..."
     puts
-    sh "cd spec/fixtures && ruby run_classify.rb all"
+    Dir.chdir("spec/fixtures") { ruby "run_classify.rb all" }
   end
 
   desc "Run classification for a specific flavor"
   task :classify, [:flavor] do |_t, args|
     flavor = args[:flavor] || raise("Usage: rake validation:classify[flavor]")
-    sh "cd spec/fixtures && ruby run_classify.rb #{flavor}"
+    Dir.chdir("spec/fixtures") { ruby "run_classify.rb #{flavor}" }
   end
 
   desc "Show validation summary for all flavors"
