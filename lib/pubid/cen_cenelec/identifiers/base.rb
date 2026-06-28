@@ -20,10 +20,6 @@ module Pubid
         attribute :adopted_identifier, Base, polymorphic: true # Nested identifier object (ISO, IEC, etc.)
         attribute :edition, :string # Edition number
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         def ==(other)
           return false unless other.is_a?(Base)
 

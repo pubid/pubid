@@ -18,10 +18,6 @@ module Pubid
             stage_code: "published",
           ),
         ].freeze
-
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

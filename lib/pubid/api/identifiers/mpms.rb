@@ -12,10 +12,6 @@ module Pubid
           "MPMS"
         end
 
-        def to_s
-          render(format: :human)
-        end
-
         private
 
         def code_portion

@@ -9,10 +9,6 @@ module Pubid
         attribute :base_identifier, Amendment
         attribute :fragment_number, :string
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         def publisher
           base_identifier&.base_identifier&.publisher
         end

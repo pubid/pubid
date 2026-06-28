@@ -14,10 +14,6 @@ module Pubid
         # Second organization's identifier
         attribute :second_identifier, Base, polymorphic: true
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           # Return array of both publishers
           [first_identifier&.publisher, second_identifier&.publisher].compact

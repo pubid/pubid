@@ -17,10 +17,6 @@ module Pubid
       class Series < Base
         # Series prefix (MH, RV, etc.) - optional
         attribute :series_prefix, :string
-
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end

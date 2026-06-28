@@ -40,9 +40,6 @@ module Pubid
         end
 
         # TRF uses special rendering via the Renderer
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end

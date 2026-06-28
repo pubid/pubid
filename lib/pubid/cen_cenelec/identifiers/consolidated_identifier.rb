@@ -8,10 +8,6 @@ module Pubid
       class ConsolidatedIdentifier < Base
         attribute :identifiers, Base, polymorphic: true, collection: true
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         # Delegate to first identifier (base document)
         def publisher
           identifiers&.first&.publisher

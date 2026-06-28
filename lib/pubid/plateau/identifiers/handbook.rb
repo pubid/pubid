@@ -13,10 +13,6 @@ module Pubid
           "Handbook"
         end
 
-        def to_s
-          render(format: :human)
-        end
-
         def formatted_edition
           "第#{edition}版"
         end

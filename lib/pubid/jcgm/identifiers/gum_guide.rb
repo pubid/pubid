@@ -22,10 +22,6 @@ module Pubid
           { key: :gum_guide, title: "GUM Guide", short: "GUM" }
         end
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         private
 
         def language_portion

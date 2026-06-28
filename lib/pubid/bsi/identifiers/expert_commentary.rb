@@ -14,10 +14,6 @@ module Pubid
         attribute :format, :string # "full", "abbr", "abbr_with_topic"
         attribute :topic, :string # e.g., "Fire"
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           base_identifier&.publisher
         end

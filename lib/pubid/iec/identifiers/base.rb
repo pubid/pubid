@@ -20,10 +20,6 @@ module Pubid
           map "database", to: :database, render_default: false
         end
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         def number_portion
           return "" unless number
 

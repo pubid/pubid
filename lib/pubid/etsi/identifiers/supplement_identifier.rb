@@ -26,9 +26,6 @@ module Pubid
         end
 
         # Render via renderer
-        def to_s
-          render(format: :human)
-        end
 
         # Recursively collect supplement notations from the supplement chain
         def collect_supplement_notations(current_supplement, notations)

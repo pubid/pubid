@@ -32,10 +32,6 @@ module Pubid
           ieee_identifier.typed_stage
         end
 
-        def to_s
-          render(format: :human)
-        end
-
         def self.parse(string)
           Base.parse(string)
         end

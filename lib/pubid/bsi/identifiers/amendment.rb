@@ -11,10 +11,6 @@ module Pubid
         attribute :amendment_year, :integer
         attribute :separator, :string, default: -> { "+" }
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           base_identifier&.publisher
         end

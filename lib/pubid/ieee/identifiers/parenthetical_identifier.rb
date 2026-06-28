@@ -8,10 +8,6 @@ module Pubid
       class ParentheticalIdentifier < Base
         attribute :base_identifier, Base, polymorphic: true
         attribute :parenthetical_identifier, Base, polymorphic: true
-
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

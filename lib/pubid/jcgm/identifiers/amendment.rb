@@ -20,10 +20,6 @@ module Pubid
         def self.type
           { key: :amendment, title: "Amendment", short: "Amd" }
         end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end

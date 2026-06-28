@@ -20,10 +20,6 @@ module Pubid
           ":"
         } # Separator before Supplement (":" or " ")
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           base_identifier&.publisher
         end
