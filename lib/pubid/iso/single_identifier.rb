@@ -3,10 +3,6 @@
 module Pubid
   module Iso
     class SingleIdentifier < Identifier
-      def to_s(**opts)
-        render(format: :human, **opts)
-      end
-
       private
 
       def build_rendering_context(_renderer, format:, with_edition: false,
