@@ -35,10 +35,6 @@ module Pubid
           end
         end
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         # Delegate common attributes to first identifier (base document)
         def publisher
           identifiers&.first&.publisher

@@ -15,10 +15,6 @@ module Pubid
         attribute :adopted_identifiers, Base, polymorphic: true,
                                               collection: true
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           ieee_identifier&.publisher || "IEEE"
         end

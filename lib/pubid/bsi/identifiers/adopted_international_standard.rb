@@ -25,10 +25,6 @@ module Pubid
           nil
         end
 
-        def to_s
-          render(format: :human)
-        end
-
         # Delegate common methods to adopted identifier
         def number
           adopted_identifier&.number

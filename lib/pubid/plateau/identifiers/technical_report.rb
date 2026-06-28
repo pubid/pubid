@@ -10,10 +10,6 @@ module Pubid
         def type_string
           "Technical Report"
         end
-
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

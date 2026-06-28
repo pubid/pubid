@@ -12,10 +12,6 @@ module Pubid
         attribute :draft_info, :string          # Draft information like "/D5"
         attribute :iec_year, :string            # IEC year like "2013"
         attribute :date_info, :string           # Date information like "(10/07)"
-
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

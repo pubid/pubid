@@ -16,10 +16,6 @@ module Pubid
         # Secondary identifier (additional number for same document)
         attr_accessor :secondary_identifier
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           primary_identifier&.publisher
         end

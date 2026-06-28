@@ -6,7 +6,8 @@ module Pubid
       # Consolidated Identifier - contains base document plus supplements
       # Example: "BS 4592-0:2006+A1:2012" = [BS 4592-0:2006, Amendment 1:2012]
       class ConsolidatedIdentifier < SingleIdentifier
-        attribute :identifiers, ::Pubid::Identifier, polymorphic: true, collection: true
+        attribute :identifiers, ::Pubid::Identifier, polymorphic: true, 
+                                                     collection: true
 
         def to_s(lang: :en, lang_single: false)
           render(format: :human, lang: lang, lang_single: lang_single)

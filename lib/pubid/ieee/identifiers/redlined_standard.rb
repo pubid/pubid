@@ -17,10 +17,6 @@ module Pubid
         # Redline flag (always true for this class)
         attribute :redline, :boolean, default: -> { true }
 
-        def to_s
-          render(format: :human)
-        end
-
         def publisher
           base_identifier&.publisher || "IEEE"
         end

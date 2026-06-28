@@ -8,10 +8,6 @@ module Pubid
       class DualIdentifier < Base
         attribute :first_identifier, Base, polymorphic: true
         attribute :second_identifier, Base, polymorphic: true
-
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

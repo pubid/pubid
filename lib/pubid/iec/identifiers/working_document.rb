@@ -42,10 +42,6 @@ module Pubid
 
           @stage ||= ::Pubid::Components::Stage.new(stage_code: stage_code)
         end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end

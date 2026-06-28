@@ -27,15 +27,11 @@ module Pubid
           return unless base
 
           doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
-                                                                base.to_hash))
+                                                                 base.to_hash))
         end
 
         def base_from_kv(model, value)
           model.base_identifier = ::Pubid::Iec::Identifier.from_hash(value) if value
-        end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
         end
 
         # Delegate common attributes to base_identifier

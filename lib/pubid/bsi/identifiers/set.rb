@@ -13,7 +13,8 @@ module Pubid
       #   BS ISO 20400 + BS ISO 44001+BS ISO 44002
       #   BS ISO 9001+BS ISO 14001
       class Set < SingleIdentifier
-        attribute :identifiers, ::Pubid::Identifier, collection: true, polymorphic: true
+        attribute :identifiers, ::Pubid::Identifier, collection: true, 
+                                                     polymorphic: true
         attribute :separators, :string, collection: true # Should all be " + "
 
         def to_s(lang: :en, lang_single: false)

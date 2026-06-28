@@ -29,10 +29,6 @@ module Pubid
 
         # Use proper Draft component (Lutaml::Model object)
         attr_accessor :draft_obj
-
-        def to_s
-          render(format: :human)
-        end
       end
     end
   end

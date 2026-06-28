@@ -38,7 +38,7 @@ module Pubid
           return unless base
 
           doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
-                                                                base.to_hash))
+                                                                 base.to_hash))
         end
 
         def base_from_kv(model, value)
@@ -116,10 +116,6 @@ module Pubid
         def self.type
           { key: :frag,
             web: :fragment_identifier, title: "Fragment", short: "FRAG" }
-        end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
         end
 
         # Delegate common attributes to base_identifier

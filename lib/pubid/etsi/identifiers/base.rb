@@ -23,10 +23,6 @@ module Pubid
       # raise on to_hash.
       attribute :publisher, :string, default: -> { "ETSI" }
 
-      def to_s
-        render(format: :human)
-      end
-
       def ==(other)
         return false unless other.is_a?(Pubid::Etsi::Identifier)
 

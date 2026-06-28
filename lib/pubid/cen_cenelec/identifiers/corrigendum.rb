@@ -11,10 +11,6 @@ module Pubid
         attribute :corrigendum_year, :integer
         attribute :corrigendum_month, :string
 
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
-
         def publisher
           base_identifier&.publisher
         end

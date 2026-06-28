@@ -20,10 +20,6 @@ module Pubid
 
           @code ||= Components::Code.new(value: "#{cec_part.value}-#{no_number.value}")
         end
-
-        def to_s(**opts)
-          render(format: :human, **opts)
-        end
       end
     end
   end
