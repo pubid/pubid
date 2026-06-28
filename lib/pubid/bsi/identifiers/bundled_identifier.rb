@@ -18,10 +18,6 @@ module Pubid
         attribute :common_year, Bsi::Components::Date # Year applied to all if present
         attribute :bundle_type, :string # "Parts", "Sections", or nil for regular bundles
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
-
         def <=>(other)
           return nil unless other.is_a?(BundledIdentifier)
 

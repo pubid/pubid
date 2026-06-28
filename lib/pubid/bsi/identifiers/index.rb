@@ -24,9 +24,6 @@ module Pubid
           { key: :index, title: "Index", short: "Index" }
         end
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
       end
     end
   end

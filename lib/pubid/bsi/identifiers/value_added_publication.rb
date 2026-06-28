@@ -15,10 +15,6 @@ module Pubid
         attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
         attribute :format, :string, values: ["PDF", "TC", "BOOK"]
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
-
         # Delegate common attributes to base_identifier
         def publisher
           base_identifier&.publisher
