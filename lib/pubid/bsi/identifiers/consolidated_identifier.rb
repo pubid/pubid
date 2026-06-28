@@ -9,10 +9,6 @@ module Pubid
         attribute :identifiers, ::Pubid::Identifier, polymorphic: true, 
                                                      collection: true
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
-
         def to_urn
           base = identifiers&.first
           return nil unless base

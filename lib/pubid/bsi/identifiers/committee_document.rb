@@ -29,9 +29,6 @@ module Pubid
           { key: :committee_document, title: "Committee Document", short: "DC" }
         end
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
       end
     end
   end

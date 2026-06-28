@@ -17,10 +17,6 @@ module Pubid
                                                      polymorphic: true
         attribute :separators, :string, collection: true # Should all be " + "
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
-
         def <=>(other)
           return nil unless other.is_a?(Set)
 

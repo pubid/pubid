@@ -21,9 +21,6 @@ module Pubid
             web: :published_document, title: "Published Document", short: "PD" }
         end
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
       end
     end
   end

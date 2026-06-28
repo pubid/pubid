@@ -53,10 +53,6 @@ module Pubid
       attribute :explicit_publisher, :boolean, default: -> { false }
       attribute :space_separated_part, :boolean, default: -> { false }
 
-      def to_s(lang: :en, lang_single: false)
-        render(format: :human, lang: lang, lang_single: lang_single)
-      end
-
       def <=>(other)
         return nil unless other.is_a?(Pubid::Bsi::Identifier)
 

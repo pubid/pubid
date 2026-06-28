@@ -21,10 +21,6 @@ module Pubid
           ":"
         } # Separator before Addendum (":" or " ")
 
-        def to_s(lang: :en, lang_single: false)
-          render(format: :human, lang: lang, lang_single: lang_single)
-        end
-
         def publisher
           base_identifier&.publisher
         end
