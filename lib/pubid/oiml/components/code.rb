@@ -13,11 +13,18 @@ module Pubid
         attribute :number, :string
         attribute :part, :string
         attribute :subpart, :string
+        # Free-form trailing suffix glued to the code, e.g. "sup", "A",
+        # "erratum", "GUM 1", "ISO3930". Preserved verbatim for round-trip.
+        attribute :suffix, :string
+        # When true the suffix is space-separated ("D 1 Brochure") rather than
+        # the default dash ("R 60-sup").
+        attribute :space_suffix, :boolean, default: false
 
         def to_s
           result = number.to_s
           result += "-#{part}" if part
           result += "-#{subpart}" if subpart
+          result += "#{space_suffix ? ' ' : '-'}#{suffix}" if suffix
           result
         end
 

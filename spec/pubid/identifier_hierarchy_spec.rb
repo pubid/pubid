@@ -24,7 +24,7 @@ RSpec.describe "Identifier hierarchy contract" do
       Jcgm: Pubid::Jcgm::Identifier,
       Jis: Pubid::Jis::Identifier,
       Nist: Pubid::Nist::Identifiers::Base,
-      Oiml: Pubid::Oiml::Identifiers::Base,
+      Oiml: Pubid::Oiml::Identifier,
       Plateau: Pubid::Plateau::Identifiers::Base,
       Sae: Pubid::Sae::Identifiers::Base,
     }
