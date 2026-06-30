@@ -2,7 +2,12 @@
 
 module Pubid
   module Csa
-    class Identifier
+    # Common base class for all CSA identifiers. SingleIdentifier (and the
+    # concrete Identifiers::* types through it) descends from it, so every CSA
+    # identifier is `is_a?(Pubid::Csa::Identifier)` natively and gets the shared
+    # polymorphic `from_hash`. (The Wrapper/Composite container models are
+    # separate Lutaml::Model types, not identifiers.)
+    class Identifier < ::Pubid::Identifier
       def self.parse(input)
         # Filter out comments
         return nil if input.start_with?("#")

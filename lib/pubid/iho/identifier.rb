@@ -1,27 +1,9 @@
 # frozen_string_literal: true
 
-module Pubid
-  module Iho
-    # Entry point for parsing IHO identifiers.
-    #
-    # `extend Pubid::IdentifierFacade` provides polymorphic `from_hash` (routing
-    # to the concrete subclass via the `_type` discriminator) and pairs with
-    # `include Pubid::Iho::Identifier` in Identifiers::Base for identity
-    # (`is_a?`/`===`), so a consumer handed this module can both deserialize and
-    # identity-check IHO ids through it.
-    module Identifier
-      extend Pubid::IdentifierFacade
-
-      # Parse an IHO identifier string into an identifier object
-      # @param identifier [String] The IHO identifier string to parse
-      # @return [Pubid::Iho::Identifiers::Base] The appropriate identifier object
-      # @raise [Parslet::ParseFailed] If parsing fails
-      def self.parse(identifier)
-        parsed = Parser.parse(identifier)
-        Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse IHO identifier '#{identifier}': #{e.message}"
-      end
-    end
-  end
-end
+# The IHO flavor base class is Pubid::Iho::Identifier — a real Pubid::Identifier
+# subclass that every concrete IHO identifier descends from, so `is_a?` identity
+# and the shared polymorphic `from_hash` work natively (no facade needed). Its
+# body, `.parse`, and the Identifiers::Base back-compat alias live in
+# identifiers/base.rb; this file just ensures it is loaded when a consumer
+# references Pubid::Iho::Identifier directly.
+require_relative "identifiers/base"

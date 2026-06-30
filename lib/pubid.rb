@@ -50,7 +50,6 @@ module Pubid
   autoload :Components, "pubid/components"
   autoload :BundledIdentifier, "pubid/bundled_identifier"
   autoload :Identifier, "pubid/identifier"
-  autoload :IdentifierFacade, "pubid/identifier_facade"
   autoload :IdentifierMetadata, "pubid/identifier_metadata"
   autoload :Rendering, "pubid/rendering"
   autoload :Renderers, "pubid/renderers"
@@ -126,7 +125,7 @@ module Pubid
       end
 
       urn_parser = flavor_module.const_get(:UrnParser)
-      urn_parser.parse(string)    else
+      urn_parser.parse(string) else
       # Default to MR string parser for MR format, human-readable otherwise
       # The MR string parser converts to human-readable and delegates to flavor.parse
       raise ArgumentError,

@@ -2,7 +2,9 @@
 
 module Pubid
   module Asme
-    class SingleIdentifier < Pubid::Identifier
+    # Descends from Pubid::Asme::Identifier (the flavor base) so every concrete
+    # ASME identifier is `is_a?(Pubid::Asme::Identifier)`.
+    class SingleIdentifier < Identifier
       # Generate URN for this identifier
       #
       # @return [String] URN representation

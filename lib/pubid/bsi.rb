@@ -12,7 +12,10 @@ module Pubid
     autoload :Builder, "#{__dir__}/bsi/builder"
     autoload :Identifier, "#{__dir__}/bsi/identifier"
     autoload :Identifiers, "#{__dir__}/bsi/identifiers"
-    autoload :Model, "#{__dir__}/bsi/model"
+    # NOTE: bsi/model.rb is legacy/unused (nothing references Pubid::Bsi::Model)
+    # and defines a conflicting `class Identifier < Lutaml::Model::Serializable`.
+    # It is intentionally NOT autoloaded so it can never clash with the real
+    # Pubid::Bsi::Identifier (single_identifier.rb).
     autoload :Parser, "#{__dir__}/bsi/parser"
     autoload :Renderer, "#{__dir__}/bsi/renderer"
     autoload :SingleIdentifier, "#{__dir__}/bsi/single_identifier"

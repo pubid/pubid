@@ -2,14 +2,15 @@
 
 module Pubid
   module Api
-    class SingleIdentifier < Pubid::Identifier
+    class SingleIdentifier < Identifier
       # Generate URN for this identifier
       #
       # @return [String] URN representation
 
-      def publisher
-        "API"
-      end
+      # Stored as a plain string (always "API") so it round-trips through
+      # to_hash/from_hash. Was a `def publisher` method, which made lutaml
+      # serialize a String against the Components::Publisher attribute.
+      attribute :publisher, :string, default: -> { "API" }
 
       attribute :code, Components::Code
       attribute :part, :string

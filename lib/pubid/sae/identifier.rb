@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
-module Pubid
-  module Sae
-    class Identifier
-      def self.parse(input)
-        parsed = Parser.parse(input)
-        Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse SAE identifier: #{input}\n#{e.message}"
-      end
-    end
-  end
-end
+# Pubid::Sae::Identifier is the SAE base class (a real Pubid::Identifier
+# subclass); its body, `.parse`, and the Identifiers::Base back-compat alias
+# live in identifiers/base.rb. This file just ensures it is loaded.
+require_relative "identifiers/base"

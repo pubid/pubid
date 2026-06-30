@@ -1,0 +1,88 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+
+# Phase 0 safety net for the identifier-hierarchy unification
+# (plans/exlpore-why-in-the-misty-hennessy.md).
+#
+# Asserts that for every flavor, `parse -> to_hash -> from_hash` reconstructs an
+# equal identifier (same concrete class, same canonical string). This is the
+# regression net the refactor leans on: promoting a shared polymorphic
+# `from_hash` onto the base, and converting every flavor's Identifier into a
+# real Pubid::Identifier subclass, must not change any of these round-trips.
+#
+# Flavors whose serialization is currently broken are listed in
+# PENDING_ROUND_TRIP and marked `pending`. RSpec reports a pending example that
+# still fails as pending (suite stays green); once a Phase 3 fix lands and the
+# example passes, RSpec FAILS it ("expected pending to fail") — that red is the
+# signal to delete the marker. Do not remove a PENDING_ROUND_TRIP entry until
+# its flavor actually round-trips.
+RSpec.describe "Identifier to_hash/from_hash round-trip" do
+  # flavor module => a simple, canonical, parseable identifier for that flavor.
+  ROUND_TRIP_SAMPLES = {
+    "Pubid::Amca"       => "AMCA 200",
+    "Pubid::Ansi"       => "ANSI 802.3-2012",
+    "Pubid::Api"        => "API BULL 11L2",
+    "Pubid::Ashrae"     => "ASHRAE 55-2017",
+    "Pubid::Asme"       => "ASME B18.3-2012",
+    "Pubid::Astm"       => "ASTM ADJD2148",
+    "Pubid::Bsi"        => "BS 5839-1:2017",
+    "Pubid::Ccsds"      => "CCSDS 100.0-G-1",
+    "Pubid::CenCenelec" => "EN 50128:2011",
+    "Pubid::Cie"        => "CIE 198:2011",
+    "Pubid::Csa"        => "CSA C22.2 NO. 0:20",
+    "Pubid::Etsi"       => "ETSI EG 200 053 V1.5.1 (2004-06)",
+    "Pubid::Idf"        => "IDF 146:2003",
+    "Pubid::Iec"        => "IEC 60050:2011",
+    "Pubid::Ieee"       => "IEEE 802.3-2018",
+    "Pubid::Iho"        => "IHO S-57",
+    "Pubid::Iso"        => "ISO 9001:2015",
+    "Pubid::Itu"        => "ITU-T G.711",
+    "Pubid::Jcgm"       => "JCGM 100:2008",
+    "Pubid::Jis"        => "JIS A 0001:1999",
+    "Pubid::Nist"       => "NIST IR 88-4008",
+    "Pubid::Oiml"       => "OIML R 138",
+    "Pubid::Plateau"    => "PLATEAU Handbook #00",
+    "Pubid::Sae"        => "SAE J1939",
+  }.freeze
+
+  # Known-broken round-trips, to be fixed in Phase 3 (fix all 8). Value is the
+  # reason, shown in the pending output.
+  # Remaining broken round-trips after the hierarchy unification. The publisher
+  # crash is fixed for all of these, but their custom component attributes
+  # (code/version/sector/series/type/year objects) still need per-flavor
+  # key_value mappings to round-trip. Tracked here; identity (is_a?) works.
+  PENDING_ROUND_TRIP = {
+    "Pubid::Amca" => "custom component round-trip: `type` Hash not rebuilt by from_hash",
+    "Pubid::Api"  => "custom component round-trip: `type` Parslet::Slice not rebuilt by from_hash",
+    "Pubid::Cie"  => "publisher String vs Components::Publisher; needs publisher/component mapping",
+    "Pubid::Etsi" => "custom component round-trip: code/version dropped by from_hash",
+    "Pubid::Itu"  => "base_hash series/sector transform not reversed by from_hash",
+    "Pubid::Ieee" => "lossy rebuild: code/year stored as objects, dropped on from_hash",
+  }.freeze
+
+  ROUND_TRIP_SAMPLES.each do |flavor_const, sample|
+    it "#{flavor_const} round-trips #{sample.inspect}" do
+      pending(PENDING_ROUND_TRIP[flavor_const]) if PENDING_ROUND_TRIP.key?(flavor_const)
+
+      flavor = Object.const_get(flavor_const)
+      id = flavor.parse(sample)
+      restored = id.class.from_hash(id.to_hash)
+
+      expect(restored.class).to eq(id.class)
+      expect(restored.to_s).to eq(id.to_s)
+    end
+  end
+
+  # CSA's general forms round-trip (covered above), but the CAN/CSA adoption +
+  # revision form does not yet. Tracked separately so the working forms stay
+  # protected while this specific form is fixed in Phase 3.
+  describe "CSA CAN/CSA adoption+revision form (Phase 3 fix)" do
+    it "round-trips CAN/CSA-A123.2-03 (R2023)" do
+      pending "from_hash raises NoMethodError (nil.attributes) on the (Ryyyy) revision form"
+      id = Pubid::Csa.parse("CAN/CSA-A123.2-03 (R2023)")
+      restored = id.class.from_hash(id.to_hash)
+      expect(restored.to_s).to eq(id.to_s)
+    end
+  end
+end

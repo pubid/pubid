@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
-
 module Pubid
   module CenCenelec
-    # `extend Pubid::IdentifierFacade` adds polymorphic `from_hash` and pairs
-    # with `include Pubid::CenCenelec::Identifier` in Identifiers::Base for
-    # identity (`is_a?`/`===`), so a consumer handed this module can deserialize
-    # and identity-check CEN/CENELEC ids through it.
-    module Identifier
-      extend Pubid::IdentifierFacade
-
+    # Common base class for all CEN/CENELEC identifiers. CEN/CENELEC has a split
+    # hierarchy — some concrete types descend from Identifiers::Base, others from
+    # SingleIdentifier — so this class is the shared parent of BOTH, making every
+    # CEN/CENELEC identifier `is_a?(Pubid::CenCenelec::Identifier)` natively (and
+    # giving them the shared polymorphic `from_hash`). No facade needed.
+    class Identifier < ::Pubid::Identifier
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
         Builder.new.build(parsed)

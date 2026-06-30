@@ -117,20 +117,8 @@ module Pubid
         render(format: :human, **opts)
       end
 
-      # Dispatch deserialization to the concrete identifier class named by the
-      # stored `_type`, so `from_hash` rebuilds e.g. a Corrigendum rather than a
-      # bare Pubid::Jis::Identifier. lutaml resolves `_type` only for validation,
-      # not instantiation, so we route to the mapped subclass and let its own
-      # (inherited) from_hash do the actual work.
-      def self.from_hash(data, options = {})
-        type = data["_type"] || data[:_type]
-        klass_name = JIS_TYPE_MAP[type]
-        if klass_name
-          klass = Object.const_get(klass_name)
-          return klass.from_hash(data, options) unless klass == self
-        end
-        super
-      end
+      # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
+      # JIS_TYPE_MAP remains as the key_value polymorphic_map.
 
       # Parse a JIS identifier string into an identifier object
       # @param identifier [String] The JIS identifier string to parse
