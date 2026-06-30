@@ -31,7 +31,7 @@ module Pubid
       def render_base(id)
         parts = []
         parts << id.copublisher if id.copublisher
-        t = id.class.attributes.key?(:type) ? id.type : nil
+        t = id.class.respond_to?(:type) ? id.class.type : nil
         if t.is_a?(Hash) && t[:title]
           parts << t[:title].to_s
         end

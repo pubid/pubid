@@ -17,10 +17,13 @@ module Pubid
         attribute :subseries, :string
         attribute :parts, :string, collection: true
 
-        def initialize(number:, subseries: nil, parts: nil)
-          @number = number
-          @subseries = subseries
-          @parts = parts || []
+        # Optional args + `super()` + setters so the attributes are lutaml-tracked
+        # and round-trip through to_hash/from_hash.
+        def initialize(number: nil, subseries: nil, parts: nil, **opts)
+          super(**opts)
+          self.number = number
+          self.subseries = subseries
+          self.parts = parts || []
         end
 
         def to_s

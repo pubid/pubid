@@ -45,18 +45,6 @@ module Pubid
       #
       # @return [String] URN representation
 
-      # Override base_hash to handle ITU-specific attributes
-      def base_hash
-        hash = super
-        # ITU Series has a 'series' attribute, not 'number'
-        if hash[:series].is_a?(Hash) && series
-          hash[:series] = series.series
-        end
-        # Add sector (ITU-specific, has a 'sector' attribute)
-        hash[:sector] = sector.sector if sector
-        hash
-      end
-
       # Stored as a plain string (always "ITU") so it round-trips through
       # to_hash/from_hash. Was a `def publisher` method, which made lutaml
       # serialize a String against the Components::Publisher attribute.

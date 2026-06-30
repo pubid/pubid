@@ -24,10 +24,6 @@ reaffirmed: nil, interpretation_code: nil)
         def self.type
           { key: :interpretation, title: "Interpretation", short: "Interp" }
         end
-
-        def type
-          Interpretation.type
-        end
       end
     end
   end

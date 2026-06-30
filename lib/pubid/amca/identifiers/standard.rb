@@ -12,10 +12,6 @@ module Pubid
         def self.type
           { key: :standard, title: "Standard", short: nil }
         end
-
-        def type
-          Standard.type
-        end
       end
     end
   end
