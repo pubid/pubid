@@ -18,7 +18,8 @@ module Pubid
 
       # Main identifier pattern - check supplements first
       rule(:identifier) do
-        amendment_identifier | amendment_short | annex_letter_identifier | annex_identifier | base_identifier
+        amendment_identifier | amendment_short | annex_letter_identifier |
+          annex_identifier | trailing_supplement_identifier | base_identifier
       end
 
       # Publisher - always "OIML"
@@ -30,14 +31,33 @@ module Pubid
       # Number with optional part and subpart
       rule(:number_only) { digits.as(:number) }
 
-      rule(:part_number) { dash >> digits.as(:part) }
+      # Part number, optionally a slashed multi-part continuation captured
+      # verbatim, e.g. "1/-2" in "OIML R 46-1/-2:2012".
+      rule(:part_number) do
+        dash >> (digits >> (slash >> dash >> digits).repeat).as(:part)
+      end
 
       rule(:subpart_number) { dash >> digits.as(:subpart) }
 
+      # Free-form named/lettered code suffix glued after the numeric part:
+      #   -GUM 1, -special, -sup, -erratum, -A, -ISO3930, -Amend, -Amended_2012
+      # plus the space-separated "Brochure" label. "GUM <n>" is tried first so
+      # its trailing number isn't lost to the bare-word alternative. The
+      # trailing `(_?digits)*` captures joint codes ("ISO3930") and the
+      # "Amended_2012" amendment label (the hand-off treats these as part
+      # suffixes, preserved verbatim for round-trip).
+      rule(:named_suffix) do
+        (dash >> (
+          (str("GUM") >> space >> digits) |
+          (match("[A-Za-z]").repeat(1) >> (str("_").maybe >> digits).repeat)
+        ).as(:code_suffix)) |
+          (space >> str("Brochure").as(:code_suffix) >> str("").as(:space_suffix))
+      end
+
       rule(:full_number) do
-        (number_only >> part_number >> subpart_number) |
-          (number_only >> part_number) |
-          number_only
+        (number_only >> part_number >> subpart_number >> named_suffix.maybe) |
+          (number_only >> part_number >> named_suffix.maybe) |
+          (number_only >> named_suffix.maybe)
       end
 
       # Edition number - ordinal numbers
@@ -82,8 +102,18 @@ module Pubid
       end
 
       # Language codes
+      #
+      # relaton-data-oiml encodes the publication language with its own code
+      # set (lib/oiml_fetcher.rb DOCID_LANG_CODE): single uppercase letters
+      # E F D R S C A U X, plus two-letter PO/PT/PE/SR. The two-letter OIML
+      # codes must be tried before the single-letter rule so e.g. "PE" isn't
+      # left with a dangling "E".
       rule(:lang_single) do
-        match("[EFRX]") # Single letter: E, F, R, X
+        match("[EFRXDSCAU]")
+      end
+
+      rule(:lang_multi_oiml) do
+        str("PO") | str("PT") | str("PE") | str("SR")
       end
 
       rule(:lang_multi) do
@@ -93,8 +123,9 @@ module Pubid
       rule(:language_code) do
         (
           (lang_single >> slash >> lang_single) | # E/F
-          lang_single |                          # E, F
-          lang_multi                             # en, fr
+          lang_multi_oiml |                        # PO, PT, PE, SR
+          lang_single |                            # E, F, D, R, S, C, A, U, X
+          lang_multi                               # en, fr
         ).as(:language)
       end
 
@@ -131,21 +162,37 @@ module Pubid
           language_portion.maybe.as(:language)
       end
 
-      # Annex identifier - "BASE Annexes Edition YYYY" or "BASE Annexes:YYYY"
+      # Trailing supplement word - "BASE Amendment" / "BASE Errata" where the
+      # publication year stays on the base (e.g. "OIML R 138:2009 Amendment").
+      # amendment_short is tried first; it only matches when a year follows the
+      # word, so the no-year trailing form falls through to here.
+      rule(:trailing_supplement_identifier) do
+        base_without_language.as(:base_identifier) >>
+          space >> (str("Amendment") | str("Errata")).as(:trailing_marker) >>
+          language_portion.maybe.as(:language)
+      end
+
+      # Annex identifier - "BASE Annexes Edition YYYY" / "BASE Annexes:YYYY" /
+      # "BASE:YYYY Annexes" (year on the base, no annex year).
       rule(:annex_identifier) do
         base_without_language.as(:base_identifier) >>
           space >> str("Annexes").as(:annex_marker) >>
           (
             (space >> edition_text >> space >> year_digits.as(:year)).as(:edition_format) |
             (colon >> year_digits.as(:year))
-          ) >>
+          ).maybe >>
           language_portion.maybe.as(:language)
       end
 
-      # Annex with letter - "BASE Annex A Edition YYYY"
+      # Annex letter or letter range, e.g. "A" or "B-C".
+      rule(:annex_letter_value) do
+        (match("[A-Z]") >> (dash >> match("[A-Z]")).maybe).as(:annex_letter)
+      end
+
+      # Annex with letter - "BASE Annex A Edition YYYY" / "BASE:YYYY Annex B-C"
       rule(:annex_letter_identifier) do
         base_without_language.as(:base_identifier) >>
-          space >> str("Annex") >> space >> match("[A-Z]").as(:annex_letter) >>
+          space >> str("Annex") >> space >> annex_letter_value >>
           ((space >> edition_text >> space >> year_digits.as(:year)) | (colon >> year_digits.as(:year))).maybe >>
           language_portion.maybe.as(:language)
       end

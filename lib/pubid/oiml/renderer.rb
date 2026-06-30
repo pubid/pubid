@@ -24,8 +24,6 @@ module Pubid
           render_supplement(id)
         when SingleIdentifier
           render_single(id)
-        when Identifiers::Base
-          render_base_identifier(id)
         else
           id.to_s
         end
@@ -36,6 +34,12 @@ module Pubid
       def effective_format(id)
         id.requested_format ||
           (id.parsed_format == "long" ? :long : :short)
+      end
+
+      # Strip a trailing language group "(...)" from a rendered base string so
+      # the supplement can re-attach its own language at the end.
+      def strip_language(str)
+        str.sub(/\s*\([^)]+\)\s*$/, "").strip
       end
 
       def render_single(id)
@@ -80,6 +84,16 @@ module Pubid
       def render_supplement(id)
         format = effective_format(id)
 
+        # Trailing-word shorthand: "BASE Amendment" / "BASE Errata" with the
+        # publication year kept on the base identifier. The word comes from the
+        # concrete supplement class.
+        if id.trailing
+          base_str = strip_language(id.base_identifier.to_s)
+          result = "#{base_str} #{id.supplement_type}"
+          result += " (#{id.language})" if id.language
+          return result
+        end
+
         base_format = if format && format != :short
                         format
                       elsif id.base_identifier.class.attributes.key?(:parsed_format) && id.base_identifier.parsed_format == "long"
@@ -93,7 +107,7 @@ module Pubid
                    else
                      id.base_identifier.to_s
                    end
-        base_str = base_str.sub(/\s*\([^)]+\)\s*$/, "").strip
+        base_str = strip_language(base_str)
 
         result = "#{id.supplement_type} (#{id.year}) to #{base_str}"
         result += " (#{id.language})" if id.language
@@ -103,6 +117,16 @@ module Pubid
 
       def render_annex(id)
         format = effective_format(id)
+
+        # "BASE:YYYY Annex(es)" — the year is glued to the base, the marker
+        # carries none. Keep the base date instead of stripping it.
+        if id.year_on_base
+          base_str = strip_language(id.base_identifier.to_s)
+          marker = id.letter ? "Annex #{id.letter}" : "Annexes"
+          result = "#{base_str} #{marker}"
+          result += " (#{id.language})" if id.language
+          return result
+        end
 
         base_format = if id.base_identifier.class.attributes.key?(:parsed_format) && id.base_identifier.parsed_format == "long"
                         :long
@@ -140,20 +164,6 @@ module Pubid
         end
 
         result += " (#{id.language})" if id.language
-        result
-      end
-
-      def render_base_identifier(id)
-        result = "#{id.publisher} #{id.type} #{id.code}"
-        result += ":#{id.date.render(context: @context)}" if id.date
-
-        if id.stage || id.iteration
-          result += " "
-          result += id.iteration.to_s if id.iteration
-          result += id.stage.to_s if id.stage
-        end
-
-        result += "(#{id.language})" if id.language
         result
       end
     end

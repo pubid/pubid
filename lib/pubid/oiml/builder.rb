@@ -77,14 +77,21 @@ module Pubid
       end
 
       def build_supplement(parsed_hash)
-        # Determine supplement type
+        marker = parsed_hash[:trailing_marker].to_s if parsed_hash[:trailing_marker]
+
+        # Determine supplement type. The trailing word ("Amendment"/"Errata")
+        # selects the class; the concrete class then carries the word via
+        # #supplement_type, so only the `trailing` flag needs storing.
         supplement_class = if parsed_hash[:annex_letter] || parsed_hash[:annex_marker]
                              Identifiers::Annex
+                           elsif marker == "Errata"
+                             Identifiers::Errata
                            else
                              Identifiers::Amendment
                            end
 
         supplement = supplement_class.new
+        supplement.trailing = true if marker
 
         # Recursively parse base identifier
         if parsed_hash[:base_identifier]
@@ -103,6 +110,13 @@ module Pubid
         supplement.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
         supplement.letter = parsed_hash[:annex_letter].to_s if parsed_hash[:annex_letter]
 
+        # Annex with no year of its own but a dated base ("R 60:2017 Annexes"):
+        # the year belongs to the base and must render glued to it.
+        if supplement.is_a?(Identifiers::Annex) && !year_value &&
+            supplement.base_identifier&.date
+          supplement.year_on_base = true
+        end
+
         # Track if supplement itself was parsed with Edition format
         if parsed_hash[:edition_format]
           supplement.parsed_format = "long"
@@ -119,8 +133,8 @@ module Pubid
 
         identifier = identifier_class.new
 
-        # Handle code (number-part-subpart) specially
-        if parsed_hash[:number] || parsed_hash[:part] || parsed_hash[:subpart]
+        # Handle code (number-part-subpart-suffix) specially
+        if parsed_hash[:number] || parsed_hash[:part] || parsed_hash[:subpart] || parsed_hash[:code_suffix]
           code_attrs = {}
           if parsed_hash[:number]
             code_attrs[:number] =
@@ -130,6 +144,10 @@ module Pubid
           if parsed_hash[:subpart]
             code_attrs[:subpart] =
               parsed_hash[:subpart].to_s
+          end
+          if parsed_hash[:code_suffix]
+            code_attrs[:suffix] = parsed_hash[:code_suffix].to_s
+            code_attrs[:space_suffix] = true if parsed_hash.key?(:space_suffix)
           end
           identifier.code = Components::Code.new(**code_attrs)
         end
