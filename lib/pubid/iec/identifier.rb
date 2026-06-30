@@ -98,6 +98,14 @@ module Pubid
         "pubid:iec:single-identifier" => "Pubid::Iec::SingleIdentifier",
       }.freeze
 
+      # SingleIdentifier lives outside Pubid::Iec::Identifiers but appears as a
+      # nested `_type`, so the shared polymorphic_type_map needs it explicitly
+      # (see Pubid::Identifier#additional_identifier_classes).
+      def self.additional_identifier_classes
+        [Pubid::Iec::SingleIdentifier]
+      end
+      private_class_method :additional_identifier_classes
+
       # Build the type map from the live class list, for the validation spec.
       def self.build_type_map
         types = Pubid::Iec.identifier_types
@@ -275,20 +283,8 @@ module Pubid
         Pubid::Iec::Builder.new.build(parsed)
       end
 
-      # lutaml's polymorphic key_value mapping reads `_type` only to validate; it
-      # does not re-instantiate the concrete subclass on root deserialization. So
-      # `Identifier.from_hash(amendment_hash)` would return a bare Identifier and
-      # drop base_identifier. Route by `_type` to the right subclass and let its
-      # (inherited) from_hash do the real work, mirroring ISO/JIS.
-      def self.from_hash(data, options = {})
-        type = data["_type"] || data[:_type]
-        klass_name = IEC_TYPE_MAP[type]
-        if klass_name
-          klass = Object.const_get(klass_name)
-          return klass.from_hash(data, options) unless klass == self
-        end
-        super
-      end
+      # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
+      # IEC_TYPE_MAP remains as the key_value polymorphic_map.
     end
   end
 end

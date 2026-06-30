@@ -62,20 +62,8 @@ module Pubid
         raise "Failed to parse CCSDS identifier '#{identifier}': #{e.message}"
       end
 
-      # Dispatch deserialization to the concrete class named by the stored
-      # `_type`, so `from_hash` rebuilds a Corrigendum rather than a bare root
-      # (lutaml resolves `_type` only for validation, not instantiation).
-      # Mirrors Pubid::Jis::Identifier.from_hash. The `klass == self` guard lets
-      # the matched subclass fall through to lutaml's inherited from_hash.
-      def self.from_hash(data, options = {})
-        type = data["_type"] || data[:_type]
-        klass_name = CCSDS_TYPE_MAP[type]
-        if klass_name
-          klass = Object.const_get(klass_name)
-          return klass.from_hash(data, options) unless klass == self
-        end
-        super
-      end
+      # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
+      # CCSDS_TYPE_MAP remains as the key_value polymorphic_map.
     end
   end
 end

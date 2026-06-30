@@ -2,7 +2,7 @@
 
 module Pubid
   module Csa
-    class SingleIdentifier < Pubid::Identifier
+    class SingleIdentifier < Identifier
       # Generate URN for this identifier
       #
       # @return [String] URN representation

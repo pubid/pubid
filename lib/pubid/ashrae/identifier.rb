@@ -1,24 +1,9 @@
 # frozen_string_literal: true
 
-module Pubid
-  module Ashrae
-    # `extend Pubid::IdentifierFacade` adds polymorphic `from_hash` and pairs
-    # with `include Pubid::Ashrae::Identifier` in Identifiers::Base for identity
-    # (`is_a?`/`===`), so a consumer handed this module can deserialize and
-    # identity-check ASHRAE ids through it.
-    module Identifier
-      extend Pubid::IdentifierFacade
-
-      # Parse an ASHRAE identifier string into an identifier object
-      # @param identifier [String] The ASHRAE identifier string to parse
-      # @return [Identifiers::Base] The appropriate identifier object
-      # @raise [Parslet::ParseFailed] If parsing fails
-      def self.parse(identifier)
-        parsed = Parser.parse(identifier)
-        Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse ASHRAE identifier '#{identifier}': #{e.message}"
-      end
-    end
-  end
-end
+# The ASHRAE flavor base class is Pubid::Ashrae::Identifier — a real
+# Pubid::Identifier subclass that every concrete ASHRAE identifier descends
+# from, so `is_a?` identity and the shared polymorphic `from_hash` work natively
+# (no facade needed). Its body, `.parse`, and the Identifiers::Base back-compat
+# alias live in identifiers/base.rb; this file just ensures it is loaded when a
+# consumer references Pubid::Ashrae::Identifier directly.
+require_relative "identifiers/base"

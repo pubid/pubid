@@ -85,6 +85,14 @@ module Pubid
         "pubid:iso:bundled-identifier" => "Pubid::Iso::BundledIdentifier",
       }.freeze
 
+      # BundledIdentifier lives outside Pubid::Iso::Identifiers but carries a
+      # polymorphic `_type`, so the shared polymorphic_type_map needs it
+      # explicitly (see Pubid::Identifier#additional_identifier_classes).
+      def self.additional_identifier_classes
+        [Pubid::Iso::BundledIdentifier]
+      end
+      private_class_method :additional_identifier_classes
+
       # Build type map from Pubid::Iso.identifier_types for validation
       def self.build_type_map
         Pubid::Iso.identifier_types.to_h do |klass|
@@ -277,20 +285,9 @@ module Pubid
         end
       end
 
-      # lutaml's polymorphic key_value mapping reads `_type` only to validate;
-      # it does not re-instantiate the concrete subclass on deserialization. So
-      # `Identifier.from_hash(corrigendum_hash)` would return a bare Identifier
-      # and drop `base_identifier`. Route by `_type` to the right subclass and
-      # let its (inherited) from_hash do the real work, mirroring JIS.
-      def self.from_hash(data, options = {})
-        type = data["_type"] || data[:_type]
-        klass_name = ISO_TYPE_MAP[type]
-        if klass_name
-          klass = Object.const_get(klass_name)
-          return klass.from_hash(data, options) unless klass == self
-        end
-        super
-      end
+      # from_hash is the shared polymorphic dispatch on Pubid::Identifier, which
+      # routes `_type` through polymorphic_type_map (ISO_TYPE_MAP's dynamic
+      # equivalent). ISO_TYPE_MAP remains as the key_value polymorphic_map.
     end
   end
 end

@@ -2,15 +2,30 @@
 
 module Pubid
   module Bsi
-    class SingleIdentifier < Pubid::Identifier
-      # Identity for the Pubid::Bsi::Identifier facade: SingleIdentifier is the
-      # common ancestor of every concrete BSI identifier, so including the
-      # facade module here makes them all `is_a?(Pubid::Bsi::Identifier)`.
-      include Pubid::Bsi::Identifier
+    # BSI base class. Canonical name Pubid::Bsi::Identifier; SingleIdentifier is a
+    # back-compat alias (BSI's common ancestor — there is no Identifiers::Base).
+    # Every concrete BSI identifier descends from it, so they are all
+    # `is_a?(Pubid::Bsi::Identifier)` natively and get the shared polymorphic
+    # `from_hash` (no facade needed).
+    class Identifier < ::Pubid::Identifier
+      def self.parse(string)
+        # Delegate to IEC for bare IEC identifiers. This handles IEC-specific
+        # features like VAP suffixes (CSV, RLV, etc.) and consolidated
+        # supplements (+AMD1:2001).
+        if string.match?(/\bIEC\b/) &&
+            (string.match?(/\s+(CSV|CMV|RLV|SER|EXV|PAC|PRV)\b/) ||
+             string.match?(/\+AMD\d+:/) ||
+             string.match?(/\+COR\d+:/))
+          return Pubid::Iec.parse(string)
+        end
 
-      # Generate URN for this identifier
-      #
-      # @return [String] URN representation
+        parser = Parser.new
+
+        parsed = parser.parse(string)
+        Builder.build(parsed)
+      rescue Parslet::ParseFailed => e
+        raise StandardError, "Failed to parse '#{string}': #{e.message}"
+      end
 
       attribute :publisher, Bsi::Components::Publisher, default: -> {
         Bsi::Components::Publisher.new(body: "BS")
@@ -39,7 +54,7 @@ module Pubid
       end
 
       def <=>(other)
-        return nil unless other.is_a?(SingleIdentifier)
+        return nil unless other.is_a?(Pubid::Bsi::Identifier)
 
         # Compare by number first
         num_cmp = number.to_s <=> other.number.to_s
@@ -61,5 +76,9 @@ module Pubid
         end
       end
     end
+
+    # Backward-compatible alias: BSI's base class is Pubid::Bsi::Identifier.
+    # Concrete types declared as `< SingleIdentifier` continue to work.
+    SingleIdentifier = Identifier
   end
 end

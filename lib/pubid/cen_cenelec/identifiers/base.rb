@@ -3,12 +3,9 @@
 module Pubid
   module CenCenelec
     module Identifiers
-      # Base CEN identifier
+      # Base CEN identifier (one of two roots; see Pubid::CenCenelec::Identifier).
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
-      class Base < Pubid::Identifier
-        # Identity for the Pubid::CenCenelec::Identifier facade (see its comment).
-        include Pubid::CenCenelec::Identifier
-
+      class Base < Pubid::CenCenelec::Identifier
         # Generate URN for this identifier
         #
         # @return [String] URN representation
