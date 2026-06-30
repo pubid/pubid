@@ -12,12 +12,19 @@ module Pubid
 
         VALID_SECTORS = %w[R T D].freeze
 
-        def initialize(sector:)
-          unless VALID_SECTORS.include?(sector.to_s.upcase)
+        # Optional arg + `super()` + setter so the attribute is lutaml-tracked
+        # and round-trips through to_hash/from_hash (lutaml deserializes via an
+        # argless `.new` then attribute assignment).
+        def initialize(sector: nil, **opts)
+          super(**opts)
+          return if sector.nil?
+
+          normalized = sector.to_s.upcase
+          unless VALID_SECTORS.include?(normalized)
             raise ArgumentError, "Invalid sector: #{sector}. Must be R, T, or D"
           end
 
-          @sector = sector.to_s.upcase
+          self.sector = normalized
         end
 
         def to_s

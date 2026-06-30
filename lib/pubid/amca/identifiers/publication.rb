@@ -24,10 +24,6 @@ reaffirmed: nil, revision: nil)
         def self.type
           { key: :publication, title: "Publication", short: nil }
         end
-
-        def type
-          Publication.type
-        end
       end
     end
   end

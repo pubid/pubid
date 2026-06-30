@@ -95,13 +95,29 @@ module Pubid
         end
       end
 
-      # Override accessors to return component objects
+      # Override accessors to return component objects.
       def code
         code_obj
       end
 
       def draft
         draft_obj
+      end
+
+      # Lazily rebuild the parsed component objects from the underlying string
+      # attributes. After from_hash, lutaml restores the :code/:draft strings
+      # (@code/@draft) but not these objects; the renderer reads code_obj/
+      # draft_obj directly, so rebuild on demand to render a deserialized
+      # identifier identically to the parsed one. On the parse path code_obj/
+      # draft_obj are already set, so the `||=` returns them unchanged.
+      def code_obj
+        @code_obj ||=
+          (Components::Code.parse(@code.to_s) unless @code.nil? || @code.to_s.empty?)
+      end
+
+      def draft_obj
+        @draft_obj ||=
+          (Components::Draft.parse(@draft.to_s) unless @draft.nil? || @draft.to_s.empty?)
       end
 
       # Expose numeric month from draft if available

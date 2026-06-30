@@ -18,10 +18,15 @@ module Pubid
         attribute :minor, :string # Optional minor part
         attribute :parts, :string, collection: true # Parts array
 
-        def initialize(number:, minor: nil, parts: nil)
-          @number = number
-          @minor = minor
-          @parts = parts || []
+        # Args are optional and assigned via lutaml setters (with `super()`) so
+        # the component's attributes are tracked and round-trip through
+        # to_hash/from_hash — lutaml deserializes by calling `.new` with no args
+        # and then assigning attributes.
+        def initialize(number: nil, minor: nil, parts: nil, **opts)
+          super(**opts)
+          self.number = number
+          self.minor = minor
+          self.parts = parts || []
         end
 
         # Render code with space for minor and dash-separated parts

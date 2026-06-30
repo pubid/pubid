@@ -28,7 +28,8 @@ module Pubid
       end
 
       def urn_type
-        identifier.type&.to_s&.downcase
+        (identifier.class.respond_to?(:type) ? identifier.class.type : nil)
+          &.to_s&.downcase
       end
 
       def generate

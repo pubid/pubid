@@ -18,10 +18,10 @@ module Pubid
     # - Identical (identical to ISO publications)
     # - TutorialBundle (tutorial bundles)
     class SingleIdentifier < Identifier
-      # CIE uses a fixed publisher string
-      def publisher
-        "CIE"
-      end
+      # Stored as a plain string (always "CIE") so it round-trips through
+      # to_hash/from_hash. Was a `def publisher` method, which made lutaml
+      # serialize a String against the Components::Publisher attribute and raise.
+      attribute :publisher, :string, default: -> { "CIE" }
 
       attribute :year, :string
       attribute :date_separator, :string # "dash" or "colon"

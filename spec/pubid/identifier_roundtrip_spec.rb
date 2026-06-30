@@ -53,12 +53,6 @@ RSpec.describe "Identifier to_hash/from_hash round-trip" do
   # (code/version/sector/series/type/year objects) still need per-flavor
   # key_value mappings to round-trip. Tracked here; identity (is_a?) works.
   PENDING_ROUND_TRIP = {
-    "Pubid::Amca" => "custom component round-trip: `type` Hash not rebuilt by from_hash",
-    "Pubid::Api"  => "custom component round-trip: `type` Parslet::Slice not rebuilt by from_hash",
-    "Pubid::Cie"  => "publisher String vs Components::Publisher; needs publisher/component mapping",
-    "Pubid::Etsi" => "custom component round-trip: code/version dropped by from_hash",
-    "Pubid::Itu"  => "base_hash series/sector transform not reversed by from_hash",
-    "Pubid::Ieee" => "lossy rebuild: code/year stored as objects, dropped on from_hash",
   }.freeze
 
   ROUND_TRIP_SAMPLES.each do |flavor_const, sample|
@@ -75,11 +69,20 @@ RSpec.describe "Identifier to_hash/from_hash round-trip" do
   end
 
   # CSA's general forms round-trip (covered above), but the CAN/CSA adoption +
-  # revision form does not yet. Tracked separately so the working forms stay
-  # protected while this specific form is fixed in Phase 3.
-  describe "CSA CAN/CSA adoption+revision form (Phase 3 fix)" do
+  # revision form does not yet. It is a WrapperIdentifier (a plain
+  # Lutaml::Model::Serializable, not a Pubid::Identifier) whose nested
+  # `wrapped_identifier` is an attr_accessor — invisible to serialization, so it
+  # is nil after from_hash. Making it a polymorphic lutaml attribute is the right
+  # shape, but it needs (a) cross-flavor `_type` dispatch for the nested id
+  # (CanadianAdopted wraps CSA, CsaAdopted wraps ISO/IEC/CISPR), which the
+  # static class_map doesn't resolve cleanly, and (b) a fix for
+  # CanadianAdopted#to_s, which references `original_reaffirmation_4digit` on
+  # itself (it lives on the wrapped id). Tracked separately; the working CSA
+  # forms stay protected by the suite above.
+  describe "CSA CAN/CSA adoption+revision form" do
     it "round-trips CAN/CSA-A123.2-03 (R2023)" do
-      pending "from_hash raises NoMethodError (nil.attributes) on the (Ryyyy) revision form"
+      pending "wrapped_identifier (attr_accessor on a Lutaml wrapper) is not " \
+              "serialized; needs polymorphic nested-id dispatch + a to_s fix"
       id = Pubid::Csa.parse("CAN/CSA-A123.2-03 (R2023)")
       restored = id.class.from_hash(id.to_hash)
       expect(restored.to_s).to eq(id.to_s)

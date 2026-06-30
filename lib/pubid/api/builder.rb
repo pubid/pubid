@@ -26,6 +26,10 @@ module Pubid
 
       def cast(key, value)
         case key
+        # `:type` is consumed only by select_class for dispatch; it is not an
+        # identifier attribute (the concrete class is pinned by `_type`). Drop it
+        # so the raw Parslet::Slice never lands in the inherited :type attribute.
+        when :type then nil
         when :number then Components::Code.new(value: value.to_s)
         when :reaffirmation
           value.is_a?(Hash) ? (value[:year] || value).to_s : value.to_s
