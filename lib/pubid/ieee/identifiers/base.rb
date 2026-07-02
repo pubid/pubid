@@ -245,10 +245,6 @@ module Pubid
         builder.original_input = input
         builder.build(parsed)
       end
-
-      def to_s
-        render(format: :human)
-      end
     end
 
     module Identifiers
