@@ -16,18 +16,7 @@ module Pubid
       class Code < Lutaml::Model::Serializable
         attribute :number, :string # Main number
         attribute :minor, :string # Optional minor part
-        attribute :parts, :string, collection: true # Parts array
-
-        # Args are optional and assigned via lutaml setters (with `super()`) so
-        # the component's attributes are tracked and round-trip through
-        # to_hash/from_hash — lutaml deserializes by calling `.new` with no args
-        # and then assigning attributes.
-        def initialize(number: nil, minor: nil, parts: nil, **opts)
-          super(**opts)
-          self.number = number
-          self.minor = minor
-          self.parts = parts || []
-        end
+        attribute :parts, :string, collection: true, default: [] # Parts array
 
         # Render code with space for minor and dash-separated parts
         def to_s
