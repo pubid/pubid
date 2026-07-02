@@ -6,6 +6,9 @@ source "https://rubygems.org"
 gemspec
 
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
+# benchmark is used by spec/pubid/iso/performance_spec.rb and is no longer a
+# default gem as of Ruby 4.0, so it must be declared explicitly.
+gem "benchmark"
 gem "nokogiri"
 gem "rake"
 gem "rspec"

@@ -4,7 +4,7 @@ require "spec_helper"
 
 module NistFixturesSpec
   FIXTURE_FILES = Dir.glob(File.join(__dir__,
-                                     "../../fixtures/NIST/identifiers/pass", "*.txt")).freeze
+                                     "../../fixtures/nist/identifiers/pass", "*.txt")).freeze
 end
 
 RSpec.describe "NIST Fixture Round-trip Tests" do
