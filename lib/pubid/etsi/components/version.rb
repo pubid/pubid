@@ -13,16 +13,6 @@ module Pubid
           false
         } # true for ed.N format
 
-        # Args are optional and assigned via lutaml setters (with `super()`) so
-        # the component's attributes are tracked and round-trip through
-        # to_hash/from_hash — lutaml deserializes by calling `.new` with no args
-        # and then assigning attributes.
-        def initialize(version: nil, is_edition: false, **opts)
-          super(**opts)
-          self.version = version
-          self.is_edition = is_edition
-        end
-
         def to_s
           if is_edition
             "ed.#{version}"

@@ -15,16 +15,7 @@ module Pubid
       class Code < Lutaml::Model::Serializable
         attribute :number, :string
         attribute :subseries, :string
-        attribute :parts, :string, collection: true
-
-        # Optional args + `super()` + setters so the attributes are lutaml-tracked
-        # and round-trip through to_hash/from_hash.
-        def initialize(number: nil, subseries: nil, parts: nil, **opts)
-          super(**opts)
-          self.number = number
-          self.subseries = subseries
-          self.parts = parts || []
-        end
+        attribute :parts, :string, collection: true, default: []
 
         def to_s
           result = number.to_s

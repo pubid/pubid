@@ -12,16 +12,20 @@ module Pubid
 
         VALID_SECTORS = %w[R T D].freeze
 
-        # Optional arg + `super()` + setter so the attribute is lutaml-tracked
-        # and round-trips through to_hash/from_hash (lutaml deserializes via an
-        # argless `.new` then attribute assignment).
-        def initialize(sector: nil, **opts)
-          super(**opts)
-          return if sector.nil?
+        # Accept either a positional Hash (lutaml-model's call style:
+        # `Sector.new({lutaml_register: :default})` then attribute assignment)
+        # or a literal `sector:` kwarg (`Sector.new(sector: "R")`). Both call
+        # paths funnel through the same validate-then-set flow so the attribute
+        # stays lutaml-tracked and round-trips through to_hash/from_hash.
+        def initialize(attrs = {}, options = {})
+          super
+          sector_val = attrs[:sector] || attrs["sector"]
+          return if sector_val.nil?
 
-          normalized = sector.to_s.upcase
+          normalized = sector_val.to_s.upcase
           unless VALID_SECTORS.include?(normalized)
-            raise ArgumentError, "Invalid sector: #{sector}. Must be R, T, or D"
+            raise ArgumentError,
+                  "Invalid sector: #{sector_val}. Must be R, T, or D"
           end
 
           self.sector = normalized

@@ -10,13 +10,6 @@ module Pubid
       class Series < Lutaml::Model::Serializable
         attribute :series, :string # e.g., BO, V, X, R, SG1, OB
 
-        # Optional arg + `super()` + setter so the attribute is lutaml-tracked
-        # and round-trips through to_hash/from_hash.
-        def initialize(series: nil, **opts)
-          super(**opts)
-          self.series = series
-        end
-
         def to_s
           series
         end
