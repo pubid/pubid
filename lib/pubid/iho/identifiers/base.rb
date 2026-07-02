@@ -63,12 +63,6 @@ module Pubid
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
       # IHO_TYPE_MAP remains as the key_value polymorphic_map.
-
-      # Render the identifier as a string in canonical IHO form.
-      # @return [String]
-      def to_s
-        render(format: :human)
-      end
     end
 
     module Identifiers
