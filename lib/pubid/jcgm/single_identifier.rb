@@ -35,10 +35,6 @@ module Pubid
           ")",
         ].join
       end
-
-      def to_s
-        render(format: :human)
-      end
     end
   end
 end
