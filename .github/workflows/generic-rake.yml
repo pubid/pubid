@@ -30,6 +30,11 @@ on:
       pat_token:
         required: false
 
+# Least-privilege default; the only job that needs more (tests-passed) overrides
+# below. Jobs here check out code and run rake — no repo write access required.
+permissions:
+  contents: read
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -205,6 +210,11 @@ jobs:
     needs: [rake-traditional, rake-monorepo]
     if: always() && (needs.rake-traditional.result == 'success' || needs.rake-traditional.result == 'skipped') && (needs.rake-monorepo.result == 'success' || needs.rake-monorepo.result == 'skipped')
     runs-on: ubuntu-latest
+    permissions:
+      # peter-evans/repository-dispatch falls back to github.token
+      # (secrets.pat_token || github.token); repository_dispatch via
+      # GITHUB_TOKEN requires contents:write.
+      contents: write
     steps:
     - if: ${{ inputs.monorepo }}
       uses: peter-evans/repository-dispatch@v3
