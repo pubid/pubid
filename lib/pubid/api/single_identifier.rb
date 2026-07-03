@@ -17,10 +17,6 @@ module Pubid
       attribute :year, :string
       attribute :reaffirmation, :string
 
-      def to_s
-        render(format: :human)
-      end
-
       private
 
       def code_portion

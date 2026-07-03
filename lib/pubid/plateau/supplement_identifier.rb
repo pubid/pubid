@@ -19,10 +19,6 @@ module Pubid
         raise NotImplementedError, "Subclasses must implement supplement_string"
       end
 
-      def to_s
-        render(format: :human)
-      end
-
       # Override base_hash to extract edition, type, and annex from base_identifier
       def base_hash
         hash = super
