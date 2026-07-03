@@ -57,6 +57,10 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      # gem bump --tag --push uses token: secrets.pat_token || github.token;
+      # the github.token fallback needs contents:write to push the git tag.
+      contents: write
     env:
       HAVE_PAT_TOKEN: ${{ secrets.pat_token != '' }}
     defaults:
