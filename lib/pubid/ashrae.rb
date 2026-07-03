@@ -13,6 +13,10 @@ module Pubid
     autoload :UrnParser, "#{__dir__}/ashrae/urn_parser"
 
     def self.parse(identifier)
+      if identifier.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       Identifier.parse(identifier)
     end
 

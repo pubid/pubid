@@ -206,6 +206,10 @@ module Pubid
     ].freeze
 
     def self.parse(string)
+      if string.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       Identifier.parse(string)
     end
 

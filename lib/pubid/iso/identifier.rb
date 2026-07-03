@@ -267,6 +267,10 @@ module Pubid
       end
 
       def self.parse(string, format: :auto)
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         format = Pubid::FormatDetector.detect(string) if format == :auto
 
         case format

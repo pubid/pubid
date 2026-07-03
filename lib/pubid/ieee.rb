@@ -25,6 +25,10 @@ module Pubid
 
     class << self
       def parse(input)
+        if input.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         Identifier.parse(input)
       end
 

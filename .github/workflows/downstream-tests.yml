@@ -6,6 +6,10 @@ on:
   repository_dispatch:
     types: [ tests-passed, release-passed ]
 
+# Jobs only check out code and run rake; no write access to the repo is needed.
+permissions:
+  contents: read
+
 jobs:
   build-matrix:
     uses: metanorma/ci/.github/workflows/prepare-rake.yml@main

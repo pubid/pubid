@@ -53,6 +53,10 @@ module Pubid
     # @param identifier [String] the identifier string to parse
     # @return [Identifiers::Base] the parsed identifier
     def self.parse(identifier)
+      if identifier.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       # Use the Parser class's preprocessing method
       # Note: We call the class method directly to ensure preprocessing is applied
       parsed = Parser.class_parse_with_preprocessing(identifier)

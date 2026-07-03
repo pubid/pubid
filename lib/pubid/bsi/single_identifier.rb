@@ -9,6 +9,10 @@ module Pubid
     # `from_hash` (no facade needed).
     class Identifier < ::Pubid::Identifier
       def self.parse(string)
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         # Delegate to IEC for bare IEC identifiers. This handles IEC-specific
         # features like VAP suffixes (CSV, RLV, etc.) and consolidated
         # supplements (+AMD1:2001).

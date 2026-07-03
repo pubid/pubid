@@ -53,6 +53,7 @@ module Pubid
       # Extracted so rubocop can scope length/ABC metrics narrowly.
       # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       def run_stages
+        normalize_spurious_u_suffix!
         normalize_publisher_and_series!
         normalize_lcirc_supplement_contexts!
         normalize_revision_spacing!
@@ -83,6 +84,17 @@ module Pubid
       end
 
       private
+
+      # Strip the spurious "U" a bad v2 data migration prefixed onto real
+      # letter/revision suffixes (e.g. "800-38a" → "800-38Ua",
+      # "73-197r" → "73-197Ur"). NIST's authoritative records
+      # (allrecords.xml, DOIs) carry no such "U"; it exists only in the
+      # migrated corpus. Removing it here lets the remainder parse through
+      # the normal letter-suffix / revision path — "U<letter>" is never a
+      # real NIST suffix, so this only ever undoes the corruption.
+      def normalize_spurious_u_suffix!
+        @cleaned = @cleaned.gsub(/(\d)U([a-z])/, '\1\2')
+      end
 
       # Lowercase publishers, publisher+series concatenations, lowercase
       # series codes, and the lone "LC" → "LCIRC" expansion.

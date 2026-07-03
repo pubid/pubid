@@ -15,6 +15,10 @@ module Pubid
     autoload :Components, "#{__dir__}/csa/components"
 
     def self.parse(identifier_string)
+      if identifier_string.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       Identifier.parse(identifier_string)
     end
 

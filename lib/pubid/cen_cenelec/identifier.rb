@@ -9,6 +9,10 @@ module Pubid
     # giving them the shared polymorphic `from_hash`). No facade needed.
     class Identifier < ::Pubid::Identifier
       def self.parse(identifier)
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Parser.parse(identifier)
         Builder.new.build(parsed)
       rescue Parslet::ParseFailed => e

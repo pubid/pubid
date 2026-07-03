@@ -11,6 +11,10 @@ module Pubid
       attribute :style, :string # "legacy" or "current"
 
       def self.parse(input)
+        if input.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Parser.parse(input)
         builder = Builder.new
         builder.build(parsed, original_string: input)

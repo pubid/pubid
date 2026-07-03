@@ -650,6 +650,10 @@ module Pubid
       root(:identifier)
 
       def self.parse(string)
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         # Strip leading/trailing whitespace
         cleaned = string.strip
 

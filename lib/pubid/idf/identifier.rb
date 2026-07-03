@@ -53,6 +53,10 @@ module Pubid
       end
 
       def self.parse(string)
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Pubid::Idf::Parser.new.parse(string)
         if parsed.nil? || parsed.empty?
           raise Pubid::Idf::Parser::ParseError,

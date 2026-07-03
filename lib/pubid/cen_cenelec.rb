@@ -141,6 +141,10 @@ module Pubid
     ).freeze
 
     def self.parse(identifier)
+      if identifier.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       CenCenelec::Identifier.parse(identifier)
     end
 

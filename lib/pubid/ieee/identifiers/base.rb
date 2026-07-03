@@ -133,6 +133,10 @@ module Pubid
       # orchestrator that consumes a PreParser::Result and routes to the
       # correct builder.
       def self.parse(input)
+        if input.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         result = PreParser.preprocess(input)
 
         case result.dispatch
