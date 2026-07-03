@@ -10,6 +10,21 @@ require "parslet"
 require "pubid/lutaml/no_store_registration"
 
 module Pubid
+  # Upper bound on the length of an identifier string accepted by any +parse+
+  # entry point. Real-world standards identifiers are well under 200 characters;
+  # this limit exists purely to keep pathological, attacker-controlled inputs
+  # away from the flavors' backtracking-capable normalization regexes
+  # (CodeQL rb/polynomial-redos). The inline `.length` checks in every public
+  # +parse+ method are recognized by CodeQL as a barrier that bounds the input
+  # before it can reach those regexes. Ruby 3.2+ already memoizes the flagged
+  # regexes to linear time, so this guard is defense-in-depth, not a fix for a
+  # live exploit; it must therefore never reject a legitimate identifier.
+  MAX_INPUT_LENGTH = 1000
+
+  # Raised (as an ArgumentError) when an input string exceeds MAX_INPUT_LENGTH.
+  INPUT_TOO_LONG_MESSAGE =
+    "identifier string exceeds maximum length of #{MAX_INPUT_LENGTH} characters"
+
   # Registry for tracking all loaded flavors
   class Registry
     @flavors = {}
@@ -110,6 +125,8 @@ module Pubid
   # @param format [Symbol] :auto, :human, :mr_string, or :urn
   # @return [Identifier] The parsed identifier
   def self.parse(string, format: :auto)
+    raise ArgumentError, INPUT_TOO_LONG_MESSAGE if string.length > MAX_INPUT_LENGTH
+
     format = FormatDetector.detect(string) if format == :auto
 
     case format

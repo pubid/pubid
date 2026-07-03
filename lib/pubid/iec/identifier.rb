@@ -267,6 +267,10 @@ module Pubid
       end
 
       def self.parse(string)
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         # Route URN strings to the URN parser (mirrors Iso::Identifier.parse)
         if Pubid::FormatDetector.detect(string) == :urn
           return Pubid::Iec::UrnParser.parse(string)

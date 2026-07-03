@@ -25,6 +25,10 @@ module Pubid
     # @param format [Symbol] :auto, :human, :mr_string, or :urn
     # @return [Identifier] the parsed identifier
     def self.parse(identifier, format: :auto)
+      if identifier.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       format = Pubid::FormatDetector.detect(identifier) if format == :auto
 
       case format

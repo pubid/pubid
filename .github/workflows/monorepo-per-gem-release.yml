@@ -28,6 +28,11 @@ on:
         required: true
         default: 'skip'
 
+# Release flow may create tags/releases via GITHUB_TOKEN; gem push and downstream
+# dispatch use the passed rubygems-api-key / pat_token secrets.
+permissions:
+  contents: write
+
 jobs:
   release:
     uses: ./.github/workflows/rubygems-release.yml

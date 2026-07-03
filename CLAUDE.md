@@ -88,6 +88,7 @@ lib/pubid/{flavor}/
 - **Scheme class**: Some flavors (IEC, ISO) use a `Scheme` class as a registry for identifier types and typed stages
 - **Lutaml::Model**: Serialization framework for identifier objects (`to_h`, `to_json`, custom mappings)
 - **Pre-parse normalization**: `data/{flavor}/update_codes.yaml` maps malformed/legacy identifiers to canonical form before parsing
+- **Input-length guard (ReDoS)**: every public `parse` entry point (`Pubid.parse`, `Pubid::{Flavor}.parse`, and the class-level `{Flavor}::Identifier.parse` / `Parser.parse` funnels) rejects strings longer than `Pubid::MAX_INPUT_LENGTH` (1000) with `ArgumentError` **before** they reach the normalization regexes. This is the CodeQL-recommended mitigation for `rb/polynomial-redos`. **Do not** "fix" flagged normalization regexes with possessive (`++`, `*+`) or atomic (`(?>…)`) quantifiers — on Ruby 3.2+ those *disable* MRI's regex memoization and reintroduce O(n²) blow-up. Keep the plain regexes and, when adding a new flavor, add the same inline length guard to its `parse` entry (inline `.length` comparison, not a helper, so CodeQL recognizes the barrier).
 
 ### Shared Components
 
