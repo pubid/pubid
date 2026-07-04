@@ -13,6 +13,9 @@ module Pubid
       # "Amendment (YYYY) to BASE" prose form. The word itself comes from the
       # concrete class (#supplement_type), so only this flag is stored.
       attribute :trailing, :boolean, default: false
+      # True for the plus-joined form ("OIML B 10:2011+Amendment:2012") where
+      # both the base and the supplement carry their own year, joined by "+".
+      attribute :joined, :boolean, default: false
       attribute :parsed_format, :string, default: -> {
         "short"
       } # Track supplement's parsed format
@@ -25,6 +28,7 @@ module Pubid
             with: { to: :base_identifier_to_kv, from: :base_identifier_from_kv }
         map "year", to: :year
         map "trailing", to: :trailing
+        map "joined", to: :joined
       end
 
       def base_identifier_to_kv(model, doc)

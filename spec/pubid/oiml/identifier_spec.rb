@@ -232,6 +232,39 @@ RSpec.describe Pubid::Oiml do
         expect(result.base_identifier.code.number).to eq("2")
         expect(result.to_s).to eq("Amendment (2004) to OIML D 2 Edition 1999 (E)")
       end
+
+      it "parses OIML B 10:2011+Amendment:2012 (joined form)" do
+        result = described_class.parse("OIML B 10:2011+Amendment:2012")
+
+        expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
+        expect(result.year).to eq("2012")
+        expect(result.joined).to be(true)
+        expect(result.base_identifier).to be_a(Pubid::Oiml::Identifiers::BasicPublication)
+        expect(result.base_identifier.code.number).to eq("10")
+        expect(result.base_identifier.date.year).to eq("2011")
+        expect(result.to_s).to eq("OIML B 10:2011+Amendment:2012")
+      end
+
+      it "parses OIML R 138:2007+Amendment:2009 (E) (joined form with language)" do
+        result = described_class.parse("OIML R 138:2007+Amendment:2009 (E)")
+
+        expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
+        expect(result.year).to eq("2009")
+        expect(result.joined).to be(true)
+        expect(result.language).to eq("E")
+        expect(result.to_s).to eq("OIML R 138:2007+Amendment:2009 (E)")
+      end
+
+      it "parses OIML B 10-1:2004+Amendment:2006 (joined form with part)" do
+        result = described_class.parse("OIML B 10-1:2004+Amendment:2006")
+
+        expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
+        expect(result.year).to eq("2006")
+        expect(result.base_identifier.code.number).to eq("10")
+        expect(result.base_identifier.code.part).to eq("1")
+        expect(result.base_identifier.date.year).to eq("2004")
+        expect(result.to_s).to eq("OIML B 10-1:2004+Amendment:2006")
+      end
     end
 
     context "annex identifiers" do
