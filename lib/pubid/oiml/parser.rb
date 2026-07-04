@@ -19,7 +19,8 @@ module Pubid
       # Main identifier pattern - check supplements first
       rule(:identifier) do
         amendment_identifier | amendment_short | annex_letter_identifier |
-          annex_identifier | trailing_supplement_identifier | base_identifier
+          annex_identifier | plus_supplement_identifier |
+          trailing_supplement_identifier | base_identifier
       end
 
       # Publisher - always "OIML"
@@ -169,6 +170,18 @@ module Pubid
       rule(:trailing_supplement_identifier) do
         base_without_language.as(:base_identifier) >>
           space >> (str("Amendment") | str("Errata")).as(:trailing_marker) >>
+          language_portion.maybe.as(:language)
+      end
+
+      # Plus-joined supplement - "BASE:YEAR+Supplement:YEAR" form where both
+      # the base and the supplement carry their own year. Used for amendments
+      # and errata to dated bases (e.g. "OIML B 10:2011+Amendment:2012").
+      # Annexes already encode the year-on-base intent via their own model.
+      rule(:plus_supplement_identifier) do
+        base_without_language.as(:base_identifier) >>
+          str("+") >>
+          (str("Amendment") | str("Errata")).as(:plus_marker) >>
+          (colon >> year_digits.as(:year)).maybe >>
           language_portion.maybe.as(:language)
       end
 

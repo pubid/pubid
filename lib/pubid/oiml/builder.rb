@@ -78,13 +78,14 @@ module Pubid
 
       def build_supplement(parsed_hash)
         marker = parsed_hash[:trailing_marker].to_s if parsed_hash[:trailing_marker]
+        plus_marker = parsed_hash[:plus_marker].to_s if parsed_hash[:plus_marker]
 
         # Determine supplement type. The trailing word ("Amendment"/"Errata")
         # selects the class; the concrete class then carries the word via
         # #supplement_type, so only the `trailing` flag needs storing.
         supplement_class = if parsed_hash[:annex_letter] || parsed_hash[:annex_marker]
                              Identifiers::Annex
-                           elsif marker == "Errata"
+                           elsif marker == "Errata" || plus_marker == "Errata"
                              Identifiers::Errata
                            else
                              Identifiers::Amendment
@@ -92,6 +93,7 @@ module Pubid
 
         supplement = supplement_class.new
         supplement.trailing = true if marker
+        supplement.joined = true if plus_marker
 
         # Recursively parse base identifier
         if parsed_hash[:base_identifier]

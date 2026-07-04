@@ -84,6 +84,16 @@ module Pubid
       def render_supplement(id)
         format = effective_format(id)
 
+        # Plus-joined: "BASE+Amendment:YEAR" / "BASE+Errata:YEAR" with both
+        # the base and the supplement carrying their own year.
+        if id.joined
+          base_str = strip_language(id.base_identifier.to_s)
+          result = "#{base_str}+#{id.supplement_type}"
+          result += ":#{id.year}" if id.year
+          result += " (#{id.language})" if id.language
+          return result
+        end
+
         # Trailing-word shorthand: "BASE Amendment" / "BASE Errata" with the
         # publication year kept on the base identifier. The word comes from the
         # concrete supplement class.
