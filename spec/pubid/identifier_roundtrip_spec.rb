@@ -65,6 +65,12 @@ RSpec.describe "Identifier to_hash/from_hash round-trip" do
 
       expect(restored.class).to eq(id.class)
       expect(restored.to_s).to eq(id.to_s)
+
+      # to_hash is canonical: from_hash must not re-introduce defaulted
+      # attributes (all_parts, publisher_was_parsed, ...) that parse omitted,
+      # so the serialized hash round-trips idempotently. relaton-index relies on
+      # this exact-equality check to validate every stored index row.
+      expect(restored.to_hash).to eq(id.to_hash)
     end
   end
 

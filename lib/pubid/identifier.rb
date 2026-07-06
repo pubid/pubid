@@ -125,6 +125,84 @@ module Pubid
       date&.year&.to_s
     end
 
+    # Canonicalize the serialized hash so it never carries a defaulted attribute
+    # still at its default (or empty) value. This makes to_hash a pure function
+    # of the identifier's values, independent of how the object was built.
+    #
+    # Motivation: lutaml materializes each attribute's default as an explicit
+    # assignment during deserialization (flipping using_default? to false), so a
+    # naive from_hash(x).to_hash re-emits defaults that parse(x).to_hash omits —
+    # breaking the exact-equality round-trip relaton-index relies on
+    # (from_hash(raw).to_hash == raw). pubid never consults lutaml's unset
+    # tracking and defines no render_default: true, so a defaulted attribute at
+    # its default/empty value carries no meaning and does not belong in the
+    # canonical hash. Dropping it here (rather than repairing from_hash) fixes
+    # the round-trip through every construction path — parse, from_hash, manual.
+    def to_hash(*args)
+      hash = super
+      canonicalize_hash(self, hash) if hash.is_a?(::Hash)
+      hash
+    end
+
+    # Recursively drop attributes holding only their default (or empty) value
+    # from +hash+, the serialization of +model+. Recurses into nested component
+    # / identifier values because lutaml serializes those via its own transform
+    # — bypassing their public to_hash — so a nested defaulted attribute (e.g.
+    # Components::Supplement#has_revision) would otherwise leak into the parent
+    # hash and break the idempotent round-trip.
+    def canonicalize_hash(model, hash)
+      register = model.lutaml_register
+      model.class.attributes(register).each do |name, attr|
+        canonicalize_attr(model, hash, name, attr) unless name == :_type
+      end
+    end
+
+    # Canonicalize a single attribute against its serialized value in +hash+:
+    # drop it when it holds only its default/empty value, else recurse into it.
+    def canonicalize_attr(model, hash, name, attr)
+      key = hash.key?(name.to_s) ? name.to_s : name
+      return unless hash.key?(key)
+
+      value = model.public_send(name)
+      if default_valued?(value, attr, model)
+        hash.delete(key)
+      else
+        canonicalize_nested(value, hash[key])
+      end
+    end
+
+    # True when +value+ is +attr+'s default (or empty), so it can be dropped.
+    def default_valued?(value, attr, model)
+      register = model.lutaml_register
+      attr.default_set?(register, model) &&
+        (Lutaml::Model::Utils.empty?(value) ||
+          value == attr.default(register, model))
+    end
+
+    # Recurse into a nested component / identifier (or a collection of them) so
+    # its own defaulted attributes are canonicalized against its sub-hash.
+    def canonicalize_nested(value, sub)
+      if value.is_a?(Lutaml::Model::Serialize)
+        canonicalize_hash(value, sub) if sub.is_a?(::Hash)
+      elsif value.is_a?(::Array)
+        canonicalize_collection(value, sub)
+      end
+    end
+
+    # Canonicalize each element of a collection against its serialized sub-hash.
+    # Only zip when object and serialized sizes match, so a (never-observed)
+    # length mismatch can't pair an element with the wrong sub-hash — worst case
+    # it leaves that collection untouched.
+    def canonicalize_collection(models, subs)
+      return unless subs.is_a?(::Array) && models.size == subs.size
+
+      models.each_with_index do |model, i|
+        canonicalize_nested(model, subs[i])
+      end
+    end
+    private :canonicalize_hash, :canonicalize_attr, :default_valued?,
+            :canonicalize_nested, :canonicalize_collection
+
     def initialize(attrs = {}, options = {})
       attrs = attrs.dup
       attrs[:_type] ||= self.class.polymorphic_name
