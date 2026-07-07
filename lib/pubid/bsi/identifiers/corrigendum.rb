@@ -14,6 +14,30 @@ module Pubid
         def publisher
           base_identifier&.publisher
         end
+
+        # Base document = the standard this corrigendum applies to, fully peeled.
+        def base_document
+          base_identifier&.base_document || self
+        end
+
+        # Dropping the supplement layer yields the base standard.
+        def drop_supplements
+          base_identifier || self
+        end
+
+        # Uniform supplement interface (shared with Amendment) so callers need
+        # not special-case the class.
+        def supplement_type
+          :corrigendum
+        end
+
+        def supplement_number
+          corrigendum_number
+        end
+
+        def supplement_year
+          corrigendum_year
+        end
       end
     end
   end

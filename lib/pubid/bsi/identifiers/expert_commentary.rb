@@ -25,6 +25,11 @@ module Pubid
         def year
           base_identifier&.year
         end
+
+        # Base document = the commented standard, fully peeled.
+        def base_document
+          base_identifier&.base_document || self
+        end
       end
     end
   end
