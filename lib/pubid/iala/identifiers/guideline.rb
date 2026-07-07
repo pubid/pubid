@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+module Pubid
+  module Iala
+    module Identifiers
+      # IALA Guidelines (G series).
+      # Examples: G1015 Ed 2.2, G1078 Ed 2.1.
+      class Guideline < Base
+        def self.type
+          { key: :guideline, title: "Guideline", short: "G" }
+        end
+      end
+    end
+  end
+end
