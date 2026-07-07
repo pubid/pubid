@@ -95,6 +95,7 @@ module Pubid
   autoload :Idf, "pubid/idf"
   autoload :Iec, "pubid/iec"
   autoload :Ieee, "pubid/ieee"
+  autoload :Iala, "pubid/iala"
   autoload :Iho, "pubid/iho"
   autoload :Iso, "pubid/iso"
   autoload :Itu, "pubid/itu"
