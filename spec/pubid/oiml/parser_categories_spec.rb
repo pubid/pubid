@@ -126,4 +126,95 @@ RSpec.describe "Pubid::Oiml failing-docid categories" do
       end
     end
   end
+
+  context "Category 7 — OIML Bulletin issues" do
+    [
+      "OIML Bulletin",
+      "OIML Bulletin 1960",
+      "OIML Bulletin 1960-03",
+      "OIML Bulletin 1960-03-01",
+      "OIML Bulletin 2024",
+      "OIML Bulletin 2024-11",
+      "OIML Bulletin 2024-11-15",
+    ].each do |str|
+      it "round-trips #{str.inspect}" do
+        expect_round_trip(str)
+      end
+    end
+
+    it "builds a Bulletin identifier with no code" do
+      id = Pubid::Oiml.parse("OIML Bulletin 1960-03-01")
+      expect(id).to be_a(Pubid::Oiml::Identifiers::Bulletin)
+      expect(id.code).to be_nil
+      expect(id.type).to eq("Bulletin")
+      expect(id.date.year).to eq("1960")
+      expect(id.issue).to eq("03")
+      expect(id.sequence).to eq("01")
+    end
+
+    it "does not collapse a full Bulletin locator to year-only in URN output" do
+      id = Pubid::Oiml.parse("OIML Bulletin 1960-03-01")
+      expect(id.to_urn).to eq("urn:oiml:bulletin:1960-03-01")
+    end
+  end
+
+  # The citation format OIML prints on article pages, e.g.
+  #   "Citation: G. Ardimento 2026 OIML Bulletin LXVII(2) 20260211"
+  # where LXVII is the volume in roman numerals, (2) is the issue in arabic,
+  # and 20260211 is the 8-digit oiml.org article id (YYYYNNSS). The dataset
+  # already carries these three components in `series`, `extent`, and a
+  # secondary `OIML-bulletin-article-id` docidentifier — pubid-oiml only has
+  # to recognize the assembled citation string.
+  context "Category 8 — OIML Bulletin citation form" do
+    [
+      "OIML Bulletin LXVII(2) 20260211",
+      "OIML Bulletin LXVIII(1) 20270101",
+      "OIML Bulletin I(1) 19600101",
+    ].each do |str|
+      it "round-trips #{str.inspect}" do
+        expect_round_trip(str)
+      end
+    end
+
+    it "decodes the citation form to the same record as the structured form" do
+      citation   = Pubid::Oiml.parse("OIML Bulletin LXVII(2) 20260211")
+      structured = Pubid::Oiml.parse("OIML Bulletin 2026-02-11")
+
+      expect(citation.date.year).to eq(structured.date.year)
+      expect(citation.issue).to    eq(structured.issue)
+      expect(citation.sequence).to eq(structured.sequence)
+    end
+
+    it "derives roman volume and arabic article id from the structured form" do
+      id = Pubid::Oiml.parse("OIML Bulletin 2026-02-11")
+      expect(id.volume_arabic).to eq("67")
+      expect(id.volume_roman).to  eq("LXVII")
+      expect(id.article_id).to    eq("20260211")
+    end
+
+    it "renders the structured form as citation when requested" do
+      id = Pubid::Oiml.parse("OIML Bulletin 2026-02-11")
+      expect(id.to_s(format: :citation)).to eq("OIML Bulletin LXVII(2) 20260211")
+    end
+
+    it "renders the citation form as structured when requested" do
+      id = Pubid::Oiml.parse("OIML Bulletin LXVII(2) 20260211")
+      expect(id.to_s(format: :short)).to eq("OIML Bulletin 2026-02-11")
+    end
+
+    it "emits a canonical URN regardless of input form" do
+      citation   = Pubid::Oiml.parse("OIML Bulletin LXVII(2) 20260211")
+      structured = Pubid::Oiml.parse("OIML Bulletin 2026-02-11")
+      expect(citation.to_urn).to eq(structured.to_urn)
+      expect(citation.to_urn).to eq("urn:oiml:bulletin:2026-02-11")
+    end
+
+    it "does not emit the citation form for volume-only or issue-only records" do
+      # OIML's citation format is article-only; lower tiers fall back.
+      expect(Pubid::Oiml.parse("OIML Bulletin 2026").to_s(format: :citation))
+        .to eq("OIML Bulletin 2026")
+      expect(Pubid::Oiml.parse("OIML Bulletin 2026-02").to_s(format: :citation))
+        .to eq("OIML Bulletin 2026-02")
+    end
+  end
 end

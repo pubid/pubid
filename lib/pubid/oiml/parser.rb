@@ -20,7 +20,7 @@ module Pubid
       rule(:identifier) do
         amendment_identifier | amendment_short | annex_letter_identifier |
           annex_identifier | plus_supplement_identifier |
-          trailing_supplement_identifier | base_identifier
+          trailing_supplement_identifier | bulletin_identifier | base_identifier
       end
 
       # Publisher - always "OIML"
@@ -28,6 +28,48 @@ module Pubid
 
       # Document type - single letter
       rule(:doc_type) { match("[BDEGRSVX]").as(:type) >> space }
+
+      # Bulletin locator — structured form. Year optionally followed by
+      # 2-digit issue and 2-digit sequence:
+      #   "OIML Bulletin", "OIML Bulletin 1960",
+      #   "OIML Bulletin 1960-03", "OIML Bulletin 1960-03-01"
+      # All four shapes appear as primary docids in relaton-data-oiml.
+      rule(:bulletin_date) do
+        space >> year_digits.as(:year) >>
+          (dash >> two_digits.as(:issue)).maybe >>
+          (dash >> two_digits.as(:sequence)).maybe
+      end
+
+      # Two-digit zero-padded number (used for issue / sequence).
+      rule(:two_digits) { match('\d').repeat(2, 2) }
+
+      # Roman numeral token composed of I,V,X,L,C,D,M (uppercase, matching
+      # OIML's print convention). Consumed but not captured — the 8-digit
+      # article id in the same citation carries year/issue/sequence
+      # deterministically, so the roman volume is redundant for parsing.
+      rule(:roman_numeral) { match("[IVXLCDM]").repeat(1) }
+
+      # Bulletin locator — citation form. The format OIML prints on the
+      # article page is: "LXVII(2) 20260211" where LXVII is the volume in
+      # roman numerals, (2) is the issue in arabic without zero padding,
+      # and 20260211 is the 8-digit oiml.org article id (YYYYNNSS).
+      rule(:bulletin_citation) do
+        space >> roman_numeral >>
+          lparen >> digits.as(:issue_arabic) >> rparen >>
+          space >> match('\d').repeat(8, 8).as(:article_id)
+      end
+
+      # Bulletin identifier — no code; the locator (when present) is the
+      # (year, issue, sequence) tuple drawn from either the structured
+      # YYYY-II-SS form or the citation VOLUME(ISSUE) ARTID form. Both
+      # decode to the same record. Tried before base_identifier because
+      # "Bulletin" is a word that the single-letter doc_type rule cannot
+      # match.
+      rule(:bulletin_identifier) do
+        publisher >> str("Bulletin").as(:type) >>
+          (bulletin_citation | bulletin_date).maybe >>
+          language_portion.maybe.as(:language)
+      end
 
       # Number with optional part and subpart
       rule(:number_only) { digits.as(:number) }

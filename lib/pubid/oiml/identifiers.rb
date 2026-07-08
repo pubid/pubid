@@ -6,6 +6,7 @@ module Pubid
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Annex, "#{__dir__}/identifiers/annex"
       autoload :BasicPublication, "#{__dir__}/identifiers/basic_publication"
+      autoload :Bulletin, "#{__dir__}/identifiers/bulletin"
       autoload :Document, "#{__dir__}/identifiers/document"
       autoload :Errata, "#{__dir__}/identifiers/errata"
       autoload :ExpertReport, "#{__dir__}/identifiers/expert_report"

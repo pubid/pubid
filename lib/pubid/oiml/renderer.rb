@@ -20,6 +20,8 @@ module Pubid
         case id
         when Identifiers::Annex
           render_annex(id)
+        when Identifiers::Bulletin
+          render_bulletin(id)
         when SupplementIdentifier
           render_supplement(id)
         when SingleIdentifier
@@ -30,6 +32,55 @@ module Pubid
       end
 
       private
+
+      # Render the Bulletin in the requested or parsed form. Default is the
+      # structured "YYYY-II-SS" form (the dataset's primary docid). The
+      # citation form ("LXVII(2) 20260211") is emitted when the user asks
+      # for it via `to_s(format: :citation)` or when the identifier was
+      # itself parsed from a citation string (parsed_format == "citation").
+      def render_bulletin(id)
+        if citation_form?(id)
+          render_bulletin_citation(id)
+        else
+          render_bulletin_structured(id)
+        end
+      end
+
+      # User's explicit format request takes precedence over the parsed
+      # form, so `parse("LXVII(2) 20260211").to_s(format: :short)` returns
+      # the structured form. With no explicit request, the parsed form is
+      # preserved for round-trip fidelity.
+      def citation_form?(id)
+        case id.requested_format
+        when :citation then true
+        when :short, :structured then false
+        else
+          id.parsed_format == "citation"
+        end
+      end
+
+      # "OIML Bulletin" / "OIML Bulletin 1960" / "OIML Bulletin 1960-03" /
+      # "OIML Bulletin 1960-03-01". No code; the locator is space-separated.
+      def render_bulletin_structured(id)
+        result = "#{id.publisher} Bulletin"
+        if id.date&.year
+          result += " #{id.date.year}"
+          result += "-#{id.issue}" if id.issue
+          result += "-#{id.sequence}" if id.sequence
+        end
+        result += " (#{id.language})" if id.language
+        result
+      end
+
+      # "OIML Bulletin LXVII(2) 20260211". Only emitted for full articles
+      # (year + issue + sequence all present); lower tiers fall back to
+      # structured since OIML's citation format doesn't define volume-only
+      # or issue-only variants.
+      def render_bulletin_citation(id)
+        return render_bulletin_structured(id) unless id.date&.year && id.issue && id.sequence
+
+        "#{id.publisher} Bulletin #{id.volume_roman}(#{id.issue.to_i}) #{id.article_id}"
+      end
 
       def effective_format(id)
         id.requested_format ||

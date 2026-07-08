@@ -28,6 +28,17 @@ module Pubid
       end
 
       def generate
+        # Bulletin issues carry no code; the (year, issue, sequence) tuple
+        # is the locator. URNs are canonical regardless of how the input was
+        # formatted, so we always emit the structured YYYY-II-SS form even
+        # when the identifier was parsed from a citation string.
+        if identifier.is_a?(Identifiers::Bulletin)
+          parts = ["urn", "oiml", "bulletin"]
+          parts << bulletin_locator if identifier.date&.present?
+          parts << urn_language if urn_language
+          return parts.join(":")
+        end
+
         parts = ["urn", "oiml"]
         parts << urn_type
         parts << urn_number if urn_number
@@ -50,6 +61,17 @@ module Pubid
         end
 
         parts.join(":")
+      end
+
+      # Structured locator "YYYY-II-SS" (or "YYYY-II" / "YYYY") for a Bulletin.
+      # Built directly from the date year and the issue/sequence attributes so
+      # the URN is identical regardless of whether the input was the structured
+      # or citation form.
+      def bulletin_locator
+        locator = identifier.date.year.to_s
+        locator += "-#{identifier.issue}" if identifier.issue
+        locator += "-#{identifier.sequence}" if identifier.sequence
+        locator
       end
     end
   end

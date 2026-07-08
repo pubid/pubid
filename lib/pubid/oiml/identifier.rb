@@ -10,6 +10,7 @@ module Pubid
       OIML_TYPE_MAP = {
         "pubid:oiml:recommendation" => "Pubid::Oiml::Identifiers::Recommendation",
         "pubid:oiml:basic-publication" => "Pubid::Oiml::Identifiers::BasicPublication",
+        "pubid:oiml:bulletin" => "Pubid::Oiml::Identifiers::Bulletin",
         "pubid:oiml:document" => "Pubid::Oiml::Identifiers::Document",
         "pubid:oiml:guide" => "Pubid::Oiml::Identifiers::Guide",
         "pubid:oiml:vocabulary" => "Pubid::Oiml::Identifiers::Vocabulary",

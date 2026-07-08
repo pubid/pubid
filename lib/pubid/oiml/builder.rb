@@ -6,6 +6,7 @@ module Pubid
       # Type to identifier class mapping (MECE)
       TYPE_CLASS_MAP = {
         "B" => "BasicPublication",
+        "Bulletin" => "Bulletin",
         "D" => "Document",
         "E" => "ExpertReport",
         "G" => "Guide",
@@ -175,12 +176,26 @@ module Pubid
           identifier.date = Pubid::Components::Date.new(year: year_value.to_s)
         end
 
+        # Bulletin-specific locator fields. The structured form captures
+        # issue/sequence directly; the citation form captures volume/issue/
+        # article_id, which we decode to the same (year, issue, sequence)
+        # tuple. Year comes from either the date rule (structured) or the
+        # article_id (citation).
+        if identifier.is_a?(Identifiers::Bulletin)
+          apply_bulletin_locator(identifier, parsed_hash)
+        end
+
         # Determine parsed format for round-trip fidelity
         # If edition_format was captured, it means "Edition" text was present
         identifier.parsed_format = if parsed_hash[:edition_format]
                                      "long"
                                    elsif parsed_hash[:space_before_lang]
                                      "short_with_space"
+                                   elsif parsed_hash[:article_id]
+                                     # Bulletin citation form — preserve on
+                                     # the identifier so default to_s gives
+                                     # back the citation string verbatim.
+                                     "citation"
                                    else
                                      "short"
                                    end
@@ -193,6 +208,24 @@ module Pubid
         identifier.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
 
         identifier
+      end
+
+      # Populate issue/sequence on a Bulletin from either parse shape.
+      # Structured: :issue and :sequence captured directly as zero-padded
+      # strings. Citation: :volume_roman, :issue_arabic, :article_id —
+      # decode the 8-digit article_id to recover year+issue+sequence.
+      def apply_bulletin_locator(identifier, parsed_hash)
+        if parsed_hash[:article_id]
+          article_id = parsed_hash[:article_id].to_s
+          identifier.date ||= Pubid::Components::Date.new
+          identifier.date.year = article_id[0, 4]
+          identifier.issue = article_id[4, 2]
+          identifier.sequence = article_id[6, 2]
+          return
+        end
+
+        identifier.issue = parsed_hash[:issue].to_s if parsed_hash[:issue]
+        identifier.sequence = parsed_hash[:sequence].to_s if parsed_hash[:sequence]
       end
 
       def extract_language(lang_data)
