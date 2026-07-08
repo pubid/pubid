@@ -116,7 +116,9 @@ module Pubid
           str("AI") | str("CIRC") | str("CS") | str("CSM") |
           str("CRPL") | str("LCIRC") | str("OWMWP") | str("PC") | str("RPT") |
           str("SIBS") | str("TIBM") | str("TTB") | str("EAB") |
-          str("JPCRD") | str("JRES")
+          str("JPCRD") | str("JRES") |
+          # NEW - CHIPS Act, NWIRP, and Research Brief series
+          str("CHIPS") | str("NWIRP") | str("RB")
         ).as(:series)
       end
 

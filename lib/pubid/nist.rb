@@ -13,6 +13,7 @@ module Pubid
       NIST NBS
       AMS VTS BSS BMS BH FIPS GCR HB MONO MP NCSTAR NSRDS IR SP TN CSWP
       AI CIRC CS CSM CRPL LCIRC OWMWP PC RPT SIBS TIBM TTB EAB JPCRD JRES
+      CHIPS NWIRP RB
     ].freeze
 
     autoload :Builder, "#{__dir__}/nist/builder"
