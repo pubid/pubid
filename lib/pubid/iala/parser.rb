@@ -28,19 +28,32 @@ module Pubid
       rule(:lparen) { str("(") }
       rule(:rparen) { str(")") }
 
-      # Type letter — one of IALA's seven document classes. Captured to
-      # route to the right Identifiers::* subclass.
+      # Type prefix — IALA document classes. GA must be tried before G so it
+      # isn't left with a dangling "A". Captured to route to the right
+      # Identifiers::* subclass.
       rule(:type_letter) do
-        (str("S") | str("R") | str("G") | str("M") |
-         str("C") | str("X") | str("P")).as(:type_letter)
+        (str("GA") | str("S") | str("R") | str("G") | str("M") |
+         str("C") | str("A") | str("L") | str("X") | str("P")).as(:type_letter)
       end
 
-      # Document number — accepts the legacy 4-digit zero-padded form
-      # ("0103", "0001") and the unpadded form ("103", "1"). The renderer
-      # emits the unpadded form; the parser accepts both for back-compat
-      # with existing relaton-data-iala YAMLs and IALA cover pages.
+      # Document number — one or more decimal digits. The dataset historically
+      # zero-pads to 4 (S1070, R0126, M0001) but the canonical form going
+      # forward is unpadded (M1, GA1.1). Accept any length so both shapes
+      # round-trip; the number attribute preserves whatever was parsed.
       rule(:doc_number) do
-        match("[0-9]").repeat(1, 4).as(:doc_number)
+        match("[0-9]").repeat(1).as(:doc_number)
+      end
+
+      # Dotted continuation that some prefixes use as part of the number:
+      # GA01.01 (series.index), L2.1.11 (series.sub.item). Captured into the
+      # same :doc_number atom so the number attribute stays a single string
+      # (e.g. "01.01", "2.1.11") and the existing builder needs no changes.
+      rule(:dotted_number) do
+        dot >> match("[0-9]").repeat(1)
+      end
+
+      rule(:number_with_dots) do
+        doc_number >> dotted_number.repeat.as(:doc_number_dots)
       end
 
       # Numeric sub-part suffix(es): "-1", "-9-10", "-11". The catalogue
@@ -51,7 +64,7 @@ module Pubid
       end
 
       rule(:code) do
-        type_letter >> doc_number >> subpart.maybe
+        type_letter >> number_with_dots >> subpart.maybe
       end
 
       # Edition forms observed on covers and listing pages:
@@ -86,7 +99,22 @@ module Pubid
       end
 
       rule(:identifier) do
-        publisher >> code >> edition.maybe >> language.maybe
+        annex_identifier | (publisher >> code >> edition.maybe >> language.maybe)
+      end
+
+      # Annex to a base publication. Wraps the base code and adds an
+      # "Annex" / "ANNEX" marker (case preserved verbatim), an optional
+      # single-letter suffix (A/B/C/D), then the usual edition + language.
+      # Tried before the flat `identifier` so the annex marker isn't left
+      # dangling after a successful base-code match.
+      #
+      # The letter suffix uses a negative lookahead for a following lowercase
+      # letter so the "E" in "Ed 1" isn't mis-captured as annex letter "E".
+      rule(:annex_identifier) do
+        (publisher >> type_letter >> number_with_dots >> subpart.maybe).as(:base) >>
+          space >> (str("Annex") | str("ANNEX")).as(:annex_marker) >>
+          (space >> match("[A-Z]").as(:annex_letter) >> match("[a-z]").absent?).maybe >>
+          edition.maybe >> language.maybe
       end
 
       # Parse a string and return the raw parslet tree.
