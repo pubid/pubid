@@ -32,8 +32,10 @@ module Pubid
           { key: :annex, title: "Annex", short: nil }
         end
 
-        private
-
+        # Public because lutaml-model invokes the `to:` / `from:` mapping
+        # methods via public_send during (de)serialization — a `private`
+        # section here raises NoMethodError on to_hash (matches the public
+        # visibility of Oiml::SupplementIdentifier's identical helpers).
         def base_identifier_to_kv(model, doc)
           base = model.base_identifier
           return unless base
