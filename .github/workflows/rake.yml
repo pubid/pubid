@@ -5,13 +5,15 @@ on:
     branches: [ main, master ]
     tags: [ v* ]
   pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
-# Least-privilege default; the reusable generic-rake.yml drives releases via the
-# METANORMA_CI_PAT_TOKEN secret, so GITHUB_TOKEN only needs read access here.
+# The reusable generic-rake.yml's tests-passed job needs contents:write for
+# peter-evans/repository-dispatch (GITHUB_TOKEN fallback when pat_token is
+# unset). Pinning to read here breaks the nested job with: "The nested job
+# 'tests-passed' is requesting 'contents: write', but is only allowed
+# 'contents: read'."
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
