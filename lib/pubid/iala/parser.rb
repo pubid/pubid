@@ -35,9 +35,12 @@ module Pubid
          str("C") | str("X") | str("P")).as(:type_letter)
       end
 
-      # 4-digit document number, e.g. "1070", "0126".
+      # Document number — accepts the legacy 4-digit zero-padded form
+      # ("0103", "0001") and the unpadded form ("103", "1"). The renderer
+      # emits the unpadded form; the parser accepts both for back-compat
+      # with existing relaton-data-iala YAMLs and IALA cover pages.
       rule(:doc_number) do
-        match("[0-9]").repeat(4, 4).as(:doc_number)
+        match("[0-9]").repeat(1, 4).as(:doc_number)
       end
 
       # Numeric sub-part suffix(es): "-1", "-9-10", "-11". The catalogue

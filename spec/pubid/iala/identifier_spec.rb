@@ -9,12 +9,19 @@ RSpec.describe Pubid::Iala::Identifier do
       "S1070"                      => "IALA S1070",
       "S1070 Ed 2.0"               => "IALA S1070 Ed 2.0",
       "IALA S1070 Ed 2.0"          => "IALA S1070 Ed 2.0",
-      "R0126 Ed 2.0"               => "IALA R0126 Ed 2.0",
-      "R0126:ed2.0"                => "IALA R0126 Ed 2.0",
+      # Leading zeros are stripped on parse (M0001 → M1, R0126 → R126,
+      # C0103-1 → C103-1). The zero-padded form is accepted as input for
+      # back-compat with legacy YAMLs and IALA cover pages.
+      "R0126 Ed 2.0"               => "IALA R126 Ed 2.0",
+      "R126 Ed 2.0"                => "IALA R126 Ed 2.0",
+      "R0126:ed2.0"                => "IALA R126 Ed 2.0",
       "R1016:ed2.0(F)"             => "IALA R1016 Ed 2.0 (F)",
       "G1015 Ed 2.2"               => "IALA G1015 Ed 2.2",
-      "C0103-1 Ed 3.0"             => "IALA C0103-1 Ed 3.0",
-      "C0103-1"                    => "IALA C0103-1",
+      "C0103-1 Ed 3.0"             => "IALA C103-1 Ed 3.0",
+      "C103-1 Ed 3.0"              => "IALA C103-1 Ed 3.0",
+      "C0103-1"                    => "IALA C103-1",
+      "M0001 Ed 9.0"               => "IALA M1 Ed 9.0",
+      "M1 Ed 9.0"                  => "IALA M1 Ed 9.0",
       "S1070 Ed 2.0 (F)"           => "IALA S1070 Ed 2.0 (F)",
     }.each do |input, canonical|
       it "parses #{input.inspect} → #{canonical.inspect}" do
@@ -38,8 +45,9 @@ RSpec.describe Pubid::Iala::Identifier do
       expect(Pubid::Iala.parse("C0103-1")).to be_a(Pubid::Iala::Identifiers::ModelCourse)
     end
 
-    it "preserves the subpart verbatim in the number" do
-      expect(Pubid::Iala.parse("C0103-1").number).to eq("0103-1")
+    it "strips leading zeros from the base number" do
+      expect(Pubid::Iala.parse("C0103-1").number).to eq("103-1")
+      expect(Pubid::Iala.parse("M0001").number).to eq("1")
     end
 
     it "captures the language letter" do
@@ -57,7 +65,7 @@ RSpec.describe Pubid::Iala::Identifier do
       "S1070 Ed 2.0"       => "urn:mrn:iala:pub:s1070:ed2.0",
       "R1016 Ed 2.0"       => "urn:mrn:iala:pub:r1016:ed2.0",
       "R1016 Ed 2.0 (F)"   => "urn:mrn:iala:pub:r1016:ed2.0:f",
-      "C0103-1 Ed 3.0"     => "urn:mrn:iala:pub:c0103-1:ed3.0",
+      "C0103-1 Ed 3.0"     => "urn:mrn:iala:pub:c103-1:ed3.0",
     }.each do |input, urn|
       it "renders #{input.inspect} as #{urn.inspect}" do
         expect(Pubid::Iala.parse(input).to_urn).to eq(urn)
@@ -69,7 +77,7 @@ RSpec.describe Pubid::Iala::Identifier do
     %w[
       urn:mrn:iala:pub:s1070:ed2.0
       urn:mrn:iala:pub:r1016:ed2.0:f
-      urn:mrn:iala:pub:c0103-1:ed3.0
+      urn:mrn:iala:pub:c103-1:ed3.0
       urn:mrn:iala:pub:g1015
     ].each do |urn|
       it "round-trips #{urn.inspect} through the parser" do
