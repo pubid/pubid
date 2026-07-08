@@ -33,13 +33,17 @@ module Pubid
       attribute :language,  :string    # "E", "F", "S", "C", "A", "R", nil
 
       IALA_TYPE_MAP = {
-        "pubid:iala:standard"       => "Pubid::Iala::Identifiers::Standard",
-        "pubid:iala:recommendation" => "Pubid::Iala::Identifiers::Recommendation",
-        "pubid:iala:guideline"      => "Pubid::Iala::Identifiers::Guideline",
-        "pubid:iala:manual"         => "Pubid::Iala::Identifiers::Manual",
-        "pubid:iala:model-course"   => "Pubid::Iala::Identifiers::ModelCourse",
-        "pubid:iala:report"         => "Pubid::Iala::Identifiers::Report",
-        "pubid:iala:resolution"     => "Pubid::Iala::Identifiers::Resolution",
+        "pubid:iala:standard"          => "Pubid::Iala::Identifiers::Standard",
+        "pubid:iala:recommendation"    => "Pubid::Iala::Identifiers::Recommendation",
+        "pubid:iala:guideline"         => "Pubid::Iala::Identifiers::Guideline",
+        "pubid:iala:manual"            => "Pubid::Iala::Identifiers::Manual",
+        "pubid:iala:model-course"      => "Pubid::Iala::Identifiers::ModelCourse",
+        "pubid:iala:advice"            => "Pubid::Iala::Identifiers::Advice",
+        "pubid:iala:general-assembly"  => "Pubid::Iala::Identifiers::GeneralAssembly",
+        "pubid:iala:letter"            => "Pubid::Iala::Identifiers::Letter",
+        "pubid:iala:annex"             => "Pubid::Iala::Identifiers::Annex",
+        "pubid:iala:report"            => "Pubid::Iala::Identifiers::Report",
+        "pubid:iala:resolution"        => "Pubid::Iala::Identifiers::Resolution",
       }.freeze
 
       key_value do
