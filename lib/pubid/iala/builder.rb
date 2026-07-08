@@ -23,14 +23,15 @@ module Pubid
 
       private
 
-      # Compose "1070" or "126-1" from doc_number + optional subpart.
-      # Strips leading zeros from the base number per the IALA convention
-      # (M0001 → M1, R0101 → R101, C0103-1 → C103-1).
+      # Compose "0103" or "0126-1" from doc_number + optional subpart.
+      # Zero-pads the base to 4 digits per IALA's canonical form
+      # (M1 → M0001, R126 → R0126, C103-1 → C0103-1). Sub-parts are
+      # preserved verbatim.
       def build_number(hash)
         base = stringify(hash[:doc_number])
         return base unless base
 
-        base = base.sub(/\A0+(\d)/, '\1')
+        base = base.rjust(4, "0")
         return base unless hash[:subpart]
 
         subpart_str = subpart_to_s(hash[:subpart])
