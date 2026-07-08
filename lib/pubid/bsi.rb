@@ -2,6 +2,21 @@
 
 module Pubid
   module Bsi
+    extend Pubid::PrefixesSupport
+
+    # Leading tokens a printed BSI reference can start with, curated from the
+    # parser grammar (lib/pubid/bsi/parser.rb): the publisher (`bs` => BS/BSI),
+    # the native series/type rules that begin references (dd, pd, pas, na, ts,
+    # handbook => HB, pp, bip, ep_type), and the "BS <adopted-org>" combos the
+    # grammar builds from `bs` + `adopted_org_prefix`. Deliberately EXCLUDES the
+    # aerospace single/multi-letter prefixes (see
+    # identifiers/aerospace_standard.rb SINGLE_LETTER_PREFIXES / the parser's
+    # `single_letter_prefix` rule — A/B/C/S/X ...) because they are dangerously
+    # ambiguous and never lead a routable reference on their own; and the bare
+    # adopted forms (ISO/IEC/EN alone), which route to their own SDOs.
+    PREFIXES = (%w[BS BSI DD PD PAS NA TS HB PP BIP EP] +
+      ["BS EN", "BS ISO", "BS IEC", "BS EN ISO", "BS EN IEC"]).freeze
+
     module Components
       autoload :Code, "#{__dir__}/bsi/components/code"
       autoload :Date, "#{__dir__}/bsi/components/date"

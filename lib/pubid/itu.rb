@@ -4,6 +4,11 @@ require "lutaml/model"
 
 module Pubid
   module Itu
+    extend Pubid::PrefixesSupport
+
+    # Sole ITU publisher token (see the parser's `itu_prefix` rule).
+    PREFIXES = ["ITU"].freeze
+
     autoload :Builder, "#{__dir__}/itu/builder"
     autoload :Components, "#{__dir__}/itu/components"
     autoload :Identifier, "#{__dir__}/itu/identifier"

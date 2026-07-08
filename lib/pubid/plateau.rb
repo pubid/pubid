@@ -4,6 +4,11 @@ require "parslet"
 
 module Pubid
   module Plateau
+    extend Pubid::PrefixesSupport
+
+    # Sole PLATEAU publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["PLATEAU"].freeze
+
     autoload :Builder, "#{__dir__}/plateau/builder"
     autoload :Identifier, "#{__dir__}/plateau/identifier"
     autoload :Identifiers, "#{__dir__}/plateau/identifiers"

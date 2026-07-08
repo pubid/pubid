@@ -2,6 +2,13 @@
 
 module Pubid
   module Ansi
+    extend Pubid::PrefixesSupport
+
+    # ANSI publisher token; ANSI/ASHRAE and ANSI/AMCA joint forms come from
+    # Pubid::JOINT_PREFIXES. Parser::ORGANIZATIONS are co-publishers, not
+    # leading ANSI tokens, so they are excluded.
+    PREFIXES = ["ANSI"].freeze
+
     autoload :Builder, "#{__dir__}/ansi/builder"
     autoload :Identifier, "#{__dir__}/ansi/identifier"
     autoload :Identifiers, "#{__dir__}/ansi/identifiers"

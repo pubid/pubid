@@ -2,6 +2,11 @@
 
 module Pubid
   module Iho
+    extend Pubid::PrefixesSupport
+
+    # Sole IHO publisher token (see the parser grammar).
+    PREFIXES = ["IHO"].freeze
+
     autoload :Builder,      "#{__dir__}/iho/builder"
     autoload :Identifier,   "#{__dir__}/iho/identifier"
     autoload :Identifiers,  "#{__dir__}/iho/identifiers"

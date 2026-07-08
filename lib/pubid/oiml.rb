@@ -2,6 +2,11 @@
 
 module Pubid
   module Oiml
+    extend Pubid::PrefixesSupport
+
+    # Sole OIML publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["OIML"].freeze
+
     autoload :Builder, "#{__dir__}/oiml/builder"
     autoload :Components, "#{__dir__}/oiml/components"
     autoload :Identifier, "#{__dir__}/oiml/identifier"

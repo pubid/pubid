@@ -2,6 +2,12 @@
 
 module Pubid
   module Sae
+    extend Pubid::PrefixesSupport
+
+    # Sole SAE publisher token (see the parser's `publisher` rule). Document
+    # types (AMS/AIR/ARP/AS/J/MA) follow the SAE prefix and are excluded.
+    PREFIXES = ["SAE"].freeze
+
     autoload :Builder, "#{__dir__}/sae/builder"
     autoload :Components, "#{__dir__}/sae/components"
     autoload :Identifier, "#{__dir__}/sae/identifier"

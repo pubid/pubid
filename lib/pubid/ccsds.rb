@@ -2,6 +2,11 @@
 
 module Pubid
   module Ccsds
+    extend Pubid::PrefixesSupport
+
+    # Sole CCSDS publisher token (see the parser's `ccsds_prefix` rule).
+    PREFIXES = ["CCSDS"].freeze
+
     autoload :Builder, "#{__dir__}/ccsds/builder"
     autoload :Identifier, "#{__dir__}/ccsds/identifier"
     autoload :Identifiers, "#{__dir__}/ccsds/identifiers"

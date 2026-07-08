@@ -2,6 +2,12 @@
 
 module Pubid
   module Ashrae
+    extend Pubid::PrefixesSupport
+
+    # ASHRAE publisher token; the ANSI/ASHRAE joint form comes from
+    # Pubid::JOINT_PREFIXES.
+    PREFIXES = ["ASHRAE"].freeze
+
     autoload :Builder, "#{__dir__}/ashrae/builder"
     autoload :Identifier, "#{__dir__}/ashrae/identifier"
     autoload :Identifiers, "#{__dir__}/ashrae/identifiers"

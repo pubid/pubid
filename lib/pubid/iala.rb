@@ -2,6 +2,11 @@
 
 module Pubid
   module Iala
+    extend Pubid::PrefixesSupport
+
+    # Sole IALA publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["IALA"].freeze
+
     autoload :Builder,      "#{__dir__}/iala/builder"
     autoload :Identifier,   "#{__dir__}/iala/identifier"
     autoload :Identifiers,  "#{__dir__}/iala/identifiers"

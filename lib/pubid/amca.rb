@@ -2,6 +2,12 @@
 
 module Pubid
   module Amca
+    extend Pubid::PrefixesSupport
+
+    # AMCA publisher token; the ANSI/AMCA joint form comes from
+    # Pubid::JOINT_PREFIXES.
+    PREFIXES = ["AMCA"].freeze
+
     autoload :Identifier, "#{__dir__}/amca/identifier"
     autoload :Identifiers, "#{__dir__}/amca/identifiers"
     autoload :Builder, "#{__dir__}/amca/builder"
