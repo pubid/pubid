@@ -67,6 +67,42 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
         expect(parsed.to_urn).to eq(urn)
       end
     end
+
+    # Legacy ISO Recommendations can carry an *alphabetic* part code whose
+    # first letter is a Roman numeral (C, D, I, L, M, V, X) followed by a
+    # non-Roman letter, e.g. "CS". Such a part must stay an alphabetic code
+    # ("CS"), NOT be misread as a Roman-numeral part — the guard that
+    # pubid 1.x added in #56 (fixing ~50 ISO Open Data deliverables).
+    # Pinned here so the behaviour survives the pubid 2.x rewrite.
+    describe "ISO/R 194-CS:1964 (alphabetic part, Roman first letter)" do
+      subject { "ISO/R 194-CS:1964" }
+
+      let(:parsed) { Pubid::Iso.parse(subject) }
+
+      it "parses publisher" do
+        expect(parsed.publisher.publisher).to eq("ISO")
+      end
+
+      it "parses number" do
+        expect(parsed.number.value).to eq("194")
+      end
+
+      it "keeps the alphabetic part code (not folded to a Roman numeral)" do
+        expect(parsed.part.value).to eq("CS")
+      end
+
+      it "parses date" do
+        expect(parsed.date.year).to eq("1964")
+      end
+
+      it "round-trips" do
+        expect(parsed.to_s).to eq(subject)
+      end
+
+      it "provides type code" do
+        expect(parsed.typed_stage.type_code).to eq("rec")
+      end
+    end
   end
 
   # Test normal undated recommendation
