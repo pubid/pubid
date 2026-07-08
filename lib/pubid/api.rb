@@ -2,6 +2,11 @@
 
 module Pubid
   module Api
+    extend Pubid::PrefixesSupport
+
+    # Sole API publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["API"].freeze
+
     autoload :Builder, "#{__dir__}/api/builder"
     autoload :Identifier, "#{__dir__}/api/identifier"
     autoload :Identifiers, "#{__dir__}/api/identifiers"

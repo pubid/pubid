@@ -2,6 +2,14 @@
 
 module Pubid
   module Ieee
+    extend Pubid::PrefixesSupport
+
+    # Publisher prefix. The private PreParser::PUBLISHERS list also holds adopted
+    # co-org names (ANSI, AIEE, ASA, ...) that are not leading routing tokens for
+    # an IEEE reference, so they are deliberately excluded. The joint ISO/IEC/IEEE
+    # form comes from Pubid::JOINT_PREFIXES.
+    PREFIXES = ["IEEE"].freeze
+
     autoload :Aiee, "#{__dir__}/ieee/aiee"
     autoload :Builder, "#{__dir__}/ieee/builder"
     autoload :Identifier, "#{__dir__}/ieee/identifier"

@@ -2,6 +2,11 @@
 
 module Pubid
   module Csa
+    extend Pubid::PrefixesSupport
+
+    # Sole CSA publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["CSA"].freeze
+
     autoload :Builder, "#{__dir__}/csa/builder"
     autoload :Identifier, "#{__dir__}/csa/identifier"
     autoload :Identifiers, "#{__dir__}/csa/identifiers"

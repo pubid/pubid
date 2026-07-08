@@ -2,6 +2,12 @@
 
 module Pubid
   module Jis
+    extend Pubid::PrefixesSupport
+
+    # Sole JIS publisher token (see the parser's `jis_prefix` rule). Document
+    # types (TR/TS) follow the JIS prefix and are excluded.
+    PREFIXES = ["JIS"].freeze
+
     autoload :Builder, "#{__dir__}/jis/builder"
     autoload :Identifier, "#{__dir__}/jis/identifier"
     autoload :Identifiers, "#{__dir__}/jis/identifiers"

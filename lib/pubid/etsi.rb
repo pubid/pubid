@@ -4,6 +4,13 @@ require "lutaml/model"
 
 module Pubid
   module Etsi
+    extend Pubid::PrefixesSupport
+
+    # Sole ETSI publisher token (see the parser's `etsi_prefix` rule). The
+    # document-type tokens (EN, TS, TR, ...) are sub-types that follow the ETSI
+    # prefix, not standalone routing tokens, so they are excluded.
+    PREFIXES = ["ETSI"].freeze
+
     autoload :Builder, "#{__dir__}/etsi/builder"
     autoload :Components, "#{__dir__}/etsi/components"
     autoload :Identifier, "#{__dir__}/etsi/identifier"

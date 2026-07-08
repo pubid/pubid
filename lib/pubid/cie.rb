@@ -2,6 +2,11 @@
 
 module Pubid
   module Cie
+    extend Pubid::PrefixesSupport
+
+    # Sole CIE publisher token (see the parser grammar).
+    PREFIXES = ["CIE"].freeze
+
     module Components
       autoload :Code, "#{__dir__}/cie/components/code"
       autoload :Language, "#{__dir__}/cie/components/language"

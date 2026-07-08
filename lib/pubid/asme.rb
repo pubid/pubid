@@ -2,6 +2,11 @@
 
 module Pubid
   module Asme
+    extend Pubid::PrefixesSupport
+
+    # Sole ASME publisher token (see the parser's `asme_publisher` rule).
+    PREFIXES = ["ASME"].freeze
+
     autoload :Builder, "#{__dir__}/asme/builder"
     autoload :Components, "#{__dir__}/asme/components/code"
     autoload :Identifier, "#{__dir__}/asme/identifier"

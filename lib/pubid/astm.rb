@@ -2,6 +2,11 @@
 
 module Pubid
   module Astm
+    extend Pubid::PrefixesSupport
+
+    # Sole ASTM publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["ASTM"].freeze
+
     autoload :Components, "#{__dir__}/astm/components"
     autoload :Identifier, "#{__dir__}/astm/identifier"
     autoload :Identifiers, "#{__dir__}/astm/identifiers"

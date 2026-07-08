@@ -2,6 +2,11 @@
 
 module Pubid
   module Idf
+    extend Pubid::PrefixesSupport
+
+    # Sole IDF publisher token (see the parser's `prefix_sole_publisher` rule).
+    PREFIXES = ["IDF"].freeze
+
     autoload :Builder, "#{__dir__}/idf/builder"
     autoload :Identifier, "#{__dir__}/idf/identifier"
     autoload :Identifiers, "#{__dir__}/idf/identifiers"

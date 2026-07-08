@@ -4,6 +4,12 @@ require "lutaml/model"
 
 module Pubid
   module Iso
+    extend Pubid::PrefixesSupport
+
+    # Sole ISO publisher token. Joint / co-publication forms (ISO/IEC, IEC/ISO,
+    # ISO/IEC/IEEE) are contributed symmetrically via Pubid::JOINT_PREFIXES.
+    PREFIXES = ["ISO"].freeze
+
     autoload :Builder, "#{__dir__}/iso/builder"
     autoload :BundledIdentifier, "#{__dir__}/iso/bundled_identifier"
     autoload :CombinedIdentifier, "#{__dir__}/iso/combined_identifier"

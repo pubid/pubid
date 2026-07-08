@@ -2,6 +2,11 @@
 
 module Pubid
   module Jcgm
+    extend Pubid::PrefixesSupport
+
+    # Sole JCGM publisher token (see the parser's `publisher` rule).
+    PREFIXES = ["JCGM"].freeze
+
     autoload :Builder, "#{__dir__}/jcgm/builder"
     autoload :Components, "#{__dir__}/jcgm/components"
     autoload :Identifier, "#{__dir__}/jcgm/identifier"

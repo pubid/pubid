@@ -2,6 +2,19 @@
 
 module Pubid
   module Nist
+    extend Pubid::PrefixesSupport
+
+    # Publisher prefixes (NBS/NIST) plus the "simple series" tokens that can
+    # *begin* a printed reference on their own — mirrors the parser's
+    # `publisher` and `simple_series` rules (lib/pubid/nist/parser.rb). Compound
+    # series that only appear glued to a publisher (e.g. "NBS CRPL-F-A") are
+    # excluded because they never lead a routable reference by themselves.
+    PREFIXES = %w[
+      NIST NBS
+      AMS VTS BSS BMS BH FIPS GCR HB MONO MP NCSTAR NSRDS IR SP TN CSWP
+      AI CIRC CS CSM CRPL LCIRC OWMWP PC RPT SIBS TIBM TTB EAB JPCRD JRES
+    ].freeze
+
     autoload :Builder, "#{__dir__}/nist/builder"
     autoload :Caster, "#{__dir__}/nist/caster"
     autoload :CircularSupplementBuilder, "#{__dir__}/nist/circular_supplement_builder"

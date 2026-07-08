@@ -9,6 +9,11 @@ require "parslet"
 # code runs.
 require "pubid/lutaml/no_store_registration"
 
+# Uniform, static per-flavor prefix API (Pubid::<Flavor>.prefixes). Required
+# before the flavor autoloads below so each flavor file can `extend` it and the
+# central JOINT_PREFIXES constant is visible when its PREFIXES is defined.
+require "pubid/prefixes_support"
+
 module Pubid
   # Upper bound on the length of an identifier string accepted by any +parse+
   # entry point. Real-world standards identifiers are well under 200 characters;
@@ -60,6 +65,21 @@ module Pubid
       end
     end
   end
+
+  # Canonical joint / co-publication leading tokens, injected symmetrically into
+  # every participating flavor's +prefixes+ (see {PrefixesSupport}). Single
+  # source of truth: editing an entry here updates both sides at once
+  # (e.g. +"ISO/IEC"+ appears in +Pubid::Iso.prefixes+ and +Pubid::Iec.prefixes+),
+  # so co-publication symmetry can never drift. Keyed by
+  # {PrefixesSupport#prefix_flavor_key}.
+  JOINT_PREFIXES = {
+    iso: ["ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE"],
+    iec: ["ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE"],
+    ieee: ["ISO/IEC/IEEE"],
+    ansi: ["ANSI/ASHRAE", "ANSI/AMCA"],
+    ashrae: ["ANSI/ASHRAE"],
+    amca: ["ANSI/AMCA"],
+  }.freeze
 
   autoload :Parser, "pubid/parser"
   autoload :Components, "pubid/components"
@@ -174,5 +194,53 @@ module Pubid
       end
     end
     @flavors_loaded = true
+  end
+
+  # Static leading prefix tokens for a single flavor.
+  #
+  # @param flavor [Symbol, String] a registered flavor name (e.g. +:iso+)
+  # @return [Array<String>] the flavor's prefixes (see {PrefixesSupport})
+  # @raise [ArgumentError] if the flavor is not registered
+  def self.prefixes(flavor)
+    mod = Registry.get(flavor)
+    raise ArgumentError, "unknown flavor: #{flavor.inspect}" unless mod
+
+    mod.prefixes
+  end
+
+  # Reverse index mapping every canonical prefix token to the flavor(s) that
+  # own it — the exact routing table relaton needs. Co-published prefixes list
+  # every co-publisher (e.g. +"ISO/IEC" => [:iec, :iso]+); see the inclusion /
+  # exclusion policy documented on {PrefixesSupport}.
+  #
+  # The +:cen+ alias of +:cen_cenelec+ is de-duplicated by module identity, so a
+  # prefix is attributed to a flavor's canonical
+  # {PrefixesSupport#prefix_flavor_key} exactly once.
+  #
+  # @return [Hash{String => Array<Symbol>}] prefix token => sorted flavor keys,
+  #   e.g. +{ "ISO" => [:iso], "ISO/IEC" => [:iec, :iso], ... }+
+  def self.prefix_flavors
+    index = Hash.new { |h, k| h[k] = [] }
+    each_prefix_flavor_module do |mod|
+      key = mod.prefix_flavor_key
+      mod.prefixes.each { |prefix| index[prefix] |= [key] }
+    end
+    index.transform_values(&:sort).sort.to_h
+  end
+
+  # Yields each unique flavor module that exposes +prefixes+ exactly once,
+  # collapsing alias registrations (e.g. +:cen+ and +:cen_cenelec+ both point to
+  # +Pubid::CenCenelec+) by module identity.
+  # @yieldparam mod [Module] a flavor module
+  def self.each_prefix_flavor_module
+    eager_load_flavors!
+    seen = {}
+    Registry.flavor_names.each do |flavor_name|
+      mod = Registry.get(flavor_name)
+      next if seen.key?(mod) || !mod.respond_to?(:prefixes)
+
+      seen[mod] = true
+      yield mod
+    end
   end
 end

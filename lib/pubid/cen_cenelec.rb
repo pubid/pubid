@@ -2,6 +2,13 @@
 
 module Pubid
   module CenCenelec
+    extend Pubid::PrefixesSupport
+
+    # CEN/CENELEC publisher tokens, mirroring the parser's publisher rules
+    # (lib/pubid/cen_cenelec/parser.rb). Adopted-org prefixes (ISO/IEC/CISPR)
+    # are excluded — they route to their own SDOs, not to CEN.
+    PREFIXES = %w[EN CEN CLC CWA HD ES CR ENV].freeze
+
     autoload :Builder, "#{__dir__}/cen_cenelec/builder"
     autoload :Identifier, "#{__dir__}/cen_cenelec/identifier"
     autoload :Identifiers, "#{__dir__}/cen_cenelec/identifiers"

@@ -292,6 +292,46 @@ base.root.equal?(base) # => true
 * ✅ **Works with supplements** - Traverses supplement chains correctly
 
 
+== Flavor Prefix Routing
+
+Every flavor exposes a static `prefixes` method returning the *leading
+identifier prefix tokens* it recognizes — the tokens a printed identifier can
+start with such that the string belongs to that SDO. This is the routing key a
+consumer (such as relaton) uses to dispatch a reference string to the right
+backend, without parsing.
+
+[source,ruby]
+----
+require 'pubid'
+
+Pubid::Iso.prefixes
+# => ["ISO", "ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE"]
+
+Pubid::Bsi.prefixes
+# => ["BS", "BSI", "DD", "PD", "PAS", "NA", "TS", "HB", ... , "BS EN ISO"]
+
+# Look up a single flavor by name
+Pubid.prefixes(:iec)
+# => ["IEC", "CISPR", "IECEE", "IECEx", "IECQ", "ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE"]
+
+# Reverse index: prefix token => owning flavor(s)
+Pubid.prefix_flavors["ISO/IEC"]       # => [:iec, :iso]
+Pubid.prefix_flavors["ISO/IEC/IEEE"]  # => [:iec, :ieee, :iso]
+Pubid.prefix_flavors["DD"]            # => [:bsi]
+----
+
+**Semantics** (see `Pubid::PrefixesSupport` for the full contract):
+
+* **Static** — no identifier string is parsed; callable at startup.
+* **Uniform** — every registered flavor returns a plain `Array<String>`.
+* **Symmetric joints** — a co-published prefix is listed by every co-publisher
+  (`"ISO/IEC"` is in both `Pubid::Iso.prefixes` and `Pubid::Iec.prefixes`).
+* **Inclusion** — publisher prefixes (`ISO`, `NIST`, `BS`…) and leading
+  series/type tokens that can *begin* a reference (BSI `DD`/`PD`, NIST `FIPS`).
+* **Exclusion** — pure sub-series that never lead a reference and
+  dangerously-ambiguous single letters (e.g. BSI aerospace `A`/`B`/`C`).
+
+
 == Advanced Rendering Styles
 
 ISO and IEC identifiers support multiple abbreviation forms for supplements to maintain round-trip fidelity with different official formats.

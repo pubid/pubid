@@ -3,6 +3,14 @@
 module Pubid
   module Iec
     autoload :Components, "#{__dir__}/iec/components"
+
+    extend Pubid::PrefixesSupport
+
+    # Sourced from the parser's publisher list (Components::Publisher::PUBLISHERS)
+    # minus the joint "ISO/IEC", which is contributed symmetrically via
+    # Pubid::JOINT_PREFIXES (along with IEC/ISO and ISO/IEC/IEEE).
+    PREFIXES = (Components::Publisher::PUBLISHERS.keys - ["ISO/IEC"]).freeze
+
     autoload :Identifier, "#{__dir__}/iec/identifier"
     autoload :Identifiers, "#{__dir__}/iec/identifiers"
     autoload :SingleIdentifier, "#{__dir__}/iec/single_identifier"
