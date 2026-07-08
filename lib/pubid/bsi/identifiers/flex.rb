@@ -20,6 +20,10 @@ module Pubid
           { key: :flex, title: "BSI Flex", short: "BSI Flex" }
         end
 
+        # Base document = the Flex standard without its version (edition).
+        def base_document
+          exclude(:edition)
+        end
       end
     end
   end

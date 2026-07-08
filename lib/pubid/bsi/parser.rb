@@ -5,6 +5,19 @@ require "parslet"
 module Pubid
   module Bsi
     class Parser < Parslet::Parser
+      # Case-insensitive string match (Parslet 2.0 has no built-in `stri`).
+      # Each character becomes a two-case character class; other characters
+      # (spaces, punctuation) match verbatim.
+      def stri(string)
+        string.each_char.map do |char|
+          if char =~ /[a-z]/i
+            match["#{char.upcase}#{char.downcase}"]
+          else
+            str(char)
+          end
+        end.reduce(:>>)
+      end
+
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }
       rule(:space) { str(" ") }
@@ -296,14 +309,15 @@ module Pubid
       # Single letter (a-z or A-Z) that comes immediately after number or part
       rule(:letter_edition) { match["a-zA-Z"].as(:letter_edition) }
 
-      # Amendment (+A1:2008 or /A2:2019 or /Amd 1:2020 or +A1:15 for short year)
+      # Amendment (+A1:2008 or /A2:2019 or /Amd 1:2020 or +A1:15 for short year,
+      # or +A2 / /A2 without a year — mirrors the optional-year corrigendum rule)
       rule(:amendment) do
         ((plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
           str("A") >> digits.as(:amd_number) >>
-          colon >> digit.repeat(2, 4).as(:amd_year)) |
+          (colon >> digit.repeat(2, 4).as(:amd_year)).maybe) |
           ((plus.as(:amd_sep_plus) | slash.as(:amd_sep_slash)) >>
             str("Amd") >> space >> digits.as(:amd_number) >>
-            colon >> digit.repeat(4, 4).as(:amd_year))
+            (colon >> digit.repeat(4, 4).as(:amd_year)).maybe)
       end
 
       # Corrigendum (+AC:2009 or +AC1:2008 or /AC1:2005 or +C1:2018 or +C1 without year)
@@ -518,8 +532,8 @@ module Pubid
       # 3. "ExComm (Fire)" (with optional topic suffix)
       rule(:expert_commentary) do
         space >> (
-          str("Expert Commentary").as(:expert_commentary_full) |
-          (str("ExComm") >> (space >> str("(") >> match["A-Za-z"].repeat(1).as(:expert_commentary_topic) >> str(")")).maybe).as(:expert_commentary)
+          stri("Expert Commentary").as(:expert_commentary_full) |
+          (stri("ExComm") >> (space >> str("(") >> match["A-Za-z"].repeat(1).as(:expert_commentary_topic) >> str(")")).maybe).as(:expert_commentary)
         )
       end
 

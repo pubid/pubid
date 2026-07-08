@@ -114,19 +114,11 @@ module Pubid
         if data[:na_prefix]
           return build_national_annex(data, supplements_data)
         elsif data[:adopted_string]
-          # Check for multi-level adoptions
-          identifier = build_adopted_identifier(data)
-
-          # Wrap with consolidated if supplements present
-          if supplements_data.any?
-            identifier = wrap_with_consolidated(identifier,
-                                                supplements_data)
-          end
-
-          # Wrap with ExpertCommentary if needed
-          identifier = wrap_with_expert_commentary(identifier) if data[:expert_commentary]
-
-          return identifier
+          # Adopted identifiers carry their supplements and Expert-commentary
+          # suffix *inside* the adopted string, so build_adopted_identifier does
+          # all the wrapping. Wrapping again here would double-wrap (a second
+          # ExpertCommentary around the first) and break #base_document.
+          return build_adopted_identifier(data)
         end
 
         # Determine identifier class using the module's lookup helpers
@@ -139,8 +131,11 @@ module Pubid
                                               supplements_data)
         end
 
-        # Wrap with ExpertCommentary if needed
-        identifier = wrap_with_expert_commentary(identifier) if data[:expert_commentary]
+        # Wrap with ExpertCommentary if needed (full "Expert Commentary" form
+        # arrives as the standalone :expert_commentary_full token)
+        if data[:expert_commentary] || data[:expert_commentary_full]
+          identifier = wrap_with_expert_commentary(identifier)
+        end
 
         identifier
       end
@@ -922,6 +917,7 @@ module Pubid
             number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
             year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
             separator: separator,
+            amd_suffix_form: !(supp_data[:amd_sep_plus] || supp_data[:amd_sep_slash]),
           }
         end
       end
@@ -1157,8 +1153,10 @@ module Pubid
         # Extract ExComm suffix before parsing (it should be preserved in data[:expert_commentary])
         # Remove it from adopted_string so ISO/IEC parsers don't choke on it
         # Handle all three formats: "Expert Commentary", "ExComm", "ExComm (Fire)"
-        if adopted_str.end_with?("Expert Commentary")
-          adopted_str = adopted_str.sub(/Expert Commentary$/, "")
+        # Expert-commentary suffix matching is case-insensitive; output is always
+        # canonicalised to "Expert Commentary" / "ExComm".
+        if adopted_str.match?(/expert commentary$/i)
+          adopted_str = adopted_str.sub(/expert commentary$/i, "")
           data[:expert_commentary_full] = "Expert Commentary"
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
           # Update @original_data so wrap_with_expert_commentary can access it
@@ -1167,8 +1165,8 @@ module Pubid
             @original_data[:expert_commentary] =
               true
           end
-        elsif adopted_str.end_with?("ExComm (")
-          adopted_str = adopted_str.sub(/ExComm \(.*\)$/, "")
+        elsif adopted_str.match?(/excomm \($/i)
+          adopted_str = adopted_str.sub(/excomm \(.*\)$/i, "")
           data[:expert_commentary_full] = "Expert Commentary"
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
           @original_data[:expert_commentary_full] = "Expert Commentary"
@@ -1176,10 +1174,10 @@ module Pubid
             @original_data[:expert_commentary] =
               true
           end
-        elsif adopted_str.include?("ExComm (")
+        elsif adopted_str.match?(/excomm \(/i)
           # Extract topic from "ExComm (Fire)"
-          topic_match = adopted_str.match(/ExComm\s*\(([^)]+)\)/)
-          adopted_str = adopted_str.sub(/ExComm\s*\(.*\)$/, "")
+          topic_match = adopted_str.match(/excomm\s*\(([^)]+)\)/i)
+          adopted_str = adopted_str.sub(/excomm\s*\(.*\)$/i, "")
           data[:expert_commentary_topic] = topic_match[1] if topic_match
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
           if topic_match
@@ -1190,9 +1188,9 @@ module Pubid
             @original_data[:expert_commentary] =
               true
           end
-        elsif adopted_str.match?(/ExComm\s*$/)
+        elsif adopted_str.match?(/excomm\s*$/i)
           # Abbreviated form "ExComm" at the end
-          adopted_str = adopted_str.sub(/ExComm\s*$/, "")
+          adopted_str = adopted_str.sub(/excomm\s*$/i, "")
           data[:expert_commentary] = true unless data.key?(:expert_commentary)
           unless @original_data.key?(:expert_commentary)
             @original_data[:expert_commentary] =
@@ -1258,9 +1256,10 @@ module Pubid
         # BSI uses +A1:2020 format, but ISO/IEC parsers can't handle this
         # Patterns: +A1:2020, +A11:2021, +AMD1:2001, +C1:2020
         extracted_supplements = []
-        # Match patterns like: +A1:2020, +A11:2021, +AMD1:2001, +C1:2020, +COR1:2020
+        # Match patterns like: +A1:2020, +A11:2021, +AMD1:2001, +C1:2020, +COR1:2020,
+        # and the year-less compact forms +A2 / +C1 (the ":YYYY" is optional).
         # Must be at end of string or followed by space (not colon, which is part of date)
-        adopted_str_clean = adopted_str_clean.gsub(/([+])(A(\d+)|AMD(\d+)|C(\d+)|COR(\d+)):(\d{4})(?:\s|$)/) do |_match|
+        adopted_str_clean = adopted_str_clean.gsub(/([+])(A(\d+)|AMD(\d+)|C(\d+)|COR(\d+))(?::(\d{4}))?(?:\s|$)/) do |_match|
           separator = $1 # "+" or "/"
           type_code = $2 || $3 || $4 || $5 || $6
           $2 || $3 || $4 || $5 || $6
@@ -1285,6 +1284,8 @@ module Pubid
             number: supp_number,
             year: year,
             separator: separator,
+            # compact "+A"/"/A" join form (not the trailing " AMD5" suffix form)
+            amd_suffix_form: false,
           }
 
           "" # Remove from adopted_string
@@ -1300,6 +1301,7 @@ module Pubid
             number: amd_number,
             year: nil,
             separator: nil, # No separator for AMD without year
+            amd_suffix_form: true, # trailing " AMD5" suffix form
           }
           "" # Remove from adopted_string
         end.strip
@@ -1365,6 +1367,9 @@ module Pubid
         # Return appropriate wrapper based on adoption type
         if adopted_id
           # If adopted_id is a CEN identifier (in Cen module), use AdoptedEuropeanNorm
+          # The Expert-commentary suffix is represented uniformly by an outer
+          # ExpertCommentary wrapper (below), never a boolean on the inner norm,
+          # so that #base_document peels cleanly to the bare standard.
           identifier = if adopted_id.class.name.start_with?("Pubid::CenCenelec::")
                          Identifiers::AdoptedEuropeanNorm.new(
                            publisher: Components::Publisher.new(body: bsi_prefix),
@@ -1372,10 +1377,6 @@ module Pubid
                            edition: final_edition&.to_s,
                            translation_lang: data[:translation_lang]&.to_s,
                            translation_upper: data[:translation_upper]&.to_s,
-                           # Pass expert_commentary data so ConsolidatedIdentifier can render it
-                           expert_commentary: data[:expert_commentary],
-                           # Pass expert_commentary_topic if present
-                           expert_commentary_topic: data[:expert_commentary_topic],
                            # Pass translation_suffix_type for rendering
                            translation_suffix_type: data[:translation_suffix_type]&.to_s,
                            # Pass reaffirmation_year for rendering
@@ -1389,11 +1390,6 @@ module Pubid
                            edition: final_edition&.to_s,
                            translation_lang: data[:translation_lang]&.to_s,
                            translation_upper: data[:translation_upper]&.to_s,
-                           # Pass expert_commentary data ONLY if no supplements
-                           # When supplements are present, ConsolidatedIdentifier will add ExComm later
-                           expert_commentary: data[:expert_commentary] && extracted_supplements.none?,
-                           # Pass expert_commentary_topic if present and no supplements
-                           expert_commentary_topic: (data[:expert_commentary_topic] if extracted_supplements.none?),
                            # Pass translation_suffix_type for rendering
                            translation_suffix_type: data[:translation_suffix_type]&.to_s,
                            # Pass reaffirmation_year for rendering
@@ -1401,20 +1397,13 @@ module Pubid
                          )
                        end
 
-          # NEW: Wrap with supplements if any were extracted from adopted_string
-          # This must happen BEFORE wrapping with ExpertCommentary so that supplements
-          # render before ExComm suffix
+          # Wrap supplements first (they render before the ExComm suffix), then
+          # wrap the whole thing in a single ExpertCommentary — same shape as the
+          # pure-BSI path, keeping #base_document uniform.
           if extracted_supplements.any?
-            # When supplements are present, wrap with ConsolidatedIdentifier
-            # Pass expert_commentary data so ConsolidatedIdentifier can render it later
-            identifier = wrap_with_consolidated(
-              identifier,
-              extracted_supplements,
-              expert_commentary: data[:expert_commentary],
-              expert_commentary_topic: data[:expert_commentary_topic],
-            )
-          elsif data[:expert_commentary]
-            # When no supplements but ExComm present, wrap with ExpertCommentary
+            identifier = wrap_with_consolidated(identifier, extracted_supplements)
+          end
+          if data[:expert_commentary] || data[:expert_commentary_full]
             identifier = wrap_with_expert_commentary(identifier)
           end
 
@@ -1451,6 +1440,7 @@ expert_commentary: nil, expert_commentary_topic: nil)
               amendment_number: supp[:number],
               amendment_year: year_val&.to_i,
               separator: supp[:separator] || "+",
+              amd_suffix_form: supp[:amd_suffix_form] ? true : false,
             )
           else
             Identifiers::Corrigendum.new(
@@ -1484,6 +1474,9 @@ expert_commentary: nil, expert_commentary_topic: nil)
             number: (supp_data[:amd_number] || supp_data[:cor_number])&.to_s,
             year: (supp_data[:amd_year] || supp_data[:cor_year])&.to_s,
             separator: separator,
+            # The compact "+A"/"/A" amendment rule captures an explicit separator;
+            # the trailing " AMD5" suffix form does not.
+            amd_suffix_form: !(supp_data[:amd_sep_plus] || supp_data[:amd_sep_slash]),
           }
         end
       end

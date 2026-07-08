@@ -289,20 +289,21 @@ module Pubid
       end
 
       def render_amendment(id)
-        if id.base_identifier
-          if id.amendment_year
-            "#{id.base_identifier}#{id.separator}A#{id.amendment_number}:#{id.amendment_year}"
-          elsif id.amendment_number&.match?(/^[A-Z]+$/)
-            "#{id.base_identifier} AMD #{id.amendment_number}"
-          else
-            "#{id.base_identifier} AMD#{id.amendment_number}"
-          end
-        elsif id.amendment_year
-          "#{id.separator}A#{id.amendment_number}:#{id.amendment_year}"
-        elsif id.amendment_number&.match?(/^[A-Z]+$/)
-          "AMD #{id.amendment_number}"
+        base = id.base_identifier ? id.base_identifier.to_s : ""
+
+        if id.amd_suffix_form
+          # Trailing " AMD5" / " AMD AA" suffix form
+          suffix = if id.amendment_number&.match?(/^[A-Z]+$/)
+                     " AMD #{id.amendment_number}"
+                   else
+                     " AMD#{id.amendment_number}"
+                   end
+          base.empty? ? suffix.lstrip : "#{base}#{suffix}"
         else
-          "AMD#{id.amendment_number}"
+          # Compact "+A5" / "/A5" join form, with an optional ":year"
+          compact = "#{id.separator}A#{id.amendment_number}"
+          compact += ":#{id.amendment_year}" if id.amendment_year
+          "#{base}#{compact}"
         end
       end
 
@@ -408,15 +409,16 @@ module Pubid
 
         id.identifiers[1..].each do |idd|
           if idd.is_a?(Identifiers::Amendment)
-            if idd.amendment_year
-              sep = idd.separator || "+"
-              result += "#{sep}A#{idd.amendment_number}:#{idd.amendment_year}"
-            else
+            if idd.amd_suffix_form
               result += if idd.amendment_number&.match?(/^[A-Z]+$/)
                           " AMD #{idd.amendment_number}"
                         else
                           " AMD#{idd.amendment_number}"
                         end
+            else
+              sep = idd.separator || "+"
+              result += "#{sep}A#{idd.amendment_number}"
+              result += ":#{idd.amendment_year}" if idd.amendment_year
             end
           elsif idd.is_a?(Identifiers::Corrigendum)
             sep = idd.separator || "+"

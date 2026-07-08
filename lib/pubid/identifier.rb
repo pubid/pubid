@@ -120,6 +120,13 @@ module Pubid
       nil
     end
 
+    # The underlying standard, with amendment / corrigendum / Expert-commentary
+    # / Flex-version wrappers peeled recursively. Wrapper subclasses override
+    # this; a plain identifier is its own base document.
+    def base_document
+      self
+    end
+
     # @return [String, nil] publication year from the date component
     def year
       date&.year&.to_s
@@ -311,15 +318,46 @@ module Pubid
       Pubid::UrnGenerator::Base
     end
 
+    # Excluded attributes are nilled; every other value is passed through
+    # #exclude_from_nested so the exclusion also propagates into nested
+    # identifiers — wrapper types (adopted standards, consolidated amendments,
+    # expert-commentary wrappers) delegate their date to an inner identifier
+    # rather than storing it in their own attribute.
     def exclude(*args)
+      # :amendment / :supplement are structural, not attributes — they reduce
+      # a supplemented identifier to the standard it wraps (#drop_supplements).
+      supplement_keys = args & %i[amendment supplement]
+      unless supplement_keys.empty?
+        return drop_supplements.exclude(*(args - supplement_keys))
+      end
+
       excluded_args = args.dup
       # Map :year to :date since identifiers store years inside date
       excluded_args << :date if excluded_args.delete(:year)
 
       attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
-        h[name] = excluded_args.include?(name) ? nil : public_send(name)
+        value = excluded_args.include?(name) ? nil : public_send(name)
+        h[name] = exclude_from_nested(value, args)
       end
       self.class.new(attrs)
+    end
+
+    # The standard this identifier supplements, dropping its own supplement
+    # layer (one level). Overridden by ConsolidatedIdentifier / Amendment /
+    # Corrigendum; a non-supplement identifier supplements nothing, so it is
+    # returned unchanged.
+    def drop_supplements
+      self
+    end
+
+    # Fuzz-level equality: two identifiers match when they are equal after
+    # excluding the given aspects. `ignore` accepts the same symbols as #exclude
+    # (e.g. :date, :edition, :amendment). This is the primitive relaton uses to
+    # match a reference against catalogue hits at varying strictness.
+    def matches?(other, ignore: [])
+      return false unless other.is_a?(::Pubid::Identifier)
+
+      exclude(*ignore) == other.exclude(*ignore)
     end
 
     def new_edition_of?(other)
@@ -361,6 +399,21 @@ module Pubid
     end
 
     private
+
+    # Propagate an #exclude into a nested attribute value: recurse when it is
+    # (or contains) another identifier, otherwise return it unchanged.
+    # Components and scalars are copied as-is. Passes the original args so
+    # nested identifiers re-apply the same :year->:date mapping themselves.
+    def exclude_from_nested(value, args)
+      case value
+      when ::Pubid::Identifier
+        value.exclude(*args)
+      when Array
+        value.map { |item| exclude_from_nested(item, args) }
+      else
+        value
+      end
+    end
 
     def build_rendering_context(_renderer, format:, with_edition: false,
                                 lang: :en, lang_single: false,
