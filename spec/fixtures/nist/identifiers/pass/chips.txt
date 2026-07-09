@@ -1,0 +1,9 @@
+# NIST CHIPS (CHIPS Act R&D program) - Pass
+# Observed set from the NIST-Tech-Pubs MODS dump (dotted DOI forms
+# NIST.CHIPS.<n>-<m> arrive here spaced as the human form).
+
+NIST CHIPS 1100-1
+NIST CHIPS 1400-1
+NIST CHIPS 1400-2
+NIST CHIPS 1400-3
+NIST CHIPS 1400-4

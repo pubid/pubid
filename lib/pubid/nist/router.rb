@@ -18,6 +18,7 @@ module Pubid
         "GCR", "AMS", "BSS", "BMS", "BH", "MONO", "MP",
         "NCSTAR", "NSRDS", "CSWP", "VTS", "AI", "OWMWP",
         "PC", "RPT", "SIBS", "TIBM", "TTB", "EAB",
+        "CHIPS", "NWIRP", "RB",
         "JPCRD", "JRES", "CIS", "HR", "IRPL", "IP",
         "LC", "PS", "LCIRC",
         # Compound series

@@ -1,0 +1,5 @@
+# NIST NWIRP - Pass
+# Low-volume series present in the NIST-Tech-Pubs MODS dump (1 doc). The dump
+# gave no concrete identifier, so a generic number pins parse + round-trip.
+
+NIST NWIRP 1
