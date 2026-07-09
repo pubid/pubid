@@ -23,7 +23,7 @@ module Pubid
                               end
 
           # Extract code
-          code_str = extract_value(parsed[:number])
+          code_str = extract_number(parsed[:number])
           if code_str
             attributes[:code] = Components::Code.parse(code_str)
           end
@@ -52,6 +52,18 @@ module Pubid
         end
 
         private
+
+        # Extract the number, flattening a "431 (105)" main-number/parenthetical
+        # subtree into a plain string. Without this, a Hash node leaks its raw
+        # Parslet inspect form (e.g. `{main_number: "431"@8, ...}`) into `to_s`.
+        def extract_number(value)
+          return extract_value(value) unless value.is_a?(Hash)
+
+          main = extract_value(value[:main_number])
+          paren = value[:parenthetical]
+          alt = paren.is_a?(Hash) ? extract_value(paren[:alt_number]) : nil
+          alt ? "#{main} (#{alt})" : main
+        end
 
         def extract_value(value)
           return nil if value.nil?

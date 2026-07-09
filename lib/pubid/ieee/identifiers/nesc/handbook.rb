@@ -11,17 +11,19 @@ module Pubid
         #
         # @example Basic handbook
         #   nesc = Pubid::Ieee.parse("2012 NESC Handbook")
-        #   nesc.to_s  # => "2012 NESC Handbook"
+        #   nesc.to_s  # => "IEEE Std 2012 NESC Handbook"
         #
         # @example With edition
         #   nesc = Pubid::Ieee.parse("2017 NESC Handbook, Premier Edition")
-        #   nesc.to_s  # => "2017 NESC Handbook, Premier Edition"
+        #   nesc.to_s  # => "IEEE Std 2017 NESC Handbook, Premier Edition"
         class Handbook < Base
           # Render handbook identifier
           #
           # @return [String] YYYY NESC Handbook format with optional edition
           def to_s
-            parts = ["#{year.year} NESC Handbook"]
+            abbr = "NESC"
+            abbr += "(R)" if registered
+            parts = ["IEEE Std #{year.year} #{abbr} Handbook"]
             parts << ", #{edition}" if edition
             parts.join
           end

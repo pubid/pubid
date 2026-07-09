@@ -34,15 +34,15 @@ module Pubid
           str("C2").as(:code)
         end
 
-        # NESC name variations
+        # NESC name variations (the "(R)" registered mark is captured
+        # separately by the `registered` rule so it can be round-tripped)
         rule(:nesc_full_name) do
-          str("National Electrical Safety Code(R)") |
-            str("National Electrical Safety Code") |
+          str("National Electrical Safety Code") |
             str("National Electric Safety Code") # Typo variation
         end
 
         rule(:nesc_abbr) do
-          str("NESC(R)") | str("NESC")
+          str("NESC")
         end
 
         rule(:nesc_name) do
@@ -51,7 +51,7 @@ module Pubid
 
         # Registered trademark notation
         rule(:registered) do
-          str("(R)").maybe
+          str("(R)")
         end
 
         # Edition notations
@@ -97,8 +97,8 @@ module Pubid
             dash >>
             year.as(:year) >>
             (comma.maybe >> space).maybe >>
-            nesc_full_name >>
-            (space >> str("(") >> nesc_abbr >> str(")")).maybe
+            nesc_full_name >> registered.maybe >>
+            (space >> str("(") >> nesc_abbr >> registered.maybe >> str(")")).maybe
         end
 
         # Pattern 2: YYYY NESC format (year-first)
@@ -109,11 +109,12 @@ module Pubid
           year.as(:year) >>
             space >>
             (
-              # Full name with optional (NESC) suffix
-              (nesc_full_name >> registered >>
-               (space >> str("(") >> nesc_abbr >> registered >> str(")")).maybe) |
-              # Just NESC abbreviation
-              (nesc_abbr >> registered)
+              # Full name with optional (NESC) abbreviation suffix
+              (nesc_full_name.as(:full_name) >> registered.as(:name_registered).maybe >>
+               (space >> str("(") >> nesc_abbr.as(:paren_abbr) >>
+                registered.as(:paren_registered).maybe >> str(")")).maybe) |
+              # Just the NESC abbreviation (e.g. "2017 NESC(R) Handbook")
+              (nesc_abbr.as(:abbr) >> registered.as(:abbr_registered).maybe)
             ) >>
             (space >> variant).maybe >>
             (comma >> space >> edition).maybe
@@ -123,7 +124,7 @@ module Pubid
         # Examples: "National Electrical Safety Code, C2-2012"
         #           "National Electrical Safety Code, C2-2012 - Redline"
         rule(:name_first) do
-          nesc_full_name >>
+          nesc_full_name >> registered.maybe >>
             comma >>
             space >>
             c2_code >>
@@ -138,7 +139,7 @@ module Pubid
         rule(:draft_nesc) do
           str("Draft").as(:draft) >>
             space >>
-            nesc_name >>
+            nesc_name >> registered.maybe >>
             comma >> space >>
             month >> space >> year.as(:year)
         end

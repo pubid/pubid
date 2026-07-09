@@ -28,6 +28,12 @@ module Pubid
           attribute :edition, :string              # Edition notation
           attribute :draft, :boolean               # Draft flag
           attribute :month, :string                # For draft identifiers
+          # Registered-trademark "(R)" after the full name or abbreviation
+          attribute :registered, :boolean
+          # Whether the "(NESC)"/"(NESC(R))" abbreviation suffix was present
+          attribute :abbr_suffix, :boolean
+          # Registered-trademark "(R)" inside the "(NESC(R))" suffix
+          attribute :abbr_suffix_registered, :boolean
 
           # Publisher portion for NESC identifiers
           #
@@ -36,18 +42,28 @@ module Pubid
             "NESC"
           end
 
-          # Base rendering - override in subclasses
+          # Rendering for year-first NESC identifiers (the C2-code standard form
+          # overrides this in Nesc::Standard). IEEE catalogues the year-first
+          # editions with the "IEEE Std" prefix, so it is prepended here.
           #
           # @return [String] String representation
           def to_s
-            parts = []
-            if code && year
-              parts << "#{code}-#{year.year}"
-            elsif year
-              parts << year.year.to_s
+            "IEEE Std #{year.year} #{name_portion}"
+          end
+
+          # The document-name portion, including the registered marks and the
+          # optional "(NESC(R))" abbreviation suffix.
+          #
+          # @return [String] e.g. "National Electrical Safety Code(R) (NESC(R))"
+          def name_portion
+            name = "National Electrical Safety Code"
+            name += "(R)" if registered
+            if abbr_suffix
+              suffix = "NESC"
+              suffix += "(R)" if abbr_suffix_registered
+              name += " (#{suffix})"
             end
-            parts << "National Electrical Safety Code"
-            parts.join(" ")
+            name
           end
         end
       end

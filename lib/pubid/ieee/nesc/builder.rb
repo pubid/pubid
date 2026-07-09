@@ -66,6 +66,15 @@ module Pubid
             identifier.month = parsed_hash[:month].to_s
           end
 
+          # Registered-trademark "(R)" marks and the "(NESC(R))" abbreviation
+          # suffix (year-first forms) — see Identifiers::Nesc::Base#name_portion.
+          identifier.registered = true if parsed_hash[:name_registered] ||
+            parsed_hash[:abbr_registered]
+          if parsed_hash[:paren_abbr]
+            identifier.abbr_suffix = true
+            identifier.abbr_suffix_registered = true if parsed_hash[:paren_registered]
+          end
+
           identifier
         end
 

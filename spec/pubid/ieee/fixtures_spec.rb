@@ -14,6 +14,26 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
     pubid_to_parse_fixtures + unapproved_fixtures + pubid_parsed_fixtures
   end
 
+  # Emit a concise, human-readable summary of the fixture mismatches so the
+  # real round-trip rate and the first failures are visible when running the
+  # suite (issue #32 — these blocks used to be empty, hiding the failures).
+  def report_mismatches(label, header, failures)
+    return if failures.empty?
+
+    lines = ["#{label}: #{header}, #{failures.size} mismatches (first 10):"]
+    failures.first(10).each { |f| lines << format_failure(f) }
+    RSpec.configuration.reporter.message(lines.join("\n"))
+  end
+
+  def format_failure(failure)
+    original = failure[:original].inspect
+    return "  #{original} -> ERROR #{failure[:error]}" if failure[:error]
+
+    detail = "  #{original}\n"
+    detail += "    expected: #{failure[:expected].inspect}\n" if failure.key?(:expected)
+    detail + "    got:      #{failure[:rendered].inspect} (#{failure[:class]})"
+  end
+
   describe "pubid-to-parse.txt fixtures" do
     it "round-trips pubid-to-parse identifiers" do
       failures = []
@@ -55,19 +75,26 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      if failures.any?
+      pct = (successes.to_f / total_tested * 100).round(2)
+      report_mismatches("pubid-to-parse",
+                        "#{successes}/#{total_tested} round-trip (#{pct}%)",
+                        failures)
 
-        failures.first(10).each do |failure|
-          if failure[:error]
-
-          end
-        end
-      end
-
-      # NOTE: These are V1 fixture files with legacy patterns
-      # V2 has different normalization (e.g., "IEEE No" → "IEEE Std")
-      # We expect lower pass rate due to architectural differences
-      expect(successes.to_f / total_tested).to be >= 0.01
+      # These are V1 fixture files whose "expected" column is internally
+      # inconsistent and, in many cases, encodes conventions V2 deliberately
+      # abandoned, so a large subset can never round-trip without regressing V2
+      # (see issue #32 for the analysis). Known non-round-trippable classes:
+      #   * V2 emits "IEEE Std 267A-1980" where the fixture expects bare
+      #     "IEEE 267A-1980" (V2's "IEEE Std" form is the correct one).
+      #   * The fixture drops "AIEE No" (→ "AIEE 14-1925"); V2 deliberately
+      #     retains it (asserted in identifiers/base_spec.rb).
+      #   * Month/year comma ("August 2016" vs "August, 2016") and trailing
+      #     ".pdf" differ between this file and pubid-parsed.txt.
+      # The threshold is therefore a floor over the genuinely round-trippable
+      # fixtures, raised from the historical 1% (which had been reached only by
+      # relaxing the denominator, not by fixing mismatches) to lock in the
+      # NESC-family fixes from issue #32.
+      expect(successes.to_f / total_tested).to be >= 0.05
     end
   end
 
@@ -110,14 +137,7 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      if failures.any?
-
-        failures.first(10).each do |failure|
-          if failure[:error]
-
-          end
-        end
-      end
+      report_mismatches("unapproved", "#{successes} round-trip", failures)
 
       # NOTE: These are V1 fixture files with legacy patterns
       # V2 has different normalization (e.g., "IEEE No" → "IEEE Std")
@@ -159,14 +179,8 @@ RSpec.describe "IEEE Fixture Round-trip Tests" do
         end
       end
 
-      if failures.any?
-
-        failures.first(10).each do |failure|
-          if failure[:error]
-
-          end
-        end
-      end
+      report_mismatches("pubid-parsed",
+                        "#{successes}/#{total_tested} round-trip", failures)
 
       # NOTE: These are V1 canonical forms - V2 normalization may differ
       # We expect lower pass rate due to architectural differences
