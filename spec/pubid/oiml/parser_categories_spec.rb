@@ -216,5 +216,23 @@ RSpec.describe "Pubid::Oiml failing-docid categories" do
       expect(Pubid::Oiml.parse("OIML Bulletin 2026-02").to_s(format: :citation))
         .to eq("OIML Bulletin 2026-02")
     end
+
+    it "warns when the roman volume disagrees with the article_id year" do
+      # L(2) implies volume 50 = year 2009, but the article_id 20260211
+      # encodes year 2026 = volume 67 (LXVII). The article_id is the
+      # source of truth — warn but still parse using the article_id.
+      expect do
+        id = Pubid::Oiml.parse("OIML Bulletin L(2) 20260211")
+        expect(id.date.year).to eq("2026")
+        expect(id.issue).to eq("02")
+        expect(id.sequence).to eq("11")
+      end.to output(/Bulletin citation volume mismatch/).to_stderr
+    end
+
+    it "stays silent when the roman volume matches the article_id year" do
+      expect do
+        Pubid::Oiml.parse("OIML Bulletin LXVII(2) 20260211")
+      end.not_to output(/volume mismatch/).to_stderr
+    end
   end
 end

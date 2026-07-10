@@ -44,10 +44,9 @@ module Pubid
       rule(:two_digits) { match('\d').repeat(2, 2) }
 
       # Roman numeral token composed of I,V,X,L,C,D,M (uppercase, matching
-      # OIML's print convention). Consumed but not captured — the 8-digit
-      # article id in the same citation carries year/issue/sequence
-      # deterministically, so the roman volume is redundant for parsing.
-      rule(:roman_numeral) { match("[IVXLCDM]").repeat(1) }
+      # OIML's print convention). Captured so the builder can cross-check
+      # the declared volume against the year implied by the article_id.
+      rule(:roman_numeral) { match("[IVXLCDM]").repeat(1).as(:volume_roman) }
 
       # Bulletin locator — citation form. The format OIML prints on the
       # article page is: "LXVII(2) 20260211" where LXVII is the volume in
