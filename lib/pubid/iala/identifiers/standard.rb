@@ -6,6 +6,8 @@ module Pubid
       # IALA Standards (S series).
       # Examples: S1010, S1020 Ed 2.0, S1070 Ed 2.0.
       class Standard < Base
+        number_width 4
+
         def self.type
           { key: :standard, title: "Standard", short: "S" }
         end
