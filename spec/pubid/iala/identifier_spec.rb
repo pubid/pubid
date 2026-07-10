@@ -149,6 +149,13 @@ RSpec.describe Pubid::Iala::Identifier do
       urn:mrn:iala:pub:r1016:ed2.0:f
       urn:mrn:iala:pub:c0103-1:ed3.0
       urn:mrn:iala:pub:g1015
+      urn:mrn:iala:pub:m0001:ed9.0
+      urn:mrn:iala:pub:a12-01
+      urn:mrn:iala:pub:ga01.01
+      urn:mrn:iala:pub:l2.1.11:ed2
+      urn:mrn:iala:pub:g1045:annex:ed1
+      urn:mrn:iala:pub:g1128:annex-a:ed1.6
+      urn:mrn:iala:pub:g1128:annex-d:ed1.6:e
     ].each do |urn|
       it "round-trips #{urn.inspect} through the parser" do
         id = Pubid::Iala::UrnParser.parse(urn)
