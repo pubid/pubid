@@ -113,6 +113,7 @@ module Pubid
   autoload :Cie, "pubid/cie"
   autoload :Csa, "pubid/csa"
   autoload :Etsi, "pubid/etsi"
+  autoload :Gost, "pubid/gost"
   autoload :Idf, "pubid/idf"
   autoload :Iec, "pubid/iec"
   autoload :Ieee, "pubid/ieee"
