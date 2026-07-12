@@ -100,6 +100,7 @@ module Pubid
 
 
   # Require all flavor modules
+  autoload :Adobe, "pubid/adobe"
   autoload :Amca, "pubid/amca"
   autoload :Ansi, "pubid/ansi"
   autoload :Api, "pubid/api"
