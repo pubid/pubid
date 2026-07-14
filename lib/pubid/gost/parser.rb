@@ -73,8 +73,18 @@ module Pubid
         str("/") >> match(".").repeat(1).as(:adopted_raw)
       end
 
+      # Adoption reference in parens: "(<foreign-id>)". The parens
+      # themselves are consumed but NOT captured. The content goes
+      # into :adopted_reference_raw. This form appears for MOD/NEQ
+      # adoptions where the foreign standard is referenced but not
+      # identical (IDT would use the slash form instead).
+      rule(:adopted_reference_part) do
+        space?.maybe >> str("(") >> match("[^)]").repeat(1).as(:adopted_reference_raw) >> str(")")
+      end
+
       rule(:identifier) do
-        gost_word >> scope_r.maybe >> prefix_text.maybe >> raw_body >> adopted_part.maybe
+        gost_word >> scope_r.maybe >> prefix_text.maybe >> raw_body >>
+          adopted_part.maybe >> adopted_reference_part.maybe
       end
 
       def self.parse(string)

@@ -29,11 +29,14 @@ module Pubid
         rendered << " #{id.subtype}" if id.subtype
         rendered << " #{id.number}"
         rendered << "-#{id.year}" if id.year
+        rendered << " (#{id.adopted_reference})" if id.adopted_reference
         rendered
       end
 
       def render_identical_adoption(id)
-        "#{id.base.to_s}/#{id.adopted.to_s}"
+        rendered = +"#{id.base.to_s}/#{id.adopted.to_s}"
+        rendered << " (#{id.base.adopted_reference})" if id.base&.adopted_reference
+        rendered
       end
     end
   end
