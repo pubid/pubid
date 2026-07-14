@@ -106,6 +106,7 @@ module Pubid
   autoload :Ashrae, "pubid/ashrae"
   autoload :Asme, "pubid/asme"
   autoload :Astm, "pubid/astm"
+  autoload :Bipm, "pubid/bipm"
   autoload :Bsi, "pubid/bsi"
   autoload :Ccsds, "pubid/ccsds"
   autoload :CenCenelec, "pubid/cen_cenelec"
