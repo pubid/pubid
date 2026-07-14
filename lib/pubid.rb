@@ -131,6 +131,7 @@ module Pubid
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
+  autoload :Tgpp, "pubid/tgpp"
   autoload :Xsf, "pubid/xsf"
   autoload :W3c, "pubid/w3c"
 
