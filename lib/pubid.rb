@@ -100,11 +100,13 @@ module Pubid
 
 
   # Require all flavor modules
+  autoload :Adobe, "pubid/adobe"
   autoload :Amca, "pubid/amca"
   autoload :Ansi, "pubid/ansi"
   autoload :Api, "pubid/api"
   autoload :Ashrae, "pubid/ashrae"
   autoload :Asme, "pubid/asme"
+  autoload :Easc, "pubid/easc"
   autoload :Astm, "pubid/astm"
   autoload :Bipm, "pubid/bipm"
   autoload :Bsi, "pubid/bsi"
@@ -113,6 +115,7 @@ module Pubid
   autoload :Cie, "pubid/cie"
   autoload :Csa, "pubid/csa"
   autoload :Etsi, "pubid/etsi"
+  autoload :Gost, "pubid/gost"
   autoload :Idf, "pubid/idf"
   autoload :Iec, "pubid/iec"
   autoload :Ieee, "pubid/ieee"
@@ -128,6 +131,7 @@ module Pubid
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
+  autoload :W3c, "pubid/w3c"
 
   # Format infrastructure (loaded eagerly so Pubid::Renderers / Pubid::Parsers are always available)
   require "pubid/renderers/base"
