@@ -62,6 +62,32 @@ module Pubid
       def type_letter
         self.class.type[:short]
       end
+
+      class << self
+        # Zero-pad the leading numeric run of the document number to this
+        # width. nil means preserve the input verbatim. Subclasses declare
+        # their canonical IALA cover-page form via `number_width` (e.g.
+        # Standard declares 4 → M0001; GeneralAssembly declares 2 → GA01).
+        # The builder consults this instead of branching on type_letter.
+        attr_reader :canonical_number_width
+
+        # Zero-pad each dotted continuation segment of the number to this
+        # width. nil means preserve verbatim. Only GeneralAssembly (GA)
+        # sets this today — its series.index form (01.01, 01.13) is the
+        # canonical cover-page shape.
+        attr_reader :canonical_dotted_segment_width
+
+        # DSL: declare the canonical zero-pad width for the leading number.
+        private
+
+        def number_width(width)
+          @canonical_number_width = width
+        end
+
+        def dotted_segment_width(width)
+          @canonical_dotted_segment_width = width
+        end
+      end
     end
   end
 end

@@ -16,6 +16,11 @@ RSpec.describe "JCGM URN Generation" do
       urn = id.to_urn
       expect(urn).to start_with("urn:jcgm:")
     end
+
+    it "generates a meeting URN" do
+      id = Pubid::Jcgm.parse("JCGM 17th Meeting (2012)")
+      expect(id.to_urn).to eq("urn:jcgm:meeting:17:2012")
+    end
   end
 
   describe "URN format compliance" do

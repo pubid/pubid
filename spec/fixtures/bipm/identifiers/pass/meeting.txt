@@ -1,0 +1,22 @@
+# BIPM meeting documents — Pass
+# Sampled verbatim from relaton-data-bipm docidentifier[type=BIPM] content.
+# Ordinals are the naive data forms (11st/12nd/13rd), derived from the first
+# number component's last digit; ranges keep the first component's ordinal.
+
+# --- English "<n><ord> Meeting (<year>)" ---
+CCAUV 1st Meeting (1999)
+CCAUV 2nd Meeting (2001)
+CCAUV 3rd Meeting (2002)
+CCAUV 10th Meeting (2015)
+CCAUV 11st Meeting (2017)
+CCAUV 12nd Meeting (2019)
+CCAUV 13rd Meeting (2021)
+CGPM 17th Meeting (1983)
+
+# --- Meeting ranges (ordinal from first component) ---
+CIPM 100-1th Meeting (2011)
+CIPM 101-1st Meeting (2012)
+
+# --- French "<n><sup>e</sup> réunion (<year>)" ---
+CCAUV 10<sup>e</sup> réunion (2015)
+CCAUV 13<sup>e</sup> réunion (2021)

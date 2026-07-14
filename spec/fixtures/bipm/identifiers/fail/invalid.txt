@@ -1,0 +1,16 @@
+# BIPM invalid identifiers — must be REJECTED by Pubid::Bipm.
+# One per line; blank lines and # comments ignored.
+
+# JCGM is owned by the separate Pubid::Jcgm flavor — BIPM must not parse it.
+JCGM 100:2008
+JCGM 24th Meeting (2021)
+
+# Missing year parenthesis
+CCTF REC 2
+CGPM DECL
+
+# Unknown committee acronym
+XXXX REC 1 (2020)
+
+# Garbage
+not an identifier

@@ -214,6 +214,11 @@ module Pubid
       # Structured: :issue and :sequence captured directly as zero-padded
       # strings. Citation: :volume_roman, :issue_arabic, :article_id —
       # decode the 8-digit article_id to recover year+issue+sequence.
+      #
+      # For the citation form, the parsed roman volume is cross-checked
+      # against the year decoded from the article_id; a mismatch warns but
+      # does not raise (the article_id is the source of truth — the roman
+      # volume is redundant display).
       def apply_bulletin_locator(identifier, parsed_hash)
         if parsed_hash[:article_id]
           article_id = parsed_hash[:article_id].to_s
@@ -221,11 +226,30 @@ module Pubid
           identifier.date.year = article_id[0, 4]
           identifier.issue = article_id[4, 2]
           identifier.sequence = article_id[6, 2]
+          warn_on_volume_mismatch(identifier, parsed_hash[:volume_roman])
           return
         end
 
         identifier.issue = parsed_hash[:issue].to_s if parsed_hash[:issue]
         identifier.sequence = parsed_hash[:sequence].to_s if parsed_hash[:sequence]
+      end
+
+      # Citation form carries the volume in two places: spelled out as a
+      # roman numeral ("LXVII") and encoded in the 8-digit article_id
+      # (year+issue+sequence, where year - 1959 = volume). They should
+      # agree; if they don't, the input was malformed. Warn loudly so the
+      # user sees the discrepancy, but continue using the article_id
+      # (deterministic) rather than the roman (possibly mistyped).
+      def warn_on_volume_mismatch(identifier, parsed_volume_roman)
+        return unless parsed_volume_roman && identifier.date&.year
+
+        declared = parsed_volume_roman.to_s
+        computed = Identifiers::Bulletin.to_roman(identifier.date.year.to_i -
+                                                  Identifiers::Bulletin::BASE_YEAR_OFFSET)
+        return if declared == computed
+
+        warn "OIML Bulletin citation volume mismatch: parsed '#{declared}' " \
+             "but article_id year #{identifier.date.year} implies '#{computed}'"
       end
 
       def extract_language(lang_data)

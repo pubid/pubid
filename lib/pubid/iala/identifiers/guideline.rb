@@ -6,6 +6,8 @@ module Pubid
       # IALA Guidelines (G series).
       # Examples: G1015 Ed 2.2, G1078 Ed 2.1.
       class Guideline < Base
+        number_width 4
+
         def self.type
           { key: :guideline, title: "Guideline", short: "G" }
         end

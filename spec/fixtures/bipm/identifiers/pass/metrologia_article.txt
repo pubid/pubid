@@ -1,0 +1,18 @@
+# BIPM Metrologia journal — Pass
+# Sampled verbatim from relaton-data-bipm docidentifier[type=BIPM] content.
+# Forms: "Metrologia <volume>[ <issue>[ <article>]]" (issue/article optional).
+
+# --- Volume only ---
+Metrologia 1
+Metrologia 51
+
+# --- Volume + issue ---
+Metrologia 1 1
+Metrologia 1 2
+
+# --- Volume + issue + article ---
+Metrologia 1 1 15
+Metrologia 9 4 155
+Metrologia 51 1 128
+Metrologia 42 3 S138
+Metrologia 55 1A 06007

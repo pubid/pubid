@@ -1,0 +1,16 @@
+# 3GPP Technical Report - representative sample
+# Sampled from relaton-data-3gpp (index-v1.yaml). Covers every release form
+# (REL-, Ph, UMTS), the 'U' letter suffix and part depths.
+
+TR 01.00:REL-96/5.0.0
+TR 01.00:REL-98/7.0.0
+TR 26.905:REL-8/1.0.0
+TR 00.01U:UMTS/3.0.0
+TR 00.02U:UMTS/3.0.0
+TR 01.03U:UMTS/3.0.0
+TR 01.00:Ph2/0.0.0
+TR 01.00:Ph2/1.1.0
+TR 23.700-01:REL-19/0.1.0
+TR 23.700-01:REL-19/0.3.0
+TR 29.998-04-1:REL-4/4.0.0
+TR 29.998-04-1:REL-4/4.2.0
