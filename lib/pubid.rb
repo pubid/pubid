@@ -122,6 +122,7 @@ module Pubid
   autoload :Jcgm, "pubid/jcgm"
   autoload :Jis, "pubid/jis"
   autoload :Nist, "pubid/nist"
+  autoload :Ogc, "pubid/ogc"
   autoload :Oiml, "pubid/oiml"
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
