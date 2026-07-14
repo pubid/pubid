@@ -6,28 +6,26 @@ module Pubid
   module Gost
     # Parslet grammar for GOST identifiers.
     #
-    # Accepts the Latin and Cyrillic surface forms observed in the wild
-    # (incl. the KSM catalogue at new-shop.ksm.kz):
+    # Accepts the Latin and Cyrillic surface forms observed in the wild:
     #
-    #   GOST 14946-82
-    #   GOST R 34.12-2015
-    #   ГОСТ Р 34.11-94
-    #   ГОСТ Р 71039— 2023              (em-dash + space)
-    #   ГОСТ IEC 62550-2025             (joint adoption — copublisher IEC)
-    #   ГОСТ EN 14179-1-2024            (joint adoption, subpart + year)
-    #   ГОСТ ISO 17635-2018             (joint adoption — copublisher ISO)
+    #   ГОСТ 14946-82                       (interstate, dated)
+    #   ГОСТ 2.312                          (interstate, undated)
+    #   ГОСТ Р 71039— 2023                  (national, em-dash + space)
+    #   ГОСТ ISO 9692-1                     (copublisher, undated)
+    #   ГОСТ Р МЭК 60794-1-23-2017          (Cyrillic copublisher)
+    #   ГОСТ Р ИСО/МЭК МФС 10609-9-95      (compound copublisher + subtype)
+    #   ГОСТ ISO Guide 30-2019              (copublisher + subtype "Guide")
+    #   ГОСТ Р 58904-2020/ISO/TR 25901-1:2016  (IDT adoption, slash form)
     #
-    # The optional "R" / "Р" marker is captured as `:scope_r`; the
-    # builder translates that into `scope: "russian"` (its absence
-    # means interstate, scope: nil). The optional copublisher word is
-    # captured as `:copublisher`.
+    # The parser captures three atoms:
+    #   * :scope_r     — "R"/"Р" if Russian national, nil if interstate
+    #   * :prefix_text — everything between scope_r and the number
+    #                     (copublisher, subtype, or both) as a raw string
+    #   * :raw         — digit runs separated by dots/dashes (number+year)
+    #   * :adopted_raw — the foreign identifier after "/" (IDT adoption)
     #
-    # The number-with-optional-year is captured as a single `:raw` atom
-    # (digit runs separated by dots, dashes, em-dashes, en-dashes).
-    # The builder splits it into `number` + `year` because the
-    # disambiguation between subpart dashes (`14179-1`) and year
-    # separators (`14946-82`) is context-dependent and easier done
-    # with a regex than a PEG rule.
+    # The builder interprets prefix_text (splits copublisher vs subtype,
+    # normalizes Cyrillic to Latin) and raw (splits number vs year).
     class Parser < Parslet::Parser
       include ::Pubid::Parser::CommonParseRules
 
@@ -37,10 +35,7 @@ module Pubid
       rule(:space?) { space.maybe }
       rule(:dot)    { str(".") }
 
-      # Separators allowed inside the raw number-with-year: ASCII hyphen,
-      # Unicode em-dash (U+2014), Unicode en-dash (U+2013). Each may be
-      # followed by optional whitespace (KSM emits "ГОСТ Р 71039— 2023").
-      rule(:sep) do
+      rule(:year_sep) do
         (str("-") | str("—") | str("–")) >> space?.maybe
       end
 
@@ -52,32 +47,34 @@ module Pubid
         (match("R") | match("Р")).as(:scope_r) >> space
       end
 
-      # Joint-adoption copublisher — a foreign SDO whose standard GOST
-      # republishes. Latin and Cyrillic forms both appear.
-      rule(:copublisher_word) do
-        (str("IEC") | str("ISO") | str("EN") | str("ASTM") |
-         str("IEEE") | str("CISPR") | str("CEN") | str("CENELEC") |
-         str("МЭК") | str("ИСО") | str("ЕН") | str("МЭК") |
-         str("ИСО/МЭК") | str("ISO/IEC")).as(:copublisher) >> space
-      end
-
-      rule(:prefix) do
-        gost_word >> scope_r.maybe >> copublisher_word.maybe
+      # Everything between scope_r and the first digit: copublisher,
+      # subtype, or both. Captured as a raw string — the builder splits
+      # it into copublisher + subtype. Matches uppercase letters (Latin
+      # and Cyrillic), forward slashes, and spaces between words.
+      rule(:prefix_text) do
+        (match("[A-ZА-Яa-zа-я/]").repeat(1) >>
+          (space >> match("[A-ZА-Яa-zа-я/]").repeat(1)).repeat).as(:prefix_text) >> space
       end
 
       rule(:digits) do
         match("[0-9]").repeat(1)
       end
 
-      # Raw body: digit runs separated by dots or dashes/em-dashes.
-      # Captured as a single atom and split into number+year by the
-      # builder.
       rule(:raw_body) do
-        (digits >> ((dot | sep) >> digits).repeat).as(:raw)
+        (digits >> ((dot | year_sep) >> digits).repeat).as(:raw)
+      end
+
+      # IDT adoption suffix: "/<foreign-identifier>". The slash is
+      # consumed but NOT captured — only the foreign identifier text
+      # goes into :adopted_raw. Captures everything after the first
+      # slash, including subsequent slashes (the adopted identifier
+      # may itself contain slashes, e.g. "ISO/TR 25901-1:2016").
+      rule(:adopted_part) do
+        str("/") >> match(".").repeat(1).as(:adopted_raw)
       end
 
       rule(:identifier) do
-        prefix >> raw_body
+        gost_word >> scope_r.maybe >> prefix_text.maybe >> raw_body >> adopted_part.maybe
       end
 
       def self.parse(string)

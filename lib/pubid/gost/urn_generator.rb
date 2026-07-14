@@ -7,10 +7,7 @@ module Pubid
     # Format:
     #   urn:gost:std:<number>[:<year>]              (interstate)
     #   urn:gost:std:r:<number>[:<year>]            (Russian national)
-    #
-    # Examples:
-    #   urn:gost:std:14946:82
-    #   urn:gost:std:r:34.12:2015
+    #   urn:gost:std:r:<number>[:<year>]            (IdenticalAdoption delegates to base)
     class UrnGenerator
       attr_reader :identifier
 
@@ -19,15 +16,26 @@ module Pubid
       end
 
       def generate
-        raise ArgumentError,
-              "Unknown GOST identifier class: #{identifier.class}" \
-                unless identifier.is_a?(Identifiers::Standard)
+        return generate_for_base(identifier.base) if identifier.is_a?(Identifiers::IdenticalAdoption)
+        return generate_for_base(identifier) if standard?(identifier)
 
+        raise ArgumentError,
+              "Unknown GOST identifier class: #{identifier.class}"
+      end
+
+      private
+
+      def generate_for_base(id)
         parts = ["urn:gost:std"]
-        parts << "r" if identifier.scope == "russian"
-        parts << identifier.number.to_s
-        parts << identifier.year.to_s if identifier.year
+        parts << "r" if id.is_a?(Identifiers::NationalStandard)
+        parts << id.number.to_s
+        parts << id.year.to_s if id.year
         parts.join(":")
+      end
+
+      def standard?(id)
+        id.is_a?(Identifiers::InterstateStandard) ||
+          id.is_a?(Identifiers::NationalStandard)
       end
     end
   end
