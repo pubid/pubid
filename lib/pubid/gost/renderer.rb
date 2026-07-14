@@ -4,19 +4,18 @@ module Pubid
   module Gost
     # Human-readable renderer for GOST identifiers.
     #
-    # Produces strings like:
+    # Produces canonical Latin-script citations:
     #   "GOST 14946-82"
     #   "GOST R 34.12-2015"
-    #
-    # Always renders in Latin script regardless of input script. The
-    # Cyrillic form (ГОСТ) is preserved on parse but normalised to
-    # "GOST" on render — the canonical citation form for international
-    # audiences is Latin.
+    #   "GOST ISO 9692-1"
+    #   "GOST R ISO/IEC ISP 10609-9-95"
+    #   "GOST R 58904-2020/ISO/TR 25901-1:2016"
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **_opts)
         id = @id
 
-        return render_standard(id) if id.is_a?(Identifiers::Standard)
+        return render_identical_adoption(id) if id.is_a?(Identifiers::IdenticalAdoption)
+        return render_standard(id)
 
         raise ArgumentError, "Unknown GOST identifier class: #{id.class}"
       end
@@ -25,11 +24,16 @@ module Pubid
 
       def render_standard(id)
         rendered = +"GOST"
-        rendered << " R" if id.scope == "russian"
+        rendered << " R" if id.is_a?(Identifiers::NationalStandard)
         rendered << " #{id.copublisher}" if id.copublisher
+        rendered << " #{id.subtype}" if id.subtype
         rendered << " #{id.number}"
         rendered << "-#{id.year}" if id.year
         rendered
+      end
+
+      def render_identical_adoption(id)
+        "#{id.base.to_s}/#{id.adopted.to_s}"
       end
     end
   end
