@@ -17,10 +17,28 @@ RSpec.describe Pubid::Gost::Identifier do
       # Cyrillic surface form (ГОСТ) — parsed but rendered as Latin.
       "ГОСТ Р 34.11-94"      => "GOST R 34.11-94",
       "ГОСТ 14946-82"        => "GOST 14946-82",
+      # Em-dash separator + optional trailing space (Russian
+      # typographic convention; seen on KSM detail pages).
+      "ГОСТ Р 71039—2023"    => "GOST R 71039-2023",
+      "ГОСТ Р 71039— 2023"   => "GOST R 71039-2023",
+      "GOST R 71039–2023"    => "GOST R 71039-2023",  # en-dash
+      # Joint adoptions — copublisher preserved as attribute.
+      "GOST IEC 62550-2025"  => "GOST IEC 62550-2025",
+      "ГОСТ EN 14179-1-2024" => "GOST EN 14179-1-2024",
+      "GOST ISO 17635-2018"  => "GOST ISO 17635-2018",
     }.each do |input, canonical|
       it "parses #{input.inspect} → #{canonical.inspect}" do
         expect(Pubid::Gost.parse(input).to_s).to eq(canonical)
       end
+    end
+
+    it "captures the copublisher on joint adoptions" do
+      expect(Pubid::Gost.parse("GOST IEC 62550-2025").copublisher).to eq("IEC")
+      expect(Pubid::Gost.parse("ГОСТ ISO 17635-2018").copublisher).to eq("ISO")
+    end
+
+    it "leaves copublisher nil for plain GOST/R standards" do
+      expect(Pubid::Gost.parse("GOST R 34.12-2015").copublisher).to be_nil
     end
 
     it "routes to Identifiers::Standard" do

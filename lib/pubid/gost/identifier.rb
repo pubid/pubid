@@ -8,18 +8,23 @@ module Pubid
     # at the foot of identifiers/base.rb — points back to it.
     #
     # GOST identifiers have the form:
-    #   GOST [R ]<number>[-<year>]
+    #   GOST [R ][<copublisher> ]<number>[-<year>]
     #
     # Where:
     #   * the optional "R" marks a Russian national standard
     #     (e.g. "GOST R 34.12-2015"); bare "GOST" is interstate.
-    #   * <number> is a digit run, optionally dotted ("34.12", "8.595").
-    #   * <year> is 2 or 4 digits ("82", "2015").
+    #   * the optional <copublisher> (IEC, ISO, EN, ASTM, ...) marks a
+    #     joint adoption (e.g. "GOST IEC 62550-2025").
+    #   * <number> is a digit run, optionally dotted ("34.12", "8.595")
+    #     or with subpart dashes ("14179-1").
+    #   * <year> is 2 or 4 digits ("82", "2015"), separated by either an
+    #     ASCII hyphen or a Unicode em-dash.
     #
     # Examples:
     #   GOST 14946-82
     #   GOST R 34.12-2015
-    #   ГОСТ Р 34.11-94
+    #   ГОСТ Р 71039— 2023
+    #   ГОСТ IEC 62550-2025
     class Identifier < ::Pubid::Identifier
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
@@ -28,20 +33,22 @@ module Pubid
         raise "Failed to parse GOST identifier '#{identifier}': #{e.message}"
       end
 
-      attribute :publisher, :string, default: "GOST"
-      attribute :scope,  :string    # "russian" | "interstate" | nil
-      attribute :number, :string    # "14946", "34.12", "8.595"
-      attribute :year,   :string    # "82", "2015", nil
+      attribute :publisher,   :string, default: "GOST"
+      attribute :scope,       :string    # "russian" | "interstate" | nil
+      attribute :copublisher, :string    # "IEC" | "ISO" | "EN" | nil
+      attribute :number,      :string    # "14946", "34.12", "14179-1"
+      attribute :year,        :string    # "82", "2015", nil
 
       GOST_TYPE_MAP = {
         "pubid:gost:standard" => "Pubid::Gost::Identifiers::Standard",
       }.freeze
 
       key_value do
-        map "_type",  to: :_type, polymorphic_map: GOST_TYPE_MAP
-        map "scope",  to: :scope
-        map "number", to: :number
-        map "year",   to: :year
+        map "_type",       to: :_type, polymorphic_map: GOST_TYPE_MAP
+        map "scope",       to: :scope
+        map "copublisher", to: :copublisher
+        map "number",      to: :number
+        map "year",        to: :year
       end
 
       def to_urn
