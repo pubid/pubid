@@ -6,10 +6,14 @@ module Pubid
     #
     # GOST identifiers observed in the wild have the shape:
     #
-    #   GOST [R ][<copublisher> ][<subtype> ]<number>[-<year>][/<adopted>]
+    #   GOST [R ][<copublisher> ][<subtype> ]<number>[-<year>][/<adopted>][(<ref>)]
+    #
+    # Where /<adopted> is the IDT slash form (part of the identifier)
+    # and (<ref>) is a parenthesized adoption reference (MOD/NEQ or
+    # unknown degree — the foreign standard this GOST relates to).
     #
     # See identifiers/interstate_standard.rb, national_standard.rb, and
-    # identical_adoption.rb for the three concrete classes.
+    # identical_adoption.rb for the concrete classes.
     class Identifier < ::Pubid::Identifier
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
@@ -18,11 +22,12 @@ module Pubid
         raise "Failed to parse GOST identifier '#{identifier}': #{e.message}"
       end
 
-      attribute :publisher,   :string, default: "GOST"
-      attribute :copublisher, :string
-      attribute :subtype,     :string
-      attribute :number,      :string
-      attribute :year,        :string
+      attribute :publisher,          :string, default: "GOST"
+      attribute :copublisher,        :string
+      attribute :subtype,            :string
+      attribute :number,             :string
+      attribute :year,               :string
+      attribute :adopted_reference,  :string   # parens content (raw)
 
       GOST_TYPE_MAP = {
         "pubid:gost:interstate-standard" => "Pubid::Gost::Identifiers::InterstateStandard",
@@ -31,11 +36,12 @@ module Pubid
       }.freeze
 
       key_value do
-        map "_type",       to: :_type, polymorphic_map: GOST_TYPE_MAP
-        map "copublisher", to: :copublisher
-        map "subtype",     to: :subtype
-        map "number",      to: :number
-        map "year",        to: :year
+        map "_type",              to: :_type, polymorphic_map: GOST_TYPE_MAP
+        map "copublisher",        to: :copublisher
+        map "subtype",            to: :subtype
+        map "number",             to: :number
+        map "year",               to: :year
+        map "adopted_reference",  to: :adopted_reference
       end
 
       def to_urn

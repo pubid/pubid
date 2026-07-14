@@ -33,6 +33,7 @@ module Pubid
           subtype: subtype,
           number: number,
           year: year,
+          adopted_reference: stringify(parsed[:adopted_reference_raw]),
         }.compact)
 
         adopted_raw = stringify(parsed[:adopted_raw])
