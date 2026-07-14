@@ -5,8 +5,8 @@ require "pubid/export"
 
 RSpec.describe Pubid::Export::Exporter do
   describe "FLAVORS" do
-    it "lists all 31 flavors" do
-      expect(described_class::FLAVORS.size).to eq(31)
+    it "lists all 32 flavors" do
+      expect(described_class::FLAVORS.size).to eq(32)
     end
 
     it "includes iso" do
@@ -33,6 +33,10 @@ RSpec.describe Pubid::Export::Exporter do
       expect(described_class::FLAVORS).to include(:ecma)
     end
 
+    it "includes ietf" do
+      expect(described_class::FLAVORS).to include(:ietf)
+    end
+
     it "includes ieee" do
       expect(described_class::FLAVORS).to include(:ieee)
     end
@@ -53,8 +57,8 @@ RSpec.describe Pubid::Export::Exporter do
       expect(data.keys).to all(be_a(String))
     end
 
-    it "exports all 31 flavors" do
-      expect(data.size).to eq(31)
+    it "exports all 32 flavors" do
+      expect(data.size).to eq(32)
     end
 
     it "exports OASIS with its Standard identifier type" do
@@ -65,6 +69,11 @@ RSpec.describe Pubid::Export::Exporter do
 
     it "exports ECMA with identifier types" do
       expect(data["ecma"][:identifier_types].size).to eq(3)
+    end
+
+    it "exports IETF with identifier types" do
+      expect(data["ietf"][:identifier_types]).to be_a(Array)
+      expect(data["ietf"][:identifier_types].size).to be > 0
     end
 
     it "exports ISO with identifier types" do

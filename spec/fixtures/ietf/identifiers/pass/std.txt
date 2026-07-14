@@ -1,0 +1,9 @@
+# IETF STD (Internet Standard) - Pass
+# Sampled from relaton-data-rfcsubseries
+
+STD 3
+STD 5
+STD 6
+STD 7
+STD 8
+STD 9
