@@ -130,6 +130,7 @@ module Pubid
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
+  autoload :Xsf, "pubid/xsf"
   autoload :W3c, "pubid/w3c"
 
   # Format infrastructure (loaded eagerly so Pubid::Renderers / Pubid::Parsers are always available)
