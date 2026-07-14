@@ -9,7 +9,8 @@ module Pubid
     class Exporter
       FLAVORS = %i[
         iso iec ieee nist bsi itu cen_cenelec etsi ansi astm ashrae asme
-        ccsds cie csa jis jcgm oiml idf api amca plateau sae ogc w3c bipm
+        ccsds cie csa jis jcgm oiml idf api amca plateau sae ogc w3c xsf
+        bipm
       ].freeze
 
       # Export all flavors to a hash suitable for JSON serialization.
