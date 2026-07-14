@@ -97,6 +97,31 @@ RSpec.describe Pubid::Gost::Identifier do
     end
   end
 
+  describe ".parse — parens adoption reference (MOD/NEQ/unknown)" do
+    {
+      "ГОСТ 35311.2-2025 (EN 1129-2:1995)"              => "GOST 35311.2-2025 (EN 1129-2:1995)",
+      "ГОСТ 35298-2025 (ISO 23767:2021)"                => "GOST 35298-2025 (ISO 23767:2021)",
+      "ГОСТ 31610.11-2025 (IEC 60079-11:2023)"          => "GOST 31610.11-2025 (IEC 60079-11:2023)",
+      "ГОСТ 35260-2025 (ISO/IEC 17360:2023)"            => "GOST 35260-2025 (ISO/IEC 17360:2023)",
+      "ГОСТ 34853-2022 (OECD 460:2017)"                 => "GOST 34853-2022 (OECD 460:2017)",
+      "ГОСТ 33562-2015 (UNECE STANDARD FFV-18:2011)"    => "GOST 33562-2015 (UNECE STANDARD FFV-18:2011)",
+    }.each do |input, canonical|
+      it "parses #{input.inspect} → #{canonical.inspect}" do
+        expect(Pubid::Gost.parse(input).to_s).to eq(canonical)
+      end
+    end
+
+    it "captures adopted_reference" do
+      id = Pubid::Gost.parse("ГОСТ 35298-2025 (ISO 23767:2021)")
+      expect(id.adopted_reference).to eq("ISO 23767:2021")
+    end
+
+    it "stays as InterstateStandard (not a different class)" do
+      id = Pubid::Gost.parse("ГОСТ 35298-2025 (ISO 23767:2021)")
+      expect(id).to be_a(Pubid::Gost::Identifiers::InterstateStandard)
+    end
+  end
+
   describe "#to_urn" do
     {
       "GOST 14946-82"           => "urn:gost:std:14946:82",
