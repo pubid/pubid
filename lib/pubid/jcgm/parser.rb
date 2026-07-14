@@ -11,7 +11,22 @@ module Pubid
       root :identifier
 
       rule(:identifier) do
-        amendment_identifier | base_identifier
+        meeting_identifier | amendment_identifier | base_identifier
+      end
+
+      # Committee/meeting record, e.g. "JCGM 17th Meeting (2012)". Diverges
+      # from base_identifier right after the digits (base wants ":", meeting
+      # wants the ordinal suffix), so ordered choice is unambiguous. Emits the
+      # same tokens as a guide plus type_with_stage "Meeting", so the generic
+      # builder path resolves it to Identifiers::Meeting (like "Amd").
+      rule(:meeting_identifier) do
+        publisher >> space >> digits.as(:number) >> ordinal_suffix >>
+          space >> str("Meeting").as(:type_with_stage) >> space >>
+          str("(") >> year_digits.as(:date) >> str(")")
+      end
+
+      rule(:ordinal_suffix) do
+        str("st") | str("nd") | str("rd") | str("th")
       end
 
       rule(:base_identifier) do

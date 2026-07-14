@@ -8,5 +8,7 @@ RSpec.describe Pubid::Jcgm::UrnParser do
   it_behaves_like "flavor URN round-trip", Pubid::Jcgm, [
     "JCGM 200:2012",
     "JCGM 100:2008",
+    "JCGM 17th Meeting (2012)",
+    "JCGM 11st Meeting (2006)",
   ]
 end

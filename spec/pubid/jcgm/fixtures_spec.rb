@@ -4,7 +4,7 @@ require "spec_helper"
 
 module JcgmFixturesSpec
   FIXTURE_FILES = Dir.glob(File.join(__dir__,
-                                     "../../../fixtures/JCGM/identifiers/pass", "*.txt")).freeze
+                                     "../../../fixtures/jcgm/identifiers/pass", "*.txt")).freeze
 end
 
 RSpec.describe "JCGM Fixture Round-trip Tests" do

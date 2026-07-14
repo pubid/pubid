@@ -4,7 +4,9 @@ module Pubid
   module Jcgm
     class UrnGenerator < Pubid::UrnGenerator::Base
       def generate
-        if identifier.is_a?(SupplementIdentifier)
+        if identifier.is_a?(Identifiers::Meeting)
+          generate_meeting_urn
+        elsif identifier.is_a?(SupplementIdentifier)
           generate_supplement_urn
         else
           generate_base_urn
@@ -12,6 +14,14 @@ module Pubid
       end
 
       protected
+
+      # urn:jcgm:meeting:<number>:<year>, e.g. urn:jcgm:meeting:17:2012
+      def generate_meeting_urn
+        parts = ["urn", "jcgm", "meeting"]
+        parts << identifier.number.value if identifier.number
+        parts << identifier.date.year if identifier.date
+        parts.join(":")
+      end
 
       def generate_base_urn
         parts = ["urn", "jcgm"]
