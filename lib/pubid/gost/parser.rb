@@ -70,7 +70,7 @@ module Pubid
       # slash, including subsequent slashes (the adopted identifier
       # may itself contain slashes, e.g. "ISO/TR 25901-1:2016").
       rule(:adopted_part) do
-        str("/") >> match(".").repeat(1).as(:adopted_raw)
+        space?.maybe >> str("/") >> match(".").repeat(1).as(:adopted_raw)
       end
 
       # Adoption reference in parens: "(<foreign-id>)". The parens
