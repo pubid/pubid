@@ -1,0 +1,43 @@
+# W3C identifiers — round-trip fixtures
+# Real printed docidentifier.content strings from relaton-data-w3c.
+# One identifier per line; every line must satisfy parse(x).to_s == x.
+
+# --- Shape A: type + code + date (one per maturity token) ---
+W3C WD-charmod-19991129
+W3C WD-dial-primer-20071101
+W3C DNOTE-webcodecs-flac-codec-registration-20240419
+W3C DNOTE-webcodecs-alaw-codec-registration-20230821
+W3C NOTE-did-spec-registries-20230124
+W3C CRD-accelerometer-20250212
+W3C CRD-css-backgrounds-3-20210726
+W3C CR-exi-20091208
+W3C REC-CSS1-19990111
+W3C REC-ATAG10-20000203
+W3C PR-InkML-20110510
+W3C PR-CSS1
+W3C PER-rif-dtb-20121211
+W3C SPSD-2dcontext-20210128
+W3C OBSL-widgets-apis-20181011
+
+# --- Shape C: type + code, no date ---
+W3C NOTE-xml-names
+W3C NOTE-CDFsubmit
+W3C NOTE-OSD
+W3C REC-DOM-Level-1
+W3C WD-proxy
+
+# --- Shape B: bare code (incl. codes ending in short digit runs) ---
+W3C becss
+W3C 2dcontext
+W3C 07-WebData
+W3C url-1
+W3C xpath-datamodel-31
+
+# --- Legacy edge cases ---
+# 6-digit (YYMMDD) date
+W3C NOTE-TPRC-970930
+# 4-digit (MMDD) legacy date
+W3C NOTE-voice-0128
+W3C WD-smil-0202
+# date baked into code with a .html suffix (stays inside the code)
+W3C WD-DSIG-label-971024.html

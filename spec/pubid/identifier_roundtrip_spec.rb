@@ -41,6 +41,7 @@ RSpec.describe "Identifier to_hash/from_hash round-trip" do
     "Pubid::Jcgm"       => "JCGM 100:2008",
     "Pubid::Jis"        => "JIS A 0001:1999",
     "Pubid::Nist"       => "NIST IR 88-4008",
+    "Pubid::Ogc"        => "24-032r1",
     "Pubid::Oiml"       => "OIML R 138",
     "Pubid::Plateau"    => "PLATEAU Handbook #00",
     "Pubid::Sae"        => "SAE J1939",

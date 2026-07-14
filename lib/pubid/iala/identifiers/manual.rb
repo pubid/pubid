@@ -7,6 +7,8 @@ module Pubid
       # Today manuals carry no code (NAVGUIDE, VTS Manual, …); M is
       # reserved for future numbered manuals.
       class Manual < Base
+        number_width 4
+
         def self.type
           { key: :manual, title: "Manual", short: "M" }
         end
