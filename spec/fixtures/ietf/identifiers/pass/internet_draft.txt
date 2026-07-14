@@ -1,0 +1,29 @@
+# IETF Internet-Drafts - Pass
+# Sampled from relaton-data-ids (incl. digit-tail topic edge cases)
+
+draft-3gpp-collaboration-01
+draft-aboba-context-802
+draft-aboba-context-802-00
+draft-adams-cast-256
+draft-boucadair-tcpm-rst-diagnostic-payload-11
+draft-conta-ipv6-nd_ext_ind-00
+draft-decraene-idr-next-hop-capability-03
+draft-durand-gse+-00
+draft-g00se-honk
+draft-giuliano-treedn
+draft-giuliano-treedn-02
+draft-hsharma-lamps-ocsp-nonce
+draft-ietf-bier-te-ospf-09
+draft-ietf-dtn-bpsec-cose-04
+draft-ietf-ipsecme-ikev2-fragmentation-01
+draft-ietf-mpls-ldp-survey2002
+draft-ietf-pce-stateful-pce-lsp-scheduling-03
+draft-ietf-sipping-config-framework-18
+draft-ihlesong-mpls-mna-signaling-02
+draft-kucherawy-rfc3777bis-04
+draft-martinotti-mpls-tp-iw-layering
+draft-ouldbrahim-l2vpn-lpe-02
+draft-rundgren-cbor-core-24
+draft-tang-ipv4plus-06
+draft-wendt-stir-vesper-use-cases-00
+draft-zzhang-idr-bgp-rt-constrains-extension-03
