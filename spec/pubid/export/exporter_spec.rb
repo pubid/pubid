@@ -5,8 +5,8 @@ require "pubid/export"
 
 RSpec.describe Pubid::Export::Exporter do
   describe "FLAVORS" do
-    it "lists all 26 flavors" do
-      expect(described_class::FLAVORS.size).to eq(26)
+    it "lists all 27 flavors" do
+      expect(described_class::FLAVORS.size).to eq(27)
     end
 
     it "includes iso" do
@@ -37,8 +37,8 @@ RSpec.describe Pubid::Export::Exporter do
       expect(data.keys).to all(be_a(String))
     end
 
-    it "exports all 26 flavors" do
-      expect(data.size).to eq(26)
+    it "exports all 27 flavors" do
+      expect(data.size).to eq(27)
     end
 
     it "exports ISO with identifier types" do
