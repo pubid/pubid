@@ -120,6 +120,7 @@ module Pubid
   autoload :Iec, "pubid/iec"
   autoload :Ieee, "pubid/ieee"
   autoload :Iala, "pubid/iala"
+  autoload :Iana, "pubid/iana"
   autoload :Iho, "pubid/iho"
   autoload :Iso, "pubid/iso"
   autoload :Itu, "pubid/itu"
