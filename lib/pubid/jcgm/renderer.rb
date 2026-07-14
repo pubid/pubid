@@ -13,19 +13,19 @@ module Pubid
     # registry and invoked via `render(format: :human)`.
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **opts)
-        id = @id
-
-        case id
-        when Identifiers::Amendment
-          render_amendment(id, context)
-        when Identifiers::GumGuide
-          render_gum_guide(id, context)
-        else
-          render_single(id)
+        case @id
+        when Identifiers::Amendment then render_amendment(@id, context)
+        when Identifiers::GumGuide then render_gum_guide(@id, context)
+        when Identifiers::Meeting then render_meeting(@id)
+        else render_single(@id)
         end
       end
 
       private
+
+      def render_meeting(id)
+        "JCGM #{id.ordinal} Meeting (#{id.date.year})"
+      end
 
       def render_single(id)
         parts = [id.publisher_portion]

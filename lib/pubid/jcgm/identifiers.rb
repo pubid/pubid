@@ -6,6 +6,7 @@ module Pubid
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Guide, "#{__dir__}/identifiers/guide"
       autoload :GumGuide, "#{__dir__}/identifiers/gum_guide"
+      autoload :Meeting, "#{__dir__}/identifiers/meeting"
     end
   end
 end
