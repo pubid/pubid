@@ -26,6 +26,7 @@ module Pubid
       def render_standard(id)
         rendered = +"GOST"
         rendered << " R" if id.scope == "russian"
+        rendered << " #{id.copublisher}" if id.copublisher
         rendered << " #{id.number}"
         rendered << "-#{id.year}" if id.year
         rendered

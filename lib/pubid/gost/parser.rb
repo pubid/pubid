@@ -6,17 +6,28 @@ module Pubid
   module Gost
     # Parslet grammar for GOST identifiers.
     #
-    # Accepts the Latin and Cyrillic surface forms:
+    # Accepts the Latin and Cyrillic surface forms observed in the wild
+    # (incl. the KSM catalogue at new-shop.ksm.kz):
     #
     #   GOST 14946-82
     #   GOST R 34.12-2015
-    #   GOST R 8.595-2004
     #   ГОСТ Р 34.11-94
-    #   ГОСТ 14946-82
+    #   ГОСТ Р 71039— 2023              (em-dash + space)
+    #   ГОСТ IEC 62550-2025             (joint adoption — copublisher IEC)
+    #   ГОСТ EN 14179-1-2024            (joint adoption, subpart + year)
+    #   ГОСТ ISO 17635-2018             (joint adoption — copublisher ISO)
     #
     # The optional "R" / "Р" marker is captured as `:scope_r`; the
     # builder translates that into `scope: "russian"` (its absence
-    # means interstate, scope: nil).
+    # means interstate, scope: nil). The optional copublisher word is
+    # captured as `:copublisher`.
+    #
+    # The number-with-optional-year is captured as a single `:raw` atom
+    # (digit runs separated by dots, dashes, em-dashes, en-dashes).
+    # The builder splits it into `number` + `year` because the
+    # disambiguation between subpart dashes (`14179-1`) and year
+    # separators (`14946-82`) is context-dependent and easier done
+    # with a regex than a PEG rule.
     class Parser < Parslet::Parser
       include ::Pubid::Parser::CommonParseRules
 
@@ -24,50 +35,49 @@ module Pubid
 
       rule(:space)  { str(" ") }
       rule(:space?) { space.maybe }
-      rule(:dash)   { str("-") }
       rule(:dot)    { str(".") }
 
-      # The "GOST" word — Latin OR Cyrillic. Captured to keep the parse
-      # tree uniform; the builder ignores the literal (publisher is
-      # always rendered as "GOST" / "ГОСТ" based on context, defaulting
-      # to Latin).
+      # Separators allowed inside the raw number-with-year: ASCII hyphen,
+      # Unicode em-dash (U+2014), Unicode en-dash (U+2013). Each may be
+      # followed by optional whitespace (KSM emits "ГОСТ Р 71039— 2023").
+      rule(:sep) do
+        (str("-") | str("—") | str("–")) >> space?.maybe
+      end
+
       rule(:gost_word) do
         (str("GOST") | str("ГОСТ")).as(:gost_word) >> space
       end
 
-      # Russian-national scope marker — Latin "R" or Cyrillic "Р".
       rule(:scope_r) do
         (match("R") | match("Р")).as(:scope_r) >> space
       end
 
+      # Joint-adoption copublisher — a foreign SDO whose standard GOST
+      # republishes. Latin and Cyrillic forms both appear.
+      rule(:copublisher_word) do
+        (str("IEC") | str("ISO") | str("EN") | str("ASTM") |
+         str("IEEE") | str("CISPR") | str("CEN") | str("CENELEC") |
+         str("МЭК") | str("ИСО") | str("ЕН") | str("МЭК") |
+         str("ИСО/МЭК") | str("ISO/IEC")).as(:copublisher) >> space
+      end
+
       rule(:prefix) do
-        gost_word >> scope_r.maybe
+        gost_word >> scope_r.maybe >> copublisher_word.maybe
       end
 
       rule(:digits) do
         match("[0-9]").repeat(1)
       end
 
-      # GOST numbers are digit runs optionally dotted ("34.12", "8.595",
-      # "1.0"). Captured as a single string attribute.
-      rule(:number) do
-        (digits >> (dot >> digits).repeat).as(:number)
-      end
-
-      rule(:year_2digit) do
-        match("[0-9]").repeat(2, 2)
-      end
-
-      rule(:year_4digit) do
-        match("[0-9]").repeat(4, 4)
-      end
-
-      rule(:year) do
-        (year_4digit | year_2digit).as(:year)
+      # Raw body: digit runs separated by dots or dashes/em-dashes.
+      # Captured as a single atom and split into number+year by the
+      # builder.
+      rule(:raw_body) do
+        (digits >> ((dot | sep) >> digits).repeat).as(:raw)
       end
 
       rule(:identifier) do
-        prefix >> number >> (dash >> year).maybe
+        prefix >> raw_body
       end
 
       def self.parse(string)
