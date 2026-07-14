@@ -1,0 +1,8 @@
+# OGC identifiers that must NOT parse - Fail
+# One malformed identifier per line; the parser must reject each of these.
+25
+25-023-1
+OGC25-023
+25-abc
+abc-023
+-023
