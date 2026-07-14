@@ -17,10 +17,16 @@ module Pubid
       def parse_urn(urn)
         body = strip_namespace(urn)
         parts = split_parts(body)
-        scope = parts.first == "r" ? "russian" : nil
-        number, year = scope ? parts.drop(1) : parts
 
-        Identifiers::Standard.new(scope: scope, number: number, year: year)
+        if parts.first == "r"
+          number = parts[1]
+          year = parts[2]
+          Identifiers::NationalStandard.new(number: number, year: year)
+        else
+          number = parts[0]
+          year = parts[1]
+          Identifiers::InterstateStandard.new(number: number, year: year)
+        end
       end
 
       private
