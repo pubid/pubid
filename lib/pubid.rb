@@ -126,6 +126,7 @@ module Pubid
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
+  autoload :Xsf, "pubid/xsf"
 
   # Format infrastructure (loaded eagerly so Pubid::Renderers / Pubid::Parsers are always available)
   require "pubid/renderers/base"
