@@ -44,6 +44,7 @@ RSpec.describe "Identifier to_hash/from_hash round-trip" do
     "Pubid::Oiml"       => "OIML R 138",
     "Pubid::Plateau"    => "PLATEAU Handbook #00",
     "Pubid::Sae"        => "SAE J1939",
+    "Pubid::Tgpp"       => "TS 23.207:REL-4/2.0.0",
   }.freeze
 
   # Known-broken round-trips, to be fixed in Phase 3 (fix all 8). Value is the
