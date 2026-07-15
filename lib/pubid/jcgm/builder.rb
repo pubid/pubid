@@ -25,15 +25,26 @@ module Pubid
       end
 
       def build(parsed_hash)
-        identifier = locate_identifier_klass(parsed_hash).new
+        klass = locate_identifier_klass(parsed_hash)
+
+        # GUM guides store their part number in the shared `number` attribute
+        # ("JCGM GUM-6" -> number "6"); the parser tags it :gum_number only to
+        # pick this class. Fold it back onto :number before assigning.
+        if parsed_hash[:gum_number] && klass == Identifiers::GumGuide
+          parsed_hash = parsed_hash.merge(number: parsed_hash[:gum_number])
+          parsed_hash.delete(:gum_number)
+        end
+
+        identifier = klass.new
         assign_attributes(identifier, parsed_hash)
 
+        # Bare guides/gum-guides carry no parsed stage; derive the (single,
+        # published) typed_stage from the concrete class so parse and from_hash
+        # agree. Avoids the ambiguous locate_stage("") lookup (Guide and
+        # GumGuide both register abbr: [""]).
         if identifier.class.attributes.key?(:typed_stage) && identifier.typed_stage.nil?
-          default_typed_stage = Jcgm.locate_stage("") ||
-            raise(ArgumentError, "Unknown type abbreviation: ''")
-          identifier.typed_stage = default_typed_stage
-          identifier.stage = default_typed_stage.to_stage if identifier.class.attributes.key?(:stage)
-          identifier.type = default_typed_stage.to_type if identifier.class.attributes.key?(:type)
+          identifier.typed_stage = identifier.class.published_typed_stage ||
+            raise(ArgumentError, "No published typed_stage for #{identifier.class}")
         end
 
         identifier
@@ -58,8 +69,6 @@ module Pubid
         when :publisher
           Jcgm::Components::Publisher.new(publisher: value.to_s)
         when :number
-          Pubid::Components::Code.new(value: value.to_s)
-        when :gum_number
           Pubid::Components::Code.new(value: value.to_s)
         when :date
           date_str = value.to_s

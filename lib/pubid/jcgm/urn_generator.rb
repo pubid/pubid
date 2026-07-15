@@ -26,13 +26,10 @@ module Pubid
       def generate_base_urn
         parts = ["urn", "jcgm"]
 
-        gum_number = maybe(:gum_number)
-        if gum_number
-          number = gum_number.to_s
-          parts << "gum.#{number}"
+        if identifier.is_a?(Identifiers::GumGuide) && identifier.number
+          parts << "gum.#{identifier.number}"
         elsif identifier.number
-          number = identifier.number.to_s
-          parts << number
+          parts << identifier.number.to_s
         end
 
         part = maybe(:part)
@@ -65,9 +62,11 @@ module Pubid
           parts << "iter.#{iter}"
         end
 
+        # Guide and GUM-guide are already implied by the number form (bare
+        # number vs "gum.N"), so their type_code is not appended.
         if identifier.typed_stage
           type_code = identifier.typed_stage.type_code
-          if type_code && type_code.to_s != "guide"
+          if type_code && !%w[guide gum_guide].include?(type_code.to_s)
             parts << type_code.to_s
           end
         end

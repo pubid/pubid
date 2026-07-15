@@ -4,8 +4,6 @@ module Pubid
   module Jcgm
     module Identifiers
       class Amendment < SupplementIdentifier
-        attribute :type, Pubid::Components::Type, default: -> { self.class.type[:key] }
-
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :pubamd,

@@ -21,6 +21,11 @@ RSpec.describe "JCGM URN Generation" do
       id = Pubid::Jcgm.parse("JCGM 17th Meeting (2012)")
       expect(id.to_urn).to eq("urn:jcgm:meeting:17:2012")
     end
+
+    it "generates a GUM guide URN without a trailing type segment" do
+      id = Pubid::Jcgm.parse("JCGM GUM-6:2020")
+      expect(id.to_urn).to eq("urn:jcgm:gum.6:2020")
+    end
   end
 
   describe "URN format compliance" do

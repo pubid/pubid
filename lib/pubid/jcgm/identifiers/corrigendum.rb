@@ -7,8 +7,6 @@ module Pubid
       # a trailing " Corrigendum" marker (no iteration number). Mirrors
       # Amendment but with a space-separated word suffix instead of "/Amd N".
       class Corrigendum < SupplementIdentifier
-        attribute :type, Pubid::Components::Type, default: -> { self.class.type[:key] }
-
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :pubcorr,

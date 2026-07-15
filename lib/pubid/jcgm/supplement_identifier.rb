@@ -7,23 +7,46 @@ module Pubid
       attribute :base_identifier, Identifier, polymorphic: true
       attribute :iteration, Pubid::Components::Code
 
-      # lutaml's default polymorphic deserialization rebuilds the nested base
-      # document as a bare Pubid::Jcgm::Identifier, dropping its concrete
-      # Guide/GumGuide subclass — so a later render blows up on
-      # publisher_portion. Re-run the base sub-hash through
-      # Identifier.from_hash, which re-dispatches by `_type` to the concrete
-      # class (JCGM's generic from_hash). This targeted
-      # fixup keeps JCGM's default component auto-serialization intact (a full
-      # explicit key_value remap would instead drop every auto-mapped
-      # attribute from to_hash).
-      def self.from_hash(data, options = {})
-        identifier = super
-        base = data && (data["base_identifier"] || data[:base_identifier])
-        if base && identifier.respond_to?(:base_identifier=)
-          identifier.base_identifier =
-            ::Pubid::Jcgm::Identifier.from_hash(base, options)
-        end
-        identifier
+      # The base document nests under the compact key "base" (mirrors ISO/JIS),
+      # serialized via its own to_hash so it collapses to {_type, number, year}.
+      # On load the sub-hash is re-dispatched through Jcgm::Identifier.from_hash,
+      # which resolves `_type` to the concrete Guide/GumGuide — a bare
+      # polymorphic cast would rebuild it as a plain Identifier and later fail
+      # on publisher_portion. This custom mapping replaces the former
+      # self.from_hash override.
+      key_value do
+        map "base", with: { to: :base_to_kv, from: :base_from_kv }
+        map "iteration",
+            with: { to: :iteration_to_kv, from: :iteration_from_kv }
+      end
+
+      def base_to_kv(model, doc)
+        return unless model.base_identifier
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new(
+            "base", model.base_identifier.to_hash
+          ),
+        )
+      end
+
+      def base_from_kv(model, value)
+        return unless value
+
+        model.base_identifier = ::Pubid::Jcgm::Identifier.from_hash(value)
+      end
+
+      def iteration_to_kv(model, doc)
+        v = model.iteration&.value
+        return if v.nil? || v.to_s.empty?
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new("iteration", v.to_s),
+        )
+      end
+
+      def iteration_from_kv(model, value)
+        model.iteration = build_code(value)
       end
 
       # Delegate publisher to base_identifier
