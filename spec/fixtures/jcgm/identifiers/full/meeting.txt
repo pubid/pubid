@@ -1,0 +1,20 @@
+# JCGM Meeting - Full
+# Source of truth for all JCGM committee/meeting identifiers
+# (relaton-data-bipm/data/jcgm/meeting/*.yaml). Naive last-digit ordinal.
+
+JCGM 11st Meeting (2006)
+JCGM 12nd Meeting (2007)
+JCGM 13rd Meeting (2008)
+JCGM 15th Meeting (2009)
+JCGM 16th Meeting (2011)
+JCGM 17th Meeting (2012)
+JCGM 18th Meeting (2013)
+JCGM 19th Meeting (2014)
+JCGM 20th Meeting (2015)
+JCGM 21st Meeting (2017)
+JCGM 22nd Meeting (2018)
+JCGM 23rd Meeting (2020)
+JCGM 24th Meeting (2021)
+JCGM 25th Meeting (2022)
+JCGM 26th Meeting (2024)
+JCGM 27th Meeting (2025)

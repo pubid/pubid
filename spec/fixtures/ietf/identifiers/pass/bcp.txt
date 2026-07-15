@@ -1,0 +1,9 @@
+# IETF BCP (Best Current Practice) - Pass
+# Sampled from relaton-data-rfcsubseries
+
+BCP 3
+BCP 4
+BCP 5
+BCP 6
+BCP 7
+BCP 8

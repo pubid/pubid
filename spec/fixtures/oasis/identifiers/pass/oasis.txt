@@ -1,0 +1,77 @@
+# Curated sample of real OASIS identifiers from relaton-data-oasis (~605 records).
+# Every line must satisfy parse(x).to_s == x (100%) — the verbatim `original`
+# contract guarantees this regardless of how much decomposition succeeds.
+# Covers: bare spec, version forms (v/bare/3-part/glued), the three part
+# spellings, all stage tokens, labels, both fragment orders, and the handful of
+# malformed records (embedded space / stray `]`).
+
+# --- bare spec name only ---
+OASIS EDXL
+OASIS OSLC
+OASIS SAML
+OASIS WSS
+OASIS OData
+OASIS BIASPROFILE
+OASIS SAML-QR
+OASIS amqp-core
+OASIS cals-table-model
+
+# --- spec + version ---
+OASIS WSDM-v1.1
+OASIS OpenDocument-v1.1
+OASIS DITA-v1.2
+OASIS SAML-v1.1
+OASIS UBL-v2.4
+OASIS OData-JSON-Format-v4.0
+OASIS xacml-rest-v1.1
+
+# --- bare (no v) version ---
+OASIS OSLC-CM-v1.0
+OASIS OSLC-RM-2.1-Part2-PS01
+OASIS UBL-2.3
+
+# --- three-component version ---
+OASIS STIX-v1.2.1-Report-CS01-Pt11
+OASIS SARIF-v2.1.0
+OASIS PKCS11-Profiles-v2.40
+
+# --- spec + version + part (Pt spelling) ---
+OASIS amqp-core-overview-v1.0-Pt0
+OASIS OSLC-Discovery-3.0-PS01-Pt2
+
+# --- spec + version + stage + part ---
+OASIS OSLC-CoreShapes-3.0-PS01-Pt8
+OASIS OSLC-AM-2.1-CS01-Pt1
+
+# --- part-before-stage order variant ---
+OASIS OSLC-AM-3.0-Part1-PS01
+OASIS OSLC-CM-3.0-Part1-CS02
+OASIS OpenDocument-v1.3-part1
+
+# --- label between fragments ---
+OASIS STIX-v1.2.1-Common-CS01-Pt2
+OASIS STIX-v2.0-Pt1-Core-CS01
+OASIS OSLC-PROMCODE-v1.0-Shapes-CS02-Pt3
+
+# --- trailing free-text label ---
+OASIS AkomaNtosoCore-v1.0-Pt2-Specifications
+
+# --- stage tokens: CS0x / PS0x ---
+OASIS BasicSecurityProfile-v1.1-CS01
+OASIS ECF-v5.0-CS01
+OASIS OSLC-TRS-v3.0-PS02
+
+# --- errata ---
+OASIS CMIS-v1.1-Errata01
+OASIS DITA-v1.3-Errata02
+OASIS CMIS-v1.1-Plus-Errata01
+
+# --- mixed-case spec names ---
+OASIS xacml-3.0-nested-ent-v1.0-CS01
+OASIS OSLC-am-2.1-Part2-CS01
+
+# --- malformed records (must still round-trip via verbatim original) ---
+OASIS ECF v4.01
+OASIS PLCS v1.0-CS01
+OASIS CTAS-v3.0]-PS01
+OASIS OpenC2-MQTT-v1.0] -CS01

@@ -1,0 +1,13 @@
+# IANA - Fail (must NOT parse)
+# The grammar requires a non-empty slug and forbids spaces inside slugs,
+# a leading slash, a trailing slash, and more than one slash.
+
+# space inside the slug
+foo bar
+IANA foo bar
+# leading slash
+/lowpan_nhc
+# trailing slash
+_6lowpan-parameters/
+# more than one slash (max depth is 1)
+a/b/c

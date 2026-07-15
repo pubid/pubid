@@ -165,6 +165,62 @@ RSpec.describe Pubid::Jcgm do
       end
     end
 
+    context "committee meetings" do
+      describe "JCGM 17th Meeting (2012)" do
+        subject { "JCGM 17th Meeting (2012)" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses as Meeting" do
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Meeting)
+        end
+
+        it "parses publisher" do
+          expect(parsed.publisher.to_s).to eq("JCGM")
+        end
+
+        it "parses the meeting number as a clean integer value" do
+          expect(parsed.number.value).to eq("17")
+        end
+
+        it "parses the year" do
+          expect(parsed.date.year).to eq("2012")
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      # Exercise the naive last-digit ordinal rule (1->st, 2->nd, 3->rd,
+      # else th; NO 11/12/13 teens exception) — matches the real records.
+      {
+        "JCGM 11st Meeting (2006)" => %w[11 2006],
+        "JCGM 12nd Meeting (2007)" => %w[12 2007],
+        "JCGM 13rd Meeting (2008)" => %w[13 2008],
+        "JCGM 15th Meeting (2009)" => %w[15 2009],
+        "JCGM 21st Meeting (2017)" => %w[21 2017],
+        "JCGM 22nd Meeting (2018)" => %w[22 2018],
+        "JCGM 23rd Meeting (2020)" => %w[23 2020],
+      }.each do |id_str, (number, year)|
+        describe id_str do
+          subject { id_str }
+
+          let(:parsed) { described_class.parse(subject) }
+
+          it "parses as Meeting with number #{number} and year #{year}" do
+            expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Meeting)
+            expect(parsed.number.value).to eq(number)
+            expect(parsed.date.year).to eq(year)
+          end
+
+          it "round-trips" do
+            expect(parsed.to_s).to eq(subject)
+          end
+        end
+      end
+    end
+
     context "amendments" do
       describe "JCGM 100:2008/Amd 1" do
         subject { "JCGM 100:2008/Amd 1" }

@@ -1,0 +1,33 @@
+# BIPM committee documents — Pass
+# Sampled verbatim from relaton-data-bipm docidentifier[type=BIPM] content.
+# One identifier per line; blank lines and # comments ignored.
+
+# --- Short abbreviated key form (no language) ---
+CCTF REC 2 (2012)
+CCEM REC 1 (2005)
+CGPM RES 1 (1927)
+CGPM RES 1 (1948)
+JCRB ACT 10-1 (2003)
+JCRB ACT 10-10 (2003)
+
+# --- Language suffix (E / F) ---
+CCTF REC 2 (2012, E)
+CCTF REC 2 (2012, F)
+JCRB ACT 10-1 (2003, E)
+CCEM REC 1 (2005, F)
+
+# --- Number-less declarations ---
+CGPM DECL (1889)
+CGPM DECL (1889, E)
+CIPM DECL (1964, F)
+
+# --- Full English name ---
+CCL Recommendation 1 (2001)
+CGPM Resolution 1 (1927)
+CGPM Statement 1 (1901)
+CGPM Statement (1889)
+
+# --- Full French name (connective: "de la" for CGPM, else "du") ---
+Recommandation 1 du CCL (2001)
+Résolution 1 de la CGPM (1927)
+Action 10-1 du JCRB (2003)

@@ -1,0 +1,9 @@
+# IETF FYI (For Your Information) - Pass
+# Sampled from relaton-data-rfcsubseries
+
+FYI 2
+FYI 3
+FYI 4
+FYI 5
+FYI 6
+FYI 7

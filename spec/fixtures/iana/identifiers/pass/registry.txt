@@ -1,0 +1,39 @@
+# IANA protocol registries - Pass (round-trip verbatim)
+# Sampled from relaton-data-iana docidentifier content (type: IANA).
+# Authoritative printed form: "IANA <slug>[/<sub-slug>]".
+
+# Top registries (no sub-registry)
+IANA _6lowpan-parameters
+IANA _6tisch
+IANA calipso
+IANA stun-parameters
+IANA edhoc
+IANA eap-sake-parameters
+IANA eapsimaka-numbers
+IANA ecml-parameters
+IANA idna-tables-9.0.0
+IANA tcp-header-flags
+IANA rtspv2-parameters
+IANA owamp-parameters
+
+# Sub-registries (single slash)
+IANA _6lowpan-parameters/lowpan_nhc
+IANA _6lowpan-parameters/critical-6lowpan-routing-header-type
+IANA _6lowpan-parameters/esc-extension-types
+IANA _6tisch/_6tisch-6p-version-numbers
+IANA _6tisch/_6tisch-cojp-unsupported-configuration-codes
+IANA sip-parameters/sip-parameters-13
+IANA ssh-parameters/ssh-parameters-20
+IANA tcp-parameters/tcp-parameters-1
+IANA smi-numbers/smi-numbers-18
+IANA edhoc/edhoc-cipher-suites
+IANA suit/suit-commands
+IANA teap-parameters/status-codes
+IANA te-types/rfc-4973-experimental-te-lsa-types
+IANA stamp-tlv-types/stamp-synchronization-sources
+IANA eapsimaka-numbers/trusted-non-3gpp-access
+
+# Dotted slugs (version numbers embedded)
+IANA idna-tables-11.0.0/idna-tables-context
+IANA idna-tables-6.2.0/idna-tables-context
+IANA ieee-std-802.15.4-ietf-ie-subtype-ids/ieee-std-802.15.4-ietf-ie-subtype-ids-1

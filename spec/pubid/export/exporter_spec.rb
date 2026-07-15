@@ -5,8 +5,8 @@ require "pubid/export"
 
 RSpec.describe Pubid::Export::Exporter do
   describe "FLAVORS" do
-    it "lists all 26 flavors" do
-      expect(described_class::FLAVORS.size).to eq(26)
+    it "lists all 33 flavors" do
+      expect(described_class::FLAVORS.size).to eq(33)
     end
 
     it "includes iso" do
@@ -15,6 +15,26 @@ RSpec.describe Pubid::Export::Exporter do
 
     it "includes w3c" do
       expect(described_class::FLAVORS).to include(:w3c)
+    end
+
+    it "includes xsf" do
+      expect(described_class::FLAVORS).to include(:xsf)
+    end
+
+    it "includes bipm" do
+      expect(described_class::FLAVORS).to include(:bipm)
+    end
+
+    it "includes oasis" do
+      expect(described_class::FLAVORS).to include(:oasis)
+    end
+
+    it "includes ecma" do
+      expect(described_class::FLAVORS).to include(:ecma)
+    end
+
+    it "includes ietf" do
+      expect(described_class::FLAVORS).to include(:ietf)
     end
 
     it "includes calconnect" do
@@ -41,8 +61,23 @@ RSpec.describe Pubid::Export::Exporter do
       expect(data.keys).to all(be_a(String))
     end
 
-    it "exports all 26 flavors" do
-      expect(data.size).to eq(26)
+    it "exports all 33 flavors" do
+      expect(data.size).to eq(33)
+    end
+
+    it "exports OASIS with its Standard identifier type" do
+      expect(data["oasis"][:identifier_types].size).to eq(1)
+      expect(data["oasis"][:identifier_types].first[:title])
+        .to eq("OASIS Standard")
+    end
+
+    it "exports ECMA with identifier types" do
+      expect(data["ecma"][:identifier_types].size).to eq(3)
+    end
+
+    it "exports IETF with identifier types" do
+      expect(data["ietf"][:identifier_types]).to be_a(Array)
+      expect(data["ietf"][:identifier_types].size).to be > 0
     end
 
     it "exports ISO with identifier types" do
