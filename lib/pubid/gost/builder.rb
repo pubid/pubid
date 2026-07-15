@@ -23,24 +23,8 @@ module Pubid
       }.freeze
 
       def build(parsed)
-        russian = parsed[:scope_r] ? true : false
-        copublisher, subtype = split_prefix(stringify(parsed[:prefix_text]))
-        number, year = split_number_year(stringify(parsed[:raw]))
-
-        base_klass = russian ? Identifiers::NationalStandard : Identifiers::InterstateStandard
-        base = base_klass.new(**{
-          copublisher: copublisher,
-          subtype: subtype,
-          number: number,
-          year: year,
-          adopted_reference: stringify(parsed[:adopted_reference_raw]),
-        }.compact)
-
-        adopted_raw = stringify(parsed[:adopted_raw])
-        return base unless adopted_raw
-
-        adopted = parse_foreign(adopted_raw)
-        Identifiers::IdenticalAdoption.new(base: base, adopted: adopted)
+        base = build_base(parsed)
+        with_foreign_adoption(base, parsed)
       end
 
       def self.build(parsed)
@@ -49,6 +33,52 @@ module Pubid
 
       private
 
+      def build_base(parsed)
+        russian = parsed[:scope_r] ? true : false
+        copublisher, subtype = split_prefix(stringify(parsed[:prefix_text]))
+        number, year = split_number_year(stringify(parsed[:raw]))
+
+        klass = russian ? Identifiers::NationalStandard : Identifiers::InterstateStandard
+        klass.new(**{
+          copublisher: copublisher,
+          subtype: subtype,
+          number: number,
+          year: year,
+        }.compact)
+      end
+
+      # Apply the slash (IdenticalAdoption) and/or parens (Harmonized)
+      # wrappers around the base standard. Both can apply simultaneously.
+      def with_foreign_adoption(base, parsed)
+        wrapper = wrap_identical_adoption(base, parsed)
+        wrap_harmonized(wrapper, parsed)
+      end
+
+      def wrap_identical_adoption(base, parsed)
+        adopted_raw = stringify(parsed[:adopted_raw])
+        return base unless adopted_raw
+
+        adopted = parse_foreign(adopted_raw)
+        Identifiers::IdenticalAdoption.new(base: base, adopted: adopted)
+      end
+
+      def wrap_harmonized(base, parsed)
+        reference_raw = stringify(parsed[:adopted_reference_raw])
+        return base unless reference_raw
+
+        items = reference_raw.split(",").map(&:strip).map { |s| normalize_foreign(s) }
+        adopted = items.map { |item| adopt_identifier(item) }
+
+        Identifiers::Harmonized.new(base: base, adopted_identifiers: adopted)
+      end
+
+      # Parse a single foreign identifier, falling back to a
+      # ForeignReference that preserves the raw surface form when no
+      # registered flavor recognizes it (e.g. OECD, UNECE STANDARD).
+      def adopt_identifier(raw)
+        parse_foreign(raw) || Identifiers::ForeignReference.new(raw: raw)
+      end
+
       def split_prefix(text)
         return [nil, nil] unless text
 
@@ -56,9 +86,7 @@ module Pubid
         copublisher_raw = tokens.first
         subtype_raw = tokens.size > 1 ? tokens.drop(1).join(" ") : nil
 
-        copublisher = normalize_copublisher(copublisher_raw)
-        subtype = normalize_subtype(subtype_raw)
-        [copublisher, subtype]
+        [normalize_copublisher(copublisher_raw), normalize_subtype(subtype_raw)]
       end
 
       def normalize_copublisher(raw)
@@ -71,6 +99,18 @@ module Pubid
         SUBTYPE_MAP.fetch(raw) { raw }
       end
 
+      # Normalize a leading Cyrillic publisher token (e.g. "ИСО") to its
+      # Latin equivalent so a foreign parser can recognize it. Longest
+      # keys first so "ИСО/МЭК" wins over "ИСО".
+      def normalize_foreign(raw)
+        COPUBLISHER_MAP.keys.sort_by(&:length).reverse.each do |cyr|
+          next unless raw.start_with?(cyr + " ") || raw.start_with?(cyr + "/")
+
+          return COPUBLISHER_MAP[cyr] + raw[cyr.length..]
+        end
+        raw
+      end
+
       def split_number_year(raw)
         return [raw, nil] unless raw
 
@@ -80,17 +120,13 @@ module Pubid
         [m[1], m[2]]
       end
 
+      # Try every registered flavor (other than GOST itself) as a parser
+      # for a foreign adopted identifier. Returns the first successful
+      # parse, or nil if none recognize the string.
       def parse_foreign(raw)
-        # Pubid doesn't auto-detect flavor from a bare string, and
-        # autoloaded flavor modules may not be registered yet. Trigger
-        # the autoload by referencing the constant via const_get, which
-        # loads the module file (which in turn registers the flavor).
-        %w[Iso Iec Ieee Astm Bsi].each do |name|
-          mod = begin
-            ::Pubid.const_get(name)
-          rescue NameError
-            next
-          end
+        ::Pubid.eager_load_flavors!
+        ::Pubid::Registry.flavors.each_value do |mod|
+          next if mod == ::Pubid::Gost
 
           begin
             return mod.parse(raw)
