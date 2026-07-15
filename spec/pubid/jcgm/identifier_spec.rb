@@ -279,5 +279,61 @@ RSpec.describe Pubid::Jcgm do
         end
       end
     end
+
+    context "named guides (dateless vocabulary tokens)" do
+      {
+        "JCGM GUM" => "GUM",
+        "JCGM VIM-3" => "VIM-3",
+      }.each do |id_str, number|
+        describe id_str do
+          subject { id_str }
+
+          let(:parsed) { described_class.parse(subject) }
+
+          it "parses as a plain Guide with the token as its number" do
+            expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Guide)
+            expect(parsed.number.value).to eq(number)
+          end
+
+          it "has no date" do
+            expect(parsed.date).to be_nil
+          end
+
+          it "parses publisher" do
+            expect(parsed.publisher.to_s).to eq("JCGM")
+          end
+
+          it "round-trips" do
+            expect(parsed.to_s).to eq(subject)
+          end
+        end
+      end
+    end
+
+    context "corrigendum" do
+      describe "JCGM 200:2008 Corrigendum" do
+        subject { "JCGM 200:2008 Corrigendum" }
+
+        let(:parsed) { described_class.parse(subject) }
+
+        it "parses as Corrigendum" do
+          expect(parsed).to be_a(Pubid::Jcgm::Identifiers::Corrigendum)
+        end
+
+        it "parses the base identifier as a Guide 200:2008" do
+          expect(parsed.base_identifier).to be_a(Pubid::Jcgm::Identifiers::Guide)
+          expect(parsed.base_identifier.number.value).to eq("200")
+          expect(parsed.base_identifier.date.year).to eq("2008")
+        end
+
+        it "carries no iteration" do
+          expect(parsed.iteration).to be_nil
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+    end
   end
 end

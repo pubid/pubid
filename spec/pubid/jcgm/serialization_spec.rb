@@ -11,6 +11,10 @@ RSpec.describe "JCGM serialization" do
       "JCGM 23rd Meeting (2020)" => "pubid:jcgm:meeting",
       # a guide, to show the mechanism is general (not meeting-specific)
       "JCGM 100:2008" => "pubid:jcgm:guide",
+      # dateless named guides and the corrigendum suffix form
+      "JCGM GUM" => "pubid:jcgm:guide",
+      "JCGM VIM-3" => "pubid:jcgm:guide",
+      "JCGM 200:2008 Corrigendum" => "pubid:jcgm:corrigendum",
     }.each do |id_str, expected_type|
       describe id_str do
         let(:identifier) { Pubid::Jcgm.parse(id_str) }
