@@ -48,6 +48,14 @@ module Pubid
         super
       end
 
+      # Uniform class-level parse entry, mirroring every other flavor's
+      # `Pubid::<Flavor>::Identifier.parse`. OIML's real logic lives in the
+      # module method, so delegate to it (same pattern as jcgm/nist/plateau).
+      # The `Pubid::MAX_INPUT_LENGTH` ReDoS guard lives in `Pubid::Oiml.parse`.
+      def self.parse(identifier)
+        Pubid::Oiml.parse(identifier)
+      end
+
       def to_urn
         UrnGenerator.new(self).generate
       end
