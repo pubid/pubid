@@ -19,6 +19,10 @@ module Pubid
     autoload :UrnParser, "#{__dir__}/oiml/urn_parser"
 
     def self.parse(identifier)
+      if identifier.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       parser = Parser.new
       builder = Builder.new
 
