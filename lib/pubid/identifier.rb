@@ -19,13 +19,38 @@ module Pubid
       #
       # This generalizes the per-flavor `*_TYPE_MAP` dispatch that ISO, JIS,
       # IEC, CCSDS and IHO each hand-rolled — one implementation, inherited by
-      # every flavor base.
+      # every flavor base. Cross-flavor dispatch (a nested adopted identifier
+      # whose _type belongs to a different flavor) is delegated to
+      # {TypeResolver}, which knows about every registered flavor.
       def from_hash(data, options = {})
-        type = data && (data["_type"] || data[:_type])
-        klass = polymorphic_type_map[type]
+        klass = concrete_class_for(data)
         return klass.from_hash(data, options) if klass && klass != self
-
         super
+      end
+
+      # lutaml's nested polymorphic cast (Attribute#cast → apply_mappings)
+      # bypasses {from_hash}, so cross-flavor dispatch wouldn't fire for a
+      # nested attribute that carries another flavor's _type. Intercept
+      # apply_mappings and route to {from_hash} so the concrete class's own
+      # mappings (with their flavor-specific custom cast methods, e.g. ISO's
+      # number_from_kv) drive deserialization.
+      def apply_mappings(doc, format, options = {})
+        return super unless hash_with_type?(doc, format)
+
+        klass = concrete_class_for(doc)
+        return super unless klass && klass != self
+
+        klass.from_hash(doc, options)
+      end
+
+      # Resolve a polymorphic _type to the concrete class that owns it:
+      # this flavor's own map first, then any registered flavor's map via
+      # {TypeResolver}. Returns nil for blank or unknown types.
+      def concrete_class_for(data)
+        type = data && (data["_type"] || data[:_type])
+        return nil unless type
+
+        polymorphic_type_map[type] || ::Pubid::TypeResolver.resolve(type)
       end
 
       # Map of polymorphic_name ("pubid:iso:corrigendum") => concrete class for
@@ -33,13 +58,20 @@ module Pubid
       # `Identifiers` namespace for Pubid::Identifier descendants and unioning
       # the flavor's `identifier_types` registry (which may register classes
       # living outside that namespace, e.g. ISO's BundledIdentifier). Memoized
-      # per class.
+      # per class. Public so {TypeResolver} can read another flavor's map for
+      # cross-flavor polymorphic dispatch.
       def polymorphic_type_map
         @polymorphic_type_map ||=
           identifier_registry_classes.each_with_object({}) do |klass, map|
             poly = klass.polymorphic_name
             map[poly] ||= klass if poly
           end
+      end
+
+      private
+
+      def hash_with_type?(doc, format)
+        format == :hash && doc.is_a?(Hash) && (doc["_type"] || doc[:_type])
       end
 
       private

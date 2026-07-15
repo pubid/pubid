@@ -97,7 +97,7 @@ RSpec.describe Pubid::Gost::Identifier do
     end
   end
 
-  describe ".parse — parens adoption reference (MOD/NEQ/unknown)" do
+  describe ".parse — harmonized (parens form)" do
     {
       "ГОСТ 35311.2-2025 (EN 1129-2:1995)"              => "GOST 35311.2-2025 (EN 1129-2:1995)",
       "ГОСТ 35298-2025 (ISO 23767:2021)"                => "GOST 35298-2025 (ISO 23767:2021)",
@@ -111,14 +111,46 @@ RSpec.describe Pubid::Gost::Identifier do
       end
     end
 
-    it "captures adopted_reference" do
+    it "routes single ISO parens to Harmonized" do
       id = Pubid::Gost.parse("ГОСТ 35298-2025 (ISO 23767:2021)")
-      expect(id.adopted_reference).to eq("ISO 23767:2021")
+      expect(id).to be_a(Pubid::Gost::Identifiers::Harmonized)
+      expect(id.base).to be_a(Pubid::Gost::Identifiers::InterstateStandard)
+      expect(id.adopted_identifiers.size).to eq(1)
+      expect(id.adopted_identifiers.first.to_s).to eq("ISO 23767:2021")
     end
 
-    it "stays as InterstateStandard (not a different class)" do
-      id = Pubid::Gost.parse("ГОСТ 35298-2025 (ISO 23767:2021)")
-      expect(id).to be_a(Pubid::Gost::Identifiers::InterstateStandard)
+    it "wraps unparseable foreign references as ForeignReference inside Harmonized" do
+      id = Pubid::Gost.parse("ГОСТ 34853-2022 (OECD 460:2017)")
+      expect(id).to be_a(Pubid::Gost::Identifiers::Harmonized)
+      expect(id.adopted_identifiers.size).to eq(1)
+      expect(id.adopted_identifiers.first).to be_a(Pubid::Gost::Identifiers::ForeignReference)
+      expect(id.adopted_identifiers.first.to_s).to eq("OECD 460:2017")
+    end
+  end
+
+  describe ".parse — multi-identifier harmonization" do
+    {
+      "ГОСТ 25346-2013 (ISO 286-1:2010)"                                  => "GOST 25346-2013 (ISO 286-1:2010)",
+      "ГОСТ 6032-2017 (ISO 3651-1:1998, ISO 3651-2:1998)"                 => "GOST 6032-2017 (ISO 3651-1:1998, ISO 3651-2:1998)",
+      "ГОСТ 6996-66 (ИСО 4136-89, ИСО 5173-81, ИСО 5177-81)"              => "GOST 6996-66 (ISO 4136-89, ISO 5173-81, ISO 5177-81)",
+    }.each do |input, canonical|
+      it "parses #{input.inspect} → #{canonical.inspect}" do
+        expect(Pubid::Gost.parse(input).to_s).to eq(canonical)
+      end
+    end
+
+    it "routes to Harmonized with multiple adopted identifiers" do
+      id = Pubid::Gost.parse("ГОСТ 6032-2017 (ISO 3651-1:1998, ISO 3651-2:1998)")
+      expect(id).to be_a(Pubid::Gost::Identifiers::Harmonized)
+      expect(id.adopted_identifiers.size).to eq(2)
+      expect(id.adopted_identifiers.map(&:to_s)).to eq(["ISO 3651-1:1998", "ISO 3651-2:1998"])
+    end
+
+    it "normalizes Cyrillic ИСО → ISO in each adopted identifier" do
+      id = Pubid::Gost.parse("ГОСТ 6996-66 (ИСО 4136-89, ИСО 5173-81, ИСО 5177-81)")
+      expect(id).to be_a(Pubid::Gost::Identifiers::Harmonized)
+      expect(id.adopted_identifiers.size).to eq(3)
+      expect(id.adopted_identifiers.map(&:to_s)).to eq(["ISO 4136-89", "ISO 5173-81", "ISO 5177-81"])
     end
   end
 
@@ -128,6 +160,7 @@ RSpec.describe Pubid::Gost::Identifier do
       "GOST R 34.12-2015"       => "urn:gost:std:r:34.12:2015",
       "GOST 2.312"              => "urn:gost:std:2.312",
       "ГОСТ 31610.18-2016/IEC 60079-18:2014" => "urn:gost:std:31610.18:2016",
+      "ГОСТ 6032-2017 (ISO 3651-1:1998, ISO 3651-2:1998)" => "urn:gost:std:6032:2017",
     }.each do |input, urn|
       it "renders #{input.inspect} as #{urn.inspect}" do
         expect(Pubid::Gost.parse(input).to_urn).to eq(urn)
@@ -153,6 +186,10 @@ RSpec.describe Pubid::Gost::Identifier do
       GOST\ 14946-82
       GOST\ R\ 34.12-2015
       GOST\ ISO\ 9692-1
+      ГОСТ\ 25346-2013\ (ISO\ 286-1:2010)
+      ГОСТ\ 6032-2017\ (ISO\ 3651-1:1998,\ ISO\ 3651-2:1998)
+      ГОСТ\ 6996-66\ (ИСО\ 4136-89,\ ИСО\ 5173-81,\ ИСО\ 5177-81)
+      ГОСТ\ Р\ 58904-2020/ISO/TR\ 25901-1:2016
     ].each do |code|
       it "round-trips #{code.inspect}" do
         id = Pubid::Gost.parse(code)

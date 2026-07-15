@@ -97,6 +97,7 @@ module Pubid
   autoload :Utils, "pubid/utils"
   autoload :Version, "pubid/version"
   autoload :Core, "pubid/core"
+  autoload :TypeResolver, "pubid/type_resolver"
 
 
   # Require all flavor modules

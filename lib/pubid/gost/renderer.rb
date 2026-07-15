@@ -14,6 +14,7 @@ module Pubid
       def render(context: nil, **_opts)
         id = @id
 
+        return render_harmonized(id) if id.is_a?(Identifiers::Harmonized)
         return render_identical_adoption(id) if id.is_a?(Identifiers::IdenticalAdoption)
         return render_standard(id)
 
@@ -29,13 +30,17 @@ module Pubid
         rendered << " #{id.subtype}" if id.subtype
         rendered << " #{id.number}"
         rendered << "-#{id.year}" if id.year
-        rendered << " (#{id.adopted_reference})" if id.adopted_reference
         rendered
       end
 
       def render_identical_adoption(id)
-        rendered = +"#{id.base.to_s}/#{id.adopted.to_s}"
-        rendered << " (#{id.base.adopted_reference})" if id.base&.adopted_reference
+        +"#{id.base.to_s}/#{id.adopted.to_s}"
+      end
+
+      def render_harmonized(id)
+        rendered = +id.base.to_s
+        adopted = id.adopted_identifiers&.map(&:to_s)&.join(", ")
+        rendered << " (#{adopted})" unless adopted.nil? || adopted.empty?
         rendered
       end
     end

@@ -16,8 +16,12 @@ module Pubid
       end
 
       def generate
-        return generate_for_base(identifier.base) if identifier.is_a?(Identifiers::IdenticalAdoption)
-        return generate_for_base(identifier) if standard?(identifier)
+        id = identifier
+        while id.is_a?(Identifiers::Harmonized) || id.is_a?(Identifiers::IdenticalAdoption)
+          id = id.base
+        end
+
+        return generate_for_standard(id) if standard?(id)
 
         raise ArgumentError,
               "Unknown GOST identifier class: #{identifier.class}"
@@ -25,7 +29,7 @@ module Pubid
 
       private
 
-      def generate_for_base(id)
+      def generate_for_standard(id)
         parts = ["urn:gost:std"]
         parts << "r" if id.is_a?(Identifiers::NationalStandard)
         parts << id.number.to_s

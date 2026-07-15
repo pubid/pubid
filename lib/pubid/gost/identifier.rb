@@ -6,14 +6,11 @@ module Pubid
     #
     # GOST identifiers observed in the wild have the shape:
     #
-    #   GOST [R ][<copublisher> ][<subtype> ]<number>[-<year>][/<adopted>][(<ref>)]
+    #   GOST [R ][<copublisher> ][<subtype> ]<number>[-<year>][/<adopted>][(<refs>)]
     #
-    # Where /<adopted> is the IDT slash form (part of the identifier)
-    # and (<ref>) is a parenthesized adoption reference (MOD/NEQ or
-    # unknown degree — the foreign standard this GOST relates to).
-    #
-    # See identifiers/interstate_standard.rb, national_standard.rb, and
-    # identical_adoption.rb for the concrete classes.
+    # Where /<adopted> is the IDT slash form (modeled by IdenticalAdoption)
+    # and (<refs>) is the parenthesized harmonization list (modeled by
+    # Harmonized). A bare InterstateStandard/NationalStandard has neither.
     class Identifier < ::Pubid::Identifier
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
@@ -22,26 +19,26 @@ module Pubid
         raise "Failed to parse GOST identifier '#{identifier}': #{e.message}"
       end
 
-      attribute :publisher,          :string, default: "GOST"
-      attribute :copublisher,        :string
-      attribute :subtype,            :string
-      attribute :number,             :string
-      attribute :year,               :string
-      attribute :adopted_reference,  :string   # parens content (raw)
+      attribute :publisher,   :string, default: "GOST"
+      attribute :copublisher, :string
+      attribute :subtype,     :string
+      attribute :number,      :string
+      attribute :year,        :string
 
       GOST_TYPE_MAP = {
         "pubid:gost:interstate-standard" => "Pubid::Gost::Identifiers::InterstateStandard",
         "pubid:gost:national-standard"   => "Pubid::Gost::Identifiers::NationalStandard",
         "pubid:gost:identical-adoption"  => "Pubid::Gost::Identifiers::IdenticalAdoption",
+        "pubid:gost:harmonized"          => "Pubid::Gost::Identifiers::Harmonized",
+        "pubid:gost:foreign-reference"   => "Pubid::Gost::Identifiers::ForeignReference",
       }.freeze
 
       key_value do
-        map "_type",              to: :_type, polymorphic_map: GOST_TYPE_MAP
-        map "copublisher",        to: :copublisher
-        map "subtype",            to: :subtype
-        map "number",             to: :number
-        map "year",               to: :year
-        map "adopted_reference",  to: :adopted_reference
+        map "_type",       to: :_type, polymorphic_map: GOST_TYPE_MAP
+        map "copublisher", to: :copublisher
+        map "subtype",     to: :subtype
+        map "number",      to: :number
+        map "year",        to: :year
       end
 
       def to_urn

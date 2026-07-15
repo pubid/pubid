@@ -95,4 +95,31 @@ RSpec.describe "Identifier class polymorphism contract" do
       expect(base).to be_a(Pubid::Nist::Identifier)
     end
   end
+
+  describe "cross-flavor polymorphic dispatch" do
+    it "root Pubid::Identifier.from_hash dispatches by _type to a flavor class" do
+      require "pubid/iso"
+      hash = { "_type" => "pubid:iso:technical-report",
+               "number" => "25901", "part" => "1", "year" => "2016" }
+      resolved = Pubid::Identifier.from_hash(hash)
+      expect(resolved).to be_a(Pubid::Iso::Identifiers::TechnicalReport)
+      expect(resolved.to_s).to eq("ISO/TR 25901-1:2016")
+    end
+
+    it "from_hash on a flavor base dispatches a nested adopted identifier" do
+      require "pubid/gost"
+      outer = { "_type" => "pubid:gost:identical-adoption",
+                "number" => "58904",
+                "year" => "2020",
+                "base" => { "_type" => "pubid:gost:national-standard",
+                            "number" => "58904", "year" => "2020" },
+                "adopted" => { "_type" => "pubid:iso:technical-report",
+                               "number" => "25901", "part" => "1",
+                               "year" => "2016" } }
+      restored = Pubid::Gost::Identifier.from_hash(outer)
+      expect(restored).to be_a(Pubid::Gost::Identifiers::IdenticalAdoption)
+      expect(restored.adopted).to be_a(Pubid::Iso::Identifiers::TechnicalReport)
+      expect(restored.to_s).to eq("GOST R 58904-2020/ISO/TR 25901-1:2016")
+    end
+  end
 end
