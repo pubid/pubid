@@ -111,6 +111,7 @@ module Pubid
   autoload :Astm, "pubid/astm"
   autoload :Bipm, "pubid/bipm"
   autoload :Bsi, "pubid/bsi"
+  autoload :Calconnect, "pubid/calconnect"
   autoload :Ccsds, "pubid/ccsds"
   autoload :CenCenelec, "pubid/cen_cenelec"
   autoload :Cie, "pubid/cie"

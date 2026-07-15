@@ -10,7 +10,7 @@ module Pubid
       FLAVORS = %i[
         iso iec ieee nist bsi itu cen_cenelec etsi ansi astm ashrae asme
         ccsds cie csa ecma jis jcgm oiml idf api amca plateau sae ogc ietf tgpp w3c xsf
-        bipm iana oasis
+        bipm iana oasis calconnect
       ].freeze
 
       # Export all flavors to a hash suitable for JSON serialization.
