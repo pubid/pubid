@@ -8,8 +8,6 @@ module Pubid
       # `number` (Components::Code) holds the meeting ordinal as a clean integer
       # value ("17"); `date` (Components::Date, year-only) holds the year.
       class Meeting < SingleIdentifier
-        attribute :type, Pubid::Components::Type, default: -> { self.class.type[:key] }
-
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :pubmeeting,

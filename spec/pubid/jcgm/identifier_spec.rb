@@ -124,7 +124,7 @@ RSpec.describe Pubid::Jcgm do
         end
 
         it "parses GUM number" do
-          expect(parsed.gum_number.value).to eq("6")
+          expect(parsed.number.value).to eq("6")
         end
 
         it "parses date" do
@@ -146,7 +146,7 @@ RSpec.describe Pubid::Jcgm do
         end
 
         it "parses GUM number" do
-          expect(parsed.gum_number.value).to eq("1")
+          expect(parsed.number.value).to eq("1")
         end
 
         it "parses full date" do

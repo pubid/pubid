@@ -51,7 +51,7 @@ module Pubid
       def render_gum_guide(id, context)
         parts = []
         parts << id.publisher.publisher if id.publisher
-        parts << "GUM-#{id.gum_number.render(context:)}" if id.gum_number
+        parts << "GUM-#{id.number.render(context:)}" if id.number
 
         result = parts.join(" ")
         result += ":#{id.date}" if id.date

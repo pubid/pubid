@@ -3,10 +3,10 @@
 module Pubid
   module Jcgm
     module Identifiers
+      # A GUM guide, e.g. "JCGM GUM-6:2020". The GUM-series part number ("6")
+      # lives in the inherited `number` attribute (serialized as `number: "6"`);
+      # `_type: pubid:jcgm:gum-guide` disambiguates it from a plain guide.
       class GumGuide < SingleIdentifier
-        attribute :gum_number, Pubid::Components::Code
-        attribute :type, Pubid::Components::Type, default: -> { self.class.type[:key] }
-
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :pubgumguide,
