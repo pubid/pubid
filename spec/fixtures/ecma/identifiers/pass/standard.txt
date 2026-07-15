@@ -1,0 +1,24 @@
+# ECMA Standard — Pass
+# Sampled from relaton-data-ecma docidentifier `content` values.
+
+ECMA-6
+ECMA-13
+ECMA-35
+ECMA-43
+ECMA-48
+ECMA-74
+ECMA-94
+ECMA-99
+ECMA-100
+ECMA-119
+ECMA-130
+ECMA-167
+ECMA-262
+ECMA-334
+ECMA-402
+ECMA-411
+ECMA-434
+
+# Standards split into parts (only ECMA-418 in the data)
+ECMA-418-1
+ECMA-418-2

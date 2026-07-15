@@ -1,0 +1,13 @@
+# ECMA Memento — Pass
+# Sampled from relaton-data-ecma docidentifier `content` values.
+# The number is the memento year.
+
+ECMA MEM/1962
+ECMA MEM/1966
+ECMA MEM/1970
+ECMA MEM/1985
+ECMA MEM/1999
+ECMA MEM/2000
+ECMA MEM/2012
+ECMA MEM/2020
+ECMA MEM/2026
