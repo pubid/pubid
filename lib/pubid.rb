@@ -114,6 +114,7 @@ module Pubid
   autoload :CenCenelec, "pubid/cen_cenelec"
   autoload :Cie, "pubid/cie"
   autoload :Csa, "pubid/csa"
+  autoload :Ecma, "pubid/ecma"
   autoload :Etsi, "pubid/etsi"
   autoload :Gost, "pubid/gost"
   autoload :Idf, "pubid/idf"

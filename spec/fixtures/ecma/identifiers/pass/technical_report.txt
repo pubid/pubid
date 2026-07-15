@@ -1,0 +1,13 @@
+# ECMA Technical Report — Pass
+# Sampled from relaton-data-ecma docidentifier `content` values.
+
+ECMA TR/18
+ECMA TR/27
+ECMA TR/53
+ECMA TR/70
+ECMA TR/84
+ECMA TR/100
+ECMA TR/101
+ECMA TR/104
+ECMA TR/107
+ECMA TR/113
