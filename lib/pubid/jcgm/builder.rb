@@ -5,7 +5,10 @@ module Pubid
     class Builder < Pubid::Builder::Base
       def locate_identifier_klass(parsed_hash)
         if parsed_hash[:base_identifier]
-          return Jcgm.locate_type(:amendment)
+          type_with_stage = parsed_hash[:type_with_stage]
+          return Jcgm.locate_type(:amendment) unless type_with_stage
+
+          return Jcgm.locate_type(locate_typed_stage(type_with_stage).type_code)
         end
 
         if parsed_hash[:gum_number]

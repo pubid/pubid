@@ -1,0 +1,4 @@
+# JCGM Corrigendum - Full
+# Source of truth for JCGM corrigendum identifiers
+
+JCGM 200:2008 Corrigendum

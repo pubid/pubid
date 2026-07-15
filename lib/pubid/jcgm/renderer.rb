@@ -15,6 +15,7 @@ module Pubid
       def render(context: nil, **opts)
         case @id
         when Identifiers::Amendment then render_amendment(@id, context)
+        when Identifiers::Corrigendum then render_corrigendum(@id)
         when Identifiers::GumGuide then render_gum_guide(@id, context)
         when Identifiers::Meeting then render_meeting(@id)
         else render_single(@id)
@@ -22,6 +23,10 @@ module Pubid
       end
 
       private
+
+      def render_corrigendum(id)
+        "#{id.base_identifier} Corrigendum"
+      end
 
       def render_meeting(id)
         "JCGM #{id.ordinal} Meeting (#{id.date.year})"
