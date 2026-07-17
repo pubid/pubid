@@ -1,0 +1,11 @@
+# ETSI partial references - Pass
+# Bare references omitting version and/or date (version/date left nil).
+# These enable relaton to look ETSI documents up by a partial reference,
+# matching candidates via matches?(row_id, ignore: [:version, :date]).
+
+ETSI GS ZSM 012
+ETSI EN 300 175-1
+ETSI EN 300 175
+ETSI TS 102 606-1
+ETSI GR ZSM 009-3
+ETSI GTS GSM 02.01

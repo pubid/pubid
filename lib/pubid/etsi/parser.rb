@@ -114,13 +114,19 @@ module Pubid
       end
 
       # Main identifier
+      #
+      # The mandatory core is `etsi_prefix type number` (+ optional
+      # minor/parts/supplements), mirroring ISO. The version/edition and date
+      # suffixes are optional so a partial reference (e.g. "ETSI GS ZSM 012")
+      # parses with version/date left nil. Each `.maybe` guards its own leading
+      # space so no trailing space is demanded when the suffix is absent.
       rule(:identifier) do
         etsi_prefix >>
           type >> space >>
           number >> minor.maybe >> parts >>
           supplements.maybe >>
-          space >> version_or_edition >>
-          space >> date_part
+          (space >> version_or_edition).maybe >>
+          (space >> date_part).maybe
       end
 
       rule(:root) { identifier }
