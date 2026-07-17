@@ -51,29 +51,32 @@ module Pubid
       rule(:ordinal) { str("st") | str("nd") | str("rd") | str("th") }
 
       # --- committee documents ---
+      # The trailing "(YYYY)" date is optional (`.maybe`) so a partial reference
+      # that omits it — e.g. "CCTF REC 2" — still parses, leaving :year absent.
       rule(:committee_short) do
         (group >> space >> type_abbrev >>
-          (space >> number).maybe >> space >> year_paren).as(:committee_short)
+          (space >> number).maybe >> (space >> year_paren).maybe)
+          .as(:committee_short)
       end
       rule(:committee_long_en) do
         (group >> space >> type_name_en >>
-          (space >> number).maybe >> space >> year_paren_nolang)
+          (space >> number).maybe >> (space >> year_paren_nolang).maybe)
           .as(:committee_long_en)
       end
       rule(:committee_long_fr) do
         (type_name_fr >> (space >> number).maybe >> space >>
-          connective >> space >> group >> space >> year_paren_nolang)
+          connective >> space >> group >> (space >> year_paren_nolang).maybe)
           .as(:committee_long_fr)
       end
 
       # --- meetings ---
       rule(:meeting_en) do
         (group >> space >> number >> ordinal >> space >>
-          str("Meeting") >> space >> year_paren).as(:meeting_en)
+          str("Meeting") >> (space >> year_paren).maybe).as(:meeting_en)
       end
       rule(:meeting_fr) do
         (group >> space >> number >> str("<sup>e</sup>") >> space >>
-          str("réunion") >> space >> year_paren).as(:meeting_fr)
+          str("réunion") >> (space >> year_paren).maybe).as(:meeting_fr)
       end
 
       # --- Metrologia journal ---

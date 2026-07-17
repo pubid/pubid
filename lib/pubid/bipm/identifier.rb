@@ -99,6 +99,18 @@ module Pubid
         form == "long"
       end
 
+      # BIPM keeps the publication year in its own `year` integer attribute
+      # rather than the base `date` component, so the base #exclude's
+      # :year->:date remap would nil the (unused) inherited `date` and leave
+      # `year` intact. Clear `year` directly when either alias is excluded so
+      # `matches?(row, ignore: [:year])` treats a partial (date-less) reference
+      # as a year wildcard.
+      def exclude(*args)
+        result = super
+        result.year = nil if args.include?(:year) || args.include?(:date)
+        result
+      end
+
       # Basic string representation. Delegates to renderer.
       def to_s(**opts)
         render(format: :human, **opts)

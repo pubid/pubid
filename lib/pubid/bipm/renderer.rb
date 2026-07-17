@@ -23,30 +23,38 @@ module Pubid
         id.number ? " #{id.number}" : ""
       end
 
+      # Optional " (<year>[, <lang>])" segment (with a leading space), or ""
+      # when the year is absent (a partial reference). `lang` is the trailing
+      # ", E"/", F" suffix carried only by the short committee form.
+      def year_segment(id, lang: "")
+        id.year ? " (#{id.year}#{lang})" : ""
+      end
+
       def render_committee(id)
         return render_committee_long(id) if id.long?
 
         # short abbreviated key form
         lang = id.language ? ", #{id.language}" : ""
-        "#{id.group} #{id.type_code}#{number_segment(id)} (#{id.year}#{lang})"
+        "#{id.group} #{id.type_code}#{number_segment(id)}" \
+          "#{year_segment(id, lang: lang)}"
       end
 
       def render_committee_long(id)
         if id.language == "F"
           name = Identifier::TYPE_NAME_FR[id.type_code]
           conn = Identifier.french_connective(id.group)
-          "#{name}#{number_segment(id)} #{conn} #{id.group} (#{id.year})"
+          "#{name}#{number_segment(id)} #{conn} #{id.group}#{year_segment(id)}"
         else
           name = Identifier::TYPE_NAME_EN[id.type_code]
-          "#{id.group} #{name}#{number_segment(id)} (#{id.year})"
+          "#{id.group} #{name}#{number_segment(id)}#{year_segment(id)}"
         end
       end
 
       def render_meeting(id)
         if id.language == "F"
-          "#{id.group} #{id.number}<sup>e</sup> réunion (#{id.year})"
+          "#{id.group} #{id.number}<sup>e</sup> réunion#{year_segment(id)}"
         else
-          "#{id.group} #{id.ordinal_en} Meeting (#{id.year})"
+          "#{id.group} #{id.ordinal_en} Meeting#{year_segment(id)}"
         end
       end
 

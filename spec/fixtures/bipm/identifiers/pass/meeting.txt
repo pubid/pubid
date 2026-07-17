@@ -20,3 +20,7 @@ CIPM 101-1st Meeting (2012)
 # --- French "<n><sup>e</sup> réunion (<year>)" ---
 CCAUV 10<sup>e</sup> réunion (2015)
 CCAUV 13<sup>e</sup> réunion (2021)
+
+# --- Partial references (date omitted; year left nil for collection matching) ---
+CCAUV 1st Meeting
+CCAUV 10<sup>e</sup> réunion
