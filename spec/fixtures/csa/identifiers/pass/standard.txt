@@ -169,3 +169,8 @@ CSA B140.11:M89 (R2024)
 CSA B140.12:22
 CSA B140.3:62 (R2020)
 CSA B140.4:22
+
+# Partial references (year omitted) — parse with year nil, round-trip to_s
+CSA Z299.1
+CSA B149.1
+CSA B140.4
