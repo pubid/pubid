@@ -24,14 +24,20 @@ module Pubid
       private
 
       def committee
-        ["urn", "bipm", identifier.group.downcase,
-         identifier.type_code.downcase, identifier.number.to_s,
-         identifier.year].join(":")
+        id = identifier
+        parts = ["urn", "bipm", id.group.downcase,
+                 id.type_code.downcase, id.number.to_s]
+        # A partial (date-less) reference drops the trailing year segment; a
+        # number-less-but-dated doc keeps its empty number segment.
+        parts << id.year if id.year
+        parts.join(":")
       end
 
       def meeting
-        ["urn", "bipm", identifier.group.downcase, "meeting",
-         identifier.number.to_s, identifier.year].join(":")
+        id = identifier
+        parts = ["urn", "bipm", id.group.downcase, "meeting", id.number.to_s]
+        parts << id.year if id.year
+        parts.join(":")
       end
 
       def metrologia
