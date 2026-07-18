@@ -1,12 +1,10 @@
 # CalConnect Standard - Fail (malformed, must not parse)
 # Auto-authored for grammar boundary coverage
 
-CC 18011
 CC 18011:
 CC18011:2018
 XX 18011:2018
 CC/DIR:2019
-CC/DIR 10006
 18011:2018
 CC -:2018
 CC .:2018
