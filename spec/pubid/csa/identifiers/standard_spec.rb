@@ -357,5 +357,47 @@ RSpec.describe Pubid::Csa::Identifiers::Standard do
         end
       end
     end
+
+    context "partial reference (no year)" do
+      describe "CSA Z299.1" do
+        subject { "CSA Z299.1" }
+
+        let(:parsed) { Pubid::Csa.parse(subject) }
+
+        it "parses as Standard" do
+          expect(parsed).to be_a(described_class)
+        end
+
+        it "parses code" do
+          expect(parsed.code.value).to eq("Z299.1")
+        end
+
+        it "leaves year nil" do
+          expect(parsed.year).to be_nil
+        end
+
+        it "round-trips correctly (no trailing year)" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+
+      describe "CSA B149.1" do
+        subject { "CSA B149.1" }
+
+        let(:parsed) { Pubid::Csa.parse(subject) }
+
+        it "parses code" do
+          expect(parsed.code.value).to eq("B149.1")
+        end
+
+        it "leaves year nil" do
+          expect(parsed.year).to be_nil
+        end
+
+        it "round-trips correctly (no trailing year)" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+    end
   end
 end

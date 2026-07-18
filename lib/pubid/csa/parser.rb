@@ -179,7 +179,7 @@ module Pubid
           # Optional series prefix (MH, RV, etc.) before SERIES keyword
           (series_prefix >> space).maybe >>
           series_keyword.as(:series_type) >>
-          (colon_year | dash_year) >>
+          (colon_year | dash_year).maybe >>
           reaffirmation.maybe
       end
 
@@ -194,7 +194,7 @@ module Pubid
           ).as(:cec_part) >>
           no_notation >>
           no_number >>
-          (colon_year | dash_year) >>
+          (colon_year | dash_year).maybe >>
           reaffirmation.maybe
       end
 
@@ -257,7 +257,7 @@ module Pubid
             (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
             # Option 4: just year (no series, no NO.)
             (colon_year | dash_year)
-          ) >>
+          ).maybe >> # trailing year optional (partial reference)
           amendment_slash.maybe # Add amendment support here
       end
 
@@ -274,7 +274,7 @@ module Pubid
             (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
             # Option 4: just year
             (colon_year | dash_year)
-          )
+          ).maybe # trailing year optional (partial reference)
       end
 
       # Continuation code (optional CSA publisher prefix, for combined identifiers)
@@ -290,7 +290,7 @@ module Pubid
             (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
             # Option 4: just year
             (colon_year | dash_year)
-          ) >>
+          ).maybe >> # trailing year optional (partial reference)
           amendment_slash.maybe
       end
 
@@ -353,7 +353,7 @@ module Pubid
             (space >> series_keyword.as(:series) >> (colon_year | dash_year)) |
             # Option 3: just year
             (colon_year | dash_year)
-          ) >>
+          ).maybe >> # trailing year optional (partial reference)
           (space >> str("PACKAGE")).as(:package_portion).maybe
       end
 
