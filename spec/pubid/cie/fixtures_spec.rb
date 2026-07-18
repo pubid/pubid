@@ -4,7 +4,7 @@ require "spec_helper"
 
 module CieFixturesSpec
   FIXTURE_FILES = Dir.glob(File.join(__dir__,
-                                     "../../../fixtures/CIE/identifiers/pass", "*.txt")).freeze
+                                     "../../fixtures/cie/identifiers/pass", "*.txt")).freeze
 end
 
 RSpec.describe "CIE Fixture Round-trip Tests" do
