@@ -24,7 +24,13 @@ module Pubid
       attribute :publisher, :string, default: -> { "CIE" }
 
       attribute :year, :string
-      attribute :date_separator, :string # "dash" or "colon"
+
+      # The number<->year separator character, derived from +style+ (the sole
+      # separator field; there is no date_separator attribute):
+      #   current -> ":"   legacy -> "-"   slash -> "/"
+      def date_sep_char
+        { "legacy" => "-", "slash" => "/" }.fetch(style, ":")
+      end
     end
   end
 end

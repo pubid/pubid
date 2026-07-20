@@ -5,38 +5,40 @@ require "lutaml/model"
 module Pubid
   module Cie
     module Identifiers
-      # Supplement identifier for CIE
-      # Handles -SPN and -SPN.P notation with recursive base parsing
+      # Supplement identifier for CIE (-SPN / -SPN.P notation).
+      # Wraps a nested base_identifier (the base Standard); the "-SPN" is
+      # inserted after the base number, so to_s renders from the base's parts.
       # Examples: CIE 121-SP1:2009, CIE 198-SP1.4:2011, CIE DIS 025-SP1/E:2019
       class Supplement < SupplementIdentifier
-        attribute :base_number, :string
-        attribute :supplement_number, :string    # "1", "2"
-        attribute :supplement_part, :string      # "1" in "SP1.1", "4" in "SP1.4"
-        attribute :year, :string
-        attribute :stage, :string                # "DIS", "DS"
-        attribute :language, Components::Language
+        attribute :supplement_number, :string # "1", "2"
+        attribute :supplement_part, :string   # "1" in "SP1.1", "4" in "SP1.4"
+
+        # Uniform supplement interface (shared with Corrigendum).
+        def supplement_type
+          :supplement
+        end
+
+        def supplement_year
+          base_identifier&.year
+        end
 
         def to_s
+          b = base_identifier
           parts = ["CIE"]
+          parts << b.stage if b.respond_to?(:stage) && b.stage
 
-          # Stage if present (DIS/DS)
-          parts << stage if stage
-
-          # Build base number and supplement
+          core = "#{b.number}-SP#{supplement_number}"
+          core += ".#{supplement_part}" if supplement_part
+          parts << core
           result = parts.join(" ")
-          result += " #{base_number}-SP#{supplement_number}"
 
-          # Add part if present (e.g., ".4" in "SP1.4")
-          result += ".#{supplement_part}" if supplement_part
-
-          # Add language with slash if present (before year)
-          if language && language.format == "slash_colon"
-            result += "/#{language.code}"
+          # Language with slash (before year), e.g. "/E"
+          if b.language && b.language.format == "slash_colon"
+            result += "/#{b.language.code}"
           end
 
-          # Add year with colon (supplements always use current style)
-          result += ":#{year}" if year
-
+          # Supplements always use the current (colon) style.
+          result += ":#{b.year}" if b.year
           result
         end
       end

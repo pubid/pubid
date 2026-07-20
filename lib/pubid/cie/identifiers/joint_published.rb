@@ -8,8 +8,9 @@ module Pubid
       # Joint published identifier for CIE
       # Handles CIE ISO, CIE IEC, CIE ISO/CIE patterns
       class JointPublished < SingleIdentifier
+        include CodeAttributes # flat number/part/iteration/part_separator + #code_string
+
         attribute :copublisher, :string       # "ISO", "IEC", or "ISO/CIE"
-        attribute :code, Components::Code
         attribute :language, Components::Language
         attribute :doc_type, :string          # "TR" for Technical Report
         attribute :stage, :string             # "DIS" for draft stage
@@ -24,21 +25,20 @@ module Pubid
           parts << stage if stage
 
           # Code (number-part) - special handling for IEC dot separator
-          if code
-            code_str = code.to_s
+          if number
+            code_str = code_string
             # For IEC copublisher, if code has a part, use dot not slash/dash
-            if copublisher == "IEC" && code.part
-              code_str = "#{code.number}.#{code.part}"
+            if copublisher == "IEC" && part
+              code_str = "#{number}.#{part}"
             end
             parts << code_str
           end
 
           result = parts.join(" ")
 
-          # Date - use the actual captured separator
+          # Date - separator derived from style
           if year
-            separator = date_separator == "colon" ? ":" : "-"
-            result += "#{separator}#{year}"
+            result += "#{date_sep_char}#{year}"
           end
 
           # Language (always parenthetical for joint published)

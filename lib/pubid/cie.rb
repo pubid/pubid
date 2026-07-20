@@ -8,8 +8,8 @@ module Pubid
     PREFIXES = ["CIE"].freeze
 
     module Components
-      autoload :Code, "#{__dir__}/cie/components/code"
       autoload :Language, "#{__dir__}/cie/components/language"
+      autoload :Paper, "#{__dir__}/cie/components/paper"
     end
 
     autoload :Builder, "#{__dir__}/cie/builder"

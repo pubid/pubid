@@ -2,25 +2,27 @@
 
 module Pubid
   module Cie
-    # Base class for CIE supplement identifiers
-    # Single Responsibility: Provide common attributes for supplement documents
+    # Base class for CIE supplement identifiers (Supplement, Corrigendum).
     #
-    # Supplement identifiers modify or extend base identifiers.
-    # Unlike ISO/IEC, CIE supplements store base information as flat
-    # string attributes rather than recursive Identifier objects.
+    # Like ISO/IEC/BSI/JCGM, a CIE supplement wraps its base document as a
+    # nested full identifier (+base_identifier+, a Pubid::Cie::Identifier),
+    # rather than flat base_number/base_year strings. This lets CIE supplements
+    # participate in the shared base_document / drop_supplements / matches?
+    # vocabulary relaton uses to match a citation to its base standard.
     #
-    # Classes inheriting from SupplementIdentifier:
-    # - Corrigendum (corrigenda with /CorN notation)
-    # - Supplement (supplements with -SPN notation)
-    #
-    # Architecture Note:
-    # CIE uses a different architectural approach than ISO/IEC:
-    # - ISO/IEC: Recursive base_identifier objects
-    # - CIE: Flat string attributes (base_number, base_year, etc.)
+    # Concrete subtypes: Supplement (-SPN), Corrigendum (/CorN).
     class SupplementIdentifier < Identifier
-      # Common attribute for all CIE identifiers
-      # Values: "current" (colon date separator) or "legacy" (dash date separator)
-      attribute :style, :string
+      attribute :base_identifier, Identifier, polymorphic: true
+
+      # The underlying standard, with supplement layer(s) peeled recursively.
+      def base_document
+        base_identifier&.base_document || self
+      end
+
+      # Dropping one supplement layer yields the wrapped base identifier.
+      def drop_supplements
+        base_identifier || self
+      end
     end
   end
 end

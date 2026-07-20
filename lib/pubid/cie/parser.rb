@@ -135,9 +135,50 @@ module Pubid
         (str("FDIS") | str("DIS") | str("DS")) >> space
       end
 
-      # Document type (TR for Technical Report)
+      # Document type (TR for Technical Report, TS for Technical Specification)
       rule(:doc_type) do
-        str("TR") # Don't consume trailing space
+        (str("TR") | str("TS")) # Don't consume trailing space
+      end
+
+      # Proceedings paper code: 1+ uppercase letters (OP, PO, PP, WP, IP, P, ...)
+      # Deliberately generic (open set); greedy letters then digits.
+      rule(:paper_code) do
+        match("[A-Z]").repeat(1).as(:paper_code)
+      end
+
+      # Techstreet opaque conference variant: /<lowercase-alnum slug>
+      # Charset kept lowercase-alnum so it can't collide with the uppercase
+      # /E, /Cor, /IEC tails or the self.parse language gsub.
+      rule(:variant_slug) do
+        slash >> match("[0-9a-z]").repeat(1).as(:variant)
+      end
+
+      # Conference proceedings paper (x-prefixed): CIE x043-OP01
+      rule(:conf_proceedings) do
+        str("CIE") >> space >> str("x") >> digits.as(:conf_number) >>
+          dash >> paper_code >> digits.as(:paper_number)
+      end
+
+      # Standalone proceedings paper: CIE OP02 1-5
+      rule(:standalone_proceedings) do
+        str("CIE") >> space >> paper_code >> digits.as(:paper_number) >>
+          space >> (digits >> dash >> digits).as(:page_range)
+      end
+
+      # D-series: CIE D001-2006 / CIE D002:2004
+      rule(:d_series_identifier) do
+        str("CIE") >> space >> str("D").as(:d_prefix) >> digits.as(:number) >> date
+      end
+
+      # Standard with bare slash-year (no language letter): CIE S 007/1998
+      # Uses a narrow number(+iteration) pattern rather than the full code rule
+      # so code_with_part_slash doesn't greedily consume the /year.
+      rule(:standard_with_slash_year) do
+        str("CIE") >> space >>
+          stage_code.maybe.as(:stage) >>
+          s_prefix.maybe.as(:s_prefix) >>
+          (digits.as(:number) >> (dot >> digits.as(:iteration)).maybe) >>
+          slash >> year_digits.as(:slash_year)
       end
 
       # DIS stage with supplement pattern (e.g., DIS 025-SP1/E:2019)
@@ -181,7 +222,9 @@ module Pubid
           digits.as(:conf_number) >>
           date >>
           # Optional amendment
-          (space >> str("Amendment") >> space >> digits.as(:amd_number)).maybe
+          (space >> str("Amendment") >> space >> digits.as(:amd_number)).maybe >>
+          # Optional techstreet opaque /slug variant
+          variant_slug.maybe
       end
 
       # Joint published with ISO
@@ -320,6 +363,10 @@ module Pubid
           corrigendum_identifier |
           supplement_identifier |
           standard_with_language_year |
+          standard_with_slash_year |
+          d_series_identifier |
+          conf_proceedings |
+          standalone_proceedings |
           legacy_code_with_year | # Before standard to catch 001-1980 pattern
           conference_identifier |
           standard_identifier

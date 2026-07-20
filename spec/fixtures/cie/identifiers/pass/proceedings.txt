@@ -1,0 +1,18 @@
+# CIE Proceedings - Pass
+# Conference proceedings papers (x-prefixed and standalone)
+
+# x-prefixed (conference paper): CIE x<conf>-<CODE><num>
+CIE x043-OP01
+CIE x043-PO05
+CIE x043-PP12
+CIE x043-WP03
+CIE x043-IP01
+# single-letter paper code (x049 series)
+CIE x049-P03
+
+# standalone: CIE <CODE><num> <pageStart>-<pageEnd>
+CIE OP02 1-5
+CIE PO01 404-407
+CIE PP06 265-270
+CIE WP01 1-6
+CIE IP04 10-16
