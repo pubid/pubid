@@ -24,25 +24,27 @@ module Pubid
       attribute :publisher, :string, default: -> { "CIE" }
 
       attribute :year, :string
-      attribute :date_separator, :string # "dash" or "colon"
+      # The number<->year separator character, derived from +style+ (the sole
+      # separator field; there is no date_separator attribute):
+      #   current -> ":"   legacy -> "-"   slash -> "/"
+      def date_sep_char
+        { "legacy" => "-", "slash" => "/" }.fetch(style, ":")
+      end
 
-      # CIE keeps the publication year in its own `year` string attribute (plus
-      # a `date_separator` rendering hint), not a `Date` component, so base's
-      # `:year`->`:date` remap would nil the unused inherited `date` and leave
-      # both intact. Call super (preserving the nested-identifier recursion),
-      # then nil `year` and its now-meaningless separator directly, so a
-      # year-less CIE ref is a year wildcard under `matches?(ignore: [:year])`.
+      # Partial-reference matching: CIE keeps the publication year in its own
+      # `year` string attribute (the separator lives in `style`), not a `Date`
+      # component, so the base's `:year`->`:date` remap would nil the unused
+      # inherited `date` and leave `year` intact. Call super (preserving the
+      # nested-identifier recursion), then nil `year` directly so a year-less
+      # CIE ref is a year wildcard under `matches?(ignore: [:year])`.
       #
-      # Known limit: the year-derived `style` (colon->current, dash->legacy, on
-      # this id and the nested `code`) is intentionally NOT wildcarded, so bare
-      # `CIE 015` (always current) matches a colon-dated full but not a legacy
-      # dash-dated (pre-2001) one. Partial-ref scope targets modern colon forms.
+      # Known limit: `style` (which also encodes the era: current<->colon,
+      # legacy<->dash) is intentionally NOT wildcarded, so bare `CIE 015`
+      # (always current) matches a colon-dated full but not a legacy dash-dated
+      # (pre-2001) one. Partial-ref scope targets modern colon forms.
       def exclude(*args)
         result = super
-        if args.include?(:year) || args.include?(:date)
-          result.year = nil
-          result.date_separator = nil
-        end
+        result.year = nil if args.include?(:year) || args.include?(:date)
         result
       end
     end

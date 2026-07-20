@@ -44,3 +44,7 @@ CIE x044:2017
 CIE x045:2018
 CIE x046:2019
 CIE x038:2013 Amendment 1
+
+# Techstreet /slug conference variants (family 3)
+CIE x051:2025/2aue4q
+CIE x051:2025/33bx34

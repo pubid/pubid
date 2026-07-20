@@ -14,6 +14,14 @@ module Pubid
         # Determine identifier class based on parsed content
         identifier_class = determine_class(parsed_hash)
 
+        # Supplement / Corrigendum wrap a nested base_identifier.
+        if identifier_class == Cie::Identifiers::Corrigendum
+          return build_corrigendum(parsed_hash)
+        end
+        if identifier_class == Cie::Identifiers::Supplement
+          return build_supplement(parsed_hash)
+        end
+
         # Extract attributes with style detection
         attributes = extract_attributes(parsed_hash)
 
@@ -27,6 +35,50 @@ module Pubid
       end
 
       private
+
+      # Supplement: nest the base Standard (the stage/year/language belong to
+      # the base), keep only the -SPN number/part on the wrapper.
+      def build_supplement(parsed_hash)
+        a = extract_attributes(parsed_hash)
+        base = Cie::Identifiers::Standard.new(
+          number: a[:base_number],
+          stage: a[:stage],
+          s_prefix: a.fetch(:s_prefix, false),
+          language: a[:language],
+          year: a[:year],
+          style: "current", # supplements always use the colon style
+        )
+        Cie::Identifiers::Supplement.new(
+          base_identifier: base,
+          supplement_number: a[:supplement_number],
+          supplement_part: a[:supplement_part],
+        )
+      end
+
+      # Corrigendum: nest the base (a Standard, or a Supplement when the base
+      # itself carries -SPN), keep only the /CorN number/year on the wrapper.
+      def build_corrigendum(parsed_hash)
+        a = extract_attributes(parsed_hash)
+        base_std = Cie::Identifiers::Standard.new(
+          number: a[:base_number],
+          year: a[:base_year],
+          style: "current",
+        )
+        base = if a[:base_supplement]
+                 Cie::Identifiers::Supplement.new(
+                   base_identifier: base_std,
+                   supplement_number: a[:base_supplement],
+                   supplement_part: a[:base_supplement_part],
+                 )
+               else
+                 base_std
+               end
+        Cie::Identifiers::Corrigendum.new(
+          base_identifier: base,
+          cor_number: a[:cor_number],
+          cor_year: a[:cor_year],
+        )
+      end
 
       # Determine which identifier class to use
       def determine_class(parsed_hash)
@@ -48,6 +100,11 @@ module Pubid
         # Supplement (-SPN)
         if parsed_hash[:supplement_number] && !parsed_hash[:cor_number]
           return Cie::Identifiers::Supplement
+        end
+
+        # Proceedings paper (x-prefixed or standalone)
+        if parsed_hash[:paper_code]
+          return Cie::Identifiers::Proceedings
         end
 
         # Conference (x-prefix)
@@ -179,46 +236,62 @@ module Pubid
           date_sep = "slash" # Special format for identical identifiers
         end
 
-        # Detect style from date separator
-        style = if date_sep == "colon"
-                  "current"
-                else
-                  (date_sep == "dash" ? "legacy" : detect_style_fallback(parsed_hash))
+        # Style is the sole separator field (no date_separator):
+        #   colon -> current (":")   dash -> legacy ("-")   slash -> slash ("/")
+        style = case date_sep
+                when "colon" then "current"
+                when "dash" then "legacy"
+                when "slash" then "slash"
+                else detect_style_fallback(parsed_hash)
                 end
         attributes[:style] = style
 
-        # Set year and separator if present
+        # Set year if present
         attributes[:year] = year_value if year_value
-        attributes[:date_separator] = date_sep if date_sep
 
-        # Extract code
+        # Extract code (flat number/part/iteration/part_separator on the
+        # identifier; the code's style is the identifier's own `style`).
         if parsed_hash[:number]
-          code_attrs = { number: extract_value(parsed_hash[:number]),
-                         style: style }
+          attributes[:number] = extract_value(parsed_hash[:number])
           if parsed_hash[:part]
-            code_attrs[:part] =
-              extract_value(parsed_hash[:part])
+            attributes[:part] = extract_value(parsed_hash[:part])
           end
           if parsed_hash[:iteration]
-            code_attrs[:iteration] =
-              extract_value(parsed_hash[:iteration])
+            attributes[:iteration] = extract_value(parsed_hash[:iteration])
           end
 
           # Detect part separator from parser markers
           if parsed_hash[:slash_sep]
-            code_attrs[:part_separator] = "slash"
+            attributes[:part_separator] = "slash"
           elsif parsed_hash[:dash_sep]
-            code_attrs[:part_separator] = "dash"
+            attributes[:part_separator] = "dash"
           end
-
-          attributes[:code] = Components::Code.new(**code_attrs)
         end
 
         # Conference number (separate from regular code)
         if parsed_hash[:conf_number]
-          attributes[:conference_number] =
+          attributes[:number] =
             extract_value(parsed_hash[:conf_number])
         end
+
+        # Proceedings paper identity (code + number) as a Components::Paper
+        if parsed_hash[:paper_code]
+          attributes[:paper] = Components::Paper.new(
+            code: extract_value(parsed_hash[:paper_code]),
+            number: extract_value(parsed_hash[:paper_number]),
+          )
+        end
+        if parsed_hash[:page_range]
+          attributes[:page_range] = extract_value(parsed_hash[:page_range])
+        end
+
+        # Conference /slug variant (opaque, verbatim)
+        if parsed_hash[:variant]
+          attributes[:variant] = extract_value(parsed_hash[:variant])
+        end
+
+        # D-series marker
+        attributes[:d_prefix] = true if parsed_hash[:d_prefix]
 
         # Extract language (direct lang_code for slash_colon format)
         lang_code = nil

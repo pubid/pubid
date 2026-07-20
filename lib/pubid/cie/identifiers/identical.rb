@@ -12,8 +12,9 @@ module Pubid
       #   CIE S 014-4/E2007 - part with dash + language
       #   CIE S 008/E:2001 (ISO 8995-1:2002(E)) - language with colon year
       class Identical < SingleIdentifier
+        include CodeAttributes # flat number/part/iteration/part_separator + #code_string
+
         attribute :s_prefix, :boolean, default: -> { false }
-        attribute :code, Components::Code
         attribute :language, Components::Language
         attribute :iso_reference, :string # The ISO identifier in parentheses
 
@@ -24,12 +25,12 @@ module Pubid
           parts << "S" if s_prefix
 
           # Code
-          parts << code.to_s if code
+          parts << code_string if number
 
           result = parts.join(" ")
 
           # Language + Year combined for slash formats before ISO reference
-          if language && (language.format == "slash_colon" || (language.format == "slash" && year && date_separator != "slash"))
+          if language && (language.format == "slash_colon" || (language.format == "slash" && year && style != "slash"))
             # Render /E:YYYY or /EYYYY (language with year, no separate date separator)
             result += if language.format == "slash_colon"
                         "/#{language.code}:#{year}" # /E:2001
@@ -39,13 +40,12 @@ module Pubid
           elsif language && language.format == "slash"
             # Language without year: /E
             result += "/#{language.code}"
-          elsif year && date_separator == "slash"
+          elsif year && style == "slash"
             # Legacy slash-year format without language: /1998
             result += "/#{year}"
           elsif year
-            # Standard date with separator (colon or dash)
-            separator = date_separator == "colon" ? ":" : "-"
-            result += "#{separator}#{year}"
+            # Standard date with separator derived from style
+            result += "#{date_sep_char}#{year}"
           end
 
           # Language (parenthetical) after date

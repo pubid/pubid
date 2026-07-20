@@ -15,8 +15,8 @@ module Pubid
 
         parts << publisher_component
 
-        if identifier.code
-          parts << identifier.code.to_s
+        if identifier.respond_to?(:code_string) && identifier.code_string
+          parts << identifier.code_string
         end
 
         year = extract_year
@@ -37,8 +37,8 @@ module Pubid
         stage = maybe(:stage)
         parts << stage.to_s.downcase if stage
 
-        date_separator = maybe(:date_separator)
-        parts << "sep.#{date_separator}" if date_separator
+        # style is the sole separator field; record it for dated identifiers
+        parts << "sep.#{maybe(:style)}" if year
 
         iec_identifier = maybe(:iec_identifier)
         parts << "iec.#{iec_identifier}" if iec_identifier
