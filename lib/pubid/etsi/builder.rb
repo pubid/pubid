@@ -95,19 +95,23 @@ module Pubid
       end
 
       def build_version(data)
-        # Handle both version and edition
+        # Handle both version and edition. A partial reference omits both, in
+        # which case version is left nil (not defaulted) so exclude/matches?
+        # treat it as a wildcard.
         if data[:version]
           Components::Version.new(version: data[:version].to_s,
                                   is_edition: false)
         elsif data[:edition]
           Components::Version.new(version: data[:edition].to_s,
                                   is_edition: true)
-        else
-          Components::Version.new(version: "1.0.0", is_edition: false)
         end
       end
 
       def build_date(data)
+        # A partial reference omits the date; leave it nil rather than building
+        # an empty Date, so the canonical to_hash drops it entirely.
+        return nil unless data[:year]
+
         Pubid::Components::Date.new(
           year: data[:year].to_s,
           month: data[:month].to_s,

@@ -458,6 +458,35 @@ module Pubid
 
         nil
       end
+
+      # CSA stores the publication year in its own plain `year` string
+      # attribute (not a `Components::Date`), so the base `#exclude`'s
+      # `:year`->`:date` remap nils the unused inherited `date` and leaves
+      # `year` intact. Override to nil `year` (and its formatting metadata)
+      # when `:year`/`:date` is excluded, so a partial (year-less) CSA
+      # reference is a year wildcard under `matches?(row, ignore: [:year])`.
+      # The metadata attrs (`year_format`, `year_prefix`,
+      # `original_year_4digit`, `french`) are year-derived — a year-less
+      # parse leaves them nil/false, so they must be reset here too or `==`
+      # would still differ. `french` in particular is only ever set from a
+      # `:F` year prefix (the French-edition form `CSA B149.1:F20`), so a
+      # bare `CSA B149.1` reference must wildcard it to match both the
+      # English and French editions of a document number. `super` preserves
+      # the base recursion into nested identifiers (adoption wrappers
+      # delegate their year to an inner id and lack a `year` accessor, hence
+      # the `respond_to?` guard). Mirrors BIPM.
+      def exclude(*args)
+        result = super
+        year_keys = args & %i[year date]
+        if !year_keys.empty? && result.respond_to?(:year=)
+          result.year = nil
+          result.year_format = nil
+          result.year_prefix = nil
+          result.original_year_4digit = false
+          result.french = nil
+        end
+        result
+      end
     end
   end
 end

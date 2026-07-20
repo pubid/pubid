@@ -12,6 +12,11 @@ module Pubid
     # The date segment (year or full "YYYY-MM-DD") never contains a colon, so
     # it is a single trailing part; the number precedes it, and an optional
     # series precedes the number.
+    #
+    # This positional pop assumes a *dated* URN (the form UrnGenerator emits for
+    # a full id). A partial (date-less) reference has no round-trippable URN —
+    # see UrnGenerator — so this parser is only guaranteed for URNs produced
+    # from a full id; a date-less URN misaligns the pops and will not parse.
     class UrnParser < Pubid::UrnParser::Base
       def parse_urn(urn)
         parts = split_parts(strip_namespace(urn))

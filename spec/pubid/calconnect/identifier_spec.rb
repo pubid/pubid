@@ -67,6 +67,33 @@ RSpec.describe Pubid::Calconnect::Identifier do
       end
     end
 
+    context "partial reference (no date)" do
+      it "parses a bare number with a nil date" do
+        parsed = described_class.parse("CC 11001")
+        expect(parsed.series).to be_nil
+        expect(parsed.number).to eq("11001")
+        expect(parsed.date).to be_nil
+        expect(parsed.date_string).to be_nil
+      end
+
+      it "parses a bare series id with a nil date" do
+        parsed = described_class.parse("CC/DIR 10006")
+        expect(parsed.series).to eq("DIR")
+        expect(parsed.number).to eq("10006")
+        expect(parsed.date).to be_nil
+      end
+
+      it "round-trips via to_s without a trailing colon" do
+        expect(described_class.parse("CC 11001").to_s).to eq("CC 11001")
+        expect(described_class.parse("CC/DIR 10006").to_s).to eq("CC/DIR 10006")
+      end
+
+      it "still rejects a bare trailing colon" do
+        expect { described_class.parse("CC 18011:") }
+          .to raise_error(RuntimeError)
+      end
+    end
+
     context "rendering without the publisher token" do
       it "drops the CC and series slash for a series id" do
         parsed = described_class.parse("CC/DIR 10006:2019")

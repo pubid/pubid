@@ -134,63 +134,74 @@ jobs:
         import re
         print("Python version:", sys.version)
 
-        # Parse Gemfile.lock to find all pubid* gems actually installed
+        # We must make the downstream gem test THIS PR's pubid checkout (at ../),
+        # not whatever pubid its Gemfile/Gemfile.lock resolves from git or
+        # rubygems. Relying on the downstream `git: branch: "main"` pin loaded a
+        # STALE cached revision, so partial-ref features under test were absent.
+        # A `path:` source is always read from disk, sidestepping git caching.
+
+        # Authoritative gem list from the discover-gems job (V2: ["pubid"]),
+        # augmented by any pubid* gems the lockfile actually resolved.
+        pubid_gems = list(json.loads('${{ needs.discover-gems.outputs.gems }}'))
+
         gemfile_lock_path = "Gemfile.lock"
-        pubid_gems_in_lock = []
-
         if os.path.exists(gemfile_lock_path):
-          print(f"Parsing {gemfile_lock_path} for pubid gems...")
+          print(f"Scanning {gemfile_lock_path} for pubid gems...")
           with open(gemfile_lock_path, 'r') as f:
-            content = f.read()
-            # Find all pubid* gems in the SPECS section
-            specs_section = False
-            for line in content.split('\n'):
-              line = line.strip()
-              if line == "SPECS":
-                specs_section = True
-                continue
-              elif line == "PLATFORMS" or line == "DEPENDENCIES" or line == "BUNDLED WITH":
-                specs_section = False
-                continue
+            for raw in f:
+              # Match a spec line under a `specs:` block, e.g. "    pubid (2.0.0)".
+              # The prior code compared against "SPECS" (never present — the real
+              # header is the lowercase, indented `specs:`), so it found nothing
+              # and silently skipped the local override.
+              m = re.match(r'^\s{4,}(pubid(?:-[\w-]+)?)\s+\(', raw)
+              if m and m.group(1) not in pubid_gems:
+                pubid_gems.append(m.group(1))
+        print(f"pubid gems to override: {pubid_gems}")
 
-              if specs_section and line.startswith('pubid'):
-                # Extract gem name (before version info)
-                gem_name = line.split(' ')[0]
-                if gem_name not in pubid_gems_in_lock:
-                  pubid_gems_in_lock.append(gem_name)
-
-          print(f"Found pubid gems in Gemfile.lock: {pubid_gems_in_lock}")
-        else:
-          print("No Gemfile.lock found, using discovered gems list")
-          pubid_gems_in_lock = json.loads('${{ needs.discover-gems.outputs.gems }}')
-
-        # Add all found pubid gems to Gemfile with local paths
-        gemfile_additions = []
-        for gem in pubid_gems_in_lock:
-          # V2 single-gem layout: root directory has pubid.gemspec
-          gem_path = "../"
-          if os.path.exists(gem_path + "pubid.gemspec"):
-            gemfile_additions.append(f'gem "{gem}", path: "{gem_path}"')
-            print(f"Will add: gem \"{gem}\", path: \"{gem_path}\"")
+        # Map each gem to its local gemspec at ../ (V2 single-gem layout has only
+        # pubid.gemspec). Skip any gem without a matching local gemspec.
+        overrides = {}
+        for gem in pubid_gems:
+          if os.path.exists(f"../{gem}.gemspec"):
+            overrides[gem] = f'gem "{gem}", path: "../"'
           else:
-            print(f"Warning: {gem_path} does not have pubid.gemspec, skipping {gem}")
+            print(f"Warning: ../{gem}.gemspec not found; cannot override {gem} locally")
 
-        # Append to Gemfile
-        if gemfile_additions:
-          with open("Gemfile", "a") as f:
-            f.write("\n# Local pubid gems for testing\n")
-            for addition in gemfile_additions:
-              f.write(addition + "\n")
-          print(f"Added {len(gemfile_additions)} pubid gems to Gemfile")
+        if not overrides:
+          print("ERROR: no local pubid gem could be resolved for override; "
+                "the downstream test would silently run against a remote/stale "
+                "pubid instead of this PR. Failing so the problem is visible.")
+          sys.exit(1)
 
-        # Remove Gemfile.lock to force re-resolution
-        if os.path.exists("Gemfile.lock"):
-          os.remove("Gemfile.lock")
+        # Rewrite the Gemfile: replace any existing declaration of each pubid gem
+        # (whatever its source) with the local path, or append it when the gem is
+        # only pulled in transitively. Replacing (not just appending) avoids a
+        # "same gem declared twice" bundler error and guarantees the local copy
+        # wins over the downstream's own `git:`/rubygems declaration.
+        with open("Gemfile", "r") as f:
+          gemfile = f.read()
+
+        for gem, local_line in overrides.items():
+          pattern = re.compile(
+            r'^[ \t]*gem\s+["\']' + re.escape(gem) + r'["\'].*$', re.MULTILINE)
+          if pattern.search(gemfile):
+            gemfile = pattern.sub(local_line, gemfile)
+            print(f"Replaced existing '{gem}' declaration -> {local_line}")
+          else:
+            gemfile += f'\n# Local pubid gem for testing\n{local_line}\n'
+            print(f"Appended local declaration -> {local_line}")
+
+        with open("Gemfile", "w") as f:
+          f.write(gemfile)
+
+        # Remove Gemfile.lock to force re-resolution against the local path.
+        if os.path.exists(gemfile_lock_path):
+          os.remove(gemfile_lock_path)
           print("Removed Gemfile.lock to force re-resolution")
 
         print("\n> Updated Gemfile:")
         sys.stdout.flush()
-        os.system("tail -20 Gemfile")
+        os.system("tail -30 Gemfile")
       working-directory: dependent
 
     - name: Remove existing msys64 symlink (Windows only)

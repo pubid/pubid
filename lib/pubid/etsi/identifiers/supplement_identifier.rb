@@ -8,6 +8,38 @@ module Pubid
         attribute :base, Pubid::Etsi::Identifiers::Base
         attribute :number, :integer
 
+        # Compact serialization: a supplement carries only its own ordinal
+        # `number` (A1 -> 1) and the nested base standard under the compact key
+        # `base`. type/code/version/date are delegated to `base` (methods below)
+        # and NOT re-emitted here, so the old redundant duplication is gone.
+        # This block is inherited unchanged by Amendment/Corrigendum.
+        key_value do
+          map "_type",  to: :_type
+          map "number", to: :number
+          map "base",   with: { to: :base_to_kv, from: :base_from_kv }
+        end
+
+        # Serialize the base via its own to_hash so it collapses to the compact
+        # EtsiStandard shape.
+        def base_to_kv(model, doc)
+          return unless model.base
+
+          doc.add_child(
+            Lutaml::KeyValue::DataModel::Element.new(
+              "base", model.base.to_hash
+            ),
+          )
+        end
+
+        # Re-dispatch through the flavor base so `_type` resolves to the
+        # concrete EtsiStandard; a bare polymorphic cast would rebuild a plain
+        # Base and lose the subclass (and its custom mappings). Mirrors JCGM.
+        def base_from_kv(model, value)
+          return unless value
+
+          model.base = Pubid::Etsi::Identifier.from_hash(value)
+        end
+
         # Inherit attributes from base
         def type
           base.type

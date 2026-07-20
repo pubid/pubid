@@ -22,7 +22,8 @@ module Pubid
                  else
                    id.series ? "#{id.series} " : ""
                  end
-        "#{prefix}#{id.number}:#{id.date_string}"
+        date = id.date_string
+        "#{prefix}#{id.number}#{":#{date}" if date}"
       end
 
       private

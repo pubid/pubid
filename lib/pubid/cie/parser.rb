@@ -198,12 +198,14 @@ module Pubid
           stage_code.maybe.as(:stage) >>
           s_prefix.maybe.as(:s_prefix) >>
           code >>
-          # Language can come BEFORE date, AFTER date, or both
+          # Language can come BEFORE date, AFTER date, or both.
+          # The whole date group is optional so a bare "CIE 015" (no year)
+          # parses with year left nil (partial reference for relaton matching).
           (
             (language >> date).as(:lang_before) |
             (date >> language.maybe).as(:date_then_lang) |
             date
-          )
+          ).maybe
       end
 
       # Standard identifier without ISO reference but with language-year (CIE S 014-4/E:2007)

@@ -19,10 +19,14 @@ module Pubid
 
       private
 
-      # Publication date as a Pubid::Components::Date. Digits are kept as
-      # strings verbatim (already zero-padded in the source, e.g. "07"/"23");
-      # month/day are nil for the common year-only form.
+      # Publication date as a Pubid::Components::Date, or nil for a partial
+      # reference that omits the trailing ":YYYY" (relaton matches such refs by
+      # excluding the date). Digits are kept as strings verbatim (already
+      # zero-padded in the source, e.g. "07"/"23"); month/day are nil for the
+      # common year-only form.
       def build_date(data)
+        return nil if data[:year].nil?
+
         ::Pubid::Components::Date.new(
           year: data[:year].to_s,
           month: data[:month]&.to_s,

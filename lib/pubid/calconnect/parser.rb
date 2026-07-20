@@ -41,8 +41,7 @@ module Pubid
           (str("/") >> series).maybe >>
           str(" ") >>
           number >>
-          str(":") >>
-          date
+          (str(":") >> date).maybe
       end
 
       rule(:root) { identifier }
