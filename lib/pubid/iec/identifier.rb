@@ -129,8 +129,13 @@ module Pubid
         map "subpart", with: { to: :subpart_to_kv, from: :subpart_from_kv }
         map "stage_iteration",
             with: { to: :stage_iteration_to_kv, from: :stage_iteration_from_kv }
-        # IEC dates are year-only, so flatten the Date component to a scalar year.
+        # date serialized flat as year/month/day, nils omitted.
         map "year", with: { to: :year_to_kv, from: :year_from_kv }
+        map "month", with: { to: :month_to_kv, from: :month_from_kv }
+        map "day", with: { to: :day_to_kv, from: :day_from_kv }
+        # IEC undated reference (e.g. IEC 60050:--). The `false` default is
+        # omitted; only the meaningful `true` round-trips via to_hash.
+        map "undated", with: { to: :undated_to_kv, from: :undated_from_kv }
         map "edition", to: :edition, render_default: false
         map "languages", to: :languages, render_default: false
         # publisher emitted only when the primary isn't the IEC default;
@@ -183,7 +188,7 @@ module Pubid
           ::Pubid::Components::Iteration.new(number: value.to_s)
       end
 
-      # --- date <-> scalar year (IEC dates are year-only) ---
+      # --- date serialized flat as year/month/day ---
       def year_to_kv(model, doc)
         y = model.date&.year
         return if y.nil? || y.to_s.empty?
@@ -195,6 +200,45 @@ module Pubid
         return if value.nil? || value.to_s.empty?
 
         (model.date ||= ::Pubid::Components::Date.new).year = value.to_s
+      end
+
+      def month_to_kv(model, doc)
+        m = model.date&.month
+        return if m.nil? || m.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("month", m.to_s))
+      end
+
+      def month_from_kv(model, value)
+        return if value.nil? || value.to_s.empty?
+
+        (model.date ||= ::Pubid::Components::Date.new).month = value.to_s
+      end
+
+      def day_to_kv(model, doc)
+        d = model.date&.day
+        return if d.nil? || d.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("day", d.to_s))
+      end
+
+      def day_from_kv(model, value)
+        return if value.nil? || value.to_s.empty?
+
+        (model.date ||= ::Pubid::Components::Date.new).day = value.to_s
+      end
+
+      # --- date undated flag (IEC undated reference, e.g. IEC 60050:--) ---
+      # The `false` default is omitted; only the meaningful `true` round-trips
+      # via to_hash / from_hash.
+      def undated_to_kv(model, doc)
+        return unless model.date&.undated?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("undated", true))
+      end
+
+      def undated_from_kv(model, value)
+        (model.date ||= ::Pubid::Components::Date.new).undated = value.to_s == "true"
       end
 
       # --- publisher: primary only when non-default; copublishers as a list ---

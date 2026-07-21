@@ -345,6 +345,46 @@ RSpec.describe Pubid::Iso::Parser do
         expect(id.languages.map(&:original_code)).to eq(["E", "F"])
         expect(id.to_s).to eq("ISO 19115:2003(E/F)")
       end
+
+      # Issue #138: undated references (ISO/IEC convention)
+      it "parses undated reference with double-dash and round-trips" do
+        id = Pubid::Iso.parse("ISO 16634:--")
+        expect(id.date).not_to be_nil
+        expect(id.date.undated?).to be true
+        expect(id.date.year).to be_nil
+        expect(id.to_s).to eq("ISO 16634:--")
+      end
+
+      it "parses undated reference with em-dash and canonicalizes to double-dash" do
+        id = Pubid::Iso.parse("ISO 16634:—")
+        expect(id.date.undated?).to be true
+        # Canonical presentation form is the double-dash, per issue #138.
+        expect(id.to_s).to eq("ISO 16634:--")
+      end
+
+      it "preserves the undated flag through to_hash / from_hash round-trip" do
+        id = Pubid::Iso.parse("ISO 16634:--")
+        rebuilt = Pubid::Iso::Identifier.from_hash(id.to_hash)
+        expect(rebuilt.date.undated?).to be true
+        expect(rebuilt.to_s).to eq("ISO 16634:--")
+      end
+
+      it "round-trip via to_hash does not collapse undated to bare" do
+        undated = Pubid::Iso.parse("ISO 16634:--")
+        bare = Pubid::Iso.parse("ISO 16634")
+        # The undated form has a date slot; bare does not — they must not
+        # compare equal, and exclude(:date) must converge them.
+        expect(undated).not_to eq(bare)
+        expect(undated.exclude(:date)).to eq(bare.exclude(:date))
+        expect(undated.matches?(bare, ignore: [:date])).to be true
+      end
+
+      it "drops the year slot in the URN for undated references (issue #138, option A)" do
+        id = Pubid::Iso.parse("ISO 16634:--")
+        bare = Pubid::Iso.parse("ISO 16634")
+        # URN collapses undated to date-less form — same as bare.
+        expect(id.to_urn).to eq(bare.to_urn)
+      end
     end
 
     context "stage patterns" do

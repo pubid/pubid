@@ -125,9 +125,11 @@ module Pubid
 
       def parse_date(value)
         value = value.to_s
-        if value.match?(/^\d{4}(-\d{2})?$/)
-          year, month = value.split("-")
-          Pubid::Components::Date.new(year: year, month: month || nil)
+        if value.match?(/^\d{4}(-\d{2}){0,2}$/)
+          year, month, day = value.split("-")
+          Pubid::Components::Date.new(year: year,
+                                       month: month || nil,
+                                       day: day || nil)
         elsif value.is_a?(Integer) || (value.is_a?(String) && value.match?(/^\d{4}$/))
           Pubid::Components::Date.new(year: value)
         else

@@ -148,12 +148,16 @@ module Pubid
       end
 
       rule(:date) do
-        # :2005-02
+        # :2005-02 or :-- (undated reference — ISO/IEC undated-reference form,
+        # e.g. ISO 16634:--, also accepted as the em-dash variant ISO 16634:—)
         (str(":") | dash) >>
-          (year_digits >>
-            (dash >> month_digits).maybe >>
-            (dash >> day_digits).maybe
-          ).as(:date).maybe
+          (
+            (str("--") | str("—")).as(:undated_marker) |
+              (year_digits >>
+                (dash >> month_digits).maybe >>
+                (dash >> day_digits).maybe
+              ).as(:date)
+          ).maybe
       end
 
       rule(:part_and_subpart) do

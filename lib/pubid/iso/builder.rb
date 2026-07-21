@@ -230,6 +230,11 @@ module Pubid
         when :date
           parse_date(value)
 
+        when :undated_marker
+          # ISO/IEC undated reference (e.g. "ISO 16634:--") — explicit
+          # publication-date slot with no year; round-trips via date.render.
+          { date: Pubid::Components::Date.new(undated: true) }
+
         when :edition
           # value can be "Ed.2", "Ed 2", "ED1", "Edition 13", or just "Ed"
           original_text = value.to_s

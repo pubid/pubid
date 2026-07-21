@@ -48,7 +48,7 @@ module Pubid
           (part ? "-#{part}" : ""),
           (subpart ? "-#{subpart}" : ""),
           (stage_iteration ? ".#{stage_iteration}" : ""),
-          (date ? ":#{date.year}" : ""),
+          (date ? ":#{date.render}" : ""),
         ].join
       end
 
