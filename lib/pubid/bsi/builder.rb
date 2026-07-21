@@ -674,7 +674,7 @@ module Pubid
         topic = @original_data[:expert_commentary_topic]&.to_s
 
         Identifiers::ExpertCommentary.new(
-          base_identifier: base_id,
+          base: base_id,
           format: format,
           topic: topic,
         )
@@ -724,7 +724,7 @@ module Pubid
                           end
 
         Identifiers::SupplementDocument.new(
-          base_identifier: base_id,
+          base: base_id,
           supplement_number: data[:supplement_number].to_s,
           supplement_year: data[:supplement_year].to_i,
           supplement_type: supplement_type,
@@ -771,7 +771,7 @@ module Pubid
         end
 
         Identifiers::AddendumDocument.new(
-          base_identifier: base_id,
+          base: base_id,
           addendum_number: data[:addendum_number].to_s,
           addendum_year: data[:addendum_year].to_i,
           addendum_type: addendum_type,
@@ -837,7 +837,7 @@ module Pubid
         base_id = build(base_data)
 
         Identifiers::ValueAddedPublication.new(
-          base_identifier: base_id,
+          base: base_id,
           format: format,
         )
       end
@@ -882,14 +882,14 @@ module Pubid
 
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
-              base_identifier: nil, # NA supplements don't wrap base
+              base: nil, # NA supplements don't wrap base
               amendment_number: supp[:number],
               amendment_year: year_val&.to_i,
               separator: supp[:separator] || "+",
             )
           else
             Identifiers::Corrigendum.new(
-              base_identifier: nil,
+              base: nil,
               corrigendum_number: supp[:number],
               corrigendum_year: year_val&.to_i,
               separator: supp[:separator] || "+",
@@ -1411,17 +1411,17 @@ module Pubid
         end
       end
 
-      def wrap_with_consolidated(base_identifier, supplements_data,
+      def wrap_with_consolidated(base, supplements_data,
 expert_commentary: nil, expert_commentary_topic: nil)
-        # If expert_commentary data is provided, set it on the base_identifier
+        # If expert_commentary data is provided, set it on the base
         # This allows ConsolidatedIdentifier to render the ExComm suffix correctly
         if expert_commentary
-          base_attrs = base_identifier.class.attributes
+          base_attrs = base.class.attributes
           if base_attrs.key?(:expert_commentary)
-            base_identifier.expert_commentary = expert_commentary
+            base.expert_commentary = expert_commentary
           end
           if expert_commentary_topic && base_attrs.key?(:expert_commentary_topic)
-            base_identifier.expert_commentary_topic = expert_commentary_topic
+            base.expert_commentary_topic = expert_commentary_topic
           end
         end
 
@@ -1436,7 +1436,7 @@ expert_commentary: nil, expert_commentary_topic: nil)
 
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
-              base_identifier: base_identifier,
+              base: base,
               amendment_number: supp[:number],
               amendment_year: year_val&.to_i,
               separator: supp[:separator] || "+",
@@ -1444,7 +1444,7 @@ expert_commentary: nil, expert_commentary_topic: nil)
             )
           else
             Identifiers::Corrigendum.new(
-              base_identifier: base_identifier,
+              base: base,
               corrigendum_number: supp[:number],
               corrigendum_year: year_val&.to_i,
               separator: supp[:separator] || "+",
@@ -1453,7 +1453,7 @@ expert_commentary: nil, expert_commentary_topic: nil)
         end
 
         Identifiers::ConsolidatedIdentifier.new(
-          identifiers: [base_identifier] + supplement_ids,
+          identifiers: [base] + supplement_ids,
         )
       end
 

@@ -164,19 +164,19 @@ module Pubid
           return build_multi_numbered_identifier(parsed_hash)
         end
 
-        # Handle corrigendum supplements (check for base_identifier + cor_number)
+        # Handle corrigendum supplements (check for base + cor_number)
         # This enables recursive base identifier parsing like ISO/IEC Amendment
-        if parsed_hash[:base_identifier] && parsed_hash[:cor_number]
+        if parsed_hash[:base] && parsed_hash[:cor_number]
           return build_corrigendum_supplement(parsed_hash)
         end
 
-        # Handle interpretation supplements (check for base_identifier + int_year)
-        if parsed_hash[:base_identifier] && (parsed_hash[:int_year] || parsed_hash[:interpretation])
+        # Handle interpretation supplements (check for base + int_year)
+        if parsed_hash[:base] && (parsed_hash[:int_year] || parsed_hash[:interpretation])
           return build_interpretation_supplement(parsed_hash)
         end
 
-        # Handle conformance supplements (check for base_identifier + conf_number)
-        if parsed_hash[:base_identifier] && parsed_hash[:conf_number]
+        # Handle conformance supplements (check for base + conf_number)
+        if parsed_hash[:base] && parsed_hash[:conf_number]
           return build_conformance_supplement(parsed_hash)
         end
 
@@ -203,7 +203,7 @@ module Pubid
       def build_corrigendum_supplement(parsed_hash)
         # Reconstruct base identifier string from parsed components
         base_parts = []
-        base_data = parsed_hash[:base_identifier]
+        base_data = parsed_hash[:base]
 
         # Extract publisher
         if base_data[:publishers]
@@ -261,7 +261,7 @@ module Pubid
         base_string = base_parts.join(" ")
 
         # Recursively parse base identifier using Base.parse
-        base_identifier = Identifiers::Base.parse(base_string)
+        base = Identifiers::Base.parse(base_string)
 
         # Extract corrigendum attributes
         cor_number = extract_value(parsed_hash[:cor_number])
@@ -269,7 +269,7 @@ module Pubid
 
         # Create Corrigendum with parsed base
         Identifiers::Corrigendum.new(
-          base_identifier: base_identifier,
+          base: base,
           cor_number: cor_number,
           cor_year: cor_year,
         )
@@ -281,7 +281,7 @@ module Pubid
       def build_interpretation_supplement(parsed_hash)
         # Reconstruct base identifier string from parsed components (same logic as corrigendum)
         base_parts = []
-        base_data = parsed_hash[:base_identifier]
+        base_data = parsed_hash[:base]
 
         # Extract publisher
         if base_data[:publishers]
@@ -337,14 +337,14 @@ module Pubid
         base_string = base_parts.join(" ")
 
         # Recursively parse base identifier using Base.parse
-        base_identifier = Identifiers::Base.parse(base_string)
+        base = Identifiers::Base.parse(base_string)
 
         # Extract interpretation attributes
         int_year = extract_value(parsed_hash[:int_year])
 
         # Create InterpretationIdentifier with parsed base
         Identifiers::InterpretationIdentifier.new(
-          base_identifier: base_identifier,
+          base: base,
           int_year: int_year,
         )
       end
@@ -355,7 +355,7 @@ module Pubid
       def build_conformance_supplement(parsed_hash)
         # Reconstruct base identifier string from parsed components (same logic as corrigendum)
         base_parts = []
-        base_data = parsed_hash[:base_identifier]
+        base_data = parsed_hash[:base]
 
         # Extract publisher
         if base_data[:publishers]
@@ -411,7 +411,7 @@ module Pubid
         base_string = base_parts.join(" ")
 
         # Recursively parse base identifier using Base.parse
-        base_identifier = Identifiers::Base.parse(base_string)
+        base = Identifiers::Base.parse(base_string)
 
         # Extract conformance attributes
         conf_number = extract_value(parsed_hash[:conf_number])
@@ -419,7 +419,7 @@ module Pubid
 
         # Create ConformanceIdentifier with parsed base
         Identifiers::ConformanceIdentifier.new(
-          base_identifier: base_identifier,
+          base: base,
           conf_number: conf_number,
           conf_year: conf_year,
         )

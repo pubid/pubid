@@ -48,9 +48,9 @@ RSpec.describe Pubid::Plateau do
 
         expect(result).to be_a(Pubid::Plateau::Identifiers::Annex)
         expect(result.letter).to eq("A")
-        expect(result.base_identifier).to be_a(Pubid::Plateau::Identifiers::Handbook)
-        expect(result.base_identifier.number).to eq(0)
-        expect(result.base_identifier.edition).to eq("1.0")
+        expect(result.base).to be_a(Pubid::Plateau::Identifiers::Handbook)
+        expect(result.base.number).to eq(0)
+        expect(result.base.edition).to eq("1.0")
         expect(result.to_s).to eq("PLATEAU Handbook #00 第1.0版 Annex A")
       end
 
@@ -59,8 +59,8 @@ RSpec.describe Pubid::Plateau do
 
         expect(result).to be_a(Pubid::Plateau::Identifiers::Annex)
         expect(result.letter).to eq("B")
-        expect(result.base_identifier).to be_a(Pubid::Plateau::Identifiers::TechnicalReport)
-        expect(result.base_identifier.number).to eq(1)
+        expect(result.base).to be_a(Pubid::Plateau::Identifiers::TechnicalReport)
+        expect(result.base.number).to eq(1)
         expect(result.to_s).to eq("PLATEAU Technical Report #01 Annex B")
       end
 
@@ -69,9 +69,9 @@ RSpec.describe Pubid::Plateau do
 
         expect(result).to be_a(Pubid::Plateau::Identifiers::Annex)
         expect(result.letter).to eq("C")
-        expect(result.base_identifier.number).to eq(3)
-        expect(result.base_identifier.annex).to eq(1)
-        expect(result.base_identifier.edition).to eq("2.0")
+        expect(result.base.number).to eq(3)
+        expect(result.base.annex).to eq(1)
+        expect(result.base.edition).to eq("2.0")
         expect(result.to_s).to eq("PLATEAU Handbook #03-1 第2.0版 Annex C")
       end
     end

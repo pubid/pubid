@@ -11,7 +11,7 @@ module Pubid
       # "BS 2000-0:Addendum 1:1983"
       # "BS 6034:1981:Addendum No. 1:1986"
       class AddendumDocument < SingleIdentifier
-        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
+        attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :addendum_number, :string
         attribute :addendum_year, :integer
         attribute :addendum_type, :string, default: -> {
@@ -22,7 +22,7 @@ module Pubid
         } # Separator before Addendum (":" or " ")
 
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
       end
     end

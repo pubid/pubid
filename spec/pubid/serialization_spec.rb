@@ -17,8 +17,8 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
     it_behaves_like "a round-trippable identifier", :Iso, "ISO 4"
   end
 
-  describe "supplements (nested base_identifier)" do
-    it "Amendment has nested base_identifier with _type discriminator" do
+  describe "supplements (nested base)" do
+    it "Amendment has nested base with _type discriminator" do
       id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
       hash = id.to_hash
 
@@ -27,14 +27,14 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
       expect(hash["base"]["number"]).to eq("9001")
     end
 
-    it "round-trips Amendment with base_identifier" do
+    it "round-trips Amendment with base" do
       id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
       hash = id.to_hash
       restored = id.class.from_hash(hash)
 
       expect(restored.class).to eq(Pubid::Iso::Identifiers::Amendment)
-      expect(restored.base_identifier.class).to eq(Pubid::Iso::Identifiers::InternationalStandard)
-      expect(restored.base_identifier.number.value).to eq("9001")
+      expect(restored.base.class).to eq(Pubid::Iso::Identifiers::InternationalStandard)
+      expect(restored.base.number.value).to eq("9001")
       expect(restored.number.value).to eq("1")
     end
 
@@ -44,8 +44,8 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
       restored = id.class.from_hash(hash)
 
       expect(restored.class).to eq(Pubid::Iso::Identifiers::Corrigendum)
-      expect(restored.base_identifier.class).to eq(Pubid::Iso::Identifiers::Amendment)
-      expect(restored.base_identifier.base_identifier.class).to eq(Pubid::Iso::Identifiers::InternationalStandard)
+      expect(restored.base.class).to eq(Pubid::Iso::Identifiers::Amendment)
+      expect(restored.base.base.class).to eq(Pubid::Iso::Identifiers::InternationalStandard)
     end
 
     it "3-level nesting has _type discriminator at each level" do

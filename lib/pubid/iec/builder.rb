@@ -24,15 +24,15 @@ module Pubid
 
       def build(parsed_hash)
         # Handle sheet_supplement_identifier pattern:
-        # {base_identifier: {...}, sheet_number: ..., sheet_year: ..., type_with_stage: "COR", number_with_part: "1", date: "1995"}
+        # {base: {...}, sheet_number: ..., sheet_year: ..., type_with_stage: "COR", number_with_part: "1", date: "1995"}
         # This is a Corrigendum/Amendment wrapping a SheetIdentifier
-        if parsed_hash[:base_identifier] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year]) && parsed_hash[:type_with_stage]
+        if parsed_hash[:base] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year]) && parsed_hash[:type_with_stage]
           # Extract sheet info first
           sheet_number = parsed_hash.delete(:sheet_number)
           sheet_year = parsed_hash.delete(:sheet_year)
 
           # Build the base identifier (IEC 60695-2-1 with /1:1994 -> SheetIdentifier)
-          base_parsed = parsed_hash[:base_identifier].dup
+          base_parsed = parsed_hash[:base].dup
           base_parsed[:sheet_number] = sheet_number
           base_parsed[:sheet_year] = sheet_year if sheet_year
           sheet_id = wrap_with_sheet(build(base_parsed), sheet_number,
@@ -68,10 +68,10 @@ module Pubid
           return wrap_with_supplement(sheet_id, supplement)
         end
 
-        # Handle sheet_identifier pattern: {base_identifier: {...}, sheet_number: ..., sheet_year: ...}
-        if parsed_hash[:base_identifier] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year])
+        # Handle sheet_identifier pattern: {base: {...}, sheet_number: ..., sheet_year: ...}
+        if parsed_hash[:base] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year])
           # Build the base identifier first
-          base_id = build(parsed_hash[:base_identifier])
+          base_id = build(parsed_hash[:base])
           # Wrap with SheetIdentifier
           sheet_number = parsed_hash.delete(:sheet_number)
           sheet_year = parsed_hash.delete(:sheet_year)
@@ -105,8 +105,8 @@ module Pubid
           fragment_edition = parsed_hash.delete(:edition)
 
           # Build the base identifier (Amendment/Corrigendum) directly
-          if parsed_hash[:base_identifier]
-            base_id = build(parsed_hash[:base_identifier])
+          if parsed_hash[:base]
+            base_id = build(parsed_hash[:base])
             return wrap_with_fragment(base_id, fragment_number,
                                       fragment_edition, fragment_typed_stage)
           end
@@ -235,10 +235,10 @@ module Pubid
       end
 
       # Wrap identifier with FragmentIdentifier for /FRAGN notation
-      def wrap_with_fragment(base_identifier, fragment_number,
+      def wrap_with_fragment(base, fragment_number,
       edition_data = nil, typed_stage = nil)
         fragment = Identifiers::FragmentIdentifier.new(
-          base_identifier: base_identifier,
+          base: base,
           fragment_number: fragment_number,
         )
 
@@ -254,25 +254,25 @@ module Pubid
       end
 
       # Wrap identifier with SheetIdentifier for /N:YEAR notation
-      def wrap_with_sheet(base_identifier, sheet_number, sheet_year)
+      def wrap_with_sheet(base, sheet_number, sheet_year)
         # Only pass year if it's present
         year_value = sheet_year&.to_s
 
         Identifiers::SheetIdentifier.new(
-          base_identifier: base_identifier,
+          base: base,
           sheet_number: sheet_number.to_s,
           year: year_value,
         )
       end
 
       # Wrap base identifier with supplement (Amendment/Corrigendum)
-      def wrap_with_supplement(base_identifier, supplement)
-        supplement.base_identifier = base_identifier
+      def wrap_with_supplement(base, supplement)
+        supplement.base = base
         supplement
       end
 
       # Wrap identifier with ConsolidatedIdentifier for +AMD chains
-      def wrap_with_consolidated(base_identifier, supplements_data)
+      def wrap_with_consolidated(base, supplements_data)
         supplements = supplements_data.filter_map do |supp|
           type = supp[:supplement_type].to_s
           number = supp[:supplement_number].to_s
@@ -295,31 +295,31 @@ module Pubid
         end
 
         Identifiers::ConsolidatedIdentifier.new(
-          identifiers: [base_identifier] + supplements,
+          identifiers: [base] + supplements,
         )
       end
 
       # Wrap identifier with VapIdentifier for one or more VAP codes
       # (e.g. "CSV" or "EXV-CMV").
-      def wrap_with_vap(base_identifier, vap_suffix_data)
+      def wrap_with_vap(base, vap_suffix_data)
         vap = vap_suffix_data.to_s.split("-")
 
         # Extract edition - need to go deep for ConsolidatedIdentifier
         edition = nil
-        if base_identifier.is_a?(Identifiers::ConsolidatedIdentifier)
+        if base.is_a?(Identifiers::ConsolidatedIdentifier)
           # Edition is on the first identifier (base document)
-          base_first = base_identifier.identifiers.first
+          base_first = base.identifiers.first
           if base_first && base_first.class.attributes.key?(:edition)
             edition = base_first.edition
             base_first.edition = nil
           end
-        elsif base_identifier.class.attributes.key?(:edition)
-          edition = base_identifier.edition
-          base_identifier.edition = nil
+        elsif base.class.attributes.key?(:edition)
+          edition = base.edition
+          base.edition = nil
         end
 
         Identifiers::VapIdentifier.new(
-          base_identifier: base_identifier,
+          base: base,
           vap: vap,
           edition: edition,
         )
@@ -339,7 +339,7 @@ module Pubid
 
       def cast(type, value)
         case type
-        when :base_identifier
+        when :base
           # If it has a base identifier, we need to build a supplement
           # We assume that the base identifier is already a valid Identifier object
           build(value)

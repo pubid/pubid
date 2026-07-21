@@ -56,48 +56,48 @@ module Pubid
 
       # Addendum: "ASHRAE Addendum a to Standard 15-2001"
       def render_addendum(id)
-        return id.base_identifier.to_s unless id.base_identifier
+        return id.base.to_s unless id.base
 
-        base_type = id.base_identifier.type || "Standard"
+        base_type = id.base.type || "Standard"
 
         if id.copublisher
-          "#{id.copublisher} Addendum #{id.addendum_code} to #{id.base_identifier}"
+          "#{id.copublisher} Addendum #{id.addendum_code} to #{id.base}"
         else
-          result = "ASHRAE Addendum #{id.addendum_code} to #{base_type} #{id.base_identifier.code}"
-          result += "-#{id.base_identifier.year}" if id.base_identifier.year
+          result = "ASHRAE Addendum #{id.addendum_code} to #{base_type} #{id.base.code}"
+          result += "-#{id.base.year}" if id.base.year
           result
         end.tap { |r| r << " (#{id.addendum_date})" if id.addendum_date }
       end
 
       # AddendaPackage: "ASHRAE Standard 52.2-1999: Addenda Supplement Package"
       def render_addenda_package(id)
-        return id.base_identifier.to_s unless id.base_identifier
+        return id.base.to_s unless id.base
 
-        result = "ASHRAE #{id.base_identifier.type || 'Standard'} #{id.base_identifier.code}"
-        result += "-#{id.base_identifier.year}" if id.base_identifier.year
+        result = "ASHRAE #{id.base.type || 'Standard'} #{id.base.code}"
+        result += "-#{id.base.year}" if id.base.year
         result += ": Addenda #{id.package_description}" if id.package_description
         result
       end
 
       # CombinedAddenda: "ASHRAE Addenda c and d to Standard 15-1994"
       def render_combined_addenda(id)
-        return id.base_identifier.to_s unless id.base_identifier
+        return id.base.to_s unless id.base
 
-        base_type = id.base_identifier.type || "Standard"
+        base_type = id.base.type || "Standard"
         if id.addendum_codes
-          result = "ASHRAE Addenda #{id.addendum_codes} to #{base_type} #{id.base_identifier.code}"
+          result = "ASHRAE Addenda #{id.addendum_codes} to #{base_type} #{id.base.code}"
         else
-          result = "ASHRAE Addenda to #{base_type} #{id.base_identifier.code}"
+          result = "ASHRAE Addenda to #{base_type} #{id.base.code}"
         end
-        result += "-#{id.base_identifier.year}" if id.base_identifier.year
+        result += "-#{id.base.year}" if id.base.year
         result
       end
 
       # Errata: "ASHRAE Guideline 0-2005 Errata (September 28, 2011)"
       def render_errata(id)
-        return id.base_identifier.to_s unless id.base_identifier
+        return id.base.to_s unless id.base
 
-        result = id.base_identifier.to_s
+        result = id.base.to_s
         result += " Errata"
         result += " (#{id.errata_date})" if id.errata_date
         result
@@ -105,11 +105,11 @@ module Pubid
 
       # Interpretation: "Interpretations for Standard 15.2-2022"
       def render_interpretation(id)
-        return id.base_identifier.to_s unless id.base_identifier
+        return id.base.to_s unless id.base
 
-        base_type = id.base_identifier.type || "Standard"
-        result = "Interpretations for #{base_type} #{id.base_identifier.code}"
-        result += "-#{id.base_identifier.year}" if id.base_identifier.year
+        base_type = id.base.type || "Standard"
+        result = "Interpretations for #{base_type} #{id.base.code}"
+        result += "-#{id.base.year}" if id.base.year
         result
       end
     end

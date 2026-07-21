@@ -160,13 +160,13 @@ module Pubid
       # ------------------------------------------------------------------
 
       def render_addendum_document(id, opts)
-        result = id.base_identifier.to_s(**opts)
+        result = id.base.to_s(**opts)
 
-        base_has_year = id.base_identifier.to_s =~ /:(\d{4})$/
+        base_has_year = id.base.to_s =~ /:(\d{4})$/
 
         sep = if id.separator == ":"
                 ":"
-              elsif base_has_year && id.base_identifier.to_s !~ /:\d{4}:/
+              elsif base_has_year && id.base.to_s !~ /:\d{4}:/
                 " "
               else
                 id.separator
@@ -289,7 +289,7 @@ module Pubid
       end
 
       def render_amendment(id)
-        base = id.base_identifier ? id.base_identifier.to_s : ""
+        base = id.base ? id.base.to_s : ""
 
         if id.amd_suffix_form
           # Trailing " AMD5" / " AMD AA" suffix form
@@ -471,7 +471,7 @@ module Pubid
       end
 
       def render_corrigendum(id)
-        result = id.base_identifier ? id.base_identifier.to_s : ""
+        result = id.base ? id.base.to_s : ""
         result += "#{id.separator}C"
         result += id.corrigendum_number.to_s if id.corrigendum_number
         result += ":#{id.corrigendum_year}" if id.corrigendum_year
@@ -589,7 +589,7 @@ module Pubid
       end
 
       def render_expert_commentary(id)
-        base_str = id.base_identifier.to_s
+        base_str = id.base.to_s
         base_str = base_str.sub(/ (Expert Commentary|ExComm(\s*\(.*\))?)$/, "")
 
         case id.format
@@ -895,7 +895,7 @@ module Pubid
       end
 
       def render_supplement_document(id)
-        base_str = id.base_identifier.to_s
+        base_str = id.base.to_s
 
         if id.reverse_format
           supplement_str = if id.supplement_type == "No."
@@ -998,7 +998,7 @@ module Pubid
       end
 
       def render_value_added_publication(id, opts)
-        base_str = id.base_identifier.to_s(**opts)
+        base_str = id.base.to_s(**opts)
 
         case id.format
         when "TC"

@@ -23,6 +23,12 @@ module Pubid
         attribute :year_format, :string # Dummy for compatibility
         attribute :separator, :string, default: -> { "/" } # "/" or ", "
 
+        # CSA combined ids are not Pubid::Identifier objects, so they do not
+        # inherit #root. They are their own origin for matching purposes.
+        def root
+          self
+        end
+
         def to_s
           # For comma separator, render both parts with full prefix
           # For slash separator, second/third parts without prefix

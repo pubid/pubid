@@ -9,7 +9,7 @@ module Pubid
 
       def build(parsed)
         # Check for annex supplement first
-        if parsed[:base_identifier] && parsed[:annex_letter]
+        if parsed[:base] && parsed[:annex_letter]
           return build_annex(parsed)
         end
 
@@ -38,10 +38,10 @@ module Pubid
 
       def build_annex(parsed)
         # Recursively parse base identifier
-        base = build(parsed[:base_identifier])
+        base = build(parsed[:base])
 
         Identifiers::Annex.new(
-          base_identifier: base,
+          base: base,
           letter: parsed[:annex_letter].to_s,
         )
       end

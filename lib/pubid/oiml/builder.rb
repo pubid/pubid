@@ -21,8 +21,8 @@ module Pubid
           return build_short_amendment(parsed_hash)
         end
 
-        # Check for supplements first (have base_identifier)
-        if parsed_hash[:base_identifier]
+        # Check for supplements first (have base)
+        if parsed_hash[:base]
           return build_supplement(parsed_hash)
         end
 
@@ -53,11 +53,11 @@ module Pubid
         end
 
         # Build the base document
-        base_identifier = build_base_document(base_hash)
+        base = build_base_document(base_hash)
 
         # Create amendment
         amendment = Identifiers::Amendment.new
-        amendment.base_identifier = base_identifier
+        amendment.base = base
 
         # Extract year from edition_format if present, otherwise from year directly
         year_value = if parsed_hash[:edition_format].is_a?(Hash)
@@ -97,8 +97,8 @@ module Pubid
         supplement.joined = true if plus_marker
 
         # Recursively parse base identifier
-        if parsed_hash[:base_identifier]
-          supplement.base_identifier = build(parsed_hash[:base_identifier])
+        if parsed_hash[:base]
+          supplement.base = build(parsed_hash[:base])
         end
 
         # Extract year from edition_format if present, otherwise from year directly
@@ -116,7 +116,7 @@ module Pubid
         # Annex with no year of its own but a dated base ("R 60:2017 Annexes"):
         # the year belongs to the base and must render glued to it.
         if supplement.is_a?(Identifiers::Annex) && !year_value &&
-            supplement.base_identifier&.date
+            supplement.base&.date
           supplement.year_on_base = true
         end
 

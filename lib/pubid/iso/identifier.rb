@@ -103,7 +103,7 @@ module Pubid
       # The base Pubid::Identifier no longer auto-maps attributes, so each
       # flavor's top class must declare its own key_value mapping. Subclasses
       # merge their own blocks on top of this one (e.g. SupplementIdentifier
-      # adds base_identifier; Directives adds subgroup), so list every base
+      # adds base; Directives adds subgroup), so list every base
       # attribute ISO serializes here once.
       key_value do
         map "_type", to: :_type, polymorphic_map: ISO_TYPE_MAP

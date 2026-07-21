@@ -53,7 +53,7 @@ module Pubid
         # Build base identifier (without package_portion)
         base_data = parsed_hash.dup
         base_data.delete(:package_portion)
-        package.base_identifier = build_single(base_data)
+        package.base = build_single(base_data)
 
         # Set package materials
         if parsed_hash[:package_portion]

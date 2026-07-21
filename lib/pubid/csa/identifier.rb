@@ -355,12 +355,12 @@ module Pubid
           end
 
           # Parse base identifier recursively
-          base_identifier = base_input ? parse(base_input) : nil
-          return nil unless base_identifier
+          base = base_input ? parse(base_input) : nil
+          return nil unless base
 
           # Create PackageIdentifier
           result = Identifiers::Package.new
-          result.base_identifier = base_identifier
+          result.base = base
           # Set materials if present
           if package_materials && !package_materials.empty?
             result.package_materials = package_materials

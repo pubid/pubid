@@ -6,7 +6,7 @@ module Pubid
   module Cie
     module Identifiers
       # Corrigendum identifier for CIE (/CorN notation).
-      # Wraps a nested base_identifier — a Standard, or a Supplement when the
+      # Wraps a nested base — a Standard, or a Supplement when the
       # corrigendum applies to a supplement (CIE 198-SP1.4:2011/Cor1:2013).
       # The "/CorN:year" is a clean trailing suffix on the base's rendering.
       # Examples: CIE 232:2019/Cor1:2020, CIE 198-SP1.4:2011/Cor1:2013
@@ -28,7 +28,7 @@ module Pubid
         end
 
         def to_s
-          "#{base_identifier}/Cor#{cor_number}:#{cor_year}"
+          "#{base}/Cor#{cor_number}:#{cor_year}"
         end
       end
     end

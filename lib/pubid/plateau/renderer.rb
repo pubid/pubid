@@ -44,7 +44,7 @@ module Pubid
       end
 
       def render_supplement(id)
-        "#{id.base_identifier} #{id.supplement_string}"
+        "#{id.base} #{id.supplement_string}"
       end
     end
   end

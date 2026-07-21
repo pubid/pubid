@@ -39,11 +39,11 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -86,7 +86,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -129,11 +129,11 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -176,7 +176,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -219,11 +219,11 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -269,7 +269,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -312,7 +312,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -359,7 +359,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -403,11 +403,11 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses supplement date" do
@@ -453,11 +453,11 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("dir")
+        expect(parsed.base.typed_stage.type_code).to eq("dir")
       end
 
       it "parses edition" do

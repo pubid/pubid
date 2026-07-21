@@ -6,23 +6,23 @@ module Pubid
     # Supplements wrap a base identifier with additional edition information
     #
     # Architecture follows ISO pattern:
-    # - base_identifier: The base document being supplemented
+    # - base: The base document being supplemented
     # - edition: Edition information for the supplement
     #
     # Examples:
     # - "NBS CIRC 101e2supp" → CircularSupplement(base: "NBS CIRC 101", edition: e2)
     # - "NBS CIRC 25supp-1924" → CircularSupplement(base: "NBS CIRC 25", edition: 1924)
     class SupplementIdentifier < Identifiers::Base
-      attribute :base_identifier, Identifiers::Base, polymorphic: true
+      attribute :base, Identifiers::Base, polymorphic: true
 
-      # Delegate publisher to base_identifier
+      # Delegate publisher to base
       def publisher
-        base_identifier&.publisher
+        base&.publisher
       end
 
-      # Delegate series to base_identifier
+      # Delegate series to base
       def series
-        base_identifier&.series
+        base&.series
       end
 
       def to_s(format = :short)
@@ -31,9 +31,9 @@ module Pubid
           return "NBS CIRC sup#{supplement_date_range_start}-#{supplement_date_range_end}"
         end
 
-        return super unless base_identifier
+        return super unless base
 
-        result = base_identifier.to_s(format)
+        result = base.to_s(format)
 
         # NEW: Handle update attribute (e.g., "Upd12-1926" for supplement patterns)
         if update

@@ -16,11 +16,17 @@ module Pubid
     class CompositeIdentifier < Lutaml::Model::Serializable
       # The primary/base identifier
       # Use attr_accessor since it can be any identifier object
-      attr_accessor :base_identifier
+      attr_accessor :base
 
       # Subclasses MUST implement to_s to define how they render
       def to_s
         raise NotImplementedError, "Subclasses must implement to_s method"
+      end
+
+      # CSA composites are not Pubid::Identifier objects, so they do not inherit
+      # #root. They are their own origin for matching purposes.
+      def root
+        self
       end
     end
   end

@@ -92,7 +92,7 @@ RSpec.describe "Pubid::Oiml failing-docid categories" do
     it "builds an Errata supplement for the Errata word" do
       id = Pubid::Oiml.parse("OIML R 126:2015 Errata")
       expect(id).to be_a(Pubid::Oiml::Identifiers::Errata)
-      expect(id.base_identifier.date.year).to eq("2015")
+      expect(id.base.date.year).to eq("2015")
     end
   end
 

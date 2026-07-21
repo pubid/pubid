@@ -5,27 +5,27 @@ require "lutaml/model"
 module Pubid
   module CenCenelec
     class SupplementIdentifier < Identifiers::Base
-      attribute :base_identifier, Identifiers::Base, polymorphic: true
+      attribute :base, Identifiers::Base, polymorphic: true
       attribute :number, Components::Code
       attribute :date, Components::Date
       attribute :stage, Components::Stage
       attribute :type, Components::Type
       attribute :typed_stage, Components::TypedStage
 
-      # Delegate methods to base_identifier for convenient access
+      # Delegate methods to base for convenient access
       def publisher
-        base_identifier&.publisher
+        base&.publisher
       end
 
       def copublishers
-        base_identifier&.copublishers
+        base&.copublishers
       end
 
       def <=>(other)
         return nil unless other.is_a?(SupplementIdentifier)
 
         # Compare base identifiers first
-        base_cmp = base_identifier <=> other.base_identifier
+        base_cmp = base <=> other.base
         return base_cmp unless base_cmp.zero?
 
         # Then compare numbers

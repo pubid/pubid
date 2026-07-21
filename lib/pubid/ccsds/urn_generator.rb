@@ -91,14 +91,14 @@ module Pubid
 
         while current.is_a?(SupplementIdentifier)
           supplement_chain.unshift(current)
-          current = current.base_identifier
+          current = current.base
         end
 
         base_gen = self.class.new(current)
         base_urn = base_gen.generate_base_urn
 
-        base_identifier_part = base_urn.sub(/^urn:ccsds:/, "")
-        parts << base_identifier_part
+        base_part = base_urn.sub(/^urn:ccsds:/, "")
+        parts << base_part
 
         supplement_chain.each do |supp|
           if supp.number && !supp.number.to_s.empty?

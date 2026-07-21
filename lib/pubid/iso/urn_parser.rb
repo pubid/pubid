@@ -425,7 +425,7 @@ typed_stage
 
           # Wrap current identifier with supplement
           base_hash = {
-            base_identifier: base_hash,
+            base: base_hash,
             **supp_hash,
           }
         end

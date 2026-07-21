@@ -35,11 +35,11 @@ module Pubid
 
         # Delegate base identifier attributes for easier access
         def copublishers
-          base_identifier&.copublishers
+          base&.copublishers
         end
 
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         TYPED_STAGES = [
@@ -61,7 +61,7 @@ module Pubid
         # def render_directives_supplement_identifier(identifier)
         #   raise "Not a directives supplement identifier" unless identifier.is_a?(Identifiers::DirectivesSupplement)
 
-        #   render(identifier.base_identifier) +
+        #   render(identifier.base) +
         #     " #{identifier.publisher.body}" +
         #     " #{identifier.stage.abbr}" +
         #     (identifier.date ? ":#{identifier.date.year}" : "")
@@ -69,10 +69,10 @@ module Pubid
 
         def to_s(lang: :en, lang_single: false, with_edition: false,
 format: nil, stage_format_long: nil, with_date: nil)
-          if base_identifier
+          if base
             # Full rendering with base identifier
             [
-              base_identifier.to_s(lang: lang, lang_single: lang_single,
+              base.to_s(lang: lang, lang_single: lang_single,
                                    with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date),
               " #{supplement_publisher.render}",
               " SUP", # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
@@ -107,8 +107,8 @@ format: nil, stage_format_long: nil, with_date: nil)
         def to_urn
           urn_ctx = Rendering::RenderingContext.urn
 
-          # If this is a standalone supplement (no base_identifier), build URN directly
-          unless base_identifier
+          # If this is a standalone supplement (no base), build URN directly
+          unless base
             parts = ["urn", "iso", "doc"]
             parts << supplement_publisher.render(context: urn_ctx) if supplement_publisher
             parts << "sup"
@@ -118,7 +118,7 @@ format: nil, stage_format_long: nil, with_date: nil)
           end
 
           # Start with base identifier's URN parts (it will use urn:iso:doc scheme)
-          base_urn = base_identifier.to_urn
+          base_urn = base.to_urn
 
           # Handle JTC pattern specially
           if supplement_publisher&.body&.match?(/^JTC\s+(\d+)$/i)

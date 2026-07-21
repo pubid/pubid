@@ -15,19 +15,19 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60695")
+        expect(parsed.base.number.value).to eq("60695")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("2")
+        expect(parsed.base.part.value).to eq("2")
       end
 
       it "parses base identifier subpart" do
-        expect(parsed.base_identifier.subpart.value).to eq("1")
+        expect(parsed.base.subpart.value).to eq("1")
       end
 
       it "parses sheet_number" do
@@ -68,7 +68,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60695")
+        expect(parsed.base.number.value).to eq("60695")
       end
 
       it "parses sheet_number" do
@@ -122,11 +122,11 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("ISO")
+        expect(parsed.base.publisher.body).to eq("ISO")
       end
 
       it "parses base copublisher" do
-        expect(parsed.base_identifier.copublishers.first.body).to eq("IEC")
+        expect(parsed.base.copublishers.first.body).to eq("IEC")
       end
 
       it "parses sheet_number" do
@@ -165,7 +165,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2013")
+        expect(parsed.base.date.year).to eq("2013")
       end
 
       it "parses sheet_number" do
@@ -198,11 +198,11 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60034")
+        expect(parsed.base.number.value).to eq("60034")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses sheet_number" do
@@ -231,11 +231,11 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60529")
+        expect(parsed.base.number.value).to eq("60529")
       end
 
       it "base has no part" do
-        expect(parsed.base_identifier.part).to be_nil
+        expect(parsed.base.part).to be_nil
       end
 
       it "parses sheet_number" do
@@ -260,11 +260,11 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "delegates stage to base" do
-        expect(parsed.stage).to eq(parsed.base_identifier.stage)
+        expect(parsed.stage).to eq(parsed.base.stage)
       end
 
       it "delegates typed_stage to base" do
-        expect(parsed.typed_stage).to eq(parsed.base_identifier.typed_stage)
+        expect(parsed.typed_stage).to eq(parsed.base.typed_stage)
       end
     end
   end
@@ -281,7 +281,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "base is TechnicalReport" do
-        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::TechnicalReport)
+        expect(parsed.base).to be_a(Pubid::Iec::Identifiers::TechnicalReport)
       end
 
       it "parses sheet_number" do
@@ -306,7 +306,7 @@ RSpec.describe Pubid::Iec::Identifiers::SheetIdentifier do
       end
 
       it "base is TechnicalSpecification" do
-        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::TechnicalSpecification)
+        expect(parsed.base).to be_a(Pubid::Iec::Identifiers::TechnicalSpecification)
       end
 
       it "parses sheet_number" do

@@ -260,7 +260,7 @@ RSpec.describe Pubid::Iso::Builder do
     describe "supplement building" do
       it "builds single supplement (amendment)" do
         data = {
-          base_identifier: {
+          base: {
             publisher: "ISO",
             number: "19110",
             year: "2005",
@@ -272,7 +272,7 @@ RSpec.describe Pubid::Iso::Builder do
 
         result = builder.build(data)
         expect(result).to be_a(Pubid::Iso::Identifiers::Amendment)
-        expect(result.base_identifier).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(result.base).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
         expect(result.number.value).to eq("1")
       end
 
@@ -289,7 +289,7 @@ RSpec.describe Pubid::Iso::Builder do
         # Build amendment by manually constructing supplement data
         # (In practice, the parser provides this structure)
         amd_data = {
-          base_identifier: {
+          base: {
             publisher: "ISO/IEC",
             number_with_part: "13818-1",
             year: "2015",
@@ -302,11 +302,11 @@ RSpec.describe Pubid::Iso::Builder do
 
         # Build corrigendum
         cor_data = {
-          base_identifier: {
+          base: {
             publisher: "ISO/IEC",
             number_with_part: "13818-1",
             year: "2015",
-            base_identifier: {
+            base: {
               publisher: "ISO/IEC",
               number_with_part: "13818-1",
               year: "2015",
@@ -322,13 +322,13 @@ RSpec.describe Pubid::Iso::Builder do
         result = builder.build(cor_data)
 
         expect(result).to be_a(Pubid::Iso::Identifiers::Corrigendum)
-        expect(result.base_identifier).to be_a(Pubid::Iso::Identifiers::Amendment)
-        expect(result.base_identifier.base_identifier).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(result.base).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(result.base.base).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
       end
 
       it "infers supplement class from typed_stage" do
         data = {
-          base_identifier: {
+          base: {
             publisher: "ISO",
             number: "1234",
             year: "2020",

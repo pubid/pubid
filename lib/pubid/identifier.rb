@@ -13,7 +13,7 @@ module Pubid
       # `key_value` polymorphic_map reads `_type` only to VALIDATE; it does not
       # re-instantiate the concrete subclass. So a base-class `from_hash` would
       # return a bare base object and drop subtype-specific attributes (e.g. a
-      # supplement's base_identifier). Route by `_type` to the concrete class
+      # supplement's base). Route by `_type` to the concrete class
       # named in `polymorphic_type_map`, then let its inherited from_hash (this
       # method again, where klass == self) fall through to lutaml's real work.
       #
@@ -147,8 +147,8 @@ module Pubid
     attribute :locality, Components::Locality
     attribute :typed_stage, Components::TypedStage
     attribute :all_parts, Lutaml::Model::Type::Boolean, default: false
-    # base_identifier is declared by supplement subclasses with proper type
-    def base_identifier
+    # base is declared by supplement subclasses with proper type
+    def base
       nil
     end
 
@@ -261,7 +261,7 @@ module Pubid
     end
 
     def root
-      return base_identifier.root if base_identifier
+      return base.root if base
 
       self
     end

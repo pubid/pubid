@@ -138,7 +138,7 @@ module Pubid
         # Plus-joined: "BASE+Amendment:YEAR" / "BASE+Errata:YEAR" with both
         # the base and the supplement carrying their own year.
         if id.joined
-          base_str = strip_language(id.base_identifier.to_s)
+          base_str = strip_language(id.base.to_s)
           result = "#{base_str}+#{id.supplement_type}"
           result += ":#{id.year}" if id.year
           result += " (#{id.language})" if id.language
@@ -149,7 +149,7 @@ module Pubid
         # publication year kept on the base identifier. The word comes from the
         # concrete supplement class.
         if id.trailing
-          base_str = strip_language(id.base_identifier.to_s)
+          base_str = strip_language(id.base.to_s)
           result = "#{base_str} #{id.supplement_type}"
           result += " (#{id.language})" if id.language
           return result
@@ -157,16 +157,16 @@ module Pubid
 
         base_format = if format && format != :short
                         format
-                      elsif id.base_identifier.class.attributes.key?(:parsed_format) && id.base_identifier.parsed_format == "long"
+                      elsif id.base.class.attributes.key?(:parsed_format) && id.base.parsed_format == "long"
                         :long
                       else
                         :short
                       end
 
-        base_str = if id.base_identifier.is_a?(SingleIdentifier)
-                     id.base_identifier.to_s(format: base_format)
+        base_str = if id.base.is_a?(SingleIdentifier)
+                     id.base.to_s(format: base_format)
                    else
-                     id.base_identifier.to_s
+                     id.base.to_s
                    end
         base_str = strip_language(base_str)
 
@@ -182,14 +182,14 @@ module Pubid
         # "BASE:YYYY Annex(es)" — the year is glued to the base, the marker
         # carries none. Keep the base date instead of stripping it.
         if id.year_on_base
-          base_str = strip_language(id.base_identifier.to_s)
+          base_str = strip_language(id.base.to_s)
           marker = id.letter ? "Annex #{id.letter}" : "Annexes"
           result = "#{base_str} #{marker}"
           result += " (#{id.language})" if id.language
           return result
         end
 
-        base_format = if id.base_identifier.class.attributes.key?(:parsed_format) && id.base_identifier.parsed_format == "long"
+        base_format = if id.base.class.attributes.key?(:parsed_format) && id.base.parsed_format == "long"
                         :long
                       else
                         :short
@@ -203,10 +203,10 @@ module Pubid
                          :short
                        end
 
-        base_str = if id.base_identifier.is_a?(SingleIdentifier)
-                     id.base_identifier.to_s(format: base_format)
+        base_str = if id.base.is_a?(SingleIdentifier)
+                     id.base.to_s(format: base_format)
                    else
-                     id.base_identifier.to_s
+                     id.base.to_s
                    end
         result = base_str.sub(/:.*/, "").sub(/\s+Edition\s+\d{4}/, "").sub(
           /\(.*\)/, ""
@@ -219,8 +219,8 @@ module Pubid
           result += " Annexes"
           if id.year
             result += annex_format == :long ? " Edition #{id.year}" : ":#{id.year}"
-          elsif id.base_identifier.date
-            result += annex_format == :long ? " Edition #{id.base_identifier.date.render(context: @context)}" : ":#{id.base_identifier.date.render(context: @context)}"
+          elsif id.base.date
+            result += annex_format == :long ? " Edition #{id.base.date.render(context: @context)}" : ":#{id.base.date.render(context: @context)}"
           end
         end
 

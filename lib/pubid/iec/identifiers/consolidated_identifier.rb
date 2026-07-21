@@ -69,6 +69,12 @@ module Pubid
           identifiers&.first
         end
 
+        # The origin document. A consolidated bundle stores its members in
+        # `identifiers` (not `base`), so walk the first member to its root.
+        def root
+          identifiers&.first&.root || self
+        end
+
         # Get all supplements (identifiers after first)
         def supplements
           identifiers&.drop(1) || []

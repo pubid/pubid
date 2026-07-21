@@ -8,7 +8,7 @@ module Pubid
       # Example: "IEC 60050-191/AMD2/FRAG2 ED1" = Fragment 2 of Amendment 2
       # Fragments are independently approved and have their own lifecycle stages.
       class FragmentIdentifier < Identifier
-        attribute :base_identifier, Identifier, polymorphic: true
+        attribute :base, Identifier, polymorphic: true
         attribute :fragment_number, :string
         attribute :edition, ::Pubid::Components::Edition, default: -> {}
         # Fragments have their own lifecycle; default to the published FRAG stage
@@ -16,7 +16,7 @@ module Pubid
         attribute :typed_stage, ::Pubid::Components::TypedStage,
                   default: -> { self.class.published_typed_stage }
 
-        # number/date/publisher delegate to base_identifier, but the fragment's
+        # number/date/publisher delegate to base, but the fragment's
         # stage and edition are its own. Serialize the wrapped identifier under
         # "base" plus the fragment number; suppress only the truly-delegated
         # common maps (keep stage/edition from the inherited block).
@@ -34,7 +34,7 @@ module Pubid
         def copublishers_to_kv(_model, _doc); end
 
         def base_to_kv(model, doc)
-          base = model.base_identifier
+          base = model.base
           return unless base
 
           doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
@@ -42,7 +42,7 @@ module Pubid
         end
 
         def base_from_kv(model, value)
-          model.base_identifier = ::Pubid::Iec::Identifier.from_hash(value) if value
+          model.base = ::Pubid::Iec::Identifier.from_hash(value) if value
         end
 
         TYPED_STAGES = [
@@ -118,29 +118,29 @@ module Pubid
             web: :fragment_identifier, title: "Fragment", short: "FRAG" }
         end
 
-        # Delegate common attributes to base_identifier
+        # Delegate common attributes to base
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         def copublishers
-          base_identifier&.copublishers
+          base&.copublishers
         end
 
         def code
-          base_identifier&.code
+          base&.code
         end
 
         def number
-          base_identifier&.number
+          base&.number
         end
 
         def date
-          base_identifier&.date
+          base&.date
         end
 
         def stage
-          typed_stage&.to_stage || base_identifier&.stage
+          typed_stage&.to_stage || base&.stage
         end
       end
     end

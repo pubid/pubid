@@ -6,12 +6,12 @@ module Pubid
       # Amendment Identifier
       # Contains a base identifier plus amendment parameters
       class Amendment < Base
-        attribute :base_identifier, Base, polymorphic: true
+        attribute :base, Base, polymorphic: true
         attribute :amendment_number, :string
         attribute :amendment_year, :integer
 
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
       end
     end

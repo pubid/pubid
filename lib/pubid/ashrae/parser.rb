@@ -166,7 +166,7 @@ module Pubid
           (space >> additional_copublisher).maybe >>
           suffix.maybe >>
           reaffirmed.maybe
-        ).as(:base_identifier) >>
+        ).as(:base) >>
           space >>
           str("Errata").as(:errata_keyword) >>
           (
@@ -188,7 +188,7 @@ module Pubid
             (space >> additional_copublisher).maybe >>
             suffix.maybe >>
             reaffirmed.maybe
-          ).as(:base_identifier) >>
+          ).as(:base) >>
             space >>
             str("Errata").as(:errata_keyword) >>
             (
@@ -207,7 +207,7 @@ module Pubid
             (space >> additional_copublisher).maybe >>
             suffix.maybe >>
             reaffirmed.maybe
-          ).as(:base_identifier) >>
+          ).as(:base) >>
             space >>
             str("Errata").as(:errata_keyword) >>
             errata_date.maybe >>
@@ -219,7 +219,7 @@ module Pubid
       rule(:interpretation_identifier) do
         str("Interpretations") >> space >>
           str("for") >> space >>
-          (type.as(:type) >> space >> code >> (dash >> year_digits.as(:year)).maybe).as(:base_identifier)
+          (type.as(:type) >> space >> code >> (dash >> year_digits.as(:year)).maybe).as(:base)
       end
 
       # Combined Addenda pattern (multiple addendums grouped together)

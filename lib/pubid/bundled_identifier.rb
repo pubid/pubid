@@ -52,10 +52,10 @@ stage_format_long: nil, with_date: nil)
 
       supplements.each do |supplement|
         # ISO DirectivesSupplement always uses " + " (space before)
-        # CEN-style supplements (AC, A) without base_identifier use "+" (no space before)
-        # Other ISO supplements with base_identifier use " + " (space before)
+        # CEN-style supplements (AC, A) without base use "+" (no space before)
+        # Other ISO supplements with base use " + " (space before)
         if supplement.class.name&.include?("DirectivesSupplement") ||
-            (supplement.class.attributes.key?(:base_identifier) && !supplement.base_identifier.nil?)
+            (supplement.class.attributes.key?(:base) && !supplement.base.nil?)
           result += " + #{supplement.to_s(lang: lang, lang_single: lang_single,
                                           with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
         else

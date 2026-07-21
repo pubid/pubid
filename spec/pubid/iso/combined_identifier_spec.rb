@@ -9,7 +9,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       subject { "ISO 4214:2022 | IDF/RM 254:2022" }
 
       let(:parsed) { described_class.parse(subject) }
-      let(:base_identifier) { parsed.base_identifier }
+      let(:base) { parsed.base }
       let(:additional_identifier) { parsed.additional_identifiers.first }
 
       it "round-trips" do
@@ -34,27 +34,27 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
 
       # Test main ISO identifier attributes are not corrupted
       it "parses ISO publisher" do
-        expect(base_identifier.publisher.body).to eq("ISO")
+        expect(base.publisher.body).to eq("ISO")
       end
 
       it "parses ISO number" do
-        expect(base_identifier.number.value).to eq("4214")
+        expect(base.number.value).to eq("4214")
       end
 
       it "parses ISO date" do
-        expect(base_identifier.date.year).to eq("2022")
+        expect(base.date.year).to eq("2022")
       end
 
       it "parses ISO part" do
-        expect(base_identifier.part).to be_nil
+        expect(base.part).to be_nil
       end
 
       it "provides ISO type code" do
-        expect(base_identifier.type.type_code).to eq("is")
+        expect(base.type.type_code).to eq("is")
       end
 
       it "provides ISO stage code" do
-        expect(base_identifier.stage.stage_code).to eq("published")
+        expect(base.stage.stage_code).to eq("published")
       end
     end
 
@@ -63,7 +63,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       subject { "ISO/CD 24191.3 | IDF 263" }
 
       let(:parsed) { described_class.parse(subject) }
-      let(:base_identifier) { parsed.base_identifier }
+      let(:base) { parsed.base }
       let(:additional_identifier) { parsed.additional_identifiers.first }
 
       it "round-trips" do
@@ -88,31 +88,31 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
 
       # Test main ISO identifier attributes are not corrupted
       it "parses ISO publisher" do
-        expect(base_identifier.publisher.body).to eq("ISO")
+        expect(base.publisher.body).to eq("ISO")
       end
 
       it "parses ISO number" do
-        expect(base_identifier.number.value).to eq("24191")
+        expect(base.number.value).to eq("24191")
       end
 
       it "parses ISO stage" do
-        expect(base_identifier.stage.stage_code).to eq("cd")
+        expect(base.stage.stage_code).to eq("cd")
       end
 
       it "parses ISO stage iteration" do
-        expect(base_identifier.stage_iteration.number).to eq("3")
+        expect(base.stage_iteration.number).to eq("3")
       end
 
       it "parses ISO date" do
-        expect(base_identifier.date).to be_nil
+        expect(base.date).to be_nil
       end
 
       it "parses ISO part" do
-        expect(base_identifier.part).to be_nil
+        expect(base.part).to be_nil
       end
 
       it "provides ISO type code" do
-        expect(base_identifier.type.type_code).to eq("is")
+        expect(base.type.type_code).to eq("is")
       end
     end
 
@@ -121,7 +121,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       subject { "ISO/WD 14501 | IDF 171:2017" }
 
       let(:parsed) { described_class.parse(subject) }
-      let(:base_identifier) { parsed.base_identifier }
+      let(:base) { parsed.base }
       let(:additional_identifier) { parsed.additional_identifiers.first }
 
       it "round-trips" do
@@ -146,27 +146,27 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
 
       # Test main ISO identifier attributes are not corrupted
       it "parses ISO publisher" do
-        expect(base_identifier.publisher.body).to eq("ISO")
+        expect(base.publisher.body).to eq("ISO")
       end
 
       it "parses ISO number" do
-        expect(base_identifier.number.value).to eq("14501")
+        expect(base.number.value).to eq("14501")
       end
 
       it "parses ISO stage" do
-        expect(base_identifier.stage.stage_code).to eq("wd")
+        expect(base.stage.stage_code).to eq("wd")
       end
 
       it "parses ISO date" do
-        expect(base_identifier.date).to be_nil
+        expect(base.date).to be_nil
       end
 
       it "parses ISO part" do
-        expect(base_identifier.part).to be_nil
+        expect(base.part).to be_nil
       end
 
       it "provides ISO type code" do
-        expect(base_identifier.type.type_code).to eq("is")
+        expect(base.type.type_code).to eq("is")
       end
     end
 
@@ -175,7 +175,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       subject { "ISO 8262-2 | IDF 124-2:2005" }
 
       let(:parsed) { described_class.parse(subject) }
-      let(:base_identifier) { parsed.base_identifier }
+      let(:base) { parsed.base }
       let(:additional_identifier) { parsed.additional_identifiers.first }
 
       it "round-trips" do
@@ -200,27 +200,27 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
 
       # Test main ISO identifier attributes are not corrupted
       it "parses ISO publisher" do
-        expect(base_identifier.publisher.body).to eq("ISO")
+        expect(base.publisher.body).to eq("ISO")
       end
 
       it "parses ISO number" do
-        expect(base_identifier.number.value).to eq("8262")
+        expect(base.number.value).to eq("8262")
       end
 
       it "parses ISO part" do
-        expect(base_identifier.part.value).to eq("2")
+        expect(base.part.value).to eq("2")
       end
 
       it "parses ISO date" do
-        expect(base_identifier.date).to be_nil
+        expect(base.date).to be_nil
       end
 
       it "provides ISO type code" do
-        expect(base_identifier.type.type_code).to eq("is")
+        expect(base.type.type_code).to eq("is")
       end
 
       it "provides ISO stage code" do
-        expect(base_identifier.stage.stage_code).to eq("published")
+        expect(base.stage.stage_code).to eq("published")
       end
     end
   end

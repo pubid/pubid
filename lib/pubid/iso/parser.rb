@@ -99,7 +99,7 @@ module Pubid
       rule(:iso_r_supplement_identifier) do
         (
           str("ISO/R").as(:iso_r_prefix) >> space >> iso_r_second_part
-        ).as(:base_identifier) >>
+        ).as(:base) >>
           iso_r_supplement_separator >>
           supplement_type_with_stage >>
           space? >> second_part >> third_part
@@ -270,14 +270,14 @@ module Pubid
       end
 
       # For joint identifiers, we do not treat it as a supplementary identifier
-      # (hence not a base_identifier)
+      # (hence not a base)
       # ISO only supports IDF in joint identifiers
       # ISO 5537|IDF 26
       # ISO 17678|IDF 202:2010
       # ISO/TS 4985:2023 | IDF/RM 255
       # ISO 4214:2022 | IDF 254:2022
       rule(:joint_identifier) do
-        identifier_copublishers_no_third.as(:base_identifier) >>
+        identifier_copublishers_no_third.as(:base) >>
           space? >> str("|") >> space? >>
           scope { idf_identifier }.as(:joint_identifier)
       end
@@ -336,7 +336,7 @@ module Pubid
       # ISO 8601-1:2019/Amd 2:2024
       # ISO/IEC 10646-1:1993/pDCOR.2 (legacy dot-prefixed format)
       rule(:supplement_identifier_no_third) do
-        identifier_copublishers_no_third.as(:base_identifier) >>
+        identifier_copublishers_no_third.as(:base) >>
           str("/") >> supplement_type_with_stage >>
           # The trailing number/date is optional: some draft supplements have no
           # number yet, e.g. "ISO/IEC 9579/WD Amd".
@@ -351,14 +351,14 @@ module Pubid
       # ISO/IEC 19794-7:2014/Amd 1:2015/CD Cor 1
       # ISO/IEC 10646-1:1993/pDCOR.2 (legacy dot-prefixed format)
       rule(:supplement_supplement_identifier) do
-        supplement_identifier_no_third.as(:base_identifier) >>
+        supplement_identifier_no_third.as(:base) >>
           str("/") >> supplement_type_with_stage >>
           ((space? >> second_part >> third_part) | (str(".") >> digits.as(:number) >> third_part))
       end
 
       # ISO 12345:2020/Amd 1:2021/Cor 1:2022/Amd 2:2023 (three-level supplement)
       rule(:supplement_supplement_supplement_identifier) do
-        supplement_supplement_identifier.as(:base_identifier) >>
+        supplement_supplement_identifier.as(:base) >>
           str("/") >> supplement_type_with_stage >>
           ((space? >> second_part >> third_part) | (str(".") >> digits.as(:number) >> third_part))
       end
@@ -408,7 +408,7 @@ module Pubid
       end
 
       rule(:directives_supplement_identifier) do
-        directives_identifier_no_third.as(:base_identifier) >> space? >> directives_supplement_part
+        directives_identifier_no_third.as(:base) >> space? >> directives_supplement_part
       end
 
       DIRECTIVES_SUPPLEMENTS_TYPED_STAGES = Identifiers::DirectivesSupplement::TYPED_STAGES.map(&:abbr).flatten.sort_by(&:length).reverse

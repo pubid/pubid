@@ -15,27 +15,27 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("98")
+        expect(parsed.base.number.value).to eq("98")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("3")
+        expect(parsed.base.part.value).to eq("3")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2008")
+        expect(parsed.base.date.year).to eq("2008")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("guide")
+        expect(parsed.base.typed_stage.type_code).to eq("guide")
       end
 
       it "parses supplement number" do
@@ -74,15 +74,15 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:123:sup:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("123")
+        expect(parsed.base.number.value).to eq("123")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("1999")
+        expect(parsed.base.date.year).to eq("1999")
       end
 
       it "parses supplement number" do
@@ -125,23 +125,23 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("98")
+        expect(parsed.base.number.value).to eq("98")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("3")
+        expect(parsed.base.part.value).to eq("3")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("guide")
+        expect(parsed.base.typed_stage.type_code).to eq("guide")
       end
 
       it "parses supplement number" do
@@ -181,27 +181,27 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1:en" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("98")
+        expect(parsed.base.number.value).to eq("98")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("3")
+        expect(parsed.base.part.value).to eq("3")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2008")
+        expect(parsed.base.date.year).to eq("2008")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("guide")
+        expect(parsed.base.typed_stage.type_code).to eq("guide")
       end
 
       it "parses supplement number" do
@@ -248,23 +248,23 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:stage-10.00:sup:2:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+          expect(parsed.base.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("98")
+          expect(parsed.base.number.value).to eq("98")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("3")
+          expect(parsed.base.part.value).to eq("3")
         end
 
         it "parses base identifier type" do
-          expect(parsed.base_identifier.typed_stage.type_code).to eq("guide")
+          expect(parsed.base.typed_stage.type_code).to eq("guide")
         end
 
         it "parses supplement number" do
@@ -302,19 +302,19 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         let(:urn) { "urn:iso:std:iso:guide:98:stage-40.00:sup:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("98")
+          expect(parsed.base.number.value).to eq("98")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1995")
+          expect(parsed.base.date.year).to eq("1995")
         end
 
         it "parses base identifier type" do
-          expect(parsed.base_identifier.typed_stage.type_code).to eq("guide")
+          expect(parsed.base.typed_stage.type_code).to eq("guide")
         end
 
         it "parses supplement number" do
@@ -355,27 +355,27 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+          expect(parsed.base.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("98")
+          expect(parsed.base.number.value).to eq("98")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1995")
+          expect(parsed.base.date.year).to eq("1995")
         end
 
         it "parses base identifier type" do
-          expect(parsed.base_identifier.typed_stage.type_code).to eq("guide")
+          expect(parsed.base.typed_stage.type_code).to eq("guide")
         end
 
         it "parses base identifier stage" do
-          expect(parsed.base_identifier.typed_stage.stage_code).to eq("np")
+          expect(parsed.base.typed_stage.stage_code).to eq("np")
         end
 
         it "parses supplement number" do
@@ -418,15 +418,15 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:3758:sup:1993" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("3758")
+        expect(parsed.base.number.value).to eq("3758")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("1991")
+        expect(parsed.base.date.year).to eq("1991")
       end
 
       it "parses supplement number" do
@@ -468,19 +468,19 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:tr:10000:sup:2005:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("10000")
+        expect(parsed.base.number.value).to eq("10000")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2000")
+        expect(parsed.base.date.year).to eq("2000")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("tr")
+        expect(parsed.base.typed_stage.type_code).to eq("tr")
       end
 
       it "parses supplement number" do
@@ -519,19 +519,19 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:14000:sup:2020:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("14000")
+        expect(parsed.base.number.value).to eq("14000")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2015")
+        expect(parsed.base.date.year).to eq("2015")
       end
 
       it "parses base identifier type" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("is")
+        expect(parsed.base.typed_stage.type_code).to eq("is")
       end
 
       it "parses supplement number" do
@@ -573,15 +573,15 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:10000:WD:sup:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("10000")
+        expect(parsed.base.number.value).to eq("10000")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2020")
+        expect(parsed.base.date.year).to eq("2020")
       end
 
       it "parses supplement number" do
@@ -616,15 +616,15 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:10000:CD:sup:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("10000")
+        expect(parsed.base.number.value).to eq("10000")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2020")
+        expect(parsed.base.date.year).to eq("2020")
       end
 
       it "parses supplement number" do
@@ -660,15 +660,15 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:12345:stage-50.00:sup:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("12345")
+        expect(parsed.base.number.value).to eq("12345")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2020")
+        expect(parsed.base.date.year).to eq("2020")
       end
 
       it "parses supplement number" do
@@ -703,15 +703,15 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       let(:urn) { "urn:iso:std:iso:12345:stage-50.00:sup:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("12345")
+        expect(parsed.base.number.value).to eq("12345")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2020")
+        expect(parsed.base.date.year).to eq("2020")
       end
 
       it "parses supplement number" do

@@ -12,24 +12,24 @@ module Pubid
       #   PAS 96:2017 - TC
       #   PP 7722:2006 BOOK
       class ValueAddedPublication < SingleIdentifier
-        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
+        attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :format, :string, values: ["PDF", "TC", "BOOK"]
 
-        # Delegate common attributes to base_identifier
+        # Delegate common attributes to base
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         def number
-          base_identifier&.number
+          base&.number
         end
 
         def year
-          base_identifier&.year
+          base&.year
         end
 
         def date
-          base_identifier&.date
+          base&.date
         end
       end
     end

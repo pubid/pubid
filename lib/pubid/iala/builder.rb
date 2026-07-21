@@ -37,7 +37,7 @@ module Pubid
         base = base_klass.new(number: build_number(base_hash, base_klass))
 
         attrs = {
-          base_identifier: base,
+          base: base,
           annex_form:      stringify(hash[:annex_marker]),
           letter:          stringify(hash[:annex_letter]),
           edition:         stringify(hash.dig(:edition, :edition_value)),

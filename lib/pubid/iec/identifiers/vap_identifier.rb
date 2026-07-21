@@ -7,12 +7,12 @@ module Pubid
       # Single Responsibility: Wraps another identifier with VAP type suffix
       # Examples: "IEC 61666:2010+AMD1:2021 CSV"
       class VapIdentifier < Identifier
-        attribute :base_identifier, Identifier, polymorphic: true
+        attribute :base, Identifier, polymorphic: true
         # One or more VAP codes (e.g. ["CSV"] or ["EXV", "CMV"]). Plain strings.
         attribute :vap, :string, collection: true
         attribute :edition, ::Pubid::Components::Edition, default: -> {}
 
-        # number/date/publisher/stage are delegated to base_identifier, so
+        # number/date/publisher/stage are delegated to base, so
         # serialize the wrapped identifier under "base" plus the vap array; the
         # common fields live inside "base", not at the top level.
         include Pubid::Iec::DelegatedFieldSuppression
@@ -23,7 +23,7 @@ module Pubid
         end
 
         def base_to_kv(model, doc)
-          base = model.base_identifier
+          base = model.base
           return unless base
 
           doc.add_child(Lutaml::KeyValue::DataModel::Element.new("base",
@@ -31,7 +31,7 @@ module Pubid
         end
 
         def base_from_kv(model, value)
-          model.base_identifier = ::Pubid::Iec::Identifier.from_hash(value) if value
+          model.base = ::Pubid::Iec::Identifier.from_hash(value) if value
         end
 
         # VAP types mapping
@@ -42,33 +42,33 @@ module Pubid
           "SER" => "Serial version",
         }.freeze
 
-        # Delegate common attributes to base_identifier
+        # Delegate common attributes to base
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         def copublishers
-          base_identifier&.copublishers
+          base&.copublishers
         end
 
         def code
-          base_identifier&.code
+          base&.code
         end
 
         def number
-          base_identifier&.number
+          base&.number
         end
 
         def date
-          base_identifier&.date
+          base&.date
         end
 
         def stage
-          base_identifier&.stage
+          base&.stage
         end
 
         def typed_stage
-          base_identifier&.typed_stage
+          base&.typed_stage
         end
       end
     end

@@ -89,12 +89,12 @@ RSpec.describe Pubid::Ccsds do
         expect(result).to be_a(Pubid::Ccsds::Identifiers::Corrigendum)
         expect(result.number).to eq("1")
 
-        expect(result.base_identifier).to be_a(Pubid::Ccsds::Identifiers::Base)
-        expect(result.base_identifier.number).to eq("131")
-        expect(result.base_identifier.part).to eq("2")
-        expect(result.base_identifier.type).to eq("O")
-        expect(result.base_identifier.edition).to eq("1")
-        expect(result.base_identifier.suffix).to eq("S")
+        expect(result.base).to be_a(Pubid::Ccsds::Identifiers::Base)
+        expect(result.base.number).to eq("131")
+        expect(result.base.part).to eq("2")
+        expect(result.base.type).to eq("O")
+        expect(result.base.edition).to eq("1")
+        expect(result.base.suffix).to eq("S")
 
         expect(result.to_s).to eq("CCSDS 131.2-O-1-S Cor. 1")
       end
@@ -105,12 +105,12 @@ RSpec.describe Pubid::Ccsds do
         expect(result).to be_a(Pubid::Ccsds::Identifiers::Corrigendum)
         expect(result.number).to eq("1")
 
-        expect(result.base_identifier).to be_a(Pubid::Ccsds::Identifiers::Base)
-        expect(result.base_identifier.number).to eq("912")
-        expect(result.base_identifier.part).to eq("1")
-        expect(result.base_identifier.type).to eq("B")
-        expect(result.base_identifier.edition).to eq("2")
-        expect(result.base_identifier.suffix).to eq("S")
+        expect(result.base).to be_a(Pubid::Ccsds::Identifiers::Base)
+        expect(result.base.number).to eq("912")
+        expect(result.base.part).to eq("1")
+        expect(result.base.type).to eq("B")
+        expect(result.base.edition).to eq("2")
+        expect(result.base.suffix).to eq("S")
 
         expect(result.to_s).to eq("CCSDS 912.1-B-2-S Cor. 1")
       end

@@ -84,7 +84,7 @@ module Pubid
 
         while current.is_a?(SupplementIdentifier)
           supplement_chain.unshift(current)
-          current = current.base_identifier
+          current = current.base
         end
 
         base_id = current

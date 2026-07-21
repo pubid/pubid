@@ -6,16 +6,16 @@ module Pubid
       # Base class for supplement identifiers (amendments, corrigenda, interpretations, etc.)
       # Supplements modify or add to a base document
       class SupplementIdentifier < Base
-        attribute :base_identifier, Base, polymorphic: true
+        attribute :base, Base, polymorphic: true
 
-        # Delegate publisher to base_identifier
+        # Delegate publisher to base
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
-        # Delegate code to base_identifier if not overridden
+        # Delegate code to base if not overridden
         def code
-          base_identifier&.code
+          base&.code
         end
       end
     end

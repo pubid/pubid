@@ -25,7 +25,7 @@ module Pubid
       private
 
       def render_corrigendum(id)
-        "#{id.base_identifier} Corrigendum"
+        "#{id.base} Corrigendum"
       end
 
       def render_meeting(id)
@@ -41,7 +41,7 @@ module Pubid
       end
 
       def render_amendment(id, context)
-        result = id.base_identifier.to_s if id.base_identifier
+        result = id.base.to_s if id.base
         result += "/Amd"
         result += " #{id.iteration.render(context:)}" if id.iteration
         result += ":#{id.date}" if id.date

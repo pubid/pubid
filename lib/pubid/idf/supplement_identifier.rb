@@ -12,15 +12,15 @@ module Pubid
     # SingleIdentifier (which is for base documents only).
     #
     # Architecture Note:
-    # - Supplements have a base_identifier attribute (recursive structure)
+    # - Supplements have a base attribute (recursive structure)
     # - Supplements share the to_s rendering pattern
     # - Supplements inherit typed_stage from base Identifier class
     class SupplementIdentifier < Identifier
-      attribute :base_identifier, Identifier
+      attribute :base, Identifier
 
       # Render supplement identifier as string.
       #
-      # Format: "base_identifier/ABBREVIATION number:year"
+      # Format: "base/ABBREVIATION number:year"
       # Example: "IDF 125:1988/AMD 1:2023"
       #
       # @param lang [Symbol] Language (default: :en)

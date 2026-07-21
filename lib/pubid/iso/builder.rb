@@ -16,7 +16,7 @@ module Pubid
 
       def locate_identifier_klass(parsed_hash)
         # If there is a joint_identifier, we need to use a CombinedIdentifier
-        # which takes `base_identifier` and `additional_identifiers`
+        # which takes `base` and `additional_identifiers`
         if parsed_hash[:joint_identifier]
           return CombinedIdentifier
         end
@@ -47,7 +47,7 @@ module Pubid
         # a) It is an IS.
         # b) It is a Directive Supplements. The "SUP" keyword may be entirely missing, and hence nil. If the base type_with_stage is a directive, then if the type_with_stage is blank, it is a directive supplement.
 
-        if parsed_hash[:type_with_stage].nil? && parsed_hash[:base_identifier] && parsed_hash[:base_identifier][:type_with_stage] == "DIR"
+        if parsed_hash[:type_with_stage].nil? && parsed_hash[:base] && parsed_hash[:base][:type_with_stage] == "DIR"
           # Directive Supplement without "SUP" keyword
           parsed_hash[:type_with_stage] = "SUP"
         end
@@ -150,12 +150,12 @@ module Pubid
 
       def cast(type, value)
         case type
-        when :base_identifier
+        when :base
           # If it has a base identifier, we need to build a supplement
           # We assume that the base identifier is already a valid Identifier object
           build(value)
 
-          # If there is a base_identifier, and it has a joint_identifier, we need to use a CombinedIdentifier.
+          # If there is a base, and it has a joint_identifier, we need to use a CombinedIdentifier.
 
         when :publisher, :directives_supplement_body, :supplement_publisher
           # value can be either a string OR a hash with publisher + copublisher
