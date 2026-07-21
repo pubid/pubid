@@ -31,8 +31,8 @@ module Pubid
           # Add subpart if present
           result += "-#{subpart}" if subpart && subpart.to_s != ""
 
-          # Add date if present
-          result += ":#{date.year}" if date
+          # Render the date (year[-month[-day]], or `--` for undated).
+          result += ":#{date.render}" if date
 
           result
         end

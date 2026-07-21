@@ -117,6 +117,9 @@ module Pubid
         map "year", with: { to: :year_to_kv, from: :year_from_kv }
         map "month", with: { to: :month_to_kv, from: :month_from_kv }
         map "day", with: { to: :day_to_kv, from: :day_from_kv }
+        # ISO/IEC undated reference (e.g. ISO 16634:--). The `false` default
+        # is omitted; only the meaningful `true` round-trips via to_hash.
+        map "undated", with: { to: :undated_to_kv, from: :undated_from_kv }
         map "edition", to: :edition
         map "languages", to: :languages
         # publisher emitted only when the primary isn't the type default;
@@ -216,6 +219,19 @@ module Pubid
       def month_from_kv(model, value) = date_for(model).month = value.to_s
       def day_to_kv(model, doc) = emit_date_part(doc, "day", model.date&.day)
       def day_from_kv(model, value) = date_for(model).day = value.to_s
+
+      # --- date undated flag (ISO/IEC undated reference, e.g. ISO 16634:--) ---
+      # The `false` default is omitted; only the meaningful `true` round-trips
+      # via to_hash / from_hash.
+      def undated_to_kv(model, doc)
+        return unless model.date&.undated?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("undated", true))
+      end
+
+      def undated_from_kv(model, value)
+        date_for(model).undated = value.to_s == "true"
+      end
 
       def emit_date_part(doc, key, val)
         return if val.nil? || val.to_s.empty?

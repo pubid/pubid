@@ -258,6 +258,9 @@ module Pubid
 
       def year_component
         return nil unless identifier.date&.present?
+        # Undated references (e.g. ISO 16634:--) drop the year slot in the URN,
+        # matching the date-less identifier's URN form (per issue #138).
+        return nil if identifier.date&.undated?
         return nil if identifier.is_a?(Pubid::Iso::SingleIdentifier)
 
         identifier.date.render(context: URN_CONTEXT)

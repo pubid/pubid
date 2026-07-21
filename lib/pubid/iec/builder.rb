@@ -400,6 +400,11 @@ module Pubid
         when :date
           parse_date(value)
 
+        when :undated_marker
+          # ISO/IEC undated reference (e.g. "IEC 60050:--") — explicit
+          # publication-date slot with no year; round-trips via date.render.
+          { date: Pubid::Components::Date.new(undated: true) }
+
         when :edition
           # Coerce to String: the parsed value may be a Parslet::Slice, which
           # Edition.number (Type::Value) would store verbatim and serialize as a
