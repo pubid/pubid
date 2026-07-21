@@ -6,7 +6,7 @@ module Pubid
       # Parenthetical Identifier - wraps identifier with parenthetical annotation
       # Example: "IEEE Standard No 18-1968 (ANSI C55.1-1968)"
       class ParentheticalIdentifier < Base
-        attribute :base_identifier, Base, polymorphic: true
+        attribute :base, Base, polymorphic: true
         attribute :parenthetical_identifier, Base, polymorphic: true
       end
     end

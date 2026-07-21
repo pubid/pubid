@@ -14,6 +14,12 @@ module Pubid
         }
         attribute :year_format, :string # Add for compatibility with identifier.rb
 
+        # CSA bundles are not Pubid::Identifier objects, so they do not inherit
+        # #root. They are their own origin for matching purposes.
+        def root
+          self
+        end
+
         def to_s
           # For Cec identifiers, use normalized form (code instead of cec_part + NO.)
           # This is used for "normalized form" rendering in bundled identifiers

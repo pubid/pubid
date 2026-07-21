@@ -190,8 +190,8 @@ module Pubid
 
       # Amendment: "EN 196-3:2005/A1:2008"
       def render_amendment(id)
-        result = if id.base_identifier
-                   "#{id.base_identifier}/A#{id.amendment_number}"
+        result = if id.base
+                   "#{id.base}/A#{id.amendment_number}"
                  else
                    "/A#{id.amendment_number}"
                  end
@@ -201,8 +201,8 @@ module Pubid
 
       # Corrigendum: "EN 60038/AC1:2012"
       def render_corrigendum(id)
-        if id.base_identifier
-          result = id.base_identifier.to_s
+        if id.base
+          result = id.base.to_s
           result += "/AC"
           result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
         else
@@ -245,7 +245,7 @@ module Pubid
 
       # Fragment: "EN 60038 AMD1 FRAG2"
       def render_fragment(id)
-        "#{id.base_identifier} FRAG#{id.fragment_number}"
+        "#{id.base} FRAG#{id.fragment_number}"
       end
 
       # EuropeanPrestandard: "ENV ISO 8601" or falls through to SingleIdentifier

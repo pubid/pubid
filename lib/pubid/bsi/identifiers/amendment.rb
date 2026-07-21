@@ -6,7 +6,7 @@ module Pubid
       # Amendment Identifier
       # Contains a base identifier plus amendment parameters
       class Amendment < SingleIdentifier
-        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
+        attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :amendment_number, :string
         attribute :amendment_year, :integer
         attribute :separator, :string, default: -> { "+" }
@@ -16,17 +16,17 @@ module Pubid
         attribute :amd_suffix_form, :boolean, default: -> { false }
 
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         # Base document = the standard this amendment applies to, fully peeled.
         def base_document
-          base_identifier&.base_document || self
+          base&.base_document || self
         end
 
         # Dropping the supplement layer yields the base standard.
         def drop_supplements
-          base_identifier || self
+          base || self
         end
 
         # Uniform supplement interface (shared with Corrigendum) so callers need

@@ -6,7 +6,7 @@ module Pubid
       def render(context:, with_edition: false)
         parts = []
 
-        base_str = @id.base_identifier.to_s(
+        base_str = @id.base.to_s(
           with_edition: with_edition,
           stage_format_long: context.stage_format_long,
           with_date: context.with_date,

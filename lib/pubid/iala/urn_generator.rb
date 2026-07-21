@@ -31,7 +31,7 @@ module Pubid
       #   G1045 Annex Ed 1           → urn:mrn:iala:pub:g1045:annex:ed1
       #   G1128 ANNEX A Ed 1.6 (E)    → urn:mrn:iala:pub:g1128:annex-a:ed1.6:e
       def generate_annex
-        base = identifier.base_identifier
+        base = identifier.base
         parts = ["urn:mrn:iala:pub",
                  "#{base.type_letter.downcase}#{base.number}"]
         annex_seg = identifier.letter ? "annex-#{identifier.letter.downcase}" : "annex"

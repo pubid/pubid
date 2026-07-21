@@ -25,14 +25,14 @@ module Pubid
         # attribute (mirroring ISO), so it serializes via Base's key_value as
         # { _type, number: '1', base: {...} } with no corrigendum-specific map.
         def to_s
-          base_str = base_identifier.to_s
+          base_str = base.to_s
           "#{base_str} Cor. #{number}"
         end
 
         def ==(other)
           return false unless other.is_a?(Corrigendum)
 
-          base_identifier == other.base_identifier && number == other.number
+          base == other.base && number == other.number
         end
       end
     end

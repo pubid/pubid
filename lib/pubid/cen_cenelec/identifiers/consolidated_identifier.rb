@@ -28,6 +28,12 @@ module Pubid
         def type
           identifiers&.first&.type
         end
+
+        # The origin document. Members live in `identifiers` (not `base`), so
+        # walk the first member to its root.
+        def root
+          identifiers&.first&.root || self
+        end
       end
     end
   end

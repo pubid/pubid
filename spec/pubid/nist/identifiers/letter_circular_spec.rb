@@ -222,7 +222,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
 
         it "parses as CircularSupplement with LetterCircular base" do
           expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
-          expect(parsed.base_identifier).to be_a(described_class)
+          expect(parsed.base).to be_a(described_class)
         end
 
         it "normalizes supplement with date to Upd format" do
@@ -230,11 +230,11 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.base_identifier.number.value).to eq("118")
+          expect(parsed.base.number.value).to eq("118")
         end
 
         it "parses supplement" do
-          expect(parsed.base_identifier).not_to be_nil
+          expect(parsed.base).not_to be_nil
         end
       end
 
@@ -269,7 +269,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
 
         it "parses as CircularSupplement with LetterCircular base" do
           expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
-          expect(parsed.base_identifier).to be_a(described_class)
+          expect(parsed.base).to be_a(described_class)
         end
 
         it "normalizes supplement to Upd format" do
@@ -286,7 +286,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
 
         it "parses as CircularSupplement with LetterCircular base" do
           expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
-          expect(parsed.base_identifier).to be_a(described_class)
+          expect(parsed.base).to be_a(described_class)
         end
 
         it "normalizes revision with date to Upd format" do
@@ -294,7 +294,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.base_identifier.number.value).to eq("145")
+          expect(parsed.base.number.value).to eq("145")
         end
       end
 
@@ -309,7 +309,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
 
         it "parses as CircularSupplement with LetterCircular base" do
           expect(parsed).to be_a(Pubid::Nist::Identifiers::CircularSupplement)
-          expect(parsed.base_identifier).to be_a(described_class)
+          expect(parsed.base).to be_a(described_class)
         end
 
         it "normalizes revision with date to an unpadded Upd format" do
@@ -317,7 +317,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.base_identifier.number.value).to eq("145")
+          expect(parsed.base.number.value).to eq("145")
         end
 
         it "round-trips its generated short form" do

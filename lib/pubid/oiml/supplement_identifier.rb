@@ -5,7 +5,7 @@ module Pubid
     class SupplementIdentifier < Identifier
       # Base class for OIML supplements (amendments, annexes)
       # These wrap a base identifier like ISO amendments
-      attribute :base_identifier, Oiml::Identifier, polymorphic: true
+      attribute :base, Oiml::Identifier, polymorphic: true
       attribute :year, :string
       attribute :language, :string
       # True for the trailing-word shorthand ("OIML R 138:2009 Amendment"),
@@ -21,28 +21,28 @@ module Pubid
       } # Track supplement's parsed format
 
       # Serialization delta on top of Oiml::Identifier's shared block. The
-      # nested base_identifier is (de)serialized recursively through the
+      # nested base is (de)serialized recursively through the
       # polymorphic router so its own `_type` selects the right subclass.
       key_value do
-        map "base_identifier",
-            with: { to: :base_identifier_to_kv, from: :base_identifier_from_kv }
+        map "base",
+            with: { to: :base_to_kv, from: :base_from_kv }
         map "year", to: :year
         map "trailing", to: :trailing
         map "joined", to: :joined
       end
 
-      def base_identifier_to_kv(model, doc)
-        base = model.base_identifier
+      def base_to_kv(model, doc)
+        base = model.base
         return unless base
 
         doc.add_child(
-          Lutaml::KeyValue::DataModel::Element.new("base_identifier",
+          Lutaml::KeyValue::DataModel::Element.new("base",
                                                    base.to_hash),
         )
       end
 
-      def base_identifier_from_kv(model, value)
-        model.base_identifier = ::Pubid::Oiml::Identifier.from_hash(value) if value
+      def base_from_kv(model, value)
+        model.base = ::Pubid::Oiml::Identifier.from_hash(value) if value
       end
 
       attr_reader :requested_format

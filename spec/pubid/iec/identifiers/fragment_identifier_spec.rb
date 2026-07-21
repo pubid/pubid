@@ -19,15 +19,15 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       end
 
       it "parses base number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("60050")
+        expect(parsed.base.base.number.value).to eq("60050")
       end
 
       it "parses base part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("191")
+        expect(parsed.base.base.part.value).to eq("191")
       end
 
       it "parses amendment number" do
-        expect(parsed.base_identifier.number.value).to eq("2")
+        expect(parsed.base.number.value).to eq("2")
       end
 
       it "parses fragment number" do
@@ -87,7 +87,7 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       end
 
       it "parses base identifier as corrigendum" do
-        expect(parsed.base_identifier).to be_a(Pubid::Iec::Identifiers::Corrigendum)
+        expect(parsed.base).to be_a(Pubid::Iec::Identifiers::Corrigendum)
       end
 
       it "parses fragment number" do
@@ -148,11 +148,11 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       end
 
       it "parses base date" do
-        expect(parsed.base_identifier.base_identifier.date.year).to eq("2010")
+        expect(parsed.base.base.date.year).to eq("2010")
       end
 
       it "parses amendment date" do
-        expect(parsed.base_identifier.date.year).to eq("2015")
+        expect(parsed.base.date.year).to eq("2015")
       end
 
       it "parses fragment number" do
@@ -173,15 +173,15 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "delegates publisher to base" do
-        expect(parsed.publisher).to eq(parsed.base_identifier.publisher)
+        expect(parsed.publisher).to eq(parsed.base.publisher)
       end
 
       it "delegates number to base" do
-        expect(parsed.number).to eq(parsed.base_identifier.number)
+        expect(parsed.number).to eq(parsed.base.number)
       end
 
       it "delegates date to base" do
-        expect(parsed.date).to eq(parsed.base_identifier.date)
+        expect(parsed.date).to eq(parsed.base.date)
       end
 
       it "has its own stage from FRAG typed stage" do
@@ -210,7 +210,7 @@ RSpec.describe Pubid::Iec::Identifiers::FragmentIdentifier do
       end
 
       it "parses multi-digit amendment number" do
-        expect(parsed.base_identifier.number.value).to eq("10")
+        expect(parsed.base.number.value).to eq("10")
       end
 
       it "round-trips" do

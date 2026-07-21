@@ -68,6 +68,12 @@ module Pubid
           identifiers&.first&.base_document || self
         end
 
+        # The origin document. Members live in `identifiers` (not `base`), so
+        # walk the first member to its root.
+        def root
+          identifiers&.first&.root || self
+        end
+
         # Dropping the supplement layer yields the base standard alone.
         def drop_supplements
           identifiers&.first || self

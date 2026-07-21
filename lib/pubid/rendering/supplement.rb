@@ -4,14 +4,14 @@ module Pubid
   module Rendering
     module Supplement
       # Render supplement identifiers (amendment, corrigendum, addendum, etc.)
-      # @param base_identifier [Identifier] base identifier
+      # @param base [Identifier] base identifier
       # @param supplements [Array<Hash>] list of supplements
       # @param options [Hash] rendering options
       # @return [String] formatted supplement string
-      def render_supplements(base_identifier, supplements, **options)
-        return base_identifier.to_s(**options) unless supplements&.any?
+      def render_supplements(base, supplements, **options)
+        return base.to_s(**options) unless supplements&.any?
 
-        result = base_identifier.to_s(**options)
+        result = base.to_s(**options)
 
         supplements.each do |supp|
           result += render_single_supplement(supp, **options)

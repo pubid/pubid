@@ -7,7 +7,7 @@ module Pubid
     # Base class for PLATEAU supplements (Annex)
     # Supplements reference a base identifier
     class SupplementIdentifier < Pubid::Identifier
-      attribute :base_identifier, Identifiers::Base
+      attribute :base, Identifiers::Base
       attribute :letter, :string, default: -> {}
 
       def publisher
@@ -19,20 +19,20 @@ module Pubid
         raise NotImplementedError, "Subclasses must implement supplement_string"
       end
 
-      # Override base_hash to extract edition, type, and annex from base_identifier
+      # Override base_hash to extract edition, type, and annex from base
       def base_hash
         hash = super
         # For Plateau supplements, edition comes from the base identifier
-        if base_identifier.class.attributes.key?(:edition) && base_identifier.edition
-          hash[:edition] = base_identifier.edition
+        if base.class.attributes.key?(:edition) && base.edition
+          hash[:edition] = base.edition
         end
-        # Include type from base_identifier
-        if base_identifier.class.attributes.key?(:type_string) && base_identifier.type_string
-          hash[:type] = base_identifier.type_string
+        # Include type from base
+        if base.class.attributes.key?(:type_string) && base.type_string
+          hash[:type] = base.type_string
         end
-        # Include annex from base_identifier
-        if base_identifier.class.attributes.key?(:annex) && base_identifier.annex
-          hash[:annex] = base_identifier.annex
+        # Include annex from base
+        if base.class.attributes.key?(:annex) && base.annex
+          hash[:annex] = base.annex
         end
         hash
       end
@@ -60,7 +60,7 @@ module Pubid
       def ==(other)
         return false unless other.class == self.class
 
-        base_identifier == other.base_identifier &&
+        base == other.base &&
           letter == other.letter
       end
     end

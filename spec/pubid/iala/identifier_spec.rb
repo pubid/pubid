@@ -111,8 +111,8 @@ RSpec.describe Pubid::Iala::Identifier do
 
     it "builds the base identifier for an Annex" do
       annex = Pubid::Iala.parse("IALA G1128 ANNEX A Ed 1.6")
-      expect(annex.base_identifier).to be_a(Pubid::Iala::Identifiers::Guideline)
-      expect(annex.base_identifier.number).to eq("1128")
+      expect(annex.base).to be_a(Pubid::Iala::Identifiers::Guideline)
+      expect(annex.base.number).to eq("1128")
       expect(annex.letter).to eq("A")
     end
 

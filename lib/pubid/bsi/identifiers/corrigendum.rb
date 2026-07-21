@@ -6,23 +6,23 @@ module Pubid
       # Corrigendum Identifier
       # Contains a base identifier plus corrigendum parameters
       class Corrigendum < SingleIdentifier
-        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
+        attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :corrigendum_number, :string
         attribute :corrigendum_year, :integer
         attribute :separator, :string, default: -> { "+" }
 
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         # Base document = the standard this corrigendum applies to, fully peeled.
         def base_document
-          base_identifier&.base_document || self
+          base&.base_document || self
         end
 
         # Dropping the supplement layer yields the base standard.
         def drop_supplements
-          base_identifier || self
+          base || self
         end
 
         # Uniform supplement interface (shared with Amendment) so callers need

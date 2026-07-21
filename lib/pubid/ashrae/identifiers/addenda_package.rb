@@ -28,7 +28,7 @@ module Pubid
         end
 
         def copublisher
-          base_identifier&.copublisher
+          base&.copublisher
         end
       end
     end

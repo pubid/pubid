@@ -4,7 +4,7 @@ module Pubid
   module Jcgm
     class Builder < Pubid::Builder::Base
       def locate_identifier_klass(parsed_hash)
-        if parsed_hash[:base_identifier]
+        if parsed_hash[:base]
           type_with_stage = parsed_hash[:type_with_stage]
           return Jcgm.locate_type(:amendment) unless type_with_stage
 
@@ -64,7 +64,7 @@ module Pubid
 
       def cast(type, value)
         case type
-        when :base_identifier
+        when :base
           build(value)
         when :publisher
           Jcgm::Components::Publisher.new(publisher: value.to_s)

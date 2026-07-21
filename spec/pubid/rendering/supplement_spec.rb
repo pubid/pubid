@@ -20,7 +20,7 @@ RSpec.describe Pubid::Rendering::Supplement do
     Class.new do
       include Pubid::Rendering::Supplement
 
-      attr_accessor :base_identifier, :supplements
+      attr_accessor :base, :supplements
 
       def to_s(**_options)
         "ISO 9001:2015"

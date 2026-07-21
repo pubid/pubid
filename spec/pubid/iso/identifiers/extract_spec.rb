@@ -17,15 +17,15 @@ RSpec.describe Pubid::Iso::Identifiers::Extract do
         let(:urn) { "urn:iso:std:iso:1101:ext:1983:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("1101")
+          expect(parsed.base.number.value).to eq("1101")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1983")
+          expect(parsed.base.date.year).to eq("1983")
         end
 
         it "parses extract number" do

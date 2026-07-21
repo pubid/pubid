@@ -656,7 +656,7 @@ module Pubid
           (type_word.as(:type) >> space?).maybe >>
           number >>
           part_subpart_year.maybe # This captures the full identifier before /Cor
-        ).as(:base_identifier) >>
+        ).as(:base) >>
           # Now match the corrigendum portion
           (slash | dash | space) >>
           str("Cor") >>
@@ -677,7 +677,7 @@ module Pubid
           (type_word.as(:type) >> space?).maybe >>
           number >>
           part_subpart_year.maybe
-        ).as(:base_identifier) >>
+        ).as(:base) >>
           # Now match the interpretation portion
           (slash | dash | space) >>
           str("INT") >>
@@ -695,7 +695,7 @@ module Pubid
           (type_word.as(:type) >> space?).maybe >>
           number >>
           part_subpart_year.maybe
-        ).as(:base_identifier) >>
+        ).as(:base) >>
           # Now match the conformance portion
           (slash | dash | space) >>
           str("Conformance") >>

@@ -205,9 +205,9 @@ RSpec.describe Pubid::Oiml do
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
         expect(result.year).to eq("2009")
-        expect(result.base_identifier).to be_a(Pubid::Oiml::Identifiers::Recommendation)
-        expect(result.base_identifier.code.number).to eq("138")
-        expect(result.base_identifier.date.year).to eq("2007")
+        expect(result.base).to be_a(Pubid::Oiml::Identifiers::Recommendation)
+        expect(result.base.code.number).to eq("138")
+        expect(result.base.date.year).to eq("2007")
         expect(result.language).to eq("E")
         expect(result.to_s).to eq("Amendment (2009) to OIML R 138 Edition 2007 (E)")
       end
@@ -217,8 +217,8 @@ RSpec.describe Pubid::Oiml do
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
         expect(result.year).to eq("2009")
-        expect(result.base_identifier.code.number).to eq("138")
-        expect(result.base_identifier.date.year).to eq("2007")
+        expect(result.base.code.number).to eq("138")
+        expect(result.base.date.year).to eq("2007")
         expect(result.to_s(format: :short)).to eq("Amendment (2009) to OIML R 138:2007 (E)")
         expect(result.to_s(format: :long)).to eq("Amendment (2009) to OIML R 138 Edition 2007 (E)")
       end
@@ -228,8 +228,8 @@ RSpec.describe Pubid::Oiml do
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
         expect(result.year).to eq("2004")
-        expect(result.base_identifier).to be_a(Pubid::Oiml::Identifiers::Document)
-        expect(result.base_identifier.code.number).to eq("2")
+        expect(result.base).to be_a(Pubid::Oiml::Identifiers::Document)
+        expect(result.base.code.number).to eq("2")
         expect(result.to_s).to eq("Amendment (2004) to OIML D 2 Edition 1999 (E)")
       end
 
@@ -239,9 +239,9 @@ RSpec.describe Pubid::Oiml do
         expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
         expect(result.year).to eq("2012")
         expect(result.joined).to be(true)
-        expect(result.base_identifier).to be_a(Pubid::Oiml::Identifiers::BasicPublication)
-        expect(result.base_identifier.code.number).to eq("10")
-        expect(result.base_identifier.date.year).to eq("2011")
+        expect(result.base).to be_a(Pubid::Oiml::Identifiers::BasicPublication)
+        expect(result.base.code.number).to eq("10")
+        expect(result.base.date.year).to eq("2011")
         expect(result.to_s).to eq("OIML B 10:2011+Amendment:2012")
       end
 
@@ -260,9 +260,9 @@ RSpec.describe Pubid::Oiml do
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Amendment)
         expect(result.year).to eq("2006")
-        expect(result.base_identifier.code.number).to eq("10")
-        expect(result.base_identifier.code.part).to eq("1")
-        expect(result.base_identifier.date.year).to eq("2004")
+        expect(result.base.code.number).to eq("10")
+        expect(result.base.code.part).to eq("1")
+        expect(result.base.date.year).to eq("2004")
         expect(result.to_s).to eq("OIML B 10-1:2004+Amendment:2006")
       end
     end
@@ -272,7 +272,7 @@ RSpec.describe Pubid::Oiml do
         result = described_class.parse("OIML R 60 Annexes Edition 2021 (E)")
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Annex)
-        expect(result.base_identifier.code.number).to eq("60")
+        expect(result.base.code.number).to eq("60")
         expect(result.year).to eq("2021")
         expect(result.letter).to be_nil
         expect(result.language).to eq("E")
@@ -283,7 +283,7 @@ RSpec.describe Pubid::Oiml do
         result = described_class.parse("OIML R 60 Annexes:2021 (E)")
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Annex)
-        expect(result.base_identifier.code.number).to eq("60")
+        expect(result.base.code.number).to eq("60")
         expect(result.year).to eq("2021")
         expect(result.to_s(format: :short)).to eq("OIML R 60 Annexes:2021 (E)")
         expect(result.to_s(format: :long)).to eq("OIML R 60 Annexes Edition 2021 (E)")
@@ -293,7 +293,7 @@ RSpec.describe Pubid::Oiml do
         result = described_class.parse("OIML R 60 Annex A Edition 2013 (E)")
 
         expect(result).to be_a(Pubid::Oiml::Identifiers::Annex)
-        expect(result.base_identifier.code.number).to eq("60")
+        expect(result.base.code.number).to eq("60")
         expect(result.letter).to eq("A")
         expect(result.year).to eq("2013")
         expect(result.to_s).to eq("OIML R 60 Annex A Edition 2013 (E)")

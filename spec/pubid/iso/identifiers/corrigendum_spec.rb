@@ -31,19 +31,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:10360:-1:cor:2002:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("10360")
+        expect(parsed.base.number.value).to eq("10360")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2000")
+        expect(parsed.base.date.year).to eq("2000")
       end
 
       it "parses corrigendum number" do
@@ -82,19 +82,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:10360:-1:cor:2002:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("10360")
+        expect(parsed.base.number.value).to eq("10360")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date).to be_nil
+        expect(parsed.base.date).to be_nil
       end
 
       it "parses corrigendum number" do
@@ -133,23 +133,23 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-ieee:11073:-10418:cor:2016:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEEE")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEEE")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("11073")
+        expect(parsed.base.number.value).to eq("11073")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("10418")
+        expect(parsed.base.part.value).to eq("10418")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2014")
+        expect(parsed.base.date.year).to eq("2014")
       end
 
       it "parses corrigendum number" do
@@ -188,15 +188,15 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:123:cor:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("123")
+        expect(parsed.base.number.value).to eq("123")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("1999")
+        expect(parsed.base.date.year).to eq("1999")
       end
 
       it "parses corrigendum number" do
@@ -242,19 +242,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:105:-G01:cor:1995:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("105")
+        expect(parsed.base.number.value).to eq("105")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("G01")
+        expect(parsed.base.part.value).to eq("G01")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("1993")
+        expect(parsed.base.date.year).to eq("1993")
       end
 
       it "parses corrigendum number" do
@@ -294,15 +294,15 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:6709:cor:2009:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("6709")
+        expect(parsed.base.number.value).to eq("6709")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2008")
+        expect(parsed.base.date.year).to eq("2008")
       end
 
       it "parses corrigendum number" do
@@ -342,19 +342,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:9606:-1:cor:2013:v2:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("9606")
+        expect(parsed.base.number.value).to eq("9606")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2012")
+        expect(parsed.base.date.year).to eq("2012")
       end
 
       it "parses corrigendum number" do
@@ -398,19 +398,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:17025:cor:2006:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2005")
+        expect(parsed.base.date.year).to eq("2005")
       end
 
       it "parses corrigendum number" do
@@ -457,19 +457,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso:3822:-3:stage-00.00:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("3822")
+          expect(parsed.base.number.value).to eq("3822")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("3")
+          expect(parsed.base.part.value).to eq("3")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1997")
+          expect(parsed.base.date.year).to eq("1997")
         end
 
         it "parses corrigendum number" do
@@ -506,19 +506,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso:10303:-111:stage-10.00:cor:2:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("10303")
+          expect(parsed.base.number.value).to eq("10303")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("111")
+          expect(parsed.base.part.value).to eq("111")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("2007")
+          expect(parsed.base.date.year).to eq("2007")
         end
 
         it "parses corrigendum number" do
@@ -555,15 +555,15 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso:13431:stage-10.99:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("13431")
+          expect(parsed.base.number.value).to eq("13431")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1999")
+          expect(parsed.base.date.year).to eq("1999")
         end
 
         it "parses corrigendum number" do
@@ -598,15 +598,15 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso:13431:stage-20.20:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("13431")
+          expect(parsed.base.number.value).to eq("13431")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1999")
+          expect(parsed.base.date.year).to eq("1999")
         end
 
         it "parses corrigendum number" do
@@ -643,19 +643,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso:3864:-2:CD:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("3864")
+          expect(parsed.base.number.value).to eq("3864")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("2")
+          expect(parsed.base.part.value).to eq("2")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("2004")
+          expect(parsed.base.date.year).to eq("2004")
         end
 
         it "parses corrigendum number" do
@@ -690,27 +690,27 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso-iec:isp:10611:-4:CD:cor:2:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+          expect(parsed.base.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("10611")
+          expect(parsed.base.number.value).to eq("10611")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("4")
+          expect(parsed.base.part.value).to eq("4")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1997")
+          expect(parsed.base.date.year).to eq("1997")
         end
 
         it "parses base identifier type" do
-          expect(parsed.base_identifier.typed_stage.type_code).to eq("isp")
+          expect(parsed.base.typed_stage.type_code).to eq("isp")
         end
 
         it "parses corrigendum number" do
@@ -745,23 +745,23 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso-iec:15408:-2:CD:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+          expect(parsed.base.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("15408")
+          expect(parsed.base.number.value).to eq("15408")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("2")
+          expect(parsed.base.part.value).to eq("2")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("1999")
+          expect(parsed.base.date.year).to eq("1999")
         end
 
         it "parses corrigendum number" do
@@ -802,23 +802,23 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso-iec:14496:-12:DCOR:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses copublisher" do
-          expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+          expect(parsed.base.publisher.copublisher.first).to eq("IEC")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("14496")
+          expect(parsed.base.number.value).to eq("14496")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base_identifier.part.value).to eq("12")
+          expect(parsed.base.part.value).to eq("12")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date).to be_nil
+          expect(parsed.base.date).to be_nil
         end
 
         it "parses corrigendum number" do
@@ -855,19 +855,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         let(:urn) { "urn:iso:std:iso:tr:23455:FDCOR:cor:1:v1" }
 
         it "parses publisher" do
-          expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+          expect(parsed.base.publisher.publisher).to eq("ISO")
         end
 
         it "parses base identifier number" do
-          expect(parsed.base_identifier.number.value).to eq("23455")
+          expect(parsed.base.number.value).to eq("23455")
         end
 
         it "parses base identifier date" do
-          expect(parsed.base_identifier.date.year).to eq("2019")
+          expect(parsed.base.date.year).to eq("2019")
         end
 
         it "parses base identifier type" do
-          expect(parsed.base_identifier.typed_stage.type_code).to eq("tr")
+          expect(parsed.base.typed_stage.type_code).to eq("tr")
         end
 
         it "parses corrigendum number" do
@@ -907,23 +907,23 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:10646:-1:CD:cor:2:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("10646")
+        expect(parsed.base.number.value).to eq("10646")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("1993")
+        expect(parsed.base.date.year).to eq("1993")
       end
 
       it "parses corrigendum number" do
@@ -961,19 +961,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:DCOR.3:cor:2002:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1012,19 +1012,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:DCOR.3:cor:2:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1067,19 +1067,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:DCOR.3:cor:2002:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1118,19 +1118,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:FDCOR.3:cor:2022:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1173,19 +1173,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:FDCOR.3:cor:2022:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1224,19 +1224,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:FDCOR.3:cor:2:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1279,19 +1279,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:17301:-1:FDCOR.3:cor:2:v1.3" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17301")
+        expect(parsed.base.number.value).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1333,35 +1333,35 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:13818:-1:amd:2016:v3:cor:2017:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "has amendment as base identifier" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("amd")
+        expect(parsed.base.typed_stage.type_code).to eq("amd")
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("13818")
+        expect(parsed.base.base.number.value).to eq("13818")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("1")
+        expect(parsed.base.base.part.value).to eq("1")
       end
 
       it "parses amendment base identifier date" do
-        expect(parsed.base_identifier.base_identifier.date.year).to eq("2015")
+        expect(parsed.base.base.date.year).to eq("2015")
       end
 
       it "parses amendment number" do
-        expect(parsed.base_identifier.number.value).to eq("3")
+        expect(parsed.base.number.value).to eq("3")
       end
 
       it "parses amendment date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -1402,35 +1402,35 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses publisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "has amendment as base identifier" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("amd")
+        expect(parsed.base.typed_stage.type_code).to eq("amd")
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("15938")
+        expect(parsed.base.base.number.value).to eq("15938")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("7")
+        expect(parsed.base.base.part.value).to eq("7")
       end
 
       it "parses amendment base identifier date" do
-        expect(parsed.base_identifier.base_identifier.date.year).to eq("2003")
+        expect(parsed.base.base.date.year).to eq("2003")
       end
 
       it "parses amendment number" do
-        expect(parsed.base_identifier.number.value).to eq("5")
+        expect(parsed.base.number.value).to eq("5")
       end
 
       it "parses amendment date" do
-        expect(parsed.base_identifier.date.year).to eq("2010")
+        expect(parsed.base.date.year).to eq("2010")
       end
 
       it "parses corrigendum number" do
@@ -1468,39 +1468,39 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:guide:98:-3:sup:2008:v1:cor:2009:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "has supplement as base identifier" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("suppl")
+        expect(parsed.base.typed_stage.type_code).to eq("suppl")
       end
 
       it "parses supplement base identifier number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("98")
+        expect(parsed.base.base.number.value).to eq("98")
       end
 
       it "parses supplement base identifier part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("3")
+        expect(parsed.base.base.part.value).to eq("3")
       end
 
       it "parses supplement base identifier date" do
-        expect(parsed.base_identifier.base_identifier.date.year).to eq("2008")
+        expect(parsed.base.base.date.year).to eq("2008")
       end
 
       it "parses supplement base identifier type" do
-        expect(parsed.base_identifier.base_identifier.typed_stage.type_code).to eq("guide")
+        expect(parsed.base.base.typed_stage.type_code).to eq("guide")
       end
 
       it "parses supplement number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses supplement date" do
-        expect(parsed.base_identifier.date.year).to eq("2008")
+        expect(parsed.base.date.year).to eq("2008")
       end
 
       it "parses corrigendum number" do
@@ -1541,43 +1541,43 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses publisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "has supplement as base identifier" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("suppl")
+        expect(parsed.base.typed_stage.type_code).to eq("suppl")
       end
 
       it "parses supplement base identifier number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("98")
+        expect(parsed.base.base.number.value).to eq("98")
       end
 
       it "parses supplement base identifier part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("3")
+        expect(parsed.base.base.part.value).to eq("3")
       end
 
       it "parses supplement base identifier date" do
-        expect(parsed.base_identifier.base_identifier.date).to be_nil
+        expect(parsed.base.base.date).to be_nil
       end
 
       it "parses supplement base identifier type" do
-        expect(parsed.base_identifier.base_identifier.typed_stage.type_code).to eq("guide")
+        expect(parsed.base.base.typed_stage.type_code).to eq("guide")
       end
 
       it "parses supplement base identifier edition" do
-        expect(parsed.base_identifier.base_identifier.edition.number.value).to eq("1")
+        expect(parsed.base.base.edition.number.value).to eq("1")
       end
 
       it "parses supplement number" do
-        expect(parsed.base_identifier.number.value).to eq("1")
+        expect(parsed.base.number.value).to eq("1")
       end
 
       it "parses supplement date" do
-        expect(parsed.base_identifier.date.year).to eq("2008")
+        expect(parsed.base.date.year).to eq("2008")
       end
 
       it "parses corrigendum number" do
@@ -1620,19 +1620,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:11783:-2:cor:2012:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("11783")
+        expect(parsed.base.number.value).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("2")
+        expect(parsed.base.part.value).to eq("2")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2012")
+        expect(parsed.base.date.year).to eq("2012")
       end
 
       it "parses corrigendum number" do
@@ -1676,19 +1676,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:11783:-2:ed-2:cor:2012:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("11783")
+        expect(parsed.base.number.value).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("2")
+        expect(parsed.base.part.value).to eq("2")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2012")
+        expect(parsed.base.date.year).to eq("2012")
       end
 
       it "parses edition" do
@@ -1735,19 +1735,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:11783:-2:cor:2012:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("11783")
+        expect(parsed.base.number.value).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("2")
+        expect(parsed.base.part.value).to eq("2")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2012")
+        expect(parsed.base.date.year).to eq("2012")
       end
 
       it "parses corrigendum number" do
@@ -1790,23 +1790,23 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso:11783:-2:ed-2:cor:2012:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("11783")
+        expect(parsed.base.number.value).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("2")
+        expect(parsed.base.part.value).to eq("2")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date).to be_nil
+        expect(parsed.base.date).to be_nil
       end
 
       it "parses edition" do
-        expect(parsed.base_identifier.edition&.value).to eq("2")
+        expect(parsed.base.edition&.value).to eq("2")
       end
 
       it "parses corrigendum number" do
@@ -1849,19 +1849,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:17025:cor:1:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2005")
+        expect(parsed.base.date.year).to eq("2005")
       end
 
       it "parses corrigendum number" do
@@ -1901,19 +1901,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:17025:cor:2006:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2005")
+        expect(parsed.base.date.year).to eq("2005")
       end
 
       it "parses corrigendum number" do
@@ -1957,19 +1957,19 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:17025:ed-1:cor:2006:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2005")
+        expect(parsed.base.date.year).to eq("2005")
       end
 
       it "parses edition" do
@@ -2016,23 +2016,23 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:17025:ed-1:cor:2006:v1:fr" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2005")
+        expect(parsed.base.date.year).to eq("2005")
       end
 
       it "parses edition" do
-        expect(parsed.base_identifier.edition&.value).to eq("1")
+        expect(parsed.base.edition&.value).to eq("1")
       end
 
       it "parses corrigendum number" do
@@ -2078,39 +2078,39 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:13818:-1:ed-5:amd:2016:v3:cor:2017:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "has amendment as base identifier" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("amd")
+        expect(parsed.base.typed_stage.type_code).to eq("amd")
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("13818")
+        expect(parsed.base.base.number.value).to eq("13818")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("1")
+        expect(parsed.base.base.part.value).to eq("1")
       end
 
       it "parses amendment base identifier date" do
-        expect(parsed.base_identifier.base_identifier.date).to be_nil
+        expect(parsed.base.base.date).to be_nil
       end
 
       it "parses amendment base identifier edition" do
-        expect(parsed.base_identifier.base_identifier.edition.number.value).to eq("5")
+        expect(parsed.base.base.edition.number.value).to eq("5")
       end
 
       it "parses amendment number" do
-        expect(parsed.base_identifier.number.value).to eq("3")
+        expect(parsed.base.number.value).to eq("3")
       end
 
       it "parses amendment date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do
@@ -2149,27 +2149,27 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       let(:urn) { "urn:iso:std:iso-iec:13818:-1:ed-5:amd:2016:v3:cor:2017:v1" }
 
       it "parses publisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.publisher).to eq("ISO")
+        expect(parsed.base.base.publisher.publisher).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.base_identifier.publisher.copublisher.first).to eq("IEC")
+        expect(parsed.base.base.publisher.copublisher.first).to eq("IEC")
       end
 
       it "has amendment as base identifier" do
-        expect(parsed.base_identifier.typed_stage.type_code).to eq("amd")
+        expect(parsed.base.typed_stage.type_code).to eq("amd")
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base_identifier.base_identifier.number.value).to eq("13818")
+        expect(parsed.base.base.number.value).to eq("13818")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base_identifier.base_identifier.part.value).to eq("1")
+        expect(parsed.base.base.part.value).to eq("1")
       end
 
       it "parses amendment base identifier date" do
-        expect(parsed.base_identifier.base_identifier.date.year).to eq("2015")
+        expect(parsed.base.base.date.year).to eq("2015")
       end
 
       it "parses edition" do
@@ -2177,11 +2177,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment number" do
-        expect(parsed.base_identifier.number.value).to eq("3")
+        expect(parsed.base.number.value).to eq("3")
       end
 
       it "parses amendment date" do
-        expect(parsed.base_identifier.date.year).to eq("2016")
+        expect(parsed.base.date.year).to eq("2016")
       end
 
       it "parses corrigendum number" do

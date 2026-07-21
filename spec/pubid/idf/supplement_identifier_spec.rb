@@ -12,16 +12,16 @@ RSpec.describe Pubid::Idf::SupplementIdentifier do
   describe "shared attributes" do
     let(:parsed) { Pubid::Idf.parse("IDF 125:1988/AMD 1:2023") }
 
-    it "has base_identifier attribute" do
-      expect(parsed.respond_to?(:base_identifier)).to be true
+    it "has base attribute" do
+      expect(parsed.respond_to?(:base)).to be true
     end
 
-    it "base_identifier returns the base identifier" do
-      expect(parsed.base_identifier).to be_a(Pubid::Idf::Identifiers::InternationalStandard)
+    it "base returns the base identifier" do
+      expect(parsed.base).to be_a(Pubid::Idf::Identifiers::InternationalStandard)
     end
 
-    it "base_identifier has the correct number" do
-      expect(parsed.base_identifier.number.value).to eq("125")
+    it "base has the correct number" do
+      expect(parsed.base.number.value).to eq("125")
     end
   end
 
@@ -64,7 +64,7 @@ RSpec.describe Pubid::Idf::SupplementIdentifier do
       end
 
       it "has the base identifier's date" do
-        expect(subject.base_identifier.date.year).to eq("1988")
+        expect(subject.base.date.year).to eq("1988")
       end
     end
 
@@ -76,7 +76,7 @@ RSpec.describe Pubid::Idf::SupplementIdentifier do
       end
 
       it "parses base part number" do
-        expect(subject.base_identifier.part.value).to eq("1")
+        expect(subject.base.part.value).to eq("1")
       end
     end
   end

@@ -232,9 +232,9 @@ RSpec.describe Pubid::Jcgm do
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(Pubid::Jcgm::Identifiers::Guide)
-          expect(parsed.base_identifier.number.value).to eq("100")
-          expect(parsed.base_identifier.date.year).to eq("2008")
+          expect(parsed.base).to be_a(Pubid::Jcgm::Identifiers::Guide)
+          expect(parsed.base.number.value).to eq("100")
+          expect(parsed.base.date.year).to eq("2008")
         end
 
         it "parses iteration" do
@@ -260,7 +260,7 @@ RSpec.describe Pubid::Jcgm do
         end
 
         it "parses base identifier" do
-          expect(parsed.base_identifier).to be_a(Pubid::Jcgm::Identifiers::Guide)
+          expect(parsed.base).to be_a(Pubid::Jcgm::Identifiers::Guide)
         end
 
         it "parses iteration" do
@@ -321,9 +321,9 @@ RSpec.describe Pubid::Jcgm do
         end
 
         it "parses the base identifier as a Guide 200:2008" do
-          expect(parsed.base_identifier).to be_a(Pubid::Jcgm::Identifiers::Guide)
-          expect(parsed.base_identifier.number.value).to eq("200")
-          expect(parsed.base_identifier.date.year).to eq("2008")
+          expect(parsed.base).to be_a(Pubid::Jcgm::Identifiers::Guide)
+          expect(parsed.base.number.value).to eq("200")
+          expect(parsed.base.date.year).to eq("2008")
         end
 
         it "carries no iteration" do

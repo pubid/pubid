@@ -70,7 +70,7 @@ module Pubid
         with_edition = opts[:with_edition] || false
 
         [
-          id.base_identifier.to_s(lang: lang, lang_single: lang_single,
+          id.base.to_s(lang: lang, lang_single: lang_single,
                                    with_edition: with_edition),
           "/",
           id.typed_stage.abbreviation,

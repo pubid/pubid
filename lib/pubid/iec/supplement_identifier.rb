@@ -4,7 +4,7 @@ module Pubid
   module Iec
     # Identifier that represents a supplement to a base identifier.
     class SupplementIdentifier < SingleIdentifier
-      attribute :base_identifier, Identifier, polymorphic: true
+      attribute :base, Identifier, polymorphic: true
 
       # Serialize the supplemented document under "base". The supplement's own
       # number/date/stage come from the inherited common maps; route the nested
@@ -15,10 +15,10 @@ module Pubid
       end
 
       def base_to_kv(model, doc)
-        base = model.base_identifier
+        base = model.base
         return unless base
 
-        # `base_identifier` synthesises a base for a supplement that has none
+        # `base` synthesises a base for a supplement that has none
         # (e.g. a bare "+AMD1:2008" nested in a consolidation): a fake doc whose
         # number equals the supplement's own. It renders nothing and the getter
         # recreates it identically on load, so don't persist it. A standalone
@@ -34,7 +34,7 @@ module Pubid
         return unless value
 
         base = ::Pubid::Iec::Identifier.from_hash(value)
-        model.base_identifier = base
+        model.base = base
 
         # A base of the exact SingleIdentifier class is the synthetic self-base
         # of a standalone supplement ("IEC/FDAM 60038-1"); a real attached base
@@ -55,18 +55,18 @@ module Pubid
         @supplement_number = @number
       end
 
-      # Override base_identifier getter to ensure it's always created for standalone supplements
-      def base_identifier
-        @base_identifier || ensure_base_identifier
+      # Override base getter to ensure it's always created for standalone supplements
+      def base
+        @base || ensure_base
       end
 
       # Override number getter to trigger swap for standalone supplements
       def number
-        # Guard against recursion in ensure_base_identifier
+        # Guard against recursion in ensure_base
         return @number if @ensuring_base
 
         # For standalone supplements, trigger base creation first
-        ensure_base_identifier if @synthetic_base.nil? && publisher && part
+        ensure_base if @synthetic_base.nil? && publisher && part
 
         if @synthetic_base
           @supplement_number || @number
@@ -85,7 +85,7 @@ module Pubid
         end
       end
 
-      # Delegate publisher and copublishers to base_identifier whenever there is
+      # Delegate publisher and copublishers to base whenever there is
       # a base (a supplement carries the publisher of the document it
       # supplements). Checking base first — rather than `@publisher || base` — is
       # required now that the publisher attribute has an IEC default, which would
@@ -93,20 +93,20 @@ module Pubid
       def publisher
         return @publisher if @ensuring_base
 
-        base_identifier ? base_identifier.publisher : @publisher
+        base ? base.publisher : @publisher
       end
 
       def copublishers
         return @copublishers if @ensuring_base
 
-        base_identifier ? base_identifier.copublishers : @copublishers
+        base ? base.copublishers : @copublishers
       end
 
-      # Ensure we have a base_identifier for standalone supplements
+      # Ensure we have a base for standalone supplements
       # Creates a synthetic base identifier from supplement attributes if needed
-      # Returns the base_identifier
-      def ensure_base_identifier
-        return @base_identifier if @base_identifier
+      # Returns the base
+      def ensure_base
+        return @base if @base
 
         # Guard flag to prevent recursion in number getter
         @ensuring_base = true
@@ -140,14 +140,14 @@ module Pubid
           stage_code: :undated,
         )
 
-        @base_identifier = base
+        @base = base
 
         # Store the supplement number for getter override
-        # The original number is the base number (moved to base_identifier)
+        # The original number is the base number (moved to base)
         # The original part is the supplement number (what we want to return)
         @supplement_number = supplement_number
 
-        @base_identifier
+        @base
       ensure
         @ensuring_base = false
       end

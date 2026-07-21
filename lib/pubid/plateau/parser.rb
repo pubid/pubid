@@ -52,7 +52,7 @@ module Pubid
 
       # Annex identifier (supplement)
       rule(:annex_identifier) do
-        (handbook | technical_report).as(:base_identifier) >> annex_supplement
+        (handbook | technical_report).as(:base) >> annex_supplement
       end
 
       rule(:identifier) { annex_identifier | handbook | technical_report }

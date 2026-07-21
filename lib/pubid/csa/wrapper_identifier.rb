@@ -26,6 +26,12 @@ module Pubid
       def to_s
         raise NotImplementedError, "Subclasses must implement to_s method"
       end
+
+      # CSA wrappers are not Pubid::Identifier objects, so they do not inherit
+      # #root. They are their own origin for matching purposes.
+      def root
+        self
+      end
     end
   end
 end

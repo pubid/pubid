@@ -36,9 +36,9 @@ RSpec.describe "Joint Document with Pipe" do
     expect(id.to_s).to eq("ISO 5537 | IDF 26")
   end
 
-  it "has base_identifier and additional_identifiers" do
+  it "has base and additional_identifiers" do
     id = Pubid::Iso.parse("ISO 5537|IDF 26")
-    expect(id.base_identifier).to be_a(Pubid::Iso::Identifier)
+    expect(id.base).to be_a(Pubid::Iso::Identifier)
     expect(id.additional_identifiers).to be_a(Array)
     expect(id.additional_identifiers.first).to be_a(Pubid::Identifier)
   end

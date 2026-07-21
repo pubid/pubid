@@ -10,7 +10,7 @@ module Pubid
     #
     # Keeping the root abstract (it is never itself a serialized type, so it is
     # absent from CCSDS_TYPE_MAP) is what breaks the polymorphic recursion a
-    # supplement's `base_identifier` would otherwise hit if it pointed at a
+    # supplement's `base` would otherwise hit if it pointed at a
     # concrete type that is also its own superclass.
     class Identifier < ::Pubid::Identifier
       # CCSDS stores every code component as a plain string (the Builder passes

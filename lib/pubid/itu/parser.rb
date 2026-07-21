@@ -116,13 +116,13 @@ module Pubid
           date_part.maybe
       end
 
-      rule(:base_identifier) do
+      rule(:base) do
         base_with_series | base_without_series
       end
 
       # Supplement with base identifier (has recommendation number)
       rule(:supplement_with_base) do
-        base_identifier.as(:base) >>
+        base.as(:base) >>
           space >>
           supplement_type >>
           supplement_number >>

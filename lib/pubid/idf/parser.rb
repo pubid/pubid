@@ -117,7 +117,7 @@ module Pubid
       # IDF 148-1:2008 / COR 1:2009
       # IDF 140-1:2007 / AMD1:2012 (no space between AMD and 1)
       rule(:supplement_identifier_no_third) do
-        identifier_publisher_no_third.as(:base_identifier) >>
+        identifier_publisher_no_third.as(:base) >>
           space? >> str("/") >> space? >>
           supplement_type_with_stage >>
           space.maybe >> second_part
@@ -130,7 +130,7 @@ module Pubid
       # # ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017
       # # ISO/IEC 19794-7:2014/Amd 1:2015/CD Cor 1
       # rule(:supplement_supplement_identifier) do
-      #   supplement_identifier_no_third.as(:base_identifier) >>
+      #   supplement_identifier_no_third.as(:base) >>
       #     str("/") >> supplement_type_with_stage >>
       #     # digits.as(:stage_iteration).maybe >>
       #     space? >> second_part >> third_part

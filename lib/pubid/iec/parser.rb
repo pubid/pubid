@@ -251,14 +251,14 @@ module Pubid
       # IEC 60695-2-1/1:1994 (sheet 1 from year 1994)
       # IEC 60695-2-1/1 (sheet 1 without year)
       rule(:sheet_identifier) do
-        identifier_copublishers_no_third.as(:base_identifier) >>
+        identifier_copublishers_no_third.as(:base) >>
           (sheet_notation | sheet_notation_no_year)
       end
 
       # Sheet identifier followed by supplement: base/sheet/supplement
       # IEC 60695-2-1/1:1994/COR1:1995
       rule(:sheet_supplement_identifier) do
-        identifier_copublishers_no_third.as(:base_identifier) >>
+        identifier_copublishers_no_third.as(:base) >>
           sheet_notation >>
           str("/") >> supplement_type_with_stage >>
           space? >> second_part >> third_part
@@ -353,7 +353,7 @@ module Pubid
       # ISO/IEC 17025:2017 handles copublisher in copublishers rule
       # We handle this in identifier_copublishers already
       rule(:joint_identifier) do
-        identifier_copublishers_no_third.as(:base_identifier) >>
+        identifier_copublishers_no_third.as(:base) >>
           space? >> str("|") >> space? >>
           scope { iso_identifier }.as(:joint_identifier)
       end
@@ -381,7 +381,7 @@ module Pubid
 
       # IEC 60038:2009/Amd 1:2011
       rule(:supplement_identifier_no_third) do
-        identifier_copublishers_no_third.as(:base_identifier) >>
+        identifier_copublishers_no_third.as(:base) >>
           str("/") >> supplement_type_with_stage >>
           space? >> second_part
       end
@@ -392,7 +392,7 @@ module Pubid
 
       # IEC 60038:2009/Amd 1:2011/Cor 1:2012
       rule(:supplement_supplement_identifier) do
-        supplement_identifier_no_third.as(:base_identifier) >>
+        supplement_identifier_no_third.as(:base) >>
           str("/") >> supplement_type_with_stage >>
           space? >> second_part >> third_part
       end

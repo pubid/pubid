@@ -25,7 +25,7 @@ module Pubid
         @builder = builder
       end
 
-      # Build CircularSupplement with base_identifier wrapping
+      # Build CircularSupplement with base wrapping
       # @param parsed_hash [Hash] the parsed supplement data
       # Build a CIRC/LCIRC supplement. Most forms collapse onto the base
       # identifier's normal class (Circular / LetterCircular) with isolated
@@ -216,7 +216,7 @@ module Pubid
 
           # Recursively build base identifier
           # This will go through normal build() process which extracts edition from "101e2"
-          supplement.base_identifier = @builder.build(base_hash)
+          supplement.base = @builder.build(base_hash)
 
           # NEW: Handle revision + implicit supplement pattern (e.g., "145r11/1925")
           # Create update format: "Upd1-{year}{revision_number}"
@@ -246,7 +246,7 @@ module Pubid
           }
 
           # Recursively build base identifier
-          supplement.base_identifier = @builder.build(base_hash)
+          supplement.base = @builder.build(base_hash)
         end
 
         # Build supplement edition from captured data

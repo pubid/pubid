@@ -12,7 +12,7 @@ module Pubid
       #   CSA C22.2 NO. 60601-1:15 PACKAGE WITH ADDENDUM
       #
       # This is a composite pattern where:
-      #   - base_identifier is the core CSA standard (recursively parsed)
+      #   - base is the core CSA standard (recursively parsed)
       #   - package_materials describes what's included in the package
       #   - Package portion is metadata, not a parseable identifier
       #
@@ -34,7 +34,7 @@ module Pubid
         attribute :materials_after_keyword, :boolean, default: -> { true }
 
         def to_s
-          result = base_identifier.to_s
+          result = base.to_s
 
           # Add package materials if present
           if package_materials && !package_materials.empty?

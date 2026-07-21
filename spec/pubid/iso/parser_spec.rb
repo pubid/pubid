@@ -230,7 +230,7 @@ RSpec.describe Pubid::Iso::Parser do
         id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
         expect(id).to be_a(Pubid::Iso::Identifiers::Corrigendum)
         # Level 2 corrigendum wraps amendment
-        expect(id.base_identifier).to be_a(Pubid::Iso::Identifiers::Amendment)
+        expect(id.base).to be_a(Pubid::Iso::Identifiers::Amendment)
         expect(id.to_s).to eq("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
       end
 
@@ -247,14 +247,14 @@ RSpec.describe Pubid::Iso::Parser do
       it "parses directives supplement with ISO publisher" do
         id = Pubid::Iso.parse("ISO/IEC DIR 1 ISO SUP:2022")
         expect(id.type.abbr).to eq("DIR SUP")
-        expect(id.base_identifier.number.value).to eq("1")
+        expect(id.base.number.value).to eq("1")
         expect(id.to_s).to eq("ISO/IEC DIR 1 ISO SUP:2022")
       end
 
       it "parses directives supplement with IEC copublisher" do
         id = Pubid::Iso.parse("ISO/IEC DIR 2 ISO/IEC SUP:2023")
         expect(id.type.abbr).to eq("DIR SUP")
-        expect(id.base_identifier.number.value).to eq("2")
+        expect(id.base.number.value).to eq("2")
         expect(id.to_s).to eq("ISO/IEC DIR 2 ISO/IEC SUP:2023")
       end
     end

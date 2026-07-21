@@ -32,7 +32,7 @@ module Pubid
 
       def cast(type, value)
         case type
-        when :base_identifier
+        when :base
           build(value)
         when :publisher
           Components::Publisher.new(body: value)

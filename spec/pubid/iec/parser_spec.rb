@@ -71,10 +71,10 @@ RSpec.describe Pubid::Iec::Parser do
       it "parses IEC 60038:2009/Amd 1:2011" do
         result = subject.parse("IEC 60038:2009/Amd 1:2011")
         expect(result).to be_a(Hash)
-        expect(result[:base_identifier]).to be_a(Hash)
-        expect(result[:base_identifier][:publisher]).to eq("IEC")
-        expect(result[:base_identifier][:number_with_part]).to eq("60038")
-        expect(result[:base_identifier][:date]).to eq("2009")
+        expect(result[:base]).to be_a(Hash)
+        expect(result[:base][:publisher]).to eq("IEC")
+        expect(result[:base][:number_with_part]).to eq("60038")
+        expect(result[:base][:date]).to eq("2009")
         expect(result[:type_with_stage]).to eq("Amd")
         expect(result[:number_with_part]).to eq("1")
         expect(result[:date]).to eq("2011")
@@ -83,7 +83,7 @@ RSpec.describe Pubid::Iec::Parser do
       it "parses IEC 60038:2009/Cor 1:2012" do
         result = subject.parse("IEC 60038:2009/Cor 1:2012")
         expect(result).to be_a(Hash)
-        expect(result[:base_identifier]).to be_a(Hash)
+        expect(result[:base]).to be_a(Hash)
         expect(result[:type_with_stage]).to eq("Cor")
         expect(result[:number_with_part]).to eq("1")
         expect(result[:date]).to eq("2012")

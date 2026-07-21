@@ -20,7 +20,7 @@ module Pubid
       rule(:identifier) do
         amendment_identifier | amendment_short | annex_letter_identifier |
           annex_identifier | plus_supplement_identifier |
-          trailing_supplement_identifier | bulletin_identifier | base_identifier
+          trailing_supplement_identifier | bulletin_identifier | base
       end
 
       # Publisher - always "OIML"
@@ -61,7 +61,7 @@ module Pubid
       # Bulletin identifier — no code; the locator (when present) is the
       # (year, issue, sequence) tuple drawn from either the structured
       # YYYY-II-SS form or the citation VOLUME(ISSUE) ARTID form. Both
-      # decode to the same record. Tried before base_identifier because
+      # decode to the same record. Tried before base because
       # "Bulletin" is a word that the single-letter doc_type rule cannot
       # match.
       rule(:bulletin_identifier) do
@@ -187,7 +187,7 @@ module Pubid
       rule(:amendment_identifier) do
         str("Amendment") >> space >> lparen >> year_digits.as(:year) >> rparen >>
           space >> str("to") >> space >>
-          base_without_language.as(:base_identifier) >>
+          base_without_language.as(:base) >>
           language_portion.maybe.as(:language)
       end
 
@@ -209,7 +209,7 @@ module Pubid
       # amendment_short is tried first; it only matches when a year follows the
       # word, so the no-year trailing form falls through to here.
       rule(:trailing_supplement_identifier) do
-        base_without_language.as(:base_identifier) >>
+        base_without_language.as(:base) >>
           space >> (str("Amendment") | str("Errata")).as(:trailing_marker) >>
           language_portion.maybe.as(:language)
       end
@@ -219,7 +219,7 @@ module Pubid
       # and errata to dated bases (e.g. "OIML B 10:2011+Amendment:2012").
       # Annexes already encode the year-on-base intent via their own model.
       rule(:plus_supplement_identifier) do
-        base_without_language.as(:base_identifier) >>
+        base_without_language.as(:base) >>
           str("+") >>
           (str("Amendment") | str("Errata")).as(:plus_marker) >>
           (colon >> year_digits.as(:year)).maybe >>
@@ -229,7 +229,7 @@ module Pubid
       # Annex identifier - "BASE Annexes Edition YYYY" / "BASE Annexes:YYYY" /
       # "BASE:YYYY Annexes" (year on the base, no annex year).
       rule(:annex_identifier) do
-        base_without_language.as(:base_identifier) >>
+        base_without_language.as(:base) >>
           space >> str("Annexes").as(:annex_marker) >>
           (
             (space >> edition_text >> space >> year_digits.as(:year)).as(:edition_format) |
@@ -245,7 +245,7 @@ module Pubid
 
       # Annex with letter - "BASE Annex A Edition YYYY" / "BASE:YYYY Annex B-C"
       rule(:annex_letter_identifier) do
-        base_without_language.as(:base_identifier) >>
+        base_without_language.as(:base) >>
           space >> str("Annex") >> space >> annex_letter_value >>
           ((space >> edition_text >> space >> year_digits.as(:year)) | (colon >> year_digits.as(:year))).maybe >>
           language_portion.maybe.as(:language)
@@ -261,7 +261,7 @@ module Pubid
       end
 
       # Base identifier for recursion and standalone parsing
-      rule(:base_identifier) do
+      rule(:base) do
         publisher >>
           doc_type >>
           full_number >>

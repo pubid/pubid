@@ -78,7 +78,7 @@ module Pubid
       def generate_supplement_urn
         parts = ["urn", "cen"]
 
-        base_id = maybe(:base_identifier)
+        base_id = maybe(:base)
         if base_id
           base_gen = self.class.new(base_id)
           base_urn = base_gen.generate_base_urn

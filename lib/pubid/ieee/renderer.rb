@@ -198,16 +198,16 @@ module Pubid
       end
 
       def render_redlined_standard(id)
-        result = id.base_identifier.to_s
+        result = id.base.to_s
         result += " (Revision of #{id.revision_of})" if id.revision_of
         result += " - Redline" if id.redline
         result
       end
 
       def render_corrigendum(id)
-        return render_base(id) unless id.base_identifier
+        return render_base(id) unless id.base
 
-        result = id.base_identifier.to_s
+        result = id.base.to_s
         result += "/Cor"
         result += ". " if id.cor_number # Add period and space for formal format
         result += id.cor_number if id.cor_number
@@ -216,18 +216,18 @@ module Pubid
       end
 
       def render_interpretation(id)
-        return render_base(id) unless id.base_identifier
+        return render_base(id) unless id.base
 
-        result = id.base_identifier.to_s
+        result = id.base.to_s
         result += "/INT"
         result += "-#{id.int_year}" if id.int_year
         result
       end
 
       def render_conformance(id)
-        return render_base(id) unless id.base_identifier
+        return render_base(id) unless id.base
 
-        result = id.base_identifier.to_s
+        result = id.base.to_s
         result += "/Conformance#{id.conf_number}" if id.conf_number
         result += "-#{id.conf_year}" if id.conf_year
         result
@@ -245,7 +245,7 @@ module Pubid
       end
 
       def render_parenthetical(id)
-        result = id.base_identifier.to_s
+        result = id.base.to_s
         result += " (#{id.parenthetical_identifier})" if id.parenthetical_identifier
         result
       end

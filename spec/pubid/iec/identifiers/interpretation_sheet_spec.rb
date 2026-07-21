@@ -15,19 +15,19 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base number" do
-        expect(parsed.base_identifier.number.value).to eq("60050")
+        expect(parsed.base.number.value).to eq("60050")
       end
 
       it "parses base part" do
-        expect(parsed.base_identifier.part.value).to eq("191")
+        expect(parsed.base.part.value).to eq("191")
       end
 
       it "parses base date" do
-        expect(parsed.base_identifier.date.year).to eq("2010")
+        expect(parsed.base.date.year).to eq("2010")
       end
 
       it "parses ISH number" do
@@ -72,7 +72,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses base date as nil" do
-        expect(parsed.base_identifier.date).to be_nil
+        expect(parsed.base.date).to be_nil
       end
 
       it "parses ISH date as nil" do
@@ -103,7 +103,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       it "parses number" do
         # For "IEC/DISH 60050-191", the supplement number (ISH) is not explicitly specified
         # "60050-191" is the base document number with part
-        expect(parsed.base_identifier.number.value).to eq("60050")
+        expect(parsed.base.number.value).to eq("60050")
       end
 
       it "parses part" do
@@ -144,7 +144,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       it "parses number" do
         # For "IEC/CDISH 60050-191", the supplement number (ISH) is not explicitly specified
         # "60050-191" is the base document number with part
-        expect(parsed.base_identifier.number.value).to eq("60050")
+        expect(parsed.base.number.value).to eq("60050")
       end
 
       it "provides stage code" do
@@ -173,11 +173,11 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("ISO")
+        expect(parsed.base.publisher.body).to eq("ISO")
       end
 
       it "parses copublisher" do
-        expect(parsed.base_identifier.copublishers.first.body).to eq("IEC")
+        expect(parsed.base.copublishers.first.body).to eq("IEC")
       end
 
       it "parses ISH number" do
@@ -202,11 +202,11 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses base part" do
-        expect(parsed.base_identifier.part.value).to eq("191")
+        expect(parsed.base.part.value).to eq("191")
       end
 
       it "parses base subpart" do
-        expect(parsed.base_identifier.subpart.value).to eq("2")
+        expect(parsed.base.subpart.value).to eq("2")
       end
 
       it "round-trips" do

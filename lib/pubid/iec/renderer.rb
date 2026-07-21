@@ -75,11 +75,11 @@ module Pubid
       end
 
       def render_supplement(id, opts, context)
-        id.ensure_base_identifier
+        id.ensure_base
 
         if id.synthetic_base?
           render_supplement_standalone(id, context)
-        elsif id.base_identifier
+        elsif id.base
           render_supplement_attached(id, opts, context)
         else
           render_single(id, opts, context)
@@ -97,7 +97,7 @@ module Pubid
         end
 
         abbr = id.typed_stage.abbr.first
-        number_str = id.base_identifier.number.to_s
+        number_str = id.base.number.to_s
         number_str += "-#{id.number}" if id.number
         number_str += "-#{id.subpart}" if id.subpart
         parts << "#{abbr} #{number_str}"
@@ -110,7 +110,7 @@ module Pubid
 
       def render_supplement_attached(id, opts, context)
         parts = []
-        parts << id.base_identifier.to_s(**opts)
+        parts << id.base.to_s(**opts)
 
         abbr = id.typed_stage.abbr.first.upcase
         supp_part = "/#{abbr}#{id.number}"
@@ -155,7 +155,7 @@ module Pubid
       def render_vap(id, opts, context)
         parts = []
 
-        parts << id.base_identifier.to_s(**opts.merge(with_edition: false))
+        parts << id.base.to_s(**opts.merge(with_edition: false))
         parts << " #{id.vap.join('-')}" if id.vap&.any?
         parts << " #{id.edition.render(context:)}" if id.edition&.number
 
@@ -164,7 +164,7 @@ module Pubid
 
       def render_sheet(id, opts, context)
         parts = []
-        parts << id.base_identifier.to_s(**opts)
+        parts << id.base.to_s(**opts)
         parts << "/#{id.sheet_number}"
         parts << ":#{id.year}" if id.year
         parts.join
@@ -172,9 +172,9 @@ module Pubid
 
       def render_fragment(id, opts, context)
         parts = []
-        parts << id.base_identifier.to_s(**opts)
+        parts << id.base.to_s(**opts)
 
-        parts << if id.base_identifier.is_a?(Identifiers::Corrigendum)
+        parts << if id.base.is_a?(Identifiers::Corrigendum)
                    "/FRAGC#{id.fragment_number}"
                  else
                    "/FRAG#{id.fragment_number}"

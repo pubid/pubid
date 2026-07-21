@@ -56,18 +56,18 @@ module Pubid
         base_data.delete(:amendment_number)
         base_data.delete(:fragment_number)
 
-        base_identifier = locate_identifier_klass(base_data).new
-        assign_attributes(base_identifier, base_data)
+        base = locate_identifier_klass(base_data).new
+        assign_attributes(base, base_data)
 
         # Build Amendment identifier wrapping the base
         amendment = Identifiers::Amendment.new(
-          base_identifier: base_identifier,
+          base: base,
           amendment_number: data[:amendment_number].to_s,
         )
 
         # Build Fragment wrapping the amendment
         Identifiers::Fragment.new(
-          base_identifier: amendment,
+          base: amendment,
           fragment_number: data[:fragment_number].to_s,
         )
       end
@@ -225,17 +225,17 @@ module Pubid
         )
       end
 
-      def wrap_with_consolidated(base_identifier, supplements_data)
+      def wrap_with_consolidated(base, supplements_data)
         supplement_ids = supplements_data.map do |supp|
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
-              base_identifier: base_identifier,
+              base: base,
               amendment_number: supp[:number],
               amendment_year: supp[:year]&.to_i,
             )
           else
             corr_attrs = {
-              base_identifier: base_identifier,
+              base: base,
               corrigendum_number: supp[:number],
               corrigendum_year: supp[:year]&.to_i,
             }
@@ -245,7 +245,7 @@ module Pubid
         end
 
         Identifiers::ConsolidatedIdentifier.new(
-          identifiers: [base_identifier] + supplement_ids,
+          identifiers: [base] + supplement_ids,
         )
       end
 
@@ -294,8 +294,8 @@ module Pubid
         # Build base identifier first (without supplements)
         base_data = data.dup
         base_data.delete(:supplements)
-        base_identifier = locate_identifier_klass(base_data).new
-        assign_attributes(base_identifier, base_data)
+        base = locate_identifier_klass(base_data).new
+        assign_attributes(base, base_data)
 
         # Get the first supplement (slash means only one supplement)
         supp_array = data[:supplements]
@@ -305,13 +305,13 @@ module Pubid
         # Build appropriate supplement identifier
         if supp_data[:amd_number]
           Identifiers::Amendment.new(
-            base_identifier: base_identifier,
+            base: base,
             amendment_number: supp_data[:amd_number].to_s,
             amendment_year: supp_data[:amd_year]&.to_i,
           )
         else
           corr_attrs = {
-            base_identifier: base_identifier,
+            base: base,
             corrigendum_number: supp_data[:cor_number]&.to_s,
             corrigendum_year: (supp_data[:cor_year] || supp_data[:year])&.to_i,
           }

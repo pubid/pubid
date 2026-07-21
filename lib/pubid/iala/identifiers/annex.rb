@@ -14,16 +14,16 @@ module Pubid
       class Annex < Base
         # The publication this annex supplements. Always present; carries the
         # type letter and number (e.g. G1045).
-        attribute :base_identifier, ::Pubid::Iala::Identifier, polymorphic: true
+        attribute :base, ::Pubid::Iala::Identifier, polymorphic: true
         # "Annex" or "ANNEX" — preserved verbatim for exact round-trip.
         attribute :annex_form, :string
         # "A", "B", "C", "D", or nil for the bare form.
         attribute :letter, :string
 
         key_value do
-          map "base_identifier",
-              with: { to: :base_identifier_to_kv, 
-                      from: :base_identifier_from_kv }
+          map "base",
+              with: { to: :base_to_kv, 
+                      from: :base_from_kv }
           map "annex_form", to: :annex_form
           map "letter",     to: :letter
         end
@@ -36,20 +36,20 @@ module Pubid
         # methods via public_send during (de)serialization — a `private`
         # section here raises NoMethodError on to_hash (matches the public
         # visibility of Oiml::SupplementIdentifier's identical helpers).
-        def base_identifier_to_kv(model, doc)
-          base = model.base_identifier
+        def base_to_kv(model, doc)
+          base = model.base
           return unless base
 
           doc.add_child(
-            Lutaml::KeyValue::DataModel::Element.new("base_identifier",
+            Lutaml::KeyValue::DataModel::Element.new("base",
                                                      base.to_hash),
           )
         end
 
-        def base_identifier_from_kv(model, value)
+        def base_from_kv(model, value)
           return unless value
 
-          model.base_identifier = ::Pubid::Iala::Identifier.from_hash(value)
+          model.base = ::Pubid::Iala::Identifier.from_hash(value)
         end
       end
     end

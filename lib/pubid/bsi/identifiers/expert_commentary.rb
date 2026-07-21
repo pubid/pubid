@@ -10,25 +10,25 @@ module Pubid
       # 2. "ExComm" (abbreviated form)
       # 3. "ExComm (Fire)" (with optional topic suffix)
       class ExpertCommentary < SingleIdentifier
-        attribute :base_identifier, ::Pubid::Identifier, polymorphic: true
+        attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :format, :string # "full", "abbr", "abbr_with_topic"
         attribute :topic, :string # e.g., "Fire"
 
         def publisher
-          base_identifier&.publisher
+          base&.publisher
         end
 
         def number
-          base_identifier&.number
+          base&.number
         end
 
         def year
-          base_identifier&.year
+          base&.year
         end
 
         # Base document = the commented standard, fully peeled.
         def base_document
-          base_identifier&.base_document || self
+          base&.base_document || self
         end
       end
     end

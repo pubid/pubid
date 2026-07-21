@@ -11,15 +11,15 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base.number.value).to eq("60038")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2009")
+        expect(parsed.base.date.year).to eq("2009")
       end
 
       it "parses corrigendum number" do
@@ -52,19 +52,19 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base.number.value).to eq("60038")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base_identifier.part.value).to eq("1")
+        expect(parsed.base.part.value).to eq("1")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2009")
+        expect(parsed.base.date.year).to eq("2009")
       end
 
       it "parses corrigendum number" do
@@ -89,19 +89,19 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("ISO")
+        expect(parsed.base.publisher.body).to eq("ISO")
       end
 
       it "parses base identifier copublisher" do
-        expect(parsed.base_identifier.copublishers.first.body).to eq("IEC")
+        expect(parsed.base.copublishers.first.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("17025")
+        expect(parsed.base.number.value).to eq("17025")
       end
 
       it "parses base identifier date" do
-        expect(parsed.base_identifier.date.year).to eq("2017")
+        expect(parsed.base.date.year).to eq("2017")
       end
 
       it "parses corrigendum number" do
@@ -126,11 +126,11 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base.number.value).to eq("60038")
       end
 
       it "parses corrigendum number" do
@@ -163,11 +163,11 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base.number.value).to eq("60038")
       end
 
       it "parses corrigendum number" do
@@ -200,11 +200,11 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base.number.value).to eq("60038")
       end
 
       it "parses corrigendum number" do
@@ -237,11 +237,11 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       let(:parsed) { described_class.parse(subject) }
 
       it "parses base identifier publisher" do
-        expect(parsed.base_identifier.publisher.body).to eq("IEC")
+        expect(parsed.base.publisher.body).to eq("IEC")
       end
 
       it "parses base identifier number" do
-        expect(parsed.base_identifier.number.value).to eq("60038")
+        expect(parsed.base.number.value).to eq("60038")
       end
 
       it "parses corrigendum number" do

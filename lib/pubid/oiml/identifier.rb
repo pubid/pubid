@@ -37,7 +37,7 @@ module Pubid
       # lutaml's polymorphic_map only validates `_type` on deserialization; it
       # does not re-instantiate the concrete subclass. Route by `_type` so
       # `Pubid::Oiml::Identifier.from_hash(h)` returns the right class (and its
-      # nested base_identifier), mirroring Pubid::Iso::Identifier.from_hash.
+      # nested base), mirroring Pubid::Iso::Identifier.from_hash.
       def self.from_hash(data, options = {})
         type = data["_type"] || data[:_type]
         klass_name = OIML_TYPE_MAP[type]

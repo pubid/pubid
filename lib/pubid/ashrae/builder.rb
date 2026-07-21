@@ -158,12 +158,12 @@ module Pubid
       def build_errata(parsed)
         base_attrs = extract_base_attributes(parsed)
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         errata_date = extract_errata_date(parsed[:errata_date])
 
         Identifiers::Errata.new(
-          base_identifier: base_identifier,
+          base: base,
           errata_date: errata_date,
         )
       end
@@ -174,10 +174,10 @@ module Pubid
       def build_interpretation(parsed)
         base_attrs = extract_base_attributes(parsed)
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         Identifiers::Interpretation.new(
-          base_identifier: base_identifier,
+          base: base,
         )
       end
 
@@ -187,13 +187,13 @@ module Pubid
       def build_addendum_from_identifier(parsed)
         base_attrs = extract_base_attributes(parsed)
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         addendum_code = extract_value(parsed[:addendum_code])
         addendum_date = extract_addendum_date(parsed[:addendum_year])
 
         Identifiers::Addendum.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_code: addendum_code,
           addendum_date: addendum_date,
         )
@@ -209,13 +209,13 @@ module Pubid
           year: extract_value(parsed[:year]),
         }
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         addendum_code = extract_value(parsed[:addendum_code])
         addendum_date = extract_addendum_date(parsed[:addendum_year])
 
         Identifiers::Addendum.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_code: addendum_code,
           addendum_date: addendum_date,
         )
@@ -232,13 +232,13 @@ module Pubid
           year: extract_value(parsed[:year]),
         }
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         addendum_code = extract_value(parsed[:addendum_code])
         addendum_date = extract_addendum_date(parsed[:addendum_year])
 
         Identifiers::Addendum.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_code: addendum_code,
           addendum_date: addendum_date,
         )
@@ -270,13 +270,13 @@ module Pubid
         end
 
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         addendum_code = extract_value(parsed[:addendum_code])
         addendum_date = extract_addendum_date(parsed[:addendum_year])
 
         Identifiers::Addendum.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_code: addendum_code,
           addendum_date: addendum_date,
         )
@@ -308,13 +308,13 @@ module Pubid
         end
 
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         addendum_code = extract_value(parsed[:addendum_code])
         addendum_date = extract_addendum_date(parsed[:addendum_year])
 
         Identifiers::Addendum.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_code: addendum_code,
           addendum_date: addendum_date,
         )
@@ -326,13 +326,13 @@ module Pubid
       def build_standard_addendum(parsed)
         base_attrs = extract_base_attributes(parsed)
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         addendum_code = extract_value(parsed[:addendum_code])
         addendum_date = extract_addendum_date(parsed[:addendum_year])
 
         Identifiers::Addendum.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_code: addendum_code,
           addendum_date: addendum_date,
         )
@@ -372,7 +372,7 @@ module Pubid
         end
 
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         # Build the addendum_codes string from first code and additional codes
         first_code = extract_value(parsed[:addendum_code])
@@ -406,7 +406,7 @@ module Pubid
         end
 
         Identifiers::CombinedAddenda.new(
-          base_identifier: base_identifier,
+          base: base,
           addendum_codes: addendum_codes_str,
         )
       end
@@ -417,12 +417,12 @@ module Pubid
       def build_addenda_package(parsed)
         base_attrs = extract_base_attributes(parsed)
         base_class = determine_identifier_class(base_attrs)
-        base_identifier = base_class.new(**base_attrs)
+        base = base_class.new(**base_attrs)
 
         package_description = extract_value(parsed[:package_description])
 
         Identifiers::AddendaPackage.new(
-          base_identifier: base_identifier,
+          base: base,
           package_description: package_description,
         )
       end

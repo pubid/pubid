@@ -62,7 +62,7 @@ RSpec.describe "Pubid::Oiml to_hash/from_hash round-trip" do
       id = Pubid::Oiml.parse("Amendment (2009) to OIML R 138 Edition 2007 (E)")
       restored = Pubid::Oiml::Identifier.from_hash(id.to_hash)
       expect(restored).to be_a(Pubid::Oiml::Identifiers::Amendment)
-      expect(restored.base_identifier).to be_a(Pubid::Oiml::Identifiers::Recommendation)
+      expect(restored.base).to be_a(Pubid::Oiml::Identifiers::Recommendation)
     end
   end
 

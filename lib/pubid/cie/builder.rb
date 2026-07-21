@@ -14,7 +14,7 @@ module Pubid
         # Determine identifier class based on parsed content
         identifier_class = determine_class(parsed_hash)
 
-        # Supplement / Corrigendum wrap a nested base_identifier.
+        # Supplement / Corrigendum wrap a nested base.
         if identifier_class == Cie::Identifiers::Corrigendum
           return build_corrigendum(parsed_hash)
         end
@@ -49,7 +49,7 @@ module Pubid
           style: "current", # supplements always use the colon style
         )
         Cie::Identifiers::Supplement.new(
-          base_identifier: base,
+          base: base,
           supplement_number: a[:supplement_number],
           supplement_part: a[:supplement_part],
         )
@@ -66,7 +66,7 @@ module Pubid
         )
         base = if a[:base_supplement]
                  Cie::Identifiers::Supplement.new(
-                   base_identifier: base_std,
+                   base: base_std,
                    supplement_number: a[:base_supplement],
                    supplement_part: a[:base_supplement_part],
                  )
@@ -74,7 +74,7 @@ module Pubid
                  base_std
                end
         Cie::Identifiers::Corrigendum.new(
-          base_identifier: base,
+          base: base,
           cor_number: a[:cor_number],
           cor_year: a[:cor_year],
         )

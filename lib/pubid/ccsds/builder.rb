@@ -47,7 +47,7 @@ module Pubid
         # If multiple corrigenda exist, we build the last one wrapping the base
         corr_numbers.reduce(base) do |current_base, cor_num|
           Identifiers::Corrigendum.new(
-            base_identifier: current_base,
+            base: current_base,
             number: cor_num,
           )
         end

@@ -69,10 +69,10 @@ module Pubid
           supplement_year = match[4]   # "1987" or nil
 
           base_parsed = Pubid::Iso.parser.parse(base_str)
-          base_identifier = Pubid::Iso.builder.build(base_parsed)
+          base = Pubid::Iso.builder.build(base_parsed)
 
           addendum = Identifiers::Addendum.new
-          addendum.base_identifier = base_identifier
+          addendum.base = base
           addendum.number = Iso::Components::Code.new(value: supplement_number)
           addendum.date = Pubid::Components::Date.new(year: supplement_year) if supplement_year
 

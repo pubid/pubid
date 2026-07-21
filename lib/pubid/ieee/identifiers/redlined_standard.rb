@@ -9,7 +9,7 @@ module Pubid
       # Contains: base standard + optional revision standard + redline flag
       class RedlinedStandard < Base
         # The current standard identifier
-        attribute :base_identifier, Base, polymorphic: true
+        attribute :base, Base, polymorphic: true
 
         # Optional: the standard this revises
         attribute :revision_of, Base, polymorphic: true
@@ -18,7 +18,7 @@ module Pubid
         attribute :redline, :boolean, default: -> { true }
 
         def publisher
-          base_identifier&.publisher || "IEEE"
+          base&.publisher || "IEEE"
         end
       end
     end

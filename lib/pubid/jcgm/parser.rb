@@ -12,22 +12,22 @@ module Pubid
 
       rule(:identifier) do
         meeting_identifier | amendment_identifier | corrigendum_identifier |
-          base_identifier | named_guide_identifier
+          base | named_guide_identifier
       end
 
       # "JCGM 200:2008 Corrigendum" — a base guide plus a trailing
-      # " Corrigendum" word (no number). Must precede base_identifier: Parslet
+      # " Corrigendum" word (no number). Must precede base: Parslet
       # is an ordered PEG that commits to the first matching alternative, so if
-      # base_identifier ran first it would consume "JCGM 200:2008" and root
+      # base ran first it would consume "JCGM 200:2008" and root
       # would fail on the leftover " Corrigendum". Emits type_with_stage so the
       # builder routes it to Corrigendum.
       rule(:corrigendum_identifier) do
-        base_identifier.as(:base_identifier) >> space >>
+        base.as(:base) >> space >>
           str("Corrigendum").as(:type_with_stage)
       end
 
       # Dateless "named" guides: "JCGM GUM", "JCGM VIM-3" (and future "VIM-N").
-      # Last in the alternation — only reached when base_identifier fully fails
+      # Last in the alternation — only reached when base fully fails
       # (these have no date, so number_portion/date_portion never match).
       rule(:named_guide_identifier) do
         publisher >> space >> named_number
@@ -38,7 +38,7 @@ module Pubid
       end
 
       # Committee/meeting record, e.g. "JCGM 17th Meeting (2012)". Diverges
-      # from base_identifier right after the digits (base wants ":", meeting
+      # from base right after the digits (base wants ":", meeting
       # wants the ordinal suffix), so ordered choice is unambiguous. Emits the
       # same tokens as a guide plus type_with_stage "Meeting", so the generic
       # builder path resolves it to Identifiers::Meeting (like "Amd").
@@ -52,12 +52,12 @@ module Pubid
         str("st") | str("nd") | str("rd") | str("th")
       end
 
-      rule(:base_identifier) do
+      rule(:base) do
         publisher >> space >> number_portion >> date_portion >> language_portion.maybe
       end
 
       rule(:amendment_identifier) do
-        base_identifier.as(:base_identifier) >>
+        base.as(:base) >>
           str("/") >> amendment_type >>
           space >> amendment_number >>
           amendment_date.maybe

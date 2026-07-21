@@ -24,7 +24,7 @@ module Pubid
       # the marker form is preserved verbatim ("Annex" vs "ANNEX"), then the
       # optional letter, edition, and language.
       def render_annex(id)
-        base_str = id.base_identifier.to_s
+        base_str = id.base.to_s
         rendered = "#{base_str} #{id.annex_form}"
         rendered << " #{id.letter}" if id.letter
         rendered << " Ed #{id.edition}" if id.edition
