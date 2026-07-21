@@ -25,9 +25,9 @@ module Pubid
         # Extract attributes with style detection
         attributes = extract_attributes(parsed_hash)
 
-        # For Bundle identifier, store original string
+        # For Bundle, parse each comma-separated member and hoist a shared base.
         if parsed_hash[:bundle_items] && original_string
-          attributes[:identifiers_string] = original_string
+          attributes.merge!(build_bundle(original_string))
         end
 
         # Construct identifier
@@ -35,6 +35,41 @@ module Pubid
       end
 
       private
+
+      # Build a Bundle's attributes from its printed form. Parse each member,
+      # then — since a CIE bundle is the parts of one supplement of one standard
+      # — hoist the shared base and keep only the differing supplement
+      # number/part in each doc. If the members don't share a base (not seen in
+      # practice, but the grammar allows it), keep each doc's own base instead.
+      def build_bundle(original_string)
+        members = split_bundle_members(original_string)
+        shared = common_base(members)
+        return { ids: members } unless shared
+
+        ids = members.map do |m|
+          Cie::Identifiers::Supplement.new(number: m.number, part: m.part)
+        end
+        { base: shared, ids: ids }
+      end
+
+      # The publisher prefix is written once, so only the first item carries
+      # "CIE "; prepend it to the rest before parsing each member.
+      def split_bundle_members(original_string)
+        original_string.split(",").each_with_index.map do |item, i|
+          ref = i.zero? ? item.strip : "CIE #{item.strip}"
+          Cie::Identifier.parse(ref)
+        end
+      end
+
+      # The base shared by every member, or nil if they differ (or any is
+      # base-less). Compared by canonical hash so structural equality holds.
+      def common_base(members)
+        bases = members.map(&:base)
+        return nil if bases.any?(&:nil?)
+
+        first = bases.first.to_hash
+        bases.all? { |b| b.to_hash == first } ? bases.first : nil
+      end
 
       # Supplement: nest the base Standard (the stage/year/language belong to
       # the base), keep only the -SPN number/part on the wrapper.
@@ -50,8 +85,8 @@ module Pubid
         )
         Cie::Identifiers::Supplement.new(
           base: base,
-          supplement_number: a[:supplement_number],
-          supplement_part: a[:supplement_part],
+          number: a[:supplement_number],
+          part: a[:supplement_part],
         )
       end
 
@@ -67,16 +102,16 @@ module Pubid
         base = if a[:base_supplement]
                  Cie::Identifiers::Supplement.new(
                    base: base_std,
-                   supplement_number: a[:base_supplement],
-                   supplement_part: a[:base_supplement_part],
+                   number: a[:base_supplement],
+                   part: a[:base_supplement_part],
                  )
                else
                  base_std
                end
         Cie::Identifiers::Corrigendum.new(
           base: base,
-          cor_number: a[:cor_number],
-          cor_year: a[:cor_year],
+          number: a[:cor_number],
+          year: a[:cor_year],
         )
       end
 
@@ -274,15 +309,21 @@ module Pubid
             extract_value(parsed_hash[:conf_number])
         end
 
-        # Proceedings paper identity (code + number) as a Components::Paper
+        # Proceedings paper: the paper itself is the document, so its identity
+        # (code + running number, e.g. "OP01") is the flat +number+ for both
+        # surface forms. The x-form's parent conference goes to
+        # +conference+; the standalone form keeps its +page+ range.
         if parsed_hash[:paper_code]
-          attributes[:paper] = Components::Paper.new(
-            code: extract_value(parsed_hash[:paper_code]),
-            number: extract_value(parsed_hash[:paper_number]),
-          )
+          attributes[:number] =
+            "#{extract_value(parsed_hash[:paper_code])}" \
+            "#{extract_value(parsed_hash[:paper_number])}"
+          if parsed_hash[:conf_number]
+            attributes[:conference] =
+              extract_value(parsed_hash[:conf_number])
+          end
         end
         if parsed_hash[:page_range]
-          attributes[:page_range] = extract_value(parsed_hash[:page_range])
+          attributes[:page] = extract_value(parsed_hash[:page_range])
         end
 
         # Conference /slug variant (opaque, verbatim)
@@ -398,10 +439,11 @@ module Pubid
             extract_value(parsed_hash[:amd_number])
         end
 
-        # Extract bundle data
+        # Tutorial bundle: the ordinal is the bundle's own `number` (also its
+        # relaton-index key). A comma-list bundle instead keys via its `ids`
+        # members through #root, so it needs no stored number.
         if parsed_hash[:bundle_number]
-          attributes[:bundle_number] =
-            extract_value(parsed_hash[:bundle_number])
+          attributes[:number] = extract_value(parsed_hash[:bundle_number])
         end
 
         # Extract trailing language from legacy_code_with_year

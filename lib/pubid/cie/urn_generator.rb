@@ -49,11 +49,14 @@ module Pubid
         doc_type = maybe(:doc_type)
         parts << "doctype.#{doc_type}" if doc_type
 
-        identifiers_string = maybe(:identifiers_string)
-        parts << "bundle.#{identifiers_string}" if identifiers_string
+        if identifier.respond_to?(:ids) && identifier.ids&.any?
+          parts << "bundle.#{identifier}"
+        end
 
-        bundle_number = maybe(:bundle_number)
-        parts << "tut-bundle.#{bundle_number}" if bundle_number
+        if identifier.is_a?(Cie::Identifiers::TutorialBundle) &&
+           identifier.number
+          parts << "tut-bundle.#{identifier.number}"
+        end
 
         languages = maybe(:languages)
         if languages&.any?

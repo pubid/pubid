@@ -11,23 +11,26 @@ module Pubid
       #   x-prefixed (attached to a conference): "CIE x043-OP01"
       #   standalone (with a page range):        "CIE OP02 1-5"
       #
-      # The paper's identity (code + number) is a Components::Paper, matching
-      # how the flavor groups other sub-structure into components.
-      # +number+ (the parent conference, x-form) and +page_range+ (standalone)
-      # are the form-specific parts. No-default values so absent keys drop from
-      # to_hash (relaton-index round-trip contract).
+      # The paper itself is the document, so its identity (code + running
+      # number, e.g. "OP01") is stored flat as +number+ for BOTH forms. This
+      # gives every proceedings row a non-empty relaton-index binary-search key
+      # (see index_number_spec). The x-form's parent conference lives in
+      # +conference+; the standalone form's +page+ range is its locality.
+      # No-default values so absent keys drop from to_hash (round-trip).
       class Proceedings < SingleIdentifier
-        # The conference number "043" (nil for standalone form). :string
-        # overrides the base ::Pubid::Identifier Components::Code type.
+        # The paper identity "OP01" / "P03". :string overrides the base
+        # ::Pubid::Identifier Components::Code type.
         attribute :number, :string
-        attribute :paper, Components::Paper   # code "OP" + number "01"
-        attribute :page_range, :string        # "1-5" (standalone form only)
+        # The parent conference "043" (x-form only; nil for standalone).
+        attribute :conference, :string
+        # Page range "1-5" (standalone form only).
+        attribute :page, :string
 
         def to_s
-          if number
-            "CIE x#{number}-#{paper}"
+          if conference
+            "CIE x#{conference}-#{number}"
           else
-            "CIE #{paper} #{page_range}"
+            "CIE #{number} #{page}"
           end
         end
       end

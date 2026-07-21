@@ -9,7 +9,6 @@ module Pubid
 
     module Components
       autoload :Language, "#{__dir__}/cie/components/language"
-      autoload :Paper, "#{__dir__}/cie/components/paper"
     end
 
     autoload :Builder, "#{__dir__}/cie/builder"

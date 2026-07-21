@@ -8,11 +8,15 @@ module Pubid
       # Tutorial Bundle identifier for CIE
       # Special text-based identifier
       # Example: CIE Tutorials Bundle 1
+      #
+      # The ordinal ("1") is the bundle's own +number+ (also the relaton-index
+      # root key); there is no separate document, so no nested base.
       class TutorialBundle < SingleIdentifier
-        attribute :bundle_number, :string
+        # :string overrides the base ::Pubid::Identifier Components::Code type.
+        attribute :number, :string
 
         def to_s
-          "CIE Tutorials Bundle #{bundle_number}"
+          "CIE Tutorials Bundle #{number}"
         end
       end
     end
