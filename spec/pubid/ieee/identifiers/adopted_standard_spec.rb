@@ -41,9 +41,9 @@ RSpec.describe Pubid::Ieee::Identifiers::AdoptedStandard do
         expect(id.ieee_identifier.to_s).to eq("IEEE Std C37.111-2013")
 
         expect(id.adopted_identifiers.first).to be_a(Pubid::Iec::Identifiers::InternationalStandard)
-        expect(id.adopted_identifiers.first.to_s).to eq("IEC 60255-24:2013 ED2.0")
+        expect(id.adopted_identifiers.first.to_s).to eq("IEC 60255-24:2013-04 ED2.0")
 
-        expect(id.to_s).to eq("IEEE Std C37.111-2013 (IEC 60255-24:2013 ED2.0)")
+        expect(id.to_s).to eq("IEEE Std C37.111-2013 (IEC 60255-24:2013-04 ED2.0)")
       end
     end
   end
