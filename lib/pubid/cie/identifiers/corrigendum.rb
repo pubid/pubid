@@ -11,24 +11,22 @@ module Pubid
       # The "/CorN:year" is a clean trailing suffix on the base's rendering.
       # Examples: CIE 232:2019/Cor1:2020, CIE 198-SP1.4:2011/Cor1:2013
       class Corrigendum < SupplementIdentifier
-        attribute :cor_number, :string
-        attribute :cor_year, :string
+        # +number+ (the "/CorN" ordinal) is inherited from SupplementIdentifier.
+        # The corrigendum's own year — SupplementIdentifier descends from the
+        # base Identifier (not SingleIdentifier), so there is no inherited year.
+        attribute :year, :string
 
         # Uniform supplement interface (shared with Supplement).
         def supplement_type
           :corrigendum
         end
 
-        def supplement_number
-          cor_number
-        end
-
         def supplement_year
-          cor_year
+          year
         end
 
         def to_s
-          "#{base}/Cor#{cor_number}:#{cor_year}"
+          "#{base}/Cor#{number}:#{year}"
         end
       end
     end

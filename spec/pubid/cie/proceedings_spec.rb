@@ -56,26 +56,28 @@ RSpec.describe "Pubid::Cie grammar extensions" do
   end
 
   describe "Proceedings attributes" do
-    it "captures conference number and paper identity for x-prefixed" do
+    # The paper is the document, so its identity (code + running number) is the
+    # flat `number` for both forms; the x-form's parent conference lives in
+    # `conference`. This gives every proceedings row a non-empty
+    # relaton-index binary-search key (see index_number_spec).
+    it "captures the paper as number and the conference for x-prefixed" do
       id = Pubid::Cie.parse("CIE x043-OP01")
-      expect(id.number).to eq("043")
-      expect(id.paper.code).to eq("OP")
-      expect(id.paper.number).to eq("01")
-      expect(id.page_range).to be_nil
+      expect(id.number).to eq("OP01")
+      expect(id.conference).to eq("043")
+      expect(id.page).to be_nil
     end
 
-    it "captures paper identity and page_range for standalone" do
+    it "captures the paper as number and the page range for standalone" do
       id = Pubid::Cie.parse("CIE OP02 1-5")
-      expect(id.number).to be_nil
-      expect(id.paper.code).to eq("OP")
-      expect(id.paper.number).to eq("02")
-      expect(id.page_range).to eq("1-5")
+      expect(id.number).to eq("OP02")
+      expect(id.conference).to be_nil
+      expect(id.page).to eq("1-5")
     end
 
-    it "captures a single-letter paper code" do
+    it "captures a single-letter paper code as part of number" do
       id = Pubid::Cie.parse("CIE x049-P03")
-      expect(id.paper.code).to eq("P")
-      expect(id.paper.number).to eq("03")
+      expect(id.number).to eq("P03")
+      expect(id.conference).to eq("049")
     end
   end
 

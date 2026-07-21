@@ -10,8 +10,8 @@ module Pubid
       # inserted after the base number, so to_s renders from the base's parts.
       # Examples: CIE 121-SP1:2009, CIE 198-SP1.4:2011, CIE DIS 025-SP1/E:2019
       class Supplement < SupplementIdentifier
-        attribute :supplement_number, :string # "1", "2"
-        attribute :supplement_part, :string   # "1" in "SP1.1", "4" in "SP1.4"
+        # +number+ (the "-SPN" ordinal) is inherited from SupplementIdentifier.
+        attribute :part, :string # "1" in "SP1.1", "4" in "SP1.4"
 
         # Uniform supplement interface (shared with Corrigendum).
         def supplement_type
@@ -27,8 +27,8 @@ module Pubid
           parts = ["CIE"]
           parts << b.stage if b.respond_to?(:stage) && b.stage
 
-          core = "#{b.number}-SP#{supplement_number}"
-          core += ".#{supplement_part}" if supplement_part
+          core = "#{b.number}-SP#{number}"
+          core += ".#{part}" if part
           parts << core
           result = parts.join(" ")
 
