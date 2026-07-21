@@ -61,7 +61,12 @@ RSpec.describe "ISO Parser Performance" do
 
       (time.real / 500 * 1000).round(2)
 
-      expect(time.real).to be < 5.0  # round-trip is 3 operations, needs more time
+      # Each of the 500 iterations does 2 parses + 1 to_s. The complex-parse
+      # benchmark above budgets 8ms/parse for CI variability, so a consistent
+      # round-trip budget is ~2 parse-equivalents per iteration with headroom.
+      # (The old 5.0s was tighter per-op than the parse tests and flaked on
+      # slower CI runners.)
+      expect(time.real).to be < 10.0
     end
   end
 
