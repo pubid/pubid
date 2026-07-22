@@ -103,6 +103,26 @@ module Pubid
         raise NotImplementedError, "Subclasses must implement type_string"
       end
 
+      # OIML keeps identity in `code` (Components::Code) and `type_string`
+      # (e.g. "R", "V", "D"), not in the inherited `number`/`typed_stage` —
+      # the generic MrString renderer would otherwise drop both and produce
+      # `OIML.<year>`. Losslessness for issue #142 requires the type letter
+      # and document number to appear in MR.
+      def mr_number_with_part
+        segments = []
+        segments << code&.number&.to_s if code&.number
+        segments << code&.part&.to_s if code&.part
+        segments << code&.subpart&.to_s if code&.subpart
+        segments << code&.suffix&.to_s if code&.suffix
+        return nil if segments.empty?
+
+        segments.join("-")
+      end
+
+      def mr_type
+        type_string&.downcase
+      end
+
       # Subclasses override this
     end
   end

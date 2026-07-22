@@ -243,6 +243,14 @@ module Pubid
                nist_format: format || parsed_format&.to_sym || :short)
       end
 
+      # NIST has its own defined MR format (to_mr_style) used by relaton-nist
+      # and downstream tooling. The generic Renderers::MrString does not know
+      # about NIST series, revisions, supplements, etc., so delegate to the
+      # established style for losslessness (issue #142).
+      def to_mr_string
+        to_mr_style
+      end
+
       # Returns weight based on amount of defined attributes
       # Used for ranking identifiers by specificity for conflict resolution
       # @return [Integer] weight score (higher = more specific)

@@ -19,6 +19,17 @@ module Pubid
             stage_code: "published",
           ),
         ].freeze
+
+        # MR supplement suffix: `cor.{number}.{year}` (e.g. "/cor.1.2017").
+        # The MrString renderer recurses into `base` and appends this so the
+        # full IEEE corrigendum round-trips losslessly (issue #142).
+        def mr_supplement_suffix
+          segments = []
+          segments << "cor"
+          segments << cor_number.to_s if cor_number
+          segments << cor_year.to_s if cor_year
+          segments.join(".")
+        end
       end
     end
   end

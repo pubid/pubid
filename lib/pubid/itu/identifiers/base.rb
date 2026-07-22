@@ -45,6 +45,30 @@ module Pubid
       #
       # @return [String] URN representation
 
+      # ITU encodes identity across `sector` (T/R/CD), `series` (G/H/J…), and
+      # `code` (number with optional part), not in the inherited `number`/
+      # `typed_stage`. The generic MrString renderer would otherwise drop all
+      # three and emit just `ITU`. Losslessness for issue #142 requires the
+      # sector letter, series letter, and document number to appear in MR.
+      def mr_publisher
+        publisher&.to_s
+      end
+
+      def mr_type
+        sector&.sector&.to_s&.downcase
+      end
+
+      def mr_number_with_part
+        segments = []
+        segments << series&.series&.to_s if series&.series
+        segments << code&.number&.to_s if code&.number
+        segments << code&.subseries&.to_s if code&.subseries
+        segments.concat(code&.parts&.map(&:to_s) || [])
+        return nil if segments.empty?
+
+        segments.join("-")
+      end
+
       # Stored as a plain string (always "ITU") so it round-trips through
       # to_hash/from_hash. Was a `def publisher` method, which made lutaml
       # serialize a String against the Components::Publisher attribute.

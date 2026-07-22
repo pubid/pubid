@@ -35,6 +35,19 @@ module Pubid
         Pubid::Renderers::SupplementRenderer.new(self).render(context:,
                                                               **opts.slice(:with_edition))
       end
+
+      # MR supplement suffix: `/{type}.{number}.{year}` (e.g. "/amd.1.2020").
+      # The MrString renderer recurses into `base` and appends this so the
+      # full supplement chain round-trips losslessly (issue #142).
+      def mr_supplement_suffix
+        segments = []
+        segments << mr_type if mr_type
+        segments << number&.to_s if number
+        segments << date&.year&.to_s if date&.year
+        return nil if segments.empty?
+
+        segments.join(".")
+      end
     end
   end
 end

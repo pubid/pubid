@@ -66,6 +66,18 @@ module Pubid
 
           result
         end
+
+        # CIE Standard distinguishes S-prefixed standards (`CIE S 017`) from
+        # plain (`CIE 015`), D-prefixed (`CIE D001`), and DIS-staged. The
+        # generic mr_type looks at typed_stage, which CIE doesn't use, so
+        # without this override the `S`/`D`/stage marker would be lost in MR.
+        def mr_type
+          return stage.downcase if stage
+          return "d" if d_prefix
+          return "s" if s_prefix
+
+          nil
+        end
       end
     end
   end
