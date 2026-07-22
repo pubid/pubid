@@ -53,4 +53,41 @@ RSpec.describe "NIST Revision Format Preservation" do
       expect(identifier.to_s).to eq("NIST SP 800-53 r5A")
     end
   end
+
+  describe "long notation references (issue #155)" do
+    # Long notation uses "Rev." / "Part." prefixes with optional separators
+    # between the prefix and the digit. Short form ("r1", "pt1") is unaffected.
+
+    it "parses 'Rev.1' (period, no space)" do
+      identifier = Pubid::Nist.parse("NIST SP 800-67 Rev.1")
+      expect(identifier.to_s).to eq("NIST SP 800-67 Rev.1")
+    end
+
+    it "parses 'Rev. 1' (period and space — already supported)" do
+      identifier = Pubid::Nist.parse("NIST SP 800-67 Rev. 1")
+      expect(identifier.to_s).to eq("NIST SP 800-67 Rev. 1")
+    end
+
+    it "parses 'Part. 1' (period and space)" do
+      identifier = Pubid::Nist.parse("NIST SP 800-57 Part. 1")
+      expect(identifier.to_s).to eq("NIST SP 800-57pt1")
+    end
+
+    it "parses 'Part.1' (period, no space)" do
+      identifier = Pubid::Nist.parse("NIST SP 800-57 Part.1")
+      expect(identifier.to_s).to eq("NIST SP 800-57pt1")
+    end
+
+    it "parses 'Part 1' (space, no period — already supported)" do
+      identifier = Pubid::Nist.parse("NIST SP 800-57 Part 1")
+      expect(identifier.to_s).to eq("NIST SP 800-57pt1")
+    end
+
+    it "round-trips 'Rev.1' form through parse-serialize-parse" do
+      original = "NIST SP 800-67 Rev.1"
+      first = Pubid::Nist.parse(original)
+      expect(first.to_s).to eq(original)
+      expect(Pubid::Nist.parse(first.to_s).to_s).to eq(original)
+    end
+  end
 end
