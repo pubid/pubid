@@ -37,6 +37,8 @@ module Pubid
           render_fragment(id, opts, context)
         when Identifiers::WorkingDocument
           render_working_document(id, context)
+        when Identifiers::TechnicalGroup
+          render_technical_group(id, context)
         when Identifiers::TestReportForm
           render_test_report_form(id, context)
         when SupplementIdentifier
@@ -182,6 +184,14 @@ module Pubid
 
         parts << " #{id.edition.render(context:)}" if id.edition&.number
 
+        parts.join
+      end
+
+      def render_technical_group(id, _context)
+        parts = []
+        parts << id.publisher_portion
+        parts << " #{id.technical_committee}"
+        parts << id.subcommittee if id.subcommittee
         parts.join
       end
 

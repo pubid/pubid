@@ -9,6 +9,11 @@ module Pubid
           return Identifiers::WorkingDocument
         end
 
+        # Check for technical group (committee identifier, no document number)
+        if parsed_hash[:technical_committee] && !parsed_hash[:wd_number]
+          return Identifiers::TechnicalGroup
+        end
+
         # Check for working document
         if parsed_hash[:technical_committee] && parsed_hash[:wd_number]
           return Identifiers::WorkingDocument
@@ -356,7 +361,7 @@ module Pubid
             end
           end
 
-        when :technical_committee, :wd_number, :wd_stage, :wd_language, :wp_stage, :wp_type
+        when :technical_committee, :subcommittee, :wd_number, :wd_stage, :wd_language, :wp_stage, :wp_type
           # Working document/programme fields - just return as string
           value.to_s
 

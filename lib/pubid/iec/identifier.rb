@@ -84,6 +84,7 @@ module Pubid
         "pubid:iec:societal-technology-trend-report" => "Pubid::Iec::Identifiers::SocietalTechnologyTrendReport",
         "pubid:iec:systems-reference-document" => "Pubid::Iec::Identifiers::SystemsReferenceDocument",
         "pubid:iec:technology-report" => "Pubid::Iec::Identifiers::TechnologyReport",
+        "pubid:iec:technical-group" => "Pubid::Iec::Identifiers::TechnicalGroup",
         "pubid:iec:test-report-form" => "Pubid::Iec::Identifiers::TestReportForm",
         "pubid:iec:white-paper" => "Pubid::Iec::Identifiers::WhitePaper",
         "pubid:iec:working-document" => "Pubid::Iec::Identifiers::WorkingDocument",

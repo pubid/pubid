@@ -20,6 +20,7 @@ module Pubid
       autoload :SystemsReferenceDocument, "#{__dir__}/identifiers/systems_reference_document"
       autoload :TechnicalReport, "#{__dir__}/identifiers/technical_report"
       autoload :TechnicalSpecification, "#{__dir__}/identifiers/technical_specification"
+      autoload :TechnicalGroup, "#{__dir__}/identifiers/technical_group"
       autoload :TechnologyReport, "#{__dir__}/identifiers/technology_report"
       autoload :TestReportForm, "#{__dir__}/identifiers/test_report_form"
       autoload :VapIdentifier, "#{__dir__}/identifiers/vap_identifier"
