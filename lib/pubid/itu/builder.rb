@@ -99,6 +99,8 @@ module Pubid
                   Identifiers::Amendment
                 when "Cor"
                   Identifiers::Corrigendum
+                when "Err"
+                  Identifiers::Errata
                 when "Suppl"
                   Identifiers::Supplement
                 end
