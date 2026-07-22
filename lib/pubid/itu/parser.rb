@@ -13,8 +13,13 @@ module Pubid
       rule(:dash) { str("-") }
       rule(:dot) { str(".") }
 
-      # ITU prefix
-      rule(:itu_prefix) { str("ITU") >> (dash | space) }
+      # ITU prefix — accepts an optional leading "Recommendation " long-form
+      # prefix that appears in ITU's own citation style (e.g. the twin-text
+      # and common-text forms in issues #233 / #234).
+      rule(:itu_prefix) do
+        (str("Recommendation ") >> str("ITU") >> (dash | space)) |
+          (str("ITU") >> (dash | space))
+      end
 
       # Sector (R, T, or D)
       rule(:sector) do
