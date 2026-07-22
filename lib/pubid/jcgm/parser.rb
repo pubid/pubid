@@ -52,8 +52,14 @@ module Pubid
         str("st") | str("nd") | str("rd") | str("th")
       end
 
+      # `date_portion` is optional so a partial reference that omits the
+      # trailing `:YYYY` date (e.g. "JCGM 100") parses with `date` left nil,
+      # letting relaton match a collection via `matches?(row, ignore: [:date])`.
+      # The whole sub-rule is `.maybe` (not the year inside it) so a dangling
+      # ":" still fails. Mirrors ETSI (lib/pubid/etsi/parser.rb).
       rule(:base) do
-        publisher >> space >> number_portion >> date_portion >> language_portion.maybe
+        publisher >> space >> number_portion >>
+          date_portion.maybe >> language_portion.maybe
       end
 
       rule(:amendment_identifier) do
