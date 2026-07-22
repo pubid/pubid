@@ -29,7 +29,11 @@ module Pubid
         }
 
         params[:annex] = parsed[:annex].to_s.to_i if parsed[:annex]
-        params[:edition] = parsed[:edition].to_s if parsed[:edition]
+        # Only Handbook carries an edition; a legacy Latin TR captures the
+        # edition slice via the shared handbook rule, so drop it here.
+        if parsed[:edition] && klass == Identifiers::Handbook
+          params[:edition] = parsed[:edition].to_s
+        end
 
         klass.new(**params)
       end
