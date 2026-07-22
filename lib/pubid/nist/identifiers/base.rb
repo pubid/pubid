@@ -251,6 +251,13 @@ module Pubid
         to_mr_style
       end
 
+      # NIST's MR shape is fixed by the pubid standard and stays uppercase
+      # (e.g. `NIST.SP.800-53`). The slug, however, must be lowercase to
+      # match the cross-flavor convention; project the MR through `downcase`.
+      def to_slug
+        to_mr_string.downcase
+      end
+
       # Returns weight based on amount of defined attributes
       # Used for ranking identifiers by specificity for conflict resolution
       # @return [Integer] weight score (higher = more specific)

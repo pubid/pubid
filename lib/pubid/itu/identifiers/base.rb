@@ -50,8 +50,9 @@ module Pubid
       # `typed_stage`. The generic MrString renderer would otherwise drop all
       # three and emit just `ITU`. Losslessness for issue #142 requires the
       # sector letter, series letter, and document number to appear in MR.
+      # Lowercased to match the all-lowercase MR convention.
       def mr_publisher
-        publisher&.to_s
+        publisher&.to_s&.downcase
       end
 
       def mr_type
@@ -60,7 +61,7 @@ module Pubid
 
       def mr_number_with_part
         segments = []
-        segments << series&.series&.to_s if series&.series
+        segments << series&.series&.to_s&.downcase if series&.series
         segments << code&.number&.to_s if code&.number
         segments << code&.subseries&.to_s if code&.subseries
         segments.concat(code&.parts&.map(&:to_s) || [])

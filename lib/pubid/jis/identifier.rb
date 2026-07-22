@@ -120,8 +120,9 @@ module Pubid
       # JIS exposes its publisher as the `PUBLISHER` constant rather than the
       # inherited `publisher` attribute, so the generic mr_publisher returns
       # nil. Without this override every JIS id would lose its "JIS." prefix.
+      # Lowercased to match the all-lowercase MR convention.
       def mr_publisher
-        PUBLISHER
+        PUBLISHER.downcase
       end
 
       # JIS stores its identity across `series` (division letter A–Z), `number`
@@ -129,6 +130,7 @@ module Pubid
       # generic mr_number_with_part only knows about `number`/`part`/`subpart`,
       # so without these overrides every JIS id would collapse onto its
       # document number and drop the division letter (issue #142).
+      # Lowercased to match the all-lowercase MR convention.
       def mr_type
         return nil unless respond_to?(:type_prefix)
 
@@ -137,7 +139,7 @@ module Pubid
 
       def mr_number_with_part
         segments = []
-        segments << series.to_s if series
+        segments << series.to_s.downcase if series
         segments << number.to_s if number
         parts&.each { |p| segments << p.to_s }
         return nil if segments.empty?

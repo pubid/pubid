@@ -28,9 +28,14 @@ module Pubid
       end
 
       # CSA wrappers serialise through `to_s` (their distinct shape is what
-      # makes them wrappers), so MR mirrors that with ` ` → `.`. Issue #142.
+      # makes them wrappers), so MR mirrors that with ` ` → `.`, `:` → `.`,
+      # `/` → `-`, then lowercased (issue #142).
       def to_mr_string
-        to_s.tr(" ", ".")
+        to_s.tr(" ", ".").tr(":", ".").tr("/", "-").downcase
+      end
+
+      def to_slug
+        to_mr_string
       end
 
       # CSA wrappers are not Pubid::Identifier objects, so they do not inherit

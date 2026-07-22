@@ -290,16 +290,33 @@ module Pubid
       render(format: :mr_string)
     end
 
+    # Filesystem-/URL-safe slug derived from the MR string. Defaults to
+    # `to_mr_string` because every flavor except NIST already emits an
+    # all-lowercase, filename-safe MR (only `[a-z0-9.-]` characters, plus
+    # `_` as the supplement separator and `-` as the copublisher separator).
+    # Flavors whose MR is not slug-safe (notably NIST, whose MR format is
+    # fixed by the pubid standard) override this to project the MR into a
+    # slug-safe form.
+    def to_slug
+      to_mr_string
+    end
+
     # MR string template methods — flavors override as needed.
     #
-    # The MR format is a lossless, dot-separated slug that mirrors `to_s`'s
-    # structure: `{publisher}[/{copublisher}…][.{type}].{number}[-{part}[-{subpart}…]][.{year}[-{month}[-{day}]|’--’}][.{edition}][.{languages}][.all-parts]`
-    # Supplements append `/{type}.{number}.{year}` recursively, so a
-    # chained supplement like `…/Amd 3:2016/Cor 1:2017` round-trips as
-    # `…/amd.3.2016/cor.1.2017`. The format is designed so distinct
-    # identifiers never collide on `to_mr_string` (issue #142).
+    # The MR format is a lossless, dot-separated, all-lowercase, filename-safe
+    # slug mirroring `to_s`'s structure:
+    #
+    #   {publisher}[-{copublisher}…][.{type}].{number}[-{part}[-{subpart}…]]
+    #   [.{year}[-{month}[-{day}]]|’--’}][.{edition}][.{language}-{language}…]
+    #   [.all-parts][_supplements…]
+    #
+    # Supplements append `_{type}.{number}.{year}` recursively, so a chained
+    # supplement like `…/Amd 3:2016/Cor 1:2017` round-trips as
+    # `…_amd.3.2016_cor.1.2017`. Copublishers join with `-`
+    # (`iso-iec.17031-1.2020`) so the slug never contains a path separator.
+    # Distinct identifiers never collide on `to_mr_string` (issue #142).
     def mr_publisher
-      publisher&.to_s
+      publisher&.to_s&.downcase&.tr("/", "-")
     end
 
     def mr_type
@@ -308,7 +325,7 @@ module Pubid
       code = typed_stage.type_code
       return nil if code.nil? || code.empty? || code.to_s == "is"
 
-      code
+      code.to_s.downcase
     end
 
     def mr_number_with_part
@@ -318,19 +335,19 @@ module Pubid
       segments = [num]
       segments << mr_part if part
       segments << mr_subpart if subpart
-      segments.compact.join("-")
+      segments.compact.join("-").downcase
     end
 
     def mr_number
-      number&.to_s
+      number&.to_s&.downcase
     end
 
     def mr_part
-      part&.to_s
+      part&.to_s&.downcase
     end
 
     def mr_subpart
-      subpart&.to_s
+      subpart&.to_s&.downcase
     end
 
     def mr_year
@@ -353,7 +370,8 @@ module Pubid
     def mr_languages
       return nil unless languages&.any?
 
-      "(#{languages.map(&:code).join(',')})"
+      # Hyphen-joined, no parens — parens are shell-/URL-unsafe.
+      languages.map { |l| l.code.to_s.downcase }.join("-")
     end
 
     def mr_all_parts
@@ -362,10 +380,11 @@ module Pubid
       "all-parts"
     end
 
-    # Hook: supplement / wrapper subclasses return the `/{type}.{number}.{year}`
+    # Hook: supplement / wrapper subclasses return the `{type}.{number}.{year}`
     # suffix that distinguishes them from their base. `nil` for non-supplements.
     # The base MrString renderer recurses into `base` whenever this returns
     # a non-nil value, so chained supplements (Cor → Amd → IS) render fully.
+    # The suffix is appended with `_` (not `/`) so the MR stays filename-safe.
     def mr_supplement_suffix
       nil
     end

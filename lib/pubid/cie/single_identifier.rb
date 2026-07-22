@@ -61,7 +61,8 @@ module Pubid
       def mr_languages
         return nil unless respond_to?(:language) && language
 
-        "/#{language.code}"
+        # Lowercase + filename-safe: drop the leading `/` (path-unsafe).
+        language.code.to_s.downcase
       end
     end
   end

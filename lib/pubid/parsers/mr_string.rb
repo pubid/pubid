@@ -4,19 +4,21 @@ module Pubid
   module Parsers
     # Parses a machine-readable (MR) identifier string back into an Identifier.
     #
-    # The MR format produced by `Renderers::MrString` mirrors the human form:
+    # The MR format produced by `Renderers::MrString` mirrors the human form,
+    # lowercased and filename-safe:
     #
-    #   ISO.9001.2015                              → ISO 9001:2015
-    #   ISO/IEC.17031-1.2020                       → ISO/IEC 17031-1:2020
-    #   ISO.1234-1-2-3.2020                        → ISO 1234-1-2-3:2020
-    #   ISO.TR.14627.2017                          → ISO/TR 14627:2017
-    #   ISO.16634.--                               → ISO 16634:--
-    #   ISO.9001.2015/amd.1.2020                   → ISO 9001:2015/Amd 1:2020
-    #   ISO/IEC.13818-1.2015/amd.3.2016/cor.1.2017 → ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017
+    #   iso.9001.2015                              → ISO 9001:2015
+    #   iso-iec.17031-1.2020                       → ISO/IEC 17031-1:2020
+    #   iso.1234-1-2-3.2020                        → ISO 1234-1-2-3:2020
+    #   iso.tr.14627.2017                          → ISO/TR 14627:2017
+    #   iso.16634.--                               → ISO 16634:--
+    #   iso.9001.2015_amd.1.2020                   → ISO 9001:2015/Amd 1:2020
+    #   iso-iec.13818-1.2015_amd.3.2016_cor.1.2017 → ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017
     #
-    # Supplements are appended after the base with `/`, and each supplement
-    # segment is `{type}.{number}.{year}` (mirroring how the renderer emits
-    # them) so chained Cor→Amd→IS round-trips without losing the base.
+    # Copublishers join with `-` (`iso-iec`), supplements append with `_`
+    # (`iso.9001.2015_amd.1.2020`). Both round-trip back to `/` here. The
+    # flavor's own parser is case-insensitive on the type/publisher tokens
+    # we emit, so the lowercased slug re-parses cleanly.
     #
     # Note: NIST, CSA, IEEE, JIS, and SAE emit their own MR shapes that this
     # parser does not attempt to reverse (their `to_s` already round-trips
@@ -80,7 +82,7 @@ module Pubid
       }.freeze
 
       # Lower-case type codes the renderer emits as a separate MR segment
-      # (e.g. `ISO.TR.14627`). When the parser sees one of these in the
+      # (e.g. `iso.tr.14627`). When the parser sees one of these in the
       # second position, it splits it back out as `/TYPE`.
       TYPE_CODES = %w[
         tr ts pas is amd cor suppl add ext guide spec
@@ -103,15 +105,17 @@ module Pubid
       end
 
       def self.detect_flavor(mr_string)
-        publisher = mr_string.split(/[.\/]/).first.to_s.upcase
+        publisher = mr_string.split(/[._-]/).first.to_s.upcase
         FLAVOR_MAP[publisher] || :iso
       end
 
       # Convert the MR slug back to a human-readable identifier string the
-      # flavor's own parser will accept. Splits on `/` first so each segment
-      # (head + each supplement) is converted independently, then re-joined.
+      # flavor's own parser will accept. Splits on `_` first so each segment
+      # (head + each supplement) is converted independently, then re-joined
+      # with `/`. Within the head, the copublisher separator `-` (first
+      # segment only) is restored to `/`.
       def self.convert_to_human_readable(mr_string)
-        head, *supplements = mr_string.split("/")
+        head, *supplements = mr_string.split("_")
         human = convert_head(head)
         return human if supplements.empty?
 
@@ -120,22 +124,24 @@ module Pubid
         end
       end
 
-      # Converts a head segment like `ISO/IEC.13818-1.2015` to `ISO/IEC 13818-1:2015`.
+      # Converts a head segment like `iso-iec.13818-1.2015` to
+      # `ISO/IEC 13818-1:2015`.
       def self.convert_head(head)
         parts = head.split(".")
-        return parts.join(" ") if parts.length <= 1
+        return parts.join(" ").upcase if parts.length <= 1
 
         publisher, *rest = parts
 
-        # Optional type code segment (ISO.TR.14627.2017 → ISO/TR 14627:2017)
+        # Optional type code segment (iso.tr.14627.2017 → ISO/TR 14627:2017).
         type_segment = nil
         if rest.first && TYPE_CODES.include?(rest.first.downcase)
           type_segment = rest.shift.upcase
         end
 
-        # Trailing language segment `(en,fr)` — pull it off before year detection.
+        # Trailing language segment — bare language code(s) with no parens.
+        # Detect by length <= 5 and all-alpha (en, fr, en-fr, ru).
         language_segment = nil
-        if rest.last&.start_with?("(")
+        if rest.last&.match?(/\A[a-z]{2}(-[a-z]{2})*\z/)
           language_segment = rest.pop
         end
 
@@ -145,17 +151,19 @@ module Pubid
           year_segment = rest.pop
         end
 
-        publisher_part = if type_segment
-                           "#{publisher}/#{type_segment}"
-                         else
-                           publisher.to_s
-                         end
+        # Copublishers in the first segment: `iso-iec` → `ISO/IEC`. Multi-word
+        # publisher bodies (e.g. `cen-cenelec`) round-trip the same way.
+        publisher_part = publisher.split("-").map(&:upcase).join("/")
+        publisher_part = "#{publisher_part}/#{type_segment}" if type_segment
 
         number_part = rest.join(" ")
         result = publisher_part
         result += " #{number_part}" unless number_part.empty?
         result += ":#{year_segment}" if year_segment
-        result += language_segment.to_s if language_segment
+        if language_segment
+          langs = language_segment.split("-").join(",")
+          result += "(#{langs})"
+        end
         result
       end
 
@@ -176,3 +184,4 @@ module Pubid
     end
   end
 end
+
