@@ -40,6 +40,13 @@ module Pubid
         dot >> digits.as(:subseries)
       end
 
+      # Edition suffix attached directly to the recommendation number.
+      # "bis" = 2nd edition, "ter" = 3rd, "quater" = 4th.
+      # Example: X.50bis, V.8bis, V.31bis.
+      rule(:series_suffix) do
+        (str("bis") | str("ter") | str("quater")).as(:series_suffix)
+      end
+
       # Parts
       rule(:part) do
         dash >> digits.as(:part)
@@ -47,9 +54,9 @@ module Pubid
 
       rule(:parts) { part.repeat(0).as(:parts) }
 
-      # Code = number + subseries + parts
+      # Code = number + edition suffix + subseries + parts
       rule(:code) do
-        number >> subseries.maybe >> parts
+        number >> series_suffix.maybe >> subseries.maybe >> parts
       end
 
       # Date

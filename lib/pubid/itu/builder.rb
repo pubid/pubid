@@ -41,6 +41,7 @@ module Pubid
           if data[:combined_number]
             combined_code = Components::Code.new(
               number: data[:combined_number].to_s,
+              series_suffix: data[:combined_series_suffix]&.to_s,
               subseries: data[:combined_subseries]&.to_s,
               parts: extract_parts(data[:combined_parts]),
             )
@@ -128,6 +129,7 @@ module Pubid
       def build_code(data)
         Components::Code.new(
           number: data[:number].to_s,
+          series_suffix: data[:series_suffix]&.to_s,
           subseries: data[:subseries]&.to_s,
           parts: extract_parts(data[:parts]),
         )

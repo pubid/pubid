@@ -383,4 +383,56 @@ RSpec.describe Pubid::Itu::Identifiers::Recommendation do
       end
     end
   end
+
+  describe "edition suffix (bis / ter / quater) — issue #231" do
+    context "ITU-T X.50bis" do
+      subject { "ITU-T X.50bis" }
+
+      let(:parsed) { Pubid::Itu.parse(subject) }
+
+      it "parses as Recommendation" do
+        expect(parsed).to be_a(described_class)
+      end
+
+      it "parses series" do
+        expect(parsed.series.series).to eq("X")
+      end
+
+      it "parses number" do
+        expect(parsed.code.number).to eq("50")
+      end
+
+      it "captures series_suffix" do
+        expect(parsed.code.series_suffix).to eq("bis")
+      end
+
+      it "round-trips" do
+        expect(parsed.to_s).to eq(subject)
+      end
+    end
+
+    %w[V.8bis V.31bis].each do |series_num|
+      context "ITU-T #{series_num}" do
+        subject { "ITU-T #{series_num}" }
+
+        let(:parsed) { Pubid::Itu.parse(subject) }
+
+        it "parses number and bis suffix" do
+          number, suffix = series_num.match(/\AV\.(\d+)(bis)\z/).captures
+          expect(parsed.code.number).to eq(number)
+          expect(parsed.code.series_suffix).to eq(suffix)
+        end
+
+        it "round-trips" do
+          expect(parsed.to_s).to eq(subject)
+        end
+      end
+    end
+
+    it "treats X.50 and X.50bis as distinct identifiers" do
+      base = Pubid::Itu.parse("ITU-T X.50")
+      with_suffix = Pubid::Itu.parse("ITU-T X.50bis")
+      expect(base).not_to eq(with_suffix)
+    end
+  end
 end
