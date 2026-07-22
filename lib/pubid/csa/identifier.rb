@@ -493,10 +493,15 @@ module Pubid
       # `package`, `reaffirmation`, `year` with prefix/format/French markers,
       # etc.) that the generic MrString renderer doesn't know about. The
       # CSA `to_s` already round-trips losslessly through the CSA parser, so
-      # MR mirrors it with ` ` → `.` and `:` kept (so a year never looks like
-      # another code segment). Issue #142.
+      # MR mirrors it: ` ` → `.`, `:` → `.` (so the year never looks like
+      # another code segment), `/` → `-` (CAN/CSA- prefix), then lowercased
+      # to match the all-lowercase MR convention (issue #142).
       def to_mr_string
-        to_s.tr(" ", ".")
+        to_s.tr(" ", ".").tr(":", ".").tr("/", "-").downcase
+      end
+
+      def to_slug
+        to_mr_string
       end
     end
   end

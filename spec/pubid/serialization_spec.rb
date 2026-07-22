@@ -61,26 +61,26 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
   describe "MR string" do
     it "renders basic identifier" do
       id = Pubid::Iso.parse("ISO 9001:2015")
-      expect(id.to_mr_string).to eq("ISO.9001.2015")
+      expect(id.to_mr_string).to eq("iso.9001.2015")
     end
 
     it "renders with part" do
       id = Pubid::Iso.parse("ISO/IEC 17031-1:2020")
-      expect(id.to_mr_string).to eq("ISO/IEC.17031-1.2020")
+      expect(id.to_mr_string).to eq("iso-iec.17031-1.2020")
     end
 
     it "renders undated" do
       id = Pubid::Iso.parse("ISO 9001")
-      expect(id.to_mr_string).to eq("ISO.9001")
+      expect(id.to_mr_string).to eq("iso.9001")
     end
 
     it "parses MR string back to identifier" do
-      id = Pubid::Parsers::MrString.parse("ISO.9001.2015")
+      id = Pubid::Parsers::MrString.parse("iso.9001.2015")
       expect(id.to_s).to eq("ISO 9001:2015")
     end
 
     it "parses MR string with part" do
-      id = Pubid::Parsers::MrString.parse("IEC.61131-3.2013")
+      id = Pubid::Parsers::MrString.parse("iec.61131-3.2013")
       expect(id.to_s).to eq("IEC 61131-3:2013")
     end
   end

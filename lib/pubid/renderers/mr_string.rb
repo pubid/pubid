@@ -4,29 +4,37 @@ module Pubid
   module Renderers
     # Machine-readable string renderer.
     #
-    # Produces a lossless, dot-separated slug mirroring `to_s`'s structure:
+    # Produces a lossless, dot-separated, all-lowercase, filename-safe slug:
     #
-    #   ISO 9001:2015                       → ISO.9001.2015
-    #   ISO/IEC 17031-1:2020                → ISO/IEC.17031-1.2020
-    #   ISO 1234-1-2-3:2020                 → ISO.1234-1-2-3.2020
-    #   ISO/TR 14627:2017                   → ISO.tr.14627.2017
-    #   ISO 16634:--                        → ISO.16634.--
-    #   ISO 9001:2015/Amd 1:2020            → ISO.9001.2015/amd.1.2020
-    #   ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017
-    #                                       → ISO/IEC.13818-1.2015/amd.3.2016/cor.1.2017
+    #   iso 9001:2015                       -> iso.9001.2015
+    #   iso/iec 17031-1:2020                -> iso-iec.17031-1.2020
+    #   iso 1234-1-2-3:2020                 -> iso.1234-1-2-3.2020
+    #   iso/tr 14627:2017                   -> iso.tr.14627.2017
+    #   iso 16634:--                        -> iso.16634.--
+    #   iso 9001:2015/amd 1:2020            -> iso.9001.2015_amd.1.2020
+    #   iso/iec 13818-1:2015/amd 3:2016/cor 1:2017
+    #                                       -> iso-iec.13818-1.2015_amd.3.2016_cor.1.2017
     #
     # The renderer recurses into a supplement's `base` (one level per
-    # `mr_supplement_suffix`) so chained Cor→Amd→IS structures render fully —
-    # without that recursion every supplement layer collapsed onto its own
-    # type/number/year, dropping the base entirely (issue #142).
+    # `mr_supplement_suffix`) so chained Cor-Amd-IS structures render fully,
+    # instead of every supplement layer collapsing onto its own
+    # type/number/year and dropping the base (issue #142).
+    #
+    # Character set is restricted to [a-z0-9.-] plus `_` (supplement
+    # separator), so `to_mr_string` doubles as a filesystem-/URL-safe slug.
+    # `Identifier#to_slug` delegates here; NIST is the one flavor that
+    # overrides `to_slug` because its MR shape is fixed by the pubid standard
+    # and stays uppercase.
     class MrString < Base
+      SEPARATOR_SUPPLEMENT = "_"
+
       def render(context: nil, **)
         suffix = @id.mr_supplement_suffix
 
         if suffix
           base = @id.base
           head = base ? self.class.new(base).render : ""
-          head.empty? ? suffix : "#{head}/#{suffix}"
+          head.empty? ? suffix : "#{head}#{SEPARATOR_SUPPLEMENT}#{suffix}"
         else
           render_flat(@id)
         end

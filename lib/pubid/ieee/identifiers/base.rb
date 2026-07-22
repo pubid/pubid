@@ -251,9 +251,10 @@ module Pubid
       # carries `year` as a bare string — none of which the generic MrString
       # renderer knows about. Override the lossless MR template directly so
       # every IEEE identifier round-trips (issue #142). Supplements append
-      # `/{type}.{number}.{year}` recursively via mr_supplement_suffix.
+      # `_{type}.{number}.{year}` recursively via mr_supplement_suffix.
+      # Lowercased to match the all-lowercase MR convention.
       def mr_publisher
-        publisher&.to_s
+        publisher&.to_s&.downcase
       end
 
       def mr_type
@@ -261,7 +262,7 @@ module Pubid
       end
 
       def mr_number_with_part
-        code_obj&.to_s
+        code_obj&.to_s&.downcase
       end
 
       def mr_year

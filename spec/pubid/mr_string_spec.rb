@@ -11,160 +11,232 @@
 # - `Pubid::Parsers::MrString.parse(mr)` round-trips back to an equivalent id.
 # - Distinct identifiers never collide on `to_mr_string` (the contrapositive
 #   of "MR carries enough to reconstruct").
+#
+# Follow-up convention: MR is ALL LOWERCASE and filename-safe
+# (`[a-z0-9.-]` + `_` as supplement separator + `-` as copublisher separator)
+# for every flavor except NIST (whose MR shape is fixed by the pubid
+# standard). `to_slug` projects the MR into a lowercase slug; for non-NIST
+# flavors that is just `to_mr_string`, for NIST it lowercases.
 require "spec_helper"
 
 RSpec.describe "Lossless MR string (issue #142)" do
   describe "ISO" do
     it "preserves every part segment" do
       id = Pubid::Iso.parse("ISO 1234-1-2-3:2020")
-      expect(id.to_mr_string).to eq("ISO.1234-1-2-3.2020")
+      expect(id.to_mr_string).to eq("iso.1234-1-2-3.2020")
     end
 
     it "preserves the year separator (4-digit year)" do
       id = Pubid::Iso.parse("ISO 9001:2015")
-      expect(id.to_mr_string).to eq("ISO.9001.2015")
+      expect(id.to_mr_string).to eq("iso.9001.2015")
     end
 
-    it "preserves copublishers" do
+    it "preserves copublishers as `-` (filename-safe)" do
       id = Pubid::Iso.parse("ISO/IEC 17031-1:2020")
-      expect(id.to_mr_string).to eq("ISO/IEC.17031-1.2020")
+      expect(id.to_mr_string).to eq("iso-iec.17031-1.2020")
     end
 
-    it "preserves the type code" do
+    it "preserves the type code (lowercase)" do
       id = Pubid::Iso.parse("ISO/TR 14627:2017")
-      expect(id.to_mr_string).to eq("ISO.tr.14627.2017")
+      expect(id.to_mr_string).to eq("iso.tr.14627.2017")
     end
 
     it "preserves undated references (:--)" do
       id = Pubid::Iso.parse("ISO 16634:--")
-      expect(id.to_mr_string).to eq("ISO.16634.--")
+      expect(id.to_mr_string).to eq("iso.16634.--")
     end
 
-    it "preserves languages" do
+    it "preserves languages as hyphen-joined, no parens" do
       id = Pubid::Iso.parse("ISO 9001:2015(en,fr)")
-      expect(id.to_mr_string).to eq("ISO.9001.2015.(en,fr)")
+      expect(id.to_mr_string).to eq("iso.9001.2015.en-fr")
     end
 
-    it "preserves the supplement base (amendment)" do
+    it "preserves the supplement base (amendment) via `_` separator" do
       id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
-      expect(id.to_mr_string).to eq("ISO.9001.2015/amd.1.2020")
+      expect(id.to_mr_string).to eq("iso.9001.2015_amd.1.2020")
     end
 
     it "preserves chained supplements (Cor over Amd over IS)" do
       id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
-      expect(id.to_mr_string).to eq("ISO/IEC.13818-1.2015/amd.3.2016/cor.1.2017")
+      expect(id.to_mr_string).to eq("iso-iec.13818-1.2015_amd.3.2016_cor.1.2017")
     end
 
     it "preserves yyyy-mm dates" do
       id = Pubid::Iso.parse("ISO 16634:2024-03")
-      expect(id.to_mr_string).to eq("ISO.16634.2024-03")
+      expect(id.to_mr_string).to eq("iso.16634.2024-03")
     end
 
     it "preserves yyyy-mm-dd dates" do
       id = Pubid::Iso.parse("ISO 16634:2024-03-15")
-      expect(id.to_mr_string).to eq("ISO.16634.2024-03-15")
+      expect(id.to_mr_string).to eq("iso.16634.2024-03-15")
     end
   end
 
   describe "IEC" do
     it "preserves the supplement base" do
       id = Pubid::Iec.parse("IEC 60050-351:2013/AMD1:2016")
-      expect(id.to_mr_string).to eq("IEC.60050-351.2013/amd.1.2016")
+      expect(id.to_mr_string).to eq("iec.60050-351.2013_amd.1.2016")
     end
 
     it "preserves multi-segment parts" do
       id = Pubid::Iec.parse("IEC 60601-1-11:2010")
-      expect(id.to_mr_string).to eq("IEC.60601-1-11.2010")
+      expect(id.to_mr_string).to eq("iec.60601-1-11.2010")
     end
   end
 
-  describe "NIST — delegates to to_mr_style (must not break)" do
-    it "preserves the series code" do
+  describe "NIST — keeps its own MR shape, slug lowercases it" do
+    it "to_mr_string preserves the series code (uppercase, per standard)" do
       id = Pubid::Nist.parse("NIST SP 800-53")
       # NIST has its own MR format; to_mr_string delegates to to_mr_style.
       expect(id.to_mr_string).to eq(id.to_mr_style)
       expect(id.to_mr_string).to eq("NIST.SP.800-53")
     end
 
-    it "preserves the series for Technical Notes" do
+    it "to_mr_string preserves the series for Technical Notes" do
       id = Pubid::Nist.parse("NIST TN 1297")
       expect(id.to_mr_string).to eq("NIST.TN.1297")
+    end
+
+    it "to_slug lowercases the MR for filesystem/URL use" do
+      id = Pubid::Nist.parse("NIST SP 800-53")
+      expect(id.to_slug).to eq("nist.sp.800-53")
     end
   end
 
   describe "IEEE" do
-    it "preserves the code and year" do
+    it "preserves the code and year (lowercase)" do
       id = Pubid::Ieee.parse("IEEE Std 802.3-2018")
-      expect(id.to_mr_string).to eq("IEEE.std.802.3.2018")
+      expect(id.to_mr_string).to eq("ieee.std.802.3.2018")
     end
 
     it "preserves the supplement (Corrigendum)" do
       id = Pubid::Ieee.parse("IEEE Std 802.3-2018/Cor 1:2019")
-      expect(id.to_mr_string).to eq("IEEE.std.802.3.2018/cor.1.2019")
+      expect(id.to_mr_string).to eq("ieee.std.802.3.2018_cor.1.2019")
     end
   end
 
   describe "BSI" do
     it "emits publisher.number.year" do
       id = Pubid::Bsi.parse("BS 490:1972")
-      expect(id.to_mr_string).to eq("BS.490.1972")
+      expect(id.to_mr_string).to eq("bs.490.1972")
     end
   end
 
   describe "CEN/CENELEC" do
     it "emits publisher.number.year" do
       id = Pubid::CenCenelec.parse("EN 1:1977")
-      expect(id.to_mr_string).to eq("EN.1.1977")
+      expect(id.to_mr_string).to eq("en.1.1977")
     end
   end
 
   describe "JIS" do
-    it "preserves the series letter" do
+    it "preserves the series letter (lowercase)" do
       id = Pubid::Jis.parse("JIS A 0001:1999")
-      expect(id.to_mr_string).to eq("JIS.A-0001.1999")
+      expect(id.to_mr_string).to eq("jis.a-0001.1999")
     end
 
     it "preserves multi-level parts" do
       id = Pubid::Jis.parse("JIS B 3700-11:1996")
-      expect(id.to_mr_string).to eq("JIS.B-3700-11.1996")
+      expect(id.to_mr_string).to eq("jis.b-3700-11.1996")
     end
 
-    it "preserves the type prefix" do
+    it "preserves the type prefix and series" do
       id = Pubid::Jis.parse("JIS TR Z 8301:2019")
-      expect(id.to_mr_string).to eq("JIS.tr.Z-8301.2019")
+      expect(id.to_mr_string).to eq("jis.tr.z-8301.2019")
     end
   end
 
   describe "SAE" do
-    it "preserves the type letter" do
+    it "preserves the type letter (lowercase)" do
       id = Pubid::Sae.parse("SAE J300:2019")
-      expect(id.to_mr_string).to eq("SAE.J.300.2019")
+      expect(id.to_mr_string).to eq("sae.j.300.2019")
     end
 
-    it "preserves multi-letter type codes (AS, ARP, AMS)" do
+    it "preserves multi-letter type codes (as, arp, ams)" do
       id = Pubid::Sae.parse("SAE AS5553")
-      expect(id.to_mr_string).to eq("SAE.AS.5553")
+      expect(id.to_mr_string).to eq("sae.as.5553")
     end
   end
 
   describe "ANSI" do
-    it "emits publisher.number.year" do
+    it "emits publisher.number.year (code lowercased)" do
       id = Pubid::Ansi.parse("ANSI X3.4:1963")
-      expect(id.to_mr_string).to eq("ANSI.X3.4.1963")
+      expect(id.to_mr_string).to eq("ansi.x3.4.1963")
     end
   end
 
-  describe "CSA — delegates through to_s" do
-    it "preserves the code and year" do
+  describe "CSA — mirrors to_s through filename-safe transform" do
+    it "preserves the code and year (lowercase, `:` → `.`)" do
       id = Pubid::Csa.parse("CSA B149.1:2020")
-      expect(id.to_mr_string).to eq("CSA.B149.1:2020")
+      expect(id.to_mr_string).to eq("csa.b149.1.2020")
     end
   end
 
   describe "IDF" do
     it "emits publisher.number.year" do
       id = Pubid::Idf.parse("IDF 1:2018")
-      expect(id.to_mr_string).to eq("IDF.1.2018")
+      expect(id.to_mr_string).to eq("idf.1.2018")
+    end
+  end
+
+  describe "to_slug defaults and overrides" do
+    it "every non-NIST flavor has to_slug == to_mr_string" do
+      samples = {
+        Iso: "ISO 9001:2015",
+        Iec: "IEC 60050:2013",
+        Ieee: "IEEE Std 802.3-2018",
+        Bsi: "BS 490:1972",
+        CenCenelec: "EN 1:1977",
+        Jis: "JIS A 0001:1999",
+        Sae: "SAE J300:2019",
+        Ansi: "ANSI X3.4:1963",
+        Csa: "CSA B149.1:2020",
+        Idf: "IDF 1:2018",
+        Oiml: "OIML R 87:2016",
+        Itu: "ITU-T G.650",
+        Cie: "CIE S 017/E:2011",
+      }
+      samples.each do |const, ref|
+        id = Pubid.const_get(const).parse(ref)
+        expect(id.to_slug).to eq(id.to_mr_string),
+                               "#{const} should have to_slug == to_mr_string"
+      end
+    end
+
+    it "NIST overrides to_slug to lowercase its MR" do
+      id = Pubid::Nist.parse("NIST SP 800-53")
+      expect(id.to_slug).to eq(id.to_mr_string.downcase)
+      expect(id.to_slug).to eq("nist.sp.800-53")
+    end
+  end
+
+  describe "MR strings are filename-safe (only [a-z0-9.-])" do
+    # The slug must not contain `/`, `:`, `(`, `)`, `,`, or any uppercase.
+    # NIST is the documented exception (its MR is fixed by the standard) —
+    # but its to_slug is still safe.
+    safe_slug_cases = [
+      [Pubid::Iso, "ISO 9001:2015"],
+      [Pubid::Iso, "ISO/IEC 17031-1:2020"],
+      [Pubid::Iso, "ISO 9001:2015/Amd 1:2020"],
+      [Pubid::Iso, "ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017"],
+      [Pubid::Iso, "ISO 9001:2015(en,fr)"],
+      [Pubid::Iso, "ISO 16634:--"],
+      [Pubid::Iec, "IEC 60050:2013/AMD1:2016"],
+      [Pubid::Ieee, "IEEE Std 802.3-2018/Cor 1:2019"],
+      [Pubid::Jis, "JIS TR Z 8301:2019"],
+      [Pubid::Sae, "SAE ARP4754A"],
+      [Pubid::Ansi, "ANSI X3.4:1963"],
+      [Pubid::Csa, "CSA B149.1:2020"],
+      [Pubid::Oiml, "OIML R 87:2016"],
+      [Pubid::Itu, "ITU-T G.650"],
+      [Pubid::Cie, "CIE S 017/E:2011"],
+      [Pubid::Nist, "NIST SP 800-53"],
+    ]
+    safe_slug_cases.each do |flavor, ref|
+      it "#{ref} (#{flavor}) slug matches /\\A[a-z0-9._-]+\\z/" do
+        id = flavor.parse(ref)
+        expect(id.to_slug).to match(/\A[a-z0-9._-]+\z/)
+      end
     end
   end
 
@@ -173,15 +245,16 @@ RSpec.describe "Lossless MR string (issue #142)" do
     # equivalent identifier — exactly equal modulo the flavor's own
     # canonicalisation (e.g. ISO renders "AMD" rather than "Amd").
     round_trip_cases = [
-      ["ISO.9001.2015", "ISO 9001:2015"],
-      ["ISO/IEC.17031-1.2020", "ISO/IEC 17031-1:2020"],
-      ["ISO.1234-1-2-3.2020", "ISO 1234-1-2-3:2020"],
-      ["ISO.TR.14627.2017", "ISO/TR 14627:2017"],
-      ["ISO.16634.--", "ISO 16634:--"],
-      ["ISO.9001.2015/amd.1.2020", "ISO 9001:2015/AMD 1:2020"],
-      ["ISO/IEC.13818-1.2015/amd.3.2016/cor.1.2017",
+      ["iso.9001.2015", "ISO 9001:2015"],
+      ["iso-iec.17031-1.2020", "ISO/IEC 17031-1:2020"],
+      ["iso.1234-1-2-3.2020", "ISO 1234-1-2-3:2020"],
+      ["iso.tr.14627.2017", "ISO/TR 14627:2017"],
+      ["iso.16634.--", "ISO 16634:--"],
+      ["iso.9001.2015_amd.1.2020", "ISO 9001:2015/AMD 1:2020"],
+      ["iso-iec.13818-1.2015_amd.3.2016_cor.1.2017",
        "ISO/IEC 13818-1:2015/AMD 3:2016/COR 1:2017"],
-      ["IEC.60050-351.2013/amd.1.2016", "IEC 60050-351:2013/AMD1:2016"],
+      ["iec.60050-351.2013_amd.1.2016", "IEC 60050-351:2013/AMD1:2016"],
+      ["iso.9001.2015.en-fr", "ISO 9001:2015(en,fr)"],
     ]
 
     round_trip_cases.each do |mr, human|
@@ -215,11 +288,8 @@ RSpec.describe "Lossless MR string (issue #142)" do
     end
   end
 
-  describe "MR round-trips for every registered flavor" do
-    # The cross-flavor invariant: each registered flavor produces a non-empty
-    # MR string for a representative identifier, so the slug is never blank
-    # (which was the CSA behaviour before issue #142's fix).
-    it "every registered flavor has a non-empty MR for a representative id" do
+  describe "every registered flavor has a non-empty MR" do
+    it "produces a non-empty MR for a representative id of each flavor" do
       samples = {
         Iso: "ISO 9001:2015",
         Iec: "IEC 60050:2013",

@@ -24,9 +24,13 @@ module Pubid
       end
 
       # CSA composites serialise through `to_s`, so MR mirrors that with
-      # ` ` → `.`. Issue #142.
+      # ` ` → `.`, `:` → `.`, `/` → `-`, then lowercased (issue #142).
       def to_mr_string
-        to_s.tr(" ", ".")
+        to_s.tr(" ", ".").tr(":", ".").tr("/", "-").downcase
+      end
+
+      def to_slug
+        to_mr_string
       end
 
       # CSA composites are not Pubid::Identifier objects, so they do not inherit
