@@ -487,6 +487,17 @@ module Pubid
         end
         result
       end
+
+      # CSA encodes its identity across many shape-specific attributes
+      # (`publisher_prefix`, `code`, `no_number`, `series`, `series_prefix`,
+      # `package`, `reaffirmation`, `year` with prefix/format/French markers,
+      # etc.) that the generic MrString renderer doesn't know about. The
+      # CSA `to_s` already round-trips losslessly through the CSA parser, so
+      # MR mirrors it with ` ` → `.` and `:` kept (so a year never looks like
+      # another code segment). Issue #142.
+      def to_mr_string
+        to_s.tr(" ", ".")
+      end
     end
   end
 end

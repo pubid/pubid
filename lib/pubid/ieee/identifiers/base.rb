@@ -245,6 +245,28 @@ module Pubid
         builder.original_input = input
         builder.build(parsed)
       end
+
+      # IEEE stores identity in `code` (prefix/number/parts) rather than the
+      # generic `number`, has its own `type` string ("Std", "Draft Std"), and
+      # carries `year` as a bare string — none of which the generic MrString
+      # renderer knows about. Override the lossless MR template directly so
+      # every IEEE identifier round-trips (issue #142). Supplements append
+      # `/{type}.{number}.{year}` recursively via mr_supplement_suffix.
+      def mr_publisher
+        publisher&.to_s
+      end
+
+      def mr_type
+        type&.downcase
+      end
+
+      def mr_number_with_part
+        code_obj&.to_s
+      end
+
+      def mr_year
+        year&.to_s
+      end
     end
 
     module Identifiers

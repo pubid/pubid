@@ -117,6 +117,56 @@ module Pubid
         render(format: :human, **opts)
       end
 
+      # JIS exposes its publisher as the `PUBLISHER` constant rather than the
+      # inherited `publisher` attribute, so the generic mr_publisher returns
+      # nil. Without this override every JIS id would lose its "JIS." prefix.
+      def mr_publisher
+        PUBLISHER
+      end
+
+      # JIS stores its identity across `series` (division letter A–Z), `number`
+      # (string, may have leading zeros), and `parts` (multi-level). The
+      # generic mr_number_with_part only knows about `number`/`part`/`subpart`,
+      # so without these overrides every JIS id would collapse onto its
+      # document number and drop the division letter (issue #142).
+      def mr_type
+        return nil unless respond_to?(:type_prefix)
+
+        type_prefix&.downcase
+      end
+
+      def mr_number_with_part
+        segments = []
+        segments << series.to_s if series
+        segments << number.to_s if number
+        parts&.each { |p| segments << p.to_s }
+        return nil if segments.empty?
+
+        segments.join("-")
+      end
+
+      # JIS stores the year as a bare integer (not a Components::Date), so the
+      # inherited mr_year (which reads `date`) returns nil. Emit it directly,
+      # including the reaffirmation marker so `JIS X:2019` and `JIS X:2019R`
+      # stay distinct in MR.
+      def mr_year
+        return nil unless year
+
+        year_with_reaffirmation.to_s
+      end
+
+      def mr_languages
+        return nil unless language
+
+        "(#{language})"
+      end
+
+      def mr_all_parts
+        return nil unless all_parts?
+
+        "all-parts"
+      end
+
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
       # JIS_TYPE_MAP remains as the key_value polymorphic_map.
 

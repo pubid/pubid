@@ -26,6 +26,14 @@ module Pubid
       def year
         date&.year
       end
+
+      # SAE encodes the document class (AS, ARP, AMS, AIR, J, …) in `type.abbr`,
+      # not in `typed_stage.type_code`, so the generic mr_type returns nil.
+      # Losslessness requires the type letter to appear in MR — without it,
+      # `SAE J300` and `SAE AS300` would collide on `SAE.300.<year>`.
+      def mr_type
+        type&.abbr&.to_s
+      end
     end
 
     module Identifiers

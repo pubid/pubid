@@ -23,6 +23,12 @@ module Pubid
         raise NotImplementedError, "Subclasses must implement to_s method"
       end
 
+      # CSA composites serialise through `to_s`, so MR mirrors that with
+      # ` ` → `.`. Issue #142.
+      def to_mr_string
+        to_s.tr(" ", ".")
+      end
+
       # CSA composites are not Pubid::Identifier objects, so they do not inherit
       # #root. They are their own origin for matching purposes.
       def root

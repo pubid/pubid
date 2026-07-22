@@ -47,6 +47,22 @@ module Pubid
         result.year = nil if args.include?(:year) || args.include?(:date)
         result
       end
+
+      # CIE stores its publication year in its own `year` string attribute
+      # (not a Components::Date), and uses a single-Language component with
+      # multiple formats. Override the lossless MR template so `CIE S 017/E:2011`
+      # round-trips as `CIE.S.017.E.2011` rather than losing the type letter,
+      # language, and year (issue #142). Subclasses add the `s_prefix` and
+      # `language` attributes that this template reads.
+      def mr_year
+        year&.to_s
+      end
+
+      def mr_languages
+        return nil unless respond_to?(:language) && language
+
+        "/#{language.code}"
+      end
     end
   end
 end

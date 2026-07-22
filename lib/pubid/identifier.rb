@@ -290,7 +290,14 @@ module Pubid
       render(format: :mr_string)
     end
 
-    # MR string template methods — flavors override as needed
+    # MR string template methods — flavors override as needed.
+    #
+    # The MR format is a lossless, dot-separated slug that mirrors `to_s`'s
+    # structure: `{publisher}[/{copublisher}…][.{type}].{number}[-{part}[-{subpart}…]][.{year}[-{month}[-{day}]|’--’}][.{edition}][.{languages}][.all-parts]`
+    # Supplements append `/{type}.{number}.{year}` recursively, so a
+    # chained supplement like `…/Amd 3:2016/Cor 1:2017` round-trips as
+    # `…/amd.3.2016/cor.1.2017`. The format is designed so distinct
+    # identifiers never collide on `to_mr_string` (issue #142).
     def mr_publisher
       publisher&.to_s
     end
@@ -299,7 +306,7 @@ module Pubid
       return nil unless typed_stage
 
       code = typed_stage.type_code
-      return nil if code.nil? || code.empty? || code == "is"
+      return nil if code.nil? || code.empty? || code.to_s == "is"
 
       code
     end
@@ -308,8 +315,10 @@ module Pubid
       num = mr_number
       return nil unless num
 
-      prt = mr_part
-      prt ? "#{num}-#{prt}" : num
+      segments = [num]
+      segments << mr_part if part
+      segments << mr_subpart if subpart
+      segments.compact.join("-")
     end
 
     def mr_number
@@ -320,8 +329,45 @@ module Pubid
       part&.to_s
     end
 
+    def mr_subpart
+      subpart&.to_s
+    end
+
     def mr_year
-      date&.year&.to_s
+      return nil unless date
+      return "--" if date.respond_to?(:undated?) && date.undated?
+      return nil unless date.year
+
+      result = date.year.to_s
+      result += "-#{date.month}" if date.respond_to?(:month) && date.month
+      result += "-#{date.day}" if date.respond_to?(:day) && date.day
+      result
+    end
+
+    def mr_edition
+      return nil unless edition&.number
+
+      "ed#{edition.number}"
+    end
+
+    def mr_languages
+      return nil unless languages&.any?
+
+      "(#{languages.map(&:code).join(',')})"
+    end
+
+    def mr_all_parts
+      return nil unless all_parts
+
+      "all-parts"
+    end
+
+    # Hook: supplement / wrapper subclasses return the `/{type}.{number}.{year}`
+    # suffix that distinguishes them from their base. `nil` for non-supplements.
+    # The base MrString renderer recurses into `base` whenever this returns
+    # a non-nil value, so chained supplements (Cor → Amd → IS) render fully.
+    def mr_supplement_suffix
+      nil
     end
 
     # URN template methods — flavors override as needed
