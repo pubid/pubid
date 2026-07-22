@@ -19,6 +19,7 @@ module Pubid
       rule(:identifier) do
         working_programme_with_publisher |
           working_programme |
+          technical_group |
           working_document |
           sheet_supplement_identifier |
           sheet_identifier |
@@ -27,6 +28,42 @@ module Pubid
           supplement_identifier |
           joint_identifier |
           identifier_copublishers
+      end
+
+      # Technical Group identifier — names a committee rather than a document.
+      # Examples: "IEC TC 1", "ISO/IEC JTC 1", "ISO/IEC JTC 1/SC 7",
+      #           "IEC SC 100A", "CISPR", "CIS/A".
+      rule(:technical_group) do
+        technical_group_with_publisher | technical_group_bare
+      end
+
+      rule(:technical_group_with_publisher) do
+        prefix_sole_publisher >> copublishers.maybe >> space >>
+          tc_body.as(:technical_committee) >>
+          (str("/") >> space? >> sc_body).as(:subcommittee).maybe
+      end
+
+      rule(:technical_group_bare) do
+        # CISPR / CIS-letter forms and bare TYPE NUMBER forms both default
+        # publisher to "IEC" via the Base class default.
+        tc_body.as(:technical_committee) >>
+          (str("/") >> space? >> sc_body).as(:subcommittee).maybe
+      end
+
+      # Committee body forms accepted by the parser. Order matters: longer
+      # or more specific patterns first so they win the ordered choice.
+      rule(:tc_body) do
+        str("CISPR") |
+          (str("CIS") >> str("/") >> match("[A-Z]")) |
+          (tc_type >> space >> digits >> match("[A-Z]").maybe)
+      end
+
+      rule(:sc_body) do
+        str("SC") >> space >> digits >> match("[A-Z]").maybe
+      end
+
+      rule(:tc_type) do
+        str("JTC") | str("JPC") | str("TC") | str("SC") | str("PC")
       end
 
       # Working Programme format: [PWI|PNW] [TR] number edition
