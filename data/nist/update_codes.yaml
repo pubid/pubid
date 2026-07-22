@@ -25,6 +25,8 @@
 # by earlier ones. Run `bundle exec rspec spec/pubid/nist/` after edits.
 NBS MN: NBS MONO
 NIST MN: NIST MONO
+# Long-form series names — normalize to the abbreviated form the parser expects.
+/\bMonograph\b/: MONO
 NIST MP: NBS MP
 NIST SP 260-162 2006ed.: NIST SP 260-162e2006
 NBS CIRC 154suprev: NBS CIRC 154r1sup
