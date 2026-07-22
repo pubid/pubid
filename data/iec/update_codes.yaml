@@ -1,4 +1,7 @@
 IECEx TRF 60079-11v3-4:2002: IECEx TRF 60079-11v4C:2002
+# IECEE TRF data-source anomaly: the OD-010-1 ampersand separator (&) was
+# mistyped as a semicolon (;) in IEC's source data. See pubid/pubid#239.
+IECEE TRF 60335-2-4;7F:2012: IECEE TRF 60335-2-4&7F:2012
 IECEE TRF cispr 15N:2022: IECEE TRF CISPR 15N:2022
 IECEE TRF cispr 15M:2021: IECEE TRF CISPR 15M:2021
 IECEE TRF cispr 15L:2020: IECEE TRF CISPR 15L:2020

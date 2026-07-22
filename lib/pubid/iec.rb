@@ -23,12 +23,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/iec/renderer"
 
     def self.parse(identifier_string)
-      if identifier_string.length > Pubid::MAX_INPUT_LENGTH
-        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
-      end
-
-      parsed = Parser.new.parse(identifier_string)
-      Builder.new.build(parsed)
+      Identifier.parse(identifier_string)
     end
 
     def self.parse_urn(urn)
