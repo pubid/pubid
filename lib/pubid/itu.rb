@@ -32,9 +32,9 @@ module Pubid
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
         .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
-        # Exclude the flavor base itself by identity (Identifiers::Base is now an
+        # Exclude the flavor base itself by identity (Identifier is now an
         # alias for Pubid::Itu::Identifier, so name-based matching misses it).
-        .reject { |c| c == Identifiers::Base }
+        .reject { |c| c == Identifier }
     end
 
     # Build typed stage index from identifier types

@@ -4,7 +4,7 @@ module Pubid
   module Ietf
     module Identifiers
       # A BCP (Best Current Practice) sub-series id, e.g. "BCP 3".
-      class Bcp < Base
+      class Bcp < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :bcp,

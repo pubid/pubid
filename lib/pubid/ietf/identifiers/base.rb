@@ -71,10 +71,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Canonical base class alias (mirrors AMCA/JIS): concrete identifier
-      # classes subclass Base.
-      Base = Pubid::Ietf::Identifier
-    end
   end
 end

@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IALA General Assembly resolutions (GA prefix). Numbering is dotted
       # with a series and an index: GA01.01, GA01.13. No edition.
-      class GeneralAssembly < Base
+      class GeneralAssembly < Identifier
         number_width 2
         dotted_segment_width 2
 

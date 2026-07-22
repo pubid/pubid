@@ -7,7 +7,7 @@ module Pubid
     class Builder
       attr_reader :identifier_class
 
-      def initialize(identifier_class = Identifiers::Base)
+      def initialize(identifier_class = Identifier)
         @identifier_class = identifier_class
       end
 
@@ -46,7 +46,7 @@ module Pubid
 
       # Class method to build an identifier from parsed data
       # @param parsed [Hash, Array] the parsed identifier data
-      # @return [Identifiers::Base] the constructed identifier object
+      # @return [Identifier] the constructed identifier object
       def self.build(parsed)
         new.build(parsed)
       end

@@ -7,7 +7,7 @@ module Pubid
     # Base class for PLATEAU supplements (Annex)
     # Supplements reference a base identifier
     class SupplementIdentifier < Pubid::Identifier
-      attribute :base, Identifiers::Base
+      attribute :base, Identifier
       attribute :letter, :string, default: -> {}
 
       def publisher

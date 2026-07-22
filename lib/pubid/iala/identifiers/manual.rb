@@ -6,7 +6,7 @@ module Pubid
       # IALA Manuals (M prefix, planned).
       # Today manuals carry no code (NAVGUIDE, VTS Manual, …); M is
       # reserved for future numbered manuals.
-      class Manual < Base
+      class Manual < Identifier
         number_width 4
 
         def self.type

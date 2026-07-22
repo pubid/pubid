@@ -11,7 +11,7 @@ module Pubid
       #
       # The case of the marker is preserved (Annex vs ANNEX) for round-trip
       # fidelity. Edition and language apply to the Annex itself, not the base.
-      class Annex < Base
+      class Annex < Identifier
         # The publication this annex supplements. Always present; carries the
         # type letter and number (e.g. G1045).
         attribute :base, ::Pubid::Iala::Identifier, polymorphic: true

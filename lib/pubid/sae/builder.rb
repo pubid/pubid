@@ -10,7 +10,7 @@ module Pubid
       private
 
       def default_identifier_class
-        Identifiers::Base
+        Identifier
       end
 
       def cast(type, value)

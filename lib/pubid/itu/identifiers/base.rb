@@ -2,8 +2,7 @@
 
 module Pubid
   module Itu
-    # Base class for all ITU identifiers. Canonical name Pubid::Itu::Identifier
-    # (Identifiers::Base is a back-compat alias).
+    # Base class for all ITU identifiers. Canonical name Pubid::Itu::Identifier.
     class Identifier < ::Pubid::Identifier
       # Parse an ITU identifier string into an identifier object.
       def self.parse(identifier)
@@ -141,10 +140,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: ITU's base class used to be
-      # Pubid::Itu::Identifiers::Base. It is now Pubid::Itu::Identifier.
-      Base = Pubid::Itu::Identifier
-    end
   end
 end

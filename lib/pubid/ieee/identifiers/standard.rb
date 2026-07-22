@@ -17,7 +17,7 @@ module Pubid
       #   std = Pubid::Ieee.parse("ANSI/IEEE Std 500-1984")
       #   std.publisher        # => "IEEE"
       #   std.copublisher     # => ["ANSI"]
-      class Standard < Base
+      class Standard < Identifier
         # TYPED_STAGES for published IEEE standards
         # Standards use "Std" abbreviation for published state
         TYPED_STAGES = [

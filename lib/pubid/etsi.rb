@@ -25,8 +25,8 @@ module Pubid
     end
 
     # Per-flavor format registry: inherits global formats, overrides :human
-    Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
-    Identifiers::Base.format_registry.register(:human, renderer: Etsi::Renderer)
+    Identifier.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Etsi::Renderer)
 
     # Auto-discover all identifier types from the Identifiers namespace
     # @return [Array<Class>] identifier classes (Pubid::Identifier subclasses)
@@ -34,9 +34,9 @@ module Pubid
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
         .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
-        # Exclude the flavor base itself by identity (Identifiers::Base is now an
+        # Exclude the flavor base itself by identity (Identifier is now an
         # alias for Pubid::Etsi::Identifier, so name-based matching misses it).
-        .reject { |c| c == Identifiers::Base }
+        .reject { |c| c == Identifier }
     end
 
     # Build typed stage index from identifier types

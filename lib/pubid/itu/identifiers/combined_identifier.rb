@@ -6,7 +6,7 @@ module Pubid
       # Combined identifier for dual-series recommendations
       # Format: ITU-T G.780/Y.1351
       # Example: ITU-T G.780/Y.1351 (2004)
-      class CombinedIdentifier < Base
+      class CombinedIdentifier < Identifier
         attribute :combined_series, Pubid::Itu::Components::Series
         attribute :combined_code, Pubid::Itu::Components::Code
 

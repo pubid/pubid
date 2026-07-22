@@ -4,7 +4,7 @@ module Pubid
   module Ietf
     module Identifiers
       # An FYI (For Your Information) sub-series id, e.g. "FYI 1".
-      class Fyi < Base
+      class Fyi < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :fyi,

@@ -1,7 +1,7 @@
 require "spec_helper"
 
 # RB (Research Brief) is a simple NIST series with no dedicated identifier
-# class; it routes to the Identifiers::Base fallback (like AMS/VTS/TTB/EAB).
+# class; it routes to the Identifier (base) fallback (like AMS/VTS/TTB/EAB).
 RSpec.describe "NIST RB series" do
   describe ".parse" do
     context "basic RB identifier" do

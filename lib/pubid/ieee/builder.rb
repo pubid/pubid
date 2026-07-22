@@ -8,7 +8,7 @@ module Pubid
       attr_accessor :original_input
       attr_reader :identifier_class
 
-      def initialize(identifier_class = Identifiers::Base)
+      def initialize(identifier_class = Identifier)
         @identifier_class = identifier_class
       end
 
@@ -261,7 +261,7 @@ module Pubid
         base_string = base_parts.join(" ")
 
         # Recursively parse base identifier using Base.parse
-        base = Identifiers::Base.parse(base_string)
+        base = Identifier.parse(base_string)
 
         # Extract corrigendum attributes
         cor_number = extract_value(parsed_hash[:cor_number])
@@ -337,7 +337,7 @@ module Pubid
         base_string = base_parts.join(" ")
 
         # Recursively parse base identifier using Base.parse
-        base = Identifiers::Base.parse(base_string)
+        base = Identifier.parse(base_string)
 
         # Extract interpretation attributes
         int_year = extract_value(parsed_hash[:int_year])
@@ -411,7 +411,7 @@ module Pubid
         base_string = base_parts.join(" ")
 
         # Recursively parse base identifier using Base.parse
-        base = Identifiers::Base.parse(base_string)
+        base = Identifier.parse(base_string)
 
         # Extract conformance attributes
         conf_number = extract_value(parsed_hash[:conf_number])
@@ -631,7 +631,7 @@ module Pubid
         end
 
         # Default to base identifier
-        Identifiers::Base
+        Identifier
       end
 
       # Detect lead party for joint development identifiers
@@ -1183,7 +1183,7 @@ module Pubid
 
       # Parse a list of identifier strings into identifier objects
       # @param list_data [Hash, Array, nil] the parsed identifier list data
-      # @return [Array<Identifiers::Base>] array of parsed identifier objects
+      # @return [Array<Identifier>] array of parsed identifier objects
       def parse_identifier_list(list_data)
         return [] unless list_data
 
@@ -1192,12 +1192,12 @@ module Pubid
 
         # Recursively parse each identifier string
         id_strings.map do |id_str|
-          # Use Identifiers::Base.parse for recursive parsing
-          Identifiers::Base.parse(id_str)
+          # Use Identifier.parse for recursive parsing
+          Identifier.parse(id_str)
         rescue Parslet::ParseFailed
           # If parsing fails, create minimal identifier with just the string
           # This maintains graceful degradation
-          Identifiers::Base.new(parenthetical_content: id_str)
+          Identifier.new(parenthetical_content: id_str)
         end
       end
 

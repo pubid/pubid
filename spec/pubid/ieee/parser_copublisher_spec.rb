@@ -16,7 +16,7 @@ RSpec.describe Pubid::Ieee::Parser do
         result = Pubid::Ieee.parse("IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17")
         expect(result.publisher).to eq("IEEE")
         # This pattern may be parsed as different format - just verify it parses
-        expect(result).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(result).to be_a(Pubid::Ieee::Identifier)
       end
 
       it "parses IEEE/CSA P pattern with dual numbering" do
@@ -31,7 +31,7 @@ RSpec.describe Pubid::Ieee::Parser do
         result = Pubid::Ieee.parse("IEEE Std 120-1955")
         # ASME appears in semicolon equivalence: "IEEE Std 120-1955; ASME PTC 19.6-1955"
         # This is tested in combined/equivalence patterns
-        expect(result).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(result).to be_a(Pubid::Ieee::Identifier)
       end
 
       it "recognizes ASME in parser organization list" do
@@ -44,7 +44,7 @@ RSpec.describe Pubid::Ieee::Parser do
     context "ASA (American Standards Association)" do
       it "parses ASA identifiers in AIEE equivalence" do
         result = Pubid::Ieee.parse("AIEE No 18-1934 (ASA C55 1934)")
-        expect(result).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(result).to be_a(Pubid::Ieee::Identifier)
         # ASA appears in parenthetical content
       end
 

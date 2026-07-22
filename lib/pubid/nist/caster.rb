@@ -32,7 +32,7 @@ module Pubid
         when :publisher
           return nil if value.nil? || value.to_s.strip.empty?
 
-          # publisher is a plain string attribute (see Identifiers::Base).
+          # publisher is a plain string attribute (see Identifier).
           value.to_s
 
         when :dated_date
@@ -633,7 +633,7 @@ module Pubid
 
         when :parsed_format
           # Format detection result from parser. :short is the render default
-          # (a nil parsed_format renders short — see Identifiers::Base#to_s), so
+          # (a nil parsed_format renders short — see Identifier#to_s), so
           # store only non-default formats (e.g. "mr"); "short" stays unset and
           # is omitted from to_hash. detect_format only emits :mr or :short.
           v = value&.to_s

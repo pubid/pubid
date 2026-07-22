@@ -8,7 +8,7 @@ module Pubid
       # Handles both:
       # - SI: Published standards (IEEE/ASTM SI 10-1997)
       # - PSI: Proposed SI (drafts: IEEE/ASTM PSI 10/D2, October 2015)
-      class SiStandard < Base
+      class SiStandard < Identifier
         # TYPED_STAGES for SI standards
         TYPED_STAGES = [
           Components::TypedStage.new(

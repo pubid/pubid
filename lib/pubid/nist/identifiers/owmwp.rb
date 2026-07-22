@@ -6,7 +6,7 @@ module Pubid
       # NIST OWMWP (Office of Weights and Measures Workshop Proceedings)
       # Examples:
       # - "NIST OWMWP 06-13-2018" - Date-based format MM-DD-YYYY
-      class Owmwp < Base
+      class Owmwp < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["OWMWP", "NIST OWMWP"],

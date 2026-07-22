@@ -3,7 +3,7 @@
 module Pubid
   module Amca
     # Base identifier class for AMCA identifiers. Canonical name
-    # Pubid::Amca::Identifier (Identifiers::Base is a back-compat alias); common
+    # Pubid::Amca::Identifier; common
     # functionality for all AMCA identifier types.
     class Identifier < ::Pubid::Identifier
       # @raise [Parslet::ParseFailed] If parsing fails
@@ -66,10 +66,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: AMCA's base class used to be
-      # Pubid::Amca::Identifiers::Base. It is now Pubid::Amca::Identifier.
-      Base = Pubid::Amca::Identifier
-    end
   end
 end

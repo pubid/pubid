@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IALA Model Courses (C series).
       # Examples: C0103-1 Ed 3.0, C2001-1 Ed 1.0.
-      class ModelCourse < Base
+      class ModelCourse < Identifier
         number_width 4
 
         def self.type

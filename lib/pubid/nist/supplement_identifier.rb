@@ -12,8 +12,8 @@ module Pubid
     # Examples:
     # - "NBS CIRC 101e2supp" → CircularSupplement(base: "NBS CIRC 101", edition: e2)
     # - "NBS CIRC 25supp-1924" → CircularSupplement(base: "NBS CIRC 25", edition: 1924)
-    class SupplementIdentifier < Identifiers::Base
-      attribute :base, Identifiers::Base, polymorphic: true
+    class SupplementIdentifier < Identifier
+      attribute :base, Identifier, polymorphic: true
 
       # Delegate publisher to base
       def publisher

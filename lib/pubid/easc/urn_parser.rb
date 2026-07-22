@@ -29,7 +29,7 @@ module Pubid
         number = rest[0]
         year = rest[1]
 
-        klass = Easc.identifier_klass_for_series(series) || Identifiers::Base
+        klass = Easc.identifier_klass_for_series(series) || Identifier
         klass.new(series: series.upcase, variant: variant,
                   number: number, year: year)
       end

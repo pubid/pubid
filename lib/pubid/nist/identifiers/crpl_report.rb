@@ -8,7 +8,7 @@ module Pubid
       # - "NBS CRPL 1-2_3-1" = Reports 1-2 and 3-1 jointly
       # - "NBS CRPL 4-m-5" = Report 4, month m, issue 5
       # - "NBS CRPL c4-4" = Report c4, issue 4
-      class CrplReport < Base
+      class CrplReport < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["CRPL", "NBS CRPL", "CRPL-F-B", "CRPL-F-A", "NBS CRPL-F-B",

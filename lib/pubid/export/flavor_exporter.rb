@@ -78,10 +78,25 @@ module Pubid
       # Scan Identifiers namespace for all Pubid::Identifier subclasses,
       # excluding structural base classes.
       def discover_from_namespace(mod)
-        return [] unless mod.const_defined?(:Identifiers)
+        if mod.const_defined?(:Identifiers)
+          classes = collect_identifier_classes(mod.const_get(:Identifiers))
+          return classes unless classes.empty?
+        end
 
-        idents_mod = mod.const_get(:Identifiers)
-        collect_identifier_classes(idents_mod)
+        # Single-class flavors (e.g. SAE) expose no concrete types under
+        # Identifiers — the flavor's own Identifier class IS the sole document
+        # type (previously discovered via the removed Identifiers::Base alias).
+        Array(single_class_flavor_type(mod))
+      end
+
+      # The flavor's own `Identifier` class when it is a concrete
+      # Pubid::Identifier subclass, else nil (used as the sole type for
+      # single-class flavors with an empty Identifiers namespace).
+      def single_class_flavor_type(mod)
+        return unless mod.const_defined?(:Identifier)
+
+        ident = mod.const_get(:Identifier)
+        ident if ident.is_a?(Class) && ident < Pubid::Identifier
       end
 
       # Recursively collect all Pubid::Identifier subclasses from a module,

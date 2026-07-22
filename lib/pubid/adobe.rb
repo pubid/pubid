@@ -28,8 +28,8 @@ module Pubid
 
     # Per-flavor format registry: inherits global formats, overrides :human
     # with the Adobe-specific renderer.
-    Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
-    Identifiers::Base.format_registry.register(:human, renderer: Adobe::Renderer)
+    Identifier.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Adobe::Renderer)
 
     # Auto-discover identifier types from the Identifiers namespace.
     # @return [Array<Class>]
@@ -37,7 +37,7 @@ module Pubid
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
         .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
-        .reject { |c| c == Identifiers::Base }
+        .reject { |c| c == Identifier }
     end
 
     # Lookup: type key → identifier class
@@ -49,7 +49,7 @@ module Pubid
 
     # Lookup: type short letter (e.g. "ATN") → identifier class
     # @param short [String]
-    # @return [Class<Identifiers::Base>]
+    # @return [Class<Identifier>]
     def self.identifier_klass_for_short(short)
       @by_short ||= identifier_types.to_h { |klass| [klass.type[:short].to_s, klass] }
       @by_short.fetch(short.to_s)

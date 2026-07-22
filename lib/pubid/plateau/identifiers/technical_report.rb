@@ -6,7 +6,7 @@ module Pubid
       # PLATEAU Technical Report
       # Format: PLATEAU Technical Report #NN[-annex]
       # Example: PLATEAU Technical Report #01
-      class TechnicalReport < Base
+      class TechnicalReport < Identifier
         def type_string
           "Technical Report"
         end

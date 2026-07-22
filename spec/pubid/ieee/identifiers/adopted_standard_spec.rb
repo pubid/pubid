@@ -11,7 +11,7 @@ RSpec.describe Pubid::Ieee::Identifiers::AdoptedStandard do
         expect(id.ieee_identifier).to be_a(Pubid::Ieee::Aiee::Identifier)
         expect(id.ieee_identifier.to_s).to eq("AIEE No 14-1925")
 
-        expect(id.adopted_identifiers.first).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id.adopted_identifiers.first).to be_a(Pubid::Ieee::Identifier)
         expect(id.adopted_identifiers.first.publisher).to eq("AESC")
         expect(id.adopted_identifiers.first.to_s).to eq("AESC C22-1925")
 
@@ -37,7 +37,7 @@ RSpec.describe Pubid::Ieee::Identifiers::AdoptedStandard do
         id = Pubid::Ieee.parse("IEEE Std C37.111-2013 (IEC 60255-24 Edition 2.0 2013-04)")
         expect(id).to be_a(described_class)
 
-        expect(id.ieee_identifier).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id.ieee_identifier).to be_a(Pubid::Ieee::Identifier)
         expect(id.ieee_identifier.to_s).to eq("IEEE Std C37.111-2013")
 
         expect(id.adopted_identifiers.first).to be_a(Pubid::Iec::Identifiers::InternationalStandard)

@@ -7,7 +7,7 @@ module Pubid
       # Examples:
       # - "NIST TN 1234" = Technical Note 1234
       # - "NBS TN 567" = NBS Technical Note 567
-      class TechnicalNote < Base
+      class TechnicalNote < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["TN", "NIST TN", "NBS TN"],

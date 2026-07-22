@@ -62,5 +62,5 @@ end
 Pubid::Registry.register(:sae, Pubid::Sae)
 
 # Per-flavor format registry: inherits global formats, overrides :human
-Pubid::Sae::Identifiers::Base.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
-Pubid::Sae::Identifiers::Base.format_registry.register(:human, renderer: Pubid::Sae::Renderer)
+Pubid::Sae::Identifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
+Pubid::Sae::Identifier.format_registry.register(:human, renderer: Pubid::Sae::Renderer)

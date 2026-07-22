@@ -5,9 +5,9 @@ module Pubid
     module Identifiers
       # Dual Identifier - wraps two identifiers connected with "and"
       # Example: "ANSI C37.61-1973 and IEEE Std 321-1973"
-      class DualIdentifier < Base
-        attribute :first_identifier, Base, polymorphic: true
-        attribute :second_identifier, Base, polymorphic: true
+      class DualIdentifier < Identifier
+        attribute :first_identifier, Identifier, polymorphic: true
+        attribute :second_identifier, Identifier, polymorphic: true
       end
     end
   end

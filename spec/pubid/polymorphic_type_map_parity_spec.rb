@@ -14,7 +14,7 @@ RSpec.describe "polymorphic_type_map parity with static *_TYPE_MAP" do
     "Pubid::Jis::Identifier"          => "JIS_TYPE_MAP",
     "Pubid::Iec::Identifier"          => "IEC_TYPE_MAP",
     "Pubid::Ccsds::Identifier"        => "CCSDS_TYPE_MAP",
-    "Pubid::Iho::Identifiers::Base"   => "IHO_TYPE_MAP",
+    "Pubid::Iho::Identifier"          => "IHO_TYPE_MAP",
   }.freeze
 
   STATIC_MAPS.each do |base_const, map_const|

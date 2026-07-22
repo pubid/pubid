@@ -7,7 +7,7 @@ module Pubid
       # Examples:
       # - "FIPS 140-3" (no NIST prefix)
       # - "NIST FIPS 140-3" (also accepted, normalizes to FIPS 140-3)
-      class FederalInformationProcessingStandards < Base
+      class FederalInformationProcessingStandards < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["FIPS", "NIST FIPS"],

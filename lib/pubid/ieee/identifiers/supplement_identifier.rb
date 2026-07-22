@@ -3,10 +3,10 @@
 module Pubid
   module Ieee
     module Identifiers
-      # Base class for supplement identifiers (amendments, corrigenda, interpretations, etc.)
+      # Identifier class for supplement identifiers (amendments, corrigenda, interpretations, etc.)
       # Supplements modify or add to a base document
-      class SupplementIdentifier < Base
-        attribute :base, Base, polymorphic: true
+      class SupplementIdentifier < Identifier
+        attribute :base, Identifier, polymorphic: true
 
         # Delegate publisher to base
         def publisher

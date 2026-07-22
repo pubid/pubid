@@ -67,7 +67,7 @@ module Pubid
       end
 
       # Build Special Publication (OB). Sector is silently dropped — OB is a
-      # cross-bureau publication and `Identifiers::Base` rejects sector+OB
+      # cross-bureau publication and `Identifier` rejects sector+OB
       # in its constructor.
       def build_special_publication(data)
         Identifiers::SpecialPublication.new(

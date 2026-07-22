@@ -3,7 +3,6 @@
 module Pubid
   module Iala
     module Identifiers
-      autoload :Base,             "#{__dir__}/identifiers/base"
       autoload :Advice,           "#{__dir__}/identifiers/advice"
       autoload :Annex,            "#{__dir__}/identifiers/annex"
       autoload :Standard,         "#{__dir__}/identifiers/standard"

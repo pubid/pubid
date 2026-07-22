@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IALA Standards (S series).
       # Examples: S1010, S1020 Ed 2.0, S1070 Ed 2.0.
-      class Standard < Base
+      class Standard < Identifier
         number_width 4
 
         def self.type

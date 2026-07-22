@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IHO Circular Letter (C series).
       # Example: IHO C-13 1.0.0.
-      class CircularLetter < Base
+      class CircularLetter < Identifier
         def self.type
           { key: :circular_letter, title: "Circular Letter", short: "C" }
         end

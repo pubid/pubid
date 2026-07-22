@@ -8,7 +8,7 @@ module Pubid
       # - AMCA 99 JW Interp
       # - AMCA 204 – 1
       # - ANSI/AMCA 204 Interp
-      class Interpretation < Base
+      class Interpretation < Identifier
         attr_reader :interpretation_code
 
         def initialize(code:, year: nil, copublisher: nil, suffix: nil,

@@ -9,7 +9,7 @@ module Pubid
       #   ГОСТ Р 71039-2023                   (dated)
       #   ГОСТ Р МЭК 60794-1-23-2017         (copublisher, dated)
       #   ГОСТ Р ИСО/МЭК МФС 10609-9-95      (compound copublisher + subtype)
-      class NationalStandard < Base
+      class NationalStandard < Identifier
         def self.type
           { key: :"national-standard", title: "National Standard", short: "R" }
         end

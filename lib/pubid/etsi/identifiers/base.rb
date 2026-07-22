@@ -2,9 +2,8 @@
 
 module Pubid
   module Etsi
-    # Base class for all ETSI identifiers. Canonical name Pubid::Etsi::Identifier
-    # (Identifiers::Base is a back-compat alias); every concrete ETSI identifier
-    # descends from it.
+    # Base class for all ETSI identifiers. Canonical name Pubid::Etsi::Identifier;
+    # every concrete ETSI identifier descends from it.
     class Identifier < ::Pubid::Identifier
       # Let Parslet::ParseFailed propagate on a bad reference (matching ISO), so
       # relaton-cli's `rescue Parslet::ParseFailed` fetch handler catches it
@@ -57,10 +56,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: ETSI's base class used to be
-      # Pubid::Etsi::Identifiers::Base. It is now Pubid::Etsi::Identifier.
-      Base = Pubid::Etsi::Identifier
-    end
   end
 end

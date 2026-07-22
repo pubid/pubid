@@ -9,7 +9,7 @@ module Pubid
       # Examples:
       #   РМГ 151-2025
       #   РМГ 29-2013
-      class Rmg < Base
+      class Rmg < Identifier
         def self.type
           { key: :rmg, title: "Interstate Recommendations", series: "RMG" }
         end

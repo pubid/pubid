@@ -7,7 +7,7 @@ module Pubid
       # Examples:
       # - "NBS CIRC 13e2revJune1908" = Circular 13, edition 2, revised June 1908
       # - "NBS CIRC 13" = Circular 13
-      class Circular < Base
+      class Circular < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["CIRC", "NBS CIRC"],

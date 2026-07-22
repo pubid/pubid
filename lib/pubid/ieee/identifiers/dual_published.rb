@@ -7,12 +7,12 @@ module Pubid
       # Document jointly published by two organizations
       # Example: "ANSI C37.61-1973 and IEEE Std 321-1973"
       # This means the document was published together by both organizations
-      class DualPublished < Base
+      class DualPublished < Identifier
         # First organization's identifier
-        attribute :first_identifier, Base, polymorphic: true
+        attribute :first_identifier, Identifier, polymorphic: true
 
         # Second organization's identifier
-        attribute :second_identifier, Base, polymorphic: true
+        attribute :second_identifier, Identifier, polymorphic: true
 
         def publisher
           # Return array of both publishers

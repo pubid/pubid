@@ -8,7 +8,7 @@ RSpec.describe "IEEE identifiers" do
     it "parses IEEE Std 1234-2007" do
       parsed = Pubid::Ieee.parse("IEEE Std 1234-2007")
 
-      expect(parsed).to be_a(Pubid::Ieee::Identifiers::Base)
+      expect(parsed).to be_a(Pubid::Ieee::Identifier)
       expect(parsed.publisher).to eq("IEEE")
       expect(parsed.code.number).to eq("1234")
       expect(parsed.year).to eq("2007")
@@ -105,7 +105,7 @@ RSpec.describe "IEEE identifiers" do
           parsed = Pubid::Ieee.parse(identifier)
           # Accept both Identifiers::Base and Aiee::Identifier
           expect(parsed).to(satisfy do |id|
-            id.is_a?(Pubid::Ieee::Identifiers::Base) || id.is_a?(Pubid::Ieee::Aiee::Identifier)
+            id.is_a?(Pubid::Ieee::Identifier) || id.is_a?(Pubid::Ieee::Aiee::Identifier)
           end)
 
           # Test round-trip by converting back to string

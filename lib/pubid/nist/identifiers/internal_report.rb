@@ -8,7 +8,7 @@ module Pubid
       # - "NIST IR 8115" = Interagency Report 8115
       # - "NIST IR 8115r1" = Interagency Report 8115 revision 1
       # - "NBS IR 73-197" = NBS Interagency Report 73-197
-      class InteragencyReport < Base
+      class InteragencyReport < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["IR", "NIST IR", "NBS IR"],

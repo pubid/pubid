@@ -7,7 +7,7 @@ module Pubid
       # Examples:
       # - "NIST GCR 17-917-45" - Basic 3-part number
       # - "NIST GCR 21-917-48v3B" - With volume and letter suffix
-      class GrantContractorReport < Base
+      class GrantContractorReport < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["GCR", "NIST GCR"],

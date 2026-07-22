@@ -5,8 +5,8 @@ module Pubid
     module Identifiers
       # Supplement identifier (Suppl.)
       # Pattern: "ITU-T H Suppl. 1", "ITU-T E.156 Suppl. 2"
-      class Supplement < Base
-        attribute :base, Base, polymorphic: true
+      class Supplement < Identifier
+        attribute :base, Identifier, polymorphic: true
         attribute :number, :string
 
         def to_s

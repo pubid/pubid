@@ -4,8 +4,7 @@ module Pubid
   module Easc
     # Base class for all EASC identifiers. Canonical name
     # Pubid::Easc::Identifier; every concrete EASC identifier
-    # (Identifiers::*) descends from it, and Identifiers::Base —
-    # aliased at the foot of identifiers/base.rb — points back to it.
+    # (Identifiers::*) descends from it.
     #
     # EASC identifiers have the form:
     #   <series> [В ]<number>[-<year>]

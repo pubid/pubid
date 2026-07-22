@@ -29,7 +29,7 @@ module Pubid
       # - "P" prefix means IEEE project (any stage)
       # - ISO stages and IEEE drafts can coexist but are not equivalent
       # - Format conversion preserves semantic meaning within each system
-      class JointDevelopment < Base
+      class JointDevelopment < Identifier
         attribute :publishers, :string, collection: true
         attribute :lead_party, :string              # "IEEE", "ISO", "IEC", etc.
         attribute :code, :string

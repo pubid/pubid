@@ -11,9 +11,9 @@ module Pubid
       #   ETSI GS ZSM 012 V1.1.1 (2022-12)
       #   ETSI GR ZSM 009-3 V1.1.1 (2023-08)
       #   ETSI GTS GSM 02.01 V5.5.0 (1999-01)
-      class EtsiStandard < Base
-        # Type is stored in @type attribute from Base
-        # All rendering handled by Base class
+      class EtsiStandard < Identifier
+        # Type is stored in @type attribute from Identifier
+        # All rendering handled by Identifier class
 
         # Compact serialization (mirrors ISO/JCGM/OIML): the Code component
         # collapses to a bare `number` scalar (plus a `parts` array and, rarely,
@@ -23,9 +23,9 @@ module Pubid
         # intentionally NOT mapped — it is reconstructed on load from its
         # attribute default, keeping the hash compact.
         #
-        # This block lives on EtsiStandard (a leaf) rather than the shared Base:
+        # This block lives on EtsiStandard (a leaf) rather than the shared Identifier:
         # SupplementIdentifier is a sibling that DELEGATES type/code/version and
-        # date to its inner `base`, so a block on Base would be inherited-and-
+        # date to its inner `base`, so a block on Identifier would be inherited-and-
         # merged by the supplement and re-emit every delegated field at the top.
         key_value do
           map "_type",      to: :_type

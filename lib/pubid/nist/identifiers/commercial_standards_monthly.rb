@@ -6,7 +6,7 @@ module Pubid
       # NBS Commercial Standards Monthly Identifier
       # Format: NBS CSM N where N is simple number
       # Example: "NBS CSM 1", "NBS CSM 40"
-      class CommercialStandardsMonthly < Base
+      class CommercialStandardsMonthly < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["CSM", "NBS CSM"],

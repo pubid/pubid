@@ -8,7 +8,7 @@ module Pubid
       # - "NBS NSRDS 1" - Basic NSRDS
       # - "NSRDS-NBS 1" - With hyphen prefix
       # - "NBS NSRDS 1p1" - With part notation
-      class Nsrds < Base
+      class Nsrds < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["NSRDS", "NBS NSRDS"],

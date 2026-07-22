@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Pubid::Nist::Identifiers::Base do
+RSpec.describe Pubid::Nist::Identifier do
   describe "#weight" do
     context "basic identifier" do
       it "returns weight for simple identifier" do

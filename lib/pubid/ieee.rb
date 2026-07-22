@@ -101,5 +101,5 @@ end
 Pubid::Registry.register(:ieee, Pubid::Ieee)
 
 # Per-flavor format registry: inherits global formats, overrides :human
-Pubid::Ieee::Identifiers::Base.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
-Pubid::Ieee::Identifiers::Base.format_registry.register(:human, renderer: Pubid::Ieee::Renderer)
+Pubid::Ieee::Identifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
+Pubid::Ieee::Identifier.format_registry.register(:human, renderer: Pubid::Ieee::Renderer)

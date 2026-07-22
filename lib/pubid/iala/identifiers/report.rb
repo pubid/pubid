@@ -6,7 +6,7 @@ module Pubid
       # IALA Reports & Proceedings (X prefix, planned).
       # Today reports carry no code; X is reserved for future numbered
       # reports.
-      class Report < Base
+      class Report < Identifier
         def self.type
           { key: :report, title: "Report", short: "X" }
         end

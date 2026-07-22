@@ -1,7 +1,7 @@
 require "spec_helper"
 require_relative "../../../../lib/pubid"
 
-RSpec.describe Pubid::Nist::Identifiers::Base do
+RSpec.describe Pubid::Nist::Identifier do
   describe ".parse" do
     context "basic NIST identifiers" do
       it "parses NIST SP identifiers" do

@@ -10,7 +10,7 @@ module Pubid
       #   ГОСТ 14946-82           (dated)
       #   ГОСТ 2.312              (undated)
       #   ГОСТ ISO 9692-1         (copublisher + part, undated)
-      class InterstateStandard < Base
+      class InterstateStandard < Identifier
         def self.type
           { key: :"interstate-standard", title: "Interstate Standard", short: nil }
         end

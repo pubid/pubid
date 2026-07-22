@@ -15,7 +15,7 @@ module Pubid
       #
       # One GOST may harmonize with multiple foreign standards at once.
       # The slash form (IdenticalAdoption) is reserved for the strict IDT case.
-      class Harmonized < Base
+      class Harmonized < Identifier
         attribute :base, ::Pubid::Gost::Identifier, polymorphic: true
         attribute :adopted_identifiers, ::Pubid::Identifier,
                   collection: true, polymorphic: true

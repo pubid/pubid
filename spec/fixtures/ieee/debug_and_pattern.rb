@@ -9,7 +9,7 @@ input = "IEEE Std 960-1989 and IEEE Std 1177-1989"
 # First check if Base.parse handles "and"
 
 begin
-  Pubid::Ieee::Identifiers::Base.parse(input)
+  Pubid::Ieee::Identifier.parse(input)
 rescue StandardError
 end
 

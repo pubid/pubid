@@ -127,10 +127,10 @@ module Pubid
         # instead of an injected dependency.
         typed_stage = Pubid::Nist.locate_stage(series)
         if typed_stage
-          Pubid::Nist.locate_type(typed_stage.type_code) || Identifiers::Base
+          Pubid::Nist.locate_type(typed_stage.type_code) || Identifier
         else
           # Fallback to Base for unmapped series (e.g., "AMS", "VTS")
-          Identifiers::Base
+          Identifier
         end
       end
 

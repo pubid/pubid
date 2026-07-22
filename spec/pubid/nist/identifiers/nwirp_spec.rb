@@ -1,6 +1,6 @@
 require "spec_helper"
 
-# NWIRP is a low-volume simple NIST series routed to the Identifiers::Base
+# NWIRP is a low-volume simple NIST series routed to the Identifier (base)
 # fallback. The hand-off gave no concrete identifier, so a generic number is
 # used to pin down parse + round-trip.
 RSpec.describe "NIST NWIRP series" do

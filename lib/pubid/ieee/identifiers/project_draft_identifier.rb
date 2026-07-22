@@ -8,7 +8,7 @@ module Pubid
       # where P1234 is the project number and D5 is the draft version
       # This is distinct from a StandardIdentifier - the "P" indicates project status,
       # not a code prefix like "C" in "C57.12"
-      class ProjectDraftIdentifier < Base
+      class ProjectDraftIdentifier < Identifier
         TYPED_STAGES = [
           Components::TypedStage.new(
             abbr: ["P"],

@@ -14,7 +14,7 @@ module Pubid
       #
       # The optional `slug` carries the filename's title segment
       # (`CIDFont_Spec`) so round-trip through the data repo is lossless.
-      class TechNote < Base
+      class TechNote < Identifier
         attribute :number, :string   # "5014", "5902"
         attribute :slug,   :string   # "CIDFont_Spec", "AFM_Spec", nil
 

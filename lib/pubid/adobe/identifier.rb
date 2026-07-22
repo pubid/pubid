@@ -4,8 +4,7 @@ module Pubid
   module Adobe
     # Base class for all Adobe identifiers. Canonical name
     # Pubid::Adobe::Identifier; every concrete Adobe identifier
-    # (Identifiers::*) descends from it, and Identifiers::Base — aliased
-    # at the foot of identifiers/base.rb — points back to it.
+    # (Identifiers::*) descends from it.
     #
     # Adobe identifiers come in two shapes:
     #
