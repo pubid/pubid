@@ -48,6 +48,11 @@ module Pubid
 
           { dated_seq: value.to_s }
 
+        when :year
+          # Bare 4-digit year (e.g. from "NIST Research Library (2022)").
+          # The Identifier#year attribute is typed as :integer.
+          value&.to_s&.to_i
+
         when :series
           return nil if value.nil? || value.to_s.strip.empty?
 
