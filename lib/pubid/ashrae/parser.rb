@@ -607,9 +607,12 @@ module Pubid
           year_first_addenda_package_identifier |
           addenda_package_identifier |
           addendum_identifier |
-          # Standalone copublisher pattern (ANSI/AMCA 210-99, AMCA 210-99)
-          (((str("ANSI") >> slash).maybe >> letter.repeat(2,
-                                                          10)).as(:copublisher) >>
+          # Standalone copublisher pattern (ANSI/AMCA 210-99, AMCA 210-99).
+          # The literal "ASHRAE" is excluded here so a bare "ASHRAE <code>-<year>"
+          # is not swallowed as a copublisher and instead falls through to the
+          # ASHRAE-publisher branch below.
+          (((str("ANSI") >> slash).maybe >> (str("ASHRAE").absent? >> letter).repeat(2,
+                                                                                     10)).as(:copublisher) >>
             space >>
             code_with_year >>
             optional_suffix.repeat(0, 2)) |
@@ -635,9 +638,11 @@ module Pubid
             suffix.maybe >>
             reaffirmed.maybe >>
             optional_suffix.repeat(0, 2)) |
-          # Standard ASHRAE pattern
+          # Standard ASHRAE pattern. The type keyword is optional so a bare
+          # partial reference "ASHRAE <code>" (no "Standard"/"Guideline") parses;
+          # the builder defaults the absent type to "Standard".
           (publisher.as(:publisher) >> space >>
-            type.as(:type) >> space >>
+            (type.as(:type) >> space).maybe >>
             code >>
             (space?.maybe >> dash >> year_digits.as(:year)).maybe >>
             (space >> additional_copublisher).maybe >>

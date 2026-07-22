@@ -26,6 +26,19 @@ module Pubid
       attribute :amendment, :string
       attribute :reaffirmed, :string
       attribute :copublisher, :string
+
+      # ASHRAE stores the publication year in a plain :string scalar, not a
+      # Components::Date, so the base #exclude's :year->:date remap cannot nil
+      # it. Reset the scalar directly (mirroring CSA/BIPM) so a year-less
+      # partial reference is a year wildcard under
+      # matches?(other, ignore: [:year]). super still recurses into the nested
+      # `base` of wrapper types (Errata/Addendum/…), which carry no year scalar.
+      def exclude(*args)
+        result = super
+        year_keys = args & %i[year date]
+        result.year = nil if !year_keys.empty? && result.respond_to?(:year=)
+        result
+      end
     end
 
     module Identifiers
