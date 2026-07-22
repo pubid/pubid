@@ -27,6 +27,9 @@ NBS MN: NBS MONO
 NIST MN: NIST MONO
 # Long-form series names — normalize to the abbreviated form the parser expects.
 /\bMonograph\b/: MONO
+# Citation-form comma before long parameter prefixes — strip so the parser's
+# " Rev. " / " Part. " / " Vol. " prefix rules match (issue #197).
+'/,\s+(Rev\.|Part\.|Vol\.|Revision|Volume|Part)(?=\s|\d)/': ' \1'
 NIST MP: NBS MP
 NIST SP 260-162 2006ed.: NIST SP 260-162e2006
 NBS CIRC 154suprev: NBS CIRC 154r1sup

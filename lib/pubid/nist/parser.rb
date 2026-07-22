@@ -448,7 +448,12 @@ module Pubid
 
       # Volume
       rule(:volume) do
-        (space.maybe >> (str("v") | str(" Vol. "))) >>
+        # Long-form "Vol." comes FIRST so PEG ordered choice doesn't commit to
+        # the bare "v" alternative after consuming the leading space via
+        # space.maybe (which would then starve the " Vol. " form). Both
+        # "Vol. 4" (period + space) and "Vol.4" (period only) are accepted.
+        (space.maybe >>
+          (str("Vol. ") | str("Vol.") | str("v"))) >>
           (digits >>
            # Support letter ranges (lowercase normalized in preprocessing)
            (str("a-l") | str("m-z") | str("A-L") | str("M-Z")).maybe >>
