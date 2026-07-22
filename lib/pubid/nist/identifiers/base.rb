@@ -426,6 +426,10 @@ module Pubid
         result += " #{number}" if number
         result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
+        # "NIST Research Library (YYYY)" — oddball identifier with no number;
+        # the year appears in parens rather than as a date component.
+        result += " (#{year})" if year && !number
+
         # Append every optional component the parser may have attached
         # (volume, part, edition, version, supplement, update, stage, ...).
         # Shared with the lossy subclasses so they cannot silently drop a

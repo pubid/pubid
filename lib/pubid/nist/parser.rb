@@ -346,6 +346,16 @@ module Pubid
           match("[0-9]").repeat(1).as(:dated_seq)
       end
 
+      # "NIST Research Library (YYYY)" — one-off NIST publication that doesn't
+      # fit the standard series+number shape (no report number, year in parens).
+      # See pubid/pubid#151.
+      rule(:research_library_identifier) do
+        publisher >> space >>
+          str("Research Library").as(:series) >>
+          (space >> str("(") >>
+            match("[0-9]").repeat(4, 4).as(:year) >> str(")")).maybe
+      end
+
       # LEGACY EDITION PATTERNS (for backward compatibility during migration)
       # These will be gradually replaced as we migrate to proper Edition/Date components
       rule(:legacy_edition) do
@@ -658,6 +668,7 @@ module Pubid
         circ_supplement_identifier |
           dated_identifier |
           mr_identifier |
+          research_library_identifier |
           (
             # Compound series (includes publisher in series name)
             compound_series >> (space | dot) >>
