@@ -195,11 +195,16 @@ module Pubid
   # Trigger autoloads for every declared flavor module so that
   # Registry is populated before URN dispatch needs it. Safe to call
   # repeatedly; no-op after the first invocation.
+  #
+  # The constant filter allows a digit inside the name (the +0-9+ in the regex)
+  # so digit-bearing flavor modules such as +W3c+ are loaded/registered too —
+  # without it +W3c+ is silently dropped from the registry enumeration and thus
+  # from every registry-driven cross-flavor spec.
   def self.eager_load_flavors!
     return if @flavors_loaded
 
     constants.each do |c|
-      next unless c.to_s.match?(/\A[A-Z][a-zA-Z]+\z/)
+      next unless c.to_s.match?(/\A[A-Z][a-zA-Z0-9]+\z/)
 
       begin
         const_get(c)
