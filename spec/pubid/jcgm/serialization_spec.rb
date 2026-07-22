@@ -58,6 +58,10 @@ RSpec.describe "JCGM serialization" do
       "JCGM 100:2008" => {
         "_type" => "pubid:jcgm:guide", "number" => "100", "year" => "2008"
       },
+      # partial (dateless) numeric guide — omits year entirely
+      "JCGM 100" => {
+        "_type" => "pubid:jcgm:guide", "number" => "100"
+      },
       "JCGM GUM" => {
         "_type" => "pubid:jcgm:guide", "number" => "GUM"
       },
