@@ -54,9 +54,25 @@ module Pubid
 
       rule(:parts) { part.repeat(0).as(:parts) }
 
-      # Code = number + edition suffix + subseries + parts
+      # Code = imp-prefixed code (Implementers' Guide) or standard code.
+      # The imp_code alternative is tried first because the standard code's
+      # number rule requires digits, which "Imp712" / "ImpOSI" would not
+      # satisfy.
       rule(:code) do
+        imp_code | standard_code
+      end
+
+      rule(:standard_code) do
         number >> series_suffix.maybe >> subseries.maybe >> parts
+      end
+
+      # Implementers' Guide code: "Imp" prefix followed by digits or a
+      # short letter string. Examples: Imp712 (G.Imp712), ImpOSI (X.ImpOSI).
+      rule(:imp_code) do
+        str("Imp").as(:imp_marker) >>
+          (digits | letter.repeat(1, 3)).as(:number) >>
+          subseries.maybe >>
+          parts
       end
 
       # Date

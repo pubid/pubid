@@ -130,6 +130,7 @@ module Pubid
 
       def build_code(data)
         Components::Code.new(
+          imp_marker: data[:imp_marker]&.to_s,
           number: data[:number].to_s,
           series_suffix: data[:series_suffix]&.to_s,
           subseries: data[:subseries]&.to_s,
