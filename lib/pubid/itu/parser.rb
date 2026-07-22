@@ -87,7 +87,8 @@ module Pubid
         (
           str("Suppl.") | str("Suppl") |
           str("Amd.") | str("Amd") |
-          str("Cor.") | str("Cor")
+          str("Cor.") | str("Cor") |
+          str("Err.") | str("Err")
         ).as(:supplement_type)
       end
 
@@ -137,6 +138,19 @@ module Pubid
           language.maybe
       end
 
+      # A supplement whose base is itself a supplement — e.g. Errata on an
+      # Amendment ("G.9701 (2014) Amd. 3 Err. 1 (12/2017)") or Errata on a
+      # Corrigendum. The parse tree nests base-inside-base so the builder
+      # produces a Supplement whose base is another Supplement.
+      rule(:chained_supplement) do
+        supplement_with_base.as(:base) >>
+          space >>
+          supplement_type >>
+          supplement_number >>
+          supplement_date.maybe >>
+          language.maybe
+      end
+
       # Supplement without base (series-only, like "ITU-T H Suppl. 1")
       rule(:supplement_series_only) do
         itu_prefix >>
@@ -150,9 +164,9 @@ module Pubid
           language.maybe
       end
 
-      # Complete supplement identifier (try with base first, then series-only)
+      # Complete supplement identifier (try chained first, then with base, then series-only)
       rule(:supplement_identifier) do
-        supplement_with_base | supplement_series_only
+        chained_supplement | supplement_with_base | supplement_series_only
       end
 
       # With series: ITU-R BO.600-1

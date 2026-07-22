@@ -8,6 +8,7 @@ module Pubid
       autoload :Base, "#{__dir__}/identifiers/base"
       autoload :CombinedIdentifier, "#{__dir__}/identifiers/combined_identifier"
       autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
+      autoload :Errata, "#{__dir__}/identifiers/errata"
       autoload :Recommendation, "#{__dir__}/identifiers/recommendation"
       autoload :SpecialPublication, "#{__dir__}/identifiers/special_publication"
       autoload :Supplement, "#{__dir__}/identifiers/supplement"
