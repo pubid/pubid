@@ -7,7 +7,7 @@ module Pubid
     end
 
     # Base class for all IEEE identifiers. Canonical name
-    # Pubid::Ieee::Identifier (Identifiers::Base is a back-compat alias). IEEE
+    # Pubid::Ieee::Identifier. IEEE
     # builds its identifiers as instances of this class directly.
     class Identifier < ::Pubid::Identifier
       # Generate URN for this identifier
@@ -270,10 +270,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: IEEE's base class used to be
-      # Pubid::Ieee::Identifiers::Base. It is now Pubid::Ieee::Identifier.
-      Base = Pubid::Ieee::Identifier
-    end
   end
 end

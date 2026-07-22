@@ -8,7 +8,7 @@ module Pubid
       # Examples:
       # - "IEEE Std 1299/C62.22.1-1996" (same document, two numbers)
       # - "IEEE Std 960-1989, Std 1177-1989" (same document, two numbers)
-      class MultiNumberedIdentifier < Base
+      class MultiNumberedIdentifier < Identifier
         # Primary identifier (main IEEE standard number)
         # Stored as-is (Lutaml model type checking doesn't work with polymorphic identifiers)
         attr_accessor :primary_identifier

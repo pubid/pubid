@@ -10,7 +10,7 @@ module Pubid
       #   ПМГ 03-2025
       #   ПМГ 126-2013
       #   ПМГ В 31-2001           (defense variant)
-      class Pmg < Base
+      class Pmg < Identifier
         def self.type
           { key: :pmg, title: "Interstate Rules", series: "PMG" }
         end

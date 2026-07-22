@@ -4,7 +4,7 @@ module Pubid
   module Ietf
     module Identifiers
       # An STD (Internet Standard) sub-series id, e.g. "STD 66".
-      class Std < Base
+      class Std < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :std,

@@ -9,7 +9,7 @@ module Pubid
       # - "NBS CS 102" - Basic commercial standard
       # - "NBS CS 102E-42" - With letter suffix and number
       # - "CS 190-58" - With year
-      class CommercialStandard < Base
+      class CommercialStandard < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["CS", "NBS CS"],

@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IHO Bibliographic Publication (B series).
       # Example: IHO B-4 2.19.0.
-      class Bibliographic < Base
+      class Bibliographic < Identifier
         def self.type
           { key: :bibliographic, title: "Bibliographic Publication",
             short: "B" }

@@ -4,7 +4,7 @@ module Pubid
   module Ieee
     # Pre-parser for IEEE identifiers.
     #
-    # Owns all regex/scan/dispatch logic that used to live on Identifiers::Base.parse.
+    # Owns all regex/scan/dispatch logic that used to live on Identifier.parse.
     # Base.parse becomes a thin orchestrator that asks PreParser for a decision
     # and then routes to the right builder.
     module PreParser

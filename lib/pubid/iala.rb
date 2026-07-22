@@ -23,8 +23,8 @@ module Pubid
     end
 
     # Per-flavor format registry: inherits global formats, overrides :human
-    Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
-    Identifiers::Base.format_registry.register(:human, renderer: Iala::Renderer)
+    Identifier.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Iala::Renderer)
 
     # Auto-discover all identifier types from the Identifiers namespace.
     # @return [Array<Class>] identifier classes (Pubid::Identifier subclasses)
@@ -32,7 +32,7 @@ module Pubid
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
         .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
-        .reject { |c| c == Identifiers::Base }
+        .reject { |c| c == Identifier }
     end
 
     # Build typed stage index from identifier types
@@ -60,7 +60,7 @@ module Pubid
 
     # Look up an identifier class by its IALA type letter (S, R, G, M, C, X, P).
     # @param letter [String]
-    # @return [Class<Identifiers::Base>]
+    # @return [Class<Identifier>]
     def self.identifier_klass_for_type_letter(letter)
       @by_letter ||= identifier_types.to_h { |klass| [klass.type[:short], klass] }
       @by_letter.fetch(letter.to_s.upcase)

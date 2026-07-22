@@ -2,8 +2,7 @@
 
 module Pubid
   module Sae
-    # Base SAE Identifier. Canonical name Pubid::Sae::Identifier (Identifiers::Base
-    # is a back-compat alias). SAE has a single identifier class that IS the
+    # Base SAE Identifier. Canonical name Pubid::Sae::Identifier. SAE has a single identifier class that IS the
     # document type, so this class is both the base and the only concrete type.
     # Handles all SAE document types (AMS, AIR, ARP, AS, MA).
     class Identifier < ::Pubid::Identifier
@@ -37,10 +36,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: SAE's base class used to be
-      # Pubid::Sae::Identifiers::Base. It is now Pubid::Sae::Identifier.
-      Base = Pubid::Sae::Identifier
-    end
   end
 end

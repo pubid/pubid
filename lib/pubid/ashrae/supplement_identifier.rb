@@ -6,8 +6,8 @@ module Pubid
   module Ashrae
     # Base class for supplement identifiers (addendums, errata, interpretations)
     # Supplements modify or add to a base document
-    class SupplementIdentifier < Identifiers::Base
-      attribute :base, Identifiers::Base, polymorphic: true
+    class SupplementIdentifier < Identifier
+      attribute :base, Identifier, polymorphic: true
 
       # Delegate publisher to base
       def publisher

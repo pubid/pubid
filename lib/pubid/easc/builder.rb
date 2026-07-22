@@ -8,7 +8,7 @@ module Pubid
         series_cyr = stringify(parsed[:series])&.upcase
         canonical_series = series_to_canonical(series_cyr)
         klass = Easc.identifier_klass_for_series(canonical_series) ||
-                Identifiers::Base
+                Identifier
         attrs = {
           series:  canonical_series,
           variant: variant_to_canonical(stringify(parsed[:variant])),

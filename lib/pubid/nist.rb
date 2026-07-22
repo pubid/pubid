@@ -37,7 +37,7 @@ module Pubid
     #
     # NIST identifier classes use `typed_stages` (not the `self.type` Hash
     # pattern used by CEN/JCGM/ANSI), so they cannot be auto-discovered.
-    # Identifiers::Base is the fallback for unmapped series (e.g. AMS, VTS)
+    # Identifier is the fallback for unmapped series (e.g. AMS, VTS)
     # and must be excluded from typed-stage aggregation.
     IDENTIFIER_TYPES = [
       Identifiers::SpecialPublication,
@@ -60,12 +60,12 @@ module Pubid
       Identifiers::CommercialStandardEmergency,
       Identifiers::CommercialStandardsMonthly,
       Identifiers::DatedDocument,
-      Identifiers::Base, # Fallback for unmapped series
+      Identifier, # Fallback for unmapped series
     ].freeze
 
     # Parse a NIST identifier string
     # @param identifier [String] the identifier string to parse
-    # @return [Identifiers::Base] the parsed identifier
+    # @return [Identifier] the parsed identifier
     def self.parse(identifier)
       if identifier.length > Pubid::MAX_INPUT_LENGTH
         raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
@@ -87,36 +87,36 @@ module Pubid
     end
 
     # Per-flavor format registry: inherits global formats, overrides :human
-    Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
-    Identifiers::Base.format_registry.register(:human, renderer: Nist::Renderer)
+    Identifier.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Nist::Renderer)
 
     # All identifier classes for external consumption (export, website).
-    # Identifiers::Base is the fallback for unmapped series and is excluded
+    # Identifier is the fallback for unmapped series and is excluded
     # from external type listings.
     # @return [Array<Class>] identifier classes
     def self.identifier_types
-      IDENTIFIER_TYPES.reject { |klass| klass == Identifiers::Base }
+      IDENTIFIER_TYPES.reject { |klass| klass == Identifier }
     end
 
     # Aggregate TYPED_STAGES from all identifier classes.
-    # Identifiers::Base is excluded because it has no typed stages and acts
+    # Identifier is excluded because it has no typed stages and acts
     # as the fallback for unmapped series.
     # @return [Array<Pubid::Components::TypedStage>] all typed stages
     def self.all_typed_stages
       @all_typed_stages ||= identifier_types
-        .reject { |klass| klass == Identifiers::Base }
+        .reject { |klass| klass == Identifier }
         .flat_map(&:typed_stages)
         .freeze
     end
 
     # Lookup: type code -> identifier class.
-    # Identifiers::Base is excluded so it never gets selected by type code.
+    # Identifier is excluded so it never gets selected by type code.
     # @param code [String, Symbol] the type code to find
     # @return [Class, nil] the matching identifier class, or nil
     def self.locate_type(code)
       type_str = code.to_s
       identifier_types
-        .reject { |klass| klass == Identifiers::Base }
+        .reject { |klass| klass == Identifier }
         .find { |klass| klass.typed_stages.any? { |ts| ts.type_code.to_s == type_str } }
     end
 

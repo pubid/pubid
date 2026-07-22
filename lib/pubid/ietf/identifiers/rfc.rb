@@ -4,7 +4,7 @@ module Pubid
   module Ietf
     module Identifiers
       # An RFC (Request for Comments), e.g. "RFC 2119".
-      class Rfc < Base
+      class Rfc < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :rfc,

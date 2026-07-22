@@ -48,7 +48,7 @@ RSpec.describe Pubid::Ieee::Identifiers::DualPublished do
       it "does not treat IEEE/IEC copublisher as dual published" do
         id = Pubid::Ieee.parse("IEEE/IEC Std 62582-1-2011")
         expect(id).not_to be_a(described_class)
-        expect(id).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(id).to be_a(Pubid::Ieee::Identifier)
       end
     end
 

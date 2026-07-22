@@ -3,8 +3,7 @@
 module Pubid
   module Iho
     # Base class for all IHO identifiers. Canonical name Pubid::Iho::Identifier;
-    # every concrete IHO identifier (Identifiers::*) descends from it, and
-    # Identifiers::Base — aliased at the foot of this file — points back to it.
+    # every concrete IHO identifier (Identifiers::*) descends from it.
     #
     # IHO identifiers have the form:
     #   IHO {S|P|M|B|C}-{number}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {version}]
@@ -65,10 +64,5 @@ module Pubid
       # IHO_TYPE_MAP remains as the key_value polymorphic_map.
     end
 
-    module Identifiers
-      # Backward-compatible alias: IHO's base class used to be
-      # Pubid::Iho::Identifiers::Base. It is now Pubid::Iho::Identifier.
-      Base = Pubid::Iho::Identifier
-    end
   end
 end

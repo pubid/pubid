@@ -3,9 +3,7 @@
 module Pubid
   module Ashrae
     # Base class for all ASHRAE identifiers. Canonical name
-    # Pubid::Ashrae::Identifier; every concrete ASHRAE identifier descends from
-    # it, and Identifiers::Base — aliased at the foot of this file — points back
-    # to it.
+    # Pubid::Ashrae::Identifier; every concrete ASHRAE identifier descends from it.
     class Identifier < ::Pubid::Identifier
       # Parse an ASHRAE identifier string into an identifier object
       # @param identifier [String] The ASHRAE identifier string to parse
@@ -41,10 +39,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: ASHRAE's base class used to be
-      # Pubid::Ashrae::Identifiers::Base. It is now Pubid::Ashrae::Identifier.
-      Base = Pubid::Ashrae::Identifier
-    end
   end
 end

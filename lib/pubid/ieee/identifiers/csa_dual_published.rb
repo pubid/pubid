@@ -6,8 +6,8 @@ module Pubid
       # CSA dual published identifier
       # Represents IEEE/CSA dual published standards
       # Example: IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17
-      class CsaDualPublished < Base
-        attribute :ieee_identifier, Base
+      class CsaDualPublished < Identifier
+        attribute :ieee_identifier, Identifier
         # CSA identifier is stored as-is (not a Lutaml model type)
         attr_accessor :csa_identifier
 
@@ -33,7 +33,7 @@ module Pubid
         end
 
         def self.parse(string)
-          Base.parse(string)
+          Identifier.parse(string)
         end
       end
     end

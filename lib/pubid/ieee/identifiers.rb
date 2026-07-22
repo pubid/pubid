@@ -4,7 +4,6 @@ module Pubid
   module Ieee
     module Identifiers
       autoload :AdoptedStandard, "#{__dir__}/identifiers/adopted_standard"
-      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :ConformanceIdentifier,
                "#{__dir__}/identifiers/conformance_identifier"
       autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"

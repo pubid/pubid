@@ -10,7 +10,7 @@ RSpec.describe Pubid::Ieee::Identifiers::Corrigendum do
         expect(result).to be_a(described_class)
         expect(result.cor_number).to eq("1")
         expect(result.cor_year).to eq("2017")
-        expect(result.base).to be_a(Pubid::Ieee::Identifiers::Base)
+        expect(result.base).to be_a(Pubid::Ieee::Identifier)
         expect(result.base.code.to_s).to eq("535")
         expect(result.base.year).to eq("2013")
         expect(result.to_s).to eq("IEEE Std 535-2013/Cor. 1-2017")

@@ -51,7 +51,7 @@ RSpec.describe Pubid::Nist::Series::Base do
 
   describe ".handle_letter_num_compound?" do
     it "returns false (no-op)" do
-      identifier = Pubid::Nist::Identifiers::Base.new
+      identifier = Pubid::Nist::Identifier.new
       result = described_class.handle_letter_num_compound?(
         identifier,
         first_num: nil, letter_base: "1", letter_suffix: "R",
@@ -62,7 +62,7 @@ RSpec.describe Pubid::Nist::Series::Base do
 
   describe ".finalize_identifier" do
     it "does nothing by default" do
-      identifier = Pubid::Nist::Identifiers::Base.new
+      identifier = Pubid::Nist::Identifier.new
       expect { described_class.finalize_identifier(identifier, {}) }
         .not_to(change { identifier })
     end

@@ -3,7 +3,7 @@
 module Pubid
   module Plateau
     # Base class for all PLATEAU identifiers. Canonical name
-    # Pubid::Plateau::Identifier (Identifiers::Base is a back-compat alias).
+    # Pubid::Plateau::Identifier.
     class Identifier < ::Pubid::Identifier
       # Delegate to the flavor module so callers can use
       # `Pubid::Plateau::Identifier.parse` consistently with other flavors.
@@ -51,10 +51,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: PLATEAU's base class used to be
-      # Pubid::Plateau::Identifiers::Base. It is now Pubid::Plateau::Identifier.
-      Base = Pubid::Plateau::Identifier
-    end
   end
 end

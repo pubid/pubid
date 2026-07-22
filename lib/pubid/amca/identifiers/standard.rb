@@ -8,7 +8,7 @@ module Pubid
       # - ANSI/AMCA 210-16
       # - ANSI/AMCA Standard 99-25
       # - AMCA Standard 803-02 (R2008)
-      class Standard < Base
+      class Standard < Identifier
         def self.type
           { key: :standard, title: "Standard", short: nil }
         end

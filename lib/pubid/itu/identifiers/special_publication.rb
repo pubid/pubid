@@ -8,7 +8,7 @@ module Pubid
       # "ITU OB No. {number}" with optional date.
       #
       # Pattern: "ITU OB No. 1283 (01/2024)"
-      class SpecialPublication < Base
+      class SpecialPublication < Identifier
         def render_base(**_opts)
           number = code&.number
           result = "#{publisher} #{series} No. #{number}"

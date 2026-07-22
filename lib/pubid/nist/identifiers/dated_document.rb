@@ -7,7 +7,7 @@ module Pubid
       # Examples:
       # - "NIST 2022-04-15 001" (short) / "NIST.2022-04-15.001" (mr/doi)
       #   DOI 10.6028/NIST.2022-04-15.001
-      class DatedDocument < Base
+      class DatedDocument < Identifier
         # Empty so the bare "NIST" abbr never shadows a series lookup; the
         # Router guard (parsed_hash[:dated_date] && :dated_seq) is the dispatch path.
         TYPED_STAGES = [].freeze

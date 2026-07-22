@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IHO Publication (P series).
       # Examples: IHO P-1 1.0.0, IHO P-1/21 1.0.0, IHO P-6-3 1.0.0.
-      class Publication < Base
+      class Publication < Identifier
         def self.type
           { key: :publication, title: "Publication", short: "P" }
         end

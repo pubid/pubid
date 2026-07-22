@@ -3,9 +3,7 @@
 module Pubid
   module Nist
     # NIST/NBS flavor base class. Canonical name Pubid::Nist::Identifier; every
-    # concrete NIST identifier (Identifiers::*) descends from it, and
-    # Identifiers::Base — aliased at the foot of this file — points back to it
-    # for backward compatibility. Being a real Pubid::Identifier subclass gives
+    # concrete NIST identifier (Identifiers::*) descends from it. Being a real Pubid::Identifier subclass gives
     # native `is_a?` identity and the shared polymorphic `from_hash`.
     class Identifier < ::Pubid::Identifier
       # Delegate to the flavor module so callers can use
@@ -658,12 +656,5 @@ module Pubid
       end
     end
 
-    module Identifiers
-      # Backward-compatible alias: NIST's base class used to be
-      # Pubid::Nist::Identifiers::Base. It is now Pubid::Nist::Identifier; keep
-      # the old constant working for `class Foo < Base` declarations and any
-      # external reference.
-      Base = Pubid::Nist::Identifier
-    end
   end
 end

@@ -57,7 +57,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
 
   describe "#to_s with single identifier" do
     let(:related_id) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.11",
@@ -124,7 +124,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
 
   describe "#to_s with two identifiers" do
     let(:id1) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232",
@@ -133,7 +133,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
     end
 
     let(:id2) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232.1",
@@ -152,7 +152,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
 
   describe "#to_s with three or more identifiers" do
     let(:id1) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232",
@@ -161,7 +161,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
     end
 
     let(:id2) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232.1",
@@ -170,7 +170,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
     end
 
     let(:id3) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "1232.2",
@@ -189,7 +189,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
 
   describe "#to_s with intermediate amendments" do
     let(:base_id) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.1Q",
@@ -198,7 +198,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
     end
 
     let(:amendment1) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.1Qca",
@@ -207,7 +207,7 @@ RSpec.describe Pubid::Ieee::Components::Relationship do
     end
 
     let(:amendment2) do
-      Pubid::Ieee::Identifiers::Base.new(
+      Pubid::Ieee::Identifier.new(
         publisher: "IEEE",
         type: "Std",
         code: "802.1Qcd",

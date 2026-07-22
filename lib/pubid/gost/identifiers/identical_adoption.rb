@@ -16,7 +16,7 @@ module Pubid
       # The MOD and NEQ degrees are NOT modeled here — they're
       # bibliographic metadata (Relaton relations), not part of the
       # identifier.
-      class IdenticalAdoption < Base
+      class IdenticalAdoption < Identifier
         attribute :base, ::Pubid::Gost::Identifier, polymorphic: true
         attribute :adopted, ::Pubid::Identifier, polymorphic: true
 

@@ -25,8 +25,8 @@ module Pubid
     end
 
     # Per-flavor format registry.
-    Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
-    Identifiers::Base.format_registry.register(:human, renderer: Easc::Renderer)
+    Identifier.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Easc::Renderer)
 
     # Auto-discover identifier types from the Identifiers namespace.
     # @return [Array<Class>]
@@ -34,12 +34,12 @@ module Pubid
       @identifier_types ||= Identifiers.constants
         .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
         .select { |c| c.is_a?(Class) && c < Pubid::Identifier }
-        .reject { |c| c == Identifiers::Base }
+        .reject { |c| c == Identifier }
     end
 
     # Lookup: series (ПМГ / РМГ / PMG / RMG) → identifier class
     # @param series [String, Symbol]
-    # @return [Class<Identifiers::Base>, nil]
+    # @return [Class<Identifier>, nil]
     def self.identifier_klass_for_series(series)
       @by_series ||= identifier_types.to_h do |klass|
         [klass.type[:series].to_s, klass]

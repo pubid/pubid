@@ -32,18 +32,18 @@ RSpec.describe "ETSI serialization" do
         end
 
         it "rebuilds via from_hash and round-trips to_s" do
-          rebuilt = Pubid::Etsi::Identifiers::Base.from_hash(hash)
+          rebuilt = Pubid::Etsi::Identifier.from_hash(hash)
           expect(rebuilt.to_s).to eq(id_str)
         end
 
         it "is idempotent under from_hash(to_hash)" do
-          rebuilt = Pubid::Etsi::Identifiers::Base.from_hash(hash)
+          rebuilt = Pubid::Etsi::Identifier.from_hash(hash)
           expect(rebuilt.to_hash).to eq(hash)
         end
 
         it "rebuilds from a symbol-keyed hash equally" do
           symbolized = deep_symbolize(hash)
-          rebuilt = Pubid::Etsi::Identifiers::Base.from_hash(symbolized)
+          rebuilt = Pubid::Etsi::Identifier.from_hash(symbolized)
           expect(rebuilt.to_hash).to eq(hash)
         end
       end
@@ -55,7 +55,7 @@ RSpec.describe "ETSI serialization" do
         ETSI\ GTS\ GSM\ 02.01\ V5.5.0\ (1999-01)
       ].each do |id_str|
         id = Pubid::Etsi.parse(id_str)
-        rebuilt = Pubid::Etsi::Identifiers::Base.from_hash(id.to_hash)
+        rebuilt = Pubid::Etsi::Identifier.from_hash(id.to_hash)
         expect(rebuilt.to_urn).to eq(id.to_urn)
       end
     end
@@ -118,7 +118,7 @@ RSpec.describe "ETSI serialization" do
   describe "concrete class reconstruction" do
     it "rebuilds an amendment's base as EtsiStandard" do
       id = Pubid::Etsi.parse("ETSI ETS 300 011/A1 ed.1 (1994-12)")
-      rebuilt = Pubid::Etsi::Identifiers::Base.from_hash(id.to_hash)
+      rebuilt = Pubid::Etsi::Identifier.from_hash(id.to_hash)
       expect(rebuilt).to be_a(Pubid::Etsi::Identifiers::Amendment)
       expect(rebuilt.base).to be_a(Pubid::Etsi::Identifiers::EtsiStandard)
     end
@@ -144,7 +144,7 @@ RSpec.describe "ETSI serialization" do
       ids.each do |id_str|
         id = Pubid::Etsi.parse(id_str)
         hash = id.to_hash
-        rebuilt = Pubid::Etsi::Identifiers::Base.from_hash(hash)
+        rebuilt = Pubid::Etsi::Identifier.from_hash(hash)
         unless rebuilt.to_s == id_str && rebuilt.to_hash == hash
           failures << id_str
         end

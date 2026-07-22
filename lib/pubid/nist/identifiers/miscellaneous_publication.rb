@@ -8,7 +8,7 @@ module Pubid
       # - "NBS MP 39e1" - Edition with "e" notation
       # - "NBS MP 260e1965" - Edition with year as edition ID
       # NOTE: Parenthetical edition format (e.g., "39(1)") does NOT exist for MP identifiers
-      class MiscellaneousPublication < Base
+      class MiscellaneousPublication < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["MP", "NBS MP"],

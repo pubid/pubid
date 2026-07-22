@@ -125,7 +125,7 @@ RSpec.describe Pubid::Iho::Identifier do
 
     it "covers every identifier type in IHO_TYPE_MAP" do
       expected = Pubid::Iho.identifier_types.map(&:polymorphic_name).sort
-      expect(Pubid::Iho::Identifiers::Base::IHO_TYPE_MAP.keys.sort)
+      expect(Pubid::Iho::Identifier::IHO_TYPE_MAP.keys.sort)
         .to eq(expected)
     end
   end

@@ -12,8 +12,8 @@ module Pubid
       #   * long with i18n_lang + format: :long: per-language `annex_long` template
       # Languages without an `annex_to` entry (fr/es/ru/zh) use the long
       # template for the short form too.
-      class Annex < Base
-        attribute :base, Base, polymorphic: true
+      class Annex < Identifier
+        attribute :base, Identifier, polymorphic: true
 
         def to_urn
           # Annex URN: append :annex to the inner identifier's URN.

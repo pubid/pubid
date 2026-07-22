@@ -6,8 +6,8 @@ module Pubid
       # ITU Recommendation
       # Format: ITU-{SECTOR} {SERIES}.{NUMBER}[-PART]
       # Example: ITU-R V.1234-1
-      class Recommendation < Base
-        # Type-specific rendering handled by Base
+      class Recommendation < Identifier
+        # Type-specific rendering handled by Identifier
       end
     end
   end

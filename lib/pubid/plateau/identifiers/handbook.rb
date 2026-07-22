@@ -6,7 +6,7 @@ module Pubid
       # PLATEAU Handbook
       # Format: PLATEAU Handbook #NN[-annex] [第X.Y版]
       # Example: PLATEAU Handbook #00 第1.0版
-      class Handbook < Base
+      class Handbook < Identifier
         attribute :edition, :string, default: -> {}
 
         def type_string

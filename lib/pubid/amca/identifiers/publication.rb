@@ -8,7 +8,7 @@ module Pubid
       # - AMCA Publication 211-22 (Rev. 01-23)
       # - AMCA Publication 311-16
       # - AMCA Publication 1011-03 (R2010)
-      class Publication < Base
+      class Publication < Identifier
         attr_reader :revision
 
         def initialize(code:, year:, copublisher: nil, suffix: nil,

@@ -3,9 +3,9 @@
 module Pubid
   module Etsi
     module Identifiers
-      # Base class for ETSI supplements (Amendment, Corrigendum)
-      class SupplementIdentifier < Base
-        attribute :base, Pubid::Etsi::Identifiers::Base
+      # Identifier class for ETSI supplements (Amendment, Corrigendum)
+      class SupplementIdentifier < Identifier
+        attribute :base, Pubid::Etsi::Identifier
         attribute :number, :integer
 
         # Compact serialization: a supplement carries only its own ordinal
@@ -33,7 +33,7 @@ module Pubid
 
         # Re-dispatch through the flavor base so `_type` resolves to the
         # concrete EtsiStandard; a bare polymorphic cast would rebuild a plain
-        # Base and lose the subclass (and its custom mappings). Mirrors JCGM.
+        # Identifier and lose the subclass (and its custom mappings). Mirrors JCGM.
         def base_from_kv(model, value)
           return unless value
 

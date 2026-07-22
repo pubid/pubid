@@ -13,7 +13,7 @@ module Pubid
       #   * human render is the slug title-cased (`Adobe Glyph List`,
       #     `Adobe-Japan1-7`); the full publication title lives in the
       #     data repo's title attribute, not here.
-      class Publication < Base
+      class Publication < Identifier
         attribute :slug,    :string   # "adobe-glyph-list", "adobe-japan1"
         attribute :version, :string   # "7", "3", nil
 

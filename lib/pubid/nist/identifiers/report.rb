@@ -11,7 +11,7 @@ module Pubid
       # - "NBS RPT ADHOC" - Ad hoc report
       # - "NBS RPT div9" - Division report
       # - "NBS RPT 4817-A" - Report with letter suffix
-      class Report < Base
+      class Report < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["RPT", "NBS RPT"],

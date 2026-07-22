@@ -11,7 +11,7 @@ module Pubid
       # - "NBS LC 378sup12/1926" - With supplement date
       # - "NBS LC 378r11/1925" - With revision date
       # - "NBS LC 378(sp)" - With language code
-      class LetterCircular < Base
+      class LetterCircular < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["LCIRC"], # Single definition of truth

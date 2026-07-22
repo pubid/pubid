@@ -9,7 +9,7 @@ module Pubid
       # for round-trip rendering without modelling the foreign standard's
       # internal structure. Quacks like Pubid::Identifier for rendering
       # and serialization.
-      class ForeignReference < Base
+      class ForeignReference < Identifier
         attribute :raw, :string
 
         def self.type

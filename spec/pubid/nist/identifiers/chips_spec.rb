@@ -1,7 +1,7 @@
 require "spec_helper"
 
 # CHIPS is a simple NIST series (CHIPS Act R&D program) with no dedicated
-# identifier class; it routes to the Identifiers::Base fallback. Its number
+# identifier class; it routes to the Identifier (base) fallback. Its number
 # carries a hyphenated compound form (e.g. "1400-3"), like SP "800-53".
 RSpec.describe "NIST CHIPS series" do
   describe ".parse" do

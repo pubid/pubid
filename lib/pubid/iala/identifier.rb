@@ -4,8 +4,7 @@ module Pubid
   module Iala
     # Base class for all IALA identifiers. Canonical name
     # Pubid::Iala::Identifier; every concrete IALA identifier
-    # (Identifiers::*) descends from it, and Identifiers::Base — aliased
-    # at the foot of identifiers/base.rb — points back to it.
+    # (Identifiers::*) descends from it.
     #
     # IALA identifiers have the form:
     #   [IALA ]{S|R|G|M|C|X|P}<4-digit number>[-<subpart>][ Ed <edition>][ (<LangLetter>)]

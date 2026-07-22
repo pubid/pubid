@@ -7,7 +7,7 @@ module Pubid
       # Examples:
       # - "NIST HB 130" = Handbook 130
       # - "NBS HB 133" = NBS Handbook 133
-      class Handbook < Base
+      class Handbook < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["HB", "NIST HB", "NBS HB"],

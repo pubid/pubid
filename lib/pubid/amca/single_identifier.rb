@@ -4,7 +4,7 @@ module Pubid
   module Amca
     # Base class for single (non-supplement) ACMA identifiers
     # Includes: Standard, Publication
-    class SingleIdentifier < Identifiers::Base
+    class SingleIdentifier < Identifier
     end
   end
 end

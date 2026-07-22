@@ -26,8 +26,8 @@ module Pubid
     end
 
     # Per-flavor format registry: inherits global formats, overrides :human
-    Identifiers::Base.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
-    Identifiers::Base.format_registry.register(:human, renderer: Amca::Renderer)
+    Identifier.format_registry = FormatRegistry.new(parent: ::Pubid::Identifier.format_registry)
+    Identifier.format_registry.register(:human, renderer: Amca::Renderer)
 
     # Auto-discover all identifier types from the Identifiers namespace
     # @return [Array<Class>] identifier classes that define a self.type Hash

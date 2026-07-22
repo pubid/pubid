@@ -7,7 +7,7 @@ module Pubid
       # "draft-giuliano-treedn" (the unversioned "latest" sibling). The full
       # slug (including the leading "draft-") is stored in `name`; the optional
       # trailing two-digit version in `version`.
-      class InternetDraft < Base
+      class InternetDraft < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             code: :internet_draft,

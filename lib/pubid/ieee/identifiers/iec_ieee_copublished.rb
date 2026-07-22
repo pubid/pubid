@@ -5,9 +5,9 @@ module Pubid
     module Identifiers
       # IEC/IEEE Copublished Identifier - represents standards copublished by IEC and IEEE
       # Example: "IEC/IEEE 60079-30-2/D5 IEC:2013 (10/07)"
-      class IecIeeeCopublished < Base
-        attribute :iec_identifier, Base, polymorphic: true
-        attribute :ieee_identifier, Base, polymorphic: true
+      class IecIeeeCopublished < Identifier
+        attribute :iec_identifier, Identifier, polymorphic: true
+        attribute :ieee_identifier, Identifier, polymorphic: true
         attribute :copublished_number, :string  # The shared number like "60079-30-2"
         attribute :draft_info, :string          # Draft information like "/D5"
         attribute :iec_year, :string            # IEC year like "2013"

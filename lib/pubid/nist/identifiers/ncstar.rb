@@ -8,7 +8,7 @@ module Pubid
       # - "NIST NCSTAR 1-1Cv1" → "NIST NCSTAR 1-1Cv1" (round-trips)
       # - "NIST NCSTAR 1-1b" → "NIST NCSTAR 1-1B" (normalizes letter)
       # - "NIST NCSTAR 1-1cv1" → "NIST NCSTAR 1-1Cv1" (normalizes letter, keeps v1 format)
-      class Ncstar < Base
+      class Ncstar < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["NCSTAR", "NIST NCSTAR"],
@@ -34,7 +34,7 @@ module Pubid
 
         # NCSTAR-specific: do NOT expand Cv patterns to ", Volume" format
         # The base class would render "1-1Cv1" as is, which is correct for NCSTAR
-        # No custom rendering needed - just inherit from Base
+        # No custom rendering needed - just inherit from Identifier
       end
     end
   end

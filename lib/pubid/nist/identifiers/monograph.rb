@@ -10,7 +10,7 @@ module Pubid
       # - "NBS MONO 128pt1" - Monograph with part
       # - "NIST MONO 1-1F" - Monograph with letter suffix
       # - "NIST MONO 1-2Bv1" - Monograph with letter suffix and volume
-      class Monograph < Base
+      class Monograph < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["MONO", "NBS MONO", "NIST MONO"],

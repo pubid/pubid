@@ -127,4 +127,38 @@ RSpec.describe "Identifier hierarchy contract" do
       expect(defined?(Pubid::Bsi::Identifiers::Base)).to be_nil
     end
   end
+
+  # `Identifiers::Base` is a legacy name that only survives where it is still a
+  # *real* intermediate class (Category B). Category-A flavors, whose `Base` was
+  # merely `Base = Identifier`, no longer define it at all — `Identifier` is the
+  # only handle. This guards against a Category-A alias creeping back.
+  describe "Identifiers::Base presence by category" do
+    # Category B: `Base` is a genuine intermediate class carrying shared
+    # single-document attributes; wrappers deliberately bypass it. Kept.
+    category_b = %i[Iec Asme Api Astm Csa Ccsds CenCenelec]
+
+    # Category A: `Base` was a pure alias for `Identifier`. Removed.
+    category_a = %i[
+      Amca Ashrae Etsi Gost Iala Ietf Iho Itu Nist Plateau Sae Ieee
+    ]
+    # (Adobe/Easc are also Category A but not registered in every build; covered
+    # implicitly — they simply must not define Identifiers::Base either.)
+
+    category_b.each do |flavor|
+      it "#{flavor}: Identifiers::Base is a real class, distinct" do
+        mod = Pubid.const_get(flavor)
+        expect(defined?(mod::Identifiers::Base)).to eq("constant")
+        expect(mod::Identifiers::Base).to be_a(Class)
+        expect(mod::Identifiers::Base).not_to equal(mod::Identifier)
+        expect(mod::Identifiers::Base).to be < mod::Identifier
+      end
+    end
+
+    category_a.each do |flavor|
+      it "#{flavor}: Identifiers::Base is not defined (unified)" do
+        mod = Pubid.const_get(flavor)
+        expect(defined?(mod::Identifiers::Base)).to be_nil
+      end
+    end
+  end
 end

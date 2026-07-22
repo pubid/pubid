@@ -1,7 +1,7 @@
 require "spec_helper"
 require_relative "../../../../lib/pubid"
 
-RSpec.describe Pubid::Ieee::Identifiers::Base do
+RSpec.describe Pubid::Ieee::Identifier do
   describe ".parse" do
     context "basic IEEE identifiers" do
       it "parses IEEE Std identifiers" do

@@ -22,7 +22,7 @@ module Pubid
 
       # Build an identifier object from parsed data
       # @param parsed [Hash, Array] the parsed identifier data
-      # @return [Identifiers::Base] the constructed identifier object
+      # @return [Identifier] the constructed identifier object
       def build(parsed)
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? flatten_array(parsed) : parsed
@@ -383,7 +383,7 @@ module Pubid
         # form that preprocessing produced back to "84-2946").
         series.finalize_identifier(identifier, parsed_hash)
 
-        # publisher_was_parsed defaults to true (see Identifiers::Base), so only
+        # publisher_was_parsed defaults to true (see Identifier), so only
         # the prefix-less case needs recording: assign false when no publisher
         # was parsed/extracted, and leave it unset (default true, omitted from
         # to_hash) when one was. Keeps the common publisher-bearing id lean.

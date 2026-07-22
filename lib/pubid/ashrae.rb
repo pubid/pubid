@@ -68,5 +68,5 @@ end
 Pubid::Registry.register(:ashrae, Pubid::Ashrae)
 
 # Per-flavor format registry: inherits global formats, overrides :human
-Pubid::Ashrae::Identifiers::Base.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
-Pubid::Ashrae::Identifiers::Base.format_registry.register(:human, renderer: Pubid::Ashrae::Renderer)
+Pubid::Ashrae::Identifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
+Pubid::Ashrae::Identifier.format_registry.register(:human, renderer: Pubid::Ashrae::Renderer)

@@ -5,7 +5,7 @@ module Pubid
     module Identifiers
       # IHO Miscellaneous Publication (M series).
       # Example: IHO M-3 2.0.0.
-      class Miscellaneous < Base
+      class Miscellaneous < Identifier
         def self.type
           { key: :miscellaneous, title: "Miscellaneous Publication",
             short: "M" }

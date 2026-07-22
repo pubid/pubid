@@ -8,7 +8,7 @@ module Pubid
       # - "NIST SP 800-53" = Special Publication 800-53
       # - "NIST SP 800-53r5" = Special Publication 800-53 revision 5
       # - "NIST SP 800-57pt1r4" = Special Publication 800-57 part 1 revision 4
-      class SpecialPublication < Base
+      class SpecialPublication < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
             abbr: ["SP", "NIST SP", "NBS SP"], # Compound series
