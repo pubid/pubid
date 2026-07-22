@@ -261,10 +261,16 @@ module Pubid
          ((dash | str(":") | space) >> year_digits.as(:cor_year)).maybe).as(:corrigendum)
       end
 
-      # Amendment
+      # Amendment — mirrors the corrigendum rule's separator flexibility so
+      # IEEE-format "/Amd 2-2004" and "/Amd2-2004" parse the same way as
+      # their Cor counterparts (issue #210).
       rule(:amendment) do
-        (slash >> str("Amd") >> digits.as(:amd_number) >>
-         (dash >> year_digits.as(:amd_year)).maybe).as(:amendment)
+        ((str("_") | slash | dash | space) >>
+         (str("Amendment") | str("Amd")) >>
+         (dash | dot | space).maybe >>
+         space? >>
+         digits.as(:amd_number).maybe >>
+         ((dash | str(":") | space) >> year_digits.as(:amd_year)).maybe).as(:amendment)
       end
 
       # Interpretation notation (/INT)
