@@ -33,6 +33,19 @@ module Pubid
           return build_standalone_supplement(data)
         end
 
+        # Implicit adoption: when an EN has no explicit "IEC" prefix but
+        # the number falls in the IEC range (60000-79999), treat it as an
+        # adoption of the corresponding IEC standard. The lower ISO-only
+        # range (1-59999) is intentionally NOT mapped here — too many
+        # existing CEN publications (EN Guide N, EN N as a real CEN-assigned
+        # number) would change type. Callers who want explicit adoption
+        # can still write "EN ISO 12345".
+        # (https://github.com/pubid/pubid/issues/249)
+        if data[:publisher]&.to_s == "EN" && !data[:adopted_string] &&
+           (adopted = build_implicit_adoption(data))
+          return adopted
+        end
+
         # Extract supplements before building base identifier (only plus/bundled)
         supplements_data = extract_supplements(data)
 
@@ -204,6 +217,24 @@ module Pubid
         Identifiers::AdoptedEuropeanNorm.new(
           publisher: publishers,
           adopted_identifier: adopted_id,
+        )
+      end
+
+      # Implicit adoption by number range. Returns an AdoptedEuropeanNorm
+      # wrapping the IEC identifier that the EN number implies, or nil if the
+      # number doesn't fall in the IEC range. Limited to IEC range only —
+      # see the call site comment for why the ISO range is excluded.
+      def build_implicit_adoption(data)
+        number = data[:number].to_s
+        num_str = number.to_s.strip
+        return nil unless num_str.match?(/\A\d{1,6}\z/)
+
+        num = num_str.to_i
+        return nil unless (60_000..79_999).cover?(num)
+
+        Identifiers::AdoptedEuropeanNorm.new(
+          publisher: ["EN"],
+          adopted_identifier: Pubid::Iec.parse("IEC #{num_str}"),
         )
       end
 
