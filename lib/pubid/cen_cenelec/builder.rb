@@ -41,7 +41,10 @@ module Pubid
         # number) would change type. Callers who want explicit adoption
         # can still write "EN ISO 12345".
         # (https://github.com/pubid/pubid/issues/249)
+        # Skip when parts are present — they would be lost when we rebuild
+        # the identifier from just the base number.
         if data[:publisher]&.to_s == "EN" && !data[:adopted_string] &&
+           data[:parts].to_a.empty? &&
            (adopted = build_implicit_adoption(data))
           return adopted
         end
