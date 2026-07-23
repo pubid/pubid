@@ -21,17 +21,23 @@ module Pubid
       # Number: #00, #01, #46, etc.
       rule(:number) { hash >> digits.as(:number) }
 
-      # Annex: -1, -2, etc.
-      rule(:annex) { dash >> digits.as(:annex) }
+      # Annex: -1, -2, etc. Legacy Latin references use "_" as the sub-number
+      # separator (e.g. "#46_1"); both render as the canonical dash.
+      rule(:annex) { (dash | str("_")) >> digits.as(:annex) }
 
-      # Edition: 第1.0版, 第2.3版, etc. (only for Handbook)
+      # Edition (Handbook only). Canonical form is 第X.Y版; legacy Latin
+      # references write the bare X.Y (e.g. "PLATEAU Handbook #00 1.0"). Both
+      # capture the same numeric :edition slice, so they build the same object
+      # and render to the canonical 第X.Y版.
       rule(:edition_part) do
         str("第") >>
           (digits >> str(".") >> digits).as(:edition) >>
           str("版")
       end
 
-      rule(:edition) { space >> edition_part }
+      rule(:edition_latin) { (digits >> str(".") >> digits).as(:edition) }
+
+      rule(:edition) { space >> (edition_part | edition_latin) }
 
       # Annex supplement: "Annex A", "Annex B", etc.
       rule(:annex_letter) { match["A-Z"].as(:annex_letter) }
@@ -45,6 +51,10 @@ module Pubid
           number >> annex.maybe >> edition.maybe
       end
 
+      # Technical Report has no edition. A legacy Latin TR reference carrying a
+      # trailing edition (e.g. "#00 1.0") is matched by the `handbook` rule
+      # (doc_type matches either keyword, tried first); the builder dispatches
+      # on :type and drops the captured edition for Technical Report.
       rule(:technical_report) do
         publisher >> space >> doc_type >> space >>
           number >> annex.maybe
