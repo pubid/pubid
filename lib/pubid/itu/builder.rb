@@ -13,15 +13,24 @@ module Pubid
           return build_annex(data[:annex_to])
         end
 
+        # Common-text twin ("| ISO/IEC ..." suffix) — extract before building
+        # the base ITU identifier, then attach to whichever class the base
+        # resolves to.
+        twin = parse_common_text_twin(data.delete(:common_text_twin))
+
         # Operational Bulletin (Special Publication) — series == "OB" or
         # legacy long form ("Operational Bulletin No. ...").
         if data[:series].to_s == "OB" || data[:_op_bull]
-          return build_special_publication(data)
+          sp = build_special_publication(data)
+          sp.common_text_twin = twin if twin && sp
+          return sp
         end
 
         # Check if this is a supplement identifier
         if data[:supplement_type]
-          return build_supplement(data)
+          supp = build_supplement(data)
+          supp.common_text_twin = twin if twin && supp
+          return supp
         end
 
         # Build basic recommendation or combined identifier
@@ -55,6 +64,7 @@ module Pubid
             combined_code: combined_code,
             date: date,
             language: data[:language]&.to_s,
+            common_text_twin: twin,
           )
         end
 
@@ -64,7 +74,32 @@ module Pubid
           code: code,
           date: date,
           language: data[:language]&.to_s,
+          common_text_twin: twin,
         )
+      end
+
+      # Parse the common-text twin string ("| ISO/IEC 13818-1:2022") into
+      # the appropriate flavor's identifier object. Returns nil if the twin
+      # is empty or unparseable.
+      def parse_common_text_twin(twin_raw)
+        return nil if twin_raw.nil?
+
+        twin_str = twin_raw.to_s.strip
+        # Strip a leading pipe if the parser captured it
+        twin_str = twin_str.sub(/\A\s*\|\s*/, "")
+        return nil if twin_str.empty?
+
+        case twin_str
+        when /\AISO\/IEC\b/, /\AISO\b/
+          Pubid::Iso.parse(twin_str)
+        when /\AIEC\b/
+          Pubid::Iec.parse(twin_str)
+        end
+      rescue StandardError
+        # If the twin doesn't parse as a known flavor, leave it as nil
+        # rather than blowing up the whole parse — the ITU half is still
+        # usable on its own.
+        nil
       end
 
       # Build Special Publication (OB). Sector is silently dropped — OB is a

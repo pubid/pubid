@@ -29,6 +29,7 @@ module Pubid
       attribute :code, Pubid::Itu::Components::Code
       attribute :date, Pubid::Components::Date
       attribute :language, :string
+      attribute :common_text_twin, ::Pubid::Identifier
 
       def initialize(**kwargs)
         if kwargs[:language]
@@ -85,7 +86,9 @@ module Pubid
       #   identifiers, otherwise the default short form.
       def to_s(**opts)
         opts = self.class.normalize_to_s_opts(opts)
-        render_base(**opts) + render_language_suffix
+        result = render_base(**opts) + render_language_suffix
+        result += " | #{common_text_twin}" if common_text_twin
+        result
       end
 
       def render_base(**_opts)
@@ -140,7 +143,8 @@ module Pubid
           series == other.series &&
           code == other.code &&
           date == other.date &&
-          language == other.language
+          language == other.language &&
+          common_text_twin == other.common_text_twin
       end
 
       private
