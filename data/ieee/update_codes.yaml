@@ -32,7 +32,13 @@ ISO/IEC/IEEE P26515 FDIS, May 2018: ISO/IEC/IEEE FDIS P26515, May 2018
 IEEE Std Std 1139-2008: IEEE Std 1139-2008
 IEC/IEEE P60214-2, FDIS 2018: IEC/IEEE FDIS P60214-2-2018(E)
 IEC/IEEE P62582-6, FDIS 2018: IEC/IEEE FDIS P62582-6-2018(E)
-ISO/IEC DIS P26511.2, May 2017: ISO/IEC DIS P26511-2, May 2017
+# ISO/IEC DIS P26511.2 (May 2017) is an IEEE-style citation of an ISO/IEC
+# DIS draft — ".2" is a draft version, not a part, so the prior mapping
+# to "ISO/IEC DIS P26511-2" produced a phantom document that doesn't exist
+# (ISO/IEC 26511 has no part 2). The ISO parser doesn't yet support the
+# IEEE-style "P" prefix or the ", Month Year" date suffix on ISO/IEC DIS
+# citations, so normalize to the bare DIS base + year. See pubid/pubid#212.
+ISO/IEC DIS P26511.2, May 2017: ISO/IEC DIS 26511.2:2017
 ISO/IEC/IEEE P90003_FDIS, August 2018: ISO/IEC/IEEE FDIS P90003, August 2018
 ISO/IEC/IEEE&#xA0;P29119-1/FDIS, September 2021: ISO/IEC/IEEE FDIS P29119-1, September 2021
 ISO/IEC/IEEE/ P12207-2/D3_FDIS, July 2020: ISO/IEC/IEEE FDIS P12207-2/D3, July 2020
