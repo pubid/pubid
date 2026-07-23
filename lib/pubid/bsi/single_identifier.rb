@@ -75,6 +75,54 @@ module Pubid
           0
         end
       end
+
+      # Annex F series groupings per "Rules for the structure and drafting
+      # of UK standards" (BSI, 2017), F.1.3-F.1.5. Each maps a `prefix`
+      # token to the broader series category.
+      SERIES_CATEGORIES = {
+        # F.1.3 Automobile
+        "AU" => :automotive,
+        # F.1.4 Aerospace
+        "A" => :aerospace, "B" => :aerospace, "C" => :aerospace,
+        "F" => :aerospace, "G" => :aerospace, "HC" => :aerospace,
+        "L" => :aerospace, "S" => :aerospace, "SP" => :aerospace,
+        "X" => :aerospace, "M" => :aerospace, "TA" => :aerospace,
+        "2A" => :aerospace, "2B" => :aerospace, "2C" => :aerospace,
+        "2F" => :aerospace, "2G" => :aerospace, "2HC" => :aerospace,
+        "2HR" => :aerospace, "2L" => :aerospace, "2M" => :aerospace,
+        "2S" => :aerospace, "2SP" => :aerospace, "2TA" => :aerospace,
+        "2X" => :aerospace, "3A" => :aerospace, "3B" => :aerospace,
+        "3F" => :aerospace, "3G" => :aerospace, "3HR" => :aerospace,
+        "3J" => :aerospace, "3L" => :aerospace, "3S" => :aerospace,
+        "3TA" => :aerospace, "4F" => :aerospace, "4L" => :aerospace,
+        "4S" => :aerospace, "5S" => :aerospace, "7S" => :aerospace,
+        # F.1.5 Marine
+        "MA" => :marine, "PL" => :marine, "QC" => :marine,
+      }.freeze
+
+      # Series accessor — semantically named alias for `prefix` per
+      # issue #252. Returns the prefix token (e.g., "AU", "MA", "2A").
+      def series
+        prefix
+      end
+
+      # Series category — one of :automotive, :aerospace, :marine, or nil
+      # when the identifier doesn't carry a recognized Annex F prefix.
+      def series_category
+        SERIES_CATEGORIES[prefix.to_s] if prefix
+      end
+
+      def automotive?
+        series_category == :automotive
+      end
+
+      def aerospace?
+        series_category == :aerospace
+      end
+
+      def marine?
+        series_category == :marine
+      end
     end
 
     # Backward-compatible alias: BSI's base class is Pubid::Bsi::Identifier.
