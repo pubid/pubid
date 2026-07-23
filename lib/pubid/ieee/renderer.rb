@@ -138,7 +138,7 @@ module Pubid
           result += ", #{id.month}"
           result += " #{id.day}" if id.day
           if id.year && !id.edition
-            result += ", #{id.year}"
+            result += " #{id.year}"
           end
         end
 
@@ -294,7 +294,16 @@ module Pubid
         end
 
         # Relationships (if present)
-        result = parts.join(" ")
+        # Join parts with spaces, but don't insert a space before parts
+        # that start with "-" or "," (e.g., "-2010", ", July 2014") so the
+        # SI form renders as "SI 10-2010" not "SI 10 -2010".
+        result = parts.each_with_object([]) do |part, acc|
+          if acc.empty? || part.to_s.start_with?("-", ",")
+            acc << part.to_s
+          else
+            acc << " " << part.to_s
+          end
+        end.join
         if id.relationships && !id.relationships.empty?
           rel_strs = id.relationships.map(&:to_s)
           result += " (#{rel_strs.join(' / ')})"
