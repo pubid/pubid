@@ -249,6 +249,13 @@ module Pubid
         str("Annex to") >> space >> special_publication.as(:annex_to)
       end
 
+      # Common-text suffix: "| ISO/IEC ..." or "| ISO ..." — the same
+      # document published jointly by ITU and ISO/IEC. Captured as a raw
+      # string; the builder parses it with the appropriate flavor.
+      rule(:common_text_twin) do
+        (space >> str("|") >> space >> match("[^|]").repeat(1)).as(:common_text_twin)
+      end
+
       rule(:identifier) do
         annex_to_identifier |
           special_publication |
@@ -257,7 +264,13 @@ module Pubid
           without_series
       end
 
-      rule(:root) { identifier }
+      # Common-text form: an ITU identifier followed by "| ISO/IEC ...".
+      # Tried last so it doesn't shadow the simpler single-identifier forms.
+      rule(:common_text_identifier) do
+        identifier >> common_text_twin
+      end
+
+      rule(:root) { common_text_identifier | identifier }
 
       def self.parse(input)
         new.parse(input)
