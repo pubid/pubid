@@ -40,6 +40,20 @@ module Pubid
         validate_ob_no_sector!
       end
 
+      # The document number lives on the `code` component for ITU; surface it at
+      # the identifier root so consumers that key on `#number` — e.g.
+      # Relaton::Index's sort/bsearch narrowing on `id.root.number.to_s` — work
+      # without special-casing ITU. Returns the `code.number` string (e.g.
+      # "530"); serialization is unaffected because the flat key_value block
+      # maps "number" via `number_to_kv`/`number_from_kv`, which read/write
+      # `code.number` directly and never touch the inherited `number` attribute.
+      # Supplement/Amendment/Corrigendum/Errata declare their own `:string`
+      # `number` (the ordinal), which overrides this reader; their base document
+      # number is still reachable via `root.number`.
+      def number
+        code&.number
+      end
+
       # Generate URN for this identifier
       #
       # @return [String] URN representation
@@ -141,6 +155,125 @@ module Pubid
           code == other.code &&
           date == other.date &&
           language == other.language
+      end
+
+      # --- Compact flat key_value converters (shared) --------------------
+      # Collapse the identity components (Sector/Series/Code/Date) to bare
+      # top-level scalars so the serialized hash is flat and index-friendly,
+      # mirroring ISO/ETSI/JCGM/OIML. Used by the per-leaf key_value blocks
+      # (see StandardSerialization) and by the Supplement/Annex/Combined
+      # blocks. `publisher` ("ITU") is intentionally never mapped — it is
+      # reconstructed from its attribute default.
+
+      def sector_to_kv(model, doc)
+        emit_kv(doc, "sector", model.sector&.sector)
+      end
+
+      def sector_from_kv(model, value)
+        model.sector = Components::Sector.new(sector: value.to_s)
+      end
+
+      def series_to_kv(model, doc)
+        emit_kv(doc, "series", model.series&.series)
+      end
+
+      def series_from_kv(model, value)
+        model.series = Components::Series.new(series: value.to_s)
+      end
+
+      def imp_marker_to_kv(model, doc)
+        emit_kv(doc, "imp_marker", model.code&.imp_marker)
+      end
+
+      def imp_marker_from_kv(model, value)
+        code_for(model).imp_marker = value.to_s
+      end
+
+      def number_to_kv(model, doc)
+        emit_kv(doc, "number", model.code&.number)
+      end
+
+      def number_from_kv(model, value)
+        code_for(model).number = value.to_s
+      end
+
+      def series_suffix_to_kv(model, doc)
+        emit_kv(doc, "series_suffix", model.code&.series_suffix)
+      end
+
+      def series_suffix_from_kv(model, value)
+        code_for(model).series_suffix = value.to_s
+      end
+
+      def subseries_to_kv(model, doc)
+        emit_kv(doc, "subseries", model.code&.subseries)
+      end
+
+      def subseries_from_kv(model, value)
+        code_for(model).subseries = value.to_s
+      end
+
+      def parts_to_kv(model, doc)
+        parts = model.code&.parts
+        return if parts.nil? || parts.empty?
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new("parts", parts.map(&:to_s)),
+        )
+      end
+
+      def parts_from_kv(model, value)
+        code_for(model).parts = Array(value).map(&:to_s)
+      end
+
+      def year_to_kv(model, doc)
+        emit_kv(doc, "year", model.date&.year)
+      end
+
+      def year_from_kv(model, value)
+        date_for(model).year = value.to_s
+      end
+
+      def month_to_kv(model, doc)
+        emit_kv(doc, "month", model.date&.month)
+      end
+
+      def month_from_kv(model, value)
+        date_for(model).month = value.to_s
+      end
+
+      # Serialize a nested `base` identifier via its own to_hash so it collapses
+      # to the compact shape, and re-dispatch through the flavor base on load so
+      # `_type` resolves to the concrete subclass (a bare polymorphic cast would
+      # rebuild a plain Identifier and lose the subclass). Mirrors ETSI/JCGM.
+      def base_to_kv(model, doc)
+        return unless model.base
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new("base", model.base.to_hash),
+        )
+      end
+
+      def base_from_kv(model, value)
+        return unless value
+
+        model.base = Pubid::Itu::Identifier.from_hash(value)
+      end
+
+      def emit_kv(doc, key, value)
+        return if value.nil? || value.to_s.empty?
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new(key, value.to_s),
+        )
+      end
+
+      def code_for(model)
+        model.code ||= Components::Code.new
+      end
+
+      def date_for(model)
+        model.date ||= Pubid::Components::Date.new
       end
 
       private

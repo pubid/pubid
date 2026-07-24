@@ -1,0 +1,51 @@
+# ITU-R Question - Pass
+# Round-trip canonical forms. Two families:
+#   numeric:        ITU-R <number>(-<part>)/<study-group>:
+#   letter-series:  ITU-R <series>.<number>(/BL)?/<study-group>  (optional [ ] and trailing :)
+
+# --- numeric, with part ---
+ITU-R 37-7/5:
+ITU-R 231-1/7:
+ITU-R 234-1/7:
+ITU-R 202-4/1:
+ITU-R 118-3/4:
+
+# --- numeric, no part ---
+ITU-R 237/3:
+ITU-R 148/6:
+ITU-R 247/7:
+ITU-R 265/5:
+ITU-R 266/5:
+
+# --- letter-series, plain (series.number/study-group) ---
+ITU-R SM.1/30
+ITU-R SM.1/160
+ITU-R SM.1/161
+ITU-R BT.6/35
+ITU-R BT.6/132
+ITU-R M.5/325
+ITU-R P.3/94
+
+# --- letter-series, /BL/ segment ---
+ITU-R P.3/BL/3
+ITU-R P.3/BL/7
+ITU-R M.4/BL/6
+ITU-R M.4/BL/7
+ITU-R M.5/BL/16
+ITU-R M.5/BL/22
+ITU-R RA.7/BL/13
+ITU-R RS.7/BL/11:
+ITU-R SM.1/BL/1
+ITU-R SM.1/BL/9
+ITU-R TF.7/BL/12
+ITU-R BO.4/BL/4
+
+# --- letter-series, /BL/ with trailing colon ---
+ITU-R M.5/BL/6:
+ITU-R M.5/BL/9:
+ITU-R M.5/BL/10:
+
+# --- letter-series, bracketed ---
+ITU-R P.[3/BL/1]
+ITU-R RA.[7/BL/7]
+ITU-R S.[4/BL/2]:
