@@ -3,6 +3,7 @@
 module Pubid
   module Amca
     module Identifiers
+      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :Interpretation, "#{__dir__}/identifiers/interpretation"
       autoload :Publication, "#{__dir__}/identifiers/publication"
       autoload :Standard, "#{__dir__}/identifiers/standard"
