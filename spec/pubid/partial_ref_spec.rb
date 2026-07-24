@@ -71,6 +71,8 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     # W3C: the publication date is an optional, separable trailing "-YYYYMMDD"
     # group; a type+code reference with no date parses with date nil.
     "w3c" => { ref: "W3C NOTE-xml-names", omits: [:date] },
+    # GB: year is the trailing "-YYYY" group, separable.
+    "gb" => { ref: "GB/T 20223", omits: [:year] },
   }.freeze
 
   it "has a partial-ref entry for every registered flavor" do
