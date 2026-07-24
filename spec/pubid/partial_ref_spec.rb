@@ -75,6 +75,8 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "gb" => { ref: "GB/T 20223", omits: [:year] },
     # OMG: identifier has no separable date; the bare acronym form parses.
     "omg" => { ref: "OMG UML", omits: [] },
+    # UN: identifier has no separable date; the bare committee path parses.
+    "un" => { ref: "TRADE/WP.4/1068", omits: [] },
   }.freeze
 
   it "has a partial-ref entry for every registered flavor" do

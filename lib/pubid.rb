@@ -140,6 +140,7 @@ module Pubid
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
   autoload :Tgpp, "pubid/tgpp"
+  autoload :Un, "pubid/un"
   autoload :Xsf, "pubid/xsf"
   autoload :W3c, "pubid/w3c"
 
