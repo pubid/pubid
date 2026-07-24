@@ -73,6 +73,8 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "w3c" => { ref: "W3C NOTE-xml-names", omits: [:date] },
     # GB: year is the trailing "-YYYY" group, separable.
     "gb" => { ref: "GB/T 20223", omits: [:year] },
+    # OMG: identifier has no separable date; the bare acronym form parses.
+    "omg" => { ref: "OMG UML", omits: [] },
   }.freeze
 
   it "has a partial-ref entry for every registered flavor" do
