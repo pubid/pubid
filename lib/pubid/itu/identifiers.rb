@@ -3,7 +3,6 @@
 module Pubid
   module Itu
     module Identifiers
-      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Annex, "#{__dir__}/identifiers/annex"
       autoload :CombinedIdentifier, "#{__dir__}/identifiers/combined_identifier"
