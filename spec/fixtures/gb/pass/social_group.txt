@@ -1,0 +1,3 @@
+# Social-group standard (T/{ORG}) — Chinese typography uses em-dash for year
+# separator; the parser accepts both forms and normalizes to ASCII dash.
+T/GZAEPI 001-2018

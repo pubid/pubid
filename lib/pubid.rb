@@ -119,6 +119,7 @@ module Pubid
   autoload :Ecma, "pubid/ecma"
   autoload :Etsi, "pubid/etsi"
   autoload :Gost, "pubid/gost"
+  autoload :Gb, "pubid/gb"
   autoload :Idf, "pubid/idf"
   autoload :Iec, "pubid/iec"
   autoload :Ieee, "pubid/ieee"
