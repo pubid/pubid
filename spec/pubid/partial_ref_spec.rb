@@ -79,6 +79,8 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "un" => { ref: "TRADE/WP.4/1068", omits: [] },
     # DOI: identifier has no separable date.
     "doi" => { ref: "doi:10.1000/182", omits: [] },
+    # ISBN: identifier has no separable date.
+    "isbn" => { ref: "ISBN 978-3-16-148410-0", omits: [] },
   }.freeze
 
   it "has a partial-ref entry for every registered flavor" do

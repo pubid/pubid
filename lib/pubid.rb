@@ -125,6 +125,7 @@ module Pubid
   autoload :Iec, "pubid/iec"
   autoload :Ieee, "pubid/ieee"
   autoload :Ietf, "pubid/ietf"
+  autoload :Isbn, "pubid/isbn"
   autoload :Iala, "pubid/iala"
   autoload :Iana, "pubid/iana"
   autoload :Iho, "pubid/iho"
