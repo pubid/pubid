@@ -135,6 +135,7 @@ module Pubid
   autoload :Oasis, "pubid/oasis"
   autoload :Ogc, "pubid/ogc"
   autoload :Oiml, "pubid/oiml"
+  autoload :Omg, "pubid/omg"
   autoload :Plateau, "pubid/plateau"
   autoload :Export, "pubid/export"
   autoload :Sae, "pubid/sae"
