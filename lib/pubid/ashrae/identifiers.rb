@@ -3,6 +3,7 @@
 module Pubid
   module Ashrae
     module Identifiers
+      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :AddendaPackage, "#{__dir__}/identifiers/addenda_package"
       autoload :Addendum, "#{__dir__}/identifiers/addendum"
       autoload :CombinedAddenda, "#{__dir__}/identifiers/combined_addenda"

@@ -3,6 +3,7 @@
 module Pubid
   module Nist
     module Identifiers
+      autoload :Base, "#{__dir__}/identifiers/base"
       autoload :Circular, "#{__dir__}/identifiers/circular"
       autoload :CircularSupplement, "#{__dir__}/identifiers/circular_supplement"
       autoload :CommercialStandard, "#{__dir__}/identifiers/commercial_standard"
