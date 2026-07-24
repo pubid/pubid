@@ -1,4 +1,9 @@
 IEEE Unapproved Draft Std PC37.110/D911Oct 07: IEEE Unapproved Draft Std PC37.110/D711, Oct 07
+# Issue #206: "IEEE Unapproved Draft Std P15289, 06" — the ", 06" suffix
+# has no clear meaning in IEEE's own grammar. Treating it as a draft
+# iteration number (D6) gives a parseable form. Conservative targeted
+# normalization rather than a general rule; revisit if more cases surface.
+IEEE Unapproved Draft Std P15289, 06: IEEE Unapproved Draft Std P15289/D6
 IEEE C57.139/D14June 2010: IEEE C57.139/D14, June 2010
 IEEE P1653.5/D7d1 November, 2019: IEEE P1653.5/D7.1 November, 2019
 IEEE P1017/D062012: P1017/D062012, Jun 2012
