@@ -34,6 +34,9 @@ module Pubid
             map "month",
                 with: { to: :month_to_kv, from: :month_from_kv }
             map "language", to: :language
+            map "common_text_twin",
+                with: { to: :common_text_twin_to_kv,
+                        from: :common_text_twin_from_kv }
           end
         end
       end

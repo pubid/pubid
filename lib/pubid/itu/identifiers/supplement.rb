@@ -25,6 +25,9 @@ module Pubid
           map "year", with: { to: :year_to_kv, from: :year_from_kv }
           map "month", with: { to: :month_to_kv, from: :month_from_kv }
           map "base", with: { to: :base_to_kv, from: :base_from_kv }
+          map "common_text_twin",
+              with: { to: :common_text_twin_to_kv,
+                      from: :common_text_twin_from_kv }
         end
 
         def supplement_sector_to_kv(model, doc)

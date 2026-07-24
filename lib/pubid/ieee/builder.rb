@@ -813,6 +813,12 @@ module Pubid
         # Handle draft (can be complex)
         handle_draft(parsed, attributes)
 
+        # Default draft version 1 when the type indicates a Draft but the
+        # parser found no explicit version (issue #205). Real-world IEEE
+        # drafts always have at least version 1; the missing suffix is a
+        # source-data omission, not an undrafted document.
+        apply_default_draft_version(attributes, type_value)
+
         # Handle corrigendum
         handle_corrigendum(parsed, attributes)
 
@@ -925,6 +931,20 @@ module Pubid
       def extract_optional(parsed, attributes, key)
         value = extract_value(parsed[key])
         attributes[key] = value if value
+      end
+
+      # Default draft version to "1" when the identifier type indicates a
+      # Draft but the parser found no explicit version (issue #205).
+      def apply_default_draft_version(attributes, type_value)
+        return if attributes[:draft] || attributes[:draft_obj]
+        return unless type_value.to_s == "Draft Std"
+
+        attributes[:draft] = "D1"
+        # Carry the identifier's year into the draft object so the renderer
+        # doesn't drop it (the renderer suppresses the `-YYYY` suffix when
+        # a draft is attached, expecting the year to live inside /D...).
+        attributes[:draft_obj] =
+          Components::Draft.new(version: "1", year: attributes[:year])
       end
 
       # Handle draft information

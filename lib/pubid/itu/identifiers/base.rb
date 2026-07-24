@@ -29,6 +29,7 @@ module Pubid
       attribute :code, Pubid::Itu::Components::Code
       attribute :date, Pubid::Components::Date
       attribute :language, :string
+      attribute :common_text_twin, ::Pubid::Identifier
 
       def initialize(**kwargs)
         if kwargs[:language]
@@ -99,7 +100,9 @@ module Pubid
       #   identifiers, otherwise the default short form.
       def to_s(**opts)
         opts = self.class.normalize_to_s_opts(opts)
-        render_base(**opts) + render_language_suffix
+        result = render_base(**opts) + render_language_suffix
+        result += " | #{common_text_twin}" if common_text_twin
+        result
       end
 
       def render_base(**_opts)
@@ -154,7 +157,8 @@ module Pubid
           series == other.series &&
           code == other.code &&
           date == other.date &&
-          language == other.language
+          language == other.language &&
+          common_text_twin == other.common_text_twin
       end
 
       # --- Compact flat key_value converters (shared) --------------------
@@ -258,6 +262,26 @@ module Pubid
         return unless value
 
         model.base = Pubid::Itu::Identifier.from_hash(value)
+      end
+
+      # The common-text twin ("| ISO/IEC 13818-1:2022") is another flavor's
+      # identifier (ISO/IEC …); serialize it via its own flat to_hash and
+      # reconstruct it cross-flavor through the top-level polymorphic router so
+      # its concrete class (and custom mappings) are restored by `_type`.
+      def common_text_twin_to_kv(model, doc)
+        return unless model.common_text_twin
+
+        doc.add_child(
+          Lutaml::KeyValue::DataModel::Element.new(
+            "common_text_twin", model.common_text_twin.to_hash
+          ),
+        )
+      end
+
+      def common_text_twin_from_kv(model, value)
+        return unless value
+
+        model.common_text_twin = ::Pubid::Identifier.from_hash(value)
       end
 
       def emit_kv(doc, key, value)

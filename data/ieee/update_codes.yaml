@@ -1,4 +1,9 @@
 IEEE Unapproved Draft Std PC37.110/D911Oct 07: IEEE Unapproved Draft Std PC37.110/D711, Oct 07
+# Issue #206: "IEEE Unapproved Draft Std P15289, 06" — the ", 06" suffix
+# has no clear meaning in IEEE's own grammar. Treating it as a draft
+# iteration number (D6) gives a parseable form. Conservative targeted
+# normalization rather than a general rule; revisit if more cases surface.
+IEEE Unapproved Draft Std P15289, 06: IEEE Unapproved Draft Std P15289/D6
 IEEE C57.139/D14June 2010: IEEE C57.139/D14, June 2010
 IEEE P1653.5/D7d1 November, 2019: IEEE P1653.5/D7.1 November, 2019
 IEEE P1017/D062012: P1017/D062012, Jun 2012
@@ -32,7 +37,13 @@ ISO/IEC/IEEE P26515 FDIS, May 2018: ISO/IEC/IEEE FDIS P26515, May 2018
 IEEE Std Std 1139-2008: IEEE Std 1139-2008
 IEC/IEEE P60214-2, FDIS 2018: IEC/IEEE FDIS P60214-2-2018(E)
 IEC/IEEE P62582-6, FDIS 2018: IEC/IEEE FDIS P62582-6-2018(E)
-ISO/IEC DIS P26511.2, May 2017: ISO/IEC DIS P26511-2, May 2017
+# ISO/IEC DIS P26511.2 (May 2017) is an IEEE-style citation of an ISO/IEC
+# DIS draft — ".2" is a draft version, not a part, so the prior mapping
+# to "ISO/IEC DIS P26511-2" produced a phantom document that doesn't exist
+# (ISO/IEC 26511 has no part 2). The ISO parser doesn't yet support the
+# IEEE-style "P" prefix or the ", Month Year" date suffix on ISO/IEC DIS
+# citations, so normalize to the bare DIS base + year. See pubid/pubid#212.
+ISO/IEC DIS P26511.2, May 2017: ISO/IEC DIS 26511.2:2017
 ISO/IEC/IEEE P90003_FDIS, August 2018: ISO/IEC/IEEE FDIS P90003, August 2018
 ISO/IEC/IEEE&#xA0;P29119-1/FDIS, September 2021: ISO/IEC/IEEE FDIS P29119-1, September 2021
 ISO/IEC/IEEE/ P12207-2/D3_FDIS, July 2020: ISO/IEC/IEEE FDIS P12207-2/D3, July 2020

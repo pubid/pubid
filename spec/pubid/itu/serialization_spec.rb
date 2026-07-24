@@ -106,6 +106,22 @@ RSpec.describe "Pubid::Itu compact flat serialization" do
       )
     end
 
+    it "common-text twin serializes as a nested flat cross-flavor identifier" do
+      id = "ITU-T H.222.0 (2021) | ISO/IEC 13818-1:2022"
+      pid = Pubid::Itu.parse(id)
+      hash = pid.to_hash
+
+      expect(hash["common_text_twin"]).to include(
+        "_type" => "pubid:iso:international-standard",
+        "number" => "13818",
+      )
+      restored = Pubid::Itu::Identifier.from_hash(hash)
+      expect(restored.to_s).to eq(id)
+      expect(restored.to_hash).to eq(hash)
+      expect(restored.common_text_twin)
+        .to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+    end
+
     it "Supplement suppresses redundant sector/series but keeps a flat base" do
       hash = Pubid::Itu.parse("ITU-T E.156 Suppl. 2").to_hash
       expect(hash).to eq(

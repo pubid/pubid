@@ -865,10 +865,21 @@ module Pubid
         # NEW: Convert IEC/IEEE space-separated to semicolon format
         # Pattern: "IEC 61523-3 First edition 2004-09; IEEE 1497" → already semicolon
         # Pattern: "IEC 62539 First Edition 2007-07 IEEE 930" → needs semicolon
-        # Match: IEC identifier (with edition) + space + IEEE identifier
-        # Be conservative: only convert if IEC has "First edition" or similar and followed by IEEE
+        # Pattern: "IEC 60076-21:2011 Edition 1.0 2011-12 IEEE Std C57.15" → needs semicolon (issue #202)
+        # Match: IEC identifier (with optional colon-year, optional "First"/numeric
+        # Edition + YYYY-MM) + space + IEEE identifier.
         cleaned = cleaned.gsub(
-          /(IEC\s+\d+(?:-\d+)?(?:\s+First?\s+Edition\s+\d{4}-\d{2})?)\s+(IEEE\s+\S+)/, '\1; \2'
+          /(IEC\s+\d+(?:-\d+)?(?::\d{4})?(?:\s+(?:First\s+)?[Ee]dition\s+\d+(?:\.\d+)?\s+\d{4}-\d{2})?)\s+(IEEE\s+Std\s+\S+|IEEE\s+\S+)/,
+          '\1; \2'
+        )
+
+        # Strip ":YYYY" from IEC numbers when an Edition clause follows — the
+        # IEEE parser's number rule doesn't accept the colon-year form, but
+        # the year is preserved in the "Edition N.M YYYY-MM" suffix.
+        # (issue #202)
+        cleaned = cleaned.gsub(
+          /^(IEC\s+\d+(?:-\d+)?):\d{4}(\s+(?:First\s+)?[Ee]dition\s+\d+(?:\.\d+)?\s+\d{4}-\d{2})/,
+          '\1\2'
         )
 
         # NEW Phase 1 (Session 141): Remove literal trademark symbol

@@ -21,6 +21,9 @@ module Pubid
           map "_type", to: :_type
           map "base", with: { to: :base_to_kv, from: :base_from_kv }
           map "language", to: :language
+          map "common_text_twin",
+              with: { to: :common_text_twin_to_kv,
+                      from: :common_text_twin_from_kv }
         end
 
         def to_urn
