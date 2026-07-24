@@ -22,6 +22,19 @@ RSpec.describe "ITU Integration" do
     context "with subseries" do
       it_behaves_like "parses and renders correctly", "ITU-R BO.1234.5-2"
     end
+
+    context "ITU-R Handbooks" do
+      it_behaves_like "parses and renders correctly", "ITU-R 23.HDB"
+      it_behaves_like "parses and renders correctly", "ITU-R 42.HDB"
+    end
+
+    context "ITU-R Questions" do
+      it_behaves_like "parses and renders correctly", "ITU-R 234-1/7:"
+      it_behaves_like "parses and renders correctly", "ITU-R 237/3:"
+      it_behaves_like "parses and renders correctly", "ITU-R P.3/BL/7"
+      it_behaves_like "parses and renders correctly", "ITU-R SM.1/30"
+      it_behaves_like "parses and renders correctly", "ITU-R S.[4/BL/2]:"
+    end
   end
 
   describe "parsing all fixtures" do

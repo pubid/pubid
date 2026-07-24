@@ -15,6 +15,17 @@ module Pubid
       class Annex < Identifier
         attribute :base, Identifier, polymorphic: true
 
+        # Compact serialization: an Annex is just the nested (itself-flat) base
+        # plus its own language; everything else is delegated to `base`.
+        key_value do
+          map "_type", to: :_type
+          map "base", with: { to: :base_to_kv, from: :base_from_kv }
+          map "language", to: :language
+          map "common_text_twin",
+              with: { to: :common_text_twin_to_kv,
+                      from: :common_text_twin_from_kv }
+        end
+
         def to_urn
           # Annex URN: append :annex to the inner identifier's URN.
           base_urn = base&.to_urn

@@ -7,6 +7,7 @@ module Pubid
       # Format: ITU-{SECTOR} {SERIES}.{NUMBER}[-PART]
       # Example: ITU-R V.1234-1
       class Recommendation < Identifier
+        include StandardSerialization
         # Type-specific rendering handled by Identifier
       end
     end

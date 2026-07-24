@@ -93,14 +93,21 @@ module Pubid
         dash >> match["EFASCR"].as(:language)
       end
 
-      # Combined identifier (Y.1351 part after slash)
-      rule(:combined_suffix) do
+      # Combined (joint) recommendation — one additional "/SERIES.CODE"
+      # designation, e.g. the "/Y.1351" of "G.780/Y.1351". Repeatable, so
+      # triple-joint forms ("G.780/Y.1351/Z.1362") are captured as a list.
+      # Each designation is a self-contained subtree under :designation; the
+      # repeated list is collected under :combined.
+      rule(:combined_designation) do
         str("/") >>
-          series.as(:combined_series) >>
-          dot >>
-          digits.as(:combined_number) >>
-          subseries.maybe >>
-          parts
+          (
+            series >> dot >> digits.as(:number) >>
+              subseries.maybe >> parts
+          ).as(:designation)
+      end
+
+      rule(:combined_suffixes) do
+        combined_designation.repeat(1).as(:combined)
       end
 
       # Supplement types
@@ -133,7 +140,7 @@ module Pubid
           space >>
           series >> dot >>
           code >>
-          combined_suffix.maybe >>
+          combined_suffixes.maybe >>
           date_part.maybe
       end
 
@@ -197,7 +204,7 @@ module Pubid
           space >>
           series >> dot >>
           code >>
-          combined_suffix.maybe >>
+          combined_suffixes.maybe >>
           date_part.maybe >>
           language.maybe
       end
@@ -249,6 +256,53 @@ module Pubid
         str("Annex to") >> space >> special_publication.as(:annex_to)
       end
 
+      # Handbook — "ITU-R 42.HDB". The ".HDB" literal marks a Handbook; it does
+      # NOT route through subseries (which is digits-only). The :handbook_marker
+      # key tells the builder to build Identifiers::Handbook.
+      rule(:handbook) do
+        itu_prefix >>
+          sector >>
+          space >>
+          number >>
+          dot >> str("HDB").as(:handbook_marker) >>
+          date_part.maybe
+      end
+
+      # Numeric Question — "ITU-R 234-1/7:", "ITU-R 237/3:".
+      # number(-part)/study-group, always with a trailing ":".
+      rule(:numeric_question) do
+        itu_prefix >>
+          sector >>
+          space >>
+          number >>
+          parts >>
+          str("/") >> digits.as(:study_group) >>
+          str(":").as(:question_colon).maybe
+      end
+
+      # One "number(/BL)?/study-group" body of a letter-series Question, shared
+      # by the bracketed and bare forms.
+      rule(:question_tail) do
+        number >>
+          str("/BL").as(:has_bl).maybe >>
+          str("/") >> digits.as(:study_group)
+      end
+
+      # Letter-series Question — "ITU-R P.3/BL/7", "ITU-R SM.1/30",
+      # "ITU-R S.[4/BL/2]:". series.number(/BL)?/study-group, optionally
+      # bracketed and/or with a trailing ":".
+      rule(:letter_question) do
+        itu_prefix >>
+          sector >>
+          space >>
+          series >> dot >>
+          (
+            (str("[").as(:bracketed) >> question_tail >> str("]")) |
+            question_tail
+          ) >>
+          str(":").as(:question_colon).maybe
+      end
+
       # Common-text suffix: "| ISO/IEC ..." or "| ISO ..." — the same
       # document published jointly by ITU and ISO/IEC. Captured as a raw
       # string; the builder parses it with the appropriate flavor.
@@ -260,6 +314,9 @@ module Pubid
         annex_to_identifier |
           special_publication |
           supplement_identifier |
+          handbook |
+          numeric_question |
+          letter_question |
           with_series |
           without_series
       end

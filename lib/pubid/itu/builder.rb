@@ -33,35 +33,32 @@ module Pubid
           return supp
         end
 
+        # Handbook — "ITU-R 42.HDB"
+        if data[:handbook_marker]
+          return build_handbook(data)
+        end
+
+        # Question — numeric ("ITU-R 234-1/7:") or letter-series
+        # ("ITU-R P.3/BL/7"). Both carry a :study_group marker.
+        if data[:study_group]
+          return build_question(data)
+        end
+
         # Build basic recommendation or combined identifier
         sector = Components::Sector.new(sector: data[:sector].to_s)
         series = Components::Series.new(series: data[:series].to_s) if data[:series]
         code = build_code(data) if data[:number]
         date = build_date(data) if data[:year]
 
-        # Check if this is a combined identifier (has combined_series and combined_number)
-        if data[:combined_series] || data[:combined_number]
-          if data[:combined_series]
-            combined_series = Components::Series.new(
-              series: data[:combined_series][:series].to_s,
-            )
-          end
-
-          if data[:combined_number]
-            combined_code = Components::Code.new(
-              number: data[:combined_number].to_s,
-              series_suffix: data[:combined_series_suffix]&.to_s,
-              subseries: data[:combined_subseries]&.to_s,
-              parts: extract_parts(data[:combined_parts]),
-            )
-          end
-
+        # Combined (joint) recommendation — one or more additional
+        # "/SERIES.CODE" designations after the primary (e.g. "G.780/Y.1351",
+        # "G.780/Y.1351/Z.1362"). The primary stays on the base series/code.
+        if data[:combined]
           return Identifiers::CombinedIdentifier.new(
             sector: sector,
             series: series,
             code: code,
-            combined_series: combined_series,
-            combined_code: combined_code,
+            combined: build_designations(data[:combined]),
             date: date,
             language: data[:language]&.to_s,
             common_text_twin: twin,
@@ -124,6 +121,32 @@ module Pubid
         )
       end
 
+      # Build Handbook ("ITU-R 42.HDB").
+      def build_handbook(data)
+        Identifiers::Handbook.new(
+          sector: Components::Sector.new(sector: data[:sector].to_s),
+          code: build_code(data),
+          date: data[:year] ? build_date(data) : nil,
+        )
+      end
+
+      # Build Question (numeric or letter-series).
+      def build_question(data)
+        series = if data[:series]
+                   Components::Series.new(series: data[:series].to_s)
+                 end
+
+        Identifiers::Question.new(
+          sector: Components::Sector.new(sector: data[:sector].to_s),
+          series: series,
+          code: build_code(data),
+          study_group: data[:study_group].to_s,
+          has_bl: !data[:has_bl].nil?,
+          bracketed: !data[:bracketed].nil?,
+          has_colon: !data[:question_colon].nil?,
+        )
+      end
+
       def build_supplement(data)
         # Build the base identifier first
         base = build(data[:base]) if data[:base]
@@ -162,6 +185,22 @@ module Pubid
       end
 
       private
+
+      # Build the additional designations of a combined recommendation from the
+      # repeated parse subtrees (each `{ designation: { series:, number:, … } }`).
+      def build_designations(combined_data)
+        Array(combined_data).map do |element|
+          d = element[:designation] || element
+          Components::Designation.new(
+            series: Components::Series.new(series: d[:series].to_s),
+            code: Components::Code.new(
+              number: d[:number].to_s,
+              subseries: d[:subseries]&.to_s,
+              parts: extract_parts(d[:parts]),
+            ),
+          )
+        end
+      end
 
       def build_code(data)
         Components::Code.new(
