@@ -6,6 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
+gem "json_schemer" # testsuite schema validation (tools/validate_schema.rb)
 # TEMPORARY, remove when lutaml/lutaml-model#767 ships. Tracked by #363.
 #
 # json 3.0.0 (released 2026-09-07) made the second argument of JSON.generate
