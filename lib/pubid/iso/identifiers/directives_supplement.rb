@@ -89,8 +89,7 @@ format: nil, stage_format_long: nil, with_date: nil, **opts)
         def to_supplement_s(lang: :en, lang_single: false, with_edition: false,
 format: nil, stage_format_long: nil, with_date: nil, **_opts)
           date_str = if date
-                       month_part = date.month ? "-#{date.month}" : ""
-                       ":#{date.render}#{month_part}"
+                       ":#{date.render}"
                      else
                        ""
                      end
