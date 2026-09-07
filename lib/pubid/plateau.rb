@@ -19,6 +19,14 @@ module Pubid
     autoload :UrnParser, "#{__dir__}/plateau/urn_parser"
 
     def self.parse(input)
+      unless input.is_a?(String)
+        raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+      end
+
+      if input.length > Pubid::MAX_INPUT_LENGTH
+        raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+      end
+
       # Apply legacy update_codes normalization first
       normalized = Core::UpdateCodes.apply(input, :plateau)
       parser = Parser.new

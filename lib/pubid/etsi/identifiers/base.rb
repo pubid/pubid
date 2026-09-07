@@ -9,6 +9,14 @@ module Pubid
       # relaton-cli's `rescue Parslet::ParseFailed` fetch handler catches it
       # instead of a bare RuntimeError.
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
       end

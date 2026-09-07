@@ -183,9 +183,9 @@ RSpec.describe Pubid::Bipm::Identifier do
   describe ".parse — JCGM exclusion" do
     it "does not parse JCGM (owned by Pubid::Jcgm)" do
       expect { described_class.parse("JCGM 24th Meeting (2021)") }
-        .to raise_error(RuntimeError)
+        .to raise_error(Parslet::ParseFailed)
       expect { described_class.parse("JCGM 100:2008") }
-        .to raise_error(RuntimeError)
+        .to raise_error(Parslet::ParseFailed)
     end
   end
 

@@ -1326,8 +1326,15 @@ module Pubid
 
         adopted_id = nil
 
-        # Check for EN ISO or EN IEC patterns (triple-level)
-        if adopted_str_clean.match?(/EN\s+(ISO\/IEC|IEC|ISO)/)
+        # Check for EN ISO or EN IEC patterns (triple-level).
+        # The test must be ANCHORED, because the repair below is: an unanchored
+        # match accepts "CEN ISO/TS 12180-1:2007" (the "EN ISO" is inside
+        # "CEN ISO"), but `sub(/^EN\s+/, "")` then changes nothing, so
+        # adopted_id stayed nil and the whole parse returned nil for 49
+        # "DD CEN ISO/..." identifiers in BSI's own pass fixtures. Anchored,
+        # a "CEN ..." string falls through to the CEN branch below, which is
+        # where it belongs.
+        if adopted_str_clean.match?(/\AEN\s+(ISO\/IEC|IEC|ISO)/)
           # Parse the ISO/IEC part
           iso_iec_str = adopted_str_clean.sub(/^EN\s+/, "")
 

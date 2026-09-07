@@ -123,14 +123,16 @@ module Pubid
       # @param identifier [String] The IANA identifier string to parse
       # @return [Identifier] The appropriate identifier object
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
         if identifier.length > Pubid::MAX_INPUT_LENGTH
           raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse IANA identifier '#{identifier}': #{e.message}"
       end
     end
   end

@@ -22,8 +22,6 @@ module Pubid
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse IALA identifier '#{identifier}': #{e.message}"
       end
 
       attribute :publisher, :string, default: "IALA"

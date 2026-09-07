@@ -1,18 +1,18 @@
 Flavor: ASHRAE
-Classified: 2026-04-01 22:07:53
+Classified: 2026-09-07 16:49:13
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 2101
-Pass: 2089 (99.43%)
-Fail: 12 (0.57%)
+Total: 2103
+Pass: 2103 (100.0%)
+Fail: 0 (0.0%)
 
 BY CLASS
 ----------------------------------------------------------------------
-addenda_package                          Pass: 17/17 (100.0%)
-addendum                                 Pass: 1257/1260 (99.76%)
-combined_addenda                         Pass: 92/92 (100.0%)
-errata                                   Pass: 160/161 (99.38%)
+addenda_package                          Pass: 25/25 (100.0%)
+addendum                                 Pass: 1320/1320 (100.0%)
+combined_addenda                         Pass: 93/93 (100.0%)
+errata                                   Pass: 160/160 (100.0%)
 guideline                                Pass: 51/51 (100.0%)
-standard                                 Pass: 512/520 (98.46%)
+standard                                 Pass: 454/454 (100.0%)

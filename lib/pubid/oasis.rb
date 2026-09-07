@@ -21,6 +21,10 @@ module Pubid
     def self.parse(identifier)
       # Reject pathological inputs before they reach the parser
       # (CodeQL rb/polynomial-redos barrier — inline .length by design).
+      unless identifier.is_a?(String)
+        raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+      end
+
       if identifier.length > Pubid::MAX_INPUT_LENGTH
         raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
       end

@@ -48,11 +48,22 @@ module NumberStringRetypeSpec
   # causes is the number type. BSI improved from 613 to 594 here, because the
   # members of a bundled identifier now resolve to the flavor class instead of
   # the abstract root — see Pubid::Identifier.own_base_class.
+  # bsi 594 -> 647 and cen_cenelec 64 -> 66 when the BSI adopted-branch nil bug
+  # was fixed, and the rise is the WHOLE point of pinning exactly. Neither
+  # flavor got worse: the BSI corpus grew from 1448 to 1501 parsed identifiers
+  # (49 `DD CEN ISO/…` inputs returned nil on the old code and were dropped by
+  # the corpus builder's filter_map; 48 now build), and CEN gained the two
+  # `ES 59008-…` ids a stale fixture had recorded as a NameError. Every one of
+  # the 53 + 2 new corpus members lands in the SAME pre-existing gap — they are
+  # BSI/CEN wrappers holding another flavor's identifier in an attribute typed
+  # to their own Components::Code, the documented `bsi-set-cross-flavor-type`
+  # issue — so the delta equals the corpus growth exactly. A count that moves
+  # for any other reason is the regression this pin exists to catch.
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
     "api" => 1,
-    "bsi" => 594,
-    "cen_cenelec" => 64,
+    "bsi" => 647,
+    "cen_cenelec" => 66,
     "idf" => 0,
     "jcgm" => 0,
   }.freeze

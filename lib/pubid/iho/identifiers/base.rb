@@ -16,10 +16,16 @@ module Pubid
       # @return [Pubid::Iho::Identifier] The appropriate identifier object
       # @raise [Parslet::ParseFailed] If parsing fails
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse IHO identifier '#{identifier}': #{e.message}"
       end
 
       # `number` overrides the generic Components::Code attribute with a plain

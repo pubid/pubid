@@ -46,16 +46,18 @@ module Pubid
       # @param identifier [String] The XSF identifier string to parse
       # @return [Identifier] The appropriate identifier object
       # @raise [ArgumentError] If the input exceeds the maximum length
-      # @raise [RuntimeError] If parsing fails
+      # @raise [Parslet::ParseFailed] If parsing fails
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
         if identifier.length > Pubid::MAX_INPUT_LENGTH
           raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse XSF identifier '#{identifier}': #{e.message}"
       end
     end
   end

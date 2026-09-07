@@ -27,13 +27,19 @@ RSpec.shared_examples "serialization" do |identifier_string|
   end
 end
 
+# Asserts the two halves of the parse failure contract that a bare
+# `raise_error(StandardError)` cannot tell apart: an unparseable string and a
+# non-String are different failures and carry different classes. The
+# cross-flavor spec/pubid/parse_error_spec.rb locks this for every registered
+# flavor; this shared example is for a per-flavor spec that wants it inline.
 RSpec.shared_examples "parse rejection" do
-  it "rejects empty input" do
-    expect { described_class.parse("") }.to raise_error(StandardError)
+  it "rejects empty input with Parslet::ParseFailed" do
+    expect { described_class.parse("") }.to raise_error(Parslet::ParseFailed)
   end
 
-  it "rejects nil input" do
-    expect { described_class.parse(nil) }.to raise_error(StandardError)
+  it "rejects nil input with ArgumentError" do
+    expect { described_class.parse(nil) }
+      .to raise_error(ArgumentError, /must be a String/)
   end
 end
 

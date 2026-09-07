@@ -88,6 +88,7 @@ module Pubid
       end
 
       def self.parse(string)
+        raise ArgumentError, ::Pubid::INPUT_NOT_A_STRING_MESSAGE unless string.is_a?(String)
         raise ArgumentError, ::Pubid::INPUT_TOO_LONG_MESSAGE if string.length > ::Pubid::MAX_INPUT_LENGTH
 
         new.parse(string.strip)

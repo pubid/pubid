@@ -70,12 +70,13 @@ ASHRAE Addenda o, p, q to Standard 55-2010
 !ASHRAE Standard 90.1-2016: Addenda k, o, x, ab, ac, ad, ae, ag, ah, ak, am!ASHRAE Addenda k, o, x, ab, ac, ad, ae, ag, ah, ak, am to Standard 90.1-2016
 !ASHRAE Standard 90.1-2016: Addenda m, ai, aj, au, az, bg, dn!ASHRAE Addenda m, ai, aj, au, az, bg, dn to Standard 90.1-2016
 !ASHRAE Standard 90.1-2016: Addenda q, s, z, ap, aq, ar!ASHRAE Addenda q, s, z, ap, aq, ar to Standard 90.1-2016
+!ASHRAE Standard 90.1-2016: Addenda t, v, y, al, an, ao, at, aw, ay, az, ba, bb, bd, bf, bh, bi, bj, bk, bl bq, bt, bx, bz, ca, cc, ce, cg, ch, ci, cj, cn, co!ASHRAE Addenda t, v, y, al, an, ao, at, aw, ay, az, ba, bb, bd, bf, bh, bi, bj, bk, bl, bq, bt, bx, bz, ca, cc, ce, cg, ch, ci, cj, cn, co to Standard 90.1-2016
 !ASHRAE Addenda af, bc, cd, and db to Standard 90.1-2019 (November 16, 2020)!ASHRAE Addenda af, bc, cd, db to Standard 90.1-2019
 !ASHRAE Addenda by, ck, and cp to Standard 90.1-2019 (August 3, 2020)!ASHRAE Addenda by, ck, cp to Standard 90.1-2019
 !ASHRAE Addendum a, b, and c to Standard 90.2-1993!ASHRAE Addenda a, b, c to Standard 90.2-1993
 !ASHRAE Standard 90.2-2004: Addenda c, d, e, k!ASHRAE Addenda c, d, e, k to Standard 90.2-2004
-!ASHRAE Addenda a and b to 105-2007!ASHRAE Addenda a, b to Standard -2007
-!ASHRAE Addenda a to 127-2020!ASHRAE Addenda a to Standard -2020
+!ASHRAE Addenda a and b to 105-2007!ASHRAE Addenda a, b to Standard 105-2007
+!ASHRAE Addenda a to 127-2020!ASHRAE Addenda a to Standard 127-2020
 ASHRAE Addenda to Standard 135.1-2009
 !ASHRAE Addenda a for Standard 140-2023 (August 29, 2025)!ASHRAE Addenda a to Standard 140-2023
 !ASHRAE Standard 145.2-2011 Addenda a, b, c!ASHRAE Addenda a, b, c to Standard 145.2-2011

@@ -6,18 +6,28 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       # Parse an ITU identifier string into an identifier object.
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Parser.parse(normalize_whitespace(identifier))
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse ITU identifier '#{identifier}': #{e.message}"
       end
 
       # ITU's own listings occasionally carry a doubled space
       # ("ITU-T D.271  (10/2016)"). Whitespace is never significant in an ITU
       # identifier, so collapse runs of it rather than teaching every rule to
       # tolerate them. Any string over the shared input-length guard is left
-      # untouched — `Pubid.parse` rejects it before this point, and the guard
-      # exists precisely to keep long inputs away from regexes.
+      # untouched: `self.parse` above rejects it before this point, and the
+      # guard exists precisely to keep long inputs away from regexes. (This
+      # note used to credit `Pubid.parse` with the rejection, which was wrong
+      # in both directions — `Pubid.parse` never routes a human-readable ITU
+      # string to a flavor, and ITU carried no raising guard of its own until
+      # one was added to `self.parse`, so an over-long string did reach here.)
       def self.normalize_whitespace(identifier)
         return identifier unless identifier.is_a?(String)
         return identifier if identifier.length > ::Pubid::MAX_INPUT_LENGTH

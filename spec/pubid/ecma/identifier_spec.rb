@@ -99,7 +99,7 @@ RSpec.describe Pubid::Ecma::Identifier do
     context "with an unparseable string" do
       it "raises" do
         expect { described_class.parse("NOT-ECMA") }
-          .to raise_error(RuntimeError, /Failed to parse/)
+          .to raise_error(Parslet::ParseFailed)
       end
     end
   end
