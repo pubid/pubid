@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
-# TEMPORARY, remove when lutaml/lutaml-model#767 ships.
+# TEMPORARY, remove when lutaml/lutaml-model#767 ships. Tracked by #363.
 #
 # json 3.0.0 (released 2026-09-07) made the second argument of JSON.generate
 # strict: an unknown key now raises ArgumentError instead of being ignored.
