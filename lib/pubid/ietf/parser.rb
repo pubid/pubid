@@ -12,7 +12,7 @@ module Pubid
     #   * draft      -> { draft_rest: }  (everything after "draft-"; the version
     #                    split is done in the Builder to keep the digit-tail
     #                    heuristic in one place)
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space) { str(" ") }
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }

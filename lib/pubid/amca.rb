@@ -20,7 +20,7 @@ module Pubid
     # Parse an ACMA identifier string into an identifier object
     # @param identifier [String] The ACMA identifier string to parse
     # @return [Pubid::Amca::Identifier] The appropriate identifier object
-    # @raise [Parslet::ParseFailed] If parsing fails
+    # @raise [Pubid::Errors::ParseError] If parsing fails
     def self.parse(identifier)
       Identifier.parse(identifier)
     end

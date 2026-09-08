@@ -5,7 +5,7 @@ require "parslet"
 module Pubid
   module Xsf
     # Parslet grammar for XSF identifiers. One fixed shape: "XEP NNNN".
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }
 

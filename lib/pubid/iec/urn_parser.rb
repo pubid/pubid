@@ -31,11 +31,14 @@ module Pubid
       # @return [Identifier] parsed identifier
       def parse_urn(urn)
         unless urn.start_with?("urn:iec:std:")
-          raise Errors::ParseError, "Invalid IEC URN: #{urn}"
+          raise Pubid::UrnParser::Errors::ParseError, "Invalid IEC URN: #{urn}"
         end
 
         code, lang, all_parts = urn_to_code(urn)
-        raise Errors::ParseError, "Invalid IEC URN: #{urn}" unless code
+        unless code
+          raise Pubid::UrnParser::Errors::ParseError,
+                "Invalid IEC URN: #{urn}"
+        end
 
         id = Pubid::Iec::Identifier.parse(code)
         id.all_parts = true if all_parts && id.class.attributes.key?(:all_parts)

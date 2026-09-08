@@ -101,6 +101,7 @@ module Pubid
     amca: ["ANSI/AMCA"],
   }.freeze
 
+  autoload :Errors, "pubid/errors"
   autoload :Parser, "pubid/parser"
   autoload :Components, "pubid/components"
   autoload :BundledIdentifier, "pubid/bundled_identifier"
@@ -195,8 +196,14 @@ module Pubid
   # @raise [Parslet::ParseFailed] when no flavor can parse the string — the
   #   class every flavor's own +parse+ raises (see the parse-failure contract)
   def self.parse(string, format: :auto)
-    raise ArgumentError, INPUT_NOT_A_STRING_MESSAGE unless string.is_a?(String)
-    raise ArgumentError, INPUT_TOO_LONG_MESSAGE if string.length > MAX_INPUT_LENGTH
+    unless string.is_a?(String)
+      raise Pubid::Errors::InvalidInputError,
+            Pubid::INPUT_NOT_A_STRING_MESSAGE
+    end
+    if string.length > MAX_INPUT_LENGTH
+      raise Pubid::Errors::InvalidInputError,
+            Pubid::INPUT_TOO_LONG_MESSAGE
+    end
 
     format = FormatDetector.detect(string) if format == :auto
 

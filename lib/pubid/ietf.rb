@@ -27,8 +27,14 @@ module Pubid
       # normalization/parse path. The type check goes above it because it is
       # what makes `.length` safe to call; the length check itself must still
       # be the first thing the input string meets.
-      raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE unless identifier.is_a?(String)
-      raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE if identifier.length > Pubid::MAX_INPUT_LENGTH
+      unless identifier.is_a?(String)
+        raise Pubid::Errors::InvalidInputError,
+              Pubid::INPUT_NOT_A_STRING_MESSAGE
+      end
+      if identifier.length > Pubid::MAX_INPUT_LENGTH
+        raise Pubid::Errors::InvalidInputError,
+              Pubid::INPUT_TOO_LONG_MESSAGE
+      end
 
       Identifier.parse(identifier)
     end

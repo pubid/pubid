@@ -6,14 +6,15 @@ module Pubid
     # Pubid::Amca::Identifier; common
     # functionality for all AMCA identifier types.
     class Identifier < ::Pubid::Identifier
-      # @raise [Parslet::ParseFailed] If parsing fails
+      # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
         unless identifier.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if identifier.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         parsed = Parser.parse(identifier)

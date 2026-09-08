@@ -14,7 +14,7 @@ module Pubid
     # greedily consume the trailing date and make a `.maybe` date rule
     # unreliable. This is safe: no real W3C code ends in a same-width (4/6/8)
     # digit run, so the Builder's fixed-width trailing-date test never collides.
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:prefix) { str("W3C") >> str(" ") }
 
       # Known W3C maturity tokens. Order matters for shared prefixes: CRD before

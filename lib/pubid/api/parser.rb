@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Api
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic building blocks
       rule(:space) { str(" ") }
       rule(:dash) { str("-") }

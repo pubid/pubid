@@ -23,15 +23,48 @@ id = Pubid::Ieee.parse("IEEE Std 802.3-2018")
 
 ### Parsing Failures
 
-Parsing errors raise exceptions:
+Every failure pubid raises includes the marker module `Pubid::Errors::Error`,
+so one rescue catches all of them:
+
+```ruby
+begin
+  Pubid::Iso.parse(reference)
+rescue Pubid::Errors::Error => e
+  puts "pubid could not read it: #{e.message}"
+end
+```
+
+There are three kinds:
+
+| Class | Superclass | Raised when |
+|-------|-----------|-------------|
+| `Pubid::Errors::ParseError` | `Parslet::ParseFailed` | a printed identifier cannot be parsed |
+| `Pubid::Errors::UrnParseError` | `StandardError` | a URN cannot be parsed |
+| `Pubid::Errors::InvalidInputError` | `ArgumentError` | the input is not a String, or is longer than `Pubid::MAX_INPUT_LENGTH` |
+
+The superclasses are part of the contract. Code that rescues
+`Parslet::ParseFailed` or `ArgumentError` keeps working, so no consumer has to
+change. New code should rescue the pubid classes instead — parslet is an
+implementation detail, and a URN failure is deliberately **not** a
+`Parslet::ParseFailed`, because no grammar runs.
 
 ```ruby
 begin
   Pubid::Iso.parse("not an identifier")
-rescue Parslet::ParseFailed => e
-  puts "Parse failed: #{e.message}"
+rescue Pubid::Errors::ParseError => e
+  puts e.input                        # => "not an identifier"
+  puts e.flavor                       # => "iso"
+  puts e.parse_failure_cause&.ascii_tree
 end
 ```
+
+`#parse_failure_cause` is parslet's structured diagnostic. It is **nillable**:
+a few flavors reject an input before the grammar runs (a CSA comment line, a
+bad ISBN check digit), and those failures have no cause. Test it before
+calling `ascii_tree` on it.
+
+`Pubid::UrnParser::Errors::ParseError` is a deprecated alias of
+`Pubid::Errors::UrnParseError`.
 
 ## Identifier Object
 

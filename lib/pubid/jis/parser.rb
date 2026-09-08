@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Jis
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Japanese character normalization
       rule(:jp_dash) { str("ｰ") } # Full-width dash
       rule(:jp_space) { str("　") }  # Full-width space

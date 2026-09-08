@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Ccsds
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }
       rule(:alnum) { match["A-Za-z0-9"] }

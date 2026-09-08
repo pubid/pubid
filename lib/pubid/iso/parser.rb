@@ -3,7 +3,7 @@ require "parslet"
 
 module Pubid
   module Iso
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       include ::Pubid::Parser::CommonParseRules
       include ::Pubid::Parser::CommonParseMethods
 

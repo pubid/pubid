@@ -12,21 +12,27 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       def self.parse(input)
         unless input.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if input.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         # Filter out comments
         if input.start_with?("#")
-          raise Parslet::ParseFailed, "Not a CSA identifier (comment): #{input}"
+          raise Pubid::Errors::ParseError.new(
+            "Not a CSA identifier (comment): #{input}",
+            input: input, flavor: "csa",
+          )
         end
 
         # Filter out non-standards (memberships, courses, newsletters)
         if input.match?(/^CSA (Communities|Group|Learning|OnDemand|Update)/)
-          raise Parslet::ParseFailed, "Not a CSA standard: #{input}"
+          raise Pubid::Errors::ParseError.new(
+            "Not a CSA standard: #{input}", input: input, flavor: "csa"
+          )
         end
 
         # Preprocessing: normalize CEI to IEC (French name)
@@ -264,7 +270,10 @@ module Pubid
           # raise, so translate here.
           base = parse_external_standard(wrapped_input)
           unless base
-            raise Parslet::ParseFailed, "Unparseable adopted standard: #{input}"
+            raise Pubid::Errors::ParseError.new(
+              "Unparseable adopted standard: #{input}",
+              input: input, flavor: "csa",
+            )
           end
 
           # Create CsaAdoptedIdentifier wrapper
@@ -367,7 +376,10 @@ module Pubid
           # Parse the base identifier recursively. An unparseable base is a
           # failed package, not a nil.
           if base_input.nil? || base_input.empty?
-            raise Parslet::ParseFailed, "Unparseable package base: #{input}"
+            raise Pubid::Errors::ParseError.new(
+              "Unparseable package base: #{input}",
+              input: input, flavor: "csa",
+            )
           end
 
           base = parse(base_input)
@@ -428,8 +440,13 @@ module Pubid
       # as a NoMethodError far from the input that caused it, rather than as a
       # catchable parse failure.
       def self.build!(tree, input)
-        Builder.new.build(tree) ||
-          raise(Parslet::ParseFailed, "Unparseable CSA identifier: #{input}")
+        built = Builder.new.build(tree)
+        return built if built
+
+        raise Pubid::Errors::ParseError.new(
+          "Unparseable CSA identifier: #{input}",
+          input: input, flavor: "csa",
+        )
       end
 
       # Probe whether a string parses. The package base scan walks

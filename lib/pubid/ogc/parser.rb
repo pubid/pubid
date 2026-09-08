@@ -12,7 +12,7 @@ module Pubid
     # leniency, though the canonical printed form omits it.
     #
     # Examples: "25-023", "24-032r1", "01-009a", "04-095c1", "OGC 24-032r1".
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space) { match["\\s"].repeat(1) }
       rule(:digits) { match["0-9"].repeat(1) }
 

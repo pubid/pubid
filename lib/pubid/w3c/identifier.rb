@@ -109,16 +109,17 @@ module Pubid
       # Parse a W3C identifier string into an identifier object
       # @param identifier [String] The W3C identifier string to parse
       # @return [Identifier] The appropriate identifier object
-      # @raise [Parslet::ParseFailed] If parsing fails
+      # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
         # Reject pathological inputs before they reach the parser
         # (CodeQL rb/polynomial-redos barrier — inline .length by design).
         unless identifier.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if identifier.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         parsed = Parser.parse(identifier)

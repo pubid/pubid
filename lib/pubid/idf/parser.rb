@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Idf
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       include ::Pubid::Parser::CommonParseRules
       include ::Pubid::Parser::CommonParseMethods
 

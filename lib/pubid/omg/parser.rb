@@ -12,7 +12,7 @@ module Pubid
     # ACRONYM is uppercase letters/digits, at least 1 char.
     # VERSION is digits/dots/spaces/beta+space+digit, e.g. "1.0", "2.5.1",
     # "5 beta 3".
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space) { str(" ") }
 
       # Acronym: starts with uppercase, may contain uppercase + lowercase +

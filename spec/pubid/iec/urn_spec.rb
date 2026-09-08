@@ -158,10 +158,23 @@ RSpec.describe "IEC URN Generation and Parsing" do
         expect(id.to_s).to eq("IEC 80000 (all parts)")
       end
 
+      # Asserts the SPECIFIC class. Both raises below named a bare
+      # `Errors::ParseError`, which does not resolve from inside
+      # `Pubid::Iec::UrnParser` — so they raised NameError, and a bare
+      # `StandardError` expectation accepted that while the intended error
+      # never fired. Same hazard as `spec/pubid/ietf/urn_parser_spec.rb`.
       it "raises error for invalid URN namespace" do
         expect do
           Pubid::Iec.parse_urn("urn:iso:std:iso:9001")
-        end.to raise_error(StandardError)
+        end.to raise_error(Pubid::UrnParser::Errors::ParseError,
+                           /Invalid IEC URN/)
+      end
+
+      it "raises error for a URN with no decodable code" do
+        expect do
+          Pubid::Iec.parse_urn("urn:iec:std:")
+        end.to raise_error(Pubid::UrnParser::Errors::ParseError,
+                           /Invalid IEC URN/)
       end
     end
   end

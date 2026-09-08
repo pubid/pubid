@@ -5,7 +5,7 @@ require "parslet"
 module Pubid
   module Iho
     # Parser class for IHO identifiers
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space)  { str(" ") }
       rule(:dash)   { str("-") }
       rule(:dot)    { str(".") }

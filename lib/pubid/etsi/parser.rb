@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Etsi
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic elements
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }

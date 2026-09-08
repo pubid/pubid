@@ -7,7 +7,7 @@ module Pubid
     module Aiee
       # Parser for AIEE (American Institute of Electrical Engineers) identifiers
       # Historical period: 1884-1963 (merged into IEEE in 1963)
-      class Parser < Parslet::Parser
+      class Parser < ::Pubid::Parser::Grammar
         # Basic building blocks
         rule(:space) { str(" ") }
         rule(:space?) { space.maybe }

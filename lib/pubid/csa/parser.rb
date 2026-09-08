@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Csa
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic building blocks
       rule(:space) { str(" ") }
       rule(:dash) { str("-") }
@@ -367,7 +367,11 @@ module Pubid
       # Preprocessing to normalize input
       def parse(input)
         # Skip comment lines
-        raise Parslet::ParseFailed.new("Comment line") if input.strip.start_with?("#")
+        if input.strip.start_with?("#")
+          raise Pubid::Errors::ParseError.new(
+            "Comment line", input: input, flavor: "csa"
+          )
+        end
 
         # Remove CONSOLIDATED notation FIRST (before other processing)
         normalized = input.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")

@@ -12,7 +12,7 @@ module Pubid
     #   CC/Adv 0707.1:2007        (dot sub-part)
     #   CC/A 0812-1:2008          (dash sub-part)
     #   CC/WD 51017:2024-07-23    (full ISO date)
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }
 

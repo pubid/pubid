@@ -17,7 +17,7 @@ module Pubid
     # document alone ("3GPP TS 23.207"), and relaton parses that bare form to
     # search the index. Only the type and the dotted number core are required,
     # so "TS" and "TS foo" are still rejected.
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }
       rule(:space) { str(" ") }

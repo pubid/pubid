@@ -10,11 +10,12 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       def self.parse(string)
         unless string.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if string.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         # Delegate to IEC for bare IEC identifiers. This handles IEC-specific

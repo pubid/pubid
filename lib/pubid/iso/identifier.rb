@@ -289,11 +289,12 @@ module Pubid
 
       def self.parse(string, format: :auto)
         unless string.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if string.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         format = Pubid::FormatDetector.detect(string) if format == :auto

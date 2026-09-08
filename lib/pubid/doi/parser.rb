@@ -13,7 +13,7 @@ module Pubid
     # SUFFIX is one-or-more chars from [A-Za-z0-9._\-/()] (printable minus
     # whitespace). The grammar is intentionally permissive on suffix chars
     # because real DOIs cover the full printable range.
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:dot)   { str(".") }
       rule(:slash) { str("/") }
 
