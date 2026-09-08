@@ -14,7 +14,7 @@ module Pubid
         attribute :s_prefix, :boolean, default: -> { false }
         attribute :iec_identifier, :string # IEC portion as string
 
-        def to_s(**_opts)
+        def to_s(**opts)
           parts = ["CIE"]
 
           # S prefix
@@ -33,7 +33,7 @@ module Pubid
           # IEC portion with slash separator
           result += "/IEC #{iec_identifier}" if iec_identifier
 
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

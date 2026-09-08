@@ -19,8 +19,8 @@ module Pubid
           map "technical", to: :technical
         end
 
-        def to_s(**_opts)
-          render_supplement(technical ? "Technical Cor." : "Cor.")
+        def to_s(**opts)
+          annotate_plain_render(render_supplement(technical ? "Technical Cor." : "Cor."), **opts)
         end
 
         # `super` already enforces instance_of?(self.class), so this only has

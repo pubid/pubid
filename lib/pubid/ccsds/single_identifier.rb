@@ -19,7 +19,7 @@ module Pubid
       attribute :type, Components::Type
       attribute :typed_stage, Components::TypedStage
 
-      def to_s(lang: :en, lang_single: false, **_opts)
+      def to_s(lang: :en, lang_single: false, **opts)
         result = ""
 
         # Publisher
@@ -47,7 +47,7 @@ module Pubid
         # Language (optional)
         result += " - #{language.code} Translated" if language
 
-        result
+        annotate_plain_render(result, **opts)
       end
 
       def <=>(other)

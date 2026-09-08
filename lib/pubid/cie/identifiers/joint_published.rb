@@ -15,7 +15,7 @@ module Pubid
         attribute :doc_type, :string          # "TR" for Technical Report
         attribute :stage, :string             # "DIS" for draft stage
 
-        def to_s(**_opts)
+        def to_s(**opts)
           parts = ["CIE", copublisher]
 
           # Document type (TR)
@@ -44,7 +44,7 @@ module Pubid
           # Language (always parenthetical for joint published)
           result += language.to_s if language
 
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

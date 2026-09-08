@@ -25,8 +25,8 @@ module Pubid
           year
         end
 
-        def to_s(**_opts)
-          "#{base}/Cor#{number}:#{year}"
+        def to_s(**opts)
+          annotate_plain_render("#{base}/Cor#{number}:#{year}", **opts)
         end
       end
     end

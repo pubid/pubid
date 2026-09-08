@@ -35,6 +35,11 @@ module Pubid
         end
 
         def to_s(format = nil)
+          # `super` is handed a SYMBOL below, so the base's annotation hook
+          # never sees the flag. Capture it here and wrap what comes back —
+          # exactly once, because the base returned plain text.
+          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+
           # Handle both keyword argument (hash) and positional argument (symbol/string)
           effective_format = if format.is_a?(Hash)
                                format[:format]
@@ -43,13 +48,15 @@ module Pubid
                              end
 
           # If explicit format is specified, use it. Otherwise, default to short.
-          if effective_format.nil?
-            super(:short)
-          elsif effective_format == :mr
-            to_mr_style
-          else
-            super(effective_format)
-          end
+          rendered = if effective_format.nil?
+                       super(:short)
+                     elsif effective_format == :mr
+                       to_mr_style
+                     else
+                       super(effective_format)
+                     end
+
+          annotate_plain_render(rendered, annotated: annotated)
         end
 
         private

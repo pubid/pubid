@@ -27,14 +27,14 @@ module Pubid
           #
           # @param trademark [Boolean] append the IEEE trademark symbol (™/®)
           # @return [String] YYYY NESC Handbook format with optional edition
-          def to_s(trademark: false, **_opts)
+          def to_s(trademark: false, **opts)
             abbr = "NESC"
             abbr += "(R)" if registered
             parts = [["IEEE Std", year, "#{abbr} Handbook"].compact.join(" ")]
             parts << ", #{edition}" if edition
             result = parts.join
             result += trademark_symbol if trademark
-            result
+            annotate_plain_render(result, **opts)
           end
         end
       end

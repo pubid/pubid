@@ -47,12 +47,12 @@ module Pubid
           identifiers&.first || self
         end
 
-        def to_s(**_opts)
+        def to_s(**opts)
           parts = render_parts
           result = parts.join(separator || "/")
           result += render_reaffirmation if reaffirmation
           result += package if package
-          result
+          annotate_plain_render(result, **opts)
         end
 
         private

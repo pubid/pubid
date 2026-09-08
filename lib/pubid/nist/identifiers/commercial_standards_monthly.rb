@@ -41,6 +41,12 @@ module Pubid
         end
 
         def to_s(format = nil)
+          # A caller passing `annotated:` reaches this positional parameter as
+          # a Hash — Ruby converts keywords for a method that accepts none.
+          # The same idiom `Identifiers::Base#to_s` uses. This renderer
+          # ignores `format`, so only the flag is read.
+          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+
           result = "#{publisher} #{series}"
 
           # Proper Volume and Part components
@@ -55,7 +61,7 @@ module Pubid
             result += " #{vol_str}n#{issue_number.number}"
           end
 
-          result
+          annotate_plain_render(result, annotated: annotated)
         end
       end
     end

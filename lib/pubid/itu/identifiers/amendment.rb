@@ -10,8 +10,8 @@ module Pubid
         # supplement types (Cor./Err./Suppl./Add.). The parser accepts both
         # spellings (see Parser#supplement_type), so the period-less input form
         # still round-trips through parse — it just normalizes here.
-        def to_s(**_opts)
-          render_supplement("Amd.")
+        def to_s(**opts)
+          annotate_plain_render(render_supplement("Amd."), **opts)
         end
       end
     end

@@ -17,7 +17,28 @@ module Pubid
         attribute :language, Components::Language
         attribute :stage, :string # DIS, DS
 
-        def to_s(**_opts)
+        def to_s(**opts)
+          annotate_plain_render(render_plain, **opts)
+        end
+
+        # CIE Standard distinguishes S-prefixed standards (`CIE S 017`) from
+        # plain (`CIE 015`), D-prefixed (`CIE D001`), and DIS-staged. The
+        # generic mr_type looks at typed_stage, which CIE doesn't use, so
+        # without this override the `S`/`D`/stage marker would be lost in MR.
+        def mr_type
+          return stage.downcase if stage
+          return "d" if d_prefix
+          return "s" if s_prefix
+
+          nil
+        end
+
+        private
+
+        # The plain composition, extracted verbatim from `to_s`. It has two
+        # early returns (the slash_colon language form and the legacy
+        # bare slash-year form), and `to_s` needs a single exit to wrap.
+        def render_plain
           parts = ["CIE"]
 
           # Stage (DIS/DS) before code if present
@@ -65,18 +86,6 @@ module Pubid
           end
 
           result
-        end
-
-        # CIE Standard distinguishes S-prefixed standards (`CIE S 017`) from
-        # plain (`CIE 015`), D-prefixed (`CIE D001`), and DIS-staged. The
-        # generic mr_type looks at typed_stage, which CIE doesn't use, so
-        # without this override the `S`/`D`/stage marker would be lost in MR.
-        def mr_type
-          return stage.downcase if stage
-          return "d" if d_prefix
-          return "s" if s_prefix
-
-          nil
         end
       end
     end

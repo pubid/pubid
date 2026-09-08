@@ -661,6 +661,22 @@ module Pubid
     end
     protected :annotate_plain_render
 
+    # The tokens {Renderers::Annotator} looks for in this identifier's rendered
+    # string, as [attribute_name, css_class] pairs.
+    #
+    # The shared table names the components a printed identifier usually
+    # carries — publisher, type, number, part, year. A flavor that keeps its
+    # identity somewhere else answers with its own names appended: IEC's
+    # working documents are `technical_committee`/`wd_number`/`wd_stage`, and
+    # CSA's electrical code prints `cec_part`/`no_number` rather than the
+    # `number` it stores. Without this they carried no annotatable token at all.
+    #
+    # Appending rather than replacing keeps whatever the shared table does
+    # find; a token whose value is not in the string is skipped anyway.
+    def annotation_tokens
+      Renderers::Annotator::TOKENS
+    end
+
     def to_s(**opts)
       render(format: :human, **opts)
     end

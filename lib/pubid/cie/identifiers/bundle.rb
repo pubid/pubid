@@ -27,13 +27,15 @@ module Pubid
         # The printed form writes the publisher once: the first member keeps its
         # "CIE " prefix, the rest are bare. A base-less member is re-based onto
         # the bundle's shared base for rendering.
-        def to_s(**_opts)
+        def to_s(**opts)
           return "" unless ids&.any?
 
-          ids.each_with_index.map do |id, i|
+          result = ids.each_with_index.map do |id, i|
             member = id.base ? id : rebased(id)
             i.zero? ? member.to_s : member.to_s.delete_prefix("CIE ")
           end.join(",")
+
+          annotate_plain_render(result, **opts)
         end
 
         private

@@ -34,3 +34,25 @@ Read this before you change `lib/pubid/cie/` or `spec/pubid/cie/`. The root
   `s_prefix`-bearing standard, and asserts `Conference` still does **not**
   declare `s_prefix` — so re-adding the attribute to silence the spec would
   turn it red rather than green.
+
+- **All 10 CIE types rendered plain under `to_s(annotated: true)`.** Every
+  one composes its own string instead of going through `render`, so none
+  reached the shared annotation hook; each now calls
+  `annotate_plain_render` on the way out.
+
+  **`Standard` needed more than a wrap.** Its body has three exits — the
+  `slash_colon` language form and the legacy bare slash-year form both
+  `return` early — and `annotate_plain_render` needs one. The composition
+  moved verbatim into a private `render_plain`; `to_s` is two lines. The
+  trap is the `private` keyword: written as a **section** it privatises
+  every method below it, which swallowed `mr_type` — a public method the
+  MR renderer calls. The section goes at the **end** of the class.
+  `Bundle` keeps its `return "" unless ids&.any?` guard and wraps only the
+  composed value.
+
+  **`Supplement` was a different bug with the same symptom.** It is a
+  wrapper: `number` is the supplement ordinal (`"1"`, which does not stand
+  alone in `CIE 121-SP1:2009`) and the document's identity — number `121`,
+  year `2009` — lives on `base`. Wrapping its `to_s` changed nothing,
+  because the annotator only read the wrapper's own attributes. It is fixed
+  by `Annotator#emit_tokens` walking `base`, not by anything in CIE.

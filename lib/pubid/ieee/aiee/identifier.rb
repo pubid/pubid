@@ -39,7 +39,7 @@ module Pubid
           Builder.new.build(parsed)
         end
 
-        def to_s(date_format: nil, trademark: false, **_opts)
+        def to_s(date_format: nil, trademark: false, **opts)
           result = [publisher]
           result << type if type
           result << code.to_s if code
@@ -81,7 +81,7 @@ module Pubid
           # document number/filename downstream). It stays reachable on
           # `relationships`.
 
-          base
+          annotate_plain_render(base, **opts)
         end
       end
     end
