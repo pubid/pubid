@@ -20,7 +20,7 @@ module Pubid
     # Each branch captures its number under a distinct key so the builder can
     # pick the identifier class without a separate type token. Numbers are kept
     # as strings to preserve any leading zeros.
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:digits) { match["0-9"].repeat(1) }
 
       rule(:prefix) { str("ECMA") }

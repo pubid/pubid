@@ -2,6 +2,7 @@
 
 module Pubid
   module Parser
+    autoload :Grammar, "pubid/parser/grammar"
     autoload :CommonParseMethods, "pubid/parser/common_parse_methods"
     autoload :CommonParseRules, "pubid/parser/common_parse_rules"
   end

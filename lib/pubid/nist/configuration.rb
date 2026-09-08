@@ -78,6 +78,10 @@ module Pubid
       end
     end
 
-    class ConfigurationError < StandardError; end
+    # Raised when the NIST series YAML cannot be loaded. Included in the
+    # marker module so `rescue Pubid::Errors::Error` stays exhaustive.
+    class ConfigurationError < StandardError
+      include ::Pubid::Errors::Error
+    end
   end
 end

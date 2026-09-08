@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Asme
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic building blocks
       rule(:space) { str(" ") }
       # Regular dash, en-dash, em-dash

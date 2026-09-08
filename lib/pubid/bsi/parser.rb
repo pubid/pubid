@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Bsi
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Case-insensitive string match (Parslet 2.0 has no built-in `stri`).
       # Each character becomes a two-case character class; other characters
       # (spaces, punctuation) match verbatim.

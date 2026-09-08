@@ -65,6 +65,24 @@ RSpec.describe "parse failure contract (cross-flavor)" do
           end
         end
 
+        # The class pubid OWNS. The assertion above is the backward-compatible
+        # half of the same raise: `Pubid::Errors::ParseError` inherits
+        # `Parslet::ParseFailed`, so both hold at once and a consumer can
+        # rescue either.
+        it "raises Pubid::Errors::ParseError for #{bad.inspect}" do
+          each_entry_point(mod, identifier_class) do |label, receiver|
+            expect { receiver.parse(bad) }
+              .to raise_error(Pubid::Errors::ParseError),
+                  "#{flavor_name} #{label} did not raise " \
+                  "Pubid::Errors::ParseError for #{bad.inspect}"
+
+            expect { receiver.parse(bad) }
+              .to raise_error(Pubid::Errors::Error),
+                  "#{flavor_name} #{label} raised a failure outside the " \
+                  "Pubid::Errors::Error marker for #{bad.inspect}"
+          end
+        end
+
         it "never returns nil for #{bad.inspect}" do
           each_entry_point(mod, identifier_class) do |label, receiver|
             result = begin
@@ -95,6 +113,19 @@ RSpec.describe "parse failure contract (cross-flavor)" do
           expect { receiver.parse(nil) }
             .to raise_error(ArgumentError, /must be a String/),
                 "#{flavor_name} #{label} let nil reach the parser"
+        end
+      end
+
+      # Same raise as the two above, seen through the class pubid owns:
+      # `Pubid::Errors::InvalidInputError` inherits `ArgumentError`.
+      it "raises Pubid::Errors::InvalidInputError for bad input" do
+        each_entry_point(mod, identifier_class) do |label, receiver|
+          [OVERLONG, nil].each do |bad_input|
+            expect { receiver.parse(bad_input) }
+              .to raise_error(Pubid::Errors::InvalidInputError),
+                  "#{flavor_name} #{label} did not raise " \
+                  "Pubid::Errors::InvalidInputError for #{bad_input.class}"
+          end
         end
       end
     end

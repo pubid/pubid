@@ -61,15 +61,17 @@ module Pubid
       # Parse an OGC identifier string into an identifier object.
       # @param identifier [String] The OGC identifier string to parse
       # @return [Identifier] The document identifier object
-      # @raise [ArgumentError] If the input exceeds the maximum length
-      # @raise [Parslet::ParseFailed] If parsing fails
+      # @raise [Pubid::Errors::InvalidInputError]
+      #   If the input exceeds the maximum length
+      # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
         unless identifier.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if identifier.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         Builder.build(Parser.parse(identifier))

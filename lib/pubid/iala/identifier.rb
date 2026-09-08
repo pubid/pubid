@@ -18,7 +18,7 @@ module Pubid
       # Parse an IALA identifier string into an identifier object.
       # @param identifier [String]
       # @return [Pubid::Iala::Identifier]
-      # @raise [Parslet::ParseFailed] If parsing fails
+      # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
         Builder.build(parsed)

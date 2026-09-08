@@ -88,6 +88,7 @@ module Pubid
     amca: ["ANSI/AMCA"],
   }.freeze
 
+  autoload :Errors, "pubid/errors"
   autoload :Parser, "pubid/parser"
   autoload :Components, "pubid/components"
   autoload :BundledIdentifier, "pubid/bundled_identifier"
@@ -172,8 +173,14 @@ module Pubid
   # @param format [Symbol] :auto, :human, :mr_string, or :urn
   # @return [Identifier] The parsed identifier
   def self.parse(string, format: :auto)
-    raise ArgumentError, INPUT_NOT_A_STRING_MESSAGE unless string.is_a?(String)
-    raise ArgumentError, INPUT_TOO_LONG_MESSAGE if string.length > MAX_INPUT_LENGTH
+    unless string.is_a?(String)
+      raise Pubid::Errors::InvalidInputError,
+            Pubid::INPUT_NOT_A_STRING_MESSAGE
+    end
+    if string.length > MAX_INPUT_LENGTH
+      raise Pubid::Errors::InvalidInputError,
+            Pubid::INPUT_TOO_LONG_MESSAGE
+    end
 
     format = FormatDetector.detect(string) if format == :auto
 

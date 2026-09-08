@@ -45,11 +45,12 @@ module Pubid
 
       def self.parse(identifier)
         unless identifier.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if identifier.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         # The two guards above must stay OUTSIDE build_identifier: this method
@@ -61,7 +62,7 @@ module Pubid
         build_identifier(identifier)
       end
 
-      # @raise [Parslet::ParseFailed] if the string is not a valid ISBN
+      # @raise [Pubid::Errors::ParseError] if the string is not a valid ISBN
       def self.build_identifier(identifier)
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
@@ -69,7 +70,10 @@ module Pubid
         # The Builder validates length and check digit. Surface that as a parse
         # failure, so every ISBN rejection reaches the caller as the same class
         # a grammar rejection does.
-        raise Parslet::ParseFailed, "invalid ISBN '#{identifier}': #{e.message}"
+        raise Pubid::Errors::ParseError.new(
+          "invalid ISBN '#{identifier}': #{e.message}",
+          input: identifier, flavor: "isbn",
+        )
       end
       private_class_method :build_identifier
     end

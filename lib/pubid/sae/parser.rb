@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Sae
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space) { str(" ") }
       rule(:digit) { match["0-9"] }
       rule(:digits) { digit.repeat(1) }

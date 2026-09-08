@@ -14,7 +14,7 @@ module Pubid
     # T/GZAEPI, ...). TYPE is T (recommended), Z (guideline), or omitted.
     # YEAR is 4 digits, separated by either ASCII dash or em-dash (Chinese
     # typography uses the em-dash form).
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space)  { str(" ") }
       rule(:dot)    { str(".") }
       rule(:dash)   { str("-") | str("—") }

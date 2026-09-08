@@ -6,7 +6,7 @@ module Pubid
   module Nist
     # Parser class for NIST identifiers
     # Single Responsibility: Parsing NIST identifier syntax
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
 
       # Class-level parse method with preprocessing.
       # Delegates all string normalization to Nist::Preprocessor, then

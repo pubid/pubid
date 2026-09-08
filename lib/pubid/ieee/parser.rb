@@ -7,7 +7,7 @@ module Pubid
     # Parser class for IEEE identifiers
     # Single Responsibility: Parsing IEEE identifier syntax
     # Note: IEEE is extremely complex with many edge cases
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic building blocks
       rule(:space) { str(" ") }
       rule(:space?) { space.maybe }

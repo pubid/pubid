@@ -16,7 +16,7 @@ module Pubid
     # Builder with order-independent fragment classification. Keeping
     # decomposition out of the PEG avoids brittle backtracking and guarantees a
     # lossless round-trip.
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:prefix) { str("OASIS") >> str(" ") }
 
       # The whole slug, captured verbatim (any character, incl. spaces / "]").

@@ -12,7 +12,7 @@ module Pubid
     #
     # Slugs use only [a-zA-Z0-9._-] and contain at most one "/", so a plain
     # character-class repeat parses them; there is no ReDoS surface.
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # A single registry slug: letters, digits, dot, underscore, hyphen.
       rule(:slug) { match['a-zA-Z0-9._\-'].repeat(1) }
 

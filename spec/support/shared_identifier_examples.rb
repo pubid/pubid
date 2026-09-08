@@ -41,6 +41,19 @@ RSpec.shared_examples "parse rejection" do
     expect { described_class.parse(nil) }
       .to raise_error(ArgumentError, /must be a String/)
   end
+
+  # The same two raises, seen through the classes pubid owns. Both hold at
+  # once: Pubid::Errors::ParseError inherits Parslet::ParseFailed and
+  # Pubid::Errors::InvalidInputError inherits ArgumentError.
+  it "rejects empty input with Pubid::Errors::ParseError" do
+    expect { described_class.parse("") }
+      .to raise_error(Pubid::Errors::ParseError)
+  end
+
+  it "rejects nil input with Pubid::Errors::InvalidInputError" do
+    expect { described_class.parse(nil) }
+      .to raise_error(Pubid::Errors::InvalidInputError)
+  end
 end
 
 RSpec.shared_examples "parse and render" do |identifier_string|

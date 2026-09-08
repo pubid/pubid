@@ -2,7 +2,7 @@
 
 module Pubid
   module Plateau
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:space) { str(" ") }
       rule(:dash) { str("-") }
       rule(:hash) { str("#") }

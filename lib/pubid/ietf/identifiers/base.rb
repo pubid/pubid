@@ -47,19 +47,21 @@ module Pubid
       # Parse an IETF identifier string into the appropriate identifier object.
       # @param identifier [String] the IETF identifier string to parse
       # @return [Identifier] the concrete identifier object
-      # @raise [ArgumentError] if the input exceeds Pubid::MAX_INPUT_LENGTH
-      # @raise [Parslet::ParseFailed] if parsing fails
+      # @raise [Pubid::Errors::InvalidInputError] if the input exceeds
+      #   Pubid::MAX_INPUT_LENGTH
+      # @raise [Pubid::Errors::ParseError] if parsing fails
       def self.parse(identifier)
         # Inline length guard (CodeQL rb/polynomial-redos barrier) — must be
         # the first statement. This class-level funnel is what relaton reaches
         # directly through `pubid_class: ::Pubid::Ietf::Identifier`, so it
         # cannot rely on the guard in Pubid::Ietf.parse.
         unless identifier.is_a?(String)
-          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
         end
 
         if identifier.length > Pubid::MAX_INPUT_LENGTH
-          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
         parsed = Parser.parse(identifier)

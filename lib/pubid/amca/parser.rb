@@ -4,7 +4,7 @@ module Pubid
   module Amca
     # Parser class for ACMA identifiers
     # Single Responsibility: Parsing ACMA identifier syntax
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic building blocks
       rule(:space) { str(" ") }
       rule(:space?) { space.maybe }

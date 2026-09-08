@@ -26,7 +26,7 @@ module Pubid
     #
     # The builder interprets prefix_text (splits copublisher vs subtype,
     # normalizes Cyrillic to Latin) and raw (splits number vs year).
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       include ::Pubid::Parser::CommonParseRules
 
       root :identifier
@@ -88,8 +88,15 @@ module Pubid
       end
 
       def self.parse(string)
-        raise ArgumentError, ::Pubid::INPUT_NOT_A_STRING_MESSAGE unless string.is_a?(String)
-        raise ArgumentError, ::Pubid::INPUT_TOO_LONG_MESSAGE if string.length > ::Pubid::MAX_INPUT_LENGTH
+        unless string.is_a?(String)
+          raise ::Pubid::Errors::InvalidInputError,
+                ::Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if string.length > ::Pubid::MAX_INPUT_LENGTH
+          raise ::Pubid::Errors::InvalidInputError,
+                ::Pubid::INPUT_TOO_LONG_MESSAGE
+        end
 
         new.parse(string.strip)
       end

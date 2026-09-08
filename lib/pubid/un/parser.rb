@@ -4,7 +4,7 @@ require "parslet"
 
 module Pubid
   module Un
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       rule(:slash) { str("/") }
       rule(:un_prefix) { (str("UN") >> str(" ")).maybe }
       rule(:token) { match("[A-Z0-9.]").repeat(1) }

@@ -7,7 +7,7 @@ module Pubid
     module Ire
       # Parser for IRE (Institute of Radio Engineers) identifiers
       # Historical period: 1912-1963 (merged into IEEE in 1963)
-      class Parser < Parslet::Parser
+      class Parser < ::Pubid::Parser::Grammar
         # Basic building blocks
         rule(:space) { str(" ") }
         rule(:space?) { space.maybe }

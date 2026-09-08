@@ -6,7 +6,7 @@ module Pubid
   module Cie
     # Parser for CIE identifiers
     # Handles dual-style system (legacy vs current)
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # Basic building blocks
       rule(:space) { str(" ") }
       rule(:space?) { space.maybe }

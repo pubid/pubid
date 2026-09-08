@@ -11,7 +11,7 @@ module Pubid
     #
     # Group and type-word alternations are built from the shared vocabularies on
     # {Identifier} (sorted longest-first so e.g. "CCTF" is tried before "CCT").
-    class Parser < Parslet::Parser
+    class Parser < ::Pubid::Parser::Grammar
       # --- primitives ---
       rule(:space) { str(" ") }
       rule(:digits) { match["0-9"].repeat(1) }

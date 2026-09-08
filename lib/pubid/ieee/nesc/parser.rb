@@ -20,7 +20,7 @@ module Pubid
       # @example Parse handbook
       #   parser = Parser.new
       #   result = parser.parse("2017 NESC Handbook, Premier Edition")
-      class Parser < Parslet::Parser
+      class Parser < ::Pubid::Parser::Grammar
         root(:nesc_identifier)
 
         rule(:space) { str(" ") }

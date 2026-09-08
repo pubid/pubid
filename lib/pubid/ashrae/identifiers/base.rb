@@ -8,7 +8,7 @@ module Pubid
       # Parse an ASHRAE identifier string into an identifier object
       # @param identifier [String] The ASHRAE identifier string to parse
       # @return [Pubid::Ashrae::Identifier] The appropriate identifier object
-      # @raise [Parslet::ParseFailed] If parsing fails
+      # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
