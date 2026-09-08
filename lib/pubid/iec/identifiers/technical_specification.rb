@@ -108,23 +108,6 @@ module Pubid
             web: :technical_specification, title: "Technical Specification", short: "TS" }
         end
 
-        # Override publisher_portion to handle TS formatting
-        # If copublishers exist, use parent implementation
-        def publisher_portion
-          # If copublishers, delegate to parent (SingleIdentifier) which handles them
-          return super if copublishers&.any?
-
-          # No copublishers: simple TS formatting
-          result = publisher.to_s
-
-          if typed_stage
-            abbr = typed_stage.abbreviation
-            # TS uses space for all stages
-            result += " #{abbr}" unless abbr.empty?
-          end
-
-          result
-        end
       end
     end
   end

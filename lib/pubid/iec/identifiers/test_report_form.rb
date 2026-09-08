@@ -28,17 +28,6 @@ module Pubid
             web: :test_report_form, title: "Test Report Form", short: "TRF" }
         end
 
-        # Override publisher_portion to add TRF with space
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "TRF"
-            result += " TRF"
-          end
-
-          result
-        end
-
         # TRF uses special rendering via the Renderer
       end
     end

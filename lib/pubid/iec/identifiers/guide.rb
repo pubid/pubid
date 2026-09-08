@@ -80,22 +80,6 @@ module Pubid
           { key: :guide, title: "Guide", short: %w[Guide GUIDE] }
         end
 
-        # Override publisher_portion to handle Guide formatting
-        # If copublishers exist, use parent implementation
-        def publisher_portion
-          # If copublishers, delegate to parent (SingleIdentifier) which handles them
-          return super if copublishers&.any?
-
-          # No copublishers: simple Guide formatting
-          result = publisher.to_s
-
-          if typed_stage
-            abbr = typed_stage.abbreviation
-            result += " #{abbr}" unless abbr.empty?
-          end
-
-          result
-        end
       end
     end
   end

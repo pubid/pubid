@@ -159,7 +159,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq("ISO PAS 29119:2013")
+        expect(parsed.to_s).to eq("ISO/IEC PAS 29119:2013")
       end
 
       it "provides type code" do
@@ -287,7 +287,7 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq("ISO DPAS 29119")
+        expect(parsed.to_s).to eq("ISO/IEC DPAS 29119")
       end
     end
   end

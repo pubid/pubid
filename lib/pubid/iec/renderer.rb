@@ -89,13 +89,18 @@ module Pubid
       end
 
       def render_supplement_standalone(id, context)
+        # This is a second, independent publisher/stage join that
+        # SingleIdentifier#publisher_portion never reaches. It follows the same
+        # house style: the slash separates copublishers, and a SPACE separates
+        # the publisher from the stage abbreviation. See issue #360 item 2.
         parts = []
 
         if id.publisher
-          parts << id.publisher.render(context:)
+          publishers = [id.publisher.render(context:)]
           if id.copublishers&.any?
-            parts << "/#{id.copublishers.map { |c| c.render(context:) }.join('/')}"
+            publishers += id.copublishers.map { |c| c.render(context:) }
           end
+          parts << publishers.join("/")
         end
 
         abbr = id.typed_stage.abbr.first
@@ -104,7 +109,7 @@ module Pubid
         number_str += "-#{id.subpart}" if id.subpart
         parts << "#{abbr} #{number_str}"
 
-        result = parts.join("/")
+        result = parts.join(" ")
         result += ":#{id.date.render(context:)}" if id.date
         result += " #{id.edition.render(context:)}" if id.edition&.number
         result
@@ -197,14 +202,12 @@ module Pubid
 
       def render_working_document(id, context)
         if id.wp_stage
+          # A work-programme registration renders bare, as it is written:
+          # "PNW 65-915 ED1", not "IEC/PNW 65-915 ED1". Its number is
+          # TC-scoped, not an IEC document number, and prefixing "IEC " would
+          # break idempotence — "IEC PNW 65-915 ED1" re-parses as an
+          # International Standard, so rendering would not be a fixed point.
           parts = []
-          if id.publisher
-            parts << id.publisher.render(context:)
-            if id.copublishers&.any?
-              parts << "/#{id.copublishers.map { |c| c.render(context:) }.join('/')}"
-            end
-            parts << "/"
-          end
           parts << id.wp_stage
           if id.wp_type && !id.wp_type.strip.empty?
             parts << " #{id.wp_type.strip}"

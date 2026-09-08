@@ -82,18 +82,6 @@ module Pubid
             web: :publicly_available_specification, title: "Publicly Available Specification", short: "PAS" }
         end
 
-        # Override publisher_portion to add PAS or DPAS stage
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage
-            abbr = typed_stage.abbreviation
-            # PAS uses space for all stages
-            result += " #{abbr}" unless abbr.empty?
-          end
-
-          result
-        end
       end
     end
   end

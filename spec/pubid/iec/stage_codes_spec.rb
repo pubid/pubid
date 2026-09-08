@@ -26,9 +26,14 @@ RSpec.describe "IEC stage codes — issue #237" do
     expect(cd.abbr.map(&:to_s)).to include("2CD", "ACD", "A9CD")
   end
 
-  it "PWI stage accepts work-item variants (PNW, NWIP, BWG, AWIN, AMW)" do
+  # PNW used to be listed here as a PWI variant. It is a stage of its own at
+  # harmonized code 10.20 — see spec/pubid/iec/pnw_stage_spec.rb and issue
+  # #360. The ISSUE_ABBRS example above still covers PNW, because that example
+  # only asserts the abbreviation is registered somewhere.
+  it "PWI stage accepts work-item variants (NWIP, BWG, AWIN, AMW)" do
     pwi = all_stages.find { |s| s.code.to_s == "pwi" }
-    expect(pwi.abbr.map(&:to_s)).to include("PNW", "NWIP", "BWG", "AWIN", "AMW")
+    expect(pwi.abbr.map(&:to_s)).to include("NWIP", "BWG", "AWIN", "AMW")
+    expect(pwi.abbr.map(&:to_s)).not_to include("PNW")
   end
 
   it "published stage accepts publication variants (BPUB, PPUB, APUB, WPUB, DELPUB)" do

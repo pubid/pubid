@@ -17,8 +17,7 @@ module Pubid
       root :identifier
 
       rule(:identifier) do
-        working_programme_with_publisher |
-          working_programme |
+        working_programme |
           technical_group |
           working_document |
           sheet_supplement_identifier |
@@ -71,21 +70,6 @@ module Pubid
       # TC-style names: "PWI TR SYCSMARTENERGY-1", "PWI SyCLVDC-1 ED1"
       rule(:working_programme) do
         (str("PWI") | str("PNW")).as(:wp_stage) >>
-          space >>
-          (
-            (str("TR") >> space) |
-            (str("TS") >> space) |
-            (str("SRD") >> space)
-          ).maybe.as(:wp_type) >>
-          wp_number >>
-          (space >> edition).maybe
-      end
-
-      # Working Programme with publisher prefix: IEC/PWI [TR] number edition
-      # Examples: "IEC/PWI 60038", "ISO/IEC/PWI TR 100-36 ED1"
-      rule(:working_programme_with_publisher) do
-        prefix_with_copublishers >> str("/") >>
-          (str("PWI") | str("PNW")).as(:wp_stage) >>
           space >>
           (
             (str("TR") >> space) |

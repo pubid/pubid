@@ -108,23 +108,6 @@ module Pubid
             web: :technical_report, title: "Technical Report", short: "TR" }
         end
 
-        # Override publisher_portion to handle TR formatting
-        # If copublishers exist, use parent implementation
-        def publisher_portion
-          # If copublishers, delegate to parent (SingleIdentifier) which handles them
-          return super if copublishers&.any?
-
-          # No copublishers: simple TR formatting
-          result = publisher.to_s
-
-          if typed_stage
-            abbr = typed_stage.abbreviation
-            # For TR: always use space (IEC convention for ALL publishers)
-            result += " #{abbr}" unless abbr.empty?
-          end
-
-          result
-        end
       end
     end
   end

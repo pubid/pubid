@@ -13,7 +13,7 @@ module Pubid
             code: :pwi,
             stage_code: :pwi,
             type_code: :is,
-            abbr: %w[PWI PNW NWIP BWG AWIN AMW],
+            abbr: %w[PWI NWIP BWG AWIN AMW],
             name: "Preliminary Work Item",
             harmonized_stages: %w[00.00 00.20 00.60 00.98 00.99],
           ),
@@ -23,7 +23,20 @@ module Pubid
             type_code: :is,
             abbr: ["NP"],
             name: "New Proposal",
-            harmonized_stages: %w[10.00 10.20 10.60 10.92 10.98],
+            harmonized_stages: %w[10.00 10.60 10.92 10.98],
+          ),
+          # PNW is a stage of its own, not an alias of PWI. IEC's portal and
+          # pubid-iec 1.x both give it harmonized code 10.20 ("New work item
+          # proposal"), which is why 10.20 is absent from :np above — the two
+          # must not both claim it, or a lookup by harmonized code is
+          # ambiguous. See issue #360 item 1.
+          Pubid::Components::TypedStage.new(
+            code: :pnw,
+            stage_code: :pnw,
+            type_code: :is,
+            abbr: ["PNW"],
+            name: "New work item proposal",
+            harmonized_stages: %w[10.20],
           ),
           Pubid::Components::TypedStage.new(
             code: :anw,

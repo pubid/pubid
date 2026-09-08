@@ -70,7 +70,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq(subject.sub("/", " "))
       end
     end
   end

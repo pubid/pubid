@@ -39,8 +39,13 @@ module Pubid
 
         id = Pubid::Iec::Identifier.parse(code)
         id.all_parts = true if all_parts && id.class.attributes.key?(:all_parts)
+        # The language slot joins codes with a hyphen ("en-fr"). Building one
+        # Language from the whole field gave a single bogus language that
+        # rendered as "(en-fr)".
         if lang && !lang.empty? && id.class.attributes.key?(:languages)
-          id.languages = [::Pubid::Components::Language.new(code: lang)]
+          id.languages = lang.split("-").map do |code|
+            ::Pubid::Components::Language.new(code: code)
+          end
         end
         id
       end
@@ -57,7 +62,8 @@ module Pubid
         all_parts = false
 
         code = head.gsub("-", "/")
-        code += " #{type}" unless type.nil? || type.empty?
+        type_code = type_slot_to_code(type)
+        code += " #{type_code}" unless type_code.empty?
         code += " #{num}"
         code += ":#{date}" unless date.nil? || date.empty?
         code += adjunct_to_code(fields[9..])
@@ -67,11 +73,40 @@ module Pubid
         # part or date, so to_s renders "IEC NNNN (all parts)").
         if deliv&.casecmp("SER")&.zero?
           all_parts = true
+        elsif (edition = edition_slot_to_code(deliv))
+          code += " #{edition}"
         elsif deliv && !deliv.empty?
           code += " #{deliv}"
         end
 
         [code, lang&.downcase, all_parts]
+      end
+
+      # The type slot holds either the legacy type token ("TS"), a stage
+      # ("STAGE-10.20"), or both ("TS-STAGE-50.00"). A stage is written back as
+      # the abbreviation the grammar accepts, resolved from the registry by
+      # type code and harmonized code — so the round trip is exact in both
+      # directions. See issue #360 item 4.
+      def type_slot_to_code(type)
+        return "" if type.nil? || type.empty?
+
+        match = /\A(?:([A-Z]+)-)?STAGE-([\d.]+)\z/.match(type)
+        return type unless match
+
+        type_code = (match[1] || "IS").downcase
+        stage = Pubid::Iec.all_typed_stages.find do |s|
+          s.type_code.to_s == type_code &&
+            s.harmonized_stages&.first.to_s == match[2]
+        end
+        return "" unless stage
+
+        stage.abbr.first.to_s
+      end
+
+      # "ED-7" in the deliverable slot is an edition, not a deliverable code.
+      def edition_slot_to_code(deliv)
+        match = /\AED-(.+)\z/.match(deliv.to_s)
+        match && "ED#{match[1]}"
       end
 
       # Port of Relaton::Iec.ajanct_to_code — recursively rebuilds amd/cor/ish

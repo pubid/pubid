@@ -101,13 +101,13 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses number" do
-        # For "IEC/DISH 60050-191", the supplement number (ISH) is not explicitly specified
+        # For "IEC DISH 60050-191", the supplement number (ISH) is not explicitly specified
         # "60050-191" is the base document number with part
         expect(parsed.base.number.value).to eq("60050")
       end
 
       it "parses part" do
-        # For "IEC/DISH 60050-191", "-191" is parsed as the supplement number
+        # For "IEC DISH 60050-191", "-191" is parsed as the supplement number
         # This represents the part of the base document "60050-191"
         expect(parsed.number.value).to eq("191")
       end
@@ -121,7 +121,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq("IEC/DISH 60050-191")
+        expect(parsed.to_s).to eq("IEC DISH 60050-191")
       end
     end
   end
@@ -142,7 +142,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses number" do
-        # For "IEC/CDISH 60050-191", the supplement number (ISH) is not explicitly specified
+        # For "IEC CDISH 60050-191", the supplement number (ISH) is not explicitly specified
         # "60050-191" is the base document number with part
         expect(parsed.base.number.value).to eq("60050")
       end
@@ -156,7 +156,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq("IEC/CDISH 60050-191")
+        expect(parsed.to_s).to eq("IEC CDISH 60050-191")
       end
     end
   end
@@ -252,7 +252,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq("IEC/DISH 60050-191:2014")
+        expect(parsed.to_s).to eq("IEC DISH 60050-191:2014")
       end
     end
   end
