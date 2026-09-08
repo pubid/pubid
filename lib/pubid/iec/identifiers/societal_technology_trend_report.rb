@@ -24,16 +24,6 @@ module Pubid
             short: "Trend Report" }
         end
 
-        # Override publisher_portion to add Trend Report
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "Trend Report"
-            result += " Trend Report"
-          end
-
-          result
-        end
       end
     end
   end

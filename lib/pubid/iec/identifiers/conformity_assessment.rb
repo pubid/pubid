@@ -22,16 +22,6 @@ module Pubid
           { key: :ca, title: "Conformity Assessment", short: "CA" }
         end
 
-        # Override publisher_portion to add /CA
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "CA"
-            result += " CA"
-          end
-
-          result
-        end
       end
     end
   end

@@ -28,19 +28,17 @@ module Pubid
             web: :working_document, title: "Working Document", short: "WD" }
         end
 
-        # Return stage object for PWI/PNW stage
+        # Return stage object for the PWI/PNW work-programme stage.
+        #
+        # This used to build a bare Stage from a hand-written abbreviation map,
+        # so the stage carried no harmonized code and "pnw" existed as a stage
+        # code nowhere else in the registry. It now resolves through the shared
+        # registry, so PWI carries 00.* and PNW carries 10.20 — which is what
+        # the URN generator reads.
         def stage
           return nil unless wp_stage
 
-          # Map PWI/PNW to stage codes
-          stage_map = {
-            "PWI" => "pwi",
-            "PNW" => "pnw",
-          }
-          stage_code = stage_map[wp_stage]
-          return nil unless stage_code
-
-          @stage ||= ::Pubid::Components::Stage.new(stage_code: stage_code)
+          @stage ||= Pubid::Iec.locate_stage(wp_stage)&.to_stage
         end
       end
     end

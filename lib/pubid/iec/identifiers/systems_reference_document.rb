@@ -23,16 +23,6 @@ module Pubid
             web: :systems_reference_document, title: "Systems Reference Document", short: "SRD" }
         end
 
-        # Override publisher_portion to add SRD
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "SRD"
-            result += " SRD"
-          end
-
-          result
-        end
       end
     end
   end

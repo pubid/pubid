@@ -23,16 +23,6 @@ module Pubid
             web: :operational_document, title: "Operational Document", short: "OD" }
         end
 
-        # Override publisher_portion to add OD
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "OD"
-            result += " OD"
-          end
-
-          result
-        end
       end
     end
   end

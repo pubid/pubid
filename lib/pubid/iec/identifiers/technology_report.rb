@@ -22,16 +22,6 @@ module Pubid
           { key: :tec, title: "Technology Report", short: "Technology Report" }
         end
 
-        # Override publisher_portion to add Technology Report
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "Technology Report"
-            result += " Technology Report"
-          end
-
-          result
-        end
       end
     end
   end

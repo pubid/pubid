@@ -23,16 +23,6 @@ module Pubid
             web: :white_paper, title: "White Paper", short: "White Paper" }
         end
 
-        # Override publisher_portion to add White Paper
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "White Paper"
-            result += " White Paper"
-          end
-
-          result
-        end
       end
     end
   end

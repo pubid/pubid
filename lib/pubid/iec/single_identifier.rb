@@ -28,16 +28,14 @@ module Pubid
                        publisher.body
                      end
 
-        # Add type abbreviation if present
-        if typed_stage && !typed_stage.abbreviation.empty?
-          abbr = typed_stage.abbreviation
-          # For copublishers or empty abbr, use space; otherwise use slash
-          pub_string += if copublishers&.any? || abbr == ""
-                          (abbr == "" ? "" : " #{abbr}")
-                        else
-                          "/#{abbr}"
-                        end
-        end
+        # IEC house style separates the publisher from the typed-stage
+        # abbreviation with a SPACE, for every type and whether or not there
+        # are copublishers: "IEC CD 60038", "IEC PNW 1000-1:2023". The slash
+        # stays the copublisher separator only. The slash input spelling
+        # ("IEC/CD 60038") is still accepted by the parser; only rendering
+        # normalises. See issue #360 item 2.
+        abbr = typed_stage&.abbreviation.to_s
+        pub_string += " #{abbr}" unless abbr.empty?
 
         pub_string
       end

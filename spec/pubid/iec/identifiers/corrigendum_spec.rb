@@ -150,7 +150,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq(subject.sub("/", " "))
       end
     end
   end
@@ -187,7 +187,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq(subject.sub("/", " "))
       end
     end
   end
@@ -224,7 +224,7 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
       end
 
       it "round-trips" do
-        expect(parsed.to_s).to eq(subject)
+        expect(parsed.to_s).to eq(subject.sub("/", " "))
       end
     end
   end

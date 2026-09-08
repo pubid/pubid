@@ -23,16 +23,6 @@ module Pubid
             web: :component_specification, title: "Component Specification", short: "CS" }
         end
 
-        # Override publisher_portion to add CS
-        def publisher_portion
-          result = publisher.to_s
-
-          if typed_stage && typed_stage.abbreviation == "CS"
-            result += " CS"
-          end
-
-          result
-        end
       end
     end
   end
