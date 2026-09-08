@@ -168,4 +168,149 @@ RSpec.describe "annotated rendering (cross-flavor)" do
       expect(annotated).to include('<span class="year">2009</span>')
     end
   end
+
+  # The types whose `to_s` composes its own string instead of going through
+  # `render`. They accept the flag (the block above proves that) and used to
+  # answer with plain text, because the shared annotation hook sits inside
+  # `render` and they never reach it.
+  #
+  # The table is keyed by CLASS, not by flavor. A per-flavor table is exactly
+  # how all 36 of these read as covered: `REFS` above holds one reference per
+  # flavor, and for csa, ieee, nist and ccsds that reference happens to be a
+  # type that DOES annotate, so the sibling types went unmeasured.
+  #
+  # Each reference is taken from that flavor's own pass fixtures.
+  describe "types that compose their own string" do
+    HAND_COMPOSED = [
+      ["Pubid::Ccsds::Identifiers::Corrigendum", "ccsds", "CCSDS 121.0-B-1-S Cor. 1"],
+      ["Pubid::Cie::Identifiers::Bundle", "cie",
+       "CIE 198-SP1.1:2011,198-SP1.2:2011,198-SP1.3:2011,198-SP1.4:2011"],
+      ["Pubid::Cie::Identifiers::Conference", "cie", "CIE x005-1992"],
+      ["Pubid::Cie::Identifiers::Corrigendum", "cie", "CIE 198-SP1.4:2011/Cor1:2013"],
+      ["Pubid::Cie::Identifiers::DualPublished", "cie", "CIE S 009:2002/IEC 62471:2006"],
+      ["Pubid::Cie::Identifiers::Identical", "cie", "CIE S 006.1/1998 (ISO 16508:1999)"],
+      ["Pubid::Cie::Identifiers::JointPublished", "cie", "CIE ISO 10916:2024"],
+      ["Pubid::Cie::Identifiers::Proceedings", "cie", "CIE x043-OP01"],
+      ["Pubid::Cie::Identifiers::Standard", "cie", "CIE S 004/E-2001"],
+      ["Pubid::Cie::Identifiers::Supplement", "cie", "CIE 121-SP1:2009"],
+      ["Pubid::Cie::Identifiers::TutorialBundle", "cie", "CIE Tutorials Bundle 1"],
+      ["Pubid::Csa::Identifiers::Bundled", "csa",
+       "CAN/CSA-C22.2 NO. 60601-1-6:11 + A1:15 + A2:21 (R2021) (CONSOLIDATED)"],
+      ["Pubid::Csa::Identifiers::CanadianAdopted", "csa", "CAN/CSA-A123.2-03 (R2023)"],
+      ["Pubid::Csa::Identifiers::Combined", "csa", "CSA A23.1:24/CSA A23.2:24"],
+      ["Pubid::Csa::Identifiers::CsaAdopted", "csa", "CSA ISO/IEC 8824-1:22"],
+      ["Pubid::Csa::Identifiers::Package", "csa",
+       "CSA B149.1:25 Code, Handbook & Training Package"],
+      ["Pubid::Ieee::Aiee::Identifier", "ieee",
+       "AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)"],
+      ["Pubid::Ieee::Identifiers::JointDevelopment", "ieee", "IEC/IEEE P60780-323, CDV1 2014"],
+      ["Pubid::Ieee::Identifiers::Nesc::Edition", "ieee",
+       "2017 National Electrical Safety Code(R) (NESC(R))"],
+      ["Pubid::Ieee::Identifiers::Nesc::Handbook", "ieee", "2012 NESC Handbook, Seventh Edition"],
+      ["Pubid::Ieee::Identifiers::Nesc::Standard", "ieee",
+       "C2-1997 National Electric Safety Code (NESC)"],
+      ["Pubid::Ieee::Ire::Identifier", "ieee", "52 IRE 7.S2"],
+      ["Pubid::Itu::Identifiers::Addendum", "itu", "ITU-T I.363 (1993) Add. 1 (11/1993)"],
+      ["Pubid::Itu::Identifiers::Amendment", "itu", "ITU-T G.722.2 App. I (2002) Amd. 1 (07/2003)"],
+      ["Pubid::Itu::Identifiers::Corrigendum", "itu", "ITU-T G.729 Annex B (1996) Cor. 3 (03/2001)"],
+      ["Pubid::Itu::Identifiers::Errata", "itu", "ITU-T G.722.2 Annex B (2002) Err. 1 (07/2003)"],
+      ["Pubid::Itu::Identifiers::Supplement", "itu", "ITU-T V.25 ter Suppl. 1 (04/1995)"],
+      ["Pubid::Nist::Identifiers::CommercialStandardsMonthly", "nist", "NBS CSM 1"],
+      ["Pubid::Nist::Identifiers::CrplReport", "nist", "NBS CRPL 1-1"],
+      ["Pubid::Nist::Identifiers::InteragencyReport", "nist", "NBS IR 73-101"],
+      ["Pubid::Nist::Identifiers::MiscellaneousPublication", "nist", "NBS MP 1"],
+      ["Pubid::Nist::Identifiers::Monograph", "nist", "NBS MONO 1"],
+      ["Pubid::Nist::Identifiers::Report", "nist", "NBS RPT 10003"],
+    ].freeze
+
+    # Two more reach the hook already and were plain for a different reason:
+    # the annotator found none of their component values in the string. They
+    # are here because the fix is the same branch, not the same edit.
+    VALUE_MATCH = [
+      ["Pubid::Csa::Identifiers::Cec", "csa", "CSA C22.2 NO. 286:23"],
+      ["Pubid::Iec::Identifiers::WorkingDocument", "iec", "1/2457/FDIS"],
+    ].freeze
+
+    (HAND_COMPOSED + VALUE_MATCH).each do |class_name, flavor, ref|
+      context "#{class_name} (#{ref})" do
+        let(:id) { Pubid::Registry.get(flavor).parse(ref) }
+
+        # Guards the table itself: a grammar change that re-routes the
+        # reference to another class would otherwise leave this example
+        # passing while the named class went unmeasured again.
+        it "parses to #{class_name}" do
+          expect(id.class.name).to eq(class_name)
+        end
+
+        it "emits at least one semantic span" do
+          expect(id.to_s(annotated: true)).to include("<span class=")
+        end
+
+        it "is byte-identical to the plain rendering once spans are stripped" do
+          expect(strip_spans(id.to_s(annotated: true))).to eq(id.to_s)
+        end
+
+        it "emits no span by default" do
+          expect(id.to_s).not_to include("<span")
+        end
+      end
+    end
+  end
+
+  # ASTM's technical report prints with no separators at all —
+  # "ISO/ASTMTR52952-EB" — so although the identifier does carry
+  # publisher "ISO/ASTM" and number "52952", both sit against a word
+  # character in the output. `Annotator#standalone?` refuses a match in that
+  # position, and that refusal is the rule that stops the part "1" of
+  # "ISO 1234-1" binding inside "1234". Annotating this form would mean
+  # relaxing the rule for every flavor.
+  #
+  # So it stays plain, deliberately, and this example says so. If a later
+  # change makes it annotate, the example turns red — which is the signal to
+  # check WHY, not to delete it.
+  describe "a glued rendering has no annotatable token" do
+    let(:id) { Pubid::Astm.parse("ISO/ASTMTR52952-EB") }
+
+    it "carries the values" do
+      expect(id.publisher).to eq("ISO/ASTM")
+      expect(id.number).to eq("52952")
+    end
+
+    it "renders plain even under the flag, because none of them stands alone" do
+      expect(id.to_s(annotated: true)).to eq("ISO/ASTMTR52952-EB")
+    end
+  end
+
+# A `to_s` that post-processes the string it got from an annotating `super`
+# must post-process FIRST. NIST's circular and handbook rewrite the edition
+# token with a `$`-anchored regex; once the string ends in "</span>" the
+# anchor cannot match and the rewrite silently stops applying.
+#
+# Asserting the OUTPUT cannot catch this today: for both references the
+# annotator happens to match only the leading publisher, so the tail is bare
+# and the anchored regex still fires. The ordering is what is under test, so
+# the ordering is what this asserts — the string handed to the annotation
+# must already be rewritten, and must carry no span.
+describe "post-processing runs before annotation, not after" do
+  {
+    "NBS CIRC 11e2-1915" => "11e2.1915",
+    "NBS HB 44e2-1955" => "44e2-1955",
+  }.each do |ref, rewritten|
+    it "annotates the already-rewritten string for #{ref}" do
+      id = Pubid::Nist.parse(ref)
+      handed = nil
+
+      allow(id).to receive(:annotate_plain_render).and_wrap_original do |orig, rendered, **opts|
+        handed = rendered
+        orig.call(rendered, **opts)
+      end
+
+      id.to_s(annotated: true)
+
+      expect(handed).to include(rewritten)
+      expect(handed).not_to include("<span")
+    end
+  end
+end
+
 end

@@ -88,6 +88,12 @@ module Pubid
         end
 
         def to_s(format = nil)
+          # A caller passing `annotated:` reaches this positional parameter as
+          # a Hash — Ruby converts keywords for a method that accepts none.
+          # The same idiom `Identifiers::Base#to_s` uses. This renderer
+          # ignores `format`, so only the flag is read.
+          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+
           # Use actual series attribute if it contains subseries (e.g., "CRPL-F-B")
           # Otherwise use default series_code ("CRPL")
           series_to_render = if series&.value&.include?("CRPL-F-")
@@ -124,7 +130,7 @@ module Pubid
           result += append_short_components
 
           result += range_notation if range_notation
-          result
+          annotate_plain_render(result, annotated: annotated)
         end
       end
     end

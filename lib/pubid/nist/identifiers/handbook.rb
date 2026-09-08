@@ -34,8 +34,15 @@ module Pubid
         # Override to_s to handle edition+year pattern with dash instead of dot
         # Pattern: "44e2-1955" (dash separator) not "44e2.1955" (dot separator)
         def to_s(format = nil)
+          # The rewrite below is `$`-anchored, so it has to run on the PLAIN
+          # string: with the flag set, `super` returns a string ending in
+          # "</span>" and the anchor no longer matches. Render plain, rewrite,
+          # then annotate.
+          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          format = format[:format] if format.is_a?(Hash)
+
           # Use the base to_s method first
-          result = super
+          result = super(format)
 
           # If edition has additional_text (year), replace dot with dash
           if edition&.additional_text && !edition.additional_text.empty?
@@ -43,7 +50,7 @@ module Pubid
                                  "#{edition.type}#{edition.id}-#{edition.additional_text}")
           end
 
-          result
+          annotate_plain_render(result, annotated: annotated)
         end
       end
     end

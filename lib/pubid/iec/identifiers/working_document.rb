@@ -28,6 +28,22 @@ module Pubid
             web: :working_document, title: "Working Document", short: "WD" }
         end
 
+        # A working document prints its committee, number, language and stage —
+        # `1/2457(F)/FDIS` — and none of those is the `number` the shared token
+        # table looks for, so it had no annotatable token. `wd_stage` is the
+        # printed stage token ("FDIS"); the derived `#stage` reader covers only
+        # the PWI/PNW work-programme form and is nil here.
+        def annotation_tokens
+          super + [
+            [:technical_committee, "docnumber"],
+            [:wd_number, "docnumber"],
+            [:wd_language, "language"],
+            [:wd_stage, "stage"],
+            [:wp_stage, "stage"],
+            [:wp_type, "doctype"],
+          ]
+        end
+
         # Return stage object for the PWI/PNW work-programme stage.
         #
         # This used to build a bare Stage from a hand-written abbreviation map,

@@ -33,7 +33,7 @@ module Pubid
         # false = materials BEFORE: "CSA B149.1:25 Code, Handbook & Training Package"
         attribute :materials_after_keyword, :boolean, default: -> { true }
 
-        def to_s(**_opts)
+        def to_s(**opts)
           result = base.to_s
 
           # Add package materials if present
@@ -57,7 +57,7 @@ module Pubid
             result += " PACKAGE"
           end
 
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

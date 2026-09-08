@@ -22,7 +22,7 @@ module Pubid
           base&.year
         end
 
-        def to_s(**_opts)
+        def to_s(**opts)
           b = base
           parts = ["CIE"]
           parts << b.stage if b.respond_to?(:stage) && b.stage
@@ -39,7 +39,7 @@ module Pubid
 
           # Supplements always use the current (colon) style.
           result += ":#{b.year}" if b.year
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

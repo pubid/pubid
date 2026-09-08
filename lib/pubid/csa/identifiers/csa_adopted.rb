@@ -25,7 +25,7 @@ module Pubid
         # When set, uses dash format without space (e.g., "CSA-ISO" not "CSA ISO")
         attribute :publisher_prefix, :string
 
-        def to_s(**_opts)
+        def to_s(**opts)
           # Get string representation from wrapped identifier
           base_str = base.to_s
 
@@ -70,7 +70,7 @@ module Pubid
           # Append reaffirmation if present
           result += " (R#{reaffirmation})" if reaffirmation
 
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

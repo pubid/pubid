@@ -115,8 +115,8 @@ module Pubid
           result
         end
 
-        def to_s(**_opts)
-          render_supplement("Suppl.")
+        def to_s(**opts)
+          annotate_plain_render(render_supplement("Suppl."), **opts)
         end
 
         # Shared by Amendment / Corrigendum / Errata.

@@ -25,13 +25,28 @@ module Pubid
         base&.series
       end
 
+      # Four exits — a date range, a base-less delegation, an update form and
+      # the canonical one — so the composition stays whole in its own method
+      # and `to_s` wraps its single result. `super` is not reachable from a
+      # private method, so it is handed in as a block.
       def to_s(format = :short)
+        annotated = format.is_a?(Hash) ? format[:annotated] : nil
+        format = format[:format] || :short if format.is_a?(Hash)
+
+        rendered = render_plain(format) { super(format) }
+
+        annotate_plain_render(rendered, annotated: annotated)
+      end
+
+      private
+
+      def render_plain(format)
         # Handle date range supplements (no base identifier)
         if supplement_date_range_start && supplement_date_range_end
           return "NBS CIRC sup#{supplement_date_range_start}-#{supplement_date_range_end}"
         end
 
-        return super unless base
+        return yield unless base
 
         result = base.to_s(format)
 

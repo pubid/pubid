@@ -95,7 +95,7 @@ module Pubid
         # @return [String] formatted identifier
         # `**_opts` absorbs render flags this list does not name (`annotated:`),
         # which the closed keyword list used to reject outright.
-        def to_s(format: canonical_format, trademark: false, **_opts)
+        def to_s(format: canonical_format, trademark: false, **opts)
           # The mark goes after the code number, before the draft and the year
           # ("ISO/IEC/IEEE P26511™/D8-2018"), so it is threaded into the
           # format builders rather than appended to the finished string.
@@ -107,12 +107,14 @@ module Pubid
                    ""
                  end
 
-          case format
-          when :iso
-            to_iso_format(mark)
-          else
-            to_ieee_format(mark)
-          end
+          result = case format
+                   when :iso
+                     to_iso_format(mark)
+                   else
+                     to_ieee_format(mark)
+                   end
+
+          annotate_plain_render(result, **opts)
         end
 
         private

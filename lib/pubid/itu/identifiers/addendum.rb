@@ -6,8 +6,8 @@ module Pubid
       # Addendum identifier (Add.)
       # Pattern: "ITU-T I.363 (1993) Add. 1 (11/1993)"
       class Addendum < Supplement
-        def to_s(**_opts)
-          render_supplement("Add.")
+        def to_s(**opts)
+          annotate_plain_render(render_supplement("Add."), **opts)
         end
       end
     end

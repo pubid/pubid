@@ -13,6 +13,18 @@ module Pubid
         attribute :cec_part, Components::Code      # C22.2, C22.3, C22.4, C22.6
         attribute :no_number, Components::Code     # Number after NO.
 
+        # `CSA C22.2 NO. 286:23` stores the joined "C22.2-286" in `number`, which
+        # appears nowhere in the printed form; the two halves it does print live
+        # in `cec_part` and `no_number`. Naming them gives the identifier its
+        # docnumber spans back.
+        def annotation_tokens
+          super + [
+            [:publisher_prefix, "publisher"],
+            [:cec_part, "docnumber"],
+            [:no_number, "docnumber"],
+          ]
+        end
+
         # Merged with SingleIdentifier's block (lutaml combines an inherited
         # key_value block with a subclass one), so this adds only the half of
         # the code that Cec keeps separately.

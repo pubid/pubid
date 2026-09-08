@@ -53,7 +53,14 @@ module Pubid
         # Override to_s for CIRC-specific edition+year rendering
         # CIRC uses dot notation: "NBS CIRC 11e2.1915" instead of "NBS CIRC 11e2-1915"
         def to_s(format = nil)
-          result = super
+          # The rewrite below is `$`-anchored, so it has to run on the PLAIN
+          # string: with the flag set, `super` returns a string ending in
+          # "</span>" and the anchor no longer matches. Render plain, rewrite,
+          # then annotate.
+          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          format = format[:format] if format.is_a?(Hash)
+
+          result = super(format)
 
           # For CIRC edition patterns with additional_text (year), render with dot notation
           # "11e2-1915" format: edition.id="2", additional_text="1915" → render as "11e2.1915"
@@ -65,7 +72,7 @@ module Pubid
                                  "e#{edition.id || '?'}.#{edition.additional_text}")
           end
 
-          result
+          annotate_plain_render(result, annotated: annotated)
         end
       end
     end

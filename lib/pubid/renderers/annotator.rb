@@ -53,6 +53,12 @@ module Pubid
       # binds to the middle of a longer run of the same character class.
       WORD_CHAR = /[A-Za-z0-9]/
 
+      # How deep to follow nested identifiers. A wrapper around a wrapper is
+      # real (BSI adopts a CEN prestandard that adopts an ISO standard); four
+      # levels is past anything the corpus holds, and the cap is here so a
+      # cyclic `base` cannot hang a rendering call.
+      MAX_NESTING = 4
+
       def initialize(identifier, context = nil)
         @id = identifier
         @context = context
@@ -102,22 +108,62 @@ module Pubid
       end
 
       # Yields [text, css_class] for every annotatable token this identifier
-      # actually carries.
-      def each_token
-        TOKENS.each do |attr_name, css_class|
-          Array(token_values(attr_name)).each do |value|
+      # actually carries, then every one its nested identifiers carry.
+      def each_token(&)
+        emit_tokens(@id, 0, &)
+      end
+
+      # A wrapper — an adoption, a supplement, a bundle — carries no number of
+      # its own and prints the document it wraps, so the annotatable tokens in
+      # its string belong to `base`. Reading only the wrapper's own attributes
+      # is why every CSA container and CIE's supplement rendered plain while
+      # accepting the flag.
+      #
+      # Order does not matter here: `ordered_tokens` sorts by first occurrence,
+      # so a nested token lands where it actually appears in the string.
+      def emit_tokens(id, depth, &)
+        return if depth > MAX_NESTING
+
+        tokens_for(id).each do |attr_name, css_class|
+          Array(token_values(id, attr_name)).each do |value|
             text = token_text(value)
             next if text.nil? || text.empty?
 
             yield text, resolve_class(css_class, value)
           end
         end
+
+        nested_identifiers(id).each { |nested| emit_tokens(nested, depth + 1, &) }
       end
 
-      def token_values(attr_name)
-        return nil unless @id.respond_to?(attr_name)
+      # {TOKENS} unless the identifier names more of its own — see
+      # `Pubid::Identifier#annotation_tokens`.
+      def tokens_for(id)
+        id.respond_to?(:annotation_tokens) ? id.annotation_tokens : TOKENS
+      end
 
-        @id.public_send(attr_name)
+      # The identifiers this one wraps, under any of the four names the gem
+      # uses: `base` (the uniform parent accessor), the `ids` / `identifiers`
+      # collections that bundles and consolidated identifiers hold instead, and
+      # CSA `Bundled`'s `bundled_with` — which holds the amendments a
+      # consolidation prints, and whose values it composes into the string from
+      # their components rather than from their own `to_s`.
+      def nested_identifiers(id)
+        %i[base ids identifiers bundled_with].flat_map do |name|
+          next [] unless id.respond_to?(name)
+
+          begin
+            Array(id.public_send(name))
+          rescue StandardError
+            []
+          end
+        end.grep(::Pubid::Identifier)
+      end
+
+      def token_values(id, attr_name)
+        return nil unless id.respond_to?(attr_name)
+
+        id.public_send(attr_name)
       rescue StandardError
         # A derived reader may assume state a partial identifier lacks. A
         # missing span is not worth an exception on a rendering path.

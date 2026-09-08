@@ -37,13 +37,22 @@ module Pubid
         attribute :implicit_supplement, :boolean # true for implicit supplements (e.g., "145r11/1925")
 
         def to_s(format = :short)
-          # Handle date range supplements (no base identifier)
-          if supplement_date_range_start && supplement_date_range_end
-            return "NBS CIRC sup#{supplement_date_range_start}-#{supplement_date_range_end}"
-          end
+          # A caller passing `annotated:` reaches this positional parameter as a
+          # Hash. Normalise it away before `super`, so the annotation is applied
+          # once, here, and covers the date-range branch too — that branch
+          # returns a hand-composed string and never reached `super` at all.
+          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          format = format[:format] || :short if format.is_a?(Hash)
 
-          # Use parent's rendering for base + supplement
-          super
+          # Handle date range supplements (no base identifier)
+          result = if supplement_date_range_start && supplement_date_range_end
+                     "NBS CIRC sup#{supplement_date_range_start}-#{supplement_date_range_end}"
+                   else
+                     # Use parent's rendering for base + supplement
+                     super(format)
+                   end
+
+          annotate_plain_render(result, annotated: annotated)
         end
       end
     end

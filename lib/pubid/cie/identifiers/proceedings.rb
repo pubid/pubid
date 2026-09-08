@@ -26,12 +26,14 @@ module Pubid
         # Page range "1-5" (standalone form only).
         attribute :page, :string
 
-        def to_s(**_opts)
-          if conference
-            "CIE x#{conference}-#{number}"
-          else
-            "CIE #{number} #{page}"
-          end
+        def to_s(**opts)
+          result = if conference
+                     "CIE x#{conference}-#{number}"
+                   else
+                     "CIE #{number} #{page}"
+                   end
+
+          annotate_plain_render(result, **opts)
         end
       end
     end

@@ -18,7 +18,7 @@ module Pubid
         attribute :language, Components::Language
         attribute :iso_reference, :string # The ISO identifier in parentheses
 
-        def to_s(**_opts)
+        def to_s(**opts)
           parts = ["CIE"]
 
           # S prefix
@@ -56,7 +56,7 @@ module Pubid
           # ISO reference in parentheses
           result += " (ISO #{iso_reference})" if iso_reference
 
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

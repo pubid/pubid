@@ -31,3 +31,16 @@ return identifier if identifier.length > ::Pubid::MAX_INPUT_LENGTH
 under a note claiming "`Pubid.parse` rejects it before this point". That was wrong twice: `Pubid.parse` never routes a human-readable string to a flavor at all (`lib/pubid.rb` raises `ArgumentError: No flavor specified` for anything that is not an MR string or a URN), and ITU had no raising guard of its own — so an over-long string reached the ITU parser through both `Pubid::Itu.parse` and `Pubid::Itu::Identifier.parse`. The guard now lives in `self.parse` as the standard inline pair, and the comment says what actually protects the method.
 
 **ITU was also the delegate in the most-visible class leak.** `Pubid::Iso.parse("ITU-T G.711")` detects an MR-shaped string, routes through `Pubid::Parsers::MrString`, and lands in `Pubid::Itu::Identifier.parse` — which raised `RuntimeError`. So `Pubid::Iso.parse` raised **two different classes** depending on its input, and a relaton-cli caller rescuing `Parslet::ParseFailed` got a raw backtrace for the ITU-shaped half. Converting ITU fixed the ISO symptom; `spec/pubid/parse_error_spec.rb` pins that exact route by name, because a generic junk string never reaches it.
+
+- **The five supplement types rendered plain under `to_s(annotated: true)`.**
+  `Pubid::Itu::Identifier#to_s` annotates, but `Addendum`, `Amendment`,
+  `Corrigendum`, `Errata` and `Supplement` each override it and none calls
+  `super` — they all funnel through `Supplement#render_supplement(label)`.
+  The wrap cannot live in that helper, which takes a label and no options,
+  so each of the five `to_s` is a one-line
+  `annotate_plain_render(render_supplement("…"), **opts)`.
+
+  `render_supplement` starts from `base.to_s` with no options, so the base
+  arrives plain and the single outer annotation covers the whole string —
+  the base's own tokens are reached by `Annotator#emit_tokens` walking
+  `base`.

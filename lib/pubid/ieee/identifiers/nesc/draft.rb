@@ -29,12 +29,12 @@ module Pubid
           #
           # @param trademark [Boolean] append the IEEE trademark symbol (™/®)
           # @return [String] Draft format with optional month and year
-          def to_s(trademark: false, **_opts)
+          def to_s(trademark: false, **opts)
             parts = ["Draft National Electrical Safety Code"]
             parts << ", #{month} #{year}" if month && year
             result = parts.join
             result += trademark_symbol if trademark
-            result
+            annotate_plain_render(result, **opts)
           end
         end
       end
