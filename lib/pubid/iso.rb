@@ -31,6 +31,10 @@ module Pubid
     # @param format [Symbol] :auto, :human, :mr_string, or :urn
     # @return [Identifier] the parsed identifier
     def self.parse(identifier, format: :auto)
+      unless identifier.is_a?(String)
+        raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+      end
+
       if identifier.length > Pubid::MAX_INPUT_LENGTH
         raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
       end

@@ -44,20 +44,34 @@ module Pubid
       end
 
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
         if identifier.length > Pubid::MAX_INPUT_LENGTH
           raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        # The two guards above must stay OUTSIDE build_identifier: this method
+        # rescues ArgumentError to convert the Builder's check-digit and
+        # length validation into a parse failure, and that rescue used to
+        # swallow the guards' own ArgumentError and re-raise it as a
+        # RuntimeError - so ISBN was the one guarded flavor where an over-long
+        # input did not surface as ArgumentError.
+        build_identifier(identifier)
+      end
+
+      # @raise [Parslet::ParseFailed] if the string is not a valid ISBN
+      def self.build_identifier(identifier)
         parsed = Parser.parse(identifier)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse ISBN '#{identifier}': #{e.message}"
       rescue ArgumentError => e
-        # Builder validates length/check-digit; surface as a parse error so
-        # the error contract matches other flavors (always raises a string
-        # beginning with "Failed to parse").
-        raise "Failed to parse ISBN '#{identifier}': #{e.message}"
+        # The Builder validates length and check digit. Surface that as a parse
+        # failure, so every ISBN rejection reaches the caller as the same class
+        # a grammar rejection does.
+        raise Parslet::ParseFailed, "invalid ISBN '#{identifier}': #{e.message}"
       end
+      private_class_method :build_identifier
     end
   end
 end

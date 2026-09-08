@@ -7,10 +7,16 @@ module Pubid
     # Handles all SAE document types (AMS, AIR, ARP, AS, MA).
     class Identifier < ::Pubid::Identifier
       def self.parse(input)
+        unless input.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if input.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Parser.parse(input)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse SAE identifier: #{input}\n#{e.message}"
       end
 
       attribute :publisher, :string, default: -> { "SAE" }

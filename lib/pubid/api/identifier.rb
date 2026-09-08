@@ -19,13 +19,22 @@ module Pubid
       attribute :subpart, :string
 
       def self.parse(input)
-        # Filter out comments
-        return nil if input.start_with?("#")
+        unless input.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
 
+        if input.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
+        # There used to be a `return nil if input.start_with?("#")` here, to
+        # skip the comment lines of a fixture file. A comment is not an
+        # identifier, so it must be rejected like any other unparseable string:
+        # this was the one public parse in the gem that could return nil, which
+        # a caller reading `id.to_s` sees as a NoMethodError far from the cause.
+        # Both API fixture loaders already drop `#` lines themselves.
         tree = Parser.new.parse(input)
         Builder.new.build(tree)
-      rescue Parslet::ParseFailed => e
-        raise e
       end
     end
   end

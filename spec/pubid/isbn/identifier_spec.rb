@@ -45,7 +45,8 @@ RSpec.describe Pubid::Isbn::Identifier do
     end
 
     it "raises on wrong length" do
-      expect { described_class.parse("ISBN 12345") }.to raise_error(/Failed to parse/)
+      expect { described_class.parse("ISBN 12345") }
+        .to raise_error(Parslet::ParseFailed)
     end
   end
 end

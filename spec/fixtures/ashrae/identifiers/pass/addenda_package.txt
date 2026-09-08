@@ -4,9 +4,11 @@
 !ASHRAE Standard 15-2007 Addenda Supplement Package (Contains Addenda a, b, c, d, and e)!ASHRAE Standard 15-2007: Addenda Supplement Package
 !ASHRAE Standard 15-2010 2012 Addenda Supplement (Contains Addenda b, c, d, e, and f)!ASHRAE Standard 15-2010: Addenda Supplement
 !ASHRAE Standard 34-2004: Addenda Supplement Package (Contains Addenda a, b, c, e, f, k, n, o, p, q, r, s, and u) (PDF)!ASHRAE Standard 34-2004: Addenda Supplement Package
+!ANSI/ASHRAE Standard 34-2013 Addenda Supplement Package (includes addenda a, b, c, d, e, f, g, h, i, j, k, l, m, n) (February 10, 2015)!ASHRAE Standard 34-2013: Addenda Supplement Package
 !ASHRAE Standard 52.2-1999: Addenda Supplement Package (Contains Addendum a)!ASHRAE Standard 52.2-1999: Addenda Supplement Package
 !ASHRAE Standard 52.2-2007 Addenda Supplement Package (Contains Addendum b)!ASHRAE Standard 52.2-2007: Addenda Supplement Package
 !ASHRAE Standard 52.2-2012 2015 Addenda Supplement Package (Contains Addenda a, b, and d) (February 26, 2015)!ASHRAE Standard 52.2-2012: Addenda Supplement Package
+!ASHRAE Standard 62.1-2004: Addenda Supplement Package (This Addenda Package contains Addenda a, b, c, d, and g.)!ASHRAE Standard 62.1-2004: Addenda Supplement Package
 !ASHRAE Standard 62.1-2007 Addenda Supplement Package (Contains Addenda a, b, e, f, and h)!ASHRAE Standard 62.1-2007: Addenda Supplement Package
 !ASHRAE Standard 62.1-2010 Addenda Supplement Package (Contains Addenda a, c, d, and e)!ASHRAE Standard 62.1-2010: Addenda Supplement Package
 !ASHRAE Standard 62.1-2013 Addenda Supplement Package for 2015 (Contains Addenda a, c, j, k, q, r, and s)!ASHRAE Standard 62.1-2013: Addenda Supplement Package
@@ -15,6 +17,12 @@
 !ASHRAE Standard 62.2-2010 Addenda Supplement Package (Contains Addenda b, c, e, g, h, i, and l)!ASHRAE Standard 62.2-2010: Addenda Supplement Package
 !2015 Addenda Supplement Package to Standard 62.2-2013 (includes Addenda a, b, d, e, f, g, and t) (February 26, 2015)!ASHRAE Standard 62.2-2013
 !2017 Supplement Addenda b, d, k, l, q, and s to Standard 62.2-2016!ASHRAE Standard 62.2-2016
+!ASHRAE Standard 90.1-2004: Addenda Supplement Package (Addenda Package includes a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, r, s, t, u, v, x, and ak)!ASHRAE Standard 90.1-2004: Addenda Supplement Package
+!ASHRAE Standard 90.1-2007: Addenda Supplement Package (Addenda Package includes Addenda a, b, c, g, h, i, j, k, l, m, n, p, q, s, t, u, w, y, ad, and aw )!ASHRAE Standard 90.1-2007: Addenda Supplement Package
+!ASHRAE Standard 90.1-2010, Addenda 2012 Supplement: Addenda Supplement Package (Addenda Package includes Addenda a, b, c, g, h, j, k, o, p, s, y, z, bz, cg, ci, and ds)!ASHRAE Standard 90.1-2010: Addenda Supplement Package
+!ASHRAE Standard 90.1-2010, Addenda 2013 Supplement: Addenda Supplement Package (Addenda Package includes Addenda e, f, i, l, m, n, q, r, u, w, aa, ad, ae, af, ag, ah, ai, aj, al, am, an, ap, aq, ar, as, at, au, av, aw, ax, ay, az, ba, bb, bc, bd, be, bf, bg, bh, bi, bj, bk, bl, bn, bo, bp, bq, br, bs, bt, bv, bw, bx, by, ca, cb, cc, cd, ce, cf, ch, cj, ck, cl, cm, cn, co, cp, cr, ct, cv, cy, cz, da, db, dc, dd, de, dg, di, dj, dk, dl, dm, dn, do, dp, dq, dr, dt, dv, and dw!ASHRAE Standard 90.1-2010: Addenda Supplement Package
+!ASHRAE Standard 90.1-2013, Addenda 2015 Supplement: Addenda Supplement Package (Addenda package includes Addenda a, c, d, e, g, h, j, k, m, n, o, p, q, r, s, z, aa, ac, ad, ae, ag, ak, bm, and dx) (March 30, 2016)!ASHRAE Standard 90.1-2013: Addenda Supplement Package
 !ASHRAE Standard 90.2-2004: Addenda Supplement Package (Contains addenda a, b, f, g, h, and i)!ASHRAE Standard 90.2-2004: Addenda Supplement Package
 !ASHRAE Standard 140-2007 Addenda Supplement (Addendum a)!ASHRAE Standard 140-2007: Addenda Supplement
 !2006 Addenda Supplement to ANSI/ASHRAE Standard 62.1-2004 (April 23, 2007) (PDF)!ASHRAE Standard 62.1-2004
+!2013 Supplement to ANSI/ASHRAE/USGBC/IES Standard 189.1-2011 Errata (March 23, 2015) (PDF)!ASHRAE Standard 189.1-2011

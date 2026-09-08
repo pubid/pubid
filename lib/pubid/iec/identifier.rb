@@ -314,6 +314,10 @@ module Pubid
       end
 
       def self.parse(string)
+        unless string.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
         if string.length > Pubid::MAX_INPUT_LENGTH
           raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
@@ -326,11 +330,6 @@ module Pubid
         # Apply legacy update_codes normalization first, before any other preprocessing
         normalized = Core::UpdateCodes.apply(string, :iec)
         parsed = Pubid::Iec::Parser.new.parse(normalized)
-        if parsed.nil? || parsed.empty?
-          raise Pubid::Iec::Parser::ParseError,
-                "Invalid identifier format"
-        end
-
         Pubid::Iec::Builder.new.build(parsed)
       end
 

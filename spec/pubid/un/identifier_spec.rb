@@ -54,7 +54,8 @@ RSpec.describe Pubid::Un::Identifier do
     end
 
     it "raises on malformed input" do
-      expect { described_class.parse("TRADE") }.to raise_error(/Failed to parse/)
+      expect { described_class.parse("TRADE") }
+        .to raise_error(Parslet::ParseFailed)
     end
   end
 end

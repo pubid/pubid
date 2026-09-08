@@ -14,6 +14,14 @@ module Pubid
       attribute :subpart, :string
 
       def self.parse(string)
+        unless string.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         parsed = Pubid::Ansi::Parser.new.parse(string)
         Pubid::Ansi::Builder.new.build(parsed)
       end

@@ -72,7 +72,7 @@ RSpec.describe "CalConnect partial reference parsing" do
   describe "a bare trailing colon still fails" do
     it "rejects 'CC 18011:'" do
       expect { Pubid::Calconnect.parse("CC 18011:") }
-        .to raise_error(RuntimeError)
+        .to raise_error(Parslet::ParseFailed)
     end
   end
 end

@@ -67,7 +67,7 @@ RSpec.describe "ITU Technical Corrigendum" do
       it "rejects #{id} rather than silently dropping the qualifier" do
         expect do
           Pubid::Itu.parse(id)
-        end.to raise_error(RuntimeError, /Failed to parse/)
+        end.to raise_error(Parslet::ParseFailed)
       end
     end
   end

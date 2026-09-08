@@ -90,7 +90,7 @@ RSpec.describe Pubid::Calconnect::Identifier do
 
       it "still rejects a bare trailing colon" do
         expect { described_class.parse("CC 18011:") }
-          .to raise_error(RuntimeError)
+          .to raise_error(Parslet::ParseFailed)
       end
     end
 

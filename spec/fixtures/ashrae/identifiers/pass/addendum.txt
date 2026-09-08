@@ -23,6 +23,8 @@ ASHRAE Addendum a to Guideline 28-2012
 !ASHRAE Addendum a to Guideline 28-2016 (January 22, 2019)!ASHRAE Addendum a to Guideline 28-2016
 !ASHRAE Addendum b to Guideline 28-2016 (October 10, 2018)!ASHRAE Addendum b to Guideline 28-2016
 !ASHRAE Addendum c to Guideline 28-2016 (October 10, 2018)!ASHRAE Addendum c to Guideline 28-2016
+!ASHRAE Addendum e to ASHRAE Guideline 28-2016 (December 3, 2019)!ASHRAE Addendum e to Guideline 28-2016
+!ASHRAE Addendum d to ASHRAE Guideline 28-2016 (May 25, 2021)!ASHRAE Addendum d to Guideline 28-2016
 ASHRAE Addendum a to Guideline 29-2009
 !ASHRAE Addendum a to Guideline 36-2018 (August 27, 2019)!ASHRAE Addendum a to Guideline 36-2018
 !ASHRAE Addendum b to Guideline 36-2018 (August 27, 2019)!ASHRAE Addendum b to Guideline 36-2018
@@ -284,17 +286,17 @@ ASHRAE Addendum aj to Standard 34-2013
 !ASHRAE Addendum al to Standard 34-2022 (August 30, 2024)!ASHRAE Addendum al to Standard 34-2022
 !ASHRAE Addendum am to Standard 34-2022 (August 30, 2024)!ASHRAE Addendum am to Standard 34-2022
 !ASHRAE Addendum n to Standard 34-2022 (August 30, 2024)!ASHRAE Addendum n to Standard 34-2022
-!ANSI/ASHRAE Addendum a to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum a to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum b to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum b to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum c to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum c to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum d to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum d to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum e to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum e to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum f to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum f to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum g to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum g to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum h to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum h to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum i to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum i to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum j to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum j to ASHRAE Standard -2024
-!ANSI/ASHRAE Addendum k to ANSI/ASHRAE 34-2024 (October 31, 2025))!ANSI/ASHRAE Addendum k to ASHRAE Standard -2024
+!ANSI/ASHRAE Addendum a to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum a to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum b to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum b to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum c to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum c to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum d to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum d to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum e to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum e to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum f to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum f to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum g to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum g to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum h to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum h to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum i to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum i to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum j to ANSI/ASHRAE 34-2024 (April 30, 2025)!ANSI/ASHRAE Addendum j to ASHRAE Standard 34-2024
+!ANSI/ASHRAE Addendum k to ANSI/ASHRAE 34-2024 (October 31, 2025))!ANSI/ASHRAE Addendum k to ASHRAE Standard 34-2024
 !ASHRAE Addendum a to Standard 41.1-2020 (June 1, 2022)!ASHRAE Addendum a to Standard 41.1-2020
 !ASHRAE Addendum a to Standard 41.2-2022 (January 31, 2024)!ASHRAE Addendum a to Standard 41.2-2022
 !ASHRAE Addendum b to Standard 41.2-2022 (January 31, 2024)!ASHRAE Addendum b to Standard 41.2-2022
@@ -452,10 +454,10 @@ ASHRAE Addendum p to Standard 62.1-2013
 !ASHRAE Addendum o to Standard 62.1-2022 (May 1, 2024)!ASHRAE Addendum o to Standard 62.1-2022
 !ASHRAE Addendum p to Standard 62.1-2022 (May 1, 2024)!ASHRAE Addendum p to Standard 62.1-2022
 !ASHRAE Addendum q for Standard 62.1-2022 (October 31, 2024)!ASHRAE Addendum q to Standard 62.1-2022
-!ASHRAE Addendum r to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum r to ASHRAE Standard -2022
-!ASHRAE Addendum s to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum s to ASHRAE Standard -2022
-!ASHRAE Addendum t to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum t to ASHRAE Standard -2022
-!ASHRAE Addendum u to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum u to ASHRAE Standard -2022
+!ASHRAE Addendum r to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum r to ASHRAE Standard 62.1-2022
+!ASHRAE Addendum s to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum s to ASHRAE Standard 62.1-2022
+!ASHRAE Addendum t to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum t to ASHRAE Standard 62.1-2022
+!ASHRAE Addendum u to ANSI/ASHRAE 62.1-2022 (April 30, 2025)!ANSI/ASHRAE Addendum u to ASHRAE Standard 62.1-2022
 !ASHRAE Addendum v for Standard 62.1-2022 (September 30, 2025)!ASHRAE Addendum v to Standard 62.1-2022
 !ASHRAE Addendum w for Standard 62.1-2022 (September 30, 2025)!ASHRAE Addendum w to Standard 62.1-2022
 !ASHRAE Addendum x to Standard 62.1-2022 (September 23, 2022)!ASHRAE Addendum x to Standard 62.1-2022
@@ -714,11 +716,14 @@ ASHRAE Addendum ap to Standard 90.1-1999
 !ASHRAE Addendum af to Standard 90.1-2022 (May 30, 2025)!ASHRAE Addendum af to Standard 90.1-2022
 !ASHRAE Addendum ag for Standard 90.1-2022 (October 31, 2024)!ASHRAE Addendum ag to Standard 90.1-2022
 !ASHRAE Addendum ah to Standard 90.1-2022 (December 31, 2024)!ASHRAE Addendum ah to Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum aj to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum aj to ASHRAE Standard 90.1-2022
 !ASHRAE Addendum ak for Standard 90.1-2022 (July 31, 2025)!ASHRAE Addendum ak to Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum am to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum am to ASHRAE Standard 90.1-2022
 !ASHRAE Addendum an for Standard 90.1-2022 (October 31, 2024)!ASHRAE Addendum an to Standard 90.1-2022
 !ASHRAE Addendum ao for Standard 90.1-2022 (August 29, 2025)!ASHRAE Addendum ao to Standard 90.1-2022
 !ASHRAE Addendum aq to Standard 90.1-2022 (May 9, 2025)!ASHRAE Addendum aq to Standard 90.1-2022
 !ASHRAE Addendum ar for Standard 90.1-2022 (March 11, 2025)!ASHRAE Addendum ar to Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum as to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum as to ASHRAE Standard 90.1-2022
 !ASHRAE Addendum at for Standard 90.1-2022 (March 11, 2025)!ASHRAE Addendum at to Standard 90.1-2022
 !ASHRAE Addendum au for Standard 90.1-2022!ASHRAE Addendum au to Standard 90.1-2022
 !ASHRAE Addendum av to Standard 90.1-2022 (December 31, 2024)!ASHRAE Addendum av to Standard 90.1-2022
@@ -730,12 +735,17 @@ ASHRAE Addendum ap to Standard 90.1-1999
 !ASHRAE Addendum bd to Standard 90.1-2022 (May 9, 2025)!ASHRAE Addendum bd to Standard 90.1-2022
 !ASHRAE Addendum be to Standard 90.1-2022 (May 30, 2025)!ASHRAE Addendum be to Standard 90.1-2022
 !ASHRAE Addendum bf for Standard 90.1-2022 (July 31, 2025)!ASHRAE Addendum bf to Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum bg to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum bg to ASHRAE Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum bh to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum bh to ASHRAE Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum bl to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum bl to ASHRAE Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum bp to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum bp to ASHRAE Standard 90.1-2022
 !ASHRAE Addendum bo to Standard 90.1-2022 (May 16, 2023)!ASHRAE Addendum bo to Standard 90.1-2022
 !ASHRAE Addendum bq to Standard 90.1-2022 (October 31, 2025)!ASHRAE Addendum bq to Standard 90.1-2022
 !ASHRAE Addendum br to Standard 90.1-2022 (May 9, 2025)!ASHRAE Addendum br to Standard 90.1-2022
 !ASHRAE Addendum bs for Standard 90.1-2022 (December 5, 2025)!ASHRAE Addendum bs to Standard 90.1-2022
 !ASHRAE Addendum bt to Standard 90.1-2022 (October 31, 2025)!ASHRAE Addendum bt to Standard 90.1-2022
 !ASHRAE Addendum bu for Standard 90.1-2022 (December 5, 2025)!ASHRAE Addendum bu to Standard 90.1-2022
+!ANSI/ASHRAE/IES Addendum bv to ANSI/ASHRAE/IES Standard 90.1-2022 (April 30, 2025)!ANSI/ASHRAE/IES Addendum bv to ASHRAE Standard 90.1-2022
 !ASHRAE Addendum bw to Standard 90.1-2022 (May 30, 2025)!ASHRAE Addendum bw to Standard 90.1-2022
 !ASHRAE Addendum by for Standard 90.1-2022 (May 30, 2025)!ASHRAE Addendum by to Standard 90.1-2022
 !ASHRAE Addendum bz for Standard 90.1-2022 (July 31, 2025)!ASHRAE Addendum bz to Standard 90.1-2022
@@ -1039,6 +1049,23 @@ ASHRAE Addendum k to Standard 170-2013
 ASHRAE Addendum m to Standard 170-2013
 ASHRAE Addendum ad to Standard 170-2013
 ASHRAE Addendum ae to Standard 170-2013
+!ANSI/ASHRAE/ASHE Addendum a for Standard 170-2017 (September 2, 2020)!ANSI/ASHRAE/ASHE Addendum a to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum b for Standard 170-2017 (March 2, 2020)!ANSI/ASHRAE/ASHE Addendum b to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum c for Standard 170-2017 (March 2, 2020)!ANSI/ASHRAE/ASHE Addendum c to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum d for Standard 170-2017 (December 15, 2020)!ANSI/ASHRAE/ASHE Addendum d to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum e for Standard 170-2017 (December 15, 2020)!ANSI/ASHRAE/ASHE Addendum e to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum g for Standard 170-2017 (January 6, 2020)!ANSI/ASHRAE/ASHE Addendum g to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum h for Standard 170-2017 (April 1, 2020)!ANSI/ASHRAE/ASHE Addendum h to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum i for Standard 170-2017 (March 2, 2020)!ANSI/ASHRAE/ASHE Addendum i to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum j for Standard 170-2017 (December 15, 2020)!ANSI/ASHRAE/ASHE Addendum j to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum k for Standard 170-2017 (August 3, 2020)!ANSI/ASHRAE/ASHE Addendum k to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum l for Standard 170-2017 (February 26, 2021)!ANSI/ASHRAE/ASHE Addendum l to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum m for Standard 170-2017 (August 3, 2020)!ANSI/ASHRAE/ASHE Addendum m to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum n for Standard 170-2017 (March 3, 2020)!ANSI/ASHRAE/ASHE Addendum n to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum p for Standard 170-2017 (March 2, 2020)!ANSI/ASHRAE/ASHE Addendum p to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum q to Standard 170-2017 (December 13, 2019)!ANSI/ASHRAE/ASHE Addendum q to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum r for Standard 170-2017 (November 2, 2020)!ANSI/ASHRAE/ASHE Addendum r to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum s for Standard 170-2017 (October 30, 2020)!ANSI/ASHRAE/ASHE Addendum s to ASHRAE Standard 170-2017
 !ASHRAE Addendum d to Standard 170-2021 (October 29, 2021)!ASHRAE Addendum d to Standard 170-2021
 !ASHRAE Addendum e to Standard 170-2021 (September 30, 2022)!ASHRAE Addendum e to Standard 170-2021
 !ASHRAE Addendum f to Standard 170-2021 (July 5, 2022)!ASHRAE Addendum f to Standard 170-2021
@@ -1225,6 +1252,7 @@ ASHRAE Addendum a to Standard 189.3-2017
 !ASHRAE Addendum g to Standard 189.3-2021 (May 31, 2024)!ASHRAE Addendum g to Standard 189.3-2021
 !ASHRAE Addendum h to Standard 189.3-2021 (July 24, 2024)!ASHRAE Addendum h to Standard 189.3-2021
 !ASHRAE Addendum i for Standard 189.3-2021 (October 31, 2024)!ASHRAE Addendum i to Standard 189.3-2021
+!ANSI/ASHRAE/ASHE Addendum j to ANSI/ASHRAE/ASHE Standard 189.3-2021 (April 30, 2025)!ANSI/ASHRAE/ASHE Addendum j to ASHRAE Standard 189.3-2021
 !ASHRAE Addendum k for Standard 189.3-2021 (October 31, 2024)!ASHRAE Addendum k to Standard 189.3-2021
 !ASHRAE Addendum l for Standard 189.3-2021 (October 31, 2024)!ASHRAE Addendum l to Standard 189.3-2021
 !ASHRAE Addendum m for Standard 189.3-2021 (January 31, 2025)!ASHRAE Addendum m to Standard 189.3-2021
@@ -1240,6 +1268,7 @@ ASHRAE Addendum a to Standard 202-2018
 !ASHRAE Addendum a to Standard 205-2023 (March 14, 2024)!ASHRAE Addendum a to Standard 205-2023
 !ASHRAE Addendum b to Standard 205-2023 (March 14, 2024)!ASHRAE Addendum b to Standard 205-2023
 !ASHRAE Addendum c to Standard 205-2023 (March 14, 2024)!ASHRAE Addendum c to Standard 205-2023
+!ANSI/ASHRAE/IBPSA Addendum d to ANSI/ASHRAE Standard 205-2023 (August 29, 2025)!ANSI/ASHRAE Addendum d to ASHRAE Standard 205-2023
 !ASHRAE Standard 206-2013 addendum a!ASHRAE Addendum a to Standard 206-2013
 !ASHRAE Addendum a for Standard 209-2018 (January 31, 2023)!ASHRAE Addendum a to Standard 209-2018
 !ASHRAE Addendum b for Standard 209-2018 (August 30, 2024)!ASHRAE Addendum b to Standard 209-2018
@@ -1258,3 +1287,37 @@ ASHRAE Addendum a to Standard 202-2018
 !ASHRAE Addendum a for Standard 211-2018 (RA2023) (October 31, 2024)!ASHRAE Addendum a to Standard 211-2018
 !ASHRAE Addendum a for Standard 217-2020 (January 21, 2022)!ASHRAE Addendum a to Standard 217-2020
 !ASHRAE Addendum a for Standard 241-2023 (October 21, 2024)!ASHRAE Addendum a to Standard 241-2023
+!ASHRAE Addendum d to ASHRAE Guideline 28-2016 Errata (July 6, 2021) (PDF)!ASHRAE Addendum d to Guideline 28-2016
+!ANSI/ASHRAE Addendum 62o to ANSI/ASHRAE Standard 62-2001 Errata (7-17- 2003) (PDF)!ANSI/ASHRAE Addendum 62o to ASHRAE Standard 62-2001
+!ANSI/ASHRAE Addendum a to ANSI/ASHRAE Standard 15-2019 Errata (August 31, 2020) (PDF)!ANSI/ASHRAE Addendum a to ASHRAE Standard 15-2019
+!ANSI/ASHRAE Addendum ab to ANSI/ASHRAE Standard 62.1-2022 Errata (December 2, 2024) (PDF)!ANSI/ASHRAE Addendum ab to ASHRAE Standard 62.1-2022
+!ANSI/ASHRAE Addendum ad to ANSI/ASHRAE Standard 34-2019 Errata (August 4, 2022) (PDF)!ANSI/ASHRAE Addendum ad to ASHRAE Standard 34-2019
+!ANSI/ASHRAE Addendum ai to ANSI/ASHRAE Standard 135-2012 Errata (June 25, 2016) (PDF)!ANSI/ASHRAE Addendum ai to ASHRAE Standard 135-2012
+!ANSI/ASHRAE Addendum aj to ANSI/ASHRAE Standard 135-2012 Errata (June 25, 2016) (PDF)!ANSI/ASHRAE Addendum aj to ASHRAE Standard 135-2012
+!ANSI/ASHRAE Addendum b to Standard 15-2022 Errata (January 2, 2025) (PDF)!ANSI/ASHRAE Addendum b to ASHRAE Standard 15-2022
+!ANSI/ASHRAE Addendum bd to ANSI/ASHRAE Standard 135-2016 Errata (February 1, 2020) (PDF)!ANSI/ASHRAE Addendum bd to ASHRAE Standard 135-2016
+!ANSI/ASHRAE Addendum bf to ANSI/ASHRAE Standard 135-2012 Errata (June 25, 2016) (PDF)!ANSI/ASHRAE Addendum bf to ASHRAE Standard 135-2012
+!ANSI/ASHRAE Addendum bi to ANSI/ASHRAE Standard 135-2016 Errata (June 16, 2020) (PDF)!ANSI/ASHRAE Addendum bi to ASHRAE Standard 135-2016
+!ANSI/ASHRAE Addendum bj to ANSI/ASHRAE Standard 135-2016 Errata (July 6, 2020) (PDF)!ANSI/ASHRAE Addendum bj to ASHRAE Standard 135-2016
+!ANSI/ASHRAE Addendum bv to ANSI/ASHRAE Standard 135-2020 Errata (January 5, 2023) (PDF)!ANSI/ASHRAE Addendum bv to ASHRAE Standard 135-2020
+!ANSI/ASHRAE Addendum c to ANSI/ASHRAE Standard 52.2-2017 Errata (September 9, 2024) (PDF)!ANSI/ASHRAE Addendum c to ASHRAE Standard 52.2-2017
+!ANSI/ASHRAE Addendum ca to ANSI/ASHRAE Standard 135-2020 Errata (January 5, 2023) (PDF)!ANSI/ASHRAE Addendum ca to ASHRAE Standard 135-2020
+!ANSI/ASHRAE Addendum cc to ANSI/ASHRAE Standard 135-2020 Errata (January 5, 2023) (PDF)!ANSI/ASHRAE Addendum cc to ASHRAE Standard 135-2020
+!ANSI/ASHRAE Addendum ce to ANSI/ASHRAE Standard 135-2020 Errata (January 5, 2023) (PDF)!ANSI/ASHRAE Addendum ce to ASHRAE Standard 135-2020
+!ANSI/ASHRAE Addendum cf to ANSI/ASHRAE Standard 135-2020 Errata (January 6, 2023) (PDF)!ANSI/ASHRAE Addendum cf to ASHRAE Standard 135-2020
+!ANSI/ASHRAE Addendum cp to ANSI/ASHRAE Standard 135-2020 Errata (February 9, 2025) (PDF)!ANSI/ASHRAE Addendum cp to ASHRAE Standard 135-2020
+!ANSI/ASHRAE Addendum d to ANSI/ASHRAE Standard 135- 2004 Errata (August 9, 2006) (PDF)!ANSI/ASHRAE Addendum d to ASHRAE Standard 135-2004
+!ANSI/ASHRAE Addendum f to ANSI/ASHRAE Standard 34-2019 Errata (June 14, 2024) (PDF)!ANSI/ASHRAE Addendum f to ASHRAE Standard 34-2019
+!ANSI/ASHRAE Addendum f to ANSI/ASHRAE Standard 55-2020 Errata (July 7, 2021) (PDF)!ANSI/ASHRAE Addendum f to ASHRAE Standard 55-2020
+!ANSI/ASHRAE Addendum i to ANSI/ASHRAE Standard 34-2019 Errata (June 25, 2021) (PDF)!ANSI/ASHRAE Addendum i to ASHRAE Standard 34-2019
+!ANSI/ASHRAE Addendum i to ANSI/ASHRAE Standard 62.1-2022 Errata (March 10, 2025) (PDF)!ANSI/ASHRAE Addendum i to ASHRAE Standard 62.1-2022
+!ANSI/ASHRAE Addendum j to ANSI/ASHRAE Standard 135-2008 Errata (February 10, 2010) (PDF)!ANSI/ASHRAE Addendum j to ASHRAE Standard 135-2008
+!ANSI/ASHRAE Addendum j to ANSI/ASHRAE Standard 62.1-2022 Errata (May 14, 2024) (PDF)!ANSI/ASHRAE Addendum j to ASHRAE Standard 62.1-2022
+!ANSI/ASHRAE Addendum m to Standard 15-2022 Errata (August 27) (PDF)!ANSI/ASHRAE Addendum m to ASHRAE Standard 15-2022
+!ANSI/ASHRAE Addendum n to ANSI/ASHRAE Standard 34-2019 Errata (February 16, 2022) (PDF)!ANSI/ASHRAE Addendum n to ASHRAE Standard 34-2019
+!ANSI/ASHRAE Addendum n to ANSI/ASHRAE Standard 62.1-2022 Errata (February 4, 2023) (PDF)!ANSI/ASHRAE Addendum n to ASHRAE Standard 62.1-2022
+!ANSI/ASHRAE Addendum q to ANSI/ASHRAE Standard 135- 2008 Errata (May 6, 2009) (PDF)!ANSI/ASHRAE Addendum q to ASHRAE Standard 135-2008
+!ANSI/ASHRAE Addendum w to ANSI/ASHRAE Standard 135- 2008 Errata (June 9, 2010) (PDF)!ANSI/ASHRAE Addendum w to ASHRAE Standard 135-2008
+!ANSI/ASHRAE Addendum z to Standard 34-2022 Errata (July 11) (PDF)!ANSI/ASHRAE Addendum z to ASHRAE Standard 34-2022
+!ANSI/ASHRAE/ASHE Addendum a to ANSI/ASHRAE/ASHE Standard 170-2017 Errata (November 16, 2020) (PDF)!ANSI/ASHRAE/ASHE Addendum a to ASHRAE Standard 170-2017
+!ANSI/ASHRAE/ASHE Addendum m to ANSI/ASHRAE/ASHE Standard 170-2017 Errata (February 7, 2023) (PDF)!ANSI/ASHRAE/ASHE Addendum m to ASHRAE Standard 170-2017

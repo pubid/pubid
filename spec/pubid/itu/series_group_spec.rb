@@ -192,7 +192,7 @@ RSpec.describe "ITU series groups and series-code documents" do
     ["ITU-T OB-1", "ITU-R OB-1"].each do |id|
       it "rejects #{id} with the documented parse error" do
         expect { parse(id) }
-          .to raise_error(RuntimeError, /Failed to parse ITU identifier/)
+          .to raise_error(Parslet::ParseFailed)
       end
     end
   end

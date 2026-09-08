@@ -30,6 +30,13 @@ module Pubid
   INPUT_TOO_LONG_MESSAGE =
     "identifier string exceeds maximum length of #{MAX_INPUT_LENGTH} characters"
 
+  # Raised (as an ArgumentError) when +parse+ gets something that is not a
+  # String. Without this check the input reaches +.length+ and the caller gets a
+  # NoMethodError ("undefined method 'length' for nil"), a Ruby internal error
+  # that says nothing about the identifier contract. Every public +parse+ entry
+  # point rejects a non-String before it measures the length.
+  INPUT_NOT_A_STRING_MESSAGE = "identifier must be a String"
+
   # Registry for tracking all loaded flavors
   class Registry
     @flavors = {}
@@ -165,6 +172,7 @@ module Pubid
   # @param format [Symbol] :auto, :human, :mr_string, or :urn
   # @return [Identifier] The parsed identifier
   def self.parse(string, format: :auto)
+    raise ArgumentError, INPUT_NOT_A_STRING_MESSAGE unless string.is_a?(String)
     raise ArgumentError, INPUT_TOO_LONG_MESSAGE if string.length > MAX_INPUT_LENGTH
 
     format = FormatDetector.detect(string) if format == :auto

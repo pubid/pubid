@@ -7,27 +7,13 @@ require_relative "classify_fixtures"
 # Load Pubid base classes first
 require_relative "../../lib/pubid"
 
-# Load all PubID V2 implementations
-# Explicitly load all 19 flavors
-require_relative "../../lib/pubid/iso"
-require_relative "../../lib/pubid/iec"
-require_relative "../../lib/pubid/ieee"
-require_relative "../../lib/pubid/nist"
-require_relative "../../lib/pubid/jcgm"
-require_relative "../../lib/pubid/idf"
-require_relative "../../lib/pubid/oiml"
-require_relative "../../lib/pubid/astm"
-require_relative "../../lib/pubid/asme"
-require_relative "../../lib/pubid/api"
-require_relative "../../lib/pubid/csa"
-require_relative "../../lib/pubid/jis"
-require_relative "../../lib/pubid/etsi"
-require_relative "../../lib/pubid/ccsds"
-require_relative "../../lib/pubid/itu"
-require_relative "../../lib/pubid/plateau"
-require_relative "../../lib/pubid/ansi"
-require_relative "../../lib/pubid/cen_cenelec"
-require_relative "../../lib/pubid/bsi"
+# Load every registered flavor. This used to be a hand-maintained list of 19
+# `require_relative` lines, so `rake "validation:classify[<flavor>]"` rejected
+# the 24 flavors missing from it with "Unknown flavor" — including amca and
+# ashrae, whose fixtures therefore could not be regenerated at all.
+# `eager_load_flavors!` is the same loader the registry-driven cross-flavor
+# specs use, so the classifier and those specs now see the same flavor set.
+Pubid.eager_load_flavors!
 
 # Get flavor from command line
 flavor = ARGV[0]&.downcase

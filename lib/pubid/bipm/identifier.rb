@@ -263,8 +263,12 @@ module Pubid
       # Parse a BIPM identifier string into an identifier object.
       # @param identifier [String] the BIPM identifier string
       # @return [Identifier] the appropriate identifier object
-      # @raise [RuntimeError] if parsing fails
+      # @raise [Parslet::ParseFailed] if parsing fails
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
         if identifier.length > Pubid::MAX_INPUT_LENGTH
           raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
@@ -274,8 +278,6 @@ module Pubid
         normalized = Core::UpdateCodes.apply(identifier, :bipm)
         parsed = Parser.parse(normalized)
         Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse BIPM identifier '#{identifier}': #{e.message}"
       end
     end
   end

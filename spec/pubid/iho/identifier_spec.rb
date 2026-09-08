@@ -69,7 +69,7 @@ RSpec.describe Pubid::Iho::Identifier do
     it "raises on garbage input" do
       expect do
         Pubid::Iho.parse("not an IHO identifier")
-      end.to raise_error(/Failed to parse IHO identifier/)
+      end.to raise_error(Parslet::ParseFailed)
     end
   end
 

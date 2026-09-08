@@ -54,12 +54,18 @@ module Pubid
 
       # Parse a CCSDS identifier string into the appropriate identifier object.
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         # Apply legacy update_codes normalization first
         normalized = Core::UpdateCodes.apply(identifier, :ccsds)
         parsed = Pubid::Ccsds::Parser.parse(normalized)
         Pubid::Ccsds::Builder.build(parsed)
-      rescue Parslet::ParseFailed => e
-        raise "Failed to parse CCSDS identifier '#{identifier}': #{e.message}"
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.

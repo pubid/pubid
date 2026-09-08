@@ -36,7 +36,8 @@ RSpec.describe "Pubid::Isbn Fixture Round-trip Tests" do
 
       it "rejects every identifier" do
         identifiers.each do |id_str|
-          expect { Pubid::Isbn.parse(id_str) }.to raise_error(/Failed to parse|check digit|length/)
+          expect { Pubid::Isbn.parse(id_str) }
+            .to raise_error(Parslet::ParseFailed)
         end
       end
     end

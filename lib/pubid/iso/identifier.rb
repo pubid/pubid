@@ -283,6 +283,10 @@ module Pubid
       end
 
       def self.parse(string, format: :auto)
+        unless string.is_a?(String)
+          raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
         if string.length > Pubid::MAX_INPUT_LENGTH
           raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
@@ -296,11 +300,6 @@ module Pubid
           Pubid::Parsers::MrString.parse(string)
         else
           parsed = Pubid::Iso::Parser.new.parse(string)
-          if parsed.nil? || parsed.empty?
-            raise Pubid::Iso::Parser::ParseError,
-                  "Invalid identifier format"
-          end
-
           Pubid::Iso::Builder.new.build(parsed)
         end
       end

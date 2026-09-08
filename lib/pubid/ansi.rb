@@ -21,12 +21,11 @@ module Pubid
     # Parse an ANSI identifier string
     # @param identifier [String] the identifier string to parse
     # @return [Identifier] the parsed identifier
+    # Delegate to the class method rather than repeating the parser/builder
+    # sequence, so the input guards live in one place and the two entry points
+    # cannot drift apart.
     def self.parse(identifier)
-      parser = Parser.new
-      builder = Builder.new
-
-      parsed = parser.parse(identifier)
-      builder.build(parsed)
+      Identifier.parse(identifier)
     end
 
     # Per-flavor format registry: inherits global formats, overrides :human

@@ -38,7 +38,8 @@ RSpec.describe "Pubid::Un Fixture Round-trip Tests" do
 
       it "rejects every identifier" do
         identifiers.each do |id_str|
-          expect { Pubid::Un.parse(id_str) }.to raise_error(/Failed to parse/)
+          expect { Pubid::Un.parse(id_str) }
+            .to raise_error(Parslet::ParseFailed)
         end
       end
     end

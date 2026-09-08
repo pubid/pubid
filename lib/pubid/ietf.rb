@@ -24,7 +24,10 @@ module Pubid
     # Parse an IETF identifier string
     def self.parse(identifier)
       # Inline length guard (CodeQL rb/polynomial-redos barrier) before the
-      # normalization/parse path — must be the first statement.
+      # normalization/parse path. The type check goes above it because it is
+      # what makes `.length` safe to call; the length check itself must still
+      # be the first thing the input string meets.
+      raise ArgumentError, Pubid::INPUT_NOT_A_STRING_MESSAGE unless identifier.is_a?(String)
       raise ArgumentError, Pubid::INPUT_TOO_LONG_MESSAGE if identifier.length > Pubid::MAX_INPUT_LENGTH
 
       Identifier.parse(identifier)
