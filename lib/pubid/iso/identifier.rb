@@ -166,9 +166,14 @@ module Pubid
       def stage_from_kv(model, value)
         return if value.nil? || value.to_s.empty?
 
+        # The fallback consults the flavor-wide table. It used to call
+        # `Pubid::Iso::Scheme`, a class removed repo-wide in e3c19ea1 — so any
+        # code absent from the class's own TYPED_STAGES raised NameError
+        # instead of falling back. The IEC twin (iec/identifier.rb) was
+        # migrated at the time; ISO was missed.
         ts = (model.class.const_defined?(:TYPED_STAGES) &&
               model.class::TYPED_STAGES.find { |t| t.code.to_s == value.to_s }) ||
-             Pubid::Iso::Scheme.locate_typed_stage_by_code(value)
+             Pubid::Iso.locate_stage_by_code(value)
         return unless ts
 
         # The renderer prefers `original_abbr` (the parsed surface form); without

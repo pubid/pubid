@@ -15,7 +15,7 @@ module Pubid
         # Techstreet opaque /slug variant (no default -> round-trips cleanly)
         attribute :variant, :string
 
-        def to_s
+        def to_s(**_opts)
           result = "CIE x#{number}"
 
           # Date with separator

@@ -39,7 +39,7 @@ module Pubid
           Builder.new.build(parsed)
         end
 
-        def to_s(date_format: nil, trademark: false)
+        def to_s(date_format: nil, trademark: false, **_opts)
           result = [publisher]
           result << type if type
           result << code.to_s if code

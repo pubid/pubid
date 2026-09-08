@@ -115,7 +115,7 @@ module Pubid
           result
         end
 
-        def to_s
+        def to_s(**_opts)
           render_supplement("Suppl.")
         end
 

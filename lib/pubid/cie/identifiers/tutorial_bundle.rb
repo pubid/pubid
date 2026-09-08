@@ -15,7 +15,7 @@ module Pubid
         # :string overrides the base ::Pubid::Identifier Components::Code type.
         attribute :number, :string
 
-        def to_s
+        def to_s(**_opts)
           "CIE Tutorials Bundle #{number}"
         end
       end

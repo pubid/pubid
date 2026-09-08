@@ -194,10 +194,13 @@ module Pubid
       # @param format [Symbol] :long for title-style rendering of supported
       #   identifiers, otherwise the default short form.
       def to_s(**opts)
+        annotated = opts[:annotated]
         opts = self.class.normalize_to_s_opts(opts)
         result = render_base(**opts) + render_language_suffix
         result += " | #{common_text_twin}" if common_text_twin
-        result
+        # ITU composes its own string rather than going through `render`, so it
+        # never reaches the shared annotation hook. Apply it here.
+        annotate_plain_render(result, annotated: annotated)
       end
 
       def render_base(**_opts)

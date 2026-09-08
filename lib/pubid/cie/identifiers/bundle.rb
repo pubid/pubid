@@ -27,7 +27,7 @@ module Pubid
         # The printed form writes the publisher once: the first member keeps its
         # "CIE " prefix, the rest are bare. A base-less member is re-based onto
         # the bundle's shared base for rendering.
-        def to_s
+        def to_s(**_opts)
           return "" unless ids&.any?
 
           ids.each_with_index.map do |id, i|

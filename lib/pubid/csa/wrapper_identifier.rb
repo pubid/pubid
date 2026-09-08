@@ -44,7 +44,7 @@ module Pubid
       attribute :year_format, :string
 
       # Subclasses MUST implement to_s
-      def to_s
+      def to_s(**_opts)
         raise NotImplementedError, "Subclasses must implement to_s method"
       end
 

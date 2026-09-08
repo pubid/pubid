@@ -170,6 +170,10 @@ module Pubid
       end
 
       def initialize(**attributes)
+        # This override calls `super()` with no attributes and assigns through
+        # setters instead, so it bypasses the base constructor's coercion and
+        # unknown-key check. Apply them here to keep the cross-flavor contract.
+        attributes = self.class.normalize_init_attributes(attributes)
         super()
 
         attrs = self.class.attributes
@@ -304,13 +308,19 @@ module Pubid
       # @param format [:full, :long, :abbreviated, :short, :mr] output format
       def to_s(format = nil)
         # Handle both keyword argument (hash) and positional argument (symbol/string)
+        annotated = format.is_a?(Hash) ? format[:annotated] : nil
         format = format[:format] if format.is_a?(Hash)
 
         # Default to parsed_format if available (preserves input format on round-trip)
         # Falls back to :short format for output (normalization)
         # Explicit format parameter always overrides parsed_format
-        render(format: :human,
-               nist_format: format || parsed_format&.to_sym || :short)
+        rendered = render(format: :human,
+                          nist_format: format || parsed_format&.to_sym || :short)
+
+        # NIST's `to_s` takes a POSITIONAL format and its `render` override
+        # builds no rendering context, so neither the flag nor the context
+        # reaches the shared hook. Apply the annotation fallback here.
+        annotate_plain_render(rendered, annotated: annotated)
       end
 
       # NIST has its own defined MR format (to_mr_style) used by relaton-nist

@@ -86,15 +86,17 @@ module Pubid
         base_document&.copublishers
       end
 
+      # See the note on Pubid::BundledIdentifier#to_s: `**opts` carries flags
+      # this list does not name, `annotated:` above all.
       def to_s(lang: :en, lang_single: false, with_edition: false, format: nil,
-stage_format_long: nil, with_date: nil)
+stage_format_long: nil, with_date: nil, **opts)
         parts = [base_document.to_s(lang: lang, lang_single: lang_single,
-                                    with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)]
+                                    with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date, **opts)]
 
         # Add each supplement with "+" separator
         supplements.each do |supplement|
           supplement_str = supplement.to_supplement_s(lang: lang, lang_single: lang_single,
-                                                      with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)
+                                                      with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date, **opts)
           parts << "+ #{supplement_str}"
         end
 

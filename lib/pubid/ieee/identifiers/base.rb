@@ -72,8 +72,19 @@ module Pubid
       # what the base `Pubid::Identifier#exclude`/matching machinery uses when it
       # rebuilds via `self.class.new(attrs)`; without it, `exclude`/`matches?`
       # raised ArgumentError for every IEEE identifier.
+      # Constructor parameters that are not lutaml attributes: `code` is
+      # runtime-only (kept as `code_obj`), and the draft forms are turned into
+      # component objects below.
+      def self.extra_init_keys
+        %i[code draft draft_obj]
+      end
+
       def initialize(args = {}, **kwargs)
         args = args.merge(kwargs) unless kwargs.empty?
+        # This override calls `super()` with no attributes and assigns through
+        # setters instead, so it bypasses the base constructor's coercion and
+        # unknown-key check. Apply them here to keep the cross-flavor contract.
+        args = self.class.normalize_init_attributes(args)
         super()
 
         # Handle typed_stage if provided
@@ -104,13 +115,26 @@ module Pubid
           self.draft = args[:draft].to_s
         end
 
-        # Set other attributes
+        # Set other attributes.
+        #
+        # A key the class accepts but does not declare as a lutaml attribute
+        # (see `extra_init_keys`) is assigned through its plain accessor.
+        # Without that, `CsaDualPublished#csa_identifier` — an `attr_accessor`
+        # by design, "stored as-is (not a Lutaml model type)" — was never
+        # assigned at all, and `renderer.rb` read nil from it:
+        # `IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17` rendered back as
+        # `IEEE Std 844.1-2017/CSA`, losing the CSA designation entirely.
         attrs = self.class.attributes
+        extra = self.class.extra_init_keys
         args.each do |key, value|
           next if %i[code draft draft_obj typed_stage].include?(key)
 
           setter = :"#{key}="
-          public_send(setter, value) if attrs.key?(key)
+          if attrs.key?(key)
+            public_send(setter, value)
+          elsif extra.include?(key) && respond_to?(setter)
+            public_send(setter, value)
+          end
         end
       end
 
@@ -279,9 +303,15 @@ module Pubid
       def self.build_aiee_asa_adoption(parts)
         aiee_id = parse_single(parts[0])
         asa_id = parse_single(parts[1])
+        # `adopted_identifierS` — AdoptedStandard declares a collection. The
+        # singular spelling was not an attribute, so lutaml dropped it without
+        # a word and the ASA half of these 13 identifiers was never stored:
+        # `AIEE No 18-1934 (ASA C55 1934)` rendered back as `AIEE No 18-1934`.
+        # The unknown-key contract turned that silent loss into a raise, which
+        # is how it was found.
         Identifiers::AdoptedStandard.new(
           ieee_identifier: aiee_id,
-          adopted_identifier: asa_id,
+          adopted_identifiers: [asa_id],
         )
       end
       private_class_method :build_aiee_asa_adoption

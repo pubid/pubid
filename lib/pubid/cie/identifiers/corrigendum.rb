@@ -25,7 +25,7 @@ module Pubid
           year
         end
 
-        def to_s
+        def to_s(**_opts)
           "#{base}/Cor#{number}:#{year}"
         end
       end

@@ -88,7 +88,7 @@ module Pubid
           #
           # @param trademark [Boolean] append the IEEE trademark symbol (™/®)
           # @return [String] String representation
-          def to_s(trademark: false)
+          def to_s(trademark: false, **_opts)
             result = ["IEEE Std", year, name_portion].compact.join(" ")
             result += trademark_symbol if trademark
             result

@@ -93,7 +93,9 @@ module Pubid
         # @param format [Symbol] :ieee or :iso (defaults to canonical_format)
         # @param trademark [Boolean] append the IEEE trademark symbol (™/®)
         # @return [String] formatted identifier
-        def to_s(format: canonical_format, trademark: false)
+        # `**_opts` absorbs render flags this list does not name (`annotated:`),
+        # which the closed keyword list used to reject outright.
+        def to_s(format: canonical_format, trademark: false, **_opts)
           # The mark goes after the code number, before the draft and the year
           # ("ISO/IEC/IEEE P26511™/D8-2018"), so it is threaded into the
           # format builders rather than appended to the finished string.

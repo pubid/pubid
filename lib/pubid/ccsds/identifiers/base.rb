@@ -24,14 +24,16 @@ module Pubid
           { key: :base, web: :base, title: "Base Standard", short: nil }
         end
 
-        def to_s(**_opts)
+        # Composes its string by hand rather than going through `render`, so
+        # the annotation hook has to be applied on the way out.
+        def to_s(**opts)
           result = "#{publisher} #{number}"
           result += ".#{part}" if part
           result += "-#{type}" if type
           result += "-#{edition}" if edition
           result += "-#{suffix}" if suffix
           result += " - #{language} Translated" if language
-          result
+          annotate_plain_render(result, **opts)
         end
       end
     end

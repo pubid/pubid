@@ -26,7 +26,7 @@ module Pubid
         # Page range "1-5" (standalone form only).
         attribute :page, :string
 
-        def to_s
+        def to_s(**_opts)
           if conference
             "CIE x#{conference}-#{number}"
           else

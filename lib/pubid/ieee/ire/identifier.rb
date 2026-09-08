@@ -44,7 +44,7 @@ module Pubid
           builder.build(parsed)
         end
 
-        def to_s(trademark: false)
+        def to_s(trademark: false, **_opts)
           # Year comes FIRST in IRE format - render as 2-digit short year
           result = [(short_year if year), publisher, type, code&.to_s]
             .compact.join(" ")

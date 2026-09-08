@@ -20,7 +20,7 @@ module Pubid
       attribute :base, ::Pubid::Identifier, polymorphic: true
 
       # Subclasses MUST implement to_s to define how they render
-      def to_s
+      def to_s(**_opts)
         raise NotImplementedError, "Subclasses must implement to_s method"
       end
 

@@ -70,6 +70,19 @@ module Pubid
       def registered?(name)
         @flavors.key?(name.to_s.downcase)
       end
+
+      # Parse an identifier without naming its flavor.
+      #
+      # The pubid 1.x entry point, kept because consumers still call it —
+      # isodoc's +std_docid_semantic_parse+ among them. It delegates to
+      # {Pubid.parse}; it is not a second implementation.
+      #
+      # @param string [String] the identifier string
+      # @return [Pubid::Identifier]
+      # @raise [Parslet::ParseFailed] when no flavor can parse it
+      def parse(string, **opts)
+        Pubid.parse(string, **opts)
+      end
     end
   end
 
@@ -168,9 +181,19 @@ module Pubid
 
   # Unified parse entry point with auto-detection
   #
+  # A human-readable string is routed to its owning flavor by leading prefix
+  # token, using the {prefix_flavors} table. This restores the pubid 1.x
+  # +Pubid::Registry.parse+ capability, which isodoc still calls; before it,
+  # this method raised +No flavor specified+ for every human-readable string,
+  # so a reference whose flavor the caller did not already know could not be
+  # parsed at all.
+  #
   # @param string [String] The identifier string to parse
   # @param format [Symbol] :auto, :human, :mr_string, or :urn
   # @return [Identifier] The parsed identifier
+  # @raise [ArgumentError] for a non-String, or one over {MAX_INPUT_LENGTH}
+  # @raise [Parslet::ParseFailed] when no flavor can parse the string — the
+  #   class every flavor's own +parse+ raises (see the parse-failure contract)
   def self.parse(string, format: :auto)
     raise ArgumentError, INPUT_NOT_A_STRING_MESSAGE unless string.is_a?(String)
     raise ArgumentError, INPUT_TOO_LONG_MESSAGE if string.length > MAX_INPUT_LENGTH
@@ -179,7 +202,20 @@ module Pubid
 
     case format
     when :mr_string
-      Parsers::MrString.parse(string)
+      # The MR detector is a shape heuristic (`/\A[A-Z]{2,}[.-]/`), and some
+      # human-readable identifiers have that shape — "ITU-T G.711" is the
+      # standing example. Fall through to prefix routing when the MR parse
+      # fails, rather than reporting an MR error for a string that was never
+      # an MR string. A genuine MR failure still surfaces, from the second
+      # attempt, as Parslet::ParseFailed.
+      #
+      # Narrow, for the reason spelled out on {parse_by_prefix}: only a parse
+      # failure means "wrong shape". Anything else is a defect and propagates.
+      begin
+        Parsers::MrString.parse(string)
+      rescue Parslet::ParseFailed
+        parse_by_prefix(string)
+      end
     when :urn
       eager_load_flavors!
       flavor = detect_flavor_from_urn(string)
@@ -190,13 +226,178 @@ module Pubid
       end
 
       urn_parser = flavor_module.const_get(:UrnParser)
-      urn_parser.parse(string) else
-      # Default to MR string parser for MR format, human-readable otherwise
-      # The MR string parser converts to human-readable and delegates to flavor.parse
-      raise ArgumentError,
-            "No flavor specified. Use Pubid::Iso.parse() or another flavor-specific parse method."
+      urn_parser.parse(string)
+    else
+      parse_by_prefix(string)
     end
   end
+
+  # Route a human-readable identifier to its flavor by leading prefix token.
+  #
+  # Three passes, widening each time — the pubid 1.x +Registry.parse+ shape:
+  #
+  #   1. flavors owning the longest matching prefix ("ISO/IEC" before "ISO")
+  #   2. every other flavor, in registry order
+  #
+  # A longest-match-first order matters because prefixes nest: "ISO/IEC 2131"
+  # must not be handed to the flavor that merely owns "ISO".
+  #
+  # @param string [String] a human-readable identifier
+  # @return [Identifier]
+  # @raise [Parslet::ParseFailed] when no flavor accepts the string
+  # @api private
+  def self.parse_by_prefix(string)
+    eager_load_flavors!
+
+    first_error = nil
+    fallback = nil
+
+    prefix_owners = candidates_by_prefix(string)
+    (prefix_owners + other_candidates(prefix_owners)).each do |mod|
+      begin
+        parsed = mod.parse(string)
+      rescue Parslet::ParseFailed => e
+        # ONLY a parse failure means "not this flavor's identifier". Every
+        # other exception is a defect in that flavor and must propagate.
+        #
+        # A blanket `rescue StandardError` here would swallow exactly the
+        # `ArgumentError: unknown attribute…` that the constructor contract on
+        # `Identifier` now raises — the error that turned three silent
+        # data-loss bugs (CIE `s_prefix`, IEEE `adopted_identifier`,
+        # IEEE `csa_identifier`) into visible ones. Catching it one layer up
+        # would hand it straight back its disguise: a real builder bug in any
+        # flavor would read as "this string is not an identifier".
+        first_error ||= e
+        next
+      end
+
+      # An exact round trip is the strongest evidence the string belongs to
+      # this flavor. It matters because some grammars accept anything by
+      # design — adobe and iana take any slug — so without it the first such
+      # flavor in registry order claims every unclaimed string and invents
+      # structure that was not in the input. Same test isodoc applies before
+      # it will annotate a parsed id.
+      return parsed if parsed.to_s == string
+
+      # A non-exact parse is still usable — several flavors legitimately
+      # normalise on render, so the round trip is a preference, not a
+      # requirement (OGC prints `06-121r9` for `OGC 06-121r9`, and 32 ASHRAE /
+      # ASME / CSA / IEEE identifiers route only this way). What it must NOT
+      # come from is a flavor that accepts anything: that is how `iec.60050`
+      # came back as `IANA iec.60050`. Reporting that no flavor could be
+      # determined beats inventing one.
+      fallback ||= parsed unless accepts_anything?(mod)
+    end
+
+    return fallback if fallback
+    raise first_error if first_error
+
+    raise Parslet::ParseFailed,
+          "no registered flavor could parse #{string.inspect}"
+  end
+  private_class_method :parse_by_prefix
+
+  # Flavor modules that own a prefix +string+ starts with, longest prefix
+  # first. Deduplicated by module identity, so an alias registration is not
+  # tried twice.
+  #
+  # These are the flavors with an actual claim on the string; a parse from one
+  # of them is trusted even when the flavor normalises on render.
+  #
+  # @param string [String] a human-readable identifier
+  # @return [Array<Module>]
+  # @api private
+  def self.candidates_by_prefix(string)
+    ordered = []
+    routing_table.each do |prefix, modules|
+      ordered.concat(modules) if prefix_match?(string, prefix)
+    end
+    ordered.compact.uniq
+  end
+  private_class_method :candidates_by_prefix
+
+  # Every other registered flavor, for the exhaustive second pass.
+  #
+  # @param exclude [Array<Module>] modules already tried
+  # @return [Array<Module>]
+  # @api private
+  def self.other_candidates(exclude)
+    ordered = []
+    each_prefix_flavor_module { |mod| ordered << mod }
+    ordered.compact.uniq - exclude
+  end
+  private_class_method :other_candidates
+
+  # A meaningless string no real identifier scheme should claim. Used to find
+  # the flavors whose grammar accepts anything.
+  ROUTING_PROBE = "zzqx-nonsense-9714"
+  private_constant :ROUTING_PROBE
+
+  # True when +mod+'s grammar accepts an arbitrary slug.
+  #
+  # `adobe` and `iana` do, by design — their identifiers genuinely are free
+  # text. That makes them unsafe as a fallback: whichever came first in
+  # registry order would claim every string no other flavor matched, and
+  # answer with structure the input never had.
+  #
+  # Detected by probing rather than by a hardcoded list, so a flavor that
+  # acquires (or loses) an anything-goes grammar is classified correctly
+  # without anyone remembering to edit a constant. Computed once per module.
+  #
+  # @param mod [Module] a flavor module
+  # @return [Boolean]
+  # @api private
+  def self.accepts_anything?(mod)
+    @accepts_anything ||= {}
+    return @accepts_anything[mod] if @accepts_anything.key?(mod)
+
+    @accepts_anything[mod] =
+      begin
+        mod.parse(ROUTING_PROBE)
+        true
+      rescue StandardError, Parslet::ParseFailed
+        false
+      end
+  end
+  private_class_method :accepts_anything?
+
+  # Prefix => flavor modules, longest prefix first, built once.
+  #
+  # {prefix_flavors} rebuilds its index on every call, iterating every
+  # registered flavor; routing consulted it twice per parse. The registry is
+  # static once +eager_load_flavors!+ has run, so the table is memoised here
+  # rather than making the public method's cost implicit.
+  #
+  # The memo is never invalidated, which is safe for every flavor shipped in
+  # this gem — they are all +Pubid+-namespace constants that
+  # +eager_load_flavors!+ loads before the first parse. A flavor registered
+  # from OUTSIDE that namespace after the first {parse} call would miss its
+  # prefix priority (it is still tried in the exhaustive second pass, so it is
+  # reachable, just not preferred). Bust the memo in +Registry.register+ if
+  # out-of-namespace flavors ever become a supported extension point.
+  #
+  # @return [Hash{String => Array<Module>}]
+  # @api private
+  def self.routing_table
+    @routing_table ||= begin
+      index = prefix_flavors
+      index.keys
+           .sort_by { |prefix| -prefix.length }
+           .to_h { |prefix| [prefix, index[prefix].map { |key| Registry.get(key) }] }
+    end
+  end
+  private_class_method :routing_table
+
+  # True when +string+ starts with +prefix+ at a token boundary, so "ISO" does
+  # not claim "ISOFIX" and "BS" does not claim "BSI".
+  # @api private
+  def self.prefix_match?(string, prefix)
+    return false unless string.start_with?(prefix)
+
+    rest = string[prefix.length]
+    rest.nil? || !/[A-Za-z0-9]/.match?(rest)
+  end
+  private_class_method :prefix_match?
 
   def self.detect_flavor_from_urn(urn)
     # urn:iso:std:... → "iso"
@@ -275,4 +476,71 @@ module Pubid
       yield mod
     end
   end
+
+  # Typed-stage lookup by abbreviation, across flavors.
+  #
+  # Each flavor module memoises +all_typed_stages+ over its own +Identifiers+
+  # namespace, so an abbreviation only one flavor uses is invisible from any
+  # other: +Pubid::Iso.locate_stage("ADTS")+ is nil while
+  # +Pubid::Iec.locate_stage("ADTS")+ finds it. A consumer that holds an
+  # abbreviation but not the owning flavor had nowhere to ask.
+  #
+  # @param abbr [String, Symbol] the stage abbreviation (case-insensitive)
+  # @param flavor [Symbol, String, nil] search this flavor only; nil searches
+  #   every registered flavor and returns the first match
+  # @return [Object, nil] the flavor's typed-stage object, or nil. The class is
+  #   flavor-specific: most return {Pubid::Components::TypedStage}, but IEEE
+  #   has its own +Ieee::Components::TypedStage+, which is not a subclass.
+  # @raise [ArgumentError] if +flavor+ names a flavor that is not registered
+  def self.locate_stage(abbr, flavor: nil)
+    return locate_stage_in(Registry.get(flavor), abbr, flavor) if flavor
+
+    each_stage_flavor_module do |mod|
+      stage = mod.locate_stage(abbr)
+      return stage if stage
+    end
+    nil
+  end
+
+  # Every flavor that knows +abbr+ — the diagnostic companion to
+  # {locate_stage}, for telling a consumer which module owns a stage.
+  #
+  # @param abbr [String, Symbol] the stage abbreviation (case-insensitive)
+  # @return [Array<Symbol>] registered flavor keys, sorted
+  def self.locate_stage_flavors(abbr)
+    found = []
+    each_stage_flavor_module do |mod, flavor_name|
+      found << flavor_name.to_sym if mod.locate_stage(abbr)
+    end
+    found.sort
+  end
+
+  # Yields each unique flavor module that implements +locate_stage+, exactly
+  # once. Three registered flavors (adobe, easc, gost) define no typed stages
+  # at all, so a cross-flavor sweep must skip them rather than raise on the
+  # first one it reaches; alias registrations are collapsed by module identity,
+  # as in {each_prefix_flavor_module}.
+  #
+  # @yieldparam mod [Module] a flavor module
+  # @yieldparam flavor_name [String] the registry key it was reached under
+  def self.each_stage_flavor_module
+    eager_load_flavors!
+    seen = {}
+    Registry.flavor_names.each do |flavor_name|
+      mod = Registry.get(flavor_name)
+      next if seen.key?(mod) || !mod.respond_to?(:locate_stage)
+
+      seen[mod] = true
+      yield mod, flavor_name
+    end
+  end
+
+  # @api private
+  def self.locate_stage_in(mod, abbr, flavor)
+    raise ArgumentError, "unknown flavor: #{flavor.inspect}" unless mod
+    return nil unless mod.respond_to?(:locate_stage)
+
+    mod.locate_stage(abbr)
+  end
+  private_class_method :locate_stage_in
 end

@@ -68,12 +68,12 @@ module Pubid
         # end
 
         def to_s(lang: :en, lang_single: false, with_edition: false,
-format: nil, stage_format_long: nil, with_date: nil)
+format: nil, stage_format_long: nil, with_date: nil, **opts)
           if base
             # Full rendering with base identifier
             [
               base.to_s(lang: lang, lang_single: lang_single,
-                                   with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date),
+                                   with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date, **opts),
               " #{supplement_publisher.render}",
               " SUP", # Always render as "SUP" even though typed_stage.abbreviation is "DIR SUP"
               (date ? ":#{date.render}" : ""),
@@ -81,13 +81,13 @@ format: nil, stage_format_long: nil, with_date: nil)
             ].join
           else
             # Simplified rendering for bundled identifiers (just the supplement part)
-            to_supplement_s(lang: lang, lang_single: lang_single)
+            to_supplement_s(lang: lang, lang_single: lang_single, **opts)
           end
         end
 
         # Render just the supplement part (for use in bundled identifiers)
         def to_supplement_s(lang: :en, lang_single: false, with_edition: false,
-format: nil, stage_format_long: nil, with_date: nil)
+format: nil, stage_format_long: nil, with_date: nil, **_opts)
           date_str = if date
                        month_part = date.month ? "-#{date.month}" : ""
                        ":#{date.render}#{month_part}"
