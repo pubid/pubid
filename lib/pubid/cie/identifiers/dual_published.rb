@@ -14,7 +14,7 @@ module Pubid
         attribute :s_prefix, :boolean, default: -> { false }
         attribute :iec_identifier, :string # IEC portion as string
 
-        def to_s
+        def to_s(**_opts)
           parts = ["CIE"]
 
           # S prefix

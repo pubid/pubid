@@ -19,7 +19,7 @@ module Pubid
       attribute :type, Components::Type
       attribute :typed_stage, Components::TypedStage
 
-      def to_s(lang: :en, lang_single: false)
+      def to_s(lang: :en, lang_single: false, **_opts)
         result = ""
 
         # Publisher

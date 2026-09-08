@@ -19,7 +19,7 @@ module Pubid
       #   - The wrapped identifier is recursively parsed as a full CSA identifier
       #   - Proper object composition, not string manipulation
       class CanadianAdopted < WrapperIdentifier
-        def to_s
+        def to_s(**_opts)
           # For CAN3- identifiers, don't add CAN/ prefix (CAN3- is already complete)
           # For Series with CAN/CSA- prefix, don't add CAN/ (it's already complete)
           # For CAN/CSA- identifiers, CAN/ wraps CSA- part

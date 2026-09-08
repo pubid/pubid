@@ -30,7 +30,7 @@ module Pubid
           base || self
         end
 
-        def to_s
+        def to_s(**_opts)
           # For Cec identifiers, use normalized form (number instead of cec_part + NO.)
           # This is used for "normalized form" rendering in bundled identifiers
           if base.is_a?(Cec)

@@ -101,6 +101,25 @@ module Pubid
         raise ArgumentError, "Unknown flavor: #{flavor}" unless flavor_module
 
         identifier_string = convert_to_human_readable(mr_string)
+
+        # Refuse to hand the flavor a string this parser did not change.
+        #
+        # `detect_flavor` falls back to `:iso` for any publisher it does not
+        # know, and `Pubid::Iso.parse` sends an MR-shaped string straight back
+        # here — so a string that survives conversion unchanged recurses
+        # forever. `ECMA-426 ed1` is the standing example: "ECMA" is absent
+        # from FLAVOR_MAP, the string matches the MR shape heuristic
+        # (`/\A[A-Z]{2,}[.-]/`), and conversion is a fixed point.
+        # `Pubid::Iso.parse("ECMA-426 ed1")` raised SystemStackError.
+        #
+        # A fixed point means "this was never an MR string", which is a parse
+        # failure — the class the cross-flavor contract requires, and the one
+        # `Pubid.parse` treats as "try the next flavor".
+        if identifier_string == mr_string && flavor_module == Pubid::Iso
+          raise Parslet::ParseFailed,
+                "#{mr_string.inspect} is not an MR string"
+        end
+
         flavor_module.parse(identifier_string)
       end
 

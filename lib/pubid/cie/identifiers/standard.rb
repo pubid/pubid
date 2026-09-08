@@ -17,7 +17,7 @@ module Pubid
         attribute :language, Components::Language
         attribute :stage, :string # DIS, DS
 
-        def to_s
+        def to_s(**_opts)
           parts = ["CIE"]
 
           # Stage (DIS/DS) before code if present

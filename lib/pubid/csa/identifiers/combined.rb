@@ -47,7 +47,7 @@ module Pubid
           identifiers&.first || self
         end
 
-        def to_s
+        def to_s(**_opts)
           parts = render_parts
           result = parts.join(separator || "/")
           result += render_reaffirmation if reaffirmation

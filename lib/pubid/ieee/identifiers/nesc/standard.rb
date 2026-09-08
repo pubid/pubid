@@ -26,7 +26,7 @@ module Pubid
           # @param trademark [Boolean] append the IEEE trademark symbol (™/®)
           # @return [String] C2-YYYY format (bare "C2" when the year is absent,
           #   e.g. a partial reference produced by `#exclude(:year)`)
-          def to_s(trademark: false)
+          def to_s(trademark: false, **_opts)
             # Unlike the year-first NESC editions, this form renders a code, so
             # the mark goes after it and before the year — as everywhere else.
             code_part = "C2"

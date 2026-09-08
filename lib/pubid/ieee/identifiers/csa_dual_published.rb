@@ -11,6 +11,13 @@ module Pubid
         # CSA identifier is stored as-is (not a Lutaml model type)
         attr_accessor :csa_identifier
 
+        # `csa_identifier` is a real constructor parameter even though it is
+        # not a lutaml attribute, so the unknown-key contract must let it
+        # through — and the constructor must actually assign it.
+        def self.extra_init_keys
+          super + %i[csa_identifier]
+        end
+
         # Walk to the IEEE designation for the relaton-index key: this wrapper
         # names one document by an IEEE and a CSA number and holds neither
         # itself, so `root.number` was "".

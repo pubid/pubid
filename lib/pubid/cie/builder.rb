@@ -30,6 +30,16 @@ module Pubid
           attributes.merge!(build_bundle(original_string))
         end
 
+        # `extract_attributes` builds one attribute hash for every CIE type,
+        # but the types do not share one attribute set — only Standard,
+        # DualPublished and Identical declare `s_prefix`, while Conference,
+        # Bundle, Proceedings and TutorialBundle do not. lutaml used to drop
+        # the surplus key without a word; the constructor now refuses it, so
+        # the builder has to stop offering it.
+        attributes = attributes.select do |key, _|
+          identifier_class.attributes.key?(key)
+        end
+
         # Construct identifier
         identifier_class.new(**attributes)
       end

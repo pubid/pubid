@@ -19,7 +19,7 @@ module Pubid
           map "technical", to: :technical
         end
 
-        def to_s
+        def to_s(**_opts)
           render_supplement(technical ? "Technical Cor." : "Cor.")
         end
 

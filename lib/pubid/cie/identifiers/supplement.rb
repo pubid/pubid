@@ -22,7 +22,7 @@ module Pubid
           base&.year
         end
 
-        def to_s
+        def to_s(**_opts)
           b = base
           parts = ["CIE"]
           parts << b.stage if b.respond_to?(:stage) && b.stage

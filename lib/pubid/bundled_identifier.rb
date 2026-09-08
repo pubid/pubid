@@ -45,10 +45,15 @@ module Pubid
       base_document&.typed_stage
     end
 
+    # `**opts` carries render flags this method does not name — `annotated:`
+    # above all. Without it the closed keyword list raised
+    # `ArgumentError: unknown keyword: :annotated` for every bundled
+    # identifier, which is worse than a missing span: a wrapper is exactly the
+    # shape a consumer renders.
     def to_s(lang: :en, lang_single: false, with_edition: false, format: nil,
-stage_format_long: nil, with_date: nil)
+stage_format_long: nil, with_date: nil, **opts)
       result = base_document.to_s(lang: lang, lang_single: lang_single,
-                                  with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)
+                                  with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date, **opts)
 
       supplements.each do |supplement|
         # ISO DirectivesSupplement always uses " + " (space before)
@@ -57,10 +62,10 @@ stage_format_long: nil, with_date: nil)
         if supplement.class.name&.include?("DirectivesSupplement") ||
             (supplement.class.attributes.key?(:base) && !supplement.base.nil?)
           result += " + #{supplement.to_s(lang: lang, lang_single: lang_single,
-                                          with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
+                                          with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date, **opts)}"
         else
           result += "+#{supplement.to_s(lang: lang, lang_single: lang_single,
-                                        with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date)}"
+                                        with_edition: with_edition, format: format, stage_format_long: stage_format_long, with_date: with_date, **opts)}"
         end
       end
 

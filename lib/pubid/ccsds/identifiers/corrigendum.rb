@@ -24,7 +24,7 @@ module Pubid
         # The corrigendum sequence number is stored in the inherited `number`
         # attribute (mirroring ISO), so it serializes via Base's key_value as
         # { _type, number: '1', base: {...} } with no corrigendum-specific map.
-        def to_s
+        def to_s(**_opts)
           base_str = base.to_s
           "#{base_str} Cor. #{number}"
         end

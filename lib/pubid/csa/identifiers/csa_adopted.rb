@@ -25,7 +25,7 @@ module Pubid
         # When set, uses dash format without space (e.g., "CSA-ISO" not "CSA ISO")
         attribute :publisher_prefix, :string
 
-        def to_s
+        def to_s(**_opts)
           # Get string representation from wrapped identifier
           base_str = base.to_s
 

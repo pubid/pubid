@@ -18,7 +18,7 @@ module Pubid
         attribute :language, Components::Language
         attribute :iso_reference, :string # The ISO identifier in parentheses
 
-        def to_s
+        def to_s(**_opts)
           parts = ["CIE"]
 
           # S prefix

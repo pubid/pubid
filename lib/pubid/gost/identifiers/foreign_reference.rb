@@ -16,7 +16,7 @@ module Pubid
           { key: :"foreign-reference", title: "Foreign Reference", short: nil }
         end
 
-        def to_s
+        def to_s(**_opts)
           raw.to_s
         end
       end

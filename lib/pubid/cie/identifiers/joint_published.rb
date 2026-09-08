@@ -15,7 +15,7 @@ module Pubid
         attribute :doc_type, :string          # "TR" for Technical Report
         attribute :stage, :string             # "DIS" for draft stage
 
-        def to_s
+        def to_s(**_opts)
           parts = ["CIE", copublisher]
 
           # Document type (TR)

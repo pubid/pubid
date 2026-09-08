@@ -2,6 +2,38 @@
 
 module Pubid
   class Identifier < Lutaml::Model::Serializable
+    # Components that serialize as a bare scalar when they carry only their
+    # single significant field: attribute name => the key the scalar is emitted
+    # under. `date` is RENAMED to `year`, matching the flat shape ISO and IEC
+    # already emit through their own converters.
+    FLAT_SCALAR_COMPONENTS = {
+      edition: "edition",
+      date: "year",
+    }.freeze
+
+    # The one field each of those components degenerates to.
+    FLAT_SCALAR_FIELDS = {
+      edition: :number,
+      date: :year,
+    }.freeze
+
+    # Keys lutaml reads out of the attribute hash itself
+    # (Serializable#extract_register_id), so they are reserved rather than
+    # unknown and must survive the unknown-key check.
+    RESERVED_INIT_KEYS = %i[lutaml_register].freeze
+
+    # Scalar aliases accepted by the constructor for a component-valued
+    # attribute: alias => [target attribute, the component field it fills].
+    # `year` is the one the issue names — it is a READER over `date`, never an
+    # attribute, on every date-based flavor, so `new(number: "1000", year: 2023)`
+    # used to build an identifier with no year and say nothing.
+    SCALAR_ATTRIBUTE_ALIASES = {
+      year: [:date, :year],
+      month: [:date, :month],
+      day: [:date, :day],
+    }.freeze
+
+
     class << self
       def format_registry
         @format_registry || superclass&.format_registry
@@ -25,7 +57,192 @@ module Pubid
       def from_hash(data, options = {})
         klass = concrete_class_for(data)
         return klass.from_hash(data, options) if klass && klass != self
-        super
+
+        super(inflate_scalar_components(data), options)
+      end
+
+      # Accept the flat scalar form that {#to_hash} now emits, and the nested
+      # form every stored row was written with. lutaml casts a Hash into a
+      # component but passes a String straight through (Attribute#cast_element),
+      # so the flat form has to be re-inflated here or it would be assigned raw.
+      #
+      # Reading BOTH shapes is what keeps published relaton-data indexes
+      # deserializing across this change.
+      def inflate_scalar_components(data)
+        return data unless data.is_a?(::Hash)
+
+        FLAT_SCALAR_COMPONENTS.each_with_object(data.dup) do |(attr, key), acc|
+          inflate_scalar_component(acc, attr, key)
+        end
+      end
+
+      # @api private
+      def inflate_scalar_component(data, attr_name, flat_key)
+        return unless component_attribute?(attr_name)
+        # A flavor with its OWN converter for the flat key (IEC's
+        # year_from_kv) already knows how to read it, and inflating would fight
+        # it. A plain `map "edition", to: :edition` is not such a converter —
+        # it hands the value to lutaml, which cannot cast a String into a
+        # component — so that one still needs inflating.
+        return if converted_hash_keys.include?(flat_key)
+        # Only when the flat key RENAMES the attribute (`date` -> `year`) can
+        # it collide with a different attribute. ~20 flavors model the edition
+        # as a real `year` attribute of their own (ASHRAE, ASME, CIE, CSA, JIS,
+        # OGC, IEEE …), and folding that into a `date` component silently drops
+        # the year on every round trip — the same collision
+        # `fold_scalar_aliases` guards against on the constructor path.
+        # `edition` keeps its own name, so it is never a collision.
+        return if flat_key != attr_name.to_s && declared_attribute?(flat_key)
+
+        key = data.key?(flat_key) ? flat_key : flat_key.to_sym
+        value = data[key]
+        return if value.nil? || value.is_a?(::Hash) || value.is_a?(::Array)
+
+        data.delete(key)
+        data[attr_name.to_s] =
+          { FLAT_SCALAR_FIELDS.fetch(attr_name).to_s => value.to_s }
+      end
+
+      # True when +name+ is a declared attribute on this class, under either a
+      # Symbol or a String key.
+      def declared_attribute?(name)
+        attributes.key?(name.to_sym) || attributes.key?(name.to_s)
+      end
+
+      # True when +name+ is declared on this class as a component (a nested
+      # Serializable), rather than a plain scalar. The coercions are
+      # type-aware: ~16 classes declare `edition` as a plain :string and must
+      # keep the scalar they were given.
+      def component_attribute?(name)
+        attr = attributes[name] || attributes[name.to_s]
+        return false unless attr
+
+        type = attr.type
+        type.is_a?(Class) && type <= Lutaml::Model::Serializable
+      rescue StandardError
+        false
+      end
+
+      # Serialization keys this class reads through a converter of its own
+      # (a `key_value` rule declared with `with: {to:, from:}`). Those keys are
+      # already handled and must not be rewritten underneath the flavor.
+      #
+      # Empty for a flavor with no `key_value` block, which serializes
+      # attribute names directly.
+      def converted_hash_keys
+        @converted_hash_keys ||=
+          begin
+            rules = mappings[:hash]&.mappings || []
+            rules.reject { |rule| rule.custom_methods.nil? || rule.custom_methods.empty? }
+                 .map { |rule| rule.name.to_s }
+          rescue StandardError
+            []
+          end
+      end
+
+      # The blessed constructor path (pubid#360 item 3).
+      #
+      # Two jobs, both of which lutaml declines to do:
+      #
+      #   * coerce a scalar into the component the attribute declares, so
+      #     `edition: 2` and `year: 2023` work as written;
+      #   * refuse a key this class does not know, instead of dropping it.
+      #
+      # The refusal is the important half. lutaml reads only declared attribute
+      # names out of the hash (Serialize#initialize_attributes) and reports
+      # nothing about the rest, so `new(number: "1000", year: 2023)` returned an
+      # identifier with no year at all and no diagnostic — which is exactly how
+      # the issue was filed. A dropped key is a silent wrong answer; a raise is
+      # a loud one.
+      #
+      # Safe to apply here because neither internal rebuild path routes
+      # attribute keys through the constructor: `from_hash` calls `new` with no
+      # attributes and assigns through setters afterwards, and `#exclude`
+      # rebuilds from `self.class.attributes` — only declared names, by
+      # construction.
+      #
+      # @param attrs [Hash] caller-supplied attributes
+      # @return [Hash] the same attributes, coerced
+      # @raise [ArgumentError] naming every key this class does not declare
+      def normalize_init_attributes(attrs)
+        return attrs.dup unless attrs.is_a?(::Hash)
+
+        normalized = attrs.dup
+        fold_scalar_aliases(normalized)
+        coerce_component_scalars(normalized)
+        reject_unknown_keys(normalized)
+        normalized
+      end
+
+      # Fold `year:` / `month:` / `day:` into the `date` component. Only when
+      # the alias is not itself a declared attribute — ~20 flavors model the
+      # edition as a plain `year` attribute, and folding there would destroy it.
+      def fold_scalar_aliases(attrs)
+        SCALAR_ATTRIBUTE_ALIASES.each do |alias_name, (target, field)|
+          key = attrs.key?(alias_name) ? alias_name : alias_name.to_s
+          next unless attrs.key?(key)
+          next if attributes.key?(alias_name) || attributes.key?(alias_name.to_s)
+          next unless component_attribute?(target)
+
+          value = attrs.delete(key)
+          next if value.nil?
+
+          existing = attrs[target] || attrs[target.to_s] || {}
+          existing = component_to_hash(existing)
+          attrs.delete(target.to_s)
+          attrs[target] = existing.merge(field => value.to_s)
+        end
+      end
+
+      # Wrap a scalar in the component its attribute declares. A flavor that
+      # declares the attribute as a plain :string keeps the scalar untouched.
+      def coerce_component_scalars(attrs)
+        FLAT_SCALAR_FIELDS.each do |attr_name, field|
+          key = attrs.key?(attr_name) ? attr_name : attr_name.to_s
+          next unless attrs.key?(key)
+          next unless component_attribute?(attr_name)
+
+          value = attrs[key]
+          next if value.nil? || value.is_a?(::Hash) ||
+            value.is_a?(Lutaml::Model::Serialize)
+
+          attrs[key] = { field => value.to_s }
+        end
+      end
+
+      def reject_unknown_keys(attrs)
+        allowed = RESERVED_INIT_KEYS + extra_init_keys
+        unknown = attrs.keys.reject do |key|
+          # A key that is neither a Symbol nor a String cannot name an
+          # attribute, so it is unknown by definition — and `to_sym` on it
+          # would raise NoMethodError instead of reporting that.
+          next false unless key.is_a?(::Symbol) || key.is_a?(::String)
+
+          allowed.include?(key.to_sym) || declared_attribute?(key)
+        end
+        return if unknown.empty?
+
+        raise ArgumentError,
+              "unknown attribute#{'s' if unknown.size > 1} for " \
+              "#{name || self}: #{unknown.map(&:to_s).sort.join(', ')}"
+      end
+
+      # Constructor parameters a flavor accepts that are not lutaml attributes.
+      # IEEE takes `code:` and `draft:` this way — runtime-only values its
+      # `initialize` turns into component objects. Override to widen.
+      #
+      # @return [Array<Symbol>]
+      def extra_init_keys
+        []
+      end
+
+      # @api private
+      def component_to_hash(value)
+        case value
+        when ::Hash then value.transform_keys(&:to_sym)
+        when Lutaml::Model::Serialize then value.to_hash.transform_keys(&:to_sym)
+        else {}
+        end
       end
 
       # lutaml's nested polymorphic cast (Attribute#cast → apply_mappings)
@@ -209,6 +426,100 @@ module Pubid
       model.class.attributes(register).each do |name, attr|
         canonicalize_attr(model, hash, name, attr) unless name == :_type
       end
+      flatten_scalar_components(model, hash)
+    end
+
+    # A component that carries only ONE meaningful value serializes as that
+    # value: `edition: "2"`, not `edition: {number: "2"}`; `year: "2024"`, not
+    # `date: {year: "2024"}`. That is the shape an index row wants to be read
+    # in, and the shape a caller can write without knowing pubid's component
+    # classes — the complaint in pubid#360 item 3.
+    #
+    # The test is per INSTANCE, not per flavor, because one flavor's corpus
+    # holds both shapes. Of 9,730 dated IEC identifiers, 9,728 carry a year
+    # alone but 10 carry a month (`IEC CA 01:2025-10`) and 2 are undated
+    # (`IEC 60050:--`); a flavor-wide switch would have discarded those.
+    #
+    # Flavors that already emit the flat form are untouched for free: IEC and
+    # ISO serialize the date as top-level year/month/day, so no "date" key ever
+    # reaches this method.
+    def flatten_scalar_components(model, hash)
+      FLAT_SCALAR_COMPONENTS.each do |attr_name, flat_key|
+        flatten_scalar_component(model, hash, attr_name, flat_key)
+      end
+    end
+
+    # Replace +hash+'s serialization of +attr_name+ with a bare scalar, when
+    # the component holds nothing but its single significant field.
+    def flatten_scalar_component(model, hash, attr_name, flat_key)
+      key = hash.key?(attr_name.to_s) ? attr_name.to_s : attr_name
+      return unless hash.key?(key) && hash[key].is_a?(::Hash)
+      return unless model.respond_to?(attr_name)
+
+      component = model.public_send(attr_name)
+      return unless component.is_a?(Lutaml::Model::Serialize)
+
+      scalar = degenerate_scalar(component, FLAT_SCALAR_FIELDS.fetch(attr_name))
+      return if scalar.nil?
+      # Never overwrite a key the flavor already emits under the flat name,
+      # and never claim a name the flavor declares as a real attribute of its
+      # own — ~20 flavors have a `year` attribute, and renaming `date` onto it
+      # would make the two indistinguishable on the way back in.
+      if flat_key != key.to_s
+        return if hash.key?(flat_key) || model.class.declared_attribute?(flat_key)
+      end
+
+      replace_key_in_place(hash, key, flat_key, scalar)
+    end
+
+    # Replace +old_key+ with +new_key+ WITHOUT moving it to the end.
+    #
+    # A plain delete-then-assign appends, which would reorder every key after
+    # the one being flattened — cosmetic for `==`, but it rewrites the byte
+    # order of every generated relaton-data YAML row for no reason.
+    def replace_key_in_place(hash, old_key, new_key, value)
+      if old_key.to_s == new_key
+        hash[old_key] = value
+        return
+      end
+
+      rebuilt = hash.each_with_object({}) do |(k, v), acc|
+        if k == old_key
+          acc[new_key] = value
+        else
+          acc[k] = v
+        end
+      end
+
+      hash.replace(rebuilt)
+    end
+
+    # The scalar +component+ degenerates to, or nil when it carries anything
+    # besides +field+.
+    #
+    # A +field+ holding another component (ISO's edition number is a
+    # Components::Code) is deliberately NOT flattened: the flat form would come
+    # back as a plain String, so `from_hash(to_hash) == parse` would break —
+    # the silent inequality that CLAUDE.md records as the costliest failure
+    # mode in this codebase, because `#matches?` is built on `==`.
+    def degenerate_scalar(component, field)
+      register = component.lutaml_register
+      found = nil
+
+      component.class.attributes(register).each do |name, attr|
+        value = component.public_send(name)
+        # `Utils.empty?(nil)` is false, so nil needs its own test — an
+        # unpopulated attribute is exactly what makes a component degenerate.
+        next if value.nil? || Lutaml::Model::Utils.empty?(value)
+        next if attr.default_set?(register, component) &&
+          value == attr.default(register, component)
+        return nil unless name == field
+        return nil if value.is_a?(Lutaml::Model::Serialize)
+
+        found = value
+      end
+
+      found&.to_s
     end
 
     # Canonicalize a single attribute against its serialized value in +hash+:
@@ -255,10 +566,12 @@ module Pubid
       end
     end
     private :canonicalize_hash, :canonicalize_attr, :default_valued?,
-            :canonicalize_nested, :canonicalize_collection
+            :canonicalize_nested, :canonicalize_collection,
+            :flatten_scalar_components, :flatten_scalar_component,
+            :degenerate_scalar, :replace_key_in_place
 
     def initialize(attrs = {}, options = {})
-      attrs = attrs.dup
+      attrs = self.class.normalize_init_attributes(attrs)
       attrs[:_type] ||= self.class.polymorphic_name
       super
     end
@@ -300,8 +613,53 @@ module Pubid
       ctx_opts = opts.except(:trademark, :with_volume)
       context = build_rendering_context(renderer, format:, **ctx_opts)
       render_opts = opts.slice(:with_edition, :trademark, :with_volume)
-      renderer.new(self).render(context:, **render_opts)
+      result = renderer.new(self).render(context:, **render_opts)
+
+      annotate_rendered(result, format, ctx_opts[:annotated], context)
     end
+
+    # Apply semantic spans when the renderer did not.
+    #
+    # `context.annotated` reaches all 39 flavor renderers and all 39 ignore it,
+    # so annotation was a v1 -> v2 regression for every flavor but ISO. This is
+    # the single choke point every renderer already passes through, which is
+    # why the fallback lives here rather than in each renderer.
+    #
+    # The `<span` test is what keeps ISO's exact, render-time placement: a
+    # renderer that annotated itself is left alone.
+    def annotate_rendered(result, format, annotated, context)
+      return result unless annotated && format == :human
+      return result unless result.is_a?(String)
+      return result if result.include?("<span")
+
+      Renderers::Annotator.new(self, context).annotate(result)
+    end
+    private :annotate_rendered
+
+    # The same fallback, for a `to_s` that composes its string by hand instead
+    # of going through {#render} — ITU, CCSDS, CIE and CSA wrappers all do.
+    # Those never reach the choke point above, so they apply it on the way out.
+    #
+    # Every such `to_s` must also ACCEPT `annotated:`. Before they did, 13 type
+    # families raised on the flag (`wrong number of arguments (given 1,
+    # expected 0)` for the ones declaring no parameters at all), which is worse
+    # than a missing span: a wrapper is exactly the shape a consumer renders.
+    #
+    # This is deliberately a per-class opt-in rather than a module prepended to
+    # every identifier class. That was tried: prepending to ~500 ancestor
+    # chains made a GOST identical adoption render its adopted ISO Technical
+    # Report as `ISO TR …` instead of `ISO/TR …`, but only under full-suite
+    # load — the multi-flavor nondeterminism this file warns about elsewhere.
+    # An explicit call in the handful of classes that need it changes no
+    # ancestor chain and cannot have that effect.
+    #
+    # @param rendered [String] the plain rendering this method produced
+    # @param opts [Hash] the render options it was called with
+    # @return [String] annotated when `annotated:` was asked for, else as-is
+    def annotate_plain_render(rendered, **opts)
+      annotate_rendered(rendered, :human, opts[:annotated], nil)
+    end
+    protected :annotate_plain_render
 
     def to_s(**opts)
       render(format: :human, **opts)

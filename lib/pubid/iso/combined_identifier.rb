@@ -9,11 +9,13 @@ module Pubid
                 polymorphic: true, collection: true
       attribute :type, :string, default: -> { "combined_identifier" }
 
-      def to_s(lang: :en, lang_single: false)
+      # `**opts` carries render flags this list does not name (`annotated:`),
+      # which the closed signature used to reject outright.
+      def to_s(lang: :en, lang_single: false, **opts)
         [
-          base.to_s(lang: lang, lang_single: lang_single),
+          base.to_s(lang: lang, lang_single: lang_single, **opts),
           additional_identifiers.map do |id|
-            id.to_s(lang: lang, lang_single: lang_single)
+            id.to_s(lang: lang, lang_single: lang_single, **opts)
           end,
         ].flatten.join(" | ")
       end
