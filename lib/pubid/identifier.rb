@@ -17,6 +17,23 @@ module Pubid
       date: :year,
     }.freeze
 
+    # The one field each degenerate component collapses to, keyed by the
+    # component CLASS rather than the attribute name — so a collection
+    # attribute (`languages`, `copublishers`) and a flavor subclass
+    # (Pubid::Iec::Components::Publisher) are both covered by one entry.
+    #
+    # `Components::Code` is deliberately absent. A String left in `number`
+    # renders and serializes correctly today, and coercing it would turn
+    # `to_hash` from {"number" => "1000"} into {"number" => {"value" => "1000"}}
+    # on the six flavors that still declare a Code (iso, iec, nist, csa, sae,
+    # ccsds) — an index wire-format change, and one the `number` retype tranches
+    # sequence to land last. The two entries here are the components that RAISE
+    # when a String reaches them, so coercing them can only repair.
+    DEGENERATE_COMPONENT_FIELDS = {
+      Components::Language => :code,
+      Components::Publisher => :body,
+    }.freeze
+
     # Keys lutaml reads out of the attribute hash itself
     # (Serializable#extract_register_id), so they are reserved rather than
     # unknown and must survive the unknown-key check.
@@ -208,6 +225,60 @@ module Pubid
 
           attrs[key] = { field => value.to_s }
         end
+
+        coerce_degenerate_components(attrs)
+      end
+
+      # Wrap a scalar in a degenerate component wherever the attribute declares
+      # one, INCLUDING a collection — the residue of pubid#360 item 3.
+      #
+      # lutaml casts a Hash element into the component but passes a String
+      # through untouched, so `languages: ["en"]` stored raw Strings and then
+      # raised in the renderer (`undefined method 'code'`) and in the URN
+      # generator. The Hash form `languages: [{code: "en"}]` already worked, so
+      # this is a coercion gap, not a lutaml limit.
+      def coerce_degenerate_components(attrs)
+        attrs.keys.each do |key|
+          next unless key.is_a?(::Symbol) || key.is_a?(::String)
+
+          field = degenerate_field_for(key)
+          next unless field
+
+          attrs[key] = wrap_degenerate(attrs[key], field)
+        end
+      end
+
+      # The degenerate field of the component +key+ declares, or nil when it
+      # declares none. A collection attribute reports its ELEMENT class, so one
+      # lookup covers both shapes; the `<=` test is what admits a flavor
+      # subclass such as Pubid::Iec::Components::Publisher.
+      def degenerate_field_for(key)
+        type = declared_component_type(key)
+        return nil unless type
+
+        DEGENERATE_COMPONENT_FIELDS.find { |klass, _| type <= klass }&.last
+      end
+
+      # The component class +key+ declares, or nil when the attribute is
+      # absent or declared as a plain scalar.
+      def declared_component_type(key)
+        type = (attributes[key.to_sym] || attributes[key.to_s])&.type
+        type.is_a?(::Class) ? type : nil
+      rescue StandardError
+        nil
+      end
+
+      # A scalar becomes `{field => scalar}` and an Array is mapped
+      # element-wise. nil, a Hash and an already-built component pass through
+      # untouched, so every shape that worked before still works.
+      def wrap_degenerate(value, field)
+        if value.is_a?(::Array)
+          return value.map { |v| wrap_degenerate(v, field) }
+        end
+        return value if value.nil? || value.is_a?(::Hash) ||
+          value.is_a?(Lutaml::Model::Serialize)
+
+        { field => value.to_s }
       end
 
       def reject_unknown_keys(attrs)

@@ -175,6 +175,72 @@ RSpec.describe "attribute construction contract (cross-flavor)" do
       expect(id.year).to eq("2013")
     end
 
+    # A COMPONENT-TYPED COLLECTION was the residue of item 3. lutaml casts a
+    # Hash element into the component but passes a String through untouched, so
+    # `languages: ["en"]` stored raw Strings and then raised — in the renderer
+    # (`wrong number of arguments`, iec/single_identifier.rb) and in the URN
+    # generator (`undefined method 'code'`). Every shape must agree.
+    it "wraps a scalar language inside a collection (IEC)" do
+      klass = Pubid::Iec::Identifiers::InternationalStandard
+
+      id = klass.new(number: "1000", part: "1", year: 2023, edition: 2,
+                     languages: ["en"])
+
+      expect(id.languages).to all(be_a(Pubid::Components::Language))
+      expect(id.to_s).to eq("IEC 1000-1:2023 ED2(en)")
+      expect(id.to_urn).to eq("urn:iec:std:iec:1000-1:2023::ed-2:en")
+    end
+
+    it "gives the scalar, Hash and component forms one result (IEC)" do
+      klass = Pubid::Iec::Identifiers::InternationalStandard
+      args = { number: "1000", year: 2023 }
+
+      from_scalar = klass.new(**args, languages: ["en"])
+      from_hash = klass.new(**args, languages: [{ code: "en" }])
+      from_component = klass.new(
+        **args, languages: [Pubid::Components::Language.new(code: "en")],
+      )
+
+      expect(from_hash.to_s).to eq(from_scalar.to_s)
+      expect(from_component.to_s).to eq(from_scalar.to_s)
+      expect(from_hash.to_hash).to eq(from_scalar.to_hash)
+      expect(from_component.to_hash).to eq(from_scalar.to_hash)
+    end
+
+    # Publisher is the second degenerate component, and it raised the same way
+    # (`undefined method 'body'`). The `<=` match is what admits the flavor
+    # subclass Pubid::Iec::Components::Publisher.
+    it "wraps a scalar copublisher in the subclass (IEC)" do
+      klass = Pubid::Iec::Identifiers::InternationalStandard
+
+      id = klass.new(number: "1000", copublishers: ["ISO"])
+
+      expect(id.copublishers).to all(be_a(Pubid::Iec::Components::Publisher))
+      expect(id.to_s).to eq("IEC/ISO 1000")
+    end
+
+    # The coercion is type-aware here too: ~8 flavors declare `language` as a
+    # plain :string and must keep the scalar they were given.
+    it "leaves a scalar language alone when declared a string (ASME)" do
+      id = Pubid::Asme::Identifiers::Standard.new(
+        number: "B31.1", language: "SPANISH",
+      )
+
+      expect(id.language).to eq("SPANISH")
+    end
+
+    # Components::Code is deliberately NOT coerced. A String in `number`
+    # renders and serializes correctly, and wrapping it would turn `to_hash`
+    # into {"number" => {"value" => "1000"}} on the six flavors that still
+    # declare a Code — an index wire-format change. This pins the exclusion, so
+    # a later branch that widens DEGENERATE_COMPONENT_FIELDS has to say why.
+    it "leaves a scalar number uncoerced (IEC)" do
+      id = Pubid::Iec::Identifiers::InternationalStandard.new(number: "1000")
+
+      expect(id.number).to be_a(String)
+      expect(id.to_hash["number"]).to eq("1000")
+    end
+
     it "matches the parsed identifier exactly (IEC)" do
       klass = Pubid::Iec::Identifiers::InternationalStandard
 
@@ -183,6 +249,31 @@ RSpec.describe "attribute construction contract (cross-flavor)" do
 
       expect(built.to_s).to eq(parsed.to_s)
       expect(built.to_hash).to eq(parsed.to_hash)
+    end
+  end
+
+  # Registry-driven, like the unknown-key block above: a String must never
+  # survive into a component-typed `languages` on ANY flavor, so a flavor added
+  # tomorrow is covered without an entry to add here.
+  describe "degenerate component coercion (cross-flavor)" do
+    Pubid::Registry.flavor_names.each do |flavor_name|
+      context flavor_name do
+        let(:identifier_class) do
+          Pubid::Registry.get(flavor_name).const_get(:Identifier)
+        end
+
+        it "never leaves a String in a component-typed languages" do
+          attribute = identifier_class.attributes[:languages]
+          skip "does not declare languages as a component" unless
+            attribute&.type.is_a?(Class) &&
+              attribute.type <= Pubid::Components::Language
+
+          id = identifier_class.new(languages: ["en"])
+
+          expect(id.languages).to all(be_a(Pubid::Components::Language)),
+                                  "#{flavor_name} kept a raw String"
+        end
+      end
     end
   end
 end
