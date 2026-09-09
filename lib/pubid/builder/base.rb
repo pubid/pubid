@@ -137,11 +137,14 @@ module Pubid
         end
       end
 
-      # Splits a compound document number ("1234", "1234-1", "1234-1-2")
-      # into number/part/subpart Code components. Flavor-specific dash/slash
-      # normalization lives in +normalize_number_with_part+; legacy year
-      # extraction (e.g. ISO "4037-1979") lives in +extract_legacy_year+.
-      def parse_number_with_part(value, code_class:)
+      # Splits a compound document number ("1234", "1234-1", "1234-1-2") into
+      # number/part/subpart. Each piece is wrapped in +code_class+ when the
+      # flavor declares those attributes as a Components::Code (ISO), and kept
+      # as a plain string when +code_class+ is nil (IEC and the other retyped
+      # flavors). Flavor-specific dash/slash normalization lives in
+      # +normalize_number_with_part+; legacy year extraction (e.g. ISO
+      # "4037-1979") lives in +extract_legacy_year+.
+      def parse_number_with_part(value, code_class: nil)
         normalized = normalize_number_with_part(value)
         parts = normalized.split("-").reject(&:empty?)
         number = parts.shift
@@ -153,10 +156,17 @@ module Pubid
 
         part = convert_roman_to_integer(part) if part
 
-        code_hash = { number: code_class.new(value: number) }
-        code_hash[:part] = code_class.new(value: part) if part
-        code_hash[:subpart] = code_class.new(value: subpart) if subpart
+        code_hash = { number: wrap_component(number, code_class) }
+        code_hash[:part] = wrap_component(part, code_class) if part
+        code_hash[:subpart] = wrap_component(subpart, code_class) if subpart
         code_hash
+      end
+
+      # A nil +code_class+ means the flavor holds number/part/subpart as plain
+      # strings — the `number` retype tranches — so keep the raw scalar. ISO
+      # still passes its Components::Code and is unaffected.
+      def wrap_component(value, code_class)
+        code_class ? code_class.new(value: value) : value
       end
 
       # Hook: normalize the raw number_with_part string before splitting.

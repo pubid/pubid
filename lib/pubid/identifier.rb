@@ -6,15 +6,29 @@ module Pubid
     # single significant field: attribute name => the key the scalar is emitted
     # under. `date` is RENAMED to `year`, matching the flat shape ISO and IEC
     # already emit through their own converters.
+    #
+    # `stage_iteration` is a Components::Iteration, which holds one `:string`
+    # field and whose `to_s`/`render` return it — degenerate by construction.
+    #
+    # Every flavor INHERITS the attribute, so the reach of this entry is not the
+    # set of flavors that map the key but the set that ever POPULATES it. That
+    # was measured over every flavor's whole pass-fixture corpus (~99k ids):
+    # only ISO does, 91 times, and ISO emits the bare scalar through its own
+    # converter — which the inflation guard below defers to — so its serialized
+    # shape is unchanged (verified byte-identical over all 7,573 ISO ids). IEC
+    # is the flavor this entry is for; it dropped its converter pair for a
+    # plain map. For every other flavor the `hash.key?` guard never fires.
     FLAT_SCALAR_COMPONENTS = {
       edition: "edition",
       date: "year",
+      stage_iteration: "stage_iteration",
     }.freeze
 
     # The one field each of those components degenerates to.
     FLAT_SCALAR_FIELDS = {
       edition: :number,
       date: :year,
+      stage_iteration: :number,
     }.freeze
 
     # The one field each degenerate component collapses to, keyed by the
@@ -25,10 +39,15 @@ module Pubid
     # `Components::Code` is deliberately absent. A String left in `number`
     # renders and serializes correctly today, and coercing it would turn
     # `to_hash` from {"number" => "1000"} into {"number" => {"value" => "1000"}}
-    # on the six flavors that still declare a Code (iso, iec, nist, csa, sae,
+    # on the five flavors that still declare a Code (iso, nist, csa, sae,
     # ccsds) — an index wire-format change, and one the `number` retype tranches
     # sequence to land last. The two entries here are the components that RAISE
     # when a String reaches them, so coercing them can only repair.
+    #
+    # IEC used to be a sixth, and its removal shows the cost of the split the
+    # other way round: because `parse` gave a Code and `new` left a String, a
+    # hand-built IEC identifier was never `==` the parsed one. Retyping the
+    # attribute — not coercing the value — is what reconciles the two paths.
     DEGENERATE_COMPONENT_FIELDS = {
       Components::Language => :code,
       Components::Publisher => :body,

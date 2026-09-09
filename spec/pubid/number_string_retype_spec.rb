@@ -2,9 +2,14 @@
 
 require "spec_helper"
 
-# Tranche 1 of the `number` retype: ansi, api, bsi, cen_cenelec, idf and jcgm
-# hold `number`, `part` and `subpart` as plain `:string` attributes instead of
-# a `Pubid::Components::Code`.
+# The converted flavors of the `number` retype — ansi, api, bsi, cen_cenelec,
+# idf and jcgm (tranche 1), plus iec (tranche 2) — hold `number`, `part` and
+# `subpart` as plain `:string` attributes instead of a `Pubid::Components::Code`.
+#
+# IEC's own forensics live in spec/pubid/iec/number_string_spec.rb: its
+# `Iec::Components::Code` subclass existed only to render a `prefix` that no
+# construction path ever set, and the split between a Code from `parse` and a
+# String from `new` made the two paths silently not `==`.
 #
 # WHY. ::Pubid::Identifier declares all three as `Components::Code`
 # (lib/pubid/identifier.rb:136-138), so a flavor that wants a scalar must
@@ -12,10 +17,11 @@ require "spec_helper"
 # inherit from resolves nondeterministically under multi-flavor load. That
 # landmine is recorded a dozen times in CLAUDE.md and is why twelve flavors
 # carry a structural tripwire spec. It exists only because the parent and the
-# leaves disagree about the type. These six flavors stored a String in a box:
-# measured over the whole fixture corpus, not one of their 2,066 identifiers
-# populated `prefix`, `part`, `subpart` or `parts` inside the Code, and
-# `number.parts` / `number.prefix` have zero call sites anywhere in lib/.
+# leaves disagree about the type. Every flavor listed here stored a String in a
+# box: measured over the whole fixture corpus, not one of the six tranche-1
+# flavors' 2,066 identifiers, and not one of IEC's 12,331, populated `prefix`,
+# `part`, `subpart` or `parts` inside the Code, and `number.parts` /
+# `number.prefix` have zero call sites anywhere in lib/.
 #
 # The base declaration is deliberately NOT changed here — that is the last step
 # of the three-tranche sequence, after ISO, NIST and CSA also move. Until then
@@ -39,8 +45,16 @@ module NumberStringRetypeSpec
     "bsi" => [Pubid::Bsi, 1_400],
     "cen_cenelec" => [Pubid::CenCenelec, 100],
     "idf" => [Pubid::Idf, 60],
+    "iec" => [Pubid::Iec, 2_000],
     "jcgm" => [Pubid::Jcgm, 25],
   }.freeze
+
+  # Flavors whose fixture corpus is too large to sweep whole: take every Nth
+  # input. IEC has 12,331 pass fixtures and parsing them all costs ~39 s, which
+  # would make one flavor dominate the suite. The stride is deterministic (not
+  # random), so a failure is reproducible, and the files are ordered by
+  # identifier type, so every type is still represented.
+  SAMPLE_STRIDE = { "iec" => 6 }.freeze
 
   # Identifiers whose from_hash(to_hash) does not reproduce to_hash. Every one
   # of these already failed before the retype (measured on the parent commit:
@@ -65,6 +79,9 @@ module NumberStringRetypeSpec
     "bsi" => 647,
     "cen_cenelec" => 66,
     "idf" => 0,
+    # Measured over the WHOLE 12,331-id IEC corpus on the parent commit, not
+    # just the sampled slice: 0 failures before the retype and 0 after.
+    "iec" => 0,
     "jcgm" => 0,
   }.freeze
 
@@ -76,6 +93,10 @@ module NumberStringRetypeSpec
     "bsi" => ["BS 1234:2020", "1234"],
     "cen_cenelec" => ["EN 196-3:2005", "196"],
     "idf" => ["IDF 125:1988", "125"],
+    # IEC already emitted a bare scalar before the retype, through the
+    # emit_code/build_code converters. The retype removed the converters, not
+    # the shape — which is why no relaton-data-iec row changes.
+    "iec" => ["IEC 60068-2-28:2008", "60068"],
     "jcgm" => ["JCGM 100:2008", "100"],
   }.freeze
 
@@ -109,8 +130,8 @@ module NumberStringRetypeSpec
     end
 
     # True when `klass` reaches `attr` through a hand-written delegation rather
-    # than the lutaml-generated accessor. All six flavors declare the three
-    # attributes on their `Identifier` base, so that is where a generated
+    # than the lutaml-generated accessor. Every converted flavor declares the
+    # three attributes on its `Identifier` base, so that is where a generated
     # reader is owned; anything else is a wrapper forwarding to a nested
     # identifier, which may belong to a flavor that has not converted yet.
     def delegated?(mod, klass, attr)
@@ -135,7 +156,9 @@ module NumberStringRetypeSpec
       glob = File.join(__dir__,
                        "../fixtures/#{flavor}/identifiers/pass/*.txt")
       lines = Dir.glob(glob).flat_map { |f| File.readlines(f, chomp: true) }
-      lines.filter_map { |line| fixture_input(line) }.uniq
+      inputs = lines.filter_map { |line| fixture_input(line) }.uniq
+      stride = SAMPLE_STRIDE[flavor]
+      stride ? inputs.each_slice(stride).map(&:first) : inputs
     end
 
     def fixture_input(line)
@@ -153,7 +176,7 @@ module NumberStringRetypeSpec
   end
 end
 
-RSpec.describe "number/part/subpart as :string (tranche 1)" do
+RSpec.describe "number/part/subpart as :string" do
   describe "the shared base is NOT retyped" do
     # The whole point of the tranching: this line moves last, once ISO, NIST
     # and CSA have also converted. A failure here means someone jumped ahead.
@@ -174,10 +197,11 @@ RSpec.describe "number/part/subpart as :string (tranche 1)" do
       end
 
       describe "the fixture corpus" do
-        # These six flavors' own fixtures_spec.rb files all report 0 examples
-        # (the `../../../fixtures` glob has one `..` too many; api and idf also
-        # use an uppercase directory). Until that is fixed separately, this
-        # sweep is the only thing exercising the corpus.
+        # The six tranche-1 flavors' own fixtures_spec.rb files all report 0
+        # examples (the `../../../fixtures` glob has one `..` too many; api and
+        # idf also use an uppercase directory). Until that is fixed separately,
+        # this sweep is the only thing exercising their corpora. IEC's own
+        # fixtures_spec.rb is live, so its sweep here is a second net.
         let(:corpus) { NumberStringRetypeSpec.corpus(flavor) }
 
         it "parses a corpus worth sweeping" do

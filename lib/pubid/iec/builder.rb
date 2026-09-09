@@ -59,7 +59,7 @@ module Pubid
           supplement = identifier_class.new
           supp_attrs = identifier_class.attributes
           if supp_attrs.key?(:number)
-            supplement.number = Components::Code.new(value: supplement_number.to_s)
+            supplement.number = supplement_number.to_s
           end
           if supplement_date && supp_attrs.key?(:date)
             supplement.date = cast(:date, supplement_date)
@@ -296,12 +296,12 @@ module Pubid
 
           if type == "AMD"
             Identifiers::Amendment.new(
-              number: Components::Code.new(value: number),
+              number: number,
               date: date_component,
             )
           elsif type == "COR"
             Identifiers::Corrigendum.new(
-              number: Components::Code.new(value: number),
+              number: number,
               date: date_component,
             )
           end
@@ -379,15 +379,14 @@ module Pubid
 
         when :number
           # Plain number for sub-org identifiers (CA, IECQ CS, IECQ OD)
-          # Just return as Code component
-          { number: Components::Code.new(value: value.to_s) }
+          { number: value.to_s }
 
         when :number_with_part
           # "60038" (no part)
           # or "60038-1" ('1' is part)
           # or "60038-1-2" ('1' is part, '2' is subpart)
           # or "29110-5-1-1" ('5' is part, '1-1' is subpart)
-          parse_number_with_part(value, code_class: Components::Code)
+          parse_number_with_part(value)
 
         when :type_with_stage
           # "WD"
