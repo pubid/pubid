@@ -12,6 +12,9 @@ RSpec.describe "Pubid::Xsf identifier hash round-trip" do
     "XEP 0060",
     "XEP 0218",
     "XEP 0424",
+    # The two named documents: the editor README and the template.
+    "XEP README",
+    "XEP xxxx",
   ]
 
   refs.each do |ref|

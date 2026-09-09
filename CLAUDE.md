@@ -115,6 +115,7 @@ from the code.
 - `docs/flavors/oiml.md` — OIML index key, bulletins and supplement URNs.
 - `docs/flavors/tgpp.md` — 3GPP (`Pubid::Tgpp`) module naming and partial references.
 - `docs/flavors/w3c.md` — W3C slug attribute and index key.
+- `docs/flavors/xsf.md` — XSF named documents (`XEP README`, `XEP xxxx`).
 
 ### Key Patterns
 
