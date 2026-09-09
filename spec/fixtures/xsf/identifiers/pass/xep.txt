@@ -51,3 +51,7 @@ XEP 0469
 XEP 0481
 XEP 0493
 XEP 0505
+
+# The two named documents: the XEP Editor README and the XEP template.
+XEP README
+XEP xxxx
