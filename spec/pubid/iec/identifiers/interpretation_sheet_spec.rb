@@ -19,11 +19,11 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses base number" do
-        expect(parsed.base.number.value).to eq("60050")
+        expect(parsed.base.number).to eq("60050")
       end
 
       it "parses base part" do
-        expect(parsed.base.part.value).to eq("191")
+        expect(parsed.base.part).to eq("191")
       end
 
       it "parses base date" do
@@ -31,7 +31,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses ISH number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses ISH date" do
@@ -68,7 +68,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses ISH number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses base date as nil" do
@@ -103,13 +103,13 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       it "parses number" do
         # For "IEC DISH 60050-191", the supplement number (ISH) is not explicitly specified
         # "60050-191" is the base document number with part
-        expect(parsed.base.number.value).to eq("60050")
+        expect(parsed.base.number).to eq("60050")
       end
 
       it "parses part" do
         # For "IEC DISH 60050-191", "-191" is parsed as the supplement number
         # This represents the part of the base document "60050-191"
-        expect(parsed.number.value).to eq("191")
+        expect(parsed.number).to eq("191")
       end
 
       it "provides stage code" do
@@ -144,7 +144,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       it "parses number" do
         # For "IEC CDISH 60050-191", the supplement number (ISH) is not explicitly specified
         # "60050-191" is the base document number with part
-        expect(parsed.base.number.value).to eq("60050")
+        expect(parsed.base.number).to eq("60050")
       end
 
       it "provides stage code" do
@@ -181,7 +181,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses ISH number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "round-trips" do
@@ -202,11 +202,11 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses base part" do
-        expect(parsed.base.part.value).to eq("191")
+        expect(parsed.base.part).to eq("191")
       end
 
       it "parses base subpart" do
-        expect(parsed.base.subpart.value).to eq("2")
+        expect(parsed.base.subpart).to eq("2")
       end
 
       it "round-trips" do
@@ -223,7 +223,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       let(:parsed) { Pubid::Iec.parse(subject) }
 
       it "parses multi-digit ISH number" do
-        expect(parsed.number.value).to eq("10")
+        expect(parsed.number).to eq("10")
       end
 
       it "round-trips" do

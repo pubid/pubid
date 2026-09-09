@@ -9,11 +9,15 @@ module Pubid
     # "base". No-op the delegated maps so they serialize once. (Mirrors
     # Iso::BundledIdentifier.) Fragment keeps its own stage/edition, so it
     # suppresses a subset inline instead of including this.
+    #
+    # number/part/subpart are NOT here, and deliberately so: their maps live on
+    # SingleIdentifier, which the four wrappers do not inherit from, so the
+    # exclusion is structural rather than a denylist that can drift. Only a
+    # converter can be no-opped this way, so a key that needs `with:` for
+    # another reason — year, publisher, copublishers, stage — still lists here.
+    # (`month`/`day`/`undated` are missing from that list and leak a duplicated
+    # top-level key on a wrapper; pre-existing, see docs/flavors/iec.md.)
     module DelegatedFieldSuppression
-      def number_to_kv(_model, _doc); end
-      def part_to_kv(_model, _doc); end
-      def subpart_to_kv(_model, _doc); end
-      def stage_iteration_to_kv(_model, _doc); end
       def year_to_kv(_model, _doc); end
       def publisher_to_kv(_model, _doc); end
       def copublishers_to_kv(_model, _doc); end
@@ -23,14 +27,33 @@ module Pubid
     class Identifier < ::Pubid::Identifier
       # Override base types with IEC-specific ones. publisher defaults to the
       # type's implied publisher (IEC), so an omitted publisher key reconstructs
-      # correctly on from_hash. number/part/subpart are IEC codes.
+      # correctly on from_hash.
       attribute :publisher, ::Pubid::Iec::Components::Publisher,
                 default: -> { self.class.default_publisher }
       attribute :copublishers, ::Pubid::Iec::Components::Publisher,
                 collection: true
-      attribute :number, ::Pubid::Iec::Components::Code
-      attribute :part, ::Pubid::Iec::Components::Code
-      attribute :subpart, ::Pubid::Iec::Components::Code
+
+      # number/part/subpart are plain strings, not a Components::Code.
+      # ::Pubid::Identifier declares them as a Code, so this is a REDECLARATION
+      # — safe here because this class body lives in this one file and is never
+      # reopened, so lutaml's deep-dup of the attribute table into each subclass
+      # always sees the complete table.
+      #
+      # The Code they used to hold was an empty box. Measured over all 12,331
+      # parseable IEC pass fixtures, number/part/subpart were a Code 9,975 /
+      # 5,422 / 2,416 times and NOT ONE populated `prefix`, `parts`, `part` or
+      # `subpart` inside it; `Iec::Components::Code` existed solely to render a
+      # `prefix` that no construction path ever set, and is deleted.
+      #
+      # The split was a live defect, not just clutter: `parse` produced a Code
+      # while `new` left a String (a `:string` assigned to a Code-typed
+      # attribute stays a String), so a hand-built identifier was not `==` the
+      # parsed one — and `#matches?` is `exclude(*ignore) == other.exclude(...)`,
+      # so every match between them silently returned false while `to_s`,
+      # `to_urn` and `to_hash` all agreed. See spec/pubid/iec/number_string_spec.
+      attribute :number, :string
+      attribute :part, :string
+      attribute :subpart, :string
 
       # The publisher implied when none is serialized (IEC for every type).
       def self.default_publisher
@@ -119,19 +142,31 @@ module Pubid
 
       # The base Pubid::Identifier no longer auto-maps attributes, so each
       # flavor's top class declares its own key_value mapping. Subclasses merge
-      # their own blocks on top of this one (e.g. SupplementIdentifier adds
-      # base; VapIdentifier adds vap), so list every base attribute IEC
-      # serializes here once. Code/Date are flattened to plain scalars; the
-      # verbose type/stage trees are not mapped (type/stage are recomputed from
-      # typed_stage, which serializes as just its code under "stage").
+      # their own blocks on top of this one — lutaml APPENDS a subclass's maps
+      # to the parent's (e.g. SingleIdentifier adds number/part/subpart,
+      # SupplementIdentifier adds base, VapIdentifier adds vap) — so list every
+      # attribute EVERY IEC type serializes here once, and put a key that only
+      # some types own on the class that owns it.
+      #
+      # Date is flattened to plain scalars; the verbose type/stage trees are not
+      # mapped (type/stage are recomputed from typed_stage, which serializes as
+      # just its code under "stage").
+      #
+      # A converter (`with:`) is for a custom class, or for splitting one
+      # attribute across several keys. A primitive takes a plain map: a nil and
+      # a default-valued attribute are both dropped by
+      # ::Pubid::Identifier#to_hash, so no converter is needed to omit them.
       key_value do
         map "_type", to: :_type, polymorphic_map: IEC_TYPE_MAP
-        # Code components serialize as their plain string value, not {value,...}.
-        map "number", with: { to: :number_to_kv, from: :number_from_kv }
-        map "part", with: { to: :part_to_kv, from: :part_from_kv }
-        map "subpart", with: { to: :subpart_to_kv, from: :subpart_from_kv }
-        map "stage_iteration",
-            with: { to: :stage_iteration_to_kv, from: :stage_iteration_from_kv }
+        # number/part/subpart are NOT mapped here — they live on
+        # SingleIdentifier, the seam that excludes the four delegating wrappers.
+        # See the comment on that block.
+        #
+        # stage_iteration is a degenerate Components::Iteration (one :string
+        # field, `number`), so the shared FLAT_SCALAR_COMPONENTS rule on
+        # ::Pubid::Identifier flattens it to a bare scalar and inflates it back.
+        # A plain map is enough; no converter.
+        map "stage_iteration", to: :stage_iteration, render_default: false
         # date serialized flat as year/month/day, nils omitted.
         map "year", with: { to: :year_to_kv, from: :year_from_kv }
         map "month", with: { to: :month_to_kv, from: :month_from_kv }
@@ -150,45 +185,9 @@ module Pubid
         # serialize only the unique typed-stage code under "stage" and recompute
         # the rest on load. _type already pins the document type.
         map "stage", with: { to: :stage_to_kv, from: :stage_from_kv }
-        # Omit the `false` default; only the meaningful `true` is serialized.
-        map "all_parts", with: { to: :all_parts_to_kv, from: :all_parts_from_kv }
-      end
-
-      # --- Code components <-> plain string ---
-      def number_to_kv(model, doc) = emit_code(doc, "number", model.number)
-      def number_from_kv(model, value) = model.number = build_code(value)
-      def part_to_kv(model, doc) = emit_code(doc, "part", model.part)
-      def part_from_kv(model, value) = model.part = build_code(value)
-      def subpart_to_kv(model, doc) = emit_code(doc, "subpart", model.subpart)
-      def subpart_from_kv(model, value) = model.subpart = build_code(value)
-
-      def emit_code(doc, key, code)
-        v = code.is_a?(::Pubid::Components::Code) ? code.value : code
-        return if v.nil? || v.to_s.empty?
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new(key, v.to_s))
-      end
-
-      def build_code(value)
-        return if value.nil? || value.to_s.empty?
-
-        ::Pubid::Iec::Components::Code.new(value: value.to_s)
-      end
-
-      def stage_iteration_to_kv(model, doc)
-        iter = model.stage_iteration
-        v = iter.is_a?(::Pubid::Components::Iteration) ? iter.number : iter
-        return if v.nil? || v.to_s.empty?
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("stage_iteration",
-                                                              v.to_s))
-      end
-
-      def stage_iteration_from_kv(model, value)
-        return if value.nil? || value.to_s.empty?
-
-        model.stage_iteration =
-          ::Pubid::Components::Iteration.new(number: value.to_s)
+        # A Boolean attribute whose `false` default ::Pubid::Identifier#to_hash
+        # already drops, so a plain map suffices (the GB spelling).
+        map "all_parts", to: :all_parts, render_default: false
       end
 
       # --- date serialized flat as year/month/day ---
@@ -274,17 +273,6 @@ module Pubid
         model.copublishers = list.map do |cp|
           ::Pubid::Iec::Components::Publisher.new(body: cp)
         end
-      end
-
-      # --- all_parts: omit the false default ---
-      def all_parts_to_kv(model, doc)
-        return unless model.all_parts
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("all_parts", true))
-      end
-
-      def all_parts_from_kv(model, value)
-        model.all_parts = value
       end
 
       # Serialize typed_stage as just its unique code (e.g. "cd", "fdis"); the

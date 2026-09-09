@@ -231,12 +231,26 @@ RSpec.describe "attribute construction contract (cross-flavor)" do
 
     # Components::Code is deliberately NOT coerced. A String in `number`
     # renders and serializes correctly, and wrapping it would turn `to_hash`
-    # into {"number" => {"value" => "1000"}} on the six flavors that still
+    # into {"number" => {"value" => "9001"}} on the five flavors that still
     # declare a Code — an index wire-format change. This pins the exclusion, so
     # a later branch that widens DEGENERATE_COMPONENT_FIELDS has to say why.
-    it "leaves a scalar number uncoerced (IEC)" do
+    it "leaves a scalar number uncoerced (ISO)" do
+      id = Pubid::Iso::Identifiers::InternationalStandard.new(number: "9001")
+
+      expect(id.number).to be_a(String)
+      expect(id.to_hash["number"]).to eq("9001")
+    end
+
+    # IEC's number is a plain :string attribute now, so a String is not merely
+    # tolerated — it is the type. That is what makes the two construction paths
+    # `==`, which the to_s/to_hash assertions below cannot see: both were
+    # already equal while a Code from `parse` and a String from `new` made the
+    # identifiers silently unequal. See spec/pubid/iec/number_string_spec.rb.
+    it "declares a scalar number outright (IEC)" do
       id = Pubid::Iec::Identifiers::InternationalStandard.new(number: "1000")
 
+      expect(Pubid::Iec::Identifier.attributes[:number].type)
+        .to eq(Lutaml::Model::Type::String)
       expect(id.number).to be_a(String)
       expect(id.to_hash["number"]).to eq("1000")
     end
@@ -249,6 +263,7 @@ RSpec.describe "attribute construction contract (cross-flavor)" do
 
       expect(built.to_s).to eq(parsed.to_s)
       expect(built.to_hash).to eq(parsed.to_hash)
+      expect(built).to eq(parsed)
     end
   end
 

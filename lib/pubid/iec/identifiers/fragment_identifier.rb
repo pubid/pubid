@@ -25,10 +25,8 @@ module Pubid
           map "fragment_number", to: :fragment_number, render_default: false
         end
 
-        def number_to_kv(_model, _doc); end
-        def part_to_kv(_model, _doc); end
-        def subpart_to_kv(_model, _doc); end
-        def stage_iteration_to_kv(_model, _doc); end
+        # number/part/subpart need no no-op here: their maps live on
+        # SingleIdentifier, which this class does not inherit from.
         def year_to_kv(_model, _doc); end
         def publisher_to_kv(_model, _doc); end
         def copublishers_to_kv(_model, _doc); end

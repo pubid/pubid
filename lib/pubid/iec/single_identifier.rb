@@ -8,6 +8,31 @@ module Pubid
       attribute :typed_stage, ::Pubid::Components::TypedStage,
                 default: -> { self.class.published_typed_stage }
 
+      # number/part/subpart are mapped HERE, not on Iec::Identifier, and the
+      # placement is the whole design.
+      #
+      # The four wrapper identifiers — FragmentIdentifier,
+      # ConsolidatedIdentifier, VapIdentifier and SheetIdentifier — inherit
+      # from Iec::Identifier DIRECTLY and override `number`/`part`/`subpart` as
+      # readers that delegate to what they wrap. A map on the shared parent
+      # would therefore serialize
+      # the delegated value twice: once at the wrapper's top level and again
+      # inside "base"/"identifiers". SingleIdentifier is the seam that excludes
+      # exactly those four while covering both classes that own a number of
+      # their own (Identifiers::Base and SupplementIdentifier).
+      #
+      # That is a structural exclusion, not a denylist of no-op converters that
+      # a later key can be forgotten from — which is how `month`/`day` came to
+      # leak (see DelegatedFieldSuppression).
+      #
+      # The values are plain strings, so no converter is needed: lutaml writes
+      # the scalar, and ::Pubid::Identifier#to_hash drops a nil.
+      key_value do
+        map "number", to: :number
+        map "part", to: :part
+        map "subpart", to: :subpart
+      end
+
       # Generate URN for this identifier
       #
       # @return [String] URN representation
