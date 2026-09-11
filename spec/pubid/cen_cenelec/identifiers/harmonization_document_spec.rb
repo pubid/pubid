@@ -25,8 +25,11 @@ RSpec.describe Pubid::CenCenelec::Identifiers::HarmonizationDocument do
         expect(parsed.date.year).to eq("2020")
       end
 
+      # A Components::Type, like the "TR" of "CEN/TR". The default used to be
+      # the bare Symbol :hd, and from_hash raised on it.
       it "has correct type" do
-        expect(parsed.type).to eq(:hd)
+        expect(parsed.type).to eq(Pubid::Components::Type.new(abbr: "HD"))
+        expect(parsed.class.type[:key]).to eq(:hd)
       end
 
       it "round-trips" do

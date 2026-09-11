@@ -7,7 +7,7 @@ module Pubid
       # Example: "BS EN 10077-1:2006" where EN 10077-1:2006 is a CEN identifier object
       # Example: "BS EN ISO 8601:2019" where EN ISO 8601:2019 is a CEN AdoptedEuropeanNorm wrapping ISO
       class AdoptedEuropeanNorm < BritishStandard
-        attribute :adopted_identifier, ::Pubid::Identifier, polymorphic: true # CEN object
+        attribute :adopted, ::Pubid::Identifier, polymorphic: true # CEN object
         attribute :edition, :string
         attribute :translation_lang, :string
         attribute :translation_upper, :string
@@ -34,32 +34,49 @@ module Pubid
         # short. `#root` recurses, so it reaches the ISO standard however many
         # adoption layers sit in between.
         def root
-          adopted_identifier ? adopted_identifier.root : self
+          adopted ? adopted.root : self
         end
 
         # Delegate common methods to adopted identifier
         def number
-          adopted_identifier&.number
+          delegate_target&.number
         end
 
         def year
-          adopted_identifier&.year if adopted_identifier&.methods&.include?(:year)
+          delegate_target&.year if delegate_target&.methods&.include?(:year)
         end
 
         def date
-          adopted_identifier&.date if adopted_identifier&.methods&.include?(:date)
+          delegate_target&.date if delegate_target&.methods&.include?(:date)
         end
 
         def parts
-          adopted_identifier&.parts if adopted_identifier&.methods&.include?(:parts)
+          delegate_target&.parts if delegate_target&.methods&.include?(:parts)
         end
 
         def part
-          adopted_identifier&.part if adopted_identifier&.methods&.include?(:part)
+          delegate_target&.part if delegate_target&.methods&.include?(:part)
         end
 
         def subpart
-          adopted_identifier&.subpart if adopted_identifier&.methods&.include?(:subpart)
+          adopted&.subpart if adopted&.methods&.include?(:subpart)
+        end
+
+        private
+
+        # The identifier that holds the number, part and date. For
+        # "BS EN ISO 8848:2021" the adopted document is a CEN adoption of an
+        # ISO standard, and the CEN adoption keeps no number of its own, so
+        # read through it to the ISO standard. The CEN class used to do this
+        # with delegating readers, which broke its serialization. `subpart`
+        # keeps reading the CEN object, as it did before.
+        def delegate_target
+          target = adopted
+          if target.is_a?(::Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
+            target.adopted
+          else
+            target
+          end
         end
       end
     end

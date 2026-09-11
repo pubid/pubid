@@ -19,15 +19,12 @@ module Pubid
         attribute :year, :integer
         attribute :stage, :string # prEN, FprEN
         attribute :supplements, :string, collection: true # Amendments and corrigenda
-        attribute :adopted_identifier, Base, polymorphic: true # Nested identifier object (ISO, IEC, etc.)
+        # Nested identifier object (ISO, IEC, etc.)
+        attribute :adopted, Base, polymorphic: true
         attribute :edition, :string # Edition number
-
-        def ==(other)
-          return false unless other.is_a?(Base)
-
-          publisher == other.publisher && number == other.number &&
-            parts == other.parts && year == other.year
-        end
+        # No custom `==`: the one that was here compared only publisher,
+        # number, parts and year, so every amendment equalled every other.
+        # lutaml's attribute-wise `==` compares the whole identifier.
       end
     end
   end

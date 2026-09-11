@@ -94,7 +94,8 @@ RSpec.describe "CEN Identifier Integration" do
         expect(identifier).to be_a(Pubid::CenCenelec::Identifiers::Amendment)
         expect(identifier.to_s).to eq("EN 1234:1999/A1:2005")
         expect(identifier.base).to be_a(Pubid::CenCenelec::Identifiers::EuropeanNorm)
-        expect(identifier.amendment_number).to eq("1")
+        expect(identifier.number).to eq("1")
+        expect(identifier.year).to eq("2005")
       end
 
       it "parses and renders corrigendum" do
@@ -102,7 +103,8 @@ RSpec.describe "CEN Identifier Integration" do
         expect(identifier).to be_a(Pubid::CenCenelec::Identifiers::Corrigendum)
         expect(identifier.to_s).to eq("EN 1234:1999/AC1:2005")
         expect(identifier.base).to be_a(Pubid::CenCenelec::Identifiers::EuropeanNorm)
-        expect(identifier.corrigendum_number).to eq("1")
+        expect(identifier.number).to eq("1")
+        expect(identifier.year).to eq("2005")
       end
     end
 

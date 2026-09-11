@@ -30,7 +30,8 @@ module Pubid
         # populated their Identifier base's polymorphic_type_map.
         ::Pubid.eager_load_flavors!
 
-        flavor = ::Pubid::Registry.get(flavor_name)
+        flavor = ::Pubid::Registry.get(flavor_name) ||
+          flavor_by_module_segment(flavor_name)
         return nil unless flavor
 
         identifier_base = flavor::Identifier
@@ -42,6 +43,19 @@ module Pubid
       end
 
       private
+
+      # The registered flavor whose module constant gives +segment+.
+      # Identifier.polymorphic_name takes the segment from the module name
+      # ("Pubid::CenCenelec" -> "cencenelec"), and a flavor can be registered
+      # under other names ("cen_cenelec", "cen"). Without this fallback no
+      # CEN/CENELEC `_type` resolved, so the root class and a nested
+      # attribute of another flavor (BSI) read a CEN hash as the abstract
+      # root.
+      def flavor_by_module_segment(segment)
+        ::Pubid::Registry.flavors.each_value.find do |flavor_module|
+          flavor_module.name.to_s.split("::")[1]&.downcase == segment
+        end
+      end
 
       # The flavor name is the segment between the leading "pubid:" and the
       # type-name, e.g. "iso" in "pubid:iso:technical-report".

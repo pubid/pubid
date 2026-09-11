@@ -4,14 +4,76 @@ module Pubid
   module CenCenelec
     class UrnGenerator < Pubid::UrnGenerator::Base
       def generate
-        if identifier.is_a?(CenCenelec::SupplementIdentifier)
-          generate_supplement_urn
-        else
-          generate_base_urn
-        end
+        urn_for(identifier)
       end
 
       protected
+
+      # The URN of +id+, walking the wrapper structure:
+      #   EN 13250:2000/A1:2005    urn:cen:en:13250:2000:amd:1:2005
+      #   EN 285:2015+A1:2021      urn:cen:en:285:2015:plus:amd:1:2021
+      #   EN 60038 AMD1 FRAG2      urn:cen:en:60038:amd:1:frag:2
+      #   CEN ISO/TS 21003-7:2019  urn:cen:cen:iso:ts:21003-7:2019
+      #   ENV ISO 11079:1999       urn:cen:env:iso:11079:1999
+      #   prEN ISO 1234:2020       urn:cen:en:iso:1234:2020:stage.proposal
+      # The "plus" marker keeps a consolidated identifier apart from the
+      # standalone amendment with the same number and year.
+      def urn_for(id)
+        case id
+        when nil
+          "urn:cen"
+        when Identifiers::Amendment, Identifiers::Corrigendum,
+             Identifiers::Fragment
+          [urn_for(id.base), *supplement_segments(id)].join(":")
+        when Identifiers::ConsolidatedIdentifier
+          base, *supplements = id.identifiers
+          [urn_for(base), *supplements.flat_map do |s|
+            ["plus", *supplement_segments(s)]
+          end].join(":")
+        else
+          if adoption?(id)
+            # The publisher, then the adopted document's MR string with its
+            # dot and underscore separators as colons, then a draft stage as
+            # the base URN writes it.
+            body = [id.mr_publisher, id.adopted&.to_mr_string]
+              .compact.reject(&:empty?).join(".").tr("._", "::")
+            ["urn:cen:#{body}", *stage_segment(id)].join(":")
+          else
+            self.class.new(id).generate_base_urn
+          end
+        end
+      end
+
+      # "EN ISO 8601:2019" or "ENV ISO 11079:1999": the document identity is
+      # on the adopted ISO/IEC identifier, not on this one.
+      def adoption?(id)
+        id.is_a?(Identifiers::AdoptedEuropeanNorm) ||
+          (id.is_a?(Identifiers::EuropeanPrestandard) && id.adopted)
+      end
+
+      # ["stage.proposal"] for a draft stage, [] for a published document.
+      def stage_segment(id)
+        code = id.typed_stage&.stage_code
+        return [] if code.nil? || code.to_s == "published"
+
+        ["stage.#{code}"]
+      end
+
+      # The segments that a supplement adds to its base: type, number (none
+      # for an unnumbered "/AC"), then the date.
+      def supplement_segments(id)
+        segments = case id
+                   when Identifiers::Amendment
+                     ["amd", id.number, id.year]
+                   when Identifiers::Corrigendum
+                     ["cor", id.number, id.supplement_date]
+                   when Identifiers::Fragment
+                     ["frag", id.number]
+                   else
+                     []
+                   end
+        segments.map(&:to_s).reject(&:empty?)
+      end
 
       def generate_base_urn
         parts = ["urn", "cen"]
@@ -70,46 +132,6 @@ module Pubid
         if languages&.any?
           lang_codes = languages.map(&:code).join(",")
           parts << lang_codes
-        end
-
-        parts.join(":")
-      end
-
-      def generate_supplement_urn
-        parts = ["urn", "cen"]
-
-        base_id = maybe(:base)
-        if base_id
-          base_gen = self.class.new(base_id)
-          base_urn = base_gen.generate_base_urn
-
-          base_part = base_urn.sub(/^urn:cen:/, "")
-          base_parts = base_part.split(":")
-
-          parts.concat(base_parts)
-
-          typed_stage = maybe(:typed_stage)
-          if typed_stage
-            supp_type = typed_stage.type_code.to_s
-            parts << supp_type if supp_type
-          end
-
-          amendment_number = maybe(:amendment_number)
-          if amendment_number
-            parts << amendment_number.to_s
-          elsif identifier.number
-            number = identifier.number.to_s
-            parts << number
-          end
-
-          amendment_year = maybe(:amendment_year)
-          if amendment_year
-            parts << amendment_year.to_s
-          elsif identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
-            parts << identifier.date.render(context: URN_CONTEXT)
-          end
-        else
-          parts << "unknown"
         end
 
         parts.join(":")

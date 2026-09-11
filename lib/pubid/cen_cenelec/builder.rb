@@ -18,6 +18,28 @@ module Pubid
           return build_fragment_identifier(data)
         end
 
+        # Every base document (an adopted norm, an ENV adoption, a plain
+        # identifier) goes through the same supplement wrapping. The adopted
+        # branches used to return early, so "CEN ISO/TS 21003-7:2008/A1:2010"
+        # lost its "/A1:2010".
+        base = build_base_document(data)
+
+        # A slash separator makes a standalone amendment/corrigendum; a plus
+        # separator makes a consolidated (bundled) identifier.
+        if has_slash_supplements?(data)
+          build_standalone_supplement(base, data)
+        elsif (supplements_data = extract_supplements(data)).any?
+          wrap_with_consolidated(base, supplements_data)
+        else
+          base
+        end
+      end
+
+      private
+
+      # The document that the supplements of +data+ apply to, or the whole
+      # identifier when there are no supplements.
+      def build_base_document(data)
         # Check if this is an adopted identifier (EN ISO, EN IEC, etc.)
         if data[:adopted_string]
           # Special case: ENV can adopt ISO/IEC standards
@@ -26,11 +48,6 @@ module Pubid
           end
 
           return build_adopted_identifier(data)
-        end
-
-        # Check if this is a standalone amendment/corrigendum (slash separator)
-        if has_slash_supplements?(data)
-          return build_standalone_supplement(data)
         end
 
         # Implicit adoption: when an EN has no explicit "IEC" prefix but
@@ -42,29 +59,32 @@ module Pubid
         # can still write "EN ISO 12345".
         # (https://github.com/pubid/pubid/issues/249)
         # Skip when parts are present — they would be lost when we rebuild
-        # the identifier from just the base number.
-        if data[:publisher]&.to_s == "EN" && !data[:adopted_string] &&
-           data[:parts].to_a.empty? &&
-           (adopted = build_implicit_adoption(data))
+        # the identifier from just the base number — and when supplements
+        # are present, which the adoption used to drop the same way.
+        if data[:publisher]&.to_s == "EN" && data[:parts].to_a.empty? &&
+            !supplements?(data) &&
+            (adopted = build_implicit_adoption(data))
           return adopted
         end
 
-        # Extract supplements before building base identifier (only plus/bundled)
-        supplements_data = extract_supplements(data)
-
         # Determine identifier class using the module's lookup helpers
-        identifier = locate_identifier_klass(data).new
-        assign_attributes(identifier, data)
-
-        # Wrap with consolidated if supplements present (plus/bundled only)
-        if supplements_data.any?
-          wrap_with_consolidated(identifier, supplements_data)
-        else
-          identifier
-        end
+        base_data = data.except(:supplements)
+        identifier = locate_identifier_klass(base_data).new
+        assign_attributes(identifier, base_data)
+        identifier
       end
 
-      private
+      def supplements?(data)
+        has_slash_supplements?(data) || extract_supplements(data).any?
+      end
+
+      # A number or month the grammar captured as an empty string is stored
+      # as nil: `to_hash` drops an empty string, so from_hash would give nil
+      # and the two identifiers would not be `==`.
+      def present_string(value)
+        str = value&.to_s
+        str unless str.nil? || str.empty?
+      end
 
       def build_fragment_identifier(data)
         # Build base identifier first (without amendment/fragment)
@@ -78,13 +98,13 @@ module Pubid
         # Build Amendment identifier wrapping the base
         amendment = Identifiers::Amendment.new(
           base: base,
-          amendment_number: data[:amendment_number].to_s,
+          number: data[:amendment_number].to_s,
         )
 
         # Build Fragment wrapping the amendment
         Identifiers::Fragment.new(
           base: amendment,
-          fragment_number: data[:fragment_number].to_s,
+          number: data[:fragment_number].to_s,
         )
       end
 
@@ -94,7 +114,7 @@ module Pubid
 
         # Check if publisher is actually a type code (CWA, HD, ES, CR, ENV act as publisher)
         publisher_str = parsed_hash[:publisher].to_s
-        if %w[CWA HD ES CR ENV].include?(publisher_str)
+        if CenCenelec::PUBLISHER_TYPES.include?(publisher_str)
           typed_stage = CenCenelec.locate_stage(publisher_str)
           if (klass = CenCenelec.locate_type(typed_stage.type_code))
             return klass
@@ -202,30 +222,43 @@ module Pubid
                        nil
                      end
 
-        # Build publishers array (EN is default for adoptions)
-        publishers = []
-        publishers << data[:publisher].to_s if data[:publisher]
+        # The publisher is a Components::Publisher (EN is the default for
+        # adoptions); a second publisher ("CEN/CLC") is a copublisher.
+        copublishers = if data[:copublishers]
+                         Array(data[:copublishers]).map do |copub|
+                           copub[:copublisher].to_s
+                         end
+                       elsif data[:copublisher]
+                         [data[:copublisher].to_s]
+                       else
+                         []
+                       end
 
-        # Handle copublishers array
-        if data[:copublishers]
-          Array(data[:copublishers]).each do |copub|
-            publishers << copub[:copublisher].to_s
+        attrs = { adopted: adopted_id }
+        # "prEN ISO 1234:2020": the draft stage is on the CEN adoption. The
+        # parser captures it as type_with_stage and not as a publisher, and
+        # it used to be dropped here, so the identifier rendered as "EN ISO".
+        if data[:type_with_stage]
+          attrs.merge!(cast(:type_with_stage, data[:type_with_stage]))
+        end
+        if data[:publisher]
+          attrs[:publisher] =
+            Components::Publisher.new(body: data[:publisher].to_s)
+        end
+        # Only when present: an empty collection would not survive to_hash,
+        # and from_hash would then give nil where the parse gave [].
+        unless copublishers.empty?
+          attrs[:copublishers] = copublishers.map do |body|
+            Components::Publisher.new(body: body)
           end
-        elsif data[:copublisher]
-          publishers << data[:copublisher].to_s
         end
 
-        publishers = ["EN"] if publishers.empty?
-
-        Identifiers::AdoptedEuropeanNorm.new(
-          publisher: publishers,
-          adopted_identifier: adopted_id,
-        )
+        Identifiers::AdoptedEuropeanNorm.new(**attrs)
       end
 
       # Implicit adoption by number range. Returns an AdoptedEuropeanNorm
       # wrapping the IEC identifier that the EN number implies, or nil if the
-      # number doesn't fall in the IEC range. Limited to IEC range only —
+      # number does not fall in the IEC range. Limited to IEC range only —
       # see the call site comment for why the ISO range is excluded.
       def build_implicit_adoption(data)
         number = data[:number].to_s
@@ -235,9 +268,9 @@ module Pubid
         num = num_str.to_i
         return nil unless (60_000..79_999).cover?(num)
 
+        # The publisher is the "EN" default.
         Identifiers::AdoptedEuropeanNorm.new(
-          publisher: ["EN"],
-          adopted_identifier: Pubid::Iec.parse("IEC #{num_str}"),
+          adopted: Pubid::Iec.parse("IEC #{num_str}"),
         )
       end
 
@@ -254,27 +287,30 @@ module Pubid
                        Pubid::Iec.parse(adopted_str)
                      end
 
+        # The publisher is ENV, as for a plain "ENV 1613:1995"; the
+        # SingleIdentifier default is EN.
         Identifiers::EuropeanPrestandard.new(
-          adopted_identifier: adopted_id,
+          publisher: Components::Publisher.new(body: "ENV"),
+          adopted: adopted_id,
         )
       end
 
+      # The members after the first carry no `base`: the consolidated
+      # identifier holds the base document once, as its first member. With a
+      # `base` in each member, `to_hash` wrote the base again for every "+".
       def wrap_with_consolidated(base, supplements_data)
         supplement_ids = supplements_data.map do |supp|
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
-              base: base,
-              amendment_number: supp[:number],
-              amendment_year: supp[:year]&.to_i,
+              number: present_string(supp[:number]),
+              year: present_string(supp[:year]),
             )
           else
-            corr_attrs = {
-              base: base,
-              corrigendum_number: supp[:number],
-              corrigendum_year: supp[:year]&.to_i,
-            }
-            corr_attrs[:corrigendum_month] = supp[:month] if supp[:month]
-            Identifiers::Corrigendum.new(**corr_attrs)
+            Identifiers::Corrigendum.new(
+              number: present_string(supp[:number]),
+              year: present_string(supp[:year]),
+              month: present_string(supp[:month]),
+            )
           end
         end
 
@@ -324,13 +360,7 @@ module Pubid
         end
       end
 
-      def build_standalone_supplement(data)
-        # Build base identifier first (without supplements)
-        base_data = data.dup
-        base_data.delete(:supplements)
-        base = locate_identifier_klass(base_data).new
-        assign_attributes(base, base_data)
-
+      def build_standalone_supplement(base, data)
         # Get the first supplement (slash means only one supplement)
         supp_array = data[:supplements]
         supp_data = supp_array.first
@@ -340,21 +370,16 @@ module Pubid
         if supp_data[:amd_number]
           Identifiers::Amendment.new(
             base: base,
-            amendment_number: supp_data[:amd_number].to_s,
-            amendment_year: supp_data[:amd_year]&.to_i,
+            number: supp_data[:amd_number].to_s,
+            year: present_string(supp_data[:amd_year]),
           )
         else
-          corr_attrs = {
+          Identifiers::Corrigendum.new(
             base: base,
-            corrigendum_number: supp_data[:cor_number]&.to_s,
-            corrigendum_year: (supp_data[:cor_year] || supp_data[:year])&.to_i,
-          }
-          month_val = supp_data[:month]&.to_s
-          if month_val && !month_val.empty?
-            corr_attrs[:corrigendum_month] =
-              month_val
-          end
-          Identifiers::Corrigendum.new(**corr_attrs)
+            number: present_string(supp_data[:cor_number]),
+            year: present_string(supp_data[:year]),
+            month: present_string(supp_data[:month]),
+          )
         end
       end
     end

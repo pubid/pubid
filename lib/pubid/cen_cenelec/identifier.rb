@@ -20,6 +20,95 @@ module Pubid
       attribute :part, :string
       attribute :subpart, :string
 
+      # The publisher serializes as a bare string ("publisher" => "CEN"), and
+      # the copublishers as a list of strings. The shared table does not do
+      # this for every flavor, because IEEE has a published index whose rows
+      # hold the nested {"body" => …} form.
+      def self.flat_scalar_components
+        super.merge(publisher: "publisher", copublishers: "copublishers")
+      end
+
+      def self.flat_scalar_fields
+        super.merge(publisher: :body, copublishers: :body)
+      end
+
+      # A draft stage serializes as its typed-stage code ("stage" => "pren"),
+      # as ISO ("dis") and IEC ("cd") do. The `type`, `stage` and
+      # `typed_stage` components all repeat one entry of the stage registry,
+      # so the code is enough, and #inflate_scalar_components rebuilds the
+      # three from it. The short form is written only when the three are
+      # exactly what the registry entry gives; any other combination keeps
+      # the nested components, so the round trip stays exact.
+      def self.compact_hash(model, hash)
+        stage = model.typed_stage
+        return unless stage && hash.key?("typed_stage")
+        return unless model.type == stage.to_type &&
+          model.stage == stage.to_stage
+
+        hash.delete("type")
+        hash.delete("typed_stage")
+        hash["stage"] = stage.code.to_s
+      end
+
+      # Reads the short stage form back; see #compact_hash. The nested form
+      # still reads as before.
+      def self.inflate_scalar_components(data)
+        data = super
+        return data unless data.is_a?(::Hash) && component_attribute?(:stage)
+
+        key = data.key?("stage") ? "stage" : :stage
+        value = data[key]
+        return data unless value.is_a?(::String) || value.is_a?(::Symbol)
+
+        stage = CenCenelec.locate_stage_by_code(value)
+        return data unless stage
+
+        data = data.dup
+        data.delete(key)
+        data["type"] = stage.to_type.to_hash
+        data["stage"] = stage.to_stage.to_hash
+        data["typed_stage"] = stage.to_hash
+        data
+      end
+
+      # The slug names a draft stage by its code ("en.pren.1234.2020"), so a
+      # prEN, an FprEN and an EN with one number and year get three slugs.
+      # The shared hook gave the type code "en" for all of them.
+      def mr_type
+        stage = typed_stage
+        return super unless stage && stage.stage_code.to_s != "published"
+
+        stage.code.to_s.downcase
+      end
+
+      # The attributes that hold a supplement's own date: `year`, and `month`
+      # on a corrigendum. Empty for a document. See #exclude.
+      def self.supplement_date_attributes
+        []
+      end
+
+      # The CEN year rule, as in BSI: `:year` removes only the base
+      # document's year ("EN 13250:2000/A1:2005" -> "EN 13250/A1:2005"), and
+      # the CEN key `:supplement_year` removes the supplement's own date
+      # ("EN 13250:2000/A1"). A supplement declares its date as a `year`
+      # attribute, which the base #exclude resets for `:year`, so the value is
+      # put back here. The month goes with the year, or a "/AC:2016-11" would
+      # keep a month with no year. The base #exclude passes every key on to
+      # the nested identifiers, so the members of a consolidated identifier
+      # follow the same rule.
+      def exclude(*args)
+        result = super
+        attrs = self.class.supplement_date_attributes
+        # `exclude(:amendment)` returns the base document, not a copy of self.
+        return result if attrs.empty? || !result.instance_of?(self.class)
+
+        drop = args.include?(:supplement_year)
+        attrs.each do |attr|
+          result.public_send(:"#{attr}=", drop ? nil : public_send(attr))
+        end
+        result
+      end
+
       def self.parse(identifier)
         unless identifier.is_a?(String)
           raise Pubid::Errors::InvalidInputError,
@@ -32,6 +121,14 @@ module Pubid
 
         parsed = Parser.parse(identifier)
         Builder.new.build(parsed)
+      end
+
+      private
+
+      # "amd.1.2005" from ("amd", "1", 2005). A nil or blank segment is left
+      # out, so an unnumbered "/AC:2003" gives "cor.2003", not "cor..2003".
+      def mr_join_segments(*segments)
+        segments.map(&:to_s).reject(&:empty?).join(".").downcase
       end
     end
   end

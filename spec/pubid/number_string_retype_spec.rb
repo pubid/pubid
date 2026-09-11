@@ -73,11 +73,20 @@ module NumberStringRetypeSpec
   # to their own Components::Code, the documented `bsi-set-cross-flavor-type`
   # issue — so the delta equals the corpus growth exactly. A count that moves
   # for any other reason is the regression this pin exists to catch.
+  # cen_cenelec 66 -> 0 when the relaton blockers were fixed: the CEN
+  # supplements no longer type `base` to the legacy Identifiers::Base, the
+  # adopted norm holds a Components::Publisher instead of an Array, the
+  # consolidated identifier lost its colliding readers, and the CWA/HD/CR/ES/
+  # ENV `type` default is a Components::Type instead of a Symbol.
+  # bsi 647 -> 597 in the same branch: Pubid::TypeResolver now resolves the
+  # `pubid:cencenelec:` type segment (the module name, not a registry name),
+  # so the CEN identifier nested in a BSI adoption deserializes as its CEN
+  # class instead of the abstract root.
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
     "api" => 1,
-    "bsi" => 647,
-    "cen_cenelec" => 66,
+    "bsi" => 597,
+    "cen_cenelec" => 0,
     "idf" => 0,
     # Measured over the WHOLE 12,331-id IEC corpus on the parent commit, not
     # just the sampled slice: 0 failures before the retype and 0 after.

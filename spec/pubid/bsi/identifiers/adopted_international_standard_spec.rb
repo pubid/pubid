@@ -15,12 +15,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has adopted_identifier" do
-        expect(parsed.adopted_identifier).not_to be_nil
+      it "has an adopted document" do
+        expect(parsed.adopted).not_to be_nil
       end
 
-      it "adopted_identifier is ISO object" do
-        expect(parsed.adopted_identifier).to be_a(Pubid::Iso::Identifier)
+      it "adopts an ISO object" do
+        expect(parsed.adopted).to be_a(Pubid::Iso::Identifier)
       end
 
       it "delegates number to adopted identifier" do
@@ -87,12 +87,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has adopted_identifier" do
-        expect(parsed.adopted_identifier).not_to be_nil
+      it "has an adopted document" do
+        expect(parsed.adopted).not_to be_nil
       end
 
-      it "adopted_identifier is IEC object" do
-        expect(parsed.adopted_identifier).to be_a(Pubid::Iec::Identifier)
+      it "adopts an IEC object" do
+        expect(parsed.adopted).to be_a(Pubid::Iec::Identifier)
       end
 
       it "delegates number to adopted identifier" do
@@ -141,12 +141,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has adopted_identifier" do
-        expect(parsed.adopted_identifier).not_to be_nil
+      it "has an adopted document" do
+        expect(parsed.adopted).not_to be_nil
       end
 
-      it "adopted_identifier is ISO object" do
-        expect(parsed.adopted_identifier).to be_a(Pubid::Iso::Identifier)
+      it "adopts an ISO object" do
+        expect(parsed.adopted).to be_a(Pubid::Iso::Identifier)
       end
 
       it "delegates number" do

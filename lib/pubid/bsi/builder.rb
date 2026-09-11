@@ -1346,11 +1346,11 @@ module Pubid
             adopted_id = Pubid::Iec.parse(iso_iec_str)
           end
 
-          # Wrap ISO/IEC identifier in EN adoption
+          # Wrap ISO/IEC identifier in EN adoption (the publisher is the
+          # "EN" default)
           if adopted_id
             adopted_id = Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm.new(
-              publisher: ["EN"],
-              adopted_identifier: adopted_id,
+              adopted: adopted_id,
             )
           end
 
@@ -1383,7 +1383,7 @@ module Pubid
           identifier = if adopted_id.class.name.start_with?("Pubid::CenCenelec::")
                          Identifiers::AdoptedEuropeanNorm.new(
                            publisher: Components::Publisher.new(body: bsi_prefix),
-                           adopted_identifier: adopted_id,
+                           adopted: adopted_id,
                            edition: final_edition&.to_s,
                            translation_lang: data[:translation_lang]&.to_s,
                            translation_upper: data[:translation_upper]&.to_s,
@@ -1396,7 +1396,7 @@ module Pubid
                          # Otherwise it's ISO/IEC, use AdoptedInternationalStandard
                          Identifiers::AdoptedInternationalStandard.new(
                            publisher: Components::Publisher.new(body: bsi_prefix),
-                           adopted_identifier: adopted_id,
+                           adopted: adopted_id,
                            edition: final_edition&.to_s,
                            translation_lang: data[:translation_lang]&.to_s,
                            translation_upper: data[:translation_upper]&.to_s,

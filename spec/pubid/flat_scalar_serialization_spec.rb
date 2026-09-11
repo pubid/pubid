@@ -72,16 +72,13 @@ RSpec.describe "flat scalar serialization of degenerate components" do
   end
 
   describe "date" do
-    # CEN/CENELEC's `from_hash` raises before it reaches any date handling —
-    # the pre-existing cross-flavor-type gap already pinned as
-    # `cen_cenelec => 66` in spec/pubid/number_string_retype_spec.rb
-    # (hand-off `bsi-set-cross-flavor-type`). Its `to_hash` half is asserted
-    # normally below; only the read-back examples are pending. A pending that
-    # starts passing turns red — that is the signal to delete this entry.
-    PENDING_FROM_HASH = {
-      "cen_cenelec" => "from_hash raises on the pre-existing cross-flavor " \
-                       "type gap, before any date handling",
-    }.freeze
+    # Flavors whose `from_hash` raises before it reaches any date handling.
+    # Only the read-back examples are pending; the `to_hash` half is asserted
+    # normally below. A pending that starts passing turns red — that is the
+    # signal to delete its entry. CEN/CENELEC was here until its `type`
+    # default became a Components::Type instead of a Symbol
+    # (docs/flavors/cen_cenelec.md).
+    PENDING_FROM_HASH = {}.freeze
 
     {
       "bsi" => "BS A 109:2024",

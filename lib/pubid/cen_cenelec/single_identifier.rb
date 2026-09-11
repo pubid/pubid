@@ -7,7 +7,7 @@ module Pubid
     # concrete type is `is_a?` it.
     class SingleIdentifier < Pubid::CenCenelec::Identifier
       attribute :publisher, Components::Publisher, default: -> {
-        Components::Publisher.new(body: "EN")
+        self.class.default_publisher
       }
 
       # Generate URN for this identifier
@@ -16,6 +16,24 @@ module Pubid
 
       def self.type
         nil
+      end
+
+      # The `publisher` default: the type token for a publisher-type
+      # ("CWA 14050", "HD 1215", "CR 954", "ES 59008", "ENV 1613"), else EN.
+      # `to_hash` leaves out a value equal to its default, so the publisher
+      # of those five is not written: `_type` already names it.
+      def self.default_publisher
+        short = type.is_a?(Hash) ? type[:short] : nil
+        body = CenCenelec::PUBLISHER_TYPES.include?(short) ? short : "EN"
+        Components::Publisher.new(body: body)
+      end
+
+      # The `type` default of a typed leaf. It is a Components::Type, like
+      # the value the parser sets for "CEN/TR", so a document with no type
+      # token deserializes the same way it parses. The default used to be the
+      # bare Symbol `type[:key]`, and from_hash raised on it.
+      def self.default_type
+        Components::Type.new(abbr: type[:short])
       end
 
       def to_s(lang: :en, lang_single: false, **opts)

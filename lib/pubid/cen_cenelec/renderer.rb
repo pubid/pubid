@@ -51,8 +51,7 @@ module Pubid
         parts = []
 
         # Check if we have a draft stage (prEN, FprEN) - these include both stage and type
-        is_draft_stage = id.typed_stage&.abbr && %w[prEN
-                                                     FprEN].include?(id.typed_stage.abbr.first)
+        is_draft_stage = !draft_stage_abbr(id).nil?
 
         # Get type short name - for draft stages, extract base type
         type_short = if is_draft_stage
@@ -68,8 +67,8 @@ module Pubid
         # Track if we should use slash before type
         use_slash_before_type = false
 
-        # For CWA/HD, they act as publisher (not EN)
-        if %w[CWA HD CR].include?(type_short)
+        # CWA, HD, ES, CR and ENV act as the publisher (not EN)
+        if CenCenelec::PUBLISHER_TYPES.include?(type_short)
           # Stage prefix OR type as publisher
           parts << if id.typed_stage&.abbr && id.typed_stage.abbr.first != type_short
                      id.typed_stage.abbr.first
@@ -96,8 +95,10 @@ module Pubid
           end
         end
 
-        # Type for non-EN documents (TS, TR) - but not CWA/HD or Guide
-        if type_short != "EN" && !%w[CWA HD CR Guide].include?(type_short)
+        # Type for non-EN documents (TS, TR) - but not the publisher-types
+        # or Guide
+        if type_short != "EN" && type_short != "Guide" &&
+            !CenCenelec::PUBLISHER_TYPES.include?(type_short)
           if use_slash_before_type && parts.any?
             # Use slash separator for publisher/type combination (TS, TR only)
             parts << "/#{type_short}"
@@ -136,6 +137,13 @@ module Pubid
         result
       end
 
+      # "prEN" or "FprEN" when +id+ has that draft stage, else nil. A draft
+      # stage prints in place of the publisher.
+      def draft_stage_abbr(id)
+        abbr = id.typed_stage&.abbr&.first
+        abbr if %w[prEN FprEN].include?(abbr)
+      end
+
       # CEN Identifiers::Base: simple key-value model
       # Format: {PUBLISHER} NUMBER[-PART]:YEAR
       def render_cen_base(id)
@@ -148,10 +156,10 @@ module Pubid
           result += id.publisher.join("/")
         end
 
-        # If we have adopted_identifier, render it (contains all info)
-        if id.adopted_identifier
-          result += " #{id.adopted_identifier}"
-          # Don't add our own number/parts/year - they're in adopted_identifier
+        # If we have adopted, render it (contains all info)
+        if id.adopted
+          result += " #{id.adopted}"
+          # Don't add our own number/parts/year - they're in adopted
         else
           # Only render our own fields if no adoption
           # Type - use space for Guide, slash for TR/TS
@@ -181,77 +189,64 @@ module Pubid
         result
       end
 
-      # AdoptedEuropeanNorm: "EN ISO 8601:2019"
+      # AdoptedEuropeanNorm: "EN ISO 8601:2019", "CEN/CLC ISO/IEC 17000",
+      # "prEN ISO 1234:2020" (a draft stage prints in place of "EN")
       def render_adopted_european_norm(id)
-        result = id.publisher.is_a?(Array) ? id.publisher.join("/") : id.publisher.join("/")
-        result += " #{id.adopted_identifier}" if id.adopted_identifier
+        publishers = ([id.publisher] + Array(id.copublishers)).compact
+          .map { |p| p.render(context: @context) }
+        draft = draft_stage_abbr(id)
+        publishers[0] = draft if draft
+        result = publishers.join("/")
+        result += " #{id.adopted}" if id.adopted
         result
       end
 
       # Amendment: "EN 196-3:2005/A1:2008"
       def render_amendment(id)
-        result = if id.base
-                   "#{id.base}/A#{id.amendment_number}"
-                 else
-                   "/A#{id.amendment_number}"
-                 end
-        result += ":#{id.amendment_year}" if id.amendment_year
-        result
+        "#{id.base}/#{supplement_token(id)}"
       end
 
-      # Corrigendum: "EN 60038/AC1:2012"
+      # Corrigendum: "EN 60038/AC1:2012", "EN 61375-2-3:2015/AC:2016-11"
       def render_corrigendum(id)
-        if id.base
-          result = id.base.to_s
-          result += "/AC"
-          result += id.corrigendum_number if id.corrigendum_number && !id.corrigendum_number.empty?
-        else
-          result = "/AC#{id.corrigendum_number}"
-        end
-        if id.corrigendum_year
-          result += ":#{id.corrigendum_year}"
-          result += "-#{id.corrigendum_month}" if id.corrigendum_month && !id.corrigendum_month.empty?
-        end
-        result
+        "#{id.base}/#{supplement_token(id)}"
       end
 
-      # ConsolidatedIdentifier: "EN 196-3:2005+A1:2008"
+      # ConsolidatedIdentifier: "EN 196-3:2005+A1:2008". The first member is
+      # the base document; the others are supplements with no base.
       def render_consolidated(id)
-        id.identifiers.map.with_index do |sub_id, idx|
-          if idx.zero?
-            # First identifier renders normally
-            sub_id.to_s
-          elsif sub_id.is_a?(Identifiers::Amendment)
-            # Supplements render with "+" prefix (bundled/consolidated format)
-            result = "+A#{sub_id.amendment_number}"
-            result += ":#{sub_id.amendment_year}" if sub_id.amendment_year
-            result
-          # Only render the amendment portion, not the full id.to_s
-          elsif sub_id.is_a?(Identifiers::Corrigendum)
-            # Only render the corrigendum portion
-            result = "+AC"
-            result += sub_id.corrigendum_number if sub_id.corrigendum_number && !sub_id.corrigendum_number.empty?
-            if sub_id.corrigendum_year
-              result += ":#{sub_id.corrigendum_year}"
-              result += "-#{sub_id.corrigendum_month}" if sub_id.corrigendum_month && !sub_id.corrigendum_month.empty?
-            end
-            result
+        base, *supplements = id.identifiers
+        base.to_s + supplements.map do |sub_id|
+          if sub_id.is_a?(Identifiers::Amendment) ||
+              sub_id.is_a?(Identifiers::Corrigendum)
+            "+#{supplement_token(sub_id)}"
           else
-            # Other identifiers (should not happen in typical bundles) render with +
+            # Other identifiers (should not happen in typical bundles)
             "+#{sub_id}"
           end
-        end.compact.join
+        end.join
+      end
+
+      # The supplement without its base: "A1:2008", "AC1:2012",
+      # "AC:2016-11" (an unnumbered corrigendum).
+      def supplement_token(id)
+        prefix = id.is_a?(Identifiers::Corrigendum) ? "AC" : "A"
+        result = "#{prefix}#{id.number}"
+        return result unless id.year
+
+        result += ":#{id.year}"
+        result += "-#{id.month}" if id.respond_to?(:month) && id.month
+        result
       end
 
       # Fragment: "EN 60038 AMD1 FRAG2"
       def render_fragment(id)
-        "#{id.base} FRAG#{id.fragment_number}"
+        "#{id.base} FRAG#{id.number}"
       end
 
       # EuropeanPrestandard: "ENV ISO 8601" or falls through to SingleIdentifier
       def render_european_prestandard(id, **opts)
-        if id.adopted_identifier
-          "ENV #{id.adopted_identifier}"
+        if id.adopted
+          "ENV #{id.adopted}"
         else
           render_single(id)
         end

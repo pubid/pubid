@@ -9,14 +9,17 @@ module Pubid
     # are excluded — they route to their own SDOs, not to CEN.
     PREFIXES = %w[EN CEN CLC CWA HD ES CR ENV].freeze
 
+    # Publisher tokens that are also the document type. "CWA 14050" has no
+    # separate type token, so the builder picks the class from the publisher
+    # and the renderer prints the token once, not as "CWA/CWA 14050".
+    PUBLISHER_TYPES = %w[CWA HD ES CR ENV].freeze
+
     autoload :Builder, "#{__dir__}/cen_cenelec/builder"
     autoload :Identifier, "#{__dir__}/cen_cenelec/identifier"
     autoload :Identifiers, "#{__dir__}/cen_cenelec/identifiers"
     autoload :Parser, "#{__dir__}/cen_cenelec/parser"
     autoload :Renderer, "#{__dir__}/cen_cenelec/renderer"
     autoload :SingleIdentifier, "#{__dir__}/cen_cenelec/single_identifier"
-    autoload :SupplementIdentifier,
-             "#{__dir__}/cen_cenelec/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/cen_cenelec/urn_generator"
     autoload :UrnParser, "#{__dir__}/cen_cenelec/urn_parser"
 
@@ -193,16 +196,25 @@ module Pubid
       abbr_str = abbr.to_s.upcase
       all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
     end
+
+    # Lookup: typed-stage code -> typed stage ("pren" -> the prEN entry).
+    # The serialized form of a draft stage is this code.
+    # @param code [String, Symbol] the typed-stage code to find
+    # @return [Pubid::Components::TypedStage, nil] the matching typed stage
+    def self.locate_stage_by_code(code)
+      all_typed_stages.find { |s| s.code.to_s == code.to_s }
+    end
   end
 end
 
 Pubid::Registry.register(:cen_cenelec, Pubid::CenCenelec)
 Pubid::Registry.register(:cen, Pubid::CenCenelec)
 
-# Per-flavor format registry: inherits global formats, overrides :human
-# Register on both root hierarchies: SingleIdentifier and Identifiers::Base
-cen_renderer = Pubid::CenCenelec::Renderer
-Pubid::CenCenelec::SingleIdentifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
-Pubid::CenCenelec::SingleIdentifier.format_registry.register(:human, renderer: cen_renderer)
-Pubid::CenCenelec::Identifiers::Base.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
-Pubid::CenCenelec::Identifiers::Base.format_registry.register(:human, renderer: cen_renderer)
+# Per-flavor format registry: inherits global formats, overrides :human.
+# Registered on the shared parent of every CEN/CENELEC class, so it covers
+# SingleIdentifier, Identifiers::Base and the supplement wrappers, which
+# descend from neither.
+Pubid::CenCenelec::Identifier.format_registry =
+  Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
+Pubid::CenCenelec::Identifier.format_registry
+  .register(:human, renderer: Pubid::CenCenelec::Renderer)

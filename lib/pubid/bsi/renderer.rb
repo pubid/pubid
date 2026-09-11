@@ -212,7 +212,7 @@ module Pubid
                  end
 
         result = prefix
-        result += " #{id.adopted_identifier}" if id.adopted_identifier
+        result += " #{id.adopted}" if id.adopted
         result += " ED#{id.edition}" if id.edition
 
         result += " (R#{id.reaffirmation_year})" if id.reaffirmation_year
@@ -237,7 +237,7 @@ module Pubid
                  end
 
         result = prefix
-        result += " #{id.adopted_identifier}" if id.adopted_identifier
+        result += " #{id.adopted}" if id.adopted
         result += " ED#{id.edition}" if id.edition
 
         result += " (R#{id.reaffirmation_year})" if id.reaffirmation_year

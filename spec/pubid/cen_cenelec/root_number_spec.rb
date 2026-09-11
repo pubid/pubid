@@ -7,7 +7,7 @@ require "spec_helper"
 # Relaton::Index::Type#candidates_by_number sorts and bsearches every index row
 # on `id.root.number.to_s`. `Identifiers::EuropeanPrestandard` is a WRAPPER: an
 # "ENV ISO 11079:1999" carries the whole document identity on its nested
-# `adopted_identifier` (the ISO standard) and holds no number of its own, so it
+# `adopted` (the ISO standard) and holds no number of its own, so it
 # keyed "" — and so did every BSI identifier that adopts one, because BSI's
 # `AdoptedEuropeanNorm#number` delegates INTO this class and the chain stopped
 # here.
@@ -17,7 +17,7 @@ require "spec_helper"
 # collides with the generated accessor and corrupts attribute resolution
 # hierarchy-wide. `#root` is a plain method on ::Pubid::Identifier with an
 # established wrapper precedent (ConsolidatedIdentifier walks
-# `identifiers.first.root`), so walking `adopted_identifier` there is both safe
+# `identifiers.first.root`), so walking `adopted` there is both safe
 # and the documented shape.
 module CenIndexKeySpec
   FIXTURE_LINES = Dir
