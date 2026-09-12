@@ -16,10 +16,10 @@ module Pubid
         attribute :id, :string          # i, f, 1-9
         attribute :type, :string        # pd, wd, prd
 
-        # Load stages from V1 YAML config
+        # Load stages from data/nist/stages.yaml
         STAGES = YAML.load_file(
           File.join(File.dirname(__FILE__),
-                    "../../../../archived-gems/pubid-nist/stages.yaml"),
+                    "../../../../data/nist/stages.yaml"),
         ).freeze
 
         # Render stage in specified format

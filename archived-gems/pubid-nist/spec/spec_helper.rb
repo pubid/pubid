@@ -1,8 +1,0 @@
-# frozen_string_literal: true
-
-require "bundler/setup"
-require "rspec/matchers"
-
-Dir["./spec/support/**/*.rb"].each { |f| require f }
-
-require_relative "../lib/pubid-nist"
