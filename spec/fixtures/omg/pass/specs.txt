@@ -4,3 +4,18 @@ OMG UML 2.5.1
 OMG SysML 1.6
 OMG DDS 5 beta 3
 OMG CORBA
+# Document part: UML 2.1.1 is two documents, and DDS carries a format name.
+OMG UML 2.1.1 Superstructure
+OMG UML 2.1.1 Infrastructure
+OMG DDS 1.4 PDF
+# The slash spelling of the same forms normalizes to a space, so it cannot
+# round-trip byte for byte. See spec/pubid/omg/identifier_spec.rb.
+# Beta, with and without a number. OMG writes both.
+OMG UML 2.5 beta
+OMG BPMN 2.0 beta 1
+# A document part may begin with the beta label. Both raised before the
+# parser's word-boundary guard.
+OMG DDS 1.4 beta2
+OMG UML 2.5 beta PDF
+# Queried by the relaton OMG flavor, which expects a parse and a 404.
+OMG NOTEXIST 1.1

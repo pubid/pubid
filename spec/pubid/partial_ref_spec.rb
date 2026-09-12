@@ -79,8 +79,9 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "w3c" => { ref: "W3C NOTE-xml-names", omits: [:date] },
     # GB: year is the trailing "-YYYY" group, separable.
     "gb" => { ref: "GB/T 20223", omits: [:year] },
-    # OMG: identifier has no separable date; the bare acronym form parses.
-    "omg" => { ref: "OMG UML", omits: [] },
+    # OMG: no date, but the trailing version and document part are both
+    # separable, so a bare acronym is a wildcard over every version and volume.
+    "omg" => { ref: "OMG UML", omits: %i[version part] },
     # UN: identifier has no separable date; the bare committee path parses.
     "un" => { ref: "TRADE/WP.4/1068", omits: [] },
     # DOI: identifier has no separable date.

@@ -12,6 +12,7 @@ module Pubid
         Identifiers::Specification.new(
           acronym: data[:acronym].to_s,
           version: data[:version]&.to_s,
+          part: data[:part]&.to_s,
         )
       end
     end
