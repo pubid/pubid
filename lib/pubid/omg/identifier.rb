@@ -13,6 +13,19 @@ module Pubid
       # rendering.
       attribute :version, :string
 
+      # The document part: the volume or format segment after the version,
+      # e.g. "Superstructure", "Infrastructure", "PDF".
+      #
+      # This retypes the `part` that ::Pubid::Identifier declares as a
+      # Components::Code, because an OMG part is a name and not a numbered
+      # part. Reusing the inherited name is what gives relaton `remove_part!`
+      # as `exclude(:part)`, and what lets Renderers::Annotator wrap the value
+      # from its own TOKENS table. The declaration sits once, on the class
+      # every OMG identifier inherits from, whose body lives in this one file
+      # and is never reopened — the placement the number-retype tranches
+      # require.
+      attribute :part, :string
+
       OMG_TYPE_MAP = {
         "pubid:omg:specification" => "Pubid::Omg::Identifiers::Specification",
       }.freeze
@@ -21,6 +34,7 @@ module Pubid
         map "_type", to: :_type, polymorphic_map: OMG_TYPE_MAP
         map "acronym", to: :acronym
         map "version", to: :version
+        map "part", to: :part
       end
 
       PUBLISHER = "OMG"

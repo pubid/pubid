@@ -2,3 +2,6 @@ OMG
 OMG 123
 foo OMG UML
 OMGuml
+# A document title, not an identifier. The relaton OMG flavor queries it and
+# expects a rejection.
+OMG Model Driven Architecture Guide rev. 2.0
