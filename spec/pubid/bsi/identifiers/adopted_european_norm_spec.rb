@@ -15,12 +15,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has adopted_identifier" do
-        expect(parsed.adopted_identifier).not_to be_nil
+      it "has an adopted document" do
+        expect(parsed.adopted).not_to be_nil
       end
 
-      it "adopted_identifier is CEN object" do
-        expect(parsed.adopted_identifier.class.name).to start_with("Pubid::CenCenelec::")
+      it "adopts a CEN object" do
+        expect(parsed.adopted.class.name).to start_with("Pubid::CenCenelec::")
       end
 
       it "delegates number to adopted identifier" do
@@ -33,6 +33,23 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
 
       it "round-trips" do
         expect(parsed.to_s).to eq(subject)
+      end
+    end
+
+    # A two-level adoption: BSI adopts the CEN adoption of an ISO standard.
+    # The CEN AdoptedEuropeanNorm keeps no number, part or date of its own,
+    # so BSI reads them from the ISO standard inside it.
+    describe "BS EN ISO 11819-1:2023" do
+      let(:parsed) { Pubid::Bsi.parse("BS EN ISO 11819-1:2023") }
+
+      it "reads the number, part and year through the CEN adoption" do
+        expect([parsed.number.to_s, parsed.part.to_s, parsed.year.to_s])
+          .to eq(%w[11819 1 2023])
+      end
+
+      it "keys the index and the slug on the ISO standard" do
+        expect(parsed.root.number.to_s).to eq("11819")
+        expect(parsed.to_mr_string).to eq("bs.11819-1.2023")
       end
     end
 
@@ -112,8 +129,8 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has adopted_identifier" do
-        expect(parsed.adopted_identifier).not_to be_nil
+      it "has an adopted document" do
+        expect(parsed.adopted).not_to be_nil
       end
 
       it "delegates number" do

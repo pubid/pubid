@@ -48,5 +48,19 @@ RSpec.describe Pubid::TypeResolver do
       expect(Pubid::Registry).to receive(:get).with("iso").and_call_original
       described_class.resolve("pubid:iso:technical-report")
     end
+
+    # The type segment comes from the module constant (CenCenelec ->
+    # "cencenelec"), but the flavor is registered as "cen_cenelec" and
+    # "cen". A lookup by registry name alone found nothing.
+    it "resolves a type segment that is the module name, not a flavor name" do
+      resolved = described_class.resolve("pubid:cencenelec:european-norm")
+      expect(resolved).to eq(Pubid::CenCenelec::Identifiers::EuropeanNorm)
+    end
+
+    it "lets the root class read a CEN/CENELEC hash" do
+      id = Pubid::CenCenelec.parse("CEN/CLC Guide 25:2023")
+
+      expect(Pubid::Identifier.from_hash(id.to_hash)).to eq(id)
+    end
   end
 end

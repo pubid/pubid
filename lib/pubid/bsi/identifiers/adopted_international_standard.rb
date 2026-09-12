@@ -7,7 +7,8 @@ module Pubid
       # Example: "BS ISO 8601:2019" where ISO 8601:2019 is an ISO identifier object
       # Example: "BS IEC 62600:2020" where IEC 62600:2020 is an IEC identifier object
       class AdoptedInternationalStandard < BritishStandard
-        attribute :adopted_identifier, ::Pubid::Identifier, polymorphic: true # ISO/IEC object
+        # The adopted ISO/IEC identifier object
+        attribute :adopted, ::Pubid::Identifier, polymorphic: true
         attribute :edition, :string
         attribute :translation_lang, :string
         attribute :translation_upper, :string
@@ -27,23 +28,23 @@ module Pubid
 
         # Delegate common methods to adopted identifier
         def number
-          adopted_identifier&.number
+          adopted&.number
         end
 
         def year
-          adopted_identifier&.year if adopted_identifier&.methods&.include?(:year)
+          adopted&.year if adopted&.methods&.include?(:year)
         end
 
         def date
-          adopted_identifier&.date if adopted_identifier&.methods&.include?(:date)
+          adopted&.date if adopted&.methods&.include?(:date)
         end
 
         def parts
-          adopted_identifier&.parts if adopted_identifier&.methods&.include?(:parts)
+          adopted&.parts if adopted&.methods&.include?(:parts)
         end
 
         def part
-          adopted_identifier&.part if adopted_identifier&.methods&.include?(:part)
+          adopted&.part if adopted&.methods&.include?(:part)
         end
       end
     end

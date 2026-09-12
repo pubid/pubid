@@ -107,10 +107,31 @@ module Pubid
       def inflate_scalar_components(data)
         return data unless data.is_a?(::Hash)
 
-        FLAT_SCALAR_COMPONENTS.each_with_object(data.dup) do |(attr, key), acc|
+        flat_scalar_components.each_with_object(data.dup) do |(attr, key), acc|
           inflate_scalar_component(acc, attr, key)
         end
       end
+
+      # The flat-scalar table of this class: FLAT_SCALAR_COMPONENTS, plus the
+      # entries a flavor adds for its own classes. CEN/CENELEC adds
+      # `publisher` and `copublishers`; a table shared by every flavor would
+      # change the wire format of flavors with a published index (IEEE).
+      def flat_scalar_components
+        FLAT_SCALAR_COMPONENTS
+      end
+
+      # The one field each entry of #flat_scalar_components degenerates to.
+      def flat_scalar_fields
+        FLAT_SCALAR_FIELDS
+      end
+
+      # Hook: rewrite +hash+, the canonical serialization of +model+ (an
+      # instance of this class), into a shorter flavor-specific form. The
+      # canonicalizer calls it for every identifier, nested ones included, so
+      # it also reaches a `base` or an adopted document. A class that
+      # overrides it must also override #inflate_scalar_components to read the
+      # short form back. The default changes nothing.
+      def compact_hash(_model, _hash); end
 
       # @api private
       def inflate_scalar_component(data, attr_name, flat_key)
@@ -132,11 +153,33 @@ module Pubid
 
         key = data.key?(flat_key) ? flat_key : flat_key.to_sym
         value = data[key]
-        return if value.nil? || value.is_a?(::Hash) || value.is_a?(::Array)
+        return if value.nil? || value.is_a?(::Hash)
+
+        field = flat_scalar_fields.fetch(attr_name).to_s
+        if value.is_a?(::Array)
+          # A collection of components (`copublishers`) flattens to a list of
+          # scalars; anything else in a list is not the flat form.
+          return unless collection_attribute?(attr_name)
+          return unless value.all? { |v| scalar_value?(v) }
+
+          data.delete(key)
+          data[attr_name.to_s] = value.map { |v| { field => v.to_s } }
+          return
+        end
 
         data.delete(key)
-        data[attr_name.to_s] =
-          { FLAT_SCALAR_FIELDS.fetch(attr_name).to_s => value.to_s }
+        data[attr_name.to_s] = { field => value.to_s }
+      end
+
+      # True when +name+ is declared as a collection on this class.
+      def collection_attribute?(name)
+        attr = attributes[name] || attributes[name.to_s]
+        attr ? attr.collection? : false
+      end
+
+      # @api private
+      def scalar_value?(value)
+        !(value.nil? || value.is_a?(::Hash) || value.is_a?(::Array))
       end
 
       # True when +name+ is a declared attribute on this class, under either a
@@ -517,6 +560,10 @@ module Pubid
         canonicalize_attr(model, hash, name, attr) unless name == :_type
       end
       flatten_scalar_components(model, hash)
+      # Nested components are not identifiers and have no such hook.
+      if model.class.respond_to?(:compact_hash)
+        model.class.compact_hash(model, hash)
+      end
     end
 
     # A component that carries only ONE meaningful value serializes as that
@@ -534,8 +581,20 @@ module Pubid
     # ISO serialize the date as top-level year/month/day, so no "date" key ever
     # reaches this method.
     def flatten_scalar_components(model, hash)
-      FLAT_SCALAR_COMPONENTS.each do |attr_name, flat_key|
+      flat_scalar_table(model).each do |attr_name, flat_key|
         flatten_scalar_component(model, hash, attr_name, flat_key)
+      end
+    end
+
+    # The flat-scalar table of +model+'s class. The canonicalizer also runs on
+    # nested components, which are not identifiers and have only the shared
+    # tables.
+    def flat_scalar_table(model, fields: false)
+      klass = model.class
+      if klass.respond_to?(:flat_scalar_components)
+        fields ? klass.flat_scalar_fields : klass.flat_scalar_components
+      else
+        fields ? FLAT_SCALAR_FIELDS : FLAT_SCALAR_COMPONENTS
       end
     end
 
@@ -543,13 +602,19 @@ module Pubid
     # the component holds nothing but its single significant field.
     def flatten_scalar_component(model, hash, attr_name, flat_key)
       key = hash.key?(attr_name.to_s) ? attr_name.to_s : attr_name
-      return unless hash.key?(key) && hash[key].is_a?(::Hash)
+      return unless hash.key?(key)
       return unless model.respond_to?(attr_name)
+
+      field = flat_scalar_table(model, fields: true).fetch(attr_name)
+      if hash[key].is_a?(::Array)
+        return flatten_scalar_collection(model, hash, attr_name, key, field)
+      end
+      return unless hash[key].is_a?(::Hash)
 
       component = model.public_send(attr_name)
       return unless component.is_a?(Lutaml::Model::Serialize)
 
-      scalar = degenerate_scalar(component, FLAT_SCALAR_FIELDS.fetch(attr_name))
+      scalar = degenerate_scalar(component, field)
       return if scalar.nil?
       # Never overwrite a key the flavor already emits under the flat name,
       # and never claim a name the flavor declares as a real attribute of its
@@ -560,6 +625,21 @@ module Pubid
       end
 
       replace_key_in_place(hash, key, flat_key, scalar)
+    end
+
+    # A collection of components (`copublishers`) serializes as a list of
+    # scalars, but only when EVERY element is degenerate; a list that mixes
+    # the two shapes could not be read back. The key keeps its name.
+    def flatten_scalar_collection(model, hash, attr_name, key, field)
+      components = model.public_send(attr_name)
+      return unless components.is_a?(::Array) &&
+        components.size == hash[key].size &&
+        components.all?(Lutaml::Model::Serialize)
+
+      scalars = components.map { |c| degenerate_scalar(c, field) }
+      return if scalars.any?(&:nil?)
+
+      hash[key] = scalars
     end
 
     # Replace +old_key+ with +new_key+ WITHOUT moving it to the end.
@@ -658,6 +738,7 @@ module Pubid
     private :canonicalize_hash, :canonicalize_attr, :default_valued?,
             :canonicalize_nested, :canonicalize_collection,
             :flatten_scalar_components, :flatten_scalar_component,
+            :flatten_scalar_collection, :flat_scalar_table,
             :degenerate_scalar, :replace_key_in_place
 
     def initialize(attrs = {}, options = {})

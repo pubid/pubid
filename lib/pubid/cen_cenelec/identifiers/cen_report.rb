@@ -6,7 +6,7 @@ module Pubid
   module CenCenelec
     module Identifiers
       class CenReport < SingleIdentifier
-        attribute :type, Components::Type, default: -> { self.class.type[:key] }
+        attribute :type, Components::Type, default: -> { self.class.default_type }
 
         TYPED_STAGES = [
           Components::TypedStage.new(

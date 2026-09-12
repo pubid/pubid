@@ -1,26 +1,27 @@
 Flavor: CEN_CENELEC
-Classified: 2026-09-07 16:47:00
+Classified: 2026-09-10 23:32:12
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 118
-Pass: 107 (90.68%)
-Fail: 11 (9.32%)
+Total: 204
+Pass: 190 (93.14%)
+Fail: 14 (6.86%)
 
 BY CLASS
 ----------------------------------------------------------------------
 adopted_european_norm                    Pass: 17/17 (100.0%)
-amendment                                Pass: 5/5 (100.0%)
-cen_report                               Pass: 21/21 (100.0%)
-consolidated_identifier                  Pass: 6/6 (100.0%)
-corrigendum                              Pass: 6/6 (100.0%)
-european_norm                            Pass: 21/21 (100.0%)
-european_prestandard                     Pass: 6/6 (100.0%)
+amendment                                Pass: 15/15 (100.0%)
+cen_report                               Pass: 22/22 (100.0%)
+cen_workshop_agreement                   Pass: 1/1 (100.0%)
+consolidated_identifier                  Pass: 18/18 (100.0%)
+corrigendum                              Pass: 17/17 (100.0%)
+european_norm                            Pass: 66/66 (100.0%)
+european_prestandard                     Pass: 7/7 (100.0%)
 european_specification                   Pass: 2/2 (100.0%)
 fragment                                 Pass: 1/1 (100.0%)
 guide                                    Pass: 11/11 (100.0%)
-harmonization_document                   Pass: 2/2 (100.0%)
-technical_report                         Pass: 5/5 (100.0%)
+harmonization_document                   Pass: 3/3 (100.0%)
+technical_report                         Pass: 6/6 (100.0%)
 technical_specification                  Pass: 4/4 (100.0%)
-unknown                                  Pass: 0/11 (0.0%)
+unknown                                  Pass: 0/14 (0.0%)

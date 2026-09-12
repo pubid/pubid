@@ -6,8 +6,8 @@ module Pubid
   module CenCenelec
     module Identifiers
       class EuropeanPrestandard < SingleIdentifier
-        attribute :type, Components::Type, default: -> { self.class.type[:key] }
-        attribute :adopted_identifier, Pubid::Identifier, polymorphic: true
+        attribute :type, Components::Type, default: -> { self.class.default_type }
+        attribute :adopted, Pubid::Identifier, polymorphic: true
 
         TYPED_STAGES = [
           Components::TypedStage.new(
@@ -26,7 +26,7 @@ module Pubid
         end
 
         # An "ENV ISO 11079:1999" is a WRAPPER: the whole document identity
-        # lives on the nested `adopted_identifier`, and this class carries no
+        # lives on the nested `adopted`, and this class carries no
         # number of its own, so `root.number` — the key relaton-index sorts and
         # bsearches on — was "". Walk to the adopted document instead.
         #
@@ -42,7 +42,13 @@ module Pubid
         # documented shape — ConsolidatedIdentifier already walks
         # `identifiers.first.root`.
         def root
-          adopted_identifier ? adopted_identifier.root : self
+          adopted ? adopted.root : self
+        end
+
+        # MR "env.iso.11079.1999": an adoption puts the adopted document's MR
+        # string where the number goes, as AdoptedEuropeanNorm does.
+        def mr_number_with_part
+          adopted ? adopted.to_mr_string : super
         end
       end
     end

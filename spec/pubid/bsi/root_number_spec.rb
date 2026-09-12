@@ -12,7 +12,7 @@ require "spec_helper"
 # just never walked to it. `BundledIdentifier` and `Set` hold their members in
 # an `identifiers` collection (the ConsolidatedIdentifier shape, which already
 # walks `identifiers.first.root`); `AdoptedEuropeanNorm` holds a CEN object in
-# `adopted_identifier`. Its `#number` delegation reached only as far as
+# `adopted`. Its `#number` delegation reached only as far as
 # `CenCenelec::Identifiers::EuropeanPrestandard`, which is itself a wrapper —
 # so the chain died one level short, and fixing it needed both flavors.
 #
