@@ -15,7 +15,9 @@ module Pubid
       # @return [String] URN representation
 
       attribute :publisher, :string, default: -> { "IEEE" }
-      attribute :copublisher, :string, collection: true # IEC, ISO, ANSI, etc.
+      # IEC, ISO, ANSI, etc. `initialize_empty` makes from_hash give `[]`, the
+      # value a parsed identifier holds, so the two paths stay `==`.
+      attribute :copublisher, :string, collection: true, initialize_empty: true
       # NB: there is deliberately NO `attribute :code`. IEEE's document code is
       # serialized as the split index columns (number/prefix/parts/separator) on
       # concrete leaf types via the CodeNumber mixin; `code`/`code_obj` remain a
