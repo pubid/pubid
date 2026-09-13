@@ -1,1 +1,0 @@
-require "parslet/rig/rspec"

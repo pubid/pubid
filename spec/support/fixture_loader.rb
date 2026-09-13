@@ -24,15 +24,16 @@ module FixtureLoader
     File.join(__dir__, "..", "fixtures", flavor.to_s, filename)
   end
 
-  # Load fixtures from old gem location
+  # Load a v1 fixture, copied verbatim from the old standalone gem.
+  #
+  # A missing file raises Errno::ENOENT. It does not return [], because an
+  # empty list makes a whole context test nothing and pass.
   #
   # @param flavor [Symbol] The flavor name
-  # @param filename [String] The fixture filename in archived-gems/pubid-{flavor}/spec/fixtures/
+  # @param filename [String] The filename in spec/fixtures/legacy/{flavor}/
   # @return [Array<String>] Array of test case strings
-  def load_gem_fixture(flavor, filename)
-    path = File.join(__dir__, "..", "..", "archived-gems", "pubid-#{flavor}", "spec",
-                     "fixtures", filename)
-    return [] unless File.exist?(path)
+  def load_legacy_fixture(flavor, filename)
+    path = File.join(__dir__, "..", "fixtures", "legacy", flavor.to_s, filename)
 
     File.readlines(path).map(&:strip).reject(&:empty?).reject do |line|
       line.start_with?("#")

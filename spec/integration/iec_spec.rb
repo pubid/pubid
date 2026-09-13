@@ -28,7 +28,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "CSV identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "csv-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "csv-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all CSV identifiers correctly" do
@@ -63,7 +63,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "IEC identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "iec-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "iec-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all IEC identifiers correctly" do
@@ -98,7 +98,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "IECEE TRF identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "iecee-trf-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "iecee-trf-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all IECEE TRF identifiers correctly" do
@@ -133,7 +133,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "IECEx TRF identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "iecex-trf-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "iecex-trf-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all IECEx TRF identifiers correctly" do
@@ -168,7 +168,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "IECQ identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "iecq-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "iecq-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all IECQ identifiers correctly" do
@@ -203,7 +203,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "ISH identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "ish-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "ish-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all ISH identifiers correctly" do
@@ -238,7 +238,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "ISO/IEC identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "iso-iec-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "iso-iec-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all ISO/IEC identifiers correctly" do
@@ -273,7 +273,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "Sheets identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "sheets-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "sheets-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all Sheets identifiers correctly" do
@@ -308,7 +308,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "TC1 identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "tc1-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "tc1-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all TC1 identifiers correctly" do
@@ -343,7 +343,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "TR identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "tr-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "tr-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all TR identifiers correctly" do
@@ -378,7 +378,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "TS identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "ts-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "ts-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all TS identifiers correctly" do
@@ -413,7 +413,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "VAP identifiers" do
-      let(:test_cases) { load_gem_fixture(:iec, "vap-pubid.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "vap-pubid.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all VAP identifiers correctly" do
@@ -448,7 +448,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "WD special groups" do
-      let(:test_cases) { load_gem_fixture(:iec, "wd-special-groups.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "wd-special-groups.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all WD special groups correctly" do
@@ -483,7 +483,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "Working documents" do
-      let(:test_cases) { load_gem_fixture(:iec, "working-documents.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "working-documents.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all working documents correctly" do
@@ -518,7 +518,7 @@ RSpec.describe "IEC v2 Implementation" do
     end
 
     context "Working programmes" do
-      let(:test_cases) { load_gem_fixture(:iec, "working-programmes.txt") }
+      let(:test_cases) { load_legacy_fixture(:iec, "working-programmes.txt") }
       let(:results) { FixtureLoader::TestResults.new }
 
       it "parses and renders all working programmes correctly" do

@@ -9,7 +9,6 @@
 # Offense count: 2
 Gemspec/RequiredRubyVersion:
   Exclude:
-    - 'archived-gems/pubid-core/pubid-core.gemspec'
     - 'pubid.gemspec'
 
 # Offense count: 51
@@ -18,11 +17,6 @@ Gemspec/RequiredRubyVersion:
 # SupportedStyles: with_first_argument, with_fixed_indentation
 Layout/ArgumentAlignment:
   Exclude:
-    - 'archived-gems/pubid-bsi/spec/pubid_bsi/identifier/create_spec.rb'
-    - 'archived-gems/pubid-cen/spec/pubid_cen/create_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/harmonized_stage_code_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/create_new_identifier_spec.rb'
-    - 'archived-gems/pubid-itu/spec/pubid_itu/create_spec.rb'
     - 'lib/pubid/builder/base.rb'
     - 'lib/pubid/nist/builder.rb'
     - 'lib/pubid/nist/identifiers/base.rb'
@@ -80,7 +74,6 @@ Layout/EmptyLinesAroundBeginBody:
 # SupportedStyles: empty_lines, no_empty_lines
 Layout/EmptyLinesAroundBlockBody:
   Exclude:
-    - 'archived-gems/pubid-iso/spec/pubid_iso/renderer/base_spec.rb'
     - 'spec/fixtures/ieee/debug_failures.rb'
     - 'spec/fixtures/run_classify.rb'
     - 'spec/integration/iec_spec.rb'
@@ -111,19 +104,6 @@ Layout/EmptyLinesAroundMethodBody:
 Layout/ExtraSpacing:
   Exclude:
     - 'spec/pubid/iec/fixtures_spec.rb'
-
-# Offense count: 8
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowMultipleStyles, EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle.
-# SupportedHashRocketStyles: key, separator, table
-# SupportedColonStyles: key, separator, table
-# SupportedLastArgumentHashStyles: always_inspect, always_ignore, ignore_implicit, ignore_explicit
-Layout/HashAlignment:
-  Exclude:
-    - 'archived-gems/pubid-bsi/spec/pubid_bsi/identifier/create_spec.rb'
-    - 'archived-gems/pubid-cen/spec/pubid_cen/create_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/create_new_identifier_spec.rb'
-    - 'archived-gems/pubid-itu/spec/pubid_itu/create_spec.rb'
 
 # Offense count: 3
 # This cop supports safe autocorrection (--autocorrect).
@@ -156,7 +136,6 @@ Layout/RescueEnsureAlignment:
 # SupportedStyles: final_newline, final_blank_line
 Layout/TrailingEmptyLines:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/parser_spec.rb'
     - 'spec/fixtures/ieee/debug_failures.rb'
     - 'spec/fixtures/ieee/debug_preprocess.rb'
     - 'spec/pubid/astm/identifier_spec.rb'
@@ -192,18 +171,10 @@ Lint/DuplicateCaseCondition:
     - 'lib/pubid/iso/builder.rb'
     - 'lib/pubid/nist/builder.rb'
 
-# Offense count: 3
-Lint/DuplicateMethods:
-  Exclude:
-    - 'archived-gems/pubid-core/lib/pubid/core/configuration.rb'
-    - 'archived-gems/pubid-core/lib/pubid/core/harmonized_stage_code.rb'
-    - 'archived-gems/pubid-ieee/lib/pubid/ieee/renderer/base.rb'
-
 # Offense count: 4
 # Configuration parameters: AllowComments, AllowEmptyLambdas.
 Lint/EmptyBlock:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/stage_spec.rb'
     - 'spec/pubid/iec/fixtures_spec.rb'
     - 'spec/spec_helper.rb'
 
@@ -234,19 +205,6 @@ Lint/IneffectiveAccessModifier:
 # Configuration parameters: AllowedParentClasses.
 Lint/MissingSuper:
   Enabled: false
-
-# Offense count: 10
-Lint/RescueException:
-  Exclude:
-    - 'archived-gems/pubid-ccsds/spec/support/convert_pubid.rb'
-    - 'archived-gems/pubid-etsi/spec/support/convert_pubid.rb'
-    - 'archived-gems/pubid-iec/spec/pubid_iec/identifier/test_report_form_spec.rb'
-    - 'archived-gems/pubid-iec/spec/support/convert_pubid.rb'
-    - 'archived-gems/pubid-ieee/spec/pubid_ieee/identifiers_parsing_spec.rb'
-    - 'archived-gems/pubid-itu/spec/support/convert_pubid.rb'
-    - 'archived-gems/pubid-jis/spec/pubid_jis/identifier_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/identifier/base_spec.rb'
-    - 'archived-gems/pubid-plateau/spec/support/convert_pubid.rb'
 
 # Offense count: 1
 Lint/ShadowedException:
@@ -333,7 +291,6 @@ Metrics/PerceivedComplexity:
 # AllowedNames: as, at, by, cc, db, id, if, in, io, ip, of, on, os, pp, to
 Naming/MethodParameterName:
   Exclude:
-    - 'archived-gems/pubid-ieee/spec/pubid_ieee/identifiers_parsing_spec.rb'
     - 'lib/pubid/export/result.rb'
 
 # Offense count: 4
@@ -370,10 +327,6 @@ Performance/MapMethodChain:
 # This cop supports unsafe autocorrection (--autocorrect-all).
 RSpec/BeEq:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier/base_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/stage_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/create_new_identifier_spec.rb'
-    - 'archived-gems/pubid-itu/spec/pubid_itu/identifier_spec.rb'
     - 'spec/pubid/astm/identifiers/adjunct_spec.rb'
     - 'spec/pubid/astm/identifiers/data_series_spec.rb'
     - 'spec/pubid/astm/identifiers/manual_spec.rb'
@@ -387,10 +340,6 @@ RSpec/BeEq:
 # SupportedStyles: be, be_nil
 RSpec/BeNil:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier/base_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/stage_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/create_new_identifier_spec.rb'
-    - 'archived-gems/pubid-itu/spec/pubid_itu/identifier_spec.rb'
     - 'spec/pubid_spec.rb'
 
 # Offense count: 2
@@ -400,13 +349,6 @@ RSpec/BeforeAfterAll:
     - '**/spec/rails_helper.rb'
     - '**/spec/support/**/*.rb'
     - 'spec/integration/iec_spec.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-RSpec/ContextMethod:
-  Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/configuration_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/typed_stage_spec.rb'
 
 # Offense count: 1572
 # Configuration parameters: Prefixes, AllowedPatterns.
@@ -430,18 +372,7 @@ RSpec/DescribedClass:
 # This cop supports unsafe autocorrection (--autocorrect-all).
 RSpec/EmptyExampleGroup:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/parser_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/renderer/base_spec.rb'
-    - 'archived-gems/pubid-jis/spec/pubid_jis/identifier/renderer_spec.rb'
     - 'spec/pubid/astm/identifier_spec.rb'
-
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowConsecutiveOneLiners.
-RSpec/EmptyLineAfterExample:
-  Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier/base_spec.rb'
-    - 'archived-gems/pubid-ieee/spec/pubid_ieee/parser_spec.rb'
 
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
@@ -453,16 +384,6 @@ RSpec/EmptyLineAfterExampleGroup:
 # This cop supports safe autocorrection (--autocorrect).
 RSpec/EmptyLineAfterFinalLet:
   Exclude:
-    - 'archived-gems/pubid-ccsds/spec/pubid_ccsds/create_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier/base_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/stage_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/tramsformer_spec.rb'
-    - 'archived-gems/pubid-etsi/spec/pubid_etsi/create_spec.rb'
-    - 'archived-gems/pubid-iec/spec/pubid_iec/identifier/interpretation_sheet_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/corrigendum_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/document/circ_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/identifier/base_spec.rb'
-    - 'archived-gems/pubid-plateau/spec/pubid_plateau/create_spec.rb'
     - 'spec/pubid/iso/identifier_spec.rb'
 
 # Offense count: 2
@@ -470,7 +391,6 @@ RSpec/EmptyLineAfterFinalLet:
 # Configuration parameters: AllowConsecutiveOneLiners.
 RSpec/EmptyLineAfterHook:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/configuration_spec.rb'
     - 'spec/integration/iec_spec.rb'
 
 # Offense count: 903
@@ -483,23 +403,10 @@ RSpec/EmptyLineAfterSubject:
 RSpec/ExampleLength:
   Max: 40
 
-# Offense count: 11
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: CustomTransform, IgnoredWords, DisallowedExamples.
-# DisallowedExamples: works
-RSpec/ExampleWording:
-  Exclude:
-    - 'archived-gems/pubid-bsi/spec/pubid_bsi/identifier_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/configuration_spec.rb'
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/create_new_identifier_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/identifier/base_spec.rb'
-
 # Offense count: 2
 # This cop supports safe autocorrection (--autocorrect).
 RSpec/ExcessiveDocstringSpacing:
   Exclude:
-    - 'archived-gems/pubid-nist/spec/nist_pubid/parsers/default_spec.rb'
     - 'spec/pubid/iho/identifier_spec.rb'
 
 # Offense count: 1
@@ -513,7 +420,6 @@ RSpec/ExpectInHook:
 # SupportedStyles: implicit, each, example
 RSpec/HookArgument:
   Exclude:
-    - 'archived-gems/pubid-nist/spec/support/webmock.rb'
     - 'spec/pubid/identifier_metadata_spec.rb'
 
 # Offense count: 1
@@ -521,14 +427,6 @@ RSpec/HookArgument:
 RSpec/HooksBeforeExamples:
   Exclude:
     - 'spec/integration/iec_spec.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: single_line_only, single_statement_only, disallow, require_implicit
-RSpec/ImplicitSubject:
-  Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier/base_spec.rb'
 
 # Offense count: 73
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -546,7 +444,6 @@ RSpec/IncludeExamples:
 # Configuration parameters: Max, AllowedIdentifiers, AllowedPatterns.
 RSpec/IndexedLet:
   Exclude:
-    - 'archived-gems/pubid-nist/spec/nist_pubid/identifier/base_spec.rb'
     - 'spec/pubid/ieee/components/relationship_spec.rb'
 
 # Offense count: 49
@@ -566,7 +463,6 @@ RSpec/IteratedExpectation:
 # This cop supports safe autocorrection (--autocorrect).
 RSpec/LeadingSubject:
   Exclude:
-    - 'archived-gems/pubid-nist/spec/nist_pubid/nist_tech_pubs_spec.rb'
     - 'spec/pubid/export/auditor_spec.rb'
 
 # Offense count: 3
@@ -581,15 +477,6 @@ RSpec/LeakyLocalVariable:
   Exclude:
     - 'spec/integration/bsi_spec.rb'
     - 'spec/integration/cen_cenelec_spec.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: hash, symbol
-RSpec/MetadataStyle:
-  Exclude:
-    - 'archived-gems/pubid-nist/spec/nist_pubid/identifier/base_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/nist_tech_pubs_spec.rb'
 
 # Offense count: 2
 RSpec/MultipleDescribes:
@@ -629,25 +516,13 @@ RSpec/NoExpectationExample:
 RSpec/Output:
   Enabled: false
 
-# Offense count: 3
-RSpec/PendingWithoutReason:
-  Exclude:
-    - 'archived-gems/pubid-nist/spec/nist_pubid/nist_tech_pubs_spec.rb'
-
 # Offense count: 7
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: Strict, EnforcedStyle, AllowedExplicitMatchers.
 # SupportedStyles: inflected, explicit
 RSpec/PredicateMatcher:
   Exclude:
-    - 'archived-gems/pubid-core/spec/pubid_core/identifier/base_spec.rb'
-    - 'archived-gems/pubid-jis/spec/pubid_jis/identifier_spec.rb'
     - 'spec/pubid/iso/components/publisher_spec.rb'
-
-# Offense count: 2
-RSpec/RepeatedDescription:
-  Exclude:
-    - 'archived-gems/pubid-ieee/spec/pubid_ieee/parser_spec.rb'
 
 # Offense count: 4
 RSpec/RepeatedExample:
@@ -658,47 +533,19 @@ RSpec/RepeatedExample:
 # Offense count: 10
 RSpec/RepeatedExampleGroupBody:
   Exclude:
-    - 'archived-gems/pubid-cen/spec/pubid_cen/identifier_spec.rb'
-    - 'archived-gems/pubid-iec/spec/pubid_iec/identifier/test_report_form_spec.rb'
-    - 'archived-gems/pubid-ieee/spec/pubid_ieee/identifiers_parsing_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/document/sp_spec.rb'
     - 'spec/pubid/iso/identifiers/directives_spec.rb'
 
 # Offense count: 18
 RSpec/RepeatedExampleGroupDescription:
   Exclude:
-    - 'archived-gems/pubid-cen/spec/pubid_cen/identifier_spec.rb'
-    - 'archived-gems/pubid-iec/spec/pubid_iec/identifier/create_spec.rb'
-    - 'archived-gems/pubid-iec/spec/pubid_iec/identifier/test_report_form_spec.rb'
-    - 'archived-gems/pubid-ieee/spec/pubid_ieee/parser_spec.rb'
-    - 'archived-gems/pubid-itu/spec/pubid_itu/identifier_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/document/nist_ir_spec.rb'
-    - 'archived-gems/pubid-nist/spec/nist_pubid/document/sp_spec.rb'
     - 'spec/pubid/iso/identifiers/directives_spec.rb'
     - 'spec/pubid/nist/identifiers/letter_circular_spec.rb'
-
-# Offense count: 19
-# This cop supports safe autocorrection (--autocorrect).
-RSpec/ScatteredLet:
-  Exclude:
-    - 'archived-gems/pubid-etsi/spec/pubid_etsi/create_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/amendment_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/corrigendum_spec.rb'
-    - 'archived-gems/pubid-iso/spec/pubid_iso/identifier/supplement_spec.rb'
-    - 'archived-gems/pubid-plateau/spec/pubid_plateau/create_spec.rb'
 
 # Offense count: 82
 # Configuration parameters: CustomTransform, IgnoreMethods, IgnoreMetadata, InflectorPath, EnforcedInflector.
 # SupportedInflectors: default, active_support
 RSpec/SpecFilePathFormat:
   Enabled: false
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, AllowedPatterns.
-# SupportedStyles: snake_case, camelCase
-RSpec/VariableName:
-  Exclude:
-    - 'archived-gems/pubid-nist/spec/nist_pubid/nist_tech_pubs_spec.rb'
 
 # Offense count: 3
 # This cop supports unsafe autocorrection (--autocorrect-all).
@@ -722,11 +569,6 @@ Rake/Desc:
 Rake/DuplicateNamespace:
   Exclude:
     - 'Rakefile'
-
-# Offense count: 1
-Security/Open:
-  Exclude:
-    - 'archived-gems/pubid-nist/lib/pubid/nist/nist_tech_pubs.rb'
 
 # Offense count: 47
 # This cop supports safe autocorrection (--autocorrect).

@@ -86,8 +86,7 @@ RSpec.describe "IEEE identifiers" do
 
   describe "fixture file parsing" do
     let(:fixture_file) do
-      File.join(__dir__,
-                "../../archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt")
+      File.expand_path("../fixtures/legacy/ieee/pubid-parsed.txt", __dir__)
     end
 
     it "parses all identifiers from fixture file", :slow do

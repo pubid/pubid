@@ -73,7 +73,9 @@ Comments (lines starting with `#`) are allowed for organization.
 
 ### Source Data
 
-- **V1 fixture files**: `archived-gems/pubid-{flavor}/spec/fixtures/*.txt`
+- **V1 fixture files**: `archived-gems/pubid-{flavor}/spec/fixtures/*.txt`. That folder
+  is removed. The v1 files that specs still read are verbatim copies in
+  `spec/fixtures/legacy/{flavor}/`. A classification run does not touch them.
 - **Test execution**: Run fixtures_spec.rb and capture results
 
 ### Classification Process
