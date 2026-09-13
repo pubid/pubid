@@ -1,15 +1,16 @@
 require "spec_helper"
 
 RSpec.describe "IEEE Fixture Round-trip Tests" do
-  let(:pubid_to_parse_fixtures) do
-    File.readlines("archived-gems/pubid-ieee/spec/fixtures/pubid-to-parse.txt").map(&:strip)
+  # The v1 fixtures, copied verbatim from the old pubid-ieee gem. The path is
+  # relative to this file, not to the working directory.
+  def legacy_fixture_lines(name)
+    path = File.expand_path("../../fixtures/legacy/ieee/#{name}", __dir__)
+    File.readlines(path).map(&:strip)
   end
-  let(:unapproved_fixtures) do
-    File.readlines("archived-gems/pubid-ieee/spec/fixtures/unapproved.txt").map(&:strip)
-  end
-  let(:pubid_parsed_fixtures) do
-    File.readlines("archived-gems/pubid-ieee/spec/fixtures/pubid-parsed.txt").map(&:strip)
-  end
+
+  let(:pubid_to_parse_fixtures) { legacy_fixture_lines("pubid-to-parse.txt") }
+  let(:unapproved_fixtures) { legacy_fixture_lines("unapproved.txt") }
+  let(:pubid_parsed_fixtures) { legacy_fixture_lines("pubid-parsed.txt") }
   let(:all_fixtures) do
     pubid_to_parse_fixtures + unapproved_fixtures + pubid_parsed_fixtures
   end

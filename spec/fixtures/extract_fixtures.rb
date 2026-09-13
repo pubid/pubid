@@ -5,6 +5,8 @@ require "fileutils"
 
 # Fixtures Extraction Script for spec/fixtures/{flavor}/{pass,fail}/{class}.txt
 # Note: This script expects PubID libraries to be already loaded
+# Note: This was a one-time migration. Its source folder, archived-gems/, is
+# removed, so the script finds no files now.
 class FixturesExtractor
   FLAVORS = %w[iso iec ieee nist idf cen bsi jis etsi ccsds itu plateau
                ansi].freeze

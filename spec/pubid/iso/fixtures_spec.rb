@@ -2,7 +2,11 @@
 
 require "spec_helper"
 
-RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
+module IsoFixturesSpec
+  # The v1 fixtures, copied verbatim from the old pubid-iso gem. They are not
+  # the classifier inputs under identifiers/full/, which hold normalizing forms.
+  LEGACY_DIR = File.expand_path("../../fixtures/legacy/iso", __dir__)
+
   FIXTURE_FILES = [
     "iso-pubid-basic.txt",
     "iso-pubid-cd.txt",
@@ -15,12 +19,13 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
     "iso-pubid-supplement-iteration.txt",
     "iwa-pubid.txt",
   ].freeze
+end
 
-  FIXTURE_FILES.each do |fixture_file|
+RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
+  IsoFixturesSpec::FIXTURE_FILES.each do |fixture_file|
     describe fixture_file do
       let(:fixture_path) do
-        File.join(__dir__,
-                  "../../../archived-gems/pubid-iso/spec/fixtures/#{fixture_file}")
+        File.join(IsoFixturesSpec::LEGACY_DIR, fixture_file)
       end
       let(:fixture_ids) do
         File.readlines(fixture_path).map(&:strip).reject do |line|
@@ -72,9 +77,8 @@ RSpec.describe "ISO V2 Comprehensive Fixtures Tests" do
       total_successes = 0
       total_identifiers = 0
 
-      FIXTURE_FILES.each do |fixture_file|
-        fixture_path = File.join(__dir__,
-                                 "../../../archived-gems/pubid-iso/spec/fixtures/#{fixture_file}")
+      IsoFixturesSpec::FIXTURE_FILES.each do |fixture_file|
+        fixture_path = File.join(IsoFixturesSpec::LEGACY_DIR, fixture_file)
         fixture_ids = File.readlines(fixture_path).map(&:strip).reject do |line|
           line.empty? || line.start_with?("#")
         end

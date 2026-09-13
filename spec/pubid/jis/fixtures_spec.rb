@@ -2,8 +2,8 @@ require "spec_helper"
 
 RSpec.describe "JIS Fixture Round-trip" do
   let(:fixture_file) do
-    File.join(__dir__,
-              "../../../archived-gems/pubid-jis/spec/fixtures/jis-pubids.txt")
+    # The v1 fixtures, copied verbatim from the old pubid-jis gem.
+    File.expand_path("../../fixtures/legacy/jis/jis-pubids.txt", __dir__)
   end
 
   it "round-trips all identifiers from fixture file" do
