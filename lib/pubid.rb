@@ -83,6 +83,17 @@ module Pubid
       def parse(string, **opts)
         Pubid.parse(string, **opts)
       end
+
+      # Build an identifier from its hash without naming its flavor.
+      # It delegates to {Pubid.from_hash}, as {parse} delegates to
+      # {Pubid.parse}.
+      #
+      # @param data [Hash] an identifier hash
+      # @return [Pubid::Identifier]
+      # @raise [Pubid::Errors::InvalidInputError] see {Pubid.from_hash}
+      def from_hash(data)
+        Pubid.from_hash(data)
+      end
     end
   end
 
@@ -238,6 +249,57 @@ module Pubid
       parse_by_prefix(string)
     end
   end
+
+  # Build an identifier from its serialized hash, without naming its flavor —
+  # the hash counterpart of {parse}.
+  #
+  # The hash is what {Identifier#to_hash} emits, and what a relaton-data
+  # +index-v2.yaml+ row stores under +:id+. Its +_type+ key
+  # ("pubid:<flavor>:<type>") names the concrete class, so no prefix guessing
+  # is necessary. The class is resolved by {TypeResolver}, and the class's own
+  # +from_hash+ does the rest, nested identifiers of other flavors included.
+  #
+  # @example
+  #   Pubid.from_hash("_type" => "pubid:iso:international-standard",
+  #                   "number" => "9001", "year" => "2015").to_s
+  #   # => "ISO 9001:2015"
+  #
+  # @param data [Hash] an identifier hash. String and Symbol keys are both
+  #   accepted.
+  # @return [Identifier] an instance of the class that +_type+ names
+  # @raise [Pubid::Errors::InvalidInputError] when +data+ is not a Hash, has no
+  #   +_type+, or has a +_type+ that no registered flavor defines. These are
+  #   the only failures it translates: once +_type+ names a class, an error
+  #   from that class's own +from_hash+ (a malformed field, or a bad +_type+
+  #   in a NESTED hash) propagates unchanged, so a flavor defect is not
+  #   disguised as bad input.
+  def self.from_hash(data)
+    unless data.is_a?(Hash)
+      raise Pubid::Errors::InvalidInputError,
+            "identifier data must be a Hash, got #{data.class}"
+    end
+
+    identifier_class_for(data).from_hash(data)
+  end
+
+  # The concrete class that the +_type+ of +data+ names.
+  #
+  # @param data [Hash] an identifier hash
+  # @return [Class<Identifier>]
+  # @raise [Pubid::Errors::InvalidInputError] no +_type+, or an unknown one
+  # @api private
+  def self.identifier_class_for(data)
+    type = data["_type"] || data[:_type]
+    unless type
+      raise Pubid::Errors::InvalidInputError,
+            "identifier hash has no _type key: #{data.inspect[0, 200]}"
+    end
+
+    TypeResolver.resolve(type) ||
+      raise(Pubid::Errors::InvalidInputError,
+            "unknown identifier _type: #{type.inspect}")
+  end
+  private_class_method :identifier_class_for
 
   # Route a human-readable identifier to its flavor by leading prefix token.
   #

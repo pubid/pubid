@@ -147,18 +147,35 @@ id.to_json
 
 === Import from Hash
 
+`Pubid.from_hash` is the hash counterpart of `Pubid.parse`. It builds the
+correct identifier class from a hash that `#to_hash` emits. You do not name
+the flavor: the `_type` key (`pubid:<flavor>:<type>`) identifies the class.
+
 [source,ruby]
 ----
-require 'pubid/iso'
+require 'pubid'
 
 hash = {
-  flavor: "iso",
-  publisher: "ISO",
-  number: "9001",
-  year: "2015"
+  "_type" => "pubid:iso:international-standard",
+  "number" => "9001",
+  "year" => "2015"
 }
-id = Pubid::Serializable.from_h(hash)
-id.to_s # => "ISO 9001:2015"
+id = Pubid.from_hash(hash)
+id.class # => Pubid::Iso::Identifiers::InternationalStandard
+id.to_s  # => "ISO 9001:2015"
+----
+
+For a row of a relaton-data `index-v2.yaml` file, give the identifier hash in
+the `:id` key of the row: `Pubid.from_hash(row[:id])`.
+
+A hash that is not an identifier hash raises `Pubid::Errors::InvalidInputError`
+(an `ArgumentError`). This occurs when the input is not a Hash, has no `_type`,
+or has a `_type` that no flavor defines.
+
+[source,ruby]
+----
+Pubid.from_hash({ "number" => "9001" })
+# => Pubid::Errors::InvalidInputError: identifier hash has no _type key: ...
 ----
 
 === Import from JSON
@@ -181,11 +198,15 @@ All identifiers support full round-trip conversion preserving all attributes:
 require 'pubid/iso'
 
 original = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020/Cor 1:2021")
-hash = original.to_h
-restored = Pubid::Serializable.from_h(hash)
+hash = original.to_hash
+# => {"_type" => "pubid:iso:corrigendum", "number" => "1", "year" => "2021",
+#     "base" => {"_type" => "pubid:iso:amendment", "number" => "1", "year" => "2020",
+#       "base" => {"_type" => "pubid:iso:international-standard",
+#                  "number" => "9001", "year" => "2015"}}}
+restored = Pubid.from_hash(hash)
 
 restored.to_s # => "ISO 9001:2015/Amd 1:2020/Cor 1:2021"
-restored.to_urn # => "urn:iso:std:iso:9001:amd:2020:cor:2021:v1"
+restored.to_urn # => "urn:iso:std:iso:9001:amd:2020:v1:cor:2021:v1"
 ----
 
 == Utility Methods
