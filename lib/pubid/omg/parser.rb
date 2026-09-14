@@ -9,7 +9,8 @@ module Pubid
     # Accepts:
     #   OMG {ACRONYM}[ {VERSION}][ {PART}]
     #
-    # ACRONYM is uppercase letters/digits, at least 1 char.
+    # ACRONYM is the URL segment of https://www.omg.org/spec/<ACRONYM>/, e.g.
+    # "UML", "DDS-XTypes", "EDMC-FIBO/BE", "VSIPL++", "smartant".
     # VERSION is digits/dots, optionally followed by a beta label, e.g. "1.0",
     # "2.5.1", "5 beta 3", "2.5 beta".
     # PART is the volume or format segment, e.g. "Superstructure", "PDF". A
@@ -17,9 +18,22 @@ module Pubid
     class Parser < ::Pubid::Parser::Grammar
       rule(:space) { str(" ") }
 
-      # Acronym: starts with uppercase, may contain uppercase + lowercase +
-      # digits (covers "SysML", "AMI4CCM", "UML", "CORBA", "BMM", ...).
-      rule(:acronym) { (match("[A-Z]") >> match("[A-Za-z0-9]").repeat).as(:acronym) }
+      # Acronym: the URL segment OMG gives the specification, kept verbatim,
+      # because a consumer builds the URL from it. It starts with a letter,
+      # which may be lower case ("smartant"). Letters, digits and "+" follow
+      # ("SysML", "AMI4CCM", "VSIPL++"). A hyphen or a slash joins further
+      # segments ("DDS-PSM-Cxx", "EDMC-FIBO/BE"). Each segment is non-empty,
+      # so a hyphen or a slash never ends the acronym.
+      #
+      # The slash in "EDMC-FIBO/BE" belongs to the acronym: OMG serves the
+      # document at /spec/EDMC-FIBO/BE/. A slash after the version separates
+      # the document part instead (see the identifier rule).
+      rule(:acronym_char) { match("[A-Za-z0-9+]") }
+
+      rule(:acronym) do
+        (match("[A-Za-z]") >> acronym_char.repeat >>
+          (match("[-/]") >> acronym_char.repeat(1)).repeat).as(:acronym)
+      end
 
       # Version: digits with optional dots, optionally followed by " beta" and
       # an optional beta number. OMG writes the label both ways: the document
@@ -48,9 +62,9 @@ module Pubid
           beta.maybe).as(:version)
       end
 
-      # OMG separates the document part with either a space or a slash. The
-      # renderer prints a space, so the two spellings of one document stay
-      # equal.
+      # After the version, OMG separates the document part with either a
+      # space or a slash. The renderer prints a space, so the two spellings of
+      # one document stay equal.
       rule(:part_separator) { space | str("/") }
 
       # Document part: the volume or format segment OMG puts after the
@@ -60,10 +74,13 @@ module Pubid
       # occupies the same position.
       rule(:part) { match("[A-Za-z0-9]").repeat(1).as(:part) }
 
+      # Only a space separates a part that follows the acronym directly. The
+      # acronym rule takes a slash there, so a slash separator is legal only
+      # after a version.
       rule(:identifier) do
         str("OMG") >> space >> acronym >>
-          (space >> version).maybe >>
-          (part_separator >> part).maybe
+          ((space >> version >> (part_separator >> part).maybe) |
+            (space >> part)).maybe
       end
 
       rule(:root) { identifier }
