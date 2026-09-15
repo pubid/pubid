@@ -1,0 +1,21 @@
+# MRN URNs printed on IALA publication covers and footers, per the
+# IALA Style Guide (G1115, Ed 1.0 January 2021) document-reference
+# clause: urn:mrn:iala:pub:[p][nnnn], p in {S, R, G, C}. Transcribed
+# from the PDFs in metanorma/mn-samples-iala reference-docs.
+# The two r1026 variants are printed malformed in the published PDF
+# (capital marker Ed1.0; separator dot ed.1.0) and are kept
+# byte-identical: the reference parser normalizes both to ed1.0.
+urn:mrn:iala:pub:s1040:ed2.0
+urn:mrn:iala:pub:s1050:ed2.0
+urn:mrn:iala:pub:s1060:ed2.0
+urn:mrn:iala:pub:r1023:ed1.0
+urn:mrn:iala:pub:r1024:ed1.0
+urn:mrn:iala:pub:r1025:ed1.0
+urn:mrn:iala:pub:r1026:ed1.0
+urn:mrn:iala:pub:r1026:Ed1.0
+urn:mrn:iala:pub:r1026:ed.1.0
+urn:mrn:iala:pub:r1027:ed1.1
+urn:mrn:iala:pub:g1195:ed1.0
+urn:mrn:iala:pub:g1199:ed1.0
+urn:mrn:iala:pub:g1201:ed1.0
+urn:mrn:iala:pub:c0103-1:ed3.0
