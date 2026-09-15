@@ -37,8 +37,12 @@ module Pubid
             # generator's casing so URN round-trip is exact.
             annex_letter = Regexp.last_match(2)&.upcase
             annex_form = annex_letter ? "ANNEX" : "Annex"
-          when /\Aed/
-            edition = seg.sub(/\Aed/, "")
+          # Edition marker: case-insensitive with an optional separator dot.
+          # Both variants occur in published documents (R1026 prints
+          # "Ed1.0" and "ed.1.0"); each parses to the canonical edition
+          # value and re-renders as lowercase "ed<x.x>".
+          when /\Aed\.?/i
+            edition = seg.sub(/\Aed\.?/i, "")
           when /\A[a-z]\z/i
             language = seg.upcase
           end

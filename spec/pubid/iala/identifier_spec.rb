@@ -162,6 +162,41 @@ RSpec.describe Pubid::Iala::Identifier do
         expect(id.to_urn).to eq(urn)
       end
     end
+
+    # URNs transcribed from the published IALA corpus
+    # (mn-samples-iala reference-docs): every S/R/G/C publication carries
+    # urn:mrn:iala:pub:<ref>:ed<x.x> on its cover and footers, per the
+    # IALA Style Guide (G1115) clause on document references.
+    %w[
+      urn:mrn:iala:pub:s1040:ed2.0
+      urn:mrn:iala:pub:s1050:ed2.0
+      urn:mrn:iala:pub:s1060:ed2.0
+      urn:mrn:iala:pub:r1023:ed1.0
+      urn:mrn:iala:pub:r1027:ed1.1
+      urn:mrn:iala:pub:g1195:ed1.0
+      urn:mrn:iala:pub:g1199:ed1.0
+      urn:mrn:iala:pub:g1201:ed1.0
+      urn:mrn:iala:pub:c0103-1:ed3.0
+    ].each do |urn|
+      it "round-trips the published #{urn.inspect}" do
+        id = Pubid::Iala.parse(urn)
+        expect(id.to_urn).to eq(urn)
+      end
+    end
+
+    # R1026 prints two malformed URNs in the published PDF ("Ed1.0" with
+    # a capital marker, "ed.1.0" with a separator dot); both parse and
+    # normalize to the canonical lowercase form.
+    {
+      "urn:mrn:iala:pub:r1026:Ed1.0"  => "urn:mrn:iala:pub:r1026:ed1.0",
+      "urn:mrn:iala:pub:r1026:ed.1.0" => "urn:mrn:iala:pub:r1026:ed1.0",
+    }.each do |urn, canonical|
+      it "normalizes the malformed #{urn.inspect} printed in R1026" do
+        id = Pubid::Iala.parse(urn)
+        expect(id.to_s).to eq("IALA R1026 Ed 1.0")
+        expect(id.to_urn).to eq(canonical)
+      end
+    end
   end
 
   describe "polymorphic round-trip via to_hash / from_hash" do
