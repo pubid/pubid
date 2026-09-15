@@ -95,4 +95,53 @@ RSpec.describe Pubid::Evs do
         .to raise_error(Parslet::ParseFailed)
     end
   end
+
+  describe "wrapped identifier classes" do
+    it "wraps a plain EuropeanNorm" do
+      expect(described_class.parse("EVS-EN 18216:2026").adopted_identifier)
+        .to be_a(Pubid::CenCenelec::Identifiers::EuropeanNorm)
+    end
+
+    it "wraps an AdoptedEuropeanNorm for EN ISO" do
+      expect(described_class.parse("EVS-EN ISO 14001:2026").adopted_identifier)
+        .to be_a(Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
+    end
+
+    it "wraps an Amendment for /A1" do
+      expect(described_class.parse("EVS-EN ISO 9001:2015/A1:2024").adopted_identifier)
+        .to be_a(Pubid::CenCenelec::Identifiers::Amendment)
+    end
+  end
+
+  describe "URN separator normalization" do
+    it "normalizes the space separator to hyphen through a URN round trip" do
+      id = described_class.parse("EVS EN 18216:2026")
+      back = Pubid.parse(id.to_urn, format: :urn)
+      expect(back.to_s).to eq("EVS-EN 18216:2026")
+    end
+  end
+
+  describe "corrigendum URN" do
+    it "round-trips a corrigendum adoption" do
+      id = Pubid.parse("urn:evs:en:iso:9001:2015:cor:1:2024", format: :urn)
+      expect(id.to_s).to eq("EVS-EN ISO 9001:2015/AC1:2024")
+      expect(id.to_urn).to eq("urn:evs:en:iso:9001:2015:cor:1:2024")
+    end
+  end
+
+  describe "UrnGenerator guard" do
+    it "rejects a non-CEN adopted identifier" do
+      id = Pubid::Evs::Identifiers::NationalAdoption.new(
+        adopted_identifier: Pubid::Iso.parse("ISO 9001:2015"),
+      )
+      expect { id.to_urn }.to raise_error(Pubid::Errors::ParseError, /expected adopted CEN URN/)
+    end
+  end
+
+  describe "case sensitivity" do
+    it "rejects a lowercase national prefix" do
+      expect { described_class.parse("evs-en 18216:2026") }
+        .to raise_error(Parslet::ParseFailed)
+    end
+  end
 end

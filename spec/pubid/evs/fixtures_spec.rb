@@ -47,6 +47,21 @@ RSpec.describe "EVS Fixture Round-trip Tests" do
           expect(failures).to be_empty,
                               "URN round-trip failures: #{failures.inspect}"
         end
+
+        it "resolves every identifier through the global dispatcher" do
+          failures = identifiers.filter_map do |id_str|
+            parsed = Pubid.parse(id_str)
+            next if parsed.is_a?(Pubid::Evs::Identifiers::NationalAdoption) &&
+                    parsed.to_s == id_str
+
+            { original: id_str, resolved: parsed.class.to_s }
+          rescue StandardError => e
+            { original: id_str, error: "#{e.class}: #{e.message}" }
+          end
+
+          expect(failures).to be_empty,
+                              "dispatcher routing failures: #{failures.inspect}"
+        end
       end
     end
   end
