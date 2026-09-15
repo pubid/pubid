@@ -84,6 +84,9 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "omg" => { ref: "OMG UML", omits: %i[version part] },
     # UN: identifier has no separable date; the bare committee path parses.
     "un" => { ref: "TRADE/WP.4/1068", omits: [] },
+    # EVS: year is the trailing ":YYYY" of the adopted EN reference and is
+    # separable; without it the national adoption parses with year nil.
+    "evs" => { ref: "EVS-EN 18216", omits: [:year] },
     # DOI: identifier has no separable date.
     "doi" => { ref: "doi:10.1000/182", omits: [] },
     # ISBN: identifier has no separable date.
