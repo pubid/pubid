@@ -134,7 +134,10 @@ RSpec.describe Pubid::Evs do
       id = Pubid::Evs::Identifiers::NationalAdoption.new(
         adopted_identifier: Pubid::Iso.parse("ISO 9001:2015"),
       )
-      expect { id.to_urn }.to raise_error(Pubid::Errors::ParseError, /expected adopted CEN URN/)
+      expect do
+        id.to_urn
+      end.to raise_error(Pubid::Errors::ParseError, 
+                         /expected adopted CEN URN/)
     end
   end
 
