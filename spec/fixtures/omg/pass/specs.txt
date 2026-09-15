@@ -19,3 +19,12 @@ OMG DDS 1.4 beta2
 OMG UML 2.5 beta PDF
 # Queried by the relaton OMG flavor, which expects a parse and a 404.
 OMG NOTEXIST 1.1
+# Acronyms with a hyphen, a slash, a plus or a lower-case first letter. The
+# acronym is the URL segment of https://www.omg.org/spec/<ACRONYM>/.
+OMG DDS-XTypes 1.3
+OMG DDSI-RTPS 2.5
+OMG DDS-PSM-Cxx
+OMG EDMC-FIBO/BE 1.1
+OMG EDMC-FIBO/BE
+OMG VSIPL++ 1.3
+OMG smartant 1.0

@@ -238,6 +238,82 @@ RSpec.describe Pubid::Omg::Identifier do
     end
   end
 
+  # The acronym is the URL segment of https://www.omg.org/spec/<ACRONYM>/, and
+  # relaton builds that URL from the parsed acronym. So the acronym must hold
+  # every character OMG puts in the segment, verbatim.
+  describe "acronym charset" do
+    {
+      "OMG DDS-XTypes 1.3" => ["DDS-XTypes", "1.3"],
+      "OMG DDSI-RTPS 2.5" => ["DDSI-RTPS", "2.5"],
+      "OMG DDS-PSM-Cxx" => ["DDS-PSM-Cxx", nil],
+      "OMG EDMC-FIBO/BE 1.1" => ["EDMC-FIBO/BE", "1.1"],
+      "OMG EDMC-FIBO/BE" => ["EDMC-FIBO/BE", nil],
+      "OMG VSIPL++ 1.3" => ["VSIPL++", "1.3"],
+      "OMG smartant 1.0" => ["smartant", "1.0"],
+    }.each do |ref, (acronym, version)|
+      it "reads #{ref} as acronym #{acronym}" do
+        identifier = described_class.parse(ref)
+
+        expect(identifier.acronym).to eq(acronym)
+        expect(identifier.version).to eq(version)
+        expect(identifier.part).to be_nil
+        expect(identifier.to_s).to eq(ref)
+      end
+    end
+
+    # Every acronym on https://www.omg.org/spec/ that the letters-and-digits
+    # rule rejected (30 of 270, fetched 2026-09-14).
+    %w[
+      APP-INST CORBA-REST DDS-DLRL DDS-JSON DDS-Java DDS-Monitoring DDS-OPCUA
+      DDS-PSM-Cxx DDS-RPC DDS-SECURITY DDS-TSN DDS-WEB DDS-XML DDS-XRCE
+      DDS-XTypes DDSI-RTPS EDMC-FIBO/BE EDMC-FIBO/FBC EDMC-FIBO/FND
+      EDMC-FIBO/IND IDL4-CPP IDL4-CSHARP IDL4-Java IEF-RA NIEM-UML PAGE-OM
+      TelcoML-SES VSIPL++ WS-POS smartant
+    ].each do |acronym|
+      it "keeps the catalog acronym #{acronym} verbatim" do
+        identifier = described_class.parse("OMG #{acronym}")
+
+        expect(identifier.acronym).to eq(acronym)
+        expect(identifier.to_s).to eq("OMG #{acronym}")
+      end
+    end
+
+    # A slash before the version belongs to the acronym, because OMG puts it in
+    # the URL segment (spec/EDMC-FIBO/BE/). A slash after the version still
+    # separates the document part.
+    describe "the slash" do
+      it "separates the part after a version" do
+        identifier = described_class.parse("OMG DDS 1.4/PDF")
+
+        expect(identifier.acronym).to eq("DDS")
+        expect(identifier.part).to eq("PDF")
+      end
+
+      it "belongs to the acronym before a version" do
+        identifier = described_class.parse("OMG UML/Superstructure")
+
+        expect(identifier.acronym).to eq("UML/Superstructure")
+        expect(identifier.part).to be_nil
+      end
+
+      it "separates the part after a version that follows a slashed acronym" do
+        identifier = described_class.parse("OMG EDMC-FIBO/BE 1.1/PDF")
+
+        expect(identifier.acronym).to eq("EDMC-FIBO/BE")
+        expect(identifier.version).to eq("1.1")
+        expect(identifier.part).to eq("PDF")
+      end
+    end
+
+    ["OMG DDS-", "OMG -DDS", "OMG DDS/", "OMG DDS--XML", "OMG 1DDS",
+     "OMG +DDS"].each do |ref|
+      it "rejects #{ref.inspect}" do
+        expect { described_class.parse(ref) }
+          .to raise_error(Parslet::ParseFailed)
+      end
+    end
+  end
+
   # The relaton OMG flavor queries this string and expects a rejection. It is a
   # document title, not an identifier.
   it "rejects a document title" do

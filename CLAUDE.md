@@ -114,7 +114,7 @@ from the code.
 - `docs/flavors/nist.md` — NIST rendering formats and annotated output.
 - `docs/flavors/oasis.md` — OASIS verbatim slugs, index key, MR slug and matching.
 - `docs/flavors/oiml.md` — OIML index key, bulletins and supplement URNs.
-- `docs/flavors/omg.md` — OMG document parts, the bare `beta`, and the separator that normalizes.
+- `docs/flavors/omg.md` — OMG document parts, the separator that normalizes, the acronym charset and its slash, and the bare `beta`.
 - `docs/flavors/tgpp.md` — 3GPP (`Pubid::Tgpp`) module naming and partial references.
 - `docs/flavors/w3c.md` — W3C slug attribute and index key.
 - `docs/flavors/xsf.md` — XSF named documents (`XEP README`, `XEP xxxx`).

@@ -4,7 +4,7 @@ module Pubid
   # OMG (Object Management Group) specification flavor.
   #
   # Covers formal OMG specifications identified by an acronym (UML, SysML,
-  # CORBA, AMI4CCM, ...) with optional version (`1.0`, `2.5.1`,
+  # CORBA, DDS-XTypes, EDMC-FIBO/BE, ...) with optional version (`1.0`, `2.5.1`,
   # `5 beta 3`).
   module Omg
     extend Pubid::PrefixesSupport
