@@ -15,13 +15,18 @@ module Pubid
     #   R1016:ed2.0(F)
     #   C0103-1 Ed 3.0
     class Identifier < ::Pubid::Identifier
-      # Parse an IALA identifier string into an identifier object.
+      # Parse an IALA identifier — human form ("IALA G1199 Ed 1.0") or
+      # MRN URN ("urn:mrn:iala:pub:g1199:ed1.0") — into an identifier.
       # @param identifier [String]
       # @return [Pubid::Iala::Identifier]
       # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
-        parsed = Parser.parse(identifier)
-        Builder.build(parsed)
+        if FormatDetector.detect(identifier) == :urn
+          UrnParser.parse(identifier)
+        else
+          parsed = Parser.parse(identifier)
+          Builder.build(parsed)
+        end
       end
 
       attribute :publisher, :string, default: "IALA"
