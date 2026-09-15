@@ -151,6 +151,7 @@ module Pubid
   autoload :Csa, "pubid/csa"
   autoload :Ecma, "pubid/ecma"
   autoload :Etsi, "pubid/etsi"
+  autoload :Evs, "pubid/evs"
   autoload :Gost, "pubid/gost"
   autoload :Gb, "pubid/gb"
   autoload :Idf, "pubid/idf"

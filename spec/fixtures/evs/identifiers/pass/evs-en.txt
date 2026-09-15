@@ -1,0 +1,12 @@
+# EVS national adoptions of European Standards - drawn from the reference
+# PDFs in metanorma/mn-samples-evs-private (TODO.auto-convert issues #1-#10).
+EVS-EN 18216:2026
+EVS-EN 18219:2026
+EVS-EN 18220:2026
+EVS-EN 18221:2026
+EVS-EN 18222:2026
+EVS-EN 18223:2026
+EVS-EN ISO 14001:2026
+EVS-EN ISO 9001:2015/A1:2024
+EVS-EN ISO/IEC 27017:2026
+EVS-EN ISO/IEC 27701:2025
