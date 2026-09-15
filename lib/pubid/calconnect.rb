@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # CalConnect (The Calendaring and Scheduling Consortium) flavor.
   #

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # Resolves a polymorphic `_type` string (e.g. "pubid:iso:technical-report")
   # to the concrete Ruby class that owns it.

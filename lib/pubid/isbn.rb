@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # ISBN flavor — bibliographic book identifier per ISO 2108.
   #

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # Identifier that represents a combined bundle of documents using the + operator.
   # Examples:

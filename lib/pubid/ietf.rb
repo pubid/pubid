@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # IETF flavor: one module covering the three IETF document families that share
   # the IETF publisher and the `urn:ietf:` namespace —

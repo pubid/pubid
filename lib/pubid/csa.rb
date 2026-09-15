@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   module Csa
     extend Pubid::PrefixesSupport

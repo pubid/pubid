@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   module Export
     autoload :IdentifierTypeResult, "#{__dir__}/export/result"
