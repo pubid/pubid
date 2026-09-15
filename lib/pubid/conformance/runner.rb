@@ -26,7 +26,7 @@ module Pubid
 
       def corpus_flavors
         Dir[File.join(corpus_dir, "*")].select { |p| File.directory?(p) }
-                                       .map { |p| File.basename(p) }
+          .map { |p| File.basename(p) }
       end
 
       def corpus_dir
@@ -37,16 +37,14 @@ module Pubid
 
       def run_flavor(flavor)
         flavor_module = Pubid::Registry.get(
-          REGISTRY_KEYS.fetch(flavor, flavor)
+          REGISTRY_KEYS.fetch(flavor, flavor),
         )
         raise ArgumentError, "unknown flavor #{flavor}" if flavor_module.nil?
 
         stats = Hash.new(0)
         failures = []
-        Corpus.case_files(flavor, corpus_dir).each do |path|
-          Corpus.load_file(path).each do |test_case|
-            execute(test_case, flavor_module, stats, failures)
-          end
+        each_payload_case(flavor) do |test_case|
+          execute(test_case, flavor_module, stats, failures)
         end
         Corpus.negative_file(flavor, corpus_dir).each do |path|
           Corpus.load_file(path).each do |test_case|
@@ -55,6 +53,12 @@ module Pubid
         end
         report(flavor, stats, failures)
         known_dirty?(flavor) ? [] : failures
+      end
+
+      def each_payload_case(flavor, &block)
+        Corpus.case_files(flavor, corpus_dir).each do |path|
+          Corpus.load_file(path).each(&block)
+        end
       end
 
       def known_dirty?(flavor)
@@ -107,7 +111,8 @@ module Pubid
         case mismatch
         when / raised\z/ then stats[:fail_parse] += 1
         when /canonical hash/ then stats[:fail_tree] += 1
-        when / human\z/, / urn\z/ then stats[:"fail_#{mismatch.split.last}"] += 1
+        when / human\z/, / urn\z/
+          stats[:"fail_#{mismatch.split.last}"] += 1
         when / alias/ then stats[:fail_alias] += 1
         else stats[:fail_roundtrip] += 1
         end
@@ -132,11 +137,6 @@ module Pubid
       rescue StandardError
         stats[:error_ok] += 1
       end
-
-
-
-
-
 
       def report(flavor, stats, failures)
         puts format(
