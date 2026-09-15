@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # Mixin providing the uniform, static +prefixes+ class method that every
   # registered flavor exposes. relaton uses this to build a global prefix

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # Machine-readable metadata for identifier classes
   # Provides a standardized way to describe identifier types for:

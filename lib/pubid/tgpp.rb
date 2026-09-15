@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # 3GPP (3rd Generation Partnership Project) flavor.
   #

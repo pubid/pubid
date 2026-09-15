@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # XSF (XMPP Standards Foundation) flavor. Its documents are XEPs — XMPP
   # Extension Protocols — printed as "XEP NNNN" with a 4-digit zero-padded

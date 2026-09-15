@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 module Pubid
   # OMG (Object Management Group) specification flavor.
   #

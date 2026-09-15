@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pubid"
 require "lutaml/model"
 
 module Pubid
