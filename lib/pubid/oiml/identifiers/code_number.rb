@@ -28,8 +28,8 @@ module Pubid
       #
       # Bulletin deliberately does NOT include this module. It carries no code
       # at all (its locator is the year/issue/sequence tuple), so it would only
-      # gain a permanently-nil `number` and a `number` key that never appears.
-      # It derives its index key from the year instead; see bulletin.rb.
+      # gain permanently-nil part/subpart/suffix columns. It declares its own
+      # `number` (the issue) instead; see bulletin.rb.
       module CodeNumber
         def self.included(base)
           install_attributes(base)
