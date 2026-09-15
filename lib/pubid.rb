@@ -499,7 +499,12 @@ module Pubid
   def self.detect_flavor_from_urn(urn)
     # urn:iso:std:... → "iso"
     # urn:iec:std:... → "iec"
+    # urn:mrn:iala:pub:... → "iala": MRN URNs carry an assigning authority
+    # where ISO-style URNs carry their namespace, so routing follows the
+    # authority (works for any future MRN assignee, not only IALA).
     parts = urn.downcase.split(":")
+    return parts[2] if parts[1] == "mrn"
+
     parts[1] # The namespace part after "urn"
   end
 

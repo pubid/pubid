@@ -158,7 +158,7 @@ RSpec.describe Pubid::Iala::Identifier do
       urn:mrn:iala:pub:g1128:annex-d:ed1.6:e
     ].each do |urn|
       it "round-trips #{urn.inspect} through the parser" do
-        id = Pubid::Iala::UrnParser.parse(urn)
+        id = Pubid::Iala.parse(urn)
         expect(id.to_urn).to eq(urn)
       end
     end
