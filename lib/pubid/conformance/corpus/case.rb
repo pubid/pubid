@@ -34,7 +34,7 @@ module Pubid
         attribute :identifier, :hash
         attribute :representations, Representations
         attribute :non_normalized_aliases, Spelling, collection: true,
-                  default: -> { [] }
+                                                     default: -> { [] }
         attribute :roundtrip, :boolean
         attribute :expect, Expectation
         attribute :input, :string

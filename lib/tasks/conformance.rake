@@ -10,15 +10,17 @@ namespace :conformance do
     require "pubid/conformance"
     flavor = args[:flavor] || "iso"
     tests_repo = ENV.fetch("PUBID_TESTSUITE_PATH",
-                           File.expand_path("../../../pubid-testsuite", __dir__))
+                           File.expand_path("../../../pubid-testsuite", 
+                                            __dir__))
     output_dir = File.join(tests_repo, "tests", flavor)
     FileUtils.mkdir_p(output_dir)
     results = Pubid::Conformance::Generator.new(flavor)
       .generate(output_dir: output_dir)
-    puts "#{flavor}: #{results[:files]} files, #{results[:cases]} cases, " \
-         "#{results[:aliases]} aliases, #{results[:duplicates]} duplicates, " \
-         "#{results[:reclassify]} reclassify, #{results[:negative]} negative, " \
-         "#{results[:debt]} debt, #{results[:roundtrip_failures]} rt-failures"
+    stats = results
+    puts "#{flavor}: #{stats[:files]} files, #{stats[:cases]} cases, " \
+         "#{stats[:aliases]} aliases, #{stats[:duplicates]} duplicates, " \
+         "#{stats[:reclassify]} reclassify, #{stats[:negative]} negative, " \
+         "#{stats[:debt]} debt, #{stats[:roundtrip_failures]} rt-failures"
   end
 
   desc "Run the neutral corpus against this implementation"
