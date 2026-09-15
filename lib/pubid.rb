@@ -84,6 +84,20 @@ module Pubid
         @flavors[name.to_s.downcase]
       end
 
+      # The canonical registered name of a module that may be registered
+      # under aliases (CenCenelec registers both cen_cenelec and cen).
+      # Canonical = the name the module's own prefix table is keyed by,
+      # so the answer cannot depend on registration or iteration order.
+      # @param flavor_module [Module]
+      # @return [String, nil]
+      def canonical_name(flavor_module)
+        if flavor_module.singleton_class.method_defined?(:prefix_flavor_key)
+          key = flavor_module.prefix_flavor_key.to_s
+          return key if @flavors[key] == flavor_module
+        end
+        @flavors.key(flavor_module)
+      end
+
       # Check if a flavor is registered
       # @param name [String, Symbol] Flavor name
       # @return [Boolean]

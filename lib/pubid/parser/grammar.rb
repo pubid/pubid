@@ -65,7 +65,7 @@ module Pubid
       # @param module_name [String] e.g. "Tgpp"
       # @return [String, nil] the registered name, nil if not registered
       def registered_flavor_name(module_name)
-        ::Pubid::Registry.flavors.key(::Pubid.const_get(module_name))
+        ::Pubid::Registry.canonical_name(::Pubid.const_get(module_name))
       rescue ::NameError
         nil
       end
