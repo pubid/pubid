@@ -4,7 +4,7 @@ require "spec_helper"
 
 module EvsFixturesSpec
   FIXTURE_FILES = Dir.glob(
-    File.join(__dir__, "../../../fixtures/evs/identifiers/pass", "*.txt")
+    File.join(__dir__, "../../../fixtures/evs/identifiers/pass", "*.txt"),
   ).freeze
 end
 
@@ -52,7 +52,7 @@ RSpec.describe "EVS Fixture Round-trip Tests" do
           failures = identifiers.filter_map do |id_str|
             parsed = Pubid.parse(id_str)
             next if parsed.is_a?(Pubid::Evs::Identifiers::NationalAdoption) &&
-                    parsed.to_s == id_str
+              parsed.to_s == id_str
 
             { original: id_str, resolved: parsed.class.to_s }
           rescue StandardError => e
