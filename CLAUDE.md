@@ -106,6 +106,7 @@ from the code.
 - `docs/flavors/ecma.md` — ECMA edition and volume in the printed identifier, and the index key.
 - `docs/flavors/etsi.md` — ETSI index key, part exclusion and MR slug.
 - `docs/flavors/iana.md` — IANA registry slugs as the index key.
+- `docs/flavors/iala.md` — IALA identifier space and MRN URN scheme.
 - `docs/flavors/iec.md` — IEC typed stages, `from_hash` equality, and the `number` retype that deleted `Iec::Components::Code`.
 - `docs/flavors/ieee.md` — IEEE code columns, drafts, trademarks, historical series and annotated rendering.
 - `docs/flavors/ietf.md` — IETF readiness for the unified relaton index.
