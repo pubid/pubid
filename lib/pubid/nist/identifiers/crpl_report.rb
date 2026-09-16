@@ -46,7 +46,7 @@ module Pubid
         def normalized_number
           return nil unless number
 
-          num_value = number.value.to_s
+          num_value = number.to_s
 
           # Pattern: c4-4 → 4-4 (hide 'c' prefix)
           case num_value
@@ -64,12 +64,12 @@ module Pubid
         end
 
         # Override number to return normalized value
-        # Tests expect number.value to be normalized (c4-4 → 4-4, 4-m-5 → 4-M-5)
+        # Tests expect number to be normalized (c4-4 → 4-4, 4-m-5 → 4-M-5)
         def number
           num = super
           return num unless num
 
-          num_value = num.value.to_s
+          num_value = num.to_s
 
           # Pattern: c4-4 → 4-4 (hide 'c' prefix)
           case num_value
@@ -83,8 +83,7 @@ module Pubid
             num_value = num_value.gsub(/^m-/, "M-")
           end
 
-          # Return new Code object with normalized value
-          Components::Code.new(value: num_value)
+          num_value
         end
 
         def to_s(format = nil)
@@ -106,7 +105,7 @@ module Pubid
 
           if number
             # Normalize number value for CRPL patterns
-            num_value = number.value.to_s
+            num_value = number.to_s
 
             # Pattern: c4-4 → 4-4 (hide 'c' prefix)
             case num_value

@@ -38,7 +38,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       end
 
       it "parses ISO number" do
-        expect(base.number.value).to eq("4214")
+        expect(base.number).to eq("4214")
       end
 
       it "parses ISO date" do
@@ -92,7 +92,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       end
 
       it "parses ISO number" do
-        expect(base.number.value).to eq("24191")
+        expect(base.number).to eq("24191")
       end
 
       it "parses ISO stage" do
@@ -150,7 +150,7 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       end
 
       it "parses ISO number" do
-        expect(base.number.value).to eq("14501")
+        expect(base.number).to eq("14501")
       end
 
       it "parses ISO stage" do
@@ -204,11 +204,11 @@ RSpec.describe Pubid::Iso::CombinedIdentifier do
       end
 
       it "parses ISO number" do
-        expect(base.number.value).to eq("8262")
+        expect(base.number).to eq("8262")
       end
 
       it "parses ISO part" do
-        expect(base.part.value).to eq("2")
+        expect(base.part).to eq("2")
       end
 
       it "parses ISO date" do

@@ -76,11 +76,11 @@ RSpec.describe "Pubid::Amca index key (root.number)" do
       end
     end
 
-    it "leaves the shared base's inherited `number` untouched" do
+    it "resolves the shared base's inherited `number` to a String" do
       # A redeclaration here is the determinism landmine: all three leaves
       # inherit from this class.
       expect(Pubid::Amca::Identifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
   end
 

@@ -21,7 +21,7 @@ RSpec.describe Pubid::Iso::Identifiers::Data do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses part" do
@@ -67,7 +67,7 @@ RSpec.describe Pubid::Iso::Identifiers::Data do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("9")
+          expect(parsed.number).to eq("9")
         end
 
         it "parses part" do

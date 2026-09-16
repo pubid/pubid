@@ -56,9 +56,14 @@ module Pubid
         ts ? dup.tap { |id| id.typed_stage = ts } : dup
       end
 
-      attribute :number, ::Pubid::Iso::Components::Code
-      attribute :part, ::Pubid::Iso::Components::Code
-      attribute :subpart, ::Pubid::Iso::Components::Code
+      # Plain strings. Iso::Components::Code existed to join `parts` with
+      # "-", a composition no ISO identifier ever reached: `parts` is never
+      # written in lib/pubid/iso and no Code in the 7,613-id corpus carries
+      # anything but `value`. ISO part and subpart are sibling attributes, not
+      # fields of the number.
+      attribute :number, :string
+      attribute :part, :string
+      attribute :subpart, :string
 
       # Polymorphic type map for lutaml::Model key_value serialization
       # Maps polymorphic_name → class name for deserialization
@@ -213,8 +218,10 @@ module Pubid
         doc.add_child(Lutaml::KeyValue::DataModel::Element.new(key, v.to_s))
       end
 
+      # number/part/subpart are plain strings; the converter name is kept
+      # so the key_value map below does not have to change.
       def build_code(value)
-        ::Pubid::Iso::Components::Code.new(value: value.to_s)
+        value.to_s
       end
 
       # --- date serialized flat as year/month/day ---

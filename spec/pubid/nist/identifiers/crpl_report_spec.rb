@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("4-4")
+          expect(parsed.number).to eq("4-4")
         end
 
         it "round-trips" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("4-4")
+          expect(parsed.number).to eq("4-4")
         end
       end
     end
@@ -65,7 +65,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses month notation" do
-          expect(parsed.number.value).to eq("4-M-5")
+          expect(parsed.number).to eq("4-M-5")
         end
       end
 
@@ -79,7 +79,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses month notation" do
-          expect(parsed.number.value).to eq("4-M-5")
+          expect(parsed.number).to eq("4-M-5")
         end
 
         it "round-trips" do
@@ -175,7 +175,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses F-B subseries number" do
-          expect(parsed.number.value).to eq("150")
+          expect(parsed.number).to eq("150")
         end
 
         it "round-trips" do
@@ -197,7 +197,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("150")
+          expect(parsed.number).to eq("150")
         end
       end
 
@@ -211,7 +211,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("245")
+          expect(parsed.number).to eq("245")
         end
 
         it "round-trips" do
@@ -243,7 +243,7 @@ RSpec.describe Pubid::Nist::Identifiers::CrplReport do
         end
 
         it "parses F-A subseries with letter suffix" do
-          expect(parsed.number.value).to eq("135B")
+          expect(parsed.number).to eq("135B")
         end
 
         it "round-trips" do

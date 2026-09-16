@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("8079")
+          expect(parsed.number).to eq("8079")
         end
 
         it "round-trips" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("8079")
+          expect(parsed.number).to eq("8079")
         end
       end
 
@@ -63,7 +63,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses MR format number" do
-          expect(parsed.number.value).to eq("8079")
+          expect(parsed.number).to eq("8079")
         end
       end
     end
@@ -79,7 +79,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("9350")
+          expect(parsed.number).to eq("9350")
         end
 
         it "parses supplement" do
@@ -103,7 +103,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("4817-A")
+          expect(parsed.number).to eq("4817-A")
         end
 
         it "round-trips" do
@@ -125,7 +125,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("7386A")
+          expect(parsed.number).to eq("7386A")
         end
       end
     end
@@ -145,7 +145,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses date range as number" do
-          expect(parsed.number.value).to eq("Oct-Dec1950")
+          expect(parsed.number).to eq("Oct-Dec1950")
         end
       end
 
@@ -163,7 +163,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses year range as number" do
-          expect(parsed.number.value).to eq("1946-1947")
+          expect(parsed.number).to eq("1946-1947")
         end
       end
     end
@@ -179,7 +179,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses ad hoc designation" do
-          expect(parsed.number.value).to eq("ADHOC")
+          expect(parsed.number).to eq("ADHOC")
         end
 
         it "round-trips" do
@@ -201,7 +201,7 @@ RSpec.describe Pubid::Nist::Identifiers::Report do
         end
 
         it "parses division designation" do
-          expect(parsed.number.value).to eq("div9")
+          expect(parsed.number).to eq("div9")
         end
       end
     end

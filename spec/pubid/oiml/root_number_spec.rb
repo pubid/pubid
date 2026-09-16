@@ -89,7 +89,7 @@ RSpec.describe "Pubid::Oiml index key (root.number)" do
       # A redeclaration here is the determinism landmine: all seven leaves
       # inherit from this class.
       expect(Pubid::Oiml::SingleIdentifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
 
     it "no longer declares a `code` attribute" do

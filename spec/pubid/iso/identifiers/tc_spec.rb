@@ -48,7 +48,7 @@
 #         expect(subject.scnumber).to eq("4")
 #         expect(subject.wgnumber).to eq("12")
 #         expect(subject.tcnumber).to eq("184")
-#         expect(subject.number.value).to eq("10897")
+#         expect(subject.number).to eq("10897")
 #       end
 #     end
 

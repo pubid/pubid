@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("158")
+          expect(parsed.number).to eq("158")
         end
 
         it "round-trips" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("178")
+          expect(parsed.number).to eq("178")
         end
 
         it "round-trips" do
@@ -67,7 +67,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses MR format" do
-          expect(parsed.number.value).to eq("158")
+          expect(parsed.number).to eq("158")
         end
       end
 
@@ -135,7 +135,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("1-1F")
+          expect(parsed.number).to eq("1-1F")
         end
 
         it "round-trips" do
@@ -157,7 +157,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("1-1F")
+          expect(parsed.number).to eq("1-1F")
         end
       end
 
@@ -187,7 +187,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("1-2B")
+          expect(parsed.number).to eq("1-2B")
         end
 
         it "parses volume" do
@@ -213,7 +213,7 @@ RSpec.describe Pubid::Nist::Identifiers::Monograph do
         end
 
         it "parses letter suffix and volume" do
-          expect(parsed.number.value).to eq("1-2B")
+          expect(parsed.number).to eq("1-2B")
           expect(parsed.volume.value).to eq("1")
         end
       end

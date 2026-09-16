@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("800-53")
+          expect(parsed.number).to eq("800-53")
         end
 
         it "round-trips" do
@@ -119,7 +119,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses letter suffix and revision" do
-          expect(parsed.number.value).to eq("800-56")
+          expect(parsed.number).to eq("800-56")
           expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.type).to eq("")
           expect(parsed.part.value).to eq("A")
@@ -189,7 +189,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
         end
 
         it "parses edition year with letter suffix" do
-          expect(parsed.number.value).to eq("304")
+          expect(parsed.number).to eq("304")
           expect(parsed.part).to be_a(Pubid::Nist::Components::Part)
           expect(parsed.part.type).to eq("")
           expect(parsed.part.value).to eq("A")

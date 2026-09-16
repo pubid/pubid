@@ -8,30 +8,30 @@ RSpec.describe Pubid::Iso::Identifiers::TcDocument do
     it "parses TC document with SC and WG" do
       id = Pubid::Iso.parse("ISO/TC 184/SC 4/WG 3 N 123")
       expect(id).to be_a(described_class)
-      expect(id.tc_type.value).to eq("TC")
-      expect(id.tc_number.value).to eq("184")
-      expect(id.sc_type.value).to eq("SC")
-      expect(id.sc_number.value).to eq("4")
-      expect(id.wg_type.value).to eq("WG")
-      expect(id.wg_number.value).to eq("3")
-      expect(id.number.value).to eq("123")
+      expect(id.tc_type).to eq("TC")
+      expect(id.tc_number).to eq("184")
+      expect(id.sc_type).to eq("SC")
+      expect(id.sc_number).to eq("4")
+      expect(id.wg_type).to eq("WG")
+      expect(id.wg_number).to eq("3")
+      expect(id.number).to eq("123")
     end
 
     it "parses the SC/QC subcommittee variant" do
       id = Pubid::Iso.parse("ISO/TC 184/SC/QC 4 N246")
       expect(id).to be_a(described_class)
-      expect(id.sc_type.value).to eq("SC/QC")
-      expect(id.sc_number.value).to eq("4")
-      expect(id.number.value).to eq("246")
+      expect(id.sc_type).to eq("SC/QC")
+      expect(id.sc_number).to eq("4")
+      expect(id.number).to eq("246")
       expect(id.to_s).to eq("ISO/TC 184/SC/QC 4 N 246")
     end
 
     it "parses simple TC document" do
       id = Pubid::Iso.parse("ISO/TC 184 N 100")
       expect(id).to be_a(described_class)
-      expect(id.tc_type.value).to eq("TC")
-      expect(id.tc_number.value).to eq("184")
-      expect(id.number.value).to eq("100")
+      expect(id.tc_type).to eq("TC")
+      expect(id.tc_number).to eq("184")
+      expect(id.number).to eq("100")
       expect(id.sc_type).to be_nil
       expect(id.wg_type).to be_nil
     end
@@ -39,27 +39,27 @@ RSpec.describe Pubid::Iso::Identifiers::TcDocument do
     it "parses JTC document" do
       id = Pubid::Iso.parse("ISO/JTC 1 N 456")
       expect(id).to be_a(described_class)
-      expect(id.tc_type.value).to eq("JTC")
-      expect(id.tc_number.value).to eq("1")
-      expect(id.number.value).to eq("456")
+      expect(id.tc_type).to eq("JTC")
+      expect(id.tc_number).to eq("1")
+      expect(id.number).to eq("456")
     end
 
     it "parses TC document with year" do
       id = Pubid::Iso.parse("ISO/TC 184 N 100:2024")
       expect(id).to be_a(described_class)
-      expect(id.number.value).to eq("100")
+      expect(id.number).to eq("100")
       expect(id.date.year).to eq("2024")
     end
 
     it "parses TC document with TC and SC only" do
       id = Pubid::Iso.parse("ISO/TC 184/SC 4 N 789")
       expect(id).to be_a(described_class)
-      expect(id.tc_type.value).to eq("TC")
-      expect(id.tc_number.value).to eq("184")
-      expect(id.sc_type.value).to eq("SC")
-      expect(id.sc_number.value).to eq("4")
+      expect(id.tc_type).to eq("TC")
+      expect(id.tc_number).to eq("184")
+      expect(id.sc_type).to eq("SC")
+      expect(id.sc_number).to eq("4")
       expect(id.wg_type).to be_nil
-      expect(id.number.value).to eq("789")
+      expect(id.number).to eq("789")
     end
   end
 

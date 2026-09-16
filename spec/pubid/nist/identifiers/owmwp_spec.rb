@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Owmwp do
         end
 
         it "parses date-based number" do
-          expect(parsed.number.value).to eq("06-13")
+          expect(parsed.number).to eq("06-13")
         end
 
         it "parses edition year" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::Owmwp do
         end
 
         it "parses date-based number" do
-          expect(parsed.number.value).to eq("01-01")
+          expect(parsed.number).to eq("01-01")
         end
 
         it "parses edition year" do
@@ -67,7 +67,7 @@ RSpec.describe Pubid::Nist::Identifiers::Owmwp do
         end
 
         it "parses date-based number" do
-          expect(parsed.number.value).to eq("12-25")
+          expect(parsed.number).to eq("12-25")
         end
 
         it "parses edition year" do

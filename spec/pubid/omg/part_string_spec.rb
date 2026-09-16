@@ -25,7 +25,9 @@ require "spec_helper"
 # resolve the attribute differently from a run that has loaded every flavor.
 module OmgPartStringSpec
   STRING = Lutaml::Model::Type::String
-  CODE = Pubid::Components::Code
+  # The base declares all three as :string since the retype landed, so the
+  # "untouched" attributes resolve to the same String as `part`.
+  CODE = Lutaml::Model::Type::String
 
   # OMG retypes `part` ALONE. `number` and `subpart` are untouched, and the
   # base declaration of all three is deliberately not changed until the last
@@ -69,7 +71,7 @@ RSpec.describe "Pubid::Omg `part` retype" do
       end
     end
 
-    it "leaves `number` and `subpart` as the inherited Components::Code" do
+    it "leaves `number` and `subpart` as the inherited String" do
       OmgPartStringSpec::UNTOUCHED.each do |attr|
         expect(Pubid::Omg::Identifier.attributes[attr].type)
           .to eq(OmgPartStringSpec::CODE)

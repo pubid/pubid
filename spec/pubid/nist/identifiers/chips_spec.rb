@@ -23,7 +23,7 @@ RSpec.describe "NIST CHIPS series" do
       end
 
       it "keeps the hyphen in the compound number" do
-        expect(parsed.number.value).to eq("1400-3")
+        expect(parsed.number).to eq("1400-3")
       end
 
       it "round-trips" do

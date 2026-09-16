@@ -15,7 +15,7 @@ RSpec.describe Pubid::Csa::Identifiers::CanadianAdopted do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("A123.2")
+          expect(parsed.base.number).to eq("A123.2")
         end
 
         it "parses year" do
@@ -91,7 +91,7 @@ RSpec.describe Pubid::Csa::Identifiers::CanadianAdopted do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("A220")
+          expect(parsed.base.number).to eq("A220")
         end
 
         it "parses series indicator" do
@@ -133,7 +133,7 @@ RSpec.describe Pubid::Csa::Identifiers::CanadianAdopted do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("A451.1")
+          expect(parsed.base.number).to eq("A451.1")
         end
 
         it "parses year with M prefix" do
@@ -155,7 +155,7 @@ RSpec.describe Pubid::Csa::Identifiers::CanadianAdopted do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code with decimal" do
-          expect(parsed.base.number.value).to eq("Z299.0")
+          expect(parsed.base.number).to eq("Z299.0")
         end
 
         it "parses 2-digit year" do

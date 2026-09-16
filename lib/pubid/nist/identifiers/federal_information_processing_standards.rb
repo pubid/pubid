@@ -66,14 +66,14 @@ module Pubid
             # Convert dash-year patterns to edition format for FIPS
             # Pattern: "14-1971" → "14e1971" (edition year format)
             # But preserve dash for parts: "140-3" stays as-is
-            if number.value =~ /^(\d{1,3})-(\d{4})$/
+            if number =~ /^(\d{1,3})-(\d{4})$/
               # This is a number-year pattern (e.g., "14-1971")
               # Convert to edition format: "14e1971"
               number_part = $1
               year_part = $2
               result += " #{number_part}e#{year_part}"
             else
-              result += " #{number.value}"
+              result += " #{number}"
             end
           end
 

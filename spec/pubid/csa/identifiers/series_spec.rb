@@ -15,7 +15,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.number.value).to eq("Z240")
+          expect(parsed.number).to eq("Z240")
         end
 
         it "parses series prefix" do
@@ -49,7 +49,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.number.value).to eq("Z240")
+          expect(parsed.number).to eq("Z240")
         end
 
         it "parses RV series prefix" do
@@ -77,7 +77,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.number.value).to eq("Z245.20")
+          expect(parsed.number).to eq("Z245.20")
         end
 
         it "has no series prefix" do
@@ -103,7 +103,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.number.value).to eq("Z341")
+          expect(parsed.number).to eq("Z341")
         end
 
         it "has no series prefix" do
@@ -140,7 +140,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("A220")
+          expect(parsed.base.number).to eq("A220")
         end
 
         it "parses year" do
@@ -179,7 +179,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("B45")
+          expect(parsed.base.number).to eq("B45")
         end
 
         it "parses year" do
@@ -210,7 +210,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("C448")
+          expect(parsed.base.number).to eq("C448")
         end
 
         it "parses year" do
@@ -237,7 +237,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("F378")
+          expect(parsed.base.number).to eq("F378")
         end
 
         it "parses year" do
@@ -265,7 +265,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         end
 
         it "parses code" do
-          expect(parsed.number.value).to eq("A165")
+          expect(parsed.number).to eq("A165")
         end
 
         it "parses year" do
@@ -289,7 +289,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code" do
-          expect(parsed.number.value).to eq("B139")
+          expect(parsed.number).to eq("B139")
         end
 
         it "parses year" do
@@ -309,7 +309,7 @@ RSpec.describe Pubid::Csa::Identifiers::Series do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code" do
-          expect(parsed.number.value).to eq("B139")
+          expect(parsed.number).to eq("B139")
         end
 
         it "parses year as 2024" do

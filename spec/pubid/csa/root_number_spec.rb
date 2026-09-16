@@ -78,22 +78,22 @@ RSpec.describe "Pubid::Csa index key (root.number)" do
   # The structural half. The examples further down prove the *effect*, but
   # would still pass if a leaf had snapshotted a differently-typed `number`;
   # these read the attribute definitions directly.
-  describe "number resolves to Components::Code everywhere" do
-    it "is Components::Code on the shared base" do
+  describe "number resolves to a plain String everywhere" do
+    it "is a String on the shared base" do
       expect(Pubid::Csa::Identifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
 
-    it "is Components::Code on SingleIdentifier" do
+    it "is a String on SingleIdentifier" do
       expect(Pubid::Csa::SingleIdentifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
 
     CsaIndexKeySpec::SINGLE_LEAVES.each do |leaf|
-      it "reaches Identifiers::#{leaf} as Components::Code" do
+      it "reaches Identifiers::#{leaf} as a String" do
         klass = Pubid::Csa::Identifiers.const_get(leaf)
         expect(klass.attributes[:number].type)
-          .to eq(Pubid::Components::Code)
+          .to eq(Lutaml::Model::Type::String)
       end
     end
 
@@ -292,9 +292,8 @@ RSpec.describe "Pubid::Csa index key (root.number)" do
       expect(parse("C22.1-15").to_hash).to include("code_only" => true)
     end
 
-    it "still exposes number as a Components::Code at runtime" do
-      expect(parse("CSA B149.1:F20").number)
-        .to be_a(Pubid::Components::Code)
+    it "exposes number as a String at runtime" do
+      expect(parse("CSA B149.1:F20").number).to be_a(String)
     end
   end
 

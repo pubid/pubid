@@ -74,11 +74,11 @@ RSpec.describe "Pubid::Etsi index key (root.number)" do
         .to eq(Lutaml::Model::Type::String)
     end
 
-    it "leaves the shared base's inherited `number` untouched" do
+    it "resolves the shared base's inherited `number` to a String" do
       # A redeclaration here is the determinism landmine: EtsiStandard and
       # SupplementIdentifier both inherit from this class.
       expect(Pubid::Etsi::Identifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
 
     it "no longer declares a `code` attribute anywhere in the hierarchy" do

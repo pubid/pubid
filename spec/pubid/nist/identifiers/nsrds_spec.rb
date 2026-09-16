@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Nsrds do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "round-trips" do
@@ -41,7 +41,7 @@ RSpec.describe Pubid::Nist::Identifiers::Nsrds do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("100")
+          expect(parsed.number).to eq("100")
         end
 
         it "round-trips" do
@@ -79,7 +79,7 @@ RSpec.describe Pubid::Nist::Identifiers::Nsrds do
         end
 
         it "parses number with part" do
-          expect(parsed.number.value).to eq("61")
+          expect(parsed.number).to eq("61")
         end
       end
 
@@ -97,7 +97,7 @@ RSpec.describe Pubid::Nist::Identifiers::Nsrds do
         end
 
         it "parses number with part" do
-          expect(parsed.number.value).to eq("100")
+          expect(parsed.number).to eq("100")
         end
       end
     end
@@ -117,7 +117,7 @@ RSpec.describe Pubid::Nist::Identifiers::Nsrds do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("100")
+          expect(parsed.number).to eq("100")
         end
 
         it "parses edition" do
@@ -141,7 +141,7 @@ RSpec.describe Pubid::Nist::Identifiers::Nsrds do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
       end
     end

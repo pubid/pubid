@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "round-trips" do
@@ -41,7 +41,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses compound number" do
-          expect(parsed.number.value).to eq("1-1")
+          expect(parsed.number).to eq("1-1")
         end
 
         it "round-trips" do
@@ -59,7 +59,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses compound number" do
-          expect(parsed.number.value).to eq("1-2")
+          expect(parsed.number).to eq("1-2")
         end
 
         it "round-trips" do
@@ -79,7 +79,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1-1")
+          expect(parsed.number).to eq("1-1")
         end
 
         it "parses volume" do
@@ -101,7 +101,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with volume" do
-          expect(parsed.number.value).to eq("1-2")
+          expect(parsed.number).to eq("1-2")
           expect(parsed.volume.value).to eq("2")
         end
 
@@ -144,7 +144,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter suffix" do
-          expect(parsed.number.value).to match(/1-1B?/)
+          expect(parsed.number).to match(/1-1B?/)
         end
       end
 
@@ -158,7 +158,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter suffix" do
-          expect(parsed.number.value).to match(/1-1A/)
+          expect(parsed.number).to match(/1-1A/)
         end
 
         it "round-trips" do
@@ -176,7 +176,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter suffix" do
-          expect(parsed.number.value).to match(/1-1D/)
+          expect(parsed.number).to match(/1-1D/)
         end
 
         it "round-trips" do
@@ -194,7 +194,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter suffix" do
-          expect(parsed.number.value).to match(/1-3C/)
+          expect(parsed.number).to match(/1-3C/)
         end
 
         it "round-trips" do
@@ -218,7 +218,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter" do
-          expect(parsed.number.value).to match(/1-1C/)
+          expect(parsed.number).to match(/1-1C/)
         end
 
         it "parses volume" do
@@ -240,7 +240,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter" do
-          expect(parsed.number.value).to match(/1-1c/)
+          expect(parsed.number).to match(/1-1c/)
         end
 
         it "parses volume" do
@@ -258,7 +258,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter and volume" do
-          expect(parsed.number.value).to match(/1-1B/)
+          expect(parsed.number).to match(/1-1B/)
           expect(parsed.volume.value).to eq("2")
         end
 
@@ -277,7 +277,7 @@ RSpec.describe Pubid::Nist::Identifiers::Ncstar do
         end
 
         it "parses number with letter and volume" do
-          expect(parsed.number.value).to match(/1-2A/)
+          expect(parsed.number).to match(/1-2A/)
           expect(parsed.volume.value).to eq("1")
         end
 

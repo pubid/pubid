@@ -18,7 +18,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("19135")
+        expect(parsed.number).to eq("19135")
       end
 
       it "parses part" do
@@ -65,7 +65,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("4")
+        expect(parsed.number).to eq("4")
       end
 
       it "parses part" do
@@ -112,11 +112,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("8601")
+        expect(parsed.number).to eq("8601")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("1")
+        expect(parsed.part).to eq("1")
       end
 
       it "parses date" do
@@ -160,11 +160,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("31")
+        expect(parsed.number).to eq("31")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("0")
+        expect(parsed.part).to eq("0")
       end
 
       it "parses date" do
@@ -193,11 +193,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("5843")
+        expect(parsed.number).to eq("5843")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("6")
+        expect(parsed.part).to eq("6")
       end
 
       it "parses date" do
@@ -227,11 +227,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("105")
+        expect(parsed.number).to eq("105")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("C06")
+        expect(parsed.part).to eq("C06")
       end
 
       it "parses date" do
@@ -384,11 +384,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       let(:undated) { Pubid::Iso.parse("ISO 80601-2-61") }
 
       it "parses part" do
-        expect(parsed.part.value).to eq("2")
+        expect(parsed.part).to eq("2")
       end
 
       it "parses subpart" do
-        expect(parsed.subpart.value).to eq("61")
+        expect(parsed.subpart).to eq("61")
       end
 
       it "parses date" do
@@ -416,11 +416,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
       let(:undated) { Pubid::Iso.parse("ISO/IEC 29110-5-1-1") }
 
       it "parses part" do
-        expect(parsed.part.value).to eq("5")
+        expect(parsed.part).to eq("5")
       end
 
       it "parses subpart" do
-        expect(parsed.subpart.value).to eq("1-1")
+        expect(parsed.subpart).to eq("1-1")
       end
 
       it "parses date" do
@@ -458,7 +458,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("17030")
+          expect(parsed.number).to eq("17030")
         end
 
         it "parses date" do
@@ -521,11 +521,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("10164")
+          expect(parsed.number).to eq("10164")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("22")
+          expect(parsed.part).to eq("22")
         end
 
         it "parses date" do
@@ -564,11 +564,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("11073")
+          expect(parsed.number).to eq("11073")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("20601")
+          expect(parsed.part).to eq("20601")
         end
 
         it "parses date" do
@@ -609,7 +609,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("26512")
+          expect(parsed.number).to eq("26512")
         end
 
         it "round-trips" do
@@ -656,11 +656,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("11664")
+          expect(parsed.number).to eq("11664")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("1")
+          expect(parsed.part).to eq("1")
         end
 
         it "parses date" do
@@ -699,11 +699,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("27953")
+          expect(parsed.number).to eq("27953")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("2")
+          expect(parsed.part).to eq("2")
         end
 
         it "parses date" do
@@ -743,7 +743,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("21434")
+          expect(parsed.number).to eq("21434")
         end
 
         it "parses date" do
@@ -784,11 +784,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("789")
+          expect(parsed.number).to eq("789")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("10")
+          expect(parsed.part).to eq("10")
         end
 
         it "parses date" do
@@ -828,7 +828,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("52901")
+          expect(parsed.number).to eq("52901")
         end
 
         it "parses date" do
@@ -870,7 +870,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("53001")
+          expect(parsed.number).to eq("53001")
         end
 
         it "parses date" do
@@ -919,7 +919,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("19171")
+            expect(parsed.number).to eq("19171")
           end
 
           it "parses stage" do
@@ -952,7 +952,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("23219")
+            expect(parsed.number).to eq("23219")
           end
 
           it "parses stage" do
@@ -1011,7 +1011,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("19476")
+            expect(parsed.number).to eq("19476")
           end
 
           it "parses stage" do
@@ -1049,11 +1049,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("23773")
+            expect(parsed.number).to eq("23773")
           end
 
           it "parses part" do
-            expect(parsed.part.value).to eq("1")
+            expect(parsed.part).to eq("1")
           end
 
           it "parses stage" do
@@ -1091,15 +1091,15 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("29110")
+            expect(parsed.number).to eq("29110")
           end
 
           it "parses part" do
-            expect(parsed.part.value).to eq("5")
+            expect(parsed.part).to eq("5")
           end
 
           it "parses subpart" do
-            expect(parsed.subpart.value).to eq("1-1")
+            expect(parsed.subpart).to eq("1-1")
           end
 
           it "parses stage" do
@@ -1137,7 +1137,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("53001")
+            expect(parsed.number).to eq("53001")
           end
 
           it "parses stage" do
@@ -1171,7 +1171,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("22868")
+            expect(parsed.number).to eq("22868")
           end
 
           it "parses stage" do
@@ -1206,7 +1206,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
           end
 
           it "parses number" do
-            expect(parsed.number.value).to eq("6709")
+            expect(parsed.number).to eq("6709")
           end
 
           it "parses date" do

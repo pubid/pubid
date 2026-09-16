@@ -72,10 +72,10 @@ RSpec.describe "Pubid::Astm index key (root.number)" do
       end
     end
 
-    it "leaves the inherited-from classes' `number` untouched" do
+    it "resolves the inherited-from classes' `number` to a String" do
       [Pubid::Astm::Identifier, Pubid::Astm::SingleIdentifier,
        Pubid::Astm::Identifiers::Base].each do |klass|
-        expect(klass.attributes[:number].type).to eq(Pubid::Components::Code)
+        expect(klass.attributes[:number].type).to eq(Lutaml::Model::Type::String)
       end
     end
 
