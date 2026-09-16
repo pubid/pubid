@@ -6,30 +6,35 @@ module Pubid
     #
     # The parser captures the publisher code verbatim (which may already
     # include the "/T" or "/Z" suffix). The builder normalizes: if the
-    # suffix is in the publisher_code string, it's split out into the
-    # separate +mandate+ attribute so the renderer can recompose either
-    # the inline or split form.
+    # suffix is in the code, it is split out into the separate +mandate+
+    # attribute so the renderer can recompose either the inline or split
+    # form. The code itself goes into the inherited +publisher+ component.
     class Builder
       def self.build(parsed_data)
         new.build(parsed_data)
       end
 
       def build(data)
-        publisher_code, mandate = split_mandate(data[:publisher_code].to_s)
-
-        mandate ||= data[:mandate]&.to_s
+        code, mandate = split_mandate(data[:publisher_code].to_s)
 
         Identifiers::Standard.new(
-          publisher_code: publisher_code,
-          mandate: mandate,
+          publisher: ::Pubid::Components::Publisher.new(body: code),
+          mandate: mandate || data[:mandate]&.to_s,
           number: data[:number].to_s,
           part: data[:part]&.to_s,
-          date: data[:year] ? ::Pubid::Components::Date.new(year: data[:year].to_s) : nil,
+          date: date_for(data[:year]),
           all_parts: !data[:all_parts].to_s.empty?,
         )
       end
 
       private
+
+      # The publication year, or nil for a partial reference.
+      def date_for(year)
+        return nil unless year
+
+        ::Pubid::Components::Date.new(year: year.to_s)
+      end
 
       # If the publisher code carries an inline /T or /Z suffix, split it off
       # and return the cleaned code + extracted mandate.

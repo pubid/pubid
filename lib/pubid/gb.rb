@@ -17,6 +17,7 @@ module Pubid
     # "GB" comes first so PrefixesSupport's longest-match wins.
     PREFIXES = %w[
       GB GB/T GB/Z
+      GBn GBn/T GBn/Z
       DB DB/T DB/Z
       QB QB/T
       ZB ZB/T
