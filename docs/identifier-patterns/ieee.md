@@ -15,23 +15,9 @@ id = Pubid::Ieee.parse("...")
 
 **Class:** `Pubid::Ieee::Identifiers::AdoptedStandard`
 
-### Amendment
-
-**Class:** `Pubid::Ieee::Identifiers::Amendment`
-
-#### Typed Stages
-
-| Abbr | Name | Stage Code | Harmonized Codes |
-|------|------|-----------|-----------------|
-| "Amd" |  | published |  |
-
 ### Base
 
 **Class:** `Pubid::Ieee::Identifiers::Base`
-
-### Code Number
-
-**Class:** `Pubid::Ieee::Identifiers::CodeNumber`
 
 ### Conformance Identifier
 
@@ -98,12 +84,6 @@ id = Pubid::Ieee.parse("...")
 ### Project Draft Identifier
 
 **Class:** `Pubid::Ieee::Identifiers::ProjectDraftIdentifier`
-
-#### Typed Stages
-
-| Abbr | Name | Stage Code | Harmonized Codes |
-|------|------|-----------|-----------------|
-| "P" |  | draft |  |
 
 ### Redlined Standard
 

@@ -19,10 +19,6 @@ id = Pubid::Astm.parse("...")
 
 **Class:** `Pubid::Astm::Identifiers::Base`
 
-### Code Number
-
-**Class:** `Pubid::Astm::Identifiers::CodeNumber`
-
 ### Data Series
 
 **Class:** `Pubid::Astm::Identifiers::DataSeries`

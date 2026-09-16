@@ -15,10 +15,6 @@ id = Pubid::Cie.parse("...")
 
 **Class:** `Pubid::Cie::Identifiers::Bundle`
 
-### Code Attributes
-
-**Class:** `Pubid::Cie::Identifiers::CodeAttributes`
-
 ### Conference
 
 **Class:** `Pubid::Cie::Identifiers::Conference`
@@ -38,10 +34,6 @@ id = Pubid::Cie.parse("...")
 ### Joint Published
 
 **Class:** `Pubid::Cie::Identifiers::JointPublished`
-
-### Proceedings
-
-**Class:** `Pubid::Cie::Identifiers::Proceedings`
 
 ### Standard
 
