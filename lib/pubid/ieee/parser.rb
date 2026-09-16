@@ -611,19 +611,31 @@ module Pubid
         # "-YYYY[-MM]" date (instead of ":YYYY"), multi-digit committee-draft
         # stage codes (CD1..CD4) plus CDV, and a wider set of joint publishers.
         # (roadmap items 2/3, phase 1). longest publisher token first.
-        (str("ISO/IEC/IEEE") | str("IEEE/ISO/IEC") | str("IEEE/IEC/ISO") |
-         str("ISO/IEEE") | str("IEC/IEEE") | str("IEEE/IEC") | str("ISO/IEC") |
-         str("IEEE")).as(:joint_publishers) >>
-          space >>
-          # ISO stage codes: FDIS, FCD, CDV; DIS/CD with an optional round digit
-          # (DIS2, CD1..CD4); WD/PWI/NP. (FCD before FDIS is fine — distinct.)
-          (str("FDIS") | str("FCD") | str("CDV") |
-           (str("DIS") >> digit.maybe) |
-           (str("CD") >> digit.maybe) |
-           str("WD") | str("PWI") | str("NP")).as(:iso_stage) >>
-          # optional " Std" noise word after the stage (e.g. "FDIS Std P15288")
-          (space >> str("Std")).maybe >>
-          space >>
+        # The stage is OPTIONAL ONLY for ISO-led joint prefixes - the
+        # stage-less PUBLISHED form (pubid#317): "ISO/IEC/IEEE 26511:2018",
+        # "ISO/IEEE 11073-20101:2004(E)". Every other prefix keeps the
+        # stage REQUIREMENT so this rule cannot steal what belongs to
+        # iec_ieee_copublished ("IEC/IEEE 60076-2016"), the bare-IEEE
+        # project rules ("IEEE P802.16/D-3") or the ISO flavor
+        # ("ISO/IEC <n>:<year>").
+        iso_led = (str("ISO/IEC/IEEE") | str("IEEE/ISO/IEC") |
+                   str("IEEE/IEC/ISO") | str("ISO/IEEE"))
+        staged_only = (str("IEC/IEEE") | str("IEEE/IEC") |
+                       str("ISO/IEC") | str("IEEE"))
+        # ISO stage codes: FDIS, FCD, CDV; DIS/CD with an optional round
+        # digit (DIS2, CD1..CD4); WD/PWI/NP.
+        iso_stage = (str("FDIS") | str("FCD") | str("CDV") |
+                     (str("DIS") >> digit.maybe) |
+                     (str("CD") >> digit.maybe) |
+                     str("WD") | str("PWI") | str("NP")).as(:iso_stage)
+        std_noise = (space >> str("Std")).maybe
+        # The empty-string marker distinguishes the stage-less PUBLISHED
+        # tree in the builder (absence of :iso_stage alone means IEEE format).
+        ((iso_led.as(:joint_publishers) >> space >>
+           (iso_stage >> std_noise >> space |
+            str("").as(:iso_published) >> space.maybe)) |
+          (staged_only.as(:joint_publishers) >> space >>
+            iso_stage >> std_noise >> space)) >>
           str("P").maybe >> # optional project marker on the number
           digits.as(:number) >>
           # part must not swallow the trailing year (year_digits.absent?)
@@ -643,10 +655,19 @@ module Pubid
           # a date-less "/D-4" keeps its hyphen (bucket 7), hence dash.maybe.
           (slash >> str("D") >> dash.maybe >>
            match('[0-9.]').repeat(1).as(:draft_version)).maybe >>
+          # Optional amendment tail (pubid#317:
+          # "8802-11:2012/Amd.1:2014(E)") - the flat tree keys reuse
+          # build_flat_amendment.
+          (slash >> str("Amd") >> (dot | space).maybe >>
+           digits.as(:amd_number) >>
+           ((str(":") | dash) >> year_digits.as(:amd_year)).maybe).maybe >>
           # Optional edition, from relaton's "/E-<n>" suffix normalized to
           # "Edition <n>.0[ YYYY]" (nil-residue hand-off item 1).
           edition.maybe >>
-          revision_suffix.maybe
+          revision_suffix.maybe >>
+          # Published joint docs print a language marker, after either the
+          # year or the amendment tail: "9945:2009(E)", "...Amd.1:2014(E)"
+          (str("(E)") | str("(F)")).maybe
       end
 
       # Embedded (stage-LAST) ISO-led designations: the corpus writes the ISO
