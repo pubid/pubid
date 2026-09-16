@@ -17,7 +17,7 @@ module Pubid
         adopted = Pubid::CenCenelec::Builder.build(data[:adopted])
 
         Identifiers::NationalAdoption.new(
-          adopted_identifier: adopted,
+          base: adopted,
           separator: data[:evs_separator] || "-",
         )
       end

@@ -56,7 +56,7 @@ module Pubid
 
         adopted = Pubid::CenCenelec.parse(text)
         ::Pubid::Evs::Identifiers::NationalAdoption.new(
-          adopted_identifier: adopted,
+          base: adopted,
         )
       end
 
