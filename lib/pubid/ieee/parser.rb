@@ -884,23 +884,47 @@ module Pubid
           Nesc::Parser.new.nesc_identifier.as(:nesc)
       end
 
+      # Draft notation for PSI (e.g., /D2, /D3, rawbib's /D-2)
+      rule(:psi_draft) do
+        slash >> str("D") >> dash.maybe >> digits.as(:draft_version)
+      end
+
+      # Date on an SI/PSI identifier: ", Month Year" or "-YEAR[-MM]". The
+      # comma branch also accepts a NUMERIC month and a DASH before the
+      # year — the renderer emits ", 05 2010" for a numeric-month draft,
+      # and the preprocessing gsub rewrites a trailing " <digits> <year>"
+      # to "<digits>-<year>" (the same load-bearing coupling draft_date
+      # documents), so the re-parse must read its own rendering back.
+      rule(:psi_date) do
+        (comma >> (month_name | month_numeric).as(:month) >> (space | dash) >>
+           year_digits.as(:year)) |
+          (dash >> year_digits.as(:year) >>
+            (dash >> digit.repeat(2, 2).as(:month)).maybe)
+      end
+
       # IEEE/ASTM SI/PSI (Système International) patterns
       # SI = Published metric system standard
       # PSI = Proposed SI (draft)
+      # Rawbib spellings (pubid#316 family 3): a bare "IEEE" publisher, a dot
+      # separator after the type ("PSI.10", "SI 10.1997"), relaton's
+      # hyphenated "/D-<n>" draft, and a dash year-month ("-2010-05").
       rule(:ieee_astm_si_psi) do
-        str("IEEE/ASTM").as(:publishers) >>
+        (str("IEEE/ASTM") | str("IEEE")).as(:publishers) >>
           space >>
           (str("PSI") | str("SI")).as(:si_type) >>
-          space >>
+          (space | str(".")) >>
           digits.as(:number) >>
-          # Draft notation for PSI (e.g., /D2, /D3)
-          (slash >> str("D") >> digits.as(:draft_version)).maybe >>
-          # Year with optional month
+          # Glued ".YEAR" edition date ("IEEE/ASTM SI 10.1997")
+          (str(".") >> year_digits.as(:year)).maybe >>
+          # The date and the draft appear in EITHER order: the legacy
+          # spelling puts the draft first ("PSI 10/D2, October 2015"),
+          # while normalize_relaton_suffixes repositions the rawbib
+          # hyphenated form onto the number ("PSI 10/D-3-2010" →
+          # "PSI 10-2010/D3"). Draft-first is tried first so the legacy
+          # comma-date keeps its original match; each side is optional so
+          # a date-only or draft-less form still parses.
           (
-            # Format: ", Month Year"
-            (comma >> month_name.as(:month) >> space >> year_digits.as(:year)) |
-            # Format: "-YEAR"
-            (dash >> year_digits.as(:year))
+            (psi_draft >> psi_date.maybe) | (psi_date >> psi_draft.maybe)
           ).maybe >>
           # Optional parenthetical (revision relationships)
           parenthetical.maybe
