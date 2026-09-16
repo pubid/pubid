@@ -21,6 +21,16 @@ id = Pubid::Jcgm.parse("...")
 |------|------|-----------|-----------------|
 | "Amd" | Amendment | :published |  |
 
+### Corrigendum
+
+**Class:** `Pubid::Jcgm::Identifiers::Corrigendum`
+
+#### Typed Stages
+
+| Abbr | Name | Stage Code | Harmonized Codes |
+|------|------|-----------|-----------------|
+|  | Corrigendum | :published |  |
+
 ### Guide
 
 **Class:** `Pubid::Jcgm::Identifiers::Guide`
@@ -40,6 +50,16 @@ id = Pubid::Jcgm.parse("...")
 | Abbr | Name | Stage Code | Harmonized Codes |
 |------|------|-----------|-----------------|
 | "" | GUM Guide | :published |  |
+
+### Meeting
+
+**Class:** `Pubid::Jcgm::Identifiers::Meeting`
+
+#### Typed Stages
+
+| Abbr | Name | Stage Code | Harmonized Codes |
+|------|------|-----------|-----------------|
+| "Meeting" | Meeting | :published |  |
 
 ## URN Support
 

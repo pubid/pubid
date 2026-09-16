@@ -11,9 +11,25 @@ id = Pubid::Itu.parse("...")
 
 ## Identifier Types
 
+### Addendum
+
+**Class:** `Pubid::Itu::Identifiers::Addendum`
+
 ### Amendment
 
 **Class:** `Pubid::Itu::Identifiers::Amendment`
+
+### Annex
+
+**Class:** `Pubid::Itu::Identifiers::Annex`
+
+### Annex Of Recommendation
+
+**Class:** `Pubid::Itu::Identifiers::AnnexOfRecommendation`
+
+### Appendix Of Recommendation
+
+**Class:** `Pubid::Itu::Identifiers::AppendixOfRecommendation`
 
 ### Base
 
@@ -27,9 +43,33 @@ id = Pubid::Itu.parse("...")
 
 **Class:** `Pubid::Itu::Identifiers::Corrigendum`
 
+### Errata
+
+**Class:** `Pubid::Itu::Identifiers::Errata`
+
+### Handbook
+
+**Class:** `Pubid::Itu::Identifiers::Handbook`
+
+### Question
+
+**Class:** `Pubid::Itu::Identifiers::Question`
+
 ### Recommendation
 
 **Class:** `Pubid::Itu::Identifiers::Recommendation`
+
+### Report
+
+**Class:** `Pubid::Itu::Identifiers::Report`
+
+### Special Publication
+
+**Class:** `Pubid::Itu::Identifiers::SpecialPublication`
+
+### Standard Serialization
+
+**Class:** `Pubid::Itu::Identifiers::StandardSerialization`
 
 ### Supplement
 

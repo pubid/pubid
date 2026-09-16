@@ -115,14 +115,16 @@ id = Pubid::Iec.parse("...")
 
 | Abbr | Name | Stage Code | Harmonized Codes |
 |------|------|-----------|-----------------|
-| "PWI" | Preliminary Work Item | :pwi |  |
+|  | Preliminary Work Item | :pwi |  |
 | "NP" | New Proposal | :np |  |
+| "PNW" | New work item proposal | :pnw |  |
 | "ANW" | Approved New Work Item | :anw |  |
 | "WD" | Working Draft | :wd |  |
-| "CD" | Committee Draft | :cd |  |
-| "CDV" | Committee Draft for Vote | :cdv |  |
-| "FDIS", "PRF" | Final Draft International Standard | :fdis |  |
-| "" | International Standard | :published |  |
+|  | Committee Draft | :cd |  |
+|  | Committee Draft for Vote | :cdv |  |
+|  | Final Draft International Standard | :fdis |  |
+| "", "BPUB", "PPUB", "APUB", "WPUB", "DELPUB",
+                   "RR", "CAN" | International Standard | :published |  |
 
 ### Interpretation Sheet
 
@@ -190,6 +192,10 @@ id = Pubid::Iec.parse("...")
 |------|------|-----------|-----------------|
 | "SRD" | Systems Reference Document | :published |  |
 
+### Technical Group
+
+**Class:** `Pubid::Iec::Identifiers::TechnicalGroup`
+
 ### Technical Report
 
 **Class:** `Pubid::Iec::Identifiers::TechnicalReport`
@@ -203,7 +209,7 @@ id = Pubid::Iec.parse("...")
 | "ANW TR" | Approved New Work Item Technical Report | :anw |  |
 | "WD TR" | Working Draft Technical Report | :wd |  |
 | "CD TR" | Committee Draft Technical Report | :cd |  |
-| "DTR" | Draft Technical Report | :draft |  |
+|  | Draft Technical Report | :draft |  |
 | "TR" | Technical Report | :published |  |
 
 ### Technical Specification
@@ -219,7 +225,7 @@ id = Pubid::Iec.parse("...")
 | "ANW TS" | Approved New Work Item Technical Specification | :anw |  |
 | "WD TS" | Working Draft Technical Specification | :wd |  |
 | "CD TS" | Committee Draft Technical Specification | :cd |  |
-| "DTS" | Draft Technical Specification | :draft |  |
+|  | Draft Technical Specification | :draft |  |
 | "TS" | Technical Specification | :published |  |
 
 ### Technology Report
