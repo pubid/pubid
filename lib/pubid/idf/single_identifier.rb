@@ -12,7 +12,7 @@ module Pubid
     #
     # Note: The type attribute is inherited from the base Identifier class.
     # Concrete classes should add their own default value like:
-    #   attribute :type, Components::Type, default: -> { self.class.type[:key] }
+    #   attribute :type, Components::Type, default: -> { self.class.default_type }
     class SingleIdentifier < Identifier
     end
   end
