@@ -31,9 +31,7 @@ module Pubid
                                              letter_suffix:)
           return false unless letter_suffix == "R"
 
-          identifier.number = Components::Code.new(
-            value: "#{first_num.value}-#{letter_base}",
-          )
+          identifier.number = "#{first_num.value}-#{letter_base}"
           edition_obj = Components::Edition.new(type: "r", id: "1")
           identifier.edition = edition_obj
           true
@@ -42,13 +40,11 @@ module Pubid
         def self.finalize_identifier(identifier, _parsed_hash)
           return unless identifier.number
 
-          value = identifier.number.value.to_s
+          value = identifier.number.to_s
           match = value.match(/^(\d+)e(\d{4})$/)
           return unless match
 
-          identifier.number = Components::Code.new(
-            value: "#{match[1]}-#{match[2]}",
-          )
+          identifier.number = "#{match[1]}-#{match[2]}"
           identifier.edition = nil
         end
       end

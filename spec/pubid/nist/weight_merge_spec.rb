@@ -48,7 +48,7 @@ RSpec.describe Pubid::Nist::Identifier do
 
         merged = id1.merge(id2)
         # Number is replaced entirely (not partially merged)
-        expect(merged.number.value).to eq("800-187")
+        expect(merged.number).to eq("800-187")
       end
 
       it "prefers higher edition value numerically" do

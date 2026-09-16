@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses number with year" do
-          expect(parsed.number.value).to eq("100-45")
+          expect(parsed.number).to eq("100-45")
         end
 
         it "round-trips" do
@@ -41,7 +41,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses number with year" do
-          expect(parsed.number.value).to eq("190-58")
+          expect(parsed.number).to eq("190-58")
         end
 
         it "round-trips" do
@@ -61,7 +61,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses letter suffix with number" do
-          expect(parsed.number.value).to eq("102E-42")
+          expect(parsed.number).to eq("102E-42")
         end
 
         it "round-trips" do
@@ -79,7 +79,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses letter with year" do
-          expect(parsed.number.value).to eq("123A-50")
+          expect(parsed.number).to eq("123A-50")
         end
 
         it "round-trips" do
@@ -103,7 +103,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses emergency number with edition year" do
-          expect(parsed.number.value).to eq("104")
+          expect(parsed.number).to eq("104")
         end
       end
 
@@ -168,7 +168,7 @@ RSpec.describe Pubid::Nist::Identifiers::CommercialStandard do
         end
 
         it "parses edition with year" do
-          expect(parsed.number.value).to eq("123")
+          expect(parsed.number).to eq("123")
         end
 
         it "parses edition" do

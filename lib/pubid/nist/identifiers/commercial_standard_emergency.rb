@@ -44,7 +44,7 @@ module Pubid
           result += " CS-E"
 
           # Number (already extracted from e104 → 104 in builder)
-          result += " #{number.value}" if number
+          result += " #{number}" if number
 
           # Edition (e1943 for e104-43 pattern) plus any other component the
           # parser attached (volume, supplement, version, ...).

@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
         end
 
         it "parses 3-part number" do
-          expect(parsed.number.value).to eq("17-917-45")
+          expect(parsed.number).to eq("17-917-45")
         end
 
         it "round-trips" do
@@ -41,7 +41,7 @@ RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
         end
 
         it "parses 3-part number" do
-          expect(parsed.number.value).to eq("20-123-45")
+          expect(parsed.number).to eq("20-123-45")
         end
 
         it "round-trips" do
@@ -61,7 +61,7 @@ RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
         end
 
         it "parses number with volume" do
-          expect(parsed.number.value).to eq("21-917-48")
+          expect(parsed.number).to eq("21-917-48")
         end
 
         it "parses volume" do
@@ -85,7 +85,7 @@ RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("21-917-48")
+          expect(parsed.number).to eq("21-917-48")
         end
 
         it "parses volume with letter suffix" do
@@ -108,7 +108,7 @@ RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
         end
 
         it "parses 3-part number" do
-          expect(parsed.number.value).to eq("18-100-20")
+          expect(parsed.number).to eq("18-100-20")
         end
 
         it "parses volume with letter" do
@@ -133,7 +133,7 @@ RSpec.describe Pubid::Nist::Identifiers::GrantContractorReport do
 
         it "parses number with letter suffix" do
           # May parse as part of number or separate attribute
-          expect(parsed.number.value).to match(/19-200-30/)
+          expect(parsed.number).to match(/19-200-30/)
         end
 
         it "round-trips" do

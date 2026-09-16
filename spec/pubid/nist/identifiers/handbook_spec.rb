@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("131")
+          expect(parsed.number).to eq("131")
         end
 
         it "round-trips" do
@@ -41,7 +41,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses number with part" do
-          expect(parsed.number.value).to eq("105-8")
+          expect(parsed.number).to eq("105-8")
         end
 
         it "round-trips" do
@@ -61,7 +61,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("44")
+          expect(parsed.number).to eq("44")
         end
 
         it "parses edition" do
@@ -128,7 +128,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses compound number" do
-          expect(parsed.number.value).to eq("105-1")
+          expect(parsed.number).to eq("105-1")
         end
 
         it "parses edition year" do
@@ -179,7 +179,7 @@ RSpec.describe Pubid::Nist::Identifiers::Handbook do
         end
 
         it "parses number with part" do
-          expect(parsed.number.value).to eq("105-3")
+          expect(parsed.number).to eq("105-3")
         end
 
         it "parses revision as edition" do

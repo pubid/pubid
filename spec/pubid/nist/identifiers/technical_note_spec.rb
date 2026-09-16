@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1297")
+          expect(parsed.number).to eq("1297")
         end
 
         it "round-trips" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("100")
+          expect(parsed.number).to eq("100")
         end
 
         it "round-trips" do
@@ -63,7 +63,7 @@ RSpec.describe Pubid::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("2150")
+          expect(parsed.number).to eq("2150")
         end
 
         it "round-trips" do
@@ -81,7 +81,7 @@ RSpec.describe Pubid::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1648")
+          expect(parsed.number).to eq("1648")
         end
 
         it "round-trips" do
@@ -145,7 +145,7 @@ RSpec.describe Pubid::Nist::Identifiers::TechnicalNote do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("100-A")
+          expect(parsed.number).to eq("100-A")
         end
 
         it "round-trips" do

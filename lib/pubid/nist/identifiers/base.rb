@@ -27,7 +27,7 @@ module Pubid
       #     bare { "value" => … } with no part;
       #   - drop the redundant build artifacts, decomposed pieces of the
       #     canonical number that identity/rendering never read.
-      COMPACT_FLAT_CODES = %w[series number subseries].freeze
+      COMPACT_FLAT_CODES = %w[series subseries].freeze
       COMPACT_FLAT_VALUES = %w[volume].freeze
       COMPACT_DROP_ATTRS = %w[first_number second_number].freeze
 
@@ -105,7 +105,14 @@ module Pubid
       # equality so a manually-built id (without subseries set) still equals a
       # parsed one.
       attribute :subseries, Components::Code
-      attribute :number, Components::Code
+      # Plain :string. NIST never populated the Code beyond `value`: `subpart`
+      # is set nowhere, and `part` was a reader splitting `value` on "-" that
+      # no library code called. `series`, `subseries`, `first_number`,
+      # `second_number` and `parts` keep the component.
+      attribute :number, :string
+      # NIST never uses `subpart`; declare it so the inherited Components::Code
+      # does not disagree with this class (the determinism landmine).
+      attribute :subpart, :string
 
       # V2 COMPONENTS (Lutaml::Model objects) - PROPER SEPARATION
       # `edition` (Components::Edition: type + id + additional_text) is the
@@ -412,7 +419,7 @@ module Pubid
         # "National Institute of Standards and Technology Special Publication 800-27, Revision A"
         result = publisher_full_name
         result += " #{series_full_name}" if series
-        result += " #{number.value}" if number
+        result += " #{number}" if number
         result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
         # Render volume and issue number in long form: "Vol. 6, No. 12"

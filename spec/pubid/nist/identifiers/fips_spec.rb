@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "round-trips" do
@@ -41,7 +41,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("140")
+          expect(parsed.number).to eq("140")
         end
 
         it "round-trips" do
@@ -183,7 +183,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("1")
+          expect(parsed.number.split("-").last).to eq("1")
         end
 
         it "round-trips" do
@@ -201,7 +201,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("2")
+          expect(parsed.number.split("-").last).to eq("2")
         end
 
         it "round-trips" do
@@ -219,7 +219,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("3")
+          expect(parsed.number.split("-").last).to eq("3")
         end
 
         it "round-trips" do
@@ -243,7 +243,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("46A")
+          expect(parsed.number).to eq("46A")
         end
       end
 
@@ -257,7 +257,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("81A")
+          expect(parsed.number).to eq("81A")
         end
 
         it "round-trips" do
@@ -303,7 +303,7 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
         end
 
         it "parses part" do
-          expect(parsed.number.part).to eq("2")
+          expect(parsed.number.split("-").last).to eq("2")
         end
       end
 

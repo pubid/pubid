@@ -22,7 +22,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
         expect(id.stage.type).to eq("pd")
 
         # All should have same number and revision
-        expect(id.number.value).to eq("800-53")
+        expect(id.number).to eq("800-53")
         expect(id.revision).to eq("r5")
       end
     end
@@ -50,8 +50,8 @@ RSpec.describe "NIST Format Cross-Conversion" do
         # Should have same components
         expect(reparsed_short.stage.id).to eq("i")
         expect(reparsed_mr.stage.id).to eq("i")
-        expect(reparsed_short.number.value).to eq("800-53")
-        expect(reparsed_mr.number.value).to eq("800-53")
+        expect(reparsed_short.number).to eq("800-53")
+        expect(reparsed_mr.number).to eq("800-53")
       end
     end
   end

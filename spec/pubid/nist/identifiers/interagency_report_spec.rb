@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("73-212")
+          expect(parsed.number).to eq("73-212")
         end
 
         it "round-trips" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses compound number" do
-          expect(parsed.number.value).to eq("84-2946")
+          expect(parsed.number).to eq("84-2946")
         end
 
         it "round-trips" do
@@ -63,7 +63,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses decimal number" do
-          expect(parsed.number.value).to eq("80-2073.3")
+          expect(parsed.number).to eq("80-2073.3")
         end
 
         it "round-trips" do
@@ -365,7 +365,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses letter suffix and language" do
-          expect(parsed.number.value).to eq("8259A")
+          expect(parsed.number).to eq("8259A")
           expect(parsed.translation.language).to eq("spa")
         end
       end
@@ -386,7 +386,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("6529-A")
+          expect(parsed.number).to eq("6529-A")
         end
       end
 
@@ -400,7 +400,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("5443-A")
+          expect(parsed.number).to eq("5443-A")
         end
 
         it "round-trips" do
@@ -418,7 +418,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("7297-B")
+          expect(parsed.number).to eq("7297-B")
         end
 
         it "round-trips" do
@@ -440,7 +440,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("6099A")
+          expect(parsed.number).to eq("6099A")
         end
       end
 
@@ -458,7 +458,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses letter suffix" do
-          expect(parsed.number.value).to eq("7103B")
+          expect(parsed.number).to eq("7103B")
         end
       end
 
@@ -472,7 +472,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "parses multi-letter suffix" do
-          expect(parsed.number.value).to eq("7356-CAS")
+          expect(parsed.number).to eq("7356-CAS")
         end
 
         it "round-trips" do
