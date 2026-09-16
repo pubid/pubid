@@ -22,7 +22,10 @@ module Pubid
 
       attribute :publisher, :string, default: -> { "SAE" }
       attribute :type, Sae::Components::Type
-      attribute :number, Sae::Components::Code
+      # A plain :string, like every converted flavor. Sae::Components::Code was
+      # a bare alias of the shared component and never carried more than
+      # `value`, so this is a representation change only.
+      attribute :number, :string
       attribute :date, Sae::Components::Date
 
       def self.type

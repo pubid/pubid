@@ -20,7 +20,7 @@ module Pubid
         when :type
           Components::Type.new(abbr: value.to_s)
         when :number
-          Components::Code.new(value: value.to_s)
+          value.to_s
         when :year
           { date: Components::Date.new(year: value.to_i) }
         else

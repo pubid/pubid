@@ -22,6 +22,10 @@ module Pubid
       # are likewise CCSDS-specific plain strings.
       attribute :number, :string
       attribute :part, :string
+      # CCSDS never populates `subpart`, but the inherited declaration is a
+      # Components::Code, and a parent that disagrees with its leaves is the
+      # determinism landmine. Declare it here, like every converted flavor.
+      attribute :subpart, :string
       attribute :edition, :string
       attribute :type, :string
       attribute :suffix, :string
