@@ -40,6 +40,7 @@ IEEE_DASHD_RECOVERED = [
   "IEEE Unapproved Std P802.1X_REV/D-4.5-2009",
   "IEEE Unapproved Std PC37.91/D-8-2007-20",
   "IEEEE P1243/D-3-2023-02",
+  "IEEE PSI.10/D-1-2010-05",
   "ISO/IEC/IEEE FDIS P15289./E-3/D-2-2016",
   "ISO/IEC/IEEE P24641/D-2_CD-2020",
   "ISO/IEC/IEEE P24641/D-3_CD2",
@@ -50,10 +51,10 @@ IEEE_DASHD_RECOVERED = [
 ].freeze
 
 # Genuinely broken source data — intentionally NOT mapped (documents the
-# boundary): D-- has no draft number; PSI.10 mis-parses and never round-trips.
+# boundary): D-- has no draft number. (PSI.10/D-1-2010-05 moved to RECOVERED
+# once the SI/PSI grammar accepted the rawbib spellings, pubid#316 family 3.)
 IEEE_DASHD_STILL_UNPARSEABLE = [
   "IEEE P11073.10415/D--2019",
-  "IEEE PSI.10/D-1-2010-05",
 ].freeze
 
 RSpec.describe "IEEE /D- corrupted draft docids — update_codes normalization" do
