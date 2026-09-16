@@ -19,17 +19,25 @@ id = Pubid::Oiml.parse("...")
 
 **Class:** `Pubid::Oiml::Identifiers::Annex`
 
-### Base
-
-**Class:** `Pubid::Oiml::Identifiers::Base`
-
 ### Basic Publication
 
 **Class:** `Pubid::Oiml::Identifiers::BasicPublication`
 
+### Bulletin
+
+**Class:** `Pubid::Oiml::Identifiers::Bulletin`
+
+### Code Number
+
+**Class:** `Pubid::Oiml::Identifiers::CodeNumber`
+
 ### Document
 
 **Class:** `Pubid::Oiml::Identifiers::Document`
+
+### Errata
+
+**Class:** `Pubid::Oiml::Identifiers::Errata`
 
 ### Expert Report
 

@@ -15,9 +15,9 @@ id = Pubid::Jis.parse("...")
 
 **Class:** `Pubid::Jis::Identifiers::Amendment`
 
-### Base
+### Corrigendum
 
-**Class:** `Pubid::Jis::Identifiers::Base`
+**Class:** `Pubid::Jis::Identifiers::Corrigendum`
 
 ### Explanation
 

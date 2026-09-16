@@ -37,10 +37,6 @@ id = Pubid::Bsi.parse("...")
 
 **Class:** `Pubid::Bsi::Identifiers::Amendment`
 
-### Base
-
-**Class:** `Pubid::Bsi::Identifiers::Base`
-
 ### British Industrial Practice
 
 **Class:** `Pubid::Bsi::Identifiers::BritishIndustrialPractice`

@@ -73,7 +73,12 @@ id = Pubid::Nist.parse("...")
 
 | Abbr | Name | Stage Code | Harmonized Codes |
 |------|------|-----------|-----------------|
-| "CRPL", "NBS CRPL", "CRPL-F-B", "CRPL-F-A", "NBS CRPL-F-B", "NBS CRPL-F-A" |  | published |  |
+| "CRPL", "NBS CRPL", "CRPL-F-B", "CRPL-F-A", "NBS CRPL-F-B",
+                   "NBS CRPL-F-A" |  | published |  |
+
+### Dated Document
+
+**Class:** `Pubid::Nist::Identifiers::DatedDocument`
 
 ### Federal Information Processing Standards
 
