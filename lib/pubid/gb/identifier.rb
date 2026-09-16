@@ -31,12 +31,17 @@ module Pubid
         "pubid:gb:standard" => "Pubid::Gb::Identifiers::Standard",
       }.freeze
 
+      # This block REPLACES the maps of ::Pubid::Identifier, so every
+      # attribute the flavor uses must appear here — "date" included, or the
+      # publication year is lost in to_hash. The shared flat-scalar rules
+      # (Identifier#to_hash / .from_hash) write it as a bare "year" scalar.
       key_value do
         map "_type", to: :_type, polymorphic_map: GB_TYPE_MAP
         map "publisher_code", to: :publisher_code
         map "mandate", to: :mandate
         map "number", to: :number
         map "part", to: :part
+        map "date", to: :date
         map "all_parts", to: :all_parts, render_default: false
       end
 

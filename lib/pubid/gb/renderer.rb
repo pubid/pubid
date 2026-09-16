@@ -8,7 +8,8 @@ module Pubid
     #   "GB/T 20223-2006"
     #   "GB/T 5606.1-2004"
     #   "GB/T 5606 (all parts)"
-    #   "T/GZAEPI 001—2018"     (social-group form, em-dash year)
+    #   "T/GZAEPI 001-2018"     (social-group form; an em-dash year
+    #                            separator in the input renders as a hyphen)
     class Renderer < ::Pubid::Renderers::Base
       def render(**_opts)
         parts = [publisher_portion, " #{number_portion}"]
