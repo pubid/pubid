@@ -1,31 +1,31 @@
-# CEN-CENELEC Identifier Patterns
+# CEN_CENELEC Identifier Patterns
 
-CEN (European Committee for Standardization)
+CEN_CENELEC identifiers
 
 ## Entry Point
 
 ```ruby
 require 'pubid/cen_cenelec'
-id = Pubid::CenCenelec.parse("...")
+id = Pubid::Cen_cenelec.parse("...")
 ```
 
 ## Identifier Types
 
 ### Adopted European Norm
 
-**Class:** `Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm`
+**Class:** `Pubid::Cen_cenelec::Identifiers::AdoptedEuropeanNorm`
 
 ### Amendment
 
-**Class:** `Pubid::CenCenelec::Identifiers::Amendment`
+**Class:** `Pubid::Cen_cenelec::Identifiers::Amendment`
 
 ### Base
 
-**Class:** `Pubid::CenCenelec::Identifiers::Base`
+**Class:** `Pubid::Cen_cenelec::Identifiers::Base`
 
 ### Cen Report
 
-**Class:** `Pubid::CenCenelec::Identifiers::CenReport`
+**Class:** `Pubid::Cen_cenelec::Identifiers::CenReport`
 
 #### Typed Stages
 
@@ -35,7 +35,7 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Cen Workshop Agreement
 
-**Class:** `Pubid::CenCenelec::Identifiers::CenWorkshopAgreement`
+**Class:** `Pubid::Cen_cenelec::Identifiers::CenWorkshopAgreement`
 
 #### Typed Stages
 
@@ -45,7 +45,7 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Cenelec Harmonization Document
 
-**Class:** `Pubid::CenCenelec::Identifiers::CenelecHarmonizationDocument`
+**Class:** `Pubid::Cen_cenelec::Identifiers::CenelecHarmonizationDocument`
 
 #### Typed Stages
 
@@ -55,27 +55,33 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Consolidated Identifier
 
-**Class:** `Pubid::CenCenelec::Identifiers::ConsolidatedIdentifier`
+**Class:** `Pubid::Cen_cenelec::Identifiers::ConsolidatedIdentifier`
 
 ### Corrigendum
 
-**Class:** `Pubid::CenCenelec::Identifiers::Corrigendum`
+**Class:** `Pubid::Cen_cenelec::Identifiers::Corrigendum`
 
 ### European Norm
 
-**Class:** `Pubid::CenCenelec::Identifiers::EuropeanNorm`
+**Class:** `Pubid::Cen_cenelec::Identifiers::EuropeanNorm`
 
 #### Typed Stages
 
 | Abbr | Name | Stage Code | Harmonized Codes |
 |------|------|-----------|-----------------|
 | "EN" | European Norm | :published |  |
+| "pWI EN" | Preliminary Work Item EN | :preliminary |  |
 | "prEN" | Proposal European Norm | :proposal |  |
 | "FprEN" | Final Proposal European Norm | :final_proposal |  |
+| "FV prEN" | Formal Vote EN | :formal_vote |  |
+| "vEN" | Vote EN | :vote |  |
+| "rvEN" | Review EN | :review |  |
+| "racEN" | Re-activated EN | :reactivation |  |
+| "wdEN" | Withdrawn EN | :withdrawn |  |
 
 ### European Prestandard
 
-**Class:** `Pubid::CenCenelec::Identifiers::EuropeanPrestandard`
+**Class:** `Pubid::Cen_cenelec::Identifiers::EuropeanPrestandard`
 
 #### Typed Stages
 
@@ -85,7 +91,7 @@ id = Pubid::CenCenelec.parse("...")
 
 ### European Specification
 
-**Class:** `Pubid::CenCenelec::Identifiers::EuropeanSpecification`
+**Class:** `Pubid::Cen_cenelec::Identifiers::EuropeanSpecification`
 
 #### Typed Stages
 
@@ -95,11 +101,11 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Fragment
 
-**Class:** `Pubid::CenCenelec::Identifiers::Fragment`
+**Class:** `Pubid::Cen_cenelec::Identifiers::Fragment`
 
 ### Guide
 
-**Class:** `Pubid::CenCenelec::Identifiers::Guide`
+**Class:** `Pubid::Cen_cenelec::Identifiers::Guide`
 
 #### Typed Stages
 
@@ -109,7 +115,7 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Harmonization Document
 
-**Class:** `Pubid::CenCenelec::Identifiers::HarmonizationDocument`
+**Class:** `Pubid::Cen_cenelec::Identifiers::HarmonizationDocument`
 
 #### Typed Stages
 
@@ -119,7 +125,7 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Technical Report
 
-**Class:** `Pubid::CenCenelec::Identifiers::TechnicalReport`
+**Class:** `Pubid::Cen_cenelec::Identifiers::TechnicalReport`
 
 #### Typed Stages
 
@@ -129,7 +135,7 @@ id = Pubid::CenCenelec.parse("...")
 
 ### Technical Specification
 
-**Class:** `Pubid::CenCenelec::Identifiers::TechnicalSpecification`
+**Class:** `Pubid::Cen_cenelec::Identifiers::TechnicalSpecification`
 
 #### Typed Stages
 
