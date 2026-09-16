@@ -780,15 +780,17 @@ module Pubid
       # status is captured (draft_status ends in a space, so "Approved Draft"
       # splits cleanly) and round-trips as the draft_status attribute; the literal
       # "Draft" stays a bare marker (dropped on render, like the plain form).
+      # `P` is not consumed here: the `number` rule carries its own optional
+      # leading P and captures it into :number ("P802.11"), so Code.parse peels
+      # it as code.prefix and the project marker round-trips (pubid#318) — a
+      # bare `str("P").maybe` here swallowed it and the render lost the P.
       rule(:ieee_draft_p_identifier) do
         (str("IEEE").as(:publisher) >> space).maybe >> # Make IEEE prefix optional
           draft_status.as(:draft_status).maybe >>
           str("Draft") >> space >>
-          # `P` is optional — a status-word draft may carry a bare number
-          # ("IEEE Unapproved Draft 802.1ah/D4.2"), mirroring
-          # ieee_approved_draft_identifier's str("P").maybe. The `number` rule
+          # A status-word draft may carry a bare number
+          # ("IEEE Unapproved Draft 802.1ah/D4.2"). The `number` rule
           # already accepts the bare forms (802.1ah, C57.15, 11073-10471).
-          str("P").maybe >>
           number >>
           (part_subpart_year | edition).maybe >>
           # Trailing "Month YYYY" date under distinct keys so it never collides

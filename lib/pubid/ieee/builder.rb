@@ -1212,6 +1212,14 @@ module Pubid
             return "P"
           elsif type_value == "Std"
             return "Std"
+          elsif type_value == "Draft Std" && parsed[:draft].nil? && parsed[:digit_draft].nil?
+            # A version-less "Draft Std" fabricates /D1 (issue #205);
+            # deriving the stage from that fabricated version renders the
+            # same P-prefixed form as an explicit "/D1" spelling, so the
+            # render reaches its fixed point in one round (pubid#318).
+            # Gated on no-draft: a dotted version ("D2.0") fails the registry
+            # lookup above and must fall through, keeping "Draft Std".
+            return "D1"
           elsif type_value.match?(/^No\.?$/)
             return type_value
           end
