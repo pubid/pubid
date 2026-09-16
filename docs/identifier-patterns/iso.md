@@ -24,8 +24,8 @@ id = Pubid::Iso.parse("...")
 | "AWI Add" | Approved Work Item for Addendum | :preliminary |  |
 | "WD Add" | Working Draft for Addendum | :working_draft |  |
 | "CD Add" | Committee Draft for Addendum | :cd |  |
-| DAD | Draft Addendum | :dad |  |
-| FDAD | Final Draft Addendum | :fdad |  |
+| DAD |  |  |  |
+| FDAD |  |  |  |
 | ADD | Addendum | :published |  |
 
 ### Amendment
@@ -42,15 +42,11 @@ id = Pubid::Iso.parse("...")
 | "WD Amd" | Working Draft for Amendment | :working_draft |  |
 | "CD Amd" | Committee Draft for Amendment | :cd |  |
 | "PDAM" |  | :cd |  |
-| DAM | Draft Amendment | :damd |  |
-| FDAM | Final Draft Amendment | :fdamd |  |
+| DAM |  |  |  |
+| FDAM |  |  |  |
 | "FPDAM" |  | :fdamd |  |
 | "PRF Amd" | Proof Amendment | :prf |  |
 | AMD | Amendment | :published |  |
-
-### Base
-
-**Class:** `Pubid::Iso::Identifiers::Base`
 
 ### Corrigendum
 
@@ -147,6 +143,7 @@ id = Pubid::Iso.parse("...")
 | "NP", "NWIP" | New Work Item Proposal for International Standard | :np |  |
 | "AWI" | Approved Work Item for International Standard | :awi |  |
 | "WD" | Working Draft for International Standard | :wd |  |
+| "WDS" | Working Draft Study | :wds |  |
 | "preCD", "PreCD" | Pre-Committee Draft for International Standard | :pcd |  |
 | "CD" | Committee Draft for International Standard | :cd |  |
 | "DIS", "FPD" | Draft International Standard | :dis |  |
@@ -171,8 +168,8 @@ id = Pubid::Iso.parse("...")
 | "AWI ISP" | Approved Work Item for International Standardized Profile | :awi |  |
 | "WD ISP" | Working Draft for International Standardized Profile | :wd |  |
 | "CD ISP" | Committee Draft for International Standardized Profile | :cd |  |
-| "DISP" | Draft International Standardized Profile | :disp |  |
-| "FDISP" | Final Draft International Standardized Profile | :fdis |  |
+| "DISP", "DIS ISP" | Draft International Standardized Profile | :disp |  |
+| "FDISP", "FDIS ISP" | Final Draft International Standardized Profile | :fdis |  |
 | "PRF ISP" | Proof International Standardized Profile | :prf |  |
 | "ISP" | International Standardized Profile | :published |  |
 
@@ -184,7 +181,7 @@ id = Pubid::Iso.parse("...")
 
 | Abbr | Name | Stage Code | Harmonized Codes |
 |------|------|-----------|-----------------|
-| "PWI IWA" | Proposed Work Item for International Workshop Agreement | :np |  |
+| "PWI IWA" | Proposed Work Item for International Workshop Agreement | :pwi |  |
 | "NP IWA" | New Work Item Proposal for International Workshop Agreement | :np |  |
 | "AWI IWA" | Approved Work Item for International Workshop Agreement | :awi |  |
 | "WD IWA" | Working Draft for International Workshop Agreement | :wd |  |
@@ -230,11 +227,12 @@ id = Pubid::Iso.parse("...")
 
 | Abbr | Name | Stage Code | Harmonized Codes |
 |------|------|-----------|-----------------|
+| "PWI Suppl" | Proposed Work Item for Supplement | :pwi |  |
 | "NP Suppl" | New Work Item Proposal for Supplement | :np |  |
 | "AWI Suppl" | Approved Work Item for Supplement | :awi |  |
 | "WD Suppl" | Working Draft for Supplement | :wd |  |
 | "CD Suppl" | Committee Draft for Supplement | :cd |  |
-| "DSuppl" | Draft Supplement | :dsuppl |  |
+| "DSuppl", "DIS Suppl" | Draft Supplement | :dsuppl |  |
 | "FDSuppl", "FDIS Suppl" | Final Draft Supplement | :fdsuppl |  |
 | "PRF Suppl" | Proof Supplement | :prf |  |
 | "Suppl", "Suppl." | Supplement | :published |  |
@@ -257,8 +255,8 @@ id = Pubid::Iso.parse("...")
 | "WD TR" | Working Draft Technical Report | :wd |  |
 | "CD TR" | Committee Draft Technical Report | :cd |  |
 | "PDTR" | Proposed Draft Technical Report | :cd |  |
-| "DTR" | Draft Technical Report | :draft |  |
-| "FDTR" | Final Draft Technical Report | :final_draft |  |
+| "DTR", "DIS TR" | Draft Technical Report | :draft |  |
+| "FDTR", "FDIS TR" | Final Draft Technical Report | :final_draft |  |
 | "PRF TR" | Proof Technical Report | :prf |  |
 | "TR" | Published Technical Report | :published |  |
 
@@ -274,7 +272,7 @@ id = Pubid::Iso.parse("...")
 | "NP TS" | New Work Item Proposal for Technical Specification | :np |  |
 | "AWI TS" | Approved Work Item for Technical Specification | :awi |  |
 | "WD TS" | Working Draft Technical Specification | :wd |  |
-| "CD TS" | Committee Draft Technical Specification | :cd |  |
+| "CDTS", "CD TS" | Committee Draft Technical Specification | :cd |  |
 | "PDTS" | Proposed Draft Technical Specification | :cd |  |
 | "DTS" | Draft Technical Specification | :dts |  |
 | "FDTS" | Final Draft Technical Specification | :fdts |  |
