@@ -20,8 +20,8 @@ module Pubid
       private
 
       def publisher_portion
-        code = @id.publisher_code.to_s
-        code += "/#{@id.mandate}" if @id.mandate && !@id.publisher_code.include?("/")
+        code = @id.publisher.to_s
+        code += "/#{@id.mandate}" if @id.mandate && !code.include?("/")
         code
       end
 

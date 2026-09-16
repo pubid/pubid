@@ -24,7 +24,7 @@ RSpec.describe Pubid::Gb::Identifier do
       subject(:parsed) { described_class.parse("GB/T 20223-2006") }
 
       it "captures publisher code" do
-        expect(parsed.publisher_code).to eq("GB")
+        expect(parsed.publisher.body).to eq("GB")
       end
 
       it "captures mandate as T" do
@@ -93,7 +93,7 @@ RSpec.describe Pubid::Gb::Identifier do
       subject(:parsed) { described_class.parse("T/GZAEPI 001—2018") }
 
       it "captures publisher code as T/GZAEPI" do
-        expect(parsed.publisher_code).to eq("T/GZAEPI")
+        expect(parsed.publisher.body).to eq("T/GZAEPI")
       end
 
       it "captures year even with em-dash separator" do
@@ -109,7 +109,7 @@ RSpec.describe Pubid::Gb::Identifier do
       subject(:parsed) { described_class.parse("GBn 123-1990") }
 
       it "captures publisher code as GBn" do
-        expect(parsed.publisher_code).to eq("GBn")
+        expect(parsed.publisher.body).to eq("GBn")
       end
 
       it "has no mandate" do
@@ -145,6 +145,28 @@ RSpec.describe Pubid::Gb::Identifier do
 
     it "carries no nested date component" do
       expect(hash).not_to have_key("date")
+    end
+
+    it "serializes the publisher as a flat scalar" do
+      expect(hash["publisher"]).to eq("GB")
+    end
+
+    it "carries no publisher_code key" do
+      expect(hash).not_to have_key("publisher_code")
+    end
+  end
+
+  describe "#to_urn" do
+    it "carries the series" do
+      expect(described_class.parse("GB/T 20223-2006").to_urn.to_s)
+        .to eq("urn:gb:gb:20223:2006")
+    end
+
+    # The series is part of the identity: GB 20223 and GBn 20223 are two
+    # documents. Both shared one URN while the publisher was unset.
+    it "gives two series two URNs" do
+      expect(described_class.parse("GBn 20223-2006").to_urn.to_s)
+        .not_to eq(described_class.parse("GB 20223-2006").to_urn.to_s)
     end
   end
 

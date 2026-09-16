@@ -76,6 +76,39 @@ spellings unequal and would need an `exclude` override. The relaton fixture
 `spec/gb/fixtures/tgzaepi_001_2018.xml` records the em-dash form and is the one
 place that must follow this decision.
 
+## The series code lives in the inherited `publisher`
+
+`GB`, `JB`, `GBn` and `T/GZAEPI` are stored in the `publisher` attribute
+inherited from `::Pubid::Identifier`, a `Components::Publisher`. The flavor had
+its own `publisher_code` string beside it while the inherited attribute stayed
+nil, so two attributes described one value and the shared code that reads
+`publisher` saw nothing.
+
+The component serializes as a bare scalar, because the class adds itself to the
+flat-scalar table — the CEN/CENELEC precedent, and for GB's own classes only:
+
+```ruby
+Pubid::Gb::Identifier.flat_scalar_components   # => {..., publisher: "publisher"}
+Pubid::Gb::Identifier.flat_scalar_fields       # => {..., publisher: :body}
+```
+
+```ruby
+{"_type" => "pubid:gb:standard", "publisher" => "GB",
+ "mandate" => "T", "number" => "20223", "year" => "2006"}
+```
+
+**The URN gained the series, which repairs a collision.** `GB 20223-2006` and
+`GBn 20223-2006` are two documents and shared `urn:gb:20223:2006`; they now
+give `urn:gb:gb:20223:2006` and `urn:gb:gbn:20223:2006`. The shared URN
+generator lowercases the body on its own. The MR slug follows (`gb.20223.2006`,
+`gbn.20223.2006`) and sanitizes the slash of a social-group code by itself
+(`T/GZAEPI` → `t-gzaepi.001.2018`), so GB does not join the IEEE slash ledger.
+Annotated rendering gained a `publisher` span for free.
+
+**Note the parse-tree key keeps its name.** `rule(:publisher_code)` in the
+parser still captures `:publisher_code`; parse-tree keys and attribute names
+are different namespaces (the ASHRAE landmine). Only the attribute moved.
+
 ## Known gaps
 
 `spec/pubid/gb/fixtures_spec.rb` now reads `spec/fixtures/gb/`, which nothing
@@ -85,10 +118,12 @@ instead of a failure. GB has no `identifiers/full/identifiers.txt`, so the
 fixtures are hand-written and `rake validation:classify[gb]` does not drive
 them; the reader accepts both the plain and the generated line shapes.
 
-The URN carries the number and the year only: `GB/T 20223-2006` and
-`GBn 20223-2006` both give `urn:gb:20223:2006`. The publisher code and the
-mandate are lost, and there is no `Pubid::Gb::UrnParser` to read a URN back.
-Nothing consumes a GB URN today, so this is recorded, not fixed.
+The URN carries the series, the number and the year, but **not the mandate**:
+`GB 20223-2006` and `GB/T 20223-2006` both give `urn:gb:gb:20223:2006`, and
+their MR slugs are equal too. The mandatory and the recommended standard are
+two documents, so this is a real collision, narrower than the one the series
+repaired. There is also no `Pubid::Gb::UrnParser`, so a GB URN cannot be read
+back. Nothing consumes a GB URN today, so both are recorded, not fixed.
 
 ## Not supported (deliberately)
 
