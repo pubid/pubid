@@ -653,8 +653,16 @@ module Pubid
           # historical "…/D-3-2017" onto the number as "…-2017/D3", so by the
           # time this rule runs the draft usually trails the date (bucket 5);
           # a date-less "/D-4" keeps its hyphen (bucket 7), hence dash.maybe.
+          # A text date may trail the DRAFT itself (pubid#216:
+          # "CD P26515/D1, March 2017", "FDIS P15289/D3, 2017") — distinct
+          # keys (:draft_month/:draft_year), because a plain :month/:year
+          # here collides with the date clause above and parslet drops the
+          # subtree with a "Duplicate subtrees" warning.
           (slash >> str("D") >> dash.maybe >>
-           match('[0-9.]').repeat(1).as(:draft_version)).maybe >>
+           match('[0-9.]').repeat(1).as(:draft_version) >>
+           (((comma | space) >> month_name.as(:draft_month) >> space >>
+               year_digits.as(:draft_year)) |
+             (comma >> year_digits.as(:draft_year))).maybe).maybe >>
           # Optional amendment tail (pubid#317:
           # "8802-11:2012/Amd.1:2014(E)") - the flat tree keys reuse
           # build_flat_amendment.
@@ -666,8 +674,12 @@ module Pubid
           edition.maybe >>
           revision_suffix.maybe >>
           # Published joint docs print a language marker, after either the
-          # year or the amendment tail: "9945:2009(E)", "...Amd.1:2014(E)"
-          (str("(E)") | str("(F)")).maybe
+          # year or the amendment tail: "9945:2009(E)", "...Amd.1:2014(E)".
+          # The crawl sometimes spaces it ("…(E), January 2017" family,
+          # pubid#216), and a relationship parenthetical may follow
+          # ("…CD2 P15288-2013-09 (Revision of …)").
+          space.maybe >> (str("(E)") | str("(F)")).maybe >>
+          parenthetical.maybe
       end
 
       # Embedded (stage-LAST) ISO-led designations: the corpus writes the ISO
@@ -1240,6 +1252,105 @@ module Pubid
         cleaned.sub(%r{(\d)[Rr][Ee][Vv][A-Za-z0-9]+\s*\z}, '\1')
       end
 
+      # Rewrite the mechanical spellings of the joint ISO-stage forms that no
+      # grammar branch reaches (pubid#216 residuals). Two safety rules keep
+      # this from stealing inputs other rules already parse:
+      #   1. only BROKEN separators fire — underscore/space glue between
+      #      number, draft and stage, a slash-SPACE before the stage, a
+      #      dash/underscore month after it. A plain "/FDIS" tail is
+      #      natively accepted by ieee_p_identifier (fdraft) and the
+      #      stage-LAST embedded rule, so it is never rewritten.
+      #   2. the number carries at most ONE part — joint_development_iso_format
+      #      reads a single optional part, while ieee_p_identifier takes
+      #      multi-part numbers ("P62271-37-013"); a rewrite that moved a
+      #      multi-part number onto the joint rule would break it.
+      def self.normalize_joint_stage_spellings(cleaned)
+        # The separator (slash-optional-space or a space) is INSIDE the
+        # capture so a rewrite re-emits it — an uncaptured separator was
+        # silently eaten, gluing the publisher to the stage.
+        pubs = %r{((?:ISO/IEC/IEEE|IEEE/ISO/IEC|IEEE/IEC/ISO|ISO/IEEE|IEC/IEEE|IEEE/IEC|ISO/IEC|IEEE)(?:/ ?| ))}
+        stage = /(FDIS|FCD|CDV|DIS\d?|CD\d?|WD|PWI|NP)/
+        num = /(P?\d+(?:[.-]\d+)?)/
+        # What the joint grammar can finish reading AFTER the stage: the end
+        # of the string, a (comma-)month-year date, or a dash-year[-month].
+        # Captured and re-emitted so a rewrite never drops the date.
+        tail = /(,? (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]* \d{4}|\z|-\d{4}(?:-\d\d)?)/
+
+        # Draft glued to the number with an underscore: "P15289_D3" →
+        # "P15289/D3" (a digit must precede the underscore; "_FDIS" is the
+        # stage, not a draft, and is already slash-rewritten earlier).
+        cleaned = cleaned.gsub(%r{(\d)_D(\d)}, '\1/D\2')
+
+        # Crawl typo: a comma with no space before a month (",March 2021").
+        # In these identifiers a comma is always a date separator, so
+        # spacing it is safe.
+        cleaned = cleaned.sub(/,(?=[A-Za-z])/, ", ")
+
+        # Stage AFTER the draft, both glued with underscores (the early
+        # stage gsub already turned "_CD" into "/CD"):
+        # "…P24748-3/D3/FDIS, April 2020 (E)" → "…FDIS P24748-3/D3, …"
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{num}/(D[\d.]+)/ ?#{stage}\b},
+          '\1\4 \2/\3',
+        )
+
+        # Slash-SPACE before the stage ("…P16085/ FDIS, August 2020" —
+        # ieee_p's fdraft has no inner space, so this spelling has no other
+        # home): → "…FDIS P16085, August 2020"
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{num}/ #{stage}#{tail}},
+          '\1\3 \2\4',
+        )
+
+        # A space-year after a slash-stage ("…P26511.2/FDIS 2018" — no rule
+        # reads "/FDIS 2018"): → "…FDIS P26511.2-2018" (dash-year clause).
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{num}/#{stage} (\d{4})\b},
+          '\1\3 \2-\4',
+        )
+
+        # Stage separated from the number by a SPACE ("IEC/IEEE P63113 CD4,
+        # April 2019"): → "IEC/IEEE CD4 P63113, April 2019". The tail guard
+        # keeps "…FDIS March 2019" (space-month-year, readable after the
+        # swap) while leaving prose suffixes alone.
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{num} #{stage}#{tail}},
+          '\1\3 \2\4',
+        )
+
+        # The same space-stage with a space-DRAFT chained after it
+        # ("IEC/IEEE P60980-344 CDV D1, June 2019"): → stage-first with a
+        # slash draft ("…CDV P60980-344/D1, June 2019").
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{num} #{stage} (D\d+)\b},
+          '\1\3 \2/\4',
+        )
+
+        # Slash-stage carrying a dash-date ("…P15288/CD2-2013-09 …" — the
+        # dash-year tail is what the joint grammar reads after the number, so
+        # this cannot steal the plain "/FDIS, June 2021" spellings
+        # ieee_p_identifier finishes): → "…CD2 P15288-2013-09 …"
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{num}/ ?#{stage}(-\d{4}(?:-\d\d)?)},
+          '\1\3 \2\4',
+        )
+
+        # Draft separated from a stage-first number by a SPACE:
+        # "…DIS P11073-10418 D13, January 2011" → "…DIS P11073-10418/D13, …"
+        cleaned = cleaned.sub(
+          %r{\A#{pubs}#{stage} #{num}/? ?(D\d+)\b},
+          '\1\2 \3/\4',
+        )
+
+        # NOT rewritten: a month glued to the stage with a dash/underscore
+        # ("…/FDIS_Dec 2012", "…/FDIS-Dec 2015"). Even routed onto the joint
+        # grammar, the joint render of a month+draft is itself not yet
+        # idempotent, and the bare-IEEE fdraft path drops the stage and the
+        # date from to_hash — rewriting would trade a visible parse failure
+        # for silent garbage. Deferred with the pubid#216 semantic residue.
+        cleaned
+      end
+
       def self.parse(string)
         # Strip .pdf extension if present (Pattern 3: File Extensions)
         cleaned = string.sub(/\.pdf$/i, "")
@@ -1319,6 +1430,11 @@ module Pubid
         cleaned = cleaned.gsub(
           /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(\d{4})\b/, '\1 \2'
         )
+
+        # Rewrite the joint ISO-stage glued spellings (pubid#216) AFTER the
+        # month unglue above, so "Dec2015" is already spaced when the
+        # dash-month rewrite looks for it.
+        cleaned = normalize_joint_stage_spellings(cleaned)
 
         # NEW: Convert IEC/IEEE space-separated to semicolon format
         # Pattern: "IEC 61523-3 First edition 2004-09; IEEE 1497" → already semicolon
