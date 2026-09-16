@@ -21,10 +21,6 @@ id = Pubid::Ccsds.parse("...")
 |------|------|-----------|-----------------|
 | "" |  | published |  |
 
-### Base Base 88929
-
-**Class:** `Pubid::Ccsds::Identifiers::BaseBase88929`
-
 ### Corrigendum
 
 **Class:** `Pubid::Ccsds::Identifiers::Corrigendum`

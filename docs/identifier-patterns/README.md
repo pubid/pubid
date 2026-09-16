@@ -12,7 +12,7 @@
 | BIPM | 6 | 0 | Yes | Yes |
 | BSI | 33 | 19 | Yes | No |
 | CALCONNECT | 1 | 1 | Yes | No |
-| CCSDS | 3 | 2 | Yes | Yes |
+| CCSDS | 2 | 2 | Yes | Yes |
 | CEN_CENELEC | 16 | 19 | Yes | No |
 | CIE | 11 | 0 | Yes | No |
 | CSA | 9 | 0 | Yes | No |
@@ -32,7 +32,7 @@
 | IHO | 6 | 0 | Yes | No |
 | ISBN | 1 | 1 | No | No |
 | ISO | 18 | 129 | Yes | Yes |
-| ITU | 16 | 0 | Yes | No |
+| ITU | 17 | 0 | Yes | No |
 | JCGM | 5 | 5 | Yes | No |
 | JIS | 7 | 3 | Yes | No |
 | NIST | 21 | 19 | Yes | Yes |
