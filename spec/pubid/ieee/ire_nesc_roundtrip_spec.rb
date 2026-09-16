@@ -88,6 +88,38 @@ RSpec.describe "IEEE IRE/NESC identifier reparenting" do
     end
   end
 
+  # Prefix-first IRE spellings (pubid#316 family 2, the rawbib residuals):
+  # the year trails the designation instead of leading it. The renderer
+  # always emits the year-first short-year form, so each spelling collapses
+  # onto its year-first twin — the same document, two crawl spellings.
+  describe "prefix-first IRE spellings" do
+    subject(:klass) { Pubid::Ieee::Identifier }
+
+    {
+      "IRE 7.S2-1952" => "52 IRE 7.S2",
+      "IRE 2.S1-1955" => "55 IRE 2.S1",
+      "IRE 28.S1-1961" => "61 IRE 28.S1",
+      "IRE 15.S1-1961" => "61 IRE 15.S1",
+      "IRE 12.S1-1962" => "62 IRE 12.S1",
+      "IRE 7.S2-1962" => "62 IRE 7.S2",
+    }.each do |input, year_first|
+      context input.inspect do
+        it "renders as the year-first form #{year_first.inspect}" do
+          expect(klass.parse(input).to_s).to eq(year_first)
+        end
+
+        it "is the same identifier as its year-first spelling" do
+          expect(klass.parse(input).to_hash).to eq(klass.parse(year_first).to_hash)
+        end
+
+        it "round-trips through to_hash/from_hash" do
+          hash = klass.parse(input).to_hash
+          expect(klass.from_hash(hash).to_hash).to eq(hash)
+        end
+      end
+    end
+  end
+
   # Nesc::Base is abstract. An instance of it would serialize the derived
   # `_type` "pubid:ieee:base", which from_hash cannot resolve back to NESC (it
   # would silently degrade to a plain Pubid::Ieee::Identifier), and it carries

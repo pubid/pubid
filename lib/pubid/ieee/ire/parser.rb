@@ -73,7 +73,7 @@ module Pubid
         end
 
         # Complete IRE identifier - YEAR FIRST format
-        rule(:ire_identifier) do
+        rule(:ire_identifier_year_first) do
           # Format: "52 IRE 7.S2" or "1952 IRE 7.S2"
           year.as(:year) >>
             space >>
@@ -82,6 +82,24 @@ module Pubid
             (ire_type >> space).maybe >>
             number >>
             (space? >> (dash | str(",")).maybe >> space? >> year_full.as(:full_year)).maybe
+        end
+
+        # Prefix-first format: "IRE 7.S2-1952" (pubid#316 family 2) — the
+        # year trails the designation instead of leading the identifier.
+        # The renderer always emits the year-first short-year form, so this
+        # spelling canonicalizes onto it ("IRE 7.S2-1952" → "52 IRE 7.S2").
+        rule(:ire_identifier_prefix_first) do
+          ire_prefix >>
+            space >>
+            (ire_type >> space).maybe >>
+            number >>
+            date
+        end
+
+        # Year-first is tried first so the original spellings keep their
+        # match; prefix-first claims only what year-first cannot.
+        rule(:ire_identifier) do
+          ire_identifier_year_first | ire_identifier_prefix_first
         end
 
         root(:ire_identifier)
