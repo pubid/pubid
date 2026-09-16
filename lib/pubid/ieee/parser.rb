@@ -1182,12 +1182,15 @@ module Pubid
         # A "\d+" right after "Rev" both selects the numbered subset and keeps
         # these off the English word "Revision". Three source positions:
         #   after a draft : "PC37.30.2/D043 Rev 18" -> ".../D043/R-18"
+        # The draft captures accept relaton's hyphenated "/D-<n>" spelling
+        # (pubid#316): without the "-?" the before-draft regex matched only
+        # "/D" of "/D-3" and emitted the garbage "/D/R-2-3-2008-02".
         cleaned = cleaned.sub(
-          %r{(/D[0-9A-Za-z.]*)\s+[Rr][Ee][Vv]\s*(\d+)}, '\1/R-\2'
+          %r{(/D-?[0-9A-Za-z.]+)\s+[Rr][Ee][Vv]\s*(\d+)}, '\1/R-\2'
         )
         #   before a draft: "P802.16Rev2/D3" -> "P802.16/D3/R-2"
         cleaned = cleaned.sub(
-          %r{[-/_.]?\s?[Rr][Ee][Vv][-\s]?(\d+)(/D[0-9A-Za-z.]*)}, '\2/R-\1'
+          %r{[-/_.]?\s?[Rr][Ee][Vv][-\s]?(\d+)(/D-?[0-9A-Za-z.]+)}, '\2/R-\1'
         )
         #   no draft, trailing: "P1722-rev1" -> "P1722/R-1"
         cleaned = cleaned.sub(
@@ -1199,7 +1202,7 @@ module Pubid
         # became "/R-<n>", so these regexes only see the lettered residue.
         # Revision token that PRECEDES a draft: drop it (keep the /D…).
         cleaned = cleaned.sub(
-          %r{[-/_.]?\s?[Rr][Ee][Vv][-\s]?[A-Za-z0-9]+(?=/D[0-9])},
+          %r{[-/_.]?\s?[Rr][Ee][Vv][-\s]?[A-Za-z0-9]+(?=/D-?[0-9A-Za-z])},
           "",
         )
         # Trailing revision glued to the number with no draft ("P802.11REVmb");
