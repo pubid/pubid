@@ -669,7 +669,14 @@ module Pubid
         # Extract publishers from joint_publishers
         if parsed[:joint_publishers]
           joint_pub_str = extract_value(parsed[:joint_publishers])
-          attributes[:publishers] = joint_pub_str.split("/")
+          pubs = joint_pub_str.split("/")
+          attributes[:publishers] = pubs
+          # lutaml materializes attribute defaults during from_hash, so the
+          # deserialized joint carries publisher/copublisher alongside
+          # publishers; set the same shape on the parse path or the
+          # amendment-wrapped round-trip diverges on exactly those keys.
+          attributes[:publisher] = pubs.first
+          attributes[:copublisher] = pubs.drop(1)
         end
 
         # Build code with parts if present
@@ -722,6 +729,10 @@ module Pubid
             attributes[:typed_stage] =
               Pubid::Ieee.locate_stage(stage_abbr)
           end
+        elsif parsed[:iso_published]
+          # Stage-less PUBLISHED joint form (pubid#317): ISO-led spelling,
+          # no project marker, no typed stage - renders as printed.
+          attributes[:lead_party] = "ISO"
         else
           # IEEE format - lead party is IEEE
           attributes[:lead_party] = "IEEE"
@@ -734,7 +745,19 @@ module Pubid
             Pubid::Ieee.locate_stage("P")
         end
 
-        Identifiers::JointDevelopment.new(**attributes)
+        joint = Identifiers::JointDevelopment.new(**attributes)
+
+        # Amendment tail on the joint ISO-format form (pubid#317:
+        # "8802-11:2012/Amd.1:2014(E)"): wrap the joint id, mirroring
+        # build_flat_amendment.
+        return joint unless parsed[:amd_number]
+
+        amd_year = extract_value(parsed[:amd_year]) if parsed[:amd_year]
+        Identifiers::Amendment.new(
+          base: joint,
+          number: extract_value(parsed[:amd_number]),
+          year: amd_year,
+        )
       end
 
       # Build SI/PSI identifier from parsed data
