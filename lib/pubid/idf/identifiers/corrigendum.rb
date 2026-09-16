@@ -4,7 +4,7 @@ module Pubid
   module Idf
     module Identifiers
       class Corrigendum < SupplementIdentifier
-        attribute :type, Components::Type, default: -> { self.class.type[:key] }
+        attribute :type, Components::Type, default: -> { self.class.default_type }
 
         TYPED_STAGES = [
           Components::TypedStage.new(
