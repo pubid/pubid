@@ -122,9 +122,14 @@ module Pubid
         ).as(:edition_format) # Wrap entire match to capture that Edition was used
       end
 
-      # Date - year after colon OR edition portion (with optional space before year)
+      # Date - year after colon, the VIM's paren-year form ("OIML V 2-200
+      # (2000)" — space + (YYYY) instead of :YYYY, the shape #342 flags as
+      # the one real-world spelling that did not parse), OR edition portion
+      # (with optional space before year)
       rule(:date) do
-        edition_portion | (colon >> space.maybe >> year_digits.as(:year))
+        edition_portion |
+          (colon >> space.maybe >> year_digits.as(:year)) |
+          (space.maybe >> lparen >> year_digits.as(:year) >> rparen)
       end
 
       # Draft stage - WD or CD with optional iteration
