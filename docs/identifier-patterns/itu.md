@@ -39,6 +39,10 @@ id = Pubid::Itu.parse("...")
 
 **Class:** `Pubid::Itu::Identifiers::CombinedIdentifier`
 
+### Contribution
+
+**Class:** `Pubid::Itu::Identifiers::Contribution`
+
 ### Corrigendum
 
 **Class:** `Pubid::Itu::Identifiers::Corrigendum`
