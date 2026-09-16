@@ -83,10 +83,14 @@ module NumberStringRetypeSpec
   # `pubid:cencenelec:` type segment (the module name, not a registry name),
   # so the CEN identifier nested in a BSI adoption deserializes as its CEN
   # class instead of the abstract root.
+  # bsi 597 -> 2 with pubid#379: `date`/`type` retyped to the shared
+  # components — nearly every residual failure was the empty
+  # Bsi::Components::Date/Type subclass rejecting the shared instances a
+  # wrapper delegates to (or a leaf materializes) on to_hash/from_hash.
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
     "api" => 1,
-    "bsi" => 597,
+    "bsi" => 2,
     "ccsds" => 0,
     "cen_cenelec" => 0,
     "idf" => 0,
