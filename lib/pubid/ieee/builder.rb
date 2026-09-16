@@ -700,6 +700,15 @@ module Pubid
         end
         attributes[:month] = extract_value(parsed[:month]) if parsed[:month]
 
+        # A text date trailing the DRAFT (pubid#216: "CD P26515/D1, March
+        # 2017") reaches the builder under :draft_month/:draft_year — the
+        # grammar captures them separately to avoid the :month/:year
+        # duplicate-subtree collision with the date clause.
+        if parsed[:draft_year]
+          attributes[:year] ||= extract_value(parsed[:draft_year])
+          attributes[:month] ||= extract_value(parsed[:draft_month])
+        end
+
         # Extract edition, from relaton's "/E-<n>" suffix (normalized to
         # "Edition <n>.0"). nil-residue hand-off item 1.
         attributes[:edition] = extract_value(parsed[:edition]) if parsed[:edition]
