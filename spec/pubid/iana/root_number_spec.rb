@@ -55,9 +55,9 @@ RSpec.describe "Pubid::Iana index key (root.number)" do
   # These two assertions are deterministic: they read the attribute definitions
   # directly, so they fail immediately and always.
   describe "number is declared on the LEAF, not the shared base" do
-    it "leaves the shared base's inherited Components::Code number alone" do
+    it "resolves the shared base's inherited number to a String" do
       expect(Pubid::Iana::Identifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
 
     it "Registry declares its own :string number" do

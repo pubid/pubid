@@ -191,13 +191,14 @@ module NumberStringRetypeSpec
 end
 
 RSpec.describe "number/part/subpart as :string" do
-  describe "the shared base is NOT retyped" do
-    # The whole point of the tranching: this line moves last, once ISO, NIST
-    # and CSA have also converted. A failure here means someone jumped ahead.
+  describe "the shared base is retyped" do
+    # The last step of the sequence, and the one that ends the bug class: with
+    # the base declaring the scalar, no flavor redeclares number/part/subpart,
+    # so the nondeterministic attribute resolution has nothing to resolve.
     NumberStringRetypeSpec::ATTRS.each do |attr|
-      it "::Pubid::Identifier still declares #{attr} as Components::Code" do
+      it "::Pubid::Identifier declares #{attr} as a String" do
         expect(Pubid::Identifier.attributes[attr].type)
-          .to eq(Pubid::Components::Code)
+          .to eq(NumberStringRetypeSpec::STRING)
       end
     end
   end

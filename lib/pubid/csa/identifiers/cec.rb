@@ -58,7 +58,7 @@ module Pubid
         def number
           return nil unless cec_part && no_number
 
-          Components::Code.new(value: "#{cec_part.value}-#{no_number.value}")
+          "#{cec_part.value}-#{no_number.value}"
         end
       end
     end

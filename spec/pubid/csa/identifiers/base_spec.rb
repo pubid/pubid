@@ -15,7 +15,7 @@ RSpec.describe Pubid::Csa::Identifiers::Base do
         end
 
         it "parses code" do
-          expect(parsed.number.value).to eq("B149.1")
+          expect(parsed.number).to eq("B149.1")
         end
 
         it "parses year" do
@@ -37,7 +37,7 @@ RSpec.describe Pubid::Csa::Identifiers::Base do
         end
 
         it "parses code from wrapped identifier" do
-          expect(parsed.base.number.value).to eq("A123.1")
+          expect(parsed.base.number).to eq("A123.1")
         end
 
         it "parses year with dash format" do
@@ -59,7 +59,7 @@ RSpec.describe Pubid::Csa::Identifiers::Base do
         end
 
         it "parses code" do
-          expect(parsed.base.number.value).to eq("B78.1")
+          expect(parsed.base.number).to eq("B78.1")
         end
 
         it "parses year with M prefix" do
@@ -195,7 +195,7 @@ RSpec.describe Pubid::Csa::Identifiers::Base do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses code" do
-          expect(parsed.number.value).to eq("A123.17")
+          expect(parsed.number).to eq("A123.17")
         end
 
         it "parses original year" do
@@ -263,7 +263,7 @@ RSpec.describe Pubid::Csa::Identifiers::Base do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses multi-part decimal code" do
-          expect(parsed.number.value).to eq("Z259.2.4")
+          expect(parsed.number).to eq("Z259.2.4")
         end
 
         it "parses year" do
