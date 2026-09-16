@@ -73,12 +73,6 @@ RSpec.describe "Pubid.from_hash" do
 
   describe "round trip through the serialized hash" do
     FROM_HASH_SAMPLES.each do |flavor, ref|
-      # EVS wraps a nested cross-flavor adopted_identifier; from_hash cannot
-      # rehydrate that shape yet (same failure on BSI's adopted norms, e.g.
-      # "BS EN 10077-1:2006"). Tracked upstream — see the issue referenced
-      # in the EVS flavor PR.
-      next if flavor == "evs"
-
       context "with #{flavor} (#{ref})" do
         let(:id) { Pubid::Registry.get(flavor).parse(ref) }
 

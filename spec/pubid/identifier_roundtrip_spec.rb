@@ -32,6 +32,7 @@ RSpec.describe "Identifier to_hash/from_hash round-trip" do
     "Pubid::Cie"        => "CIE 198:2011",
     "Pubid::Csa"        => "CSA C22.2 NO. 0:20",
     "Pubid::Etsi"       => "ETSI EG 200 053 V1.5.1 (2004-06)",
+    "Pubid::Evs"        => "EVS-EN ISO 9001:2015/A1:2024",
     "Pubid::Idf"        => "IDF 146:2003",
     "Pubid::Iec"        => "IEC 60050:2011",
     "Pubid::Ieee"       => "IEEE 802.3-2018",

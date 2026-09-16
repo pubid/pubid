@@ -3,16 +3,16 @@
 module Pubid
   module Evs
     # An EVS national adoption wraps a CEN identifier the same way BSI's
-    # AdoptedEuropeanNorm does — polymorphic `adopted_identifier` so the
+    # AdoptedEuropeanNorm does — polymorphic `base` so the
     # wrapped object stays a real Pubid::CenCenelec identifier.
     #
     # Examples:
-    #   "EVS-EN 18216:2026"           (adopted_identifier: EN 18216:2026)
-    #   "EVS-EN ISO 14001:2026"       (adopted_identifier: EN ISO 14001:2026)
-    #   "EVS-EN ISO/IEC 27017:2026"   (adopted_identifier: EN ISO/IEC 27017:2026)
-    #   "EVS-EN ISO 9001:2015/A1:2024" (adopted_identifier: EN ISO 9001:2015/A1:2024)
+    #   "EVS-EN 18216:2026"           (base: EN 18216:2026)
+    #   "EVS-EN ISO 14001:2026"       (base: EN ISO 14001:2026)
+    #   "EVS-EN ISO/IEC 27017:2026"   (base: EN ISO/IEC 27017:2026)
+    #   "EVS-EN ISO 9001:2015/A1:2024" (base: EN ISO 9001:2015/A1:2024)
     class Identifier < ::Pubid::Identifier
-      attribute :adopted_identifier, ::Pubid::Identifier, polymorphic: true
+      attribute :base, ::Pubid::Identifier, polymorphic: true
       # "-" or " " — preserves the printed separator ("EVS-EN" vs "EVS EN")
       attribute :separator, :string, default: -> { "-" }
 

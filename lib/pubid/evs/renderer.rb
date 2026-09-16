@@ -23,7 +23,7 @@ module Pubid
       end
 
       def adopted
-        @id.adopted_identifier.to_s
+        @id.base.to_s
       end
     end
   end

@@ -9,27 +9,27 @@ RSpec.describe Pubid::Evs do
       id = described_class.parse("EVS-EN 18216:2026")
       expect(id).to be_a(Pubid::Evs::Identifiers::NationalAdoption)
       expect(id.to_s).to eq("EVS-EN 18216:2026")
-      expect(id.adopted_identifier.number.to_s).to eq("18216")
-      expect(id.adopted_identifier.year.to_s).to eq("2026")
+      expect(id.base.number.to_s).to eq("18216")
+      expect(id.base.year.to_s).to eq("2026")
     end
 
     it "parses an EN ISO adoption" do
       id = described_class.parse("EVS-EN ISO 14001:2026")
-      expect(id.adopted_identifier).to be_a(Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
+      expect(id.base).to be_a(Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
       expect(id.to_s).to eq("EVS-EN ISO 14001:2026")
     end
 
     it "parses an EN ISO/IEC adoption" do
       id = described_class.parse("EVS-EN ISO/IEC 27017:2026")
-      expect(id.adopted_identifier).to be_a(Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
+      expect(id.base).to be_a(Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
       expect(id.to_s).to eq("EVS-EN ISO/IEC 27017:2026")
     end
 
     it "parses an amendment adoption" do
       id = described_class.parse("EVS-EN ISO 9001:2015/A1:2024")
       expect(id.to_s).to eq("EVS-EN ISO 9001:2015/A1:2024")
-      expect(id.adopted_identifier.root.number.to_s).to eq("9001")
-      expect(id.adopted_identifier.root.year.to_s).to eq("2015")
+      expect(id.base.root.number.to_s).to eq("9001")
+      expect(id.base.root.year.to_s).to eq("2015")
     end
 
     it "parses through the global Pubid.parse dispatcher" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Evs do
 
     it "defaults to the hyphen separator" do
       id = Pubid::Evs::Identifiers::NationalAdoption.new(
-        adopted_identifier: Pubid::CenCenelec.parse("EN 18216:2026"),
+        base: Pubid::CenCenelec.parse("EN 18216:2026"),
       )
       expect(id.to_s).to eq("EVS-EN 18216:2026")
     end
@@ -61,6 +61,66 @@ RSpec.describe Pubid::Evs do
         .to eq("urn:evs:en:iso-iec:27017:2026")
       expect(described_class.parse("EVS-EN ISO 9001:2015/A1:2024").to_urn)
         .to eq("urn:evs:en:iso:9001:2015:amd:1:2024")
+    end
+  end
+
+  # The wrapped document is exposed as `base`, the uniform parent accessor, so
+  # `#root` walks it and relaton keys the adoption under the origin standard's
+  # number. The old name `adopted_identifier` left root.number empty.
+  describe "the uniform parent accessor" do
+    {
+      "EVS-EN 18216:2026" => "18216",
+      "EVS-EN ISO 14001:2026" => "14001",
+      "EVS-EN ISO/IEC 27017:2026" => "27017",
+      "EVS-EN ISO 9001:2015/A1:2024" => "9001",
+    }.each do |ref, number|
+      it "keys #{ref} under #{number}" do
+        id = described_class.parse(ref)
+
+        expect(id.root).to eq(id.base.root)
+        expect(id.root.number.to_s).to eq(number)
+      end
+    end
+
+    it "serializes the wrapped document under \"base\"" do
+      hash = described_class.parse("EVS-EN 18216:2026").to_hash
+
+      expect(hash.keys).to eq(%w[_type base])
+    end
+  end
+
+  # pubid#383: from_hash raised InvalidFormatError on every EVS hash. The
+  # `type` default was the Symbol :evs_en, so to_hash dropped it as a default
+  # and from_hash then cast the Symbol into a Components::Type.
+  describe "from_hash round trip" do
+    [
+      "EVS-EN 18216:2026",
+      "EVS EN ISO 14001:2026",
+      "EVS-EN ISO/IEC 27017:2026",
+      "EVS-EN ISO 9001:2015/A1:2024",
+    ].each do |ref|
+      context "with #{ref}" do
+        let(:id) { described_class.parse(ref) }
+
+        it "rebuilds an equal identifier through the flavor handle" do
+          restored = Pubid::Evs::Identifier.from_hash(id.to_hash)
+
+          expect(restored).to be_a(Pubid::Evs::Identifiers::NationalAdoption)
+          expect(restored).to eq(id)
+          expect(restored.to_hash).to eq(id.to_hash)
+          expect(restored.to_s).to eq(ref)
+          expect(restored.to_urn).to eq(id.to_urn)
+        end
+
+        it "rebuilds the same class through Pubid.from_hash" do
+          expect(Pubid.from_hash(id.to_hash)).to eq(id)
+        end
+      end
+    end
+
+    it "does not serialize the defaulted type" do
+      expect(described_class.parse("EVS-EN 18216:2026").to_hash)
+        .not_to have_key("type")
     end
   end
 
@@ -98,17 +158,17 @@ RSpec.describe Pubid::Evs do
 
   describe "wrapped identifier classes" do
     it "wraps a plain EuropeanNorm" do
-      expect(described_class.parse("EVS-EN 18216:2026").adopted_identifier)
+      expect(described_class.parse("EVS-EN 18216:2026").base)
         .to be_a(Pubid::CenCenelec::Identifiers::EuropeanNorm)
     end
 
     it "wraps an AdoptedEuropeanNorm for EN ISO" do
-      expect(described_class.parse("EVS-EN ISO 14001:2026").adopted_identifier)
+      expect(described_class.parse("EVS-EN ISO 14001:2026").base)
         .to be_a(Pubid::CenCenelec::Identifiers::AdoptedEuropeanNorm)
     end
 
     it "wraps an Amendment for /A1" do
-      expect(described_class.parse("EVS-EN ISO 9001:2015/A1:2024").adopted_identifier)
+      expect(described_class.parse("EVS-EN ISO 9001:2015/A1:2024").base)
         .to be_a(Pubid::CenCenelec::Identifiers::Amendment)
     end
   end
@@ -132,7 +192,7 @@ RSpec.describe Pubid::Evs do
   describe "UrnGenerator guard" do
     it "rejects a non-CEN adopted identifier" do
       id = Pubid::Evs::Identifiers::NationalAdoption.new(
-        adopted_identifier: Pubid::Iso.parse("ISO 9001:2015"),
+        base: Pubid::Iso.parse("ISO 9001:2015"),
       )
       expect do
         id.to_urn
