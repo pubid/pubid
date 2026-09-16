@@ -859,6 +859,11 @@ module Pubid
           # Year-first pattern: "52 IRE 7.S2" or "60 IRE 28 PS7"
           ((match("[1-6]") >> digit >> space >> str("IRE")) | # 2-digit year format
            (str("19") >> digit.repeat(2, 2) >> space >> str("IRE"))) |
+          # Prefix-first pattern: "IRE 7.S2-1952" (pubid#316 family 2) —
+          # IRE then a designation (digits or a type word). Loose on
+          # purpose: the sub-parser is strict, and a failed delegation just
+          # falls through to the remaining alternatives.
+          (str("IRE") >> space >> (digits | str("Standard") | str("Std") | str("Trans"))) |
           # IEEE-IRE transitional pattern
           (str("IEEE-IRE") >> space)
         ).present? >>
