@@ -734,9 +734,13 @@ module Pubid
       end
 
       # IEEE P pattern (without Std): "IEEE P1003.1..." OR just "P1003.1..." (prefix optional)
+      # `P` is not consumed here: the `number` rule carries its own optional
+      # leading P and captures it into :number ("P1003.1"), so Code.parse
+      # peels it as code.prefix and the project marker survives the parse —
+      # a bare `str("P")` swallowed it and "P1201/D0.3" came back without
+      # its P at all (pubid#18's data-loss complaint).
       rule(:ieee_p_identifier) do
         (str("IEEE").as(:publisher) >> space).maybe >> # Make IEEE prefix optional
-          str("P") >> space.maybe >> # Make space after P optional
           number >>
           (part_subpart_year | edition).maybe >>
           # Pattern for /08 style drafts (digits without D prefix) - MUST come before corrigendum
