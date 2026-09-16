@@ -66,7 +66,7 @@ module Pubid
     # @param type [Symbol] the type key (e.g. :is, :tr, :ts, :guide)
     # @param publisher [String, Pubid::Iso::Components::Publisher] primary publisher
     # @param copublishers [Array<String>, Array<Pubid::Components::Publisher>]
-    # @param number [String, Integer, Pubid::Iso::Components::Code]
+    # @param number [String, Integer]
     # @param year [String, Integer, Pubid::Components::Date, nil]
     # @param attrs [Hash] additional identifier attributes
     # @return [Pubid::Iso::Identifier]
@@ -106,10 +106,11 @@ module Pubid
     private_class_method :build_copublishers
 
     # @!visibility private
+    # number/part/subpart are plain strings. A caller that still passes a
+    # Components::Code (another flavor's builder, a hand-built id) is read
+    # through its own #to_s rather than refused.
     def self.build_code(value)
-      return value if value.is_a?(Components::Code)
-
-      Components::Code.new(value: value.to_s)
+      value.to_s
     end
     private_class_method :build_code
 

@@ -17,7 +17,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10231")
+        expect(parsed.base.number).to eq("10231")
       end
 
       it "parses base identifier date" do
@@ -25,7 +25,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -64,7 +64,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("13688")
+        expect(parsed.base.number).to eq("13688")
       end
 
       it "parses base identifier date" do
@@ -72,7 +72,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -111,7 +111,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("123")
+        expect(parsed.base.number).to eq("123")
       end
 
       it "parses base identifier date" do
@@ -119,7 +119,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -158,11 +158,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8601")
+        expect(parsed.base.number).to eq("8601")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -170,7 +170,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -209,11 +209,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8601")
+        expect(parsed.base.number).to eq("8601")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -221,7 +221,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -261,11 +261,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8601")
+        expect(parsed.base.number).to eq("8601")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -273,7 +273,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -316,11 +316,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8601")
+        expect(parsed.base.number).to eq("8601")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -328,7 +328,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -374,7 +374,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("19110")
+        expect(parsed.base.number).to eq("19110")
       end
 
       it "parses base identifier date" do
@@ -382,7 +382,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -421,11 +421,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10993")
+        expect(parsed.base.number).to eq("10993")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("4")
+        expect(parsed.base.part).to eq("4")
       end
 
       it "parses base identifier date" do
@@ -433,7 +433,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -479,11 +479,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("105")
+        expect(parsed.base.number).to eq("105")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("B01")
+        expect(parsed.base.part).to eq("B01")
       end
 
       it "parses base identifier date" do
@@ -491,7 +491,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -531,11 +531,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10993")
+        expect(parsed.base.number).to eq("10993")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("4")
+        expect(parsed.base.part).to eq("4")
       end
 
       it "parses base identifier date" do
@@ -543,7 +543,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -594,11 +594,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("14496")
+          expect(parsed.base.number).to eq("14496")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("10")
+          expect(parsed.base.part).to eq("10")
         end
 
         it "parses base identifier date" do
@@ -606,7 +606,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses amendment date" do
@@ -645,11 +645,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("8802")
+          expect(parsed.base.number).to eq("8802")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("3")
+          expect(parsed.base.part).to eq("3")
         end
 
         it "parses base identifier date" do
@@ -657,7 +657,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("7")
+          expect(parsed.number).to eq("7")
         end
 
         it "parses amendment date" do
@@ -707,11 +707,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("8802")
+          expect(parsed.base.number).to eq("8802")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("3")
+          expect(parsed.base.part).to eq("3")
         end
 
         it "parses base identifier date" do
@@ -719,7 +719,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("11")
+          expect(parsed.number).to eq("11")
         end
 
         it "parses amendment date" do
@@ -759,11 +759,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("8802")
+          expect(parsed.base.number).to eq("8802")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("22")
+          expect(parsed.base.part).to eq("22")
         end
 
         it "parses base identifier date" do
@@ -771,7 +771,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("2")
+          expect(parsed.number).to eq("2")
         end
 
         it "parses amendment date" do
@@ -821,11 +821,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("8802")
+          expect(parsed.base.number).to eq("8802")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("22")
+          expect(parsed.base.part).to eq("22")
         end
 
         it "parses base identifier date" do
@@ -833,7 +833,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("2")
+          expect(parsed.number).to eq("2")
         end
 
         it "parses amendment date" do
@@ -881,11 +881,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("10791")
+          expect(parsed.base.number).to eq("10791")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("6")
+          expect(parsed.base.part).to eq("6")
         end
 
         it "parses base identifier date" do
@@ -893,7 +893,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses amendment date" do
@@ -930,11 +930,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("11855")
+          expect(parsed.base.number).to eq("11855")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("5")
+          expect(parsed.base.part).to eq("5")
         end
 
         it "parses base identifier date" do
@@ -942,7 +942,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses amendment date" do
@@ -977,11 +977,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("20138")
+          expect(parsed.base.number).to eq("20138")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("2")
+          expect(parsed.base.part).to eq("2")
         end
 
         it "parses base identifier date" do
@@ -989,7 +989,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
         end
 
         it "parses amendment number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses amendment date" do
@@ -1032,11 +1032,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10993")
+        expect(parsed.base.number).to eq("10993")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("18")
+        expect(parsed.base.part).to eq("18")
       end
 
       it "parses base identifier date" do
@@ -1044,7 +1044,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1079,11 +1079,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("15874")
+        expect(parsed.base.number).to eq("15874")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("3")
+        expect(parsed.base.part).to eq("3")
       end
 
       it "parses base identifier date" do
@@ -1091,7 +1091,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -1127,11 +1127,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("15874")
+        expect(parsed.base.number).to eq("15874")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("3")
+        expect(parsed.base.part).to eq("3")
       end
 
       it "parses base identifier date" do
@@ -1139,7 +1139,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -1179,11 +1179,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("7207")
+        expect(parsed.base.number).to eq("7207")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("2")
+        expect(parsed.base.part).to eq("2")
       end
 
       it "parses base identifier date" do
@@ -1191,7 +1191,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -1233,7 +1233,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("19110")
+        expect(parsed.base.number).to eq("19110")
       end
 
       it "parses base identifier date" do
@@ -1241,7 +1241,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1276,11 +1276,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("4254")
+        expect(parsed.base.number).to eq("4254")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1288,7 +1288,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1327,7 +1327,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("3245")
+        expect(parsed.base.number).to eq("3245")
       end
 
       it "parses base identifier date" do
@@ -1335,7 +1335,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1373,7 +1373,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("18362")
+        expect(parsed.base.number).to eq("18362")
       end
 
       it "parses base identifier date" do
@@ -1381,7 +1381,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1424,11 +1424,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("14496")
+        expect(parsed.base.number).to eq("14496")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("10")
+        expect(parsed.base.part).to eq("10")
       end
 
       it "parses base identifier date" do
@@ -1436,7 +1436,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1478,11 +1478,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1490,7 +1490,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1529,11 +1529,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1541,7 +1541,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1580,11 +1580,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1592,7 +1592,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1642,11 +1642,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("23008")
+        expect(parsed.base.number).to eq("23008")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier stage" do
@@ -1654,7 +1654,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -1701,11 +1701,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("23008")
+        expect(parsed.base.number).to eq("23008")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier stage" do
@@ -1713,7 +1713,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -1755,11 +1755,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8601")
+        expect(parsed.base.number).to eq("8601")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1771,7 +1771,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1802,11 +1802,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8601")
+        expect(parsed.base.number).to eq("8601")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1818,7 +1818,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1853,7 +1853,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("13688")
+        expect(parsed.base.number).to eq("13688")
       end
 
       it "parses base identifier date" do
@@ -1865,7 +1865,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1900,7 +1900,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("13688")
+        expect(parsed.base.number).to eq("13688")
       end
 
       it "parses base identifier date" do
@@ -1912,7 +1912,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -1951,11 +1951,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8802")
+        expect(parsed.base.number).to eq("8802")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("3")
+        expect(parsed.base.part).to eq("3")
       end
 
       it "parses base identifier date" do
@@ -1967,7 +1967,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("7")
+        expect(parsed.number).to eq("7")
       end
 
       it "parses amendment date" do
@@ -2003,11 +2003,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8802")
+        expect(parsed.base.number).to eq("8802")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("22")
+        expect(parsed.base.part).to eq("22")
       end
 
       it "parses base identifier date" do
@@ -2019,7 +2019,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -2055,11 +2055,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10993")
+        expect(parsed.base.number).to eq("10993")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("4")
+        expect(parsed.base.part).to eq("4")
       end
 
       it "parses base identifier date" do
@@ -2071,7 +2071,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2111,7 +2111,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10646")
+        expect(parsed.base.number).to eq("10646")
       end
 
       it "parses base identifier date" do
@@ -2123,7 +2123,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2159,7 +2159,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("15002")
+        expect(parsed.base.number).to eq("15002")
       end
 
       it "parses base identifier date" do
@@ -2171,7 +2171,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses amendment date" do
@@ -2214,11 +2214,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("11137")
+        expect(parsed.base.number).to eq("11137")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("2")
+        expect(parsed.base.part).to eq("2")
       end
 
       it "parses base identifier date" do
@@ -2230,7 +2230,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2273,11 +2273,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("14496")
+        expect(parsed.base.number).to eq("14496")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("30")
+        expect(parsed.base.part).to eq("30")
       end
 
       it "parses base identifier date" do
@@ -2289,7 +2289,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2331,11 +2331,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("23008")
+        expect(parsed.base.number).to eq("23008")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier stage" do
@@ -2343,7 +2343,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2386,11 +2386,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("23090")
+        expect(parsed.base.number).to eq("23090")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("14")
+        expect(parsed.base.part).to eq("14")
       end
 
       it "parses base identifier stage" do
@@ -2398,7 +2398,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2441,7 +2441,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("27006")
+        expect(parsed.base.number).to eq("27006")
       end
 
       it "parses base identifier date" do
@@ -2449,7 +2449,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses amendment date" do
@@ -2492,11 +2492,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("14496")
+        expect(parsed.base.number).to eq("14496")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("12")
+        expect(parsed.base.part).to eq("12")
       end
 
       it "parses base identifier date" do
@@ -2508,7 +2508,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("4")
+        expect(parsed.number).to eq("4")
       end
 
       it "parses amendment date" do
@@ -2554,11 +2554,11 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("14496")
+        expect(parsed.base.number).to eq("14496")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("12")
+        expect(parsed.base.part).to eq("12")
       end
 
       it "parses base identifier date" do
@@ -2566,7 +2566,7 @@ RSpec.describe Pubid::Iso::Identifiers::Amendment do
       end
 
       it "parses amendment number" do
-        expect(parsed.number.value).to eq("4")
+        expect(parsed.number).to eq("4")
       end
 
       it "parses amendment date" do

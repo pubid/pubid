@@ -34,8 +34,8 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
 
       expect(restored.class).to eq(Pubid::Iso::Identifiers::Amendment)
       expect(restored.base.class).to eq(Pubid::Iso::Identifiers::InternationalStandard)
-      expect(restored.base.number.value).to eq("9001")
-      expect(restored.number.value).to eq("1")
+      expect(restored.base.number).to eq("9001")
+      expect(restored.number).to eq("1")
     end
 
     it "round-trips 3-level nesting (Corrigendum → Amendment → InternationalStandard)" do
@@ -90,7 +90,7 @@ RSpec.describe "Lutaml::Model serialization round-trip" do
       id = Pubid::Iso.parse("ISO 9001:2015")
       excluded = id.exclude(:date)
       expect(excluded.date).to be_nil
-      expect(excluded.number.value).to eq("9001")
+      expect(excluded.number).to eq("9001")
     end
   end
 

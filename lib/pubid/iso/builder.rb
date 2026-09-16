@@ -143,7 +143,7 @@ module Pubid
         return nil unless year_value.between?(1900, 2099)
 
         {
-          number: code_class.new(value: number),
+          number: number,
           date: ::Pubid::Components::Date.new(year: part),
         }
       end
@@ -197,7 +197,7 @@ module Pubid
           # or "105/F" ('F' is part)
           # or "5843/6" ('6' is part)
           # LEGACY: "4037-1979" (number-year, year should become date)
-          parse_number_with_part(value, code_class: Pubid::Iso::Components::Code)
+          parse_number_with_part(value)
 
         when :directives_type
           # nothing to do here, just return nil
@@ -240,8 +240,10 @@ module Pubid
           original_text = value.to_s
           # Extract just the digit(s) for the number field
           number_string = original_text.match(/\d+/)&.to_s
-          number_code = number_string ? Pubid::Iso::Components::Code.new(value: number_string) : nil
-          Pubid::Components::Edition.new(number: number_code,
+          # A plain string: Components::Edition#number is typed Value, so a
+          # component here would leak a live Ruby object into to_hash (and a
+          # !ruby/object tag into to_yaml).
+          Pubid::Components::Edition.new(number: number_string,
                                          original_text: original_text)
 
         when :languages
@@ -260,8 +262,7 @@ module Pubid
 
         when :subgroup
           # Handle JTC 1 subgroup in directives (ISO/IEC JTC 1 DIR)
-          # Store as a component for potential use in rendering
-          Pubid::Iso::Components::Code.new(value: value.to_s)
+          value.to_s
 
         when :supplements
           # Handle bundled supplements (+ operator)
@@ -274,12 +275,10 @@ module Pubid
 
         # TC Document attributes
         when :tc_type, :sc_type, :wg_type
-          # TC, SC, WG types are code components
-          Pubid::Iso::Components::Code.new(value: value.to_s)
+          value.to_s
 
         when :tc_number, :sc_number, :wg_number
-          # TC, SC, WG numbers are code components
-          Pubid::Iso::Components::Code.new(value: value.to_s)
+          value.to_s
 
         when :year
           # For TC documents with year, convert to Date
@@ -290,7 +289,7 @@ module Pubid
           # For regular identifiers, this is handled in :number_with_part
           if value.is_a?(Parslet::Slice) || value.is_a?(String) ||
               value.is_a?(Integer)
-            Pubid::Iso::Components::Code.new(value: value.to_s)
+            value.to_s
           else
             value
           end

@@ -18,7 +18,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses part" do
@@ -58,7 +58,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("32")
+        expect(parsed.number).to eq("32")
       end
 
       it "parses date" do
@@ -89,7 +89,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("8")
+        expect(parsed.number).to eq("8")
       end
 
       it "parses part" do
@@ -124,11 +124,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("14")
+        expect(parsed.number).to eq("14")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("1")
+        expect(parsed.part).to eq("1")
       end
 
       it "parses date" do
@@ -160,7 +160,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("21")
+          expect(parsed.number).to eq("21")
         end
 
         it "parses stage" do
@@ -190,7 +190,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("39")
+          expect(parsed.number).to eq("39")
         end
 
         it "parses stage" do
@@ -218,7 +218,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("19")
+          expect(parsed.number).to eq("19")
         end
 
         it "parses stage" do
@@ -246,7 +246,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("48")
+          expect(parsed.number).to eq("48")
         end
 
         it "parses stage" do
@@ -276,7 +276,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("37")
+          expect(parsed.number).to eq("37")
         end
 
         it "parses stage" do
@@ -304,11 +304,11 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("37")
+          expect(parsed.number).to eq("37")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("1")
+          expect(parsed.part).to eq("1")
         end
 
         it "parses stage" do
@@ -338,7 +338,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("36")
+          expect(parsed.number).to eq("36")
         end
 
         it "parses stage" do
@@ -370,7 +370,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("48")
+        expect(parsed.number).to eq("48")
       end
 
       it "parses stage" do
@@ -407,7 +407,7 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalWorkshopAgreement do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("19")
+        expect(parsed.number).to eq("19")
       end
 
       it "parses stage" do

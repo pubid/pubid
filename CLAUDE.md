@@ -112,6 +112,7 @@ from the code.
 - `docs/flavors/iec.md` — IEC typed stages, `from_hash` equality, and the `number` retype that deleted `Iec::Components::Code`.
 - `docs/flavors/ieee.md` — IEEE code columns, drafts, trademarks, historical series and annotated rendering.
 - `docs/flavors/ietf.md` — IETF readiness for the unified relaton index.
+- `docs/flavors/iso.md` — ISO dropped every identifier `Components::Code`, the edition object leak, and the one `relaton-data-iso` re-crawl.
 - `docs/flavors/itu.md` — ITU grammar, versions, annexes, reports, identity surfaces and annotated rendering.
 - `docs/flavors/jcgm.md` — JCGM meetings and URN parsing.
 - `docs/flavors/nist.md` — NIST rendering formats and annotated output.

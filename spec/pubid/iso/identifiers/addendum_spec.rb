@@ -19,7 +19,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("947")
+        expect(parsed.base.number).to eq("947")
       end
 
       it "parses base identifier date" do
@@ -31,7 +31,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -70,7 +70,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("194")
+        expect(parsed.base.number).to eq("194")
       end
 
       it "parses base identifier date" do
@@ -82,7 +82,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("4")
+        expect(parsed.number).to eq("4")
       end
 
       it "parses addendum date" do
@@ -121,7 +121,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1942")
+        expect(parsed.base.number).to eq("1942")
       end
 
       it "parses base identifier date" do
@@ -133,7 +133,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -172,7 +172,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("8373")
+        expect(parsed.base.number).to eq("8373")
       end
 
       it "parses base identifier date" do
@@ -184,7 +184,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -230,7 +230,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("4037")
+        expect(parsed.base.number).to eq("4037")
       end
 
       it "parses base identifier date" do
@@ -242,7 +242,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -282,7 +282,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("91")
+        expect(parsed.base.number).to eq("91")
       end
 
       it "parses base identifier date" do
@@ -294,7 +294,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -337,7 +337,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("91")
+        expect(parsed.base.number).to eq("91")
       end
 
       it "parses base identifier date" do
@@ -349,7 +349,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -391,7 +391,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("2631")
+        expect(parsed.base.number).to eq("2631")
       end
 
       it "parses base identifier date" do
@@ -399,7 +399,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -434,7 +434,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("2553")
+        expect(parsed.base.number).to eq("2553")
       end
 
       it "parses base identifier date" do
@@ -442,7 +442,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses addendum date" do
@@ -477,11 +477,11 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1151")
+        expect(parsed.base.number).to eq("1151")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier stage" do
@@ -489,7 +489,7 @@ RSpec.describe Pubid::Iso::Identifiers::Addendum do
       end
 
       it "parses addendum number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses addendum date" do

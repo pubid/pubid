@@ -18,7 +18,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("125")
+        expect(parsed.number).to eq("125")
       end
 
       it "parses part" do
@@ -66,11 +66,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("194")
+        expect(parsed.number).to eq("194")
       end
 
       it "keeps the alphabetic part code (not folded to a Roman numeral)" do
-        expect(parsed.part.value).to eq("CS")
+        expect(parsed.part).to eq("CS")
       end
 
       it "parses date" do
@@ -101,7 +101,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("4")
+        expect(parsed.number).to eq("4")
       end
 
       it "parses part" do
@@ -148,7 +148,7 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("170")
+        expect(parsed.number).to eq("170")
       end
 
       it "parses part" do
@@ -191,11 +191,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("93")
+        expect(parsed.number).to eq("93")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("3")
+        expect(parsed.part).to eq("3")
       end
 
       it "parses date" do
@@ -240,11 +240,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("93")
+        expect(parsed.number).to eq("93")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("1")
+        expect(parsed.part).to eq("1")
       end
 
       it "parses date" do
@@ -282,11 +282,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("300")
+        expect(parsed.number).to eq("300")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("3")
+        expect(parsed.part).to eq("3")
       end
 
       it "parses date" do
@@ -324,11 +324,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("657")
+        expect(parsed.number).to eq("657")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("4")
+        expect(parsed.part).to eq("4")
       end
 
       it "parses date" do
@@ -368,11 +368,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("105")
+        expect(parsed.number).to eq("105")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("1")
+        expect(parsed.part).to eq("1")
       end
 
       it "parses date" do
@@ -409,11 +409,11 @@ RSpec.describe Pubid::Iso::Identifiers::Recommendation do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("355")
+        expect(parsed.number).to eq("355")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("8")
+        expect(parsed.part).to eq("8")
       end
 
       it "parses date" do

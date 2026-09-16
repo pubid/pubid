@@ -63,7 +63,7 @@ module Pubid
         parts << originator_component
         type_comp = type_component
         parts << type_comp if type_comp
-        parts << identifier.number.render(context: URN_CONTEXT) if identifier.number
+        parts << identifier.number.to_s if identifier.number
         part_comp = part_component
         parts << part_comp if part_comp
         stage_comp = stage_component
@@ -95,7 +95,7 @@ module Pubid
           parts << base_gen.originator_component
           type_comp = base_gen.type_component
           parts << type_comp if type_comp
-          parts << base_id.number.render(context: URN_CONTEXT) if base_id.number
+          parts << base_id.number.to_s if base_id.number
           part_comp = base_gen.part_component
           parts << part_comp if part_comp
 
@@ -138,13 +138,13 @@ module Pubid
             parts << supp.date.render(context: URN_CONTEXT)
             if supp.number
               if supp.stage_iteration && !supp.is_a?(Pubid::Iso::Identifiers::Supplement)
-                parts << "v#{supp.number.render(context: URN_CONTEXT)}.#{supp.stage_iteration.render(context: URN_CONTEXT)}"
+                parts << "v#{supp.number}.#{supp.stage_iteration.render(context: URN_CONTEXT)}"
               else
-                parts << "v#{supp.number.render(context: URN_CONTEXT)}"
+                parts << "v#{supp.number}"
               end
             end
           else
-            parts << supp.number.render(context: URN_CONTEXT) if supp.number
+            parts << supp.number.to_s if supp.number
             if supp.stage_iteration && !supp.is_a?(Pubid::Iso::Identifiers::Supplement)
               parts << "v1.#{supp.stage_iteration.render(context: URN_CONTEXT)}"
             else
@@ -197,8 +197,8 @@ module Pubid
       def part_component
         return nil unless identifier.part
 
-        result = "-#{identifier.part.render(context: URN_CONTEXT)}"
-        result += "-#{identifier.subpart.render(context: URN_CONTEXT)}" if identifier.subpart
+        result = "-#{identifier.part}"
+        result += "-#{identifier.subpart}" if identifier.subpart
         result
       end
 
@@ -292,13 +292,13 @@ module Pubid
           parts << identifier.date.render(context: URN_CONTEXT)
           if identifier.number
             parts << if identifier.stage_iteration
-                       "v#{identifier.number.render(context: URN_CONTEXT)}.#{identifier.stage_iteration.render(context: URN_CONTEXT)}"
+                       "v#{identifier.number}.#{identifier.stage_iteration.render(context: URN_CONTEXT)}"
                      else
-                       "v#{identifier.number.render(context: URN_CONTEXT)}"
+                       "v#{identifier.number}"
                      end
           end
         else
-          parts << identifier.number.render(context: URN_CONTEXT) if identifier.number
+          parts << identifier.number.to_s if identifier.number
           parts << if identifier.stage_iteration
                      "v1.#{identifier.stage_iteration.render(context: URN_CONTEXT)}"
                    else

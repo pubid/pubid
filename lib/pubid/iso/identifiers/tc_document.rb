@@ -6,18 +6,15 @@ module Pubid
       # Technical Committee Document
       # Format: TC 184/SC 4/WG 3 N 123, JTC 1 N 456, TC 184 N 100
       class TcDocument < Identifier
-        # TC type (TC, JTC, PC, IT, etc.)
-        attribute :tc_type, ::Pubid::Components::Code
-        # TC number
-        attribute :tc_number, ::Pubid::Components::Code
-        # SC type
-        attribute :sc_type, ::Pubid::Components::Code
-        # SC number
-        attribute :sc_number, ::Pubid::Components::Code
-        # WG type
-        attribute :wg_type, ::Pubid::Components::Code
-        # WG number
-        attribute :wg_number, ::Pubid::Components::Code
+        # The committee structure: plain strings ("TC", "184", "SC", "4").
+        # Each held a Components::Code carrying nothing but `value`, and the
+        # serialized form was already the bare scalar.
+        attribute :tc_type, :string
+        attribute :tc_number, :string
+        attribute :sc_type, :string
+        attribute :sc_number, :string
+        attribute :wg_type, :string
+        attribute :wg_number, :string
 
         # TC types from ISO system
         TC_TYPES = %w[TC JTC PC IT CAB CASCO COPOLCO COUNCIL CPSG CS DEVCO GA
@@ -33,32 +30,20 @@ module Pubid
         # TC documents don't use typed stages like other identifiers
         TYPED_STAGES = [].freeze
 
-        # Serialize the committee structure (all plain-string Codes) on top of
-        # the inherited ISO mapping; TC documents have no stage.
+        # Serialize the committee structure on top of the inherited ISO
+        # mapping; TC documents have no stage. The attributes are plain
+        # strings, so lutaml needs no converter (the ETSI/OIML shape).
         key_value do
-          map "tc_type", with: { to: :tc_type_to_kv, from: :tc_type_from_kv }
-          map "tc_number", with: { to: :tc_number_to_kv, from: :tc_number_from_kv }
-          map "sc_type", with: { to: :sc_type_to_kv, from: :sc_type_from_kv }
-          map "sc_number", with: { to: :sc_number_to_kv, from: :sc_number_from_kv }
-          map "wg_type", with: { to: :wg_type_to_kv, from: :wg_type_from_kv }
-          map "wg_number", with: { to: :wg_number_to_kv, from: :wg_number_from_kv }
+          map "tc_type", to: :tc_type
+          map "tc_number", to: :tc_number
+          map "sc_type", to: :sc_type
+          map "sc_number", to: :sc_number
+          map "wg_type", to: :wg_type
+          map "wg_number", to: :wg_number
         end
 
         # TC documents have no stage; suppress the inherited stage emission.
         def stage_to_kv(_model, _doc); end
-
-        def tc_type_to_kv(m, doc) = emit_code(doc, "tc_type", m.tc_type)
-        def tc_type_from_kv(m, v) = m.tc_type = build_code(v)
-        def tc_number_to_kv(m, doc) = emit_code(doc, "tc_number", m.tc_number)
-        def tc_number_from_kv(m, v) = m.tc_number = build_code(v)
-        def sc_type_to_kv(m, doc) = emit_code(doc, "sc_type", m.sc_type)
-        def sc_type_from_kv(m, v) = m.sc_type = build_code(v)
-        def sc_number_to_kv(m, doc) = emit_code(doc, "sc_number", m.sc_number)
-        def sc_number_from_kv(m, v) = m.sc_number = build_code(v)
-        def wg_type_to_kv(m, doc) = emit_code(doc, "wg_type", m.wg_type)
-        def wg_type_from_kv(m, v) = m.wg_type = build_code(v)
-        def wg_number_to_kv(m, doc) = emit_code(doc, "wg_number", m.wg_number)
-        def wg_number_from_kv(m, v) = m.wg_number = build_code(v)
 
         def self.type
           { key: :tc,
@@ -73,23 +58,23 @@ module Pubid
           result = publisher.to_s if publisher
 
           # Add TC type and number
-          result += "/#{tc_type.render} " if tc_type&.value
-          result += tc_number.render.to_s if tc_number&.value
+          result += "/#{tc_type} " unless tc_type.to_s.empty?
+          result += tc_number.to_s unless tc_number.to_s.empty?
 
           # Add SC type and number
-          if sc_type&.value && sc_number&.value
-            result += "/#{sc_type.render} "
-            result += sc_number.render.to_s
+          unless sc_type.to_s.empty? || sc_number.to_s.empty?
+            result += "/#{sc_type} "
+            result += sc_number.to_s
           end
 
           # Add WG type and number
-          if wg_type&.value && wg_number&.value
-            result += "/#{wg_type.render} "
-            result += wg_number.render.to_s
+          unless wg_type.to_s.empty? || wg_number.to_s.empty?
+            result += "/#{wg_type} "
+            result += wg_number.to_s
           end
 
           # Add document number
-          result += " N #{number.render}" if number&.value
+          result += " N #{number}" unless number.to_s.empty?
 
           # Add year if present
           result += ":#{date.render}" if date&.year
@@ -105,16 +90,16 @@ module Pubid
           parts << publisher.render(context: urn_ctx) if publisher
 
           # Add TC
-          parts << "tc:#{tc_number.render(context: urn_ctx)}" if tc_number&.value
+          parts << "tc:#{tc_number}" unless tc_number.to_s.empty?
 
           # Add SC
-          parts << "sc-#{sc_number.render(context: urn_ctx)}" if sc_number&.value
+          parts << "sc-#{sc_number}" unless sc_number.to_s.empty?
 
           # Add WG
-          parts << "wg-#{wg_number.render(context: urn_ctx)}" if wg_number&.value
+          parts << "wg-#{wg_number}" unless wg_number.to_s.empty?
 
           # Add document number
-          parts << number.render(context: urn_ctx) if number&.value
+          parts << number.to_s unless number.to_s.empty?
 
           parts.join(":")
         end
