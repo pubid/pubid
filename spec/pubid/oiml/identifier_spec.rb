@@ -365,4 +365,23 @@ RSpec.describe Pubid::Oiml do
       end
     end
   end
+
+  # The VIM's paren-year date shape - the one real-world spelling #342
+  # flagged as not parsing. Canonicalizes onto the colon form.
+  describe "paren-year dates (issue #342)" do
+    {
+      "OIML V 2-200 (2000)" => "OIML V 2-200:2000",
+      "OIML V 3-200(1998)" => "OIML V 3-200:1998",
+    }.each do |input, canonical|
+      it "canonicalizes #{input.inspect} to #{canonical.inspect}" do
+        expect(described_class.parse(input).to_s).to eq(canonical)
+      end
+
+      it "round-trips the canonical form through to_hash/from_hash" do
+        id = described_class.parse(input)
+        hash = id.to_hash
+        expect(described_class::Identifier.from_hash(hash).to_hash).to eq(hash)
+      end
+    end
+  end
 end
