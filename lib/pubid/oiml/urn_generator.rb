@@ -64,12 +64,12 @@ module Pubid
       end
 
       # Structured locator "YYYY-II-SS" (or "YYYY-II" / "YYYY") for a Bulletin.
-      # Built directly from the date year and the issue/sequence attributes so
-      # the URN is identical regardless of whether the input was the structured
-      # or citation form.
+      # Built directly from the date year and the number (the issue) and
+      # sequence attributes so the URN is identical regardless of whether the
+      # input was the structured or citation form.
       def bulletin_locator
         locator = identifier.date.year.to_s
-        locator += "-#{identifier.issue}" if identifier.issue
+        locator += "-#{identifier.number}" if identifier.number
         locator += "-#{identifier.sequence}" if identifier.sequence
         locator
       end

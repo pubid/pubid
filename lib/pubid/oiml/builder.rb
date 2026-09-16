@@ -228,13 +228,13 @@ module Pubid
           article_id = parsed_hash[:article_id].to_s
           identifier.date ||= Pubid::Components::Date.new
           identifier.date.year = article_id[0, 4]
-          identifier.issue = article_id[4, 2]
+          identifier.number = article_id[4, 2]
           identifier.sequence = article_id[6, 2]
           warn_on_volume_mismatch(identifier, parsed_hash[:volume_roman])
           return
         end
 
-        identifier.issue = parsed_hash[:issue].to_s if parsed_hash[:issue]
+        identifier.number = parsed_hash[:issue].to_s if parsed_hash[:issue]
         identifier.sequence = parsed_hash[:sequence].to_s if parsed_hash[:sequence]
       end
 

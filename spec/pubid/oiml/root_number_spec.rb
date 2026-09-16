@@ -120,34 +120,59 @@ RSpec.describe "Pubid::Oiml index key (root.number)" do
     end
   end
 
-  # Bulletin has no code; its key is the year, clustering a volume's issues and
-  # articles into one bucket (the BIPM Metrologia-volume precedent).
-  describe "Bulletin derives its key from the year" do
+  # Bulletin has no code. Its number is the issue: the year is the volume and
+  # the issue is the number, as in the citation form "LXVII(2)".
+  describe "Bulletin keys on its issue" do
     {
-      "OIML Bulletin 1960-03-01" => "1960",
-      "OIML Bulletin 1960-03" => "1960",
-      "OIML Bulletin 1960" => "1960",
+      "OIML Bulletin 1960-03-01" => "03",
+      "OIML Bulletin 1960-03" => "03",
+      "OIML Bulletin LXVII(2) 20260211" => "02",
     }.each do |ref, key|
       it "#{ref} keys on #{key.inspect}" do
         expect(Pubid::Oiml.parse(ref).root.number.to_s).to eq(key)
       end
     end
 
-    it "adds no `number` key to the serialized hash" do
-      # A derived reader, not an attribute: storing it would duplicate `year`.
-      expect(Pubid::Oiml.parse("OIML Bulletin 1960-03-01").to_hash)
-        .not_to have_key("number")
+    it "declares `number` as a String on the Bulletin LEAF" do
+      expect(Pubid::Oiml::Identifiers::Bulletin.attributes[:number].type)
+        .to eq(Lutaml::Model::Type::String)
+      expect(Pubid::Oiml::Identifiers::Bulletin.attributes)
+        .not_to have_key(:issue)
     end
 
-    # Deliberate gap, pinned so it stays visible: the bare periodical
-    # reference names no year, so it has no key. Same shape as BIPM's
-    # ordinal-less CGPM DECL.
-    it "leaves the bare periodical reference without a key" do
+    it "serializes the issue as `number`, with no `issue` key" do
+      expect(Pubid::Oiml.parse("OIML Bulletin 1960-03-01").to_hash).to eq(
+        "_type" => "pubid:oiml:bulletin",
+        "publisher" => "OIML",
+        "year" => "1960",
+        "number" => "03",
+        "sequence" => "01",
+      )
+    end
+
+    # A volume and the bare periodical reference name no issue, so they have
+    # no number. Pinned so the gap stays visible.
+    it "leaves a volume and the bare periodical reference without a key" do
+      expect(Pubid::Oiml.parse("OIML Bulletin 1960").root.number).to be_nil
       expect(Pubid::Oiml.parse("OIML Bulletin").root.number).to be_nil
     end
 
-    # The coarse volume key is only defensible while the MR slug — which
-    # consumers use as an output FILENAME — stays per-article.
+    [
+      "OIML Bulletin",
+      "OIML Bulletin 1960",
+      "OIML Bulletin 1960-03",
+      "OIML Bulletin 1960-03-01",
+      "OIML Bulletin LXVII(2) 20260211",
+    ].each do |ref|
+      it "#{ref} is == after from_hash(to_hash)" do
+        id = Pubid::Oiml.parse(ref)
+        expect(Pubid::Oiml::Identifier.from_hash(id.to_hash)).to eq(id)
+      end
+    end
+
+    # The key groups every article of an issue number across all volumes, so
+    # the MR slug — which consumers use as an output FILENAME — must stay
+    # per-article.
     it "keeps every article of a volume distinct in the MR slug" do
       slugs = [
         "OIML Bulletin 1960",

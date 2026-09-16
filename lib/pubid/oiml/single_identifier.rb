@@ -24,7 +24,7 @@ module Pubid
       # concrete leaf, because redefining the inherited `number` on this class
       # — which every leaf inherits — is the multi-flavor determinism landmine.
       # Keeping the mapping with the attribute is also what lets Bulletin, the
-      # one leaf with no code, omit both.
+      # one leaf with no code, declare its own `number` (the issue) and map it.
       key_value do
         map "publisher", to: :publisher
         map "year", with: { to: :year_to_kv, from: :year_from_kv }

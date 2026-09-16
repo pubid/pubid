@@ -148,7 +148,7 @@ RSpec.describe "Pubid::Oiml failing-docid categories" do
       expect(id.code).to be_nil
       expect(id.type).to eq("Bulletin")
       expect(id.date.year).to eq("1960")
-      expect(id.issue).to eq("03")
+      expect(id.number).to eq("03")
       expect(id.sequence).to eq("01")
     end
 
@@ -181,7 +181,8 @@ RSpec.describe "Pubid::Oiml failing-docid categories" do
       structured = Pubid::Oiml.parse("OIML Bulletin 2026-02-11")
 
       expect(citation.date.year).to eq(structured.date.year)
-      expect(citation.issue).to    eq(structured.issue)
+      expect(citation.number).to   eq(structured.number)
+      expect(citation.number).to   eq("02")
       expect(citation.sequence).to eq(structured.sequence)
     end
 
@@ -224,7 +225,7 @@ RSpec.describe "Pubid::Oiml failing-docid categories" do
       expect do
         id = Pubid::Oiml.parse("OIML Bulletin L(2) 20260211")
         expect(id.date.year).to eq("2026")
-        expect(id.issue).to eq("02")
+        expect(id.number).to eq("02")
         expect(id.sequence).to eq("11")
       end.to output(/Bulletin citation volume mismatch/).to_stderr
     end

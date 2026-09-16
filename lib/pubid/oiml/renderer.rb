@@ -65,7 +65,7 @@ module Pubid
         result = "#{id.publisher} Bulletin"
         if id.date&.year
           result += " #{id.date.year}"
-          result += "-#{id.issue}" if id.issue
+          result += "-#{id.number}" if id.number
           result += "-#{id.sequence}" if id.sequence
         end
         result += " (#{id.language})" if id.language
@@ -77,9 +77,9 @@ module Pubid
       # structured since OIML's citation format doesn't define volume-only
       # or issue-only variants.
       def render_bulletin_citation(id)
-        return render_bulletin_structured(id) unless id.date&.year && id.issue && id.sequence
+        return render_bulletin_structured(id) unless id.date&.year && id.number && id.sequence
 
-        "#{id.publisher} Bulletin #{id.volume_roman}(#{id.issue.to_i}) #{id.article_id}"
+        "#{id.publisher} Bulletin #{id.volume_roman}(#{id.number.to_i}) #{id.article_id}"
       end
 
       def effective_format(id)

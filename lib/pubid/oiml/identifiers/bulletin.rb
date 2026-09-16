@@ -33,49 +33,43 @@ module Pubid
         # carried in the structured form and the roman volume in citations.
         BASE_YEAR_OFFSET = 1959
 
-        # Zero-padded issue number within the year ("01".."04", plus "07"/"10"
-        # for the online-bulletin series). Always 2 digits.
-        attribute :issue, :string
+        # The issue: the zero-padded number within the volume ("01".."04",
+        # plus "07"/"10" for the online-bulletin series). Always 2 digits. The
+        # year is the volume and the issue is the number, as in the citation
+        # form "LXVII(2)".
+        #
+        # Declared as `number`, so it is the relaton index key
+        # (`id.root.number.to_s`) and every index row with an issue shows a
+        # `number`. The key puts the same issue number of all volumes in one
+        # bucket; the MR slug keeps each article distinct.
+        #
+        # Declared on this LEAF, which has no subclasses. It redefines the
+        # `Components::Code number` of ::Pubid::Identifier as a :string, and a
+        # redefinition on a class that other classes inherit is the
+        # multi-flavor determinism landmine (see Identifiers::CodeNumber).
+        #
+        # nil for a volume ("OIML Bulletin 1960") and for the bare periodical
+        # reference "OIML Bulletin", which name no issue.
+        attribute :number, :string
         # Zero-padded sequence within the issue ("00" = editorial, "01"+ for
         # articles). Always 2 digits.
         attribute :sequence, :string
 
         key_value do
-          map "issue", to: :issue
+          map "number", to: :number
           map "sequence", to: :sequence
         end
 
-        # relaton-index keys on `id.root.number.to_s`. Bulletin is the one OIML
-        # leaf with no code (it does not include Identifiers::CodeNumber), so
-        # it derives the key from the year it already stores: every issue and
-        # article of a volume clusters into one bucket, with per-article
-        # distinctness coming from the MR slug instead. That is the BIPM
-        # Metrologia-volume precedent recorded in CLAUDE.md.
-        #
-        # A DERIVED READER, deliberately not an attribute: storing it would
-        # duplicate `year` in every row, and the key_value block above maps no
-        # "number", so nothing is added to the wire format. Safe as a plain
-        # method because Bulletin declares no `number` attribute of its own
-        # (the ITU itu/identifiers/base.rb precedent).
-        #
-        # nil for the bare periodical reference "OIML Bulletin", which names no
-        # year — a deliberate gap, pinned in spec/pubid/oiml/root_number_spec.rb.
-        def number
-          date&.year&.to_s
-        end
-
-        # The index key above is deliberately coarse — a whole volume in one
-        # bucket — which is only defensible because the MR slug stays
-        # per-article. The inherited hook reads through `code`, which Bulletin
-        # does not have, so it would return nil and collapse every article of a
-        # year onto `oiml.bulletin.<year>`; `to_slug` is an output FILENAME, so
-        # that is an overwrite. Emit the rest of the locator instead.
+        # The inherited hook reads through `code`, which Bulletin does not
+        # have, so it would return nil and collapse every article of a year
+        # onto `oiml.bulletin.<year>`; `to_slug` is an output FILENAME, so that
+        # is an overwrite. Emit the rest of the locator instead.
         #
         # The year is deliberately NOT included: Renderers::MrString already
         # gives it its own segment (`mr_year`), so repeating it here would
         # render `oiml.bulletin.1960-03-01.1960`.
         def mr_number_with_part
-          segments = [issue, sequence].compact
+          segments = [number, sequence].compact
           return nil if segments.empty?
 
           segments.join("-")
@@ -96,18 +90,18 @@ module Pubid
         # Volume as a roman-numeral string ("LXVII"), derived from the year.
         # nil when the year is absent.
         def volume_roman
-          number = volume_arabic&.to_i
-          return nil unless number&.positive?
+          volume = volume_arabic&.to_i
+          return nil unless volume&.positive?
 
-          self.class.to_roman(number)
+          self.class.to_roman(volume)
         end
 
         # 8-digit oiml.org article id ("20260211"). Composed by concatenating
-        # year + issue + sequence. nil unless all three are present.
+        # year + issue (number) + sequence. nil unless all three are present.
         def article_id
-          return nil unless date&.year && issue && sequence
+          return nil unless date&.year && number && sequence
 
-          "#{date.year}#{issue}#{sequence}"
+          "#{date.year}#{number}#{sequence}"
         end
 
         class << self
