@@ -30,3 +30,32 @@ OIML R 76-2 Edition 1993 (E)
 !OIML R 76-1, edition 1992 (E)!OIML R 76-1 Edition 1992 (E)
 !OIML R 76-2, edition 1993 (E)!OIML R 76-2 Edition 1993 (E)
 !OIML R 134-2: 2004 (E)!OIML R 134-2:2004 (E)
+# Punctuation-space variance as printed (oimlsmart publications-private
+# OCR corpus, sources/<slug>; provenance per line)
+OIML R 111:2004
+# r106-1-2011-deu
+!OIML R 111: 2004!OIML R 111:2004
+# r120-1996-fas
+OIML R 120 : 1996
+# r49-2013-e
+!OIML R 49-2: 2013!OIML R 49-2:2013
+# r49-3-2013-spa
+!OIML R 49-3: 2013!OIML R 49-3:2013
+OIML R 60:2000
+# r106-1-2011-deu
+!OIML R 60: 2000!OIML R 60:2000
+# r65-2006-fas
+OIML R 65 : 2006
+# r75-1-2002-fas
+OIML R 75-1 : 2002
+OIML R 76-1:2006
+# r107-1-2007-eng
+!OIML R 76-1: 2006!OIML R 76-1:2006
+OIML R 82:2006
+# r83-2006-fas
+!OIML R 82: 2006!OIML R 82:2006
+OIML R 83:2006
+# r83-2006-fas
+!OIML R 83: 2006!OIML R 83:2006
+# r95-1990-fas
+OIML R 95 : 1990
