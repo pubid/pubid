@@ -39,6 +39,30 @@ RSpec.describe Pubid::Oiml do
       end
     end
 
+    context "punctuation-space variance around the year colon" do
+      # Ground truth: oimlsmart publications-private OCR corpus, printed
+      # citations (e.g. sources/r120-1996-fas, r75-1-2002-fas,
+      # r95-1990-fas, r65-2006-fas). Space after the colon was already
+      # tolerated; these cover space BEFORE the colon, with and without a
+      # part number.
+      [
+        ["OIML R 120 : 1996", "120", nil, "1996"],
+        ["OIML R 95 : 1990", "95", nil, "1990"],
+        ["OIML R 65 : 2006", "65", nil, "2006"],
+        ["OIML R 75-1 : 2002", "75", "1", "2002"],
+      ].each do |input, number, part, year|
+        it "parses and canonicalizes #{input.inspect}" do
+          result = described_class.parse(input)
+
+          expect(result).to be_a(Pubid::Oiml::Identifiers::Recommendation)
+          expect(result.code.number).to eq(number)
+          expect(result.code.part).to eq(part) if part
+          expect(result.date.year).to eq(year)
+          expect(result.to_s).to eq("OIML R #{number}#{part ? "-#{part}" : ""}:#{year}")
+        end
+      end
+    end
+
     context "identifiers with parts" do
       it "parses OIML R 117-1:2019" do
         result = described_class.parse("OIML R 117-1:2019")

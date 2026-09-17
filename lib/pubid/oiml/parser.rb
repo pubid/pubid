@@ -128,7 +128,7 @@ module Pubid
       # (with optional space before year)
       rule(:date) do
         edition_portion |
-          (colon >> space.maybe >> year_digits.as(:year)) |
+          (space.maybe >> colon >> space.maybe >> year_digits.as(:year)) |
           (space.maybe >> lparen >> year_digits.as(:year) >> rparen)
       end
 
