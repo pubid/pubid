@@ -7,8 +7,11 @@ module Pubid
       # Example: "BS ISO 8601:2019" where ISO 8601:2019 is an ISO identifier object
       # Example: "BS IEC 62600:2020" where IEC 62600:2020 is an IEC identifier object
       class AdoptedInternationalStandard < BritishStandard
-        # The adopted ISO/IEC identifier object
-        attribute :adopted, ::Pubid::Identifier, polymorphic: true
+        include RootIdentity
+
+        # The adopted ISO/IEC document, under the uniform parent accessor.
+        # `#root` and `#base_document` are inherited and walk it.
+        attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :edition, :string
         attribute :translation_lang, :string
         attribute :translation_upper, :string
@@ -26,26 +29,6 @@ module Pubid
           nil
         end
 
-        # Delegate common methods to adopted identifier
-        def number
-          adopted&.number
-        end
-
-        def year
-          adopted&.year if adopted&.methods&.include?(:year)
-        end
-
-        def date
-          adopted&.date if adopted&.methods&.include?(:date)
-        end
-
-        def parts
-          adopted&.parts if adopted&.methods&.include?(:parts)
-        end
-
-        def part
-          adopted&.part if adopted&.methods&.include?(:part)
-        end
       end
     end
   end

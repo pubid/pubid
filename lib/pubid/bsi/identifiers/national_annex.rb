@@ -6,8 +6,24 @@ module Pubid
       # National Annex (NA) identifier
       # Can have own supplements: "NA+A1:2012 to BASE"
       class NationalAnnex < SingleIdentifier
-        attribute :na_supplements, ::Pubid::Identifier, polymorphic: true, collection: true # Supplements on the NA itself
-        attribute :base_doc, ::Pubid::Identifier, polymorphic: true # The identifier after "to"
+        include RootIdentity
+
+        # Supplements on the NA itself. `initialize_empty: true` because the
+        # builder always passes an array (empty when the grammar matched no
+        # supplement) while `from_hash` never sets the attribute at all — the
+        # serialized hash omits an empty collection — so a parsed NA held `[]`
+        # and a deserialized one `nil`, and the two were not `==`. `#matches?`
+        # is `exclude(*ignore) == other.exclude(*ignore)`, so every index lookup
+        # of a supplement-less NA silently returned nothing. The `collection:
+        # true` lesson in CLAUDE.md, and the same one-line remedy.
+        attribute :na_supplements, ::Pubid::Identifier, polymorphic: true,
+                                                        collection: true,
+                                                        initialize_empty: true
+        # The identifier after "to", under the uniform parent accessor. `#root`
+        # and `#base_document` are inherited and walk it, so the delegating
+        # readers this class used to carry are gone — they shadowed real lutaml
+        # accessors and reached only one level down.
+        attribute :base, ::Pubid::Identifier, polymorphic: true
 
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
@@ -24,24 +40,6 @@ module Pubid
           { key: :na,
             web: :national_annex, title: "National Annex", short: "NA" }
         end
-
-        # Delegation methods to access wrapped base_doc attributes
-        def number
-          base_doc&.number || super
-        end
-
-        def date
-          base_doc&.date || super
-        end
-
-        def part
-          base_doc&.part || super
-        end
-
-        def subpart
-          base_doc&.subpart || super
-        end
-
       end
     end
   end

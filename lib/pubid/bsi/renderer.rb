@@ -212,7 +212,7 @@ module Pubid
                  end
 
         result = prefix
-        result += " #{id.adopted}" if id.adopted
+        result += " #{id.base}" if id.base
         result += " ED#{id.edition}" if id.edition
 
         result += " (R#{id.reaffirmation_year})" if id.reaffirmation_year
@@ -237,7 +237,7 @@ module Pubid
                  end
 
         result = prefix
-        result += " #{id.adopted}" if id.adopted
+        result += " #{id.base}" if id.base
         result += " ED#{id.edition}" if id.edition
 
         result += " (R#{id.reaffirmation_year})" if id.reaffirmation_year
@@ -303,16 +303,16 @@ module Pubid
 
         if id.amd_suffix_form
           # Trailing " AMD5" / " AMD AA" suffix form
-          suffix = if id.amendment_number&.match?(/^[A-Z]+$/)
-                     " AMD #{id.amendment_number}"
+          suffix = if id.number&.match?(/^[A-Z]+$/)
+                     " AMD #{id.number}"
                    else
-                     " AMD#{id.amendment_number}"
+                     " AMD#{id.number}"
                    end
           base.empty? ? suffix.lstrip : "#{base}#{suffix}"
         else
           # Compact "+A5" / "/A5" join form, with an optional ":year"
-          compact = "#{id.separator}A#{id.amendment_number}"
-          compact += ":#{id.amendment_year}" if id.amendment_year
+          compact = "#{id.separator}A#{id.number}"
+          compact += ":#{id.year}" if id.year
           "#{base}#{compact}"
         end
       end
@@ -422,21 +422,21 @@ module Pubid
         id.identifiers[1..].each do |idd|
           if idd.is_a?(Identifiers::Amendment)
             if idd.amd_suffix_form
-              result += if idd.amendment_number&.match?(/^[A-Z]+$/)
-                          " AMD #{idd.amendment_number}"
+              result += if idd.number&.match?(/^[A-Z]+$/)
+                          " AMD #{idd.number}"
                         else
-                          " AMD#{idd.amendment_number}"
+                          " AMD#{idd.number}"
                         end
             else
               sep = idd.separator || "+"
-              result += "#{sep}A#{idd.amendment_number}"
-              result += ":#{idd.amendment_year}" if idd.amendment_year
+              result += "#{sep}A#{idd.number}"
+              result += ":#{idd.year}" if idd.year
             end
           elsif idd.is_a?(Identifiers::Corrigendum)
             sep = idd.separator || "+"
             result += "#{sep}C"
-            result += idd.corrigendum_number.to_s if idd.corrigendum_number
-            result += ":#{idd.corrigendum_year}" if idd.corrigendum_year
+            result += idd.number.to_s if idd.number
+            result += ":#{idd.year}" if idd.year
           else
             result += idd.to_s
           end
@@ -485,8 +485,8 @@ module Pubid
       def render_corrigendum(id)
         result = id.base ? id.base.to_s : ""
         result += "#{id.separator}C"
-        result += id.corrigendum_number.to_s if id.corrigendum_number
-        result += ":#{id.corrigendum_year}" if id.corrigendum_year
+        result += id.number.to_s if id.number
+        result += ":#{id.year}" if id.year
         result
       end
 
@@ -753,17 +753,17 @@ module Pubid
         if id.na_supplements&.any?
           id.na_supplements.each do |supp|
             if supp.is_a?(Identifiers::Amendment)
-              result += "+A#{supp.amendment_number}:#{supp.amendment_year}"
+              result += "+A#{supp.number}:#{supp.year}"
             elsif supp.is_a?(Identifiers::Corrigendum)
-              result += "+C#{supp.corrigendum_number}:#{supp.corrigendum_year}"
+              result += "+C#{supp.number}:#{supp.year}"
             end
           end
         end
 
         result += " to "
 
-        result += if id.base_doc
-                    id.base_doc.to_s
+        result += if id.base
+                    id.base.to_s
                   else
                     render_single_identifier(id)
                   end

@@ -35,6 +35,7 @@ module Pubid
       autoload :PublishedDocument, "#{__dir__}/identifiers/published_document"
       autoload :PubliclyAvailableSpecification,
                "#{__dir__}/identifiers/publicly_available_specification"
+      autoload :RootIdentity, "#{__dir__}/identifiers/root_identity"
       autoload :Section, "#{__dir__}/identifiers/section"
       autoload :Set, "#{__dir__}/identifiers/set"
       autoload :StandaloneAmendment,

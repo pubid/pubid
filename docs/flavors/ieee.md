@@ -69,3 +69,15 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
   `JointDevelopment` dispatches on `format` through a `case` whose branches
   each return a different builder; the `case` result is assigned and wrapped
   once, rather than wrapping each branch.
+
+## The parent slot is never called `base` in IEEE
+
+Recorded by the cross-flavor survey that moved BSI's adoptions onto `base` (`docs/flavors/bsi.md`). IEEE is the flavor with the most parent slots under other names, and they fall into two groups.
+
+**Carries `#root`, so the index key is correct**: `AdoptedStandard` (`ieee_identifier` is the parent, `adopted_identifiers` the collection — and `adopted_identifiers` is a key in **73 rows of the published `relaton-data-ieee/index-v2.yaml`**, so renaming it is an index regeneration, not a pure refactor), `CsaDualPublished` (`ieee_identifier`), `DualPublished` (`first_identifier`), `MultiNumberedIdentifier` (`primary_identifier`).
+
+**Has NO `#root`, so `root` returns the wrapper**: `DualIdentifier` (`first_identifier` / `second_identifier`) and `IecIeeeCopublished` (`iec_identifier` / `ieee_identifier` — this one declares its own `number`, so the key survives anyway).
+
+`ParentheticalIdentifier` and `RedlinedStandard` already declare `base` and inherit `#root`; their `parenthetical_identifier` and `revision_of` are relations, not parents, as are the six relationship collections on `Ieee::Identifier` (`amendments`, `corrigenda`, `revision_of`, `incorporates`, `supersedes`, `supplement_to`).
+
+The lesson BSI paid for: a wrapper's hand-written `#number` delegation makes the index key look right while `#root` is still broken, and it shadows a real lutaml accessor — which is how 408 BSI identifiers came to raise on `to_hash`. Before trusting one of the IEEE delegations, check what type it returns against what the attribute declares.

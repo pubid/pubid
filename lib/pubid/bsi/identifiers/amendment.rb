@@ -7,8 +7,32 @@ module Pubid
       # Contains a base identifier plus amendment parameters
       class Amendment < SingleIdentifier
         attribute :base, ::Pubid::Identifier, polymorphic: true
-        attribute :amendment_number, :string
-        attribute :amendment_year, :integer
+        # The amendment's ordinal lives in the `number` inherited from
+        # SingleIdentifier — already a `:string` there, which is what the
+        # ordinal is ("1", "11", "AA") — so the row reads `number:` rather than
+        # `amendment_number:`.
+        #
+        # This does NOT make the ordinal a document number: the amended
+        # standard is reached through `base`, and `#root` walks it, which is
+        # what relaton-index keys on.
+        #
+        # The year is a REAL `year` attribute and deliberately not the
+        # inherited `date`, the other way to reach the same `year:` key. An
+        # amendment's year belongs to the supplement, not to the standard, and
+        # `#exclude` recurses into nested identifiers — so holding it in `date`
+        # made `exclude(:date)` on the consolidated identifier drop the
+        # amendment's year too ("BS 7273-4+A1:2021" rendered as
+        # "BS 7273-4+A1"), conflating the two. A declared `year` is the shape
+        # ashrae, bipm, gost, ieee, jis, nist and ogc already use, and the
+        # canonical flat serialization leaves it alone for exactly that reason.
+        #
+        # `:string`, not `:integer`, to match the year every other BSI
+        # identifier carries (a `Components::Date` year is a String) and the
+        # base `#year` reader, which is `date&.year&.to_s`. It also has to match
+        # CEN, whose supplements carry a `:string` `year` too: relaton reads the
+        # year off a supplement of either flavor and compares it, so the two
+        # must not differ in type.
+        attribute :year, :string
         attribute :separator, :string, default: -> { "+" }
         # true for the trailing " AMD5" / " AMD AA" suffix form, false for the
         # compact "+A5" / "/A5" join form. Distinguishes the two when no year is
@@ -29,18 +53,11 @@ module Pubid
           base || self
         end
 
-        # Uniform supplement interface (shared with Corrigendum) so callers need
-        # not special-case the class.
+        # Names the supplement class, so callers need not special-case it. The
+        # ordinal and the year need no such method: Amendment and Corrigendum —
+        # in BSI and in CEN — all declare them as `number` and `year`.
         def supplement_type
           :amendment
-        end
-
-        def supplement_number
-          amendment_number
-        end
-
-        def supplement_year
-          amendment_year
         end
       end
     end

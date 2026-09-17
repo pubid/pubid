@@ -13,6 +13,8 @@ module Pubid
       #   BS ISO 20400 + BS ISO 44001+BS ISO 44002
       #   BS ISO 9001+BS ISO 14001
       class Set < SingleIdentifier
+        include RootIdentity
+
         attribute :identifiers, ::Pubid::Identifier, collection: true, 
                                                      polymorphic: true
         attribute :separators, :string, collection: true # Should all be " + "

@@ -82,10 +82,18 @@ module NumberStringRetypeSpec
   # `pubid:cencenelec:` type segment (the module name, not a registry name),
   # so the CEN identifier nested in a BSI adoption deserializes as its CEN
   # class instead of the abstract root.
+  # bsi 597 -> 191 when the adoption wrappers moved to `base`: deleting the
+  # `#date` delegation on AdoptedEuropeanNorm / AdoptedInternationalStandard /
+  # NationalAnnex removed the 408 `IncorrectModelError` raises it caused (it
+  # returned the adopted flavor's Pubid::Components::Date where BSI declares
+  # Bsi::Components::Date). Of the 191 that remain, 189 are the OTHER raise —
+  # a Pubid::Components::Type where Bsi::Components::Type is declared, untouched
+  # here — and 2 are value mismatches that do not raise. See
+  # docs/flavors/bsi.md.
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
     "api" => 1,
-    "bsi" => 597,
+    "bsi" => 191,
     "cen_cenelec" => 0,
     "idf" => 0,
     # Measured over the WHOLE 12,331-id IEC corpus on the parent commit, not
