@@ -7,6 +7,8 @@ module Pubid
     # Human render: "ED#{number}".
     # URN render: "ed-#{number}" per RFC 5141-bis.
     class Edition < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :year, :string
       attribute :number, Lutaml::Model::Type::Value
       attribute :original_text, :string

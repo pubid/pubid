@@ -6,6 +6,8 @@ module Pubid
   module Jcgm
     module Components
       class Publisher < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :publisher, :string
 
         def to_s

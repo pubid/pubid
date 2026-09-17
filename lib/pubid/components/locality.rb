@@ -7,6 +7,8 @@ module Pubid
     # Renders the human-readable phrase "(all parts)" and a URN
     # suffix that completes the locality segment.
     class Locality < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :value, :string
 
       def render(context: nil)

@@ -26,6 +26,8 @@ module Pubid
     # order they appear in the printed supplement; the URN form joins number
     # and year with ":".
     class Supplement < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       DEFAULT_TYPE = "sup"
 
       attribute :type, :string, default: -> { DEFAULT_TYPE }

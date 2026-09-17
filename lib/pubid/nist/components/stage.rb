@@ -13,6 +13,8 @@ module Pubid
       #   Stage.new(id: "i", type: "pd").to_s(:short) # => "ipd"
       #   Stage.new(id: "f", type: "pd").to_s(:long)  # => "(Final Public Draft)"
       class Stage < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :id, :string          # i, f, 1-9
         attribute :type, :string        # pd, wd, prd
 

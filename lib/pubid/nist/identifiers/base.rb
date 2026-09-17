@@ -223,6 +223,12 @@ module Pubid
 
       alias eql? ==
 
+      # A subset match skips the same attributes: `to_hash` drops the build
+      # artifacts, so an index row rebuilt by `from_hash` never has them.
+      def self.subset_ignored_attributes
+        EQUALITY_IGNORED_ATTRS
+      end
+
       def hash
         vals = self.class.attributes.each_key.reject do |name|
           EQUALITY_IGNORED_ATTRS.include?(name)

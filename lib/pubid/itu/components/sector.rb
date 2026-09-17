@@ -8,6 +8,8 @@ module Pubid
       # ITU Sector component
       # Values: R (Radio), T (Telecommunications), D (Development)
       class Sector < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :sector, :string # R, T, or D
 
         VALID_SECTORS = %w[R T D].freeze

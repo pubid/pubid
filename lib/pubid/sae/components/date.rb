@@ -8,6 +8,8 @@ module Pubid
       # Date component for SAE standards
       # SAE uses year only (e.g., 2024, 2022)
       class Date < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :year, :integer
 
         def present?

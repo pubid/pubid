@@ -10,6 +10,8 @@ module Pubid
       # Stays independent of Pubid::Components::Code because ASME uses
       # +designator+ (a flavor-specific letter prefix) plus +number+.
       class Code < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :designator, :string
         attribute :number, :string
 

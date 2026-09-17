@@ -8,6 +8,8 @@ module Pubid
       # ITU Series component
       # Examples: BO, V, X, A, etc.
       class Series < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :series, :string # e.g., BO, V, X, R, SG1, OB
 
         def to_s

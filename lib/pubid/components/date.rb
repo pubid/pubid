@@ -12,6 +12,8 @@ module Pubid
     # URN spec); flavors that drop the slot when undated gate that decision
     # at the URN-generator level, not here.
     class Date < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :year, :string
       attribute :month, :string
       attribute :day, :string

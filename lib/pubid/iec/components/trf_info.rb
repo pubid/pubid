@@ -8,6 +8,8 @@ module Pubid
       # Single Responsibility: Represents TRF-specific publishing information
       # Example: IECEE TRF or IECEx TRF publications
       class TrfInfo < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :publisher, :string, default: -> {}
         attribute :series, :string, default: -> {}
         attribute :version, :string, default: -> {}

@@ -8,6 +8,8 @@ module Pubid
     # because URN, MR, and human formats position iteration differently
     # relative to the stage abbreviation.
     class Iteration < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :number, :string
 
       def to_s

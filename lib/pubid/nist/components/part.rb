@@ -23,6 +23,8 @@ module Pubid
       #   - SP: Part number (pt1)
       #   - Letter suffixes (A, B, C, etc.)
       class Part < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :type, :string   # "pt" for part notation, "n" for issue, "" for letter suffix
         attribute :value, :string  # Part number or letter (1, 2, A, B, etc.)
 

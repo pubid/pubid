@@ -13,6 +13,8 @@ module Pubid
       #   Translation.new(code: "por").to_s(:mr)    # => ".por"
       #   Translation.new(code: "ind").to_s(:short) # => " ind"
       class Translation < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :code, :string # 3-letter ISO 639-2 code: spa, por, ind, etc.
 
         # Backward compatibility: language method returns code

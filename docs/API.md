@@ -153,6 +153,26 @@ id = Pubid::Iso.parse("ISO 9001:2015")
 id.exclude(:date).to_s  # => "ISO 9001"
 ```
 
+### `===` (subset match)
+
+Returns true when the candidate holds every part that the reference states. A
+part that the reference omits (nil or empty) matches any value. The receiver is
+the reference, so `a === b` and `b === a` are different.
+
+```ruby
+reference = Pubid::Iso.parse("ISO 9001")
+reference === Pubid::Iso.parse("ISO 9001:2015")   # => true
+reference === Pubid::Iso.parse("ISO/DIS 9001")    # => false (a default is stated)
+Pubid::Iso.parse("ISO 9001:2015") === reference   # => false
+
+# `case` and `grep` use `===`
+catalogue.grep(reference) # => the editions of ISO 9001 in the catalogue
+```
+
+A class changes the rule for its own attributes with
+`self.subset_ignored_attributes` or `#subset_attribute_match?`. See
+`Pubid::SubsetMatch`.
+
 ### `new_edition_of?`
 
 Checks if another identifier is an older edition of the same document.

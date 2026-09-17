@@ -15,6 +15,8 @@ module Pubid
       #   Supplement.new(month: "Jan", year: "1924").to_s(:short) # => "supJan1924"
       #   Supplement.new(has_revision: true).to_s(:short)        # => "suprev"
       class Supplement < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string           # Supplement number (e.g., "2" in "supp2")
         attribute :year, :string             # Year (4 digits); range START year
         attribute :month, :string            # Month abbreviation; range START month

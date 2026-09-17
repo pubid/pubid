@@ -131,6 +131,21 @@ module Pubid
         # Builder#build_supplement) and are deliberately not serialized (see
         # supplement_sector_to_kv), so comparing them would make a parsed
         # identifier unequal to the same identifier rebuilt via from_hash.
+        # A subset match follows the same rules as `==` below: the two
+        # rendering flags are not identity, and when a base is present the
+        # sector/series/code copies of the base are not serialized.
+        SUBSET_BASE_COPIES = %i[sector series code series_word].freeze
+
+        def self.subset_ignored_attributes
+          %i[number_glued slash_joined]
+        end
+
+        def subset_attribute_match?(name, mine, theirs)
+          return true if base && SUBSET_BASE_COPIES.include?(name)
+
+          super
+        end
+
         def ==(other)
           return false unless other.instance_of?(self.class)
 

@@ -8,6 +8,8 @@ module Pubid
       # ISO Publisher with copublisher support
       # Examples: ISO, ISO/IEC, ISO/IEC/IEEE
       class Publisher < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :publisher, :string, default: -> { "ISO" }
         attribute :copublisher, :string, collection: true
 

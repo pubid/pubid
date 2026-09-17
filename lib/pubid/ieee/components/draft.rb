@@ -11,6 +11,8 @@ module Pubid
       #   /D3.4            - version with revision
       #   /D7, July 2019   - with date
       class Draft < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :version, :string       # D5, D3, etc.
         attribute :revision, :string      # .4, .2 in D3.4
         attribute :year, :string

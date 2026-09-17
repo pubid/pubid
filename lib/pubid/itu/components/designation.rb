@@ -13,6 +13,8 @@ module Pubid
       #
       # Format: SERIES.CODE  (e.g. "Y.1351", "Y.1362-2")
       class Designation < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :series, Pubid::Itu::Components::Series
         attribute :code, Pubid::Itu::Components::Code
 

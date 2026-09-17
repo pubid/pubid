@@ -229,6 +229,26 @@ id.exclude(:year, :part).to_s
 # => "ISO 9001"
 ----
 
+=== Matching a Partial Reference
+
+The `===` operator is a subset match. It returns true when the candidate holds
+every part that the reference states. A part that the reference omits matches
+any value. The receiver is the reference, so the operator is not symmetric:
+
+[source,ruby]
+----
+require 'pubid/iso'
+
+reference = Pubid::Iso.parse("ISO 9001")
+reference === Pubid::Iso.parse("ISO 9001:2015")
+# => true
+reference === Pubid::Iso.parse("ISO/DIS 9001")
+# => false (a default value, here the published stage, is stated)
+
+catalogue.grep(reference)
+# => every edition of ISO 9001 in the catalogue
+----
+
 === Comparing Editions
 
 The `new_edition_of?` method checks if an identifier is a newer edition of the same document:

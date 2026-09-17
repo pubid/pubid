@@ -9,6 +9,8 @@ module Pubid
     # Human render: abbreviation with flavor-specific separator.
     # URN render: stage abbreviation alone (no separator).
     class Stage < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :name, :string
       attribute :stage_code, :string
       attribute :harmonized_stages, :string, collection: true

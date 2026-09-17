@@ -12,6 +12,8 @@ module Pubid
       # 3. Parenthetical: (DE), (ES), (en)
       # 4. Translation year: (RU-2021)
       class Language < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :code, :string              # "E", "DE", "RU", "en"
         attribute :format, :string            # "slash", "slash_colon", "paren", "paren_year"
         attribute :translation_year, :string  # "2021" in "(RU-2021)"

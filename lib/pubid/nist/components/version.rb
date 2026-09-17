@@ -12,6 +12,8 @@ module Pubid
       #   Version.new(value: "1.0.2").to_s(:short) # => "ver1.0.2"
       #   Version.new(value: "2.0").to_s(:long)    # => "Version 2.0"
       class Version < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :value, :string # Dotted notation: "1.0.2"
 
         # Render version in specified format

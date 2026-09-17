@@ -9,6 +9,8 @@ module Pubid
     # Human render: the publisher body (e.g. "ISO").
     # URN render: lowercase body (e.g. "iso") per RFC 5141-bis.
     class Publisher < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :body, :string
 
       def to_s

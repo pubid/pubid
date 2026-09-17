@@ -16,6 +16,8 @@ module Pubid
       # +original_separator+ to round-trip dot vs dash notation, and uses
       # +number+ rather than +value+.
       class Code < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :prefix, :string             # C, P for some identifiers
         attribute :number, :string             # Main number (802, 1234, etc.)
         attribute :parts, :string, collection: true # Array of part strings

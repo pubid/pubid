@@ -9,6 +9,8 @@ module Pubid
     # Human render: abbreviation with flavor-specific separator.
     # URN render: type code (e.g. "tr", "ts") per RFC 5141-bis.
     class Type < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :name, :string
       attribute :abbr, :string
       attribute :type_code, :string

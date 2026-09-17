@@ -7,6 +7,8 @@ module Pubid
       # VAP (Validation Assessment Programme) suffix codes
       # Single Responsibility: Represents VAP validation status suffixes
       class VapSuffix < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         # VAP suffix codes as defined by IEC
         CODES = {
           "CMV" => "Common Modifications and Variations",

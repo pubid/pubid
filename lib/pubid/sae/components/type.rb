@@ -8,6 +8,8 @@ module Pubid
       # Type component for SAE document types
       # AMS, AIR, ARP, AS, MA
       class Type < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :abbr, :string
 
         def to_s

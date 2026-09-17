@@ -16,6 +16,8 @@ module Pubid
       #   - CSM (Commercial Standards Monthly): Volume 6, Issue 1
       #   - CIRC (Circular): Volume 539
       class Volume < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :value, :string
 
         def to_s
