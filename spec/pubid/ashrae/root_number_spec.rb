@@ -235,7 +235,7 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
   end
 
   # FIXED GAP, and the reason the slug-distinctness sweep below could not see
-  # it. Errata#errata_date was ALWAYS nil, for three reasons in two layers:
+  # it. The date of an erratum was ALWAYS nil, for three reasons in two layers:
   # rule(:errata_date) had no leading space, so it never matched after
   # "Errata" and optional_suffix took the date; the rule named only
   # `:errata_year`, not the month or the day; and
@@ -255,7 +255,7 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
     end
 
     it "captures the errata date" do
-      expect(first.errata_date).to eq("October 10, 2008")
+      expect(first.date.to_s).to eq("2008-10-10")
     end
 
     it "tells the two apart on to_s, to_hash, == and the slug" do
