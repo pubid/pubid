@@ -30,8 +30,11 @@ module Pubid
         # Format: "IEEE/ASTM SI 10-1997" (published)
         #     or: "IEEE/ASTM PSI 10/D2, October 2015" (draft)
 
-        # Use proper Draft component (Lutaml::Model object)
-        attr_accessor :draft_obj
+        # NOTE: no `attr_accessor :draft_obj` here — it would shadow the
+        # base's lazy `draft_obj` reader (base.rb), which rebuilds the
+        # component from the `draft` attribute after from_hash. The plain
+        # accessor made every deserialized PSI draft render (and re-emit
+        # in to_hash) without its "/D<n>".
       end
     end
   end

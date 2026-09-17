@@ -19,7 +19,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses part" do
@@ -67,7 +67,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses part" do
@@ -112,7 +112,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses part" do
@@ -159,7 +159,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses date" do
@@ -207,7 +207,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("17")
+          expect(parsed.number).to eq("17")
         end
 
         it "parses date" do
@@ -248,7 +248,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("38")
+          expect(parsed.number).to eq("38")
         end
 
         it "parses date" do
@@ -289,7 +289,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("39")
+          expect(parsed.number).to eq("39")
         end
 
         it "parses date" do
@@ -329,7 +329,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("41")
+          expect(parsed.number).to eq("41")
         end
 
         it "parses date" do
@@ -369,7 +369,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("46")
+          expect(parsed.number).to eq("46")
         end
 
         it "parses date" do
@@ -409,7 +409,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("51")
+          expect(parsed.number).to eq("51")
         end
 
         it "parses date" do
@@ -449,7 +449,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("63")
+          expect(parsed.number).to eq("63")
         end
 
         it "parses date" do
@@ -489,7 +489,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("71")
+          expect(parsed.number).to eq("71")
         end
 
         it "parses date" do
@@ -532,11 +532,11 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("98")
+        expect(parsed.number).to eq("98")
       end
 
       it "parses part" do
-        expect(parsed.part.value).to eq("3")
+        expect(parsed.part).to eq("3")
       end
 
       it "parses date" do
@@ -580,7 +580,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("30")
+          expect(parsed.number).to eq("30")
         end
 
         it "parses stage" do
@@ -615,7 +615,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("98")
+          expect(parsed.number).to eq("98")
         end
 
         it "parses date" do
@@ -656,7 +656,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("14")
+          expect(parsed.number).to eq("14")
         end
 
         it "parses stage" do
@@ -688,7 +688,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("82")
+          expect(parsed.number).to eq("82")
         end
 
         it "parses stage" do
@@ -725,11 +725,11 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("98")
+          expect(parsed.number).to eq("98")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("5")
+          expect(parsed.part).to eq("5")
         end
 
         it "parses stage" do
@@ -761,7 +761,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("73")
+          expect(parsed.number).to eq("73")
         end
 
         it "parses stage" do
@@ -795,7 +795,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("84")
+          expect(parsed.number).to eq("84")
         end
 
         it "parses date" do
@@ -838,7 +838,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("83")
+          expect(parsed.number).to eq("83")
         end
 
         it "parses date" do
@@ -878,7 +878,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("31")
+          expect(parsed.number).to eq("31")
         end
 
         it "parses languages" do
@@ -917,7 +917,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("84")
+          expect(parsed.number).to eq("84")
         end
 
         it "parses stage" do
@@ -949,7 +949,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("84")
+          expect(parsed.number).to eq("84")
         end
 
         it "parses stage" do
@@ -990,11 +990,11 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("98")
+          expect(parsed.number).to eq("98")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("6")
+          expect(parsed.part).to eq("6")
         end
 
         it "parses date" do
@@ -1037,11 +1037,11 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("98")
+          expect(parsed.number).to eq("98")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("1")
+          expect(parsed.part).to eq("1")
         end
 
         it "parses stage" do
@@ -1077,11 +1077,11 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("98")
+          expect(parsed.number).to eq("98")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("1")
+          expect(parsed.part).to eq("1")
         end
 
         it "parses stage" do
@@ -1117,11 +1117,11 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("98")
+          expect(parsed.number).to eq("98")
         end
 
         it "parses part" do
-          expect(parsed.part.value).to eq("1")
+          expect(parsed.part).to eq("1")
         end
 
         it "parses stage" do
@@ -1155,7 +1155,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("99998")
+          expect(parsed.number).to eq("99998")
         end
 
         it "parses stage" do
@@ -1187,7 +1187,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("35")
+          expect(parsed.number).to eq("35")
         end
 
         it "parses stage" do
@@ -1226,7 +1226,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("99")
+        expect(parsed.number).to eq("99")
       end
 
       it "parses stage" do
@@ -1262,7 +1262,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("99999")
+        expect(parsed.number).to eq("99999")
       end
 
       it "parses stage" do
@@ -1308,7 +1308,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses date" do
@@ -1348,7 +1348,7 @@ RSpec.describe Pubid::Iso::Identifiers::Guide do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("73")
+        expect(parsed.number).to eq("73")
       end
 
       it "parses date" do

@@ -25,6 +25,10 @@ module Pubid
       rule(:publisher_code) do
         # Social-group form: "T/" then 2+ uppercase letters/digits.
         (str("T/") >> match("[A-Z0-9]").repeat(1)).as(:publisher_code) |
+          # Confidential national series. The lowercase "n" is part of the
+          # code, so it comes before the uppercase-only rule below: a PEG
+          # takes the first branch that matches and does not backtrack.
+          (str("GBn") >> (str("/T") | str("/Z")).maybe).as(:publisher_code) |
           # Standard form: 1-3 letters, optional slash-T-or-Z.
           (match("[A-Z]").repeat(1, 3) >>
             (str("/T") | str("/Z")).maybe).as(:publisher_code)

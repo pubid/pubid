@@ -19,8 +19,8 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         end
 
         it "parses number and part separately" do
-          expect(parsed.base.number.value).to eq("8824")
-          expect(parsed.base.part.value).to eq("1")
+          expect(parsed.base.number).to eq("8824")
+          expect(parsed.base.part).to eq("1")
         end
 
         it "parses year as 2-digit in rendering" do
@@ -34,8 +34,8 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses multi-part number (number and part separately)" do
-          expect(parsed.base.number.value).to eq("9594")
-          expect(parsed.base.part.value).to eq("2")
+          expect(parsed.base.number).to eq("9594")
+          expect(parsed.base.part).to eq("2")
         end
 
         it "round-trips" do
@@ -57,7 +57,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         end
 
         it "parses amendment number" do
-          expect(parsed.base.number.value).to eq("1")
+          expect(parsed.base.number).to eq("1")
         end
 
         it "round-trips" do
@@ -99,7 +99,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         end
 
         it "parses amendment number" do
-          expect(parsed.base.number.value).to eq("1")
+          expect(parsed.base.number).to eq("1")
         end
 
         it "parses reaffirmation" do
@@ -117,8 +117,8 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         let(:parsed) { Pubid::Csa.parse(subject) }
 
         it "parses multi-part TR number (number and part separately)" do
-          expect(parsed.base.number.value).to eq("12785")
-          expect(parsed.base.part.value).to eq("3")
+          expect(parsed.base.number).to eq("12785")
+          expect(parsed.base.part).to eq("3")
         end
 
         it "round-trips" do
@@ -142,7 +142,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         end
 
         it "parses ISO number" do
-          expect(parsed.base.base.number.value).to eq("10012")
+          expect(parsed.base.base.number).to eq("10012")
         end
 
         it "parses reaffirmation" do
@@ -185,8 +185,8 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         end
 
         it "parses IEC number and parts separately" do
-          expect(parsed.base.base.number.value).to eq("61000")
-          expect(parsed.base.base.part.value).to eq("4")
+          expect(parsed.base.base.number).to eq("61000")
+          expect(parsed.base.base.part).to eq("4")
         end
 
         it "parses reaffirmation" do
@@ -268,7 +268,7 @@ RSpec.describe Pubid::Csa::Identifiers::CsaAdopted do
         end
 
         it "parses ISO number" do
-          expect(parsed.base.base.number.value).to eq("9001")
+          expect(parsed.base.base.number).to eq("9001")
         end
 
         it "round-trips" do

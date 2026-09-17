@@ -23,11 +23,11 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("98")
+        expect(parsed.base.number).to eq("98")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("3")
+        expect(parsed.base.part).to eq("3")
       end
 
       it "parses base identifier date" do
@@ -39,7 +39,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -78,7 +78,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("123")
+        expect(parsed.base.number).to eq("123")
       end
 
       it "parses base identifier date" do
@@ -86,7 +86,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -133,11 +133,11 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("98")
+        expect(parsed.base.number).to eq("98")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("3")
+        expect(parsed.base.part).to eq("3")
       end
 
       it "parses base identifier type" do
@@ -145,7 +145,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -189,11 +189,11 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("98")
+        expect(parsed.base.number).to eq("98")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("3")
+        expect(parsed.base.part).to eq("3")
       end
 
       it "parses base identifier date" do
@@ -205,7 +205,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -256,11 +256,11 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("98")
+          expect(parsed.base.number).to eq("98")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("3")
+          expect(parsed.base.part).to eq("3")
         end
 
         it "parses base identifier type" do
@@ -268,7 +268,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses supplement number" do
-          expect(parsed.number.value).to eq("2")
+          expect(parsed.number).to eq("2")
         end
 
         it "parses supplement date" do
@@ -306,7 +306,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("98")
+          expect(parsed.base.number).to eq("98")
         end
 
         it "parses base identifier date" do
@@ -318,7 +318,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses supplement number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses supplement date" do
@@ -363,7 +363,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("98")
+          expect(parsed.base.number).to eq("98")
         end
 
         it "parses base identifier date" do
@@ -379,7 +379,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
         end
 
         it "parses supplement number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses supplement date" do
@@ -422,7 +422,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("3758")
+        expect(parsed.base.number).to eq("3758")
       end
 
       it "parses base identifier date" do
@@ -472,7 +472,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10000")
+        expect(parsed.base.number).to eq("10000")
       end
 
       it "parses base identifier date" do
@@ -484,7 +484,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -523,7 +523,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("14000")
+        expect(parsed.base.number).to eq("14000")
       end
 
       it "parses base identifier date" do
@@ -535,7 +535,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -577,7 +577,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10000")
+        expect(parsed.base.number).to eq("10000")
       end
 
       it "parses base identifier date" do
@@ -585,7 +585,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -620,7 +620,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10000")
+        expect(parsed.base.number).to eq("10000")
       end
 
       it "parses base identifier date" do
@@ -628,7 +628,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -664,7 +664,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("12345")
+        expect(parsed.base.number).to eq("12345")
       end
 
       it "parses base identifier date" do
@@ -672,7 +672,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -707,7 +707,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("12345")
+        expect(parsed.base.number).to eq("12345")
       end
 
       it "parses base identifier date" do
@@ -715,7 +715,7 @@ RSpec.describe Pubid::Iso::Identifiers::Supplement do
       end
 
       it "parses supplement number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses supplement date" do

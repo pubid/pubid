@@ -37,7 +37,9 @@ module Pubid
           abbr = annotate(abbr, typed_stage_css(@id.typed_stage), 
                           annotated: ann)
         end
-        subgroup_str = @id.subgroup.render(context:) if @id.subgroup
+        if @id.subgroup
+          subgroup_str = render_component(@id.subgroup, context)
+        end
 
         [
           pub_str,

@@ -23,7 +23,7 @@ RSpec.describe "NIST RB series" do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("6")
+          expect(parsed.number).to eq("6")
         end
 
         it "round-trips" do
@@ -43,7 +43,7 @@ RSpec.describe "NIST RB series" do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("4")
+          expect(parsed.number).to eq("4")
         end
 
         it "parses revision as edition" do

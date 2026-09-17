@@ -129,21 +129,21 @@ RSpec.describe Pubid::Iso::Builder do
       it "creates Hash with number Code" do
         result = builder.cast(:number_with_part, "19115")
         expect(result).to be_a(Hash)
-        expect(result[:number]).to be_a(Pubid::Iso::Components::Code)
-        expect(result[:number].value).to eq("19115")
+        expect(result[:number]).to be_a(String)
+        expect(result[:number]).to eq("19115")
       end
 
       it "creates Hash with part Code" do
         result = builder.cast(:number_with_part, "13818-1")
-        expect(result[:part]).to be_a(Pubid::Iso::Components::Code)
-        expect(result[:part].value).to eq("1")
+        expect(result[:part]).to be_a(String)
+        expect(result[:part]).to eq("1")
       end
 
       it "handles number-part-subpart format" do
         result = builder.cast(:number_with_part, "29110-5-1-1")
-        expect(result[:number].value).to eq("29110")
-        expect(result[:part].value).to eq("5")
-        expect(result[:subpart].value).to eq("1-1")
+        expect(result[:number]).to eq("29110")
+        expect(result[:part]).to eq("5")
+        expect(result[:subpart]).to eq("1-1")
       end
     end
   end
@@ -227,8 +227,8 @@ RSpec.describe Pubid::Iso::Builder do
         expect(result.typed_stage).not_to be_nil
         expect(result.typed_stage.type_code).to eq("tr")
 
-        expect(result.number).to be_a(Pubid::Iso::Components::Code)
-        expect(result.number.value).to eq("29186")
+        expect(result.number).to be_a(String)
+        expect(result.number).to eq("29186")
 
         expect(result.date).to be_a(Pubid::Components::Date)
         expect(result.date.year).to eq("2012")
@@ -273,7 +273,7 @@ RSpec.describe Pubid::Iso::Builder do
         result = builder.build(data)
         expect(result).to be_a(Pubid::Iso::Identifiers::Amendment)
         expect(result.base).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
-        expect(result.number.value).to eq("1")
+        expect(result.number).to eq("1")
       end
 
       it "builds multi-level supplements recursively" do
@@ -345,7 +345,7 @@ RSpec.describe Pubid::Iso::Builder do
         # Whitespace is stripped during parsing, not in builder
         # This is validated by integration tests
         id = Pubid::Iso.parse("ISO 19110:2005/Amd 1:2018")
-        expect(id.number.value).to eq("1")
+        expect(id.number).to eq("1")
       end
     end
 

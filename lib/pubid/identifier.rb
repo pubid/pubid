@@ -498,9 +498,17 @@ module Pubid
     end
 
     attribute :_type, :string, polymorphic_class: true
-    attribute :number, Components::Code
-    attribute :part, Components::Code
-    attribute :subpart, Components::Code
+    # Plain strings, for every flavor. A Components::Code here held nothing
+    # but its `value` on the identifier path, and the disagreement between
+    # this declaration and the leaves that redeclared a scalar was the
+    # determinism landmine: a redeclaration on an inherited-from class
+    # resolves nondeterministically under multi-flavor load. With the base
+    # declaring the scalar, no flavor redeclares and the bug class is gone.
+    # A flavor that needs structure keeps its own attributes (ISO's committee
+    # codes, NIST's series/subseries, ITU's code), never a boxed `number`.
+    attribute :number, :string
+    attribute :part, :string
+    attribute :subpart, :string
     attribute :stage_iteration, Components::Iteration
     attribute :date, Components::Date
     attribute :edition, Components::Edition

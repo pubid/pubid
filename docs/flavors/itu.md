@@ -44,3 +44,26 @@ under a note claiming "`Pubid.parse` rejects it before this point". That was wro
   arrives plain and the single outer annotation covers the whole string —
   the base's own tokens are reached by `Annotator#emit_tokens` walking
   `base`.
+
+## Contribution (Temporary Document) — pubid#340
+
+`Pubid::Itu::Identifiers::Contribution` models the working documents a study
+group circulates, mirroring pubid-itu 1.15's `Identifier::Contribution`
+(`%{series}-C%{number}`): "ITU-R SG17-C1000", sector- and language-suffixed
+per the existing rules ("ITU-T SG17-C1000-E"). The grammar entry sits between
+`with_series` and `series_code_identifier` — the **-C marker (dash + "C" +
+digits) is the discriminator**: a series-code document's post-dash number
+starts with digits or is all letters, never "C"+digits, so the two dash
+shapes cannot shadow each other in either direction ("ITU-T EMC-5" still
+builds a Recommendation, locked by a spec). The builder branch carries the
+`:contribution_marker`; `root.number` reaches the C-number through the shared
+`code.number` reader, so relaton-index keys it normally.
+
+**`locate_type` was broken for every leaf, not just this one**: no ITU class
+ever defined a `type` hash, so `Pubid::Itu.locate_type` raised `NoMethodError`
+on any call. The base now derives the key from the class name
+(`Contribution` → `:contribution`, `AnnexOfRecommendation` →
+`:annex_of_recommendation`) — plain `gsub` camel→snake, because ActiveSupport's
+`underscore` is not a dependency. metanorma-itu constructs through this
+lookup; its flavor-local `pubid_contribution.rb` render override can be
+deleted once it migrates.

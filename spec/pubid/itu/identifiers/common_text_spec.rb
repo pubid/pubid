@@ -25,8 +25,8 @@ RSpec.describe "ITU common-text identifier — issue #234" do
       expect(twin).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
       expect(twin.publisher.publisher).to eq("ISO")
       expect(twin.copublishers.first.publisher).to eq("IEC")
-      expect(twin.number.value).to eq("13818")
-      expect(twin.part.value).to eq("1")
+      expect(twin.number).to eq("13818")
+      expect(twin.part).to eq("1")
       expect(twin.date.year).to eq("2022")
     end
 

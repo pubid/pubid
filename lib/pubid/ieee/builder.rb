@@ -669,7 +669,14 @@ module Pubid
         # Extract publishers from joint_publishers
         if parsed[:joint_publishers]
           joint_pub_str = extract_value(parsed[:joint_publishers])
-          attributes[:publishers] = joint_pub_str.split("/")
+          pubs = joint_pub_str.split("/")
+          attributes[:publishers] = pubs
+          # lutaml materializes attribute defaults during from_hash, so the
+          # deserialized joint carries publisher/copublisher alongside
+          # publishers; set the same shape on the parse path or the
+          # amendment-wrapped round-trip diverges on exactly those keys.
+          attributes[:publisher] = pubs.first
+          attributes[:copublisher] = pubs.drop(1)
         end
 
         # Build code with parts if present
@@ -692,6 +699,15 @@ module Pubid
           attributes[:year] = extract_value(parsed[:edition_year])
         end
         attributes[:month] = extract_value(parsed[:month]) if parsed[:month]
+
+        # A text date trailing the DRAFT (pubid#216: "CD P26515/D1, March
+        # 2017") reaches the builder under :draft_month/:draft_year — the
+        # grammar captures them separately to avoid the :month/:year
+        # duplicate-subtree collision with the date clause.
+        if parsed[:draft_year]
+          attributes[:year] ||= extract_value(parsed[:draft_year])
+          attributes[:month] ||= extract_value(parsed[:draft_month])
+        end
 
         # Extract edition, from relaton's "/E-<n>" suffix (normalized to
         # "Edition <n>.0"). nil-residue hand-off item 1.
@@ -722,6 +738,10 @@ module Pubid
             attributes[:typed_stage] =
               Pubid::Ieee.locate_stage(stage_abbr)
           end
+        elsif parsed[:iso_published]
+          # Stage-less PUBLISHED joint form (pubid#317): ISO-led spelling,
+          # no project marker, no typed stage - renders as printed.
+          attributes[:lead_party] = "ISO"
         else
           # IEEE format - lead party is IEEE
           attributes[:lead_party] = "IEEE"
@@ -734,7 +754,19 @@ module Pubid
             Pubid::Ieee.locate_stage("P")
         end
 
-        Identifiers::JointDevelopment.new(**attributes)
+        joint = Identifiers::JointDevelopment.new(**attributes)
+
+        # Amendment tail on the joint ISO-format form (pubid#317:
+        # "8802-11:2012/Amd.1:2014(E)"): wrap the joint id, mirroring
+        # build_flat_amendment.
+        return joint unless parsed[:amd_number]
+
+        amd_year = extract_value(parsed[:amd_year]) if parsed[:amd_year]
+        Identifiers::Amendment.new(
+          base: joint,
+          number: extract_value(parsed[:amd_number]),
+          year: amd_year,
+        )
       end
 
       # Build SI/PSI identifier from parsed data
@@ -1189,6 +1221,14 @@ module Pubid
             return "P"
           elsif type_value == "Std"
             return "Std"
+          elsif type_value == "Draft Std" && parsed[:draft].nil? && parsed[:digit_draft].nil?
+            # A version-less "Draft Std" fabricates /D1 (issue #205);
+            # deriving the stage from that fabricated version renders the
+            # same P-prefixed form as an explicit "/D1" spelling, so the
+            # render reaches its fixed point in one round (pubid#318).
+            # Gated on no-draft: a dotted version ("D2.0") fails the registry
+            # lookup above and must fall through, keeping "Draft Std".
+            return "D1"
           elsif type_value.match?(/^No\.?$/)
             return type_value
           end

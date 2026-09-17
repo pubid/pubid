@@ -86,7 +86,7 @@ module Pubid
       end
 
       def number_from_kv(model, value)
-        model.number = Components::Code.new(value: value.to_s)
+        model.number = value.to_s
       end
 
       # `no_number` is a plain :string here but a Components::Code on Cec, so

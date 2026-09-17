@@ -17,7 +17,7 @@ module Pubid
       EVS_NAMESPACE = "urn:evs:"
 
       def generate
-        adopted_urn = identifier.adopted_identifier.to_urn
+        adopted_urn = identifier.base.to_urn
         unless adopted_urn.start_with?(CEN_NAMESPACE)
           raise Errors::ParseError,
                 "expected adopted CEN URN, got #{adopted_urn.inspect}"

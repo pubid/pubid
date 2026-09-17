@@ -9,10 +9,14 @@ module Pubid
       attribute :publisher, Components::Publisher, default: -> {
         Components::Publisher.new(body: "CCSDS")
       }
-      attribute :series, Components::Code
-      attribute :number, Components::Code
-      attribute :part, Components::Code
-      attribute :book_color, Components::Code
+      # Plain :string, like the live Pubid::Ccsds::Identifier hierarchy, which
+      # already declared these as strings. This class is otherwise
+      # unreferenced — nothing inherits it and no builder instantiates it — but
+      # it is public API, so it is retyped rather than deleted.
+      attribute :series, :string
+      attribute :number, :string
+      attribute :part, :string
+      attribute :book_color, :string
       attribute :edition, Components::Edition
       attribute :retired, :boolean, default: -> { false }
       attribute :language, Components::Language
@@ -29,14 +33,14 @@ module Pubid
         result += " "
 
         # Series (optional single letter before number)
-        result += series.value if series
+        result += series.to_s if series
 
         # Number with part (using dot notation)
-        result += number.value
-        result += ".#{part.value}" if part
+        result += number.to_s
+        result += ".#{part}" if part
 
         # Book color (required) - no space before dash
-        result += "-#{book_color.value}" if book_color
+        result += "-#{book_color}" if book_color
 
         # Edition (optional)
         result += "-#{edition.number}" if edition
@@ -54,11 +58,11 @@ module Pubid
         return nil unless other.is_a?(SingleIdentifier)
 
         # Compare by number first
-        num_cmp = number.value.to_i <=> other.number.value.to_i
+        num_cmp = number.to_i <=> other.number.to_i
         return num_cmp unless num_cmp.zero?
 
         # Then by part
-        part_cmp = (part ? part.value.to_i : 0) <=> (other.part ? other.part.value.to_i : 0)
+        part_cmp = part.to_i <=> other.part.to_i
         return part_cmp unless part_cmp.zero?
 
         # Then by edition

@@ -18,7 +18,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses part" do
@@ -65,7 +65,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses part" do
@@ -112,7 +112,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("5")
+        expect(parsed.number).to eq("5")
       end
 
       it "parses date" do
@@ -140,7 +140,7 @@ RSpec.describe Pubid::Iso::Identifiers::TechnologyTrendsAssessments do
       end
 
       it "parses number" do
-        expect(parsed.number.value).to eq("5")
+        expect(parsed.number).to eq("5")
       end
 
       it "parses date" do

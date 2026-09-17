@@ -7,13 +7,15 @@ RSpec.describe "IEEE default draft version — issue #205" do
     it "appends /D1 to 'IEEE Unapproved Draft Std 802.3'" do
       parsed = Pubid::Ieee.parse("IEEE Unapproved Draft Std 802.3")
       # Per IEEE guidance (issue #209), unapproved drafts are not yet standards,
-      # so the "Std" token is dropped from the rendered type.
-      expect(parsed.to_s).to eq("IEEE Unapproved Draft 802.3/D1")
+      # so the type word is dropped from the rendered form; the status word
+      # already carries the draft-ness (issue #318 made the drop total), and
+      # the D1 stage carries the project P.
+      expect(parsed.to_s).to eq("IEEE Unapproved P802.3/D1")
     end
 
     it "appends /D1 to 'IEEE Draft Std 802.3'" do
       parsed = Pubid::Ieee.parse("IEEE Draft Std 802.3")
-      expect(parsed.to_s).to eq("IEEE Draft Std 802.3/D1")
+      expect(parsed.to_s).to eq("IEEE P802.3/D1")
     end
 
     it "preserves the year as part of the draft suffix" do

@@ -47,7 +47,7 @@ module Pubid
                              end
                            end
             base_str = (needs_space ? "#{prefix} " : prefix) +
-              base.number.value.to_s + # Normalized code (e.g. "C22.2-1")
+              base.number.to_s + # Normalized code (e.g. "C22.2-1")
               ":#{year_display}"
             parts = [base_str]
           else
@@ -60,7 +60,7 @@ module Pubid
             bundled_with.each do |bundled|
               # For Cec identifiers, use normalized code format
               if bundled.is_a?(Cec)
-                bundled_part = bundled.number.value.to_s # e.g. "C22.2-2"
+                bundled_part = bundled.number.to_s # e.g. "C22.2-2"
                 if bundled.year
                   # Use dash if year_format is dash, otherwise colon
                   separator = bundled.year_format == "dash" ? "-" : ":"

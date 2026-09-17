@@ -323,6 +323,22 @@ module Pubid
           (digits | letter.repeat(1)).as(:number) >> parts
       end
 
+      # ITU Contribution (Temporary Document) — "ITU-R SG17-C1000" (pubid#340).
+      # The "-C" marker before the number distinguishes it from every
+      # neighbouring shape: a series-code document's post-dash number starts
+      # with digits or is all letters (never "C"+digits), and with_series
+      # requires a dot after the series.
+      rule(:contribution) do
+        itu_prefix >>
+          sector >>
+          space >>
+          series >>
+          str("-C").as(:contribution_marker) >>
+          number >>
+          parts >>
+          language.maybe
+      end
+
       rule(:base_series_code) do
         itu_prefix >>
           sector >>
@@ -656,9 +672,10 @@ module Pubid
           numeric_question |
           letter_question |
           with_series |
+          contribution |
           # Unreachable earlier: special_publication needs the literal "OB",
-          # handbook/numeric_question need leading digits, and letter_question
-          # needs series >> dot. Before without_series, whose code needs digits.
+          # handbook/numeric_question need leading digits, letter_question
+          # needs series >> dot, and contribution needs "-C" after the series.
           series_code_identifier |
           without_series
       end

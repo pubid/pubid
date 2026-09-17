@@ -130,11 +130,11 @@ RSpec.describe "Pubid::Bsi index key (root.number)" do
       expect(restored.to_s).to eq(id.to_s)
     end
 
-    # Note the set's `root` walks into the nested ISO identifier, whose own
-    # `number` is still an Iso::Components::Code until tranche 3. `.to_s` is
-    # what relaton keys on, so the index contract holds either way.
-    it "still reaches an ISO Code through #root" do
-      expect(id.root.number).to be_a(Pubid::Iso::Components::Code)
+    # The set's `root` walks into the nested ISO identifier, whose `number` is
+    # a plain String since the ISO retype. `.to_s` is what relaton keys on, so
+    # the index contract held through the change.
+    it "reaches the ISO number as a String through #root" do
+      expect(id.root.number).to be_a(String)
     end
   end
 

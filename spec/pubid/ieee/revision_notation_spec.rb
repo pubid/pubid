@@ -59,6 +59,39 @@ RSpec.describe "IEEE revision-notation variants" do
     end
   end
 
+  # NUMBERED variant combined with relaton's hyphenated "/D-<n>" draft
+  # spelling (pubid#316 family 1, the rawbib residuals): the before-draft
+  # reposition must capture the WHOLE hyphenated draft, and the repositioned
+  # "/D-<n>/R-<x>-YYYY[-MM]" then flows through the relaton-suffix rewrite
+  # exactly like a directly-spelled one.
+  {
+    "IEEE Unapproved Std P802.16_Rev2/D-2-2007" =>
+      "IEEE Unapproved Std P802.16/D-2/R-2-2007",
+    "IEEE Unapproved Std P802.16Rev2/D-3-2008-02" =>
+      "IEEE Unapproved Std P802.16/D-3/R-2-2008-02",
+    "IEEE P802.16Rev3/D-3-2011-11" =>
+      "IEEE P802.16/D-3/R-3-2011-11",
+  }.each do |variant, canonical|
+    context variant.inspect do
+      it "parses to the same identifier as its canonical /D-/R- form" do
+        expect(klass.parse(variant).to_hash)
+          .to eq(klass.parse(canonical).to_hash)
+      end
+
+      it "preserves the numbered revision, the draft and the date" do
+        parsed = klass.parse(variant)
+        expect(parsed.revision).not_to be_nil
+        expect(parsed.draft.version).to match(/\A\d/)
+        expect(parsed.year).to match(/\A(19|20)\d\d\z/)
+      end
+
+      it "round-trips through to_hash/from_hash" do
+        h = klass.parse(variant).to_hash
+        expect(klass.from_hash(h).to_hash).to eq(h)
+      end
+    end
+  end
+
   it "does not mangle the word 'Revision' in a parenthetical" do
     ref = "IEEE Std 802.16-2004 (Revision of IEEE Std 802.16-2001)"
     expect { klass.parse(ref) }.not_to raise_error

@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "round-trips" do
@@ -45,7 +45,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
       end
 
@@ -63,7 +63,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1088")
+          expect(parsed.number).to eq("1088")
         end
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1013")
+          expect(parsed.number).to eq("1013")
         end
 
         it "parses revision year" do
@@ -105,7 +105,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("1013")
+          expect(parsed.number).to eq("1013")
         end
       end
 
@@ -153,7 +153,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number with letter suffix" do
-          expect(parsed.number.value).to eq("378G")
+          expect(parsed.number).to eq("378G")
         end
       end
 
@@ -171,7 +171,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number with letter" do
-          expect(parsed.number.value).to eq("378G")
+          expect(parsed.number).to eq("378G")
         end
       end
     end
@@ -230,7 +230,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.base.number.value).to eq("118")
+          expect(parsed.base.number).to eq("118")
         end
 
         it "parses supplement" do
@@ -251,7 +251,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "carries the supplement as an isolated (empty) part" do
-          expect(parsed.number.value).to eq("118")
+          expect(parsed.number).to eq("118")
           expect(parsed.supplement).not_to be_nil
           expect(parsed.supplement.value_string).to eq("")
         end
@@ -294,7 +294,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.base.number.value).to eq("145")
+          expect(parsed.base.number).to eq("145")
         end
       end
 
@@ -317,7 +317,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.base.number.value).to eq("145")
+          expect(parsed.base.number).to eq("145")
         end
 
         it "round-trips its generated short form" do
@@ -372,7 +372,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("887")
+          expect(parsed.number).to eq("887")
         end
       end
     end

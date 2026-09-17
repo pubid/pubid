@@ -50,9 +50,18 @@ module Pubid
       attribute :part, :string
       attribute :subpart, :string
       attribute :second_number, Bsi::Components::Code # For collections like PAS 2035/2030
-      attribute :date, Bsi::Components::Date
+      # The shared component, not Bsi::Components::Date: the adoption wrappers
+      # (AdoptedEuropeanNorm, AdoptedInternationalStandard) delegate `date` to
+      # the foreign identifier they wrap, whose date is a plain
+      # ::Pubid::Components::Date — the empty BSI subclass rejected it and
+      # to_hash/from_hash raised on every "BS EN …"/"BS ISO …" (pubid#379,
+      # the same shape as the bsi-set-cross-flavor-type fix).
+      attribute :date, ::Pubid::Components::Date
       attribute :stage, Pubid::Components::Stage
-      attribute :type, Bsi::Components::Type
+      # Shared Type too: the leaf builders reach for ::Pubid::Components::Type
+      # (e.g. a default materialized from self.type), which the empty BSI
+      # subclass rejected — "BIP 2225:2022" et al. failed to_hash on `type`.
+      attribute :type, ::Pubid::Components::Type
       attribute :typed_stage, Pubid::Components::TypedStage
       attribute :edition, :string
       attribute :month, :integer

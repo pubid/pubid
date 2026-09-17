@@ -12,7 +12,7 @@ module Pubid
       def urn_number
         return nil unless identifier.number
 
-        identifier.number.render(context: URN_CONTEXT)
+        identifier.number.to_s
       end
 
       def generate

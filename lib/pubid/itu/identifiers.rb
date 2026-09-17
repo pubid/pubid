@@ -11,6 +11,7 @@ module Pubid
       autoload :AppendixOfRecommendation,
                "#{__dir__}/identifiers/appendix_of_recommendation"
       autoload :CombinedIdentifier, "#{__dir__}/identifiers/combined_identifier"
+      autoload :Contribution, "#{__dir__}/identifiers/contribution"
       autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
       autoload :Errata, "#{__dir__}/identifiers/errata"
       autoload :Handbook, "#{__dir__}/identifiers/handbook"

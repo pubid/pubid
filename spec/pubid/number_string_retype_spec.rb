@@ -43,6 +43,7 @@ module NumberStringRetypeSpec
     "ansi" => [Pubid::Ansi, 170],
     "api" => [Pubid::Api, 190],
     "bsi" => [Pubid::Bsi, 1_400],
+    "ccsds" => [Pubid::Ccsds, 400],
     "cen_cenelec" => [Pubid::CenCenelec, 100],
     "idf" => [Pubid::Idf, 60],
     "iec" => [Pubid::Iec, 2_000],
@@ -82,18 +83,15 @@ module NumberStringRetypeSpec
   # `pubid:cencenelec:` type segment (the module name, not a registry name),
   # so the CEN identifier nested in a BSI adoption deserializes as its CEN
   # class instead of the abstract root.
-  # bsi 597 -> 191 when the adoption wrappers moved to `base`: deleting the
-  # `#date` delegation on AdoptedEuropeanNorm / AdoptedInternationalStandard /
-  # NationalAnnex removed the 408 `IncorrectModelError` raises it caused (it
-  # returned the adopted flavor's Pubid::Components::Date where BSI declares
-  # Bsi::Components::Date). Of the 191 that remain, 189 are the OTHER raise —
-  # a Pubid::Components::Type where Bsi::Components::Type is declared, untouched
-  # here — and 2 are value mismatches that do not raise. See
-  # docs/flavors/bsi.md.
+  # bsi 597 -> 2 with pubid#379: `date`/`type` retyped to the shared
+  # components — nearly every residual failure was the empty
+  # Bsi::Components::Date/Type subclass rejecting the shared instances a
+  # wrapper delegates to (or a leaf materializes) on to_hash/from_hash.
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
     "api" => 1,
-    "bsi" => 191,
+    "bsi" => 2,
+    "ccsds" => 0,
     "cen_cenelec" => 0,
     "idf" => 0,
     # Measured over the WHOLE 12,331-id IEC corpus on the parent commit, not
@@ -108,6 +106,9 @@ module NumberStringRetypeSpec
     "ansi" => ["ANSI C135.14-2000", "C135.14"],
     "api" => ["API RP 500", "500"],
     "bsi" => ["BS 1234:2020", "1234"],
+    # CCSDS already emitted a bare scalar: its own Identifier declared :string
+    # while the unused SingleIdentifier still declared a Components::Code.
+    "ccsds" => ["CCSDS 120.0-G-4", "120"],
     "cen_cenelec" => ["EN 196-3:2005", "196"],
     "idf" => ["IDF 125:1988", "125"],
     # IEC already emitted a bare scalar before the retype, through the
@@ -194,13 +195,14 @@ module NumberStringRetypeSpec
 end
 
 RSpec.describe "number/part/subpart as :string" do
-  describe "the shared base is NOT retyped" do
-    # The whole point of the tranching: this line moves last, once ISO, NIST
-    # and CSA have also converted. A failure here means someone jumped ahead.
+  describe "the shared base is retyped" do
+    # The last step of the sequence, and the one that ends the bug class: with
+    # the base declaring the scalar, no flavor redeclares number/part/subpart,
+    # so the nondeterministic attribute resolution has nothing to resolve.
     NumberStringRetypeSpec::ATTRS.each do |attr|
-      it "::Pubid::Identifier still declares #{attr} as Components::Code" do
+      it "::Pubid::Identifier declares #{attr} as a String" do
         expect(Pubid::Identifier.attributes[attr].type)
-          .to eq(Pubid::Components::Code)
+          .to eq(NumberStringRetypeSpec::STRING)
       end
     end
   end

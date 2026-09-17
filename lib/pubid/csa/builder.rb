@@ -253,7 +253,7 @@ module Pubid
 
         # Code
         if parsed_hash[:code]
-          series.number = Components::Code.new(value: parsed_hash[:code].to_s)
+          series.number = parsed_hash[:code].to_s
         end
 
         # Year format and year
@@ -520,13 +520,13 @@ module Pubid
           # Pattern: "C22.1-15" should become code="C22.1", year="2015"
           if !data[:year] && code_value =~ /^(.+)-(\d{2})$/
             # Split code and year
-            identifier.number = Components::Code.new(value: $1)
+            identifier.number = $1
             # Convert 2-digit year to 4-digit
             year_2digit = $2
             identifier.year = "20#{year_2digit}"
             identifier.year_format = "dash"
           else
-            identifier.number = Components::Code.new(value: code_value)
+            identifier.number = code_value
           end
         end
 

@@ -37,6 +37,16 @@ module Pubid
       end
       private_class_method :normalize_whitespace
 
+      # The type key used by Pubid::Itu.locate_type — the class name
+      # ("Contribution" => :contribution). No ITU leaf ever defined a
+      # `type` hash, so locate_type raised NoMethodError on every call;
+      # the derived default gives every concrete leaf a key for free
+      # (pubid#340's ask). metanorma-itu constructs via this lookup.
+      def self.type
+        leaf = name.split("::").last
+        { key: leaf.gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase.to_sym }
+      end
+
       # Long-form ↔ ITU single-letter language code map. The parser produces
       # single-letter codes (E/F/S/R/A/C); API callers (e.g. metanorma-itu)
       # pass long-form (en/fr/es/ru/ar/zh). Storage is normalized to the

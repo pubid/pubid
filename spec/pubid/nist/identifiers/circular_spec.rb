@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("13")
+          expect(parsed.number).to eq("13")
         end
 
         it "round-trips correctly" do
@@ -162,7 +162,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "carries the year as the supplement attribute" do
-          expect(parsed.number.value).to eq("25")
+          expect(parsed.number).to eq("25")
           expect(parsed.supplement.year).to eq("1924")
         end
 
@@ -190,7 +190,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "carries the year as the supplement attribute" do
-          expect(parsed.number.value).to eq("25")
+          expect(parsed.number).to eq("25")
           expect(parsed.supplement.year).to eq("1925")
         end
 
@@ -222,7 +222,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "carries number and edition directly" do
-          expect(parsed.number.value).to eq("101")
+          expect(parsed.number).to eq("101")
           expect(parsed.edition).to be_a(Pubid::Nist::Components::Edition)
           expect(parsed.edition.type).to eq("e")
           expect(parsed.edition.id).to eq("2")
@@ -262,7 +262,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         it "parses as a plain Circular" do
           expect(parsed).to be_a(described_class)
           expect(parsed).not_to be_a(Pubid::Nist::Identifiers::CircularSupplement)
-          expect(parsed.number.value).to eq("24")
+          expect(parsed.number).to eq("24")
         end
 
         it "isolates the supplement month and year" do

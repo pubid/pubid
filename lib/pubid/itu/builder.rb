@@ -68,6 +68,16 @@ module Pubid
           return build_question(data)
         end
 
+        # Contribution (Temporary Document) — "ITU-R SG17-C1000" (pubid#340).
+        if data[:contribution_marker]
+          return Identifiers::Contribution.new(
+            sector: Components::Sector.new(sector: data[:sector].to_s),
+            series: Components::Series.new(series: data[:series].to_s),
+            code: build_code(data),
+            language: data[:language]&.to_s,
+          )
+        end
+
         # Build basic recommendation or combined identifier
         sector = Components::Sector.new(sector: data[:sector].to_s)
         series = Components::Series.new(series: data[:series].to_s) if data[:series]

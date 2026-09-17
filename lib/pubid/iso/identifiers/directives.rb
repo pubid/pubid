@@ -4,7 +4,10 @@ module Pubid
   module Iso
     module Identifiers
       class Directives < SingleIdentifier
-        attribute :subgroup, ::Pubid::Components::Code
+        # A plain string ("JTC 1"). The serialized form flattens from
+        # `{"value" => "JTC 1"}` to `"JTC 1"`, so the 5 directives rows of
+        # relaton-data-iso need a re-crawl; no compatibility shim is kept.
+        attribute :subgroup, :string
 
         # Merges with Identifier's block (base attributes); only adds the
         # Directives-specific subgroup so it survives to_hash/from_hash.
@@ -46,15 +49,15 @@ module Pubid
           parts << ([publisher] + copubs).map(&:body).map(&:downcase).join("-")
 
           if subgroup
-            subgroup_parts = subgroup.value.split
+            subgroup_parts = subgroup.split
             parts << subgroup_parts[0].downcase if subgroup_parts[0]
             parts << subgroup_parts[1] if subgroup_parts[1]
           end
 
           parts << "dir"
 
-          parts << number.value if number
-          parts << part.value.downcase if part
+          parts << number.to_s if number
+          parts << part.to_s.downcase if part
           parts << date.year if date
 
           parts.join(":")

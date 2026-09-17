@@ -131,7 +131,7 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
     AshraeIndexKeySpec::SUPPLEMENTS.each do |leaf|
       it "leaves #{leaf} without its own number attribute" do
         klass = Pubid::Ashrae::Identifiers.const_get(leaf)
-        expect(klass.attributes[:number].type).to eq(Pubid::Components::Code)
+        expect(klass.attributes[:number].type).to eq(Lutaml::Model::Type::String)
       end
     end
 
@@ -163,12 +163,12 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
       expect(id.to_hash).not_to have_key("number")
     end
 
-    it "leaves the inherited-from classes' `number` untouched" do
+    it "resolves the inherited-from classes' `number` to a String" do
       # ASHRAE's `code` sat here, inherited by BOTH the single-document and the
       # supplement branch. Redeclaring on these is the determinism landmine.
       [Pubid::Ashrae::Identifier, Pubid::Ashrae::SingleIdentifier,
        Pubid::Ashrae::SupplementIdentifier].each do |klass|
-        expect(klass.attributes[:number].type).to eq(Pubid::Components::Code)
+        expect(klass.attributes[:number].type).to eq(Lutaml::Model::Type::String)
       end
     end
   end

@@ -10,11 +10,11 @@ require "spec_helper"
 #   2. `#root` needed a hand-written override, and only one of the two classes
 #      had it.
 #   3. The `#number` / `#date` / `#part` / `#subpart` delegations that stood in
-#      for the missing `#root` SHADOWED real lutaml accessors. `#date` returned
-#      the adopted flavor's `Pubid::Components::Date` where the BSI attribute
-#      declares `Pubid::Bsi::Components::Date`, so `to_hash` raised
-#      `IncorrectModelError` for 408 of 1501 pass-fixture identifiers, and the
-#      others re-emitted the nested document's number and part at the top level.
+#      for the missing `#root` SHADOWED real lutaml accessors. They answered
+#      with a value for a plain member and nil for a wrapped one, and they
+#      re-emitted the nested document's number and part at the top level of
+#      every wrapper row. (`#date` also made `to_hash` raise; pubid#379 fixed
+#      that separately by widening the attribute type.)
 #
 # The attribute is now `base`, the delegations are gone, and every identity
 # surface (URN, MR slug, index key) reads `#root` instead.

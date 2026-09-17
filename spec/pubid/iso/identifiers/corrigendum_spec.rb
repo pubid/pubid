@@ -17,11 +17,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10360")
+        expect(parsed.base.number).to eq("10360")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -29,7 +29,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -68,11 +68,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10360")
+        expect(parsed.base.number).to eq("10360")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -80,7 +80,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -123,11 +123,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("11073")
+        expect(parsed.base.number).to eq("11073")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("10418")
+        expect(parsed.base.part).to eq("10418")
       end
 
       it "parses base identifier date" do
@@ -135,7 +135,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -174,7 +174,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("123")
+        expect(parsed.base.number).to eq("123")
       end
 
       it "parses base identifier date" do
@@ -182,7 +182,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -228,11 +228,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("105")
+        expect(parsed.base.number).to eq("105")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("G01")
+        expect(parsed.base.part).to eq("G01")
       end
 
       it "parses base identifier date" do
@@ -240,7 +240,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -280,7 +280,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("6709")
+        expect(parsed.base.number).to eq("6709")
       end
 
       it "parses base identifier date" do
@@ -288,7 +288,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -328,11 +328,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("9606")
+        expect(parsed.base.number).to eq("9606")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -340,7 +340,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses corrigendum date" do
@@ -388,7 +388,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17025")
+        expect(parsed.base.number).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -396,7 +396,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -443,11 +443,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("3822")
+          expect(parsed.base.number).to eq("3822")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("3")
+          expect(parsed.base.part).to eq("3")
         end
 
         it "parses base identifier date" do
@@ -455,7 +455,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -492,11 +492,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("10303")
+          expect(parsed.base.number).to eq("10303")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("111")
+          expect(parsed.base.part).to eq("111")
         end
 
         it "parses base identifier date" do
@@ -504,7 +504,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("2")
+          expect(parsed.number).to eq("2")
         end
 
         it "parses corrigendum date" do
@@ -541,7 +541,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("13431")
+          expect(parsed.base.number).to eq("13431")
         end
 
         it "parses base identifier date" do
@@ -549,7 +549,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -584,7 +584,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("13431")
+          expect(parsed.base.number).to eq("13431")
         end
 
         it "parses base identifier date" do
@@ -592,7 +592,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -629,11 +629,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("3864")
+          expect(parsed.base.number).to eq("3864")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("2")
+          expect(parsed.base.part).to eq("2")
         end
 
         it "parses base identifier date" do
@@ -641,7 +641,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -680,11 +680,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("10611")
+          expect(parsed.base.number).to eq("10611")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("4")
+          expect(parsed.base.part).to eq("4")
         end
 
         it "parses base identifier date" do
@@ -696,7 +696,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("2")
+          expect(parsed.number).to eq("2")
         end
 
         it "parses corrigendum date" do
@@ -735,11 +735,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("15408")
+          expect(parsed.base.number).to eq("15408")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("2")
+          expect(parsed.base.part).to eq("2")
         end
 
         it "parses base identifier date" do
@@ -747,7 +747,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -792,11 +792,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("14496")
+          expect(parsed.base.number).to eq("14496")
         end
 
         it "parses base identifier part" do
-          expect(parsed.base.part.value).to eq("12")
+          expect(parsed.base.part).to eq("12")
         end
 
         it "parses base identifier date" do
@@ -804,7 +804,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -841,7 +841,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("23455")
+          expect(parsed.base.number).to eq("23455")
         end
 
         it "parses base identifier date" do
@@ -853,7 +853,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
         end
 
         it "parses corrigendum number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses corrigendum date" do
@@ -897,11 +897,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("10646")
+        expect(parsed.base.number).to eq("10646")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -909,7 +909,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses corrigendum date" do
@@ -947,11 +947,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -959,7 +959,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -998,11 +998,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1010,7 +1010,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses corrigendum date" do
@@ -1053,11 +1053,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1065,7 +1065,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1104,11 +1104,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1116,7 +1116,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1159,11 +1159,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1171,7 +1171,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1210,11 +1210,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1222,7 +1222,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses corrigendum date" do
@@ -1265,11 +1265,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17301")
+        expect(parsed.base.number).to eq("17301")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("1")
+        expect(parsed.base.part).to eq("1")
       end
 
       it "parses base identifier date" do
@@ -1277,7 +1277,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("2")
+        expect(parsed.number).to eq("2")
       end
 
       it "parses corrigendum date" do
@@ -1327,11 +1327,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base.base.number.value).to eq("13818")
+        expect(parsed.base.base.number).to eq("13818")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base.base.part.value).to eq("1")
+        expect(parsed.base.base.part).to eq("1")
       end
 
       it "parses amendment base identifier date" do
@@ -1339,7 +1339,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment number" do
-        expect(parsed.base.number.value).to eq("3")
+        expect(parsed.base.number).to eq("3")
       end
 
       it "parses amendment date" do
@@ -1347,7 +1347,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1396,11 +1396,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base.base.number.value).to eq("15938")
+        expect(parsed.base.base.number).to eq("15938")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base.base.part.value).to eq("7")
+        expect(parsed.base.base.part).to eq("7")
       end
 
       it "parses amendment base identifier date" do
@@ -1408,7 +1408,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment number" do
-        expect(parsed.base.number.value).to eq("5")
+        expect(parsed.base.number).to eq("5")
       end
 
       it "parses amendment date" do
@@ -1416,7 +1416,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1462,11 +1462,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses supplement base identifier number" do
-        expect(parsed.base.base.number.value).to eq("98")
+        expect(parsed.base.base.number).to eq("98")
       end
 
       it "parses supplement base identifier part" do
-        expect(parsed.base.base.part.value).to eq("3")
+        expect(parsed.base.base.part).to eq("3")
       end
 
       it "parses supplement base identifier date" do
@@ -1478,7 +1478,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses supplement number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -1486,7 +1486,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1535,11 +1535,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses supplement base identifier number" do
-        expect(parsed.base.base.number.value).to eq("98")
+        expect(parsed.base.base.number).to eq("98")
       end
 
       it "parses supplement base identifier part" do
-        expect(parsed.base.base.part.value).to eq("3")
+        expect(parsed.base.base.part).to eq("3")
       end
 
       it "parses supplement base identifier date" do
@@ -1551,11 +1551,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses supplement base identifier edition" do
-        expect(parsed.base.base.edition.number.value).to eq("1")
+        expect(parsed.base.base.edition.number).to eq("1")
       end
 
       it "parses supplement number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses supplement date" do
@@ -1563,7 +1563,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1606,11 +1606,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("11783")
+        expect(parsed.base.number).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("2")
+        expect(parsed.base.part).to eq("2")
       end
 
       it "parses base identifier date" do
@@ -1618,7 +1618,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1662,11 +1662,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("11783")
+        expect(parsed.base.number).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("2")
+        expect(parsed.base.part).to eq("2")
       end
 
       it "parses base identifier date" do
@@ -1678,7 +1678,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1721,11 +1721,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("11783")
+        expect(parsed.base.number).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("2")
+        expect(parsed.base.part).to eq("2")
       end
 
       it "parses base identifier date" do
@@ -1733,7 +1733,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1776,11 +1776,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("11783")
+        expect(parsed.base.number).to eq("11783")
       end
 
       it "parses base identifier part" do
-        expect(parsed.base.part.value).to eq("2")
+        expect(parsed.base.part).to eq("2")
       end
 
       it "parses base identifier date" do
@@ -1792,7 +1792,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1839,7 +1839,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17025")
+        expect(parsed.base.number).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -1847,7 +1847,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1891,7 +1891,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17025")
+        expect(parsed.base.number).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -1899,7 +1899,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -1947,7 +1947,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17025")
+        expect(parsed.base.number).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -1959,7 +1959,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -2006,7 +2006,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("17025")
+        expect(parsed.base.number).to eq("17025")
       end
 
       it "parses base identifier date" do
@@ -2018,7 +2018,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -2072,11 +2072,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base.base.number.value).to eq("13818")
+        expect(parsed.base.base.number).to eq("13818")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base.base.part.value).to eq("1")
+        expect(parsed.base.base.part).to eq("1")
       end
 
       it "parses amendment base identifier date" do
@@ -2084,11 +2084,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment base identifier edition" do
-        expect(parsed.base.base.edition.number.value).to eq("5")
+        expect(parsed.base.base.edition.number).to eq("5")
       end
 
       it "parses amendment number" do
-        expect(parsed.base.number.value).to eq("3")
+        expect(parsed.base.number).to eq("3")
       end
 
       it "parses amendment date" do
@@ -2096,7 +2096,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do
@@ -2143,11 +2143,11 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment base identifier number" do
-        expect(parsed.base.base.number.value).to eq("13818")
+        expect(parsed.base.base.number).to eq("13818")
       end
 
       it "parses amendment base identifier part" do
-        expect(parsed.base.base.part.value).to eq("1")
+        expect(parsed.base.base.part).to eq("1")
       end
 
       it "parses amendment base identifier date" do
@@ -2159,7 +2159,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses amendment number" do
-        expect(parsed.base.number.value).to eq("3")
+        expect(parsed.base.number).to eq("3")
       end
 
       it "parses amendment date" do
@@ -2167,7 +2167,7 @@ RSpec.describe Pubid::Iso::Identifiers::Corrigendum do
       end
 
       it "parses corrigendum number" do
-        expect(parsed.number.value).to eq("1")
+        expect(parsed.number).to eq("1")
       end
 
       it "parses corrigendum date" do

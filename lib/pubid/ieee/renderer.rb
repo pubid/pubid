@@ -115,17 +115,16 @@ module Pubid
         parts << id.draft_status if id.draft_status
 
         # Type - only render for IEEE/AIEE publishers, and only for non-projects.
-        # An unapproved draft is not yet a standard, so per IEEE guidance the
-        # "Std" token is dropped from the type when draft_status is "Unapproved"
-        # (e.g. "Draft Std" -> "Draft", "Std" -> "").
+        # A status word ("Unapproved") already marks the document as a draft,
+        # so the WHOLE type word is dropped — not just "Std" (pubid#318: the
+        # half-strip left "Draft" in the render, the re-parse dropped it, and
+        # to_s needed three rounds to converge while losing the type).
         should_render_type = id.publisher&.match?(/^(IEEE|AIEE)/)
 
-        if should_render_type && !id.typed_stage&.project_status && id.type && !id.type.to_s.strip.empty? && id.type != "P"
+        if should_render_type && !id.typed_stage&.project_status && id.type && !id.type.to_s.strip.empty? && id.type != "P" &&
+            !id.draft_status.to_s.match?(/unapproved/i)
           type_str = id.type.dup
           type_str = type_str.sub(/^P/, "") if type_str.start_with?("P")
-          if id.draft_status.to_s.match?(/unapproved/i)
-            type_str = type_str.gsub(/\bStd\b/i, "").squeeze(" ").strip
-          end
           parts << type_str unless type_str.strip.empty?
         end
 

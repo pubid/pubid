@@ -21,7 +21,7 @@ RSpec.describe Pubid::Iso::Identifiers::Extract do
         end
 
         it "parses base identifier number" do
-          expect(parsed.base.number.value).to eq("1101")
+          expect(parsed.base.number).to eq("1101")
         end
 
         it "parses base identifier date" do
@@ -29,7 +29,7 @@ RSpec.describe Pubid::Iso::Identifiers::Extract do
         end
 
         it "parses extract number" do
-          expect(parsed.number.value).to eq("1")
+          expect(parsed.number).to eq("1")
         end
 
         it "parses extract date" do

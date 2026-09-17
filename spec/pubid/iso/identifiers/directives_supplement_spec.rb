@@ -21,7 +21,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses base identifier type" do
@@ -111,7 +111,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses base identifier type" do
@@ -201,7 +201,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses base identifier type" do
@@ -385,7 +385,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses base identifier type" do
@@ -435,7 +435,7 @@ RSpec.describe Pubid::Iso::Identifiers::DirectivesSupplement do
       end
 
       it "parses base identifier number" do
-        expect(parsed.base.number.value).to eq("1")
+        expect(parsed.base.number).to eq("1")
       end
 
       it "parses base identifier type" do

@@ -21,34 +21,6 @@ id = Pubid::Ccsds.parse("...")
 |------|------|-----------|-----------------|
 | "" |  | published |  |
 
-### Base Backup 88929
-
-**Class:** `Pubid::Ccsds::Identifiers::BaseBackup88929`
-
-#### Typed Stages
-
-| Abbr | Name | Stage Code | Harmonized Codes |
-|------|------|-----------|-----------------|
-| "" |  | published |  |
-
-### Base Base 88929
-
-**Class:** `Pubid::Ccsds::Identifiers::BaseBase88929`
-
-### Base Local 88929
-
-**Class:** `Pubid::Ccsds::Identifiers::BaseLocal88929`
-
-### Base Remote 88929
-
-**Class:** `Pubid::Ccsds::Identifiers::BaseRemote88929`
-
-#### Typed Stages
-
-| Abbr | Name | Stage Code | Harmonized Codes |
-|------|------|-----------|-----------------|
-| "" |  | published |  |
-
 ### Corrigendum
 
 **Class:** `Pubid::Ccsds::Identifiers::Corrigendum`

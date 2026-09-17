@@ -32,9 +32,9 @@ RSpec.describe "Pubid::Ietf index key (root.number)" do
   # definitions directly, so they fail immediately and always if the leaves
   # stop declaring `number` themselves.
   describe "number is declared on the LEAVES, not the shared base" do
-    it "leaves the shared base's inherited Components::Code number alone" do
+    it "resolves the shared base's inherited number to a String" do
       expect(Pubid::Ietf::Identifier.attributes[:number].type)
-        .to eq(Pubid::Components::Code)
+        .to eq(Lutaml::Model::Type::String)
     end
 
     %i[Rfc Bcp Std Fyi InternetDraft].each do |leaf|

@@ -50,7 +50,7 @@ RSpec.describe Pubid::Nist::Series::Ir do
         first_num: first_num, letter_base: "1786", letter_suffix: "R",
       )
       expect(handled).to be(true)
-      expect(identifier.number.value).to eq("79-1786")
+      expect(identifier.number).to eq("79-1786")
       expect(identifier.edition.id).to eq("1")
       expect(identifier.edition.type).to eq("r")
       expect(identifier.revision).to eq("r1")
@@ -73,14 +73,14 @@ RSpec.describe Pubid::Nist::Series::Ir do
       identifier.edition = Pubid::Nist::Components::Edition.new(type: "e",
                                                                 id: "2946")
       described_class.finalize_identifier(identifier, {})
-      expect(identifier.number.value).to eq("84-2946")
+      expect(identifier.number).to eq("84-2946")
       expect(identifier.edition).to be_nil
     end
 
     it "leaves non-e-suffixed numbers untouched" do
       identifier.number = Pubid::Nist::Components::Code.new(value: "84-2946")
       described_class.finalize_identifier(identifier, {})
-      expect(identifier.number.value).to eq("84-2946")
+      expect(identifier.number).to eq("84-2946")
     end
   end
 end

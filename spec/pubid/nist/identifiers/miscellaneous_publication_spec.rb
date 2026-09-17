@@ -23,7 +23,7 @@ RSpec.describe Pubid::Nist::Identifiers::MiscellaneousPublication do
         end
 
         it "parses number" do
-          expect(parsed.number.value).to eq("39")
+          expect(parsed.number).to eq("39")
         end
 
         it "parses edition" do
@@ -54,7 +54,7 @@ RSpec.describe Pubid::Nist::Identifiers::MiscellaneousPublication do
         end
 
         it "parses MR format" do
-          expect(parsed.number.value).to eq("39")
+          expect(parsed.number).to eq("39")
           expect(parsed.edition.id).to eq("1")
           expect(parsed.edition.type).to eq("e")
         end
