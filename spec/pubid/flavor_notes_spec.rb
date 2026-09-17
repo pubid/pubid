@@ -50,6 +50,10 @@ RSpec.describe "Flavor notes" do
   it "keeps the root CLAUDE.md small enough to load in every session" do
     # The split exists to bound this file. 100 KB leaves room to grow while
     # still catching a flavor bullet appended to the root file by mistake.
-    expect(File.size(claude_md)).to be < 100_000
+    # Measured LF-normalized: a Windows CRLF checkout inflates every byte
+    # count by one per line, which flipped this budget red on windows-latest
+    # while the file was under the cap on LF (the content did not change).
+    size = File.read(claude_md).delete("\r").bytesize
+    expect(size).to be < 100_000
   end
 end
