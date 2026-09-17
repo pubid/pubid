@@ -491,18 +491,23 @@ module Pubid
       end
 
       # Extract errata date from parsed errata_date data
+      # ASHRAE titles an erratum with the long date form ("October 10, 2008"),
+      # so a spelling variant such as "October 10,2008" is written in that
+      # form. A numeric date ("7-17-2003") is kept as written.
       # @param errata_date [Hash] the parsed errata_date hash
       # @return [String, nil] the formatted errata date string
       def extract_errata_date(errata_date)
-        return nil unless errata_date
+        return nil unless errata_date.is_a?(Hash)
 
-        # errata_date contains { month_name: "...", errata_year: "..." }
-        # We need to format this as "Month Day, Year"
-        extract_value(errata_date[:month_name])
-        extract_value(errata_date[:errata_year])
-        # Note: day is captured as digit.repeat(1,2) but not named in the parser
-        # We'll need to reconstruct from the raw string or enhance parser
-        nil # For now, return nil - parser enhancement needed
+        numeric = extract_value(errata_date[:numeric_date])
+        return numeric.delete(" ") if numeric
+
+        month = extract_value(errata_date[:month])
+        day = extract_value(errata_date[:day])
+        return nil unless month && day
+
+        year = extract_value(errata_date[:errata_year])
+        year ? "#{month} #{day}, #{year}" : "#{month} #{day}"
       end
 
       # Extract addendum date from parsed addendum_year data

@@ -234,22 +234,19 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
     end
   end
 
-  # KNOWN GAP, pre-existing, and the reason the slug-distinctness sweep below
-  # cannot see it. Errata#errata_date is ALWAYS nil: Builder#extract_errata_date
-  # computes the month and the year and then unconditionally `return nil`
-  # ("parser enhancement needed"), and rule(:errata_date) never captures the
-  # month name or the day at all — only `:errata_year` is named. So two errata
-  # of one standard, issued ten days apart, are one identifier on every surface.
+  # FIXED GAP, and the reason the slug-distinctness sweep below could not see
+  # it. Errata#errata_date was ALWAYS nil, for three reasons in two layers:
+  # rule(:errata_date) had no leading space, so it never matched after
+  # "Errata" and optional_suffix took the date; the rule named only
+  # `:errata_year`, not the month or the day; and
+  # Builder#extract_errata_date returned nil unconditionally. So two errata of
+  # one standard, issued ten days apart, were one identifier on every surface —
+  # and with equal hashes, the sweep read the shared slug as benign.
   #
-  # This branch's new Errata#mr_supplement_suffix reads errata_date, so today it
-  # always emits the bare "errata". The hook is kept rather than trimmed: it is
-  # correct the moment the date is captured, and the alternative is to slug
-  # every erratum flat, which is what collapsed them in the first place.
-  #
-  # Fixing it means capturing month+day in the grammar and deciding whether the
-  # date belongs in to_s — a rendering decision, not a repair. See hand-off
-  # ashrae-errata-date-dropped.
-  describe "two errata of one standard are still one identifier" do
+  # ASHRAE titles an erratum by its date, so the date now reaches to_s, the
+  # hash, == and the slug. The URN still collapses: it carries no supplement
+  # marker at all (hand-off ashrae-supplement-urn-collapse).
+  describe "two errata of one standard are two identifiers" do
     let(:first) do
       Pubid::Ashrae.parse("ASHRAE Guideline 14-2002 Errata (October 10, 2008)")
     end
@@ -257,15 +254,19 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
       Pubid::Ashrae.parse("ASHRAE Guideline 14-2002 Errata (October 20, 2008)")
     end
 
-    it "drops the errata date entirely" do
-      expect(first.errata_date).to be_nil
+    it "captures the errata date" do
+      expect(first.errata_date).to eq("October 10, 2008")
     end
 
-    it "cannot tell the two apart on any identity surface" do
-      expect(first.to_s).to eq(second.to_s)
-      expect(first.to_hash).to eq(second.to_hash)
+    it "tells the two apart on to_s, to_hash, == and the slug" do
+      expect(first.to_s).not_to eq(second.to_s)
+      expect(first.to_hash).not_to eq(second.to_hash)
+      expect(first).not_to eq(second)
+      expect(first.to_mr_string).not_to eq(second.to_mr_string)
+    end
+
+    it "still gives the two one URN (ashrae-supplement-urn-collapse)" do
       expect(first.to_urn.to_s).to eq(second.to_urn.to_s)
-      expect(first.to_mr_string).to eq(second.to_mr_string)
     end
   end
 
