@@ -5,6 +5,13 @@ module Pubid
     # Builder class for constructing ASHRAE identifier scheme from parsed data
     # Single Responsibility: Transform parsed data into identifier objects
     class Builder
+      # Month names, in the order the parser matches them. The index gives the
+      # month number the date component stores, and the renderer inverts it.
+      MONTH_NAMES = %w[
+        January February March April May June July August September October
+        November December
+      ].freeze
+
       attr_reader :identifier_class
 
       def initialize(identifier_class = Identifier)
@@ -172,11 +179,9 @@ module Pubid
         base_class = determine_identifier_class(base_attrs)
         base = base_class.new(**base_attrs)
 
-        errata_date = extract_errata_date(parsed[:errata_date])
-
         Identifiers::Errata.new(
           base: base,
-          errata_date: errata_date,
+          date: extract_errata_date(parsed[:errata_date]),
         )
       end
 
@@ -490,24 +495,53 @@ module Pubid
         attributes
       end
 
-      # Extract errata date from parsed errata_date data
-      # ASHRAE titles an erratum with the long date form ("October 10, 2008"),
-      # so a spelling variant such as "October 10,2008" is written in that
-      # form. A numeric date ("7-17-2003") is kept as written.
+      # Extract the errata date into the inherited `date` component.
+      # The component holds numbers, so every spelling of one date — "October
+      # 10, 2008", "October 10,2008", "10-10-2008" — gives one value, and the
+      # renderer writes the long form ASHRAE prints. The month and the day are
+      # padded to two digits, so two identifiers cannot differ by a leading
+      # zero. A date with no year keeps the month and the day.
       # @param errata_date [Hash] the parsed errata_date hash
-      # @return [String, nil] the formatted errata date string
+      # @return [Pubid::Components::Date, nil] the date, or nil when absent
       def extract_errata_date(errata_date)
         return nil unless errata_date.is_a?(Hash)
 
         numeric = extract_value(errata_date[:numeric_date])
-        return numeric.delete(" ") if numeric
+        return numeric_errata_date(numeric) if numeric
 
-        month = extract_value(errata_date[:month])
+        month = month_number(extract_value(errata_date[:month]))
         day = extract_value(errata_date[:day])
         return nil unless month && day
 
-        year = extract_value(errata_date[:errata_year])
-        year ? "#{month} #{day}, #{year}" : "#{month} #{day}"
+        date(extract_value(errata_date[:errata_year]), month, day)
+      end
+
+      # "7-17-2003" (the parser also accepts "7-17- 2003") is month, day, year.
+      # @param value [String] the numeric date as written
+      # @return [Pubid::Components::Date]
+      def numeric_errata_date(value)
+        month, day, year = value.delete(" ").split("-")
+        date(year, month, day)
+      end
+
+      # @param name [String, nil] a month name the parser matched
+      # @return [Integer, nil] the month number
+      def month_number(name)
+        index = MONTH_NAMES.index(name)
+        index && index + 1
+      end
+
+      # @return [Pubid::Components::Date] the date, with padded month and day
+      def date(year, month, day)
+        Pubid::Components::Date.new(
+          year: year, month: pad2(month), day: pad2(day),
+        )
+      end
+
+      # @param value [String, Integer] a month or day number
+      # @return [String] the number with two digits
+      def pad2(value)
+        value.to_s.to_i.to_s.rjust(2, "0")
       end
 
       # Extract addendum date from parsed addendum_year data

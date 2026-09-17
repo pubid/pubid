@@ -99,8 +99,39 @@ module Pubid
 
         result = id.base.to_s
         result += " Errata"
-        result += " (#{id.errata_date})" if id.errata_date
+        date = long_date(id.date)
+        result += " (#{date})" if date
         result
+      end
+
+      # The long date form ASHRAE prints on an errata sheet: "October 10,
+      # 2008". The component stores padded numbers, so the day loses its
+      # leading zero here.
+      #
+      # The parser always gives a month and a day together, so only the first
+      # two shapes come from a reference string. The others can come from a
+      # hand-built identifier or from a hash: a date with no day gives "June
+      # 2016", a date with only a year gives "2016", and a month number
+      # outside 1-12 falls back to the component's own "2016-13-01" form.
+      # They must all print something, because the date reaches `to_hash` and
+      # the MR slug, and a surface that drops it silently disagrees with them.
+      def long_date(date)
+        return nil unless date
+        return date.year&.to_s unless date.month
+
+        month = Builder::MONTH_NAMES[date.month.to_i - 1]
+        return date.to_s unless month
+
+        long_date_with_month(date, month)
+      end
+
+      # @param month [String] the month name
+      # @return [String] the date, with the day when the date carries one
+      def long_date_with_month(date, month)
+        return "#{month} #{date.year}".strip unless date.day
+
+        day = "#{month} #{date.day.to_i}"
+        date.year ? "#{day}, #{date.year}" : day
       end
 
       # Interpretation: "Interpretations for Standard 15.2-2022"

@@ -15,6 +15,17 @@ module Pubid
         num.to_s
       end
 
+      # ASHRAE keeps the edition of a document in its own `year` string. The
+      # base hook reads the inherited `date` first, which on an Errata holds
+      # the date of the erratum — a different thing from the edition year of
+      # the standard, and misleading in the year slot. Read `year` only.
+      # The supplement URN is collapsed for a wider reason: it carries no
+      # supplement marker at all (hand-off
+      # ashrae-supplement-urn-collapse).
+      def urn_year
+        identifier.year&.to_s
+      end
+
       def urn_suffix
         identifier.suffix&.to_s&.downcase
       end
