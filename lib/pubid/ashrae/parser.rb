@@ -120,17 +120,22 @@ module Pubid
           str("November") | str("December")
       end
 
+      # The date is what tells two errata of one standard apart, so every part
+      # of it is named. The leading space is part of the rule: without it the
+      # date never matched after "Errata", and optional_suffix took it instead.
       rule(:errata_date) do
         # Full date: (Month Day, Year)
-        (lparen >> month_name >> space >> digit.repeat(1,
-                                                       2) >> comma.maybe >> (space | comma.maybe) >>
+        (space.maybe >> lparen >> month_name.as(:month) >> space >>
+         digit.repeat(1, 2).as(:day) >> comma.maybe >> (space | comma.maybe) >>
          year_digits.as(:errata_year) >> rparen).as(:errata_date) |
           # Month+day without year: (August 27)
-          (lparen >> month_name >> space >> digit.repeat(1,
-                                                         2) >> rparen).as(:errata_date) |
+          (space.maybe >> lparen >> month_name.as(:month) >> space >>
+           digit.repeat(1, 2).as(:day) >> rparen).as(:errata_date) |
           # Numeric date with dash: (7-17- 2003) or (7-17-2003)
-          (lparen >> digit.repeat(1, 2) >> dash >> digit.repeat(1,
-                                                                2) >> dash >> space.maybe >> year_digits.as(:errata_year) >> rparen).as(:errata_date)
+          (space.maybe >> lparen >>
+           (digit.repeat(1, 2) >> dash >> digit.repeat(1, 2) >> dash >>
+            space.maybe >> year_digits).as(:numeric_date) >>
+           rparen).as(:errata_date)
       end
 
       # Errata suffix pattern - handles descriptive text like "– Spanish Edition" after "Errata"
@@ -139,6 +144,17 @@ module Pubid
         (space >> (str("-") | str("–")) >> space >> (letter >> (space | letter | digit | comma).repeat(0, 50))).repeat(
           0, 3
         )
+      end
+
+      # The date and the descriptive suffix after "Errata", in either order. All
+      # three errata_identifier branches share this rule: the publisher branch had
+      # only the date-first order, so "Errata – Spanish Edition (June 2, 2010)"
+      # lost its date to optional_suffix.
+      rule(:errata_date_and_suffix) do
+        (errata_suffix >> errata_date) |
+          (errata_date >> errata_suffix) |
+          errata_date |
+          errata_suffix
       end
 
       # Errata suffix on addendum (e.g., "ASHRAE Addendum a to Standard 15-2001 Errata (July 6, 2021)")
@@ -179,12 +195,7 @@ module Pubid
         ).as(:base) >>
           space >>
           str("Errata").as(:errata_keyword) >>
-          (
-            (errata_suffix >> errata_date) |
-            (errata_date >> errata_suffix) |
-            errata_date |
-            errata_suffix
-          ).maybe >>
+          errata_date_and_suffix.maybe >>
           optional_suffix.repeat(0, 2).as(:optional_suffixes)) |
           # Format with copublisher, missing type: ANSI/ASHRAE 51-1999 Errata (May 23, 2014)
           ((
@@ -201,12 +212,7 @@ module Pubid
           ).as(:base) >>
             space >>
             str("Errata").as(:errata_keyword) >>
-            (
-              (errata_suffix >> errata_date) |
-              (errata_date >> errata_suffix) |
-              errata_date |
-              errata_suffix
-            ).maybe >>
+            errata_date_and_suffix.maybe >>
             optional_suffix.repeat(0, 2).as(:optional_suffixes)) |
           # Format with publisher: ASHRAE Guideline 0-2005 Errata (September 28, 2011)
           ((
@@ -220,8 +226,7 @@ module Pubid
           ).as(:base) >>
             space >>
             str("Errata").as(:errata_keyword) >>
-            errata_date.maybe >>
-            errata_suffix.maybe >>
+            errata_date_and_suffix.maybe >>
             optional_suffix.repeat(0, 2).as(:optional_suffixes))
       end
 
