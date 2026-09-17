@@ -12,6 +12,8 @@ module Pubid
       #   BS SP 13; 14; 15 and 16:1949
       #   BS 4048:Parts 1 and 2:1966
       class BundledIdentifier < SingleIdentifier
+        include RootIdentity
+
         attribute :identifiers, ::Pubid::Identifier, collection: true, 
                                                      polymorphic: true
         attribute :separators, :string, collection: true # Separators between identifiers

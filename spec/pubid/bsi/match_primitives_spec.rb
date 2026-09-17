@@ -56,19 +56,22 @@ RSpec.describe "Pubid::Bsi match primitives" do
     end
   end
 
-  describe "uniform supplement interface" do
-    it "exposes amendment fields via the supplement_* interface" do
+  # Both supplement classes declare the same `number` and `year`, so a caller
+  # reads them without special-casing the class. `supplement_type` names the
+  # class.
+  describe "uniform supplement fields" do
+    it "exposes amendment fields as supplement_type, number and year" do
       supp = parse("BS 7273-4:2015+A1:2021").identifiers.last
       expect(supp.supplement_type).to eq(:amendment)
-      expect(supp.supplement_number).to eq("1")
-      expect(supp.supplement_year).to eq(2021)
+      expect(supp.number).to eq("1")
+      expect(supp.year).to eq("2021")
     end
 
-    it "exposes corrigendum fields via the supplement_* interface" do
+    it "exposes corrigendum fields as supplement_type, number and year" do
       supp = parse("BS 1234:2015+C1:2016").identifiers.last
       expect(supp.supplement_type).to eq(:corrigendum)
-      expect(supp.supplement_number).to eq("1")
-      expect(supp.supplement_year).to eq(2016)
+      expect(supp.number).to eq("1")
+      expect(supp.year).to eq("2016")
     end
   end
 

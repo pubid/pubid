@@ -9,6 +9,8 @@ module Pubid
       # Forward: "BS 1000:Supplement No. 1:1972", "BS 1722-1 Supplement No. 1:1974"
       # Reverse: "Supplement No. 1 (1970) to BS 1831:1969"
       class SupplementDocument < SingleIdentifier
+        include RootIdentity
+
         attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :supplement_number, :string
         attribute :supplement_year, :integer

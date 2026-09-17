@@ -199,18 +199,31 @@ RSpec.describe "Pubid::CenCenelec relaton contract" do
       end
     end
 
-    it "exposes the supplement interface on an amendment" do
+    # `supplement_type` stays: it has no attribute behind it, and relaton uses
+    # `respond_to?(:supplement_type)` to detect a supplement. The ordinal and
+    # the year are read from `number` / `year`, which both supplement classes
+    # now declare under the same names — in CEN and in BSI — so the
+    # `supplement_number` / `supplement_year` aliases were deleted.
+    it "exposes the supplement fields on an amendment" do
       id = parse("EN 13250:2000/A1:2005")
 
-      expect([id.supplement_type, id.supplement_number, id.supplement_year])
+      expect([id.supplement_type, id.number, id.year])
         .to eq([:amendment, "1", "2005"])
     end
 
-    it "exposes the supplement interface on a corrigendum" do
+    it "exposes the supplement fields on a corrigendum" do
       id = parse("EN 13254:2000/AC:2003")
 
-      expect([id.supplement_type, id.supplement_number, id.supplement_year])
+      expect([id.supplement_type, id.number, id.year])
         .to eq([:corrigendum, nil, "2003"])
+    end
+
+    it "no longer defines the supplement_number / supplement_year aliases" do
+      [Pubid::CenCenelec::Identifiers::Amendment,
+       Pubid::CenCenelec::Identifiers::Corrigendum].each do |klass|
+        expect(klass.method_defined?(:supplement_number)).to be(false)
+        expect(klass.method_defined?(:supplement_year)).to be(false)
+      end
     end
   end
 

@@ -15,8 +15,8 @@ RSpec.describe Pubid::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has base_doc" do
-        expect(parsed.base_doc).not_to be_nil
+      it "holds the base document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do
@@ -33,16 +33,16 @@ RSpec.describe Pubid::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has base_doc" do
-        expect(parsed.base_doc).not_to be_nil
+      it "holds the base document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
-      it "delegates number via base_doc" do
-        expect(parsed.base_doc.number).to eq("5678")
+      it "reads its number from the base document" do
+        expect(parsed.base.number).to eq("5678")
       end
 
-      it "delegates date via base_doc" do
-        expect(parsed.base_doc.date.year).to eq("2021")
+      it "reads its date from the base document" do
+        expect(parsed.base.date.year).to eq("2021")
       end
 
       it "renders with 'NA to' prefix" do
@@ -61,8 +61,8 @@ RSpec.describe Pubid::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has base_doc" do
-        expect(parsed.base_doc).not_to be_nil
+      it "holds the base document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do
@@ -79,8 +79,8 @@ RSpec.describe Pubid::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has base_doc" do
-        expect(parsed.base_doc).not_to be_nil
+      it "holds the base document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do
@@ -119,8 +119,8 @@ RSpec.describe Pubid::Bsi::Identifiers::NationalAnnex do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has base_doc" do
-        expect(parsed.base_doc).not_to be_nil
+      it "holds the base document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "renders with 'NA to' prefix" do

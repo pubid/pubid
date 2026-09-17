@@ -887,15 +887,15 @@ module Pubid
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
               base: nil, # NA supplements don't wrap base
-              amendment_number: supp[:number],
-              amendment_year: year_val&.to_i,
+              number: supp[:number]&.to_s,
+              year: year_val&.to_s,
               separator: supp[:separator] || "+",
             )
           else
             Identifiers::Corrigendum.new(
               base: nil,
-              corrigendum_number: supp[:number],
-              corrigendum_year: year_val&.to_i,
+              number: supp[:number]&.to_s,
+              year: year_val&.to_s,
               separator: supp[:separator] || "+",
             )
           end
@@ -903,7 +903,7 @@ module Pubid
 
         Identifiers::NationalAnnex.new(
           na_supplements: na_supps,
-          base_doc: base_id,
+          base: base_id,
         )
       end
 
@@ -1383,7 +1383,7 @@ module Pubid
           identifier = if adopted_id.class.name.start_with?("Pubid::CenCenelec::")
                          Identifiers::AdoptedEuropeanNorm.new(
                            publisher: Components::Publisher.new(body: bsi_prefix),
-                           adopted: adopted_id,
+                           base: adopted_id,
                            edition: final_edition&.to_s,
                            translation_lang: data[:translation_lang]&.to_s,
                            translation_upper: data[:translation_upper]&.to_s,
@@ -1396,7 +1396,7 @@ module Pubid
                          # Otherwise it's ISO/IEC, use AdoptedInternationalStandard
                          Identifiers::AdoptedInternationalStandard.new(
                            publisher: Components::Publisher.new(body: bsi_prefix),
-                           adopted: adopted_id,
+                           base: adopted_id,
                            edition: final_edition&.to_s,
                            translation_lang: data[:translation_lang]&.to_s,
                            translation_upper: data[:translation_upper]&.to_s,
@@ -1447,16 +1447,16 @@ expert_commentary: nil, expert_commentary_topic: nil)
           if supp[:type] == :amendment
             Identifiers::Amendment.new(
               base: base,
-              amendment_number: supp[:number],
-              amendment_year: year_val&.to_i,
+              number: supp[:number]&.to_s,
+              year: year_val&.to_s,
               separator: supp[:separator] || "+",
               amd_suffix_form: supp[:amd_suffix_form] ? true : false,
             )
           else
             Identifiers::Corrigendum.new(
               base: base,
-              corrigendum_number: supp[:number],
-              corrigendum_year: year_val&.to_i,
+              number: supp[:number]&.to_s,
+              year: year_val&.to_s,
               separator: supp[:separator] || "+",
             )
           end

@@ -29,18 +29,11 @@ module Pubid
           base || self
         end
 
-        # Uniform supplement interface (shared with Amendment and with BSI)
-        # so callers need not special-case the class.
+        # Names the supplement class, so callers need not special-case it. The
+        # ordinal and the year need no such method: Amendment and Corrigendum —
+        # in CEN and in BSI — all declare them as `number` and `year`.
         def supplement_type
           :corrigendum
-        end
-
-        def supplement_number
-          number
-        end
-
-        def supplement_year
-          year
         end
 
         # The date part of the supplement: "2016-11", "2003", or nil.

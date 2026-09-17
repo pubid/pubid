@@ -6,6 +6,8 @@ module Pubid
       # Consolidated Identifier - contains base document plus supplements
       # Example: "BS 4592-0:2006+A1:2012" = [BS 4592-0:2006, Amendment 1:2012]
       class ConsolidatedIdentifier < SingleIdentifier
+        include RootIdentity
+
         attribute :identifiers, ::Pubid::Identifier, polymorphic: true,
                                                      collection: true
 
@@ -19,11 +21,11 @@ module Pubid
           # Append supplement info to URN
           identifiers[1..].each do |id|
             if id.is_a?(Amendment)
-              urn += ":amd:#{id.amendment_number}"
-              urn += ":#{id.amendment_year}" if id.amendment_year
+              urn += ":amd:#{id.number}"
+              urn += ":#{id.year}" if id.year
             elsif id.is_a?(Corrigendum)
-              urn += ":cor:#{id.corrigendum_number}"
-              urn += ":#{id.corrigendum_year}" if id.corrigendum_year
+              urn += ":cor:#{id.number}"
+              urn += ":#{id.year}" if id.year
             end
           end
           urn
@@ -34,30 +36,18 @@ module Pubid
           identifiers&.first&.publisher
         end
 
-        def number
-          identifiers&.first&.number
-        end
-
-        def year
-          base = identifiers&.first
-          base.year if base&.class&.attributes&.key?(:year)
-        end
-
-        def date
-          base = identifiers&.first
-          base.date if base&.class&.attributes&.key?(:date)
-        end
-
-        def parts
-          base = identifiers&.first
-          base.parts if base&.class&.attributes&.key?(:parts)
-        end
-
-        def part
-          base = identifiers&.first
-          base.part if base&.class&.attributes&.key?(:part)
-        end
-
+        # `number`, `part`, `parts`, `date` and `year` are deliberately NOT
+        # delegated. They used to read `identifiers.first`, one level only, so
+        # they answered with the member's value when that member was a plain
+        # standard and with nil when it was itself a wrapper (an adoption) —
+        # the same accessor reporting two different things. They also shadowed
+        # real lutaml attributes, and the `date` one handed lutaml a foreign
+        # `Pubid::Components::Date` where BSI declares its own subclass, which
+        # is what made `to_hash` raise.
+        #
+        # A BSI wrapper owns no identity: `#root` carries it, recursively and
+        # for every layer. See `Identifiers::RootIdentity` and
+        # docs/flavors/bsi.md.
         def type
           base = identifiers&.first
           base.type if base&.class&.attributes&.key?(:type)

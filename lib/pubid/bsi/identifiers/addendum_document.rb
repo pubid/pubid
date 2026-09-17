@@ -11,6 +11,8 @@ module Pubid
       # "BS 2000-0:Addendum 1:1983"
       # "BS 6034:1981:Addendum No. 1:1986"
       class AddendumDocument < SingleIdentifier
+        include RootIdentity
+
         attribute :base, ::Pubid::Identifier, polymorphic: true
         attribute :addendum_number, :string
         attribute :addendum_year, :integer

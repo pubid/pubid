@@ -15,20 +15,20 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has an adopted document" do
-        expect(parsed.adopted).not_to be_nil
+      it "holds the adopted document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "adopts an ISO object" do
-        expect(parsed.adopted).to be_a(Pubid::Iso::Identifier)
+        expect(parsed.base).to be_a(Pubid::Iso::Identifier)
       end
 
-      it "delegates number to adopted identifier" do
-        expect(parsed.number.to_s).to eq("8601")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("8601")
       end
 
-      it "delegates year to adopted identifier" do
-        expect(parsed.date.year).to eq("2019")
+      it "reads its year from the adopted document" do
+        expect(parsed.root.date.year).to eq("2019")
       end
 
       it "round-trips" do
@@ -45,12 +45,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number.to_s).to eq("9001")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("9001")
       end
 
-      it "delegates date" do
-        expect(parsed.date.year).to eq("2015")
+      it "reads its date from the adopted document" do
+        expect(parsed.root.date.year).to eq("2015")
       end
 
       it "round-trips" do
@@ -87,20 +87,20 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has an adopted document" do
-        expect(parsed.adopted).not_to be_nil
+      it "holds the adopted document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "adopts an IEC object" do
-        expect(parsed.adopted).to be_a(Pubid::Iec::Identifier)
+        expect(parsed.base).to be_a(Pubid::Iec::Identifier)
       end
 
-      it "delegates number to adopted identifier" do
-        expect(parsed.number.to_s).to eq("62600")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("62600")
       end
 
-      it "delegates year to adopted identifier" do
-        expect(parsed.date.year).to eq("2020")
+      it "reads its year from the adopted document" do
+        expect(parsed.root.date.year).to eq("2020")
       end
 
       it "round-trips" do
@@ -117,12 +117,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number.to_s).to eq("60050")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("60050")
       end
 
-      it "delegates part" do
-        expect(parsed.part.to_s).to eq("113")
+      it "reads its part from the adopted document" do
+        expect(parsed.root.part.to_s).to eq("113")
       end
 
       it "round-trips" do
@@ -141,20 +141,20 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has an adopted document" do
-        expect(parsed.adopted).not_to be_nil
+      it "holds the adopted document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "adopts an ISO object" do
-        expect(parsed.adopted).to be_a(Pubid::Iso::Identifier)
+        expect(parsed.base).to be_a(Pubid::Iso::Identifier)
       end
 
-      it "delegates number" do
-        expect(parsed.number.to_s).to eq("27001")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("27001")
       end
 
-      it "delegates year" do
-        expect(parsed.date.year).to eq("2013")
+      it "reads its year from the adopted document" do
+        expect(parsed.root.date.year).to eq("2013")
       end
 
       it "includes copublisher in output" do
@@ -175,12 +175,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number.to_s).to eq("15693")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("15693")
       end
 
-      it "delegates part" do
-        expect(parsed.part.to_s).to eq("3")
+      it "reads its part from the adopted document" do
+        expect(parsed.root.part.to_s).to eq("3")
       end
 
       it "includes copublisher" do
@@ -203,8 +203,8 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedInternationalStandard do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number.to_s).to eq("10000")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("10000")
       end
 
       it "round-trips" do

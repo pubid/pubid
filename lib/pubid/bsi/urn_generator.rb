@@ -21,15 +21,15 @@ module Pubid
           parts << identifier.flex_prefix.to_s.downcase
         end
 
-        # Fall back to the wrapped document's number. A wrapper — an adopted
-        # European norm, a bundle, a set — carries no number of its own, and
-        # `AdoptedEuropeanNorm#number` only delegates ONE level, so a
-        # "DD ENV ISO 11079:1999" (which adopts a CEN prestandard that is
-        # itself a wrapper around the ISO standard) emitted the identity-free
+        # Read identity from the wrapped document when the wrapper has none of
+        # its own. A wrapper — an adopted European norm, a bundle, a set —
+        # carries no number, part, subpart or date, so a
+        # "DD ENV ISO 11079:1999" (which adopts a CEN prestandard that is itself
+        # a wrapper around the ISO standard) emitted the identity-free
         # `urn:bsi:dd` — the same URN as every other DD adoption. `#root`
         # recurses to the origin document, and for a non-wrapper it is `self`,
         # so this changes nothing for an ordinary identifier.
-        urn_number = identifier.number || identifier.root.number
+        urn_number = identity(:number)
         if urn_number
           number = urn_number.to_s
           if identifier.iteration && !identifier.iteration.empty?
@@ -38,25 +38,22 @@ module Pubid
           parts << number
         end
 
-        if identifier.part
-          part = identifier.part.to_s
-          parts << "-#{part}"
-        end
+        urn_part = identity(:part)
+        parts << "-#{urn_part}" if urn_part
 
-        if identifier.subpart
-          subpart = identifier.subpart.to_s
-          parts << "-#{subpart}"
-        end
+        urn_subpart = identity(:subpart)
+        parts << "-#{urn_subpart}" if urn_subpart
 
         if identifier.second_number
           second = identifier.second_number.to_s
           parts << "/#{second}"
         end
 
-        if identifier.date&.is_a?(::Pubid::Components::Date) && identifier.date.present?
-          parts << identifier.date.render(context: URN_CONTEXT)
-        elsif identifier.year
-          parts << identifier.year.to_s
+        urn_date = identity(:date)
+        if urn_date.is_a?(::Pubid::Components::Date) && urn_date.present?
+          parts << urn_date.render(context: URN_CONTEXT)
+        elsif (urn_year = identity(:year))
+          parts << urn_year.to_s
         end
 
         if identifier.month
@@ -86,6 +83,19 @@ module Pubid
         end
 
         parts.join(":")
+      end
+
+      private
+
+      # An identity attribute of the identifier, or of the document it wraps.
+      # `#root` is `self` for a non-wrapper, so an ordinary identifier reads its
+      # own value twice and nothing changes.
+      def identity(attr)
+        own = identifier.public_send(attr)
+        return own if own
+
+        root = identifier.root
+        root.equal?(identifier) ? nil : root.public_send(attr)
       end
     end
   end

@@ -15,20 +15,20 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has an adopted document" do
-        expect(parsed.adopted).not_to be_nil
+      it "holds the adopted document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
       it "adopts a CEN object" do
-        expect(parsed.adopted.class.name).to start_with("Pubid::CenCenelec::")
+        expect(parsed.base.class.name).to start_with("Pubid::CenCenelec::")
       end
 
-      it "delegates number to adopted identifier" do
-        expect(parsed.number).to eq("10077")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("10077")
       end
 
-      it "delegates part to adopted identifier" do
-        expect(parsed.part).to eq("1")
+      it "reads its part from the adopted document" do
+        expect(parsed.root.part.to_s).to eq("1")
       end
 
       it "round-trips" do
@@ -43,7 +43,8 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
       let(:parsed) { Pubid::Bsi.parse("BS EN ISO 11819-1:2023") }
 
       it "reads the number, part and year through the CEN adoption" do
-        expect([parsed.number.to_s, parsed.part.to_s, parsed.year.to_s])
+        root = parsed.root
+        expect([root.number.to_s, root.part.to_s, root.year.to_s])
           .to eq(%w[11819 1 2023])
       end
 
@@ -62,12 +63,12 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number).to eq("1234")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("1234")
       end
 
-      it "delegates date" do
-        expect(parsed.date.year).to eq("2020")
+      it "reads its date from the adopted document" do
+        expect(parsed.root.date.year).to eq("2020")
       end
 
       it "round-trips" do
@@ -104,13 +105,13 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number).to eq("1991")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("1991")
       end
 
-      it "delegates part (includes subpart as combined value)" do
+      it "reads its part from the adopted document (subpart combined)" do
         # CEN parser captures "1-1" as combined part value
-        expect(parsed.part).to eq("1-1")
+        expect(parsed.root.part.to_s).to eq("1-1")
       end
 
       it "round-trips" do
@@ -129,16 +130,16 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "has an adopted document" do
-        expect(parsed.adopted).not_to be_nil
+      it "holds the adopted document in base" do
+        expect(parsed.base).not_to be_nil
       end
 
-      it "delegates number" do
-        expect(parsed.number).to eq("50131")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("50131")
       end
 
-      it "delegates part" do
-        expect(parsed.part).to eq("1")
+      it "reads its part from the adopted document" do
+        expect(parsed.root.part.to_s).to eq("1")
       end
 
       it "includes copublisher in output" do
@@ -157,8 +158,8 @@ RSpec.describe Pubid::Bsi::Identifiers::AdoptedEuropeanNorm do
         expect(parsed).to be_a(described_class)
       end
 
-      it "delegates number" do
-        expect(parsed.number).to eq("10000")
+      it "reads its number from the adopted document" do
+        expect(parsed.root.number.to_s).to eq("10000")
       end
 
       it "round-trips" do

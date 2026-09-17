@@ -7,8 +7,18 @@ module Pubid
       # Contains a base identifier plus corrigendum parameters
       class Corrigendum < SingleIdentifier
         attribute :base, ::Pubid::Identifier, polymorphic: true
-        attribute :corrigendum_number, :string
-        attribute :corrigendum_year, :integer
+        # The ordinal and the year live in `number` (inherited, already a
+        # `:string`) and a declared `year`, exactly as on Amendment — see that
+        # class for why the year is not the inherited `date` (`#exclude`
+        # recurses, so `exclude(:date)` would drop a supplement's own year) and
+        # why it is a `:string` (relaton compares the year across supplement
+        # classes and flavors, so it must not change type with the class).
+        #
+        # The `year` is nil for a year-less corrigendum (`BS 1234:2015+C1`),
+        # which parses; `number` is in practice always set, because the grammar
+        # requires a digit after the `C` — the unnumbered `+C:2016` form that
+        # CEN spells `AC` does not parse in BSI at all.
+        attribute :year, :string
         attribute :separator, :string, default: -> { "+" }
 
         def publisher
@@ -25,18 +35,11 @@ module Pubid
           base || self
         end
 
-        # Uniform supplement interface (shared with Amendment) so callers need
-        # not special-case the class.
+        # Names the supplement class, so callers need not special-case it. The
+        # ordinal and the year need no such method: Amendment and Corrigendum —
+        # in BSI and in CEN — all declare them as `number` and `year`.
         def supplement_type
           :corrigendum
-        end
-
-        def supplement_number
-          corrigendum_number
-        end
-
-        def supplement_year
-          corrigendum_year
         end
       end
     end
