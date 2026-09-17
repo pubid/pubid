@@ -10,6 +10,8 @@ module Pubid
       # shape is otherwise compatible; a future rename of +number+ →
       # +value+ would let this become a subclass.
       class Code < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string
         attribute :part, :string
         attribute :subpart, :string

@@ -10,6 +10,8 @@ module Pubid
     # composition rules — flavor-specific separators and orderings live in
     # the subclass #to_s / #render override.
     class Code < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :value, :string
       attribute :prefix, :string
       attribute :part, :string

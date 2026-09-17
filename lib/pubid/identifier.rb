@@ -2,6 +2,9 @@
 
 module Pubid
   class Identifier < Lutaml::Model::Serializable
+    # `reference === candidate`: a subset match (see Pubid::SubsetMatch).
+    include SubsetMatch
+
     # Components that serialize as a bare scalar when they carry only their
     # single significant field: attribute name => the key the scalar is emitted
     # under. `date` is RENAMED to `year`, matching the flat shape ISO and IEC

@@ -15,6 +15,8 @@ module Pubid
       #   Update.new(number: 1, year: 2021, month: 2).to_s(:mr)    # => "-upd1-202102"
       #   Update.new(number: 1, prefix: "dash").to_s(:short)       # => "-upd1" (preserves original prefix)
       class Update < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string   # Update number as string
         attribute :year, :string     # Year (4 digits as string)
         attribute :month, :string    # Month (01-12 as string, optional)

@@ -7,6 +7,8 @@ module Pubid
     # Human render: language code, optionally single-char.
     # URN render: lowercase ISO 639-1 code (RFC 5141-bis).
     class Language < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       CHAR_MAP = {
         "R" => "ru",
         "F" => "fr",

@@ -21,6 +21,8 @@ module Pubid
     # - approved_amendments_flag: when true and no intermediate_amendments
     #   are listed, renders "... and its approved amendments".
     class Relationship < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       REVISION_OF = "revision_of"
       AMENDMENT_TO = "amendment_to"
       CORRIGENDUM_TO = "corrigendum_to"

@@ -26,6 +26,15 @@ module Pubid
         attribute :iec_year, :string            # IEC year like "2013"
         attribute :date_info, :string           # Date information like "(10/07)"
 
+        # `year_sep` only describes how a year is attached. When the reference
+        # omits the year, a subset match skips it: its default "-" would
+        # otherwise refuse a candidate printed with ":".
+        def subset_attribute_match?(name, mine, theirs)
+          return true if name == :year_sep && year.nil?
+
+          super
+        end
+
         # The printed IEC/IEEE number, rebuilt losslessly from the split
         # columns (the renderer/urn read this). Not stored — number/parts/
         # separators/year fully describe it, so the verbatim string never

@@ -28,6 +28,8 @@ module Pubid
       #   Edition.new(type: "r", id: "5").to_s                              # => "r5"
       #   Edition.new(type: "r", id: "5", original_prefix: " Rev. ").to_s    # => "Rev. 5"
       class Edition < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :type, :string            # "-", "e", or "r"
         attribute :id, :string              # Edition ID (number or year)
         attribute :additional_text, :string # Text after "rev" (WITHOUT "rev" prefix)

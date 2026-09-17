@@ -144,6 +144,7 @@ module Pubid
   autoload :Components, "pubid/components"
   autoload :BundledIdentifier, "pubid/bundled_identifier"
   autoload :Identifier, "pubid/identifier"
+  autoload :SubsetMatch, "pubid/subset_match"
   autoload :IdentifierMetadata, "pubid/identifier_metadata"
   autoload :Rendering, "pubid/rendering"
   autoload :Renderers, "pubid/renderers"

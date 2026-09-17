@@ -28,6 +28,8 @@ module Pubid
     # the prefix and any suffix notation (translation, reaffirmation,
     # commentary) by calling adoption.render(context:).
     class Adoption < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
       attribute :base, ::Pubid::Identifier, polymorphic: true
       attribute :adopter_publisher, ::Pubid::Components::Publisher
       attribute :edition, :string

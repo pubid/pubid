@@ -8,6 +8,8 @@ module Pubid
       # Single Responsibility: Represents sheet number in IEC identifiers
       # Example: IEC 60695-2-1/1:1994 (where /1 is the sheet)
       class Sheet < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string
 
         def to_s

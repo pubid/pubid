@@ -33,6 +33,23 @@ module Pubid
       attribute :package, :string         # Package portion (Code, Handbook, etc.)
       attribute :publisher_prefix, :string # Original prefix: "CAN/CSA-", "CSA", "CAN3-"
 
+      # Format flags that describe a value, keyed by that value. When the
+      # reference omits the value, a subset match skips its flags too: a bare
+      # `CSA C22.2 NO. 125` has `original_year_4digit` at its default `false`,
+      # which would otherwise refuse `CSA C22.2 NO. 125-M1984`.
+      SUBSET_FORMAT_FLAGS = {
+        year: %i[year_format year_prefix original_year_4digit french],
+        reaffirmation: %i[original_reaffirmation_4digit],
+      }.freeze
+
+      def subset_attribute_match?(name, mine, theirs)
+        return true if SUBSET_FORMAT_FLAGS.any? do |value, flags|
+          public_send(value).nil? && flags.include?(name)
+        end
+
+        super
+      end
+
       # True when the reference printed no publisher at all ("C22.1-15"), so
       # rendering must not supply the default "CSA".
       #

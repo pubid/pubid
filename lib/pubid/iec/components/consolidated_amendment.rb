@@ -7,6 +7,8 @@ module Pubid
       # Individual Amendment within a consolidated chain
       # Single Responsibility: Represents a single amendment with number and year
       class Amendment < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string
         attribute :year, :string, default: -> {}
 
@@ -21,6 +23,8 @@ module Pubid
       # Single Responsibility: Represents multiple amendments combined with + notation
       # Example: +AMD1:2020+AMD2:2022
       class ConsolidatedAmendment < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :amendments, Amendment, collection: true
 
         def to_s

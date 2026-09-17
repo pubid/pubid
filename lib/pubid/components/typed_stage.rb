@@ -7,6 +7,14 @@ module Pubid
     # Human render: typed-stage abbreviation with flavor-specific separator.
     # URN render: stage code (RFC 5141-bis: stage-XX.XX format handled by urn_generator).
     class TypedStage < Lutaml::Model::Serializable
+      include ::Pubid::SubsetMatch
+
+      # `original_abbr` records the input spelling ("Amd" or "AMD"), not the
+      # stage, so a subset match skips it.
+      def self.subset_ignored_attributes
+        %i[original_abbr]
+      end
+
       attribute :name, :string
       attribute :code, :string
       attribute :type_code, :string

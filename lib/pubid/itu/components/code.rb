@@ -20,6 +20,8 @@ module Pubid
       # +subseries+ (dot-separated, flavor-specific) and +parts+
       # (dash-separated).
       class Code < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :imp_marker, :string
         attribute :number, :string
         attribute :series_suffix, :string

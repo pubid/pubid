@@ -11,6 +11,8 @@ module Pubid
       # rich taxonomy: +letter+ (A-G for standards), +suffix+ (A/B/C for
       # data series), +subseries+ (S1/S4/S10), and +dual_m+ (metric flag).
       class Code < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :letter, :string       # A-G for standards
         attribute :number, :string       # Main number
         attribute :suffix, :string       # A, B, C for data series

@@ -19,6 +19,8 @@ module Pubid
       # - Approved Draft: Board-approved but unpublished (D7-D9)
       # - Published: Final standards (no P prefix)
       class TypedStage < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         # All recognized abbreviations for this stage
         # First in array is canonical abbreviation
         attribute :abbr, :string, collection: true

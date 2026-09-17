@@ -8,6 +8,8 @@ module Pubid
       # Represents an ETSI version string
       # Format: V1.2.3, V2.0.0, or ed.1
       class Version < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :version, :string # e.g., "1.1.1", "2.0.0", "1"
         attribute :is_edition, :boolean, default: -> {
           false

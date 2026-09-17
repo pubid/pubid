@@ -14,6 +14,8 @@ module Pubid
       # Stays independent of Pubid::Components::Code because ETSI uses
       # +minor+ (a flavor-specific sub-number) plus +parts+.
       class Code < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string # Main number
         attribute :minor, :string # Optional minor part
         attribute :parts, :string, collection: true, default: [] # Parts array

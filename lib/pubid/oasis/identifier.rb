@@ -91,6 +91,13 @@ module Pubid
         result
       end
 
+      # The same reason applies to a subset match: `original` spells out the
+      # parts a partial reference omits, so `===` compares the decomposition
+      # only. Two slugs that decompose alike therefore match each other.
+      def self.subset_ignored_attributes
+        %i[original]
+      end
+
       # MR string hooks. `to_slug` delegates to `to_mr_string` and consumers
       # use it as an output FILENAME, so the slug must be unique per document.
       #

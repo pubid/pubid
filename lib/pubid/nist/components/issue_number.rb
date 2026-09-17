@@ -8,6 +8,8 @@ module Pubid
       # IssueNumber component for NIST identifiers
       # Represents the issue/number designation (e.g., "No. 12" in "Vol. 6, No. 12")
       class IssueNumber < Lutaml::Model::Serializable
+        include ::Pubid::SubsetMatch
+
         attribute :number, :string
 
         # Short form rendering: "n12"
