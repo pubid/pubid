@@ -4,8 +4,9 @@
       "owner": "relaton",
       "repo": "relaton",
       "gemspec": "relaton.gemspec",
-      "description": "Test dependent gem relaton"
+      "description": "Test dependent gem relaton",
+      "experimental": true
     }
   ],
-  "_comment": "To add more downstream repositories, add them to the repositories array above. Each repository should have: owner, repo, gemspec (the .gemspec filename), and description (for the job name)."
+  "_comment": "To add more downstream repositories, add them to the repositories array above. Each repository should have: owner, repo, gemspec (the .gemspec filename), and description (for the job name). Set \"experimental\": true to mark that downstream's legs continue-on-error (yellow-with-annotation instead of red) while a known integration migration is pending. relaton carries it until it migrates to pubid 2.0 (the .base_identifier -> .base rename); tracked in #409."
 }
