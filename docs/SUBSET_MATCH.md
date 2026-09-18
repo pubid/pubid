@@ -108,7 +108,7 @@ In use, with the pair each flavor was losing:
 | `Gost::Identifier` | `copublisher` | `GOST R 27001` vs `GOST R ISO/IEC 27001-2006` |
 | `Plateau::Identifier` | `annex` | `PLATEAU Handbook #10` vs `#10-1 第1.0版` |
 | `Oiml::Identifiers::CodeNumber` (7 leaves), `Oiml::Components::Code` | `part`, `suffix` | `OIML R 138` vs `OIML R 138-Amend:2009` |
-| `Ccsds::Identifier` | `language` | `CCSDS 650.0-M-2` vs its French translation |
+| `Ccsds::Identifier` | `language`, `suffix` | `CCSDS 650.0-M-2` vs its French translation; `CCSDS 101.0-B-4` vs `CCSDS 101.0-B-4-S` |
 | `CenCenelec::Identifier` | `type`, `stage`, `typed_stage` | `EN 1325` vs `prEN 1325` |
 
 The measurement relaton made before the declarations existed: `ECMA-418`

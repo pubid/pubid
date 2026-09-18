@@ -35,6 +35,10 @@ module Pubid
       # translation: `CCSDS 650.0-M-2` is not its French translation.
       subset_strict :language
 
+      # A nil `suffix` means the current document, not its historical `-S`
+      # version: `CCSDS 101.0-B-4` is not `CCSDS 101.0-B-4-S`.
+      subset_strict :suffix
+
       # Polymorphic type map for lutaml::Model key_value (de)serialization,
       # mapping each concrete class's polymorphic_name to its class name.
       CCSDS_TYPE_MAP = {

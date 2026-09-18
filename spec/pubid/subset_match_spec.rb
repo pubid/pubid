@@ -369,6 +369,14 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
         .to be(true)
     end
 
+    it "CCSDS: a nil suffix means the current document, not the -S one" do
+      current = parse("ccsds", "CCSDS 101.0-B-4")
+      historical = parse("ccsds", "CCSDS 101.0-B-4-S")
+      expect(current === historical).to be(false)
+      expect(historical === current).to be(false)
+      expect(historical === parse("ccsds", "CCSDS 101.0-B-4-S")).to be(true)
+    end
+
     # A strict attribute that holds a component keeps that component's own
     # rule: `Components::TypedStage` ignores `original_abbr`, the input
     # spelling, and CEN declares `typed_stage` strict. A plain `==` here
