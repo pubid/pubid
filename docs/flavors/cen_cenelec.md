@@ -34,3 +34,26 @@ Three classes still name the parent slot `adopted`:
 CEN is a harder rename than BSI was for one reason: `Pubid::Bsi::Builder` constructs a `CenCenelec::Identifiers::AdoptedEuropeanNorm.new(adopted: …)`, and `Bsi::Identifiers::AdoptedEuropeanNorm` used to read `target.adopted` through one CEN layer. The first of those two call sites is still there.
 
 Note the asymmetry a rename must preserve: a BSI `AdoptedEuropeanNorm` now exposes `base`, and the CEN object it holds still exposes `adopted`, so a two-layer walk reads `id.base.adopted`. `#root` recurses through both regardless, which is why it — and not a delegation — is the right thing for a consumer to call.
+
+## Subset match: strict attributes
+
+Read `docs/SUBSET_MATCH.md` first. `===` reads a nil part of the reference as
+a wildcard, which is wrong for the attributes below: the flavor models a nil
+value as "this document has none". They are declared with `subset_strict`, so
+`===` compares them exactly and a stated collection is not a prefix. A caller
+that does want every part of a document sets `all_parts` on the reference, or
+keeps `#matches?(other, ignore:)`.
+
+- **`type`, `stage` and `typed_stage` are strict**
+  (`lib/pubid/cen_cenelec/identifier.rb`). A published European Norm holds
+  all three at nil, so a nil one means "published", not "any stage":
+  `EN 1325 === prEN 1325` and `EN 1991 === ENV 1991-2-2` are both false,
+  while `EN 1325 === EN 1325:2001` still holds. The three move together
+  because they repeat one entry of the stage registry — the same fact that
+  lets `compact_hash` write them as a single `"stage" => "pren"` and
+  `inflate_scalar_components` read them back, which is why the strict
+  comparison survives a `from_hash` round trip.
+- The hand-off `subset-match-nil-means-none` called this a CEN-grammar
+  decision, on the reading that a published norm should carry a published
+  stage by default. It is fixed at the matching layer instead: no grammar
+  change, no index re-crawl.

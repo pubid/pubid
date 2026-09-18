@@ -44,6 +44,13 @@ module Pubid
         attribute :minor, :string
         attribute :parts, :string, collection: true, default: -> { [] }
 
+        # The reference always states its parts. An empty list means the
+        # document has no part, and a stated list is not a prefix:
+        # `ETSI TS 129 198-4` is not `ETSI TS 129 198-4-5`. Over 10,595 bare
+        # ETSI queries relaton measured 122 changed `best_match` winners
+        # without this. A caller that wants every part sets `all_parts`.
+        subset_strict :parts
+
         # Compact serialization (mirrors ISO/JCGM/OIML): the code fields are
         # bare scalars (`number`, a `parts` array and, rarely, a `minor`);
         # Version flattens to a scalar `version` string with an `is_edition`

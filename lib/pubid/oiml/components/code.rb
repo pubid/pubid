@@ -22,6 +22,10 @@ module Pubid
         # the default dash ("R 60-sup").
         attribute :space_suffix, :boolean, default: false
 
+        # Mirrors the flat columns the CodeNumber mixin installs on the
+        # seven leaves, which own the identity.
+        subset_strict :part, :suffix
+
         def to_s
           result = number.to_s
           result += "-#{part}" if part

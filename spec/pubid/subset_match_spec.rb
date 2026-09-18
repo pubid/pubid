@@ -19,7 +19,9 @@ Pubid.eager_load_flavors!
 SUBSET_PAIRS = {
   "iso" => { ref: "ISO 9001", candidate: "ISO 9001:2015" },
   "iec" => { ref: "IEC 60601", candidate: "IEC 60601-1:2005" },
-  "etsi" => { ref: "ETSI EN 300 175",
+  # ETSI states its parts, so the reference carries the part too; the
+  # version and the date are what it omits.
+  "etsi" => { ref: "ETSI EN 300 175-1",
               candidate: "ETSI EN 300 175-1 V2.9.1 (2020-04)" },
   "nist" => { ref: "NIST SP 800-53", candidate: "NIST SP 800-53r5" },
   "ieee" => { ref: "IEEE 802.3", candidate: "IEEE 802.3-2018" },
@@ -78,6 +80,31 @@ SUBSET_MATCH_FIXTURE_ROOT = File.expand_path("../fixtures", __dir__)
 RSpec.describe "Pubid::Identifier#=== (subset match)" do
   def parse(flavor, string)
     Pubid::Registry.get(flavor).parse(string)
+  end
+
+  # Force-load every class two levels inside each flavor namespace.
+  # `eager_load_flavors!` only reaches the top-level module, so a class that
+  # no example instantiates -- six of OIML's seven `CodeNumber` leaves --
+  # is otherwise absent from ObjectSpace and a walk over it passes silently.
+  def force_load_flavor_classes
+    Pubid::Registry.flavor_names.each do |flavor|
+      load_namespace(Pubid::Registry.get(flavor), 0)
+    end
+    ObjectSpace.each_object(Class)
+      .select { |klass| klass <= Pubid::Identifier }
+  end
+
+  def load_namespace(namespace, depth)
+    return if depth > 2
+
+    namespace.constants.each do |const|
+      value = begin
+        namespace.const_get(const)
+      rescue StandardError, ScriptError
+        next
+      end
+      load_namespace(value, depth + 1) if value.is_a?(Module)
+    end
   end
 
   def rebuild(identifier)
@@ -263,28 +290,188 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
     end
   end
 
+  # A strict attribute is one the reference always states. A nil value means
+  # "this document has none", not "any value", and a stated collection is not
+  # a prefix. Without it `===` widens and the wrong record wins: relaton
+  # measured 5 spurious part rows for `ECMA-418`, two broken 3GPP specs, and
+  # 122 changed `best_match` winners for ETSI.
+  describe "strict attributes" do
+    def cen(string) = Pubid::CenCenelec.parse(string)
+
+    it "declares none by default" do
+      expect(Pubid::Identifier.subset_strict_attributes).to eq([])
+    end
+
+    it "is inherited by a subclass" do
+      expect(Pubid::Ecma::Identifier.subset_strict_attributes).to include(:part)
+      expect(Pubid::Ecma::Identifiers::Standard.subset_strict_attributes)
+        .to include(:part)
+    end
+
+    it "ECMA: a nil part means no part" do
+      expect(parse("ecma", "ECMA-418") === parse("ecma", "ECMA-418-1 ed1"))
+        .to be(false)
+      expect(parse("ecma", "ECMA-418-1") === parse("ecma", "ECMA-418-1 ed1"))
+        .to be(true)
+    end
+
+    it "3GPP: a nil suffix and an empty part list mean none" do
+      expect(parse("3gpp", "3GPP TS 29.198") ===
+             parse("3gpp", "3GPP TS 29.198-04-1")).to be(false)
+      expect(parse("3gpp", "3GPP TR 00.01") === parse("3gpp", "3GPP TR 00.01U"))
+        .to be(false)
+      exact = parse("3gpp", "3GPP TS 29.198-04-1")
+      expect(exact === parse("3gpp", "3GPP TS 29.198-04-1")).to be(true)
+    end
+
+    it "ETSI: a stated part list is not a prefix" do
+      expect(parse("etsi", "ETSI TS 129 198-4") ===
+             parse("etsi", "ETSI TS 129 198-4-5")).to be(false)
+      exact = parse("etsi", "ETSI TS 129 198-4")
+      expect(exact === parse("etsi", "ETSI TS 129 198-4")).to be(true)
+      expect(parse("etsi", "ETSI EN 300 175") ===
+             parse("etsi", "ETSI EN 300 175-1")).to be(false)
+    end
+
+    it "CalConnect: a nil series means no series" do
+      expect(parse("calconnect", "CC 36010") ===
+             parse("calconnect", "CC/WD 36010:2019")).to be(false)
+      expect(parse("calconnect", "CC/WD 36010") ===
+             parse("calconnect", "CC/WD 36010:2019")).to be(true)
+    end
+
+    it "GOST: a nil copublisher means none" do
+      expect(parse("gost", "ГОСТ Р 27001") ===
+             parse("gost", "ГОСТ Р ИСО/МЭК 27001-2006")).to be(false)
+      expect(parse("gost", "ГОСТ Р ИСО/МЭК 27001") ===
+             parse("gost", "ГОСТ Р ИСО/МЭК 27001-2006")).to be(true)
+    end
+
+    it "PLATEAU: a nil annex means no annex" do
+      expect(parse("plateau", "PLATEAU Handbook #10") ===
+             parse("plateau", "PLATEAU Handbook #10-1 第1.0版")).to be(false)
+      expect(parse("plateau", "PLATEAU Handbook #10-1") ===
+             parse("plateau", "PLATEAU Handbook #10-1 第1.0版")).to be(true)
+    end
+
+    it "OIML: a nil suffix means none" do
+      expect(parse("oiml", "OIML R 138") ===
+             parse("oiml", "OIML R 138-Amend:2009")).to be(false)
+      expect(parse("oiml", "OIML R 138-Amend") ===
+             parse("oiml", "OIML R 138-Amend:2009")).to be(true)
+    end
+
+    it "CCSDS: a nil language means none" do
+      expect(parse("ccsds", "CCSDS 650.0-M-2") ===
+             parse("ccsds", "CCSDS 650.0-M-2 - French Translated")).to be(false)
+      french = parse("ccsds", "CCSDS 650.0-M-2 - French Translated")
+      expect(french === parse("ccsds", "CCSDS 650.0-M-2 - French Translated"))
+        .to be(true)
+    end
+
+    # A strict attribute that holds a component keeps that component's own
+    # rule: `Components::TypedStage` ignores `original_abbr`, the input
+    # spelling, and CEN declares `typed_stage` strict. A plain `==` here
+    # would compare the spelling as if it were identity.
+    it "composes with a nested component's own rule" do
+      short = Pubid::Components::TypedStage.new(name: "Amendment",
+                                                original_abbr: "Amd")
+      upper = Pubid::Components::TypedStage.new(name: "Amendment",
+                                                original_abbr: "AMD")
+      other = Pubid::Components::TypedStage.new(name: "Corrigendum")
+
+      expect(Pubid::SubsetMatch.exact_match?(short, upper)).to be(true)
+      expect(Pubid::SubsetMatch.exact_match?(short, other)).to be(false)
+      expect(Pubid::SubsetMatch.exact_match?(short, nil)).to be(false)
+      expect(Pubid::SubsetMatch.exact_match?(nil, short)).to be(false)
+    end
+
+    # Exactness reaches into a collection too: a strict list matches in
+    # full, element by element, never as a prefix.
+    it "compares a strict collection in full" do
+      expect(Pubid::SubsetMatch.exact_match?(%w[4], %w[4 5])).to be(false)
+      expect(Pubid::SubsetMatch.exact_match?(%w[4 5], %w[4])).to be(false)
+      expect(Pubid::SubsetMatch.exact_match?(%w[4 5], %w[4 5])).to be(true)
+      expect(Pubid::SubsetMatch.exact_match?([], nil)).to be(true)
+    end
+
+    # A published CEN norm holds no type, stage or typed stage, so a nil one
+    # means "published", not "any stage".
+    it "CEN: a published norm is not a draft" do
+      expect(cen("EN 1325") === cen("prEN 1325")).to be(false)
+      expect(cen("EN 1325") === cen("EN 1325:2001")).to be(true)
+      draft = cen("prEN 1325")
+      expect(draft === cen("prEN 1325")).to be(true)
+      expect(cen("EN 1991") === cen("ENV 1991-2-2")).to be(false)
+    end
+
+    # A name that is not an attribute of the class would be silently
+    # ignored, so the walk has to see every class that declares one.
+    it "names only attributes the class declares" do
+      identifier_classes = force_load_flavor_classes
+      # A walk that stops early finds no offender and passes silently.
+      expect(identifier_classes.size).to be > 350
+
+      declaring = ObjectSpace.each_object(Class).select do |klass|
+        klass.respond_to?(:subset_strict_attributes) &&
+          klass.respond_to?(:attributes) &&
+          klass.subset_strict_attributes.any?
+      end
+      # The nine flavors of the table above, their subclasses and the two
+      # components; well past OIML's seven leaves on their own.
+      expect(declaring.size).to be > 20
+
+      offenders = declaring.filter_map do |klass|
+        undeclared = klass.subset_strict_attributes - klass.attributes.keys
+        "#{klass.name}: #{undeclared.join(', ')}" if undeclared.any?
+      end
+
+      expect(offenders).to be_empty
+    end
+  end
+
+  # Once a nil part means "none", `all_parts` is how a reference asks for the
+  # whole collection without a `matches?(ignore:)` list. `#includes?` and
+  # `Jis::Identifier#==` already read the flag this way.
+  describe "all_parts as the part wildcard" do
+    def iso(string) = Pubid::Iso.parse(string)
+
+    it "matches every part of the document" do
+      expect(iso("ISO 9001 (all parts)") === iso("ISO 9001-1:2015")).to be(true)
+      expect(iso("ISO 9001 (all parts)") === iso("ISO 9001:2015")).to be(true)
+    end
+
+    it "reopens a strict part list" do
+      reference = parse("etsi", "ETSI EN 300 175")
+      expect(reference === parse("etsi", "ETSI EN 300 175-1")).to be(false)
+      reference.all_parts = true
+      expect(reference === parse("etsi", "ETSI EN 300 175-1")).to be(true)
+    end
+
+    it "restricts every other part of the identifier" do
+      expect(iso("ISO 9001 (all parts)") === iso("ISO 14001-1:2015"))
+        .to be(false)
+      expect(iso("ISO 9001 (all parts)") === iso("ISO/DIS 9001-1")).to be(false)
+    end
+
+    it "stays stated in the other direction" do
+      expect(iso("ISO 9001") === iso("ISO 9001 (all parts)")).to be(false)
+    end
+
+    # A component never holds a document's parts, so the rule is on the
+    # identifier alone.
+    it "is an identifier rule, not a component rule" do
+      component = Pubid::Components::Date.new(year: "2015")
+      expect(Pubid::SubsetMatch.instance_method(:subset_all_parts_wildcard?)
+        .bind_call(component)).to be(false)
+    end
+  end
+
   # Every component type that an identifier attribute can hold must include
   # the module, or `===` falls back to strict `==` for that part without a
   # signal. This is the forcing function for a new component class.
   it "is included by every component type an identifier attribute declares" do
-    load_classes = lambda do |namespace, depth|
-      return if depth > 2
-
-      namespace.constants.each do |const|
-        value = begin
-          namespace.const_get(const)
-        rescue StandardError, ScriptError
-          next
-        end
-        load_classes.call(value, depth + 1) if value.is_a?(Module)
-      end
-    end
-    Pubid::Registry.flavor_names.each do |flavor|
-      load_classes.call(Pubid::Registry.get(flavor), 0)
-    end
-
-    identifier_classes = ObjectSpace.each_object(Class)
-      .select { |klass| klass <= Pubid::Identifier }
+    identifier_classes = force_load_flavor_classes
     # A walk that stops early finds no offender and passes silently; the
     # annotated-rendering spec had that defect with IEEE's `Nesc::` classes.
     expect(identifier_classes.size).to be > 350

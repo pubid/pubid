@@ -20,6 +20,12 @@ module Pubid
       attribute :part, :string
       attribute :subpart, :string
 
+      # A published European Norm holds no type, stage or typed stage, so a
+      # nil one means "published", not "any stage": `EN 1325` is not
+      # `prEN 1325`, and `EN 1991` is not `ENV 1991`. The three components
+      # repeat one entry of the stage registry, so they move together.
+      subset_strict :type, :stage, :typed_stage
+
       # The publisher serializes as a bare string ("publisher" => "CEN"), and
       # the copublishers as a list of strings. The shared table does not do
       # this for every flavor, because IEEE has a published index whose rows

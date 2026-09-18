@@ -18,6 +18,10 @@ module Pubid
       attribute :number, :string
       attribute :date, ::Pubid::Components::Date
 
+      # A nil `series` means the document has none: `CC 36010` is not
+      # `CC/WD 36010`, which is a working draft of it.
+      subset_strict :series
+
       # Polymorphic type map for lutaml::Model key_value (de)serialization,
       # mapping the concrete class's polymorphic_name to its class name so a
       # stored hash rebuilds the correct identifier type via from_hash.

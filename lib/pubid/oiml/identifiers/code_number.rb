@@ -34,6 +34,7 @@ module Pubid
         def self.included(base)
           install_attributes(base)
           install_mappings(base)
+          install_subset_rules(base)
         end
 
         def self.install_attributes(base)
@@ -51,6 +52,13 @@ module Pubid
           # false default, so the canonical to_hash drops it from every
           # ordinary row.
           base.attribute :space_suffix, :boolean, default: -> { false }
+        end
+
+        # A nil `part` or `suffix` means the document has neither:
+        # `OIML R 138` is not `OIML R 138-Amend`, which is its amendment.
+        # Declared on each leaf, beside the columns it governs.
+        def self.install_subset_rules(base)
+          base.subset_strict :part, :suffix
         end
 
         # Merged by lutaml with the block SingleIdentifier declares, which

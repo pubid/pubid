@@ -20,6 +20,10 @@ module Pubid
         attribute :minor, :string # Optional minor part
         attribute :parts, :string, collection: true, default: [] # Parts array
 
+        # Mirrors the flat `parts` column of EtsiStandard, which owns the
+        # identity; this component is derived from it by `#code`.
+        subset_strict :parts
+
         # Render code with space for minor and dash-separated parts
         def to_s
           result = number.to_s

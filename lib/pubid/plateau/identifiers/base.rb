@@ -14,6 +14,10 @@ module Pubid
       attribute :number, :integer
       attribute :annex, :integer, default: -> {}
 
+      # A nil `annex` means the document has none: PLATEAU Handbook #10 is
+      # not its annex, PLATEAU Handbook #10-1.
+      subset_strict :annex
+
       # Stored as a plain string (always "PLATEAU") so it round-trips through
       # to_hash/from_hash. Was a `def publisher` method, which made lutaml
       # serialize a String against the Components::Publisher attribute.

@@ -249,6 +249,28 @@ catalogue.grep(reference)
 # => every edition of ISO 9001 in the catalogue
 ----
 
+Some flavors state a part even when it is nil, because the document really
+has none. Those classes declare it strict, so the reference does not widen:
+
+[source,ruby]
+----
+Pubid::Ecma.parse("ECMA-418") === Pubid::Ecma.parse("ECMA-418-1")
+# => false (ECMA-418 has no part)
+Pubid::Ecma.parse("ECMA-418-1") === Pubid::Ecma.parse("ECMA-418-1 ed1")
+# => true
+----
+
+A reference asks for every part of a document with `all_parts`:
+
+[source,ruby]
+----
+Pubid::Iso.parse("ISO 9001 (all parts)") === Pubid::Iso.parse("ISO 9001-1:2015")
+# => true
+----
+
+See `docs/SUBSET_MATCH.md` for the full rules and the list of strict
+attributes.
+
 === Comparing Editions
 
 The `new_edition_of?` method checks if an identifier is a newer edition of the same document:

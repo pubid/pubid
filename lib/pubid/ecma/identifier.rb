@@ -20,6 +20,13 @@ module Pubid
       # is only present for standards that split into parts (e.g. ECMA-418-1).
       attribute :number, :string
       attribute :part, :string
+
+      # A nil `part` means the document has no part, not "any part":
+      # `ECMA-418` is not `ECMA-418-1`. relaton measured 5 spurious part rows
+      # for that one reference. A caller that wants every part of a document
+      # sets `all_parts` on the reference.
+      subset_strict :part
+
       # Edition is relaton's `:ed:` (the index stores {:id, :ed, :vol} and the
       # YAML has edition.content). It is part of the printed identifier: the
       # relaton index keys on a bare `to_s`, so without it all 22 editions of
