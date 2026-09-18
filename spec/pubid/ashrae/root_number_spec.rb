@@ -203,34 +203,49 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
     end
   end
 
-  # KNOWN GAP, pre-existing and deliberately not closed here. An
-  # "Interpretations for …" reference builds a plain Standard and the marker is
-  # lost entirely, giving an identifier IDENTICAL to the standard it interprets:
-  # same class, same to_s, same hash, same slug. All 51 interpretation rows
-  # already behaved this way on the main baseline, so this branch neither
-  # caused nor worsened it.
+  # FIXED GAP. An "Interpretations for …" reference built a plain Standard and
+  # the marker was lost entirely, giving an identifier IDENTICAL to the
+  # standard it interprets: same class, same to_s, same hash, same slug. All 51
+  # interpretation rows of the corpus behaved this way.
   #
-  # THE CAUSE IS NOT ALTERNATION ORDERING, which an earlier revision of this
-  # comment claimed. rule(:interpretation_identifier) IS reached and DOES match
-  # — dump the tree and you get {base: {type: "Standard", code: "15.2", year:
-  # "2022"}}, with the "Interpretations for " prefix consumed. What it never
-  # does is TAG itself: the rule has no `.as(:interpretation_identifier)`
-  # wrapper, so Builder#build's `elsif parsed_hash[:interpretation_identifier]`
-  # branch is unreachable dead code and the tree falls through to the plain
-  # identifier path. Fixing it is a one-line wrap plus whatever the resulting
-  # tree shape needs in the builder. See hand-off
-  # ashrae-interpretation-collapses-onto-base.
-  describe "interpretations still collapse onto their base standard" do
-    it "builds a Standard, not an Interpretation" do
-      expect(Pubid::Ashrae.parse("Interpretations for Standard 15.2-2022"))
-        .to be_a(Pubid::Ashrae::Identifiers::Standard)
+  # The cause was not alternation ordering. rule(:interpretation_identifier)
+  # was reached and did match, but it did not TAG its output with
+  # `.as(:interpretation_identifier)`, so Builder#build's branch for that key
+  # was dead code and the tree fell through to the plain-identifier path.
+  #
+  # The URN is still shared with every other supplement of the same base (it
+  # carries no supplement marker; hand-off ashrae-supplement-urn-collapse), but
+  # it is no longer the standard's own URN.
+  describe "interpretations are distinct from their base standard" do
+    let(:interp) do
+      Pubid::Ashrae.parse("Interpretations for Standard 15.2-2022")
+    end
+    let(:plain) { Pubid::Ashrae.parse("ASHRAE Standard 15.2-2022") }
+
+    it "builds an Interpretation over the Standard" do
+      expect(interp).to be_a(Pubid::Ashrae::Identifiers::Interpretation)
+      expect(interp.base).to be_a(Pubid::Ashrae::Identifiers::Standard)
+      expect(interp.root.number).to eq("15.2")
     end
 
-    it "is indistinguishable from the standard it interprets" do
-      interp = Pubid::Ashrae.parse("Interpretations for Standard 15.2-2022")
-      plain = Pubid::Ashrae.parse("ASHRAE Standard 15.2-2022")
-      expect(interp.to_hash).to eq(plain.to_hash)
-      expect(interp.to_mr_string).to eq(plain.to_mr_string)
+    it "is distinguishable from the standard it interprets" do
+      expect(interp.to_s).to eq("Interpretations for Standard 15.2-2022")
+      expect(interp.to_hash).not_to eq(plain.to_hash)
+      expect(interp.to_urn).not_to eq(plain.to_urn)
+      expect(interp.to_mr_string).to eq("ashrae.standard.15.2.2022_interp")
+      expect(interp.to_mr_string).not_to eq(plain.to_mr_string)
+      expect(interp).not_to eq(plain)
+    end
+
+    it "survives a hash round trip" do
+      expect(Pubid::Ashrae::Identifier.from_hash(interp.to_hash)).to eq(interp)
+    end
+
+    it "parses the partial form with no year" do
+      partial = Pubid::Ashrae.parse("Interpretations for Standard 15.2")
+      expect(partial).to be_a(Pubid::Ashrae::Identifiers::Interpretation)
+      expect(partial.base.year).to be_nil
+      expect(partial.to_s).to eq("Interpretations for Standard 15.2")
     end
   end
 

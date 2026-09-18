@@ -231,10 +231,17 @@ module Pubid
       end
 
       # Interpretation pattern ("Interpretations for Standard X-YYYY")
+      #
+      # The `.as(:interpretation_identifier)` tag is what Builder#build
+      # dispatches on. Without it the tree is a bare `{base: …}`, the builder
+      # takes the plain-identifier path, and the interpretation becomes the
+      # standard it interprets.
       rule(:interpretation_identifier) do
-        str("Interpretations") >> space >>
+        (str("Interpretations") >> space >>
           str("for") >> space >>
-          (type.as(:type) >> space >> code >> (dash >> year_digits.as(:year)).maybe).as(:base)
+          (type.as(:type) >> space >> code >>
+            (dash >> year_digits.as(:year)).maybe).as(:base))
+          .as(:interpretation_identifier)
       end
 
       # Combined Addenda pattern (multiple addendums grouped together)
