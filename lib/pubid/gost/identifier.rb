@@ -23,6 +23,11 @@ module Pubid
       attribute :number,      :string
       attribute :year,        :string
 
+      # A nil `copublisher` means GOST alone: `GOST R 27001` is not
+      # `GOST R ISO/IEC 27001`, which is an adoption of another body's
+      # document.
+      subset_strict :copublisher
+
       GOST_TYPE_MAP = {
         "pubid:gost:interstate-standard" => "Pubid::Gost::Identifiers::InterstateStandard",
         "pubid:gost:national-standard"   => "Pubid::Gost::Identifiers::NationalStandard",

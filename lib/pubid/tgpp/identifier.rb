@@ -27,6 +27,11 @@ module Pubid
       # Three-part version string, e.g. "2.0.0".
       attribute :version, :string
 
+      # A nil `suffix` and an empty `parts` mean the document has neither:
+      # `TS 29.198` is not `TS 29.198-04-1`, and `TR 00.01` is not
+      # `TR 00.01U`. A stated list is not a prefix either.
+      subset_strict :suffix, :parts
+
       # Polymorphic type map for lutaml::Model key_value (de)serialization.
       # Keys are the `pubid:3gpp:…` names produced by polymorphic_name (below).
       TGPP_TYPE_MAP = {

@@ -156,8 +156,9 @@ id.exclude(:date).to_s  # => "ISO 9001"
 ### `===` (subset match)
 
 Returns true when the candidate holds every part that the reference states. A
-part that the reference omits (nil or empty) matches any value. The receiver is
-the reference, so `a === b` and `b === a` are different.
+part that the reference omits (nil or empty) matches any value, unless the
+flavor declares that part **strict**. The receiver is the reference, so
+`a === b` and `b === a` are different.
 
 ```ruby
 reference = Pubid::Iso.parse("ISO 9001")
@@ -169,9 +170,27 @@ Pubid::Iso.parse("ISO 9001:2015") === reference   # => false
 catalogue.grep(reference) # => the editions of ISO 9001 in the catalogue
 ```
 
-A class changes the rule for its own attributes with
+Some flavors state a part even when it is nil: an ECMA `part`, a 3GPP
+`suffix`, an ETSI `parts` list. Those classes declare it with
+`subset_strict`, so a nil value means "this document has none" and a stated
+collection is not a prefix.
+
+```ruby
+Pubid::Ecma.parse("ECMA-418") === Pubid::Ecma.parse("ECMA-418-1")   # => false
+Pubid::Ecma.parse("ECMA-418-1") === Pubid::Ecma.parse("ECMA-418-1 ed1") # => true
+```
+
+A reference asks for every part of a document with `all_parts`, which makes
+`===` skip `part`, `parts`, `subpart` and `all_parts` itself:
+
+```ruby
+Pubid::Iso.parse("ISO 9001 (all parts)") === Pubid::Iso.parse("ISO 9001-1:2015")
+# => true
+```
+
+A class changes the rule for its own attributes with `subset_strict`,
 `self.subset_ignored_attributes` or `#subset_attribute_match?`. See
-`Pubid::SubsetMatch`.
+`Pubid::SubsetMatch` and `docs/SUBSET_MATCH.md`.
 
 ### `new_edition_of?`
 

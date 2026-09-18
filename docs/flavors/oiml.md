@@ -25,3 +25,21 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 **Verified** by replaying a baseline captured on `main` over all 5646 published rows (each Bulletin `issue` key renamed to `number`, as a new crawl writes it) and every OIML fixture: `to_s`, `to_urn`, `to_mr_string` and the class are identical; a Bulletin `to_hash` differs only by `issue` → `number`; `from_hash(to_hash) == id` did not change for any entry. Locked by the "Bulletin keys on its issue" block of `spec/pubid/oiml/root_number_spec.rb`.
 
 **Relaton note (not caused by this change).** `Relaton::Oiml::Bibliography#pubid_match?` compares `exclude(:year, :language).to_s`. For a Bulletin that string is `"OIML Bulletin"` for every article, so a query can return a different article of the same year (hand-off `relaton__relaton__oiml-bulletin-pubid-match`).
+
+## Subset match: strict attributes
+
+Read `docs/SUBSET_MATCH.md` first. `===` reads a nil part of the reference as
+a wildcard, which is wrong for the attributes below: the flavor models a nil
+value as "this document has none". They are declared with `subset_strict`, so
+`===` compares them exactly and a stated collection is not a prefix. A caller
+that does want every part of a document sets `all_parts` on the reference, or
+keeps `#matches?(other, ignore:)`.
+
+- **`part` and `suffix` are strict**, so `OIML R 138` does not match
+  `OIML R 138-Amend:2009`, which is its amendment. The declaration rides
+  the `Identifiers::CodeNumber` mixin
+  (`lib/pubid/oiml/identifiers/code_number.rb`), so it reaches all seven
+  leaves that install the columns; `Bulletin`, which does not include the
+  mixin, is unaffected. `Oiml::Components::Code` carries the same
+  declaration for the shapes not to drift, although `===` does not reach it
+  today.

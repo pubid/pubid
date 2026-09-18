@@ -1133,6 +1133,14 @@ module Pubid
         self != other
     end
 
+    # A reference that states +all_parts+ asks for every part of the
+    # document, so `===` does not restrict `part`, `parts` or `subpart`.
+    # `#includes?` below reads the same flag.
+    # @return [Boolean]
+    def subset_all_parts_wildcard?
+      all_parts == true
+    end
+
     # Self is an all-parts collection that covers +other+.
     def includes?(other)
       return false unless other.is_a?(::Pubid::Identifier)

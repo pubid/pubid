@@ -11,3 +11,20 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 ## Related rule in the root file
 
 3GPP's `parts` attribute produced the rule that a `collection: true` attribute needs `initialize_empty: true`. That rule applies to every flavor, so it stays in the root `CLAUDE.md`, not here.
+
+## Subset match: strict attributes
+
+Read `docs/SUBSET_MATCH.md` first. `===` reads a nil part of the reference as
+a wildcard, which is wrong for the attributes below: the flavor models a nil
+value as "this document has none". They are declared with `subset_strict`, so
+`===` compares them exactly and a stated collection is not a prefix. A caller
+that does want every part of a document sets `all_parts` on the reference, or
+keeps `#matches?(other, ignore:)`.
+
+- **`suffix` and `parts` are strict** (`lib/pubid/tgpp/identifier.rb`).
+  `TS 29.198 === TS 29.198-04-1` and `TR 00.01 === TR 00.01U` are both
+  false. `parts` is the flavor's `collection: true, initialize_empty: true`
+  attribute, so a part-less identifier holds `[]` on both construction
+  paths and the strict comparison treats that `[]` and a nil alike — the
+  same asymmetry the `initialize_empty` note above is about, seen from the
+  matching side. relaton had two committed specs breaking on this.
