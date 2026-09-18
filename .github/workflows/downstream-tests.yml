@@ -99,7 +99,10 @@ jobs:
       group: '${{ matrix.flavor }}-${{ matrix.os }}-${{ matrix.version }}-${{ matrix.repository.repo }}-${{ github.head_ref || github.ref_name }}'
       cancel-in-progress: true
 
-    continue-on-error: ${{ matrix.experimental }}
+    # Per-repository opt-out: a downstream mid-migration (see
+    # downstream-tests.json "experimental") shows its failures as
+    # yellow-with-annotation instead of a red-by-default wall (#409).
+    continue-on-error: ${{ matrix.repository.experimental }}
     strategy:
       max-parallel: 10
       fail-fast: false
