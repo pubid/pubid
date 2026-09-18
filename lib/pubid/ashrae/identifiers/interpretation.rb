@@ -13,16 +13,8 @@ module Pubid
       class Interpretation < SupplementIdentifier
         # Mirrors its four sibling supplement types: without it
         # Renderers::MrString slugs the interpretation FLAT off attributes it
-        # does not have, instead of recursing into `base`.
-        #
-        # Currently unreachable, and NOT because of alternation ordering:
-        # rule(:interpretation_identifier) is reached and does match, but it
-        # never wraps its output in `.as(:interpretation_identifier)`, so
-        # Builder#build's branch for that key is dead code and the tree falls
-        # through to the plain-Standard path (pre-existing; pinned in
-        # spec/pubid/ashrae/root_number_spec.rb, hand-off
-        # ashrae-interpretation-collapses-onto-base). Added anyway so that
-        # fixing the dispatch does not silently ship malformed filenames.
+        # does not have, instead of recursing into `base`. An interpretation
+        # carries no field of its own, so the marker alone is the suffix.
         def mr_supplement_suffix
           "interp"
         end
