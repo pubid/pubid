@@ -213,9 +213,8 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
   # `.as(:interpretation_identifier)`, so Builder#build's branch for that key
   # was dead code and the tree fell through to the plain-identifier path.
   #
-  # The URN is still shared with every other supplement of the same base (it
-  # carries no supplement marker; hand-off ashrae-supplement-urn-collapse), but
-  # it is no longer the standard's own URN.
+  # The URN is the standard's URN plus the "interp" marker, so it is no longer
+  # the standard's own URN (hand-off ashrae-supplement-urn-collapse).
   describe "interpretations are distinct from their base standard" do
     let(:interp) do
       Pubid::Ashrae.parse("Interpretations for Standard 15.2-2022")
@@ -259,8 +258,8 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
   # and with equal hashes, the sweep read the shared slug as benign.
   #
   # ASHRAE titles an erratum by its date, so the date now reaches to_s, the
-  # hash, == and the slug. The URN still collapses: it carries no supplement
-  # marker at all (hand-off ashrae-supplement-urn-collapse).
+  # hash, == and the slug. The URN takes the date in its supplement marker
+  # (hand-off ashrae-supplement-urn-collapse).
   describe "two errata of one standard are two identifiers" do
     let(:first) do
       Pubid::Ashrae.parse("ASHRAE Guideline 14-2002 Errata (October 10, 2008)")
@@ -280,8 +279,8 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
       expect(first.to_mr_string).not_to eq(second.to_mr_string)
     end
 
-    it "still gives the two one URN (ashrae-supplement-urn-collapse)" do
-      expect(first.to_urn.to_s).to eq(second.to_urn.to_s)
+    it "gives the two two URNs" do
+      expect(first.to_urn.to_s).not_to eq(second.to_urn.to_s)
     end
   end
 
@@ -337,6 +336,18 @@ RSpec.describe "Pubid::Ashrae index key (root.number)" do
       by_slug = AshraeIndexKeySpec.parsed_corpus
         .group_by { |_, id| id.to_mr_string }
       clashing = by_slug.reject do |_, rows|
+        rows.map { |_, id| id.to_hash }.uniq.size == 1
+      end
+      expect(clashing.keys.first(5)).to eq([])
+    end
+
+    # Every supplement of one base shared the bare "urn:ashrae:<number>"
+    # before its URN took the base URN and a supplement marker (hand-off
+    # ashrae-supplement-urn-collapse).
+    it "gives distinct identifiers distinct URNs" do
+      by_urn = AshraeIndexKeySpec.parsed_corpus
+        .group_by { |_, id| id.to_urn.to_s }
+      clashing = by_urn.reject do |_, rows|
         rows.map { |_, id| id.to_hash }.uniq.size == 1
       end
       expect(clashing.keys.first(5)).to eq([])

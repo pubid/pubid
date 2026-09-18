@@ -95,7 +95,7 @@ from the code.
 
 - `docs/flavors/amca.md` — AMCA index key and MR slug.
 - `docs/flavors/api.md` — API rendering repairs and the `number` retype residue.
-- `docs/flavors/ashrae.md` — ASHRAE index key, the identifiers that lost their number, the errata date, and interpretations.
+- `docs/flavors/ashrae.md` — ASHRAE index key, the identifiers that lost their number, the errata date, interpretations and supplement URNs.
 - `docs/flavors/asme.md` — ASME index key and MR slug.
 - `docs/flavors/astm.md` — ASTM index key and MR slug.
 - `docs/flavors/bipm.md` — BIPM update codes, index key, MR slug and loose consumer forms.
