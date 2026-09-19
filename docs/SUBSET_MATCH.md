@@ -40,7 +40,9 @@ pressure, because reference matching no longer goes through `#exclude`.
   collection is not a prefix. See *Strict attributes* below.
 - **`all_parts` is the part wildcard.** A reference that sets it matches
   every part of the document: `part`, `parts`, `subpart` and `all_parts`
-  itself are skipped.
+  itself are skipped. `#to_all_parts` makes such a reference from any
+  identifier. It returns a copy with `all_parts` true and no part; the date
+  and the stage stay (`ISO 9000-1:2015` → `ISO 9000:2015 (all parts)`).
 - **A partial date stays a wildcard.** A year-only reference matches a fuller
   date: `Date(2015) === Date(2015-04)`. The month and the day refine the year
   rather than naming a different document, and ISO, IEC and BSI all rely on
