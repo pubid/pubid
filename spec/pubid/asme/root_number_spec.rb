@@ -121,6 +121,9 @@ RSpec.describe "Pubid::Asme index key (root.number)" do
       slugs = AsmeIndexKeySpec.parsed_corpus.map { |_, id| id.to_mr_string }
       expect(slugs.count(&:empty?)).to eq(0)
       expect(slugs.grep(/[^a-z0-9._-]/).first(5)).to eq([])
+      # "_" separates supplement layers in the MR format
+      # (Pubid::Parsers::MrString splits on it first); ASME has none.
+      expect(slugs.grep(/_/).first(5)).to eq([])
     end
 
     it "gives distinct identifiers distinct slugs" do
@@ -129,28 +132,114 @@ RSpec.describe "Pubid::Asme index key (root.number)" do
       clashing = by_slug.reject do |_, rows|
         rows.map { |_, id| id.to_hash }.uniq.size == 1
       end
-      # KNOWN GAP, pre-existing, pinned below rather than papered over.
-      expect(clashing.keys).to eq(["asme.bpvc-cc-bpv"])
+      expect(clashing.keys).to eq([])
     end
 
-    # Two pre-existing parser gaps meet on the Boiler and Pressure Vessel Code
-    # change-record documents, and neither is this branch's to fix:
-    #
-    #   * the year is dropped ("ASME BPVC.CC.BPV-2021" and "-2023" produce
-    #     IDENTICAL hashes, so pubid cannot tell the editions apart at all);
-    #   * the same document is spelled with dots and with dashes
-    #     ("BPVC-CC-BPV" vs "BPVC.CC.BPV") and nothing normalises the two, so
-    #     they are two identifiers that the slug's charset filter maps together.
-    #
-    # Pinned so a fix to either trips this. See hand-off
-    # asme-bpvc-and-amca-residue.
-    it "still cannot distinguish the BPVC change-record spellings" do
+    # A designator with no number ("BPVC.I", "BPE", "OM", "PASE") used to lose
+    # its year: the dash branch of `number_part` took "-2021" as the number,
+    # and the BPVC builder then discarded that number. All 150 BPVC ids and 13
+    # more had no year, so the editions of one document were identical.
+    it "keeps the year of every identifier that prints one" do
+      bad = AsmeIndexKeySpec.parsed_corpus.select do |line, id|
+        line.match?(/-(\d{4}|20XX|202X)\b/) && id.year.nil? &&
+          id.draft_year.nil?
+      end
+      expect(bad.map(&:first).first(5)).to eq([])
+    end
+
+    it "never stores the year inside the number" do
+      bad = AsmeIndexKeySpec.parsed_corpus.select do |_, id|
+        id.number.to_s.match?(/-\d{4}\z/)
+      end
+      expect(bad.map(&:first).first(5)).to eq([])
+    end
+  end
+
+  # The Boiler and Pressure Vessel Code documents. Their whole identity is the
+  # designator, so the builder assembles it from the parse tree; the three
+  # defects below were all in that assembly.
+  describe "BPVC documents" do
+    {
+      "ASME BPVC.I-2021" => ["BPVC.I", "2021"],
+      "ASME BPVC.III.1.NB-2023" => ["BPVC.III.1.NB", "2023"],
+      "ASME BPVC.VIII.1_ES-2013" => ["BPVC.VIII.1_ES", "2013"],
+      "ASME BPVC COMPLETE CODE BIND-2019" =>
+        ["BPVC COMPLETE CODE BIND", "2019"],
+      "ASME BPVC.CC.BPV-2021" => ["BPVC.CC.BPV", "2021"],
+      # The case sub-code kept its leading dot: "BPVC.CC.BPV..I".
+      "ASME BPVC.CC.BPV.I-2019" => ["BPVC.CC.BPV.I", "2019"],
+      "ASME BPVC.CC.NC.XI-2023" => ["BPVC.CC.NC.XI", "2023"],
+      # The sections sit under `ssc_code` in the parse tree, and the builder
+      # read them one level up: "BPVC.SSC.".
+      "ASME BPVC.SSC.XI.II.V.IX-2021" => ["BPVC.SSC.XI.II.V.IX", "2021"],
+      # The other SSC codes of the ASME catalogue (asme.org). Each names a
+      # different document, by the BPVC sections it summarizes.
+      "ASME BPVC.SSC.VIII.XII.II.V.IX-2021" =>
+        ["BPVC.SSC.VIII.XII.II.V.IX", "2021"],
+      "ASME BPVC.SSC.VIII.XII.II.V.IX.XIII-2023" =>
+        ["BPVC.SSC.VIII.XII.II.V.IX.XIII", "2023"],
+      "ASME BPVC.SSC.I.II.V.IX-2021" => ["BPVC.SSC.I.II.V.IX", "2021"],
+      "ASME BPVC.SSC.I.II.V.IX.XIII-2023" => ["BPVC.SSC.I.II.V.IX.XIII", "2023"],
+      "ASME BPVC.SSC.III.II.V.IX-2023" => ["BPVC.SSC.III.II.V.IX", "2023"],
+      "ASME BPVC.SSC.IV.II.V.IX-2021" => ["BPVC.SSC.IV.II.V.IX", "2021"],
+      "ASME BPVC.SSC.IV.II.V.IX.XIII-2023" =>
+        ["BPVC.SSC.IV.II.V.IX.XIII", "2023"],
+      "ASME BPVC.SSC.X.II.V-2021" => ["BPVC.SSC.X.II.V", "2021"],
+      "ASME BPVC.SSC.X.II.V.XIII-2023" => ["BPVC.SSC.X.II.V.XIII", "2023"],
+      "ASME BPVC-CC-BPV-2019" => ["BPVC-CC-BPV", "2019"],
+      "ASME BPVC-CC-NUC-2019" => ["BPVC-CC-NUC", "2019"],
+    }.each do |ref, (number, year)|
+      it "parses #{ref}" do
+        id = Pubid::Asme.parse(ref)
+        expect([id.number, id.year]).to eq([number, year])
+        expect(id.to_s).to eq("ASME #{number}-#{year}")
+      end
+    end
+
+    it "tells the editions of one document apart" do
+      editions = %w[2021 2023 2025].map do |year|
+        Pubid::Asme.parse("ASME BPVC.CC.BPV-#{year}")
+      end
+      expect(editions.map(&:to_hash).uniq.size).to eq(3)
+      expect(editions.map(&:to_mr_string).uniq.size).to eq(3)
+      expect(editions.map(&:to_urn).uniq.size).to eq(3)
+    end
+
+    # The ASME catalogue lists BPVC-CC-BPV and BPVC.CC.BPV as two separate
+    # documents, so the dash form is kept, not normalized to dots.
+    it "keeps BPVC-CC-BPV and BPVC.CC.BPV apart" do
       dashed = Pubid::Asme.parse("ASME BPVC-CC-BPV-2019")
       dotted = Pubid::Asme.parse("ASME BPVC.CC.BPV-2021")
-      expect(dashed.year).to be_nil
-      expect(dotted.year).to be_nil
-      expect(dashed.to_mr_string).to eq(dotted.to_mr_string)
-      expect(dashed.to_hash).not_to eq(dotted.to_hash)
+      expect(dashed.root.number).not_to eq(dotted.root.number)
+      expect(dashed.exclude(:year)).not_to eq(dotted.exclude(:year))
+    end
+
+    # The slug is an output filename, so the two documents must not share it.
+    # ASME sells both in 2019 (the main book and the 2019 supplements).
+    it "gives BPVC-CC-BPV and BPVC.CC.BPV different slugs" do
+      slugs = %w[BPVC-CC-BPV BPVC.CC.BPV].map do |code|
+        Pubid::Asme.parse("ASME #{code}-2019").to_mr_string
+      end
+      expect(slugs).to eq(["asme.bpvc--cc--bpv.2019", "asme.bpvc-cc-bpv.2019"])
+    end
+  end
+
+  describe "designators with no number" do
+    {
+      "ASME BPE-2012" => "BPE",
+      "ASME OM-2017" => "OM",
+      "ASME PASE-2019" => "PASE",
+    }.each do |ref, number|
+      it "keeps the year of #{ref} out of the number" do
+        id = Pubid::Asme.parse(ref)
+        expect([id.number, id.year]).to eq([number, ref[-4..]])
+        expect(id.to_s).to eq(ref)
+      end
+    end
+
+    it "still reads a dashed number (BTH-1)" do
+      id = Pubid::Asme.parse("ASME BTH-1-2020")
+      expect([id.number, id.year]).to eq(["BTH-1", "2020"])
     end
   end
 

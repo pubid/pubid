@@ -154,11 +154,7 @@ module Pubid
 
         # Extract revision (Rev. 01-23)
         if parsed[:revision]
-          revision_data = parsed[:revision]
-          if revision_data && revision_data[:revision_year]
-            attributes[:revision] =
-              extract_value(revision_data[:revision_year])
-          end
+          attributes[:revision] = extract_value(parsed[:revision])
         end
 
         Identifiers::Publication.new(**attributes)

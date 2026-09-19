@@ -123,17 +123,20 @@ RSpec.describe "Pubid::Amca index key (root.number)" do
       end
     end
 
-    # KNOWN GAP, pre-existing and deliberately not fixed here. The grammar
-    # captures the revision as a top-level `revision_year` on the publication
-    # node, but Builder#build_publication looks for it nested under
-    # `parsed[:revision][:revision_year]`, so it never reaches the object — and
-    # the grammar only captures "01" of "Rev. 01-23" anyway. `revision` is a
-    # real attribute now (it was a to_hash-invisible attr_reader), so it will
-    # carry data the moment the builder is fixed. Pinned so the gap stays
-    # visible. See hand-off asme-bpvc-and-amca-residue.
-    it "does not yet populate the publication revision" do
-      expect(Pubid::Amca.parse("AMCA Publication 211-22 (Rev. 01-23)")
-        .revision).to be_nil
+    # The grammar used to capture only "01" of "Rev. 01-23", and
+    # Builder#build_publication read it under `parsed[:revision]`, where the
+    # grammar never put it. The revision never reached the object.
+    it "keeps the whole publication revision" do
+      id = Pubid::Amca.parse("AMCA Publication 211-22 (Rev. 01-23)")
+      expect(id.revision).to eq("01-23")
+      expect(id.to_hash["revision"]).to eq("01-23")
+    end
+
+    it "tells two revisions of one publication apart" do
+      rev = Pubid::Amca.parse("AMCA Publication 211-22 (Rev. 01-23)")
+      plain = Pubid::Amca.parse("AMCA Publication 211-22")
+      expect(rev).not_to eq(plain)
+      expect(rev.to_urn).not_to eq(plain.to_urn)
     end
 
     it "keeps the interpretation code" do

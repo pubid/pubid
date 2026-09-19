@@ -46,10 +46,12 @@ module Pubid
               dot >>
               (
                 # SSC with complex subdivision: BPVC.SSC.XI.II.V.IX
-                (str("SSC") >> (dot >> roman_numeral).repeat(1).as(:ssc_sections)).as(:ssc_code) |
+                (str("SSC") >> dot >>
+                 (roman_numeral >> (dot >> roman_numeral).repeat)
+                   .as(:ssc_sections)).as(:ssc_code) |
                 # CC = Case Code: BPVC.CC.BPV or BPVC.CC.NC.XI
                 (str("CC") >> dot >> bpvc_letter_code.as(:case_code) >>
-                 (dot >> (roman_numeral | bpvc_letter_code)).maybe.as(:case_sub)) |
+                 (dot >> (roman_numeral | bpvc_letter_code).as(:case_sub)).maybe) |
                 # Standard roman numeral subdivision: BPVC.I or BPVC.III.1.NB
                 (roman_numeral.as(:section) >>
                  (dot >> (digits | bpvc_letter_code).as(:subsection)).maybe >>
@@ -129,6 +131,20 @@ module Pubid
         ).as(:designator)
       end
 
+      # A trailing edition year ("-2021", "-20XX") and nothing after it.
+      # `number_part` must not read it as a dash-separated number: a
+      # designator with no number ("BPVC.I-2021", "BPE-2012") then stored the
+      # year as its number, and the year itself was lost.
+      #
+      # The grammar cannot tell a year from a final 4-digit number: a code
+      # whose whole number is "-1234" would parse as year 1234. No ASME
+      # corpus id has that shape; spec/pubid/asme/root_number_spec.rb pins
+      # the choice.
+      rule(:trailing_year) do
+        dash >> (str("20XX") | str("202X") | (str("20") >> digit >> str("X")) |
+          digit.repeat(4, 4)) >> match("[0-9A-Z.]").absent?
+      end
+
       # Number part - can start with dot (NM.1), be dotted (16.5), OR dash-separated (BTH-1)
       rule(:number_part) do
         (
@@ -136,7 +152,7 @@ module Pubid
           (dot >> match("[0-9A-Z]").repeat(1) >>
            (dot >> match("[0-9A-Z]").repeat(1)).repeat) |
           # Dash-separated first (for BTH-1, CA-1 patterns)
-          (dash >> match("[0-9A-Z]").repeat(1) >>
+          (trailing_year.absent? >> dash >> match("[0-9A-Z]").repeat(1) >>
            (dot >> match("[0-9A-Z]").repeat(1)).repeat) |
           # Regular dotted numbers
           (match("[0-9A-Z]").repeat(1) >>
