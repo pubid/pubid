@@ -62,7 +62,8 @@ module Pubid
 
       # Publication revision (Rev. 01-23)
       rule(:revision) do
-        lparen >> str("Rev") >> dot.maybe >> space >> digits.as(:revision_year) >> dash >> digits >> rparen
+        lparen >> str("Rev") >> dot.maybe >> space >>
+          (digits >> dash >> digits).as(:revision) >> rparen
       end
 
       # Interpretation code (JW, KB, RG, AW, AH, or just a number)

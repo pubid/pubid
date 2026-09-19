@@ -1190,7 +1190,7 @@ ASME BPVC.CC.BPV-2021              # Case Code BPV
 
 Special Variants:
 ASME BPVC COMPLETE CODE BIND-2019  # Complete code set
-ASME BPVC-CC-BPV-2019              # Dash notation variant
+ASME BPVC-CC-BPV-2019              # Dash notation; ASME lists it apart from BPVC.CC.BPV
 ----
 
 .BPVC Components

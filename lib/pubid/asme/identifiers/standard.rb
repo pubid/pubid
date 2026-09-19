@@ -83,10 +83,15 @@ module Pubid
         # enumerated escape list. The output emptiness check matters: a value
         # made only of out-of-charset characters collapses to "", which is
         # truthy in Ruby and would reach the renderer as a blank segment.
+        #
+        # A literal "-" is written "--", because "." and "-" otherwise meet:
+        # ASME sells BPVC-CC-BPV (the 2019 code-case supplements) and
+        # BPVC.CC.BPV (the code-case book) as different documents. "_" is not
+        # an option — the MR format reserves it for supplement layers.
         def mr_sanitize(value)
           return nil if value.nil? || value.to_s.empty?
 
-          sanitized = value.to_s.downcase
+          sanitized = value.to_s.downcase.gsub("-", "--")
             .gsub(/[^a-z0-9-]+/, "-").gsub(/\A-+|-+\z/, "")
           sanitized.empty? ? nil : sanitized
         end
