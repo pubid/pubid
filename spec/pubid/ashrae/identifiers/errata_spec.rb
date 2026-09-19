@@ -71,10 +71,12 @@ RSpec.describe Pubid::Ashrae::Identifiers::Errata do
 
     # UrnGenerator::Base#urn_year reads `date` first, so the erratum year
     # would take the place of the standard year (urn:ashrae:14:2008). The
-    # ASHRAE generator reads the `year` attribute instead, and the supplement
-    # URN stays as it was (hand-off ashrae-supplement-urn-collapse).
-    it "keeps the erratum date out of the URN" do
-      expect(first.to_urn.to_s).to eq("urn:ashrae:14")
+    # ASHRAE generator reads the `year` attribute instead. The erratum date
+    # goes into the supplement marker at the end of the URN (hand-off
+    # ashrae-supplement-urn-collapse).
+    it "keeps the erratum date out of the year slot of the URN" do
+      expect(first.to_urn.to_s)
+        .to eq("urn:ashrae:14:2002:guideline:errata.2008-10-10")
       expect(Pubid::Ashrae.parse("ASHRAE Guideline 14-2002").to_urn.to_s)
         .to eq("urn:ashrae:14:2002:guideline")
     end
