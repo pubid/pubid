@@ -1141,6 +1141,26 @@ module Pubid
       all_parts == true
     end
 
+    # A new identifier for every part of this document: +all_parts+ is true,
+    # and `part`, `parts` and `subpart` are removed. The receiver does not
+    # change. The date and the stage stay, so chain `exclude(:date)` to
+    # remove the date. Nested identifiers lose their parts too (#exclude).
+    # Only some flavors print "(all parts)"; the others keep the flag for
+    # `===`, #includes? and the series URN.
+    # @return [Pubid::Identifier]
+    def to_all_parts
+      part_attrs = SubsetMatch::ALL_PARTS_ATTRIBUTES - [:all_parts]
+      exclude(*part_attrs).tap do |id|
+        # #exclude leaves nil in a collection, where from_hash gives [].
+        part_attrs.each do |name|
+          next unless self.class.collection_attribute?(name)
+
+          id.public_send(:"#{name}=", [])
+        end
+        id.all_parts = true
+      end
+    end
+
     # Self is an all-parts collection that covers +other+.
     def includes?(other)
       return false unless other.is_a?(::Pubid::Identifier)
