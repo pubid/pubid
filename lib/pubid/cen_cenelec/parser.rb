@@ -91,12 +91,20 @@ module Pubid
       # Edition (ED2, ED3, etc.)
       rule(:edition) { space >> str("ED") >> digits.as(:edition) }
 
-      # Fragment identifier (EN 60038 AMD1 FRAG2)
+      # Fragment identifier (EN 60038 AMD1 FRAG2, EN 60038/A1 FRAG2)
       rule(:fragment_identifier) do
-        (stage_prefix | publisher) >>
+        ((stage_prefix | publisher) >>
           space >> number >> parts >>
           space >> str("AMD") >> digits.as(:amendment_number) >>
-          space >> str("FRAG") >> digits.as(:fragment_number)
+          space >> str("FRAG") >> digits.as(:fragment_number)) |
+          # Compact supplement notation: the base may carry a year, the
+          # amendment uses the /A1 or +A1 join (with an optional year of
+          # its own) instead of the spelled-out "AMD1" keyword.
+          ((stage_prefix | publisher) >>
+            space >> number >> parts >> year.maybe >>
+            (plus | slash) >> str("A") >> digits.as(:amendment_number) >>
+            (colon >> digit.repeat(4, 4).as(:amendment_year)).maybe >>
+            space >> str("FRAG") >> digits.as(:fragment_number))
       end
 
       # Adopted standard as opaque string - must start with org name
