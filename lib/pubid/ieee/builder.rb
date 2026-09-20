@@ -726,6 +726,61 @@ module Pubid
           attributes[:ieee_draft] = "D#{draft_ver}" if draft_ver
         end
 
+        # The catalogue-PRINTED joint form - the parser tags the dash-year
+        # and ", Month YYYY" spellings (:printed_dash_year /
+        # :printed_month_year), and a date trailing the DRAFT marks the same
+        # printed family: "ISO/IEC/IEEE 21451-7, April 2011",
+        # "ISO/IEC/IEEE 13210-1994", "ISO/IEC/IEEE 42010/D8, June 2010".
+        # These are IEEE standards printed with joint publishers - a Standard
+        # carrying publisher/copublisher renders them as printed and
+        # serializes like every other standard, where the colon-year
+        # spelling stays an ISO-style JointDevelopment reference.
+        printed_joint = parsed[:iso_published] &&
+                        (parsed[:printed_dash_year] || parsed[:printed_month_year] ||
+                         (parsed[:draft_version] && parsed[:draft_month]) ||
+                         # A date-less stage-less joint reference carrying only a
+                         # parenthetical ("16326 (First edition 2009-12-15)") is
+                         # the same printed family; a colon-year row keeps :year,
+                         # so its parenthetical stays with the ISO joint form.
+                         (parsed[:year].nil? && parsed[:parameters].is_a?(Hash) &&
+                          parsed[:parameters][:parenthetical_content]))
+        if printed_joint
+          sep = parsed[:part_dash] ? "-" : "."
+          printed_code = [extract_value(parsed[:number]),
+                          extract_value(parsed[:part])].compact.join(sep)
+          printed_attrs = { publisher: attributes[:publisher],
+                            copublisher: attributes[:copublisher],
+                            typed_stage: Pubid::Ieee.locate_stage("Std") }
+          printed_draft = attributes[:ieee_draft]
+          if parsed[:printed_dash_year] && parsed[:month]
+            # A dash-year-month date belongs to the printed code, glued
+            # before any draft ("16326-2017-12/D5") - the render's month
+            # slot spells text months and would lose the printed form.
+            printed_code += "-#{attributes[:year]}"
+            printed_code += "-#{attributes[:month]}"
+          elsif parsed[:printed_dash_year]
+            # A bare dash-year is the identity year - an attribute, so the
+            # render attaches it exactly as printed ("21451.7-2011").
+            printed_attrs[:year] = attributes[:year]
+          elsif parsed[:printed_month_year]
+            printed_attrs[:year] = attributes[:year]
+            printed_attrs[:month] = attributes[:month]
+          elsif parsed[:draft_month]
+            # The date trails the draft itself ("D8, June 2010"); keep it
+            # inside the draft so the code stays date-less.
+            printed_draft = "#{printed_draft}, #{extract_value(parsed[:draft_month])} "                             "#{extract_value(parsed[:draft_year])}"
+          end
+          printed_attrs[:code] = printed_code
+          printed_attrs[:draft] = printed_draft if printed_draft
+          printed_attrs[:edition] = attributes[:edition] if attributes[:edition]
+          printed_attrs[:edition_month] = attributes[:edition_month] if attributes[:edition_month]
+          if parsed[:parameters].is_a?(Hash) && parsed[:parameters][:parenthetical_content]
+            printed_attrs[:parenthetical_content] =
+              extract_value(parsed[:parameters][:parenthetical_content])
+          end
+          return Identifiers::Standard.new(**printed_attrs.compact)
+        end
+
         # Detect lead party based on pattern
         if parsed[:iso_stage]
           # ISO format - lead party is ISO
