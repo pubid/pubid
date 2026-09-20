@@ -77,13 +77,19 @@ module Pubid
           end
         end
 
-        # Instantiate the identifier based on the typed stage
-        identifier = locate_identifier_klass(parsed_hash).new
-
-        # For French GUIDE entries: "Guide ISO/CEI 37:1995"
+        # For French GUIDE entries: "Guide ISO/CEI 37:1995". The rename
+        # must happen BEFORE class selection — locate_identifier_klass
+        # reads :type_with_stage, and the tree of a guide-first spelling
+        # carries an empty :type_with_stage plus the type under
+        # :type_with_stage_fr, so deferring the rename selected the
+        # default International Standard class for every guide-first
+        # (and Cyrillic "Руководства ИСО …") reference.
         if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
           parsed_hash[:type_with_stage] = type_with_stage_fr
         end
+
+        # Instantiate the identifier based on the typed stage
+        identifier = locate_identifier_klass(parsed_hash).new
 
         # For DirectivesSupplement, rename :publisher to :supplement_publisher
         if identifier.is_a?(Identifiers::DirectivesSupplement) && parsed_hash[:publisher]
