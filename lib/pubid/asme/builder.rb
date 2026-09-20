@@ -107,8 +107,16 @@ module Pubid
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:ssc_code]
             # BPVC.SSC.XI.II.V.IX pattern. The sections sit under `ssc_code`;
             # reading them one level up rendered every SSC id as "BPVC.SSC.".
-            sections = bpvc_data[:subdivision][:ssc_code][:ssc_sections]
-            designator_str = "BPVC.SSC.#{sections}"
+            # A bare "BPVC.SSC." (the catalogue's series identity) parses
+            # with no inner capture, so `ssc_code` is the matched Slice.
+            ssc_code = bpvc_data[:subdivision][:ssc_code]
+            sections = ssc_code.is_a?(Hash) ? ssc_code[:ssc_sections] : nil
+            designator_str =
+              if sections.nil? || sections.to_s.empty?
+                "BPVC.SSC."
+              else
+                "BPVC.SSC.#{sections}"
+              end
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:case_code]
             # BPVC.CC.BPV or BPVC.CC.NC.XI - extract from subdivision hash
             cc = bpvc_data[:subdivision][:case_code].to_s
