@@ -37,6 +37,11 @@ module Pubid
       def initialize(input)
         @input = input.to_s.strip
         @cleaned = Core::UpdateCodes.apply(@input, :nist)
+        # The format describes the string the parser will see: capture
+        # it right after the update-codes remap, before the stages'
+        # cosmetic spacing (a dotted catalogue alias that remaps to the
+        # space form renders short; the dotted originals stay :mr).
+        @format = @cleaned.include?(".") && !@cleaned.match?(/\s/) ? :mr : :short
       end
 
       # Run every normalization stage and return a Result.
@@ -53,6 +58,14 @@ module Pubid
       # Extracted so rubocop can scope length/ABC metrics narrowly.
       # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       def run_stages
+        # Short-form "supprev" is the catalogue spelling of the plain
+        # supplement ("NBS CIRC 154supprev" ≡ "NBS CIRC 154sup"; the
+        # revision-bearing identity is the mr spelling "154suprev").
+        # Rewrite before the supplement/revision stages; the mr form is
+        # untouched.
+        if detected_format == :short
+          @cleaned = @cleaned.gsub("supprev", "sup")
+        end
         normalize_spurious_u_suffix!
         normalize_publisher_and_series!
         normalize_lcirc_supplement_contexts!
@@ -75,12 +88,14 @@ module Pubid
         normalize_part_notation!
         normalize_series_specific_spacing!
         normalize_verbose_keywords!
+        normalize_legacy_corpus_spellings!
       end
       # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-      # Detect input format: :mr (dot-separated machine-readable) or :short.
+      # Detect input format: :mr (dot-separated machine-readable) or
+      # :short. Frozen in #initialize (post update-codes, pre-stages).
       def detected_format
-        @input.include?(".") && !@input.match?(/\s/) ? :mr : :short
+        @format
       end
 
       private
@@ -167,12 +182,21 @@ module Pubid
       # Trailing "-a" → "-A" at end of identifier.
       def uppercase_dash_letter!
         @cleaned = @cleaned.gsub(/(\d)-([a-z])$/) { "#{$1}-#{$2.upcase}" }
+        # Same letter when a part tail follows ("-add", " Add."), so the
+        # canonical case survives; lowercase update/translation codes
+        # ("-upd", ".uppl") never match (next char is a letter).
+        @cleaned = @cleaned.gsub(/(\d)-([a-z])(?=[-.\s])/) { "#{$1}-#{$2.upcase}" }
       end
 
       # Trailing "a" → "A" when attached directly to a digit (excludes
       # "r" to preserve revision+year patterns like "73-197r").
       def uppercase_trailing_letter!
         @cleaned = @cleaned.gsub(/(\d)([a-z&&[^r]])$/) { "#{$1}#{$2.upcase}" }
+        # Same letter when an addendum tail follows ("-add", " Add."),
+        # so the canonical part case survives ("800-38a-add" ->
+        # "800-38A"); part digits ("800-85a-1") and update/translation
+        # codes ("-upd", ".uppl") never match.
+        @cleaned = @cleaned.gsub(/(\d)([a-z&&[^r]])(?=\s*[-.\s]\s*[aA]dd)/) { "#{$1}#{$2.upcase}" }
       end
 
       # Letter suffix on revision: "22r1a" → "22r1A".
@@ -334,6 +358,33 @@ module Pubid
           year = Regexp.last_match(2).to_i
           year.between?(1901, 2099) ? "#{prefix.upcase}e#{year}" : match
         end
+      end
+
+      # Legacy corpus spellings: catalogue forms the mr grammar and the
+      # renderers cannot round-trip on their own. Each rule mirrors an
+      # already-parseable spelling of the same document.
+      def normalize_legacy_corpus_spellings!
+        # The mr renderer prints the translation code with its own
+        # leading dot ("955-S..uppl"); the parser wants one dot.
+        @cleaned = @cleaned.gsub("..", ".")
+        # Trailing-dot addendum spelling; the canonical render comes from
+        # the lowercase ".add" parse ("NBS.TN.467pt1.Add." -> ".add").
+        @cleaned = @cleaned.gsub(/\.Add\.\z/, ".add")
+        # Edition glued to the series in mr form ("NBS.CIRCe2" is
+        # "NBS.CIRC.e2"; digits before "e" are untouched: "24e7", and
+        # the short form never glues an edition to a letter part:
+        # "150-1Ae2009").
+        if detected_format == :mr
+          @cleaned = @cleaned.gsub(/([A-Z])e(\d)/, '\1.e\2')
+        end
+        # Update markers without a number render a phantom "1";
+        # "…-upd" is the numberless spelling of "…-upd1".
+        @cleaned = @cleaned.gsub(/-upd\z/, "-upd1")
+        # Handbook legacy renumbering in the all-dash spelling: the
+        # e-form stage already eats the prefix generically ("HB
+        # 150-1e2017" -> "HB 1-2017"); the all-dash form carries the
+        # same 105-/150- prefixes.
+        @cleaned = @cleaned.gsub(/\b(NIST HB\s+)(?:105|150)-(\d+)-(\d{4})(?=\s|\z)/, '\1\2-\3')
       end
 
       # Series-specific reverts: HB handbooks, OWMWP dates, and RPT year
