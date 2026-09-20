@@ -393,7 +393,10 @@ module Pubid
 
         # Build the addendum_codes string from first code and additional codes
         first_code = extract_value(parsed[:addendum_code])
+        # The "a through z" range form yields a single Hash, not an
+        # Array; iterating it would emit the key name into the codes.
         additional_codes = parsed[:additional_codes]
+        additional_codes = [additional_codes] if additional_codes.is_a?(Hash)
 
         # Handle Format 4: "ASHRAE Addenda to Standard" (no specific codes)
         if first_code.nil? && additional_codes.nil?
