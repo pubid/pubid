@@ -218,7 +218,8 @@ module Pubid
         # Detect CSA adoption of international standards
         # Examples: CSA ISO/IEC TR 12785-3:15, CSA CISPR 16-1-1:18, CSA IEC 60601-1:08
         #          CSA CEI/IEC 61000-4-28-01 (bilingual)
-        if input.match?(/^CSA (ISO\/IEC|CEI\/IEC|CISPR|IEC|CEI|ISO)\s/)
+        #          CSA IWA 18:17 (the catalogue also drops the ISO keyword)
+        if input.match?(/^CSA (ISO\/IEC|CEI\/IEC|CISPR|IEC|CEI|ISO|IWA)\s/)
           # This is CSA adoption of international standard
           # Extract the wrapped standard portion
           wrapped_input = input.sub(/^CSA\s+/, "")
@@ -490,6 +491,17 @@ module Pubid
             # Normalize CEI/IEC to IEC for parsing (CEI is French for IEC)
             normalized_input = input.sub(/^CEI\/IEC/, "IEC")
             return Pubid::Iso.parse(normalized_input)
+          rescue StandardError
+            return nil
+          end
+        end
+
+        # The catalogue also prints the IWA designation without the ISO
+        # keyword ("CAN/CSA-IWA 18:17" beside "CAN/CSA-ISO IWA 18:17");
+        # the ISO parser wants the ISO/ prefix.
+        if input.match?(/^IWA\s/)
+          begin
+            return Pubid::Iso.parse(input.sub(/^IWA\s/, "ISO/IWA "))
           rescue StandardError
             return nil
           end
