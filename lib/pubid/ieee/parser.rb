@@ -536,7 +536,9 @@ module Pubid
 
       # Additional parameters (inside parentheses)
       rule(:additional_parameters) do
-        (space.maybe >> str("(") >> # Make space before '(' optional
+        (space.maybe >> str("(") >> space.maybe >> # Space before/after '(' optional
+         # ("( Revision of …)" - a crawl space inside the paren must not push
+         # the narrative to the catch-all and into the render).
          (reaffirmed |
           # Handle "Revision of IEEE Std ..." with optional space after Std
           (str("Revision of IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |

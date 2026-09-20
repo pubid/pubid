@@ -735,9 +735,15 @@ module Pubid
         # carrying publisher/copublisher renders them as printed and
         # serializes like every other standard, where the colon-year
         # spelling stays an ISO-style JointDevelopment reference.
+        # A stage-WORD draft (CD, DIS, FDIS, DCD... letters, not a D-number)
+        # belongs to the joint/project-draft family even with a trailing date -
+        # its canonical renders drop the P and keep the joint spelling, so it
+        # must not become a printed Standard (which keeps the code's P).
+        numeric_draft = parsed[:draft_version] &&
+                        extract_value(parsed[:draft_version]).to_s.match?(/\A\d/)
         printed_joint = parsed[:iso_published] &&
                         (parsed[:printed_dash_year] || parsed[:printed_month_year] ||
-                         (parsed[:draft_version] && parsed[:draft_month]) ||
+                         (numeric_draft && parsed[:draft_month]) ||
                          # A date-less stage-less joint reference carrying only a
                          # parenthetical ("16326 (First edition 2009-12-15)") is
                          # the same printed family; a colon-year row keeps :year,
@@ -1064,8 +1070,15 @@ module Pubid
         # Create code string with parts
         code_str = extract_value(parsed[:number])
 
-        # Extract type and draft_status for typed_stage lookup
+        # Extract type and draft_status for typed_stage lookup. The
+        # historical "No"-prefixed spellings ("IEEE No148, April 1959") are
+        # plain standards - the No normalizes to Std so the render prints
+        # "IEEE Std 148" and the stage lookup resolves.
         type_value = extract_value(parsed[:type])
+        # AIEE keeps its historical "No" type; IEEE's No-forms are plain
+        # standards ("IEEE No148" prints "IEEE Std 148").
+        type_value = "Std" if type_value&.match?(/\ANo\.?\z/) &&
+                               original_input.to_s.match?(/\AIEEE\s/)
         draft_status_value = extract_value(parsed[:draft_status])
 
         # Handle case where parser captured number without "P" prefix
