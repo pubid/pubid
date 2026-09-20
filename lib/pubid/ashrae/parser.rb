@@ -254,9 +254,9 @@ module Pubid
           (
             (comma >> space >> str("and") >> space >> addendum_code) | # ", and b"
             (space >> str("and") >> space >> addendum_code) |  # "and b"
-            (comma >> space >> addendum_code).repeat(1, 10) |  # comma-separated: "a, b, c"
-            (comma >> addendum_code).repeat(1, 10) # comma without space: "a,b,c"
-          ).repeat(0, 3).as(:additional_codes) >> # Multiple groups of codes (0-3 to allow single code)
+            (comma >> space >> addendum_code).repeat(1, 50) |  # comma-separated: "a, b, c"
+            (comma >> addendum_code).repeat(1, 50) # comma without space: "a,b,c"
+          ).repeat(0, 20).as(:additional_codes) >> # Multiple groups of codes
           space >>
           (str("to") | str("for")) >> space >>
           ((str("ANSI") >> slash >> str("ASHRAE") >> (slash >> letter.repeat(3, 10)).repeat(
@@ -360,11 +360,11 @@ module Pubid
               # Range pattern: "a through z"
               (space >> str("through") >> space >> addendum_code) |
               # Space or comma separated codes (handles typos like "bl bq")
-              ((space | (comma >> space)) >> addendum_code).repeat(1, 50) |
+              ((space | (comma >> space)) >> addendum_code).repeat(1, 200) |
               # Just match all comma-separated values
-              (comma >> space >> addendum_code).repeat(1, 50) |
+              (comma >> space >> addendum_code).repeat(1, 200) |
               # Or comma without space
-              (comma >> addendum_code).repeat(1, 50)
+              (comma >> addendum_code).repeat(1, 200)
             ).as(:additional_codes).maybe >>
             (space >> additional_copublisher).maybe >>
             addendum_date_suffix.maybe >>
@@ -485,6 +485,28 @@ module Pubid
           # Format: ASHRAE Addendum X to ASHRAE Standard/Guideline X-YYYY (same publisher repeated)
           (
             publisher.as(:publisher) >> space >>
+            str("Addendum") >> space >>
+            addendum_code >>
+            space >>
+            (str("to") | str("for")) >> space >>
+            publisher.as(:base_publisher) >> space >>
+            type.as(:type) >> space >>
+            code >>
+            (dash >> year_digits.as(:year)).maybe >>
+            additional_copublisher.maybe >>
+            addendum_date_suffix.maybe >>
+            errata_suffix_on_addendum.maybe >>
+            optional_suffix.repeat(0, 2)
+          ).as(:publisher_base_addendum) |
+          # Format: [ANSI/ASHRAE] Addendum X to/for ASHRAE Standard/Guideline
+          # X-YYYY (leading copublisher + publisher-led base)
+          (
+            (
+              (str("ANSI") >> slash >> str("ASHRAE") >> (slash >> letter.repeat(3, 10)).repeat(
+                0, 10
+              )).as(:copublisher) >>
+              space
+            ).maybe >>
             str("Addendum") >> space >>
             addendum_code >>
             space >>
