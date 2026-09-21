@@ -130,8 +130,10 @@ RSpec.describe "JIS Integration" do
       all_parts_id = Pubid::Jis.parse("JIS C 0617（規格群）")
       specific_id = Pubid::Jis.parse("JIS C 0617-2:2017")
 
-      expect(all_parts_id).to eq(specific_id)
-      expect(specific_id).to eq(all_parts_id)
+      # An all-parts identifier is its own class, so `===` matches and `==`
+      # compares.
+      expect(all_parts_id === specific_id).to be true
+      expect(all_parts_id).not_to eq(specific_id)
     end
 
     it "does not match identifiers with different series" do
