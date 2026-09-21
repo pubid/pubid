@@ -13,6 +13,7 @@ module Pubid
       }.freeze
 
       def build(parsed_hash)
+        all_parts = parsed_hash.delete(:all_parts)
         typed_stage = Pubid::Idf.locate_stage(parsed_hash[:type_with_stage])
         identifier = Pubid::Idf.locate_type(typed_stage.type_code).new
 
@@ -21,7 +22,9 @@ module Pubid
         end
 
         assign_attributes(identifier, parsed_hash)
-        identifier
+        # "(all parts)" names every part of the document, so it wraps the
+        # document, which holds no mark itself.
+        all_parts ? identifier.to_all_parts : identifier
       end
 
       private

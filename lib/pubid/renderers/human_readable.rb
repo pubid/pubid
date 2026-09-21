@@ -12,7 +12,6 @@ module Pubid
         parts << render_edition_portion(context) if with_edition
         result = parts.compact.join(" ")
         result << render_language_portion(context, with_edition: with_edition)
-        result << " (all parts)" if @id.all_parts
         result
       end
 

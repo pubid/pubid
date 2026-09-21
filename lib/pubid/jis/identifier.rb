@@ -7,6 +7,11 @@ module Pubid
     # Pubid::Jis::Identifiers descend from this class, so a parsed JIS id is an
     # instance of Pubid::Jis::Identifier.
     class Identifier < ::Pubid::Identifier
+      # JIS prints its own all-parts suffix, "（規格群）".
+      def self.all_parts_class
+        Identifiers::AllParts
+      end
+
       # JIS keeps its number flat at the top level (string, to preserve leading
       # zeros like "0205"), with the division letter in `series` and any
       # multi-level part numbers in `parts`. Supplements override `number` with
@@ -16,9 +21,6 @@ module Pubid
       attribute :parts, :string, collection: true # Optional multi-level parts
       attribute :year, :integer
       attribute :language, :string # "E" or "J"
-      # Boolean flags carry no default, so they stay nil (and are omitted from
-      # the serialized hash) unless actually set true.
-      attribute :all_parts, :boolean
       # Reaffirmation (再確認): a trailing "R" on the year marks an edition
       # that was reaffirmed without revision (e.g. ":2019R").
       attribute :reaffirmed, :boolean
@@ -50,7 +52,6 @@ module Pubid
         map "parts", to: :parts
         map "year", to: :year
         map "language", to: :language
-        map "all_parts", to: :all_parts
         map "reaffirmed", to: :reaffirmed
         # render_empty keeps a bare "SYMBOL" (empty-string value) in the hash so
         # it round-trips distinctly from "no symbol" (nil).
@@ -61,10 +62,6 @@ module Pubid
       # so it doesn't shadow the inherited lutaml `publisher` attribute, which
       # would otherwise fail serialization type validation.
       PUBLISHER = "JIS"
-
-      def all_parts?
-        all_parts == true
-      end
 
       def reaffirmed?
         reaffirmed == true
@@ -91,23 +88,14 @@ module Pubid
         result
       end
 
-      # Comparison with all_parts logic
-      # When either identifier has all_parts=true, compare only series and number
       def ==(other)
         return false unless other.is_a?(Identifier)
 
-        if all_parts? || other.all_parts?
-          # Compare only series and number, ignore year, parts, all_parts
-          return series == other.series && number == other.number
-        end
-
-        # Normal full comparison
         series == other.series &&
           number == other.number &&
           (parts || []) == (other.parts || []) &&
           year == other.year &&
           language == other.language &&
-          all_parts? == other.all_parts? &&
           reaffirmed? == other.reaffirmed? &&
           symbol == other.symbol
       end

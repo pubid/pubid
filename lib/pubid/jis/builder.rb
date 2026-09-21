@@ -20,6 +20,9 @@ module Pubid
                        build_single_identifier(data)
                      end
         attach_symbol(identifier, data)
+        # "(all parts)" names every part of the document, so it wraps the
+        # document, which holds no mark itself.
+        data[:all_parts] ? identifier.to_all_parts : identifier
       end
 
       private
@@ -37,7 +40,6 @@ module Pubid
           parts: extract_part_strings(data[:parts]),
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
-          all_parts: (true if data[:all_parts]),
           reaffirmed: (true if data[:reaffirmed]),
         }
 

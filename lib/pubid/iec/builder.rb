@@ -28,6 +28,8 @@ module Pubid
       end
 
       def build(parsed_hash)
+        all_parts = parsed_hash.delete(:all_parts)
+
         # Handle sheet_supplement_identifier pattern:
         # {base: {...}, sheet_number: ..., sheet_year: ..., type_with_stage: "COR", number_with_part: "1", date: "1995"}
         # This is a Corrigendum/Amendment wrapping a SheetIdentifier
@@ -218,7 +220,9 @@ module Pubid
                                      vap_suffix_data)
         end
 
-        identifier
+        # "(all parts)" and the "ser" URN slot name every part of the
+        # document, so they wrap the document, which holds no mark itself.
+        all_parts ? identifier.to_all_parts : identifier
       end
 
       def handle_key(identifier, key, value)

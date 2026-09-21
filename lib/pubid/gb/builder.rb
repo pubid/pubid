@@ -17,14 +17,17 @@ module Pubid
       def build(data)
         code, mandate = split_mandate(data[:publisher_code].to_s)
 
-        Identifiers::Standard.new(
+        identifier = Identifiers::Standard.new(
           publisher: ::Pubid::Components::Publisher.new(body: code),
           mandate: mandate || data[:mandate]&.to_s,
           number: data[:number].to_s,
           part: data[:part]&.to_s,
           date: date_for(data[:year]),
-          all_parts: !data[:all_parts].to_s.empty?,
         )
+
+        # "(all parts)" names every part of the document, so it wraps the
+        # document, which holds no mark itself.
+        data[:all_parts].to_s.empty? ? identifier : identifier.to_all_parts
       end
 
       private

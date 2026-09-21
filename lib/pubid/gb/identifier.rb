@@ -7,6 +7,11 @@ module Pubid
     # descend from this class, so a parsed GB id is always an instance of
     # Pubid::Gb::Identifier.
     class Identifier < ::Pubid::Identifier
+      # The all-parts identifier of this flavor.
+      def self.all_parts_class
+        Identifiers::AllParts
+      end
+
       # The issuing body code as printed — "GB", "JB", "GBn", "T/GZAEPI" —
       # lives in the `publisher` attribute inherited from ::Pubid::Identifier.
       # The flat-scalar hooks below serialize it as a bare string, and the
@@ -25,8 +30,6 @@ module Pubid
       # uses the dotted form (e.g. "5606.1" => number "5606", part "1").
       attribute :part, :string
 
-      # All-parts flag — true for "GB/T 5606 (all parts)" forms.
-      attribute :all_parts, :boolean, default: -> { false }
 
       # Polymorphic type map for lutaml key_value (de)serialization.
       GB_TYPE_MAP = {
@@ -44,7 +47,6 @@ module Pubid
         map "number", to: :number
         map "part", to: :part
         map "date", to: :date
-        map "all_parts", to: :all_parts, render_default: false
       end
 
       PUBLISHER = "CN"

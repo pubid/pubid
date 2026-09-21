@@ -41,7 +41,6 @@ module Pubid
         end
 
         id = Pubid::Iec::Identifier.parse(code)
-        id.all_parts = true if all_parts && id.class.attributes.key?(:all_parts)
         # The language slot joins codes with a hyphen ("en-fr"). Building one
         # Language from the whole field gave a single bogus language that
         # rendered as "(en-fr)".
@@ -50,7 +49,9 @@ module Pubid
             ::Pubid::Components::Language.new(code: code)
           end
         end
-        id
+        # The "ser" slot names every part of the document, so it wraps the
+        # document it just built.
+        all_parts ? id.to_all_parts : id
       end
 
       private
