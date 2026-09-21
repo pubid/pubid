@@ -9,7 +9,7 @@ RSpec.describe Pubid::Ieee::Parser do
         result = Pubid::Ieee.parse("IEEE/CSA P844.1-2017")
         expect(result).to be_a(Pubid::Ieee::Identifiers::JointDevelopment)
         expect(result.publishers.to_s).to include("IEEE")
-        expect(result.code.to_s).to eq("844.1")
+        expect(result.code.to_s).to eq("P844.1")
       end
 
       it "parses IEEE/CSA dual numbering format" do

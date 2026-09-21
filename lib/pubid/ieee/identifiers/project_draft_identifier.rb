@@ -33,10 +33,17 @@ module Pubid
         # object. The "P" is reflected in the typed_stage, not in the Code
         # component itself. Accepts keyword args or a single positional hash (the
         # base #exclude/matching rebuild passes the latter).
+        attribute :project_marker, :boolean, default: -> { false }
+
         def initialize(args = {}, **kwargs)
           args = kwargs.empty? ? args.dup : args.merge(kwargs)
-          # If code is provided with "P" prefix (e.g., "P1234"), strip it
+          # If code is provided with "P" prefix (e.g., "P1234"), strip it.
+          # P = project (the document is a draft): the marker is
+          # identity-bearing, so its presence is remembered for the render —
+          # stripping the letter must not strip the fact (docs/
+          # IEEE-DRAFT-STAGES.md §1.1).
           if args[:code].is_a?(String) && args[:code].start_with?("P")
+            args[:project_marker] = true unless args.key?(:project_marker)
             args[:code] = args[:code][1..] # Strip leading "P"
           end
 

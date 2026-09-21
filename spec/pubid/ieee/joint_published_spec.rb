@@ -10,7 +10,7 @@ require "spec_helper"
 # keep their own inputs.
 RSpec.describe "IEEE stage-less joint published form" do
   [
-    "ISO/IEC/IEEE 26511:2018",
+    "ISO/IEC/IEEE P26511:2018",
     "ISO/IEC/IEEE 9945:2009(E)",
     "ISO/IEEE 11073-20101:2004(E)",
     "ISO/IEC/IEEE 29119-4:2021",

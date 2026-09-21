@@ -687,6 +687,8 @@ module Pubid
         if code_str && !code_parts.empty?
           code_str += ".#{code_parts.join('.')}"
         end
+        # P = project (a draft): identity-bearing, preserved as spelled.
+        code_str = "P#{code_str}" if parsed[:project_marker] && code_str
         attributes[:code] = code_str
 
         # Extract year (and optional numeric month, e.g. the -MM of a historical
@@ -726,6 +728,26 @@ module Pubid
           attributes[:ieee_draft] = "D#{draft_ver}" if draft_ver
         end
 
+        # The joint stage-draft clause (docs/IEEE-DRAFT-STAGES.md §1.3):
+        # variant 1's compound tail composes onto the IEEE ordinal
+        # ("D5=DIS.3"); variant 1b is the ordinal-less stage draft whose
+        # date rides inside the designator ("D=CDV:2020").
+        if parsed[:draft_iso_stage]
+          stage = extract_value(parsed[:draft_iso_stage])
+          joint_draft = if parsed[:draft_version]
+                          "D#{draft_ver}=#{stage}"
+                        else
+                          "D=#{stage}"
+                        end
+          if parsed[:draft_iso_iteration]
+            joint_draft += ".#{extract_value(parsed[:draft_iso_iteration])}"
+          end
+          if parsed[:draft_stage_year]
+            joint_draft += ":#{extract_value(parsed[:draft_stage_year])}"
+          end
+          attributes[:ieee_draft] = joint_draft
+        end
+
         # The catalogue-PRINTED joint form - the parser tags the dash-year
         # and ", Month YYYY" spellings (:printed_dash_year /
         # :printed_month_year), and a date trailing the DRAFT marks the same
@@ -754,6 +776,8 @@ module Pubid
           sep = parsed[:part_dash] ? "-" : "."
           printed_code = [extract_value(parsed[:number]),
                           extract_value(parsed[:part])].compact.join(sep)
+          # P = project: the marker is identity, preserved as spelled.
+          printed_code = "P#{printed_code}" if parsed[:project_marker]
           printed_attrs = { publisher: attributes[:publisher],
                             copublisher: attributes[:copublisher],
                             typed_stage: Pubid::Ieee.locate_stage("Std") }
@@ -1250,6 +1274,19 @@ module Pubid
       # @param parsed [Hash] the full parsed data
       # @return [String, nil] the abbreviation to use for stage lookup
       def determine_stage_abbr(type_value, _draft_status_value, parsed)
+        # An explicit joint stage on the draft ("=DFDIS.3") IS the stage —
+        # it outranks the ordinal ladder, which classifies IEEE-internal
+        # drafts only (docs/IEEE-DRAFT-STAGES.md §1.3).
+        draft_hash = parsed[:draft].is_a?(Array) ? parsed[:draft].inject({}, :merge) : parsed[:draft]
+        if draft_hash.is_a?(Hash) && draft_hash[:draft_iso_stage]
+          stage = extract_value(draft_hash[:draft_iso_stage]).to_s
+          # The doubled-D alias ("DFDIS") carries its own draft marker;
+          # the stage is what remains.
+          stage = stage[1..] if stage.start_with?("D") &&
+                                %w[PWI NP WD CD CDV DIS FDIS].include?(stage[1..])
+          return stage
+        end
+
         # Check for specific draft notation (D1, D2, etc.)
         if parsed[:draft]
           draft_data = parsed[:draft]
@@ -1384,6 +1421,11 @@ module Pubid
 
           revision = extract_value(draft_data[:revision]) if draft_data[:revision]
 
+          # The compound both-systems form (docs/IEEE-DRAFT-STAGES.md
+          # §1.3): the stage half of "=DDIS.3".
+          iso_stage = extract_value(draft_data[:draft_iso_stage]) if draft_data[:draft_iso_stage]
+          iso_iteration = extract_value(draft_data[:draft_iso_iteration]) if draft_data[:draft_iso_iteration]
+
           # Extract date information from draft data
           month_slice = draft_data[:month]
           month = extract_value(month_slice) if month_slice
@@ -1406,14 +1448,17 @@ module Pubid
           version = extract_value(draft_data)
         end
 
-        # Create Draft component object if we have version info
-        if version
+        # Create Draft component object if we have version info (or a
+        # compound stage half without an ordinal, "D=CDV:2020")
+        if version || draft_data.is_a?(Hash) && draft_data[:draft_iso_stage]
           draft_obj = Components::Draft.new(
             version: version,
             revision: revision,
             month: month,
             year: year,
             day: day,
+            iso_stage: iso_stage,
+            iso_iteration: iso_iteration,
           )
           draft_obj.comma_before_month = comma_before_month
           attributes[:draft_obj] = draft_obj

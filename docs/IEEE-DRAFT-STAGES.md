@@ -86,11 +86,16 @@ names both:
 > the DIS stage document.
 
 - The left side is always the IEEE ordinal (`D<n>`); the right side is
-  always `D`+stage (`D=DIS` marker, §1.2). The `=` is the separator
-  between the two numbering systems — it reads as "equal to stage".
-- The corpus observes the glued aliases `DDIS3`/`DDIS-3` when only the
-  stage iteration exists (§1.2); the dot in the compound form exists so
-  the two numerals can never be read as one number.
+  the bare ISO/IEC stage. `D` appears ONCE per designator — the left
+  ordinal's D already says "draft", and `=` binds the stage: **D5 =
+  draft five; =DIS — the DIS**. The corpus's doubled spellings
+  (`=DDIS.3`, `=DDIS3`, `=DDIS-3`) are accepted aliases that normalize
+  to `=DIS.3`.
+- When only ONE system applies, use its plain form: an IEEE-tracked
+  draft is `D5` (§1.1); a stage-tracked draft is `D=<STAGE>` (`D=CDV`),
+  optionally with its date (`D=CDV:2020`). The compound form exists
+  precisely for the case where dropping either half would lose
+  information.
 - When only ONE system applies, use its plain form: an IEEE-tracked
   draft is `D5` (§1.1); a stage-tracked draft is `DDIS.3`'s right half
   alone, spelled `DDIS3` (§1.2). The compound form exists precisely for
@@ -114,7 +119,8 @@ Each spelling below parses; the corpus row count is given.
 | 3 | **Embedded stage** — `JOINT NUMBER[.part].STAGE` | `ISO/IEC/IEEE 12207.CD2.1410, October 2014` | 7 |
 | 4 | **Native ordinal draft** — `IEEE [status] [Std] [P]NUMBER/Dn[.rev][letter][, date]` | `IEEE Std 802.3/D2.0` | 5,145 |
 | 5 | **Underscore dialects** — `_` as the separator (`…_FDIS`, `…_D3`), pre-normalized to `/` before parsing | `IEC/IEEE P63113 CDV, May 2020` | (aliases) |
-| 6 | **Compound (both systems)** — `IEEE [P]NUMBER/D<ordinal>=D<STAGE>.<iter>` | `IEEE P24748-5/D5=DDIS.3` | (defined, none yet) |
+| 6 | **Compound (both systems)** — `IEEE [P]NUMBER/D<ordinal>=<STAGE>[.iter]` | `IEEE P24748-5/D5=DIS.3` | (defined, none yet) |
+| 7 | **Ordinal-less stage draft** — `JOINT PNUMBER/D=<STAGE>[:year]` | `IEC/IEEE P63113/D=CDV:2020` | (defined, none yet) |
 
 Rules:
 
@@ -187,8 +193,10 @@ Rules:
 ## 6. What this spec defines vs reports
 
 - **Defined here:** the `D`-marker semantics for joint stage drafts
-  (§1.2), the compound both-systems form `D5=DDIS.3` (§1.3), the
-  equivalence of stage positions (§2), the monthcode rule (§1.2), the
-  P-retention asymmetry (§2), the intended IEC/IEEE URN (§5).
+  (§1.2), the compound both-systems form `D5=DIS.3` and the
+  ordinal-less `D=<STAGE>` form (§1.3), the equivalence of stage
+  positions (§2), the monthcode rule (§1.2), the P-state identity rule
+  (§1.1: P is never added or dropped by a render), and the IEC/IEEE
+  URN (§5 — implemented: `urn:ieee:iec-ieee:61886-1:draft./D2`).
 - **Reported (observed, pinned by the corpus):** the D-ordinal ladder
   (§1.1 — registry data), every render row in §4, the URN shapes in §5.
