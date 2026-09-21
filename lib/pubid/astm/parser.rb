@@ -110,7 +110,10 @@ module Pubid
         digits.as(:number) >>
           (
             str("HOL").as(:hol_suffix) |
-            (data_series_suffix >> data_series_subseries_no_dash.maybe) |
+            # A letter suffix may carry its subseries with the dash
+            # spelled out too ("DS55S-S1"), not only glued ("DS55S1").
+            (data_series_suffix >>
+              (data_series_subseries_no_dash | data_series_subseries_with_dash).maybe) |
             data_series_subseries_with_dash
           ).maybe
       end

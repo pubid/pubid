@@ -269,6 +269,10 @@ module Pubid
       rule(:draft_date) do
         # Enhanced to handle: ", Sept 2008" or " Sept 2008" or ", Month Year"
         ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year)) |
+          # Space-separated bare year after the draft designator
+          # ("IEEE Draft Std P14764/D1 2004, Nov 2004" - the "D1 2004" draft
+          # carries its own year, with the print date still trailing).
+          (space >> year_digits.as(:year)) |
           # Numeric-month form ", 05 2007" / " 05 2007" — no text month name. The
           # year separator may be a dash: preprocessing (parser.rb ~1278) rewrites
           # a trailing " <digits> <year>" to "<digits>-<year>", so "05 2007"
@@ -532,7 +536,9 @@ module Pubid
 
       # Additional parameters (inside parentheses)
       rule(:additional_parameters) do
-        (space.maybe >> str("(") >> # Make space before '(' optional
+        (space.maybe >> str("(") >> space.maybe >> # Space before/after '(' optional
+         # ("( Revision of …)" - a crawl space inside the paren must not push
+         # the narrative to the catch-all and into the render).
          (reaffirmed |
           # Handle "Revision of IEEE Std ..." with optional space after Std
           (str("Revision of IEEE Std ") >> space.maybe >> match("[^)]").repeat(1).as(:revision_of)) |
@@ -638,16 +644,26 @@ module Pubid
             iso_stage >> std_noise >> space)) >>
           str("P").maybe >> # optional project marker on the number
           digits.as(:number) >>
-          # part must not swallow the trailing year (year_digits.absent?)
-          ((dot | dash) >> year_digits.absent? >> digits.as(:part)).maybe >>
+          # part must not swallow the trailing year (year_digits.absent?). A
+          # DASH-joined part is tagged (:part_dash) - the catalogue-printed
+          # joint form spells the part with a dash ("21451-7") where the ISO
+          # form uses the dot.
+          ((dot >> year_digits.absent? >> digits.as(:part)) |
+           (dash >> str("").as(:part_dash) >> year_digits.absent? >>
+             digits.as(:part))).maybe >>
           (
             (str(":") >> year_digits.as(:year)) |
+            # The dash-year (and ", Month YYYY" text date below) spellings are
+            # the catalogue-PRINTED joint form; tag them (:printed_form) so the
+            # builder routes to a Standard instead of the ISO joint reference.
             (dash >> year_digits.as(:year) >>
-             (dash >> month_numeric.as(:month)).maybe) |
+             (dash >> month_numeric.as(:month)).maybe >>
+             str("").as(:printed_dash_year)) |
             # Trailing text date ", April 2015" / " April 2015" (build_joint_development
             # already reads :month/:year). No :year collision — the iso rule has no
             # other :year capture (edition uses :edition_year).
-            ((comma | space) >> month_name.as(:month) >> space >> year_digits.as(:year))
+            ((comma | space) >> month_name.as(:month) >> space >>
+             year_digits.as(:year) >> str("").as(:printed_month_year))
           ).maybe >>
           # Optional /D<draft> tail. normalize_relaton_suffixes repositions the
           # historical "…/D-3-2017" onto the number as "…-2017/D3", so by the
@@ -678,7 +694,6 @@ module Pubid
           # The crawl sometimes spaces it ("…(E), January 2017" family,
           # pubid#216), and a relationship parenthetical may follow
           # ("…CD2 P15288-2013-09 (Revision of …)").
-          space.maybe >> (str("(E)") | str("(F)")).maybe >>
           parenthetical.maybe
       end
 
@@ -814,7 +829,17 @@ module Pubid
           ((space >> month_name.as(:trailing_month) >> space >> year_digits.as(:trailing_year)) |
            (space >> month_numeric.as(:trailing_month) >> (space | dash) >> year_digits.as(:trailing_year))).maybe >>
           draft.maybe >>
+          # A print date may trail a draft that carries its own date
+          # ("IEEE Unapproved Draft 24765/D1 2009, Oct 2009" - the draft's
+          # year is "2009", the print date is ", Oct 2009").
+          (comma >> space? >> month_name.as(:trailing_month) >> space >>
+            year_digits.as(:trailing_year)).maybe >>
           revision_suffix.maybe >>
+          # …and the print date may also trail the repositioned revision
+          # ("IEEE Unapproved Draft P802.16Rev2/D9a, March 2009" reaches the
+          # grammar as "…/D9a/R-2, March 2009" via normalize_revision_notation).
+          (comma >> space? >> month_name.as(:trailing_month) >> space >>
+            year_digits.as(:trailing_year)).maybe >>
           # Trailing corrigendum after the draft ("…/D2.0/Cor. 1", or
           # "…/D1.0, Dec 2007/Cor. 1" where the draft's own draft_date consumes
           # the date, leaving "/Cor. N"). The flat corrigendum+draft tree (no
@@ -899,10 +924,17 @@ module Pubid
           # Draft NESC pattern
           (str("Draft") >> space >> (str("NESC") | str("National Electrical Safety Code"))) |
           # Name-first pattern (NEW)
-          (str("National Electrical Safety Code") >> str(",") >> space >> str("C2-"))
+          (str("National Electrical Safety Code") >> str(",") >> space >> str("C2-")) |
+          # Catalogue form: "IEEE Std YYYY NESC ..." / "IEEE Std YYYY National
+          # Electrical Safety Code" - the prefix is consumed here (the NESC
+          # renderer prepends "IEEE Std" itself) but must not fall through to
+          # the generic standard grammar, which would read YYYY as a number.
+          (str("IEEE") >> space >> str("Std") >> space >> year_digits >> space >>
+            (str("NESC") | str("National Electrical Safety Code")))
         ).present? >>
           # Delegate to NESC parser if pattern detected
-          Nesc::Parser.new.nesc_identifier.as(:nesc)
+          ((str("IEEE") >> space >> str("Std") >> space).maybe >>
+            Nesc::Parser.new.nesc_identifier).as(:nesc)
       end
 
       # Draft notation for PSI (e.g., /D2, /D3, rawbib's /D-2)
@@ -1056,13 +1088,13 @@ module Pubid
           str("CSA") >> space >>
           # CSA number formats (various patterns observed)
           (
-            # Format 1: C22.2 No. 293.1-17 (with NO.)
-            (str("C") >> digit.repeat(2) >> dot >> digit >> space >> str("No") >> dot >> space >>
+            # Format 1: C22.2 No. 293.1-17 (with NO., either case)
+            (str("C") >> digit.repeat(2) >> dot >> digit >> space >> (str("No") | str("NO")) >> dot >> space >>
              match("[0-9.]").repeat(1) >> (dash | str(":")) >> digit.repeat(2)) |
             # Format 2: C293.2-17 (without NO., dash year)
             (str("C") >> match("[0-9.]").repeat(1) >> dash >> digit.repeat(2)) |
-            # Format 3: C22.2 No. 293.3:19 (with NO., colon year)
-            (str("C") >> digit.repeat(2) >> dot >> digit >> space >> str("No") >> dot >> space >>
+            # Format 3: C22.2 No. 293.3:19 (with NO., either case, colon year)
+            (str("C") >> digit.repeat(2) >> dot >> digit >> space >> (str("No") | str("NO")) >> dot >> space >>
              match("[0-9.]").repeat(1) >> str(":") >> digit.repeat(2)) |
             # Format 4: C293.4:19 (without NO., colon year)
             (str("C") >> match("[0-9.]").repeat(1) >> str(":") >> digit.repeat(2))
@@ -1110,6 +1142,15 @@ module Pubid
           # never collides with the base -YYYY identity year (see
           # ieee_p_identifier). The builder promotes it only when no base year.
           trailing_month_year.maybe >>
+          # The ASHRAE joint suffix may also trail a draft+date
+          # ("IEEE P1635/D13, December, 2017/ASHRAE Guideline 21"), so a
+          # second slot catches it after the date.
+          ashrae_copub.maybe >>
+          # A bracketed narrative may sit between the base and a trailing
+          # corrigendum: "IEEE Std 671-1985 [Corrigendum to IEEE Std 671-1985
+          # (Reaff 2008)]/Cor. 1-2010" captures the bracket as the base's
+          # nickname before the wrapper is parsed.
+          book_nickname.maybe >>
           # Trailing corrigendum after the draft+date ("IEEE Approved P1015/D1,
           # Jan 2007/Cor. 1"): the generic bucket is the only path a status-word
           # form reaches. Routes via build_flat_corrigendum (disjoint from the
@@ -1333,9 +1374,12 @@ module Pubid
         # Slash-stage carrying a dash-date ("…P15288/CD2-2013-09 …" — the
         # dash-year tail is what the joint grammar reads after the number, so
         # this cannot steal the plain "/FDIS, June 2021" spellings
-        # ieee_p_identifier finishes): → "…CD2 P15288-2013-09 …"
+        # ieee_p_identifier finishes): → "…CD2 P15288-2013-09 …". The date
+        # must be a plausible year — a 4-digit monthcode (YYMM, e.g.
+        # "…P24748-4/DIS-1404" = April 2014) is a DRAFT designator, not a
+        # dash-date, and rewriting it onto the number breaks the parse.
         cleaned = cleaned.sub(
-          %r{\A#{pubs}#{num}/ ?#{stage}(-\d{4}(?:-\d\d)?)},
+          %r{\A#{pubs}#{num}/ ?#{stage}(-(?:19|20)\d\d(?:-\d\d)?)},
           '\1\3 \2\4',
         )
 

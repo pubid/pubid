@@ -412,49 +412,49 @@ module Pubid
       rule(:addendum_document) do
         # With multi-letter flex type prefix (CECC, E9111, etc.)
         (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-         (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+         (colon | space).as(:add_sep) >> str("Addendum") >> space.repeat(1) >> str("No.").as(:add_no_prefix) >> space.repeat(1) >>
          digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                               4).as(:addendum_year)
         ).as(:addendum_document) |
           (bs.as(:publisher) >> space >> multi_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-           (colon | space).as(:add_sep) >> str("Addendum") >> space >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document) |
           # With single-letter flex type prefix (M, etc.)
           (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-           (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space.repeat(1) >> str("No.").as(:add_no_prefix) >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document) |
           (bs.as(:publisher) >> space >> single_letter_prefix.as(:flex_prefix) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-           (colon | space).as(:add_sep) >> str("Addendum") >> space >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document) |
           # With year before Addendum and SPACE separator: "BS NUMBER:YEAR Addendum No. N:YEAR"
           (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
            colon >> digit.repeat(4,
-                                 4).as(:base_year) >> space.as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+                                 4).as(:base_year) >> space.as(:add_sep) >> str("Addendum") >> space.repeat(1) >> str("No.").as(:add_no_prefix) >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document) |
           # With year before Addendum and COLON separator: "BS NUMBER:YEAR:Addendum No. N:YEAR"
           (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
            colon >> digit.repeat(4,
-                                 4).as(:base_year) >> colon.as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+                                 4).as(:base_year) >> colon.as(:add_sep) >> str("Addendum") >> space.repeat(1) >> str("No.").as(:add_no_prefix) >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document) |
           # Without flex type prefix - with "No." prefix
           (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-           (colon | space).as(:add_sep) >> str("Addendum") >> space >> str("No.").as(:add_no_prefix) >> space >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space.repeat(1) >> str("No.").as(:add_no_prefix) >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document) |
           # Without "No." prefix
           (bs.as(:publisher) >> space >> number.as(:number) >> iteration.as(:iteration) >> parts.as(:parts) >>
-           (colon | space).as(:add_sep) >> str("Addendum") >> space >>
+           (colon | space).as(:add_sep) >> str("Addendum") >> space.repeat(1) >>
            digits.as(:addendum_number) >> colon >> digit.repeat(4,
                                                                 4).as(:addendum_year)
           ).as(:addendum_document)

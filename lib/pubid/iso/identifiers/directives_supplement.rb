@@ -89,8 +89,10 @@ format: nil, stage_format_long: nil, with_date: nil, **opts)
         def to_supplement_s(lang: :en, lang_single: false, with_edition: false,
 format: nil, stage_format_long: nil, with_date: nil, **_opts)
           date_str = if date
-                       month_part = date.month ? "-#{date.month}" : ""
-                       ":#{date.render}#{month_part}"
+                       # Components::Date#render already carries the month
+                       # (and day) when present — appending a month_part
+                       # here doubled it (":2016-05-05-05").
+                       ":#{date.render}"
                      else
                        ""
                      end

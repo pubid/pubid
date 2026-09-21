@@ -37,17 +37,18 @@ RSpec.describe Pubid::Iso::Identifier do
         end
       end
 
-      # V2: Guide is a type, not a separate identifier class
-      # ISO/CEI 51:1999(F/E/R) parses as InternationalStandard with CEI copublisher
+      # Guide-first spellings ("Guide ISO/CEI …", Cyrillic
+      # "Руководства ИСО …") select the Guide class, like every other
+      # Guide reference — the type_with_stage_fr rename must run before
+      # class selection (the corpus wires these as pubid:iso:guide).
       context "French PubID ISO/CEI 51:1999(F/E/R)" do
         let(:pubid) { "Guide ISO/CEI 51:1999(F/E/R)" }
 
         it "handles PubID Guide ISO/CEI 51:1999(F/E/R)" do
           id = Pubid::Iso.parse(pubid)
-          # In V2, Guide is a type of InternationalStandard, not a separate class
-          expect(id.class).to eq(Pubid::Iso::Identifiers::InternationalStandard)
+          expect(id.class).to eq(Pubid::Iso::Identifiers::Guide)
           expect(id.type.abbr).to eq("Guide")
-          # Note: V2 reorders to standard format (copublisher before type)
+          # Note: reorders to standard format (copublisher before type)
           expect(id.to_s).to eq("ISO/CEI Guide 51:1999(F/E/R)")
         end
       end

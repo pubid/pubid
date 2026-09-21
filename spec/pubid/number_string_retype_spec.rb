@@ -87,10 +87,14 @@ module NumberStringRetypeSpec
   # components — nearly every residual failure was the empty
   # Bsi::Components::Date/Type subclass rejecting the shared instances a
   # wrapper delegates to (or a leaf materializes) on to_hash/from_hash.
+  # bsi 2 -> 0: the derived `publisher` on Amendment/Corrigendum and the
+  # consolidated wrapper is now dropped in compact_hash, so from_hash
+  # round-trips stop regrowing it (the deserialize conformance check on
+  # bsi.consolidated_identifier.1161/1476).
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
     "api" => 1,
-    "bsi" => 2,
+    "bsi" => 0,
     "ccsds" => 0,
     "cen_cenelec" => 0,
     "idf" => 0,

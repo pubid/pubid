@@ -36,6 +36,13 @@ module Pubid
           identifiers&.first&.publisher
         end
 
+        # See Identifiers::Amendment.compact_hash: the publisher is derived
+        # from the first member and must stay off the wrapper's own wire entry,
+        # or from_hash round-trips regrow it.
+        def self.compact_hash(_model, hash)
+          hash.delete("publisher")
+        end
+
         # `number`, `part`, `parts`, `date` and `year` are deliberately NOT
         # delegated. They used to read `identifiers.first`, one level only, so
         # they answered with the member's value when that member was a plain

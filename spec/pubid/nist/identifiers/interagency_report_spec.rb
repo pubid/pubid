@@ -181,7 +181,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes to update format" do
-          expect(parsed.to_s).to eq("NIST IR 8170-upd1")
+          expect(parsed.to_s).to eq("NIST IR 8170/Upd1")
         end
 
         it "parses update" do
@@ -238,7 +238,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes to update format" do
-          expect(parsed.to_s).to eq("NIST IR 8170-upd1")
+          expect(parsed.to_s).to eq("NIST IR 8170/Upd1")
         end
       end
 
@@ -252,7 +252,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes to update format" do
-          expect(parsed.to_s).to eq("NIST IR 8211-upd1")
+          expect(parsed.to_s).to eq("NIST IR 8211/Upd1")
         end
       end
     end

@@ -128,9 +128,16 @@ module Pubid
           parts << type_str unless type_str.strip.empty?
         end
 
-        # Code - with P prefix for projects (concatenated, not separated)
+        # Code - with P prefix for projects (concatenated, not separated).
+        # A DRAFT-carrying ISO-led joint reference prints P-less: the project
+        # marker is not part of the printed identity ("ISO/IEC/IEEE 15026-3/
+        # DCD, December, 2021", never "P15026-3").
         if id.code_obj
-          result = id.code_obj.to_s
+          result = if id.publisher == "ISO" && id.draft_obj
+                     id.code_obj.to_s.sub(/\AP/, "")
+                   else
+                     id.code_obj.to_s
+                   end
 
           # Prepend P if this is a project AND code doesn't already have P
           if id.typed_stage&.project_status && should_render_type && !result.start_with?("P")
@@ -150,9 +157,29 @@ module Pubid
           # ("P802.16Rev2/D3"). Keeps a revision distinct from its base standard.
           result += "Rev#{id.revision}" if id.revision
 
-          # Append draft to code - with or without space based on original format
+          # Append draft to code - with or without space based on original
+          # format. An exactly-IEC/IEEE co-published reference prints only the
+          # draft DESIGNATOR - a comma-separated project date ("IEC/IEEE
+          # 61886-1/D2, May 2020" prints as "…/D2") is catalogue metadata, not
+          # identity. Wider sets ("IEC/ISO/IEEE P82079-1/D1, June 2016") print
+          # the date; a space-separated date always stays ("…/DCDV July 2015").
+          # IEEE-published drafts normalize the comma date to the long form
+          # ("D08, September, 2018").
           if id.draft_obj
-            result += id.space_before_draft ? " #{id.draft_obj}" : id.draft_obj.to_s
+            printed = id.draft_obj.to_s
+            if id.publisher == "IEC" && id.copublisher == ["IEEE"]
+              printed = printed.split(", ").first
+            elsif id.publisher == "IEEE" && id.draft_status.to_s.empty?
+              # The long comma form is for dated project drafts; an
+              # unapproved-draft render keeps its pinned single-comma form
+              # (pubid#318 idempotence).
+              printed = printed.sub(/, ([A-Z][a-z]+) (\d{4})\z/, ', \1, \2')
+            end
+            # A space-separated draft year with no print date trailing is
+            # IEEE's dash form ("…/D1-2006"); with a trailing print date the
+            # space stays ("…/D1 2004, Nov 2004").
+            printed = printed.sub(/\A(D\d+) (\d{4})\z/, '\1-\2')
+            result += id.space_before_draft ? " #{printed}" : printed
           end
 
           # Append interpretation notation (/INT)
@@ -190,8 +217,11 @@ module Pubid
         # Build the main identifier (without month yet)
         result = parts.join(" ")
 
-        # Month/Day - append directly to avoid extra space before comma
-        if id.month
+        # Month/Day - append directly to avoid extra space before comma.
+        # An exactly-IEC/IEEE co-published reference drops the comma date
+        # entirely (same catalogue-metadata rule as the draft date above):
+        # "IEC/IEEE P60076-16, May 2016" prints as "IEC/IEEE 60076-16".
+        if id.month && !(id.publisher == "IEC" && id.copublisher == ["IEEE"])
           result += ", #{id.month}"
           result += " #{id.day}" if id.day
           if id.year && !id.edition

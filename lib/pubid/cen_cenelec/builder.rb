@@ -95,10 +95,13 @@ module Pubid
         base = locate_identifier_klass(base_data).new
         assign_attributes(base, base_data)
 
-        # Build Amendment identifier wrapping the base
+        # Build Amendment identifier wrapping the base. The compact
+        # fragment spelling can carry the amendment's own year
+        # (EN 60038/A1:2009 FRAG2); the AMD-keyword spelling cannot.
         amendment = Identifiers::Amendment.new(
           base: base,
           number: data[:amendment_number].to_s,
+          year: data[:amendment_year]&.to_s,
         )
 
         # Build Fragment wrapping the amendment

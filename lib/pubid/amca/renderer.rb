@@ -29,53 +29,42 @@ module Pubid
       private
 
       def render_base(id)
-        parts = []
-        parts << id.copublisher if id.copublisher
         t = id.class.respond_to?(:type) ? id.class.type : nil
-        if t.is_a?(Hash) && t[:title]
-          parts << t[:title].to_s
-        end
-        parts << id.number.to_s
-        parts << "-#{id.year}" if id.year
-
-        result = parts.compact.join(" ")
-
-        if id.copublisher&.include?("/") && id.year
-          type_title = t.is_a?(Hash) ? t[:title].to_s : ""
-          result = "#{id.copublisher} #{type_title} #{id.number}-#{id.year}"
-        end
-
-        result += " (#{id.reaffirmed})" if id.reaffirmed
-
+        title = t[:title].to_s if t.is_a?(Hash) && t[:title]
+        result = document(id, title)
+        result += " (R#{id.reaffirmed})" if id.reaffirmed
         result
       end
 
+      # The revision and the reaffirmation are separate optional groups in
+      # the grammar, so either or both can appear.
       def render_publication(id)
-        parts = []
-        parts << id.copublisher if id.copublisher
-        parts << "Publication"
-        parts << id.number.to_s
-        parts << "-#{id.year}" if id.year
-        parts << " (Rev. #{id.revision})" if id.revision
-        parts << " (#{id.reaffirmed})" if id.reaffirmed && !id.revision
-
-        parts.join(" ").squeeze(" ")
+        result = document(id, "Publication")
+        result += " (Rev. #{id.revision})" if id.revision
+        result += " (R#{id.reaffirmed})" if id.reaffirmed
+        result
       end
 
       def render_interpretation(id)
-        parts = []
-        parts << id.copublisher if id.copublisher
-        parts << id.number.to_s
+        result = [id.copublisher, id.number.to_s].compact.join(" ")
 
         if id.interpretation_code
-          parts << "– #{id.interpretation_code}"
+          result += " #{id.interpretation_code} Interp"
         elsif id.year
-          parts << "-#{id.year}"
+          result += " – #{id.year}"
+        else
+          result += " Interp"
         end
 
-        parts << " #{id.suffix}" if id.suffix
+        result += " #{id.suffix}" if id.suffix
+        result
+      end
 
-        parts.join(" ").squeeze(" ")
+      # "AMCA Standard 803-02": the year joins the number with a bare dash.
+      def document(id, title)
+        result = [id.copublisher, title, id.number.to_s].compact.join(" ")
+        result += "-#{id.year}" if id.year
+        result
       end
     end
   end

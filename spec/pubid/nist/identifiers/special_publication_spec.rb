@@ -253,7 +253,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
         end
 
         it "normalizes to update format" do
-          expect(parsed.to_s).to eq("NIST SP 500-300-upd1")
+          expect(parsed.to_s).to eq("NIST SP 500-300/Upd1")
         end
 
         it "parses update" do

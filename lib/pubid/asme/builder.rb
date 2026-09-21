@@ -105,14 +105,18 @@ module Pubid
             # BPVC COMPLETE CODE BIND
             designator_str = "BPVC COMPLETE CODE BIND"
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:ssc_code]
-            # BPVC.SSC.XI.II.V.IX pattern
-            ssc_sections = bpvc_data[:subdivision][:ssc_sections]
-            sections_str = if ssc_sections.is_a?(Array)
-                             ssc_sections.join(".")
-                           else
-                             ssc_sections.to_s
-                           end
-            designator_str = "BPVC.SSC.#{sections_str}"
+            # BPVC.SSC.XI.II.V.IX pattern. The sections sit under `ssc_code`;
+            # reading them one level up rendered every SSC id as "BPVC.SSC.".
+            # A bare "BPVC.SSC." (the catalogue's series identity) parses
+            # with no inner capture, so `ssc_code` is the matched Slice.
+            ssc_code = bpvc_data[:subdivision][:ssc_code]
+            sections = ssc_code.is_a?(Hash) ? ssc_code[:ssc_sections] : nil
+            designator_str =
+              if sections.nil? || sections.to_s.empty?
+                "BPVC.SSC."
+              else
+                "BPVC.SSC.#{sections}"
+              end
           elsif bpvc_data[:subdivision] && bpvc_data[:subdivision][:case_code]
             # BPVC.CC.BPV or BPVC.CC.NC.XI - extract from subdivision hash
             cc = bpvc_data[:subdivision][:case_code].to_s
@@ -120,7 +124,8 @@ module Pubid
 
             designator_str = case_sub && !case_sub.empty? ? "BPVC.CC.#{cc}.#{case_sub}" : "BPVC.CC.#{cc}"
           elsif bpvc_data[:case_code]
-            # Dash notation: BPVC-CC-BPV
+            # Dash notation: BPVC-CC-BPV. Keep the dashes: the ASME catalogue
+            # lists BPVC-CC-BPV and BPVC.CC.BPV as two separate documents.
             cc = bpvc_data[:case_code].to_s
             designator_str = "BPVC-CC-#{cc}"
           elsif bpvc_data[:subdivision]
