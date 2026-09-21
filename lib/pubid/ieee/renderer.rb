@@ -129,18 +129,19 @@ module Pubid
         end
 
         # Code - with P prefix for projects (concatenated, not separated).
-        # A DRAFT-carrying ISO-led joint reference prints P-less: the project
-        # marker is not part of the printed identity ("ISO/IEC/IEEE 15026-3/
-        # DCD, December, 2021", never "P15026-3").
+        # IEEE semantics (normative): P = project = the document is a
+        # draft; no P = it has become a standard. The P-state is
+        # identity-bearing, so the renderer never adds or drops it —
+        # whatever the source spelling carries round-trips.
         if id.code_obj
-          result = if id.publisher == "ISO" && id.draft_obj
-                     id.code_obj.to_s.sub(/\AP/, "")
-                   else
-                     id.code_obj.to_s
-                   end
+          result = id.code_obj.to_s
 
-          # Prepend P if this is a project AND code doesn't already have P
-          if id.typed_stage&.project_status && should_render_type && !result.start_with?("P")
+          # Prepend P if this is a project AND code doesn't already have P.
+          # A recorded project marker (the source spelled the P on a
+          # non-IEEE-led publisher) prints regardless of the publisher.
+          if (id.typed_stage&.project_status && should_render_type ||
+              id.is_a?(Identifiers::ProjectDraftIdentifier) &&
+              id.project_marker) && !result.start_with?("P")
             result = "P#{result}"
           end
 
@@ -148,6 +149,7 @@ module Pubid
           # year, the revision, the draft and every other suffix.
           result += mark(id.code_obj.number, id.code_obj.prefix,
                          publishers: publishers_of(id))
+
 
           # Only attach year to code if there's no edition, no month, and no draft
           result += "-#{id.year}" if id.year && !id.draft_obj && !id.edition && !id.month
@@ -216,6 +218,7 @@ module Pubid
 
         # Build the main identifier (without month yet)
         result = parts.join(" ")
+
 
         # Month/Day - append directly to avoid extra space before comma.
         # An exactly-IEC/IEEE co-published reference drops the comma date

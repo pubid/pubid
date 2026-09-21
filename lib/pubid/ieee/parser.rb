@@ -306,6 +306,15 @@ module Pubid
       rule(:draft) do
         (draft_prefix >> draft_version.repeat(1, 2) >>
          (dot >> digits.as(:revision)).maybe >>
+         # The compound both-systems form (docs/IEEE-DRAFT-STAGES.md
+         # §1.3): "=DDIS.3" - IEEE draft ordinal = draft of the ISO/IEC
+         # stage, with its iteration. The glued "=DDIS3" / "=DDIS-3"
+         # spellings are accepted aliases of "=DDIS.3".
+         (str("=") >> (str("D") >> (str("FDIS") | str("CDV") | str("PWI") |
+            str("DIS") | str("WD") | str("NP") | str("CD")) |
+           (str("FDIS") | str("CDV") | str("PWI") | str("DIS") | str("WD") |
+            str("NP") | str("CD"))).as(:draft_iso_stage) >>
+           (dot | dash).maybe >> digits.as(:draft_iso_iteration).maybe).maybe >>
          draft_date.maybe).as(:draft)
       end
 
@@ -588,15 +597,32 @@ module Pubid
         # ALSO handle: IEEE/CSA P844.1/293.1/D2 (CSA dual numbering)
         (str("ISO/IEC/IEEE") | str("ISO/IEEE") | str("IEC/IEEE") | str("IEEE/CSA")).as(:joint_publishers) >>
           space >>
-          str("P") >> # P indicates IEEE-led
+          # P = project (the document is a draft): identity-bearing, so it
+          # is captured and preserved, never silently consumed.
+          str("P").as(:project_marker) >>
           digits.as(:number) >>
           ((dot | dash) >> digits.as(:part)).maybe >> # Optional part like .1 or -1
           # CSA dual numbering: /293.1 (second number)
           (slash >> digits >> (dot >> digits).maybe >> (dash >> digits.as(:draft_version)).maybe).maybe >>
           (
-            # Variant 1: /D8 notation (original)
-            (slash >> str("D") >> digits.as(:draft_version)) |
-            # Variant 2: , CDV1 notation (comma before stage code)
+            # Variant 1b: the ordinal-less stage draft "D=CDV[:2020]" -
+            # D (draft) = CDV (the IEC stage it drafts). The year rides in
+            # the draft clause (a distinct key, so the builder keeps the
+            # date inside the designator).
+            (slash >> str("D") >> str("=") >>
+              (str("CDV") | str("FDIS") | str("PWI") | str("WD") |
+               str("NP") | str("DIS") | str("CD")).as(:draft_iso_stage) >>
+              (str(":") >> year_digits.as(:draft_stage_year)).maybe) |
+            # Variant 1: /D8 notation (original), with the compound
+            # both-systems suffix "=DDIS.3" (docs/IEEE-DRAFT-STAGES.md §1.3)
+            (slash >> str("D") >> digits.as(:draft_version) >>
+              (str("=") >> (str("D") >> (str("FDIS") | str("CDV") | str("PWI") |
+                 str("DIS") | str("WD") | str("NP") | str("CD")) |
+               (str("FDIS") | str("CDV") | str("PWI") | str("DIS") | str("WD") |
+                str("NP") | str("CD"))).as(:draft_iso_stage) >>
+               (dot | dash).maybe >> digits.as(:draft_iso_iteration).maybe).maybe) |
+            # Variant 2: , CDV1 notation (comma before stage code) —
+            # the stage draft of the named ISO/IEC stage, its iteration
             (comma >> (str("CDV") | str("FDIS") | str("CD") | str("DIS")).as(:iec_stage) >> digits.maybe.as(:stage_iteration))
           ).maybe >>
           # Optional edition, from relaton's "/E-<n>" suffix normalized to
@@ -642,7 +668,9 @@ module Pubid
             str("").as(:iso_published) >> space.maybe)) |
           (staged_only.as(:joint_publishers) >> space >>
             iso_stage >> std_noise >> space)) >>
-          str("P").maybe >> # optional project marker on the number
+          str("P").as(:project_marker).maybe >> # project marker (P =
+                                                # project/draft; its
+                                                # presence is identity)
           digits.as(:number) >>
           # part must not swallow the trailing year (year_digits.absent?). A
           # DASH-joined part is tagged (:part_dash) - the catalogue-printed
@@ -714,7 +742,9 @@ module Pubid
          str("ISO/IEEE") | str("IEC/IEEE") | str("IEEE/IEC") | str("ISO/IEC") |
          str("IEEE")).as(:joint_publishers) >>
           space >>
-          str("P").maybe >> # optional project marker on the number
+          str("P").as(:project_marker).maybe >> # project marker (P =
+                                                # project/draft; its
+                                                # presence is identity)
           digits.as(:number) >>
           # optional numeric part (dot or dash); must not swallow a year
           ((dot | dash) >> year_digits.absent? >> digits.as(:part)).maybe >>

@@ -22,6 +22,11 @@ module Pubid
         attribute :comma_before_month, :boolean, default: -> {
           false
         } # Track if comma was in input
+        # The joint stage-draft half of the compound form "D5=DDIS.3":
+        # the ISO/IEC stage this draft iterates (DIS) and its iteration
+        # numeral (3). See docs/IEEE-DRAFT-STAGES.md §1.3.
+        attribute :iso_stage, :string
+        attribute :iso_iteration, :string
 
         # Month name to number mapping
         MONTH_NAMES = {
@@ -34,7 +39,7 @@ module Pubid
         }.freeze
 
         def initialize(version: nil, revision: nil, year: nil, month: nil,
-day: nil)
+day: nil, iso_stage: nil, iso_iteration: nil)
           super()
           self.version = version
           self.revision = revision
@@ -42,6 +47,15 @@ day: nil)
           self.original_month = month # Store original format
           self.month = convert_month(month)
           self.day = day
+          # The grammar's ordered alternation captures the stage WITH its
+          # draft-marker D when the spelling doubles it ("=DDIS"): the
+          # marker is notation, the stage is the bare ISO/IEC token.
+          if iso_stage.to_s.start_with?("D") &&
+             %w[PWI NP WD CD CDV DIS FDIS].include?(iso_stage[1..])
+            iso_stage = iso_stage[1..]
+          end
+          self.iso_stage = iso_stage
+          self.iso_iteration = iso_iteration
         end
 
         # Month names as an alternation, longest-first so "September" wins over
@@ -63,12 +77,27 @@ day: nil)
         # this method after `from_hash` (a mismatch breaks `to_hash` round-trip).
         # @param value [String, Draft] the value to coerce
         # @return [Draft]
+        # The compound stage suffix (docs/IEEE-DRAFT-STAGES.md §1.3):
+        # "=DIS.3" is canonical — D (draft) = DIS (the stage), iteration 3.
+        # "=DDIS.3", "=DDIS3", "=DDIS-3" (the stage echoed with its own D)
+        # are accepted aliases. Captures [stage, iteration].
+        COMPOUND_SUFFIX = /=D?(PWI|NP|WD|CDV|FDIS|DIS|CD)(?:[.-]?(\d+))?\z/.freeze
+        private_constant :COMPOUND_SUFFIX
+
         def self.parse(value)
           return value if value.is_a?(Draft)
 
           body = strip_prefix(value.to_s)
+          iso_stage = nil
+          iso_iteration = nil
+          if (m = body.match(COMPOUND_SUFFIX))
+            iso_stage = m[1]
+            iso_iteration = m[2]
+            body = body[0...m.begin(0)]
+          end
           version, month, day, year, comma = split_date(body)
-          draft = new(version: version, month: month, day: day, year: year)
+          draft = new(version: version, month: month, day: day, year: year,
+                      iso_stage: iso_stage, iso_iteration: iso_iteration)
           draft.comma_before_month = comma
           draft
         end
@@ -112,6 +141,8 @@ day: nil)
 
         def to_s
           result = "/D#{version}"
+          result += "=#{iso_stage}" if iso_stage
+          result += ".#{iso_iteration}" if iso_stage && iso_iteration
           result += ".#{revision}" if revision
 
           if year

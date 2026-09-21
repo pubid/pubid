@@ -81,14 +81,16 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
     end
 
     context "Dual format conversion" do
+      # P = project (the document is a draft): format conversion changes
+      # the SPELLING, never the project state — the P survives both ways,
+      # and a reference without a P gains none (docs/IEEE-DRAFT-STAGES.md).
       it "IEEE format can be converted to ISO format" do
         ieee_id = Pubid::Ieee.parse("ISO/IEC/IEEE P26511/D3-2018")
         iso_format = ieee_id.to_s(format: :iso)
 
         expect(iso_format).to include("ISO/IEC/IEEE")
-        expect(iso_format).to include("26511")
+        expect(iso_format).to include("P26511")
         expect(iso_format).to include(":2018")
-        expect(iso_format).not_to include("P")
       end
 
       it "ISO format can be converted to IEEE format" do
@@ -96,7 +98,8 @@ RSpec.describe Pubid::Ieee::Identifiers::JointDevelopment do
         ieee_format = iso_id.to_s(format: :ieee)
 
         expect(ieee_format).to include("ISO/IEC/IEEE")
-        expect(ieee_format).to include("P26511")
+        expect(ieee_format).to include("26511")
+        expect(ieee_format).not_to include("P26511")
         expect(ieee_format).to include("-2018")
       end
     end

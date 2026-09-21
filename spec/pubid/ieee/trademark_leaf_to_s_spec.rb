@@ -84,9 +84,9 @@ RSpec.describe "IEEE leaf to_s(trademark:) compatibility" do
     end
 
     it "renders the mark at the code boundary in ISO format" do
-      expect(id.to_s(format: :iso)).to eq("ISO/IEC/IEEE 26511:2018")
+      expect(id.to_s(format: :iso)).to eq("ISO/IEC/IEEE P26511:2018")
       expect(id.to_s(format: :iso, trademark: true))
-        .to eq("ISO/IEC/IEEE 26511™:2018")
+        .to eq("ISO/IEC/IEEE P26511™:2018")
     end
   end
 end
