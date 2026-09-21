@@ -154,6 +154,14 @@ module Pubid
       end
 
       def type_component
+        # A joint stage draft carries the stage in its draft clause and the
+        # project P inside the code — a separate type segment would
+        # duplicate both.
+        if identifier.is_a?(Identifiers::JointDevelopment) &&
+           identifier.ieee_draft.to_s.start_with?("D=")
+          return nil
+        end
+
         return nil unless identifier.type
 
         type = identifier.type
@@ -196,6 +204,11 @@ module Pubid
       end
 
       def draft_component
+        if identifier.is_a?(Identifiers::JointDevelopment) &&
+           identifier.ieee_draft.to_s.start_with?("D=")
+          return "draft.#{identifier.ieee_draft}"
+        end
+
         if identifier.is_a?(Identifiers::IecIeeeCopublished)
           return identifier.draft_info ? "draft.#{identifier.draft_info}" : nil
         end
