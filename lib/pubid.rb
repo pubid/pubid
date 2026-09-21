@@ -143,6 +143,8 @@ module Pubid
   autoload :Parser, "pubid/parser"
   autoload :Components, "pubid/components"
   autoload :BundledIdentifier, "pubid/bundled_identifier"
+  autoload :AllParts, "pubid/all_parts"
+  autoload :AllPartsIdentifier, "pubid/all_parts_identifier"
   autoload :Identifier, "pubid/identifier"
   autoload :SubsetMatch, "pubid/subset_match"
   autoload :IdentifierMetadata, "pubid/identifier_metadata"

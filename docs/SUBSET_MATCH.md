@@ -40,9 +40,26 @@ pressure, because reference matching no longer goes through `#exclude`.
   collection is not a prefix. See *Strict attributes* below.
 - **`all_parts` is the part wildcard.** A reference that sets it matches
   every part of the document: `part`, `parts`, `subpart` and `all_parts`
-  itself are skipped. `#to_all_parts` makes such a reference from any
-  identifier. It returns a copy with `all_parts` true and no part; the date
-  and the stage stay (`ISO 9000-1:2015` → `ISO 9000:2015 (all parts)`).
+  itself are skipped.
+- **"All parts" is a class, not a flag.** `Pubid::AllParts` (`lib/pubid/
+  all_parts.rb`) is the behavior; a flavor includes it in a subclass of its
+  own `Identifier`, so `Pubid::Iso::Identifiers::AllParts <
+  Pubid::Iso::Identifier` and flavor routing still works. ISO, IEC, JIS, GB
+  and IDF have such a class and build it when they parse `(all parts)` or
+  the series URN (`…:ser`, `…:all`); every other flavor gets
+  `Pubid::AllPartsIdentifier` from `#to_all_parts`. The class holds part
+  identifiers of one document as `identifiers`, sorted and without
+  duplicates; a member with no part stands for the whole document and is
+  permitted only alone. `===` compares the document only: the first member
+  without its part and its edition keys
+  (`Identifier.all_parts_edition_keys`: `date year edition version`), so
+  `ISO 9000-1:2015` matches `ISO 9000-3:2018`, and ETSI and 3GPP parts match
+  although their parts are strict. `==` compares the members. `to_s` prints
+  no edition (`ISO 9000 (all parts)`). `+` returns another all-parts
+  identifier with one more part, or with the parts of another. `to_hash`
+  holds `_type` and `identifiers` only, and `from_hash` still reads a row
+  written with the old `all_parts: true` key. The readers `all_parts` and
+  `all_parts?` stay: true here, false on every other identifier.
 - **A partial date stays a wildcard.** A year-only reference matches a fuller
   date: `Date(2015) === Date(2015-04)`. The month and the day refine the year
   rather than naming a different document, and ISO, IEC and BSI all rely on

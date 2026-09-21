@@ -452,8 +452,8 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
     it "reopens a strict part list" do
       reference = parse("etsi", "ETSI EN 300 175")
       expect(reference === parse("etsi", "ETSI EN 300 175-1")).to be(false)
-      reference.all_parts = true
-      expect(reference === parse("etsi", "ETSI EN 300 175-1")).to be(true)
+      expect(reference.to_all_parts === parse("etsi", "ETSI EN 300 175-1"))
+        .to be(true)
     end
 
     it "restricts every other part of the identifier" do

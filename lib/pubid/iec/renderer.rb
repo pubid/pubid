@@ -67,7 +67,6 @@ module Pubid
           parts << " DB"
         end
 
-        parts << " (all parts)" if id.all_parts
 
         result = parts.compact.join
 

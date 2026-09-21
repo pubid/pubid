@@ -13,7 +13,6 @@ module Pubid
     class Renderer < ::Pubid::Renderers::Base
       def render(**_opts)
         parts = [publisher_portion, " #{number_portion}"]
-        parts << " (all parts)" if @id.all_parts
         parts.join
       end
 

@@ -12,7 +12,6 @@ module Pubid
 
         parts << identifier.language.to_s.downcase if identifier.language
 
-        parts << "all" if identifier.all_parts?
 
         if identifier.is_a?(SupplementIdentifier) && identifier.supplement_notation
           parts << identifier.supplement_notation.to_s.downcase

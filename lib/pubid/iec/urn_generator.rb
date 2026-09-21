@@ -43,6 +43,14 @@ module Pubid
         "InterpretationSheet" => "ish",
       }.freeze
 
+      # The series URN of the document: "ser" takes the deliverable slot.
+      # {Identifiers::AllParts} calls it with the document, because the
+      # document itself carries no all-parts mark.
+      def generate_series
+        @series = true
+        generate
+      end
+
       def generate
         doc = document
         return nil if doc.nil?
@@ -146,7 +154,7 @@ module Pubid
       # A deliverable code owns the slot; the edition takes it only when there
       # is none.
       def deliverable_slot
-        return "ser" if maybe_of(identifier, :all_parts)
+        return "ser" if @series
 
         vap = vap_codes
         return vap unless vap.empty?

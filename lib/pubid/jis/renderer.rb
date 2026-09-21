@@ -38,7 +38,6 @@ module Pubid
         result = "#{PUBLISHER} #{id.code}"
         result += ":#{id.year_with_reaffirmation}" if id.year
         result += "(#{id.language})" if id.language
-        result += "（規格群）" if id.all_parts?
         result + id.symbol_suffix
       end
 
@@ -52,7 +51,6 @@ module Pubid
         result += id.code.to_s
         result += ":#{id.year_with_reaffirmation}" if id.year
         result += "(#{id.language})" if id.language
-        result += "（規格群）" if id.all_parts?
         result += id.symbol_suffix
         result
       end

@@ -58,6 +58,12 @@ module Pubid
       end
 
       def build(parsed_hash)
+        # "(all parts)" and the ":ser" URN name every part of the document,
+        # so they build an AllPartsIdentifier around the document (the URN
+        # parser puts the key on the outermost identifier for the same
+        # reason). The document itself holds no all-parts mark.
+        all_parts = parsed_hash.delete(:all_parts)
+
         # For ISO/R legacy format, split into publisher and type
         if parsed_hash[:iso_r_prefix]
           parsed_hash[:publisher] = "ISO"
@@ -118,7 +124,7 @@ module Pubid
           identifier.type = default_typed_stage.to_type
         end
 
-        identifier
+        all_parts ? identifier.to_all_parts : identifier
       end
 
       def handle_key(identifier, key, value)

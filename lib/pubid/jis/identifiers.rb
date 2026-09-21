@@ -3,6 +3,7 @@
 module Pubid
   module Jis
     module Identifiers
+      autoload :AllParts, "#{__dir__}/identifiers/all_parts"
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
       autoload :Explanation, "#{__dir__}/identifiers/explanation"
