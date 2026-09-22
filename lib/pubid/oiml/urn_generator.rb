@@ -27,6 +27,19 @@ module Pubid
         identifier.language&.to_s&.downcase
       end
 
+      # DualPublished declares no `date` attribute of its own (it lives on
+      # whichever side is OIML), so the shared Base#urn_year — which gates
+      # on `identifier.class.attributes.key?(:date)` — would silently drop
+      # the year. Read it through the OIML side instead.
+      def urn_year
+        if identifier.is_a?(Identifiers::DualPublished)
+          oiml_date = identifier.oiml_identifier&.date
+          return oiml_date&.year&.to_s
+        end
+
+        super
+      end
+
       def generate
         # Bulletin issues carry no code; the (year, issue, sequence) tuple
         # is the locator. URNs are canonical regardless of how the input was

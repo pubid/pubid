@@ -702,11 +702,26 @@ module Pubid
           # keys (:draft_month/:draft_year), because a plain :month/:year
           # here collides with the date clause above and parslet drops the
           # subtree with a "Duplicate subtrees" warning.
+          # The ISO/IEC edition marker may sit between the year and an
+          # amendment/draft tail: "8802.11:2012 (E)/Amd 1-2014". A distinct
+          # key - a second :parameters capture here collides with the
+          # trailing parenthetical slot (parslet drops duplicate subtrees).
+          (space.maybe >> str("(") >>
+           match("[^)]").repeat(1).as(:edition_marker) >> str(")")).maybe >>
+          # The stage-draft clause of the ISO-led print: "/D=WD.5" -
+          # D (draft) = the ISO/IEC stage it drafts, with its iteration
+          # (docs/IEEE-DRAFT-STAGES.md §1.2).
+          ((slash >> str("D") >> str("=") >>
+           (str("FDIS") | str("FCD") | str("CDV") |
+            (str("DIS") >> digit.maybe) |
+            (str("CD") >> digit.maybe) |
+            str("WD") | str("PWI") | str("NP")).as(:draft_iso_stage) >>
+           (dot >> (digits >> match("[A-Za-z]").repeat(0, 1)).as(:draft_iso_iteration)).maybe) |
           (slash >> str("D") >> dash.maybe >>
            match('[0-9.]').repeat(1).as(:draft_version) >>
            (((comma | space) >> month_name.as(:draft_month) >> space >>
                year_digits.as(:draft_year)) |
-             (comma >> year_digits.as(:draft_year))).maybe).maybe >>
+             (comma >> year_digits.as(:draft_year))).maybe).maybe).maybe >>
           # Optional amendment tail (pubid#317:
           # "8802-11:2012/Amd.1:2014(E)") - the flat tree keys reuse
           # build_flat_amendment.
@@ -735,6 +750,22 @@ module Pubid
       # the trailing `.FDIS` is the ISO stage, NOT a second part. Routes through
       # the same build_joint_development (via :joint_publishers/:iso_stage), so the
       # stage is modeled correctly and the numeric part stays separate.
+      # The stage-less ISO/IEC label with a colon year and the ISO/IEC
+      # edition marker: "ISO/IEC 13210:1994 (E)" - the ISO/IEC portion of a
+      # double-labeled standard. The (E) parenthetical is REQUIRED: without
+      # it this spelling is the ISO flavor's own form and must not be
+      # stolen. Routes through build_joint_development like every ISO-led
+      # joint reference.
+      rule(:joint_development_iso_iec_edition) do
+        str("ISO/IEC").as(:joint_publishers) >> space >>
+          str("").as(:iso_published) >>
+          str("P").as(:project_marker).maybe >>
+          digits.as(:number) >>
+          (dot >> digits.as(:part)).maybe >>
+          (str(":") >> space.maybe >> year_digits.as(:year)) >>
+          space.maybe >> parenthetical
+      end
+
       rule(:joint_development_embedded_stage) do
         # publisher set mirrors joint_development_iso_format (incl. bare IEEE);
         # longest token first.
@@ -1147,6 +1178,8 @@ module Pubid
           conformance_identifier | # NEW: Try conformance identifier before generic patterns
           joint_development_ieee_format |
           joint_development_iso_format |
+          joint_development_iso_iec_edition | # stage-less ISO/IEC label with (E) - double-label portion
+
           joint_development_embedded_stage | # stage-LAST embedded form (before generic)
           iec_ieee_copublished |
           number_first_identifier |

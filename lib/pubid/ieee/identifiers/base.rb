@@ -363,6 +363,14 @@ module Pubid
       def self.parse_single(input)
         # Apply legacy update_codes normalization first, before Parser's extensive preprocessing
         normalized = Core::UpdateCodes.apply(input, :ieee)
+        # UpdateCodes may introduce the "; " double-label separator
+        # ("ISO/IEC13210: 1994 (E) ANSI/IEEE Std ..." → the ISO/IEC and
+        # IEEE labels of one document), but the dispatch ran on the raw
+        # input - re-dispatch so the dual construction sees it.
+        if normalized != input && normalized.include?("; ")
+          result = PreParser.preprocess(normalized)
+          return build_dual(result.parts) if result.dispatch == :dual_semicolon
+        end
         parsed = Parser.parse(normalized) # Use class method for preprocessing
         builder = Builder.new(Identifier)
         # Pass the original input string to builder for context

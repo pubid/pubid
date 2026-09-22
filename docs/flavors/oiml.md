@@ -82,3 +82,108 @@ harmless no-op there, since `===` only walks `self.class.attributes`.
 index (4.57M pairs) and found 192 disagreeing pairs outside the Bulletins —
 156 on `language`, 6 on `subpart`, 30 on `year_on_base` — all wrong on the
 `===` side before this branch.
+
+## Dual-published identifiers: OIML co-publication with another SDO (pubid #437)
+
+**The shape.** OIML sometimes co-publishes a document jointly with another
+SDO — ISO confirmed so far. The printed reference carries both identifiers,
+joined by a bare `|`, e.g. `ISO 4064-1:2024|OIML R 49-1:2024`. Both sides
+name the same document, each in its own SDO's scheme.
+
+**`Identifiers::DualPublished` is a THIRD sibling** of `SingleIdentifier`/
+`SupplementIdentifier` under `Oiml::Identifier` — same shape as
+`SupplementIdentifier`, and the same lesson applies: it inherits **nothing**
+from `SingleIdentifier`, so every identity-bearing reader `UrnGenerator` or
+the MR-slug renderer calls (`code`, `type`, `stage`, `iteration`,
+`publisher`, and the `mr_publisher`/`mr_type`/`mr_number_with_part`/
+`mr_year` hooks, plus `#root`) is hand-delegated to whichever side is OIML.
+Without the `mr_*` delegations this class would have shipped with the exact
+same empty-slug gap already recorded above for Amendment/Errata/Annex; this
+class closes it from day one instead of reproducing it.
+
+**`first`/`second` hold the two sides in original left-to-right print
+order**, each a real `attribute ..., ::Pubid::Identifier, polymorphic: true`
+— never an `attr_accessor` (see IEEE's `CsaDualPublished`, which used one
+and silently dropped its second identifier from `to_hash`/`from_hash`/
+`#exclude`). `#oiml_identifier`/`#external_identifier` pick the OIML-typed
+member out of the pair by `is_a?`, not by position, since nothing guarantees
+which side prints first.
+
+**`language`/`parsed_format` are declared locally even though this class
+never sets them.** `Oiml::Identifier`'s shared `key_value` block (inherited
+by every OIML class) maps `"language"` and `"parsed_format"` to real
+attributes; a subclass's own `key_value` block **merges** with its parent's
+rather than replacing it, so `to_hash`/`from_hash` would call
+`model.language`/`model.language=` regardless of what this class declares.
+Leaving them undeclared would crash `to_hash` outright (no such method);
+delegating `language` as a read-only method would crash `from_hash` (no
+setter). `SingleIdentifier` and `SupplementIdentifier` both declare these
+locally for the same reason — this class follows the same pattern rather
+than inventing a new one.
+
+**Parse dispatch lives in `Pubid::Oiml.parse`/
+`Identifiers::DualPublished.build`, not the Parslet grammar.** The string is
+split on `|` before the grammar ever runs; the side that matches `PREFIXES`
+(`["OIML"]`) is parsed via `Oiml.parse` (re-entering this same module
+method — safe, since the substring has no `|`), the other via the generic
+top-level `Pubid.parse`, which auto-routes to any flavor by prefix. `.build`
+returns `nil` for anything that isn't exactly two non-empty sides with
+exactly one OIML side, letting the caller fall through to the ordinary
+grammar — which has no `|` rule, so it raises the standard
+`Parslet::ParseFailed`, keeping the uniform parse-error contract intact. The
+side is detected by content, not position, so `OIML R 49-1:2024|ISO
+4064-1:2024` parses identically in the other order.
+
+**The URN represents only the OIML side** (`urn:oiml:...`) — there is no
+joint URN scheme anywhere in this codebase, matching every other
+cross-flavor wrapper (IEEE's `AdoptedStandard`/`MultiNumberedIdentifier`).
+One generator change was required: `UrnGenerator::Base#urn_year` gates on
+`identifier.class.attributes.key?(:date)`, and `DualPublished` declares no
+`date` of its own (it lives on whichever side is OIML) — so
+`Oiml::UrnGenerator#urn_year` special-cases the class and reads the date
+through `#oiml_identifier` directly. Every other URN segment
+(`urn_type`/`urn_number`/`urn_stage`/`urn_iteration`/`urn_language`) works
+for free through the §1 delegations, since they already read plain
+`identifier.type`/`.code`/etc. rather than going through the attributes
+registry.
+
+**`(de)serialization goes through `Pubid.from_hash`/`#to_hash`, not the
+OIML-scoped `Identifier.from_hash`**, because either side of `first`/
+`second` may belong to any flavor — `Identifier.from_hash` only resolves
+OIML `_type` values. Verified this round-trips both an OIML-native nested
+hash and a foreign one via the shared global `TypeResolver`.
+
+**Known, deliberately out-of-scope gaps**, matching the issue's one
+confirmed example (a plain `Recommendation` on the OIML side, no edition):
+
+- An OIML side that is itself a Amendment/Annex/Errata
+  (`SupplementIdentifier`) is untested — the delegation chain should mostly
+  work transitively, but this hasn't been exercised.
+- Only two-way co-publication is modeled (two fixed attributes), not
+  three-or-more.
+- **`edition` is not delegated**, unlike `code`/`type`/`stage`/etc. This is
+  deliberate, not an oversight: OIML's own `edition` is a plain `:string`
+  attribute (`SingleIdentifier`), but the shared `#mr_edition`/`#urn_edition`
+  (`lib/pubid/identifier.rb`, `lib/pubid/urn_generator/base.rb`) assume the
+  `Components::Edition` shape and call `edition.number` — a **pre-existing**
+  bug in OIML itself: `Pubid::Oiml.parse("OIML E 5 6th Edition 2015
+  (E)").to_mr_string` already raises `NoMethodError` on `main`, with no
+  `DualPublished` involved. Delegating `edition` here would only reproduce
+  that crash through a second path; leaving it undelegated means an
+  edition-bearing OIML side silently drops its edition from the MR slug/URN
+  instead of raising — worse data loss, but no new crash surface. Fixing the
+  root cause (OIML's edition/MR-edition type mismatch) is unrelated to
+  dual-published identifiers and is left for its own change.
+- **Annotated rendering (`to_s(annotated: true)`) only spans the OIML
+  side's publisher/type**, not its number/year, and not the external side at
+  all. This matches — not regresses — the existing shipped behavior of the
+  closest precedent, IEEE's `Identifiers::AdoptedStandard`: `Renderers::
+  Annotator#nested_identifiers` (`lib/pubid/renderers/annotator.rb`) only
+  recurses into `base`/`ids`/`identifiers`/`bundled_with`, none of which
+  `DualPublished` (or `AdoptedStandard`, which uses `ieee_identifier`/
+  `adopted_identifiers`) uses, so neither wrapper's nested sides get full
+  token annotation. The uniform contract this repo enforces is narrower than
+  full annotation: every `to_s` must **accept** `annotated:` without
+  raising, which this class does (verified by a spec). Widening
+  `Annotator#nested_identifiers` to close this for every such wrapper at
+  once is a separate, cross-flavor change.
