@@ -25,6 +25,12 @@ module Pubid
           base&.publisher
         end
 
+        # See Amendment.compact_hash: the publisher is borrowed from the base
+        # and must never appear on the supplement's own wire entry.
+        def self.compact_hash(_model, hash)
+          hash.delete("publisher")
+        end
+
         # Base document = the standard this corrigendum applies to, fully peeled.
         def base_document
           base&.base_document || self

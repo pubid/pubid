@@ -11,6 +11,12 @@ module Pubid
       attribute :copublishers, ::Pubid::Iso::Components::Publisher,
                 collection: true
 
+      # ISO prints "(all parts)" and has a series URN, so it has its own
+      # all-parts class.
+      def self.all_parts_class
+        Identifiers::AllParts
+      end
+
       # The publisher implied when none is serialized. ISO for most types;
       # publisher-less types (IWA) override this to nil.
       def self.default_publisher
@@ -137,20 +143,6 @@ module Pubid
         # unique typed-stage `code` under "stage" and recompute the rest on
         # load. _type already pins the document type.
         map "stage", with: { to: :stage_to_kv, from: :stage_from_kv }
-        # Omit the `false` default; only the meaningful `true` is serialized.
-        map "all_parts", with: { to: :all_parts_to_kv, from: :all_parts_from_kv }
-      end
-
-      def all_parts_to_kv(model, doc)
-        return unless model.all_parts
-
-        doc.add_child(
-          Lutaml::KeyValue::DataModel::Element.new("all_parts", true),
-        )
-      end
-
-      def all_parts_from_kv(model, value)
-        model.all_parts = value
       end
 
       # Serialize typed_stage as just its unique code (e.g. "is", "dis",

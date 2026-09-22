@@ -43,6 +43,16 @@ module Pubid
           base&.publisher
         end
 
+        # `publisher` reads through to the base, so it is never this
+        # amendment's own state. Lutaml only serializes the borrowed component
+        # when the member came from from_hash (the parse path shares the base
+        # instance, and lutaml omits the reference), which made
+        # from_hash(to_hash(id)).to_hash regrow a `publisher` key the parse
+        # path never emits. Drop it unconditionally to keep the wire symmetric.
+        def self.compact_hash(_model, hash)
+          hash.delete("publisher")
+        end
+
         # Base document = the standard this amendment applies to, fully peeled.
         def base_document
           base&.base_document || self

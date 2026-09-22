@@ -115,7 +115,7 @@ module Pubid
 
         # Reaffirmation - preserve original format and determine spacing
         if id.reaffirmation && !id.reaffirmation.to_s.empty?
-          result += render_reaffirmation(id)
+          result += render_reaffirmation(id, year_prints_4digit: id.original_year_4digit == true)
         end
 
         # Package (already has leading space from parser)
@@ -225,11 +225,13 @@ module Pubid
 
       private
 
-      # Reaffirmation rendering helper - shared across Base, Cec, and Series
-      def render_reaffirmation(id)
-        # Check if year was originally 2-digit (original_year_4digit flag)
-        year_was_2digit = !id.original_year_4digit
-
+      # Reaffirmation rendering helper - shared across Base, Cec, and Series.
+      # The spacing follows the PRINTED year, not the parsed spelling: a
+      # 4-digit printed year glues ("C108.1.2-M1981(R2013)"), a 2-digit
+      # printed year takes a space ("C22.2 NO. 125-M84 (R2004)") — even
+      # when the input spelled the year 4-digit, since the CEC render
+      # always displays 2 digits.
+      def render_reaffirmation(id, year_prints_4digit: false)
         # Check if reaffirmation was originally 4-digit (original_reaffirmation_4digit flag)
         reaffirmation_was_4digit = id.original_reaffirmation_4digit
 
@@ -245,13 +247,11 @@ module Pubid
                               id.reaffirmation.to_s
                             end
 
-        # Determine spacing based on original formats
-        if year_was_2digit && reaffirmation_was_4digit
-          # Year was 2-digit, reaffirmation was 4-digit → add space
-          " (R#{reaffirmation_str})"
-        else
-          # Both 2-digit, both 4-digit, or other cases → no space
+        # Determine spacing based on the printed year
+        if year_prints_4digit || !reaffirmation_was_4digit
           "(R#{reaffirmation_str})"
+        else
+          " (R#{reaffirmation_str})"
         end
       end
 

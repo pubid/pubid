@@ -15,6 +15,9 @@ module Pubid
   class TypeResolver
     TYPE_PREFIX = "pubid:"
     SEGMENT_SEPARATOR = ":"
+    # Types of classes that belong to no flavor, so they carry no flavor
+    # segment. Class names are strings, so the lookup triggers the autoload.
+    SHARED_TYPES = { "pubid:all-parts" => "Pubid::AllPartsIdentifier" }.freeze
 
     class << self
       # @param type [String, nil] Polymorphic _type, e.g. "pubid:iso:technical-report".
@@ -23,6 +26,17 @@ module Pubid
       def resolve(type)
         return nil unless type.is_a?(String)
 
+        shared_class(type) || flavor_class(type)
+      end
+
+      private
+
+      def shared_class(type)
+        name = SHARED_TYPES[type]
+        name && Object.const_get(name)
+      end
+
+      def flavor_class(type)
         flavor_name = flavor_segment(type)
         return nil unless flavor_name
 
@@ -42,8 +56,6 @@ module Pubid
         # loaded (autoload failure). Treat as unresolvable.
         nil
       end
-
-      private
 
       # The registered flavor whose module constant gives +segment+.
       # Identifier.polymorphic_name takes the segment from the module name

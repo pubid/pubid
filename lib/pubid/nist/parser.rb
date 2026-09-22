@@ -651,8 +651,9 @@ module Pubid
       rule(:mr_identifier) do
         hash_prefix.maybe >>
           publisher >> dot >>
-          simple_series >> dot >>
-          report_number >>
+          # The catalogue also lists bare series identities with no
+          # report number ("NBS.CIRC").
+          simple_series >> dot.maybe >> report_number.maybe >>
           # Edition with underscore separator (MR format: 1648_2009)
           (str("_") >> digits.as(:edition_year)).maybe >>
           # Support letter suffix before update (e.g., 8286C-upd1) - Session 219

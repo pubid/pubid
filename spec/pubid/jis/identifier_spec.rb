@@ -112,19 +112,22 @@ RSpec.describe Pubid::Jis::Identifier do
           expect(parsed.to_s).to eq(subject)
         end
 
+        # An all-parts identifier is a different object, so `==` is false
+        # and `===` does the match.
         context "when compared with identifier with part" do
           let(:other) { described_class.parse("JIS C 0617-2") }
 
-          it "returns true (all_parts matches any part)" do
-            expect(parsed == other).to be true
+          it "matches any part" do
+            expect(parsed === other).to be true
+            expect(parsed == other).to be false
           end
         end
 
         context "when compared with identifier with part and year" do
           let(:other) { described_class.parse("JIS C 0617-2:2017") }
 
-          it "returns true (all_parts matches any variation)" do
-            expect(parsed == other).to be true
+          it "matches any variation" do
+            expect(parsed === other).to be true
           end
         end
 
@@ -132,6 +135,7 @@ RSpec.describe Pubid::Jis::Identifier do
           let(:other) { described_class.parse("JIS C 0618-1") }
 
           it "returns false (different number)" do
+            expect(parsed === other).to be false
             expect(parsed == other).to be false
           end
         end

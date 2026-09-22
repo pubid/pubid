@@ -97,7 +97,13 @@ module Pubid
         klass = concrete_class_for(data)
         return klass.from_hash(data, options) if klass && klass != self
 
-        super(inflate_scalar_components(data), options)
+        # A row written before "all parts" became a class carries the old
+        # `all_parts: true` key on the document itself. Read it, and wrap.
+        legacy_all_parts = data.is_a?(::Hash) &&
+          (data["all_parts"] || data[:all_parts])
+
+        id = super(inflate_scalar_components(data), options)
+        legacy_all_parts ? id.to_all_parts : id
       end
 
       # Accept the flat scalar form that {#to_hash} now emits, and the nested
@@ -522,7 +528,17 @@ module Pubid
     attribute :stage, Components::Stage
     attribute :locality, Components::Locality
     attribute :typed_stage, Components::TypedStage
-    attribute :all_parts, Lutaml::Model::Type::Boolean, default: false
+    # "All parts" is a class, not a flag: see {Pubid::AllParts}. These two
+    # readers keep a caller that read the old attribute working.
+    # rubocop:disable Naming/PredicateMethod
+    def all_parts
+      false
+    end
+    # rubocop:enable Naming/PredicateMethod
+
+    def all_parts?
+      false
+    end
     # base is declared by supplement subclasses with proper type
     def base
       nil
@@ -1133,13 +1149,58 @@ module Pubid
         self != other
     end
 
-    # A reference that states +all_parts+ asks for every part of the
-    # document, so `===` does not restrict `part`, `parts` or `subpart`.
-    # `#includes?` below reads the same flag.
-    # @return [Boolean]
-    def subset_all_parts_wildcard?
-      all_parts == true
+    # The attributes that name a part of a document.
+    PART_ATTRIBUTES = %i[part subpart parts].freeze
+
+    # The class that #to_all_parts builds. A flavor with its own all-parts
+    # behaviour returns its subclass of {AllPartsIdentifier} here.
+    def self.all_parts_class
+      ::Pubid::AllPartsIdentifier
     end
+
+    # The attributes that name an edition of a document. An all-parts
+    # identifier ignores them, so it matches every edition. #exclude skips a
+    # name that a class does not declare, so one list serves every flavor; a
+    # flavor with another edition shape overrides this.
+    def self.all_parts_edition_keys
+      %i[date year edition version]
+    end
+
+    # A new identifier for every part of this document. It holds this
+    # identifier, unchanged, as its only member. `to_s` prints the document
+    # without its part and edition ("ISO 9000 (all parts)"), and `===`
+    # matches every part of it in every edition. The receiver does not change.
+    # A parsed "(all parts)" still sets the +all_parts+ flag instead; the two
+    # forms are not equal.
+    # @return [Pubid::AllPartsIdentifier]
+    def to_all_parts
+      self.class.all_parts_class.new(identifiers: [self])
+    end
+
+    # @return [Boolean] true when this identifier names a part of a document
+    def part?
+      without_parts != normalized_copy
+    end
+
+    # A copy without `part`, `parts`, `subpart` and the +extra+ attributes.
+    # Nested identifiers lose them too (#exclude).
+    def without_parts(*extra)
+      normalized_copy(*PART_ATTRIBUTES, *extra)
+    end
+
+    # A copy without the +attrs+ (#exclude), where a part collection holds
+    # [] and never nil. A parse and #from_hash disagree on nil against [] in
+    # some flavors (JIS), so two copies compare equal only after this.
+    def normalized_copy(*attrs)
+      exclude(*attrs).tap do |id|
+        PART_ATTRIBUTES.each do |name|
+          next unless self.class.collection_attribute?(name)
+
+          id.public_send(:"#{name}=", []) if id.public_send(name).nil?
+        end
+      end
+    end
+    protected :without_parts, :normalized_copy
 
     # Self is an all-parts collection that covers +other+.
     def includes?(other)

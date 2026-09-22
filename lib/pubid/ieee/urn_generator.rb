@@ -127,6 +127,10 @@ module Pubid
       end
 
       def publisher_component
+        # The IEC/IEEE co-published pair is definitional to the class and
+        # was previously lost ("urn:ieee:ieee" — no number, no draft).
+        return "iec-ieee" if identifier.is_a?(Identifiers::IecIeeeCopublished)
+
         pub = normalized_publisher
 
         if identifier.copublisher&.any?
@@ -150,6 +154,14 @@ module Pubid
       end
 
       def type_component
+        # A joint stage draft carries the stage in its draft clause and the
+        # project P inside the code — a separate type segment would
+        # duplicate both.
+        if identifier.is_a?(Identifiers::JointDevelopment) &&
+           identifier.ieee_draft.to_s.start_with?("D=")
+          return nil
+        end
+
         return nil unless identifier.type
 
         type = identifier.type
@@ -159,6 +171,16 @@ module Pubid
       end
 
       def code_component
+        # The co-published code is number+parts+separators (no year — its
+        # own segment), e.g. "61886-1".
+        if identifier.is_a?(Identifiers::IecIeeeCopublished)
+          return nil if identifier.number.to_s.empty?
+
+          # Year-less: the publication year is its own URN segment (the
+          # rebuilt copublished_number would double-emit it).
+          return "#{identifier.number}#{identifier.parts_suffix}"
+        end
+
         return nil unless identifier.code_obj
 
         identifier.code_obj.to_s
@@ -182,6 +204,15 @@ module Pubid
       end
 
       def draft_component
+        if identifier.is_a?(Identifiers::JointDevelopment) &&
+           identifier.ieee_draft.to_s.start_with?("D=")
+          return "draft.#{identifier.ieee_draft}"
+        end
+
+        if identifier.is_a?(Identifiers::IecIeeeCopublished)
+          return identifier.draft_info ? "draft.#{identifier.draft_info}" : nil
+        end
+
         return nil unless identifier.draft_obj
 
         "draft.#{identifier.draft_obj}"

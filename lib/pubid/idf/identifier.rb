@@ -5,6 +5,11 @@ module Pubid
   module Idf
     # An IDF identifier has no copublisher
     class Identifier < ::Pubid::Identifier
+      # The all-parts identifier of this flavor.
+      def self.all_parts_class
+        Identifiers::AllParts
+      end
+
       # A Type INSTANCE, never the raw :key symbol - lutaml materializes
       # defaults during from_hash; casting a Symbol into the
       # component raises InvalidFormatError (pubid#383).

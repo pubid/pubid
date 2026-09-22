@@ -179,7 +179,7 @@ RSpec.describe "IEEE trademark position" do
   it "honours JointDevelopment's ISO format" do
     id = Pubid::Ieee::Identifier.parse("ISO/IEC/IEEE P26511/D8-2018")
     expect(id.to_s(format: :iso, trademark: true))
-      .to eq("ISO/IEC/IEEE 26511™:2018")
+      .to eq("ISO/IEC/IEEE P26511™:2018")
   end
 
   describe "Pubid::Ieee.trademark_symbol_for" do

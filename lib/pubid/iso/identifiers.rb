@@ -4,6 +4,7 @@ module Pubid
   module Iso
     module Identifiers
       autoload :Addendum, "#{__dir__}/identifiers/addendum"
+      autoload :AllParts, "#{__dir__}/identifiers/all_parts"
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
       autoload :Data, "#{__dir__}/identifiers/data"

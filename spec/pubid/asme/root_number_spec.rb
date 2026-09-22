@@ -243,6 +243,35 @@ RSpec.describe "Pubid::Asme index key (root.number)" do
     end
   end
 
+  # Alternate catalogue spellings the corpus classifier emitted as
+  # "!RAW!FIXED" annotations. Each half is an input in its own right;
+  # the gem's own rendered output (the FIXED half) must parse back.
+  describe "catalogue alternate spellings" do
+    {
+      # The printed sub-code carries its own leading dot; the canonical
+      # render joins it with the single dot.
+      "ASME BPVC.CC.BPV..I" => ["BPVC.CC.BPV.I", nil, "ASME BPVC.CC.BPV.I"],
+      "ASME BPVC.CC.NC..XI" => ["BPVC.CC.NC.XI", nil, "ASME BPVC.CC.NC.XI"],
+      # The SSC series identity, listed bare in the catalogue.
+      "ASME BPVC.SSC." => ["BPVC.SSC.", nil],
+      # PTC and TR render glued to their number; the rendered form
+      # must not be a write-only spelling.
+      "ASME PTC19.3 TW-2010" => ["PTC19.3", "2010"],
+      "ASME TRA17.1-8.4-2013" => ["TRA17.1-8.4", "2013"],
+      # Joint adoptions with a space before the "/ASME" portion, and
+      # the numberless ISO/ASME series identity.
+      "API 579-2 /ASME PTB-14-2009" => ["PTB-14", "2009"],
+      "CSA B44.10 /ASME A17.10-2024" => ["A17.10", "2024"],
+      "ISO/ASME-2015" => [nil, "2015"],
+    }.each do |ref, (number, year, rendered)|
+      it "parses #{ref}" do
+        id = Pubid::Asme.parse(ref)
+        expect([id.number, id.year]).to eq([number, year])
+        expect(id.to_s).to eq(rendered || ref)
+      end
+    end
+  end
+
   # The serialized code was a NESTED hash; it is now flat scalars, which is
   # what an index row wants. No relaton-data-asme exists, so nothing published
   # has to migrate.

@@ -138,8 +138,10 @@ module Pubid
             end
           end
 
-          # Code (NO P prefix in ISO format, NO draft notation)
-          code_str = code.to_s.gsub(/^P/, "")
+          # IEEE semantics: P = project (a draft); no P = a standard. The
+          # P-state is identity-bearing and prints as spelled — it is never
+          # added or stripped here.
+          code_str = code.to_s
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
@@ -159,13 +161,9 @@ module Pubid
           # Publishers (slash-separated)
           parts << publishers.join("/") if publishers && !publishers.empty?
 
-          # Build code part
-          code_str = code.to_s.gsub(/^P/, "") # Remove any existing P first
-
-          # Add P prefix for projects (IEEE format always shows P for drafts)
-          if typed_stage&.project_status || type == "P"
-            code_str = "P#{code_str}"
-          end
+          # Build code part — the P-state prints as spelled (P = project
+          # draft; no P = standard). Never added or stripped.
+          code_str = code.to_s
 
           # Mark after the number, before the draft and the year
           code_str += mark unless code_str.empty?

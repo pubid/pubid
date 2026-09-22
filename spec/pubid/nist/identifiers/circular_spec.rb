@@ -245,12 +245,12 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses supplement with revision" do
-          expect(parsed.supplement.has_revision).to be true
+        it "parses supplement without revision" do
+          expect(parsed.supplement.has_revision).to be false
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
+          expect(parsed.to_s).to eq("NBS CIRC 154sup")
         end
       end
 

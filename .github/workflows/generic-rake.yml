@@ -48,7 +48,7 @@ jobs:
       default_ruby_version: ${{ steps.config.outputs.default_ruby_version }}
       public: ${{ steps.repo_status.outputs.public }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: retrieve tags
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
@@ -151,7 +151,7 @@ jobs:
       matrix: ${{ fromJson(needs.prepare.outputs.ruby_matrix) }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: true
 
@@ -165,9 +165,9 @@ jobs:
     - run: bundle exec rake
 
     - if: needs.prepare.outputs.public == 'true' && matrix.os == 'ubuntu-latest' && matrix.ruby.version == needs.prepare.outputs.default-ruby-version
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v7
       with:
-        file: coverage/.resultset.json
+        files: coverage/.resultset.json
 
   rake-monorepo:
     name: Test ${{ matrix.gem }} on Ruby ${{ matrix.ruby.version }} ${{ matrix.os }}
@@ -187,7 +187,7 @@ jobs:
         working-directory: ${{ format('{0}/{1}', inputs.gem_directory, matrix.gem) }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: true
 
@@ -202,9 +202,9 @@ jobs:
     - run: bundle exec rake
 
     - if: needs.prepare.outputs.public == 'true' && matrix.os == 'ubuntu-latest' && matrix.ruby.version == needs.prepare.outputs.default-ruby-version
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v7
       with:
-        file: ${{ format('{0}/{1}/coverage/.resultset.json', inputs.gem_directory, matrix.gem) }}
+        files: ${{ format('{0}/{1}/coverage/.resultset.json', inputs.gem_directory, matrix.gem) }}
 
   tests-passed:
     needs: [rake-traditional, rake-monorepo]

@@ -25,6 +25,12 @@ module Pubid
     end
 
     class Identifier < ::Pubid::Identifier
+      # IEC prints "(all parts)" and has a series URN, so it has its own
+      # all-parts class.
+      def self.all_parts_class
+        Identifiers::AllParts
+      end
+
       # Override base types with IEC-specific ones. publisher defaults to the
       # type's implied publisher (IEC), so an omitted publisher key reconstructs
       # correctly on from_hash.
@@ -187,7 +193,6 @@ module Pubid
         map "stage", with: { to: :stage_to_kv, from: :stage_from_kv }
         # A Boolean attribute whose `false` default ::Pubid::Identifier#to_hash
         # already drops, so a plain map suffices (the GB spelling).
-        map "all_parts", to: :all_parts, render_default: false
       end
 
       # --- date serialized flat as year/month/day ---

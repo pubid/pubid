@@ -17,15 +17,18 @@ RSpec.describe "ISO all parts notation" do
         expect(id.all_parts).to be true
       end
 
+      # The printed form names the document, so the year goes away.
       it "parses ISO identifier with year and (all parts)" do
         id = Pubid::Iso.parse("ISO 9000:2015 (all parts)")
-        expect(id.to_s).to eq("ISO 9000:2015 (all parts)")
+        expect(id.to_s).to eq("ISO 9000 (all parts)")
         expect(id.all_parts).to be true
+        expect(id.identifiers.first.year).to eq("2015")
       end
 
+      # The part goes away for the same reason.
       it "parses ISO identifier with part and (all parts)" do
         id = Pubid::Iso.parse("ISO 9000-1 (all parts)")
-        expect(id.to_s).to eq("ISO 9000-1 (all parts)")
+        expect(id.to_s).to eq("ISO 9000 (all parts)")
         expect(id.all_parts).to be true
       end
 
@@ -37,7 +40,7 @@ RSpec.describe "ISO all parts notation" do
 
       it "parses ISO with languages and (all parts)" do
         id = Pubid::Iso.parse("ISO 9000:2015(E/F) (all parts)")
-        expect(id.to_s).to eq("ISO 9000:2015(E/F) (all parts)")
+        expect(id.to_s).to eq("ISO 9000(E/F) (all parts)")
         expect(id.all_parts).to be true
       end
 
