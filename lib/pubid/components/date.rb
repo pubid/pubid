@@ -53,12 +53,6 @@ module Pubid
         result
       end
 
-      private
-
-      def pad2(value)
-        value.to_s.rjust(2, "0")
-      end
-
       def hash
         @hash ||= [year, month, day, undated].compact.map(&:hash).hash
       end
@@ -68,6 +62,12 @@ module Pubid
 
         year == other.year && month == other.month && day == other.day &&
           undated == other.undated
+      end
+
+      private
+
+      def pad2(value)
+        value.to_s.rjust(2, "0")
       end
     end
   end
