@@ -152,7 +152,11 @@ module Pubid
           result = parts.join(" ")
           result += ":#{year}" if year
           result += "/#{ieee_draft}" if ieee_draft && ieee_draft.start_with?("D=")
-          result += " (#{parenthetical_content})" if parenthetical_content
+          # Only the language/edition marker ("(E)", "(E/F)") prints; a
+          # trailing relationship narrative is metadata, not identity.
+          if parenthetical_content&.match?(%r{\A[A-Z](?:\s*[/&]\s*[A-Z])*\z})
+            result += " (#{parenthetical_content})"
+          end
 
           result
         end

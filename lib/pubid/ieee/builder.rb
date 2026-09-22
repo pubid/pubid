@@ -711,12 +711,15 @@ module Pubid
           attributes[:month] ||= extract_value(parsed[:draft_month])
         end
 
-        # The "(E)" edition marker of an ISO/IEC double label rides on the
-        # joint reference as parenthetical_content.
+        # The "(E)" edition marker of an ISO/IEC label rides on the joint
+        # reference as parenthetical_content - either from the trailing
+        # parenthetical slot (the double-label form) or the mid-rule slot
+        # before an amendment tail.
         if parsed[:parameters].is_a?(Hash) && parsed[:parameters][:parenthetical_content]
           attributes[:parenthetical_content] =
             extract_value(parsed[:parameters][:parenthetical_content])
         end
+        attributes[:parenthetical_content] ||= extract_value(parsed[:edition_marker]) if parsed[:edition_marker]
 
         # Extract edition, from relaton's "/E-<n>" suffix (normalized to
         # "Edition <n>.0"). nil-residue hand-off item 1.

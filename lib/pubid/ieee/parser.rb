@@ -702,6 +702,12 @@ module Pubid
           # keys (:draft_month/:draft_year), because a plain :month/:year
           # here collides with the date clause above and parslet drops the
           # subtree with a "Duplicate subtrees" warning.
+          # The ISO/IEC edition marker may sit between the year and an
+          # amendment/draft tail: "8802.11:2012 (E)/Amd 1-2014". A distinct
+          # key - a second :parameters capture here collides with the
+          # trailing parenthetical slot (parslet drops duplicate subtrees).
+          (space.maybe >> str("(") >>
+           match("[^)]").repeat(1).as(:edition_marker) >> str(")")).maybe >>
           # The stage-draft clause of the ISO-led print: "/D=WD.5" -
           # D (draft) = the ISO/IEC stage it drafts, with its iteration
           # (docs/IEEE-DRAFT-STAGES.md §1.2).
