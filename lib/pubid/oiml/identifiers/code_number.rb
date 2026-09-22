@@ -54,11 +54,11 @@ module Pubid
           base.attribute :space_suffix, :boolean, default: -> { false }
         end
 
-        # A nil `part` or `suffix` means the document has neither:
-        # `OIML R 138` is not `OIML R 138-Amend`, which is its amendment.
-        # Declared on each leaf, beside the columns it governs.
+        # A nil `part`, `subpart` or `suffix` means the document has none of
+        # them: `OIML R 138` is not `OIML R 138-Amend`, which is its
+        # amendment. Declared on each leaf, beside the columns it governs.
         def self.install_subset_rules(base)
-          base.subset_strict :part, :suffix
+          base.subset_strict :part, :subpart, :suffix
         end
 
         # Merged by lutaml with the block SingleIdentifier declares, which

@@ -14,6 +14,10 @@ module Pubid
         "short"
       } # Track parsed format
 
+      # A nil `language` means the document states none: `OIML R 126:2015
+      # Errata` is not `OIML R 126:2015 Errata (E)`, its English edition.
+      subset_strict :language
+
       # Serialization delta on top of Oiml::Identifier's shared block. The
       # `date` (year) component is flattened to a top-level key rather than a
       # nested hash, mirroring ISO (lib/pubid/iso/identifier.rb). `type` is

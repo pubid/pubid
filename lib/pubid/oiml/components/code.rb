@@ -24,7 +24,7 @@ module Pubid
 
         # Mirrors the flat columns the CodeNumber mixin installs on the
         # seven leaves, which own the identity.
-        subset_strict :part, :suffix
+        subset_strict :part, :subpart, :suffix
 
         def to_s
           result = number.to_s

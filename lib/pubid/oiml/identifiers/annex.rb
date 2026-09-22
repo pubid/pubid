@@ -15,6 +15,10 @@ module Pubid
           map "year_on_base", to: :year_on_base
         end
 
+        # A nil `letter` means the plural "Annexes" reference, not "any
+        # annex": it must not match a candidate naming a specific one.
+        subset_strict :letter
+
         def supplement_type
           letter ? "Annex #{letter}" : "Annexes"
         end

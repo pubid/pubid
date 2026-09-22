@@ -288,6 +288,14 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
       expect(Pubid::Oasis.parse("OASIS WSDM-v1.0") ===
              Pubid::Oasis.parse("OASIS WSDM-v1.1")).to be(false)
     end
+
+    # year_on_base records which of two equivalent renderings ("OIML R
+    # 102:1995 Annex B-C" vs "OIML R 102 Annex B-C:1995") the input used, not
+    # something the document states.
+    it "skips the OIML render flags when the reference doesn't restate them" do
+      expect(Pubid::Oiml.parse("OIML R 102 Annex B-C") ===
+             Pubid::Oiml.parse("OIML R 102:1995 Annex B-C")).to be(true)
+    end
   end
 
   # A strict attribute is one the reference always states. A nil value means
@@ -359,6 +367,28 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
              parse("oiml", "OIML R 138-Amend:2009")).to be(false)
       expect(parse("oiml", "OIML R 138-Amend") ===
              parse("oiml", "OIML R 138-Amend:2009")).to be(true)
+    end
+
+    it "OIML: a nil language means none" do
+      expect(parse("oiml", "OIML R 126:2015 Errata") ===
+             parse("oiml", "OIML R 126:2015 Errata (E)")).to be(false)
+      english = parse("oiml", "OIML R 126:2015 Errata (E)")
+      expect(english === parse("oiml", "OIML R 126:2015 Errata (E)"))
+        .to be(true)
+    end
+
+    it "OIML: a nil subpart means none" do
+      expect(parse("oiml", "OIML R 137-1 (F)") ===
+             parse("oiml", "OIML R 137-1-2:2012 (F)")).to be(false)
+      expect(parse("oiml", "OIML R 137-1-2 (F)") ===
+             parse("oiml", "OIML R 137-1-2:2012 (F)")).to be(true)
+    end
+
+    it "OIML: a nil annex letter means the plural Annexes reference" do
+      expect(parse("oiml", "OIML R 102 Annexes") ===
+             parse("oiml", "OIML R 102:1995 Annex B-C")).to be(false)
+      expect(parse("oiml", "OIML R 102 Annex B-C") ===
+             parse("oiml", "OIML R 102:1995 Annex B-C")).to be(true)
     end
 
     it "CCSDS: a nil language means none" do

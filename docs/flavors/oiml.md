@@ -35,11 +35,50 @@ value as "this document has none". They are declared with `subset_strict`, so
 that does want every part of a document sets `all_parts` on the reference, or
 keeps `#matches?(other, ignore:)`.
 
-- **`part` and `suffix` are strict**, so `OIML R 138` does not match
-  `OIML R 138-Amend:2009`, which is its amendment. The declaration rides
-  the `Identifiers::CodeNumber` mixin
-  (`lib/pubid/oiml/identifiers/code_number.rb`), so it reaches all seven
-  leaves that install the columns; `Bulletin`, which does not include the
-  mixin, is unaffected. `Oiml::Components::Code` carries the same
+- **`part`, `subpart` and `suffix` are strict**, so `OIML R 138` does not
+  match `OIML R 138-Amend:2009`, which is its amendment, and
+  `OIML R 137-1 (F)` does not match `OIML R 137-1-2:2012 (F)`, which names a
+  subpart it doesn't. The declaration rides the `Identifiers::CodeNumber`
+  mixin (`lib/pubid/oiml/identifiers/code_number.rb`), so it reaches all
+  seven leaves that install the columns; `Bulletin`, which does not include
+  the mixin, is unaffected. `Oiml::Components::Code` carries the same
   declaration for the shapes not to drift, although `===` does not reach it
   today.
+- **`language` is strict**, declared separately on `SingleIdentifier` and
+  `SupplementIdentifier` (each declares its own `language` attribute), so
+  `OIML R 126:2015 Errata` does not match `OIML R 126:2015 Errata (E)`, its
+  English edition. It could not be declared once on the shared `Identifier`
+  ancestor: `spec/pubid/subset_match_spec.rb`'s "names only attributes the
+  class declares" check requires every `subset_strict` name to be a real
+  attribute on the declaring class, and `Identifier` itself declares neither
+  `language` nor `letter`.
+- **`Annex#letter` is strict**, so `OIML R 102 Annexes` (no letter — the
+  plural form) does not match `OIML R 102:1995 Annex B-C`, which names one.
+  Found in review alongside the `language`/`subpart` work above: same bug
+  shape, on the one OIML attribute besides `language` that names a specific
+  sub-document and had no `subset_strict` declaration.
+
+## Subset match: ignored render flags
+
+`parsed_format` (`SingleIdentifier`/`SupplementIdentifier`), `year_on_base`
+(`Annex`), `space_suffix` (`CodeNumber` mixin / `Components::Code`),
+`trailing` and `joined` (`SupplementIdentifier`) are Boolean or string
+attributes with a non-nil default that record which of two equivalent input
+spellings a reference used (short vs long format, dash- vs space-separated
+suffix, trailing-word vs prose supplement form, year glued to the base vs to
+the marker) — never something the document itself states. Left alone, their
+non-nil default reads as "stated" to `===` even in a bare reference (the
+CSA/IEEE year-format trap `docs/SUBSET_MATCH.md` describes), which is why
+`OIML R 102 Annex B-C === OIML R 102:1995 Annex B-C` used to disagree with
+relaton's own OIML match on `year_on_base` alone. They are listed in
+`Oiml::Identifier.subset_ignored_attributes` (`lib/pubid/oiml/identifier.rb`)
+as one shared list on the flavor's common ancestor: a name that isn't an
+attribute of a given leaf (e.g. `year_on_base` only exists on `Annex`) is a
+harmless no-op there, since `===` only walks `self.class.attributes`.
+
+**Measurement that drove this** (hand-off
+`metanorma__pubid__oiml-subset-match-strict-language.md`): relaton compared
+`===` against its own OIML match over the full 5,646-row `relaton-data-oiml`
+index (4.57M pairs) and found 192 disagreeing pairs outside the Bulletins —
+156 on `language`, 6 on `subpart`, 30 on `year_on_base` — all wrong on the
+`===` side before this branch.
