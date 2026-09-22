@@ -37,7 +37,7 @@ RSpec.describe "IEEE joint ISO-stage spellings — issue #216" do
     "ISO/IEC/IEEE FDIS P15289_D3, 2017" => "ISO/IEC/IEEE FDIS P15289:2017",
     # underscore stage after the draft
     "ISO/IEC/IEEE P24748-3/D3_FDIS, April 2020 (E)" =>
-      "ISO/IEC/IEEE FDIS P24748.3:2020",
+      "ISO/IEC/IEEE FDIS P24748.3:2020 (E)",
     # underscore draft, then underscore stage
     "ISO/IEC/IEEE P24641_D2_CD, June 2020" => "ISO/IEC/IEEE CD P24641:2020",
     # comma with no space before the month
