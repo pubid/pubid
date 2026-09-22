@@ -34,3 +34,23 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   composition moved into a private `render_plain`; **`super` is not
   reachable from a private method**, so `to_s` hands it in as a block —
   `render_plain(format) { super(format) }`.
+
+- **`all_parts_edition_keys` needed `update`/`update_component`, not
+  `edition_year`.** `Identifier.all_parts_edition_keys` defaults to
+  `%i[date year edition version]`; NIST's primary edition carrier
+  (`edition`, a `Components::Edition`) is already covered, but the Letter
+  Circular / Circular "rJun1992"-style revision (`Builder` around the
+  "Convert revision with month+year to update component" comment) parses
+  into a **separate** attribute, `update`/`update_component`
+  (`Components::Update`: number+year+month), which the default list
+  missed entirely — `"NBS LC 800 rJun1992"` and `"NBS LC 800 rJul1995"`
+  failed to collapse under `#to_all_parts`/`#===`. Fixed with
+  `Pubid::Nist::Identifier.all_parts_edition_keys` (`super + %i[update
+  update_component]`). **`edition_year` and `revision_year`/
+  `revision_month` were investigated and are NOT added**: `Builder` only
+  ever sets `edition_year` alongside the real `edition` component (never
+  as its sole carrier, e.g. the TechnicalNote "date IS edition" branch),
+  and `revision_year`/`revision_month` are transient — converted into
+  `update`/`update_component` and cleared to `nil` before the object is
+  returned. Neither carries live information `edition`/`update` doesn't
+  already cover. Locked by `spec/pubid/all_parts_edition_keys_audit_spec.rb`.

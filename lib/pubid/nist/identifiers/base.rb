@@ -229,6 +229,24 @@ module Pubid
         EQUALITY_IGNORED_ATTRS
       end
 
+      # `edition` is the primary edition/revision carrier and is already in
+      # the default %i[date year edition version] list. `update`/
+      # `update_component` (Components::Update: number+year+month) is a
+      # SEPARATE, currently-live discriminator the default list misses — the
+      # Letter Circular / Circular "rJun1992"-style revision parses into it,
+      # not into `edition` (see Builder#build_dated_identifier), so e.g.
+      # "NBS LC 800 rJun1992" and "NBS LC 800 rJul1995" failed to collapse
+      # under #to_all_parts/#=== before this override. (`edition_year` and
+      # `revision_year`/`revision_month` are NOT added here: the builder
+      # always sets `edition_year` alongside the real `edition` component
+      # (never alone), and `revision_year`/`revision_month` are transient —
+      # converted into `update`/`update_component` and cleared to nil before
+      # the object is returned — so neither carries live information outside
+      # what `edition`/`update` already do.)
+      def self.all_parts_edition_keys
+        super + %i[update update_component]
+      end
+
       def hash
         vals = self.class.attributes.each_key.reject do |name|
           EQUALITY_IGNORED_ATTRS.include?(name)
@@ -418,8 +436,6 @@ module Pubid
         match = edition_str.match(/^[er]?(\d+)$/)
         match ? match[1].to_i : nil
       end
-
-      public
 
       def to_full_style
         # "National Institute of Standards and Technology Special Publication 800-27, Revision A"
@@ -752,6 +768,5 @@ module Pubid
         "NIST"
       end
     end
-
   end
 end

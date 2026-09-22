@@ -17,3 +17,31 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 **Every AMCA URN held a Ruby Hash.** `urn_type` interpolated the `type` metadata Hash (`copub.amca:{key: :publication, ...}`); it now reads `type[:key]`, the source `mr_type` reads. The URN also carries the interpretation code (`interp.jw`), so the interpretations of one standard no longer share a URN. `UrnParser` reads every token back (type, copublisher, interpretation code, revision, reaffirmation), so all 50 parseable fixture ids come back `==` from their URN; before, it rebuilt a bare `AMCA <number>-<year>` Standard.
 
 **Not fixed, pre-existing:** `AMCA 204 – 1` and `ANSI/AMCA Standard 210-25 / ASHRAE 51-25` do not parse. `ANSI/AMCA 210-16 /ASHRAE 51-16` parses but silently drops `/ASHRAE 51-16`, because `additional_copublisher` has no capture. The `suffix` rule of `standard_identifier` has no capture either, so `suffix` is never set on a `Standard`.
+
+## `all_parts_edition_keys`: Publication's `revision`, then the shared `reaffirmed`
+
+`Identifier.all_parts_edition_keys` defaults to `%i[date year edition
+version]`. A first pass fixed `Identifiers::Publication#revision` (the
+`Rev. 01-23` token), a separate discriminator that list never covered, so
+`"AMCA Publication 211-22 (Rev. 01-23)".to_all_parts` did not collapse
+onto another revision of the same publication under `#to_all_parts`/`#===`.
+Fixed with `Identifiers::Publication.all_parts_edition_keys` (`super +
+%i[revision]`), declared on `Publication` itself rather than the shared
+`Pubid::Amca::Identifier` base — `Standard`/`Interpretation` don't carry
+`revision`.
+
+Code review of that same change found a second, wider gap it had missed:
+`reaffirmed` (the `"(R2010)"` year) is declared on the shared
+`Pubid::Amca::Identifier` base (`identifiers/base.rb`), not on
+`Publication`, and `Renderer#render_base` reads it for **every** leaf —
+`Standard` as well as `Publication` — so `"AMCA 210-16 (R2010)"` failed to
+collapse onto `"AMCA 210-16 (R2015)"` even though neither is a
+`Publication`. Fixed on the shared base itself:
+`Pubid::Amca::Identifier.all_parts_edition_keys` is `super +
+%i[reaffirmed]`; `Publication`'s own override chains through `super` and
+picks it up automatically. **Lesson**: a discriminator declared on a
+shared base needs the override on that base, not repeated per leaf — and,
+per the IEEE entry above, finding one missed attribute is not proof the
+audit is complete. Not part of the original hand-off's audit list (which
+didn't cover AMCA); found during code review of the OGC/3GPP/NIST fix.
+Locked by `spec/pubid/all_parts_edition_keys_audit_spec.rb`.
