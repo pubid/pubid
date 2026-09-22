@@ -3,4 +3,7 @@
 
 !IEEE Std 1904.1(TM)/Conformance02-2014 (Conformance to IEEE Std 1904.1-2013)!IEEE Std 1904.1/Conformance02-2014
 !IEEE Std 1904.1(TM)/Conformance03-2014 (Conformance to IEEE Std 1904.1-2013)!IEEE Std 1904.1/Conformance03-2014
+!IEEE Std 1904.1/Conformance01-2014 (Conformance to IEEE Std 1904.1-2013)!IEEE Std 1904.1/Conformance01-2014
 IEEE Std 802.16/Conformance01-2003
+!IEEE Std 802.16/Conformance03-2004 (Conformance to IEEE Std 802.16-2001 as amended by IEEE Std 802.16a -2003 and IEEE Std 802.16c-2002)!IEEE Std 802.16/Conformance03-2004
+!IEEE Std 802.16/Conformance04-2006 (Conformance to IEEE Std 802.16-2004)!IEEE Std 802.16/Conformance04-2006
