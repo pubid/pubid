@@ -27,6 +27,15 @@ module Pubid
       # Three-part version string, e.g. "2.0.0".
       attribute :version, :string
 
+      # 3GPP's edition/version identity is split across `release` and
+      # `version`. `version` is already in the default
+      # `%i[date year edition version]` list; `release` is not, so it
+      # survived without_parts untouched and leaked into an "all parts"
+      # identity built via #to_all_parts.
+      def self.all_parts_edition_keys
+        super + %i[release]
+      end
+
       # A nil `suffix` and an empty `parts` mean the document has neither:
       # `TS 29.198` is not `TS 29.198-04-1`, and `TR 00.01` is not
       # `TR 00.01U`. A stated list is not a prefix either.

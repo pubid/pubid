@@ -201,6 +201,18 @@ module Pubid
         hash
       end
 
+      # Three more IEEE discriminators the default %i[date year edition
+      # version] list misses, alongside `edition`/`year`: `revision` (e.g.
+      # "2" in "P802.16Rev2"); `reaffirmed` (the "(R2010)" year, read by
+      # renderer.rb and urn_generator.rb — two reaffirmations of the same
+      # standard failed to collapse under #to_all_parts/#===); and
+      # `edition_month`, the month half of "Edition N YYYY-MM"
+      # (renderer.rb's `"Edition #{edition} #{year}-#{edition_month}"`),
+      # which survived even though its sibling `year` is already stripped.
+      def self.all_parts_edition_keys
+        super + %i[revision reaffirmed edition_month]
+      end
+
       # Inverse of the to_hash compaction: expand a scalar `stage` back into the
       # `typed_stage` sub-hash (on a deep copy, recursively) before lutaml
       # deserializes, so nested bases rebuild their component too. `draft` needs

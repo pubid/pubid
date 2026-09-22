@@ -28,6 +28,19 @@ module Pubid
         def self.type
           { key: :publication, title: "Publication", short: nil }
         end
+
+        # `revision` is Publication's edition/version discriminator and is
+        # not in the default %i[date year edition version] list, so
+        # #to_all_parts/#=== failed to collapse two revisions of the same
+        # publication (e.g. "AMCA Publication 211-22 (Rev. 01-23)" vs
+        # "... (Rev. 02-23)"). Declared here, not on the shared
+        # Pubid::Amca::Identifier base, because `revision` is
+        # Publication-only — Standard and Interpretation don't carry it.
+        # `super` also picks up `reaffirmed`, added on the shared base
+        # (identifiers/base.rb) since Standard carries that one too.
+        def self.all_parts_edition_keys
+          super + %i[revision]
+        end
       end
     end
   end

@@ -87,6 +87,16 @@ module Pubid
       def mr_year
         year&.to_s
       end
+
+      # `reaffirmed` (the "(R2010)" year, read by Renderer#render_base — used
+      # for Standard as well as Publication) is a discriminator the default
+      # %i[date year edition version] list misses, shared by every leaf that
+      # inherits this class. Declared here, not per-leaf, so Standard's own
+      # reaffirmations collapse too; Publication's revision (see
+      # publication.rb) is layered on top via `super`.
+      def self.all_parts_edition_keys
+        super + %i[reaffirmed]
+      end
     end
   end
 end

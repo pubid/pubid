@@ -16,6 +16,17 @@ module Pubid
       # its separator letter: "r1", "c1", "a", "r3a", "r12a". nil when absent.
       attribute :revision, :string
 
+      # `revision` is OGC's edition/version discriminator, not the default
+      # `%i[date year edition version]`. `year` IS in that default list, but
+      # here it is the document's core "<yy>" identity token — the renderer
+      # requires it to print the "12-128" core (lib/pubid/ogc/renderer.rb) —
+      # not an edition marker, so it must stay OUT of the stripped set. Do
+      # not "fix" this by adding :revision to the base default; that keeps
+      # :year in the list and reproduces the dropped-prefix bug.
+      def self.all_parts_edition_keys
+        %i[revision]
+      end
+
       # Polymorphic type map for lutaml::Model key_value (de)serialization: maps
       # the concrete class's polymorphic_name to its class name so a stored hash
       # rebuilds the correct identifier type via from_hash.
