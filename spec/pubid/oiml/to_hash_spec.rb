@@ -14,6 +14,7 @@ module OimlToHashSpec
     "OIML R 60 Annexes:2021 (E)",
     "OIML R 60 Annex A Edition 2013 (E)",
     "Amendment (2009) to OIML R 138 Edition 2007 (E)",
+    "ISO 4064-1:2024|OIML R 49-1:2024",
   ].freeze
 end
 

@@ -47,6 +47,10 @@ module OimlIndexKeySpec
     # standard through #root
     "Amendment (2009) to OIML R 138 Edition 2007 (E)" => ["Amendment", "138"],
     "OIML R 60 Annex A Edition 2013 (E)" => ["Annex", "60"],
+    # dual-published (pubid #437): root delegates to whichever side is OIML,
+    # regardless of print order.
+    "ISO 4064-1:2024|OIML R 49-1:2024" => ["DualPublished", "49"],
+    "OIML R 49-1:2024|ISO 4064-1:2024" => ["DualPublished", "49"],
   }.freeze
 
   # The seven code-bearing leaves. Bulletin is deliberately absent: it has no

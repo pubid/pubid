@@ -18,6 +18,8 @@ module Pubid
         @context = context
 
         case id
+        when Identifiers::DualPublished
+          render_dual_published(id)
         when Identifiers::Annex
           render_annex(id)
         when Identifiers::Bulletin
@@ -91,6 +93,12 @@ module Pubid
       # the supplement can re-attach its own language at the end.
       def strip_language(str)
         str.sub(/\s*\([^)]+\)\s*$/, "").strip
+      end
+
+      # Bare "|", original left-to-right print order, e.g.
+      # "ISO 4064-1:2024|OIML R 49-1:2024".
+      def render_dual_published(id)
+        "#{id.first}|#{id.second}"
       end
 
       def render_single(id)

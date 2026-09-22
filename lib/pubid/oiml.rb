@@ -29,6 +29,11 @@ module Pubid
         raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
       end
 
+      if identifier.include?("|")
+        dual = Identifiers::DualPublished.build(identifier)
+        return dual if dual
+      end
+
       parser = Parser.new
       builder = Builder.new
 

@@ -17,6 +17,17 @@ RSpec.describe Pubid::Oiml do
       end
     end
 
+    context "dual-published identifiers (pubid #437)" do
+      it "parses ISO 4064-1:2024|OIML R 49-1:2024" do
+        result = described_class.parse("ISO 4064-1:2024|OIML R 49-1:2024")
+
+        expect(result).to be_a(Pubid::Oiml::Identifiers::DualPublished)
+        expect(result.first).to be_a(Pubid::Iso::Identifiers::InternationalStandard)
+        expect(result.second).to be_a(Pubid::Oiml::Identifiers::Recommendation)
+        expect(result.to_s).to eq("ISO 4064-1:2024|OIML R 49-1:2024")
+      end
+    end
+
     context "identifiers with date" do
       it "parses OIML B 18:2018" do
         result = described_class.parse("OIML B 18:2018")
