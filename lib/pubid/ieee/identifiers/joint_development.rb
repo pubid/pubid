@@ -42,6 +42,8 @@ module Pubid
         attribute :year, :string
         attribute :iso_stage, :string               # For ISO stage if present
         attribute :ieee_draft, :string              # For IEEE P/D notation if present
+        attribute :parenthetical_content, :string   # e.g. the "(E)" edition
+                                                    # marker of an ISO/IEC label
 
         # Accepts keyword args or a single positional hash (the base
         # #exclude/matching rebuild passes the latter) — see
@@ -145,9 +147,12 @@ module Pubid
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
-          # Join with space and add year with colon
+          # Join with space and add year with colon; the joint stage-draft
+          # clause ("D=WD.5") rides after the year in the ISO-led print.
           result = parts.join(" ")
           result += ":#{year}" if year
+          result += "/#{ieee_draft}" if ieee_draft && ieee_draft.start_with?("D=")
+          result += " (#{parenthetical_content})" if parenthetical_content
 
           result
         end
