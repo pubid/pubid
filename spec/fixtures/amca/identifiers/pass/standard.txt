@@ -31,4 +31,4 @@ ANSI/AMCA Standard 500-L-23
 ANSI/AMCA Standard 540-23
 ANSI/AMCA Standard 550-22
 ANSI/AMCA Standard 610-25
-!AMCA Standard 803-02 (R2008)!AMCA Standard 803 -02 (2008)
+AMCA Standard 803-02 (R2008)
