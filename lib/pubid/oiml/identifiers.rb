@@ -9,6 +9,7 @@ module Pubid
       autoload :Bulletin, "#{__dir__}/identifiers/bulletin"
       autoload :CodeNumber, "#{__dir__}/identifiers/code_number"
       autoload :Document, "#{__dir__}/identifiers/document"
+      autoload :DualPublished, "#{__dir__}/identifiers/dual_published"
       autoload :Errata, "#{__dir__}/identifiers/errata"
       autoload :ExpertReport, "#{__dir__}/identifiers/expert_report"
       autoload :Guide, "#{__dir__}/identifiers/guide"

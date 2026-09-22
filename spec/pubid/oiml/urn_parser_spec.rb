@@ -18,4 +18,13 @@ RSpec.describe Pubid::Oiml::UrnParser do
     # round-trip lands on the structured form.
     "OIML Bulletin 2026-02-11",
   ]
+
+  # A dual-published id's URN represents only the OIML side (there is no
+  # joint URN scheme in this codebase), so it is not part of the shared
+  # round-trip list above — a URN never re-parses back into a DualPublished
+  # wrapper, only into a plain Recommendation.
+  it "generates a URN for the OIML side only" do
+    id = Pubid::Oiml.parse("ISO 4064-1:2024|OIML R 49-1:2024")
+    expect(id.to_urn).to eq("urn:oiml:r:49-1:2024")
+  end
 end
