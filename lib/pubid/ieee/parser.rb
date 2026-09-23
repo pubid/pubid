@@ -761,7 +761,13 @@ module Pubid
           str("").as(:iso_published) >>
           str("P").as(:project_marker).maybe >>
           digits.as(:number) >>
-          (dot >> digits.as(:part)).maybe >>
+          # The part may be dot- or dash-joined ("8802-9"); a dash-year
+          # ("1234-2012") is not a part.
+          # A distinct key: the iso-format route's :part_dash prints as a
+          # dot in the joint code (the "P24748.2:2018" convention); only
+          # the ISO/IEC LABEL keeps its printed dash.
+          ((dot | (dash >> str("").as(:iec_label_dash) >> year_digits.absent?)) >>
+            digits.as(:part)).maybe >>
           (str(":") >> space.maybe >> year_digits.as(:year)) >>
           space.maybe >> parenthetical
       end

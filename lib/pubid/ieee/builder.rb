@@ -685,7 +685,11 @@ module Pubid
 
         code_str = extract_value(parsed[:number])
         if code_str && !code_parts.empty?
-          code_str += ".#{code_parts.join('.')}"
+          # The ISO/IEC label's part may be dash-joined ("8802-9") - keep
+          # the printed separator (the iso-format route's :part_dash
+          # prints as a dot in the joint code).
+          sep = parsed[:iec_label_dash] ? "-" : "."
+          code_str += "#{sep}#{code_parts.join(sep)}"
         end
         # P = project (a draft): identity-bearing, preserved as spelled.
         code_str = "P#{code_str}" if parsed[:project_marker] && code_str
