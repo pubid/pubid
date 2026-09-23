@@ -203,8 +203,18 @@ module Pubid
     # subclass — including the ones that override #build — wraps the built
     # identifier in its flavor's all-parts class (Pubid::AllParts).
     module AllPartsWrap
+      # Parslet tops are a Hash or an Array of Hashes (UN's multi-token tree
+      # is an Array); the marker rides every element.
+      def all_parts_marked?(data)
+        case data
+        when Hash then data[:all_parts]
+        when Array then data.any? { |e| all_parts_marked?(e) }
+        else false
+        end
+      end
+
       def build(data, *args, **kwargs)
-        marked = data.is_a?(Hash) && data[:all_parts]
+        marked = all_parts_marked?(data)
         built = super
         marked ? built.to_all_parts : built
       end
