@@ -669,3 +669,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Csa::Builder.prepend(Pubid::Builder::AllPartsWrap)

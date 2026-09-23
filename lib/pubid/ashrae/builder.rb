@@ -559,3 +559,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Ashrae::Builder.prepend(Pubid::Builder::AllPartsWrap)

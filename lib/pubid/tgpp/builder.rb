@@ -39,3 +39,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Tgpp::Builder.prepend(Pubid::Builder::AllPartsWrap)

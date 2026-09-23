@@ -522,3 +522,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Cie::Builder.prepend(Pubid::Builder::AllPartsWrap)

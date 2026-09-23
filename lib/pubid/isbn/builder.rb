@@ -42,3 +42,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Isbn::Builder.prepend(Pubid::Builder::AllPartsWrap)

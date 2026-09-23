@@ -140,3 +140,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Etsi::Builder.prepend(Pubid::Builder::AllPartsWrap)

@@ -77,3 +77,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Oasis::Builder.prepend(Pubid::Builder::AllPartsWrap)

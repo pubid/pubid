@@ -50,3 +50,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Adobe::Builder.prepend(Pubid::Builder::AllPartsWrap)

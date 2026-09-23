@@ -40,3 +40,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Un::Builder.prepend(Pubid::Builder::AllPartsWrap)

@@ -459,3 +459,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Iec::Builder.prepend(Pubid::Builder::AllPartsWrap)

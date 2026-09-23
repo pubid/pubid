@@ -36,3 +36,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Calconnect::Builder.prepend(Pubid::Builder::AllPartsWrap)

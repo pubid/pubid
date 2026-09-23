@@ -53,3 +53,5 @@ module Pubid
     end
   end
 end
+
+Pubid::W3c::Builder.prepend(Pubid::Builder::AllPartsWrap)

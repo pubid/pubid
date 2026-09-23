@@ -268,3 +268,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Oiml::Builder.prepend(Pubid::Builder::AllPartsWrap)

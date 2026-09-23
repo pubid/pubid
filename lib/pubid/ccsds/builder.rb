@@ -55,3 +55,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Ccsds::Builder.prepend(Pubid::Builder::AllPartsWrap)

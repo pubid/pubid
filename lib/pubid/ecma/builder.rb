@@ -43,3 +43,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Ecma::Builder.prepend(Pubid::Builder::AllPartsWrap)

@@ -325,3 +325,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Iso::Builder.prepend(Pubid::Builder::AllPartsWrap)

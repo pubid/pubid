@@ -76,3 +76,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Ietf::Builder.prepend(Pubid::Builder::AllPartsWrap)
