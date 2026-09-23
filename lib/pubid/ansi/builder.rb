@@ -45,6 +45,10 @@ module Pubid
           value.to_s.split(",").map do |lang|
             Components::Language.new(code: lang.strip)
           end
+        when :all_parts
+          # The shared Grammar marks the tree; the prepended AllPartsWrap
+          # routes the wrap, so the marker itself carries no component.
+          nil
         else
           raise ArgumentError, "Unknown parameter type: #{type}"
         end
