@@ -100,3 +100,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Iala::Builder.prepend(Pubid::Builder::AllPartsWrap)

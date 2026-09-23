@@ -479,3 +479,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Nist::Builder.prepend(Pubid::Builder::AllPartsWrap)

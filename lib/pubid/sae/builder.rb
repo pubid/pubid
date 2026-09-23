@@ -30,3 +30,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Sae::Builder.prepend(Pubid::Builder::AllPartsWrap)

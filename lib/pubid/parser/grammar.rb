@@ -21,10 +21,22 @@ module Pubid
     # bypasses this and raises a bare `Parslet::ParseFailed`. Nothing in the
     # gem does that.
     class Grammar < ::Parslet::Parser
+      # A trailing "(all parts)" marks the reference as the whole document.
+      # The flavor grammars that carry their own rule consume it inside
+      # parslet; this shared strip gives every other flavor the same read:
+      # the suffix never reaches the flavor grammar, and the parsed tree
+      # carries :all_parts for the builder to wrap (see Builder::Base).
+      ALL_PARTS_SUFFIX = "(all parts)".freeze
+
       # @param io [String, IO]
       # @param options [Hash] passed through to parslet
       # @raise [Pubid::Errors::ParseError]
       def parse(io, options = {})
+        if io.is_a?(String) && io.end_with?(ALL_PARTS_SUFFIX)
+          base = io.sub(/\s*\(all parts\)\s*\z/, "")
+          return mark_all_parts(super(base, options))
+        end
+
         super
       rescue ::Pubid::Errors::ParseError
         # A nested grammar already wrapped it. Keep the inner flavor and input.
@@ -34,6 +46,17 @@ module Pubid
       end
 
       private
+
+      # Carry the stripped suffix into the tree. Parslet tops are a Hash or
+      # an Array of Hashes; the marker joins either shape, and every builder
+      # (Builder::Base and the standalone ones) routes it to #to_all_parts.
+      def mark_all_parts(tree)
+        case tree
+        when Hash then tree.merge(all_parts: true)
+        when Array then tree.map { |t| t.merge(all_parts: true) }
+        else tree
+        end
+      end
 
       # @param error [Parslet::ParseFailed]
       # @param io [String, IO] what was handed to {#parse}

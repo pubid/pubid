@@ -20,3 +20,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Iana::Builder.prepend(Pubid::Builder::AllPartsWrap)

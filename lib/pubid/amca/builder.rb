@@ -170,3 +170,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Amca::Builder.prepend(Pubid::Builder::AllPartsWrap)

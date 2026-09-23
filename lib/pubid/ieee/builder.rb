@@ -1719,3 +1719,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Ieee::Builder.prepend(Pubid::Builder::AllPartsWrap)

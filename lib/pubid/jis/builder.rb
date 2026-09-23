@@ -116,3 +116,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Jis::Builder.prepend(Pubid::Builder::AllPartsWrap)

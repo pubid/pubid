@@ -195,3 +195,20 @@ module Pubid
     end
   end
 end
+
+module Pubid
+  module Builder
+    # A trailing "(all parts)" is stripped by the shared Grammar and marked
+    # on the parse tree (:all_parts). Prepended to Builder::Base so every
+    # subclass — including the ones that override #build — wraps the built
+    # identifier in its flavor's all-parts class (Pubid::AllParts).
+    module AllPartsWrap
+      def build(data, *args, **kwargs)
+        marked = data.is_a?(Hash) && data[:all_parts]
+        built = super
+        marked ? built.to_all_parts : built
+      end
+    end
+
+  end
+end

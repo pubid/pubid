@@ -31,3 +31,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Ogc::Builder.prepend(Pubid::Builder::AllPartsWrap)

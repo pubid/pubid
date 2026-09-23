@@ -52,3 +52,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Plateau::Builder.prepend(Pubid::Builder::AllPartsWrap)

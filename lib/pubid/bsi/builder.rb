@@ -1493,3 +1493,5 @@ expert_commentary: nil, expert_commentary_topic: nil)
     end
   end
 end
+
+Pubid::Bsi::Builder.prepend(Pubid::Builder::AllPartsWrap)

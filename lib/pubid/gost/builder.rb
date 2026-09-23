@@ -183,3 +183,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Gost::Builder.prepend(Pubid::Builder::AllPartsWrap)

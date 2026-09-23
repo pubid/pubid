@@ -368,3 +368,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Itu::Builder.prepend(Pubid::Builder::AllPartsWrap)

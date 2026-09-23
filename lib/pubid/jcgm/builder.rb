@@ -104,3 +104,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Jcgm::Builder.prepend(Pubid::Builder::AllPartsWrap)

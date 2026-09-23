@@ -15,3 +15,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Xsf::Builder.prepend(Pubid::Builder::AllPartsWrap)

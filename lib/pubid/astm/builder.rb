@@ -164,3 +164,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Astm::Builder.prepend(Pubid::Builder::AllPartsWrap)

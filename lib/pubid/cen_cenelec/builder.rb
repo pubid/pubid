@@ -388,3 +388,5 @@ module Pubid
     end
   end
 end
+
+Pubid::CenCenelec::Builder.prepend(Pubid::Builder::AllPartsWrap)

@@ -165,3 +165,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Asme::Builder.prepend(Pubid::Builder::AllPartsWrap)

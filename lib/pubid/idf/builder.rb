@@ -83,3 +83,5 @@ module Pubid
     end
   end
 end
+
+Pubid::Idf::Builder.prepend(Pubid::Builder::AllPartsWrap)
