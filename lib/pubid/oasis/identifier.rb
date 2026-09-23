@@ -36,6 +36,18 @@ module Pubid
       # building the table before `Identifiers::Standard` snapshots it — DO NOT
       # split this class across two files.
       attribute :number, :string
+
+      # `original` alone drives #to_s, and the shared exclude-copy loses it
+      # (the redefined attribute does not survive the rebuild). An all-parts
+      # copy is therefore dup-based: nil the part and edition-ish attributes
+      # in place, keeping the printed slug verbatim.
+      def without_parts(*extra)
+        copy = dup
+        (::Pubid::Identifier::PART_ATTRIBUTES + extra).each do |name|
+          copy.public_send(:"#{name}=", nil) if copy.respond_to?(:"#{name}=")
+        end
+        copy
+      end
       attribute :version, :string
       attribute :stage, :string
       attribute :part, :string
