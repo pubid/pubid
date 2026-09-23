@@ -35,6 +35,17 @@ module Pubid
         map "parsed_format", to: :parsed_format
       end
 
+      # Rendering-only flags: each records which of two equivalent input
+      # spellings a document used (short vs long format, dash- vs
+      # space-separated suffix, trailing-word vs prose supplement form, year
+      # glued to the base vs to the marker), not something the document
+      # itself states. Their non-nil default would otherwise read as
+      # "stated" in a bare reference and wrongly refuse a candidate that
+      # sets them (the CSA/IEEE year-format trap).
+      def self.subset_ignored_attributes
+        %i[parsed_format year_on_base space_suffix trailing joined]
+      end
+
       # lutaml's polymorphic_map only validates `_type` on deserialization; it
       # does not re-instantiate the concrete subclass. Route by `_type` so
       # `Pubid::Oiml::Identifier.from_hash(h)` returns the right class (and its

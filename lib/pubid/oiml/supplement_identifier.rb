@@ -9,6 +9,10 @@ module Pubid
       attribute :year, :string
       attribute :language, :string
 
+      # A nil `language` means the document states none, mirroring
+      # SingleIdentifier's rule.
+      subset_strict :language
+
       # Delegate the document code to the wrapped standard, mirroring
       # Pubid::Etsi::Identifiers::SupplementIdentifier#code.
       #

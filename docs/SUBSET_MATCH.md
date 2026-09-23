@@ -126,7 +126,9 @@ In use, with the pair each flavor was losing:
 | `Calconnect::Identifier` | `series` | `CC 36010` vs `CC/WD 36010:2019` |
 | `Gost::Identifier` | `copublisher` | `GOST R 27001` vs `GOST R ISO/IEC 27001-2006` |
 | `Plateau::Identifier` | `annex` | `PLATEAU Handbook #10` vs `#10-1 第1.0版` |
-| `Oiml::Identifiers::CodeNumber` (7 leaves), `Oiml::Components::Code` | `part`, `suffix` | `OIML R 138` vs `OIML R 138-Amend:2009` |
+| `Oiml::Identifiers::CodeNumber` (7 leaves), `Oiml::Components::Code` | `part`, `subpart`, `suffix` | `OIML R 138` vs `OIML R 138-Amend:2009`; `OIML R 137-1 (F)` vs `OIML R 137-1-2:2012 (F)` |
+| `Oiml::SingleIdentifier`, `Oiml::SupplementIdentifier` | `language` | `OIML R 126:2015 Errata` vs `OIML R 126:2015 Errata (E)` |
+| `Oiml::Identifiers::Annex` | `letter` | `OIML R 102 Annexes` vs `OIML R 102:1995 Annex B-C` |
 | `Ccsds::Identifier` | `language`, `suffix` | `CCSDS 650.0-M-2` vs its French translation; `CCSDS 101.0-B-4` vs `CCSDS 101.0-B-4-S` |
 | `CenCenelec::Identifier` | `type`, `stage`, `typed_stage` | `EN 1325` vs `prEN 1325` |
 
@@ -186,6 +188,7 @@ In use:
 | `Oasis::Identifier` | ignores `original` | verbatim slug; its `#exclude` clears it for the same reason |
 | `Csa::SingleIdentifier` | skips the year format flags when `year` is nil, `original_reaffirmation_4digit` when `reaffirmation` is nil | default is stated |
 | `Ieee::Identifiers::IecIeeeCopublished` | skips `year_sep` when `year` is nil | default is stated |
+| `Oiml::Identifier` | ignores `parsed_format`, `year_on_base`, `space_suffix`, `trailing`, `joined` unconditionally | default is stated; each records an input-spelling choice on a class further down the hierarchy, and an unmatched name is a no-op |
 
 **The last two are the "default is stated" trap.** A bare `CSA C22.2 NO. 125`
 has `original_year_4digit` at its default `false`, which refused
