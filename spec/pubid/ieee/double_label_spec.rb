@@ -25,6 +25,17 @@ RSpec.describe Pubid::Ieee::Identifier do
   end
 
   describe "the double-labeled standard" do
+    it "carries the dash-part label of the 8802 family" do
+      id = described_class.parse(
+        "International Standard ISO/IEC 8802-9: 1996(E) ANSI/IEEE Std 802.9, 1996 Edition",
+      )
+
+      expect(id).to be_a(Pubid::Ieee::Identifiers::DualPublished)
+      expect(id.to_s).to eq("ISO/IEC 8802-9:1996 (E) and ANSI/IEEE 802.9-1996")
+      expect(id.first_identifier.to_s).to eq("ISO/IEC 8802-9:1996 (E)")
+      expect(id.second_identifier.to_s).to eq("ANSI/IEEE 802.9-1996")
+    end
+
     it "carries the ISO/IEC label and the IEEE label as one document" do
       id = described_class.parse("ISO/IEC13210: 1994 (E) ANSI/IEEE Std 1003.3-1991")
 

@@ -200,7 +200,6 @@ IEEE Std P802.8/D.3.2
 !IEEE/IEC/ISO P80005-1/FDIS_March 2012!IEC/ISO/IEEE P80005-1/DFDIS_March 2012
 !ISO/IEC 10038-1993: Information technology-Telecommunications and information exchange between systems - Local area networks - Media access control (MAC) bridges!ISO/IEC 10038-1993
 !ISO/IEC 23026; IEEE Std 2001-2002, First edition!ISO/IEC 23026 (IEEE Std 2001-2002, First edition)
-!International Standard ISO/IEC 8802-9: 1996(E) ANSI/IEEE Std 802.9, 1996 Edition!ISO/IEC/IEEE 802.9-1996
 !National Electrical Safety Code, C2-2012!C2-2012 National Electrical Safety Code
 !National Electrical Safety Code, C2-2012 - Redline!C2-2012 National Electrical Safety Code
 !Nuclear EQ Sourcebook and Supplement!IEEE Std 7438946
