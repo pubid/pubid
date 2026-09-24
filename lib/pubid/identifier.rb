@@ -1031,6 +1031,28 @@ module Pubid
       Pubid::UrnGenerator::Base
     end
 
+    # Attribute names on THIS class that hold a supplement's OWN identity
+    # date — e.g. an Amendment's own publication year — as distinct from the
+    # date of the document it supplements (reached one layer down, through
+    # `base`/`identifiers`). Empty by default: nothing is protected, so
+    # `exclude(:date)`/`exclude(:year)` fall straight through to every
+    # declared attribute and every nested identifier, the shape almost every
+    # flavor wants.
+    #
+    # A supplement leaf that owns its own date overrides this (CEN
+    # `Amendment` `%i[year]`, CEN `Corrigendum` `%i[year month]`, BSI
+    # `Amendment`/`Corrigendum` `%i[date]`). #exclude then protects those
+    # attributes from a bare `:date`/`:year` — recursion into a *nested*
+    # base/consolidated member is untouched, since recursion always uses the
+    # caller's original args — and requires the explicit `:supplement_year`
+    # key to clear them instead. This is what lets `exclude(:date)` on a
+    # consolidated identifier drop the base standard's date while leaving an
+    # attached amendment's own date alone, without a per-flavor #exclude
+    # override.
+    def self.supplement_date_attributes
+      []
+    end
+
     # Excluded attributes are nilled; every other value is passed through
     # #exclude_from_nested so the exclusion also propagates into nested
     # identifiers — wrapper types (adopted standards, consolidated amendments,
@@ -1049,6 +1071,16 @@ module Pubid
       # flavor that models the edition as a plain `year` attribute (e.g. GOST)
       # has it excluded too. The loop below nils whichever name the flavor has.
       excluded_args << :date if excluded_args.include?(:year)
+
+      own_date_attrs = self.class.supplement_date_attributes
+      # A no-op when own_date_attrs is empty (Array#|/#- with [] returns the
+      # receiver unchanged), which is every class that doesn't override the
+      # hook — no guard needed.
+      if excluded_args.include?(:supplement_year)
+        excluded_args |= own_date_attrs
+      else
+        excluded_args -= own_date_attrs
+      end
 
       attrs = self.class.attributes.each_with_object({}) do |(name, _), h|
         value = excluded_args.include?(name) ? nil : public_send(name)

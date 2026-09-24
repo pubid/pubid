@@ -87,33 +87,10 @@ module Pubid
         stage.code.to_s.downcase
       end
 
-      # The attributes that hold a supplement's own date: `year`, and `month`
-      # on a corrigendum. Empty for a document. See #exclude.
-      def self.supplement_date_attributes
-        []
-      end
-
-      # The CEN year rule, as in BSI: `:year` removes only the base
-      # document's year ("EN 13250:2000/A1:2005" -> "EN 13250/A1:2005"), and
-      # the CEN key `:supplement_year` removes the supplement's own date
-      # ("EN 13250:2000/A1"). A supplement declares its date as a `year`
-      # attribute, which the base #exclude resets for `:year`, so the value is
-      # put back here. The month goes with the year, or a "/AC:2016-11" would
-      # keep a month with no year. The base #exclude passes every key on to
-      # the nested identifiers, so the members of a consolidated identifier
-      # follow the same rule.
-      def exclude(*args)
-        result = super
-        attrs = self.class.supplement_date_attributes
-        # `exclude(:amendment)` returns the base document, not a copy of self.
-        return result if attrs.empty? || !result.instance_of?(self.class)
-
-        drop = args.include?(:supplement_year)
-        attrs.each do |attr|
-          result.public_send(:"#{attr}=", drop ? nil : public_send(attr))
-        end
-        result
-      end
+      # The CEN year rule (`:year` vs `:supplement_year`) is the shared
+      # `::Pubid::Identifier#exclude` mechanism driven by `Amendment`'s and
+      # `Corrigendum`'s `supplement_date_attributes` — no override needed
+      # here. Detail: `docs/flavors/cen_cenelec.md`'s year-rule bullet.
 
       def self.parse(identifier)
         unless identifier.is_a?(String)

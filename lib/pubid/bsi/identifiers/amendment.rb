@@ -16,23 +16,13 @@ module Pubid
         # standard is reached through `base`, and `#root` walks it, which is
         # what relaton-index keys on.
         #
-        # The year is a REAL `year` attribute and deliberately not the
-        # inherited `date`, the other way to reach the same `year:` key. An
-        # amendment's year belongs to the supplement, not to the standard, and
-        # `#exclude` recurses into nested identifiers — so holding it in `date`
-        # made `exclude(:date)` on the consolidated identifier drop the
-        # amendment's year too ("BS 7273-4+A1:2021" rendered as
-        # "BS 7273-4+A1"), conflating the two. A declared `year` is the shape
-        # ashrae, bipm, gost, ieee, jis, nist and ogc already use, and the
-        # canonical flat serialization leaves it alone for exactly that reason.
-        #
-        # `:string`, not `:integer`, to match the year every other BSI
-        # identifier carries (a `Components::Date` year is a String) and the
-        # base `#year` reader, which is `date&.year&.to_s`. It also has to match
-        # CEN, whose supplements carry a `:string` `year` too: relaton reads the
-        # year off a supplement of either flavor and compares it, so the two
-        # must not differ in type.
-        attribute :year, :string
+        # The year lives in the inherited `date` component, the natural home:
+        # an amendment's year belongs to the supplement, not to the standard,
+        # and `#exclude` protects it via `supplement_date_attributes` below,
+        # so `exclude(:date)` on a consolidated identifier drops only the
+        # standard's date. The flat scalar serialization rule renders a
+        # degenerate `date` as a bare `year:` key, matching CEN and every
+        # other BSI row.
         attribute :separator, :string, default: -> { "+" }
         # true for the trailing " AMD5" / " AMD AA" suffix form, false for the
         # compact "+A5" / "/A5" join form. Distinguishes the two when no year is
@@ -51,6 +41,13 @@ module Pubid
         # path never emits. Drop it unconditionally to keep the wire symmetric.
         def self.compact_hash(_model, hash)
           hash.delete("publisher")
+        end
+
+        # See the comment on `date` above: protects the amendment's own date
+        # from a bare `exclude(:date)`/`exclude(:year)`, which otherwise
+        # recurses into `base` and drops the standard's date too.
+        def self.supplement_date_attributes
+          %i[date]
         end
 
         # Base document = the standard this amendment applies to, fully peeled.

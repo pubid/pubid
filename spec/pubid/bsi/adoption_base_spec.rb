@@ -260,9 +260,11 @@ RSpec.describe "BSI adoption wrappers hold the adopted document in `base`" do
       expect(parse("BS 4592-0:2006+A1:2012").root.number.to_s).to eq("4592")
     end
 
-    # The year is a declared attribute rather than the inherited `date`,
-    # because `#exclude` recurses into nested identifiers: holding it in `date`
-    # made `exclude(:date)` drop the amendment's year along with the standard's.
+    # The year lives in the inherited `date`. `#exclude` protects it via
+    # `supplement_date_attributes` (see docs/flavors/bsi.md and
+    # spec/pubid/supplement_date_attributes_spec.rb), so a bare exclude(:date)
+    # on the consolidated identifier drops only the standard's date, not the
+    # amendment's own.
     it "survives exclude(:date), which drops only the standard's date" do
       expect(parse("BS 7273-4:2015+A1:2021").exclude(:date).to_s)
         .to eq("BS 7273-4+A1:2021")
