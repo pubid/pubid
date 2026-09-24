@@ -489,15 +489,25 @@ module Pubid
   private_class_method :routing_table
 
   # True when +string+ starts with +prefix+ at a token boundary, so "ISO" does
-  # not claim "ISOFIX" and "BS" does not claim "BSI".
-  # @api private
+  # not claim "ISOFIX" and "BS" does not claim "BSI". A boundary is the end
+  # of the string or any non-alphanumeric character, so a registered prefix
+  # can be followed by a space ("ISO 9001") or by a slash attaching a type
+  # token ("ISO/TR 25901-1:2016").
+  #
+  # Public (not +@api private+) so a flavor's own prefix routing - GOST's
+  # foreign-adoption lookup, currently the only caller outside this file -
+  # can reuse the exact boundary rule {parse_by_prefix} uses, rather than
+  # keeping a second copy that can drift out of sync.
+  #
+  # @param string [String]
+  # @param prefix [String]
+  # @return [Boolean]
   def self.prefix_match?(string, prefix)
     return false unless string.start_with?(prefix)
 
     rest = string[prefix.length]
     rest.nil? || !/[A-Za-z0-9]/.match?(rest)
   end
-  private_class_method :prefix_match?
 
   def self.detect_flavor_from_urn(urn)
     # urn:iso:std:... → "iso"

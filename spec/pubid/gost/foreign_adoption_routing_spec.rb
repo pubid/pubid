@@ -27,6 +27,43 @@ RSpec.describe "Pubid::Gost foreign adoption routing" do
     expect(adopted).to be_a(Pubid::Iec::Identifier)
   end
 
+  # "ISO/TR 25901-1:2016" attaches its type token to the publisher with a
+  # slash, not a space. `prefix_owner` used to require a literal space after
+  # a registered prefix, so this form matched no owner and fell through to
+  # the exhaustive alphabetical-fallback loop across every registered
+  # flavor. There, Pubid::Iec's grammar ALSO accepts the bare string (as its
+  # own identifier, not an ISO one) and renders it "ISO TR ..." (space) -
+  # wrong. Pubid::Bsi also accepts it, correctly delegating to ISO, and
+  # ordinarily wins the race by sorting before "iec" - which is exactly why
+  # the wrong render only showed up rarely, under full-suite load. Routing
+  # this by prefix instead of by chance removes the race entirely.
+  it "routes a slash-attached type prefix (ISO/TR) directly to its owner" do
+    adopted = Pubid::Gost
+      .parse("ГОСТ Р 58904-2020/ISO/TR 25901-1:2016").adopted
+    expect(adopted).to be_a(Pubid::Iso::Identifiers::TechnicalReport)
+    expect(adopted.to_s).to eq("ISO/TR 25901-1:2016")
+  end
+
+  it "routes ISO/TR even when bsi (the usual race winner) is unavailable" do
+    # Proves the fix is prefix routing, not a lucky alphabetical race: with
+    # "bsi" removed from the registry, the old fallback-loop behavior would
+    # have let "iec" claim the string instead.
+    Pubid::Registry.unregister(:bsi)
+    adopted = Pubid::Gost
+      .parse("ГОСТ Р 58904-2020/ISO/TR 25901-1:2016").adopted
+    expect(adopted).to be_a(Pubid::Iso::Identifiers::TechnicalReport)
+    expect(adopted.to_s).to eq("ISO/TR 25901-1:2016")
+  ensure
+    Pubid::Registry.register(:bsi, Pubid::Bsi)
+  end
+
+  it "routes a sibling slash-attached type prefix (ISO/TS)" do
+    adopted = Pubid::Gost
+      .parse("ГОСТ Р 71039-2023/ISO/TS 10303-1:2014").adopted
+    expect(adopted).to be_a(Pubid::Iso::Identifiers::TechnicalSpecification)
+    expect(adopted.to_s).to eq("ISO/TS 10303-1:2014")
+  end
+
   describe "Pubid::Registry flavor view" do
     after { Pubid::Registry.unregister(:zz_probe) }
 
