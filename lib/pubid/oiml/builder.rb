@@ -16,6 +16,9 @@ module Pubid
       }.freeze
 
       def build(parsed_hash)
+        # Certification-system documents carry no type letter
+        return build_cs(parsed_hash) if parsed_hash[:cs_series]
+
         # Check for short amendment format (has amd_marker)
         if parsed_hash[:amd_marker]
           return build_short_amendment(parsed_hash)
@@ -31,6 +34,20 @@ module Pubid
       end
 
       private
+
+      # OIML-CS documents: family (PD/OD/CID), zero-padded number, the
+      # printed "Edition N", and an optional parenthesized trailing
+      # amendment. The family-number separator is a spelling flag.
+      def build_cs(parsed_hash)
+        identifier = Identifiers::CertificationSystem.new
+        identifier.publisher = parsed_hash[:publisher].to_s if parsed_hash[:publisher]
+        identifier.family = parsed_hash[:cs_family].to_s
+        identifier.number = parsed_hash[:number].to_s
+        identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
+        identifier.amendment = parsed_hash[:cs_amendment].to_s if parsed_hash[:cs_amendment]
+        identifier.space_separator = parsed_hash[:cs_separator] == " "
+        identifier
+      end
 
       def build_short_amendment(parsed_hash)
         # Build base identifier from the code and type
@@ -110,6 +127,7 @@ module Pubid
 
         # Set supplement-specific attributes
         supplement.year = year_value.to_s if year_value
+        supplement.number = parsed_hash[:number].to_s if parsed_hash[:number]
         supplement.language = extract_language(parsed_hash[:language]) if parsed_hash[:language]
         supplement.letter = parsed_hash[:annex_letter].to_s if parsed_hash[:annex_letter]
 

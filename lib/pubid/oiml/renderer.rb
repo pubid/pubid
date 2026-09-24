@@ -24,6 +24,8 @@ module Pubid
           render_annex(id)
         when Identifiers::Bulletin
           render_bulletin(id)
+        when Identifiers::CertificationSystem
+          render_cs(id)
         when SupplementIdentifier
           render_supplement(id)
         when SingleIdentifier
@@ -34,6 +36,16 @@ module Pubid
       end
 
       private
+
+      # Certification-system document: "OIML-CS PD-05 Edition 6 (Amendment 1)".
+      # The family-number separator keeps the parsed spelling; OIML CS
+      # documents state an edition instead of a year.
+      def render_cs(id)
+        result = "#{id.publisher}-CS #{id.family}" \
+                 "#{id.space_separator ? ' ' : '-'}#{id.number} Edition #{id.edition}"
+        result += " (Amendment #{id.amendment})" if id.amendment
+        result
+      end
 
       # Render the Bulletin in the requested or parsed form. Default is the
       # structured "YYYY-II-SS" form (the dataset's primary docid). The
@@ -155,10 +167,12 @@ module Pubid
 
         # Trailing-word shorthand: "BASE Amendment" / "BASE Errata" with the
         # publication year kept on the base identifier. The word comes from the
-        # concrete supplement class.
+        # concrete supplement class; an ordinal, when printed ("Amendment 1"),
+        # follows it.
         if id.trailing
           base_str = strip_language(id.base.to_s)
           result = "#{base_str} #{id.supplement_type}"
+          result += " #{id.number}" if id.number
           result += " (#{id.language})" if id.language
           return result
         end

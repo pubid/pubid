@@ -7,6 +7,7 @@ module Pubid
       autoload :Annex, "#{__dir__}/identifiers/annex"
       autoload :BasicPublication, "#{__dir__}/identifiers/basic_publication"
       autoload :Bulletin, "#{__dir__}/identifiers/bulletin"
+      autoload :CertificationSystem, "#{__dir__}/identifiers/certification_system"
       autoload :CodeNumber, "#{__dir__}/identifiers/code_number"
       autoload :Document, "#{__dir__}/identifiers/document"
       autoload :DualPublished, "#{__dir__}/identifiers/dual_published"

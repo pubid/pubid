@@ -7,6 +7,8 @@ module Pubid
       # These wrap a base identifier like ISO amendments
       attribute :base, Oiml::Identifier, polymorphic: true
       attribute :year, :string
+      # Ordinal of the trailing-word form ("OIML R 138:2009 Amendment 1").
+      attribute :number, :string
       attribute :language, :string
 
       # A nil `language` means the document states none, mirroring
@@ -58,6 +60,7 @@ module Pubid
         map "base",
             with: { to: :base_to_kv, from: :base_from_kv }
         map "year", to: :year
+        map "number", to: :number
         map "trailing", to: :trailing
         map "joined", to: :joined
       end

@@ -20,14 +20,17 @@ module Pubid
       rule(:identifier) do
         amendment_identifier | amendment_short | annex_letter_identifier |
           annex_identifier | plus_supplement_identifier |
-          trailing_supplement_identifier | bulletin_identifier | base
+          trailing_supplement_identifier | cs_identifier |
+          bulletin_identifier | base
       end
 
       # Publisher - always "OIML"
       rule(:publisher) { str("OIML").as(:publisher) >> space }
 
-      # Document type - single letter
-      rule(:doc_type) { match("[BDEGRSVX]").as(:type) >> space }
+      # Document type - single letter. Strict family set: OIML publishes
+      # R D B G E V S documents (the estate grammar's family letters);
+      # any other letter is a rejection, not a flavor.
+      rule(:doc_type) { match("[BDEGRSV]").as(:type) >> space }
 
       # Bulletin locator — structured form. Year optionally followed by
       # 2-digit issue and 2-digit sequence:
@@ -167,10 +170,22 @@ module Pubid
         match("[a-z]").repeat(2, 2) # Two letters: en, fr, etc.
       end
 
+      # Full-word language markers as OIML prints them ("(Fra)", "(Eng)"),
+      # three or more letters, any case. Kept verbatim on the identifier;
+      # the URN lowercases.
+      rule(:lang_word) do
+        match("[A-Za-z]").repeat(3)
+      end
+
       rule(:language_code) do
         (
           (lang_single >> slash >> lang_single) | # E/F
           lang_multi_oiml |                        # PO, PT, PE, SR
+          lang_word |                              # Fra, eng, rus — before
+                                                   # the letter rules: a
+                                                   # committed "F" of "(Fra)"
+                                                   # or "fr" of "(fra)" would
+                                                   # never fall through
           lang_single |                            # E, F, D, R, S, C, A, U, X
           lang_multi                               # en, fr
         ).as(:language)
@@ -216,7 +231,23 @@ module Pubid
       rule(:trailing_supplement_identifier) do
         base_without_language.as(:base) >>
           space >> (str("Amendment") | str("Errata")).as(:trailing_marker) >>
+          (space >> digits.as(:number)).maybe >>
           language_portion.maybe.as(:language)
+      end
+
+      # OIML-CS certification-system documents. Two head spellings
+      # ("OIML-CS" / "OIML CS") and two family-number separators
+      # ("PD-05" / "PD 05"), an "Edition N" instead of a year, and an
+      # optional parenthesized trailing amendment - "(Amendment 1)".
+      rule(:cs_identifier) do
+        str("OIML").as(:publisher) >>
+          (dash >> str("CS") | space >> str("CS")).as(:cs_series) >> space >>
+          (str("PD") | str("OD") | str("CID")).as(:cs_family) >>
+          (dash | space).as(:cs_separator) >>
+          digits.as(:number) >>
+          space >> str("Edition") >> space >> digits.as(:edition) >>
+          (space >> lparen >> str("Amendment") >> space >>
+            digits.as(:cs_amendment) >> rparen).maybe
       end
 
       # Plus-joined supplement - "BASE:YEAR+Supplement:YEAR" form where both
