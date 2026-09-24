@@ -213,7 +213,9 @@ id3.new_edition_of?(id1) # => ArgumentError
 Predicates that relate two identifiers. Each returns `true` or `false`;
 a predicate that does not apply returns `false` rather than raising.
 Wrappers (supplement bases, consolidated collections) compare through the
-document they wrap.
+document they wrap. The concepts behind these relations — editions,
+supplements, the consolidated document, supersession — are described
+prose-only in [IDENTIFIER-RELATIONS.md](IDENTIFIER-RELATIONS.md).
 
 | Predicate          | True when |
 |--------------------|-----------|
