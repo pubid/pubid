@@ -166,7 +166,7 @@ module Pubid
       def prefix_owner(raw)
         index = ::Pubid.prefix_flavors
         match = index.keys
-                   .select { |p| raw.start_with?("#{p} ") || raw == p }
+                   .select { |p| ::Pubid.prefix_match?(raw, p) }
                    .max_by(&:length)
         return nil unless match
 

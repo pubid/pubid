@@ -845,11 +845,14 @@ module Pubid
     #
     # This is deliberately a per-class opt-in rather than a module prepended to
     # every identifier class. That was tried: prepending to ~500 ancestor
-    # chains made a GOST identical adoption render its adopted ISO Technical
-    # Report as `ISO TR …` instead of `ISO/TR …`, but only under full-suite
-    # load — the multi-flavor nondeterminism this file warns about elsewhere.
-    # An explicit call in the handful of classes that need it changes no
-    # ancestor chain and cannot have that effect.
+    # chains correlated with a GOST identical adoption rendering its adopted
+    # ISO Technical Report as `ISO TR …` instead of `ISO/TR …`, but only under
+    # full-suite load — the multi-flavor nondeterminism this file warns about
+    # elsewhere. The correlation turned out not to be causal: the actual
+    # defect was an unrelated foreign-adoption prefix-routing race in
+    # `Gost::Builder` (`docs/flavors/gost.md`), since fixed. The lesson about
+    # not prepending stands anyway: an explicit call in the handful of classes
+    # that need it changes no ancestor chain and cannot have that effect.
     #
     # @param rendered [String] the plain rendering this method produced
     # @param opts [Hash] the render options it was called with
