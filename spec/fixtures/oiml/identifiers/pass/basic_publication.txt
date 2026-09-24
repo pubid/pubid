@@ -3,3 +3,9 @@
 
 OIML B 18:2018
 OIML B 22 Edition 2023 (E)
+
+# @oimlsmart/oiml-pubid 1.2.1 conformance corpus (pubid/pubid-ts#63 estate parity)
+OIML B 18:2025(E)
+OIML B 14:2006 (Fra)
+OIML B 12:2004 (A)
+OIML B 10-1:2004 (F)

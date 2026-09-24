@@ -63,3 +63,9 @@ OIML R 83:2006
 OIML R 95:1990
 # r95-1990-fas
 !OIML R 95 : 1990!OIML R 95:1990
+
+# @oimlsmart/oiml-pubid 1.2.1 conformance corpus (pubid/pubid-ts#63 estate parity)
+OIML R 60-2:2021
+OIML R 60-1:2021(E)
+OIML R 60
+OIML R 7

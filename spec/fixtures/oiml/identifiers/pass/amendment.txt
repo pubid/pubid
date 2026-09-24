@@ -5,3 +5,7 @@ Amendment (2009) to OIML R 138 Edition 2007 (E)
 Amendment (2009) to OIML R 138:2007 (E)
 !OIML D 2 Amendment Edition 2004 (E)!Amendment (2004) to OIML D 2 (E)
 !OIML D 2 Amendment: 2004 (E)!Amendment (2004) to OIML D 2 (E)
+
+# Trailing-word amendment with ordinal (@oimlsmart/oiml-pubid 1.2.1
+# conformance corpus; pubid/pubid-ts#63 estate parity)
+OIML R 138:2009 Amendment 1

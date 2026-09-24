@@ -16,3 +16,6 @@ OIML D 11:2004
 OIML D 29:2008
 # b3-2011-f
 !OIML D 29: 2008!OIML D 29:2008
+
+# @oimlsmart/oiml-pubid 1.2.1 conformance corpus (pubid/pubid-ts#63 estate parity)
+OIML D 11:2013(E/F)
