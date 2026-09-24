@@ -208,6 +208,49 @@ id3 = Pubid::Iso.parse("ISO 9002:2019")
 id3.new_edition_of?(id1) # => ArgumentError
 ```
 
+### Relational algebra (pubid/pubid#247)
+
+Predicates that relate two identifiers. Each returns `true` or `false`;
+a predicate that does not apply returns `false` rather than raising.
+Wrappers (supplement bases, consolidated collections) compare through the
+document they wrap.
+
+| Predicate          | True when |
+|--------------------|-----------|
+| `supplement_of?`   | self is a supplement (amendment, corrigendum, …) whose base is `other` |
+| `has_supplement?`  | `other` is a supplement of self |
+| `dated_version_of?`| self and `other` are the same document differing only in date |
+| `sibling_of?`      | same document, different part/subpart |
+| `edition_of?`      | self and `other` are editions of the same document |
+| `includes?`        | self is an "all parts" collection covering `other` |
+| `draft_of?`        | self is a draft of the published `other` |
+| `related_to?`      | any of the above |
+
+Two rulings (pubid/pubid#449) govern supplement composites:
+
+- **The supplement year is identity-bearing.** An amendment is published
+  once under its ordinal — `BS 7273-4:2015+A1:2022` does not exist — so the
+  year is never ignored by `dated_version_of?` / `draft_of?`.
+- **Composites of one base document are editions of each other** — they are
+  the consolidated document's successive states. A composite and its bare
+  base are *not* editions: bare → +A1 → +A2 is a supersession series, not an
+  edition-year relationship, and the amendment supplements the base without
+  superseding it.
+
+```ruby
+a1   = Pubid::Bsi.parse("BS 7273-4:2015+A1:2021")
+a2   = Pubid::Bsi.parse("BS 7273-4:2015+A2:2023")
+bare = Pubid::Bsi.parse("BS 7273-4:2015")
+
+a1.edition_of?(a2)       # => true — prior edition of the consolidated document
+a1.dated_version_of?(a2) # => false — differs by incorporation, not just date
+a1.edition_of?(bare)     # => false — supersession series, not edition-year
+
+amd  = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
+base = Pubid::Iso.parse("ISO 9001:2015")
+amd.supplement_of?(base) # => true — and not edition_of?
+```
+
 ## Supplement Identifiers
 
 Amendments, corrigenda, and other supplements chain from a base identifier:
