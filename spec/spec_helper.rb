@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# Fixture files contain non-ASCII bytes (e.g. em/en dashes). Without this,
+# File.read/readlines default to the process locale (LANG/LC_ALL), which is
+# US-ASCII in a locale-less container and raises Encoding::CompatibilityError
+# the moment a fixture line with such a byte is read.
+Encoding.default_external = Encoding::UTF_8
+
 require_relative "../lib/pubid"
 
 # Load shared test helpers
