@@ -142,7 +142,7 @@ RSpec.describe Pubid::Oiml::Identifiers::DualPublished do
   end
 
   # Documented, deliberately out of scope for pubid #437 (see
-  # docs/flavors/oiml.md) — pinned so a future change to either shows up
+  # lib/pubid/oiml/CLAUDE.md) — pinned so a future change to either shows up
   # here, not silently.
   describe "known gaps" do
     # `edition` is not delegated to the OIML side. OIML models edition as a

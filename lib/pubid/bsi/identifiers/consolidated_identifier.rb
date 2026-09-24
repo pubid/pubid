@@ -54,7 +54,7 @@ module Pubid
         #
         # A BSI wrapper owns no identity: `#root` carries it, recursively and
         # for every layer. See `Identifiers::RootIdentity` and
-        # docs/flavors/bsi.md.
+        # lib/pubid/bsi/CLAUDE.md.
         def type
           base = identifiers&.first
           base.type if base&.class&.attributes&.key?(:type)

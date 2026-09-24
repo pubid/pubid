@@ -16,7 +16,7 @@ module Pubid
     # converter can be no-opped this way, so a key that needs `with:` for
     # another reason — year, publisher, copublishers, stage — still lists here.
     # (`month`/`day`/`undated` are missing from that list and leak a duplicated
-    # top-level key on a wrapper; pre-existing, see docs/flavors/iec.md.)
+    # top-level key on a wrapper; pre-existing, see lib/pubid/iec/CLAUDE.md.)
     module DelegatedFieldSuppression
       def year_to_kv(_model, _doc); end
       def publisher_to_kv(_model, _doc); end

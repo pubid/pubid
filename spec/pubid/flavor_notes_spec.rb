@@ -2,49 +2,27 @@
 
 require "spec_helper"
 
-# The root CLAUDE.md keeps the cross-flavor contract only. Each flavor's own
-# forensics live in docs/flavors/<flavor>.md, which never loads automatically —
-# a session opens it from the index in the root file. This spec is the forcing
-# function that keeps the index and the directory in step, in the same way that
-# prefixes_spec.rb keeps the registry and the PREFIXES constants in step.
+# Each flavor's own forensics live in lib/pubid/<flavor>/CLAUDE.md, next to that
+# flavor's code. Claude Code auto-loads a directory's CLAUDE.md when working with
+# files in it, so there is no index to keep in step (unlike the old
+# docs/flavors/<flavor>.md + root-CLAUDE.md-index layout this replaced) — a file's
+# path already proves it lives under lib/pubid.
 RSpec.describe "Flavor notes" do
   let(:repo_root) { File.expand_path("../..", __dir__) }
   let(:claude_md) { File.join(repo_root, "CLAUDE.md") }
-  let(:flavors_dir) { File.join(repo_root, "docs", "flavors") }
-  let(:claude_md_text) { File.read(claude_md) }
+  let(:flavor_note_files) { Dir[File.join(repo_root, "lib", "pubid", "*", "CLAUDE.md")].sort }
 
-  # Every docs/flavors/<name>.md path the root file names.
-  let(:indexed_names) do
-    claude_md_text.scan(%r{docs/flavors/([a-z0-9_]+)\.md}).flatten.uniq.sort
-  end
-
-  let(:flavor_files) { Dir[File.join(flavors_dir, "*.md")].sort }
-
-  let(:file_names) do
-    flavor_files.map { |file| File.basename(file, ".md") }.sort
-  end
-
-  it "has a docs/flavors directory" do
-    expect(Dir.exist?(flavors_dir)).to be(true)
-  end
-
-  it "names every flavor note file in the root CLAUDE.md index" do
-    expect(file_names - indexed_names).to be_empty
-  end
-
-  it "names no flavor note file that does not exist" do
-    expect(indexed_names - file_names).to be_empty
-  end
-
-  it "names each file after a directory under lib/pubid" do
-    pattern = File.join(repo_root, "lib", "pubid", "*")
-    dirs = Dir[pattern].select { |dir| File.directory?(dir) }
-    expect(file_names - dirs.map { |dir| File.basename(dir) }).to be_empty
+  it "has at least one flavor-local CLAUDE.md under lib/pubid" do
+    expect(flavor_note_files).not_to be_empty
   end
 
   it "writes a non-empty note for every flavor" do
-    too_small = flavor_files.select { |file| File.size(file) < 200 }
+    too_small = flavor_note_files.select { |file| File.size(file) < 200 }
     expect(too_small).to be_empty
+  end
+
+  it "does not keep a legacy docs/flavors directory" do
+    expect(Dir.exist?(File.join(repo_root, "docs", "flavors"))).to be(false)
   end
 
   it "keeps the root CLAUDE.md small enough to load in every session" do

@@ -261,7 +261,7 @@ RSpec.describe "BSI adoption wrappers hold the adopted document in `base`" do
     end
 
     # The year lives in the inherited `date`. `#exclude` protects it via
-    # `supplement_date_attributes` (see docs/flavors/bsi.md and
+    # `supplement_date_attributes` (see lib/pubid/bsi/CLAUDE.md and
     # spec/pubid/supplement_date_attributes_spec.rb), so a bare exclude(:date)
     # on the consolidated identifier drops only the standard's date, not the
     # amendment's own.

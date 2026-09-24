@@ -15,7 +15,7 @@ module Pubid
       # iteration/publisher, the mr_* MR-slug hooks, #root) itself. Without
       # the mr_* delegations, #to_mr_string would silently come out "" (the
       # same filename-collision gap already documented for
-      # Amendment/Errata/Annex in docs/flavors/oiml.md) — this class closes
+      # Amendment/Errata/Annex in lib/pubid/oiml/CLAUDE.md) — this class closes
       # that gap from day one instead of repeating it.
       #
       # `first`/`second` hold the two sides in their original left-to-right

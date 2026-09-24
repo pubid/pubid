@@ -42,6 +42,30 @@ are reduced to their string rendering; no language-specific tags exist.
     bundle exec rake conformance:generate[iso]  # migrate fixtures to corpus
     bundle exec rake conformance:run            # execute corpus, exit on fail
 
+## Local setup
+
+`spec/pubid/conformance_corpus_spec.rb` (which runs inside `bundle exec rake
+test:all`) and `conformance:run`/`conformance:generate` all read
+`PUBID_TESTSUITE_PATH`, defaulting to a sibling `pubid-testsuite` directory next
+to this repo. On a local run (unlike a non-`conformance` CI job, which skips
+instead) a missing corpus makes `test:all` **raise**, by design — this is not
+a bug, see `CLAUDE.md`.
+
+To run the full suite locally: clone
+[`pubid/pubid-testsuite`](https://github.com/pubid/pubid-testsuite), copy
+`.env.example` to `.env` (already gitignored — it never gets committed) and
+set `PUBID_TESTSUITE_PATH` there to a path **relative to this repo's root**,
+e.g.:
+
+    PUBID_TESTSUITE_PATH=../pubid-testsuite
+
+Both `Rakefile` and `spec/spec_helper.rb` load `.env` at start-up and resolve a
+relative value against the repo root, not your shell's `cwd`, so the same
+`.env` line works regardless of which directory you invoke `rake`/`rspec`
+from. Never put an absolute path in `.env`: it won't carry over between a
+host checkout and a container/devcontainer mounting the same repo under a
+different prefix.
+
 Regeneration is deterministic on unchanged code. Regeneration diffs are
 reviewed in PRs. spec/pubid/conformance_corpus_spec.rb runs the same cases
 inside the default test suite.

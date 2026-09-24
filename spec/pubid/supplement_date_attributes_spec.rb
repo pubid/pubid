@@ -81,7 +81,7 @@ RSpec.describe "Pubid::Identifier#exclude — supplement's own date" do
     # because BSI's old `year`-attribute dodge only protected against a bare
     # `exclude(:date)`, not `exclude(:year)`). This pins CURRENT behavior,
     # not a verdict that it's correct: CEN/CENELEC already behaved this way
-    # before this branch (see docs/flavors/bsi.md), but whether these two
+    # before this branch (see lib/pubid/bsi/CLAUDE.md), but whether these two
     # generic predicates should instead be widened to recognize two
     # differently-dated editions of the SAME supplement is left open pending
     # feedback.
