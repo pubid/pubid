@@ -37,7 +37,13 @@ module Pubid
           return oiml_date&.year&.to_s
         end
 
-        super
+        year = super
+        return year if year
+
+        # The trailing-word form keeps the publication year on the base
+        # ("R 138:2009 Amendment 1"); the supplement itself carries only the
+        # ordinal.
+        identifier.base&.date&.year&.to_s if identifier.is_a?(SupplementIdentifier)
       end
 
       def generate
@@ -49,6 +55,15 @@ module Pubid
           parts = ["urn", "oiml", "bulletin"]
           parts << bulletin_locator if identifier.date&.present?
           parts << urn_language if urn_language
+          return parts.join(":")
+        end
+
+        # Certification-system documents: the family-number pair is the
+        # document identity ("cs:pd-05"); the printed edition and trailing
+        # amendment are print states, not URN segments.
+        if identifier.is_a?(Identifiers::CertificationSystem)
+          parts = ["urn", "oiml", "cs",
+                   "#{identifier.family.downcase}-#{identifier.number}"]
           return parts.join(":")
         end
 

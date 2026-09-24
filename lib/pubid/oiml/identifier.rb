@@ -20,6 +20,7 @@ module Pubid
         "pubid:oiml:amendment" => "Pubid::Oiml::Identifiers::Amendment",
         "pubid:oiml:errata" => "Pubid::Oiml::Identifiers::Errata",
         "pubid:oiml:annex" => "Pubid::Oiml::Identifiers::Annex",
+        "pubid:oiml:certification-system" => "Pubid::Oiml::Identifiers::CertificationSystem",
       }.freeze
 
       # The base Pubid::Identifier no longer auto-maps attributes, so OIML must
