@@ -9,9 +9,16 @@ module Pubid
     class SupplementIdentifier < Pubid::Identifier
       attribute :base, Identifier
       attribute :letter, :string, default: -> {}
+      # Stored as a plain string (always "PLATEAU") so it round-trips through
+      # to_hash/from_hash. Was a `def publisher` method, which made lutaml
+      # serialize a String against the Components::Publisher attribute
+      # (pubid/pubid#407) — the same fix as Identifiers::Base.
+      attribute :publisher, :string, default: -> { "PLATEAU" }
 
-      def publisher
-        "PLATEAU"
+      # The UrnGenerator reads type_string on every identifier; the annex
+      # supplement's own type makes its "an" URN branch reachable.
+      def type_string
+        "Annex"
       end
 
       # Subclasses must implement supplement_string
@@ -22,6 +29,11 @@ module Pubid
       # Override base_hash to extract edition, type, and annex from base
       def base_hash
         hash = super
+        # The base document's number: without it from_hash cannot
+        # reconstruct the wrapped identifier (pubid/pubid#407).
+        if base.class.attributes.key?(:number) && base.number
+          hash[:number] = base.number
+        end
         # For Plateau supplements, edition comes from the base identifier
         if base.class.attributes.key?(:edition) && base.edition
           hash[:edition] = base.edition
