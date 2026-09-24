@@ -90,7 +90,7 @@ module Pubid
       # The CEN year rule (`:year` vs `:supplement_year`) is the shared
       # `::Pubid::Identifier#exclude` mechanism driven by `Amendment`'s and
       # `Corrigendum`'s `supplement_date_attributes` — no override needed
-      # here. Detail: `docs/flavors/cen_cenelec.md`'s year-rule bullet.
+      # here. Detail: `lib/pubid/cen_cenelec/CLAUDE.md`'s year-rule bullet.
 
       def self.parse(identifier)
         unless identifier.is_a?(String)

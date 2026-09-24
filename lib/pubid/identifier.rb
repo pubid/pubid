@@ -850,9 +850,10 @@ module Pubid
     # full-suite load — the multi-flavor nondeterminism this file warns about
     # elsewhere. The correlation turned out not to be causal: the actual
     # defect was an unrelated foreign-adoption prefix-routing race in
-    # `Gost::Builder` (`docs/flavors/gost.md`), since fixed. The lesson about
-    # not prepending stands anyway: an explicit call in the handful of classes
-    # that need it changes no ancestor chain and cannot have that effect.
+    # `Gost::Builder` (`lib/pubid/gost/CLAUDE.md`), since fixed. The lesson
+    # about not prepending stands anyway: an explicit call in the handful of
+    # classes that need it changes no ancestor chain and cannot have that
+    # effect.
     #
     # @param rendered [String] the plain rendering this method produced
     # @param opts [Hash] the render options it was called with

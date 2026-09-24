@@ -77,7 +77,7 @@ RSpec.describe "flat scalar serialization of degenerate components" do
     # normally below. A pending that starts passing turns red — that is the
     # signal to delete its entry. CEN/CENELEC was here until its `type`
     # default became a Components::Type instead of a Symbol
-    # (docs/flavors/cen_cenelec.md).
+    # (lib/pubid/cen_cenelec/CLAUDE.md).
     PENDING_FROM_HASH = {}.freeze
 
     {

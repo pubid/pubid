@@ -173,7 +173,7 @@ RSpec.describe "parse failure contract (cross-flavor)" do
   end
 
   # The two flavors whose grammar is a catch-all slug take any single token by
-  # design (docs/flavors/iana.md). Pin that, so the UNPARSABLE strings above
+  # design (lib/pubid/iana/CLAUDE.md). Pin that, so the UNPARSABLE strings above
   # are never "simplified" to a bare word that these two would accept — which
   # would make their examples pass for the wrong reason.
   describe "slug grammars accept a bare token by design" do

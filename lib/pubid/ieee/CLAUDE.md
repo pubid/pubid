@@ -72,7 +72,7 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 
 ## The parent slot is never called `base` in IEEE
 
-Recorded by the cross-flavor survey that moved BSI's adoptions onto `base` (`docs/flavors/bsi.md`). IEEE is the flavor with the most parent slots under other names, and they fall into two groups.
+Recorded by the cross-flavor survey that moved BSI's adoptions onto `base` (`lib/pubid/bsi/CLAUDE.md`). IEEE is the flavor with the most parent slots under other names, and they fall into two groups.
 
 **Carries `#root`, so the index key is correct**: `AdoptedStandard` (`ieee_identifier` is the parent, `adopted_identifiers` the collection — and `adopted_identifiers` is a key in **73 rows of the published `relaton-data-ieee/index-v2.yaml`**, so renaming it is an index regeneration, not a pure refactor), `CsaDualPublished` (`ieee_identifier`), `DualPublished` (`first_identifier`), `MultiNumberedIdentifier` (`primary_identifier`).
 
