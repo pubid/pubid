@@ -73,6 +73,50 @@ RSpec.describe "Pubid::Identifier algebra (pubid/pubid#247)" do
     end
   end
 
+  describe "consolidated composites (pubid/pubid#449)" do
+    let(:a1) { Pubid::Bsi.parse("BS 7273-4:2015+A1:2021") }
+    let(:a2) { Pubid::Bsi.parse("BS 7273-4:2015+A2:2023") }
+    let(:bare) { Pubid::Bsi.parse("BS 7273-4:2015") }
+    let(:other_doc_a1) { Pubid::Bsi.parse("BS 9999-1:2010+A1:2012") }
+
+    it "returns edition_of? between successive consolidated states" do
+      expect(a1).to be_edition_of(a2)
+      expect(a2).to be_edition_of(a1)
+    end
+
+    it "returns false for edition_of? between a composite and its bare base" do
+      expect(a1).not_to be_edition_of(bare)
+      expect(bare).not_to be_edition_of(a1)
+    end
+
+    it "returns false for edition_of? between composites of different documents" do
+      expect(a1).not_to be_edition_of(other_doc_a1)
+    end
+
+    it "returns sibling_of? between composites of the same document" do
+      expect(a1).to be_sibling_of(a2)
+    end
+
+    it "returns false for sibling_of? between composites of different documents" do
+      expect(a1).not_to be_sibling_of(other_doc_a1)
+    end
+
+    it "returns false for dated_version_of? across consolidated states" do
+      expect(a1).not_to be_dated_version_of(a2)
+    end
+
+    it "keeps the amendment a supplement of the base, not an edition of it" do
+      amd = a1.identifiers.last
+      expect(amd).to be_supplement_of(bare)
+      expect(bare).to have_supplement(amd)
+      expect(amd).not_to be_edition_of(bare)
+    end
+
+    it "relates the consolidated states to each other" do
+      expect(a1).to be_related_to(a2)
+    end
+  end
+
   describe "#related_to?" do
     it "returns true for supplement relationship" do
       expect(amd).to be_related_to(base_iso)
