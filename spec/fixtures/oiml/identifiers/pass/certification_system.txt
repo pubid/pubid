@@ -1,0 +1,12 @@
+# OIML-CS Certification System - Pass
+# @oimlsmart/oiml-pubid 1.2.1 conformance corpus (pubid/pubid-ts#63
+# estate parity). PD/OD/CID families, "Edition N" instead of a year,
+# optional parenthesized trailing amendment.
+
+OIML-CS PD-05 Edition 6 (Amendment 1)
+OIML-CS PD-01 Edition 3
+OIML-CS OD-01 Edition 4
+OIML-CS OD-02 Edition 3
+OIML-CS CID-01 Edition 6
+# space-separated family-number spelling, same document as PD-05
+OIML-CS PD 05 Edition 6

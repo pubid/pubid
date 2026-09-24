@@ -3,3 +3,6 @@
 
 OIML E 5:2015(en)
 OIML E 5 6th Edition 2015 (E)
+
+# @oimlsmart/oiml-pubid 1.2.1 conformance corpus (pubid/pubid-ts#63 estate parity)
+OIML E 6:2011
