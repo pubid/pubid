@@ -1138,15 +1138,42 @@ module Pubid
       matches?(other, ignore: [:date, :year]) && self != other
     end
 
+    # The document a wrapper stands in front of: a supplement's base, or
+    # the leading member of a consolidated collection ("BS 7273-4:2015"
+    # inside "BS 7273-4:2015+A1:2021"). Nil for a plain identifier.
+    def wrapped_document
+      return base if self.class.attributes.key?(:base) && base
+
+      if self.class.collection_attribute?(:identifiers) &&
+         identifiers.is_a?(Array) && identifiers.first
+        return identifiers.first
+      end
+
+      nil
+    end
+
+    # The [publisher, number, part] tuple naming the document this
+    # identifier belongs to, resolved through wrappers.
+    def document_identity
+      wrapped_document&.document_identity || [publisher, number, part]
+    end
+
     # Self and +other+ have the same publisher + number but differ in
     # part, subpart, or edition. This is the "sibling documents" pattern:
-    # same base standard, different sub-component.
+    # same base standard, different sub-component. Two wrappers compare
+    # through the document they wrap, so e.g. the amendments of one base
+    # standard are siblings while amendments of different documents are
+    # not.
     def sibling_of?(other)
       return false unless other.is_a?(::Pubid::Identifier)
+      return false if self == other
 
-      publisher == other.publisher &&
-        number == other.number &&
-        self != other
+      if wrapped_document && other.wrapped_document
+        document_identity.take(2) == other.document_identity.take(2)
+      else
+        publisher == other.publisher &&
+          number == other.number
+      end
     end
 
     # The attributes that name a part of a document.
@@ -1220,15 +1247,24 @@ module Pubid
         matches?(other, ignore: [:date, :year, :stage, :typed_stage])
     end
 
-    # Self and +other+ have the same publisher + number + part but differ
-    # in edition / revision marker.
+    # Self and +other+ are editions of the same document: the edition-year
+    # pair ("ISO 9001:2008" → "ISO 9001:2015"), or two consolidated states
+    # of one base document — "BS 7273-4:2015+A1:2021" is the prior edition
+    # of "BS 7273-4:2015+A2:2023" (pubid/pubid#449). A composite and its
+    # unwrapped base are not editions of each other: bare → +A1 → +A2 is a
+    # supersession series, not an edition-year relationship — the amendment
+    # supplements the base without superseding it.
     def edition_of?(other)
       return false unless other.is_a?(::Pubid::Identifier)
+      return false if self == other
 
-      publisher == other.publisher &&
-        number == other.number &&
-        part == other.part &&
-        self != other
+      if wrapped_document && other.wrapped_document
+        document_identity == other.document_identity
+      else
+        publisher == other.publisher &&
+          number == other.number &&
+          part == other.part
+      end
     end
 
     # Any relational predicate holds.
