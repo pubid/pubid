@@ -5,6 +5,9 @@ require "fileutils"
 require "rubocop/rake_task"
 require "bundler/gem_tasks"
 
+require_relative "local_env"
+LocalEnv.load(__dir__)
+
 # Load additional rake tasks (docs, export)
 Dir["lib/tasks/*.rake"].each { |f| import f }
 

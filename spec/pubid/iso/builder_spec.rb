@@ -305,7 +305,6 @@ RSpec.describe Pubid::Iso::Builder do
           base: {
             publisher: "ISO/IEC",
             number_with_part: "13818-1",
-            year: "2015",
             base: {
               publisher: "ISO/IEC",
               number_with_part: "13818-1",

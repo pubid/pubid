@@ -6,6 +6,11 @@
 # the moment a fixture line with such a byte is read.
 Encoding.default_external = Encoding::UTF_8
 
+# See local_env.rb: loads .env at the repo root so a direct `rspec` run
+# (not only `rake`) picks up local overrides like PUBID_TESTSUITE_PATH.
+require_relative "../local_env"
+LocalEnv.load(File.expand_path("..", __dir__))
+
 require_relative "../lib/pubid"
 
 # Load shared test helpers
