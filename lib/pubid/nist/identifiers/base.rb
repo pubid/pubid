@@ -696,14 +696,25 @@ module Pubid
           result += "#{vol_str}n#{issue_number.number}"
         end
 
-        # Use edition component - NO space before edition in MR format (per NIST spec)
-        result += edition.to_s if edition
+        # With a number, the edition glues to it per the NIST spec
+        # ("800-53r5"); series-only editions take a dot separator
+        # ("NBS.CIRC.e2" — the attested raw spelling; testsuite#5 C4/C5).
+        result += if edition
+                    number ? edition.to_s : ".#{edition}"
+                  else
+                    ""
+                  end
 
         # Use version_component
         result += version_component.to_s(:mr) if version_component
 
-        # Supplement (e.g. ".9981sup7") - keep distinct documents distinct
-        result += supplement_short
+        # Supplement (e.g. ".9981sup7") - keep distinct documents distinct;
+        # a series-only supplement ("NBS.CIRC.sup") takes the dot itself.
+        result += if supplement
+                    number ? supplement_short : ".#{supplement_short}"
+                  else
+                    ""
+                  end
 
         # Use update_component
         result += update_component.to_s(:mr) if update_component
