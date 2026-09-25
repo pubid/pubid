@@ -87,6 +87,7 @@ module Pubid
         # Note: :base_portion is lost during parser merge, so check for supplement indicators
         if parsed_hash[:supplement_date_range] || parsed_hash[:supplement_slash_year] ||
             parsed_hash[:supplement_month_year] || parsed_hash[:supplement_year] ||
+            parsed_hash[:supplement_empty] ||
             parsed_hash[:supplement] || parsed_hash[:base_portion]
           return build_circular_supplement(parsed_hash)
         end

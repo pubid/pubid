@@ -726,6 +726,15 @@ module Pubid
             # 4-digit years so it can't swallow "sup3/1926" or a base number.
             ((str("supp") | str("sup")) >> match("[0-9]").repeat(4, 4).as(:supp_year_start) >>
              dash >> match("[0-9]").repeat(4, 4).as(:supp_year_end)).as(:supplement_date_range) |
+            # Bare supplement marker to the whole series, no base number
+            # ("NBS.CIRC.sup" — testsuite#5 C4): the marker alone is the
+            # supplement.
+            ((str("supp") | str("sup")) >>
+              (
+                (month_abbrev >> digits).as(:supplement_month_year) |
+                (digits.as(:supp_number) >> slash >> digits.as(:supp_year)).as(:supplement_slash_year) |
+                str("").as(:supplement_empty)
+              ).maybe) |
             # With base identifier + supplement
             (
               # Capture base portion (everything before "supp" or "sup" or slash+year)
