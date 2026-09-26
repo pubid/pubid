@@ -16,6 +16,7 @@ module Pubid
       autoload :Errata, "#{__dir__}/identifiers/errata"
       autoload :Handbook, "#{__dir__}/identifiers/handbook"
       autoload :Question, "#{__dir__}/identifiers/question"
+      autoload :RadioRegulations, "#{__dir__}/identifiers/radio_regulations"
       autoload :Recommendation, "#{__dir__}/identifiers/recommendation"
       autoload :Report, "#{__dir__}/identifiers/report"
       autoload :SpecialPublication, "#{__dir__}/identifiers/special_publication"

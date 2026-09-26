@@ -10,7 +10,11 @@ require_relative "../../../../lib/pubid/itu"
 #   * long with format: :long: per-language `annex_long` template
 #
 # Fixtures sourced from metanorma-itu PR #497 spec/metanorma/i18n_spec.rb;
-# treated as the authoritative source per @opoudjis on PR #38.
+# treated as the authoritative source per @opoudjis on PR #38. One deliberate
+# difference: metanorma-itu now writes its own English docidentifier from the
+# i18n template "Annex to ITU OB %" (no "No."), while pubid keeps "No." — the
+# spelling of ITU's own bulletin site ("ITU OB No. 1161") and of pubid v1. The
+# form without "No." is accepted on parse.
 RSpec.describe Pubid::Itu::Identifiers::Annex do
   # Construct identifiers directly (pubid 2.x has no `Identifier.create`
   # factory); mirrors what parse produces for an OB Special Publication and
@@ -28,15 +32,24 @@ RSpec.describe Pubid::Itu::Identifiers::Annex do
   end
 
   describe "round-trip parsing and rendering" do
+    it "parses metanorma-itu's 'Annex to ITU OB 1000' with No." do
+      identifier = Pubid::Itu.parse("Annex to ITU OB 1000")
+      expect(identifier).to be_a(described_class)
+      expect(identifier.to_s).to eq("Annex to ITU OB No. 1000")
+    end
+
     it "parses 'Annex to ITU OB No. 1'" do
       identifier = Pubid::Itu.parse("Annex to ITU OB No. 1")
       expect(identifier).to be_a(described_class)
       expect(identifier.to_s).to eq("Annex to ITU OB No. 1")
     end
 
-    it "normalizes legacy 'Annex to ITU-T OB.1283 (01/2024)'" do
+    # The bulletin keeps the sector it was cited with (SpecialPublication).
+    it "keeps the sector of 'Annex to ITU-T OB.1283 (01/2024)'" do
       identifier = Pubid::Itu.parse("Annex to ITU-T OB.1283 (01/2024)")
-      expect(identifier.to_s).to eq("Annex to ITU OB No. 1283 (01/2024)")
+      expect(identifier.to_s).to eq("Annex to ITU-T OB.1283 (01/2024)")
+      expect(identifier)
+        .to eq(Pubid::Itu.parse("Annex to ITU OB No. 1283 (01/2024)"))
     end
   end
 
