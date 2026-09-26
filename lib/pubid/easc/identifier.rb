@@ -28,7 +28,16 @@ module Pubid
     #   РМГ 29-2013
     class Identifier < ::Pubid::Identifier
       def self.parse(identifier)
-        parsed = Parser.parse(identifier)
+        unless identifier.is_a?(String)
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
+        parsed = Pubid::Pg::Backend.parse(:easc, identifier)
         Builder.build(parsed)
       end
 
