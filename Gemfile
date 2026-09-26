@@ -6,6 +6,10 @@ source "https://rubygems.org"
 gemspec
 
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
+# PG artifact engine (R1 parser swap). The published parsanol release
+# predates Parsanol::PG::Artifact — flip this to a rubygems pin once a
+# release carrying the PG runtime is cut (owner call at PR time).
+gem "parsanol", path: "../../parsanol/parsanol-ruby"
 gem "json_schemer" # testsuite schema validation (tools/validate_schema.rb)
 # benchmark is used by spec/pubid/iso/performance_spec.rb and is no longer a
 # default gem as of Ruby 4.0, so it must be declared explicitly.
