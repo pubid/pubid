@@ -77,7 +77,7 @@ module Pubid
 
         # Apply legacy update_codes normalization first
         normalized = Core::UpdateCodes.apply(identifier, :ccsds)
-        parsed = Pubid::Ccsds::Parser.parse(normalized)
+        parsed = Pubid::Pg::Backend.parse(:ccsds, normalized)
         Pubid::Ccsds::Builder.build(parsed)
       end
 
