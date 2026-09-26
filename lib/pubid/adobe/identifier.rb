@@ -18,8 +18,17 @@ module Pubid
       # @return [Pubid::Adobe::Identifier]
       # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         # R1 parser swap: the baked PG artifact is the parser of record.
-        parsed = Pubid::Pg::Backend.parse(:adobe, identifier.to_s.strip)
+        parsed = Pubid::Pg::Backend.parse(:adobe, identifier.strip)
         Builder.build(parsed)
       end
 

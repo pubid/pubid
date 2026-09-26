@@ -10,13 +10,32 @@ module Pubid
 
       module_function
 
+      ALL_PARTS_SUFFIX = "(all parts)"
+
       def parse(flavor, input, entry: "identifier")
-        shape = Artifact.for(flavor).parse(entry, input)
-        to_builder_hash(shape)
+        # The parslet grammar base strips the "(all parts)" suffix before
+        # parsing and marks the tree (Grammar#parse / #mark_all_parts);
+        # the artifact backend carries the same contract so every flavor
+        # whose grammar does not itself consume the suffix keeps working.
+        if input.end_with?(ALL_PARTS_SUFFIX)
+          base = input.sub(/\s*\(all parts\)\s*\z/, "")
+          tree = to_builder_hash(Artifact.for(flavor).parse(entry, base))
+          return mark_all_parts(tree)
+        end
+
+        to_builder_hash(Artifact.for(flavor).parse(entry, input))
       rescue Parsanol::ParseFailed => e
         raise Pubid::Errors::ParseError.new(e.message, nil,
                                             input: input,
                                             flavor: flavor.to_s)
+      end
+
+      def mark_all_parts(tree)
+        case tree
+        when Hash then tree.merge(all_parts: true)
+        when Array then tree.map { |t| t.merge(all_parts: true) }
+        else tree
+        end
       end
 
       # The artifact emits the parsanol-tree wire shape: capture leaves
@@ -33,23 +52,27 @@ module Pubid
 
       def normalize(node)
         case node
-        when Hash
-          return node[:value] if leaf?(node)
-
-          node.transform_values { |value| normalize(value) }
-        when Array
-          node.map { |item| normalize(item) }
-        else
-          node
+        when Parsanol::Slice then node.content
+        when Hash then normalize_hash(node)
+        when Array then node.map { |item| normalize(item) }
+        else node
         end
+      end
+
+      def normalize_hash(node)
+        return node[:value] if wire_leaf?(node)
+
+        node.transform_values { |value| normalize(value) }
       end
 
       def mergeable_sequence?(value)
         value.is_a?(Array) && value.all?(Hash)
       end
 
-      def leaf?(node)
-        node.size == LEAF_KEYS.size && LEAF_KEYS.all? { |key| node.key?(key) }
+      def wire_leaf?(node)
+        return false unless node.size == LEAF_KEYS.size
+
+        LEAF_KEYS.all? { |key| node.key?(key) }
       end
     end
   end
