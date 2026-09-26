@@ -22,6 +22,11 @@ module Pubid
         end
 
         assign_attributes(identifier, parsed_hash)
+        # The locate-stage pass above selects the class; the typed_stage
+        # attribute itself is set by the :type_with_stage key. Subtrees
+        # built without that key (e.g. a joint identifier from a PG
+        # artifact shape) would render with a nil typed_stage otherwise.
+        identifier.typed_stage ||= typed_stage if typed_stage
         # "(all parts)" names every part of the document, so it wraps the
         # document, which holds no mark itself.
         all_parts ? identifier.to_all_parts : identifier

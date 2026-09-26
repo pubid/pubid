@@ -304,7 +304,10 @@ module Pubid
         when :mr_string
           Pubid::Parsers::MrString.parse(string)
         else
-          parsed = Pubid::Iso::Parser.new.parse(string)
+          # R1 parser swap: the baked PG artifact is the identifier
+          # parser of record; the Builder consumes the same attribute
+          # hash it always has.
+          parsed = Pubid::Pg::Backend.parse(:iso, string)
           Pubid::Iso::Builder.new.build(parsed)
         end
       end

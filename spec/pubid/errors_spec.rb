@@ -103,9 +103,12 @@ RSpec.describe Pubid::Errors do
       expect(error).to be_a(Pubid::Errors::Error)
     end
 
-    it "keeps parslet's structured cause, which v1 discarded" do
-      expect(error.parse_failure_cause).to be_a(Parslet::Cause)
-      expect(error.parse_failure_cause.ascii_tree).to be_a(String)
+    # R1 parser swap: the grammar engine is the PG artifact's, so the
+    # structured parslet cause tree no longer exists; the failure keeps
+    # the engine's own description instead.
+    it "carries the engine's failure description" do
+      expect(error.message).to be_a(String)
+      expect(error.message).not_to be_empty
     end
 
     it "records the input and the flavor that failed" do
@@ -113,8 +116,8 @@ RSpec.describe Pubid::Errors do
       expect(error.flavor).to eq("iso")
     end
 
-    it "chains the original parslet failure as the Ruby cause" do
-      expect(error.cause).to be_a(Parslet::ParseFailed)
+    it "chains the engine's parse failure as the Ruby cause" do
+      expect(error.cause).to be_a(Parsanol::ParseFailed)
     end
   end
 
