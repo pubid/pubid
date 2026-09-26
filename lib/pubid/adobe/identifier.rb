@@ -18,7 +18,8 @@ module Pubid
       # @return [Pubid::Adobe::Identifier]
       # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
-        parsed = Parser.parse(identifier)
+        # R1 parser swap: the baked PG artifact is the parser of record.
+        parsed = Pubid::Pg::Backend.parse(:adobe, identifier.to_s.strip)
         Builder.build(parsed)
       end
 
