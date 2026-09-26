@@ -3,28 +3,32 @@
 require "spec_helper"
 require_relative "../../../../lib/pubid/itu"
 
-# OB (Operational Bulletin) is a cross-bureau ITU publication and must not
-# have a sector. Legacy strings like "ITU-T OB.1096" still parse successfully
-# — the bureau is dropped during normalization.
+# OB (Operational Bulletin) is a cross-bureau ITU publication. ITU itself
+# prints it without a sector ("ITU OB No. 1283"); the TSB spelling carries one
+# ("ITU-T OB.1096 (2016)"), and relaton writes that docid, so the sector is
+# kept and rendered back. It is not part of the identity: both spellings name
+# one bulletin (hand-off itu-relaton-query-forms, item 2).
 RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
   describe "round-trip parsing and rendering" do
-    shared_examples "parses and normalizes" do |input, expected|
+    {
+      "ITU OB No. 1283" => ["ITU OB No. 1283", nil],
+      "ITU-T OB.1096" => ["ITU-T OB.1096", "T"],
+      "ITU-T OB No. 1096" => ["ITU-T OB.1096", "T"],
+      # metanorma-itu's spelling, without "No.": accepted, rendered with it.
+      "ITU OB 1283" => ["ITU OB No. 1283", nil],
+      "ITU OB 1283 (01/2024)" => ["ITU OB No. 1283 (01/2024)", nil],
+      "ITU-T OB 1096 (2016)" => ["ITU-T OB.1096 (2016)", "T"],
+      "ITU-T Operational Bulletin No. 1096" => ["ITU-T OB.1096", "T"],
+      "ITU-T OB.1096 (2016)" => ["ITU-T OB.1096 (2016)", "T"],
+      "ITU-T OB.1096 (03/2016)" => ["ITU-T OB.1096 (03/2016)", "T"],
+    }.each do |input, (expected, sector)|
       it "parses #{input.inspect} as #{expected.inspect}" do
         identifier = Pubid::Itu.parse(input)
         expect(identifier).to be_a(described_class)
         expect(identifier.to_s).to eq(expected)
-        expect(identifier.sector).to be_nil
+        expect(identifier.sector&.sector).to eq(sector)
       end
     end
-
-    it_behaves_like "parses and normalizes",
-                    "ITU OB No. 1283", "ITU OB No. 1283"
-    it_behaves_like "parses and normalizes",
-                    "ITU-T OB.1096", "ITU OB No. 1096"
-    it_behaves_like "parses and normalizes",
-                    "ITU-T OB No. 1096", "ITU OB No. 1096"
-    it_behaves_like "parses and normalizes",
-                    "ITU-T Operational Bulletin No. 1096", "ITU OB No. 1096"
 
     it "preserves date" do
       identifier = Pubid::Itu.parse("ITU OB No. 1283 (01/2024)")
@@ -38,20 +42,90 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
     end
   end
 
-  describe "OB-no-sector validation" do
-    it "raises when constructed with sector" do
+  describe "the printed bulletin date (DD.<roman month>.YYYY)" do
+    let(:id) { Pubid::Itu.parse("ITU-T OB.1096 - 15.III.2016") }
+
+    it "reads the day, month and year" do
+      expect([id.date.year, id.date.month, id.date.day])
+        .to eq(%w[2016 03 15])
+    end
+
+    it "renders back byte-exactly" do
+      expect(id.to_s).to eq("ITU-T OB.1096 - 15.III.2016")
+    end
+
+    { "I" => "01", "IV" => "04", "IX" => "09", "XII" => "12" }
+      .each do |roman, month|
+      it "accepts the month #{roman}" do
+        parsed = Pubid::Itu.parse("ITU-T OB.1096 - 01.#{roman}.2016")
+        expect(parsed.date.month).to eq(month)
+        expect(parsed.to_s).to eq("ITU-T OB.1096 - 01.#{roman}.2016")
+      end
+    end
+
+    it "rejects a month beyond XII" do
+      expect { Pubid::Itu.parse("ITU-T OB.1096 - 01.XIII.2016") }
+        .to raise_error(Pubid::Errors::ParseError)
+    end
+
+    it "round-trips through from_hash" do
+      rebuilt = Pubid::Itu::Identifier.from_hash(id.to_hash)
+      expect(rebuilt).to eq(id)
+      expect(rebuilt.to_s).to eq(id.to_s)
+      expect(rebuilt.date.day).to eq("15")
+    end
+
+    # The day is in `==`, so it reaches the URN as well.
+    it "has a URN distinct from the month-only date" do
+      month_only = Pubid::Itu.parse("ITU-T OB.1096 (03/2016)")
+      expect(id).not_to eq(month_only)
+      expect(id.to_urn).to eq("urn:itu:itu:OB.1096:15/03/2016")
+      expect(id.to_urn).not_to eq(month_only.to_urn)
+    end
+  end
+
+  describe "sector and identity" do
+    let(:with_sector) { Pubid::Itu.parse("ITU-T OB.1096 (2016)") }
+    let(:without) { Pubid::Itu.parse("ITU OB No. 1096 (2016)") }
+
+    it "serializes the sector" do
+      expect(with_sector.to_hash).to eq(
+        "_type" => "pubid:itu:special-publication",
+        "sector" => "T",
+        "series" => "OB",
+        "number" => "1096",
+        "year" => "2016",
+      )
+    end
+
+    it "round-trips the sector through from_hash" do
+      rebuilt = Pubid::Itu::Identifier.from_hash(with_sector.to_hash)
+      expect(rebuilt.to_s).to eq("ITU-T OB.1096 (2016)")
+      expect(rebuilt).to eq(with_sector)
+    end
+
+    it "treats the spelling without No. as the same bulletin" do
+      expect(Pubid::Itu.parse("ITU OB 1096 (2016)")).to eq(without)
+    end
+
+    it "treats both spellings as one bulletin" do
+      expect(with_sector).to eq(without)
+      expect(without).to eq(with_sector)
+    end
+
+    it "still tells two bulletins apart" do
+      expect(with_sector).not_to eq(Pubid::Itu.parse("ITU-T OB.1097 (2016)"))
+    end
+
+    it "matches a bare reference against a dated one" do
+      expect(Pubid::Itu.parse("ITU-T OB.1096")
+        .matches?(without, ignore: %i[year month])).to be(true)
+    end
+
+    it "accepts a sector on direct construction" do
       expect do
         described_class.new(
           sector: Pubid::Itu::Components::Sector.new(sector: "T"),
-          series: Pubid::Itu::Components::Series.new(series: "OB"),
-          code: Pubid::Itu::Components::Code.new(number: "1"),
-        )
-      end.to raise_error(ArgumentError, /cross-bureau/)
-    end
-
-    it "does not raise when sector is nil" do
-      expect do
-        described_class.new(
           series: Pubid::Itu::Components::Series.new(series: "OB"),
           code: Pubid::Itu::Components::Code.new(number: "1"),
         )

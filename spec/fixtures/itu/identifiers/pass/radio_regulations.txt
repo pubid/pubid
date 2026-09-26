@@ -1,0 +1,7 @@
+# ITU Radio Regulations - Pass
+# Round-trip canonical forms only; the URL spelling "ITU-R RR-2020"
+# normalizes to "ITU-R RR (2020)" and is covered by radio_regulations_spec.rb.
+
+ITU-R RR
+ITU-R RR (2016)
+ITU-R RR (2020)

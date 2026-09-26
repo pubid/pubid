@@ -17,6 +17,9 @@ RSpec.describe "Pubid::Itu #root.number" do
     "ITU-T E.156 Suppl. 2" => "156",        # supplement -> root is the base
     "ITU-T Z.100 (1999) Cor. 1 (10/2001)" => "100", # corrigendum -> base
     "ITU OB No. 1283 (01/2024)" => "1283",  # special publication
+    "ITU-T OB.1096 (2016)" => "1096",       # special publication, sector
+    "ITU-R RR (2020)" => "RR",              # radio regulations
+    "T-REC-T.4-200307-I" => "4",            # publication id
     "Annex to ITU OB No. 1000" => "1000",   # annex -> root is the base
     "ITU-T H.264 (V14) (08/2021)" => "264", # versioned recommendation
     "ITU-T A.23 Annex A (06/2014)" => "23", # labelled annex -> base

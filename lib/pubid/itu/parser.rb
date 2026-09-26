@@ -125,9 +125,48 @@ module Pubid
         dash >> (letter.repeat(1, 3) >> dot >> digits).as(:range_end)
       end
 
-      # Parts
+      # A "-YYYYMM" approval date — the "200307" of "T-REC-T.4-200307-I" and
+      # "ITU-T T.4-200307". ITU's own edition suffix is short ("-5"), so six
+      # digits that read as a plausible year (19xx/20xx) and month (01-12) are
+      # the date, never a part. A six-digit run that fails either test
+      # ("-200313", "-180001") is still a part, as it was before.
+      rule(:yyyymm_year) { (str("19") | str("20")) >> digit >> digit }
+      rule(:yyyymm_month) do
+        (str("0") >> match["1-9"]) | (str("1") >> match["0-2"])
+      end
+      rule(:yyyymm_shape) { yyyymm_year >> yyyymm_month >> digit.absent? }
+
+      # The status letter that trails the date in a publication id — "I" (in
+      # force) or "S" (superseded). It names the state of the edition, not the
+      # edition, so it is parsed and dropped. "S" is also the Spanish language
+      # suffix, so it is a status ONLY in the full "T-REC-…" id, where ITU
+      # always writes one; after an "ITU-T …-YYYYMM" print form only "I" is,
+      # and "-S" stays the language ("ITU-T Z.100-199911-S").
+      rule(:id_status) do
+        dash >> match["IS"] >> match["A-Za-z0-9"].absent?
+      end
+
+      rule(:print_id_status) do
+        dash >> str("I") >> match["A-Za-z0-9"].absent?
+      end
+
+      rule(:yyyymm_date) do
+        dash >> yyyymm_year.as(:year) >> yyyymm_month.as(:month) >>
+          digit.absent?
+      end
+
+      rule(:id_date) { yyyymm_date >> print_id_status.maybe }
+
+      # Either date spelling of a Recommendation.
+      rule(:document_date) { date_part | id_date }
+
+      # "ITU-T REC T.4", "ITU-T REC-T.4" — the redundant type word of ITU's
+      # own URLs. Not captured: a Recommendation is the default type.
+      rule(:rec_word) { str("REC") >> (space | dash) }
+
+      # Parts. The yyyymm guard keeps the approval date out of the part list.
       rule(:part) do
-        dash >> digits.as(:part)
+        dash >> yyyymm_shape.absent? >> digits.as(:part)
       end
 
       rule(:parts) { part.repeat(0).as(:parts) }
@@ -273,6 +312,7 @@ module Pubid
         itu_prefix >>
           sector >>
           space >>
+          rec_word.maybe >>
           series >> dot >>
           code >>
           range_end.maybe >>
@@ -281,7 +321,7 @@ module Pubid
           series_word.maybe >>
           attachment.maybe >>
           version_part.maybe >>
-          date_part.maybe
+          document_date.maybe
       end
 
       rule(:base_without_series) do
@@ -292,7 +332,7 @@ module Pubid
           code_suffixes >>
           attachment.maybe >>
           version_part.maybe >>
-          date_part.maybe
+          document_date.maybe
       end
 
       # A series-code document — "EMC-5", "MES-2", "QOS-2", "IMPL-8",
@@ -311,12 +351,10 @@ module Pubid
       # The number stays in `code.number`, so `root.number` — the field
       # relaton-index bsearches on — is "5" for EMC-5 and "QKD" for SEC-QKD
       # rather than nil.
-      # The OB guard keeps "ITU-T OB-1" a clean parse failure. Without it the
-      # string reaches Builder#build's Recommendation fallback, whose
-      # validate_ob_no_sector! raises an ArgumentError that escapes
-      # Identifier.parse's Parslet::ParseFailed rescue — turning a rejected
-      # input into a crash for callers. It guards "OB" + dash specifically, so
-      # a genuine two-letter mnemonic starting "OB" would still parse.
+      # The OB guard keeps "ITU-T OB-1" a clean parse failure rather than a
+      # Recommendation of a series "OB" — the Operational Bulletin's series
+      # name. It guards "OB" + dash specifically, so a genuine two-letter
+      # mnemonic starting "OB" would still parse.
       rule(:series_code_body) do
         (str("OB") >> dash).absent? >>
           letter.repeat(2).as(:series) >> dash.as(:series_dash) >>
@@ -365,10 +403,8 @@ module Pubid
       # Builder#build's `combined` branch, which builds a CombinedIdentifier and
       # would silently drop the marker — a clean parse failure is better than a
       # Report that comes back as a Recommendation. The OB guard mirrors
-      # series_code_body's: an Operational Bulletin is cross-bureau, and
-      # "Report ITU-T OB.1" would otherwise route to SpecialPublication (marker
-      # dropped) or hit validate_ob_no_sector!, whose ArgumentError escapes
-      # Identifier.parse's Parslet::ParseFailed rescue.
+      # series_code_body's: "Report ITU-T OB.1" would otherwise route to
+      # SpecialPublication with the marker dropped.
       rule(:report_body) do
         (str("OB") >> dot).absent? >>
           (series >> dot).maybe >>
@@ -535,6 +571,7 @@ module Pubid
         itu_prefix >>
           sector >>
           space >>
+          rec_word.maybe >>
           series >> dot >>
           code >>
           range_end.maybe >>
@@ -543,7 +580,7 @@ module Pubid
           series_word.maybe >>
           attachment.maybe >>
           version_part.maybe >>
-          date_part.maybe >>
+          document_date.maybe >>
           language.maybe
       end
 
@@ -556,24 +593,71 @@ module Pubid
           code_suffixes >>
           attachment.maybe >>
           version_part.maybe >>
-          date_part.maybe >>
+          document_date.maybe >>
           language.maybe
       end
 
+      # ITU's publication id — "T-REC-T.4-200307-I",
+      # "R-REC-BO.1130-5-202602-I": <sector>-REC-<number>[-<edition>]-<YYYYMM>
+      # [-<status>], the name ITU gives each edition in its URLs and PDF
+      # files. It builds the plain Recommendation it names and renders in the
+      # print form ("ITU-T T.4 (07/2003)"). The date is required: without it
+      # the string names no edition. No other rule starts with a bare sector
+      # letter, so the slot is free.
+      rule(:publication_id) do
+        sector >> dash >> str("REC") >> dash >>
+          series >> dot >> code >> yyyymm_date >> id_status.maybe >>
+          language.maybe
+      end
+
+      # The Radio Regulations — "ITU-R RR", "ITU-R RR (2020)", and the URL
+      # spelling "ITU-R RR-2020". Always ITU-R. The trailing any.absent? is
+      # load-bearing: PEG ordered choice never re-enters the alternation once
+      # an alternative succeeds, so a partial match on "ITU-R RR.1" must fail
+      # here and fall through to with_series.
+      rule(:radio_regulations) do
+        itu_prefix >> str("R").as(:sector) >> space >>
+          str("RR").as(:radio_regulations) >>
+          (date_part | (dash >> digit.repeat(4, 4).as(:year))).maybe >>
+          language.maybe >> any.absent?
+      end
+
       # OB (Operational Bulletin) — Special Publication.
-      # OB is a cross-bureau ITU publication; sector, when present in legacy
-      # strings like "ITU-T OB.1096", is silently dropped by the builder.
+      # OB is a cross-bureau ITU publication. The TSB spelling carries a
+      # sector ("ITU-T OB.1096 (2016)"); the builder keeps it, and it renders
+      # back, but it is not part of the bulletin's identity.
       rule(:ob_series) { str("OB").as(:series) }
 
       rule(:ob_dot_body) { dot >> number }
       rule(:ob_no_body) { space >> str("No.") >> space >> number }
+      # "ITU OB 1000" — metanorma-itu's docidentifier ("Annex to ITU OB %").
+      # Accepted as an input spelling only; it renders "ITU OB No. 1000", the
+      # form ITU's own bulletin site uses.
+      rule(:ob_bare_body) { space >> number }
+
+      # The date as a bulletin prints it — "ITU-T OB.1096 - 15.III.2016": day,
+      # Roman month, year. The months are tried longest first, because PEG
+      # takes the first alternative that matches and "I" would otherwise win
+      # on "III"; "XIII" matches "XII", then fails on the required dot.
+      rule(:roman_month) do
+        %w[XII XI X IX VIII VII VI V IV III II I]
+          .map { |m| str(m) }.reduce(:|)
+      end
+
+      rule(:ob_roman_date) do
+        str(" - ") >> digit.repeat(2, 2).as(:day) >> dot >>
+          roman_month.as(:roman_month) >> dot >>
+          digit.repeat(4, 4).as(:year)
+      end
+
+      rule(:ob_date) { date_part | ob_roman_date }
 
       rule(:ob_with_sector) do
         itu_prefix >>
           (sector >> space).maybe >>
           ob_series >>
-          (ob_dot_body | ob_no_body) >>
-          date_part.maybe >>
+          (ob_dot_body | ob_no_body | ob_bare_body) >>
+          ob_date.maybe >>
           language.maybe
       end
 
@@ -585,7 +669,7 @@ module Pubid
           str("Operational Bulletin").as(:_op_bull) >>
           space >> str("No.") >> space >>
           number >>
-          date_part.maybe >>
+          ob_date.maybe >>
           language.maybe
       end
 
@@ -671,13 +755,15 @@ module Pubid
           handbook |
           numeric_question |
           letter_question |
+          radio_regulations |
           with_series |
           contribution |
           # Unreachable earlier: special_publication needs the literal "OB",
           # handbook/numeric_question need leading digits, letter_question
           # needs series >> dot, and contribution needs "-C" after the series.
           series_code_identifier |
-          without_series
+          without_series |
+          publication_id
       end
 
       # Common-text form: an ITU identifier followed by "| ISO/IEC ...".

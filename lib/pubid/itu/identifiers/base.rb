@@ -101,8 +101,6 @@ module Pubid
         end
 
         super
-
-        validate_ob_no_sector!
       end
 
       # The document number lives on the `code` component for ITU; surface it at
@@ -462,6 +460,16 @@ module Pubid
         model.code ||= Components::Code.new
       end
 
+      # The day is set only by the printed bulletin date ("15.III.2016"), so
+      # it emits only there and no existing index row gains a key.
+      def day_to_kv(model, doc)
+        emit_kv(doc, "day", model.date&.day)
+      end
+
+      def day_from_kv(model, value)
+        date_for(model).day = value.to_s
+      end
+
       def date_for(model)
         model.date ||= Pubid::Components::Date.new
       end
@@ -472,21 +480,6 @@ module Pubid
         str = value.to_s
         LANGUAGES[str] || str
       end
-
-      # OB (Operational Bulletin) is a cross-bureau ITU publication and
-      # must not have a sector. Direct construction with both raises;
-      # the parser silently drops sector for legacy strings like
-      # "ITU-T OB.X" (handled in Builder).
-      def validate_ob_no_sector!
-        return unless series&.series == "OB"
-        return if sector.nil?
-        return if sector.is_a?(Components::Sector) && (sector.sector.nil? || sector.sector.to_s.empty?)
-
-        raise ArgumentError,
-              "OB (Operational Bulletin) is a cross-bureau ITU publication; " \
-              "sector must not be set"
-      end
     end
-
   end
 end

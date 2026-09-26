@@ -16,7 +16,10 @@ module Pubid
       def generate_base_urn
         parts = ["urn", "itu"]
 
-        if identifier.sector
+        # An Operational Bulletin is cross-bureau: its sector is a spelling,
+        # not identity (see SpecialPublication#==), so it stays out of the URN.
+        if identifier.sector &&
+            !identifier.is_a?(Identifiers::SpecialPublication)
           sector = identifier.sector.to_s
           parts << sector.to_s.downcase
         else
@@ -56,7 +59,11 @@ module Pubid
 
         if identifier.date
           date = identifier.date
-          if date&.year && date.month
+          # Only an Operational Bulletin's printed date carries a day
+          # ("15.III.2016"); it is in `==`, so it must reach the URN too.
+          if date&.year && date.month && date.day
+            parts << "#{date.day}/#{date.month}/#{date.year}"
+          elsif date&.year && date.month
             parts << "#{date.month}/#{date.year}"
           elsif date&.year
             parts << date.year.to_s

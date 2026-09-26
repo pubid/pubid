@@ -198,8 +198,8 @@ RSpec.describe "ITU series groups and series-code documents" do
   end
 
   describe "existing forms are unchanged" do
-    it "still normalises the legacy Operational Bulletin spelling" do
-      expect(parse("ITU-T OB.1096").to_s).to eq("ITU OB No. 1096")
+    it "still parses the TSB Operational Bulletin spelling" do
+      expect(parse("ITU-T OB.1096").to_s).to eq("ITU-T OB.1096")
     end
 
     [

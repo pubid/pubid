@@ -67,3 +67,49 @@ on any call. The base now derives the key from the class name
 `underscore` is not a dependency. metanorma-itu constructs through this
 lookup; its flavor-local `pubid_contribution.rb` render override can be
 deleted once it migrates.
+
+## relaton's query forms — RR, OB sector, publication ids
+
+Four forms relaton's `Relaton::Itu::Pubid` parsed and `Pubid::Itu` did not
+(hand-off itu-relaton-query-forms). None of them occurs in the published
+`relaton-data-itu` index — no `series: RR`, no OB row, no six-digit part — and
+a replay of all 24,382 rows and every ITU pass fixture showed 0 changes.
+
+- **Radio Regulations** — `Identifiers::RadioRegulations`
+  (`pubid:itu:radio-regulations`): `ITU-R RR`, `ITU-R RR (2020)`, and the URL
+  spelling `ITU-R RR-2020`, which used to build a *wrong* Recommendation
+  (series `RR`, number `2020`) with no error. "RR" is the series; there is no
+  code, so `#number` returns the series and `root.number` is `"RR"`. The rule
+  ends in `any.absent?`: it sits before `with_series`, and PEG never re-enters
+  the alternation, so a partial match on `ITU-R RR.1` must fail inside it.
+- **Operational Bulletins keep their sector.** This reverses the old
+  "cross-bureau, sector must not be set" rule: `validate_ob_no_sector!` is
+  gone, `ITU-T OB.1096 (2016)` renders back as it is, and the sector-less
+  `ITU OB No. 1096` is unchanged. The long forms with a sector (`ITU-T OB No.
+  1096`) now normalise to `ITU-T OB.1096`. `No.` stays in the default
+  render — it is how ITU's bulletin site and pubid v1 write it — and
+  metanorma-itu's `ITU OB 1000` / `Annex to ITU OB 1000` (its i18n template
+  omits `No.`) is accepted on parse (`ob_bare_body`) and rendered with it.
+  The sector is a spelling, not
+  identity: `SpecialPublication#==` skips it, the URN keeps `urn:itu:itu:…`
+  and `mr_type` stays nil, so both spellings are one bulletin on every
+  surface except `to_s`/`to_hash`. The printed date `- 15.III.2016` sets
+  `date.day`, which only this form does, so `render_ob_date` uses the day as
+  the spelling marker; `day_to_kv` emits only then.
+- **`-YYYYMM` is a date, never a part.** `part` refuses a six-digit run with a
+  19xx/20xx year and a 01–12 month (`yyyymm_shape`), and `id_date` reads it as
+  year+month. `-200313`, `-180001` stay parts. `ITU-T REC T.4` drops the
+  uncaptured `rec_word`; `T-REC-T.4-200307-I` is `publication_id`, last in
+  `identifier` (nothing else starts with a bare sector letter), and requires
+  the date. The trailing status letter (`I` in force, `S` superseded) is
+  parsed and dropped: it names the state of an edition, not the edition.
+  **`S` is also the Spanish language suffix**, so it is a status only inside
+  the full `T-REC-…` id (`id_status`); after an `ITU-T …-YYYYMM` print form
+  only `-I` is (`print_id_status`), and `ITU-T Z.100-199911-S` keeps language
+  `S`. The `-YYYYMM` date and `REC` word are also in `base_with_series`/
+  `base_without_series`: the part guard applies there too, so without them
+  `ITU-T G.989-200307 Amd 1` — a (wrong) Amendment on `main` — stopped parsing.
+  The day of an OB date reaches the URN (`…:15/03/2016`), since it is in `==`.
+  **Not done:** an RR supplement (`ITU-R RR (2020) Amd 1` fails; the
+  base-less `ITU-R RR Amd 1` still builds an Amendment on series `RR`), and
+  `ITU-R RR-E` is still a Recommendation numbered `E` — both as on `main`.

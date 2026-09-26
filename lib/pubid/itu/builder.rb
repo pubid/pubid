@@ -50,6 +50,16 @@ module Pubid
           return sp
         end
 
+        # Radio Regulations — "ITU-R RR (2020)"
+        if data[:radio_regulations]
+          return Identifiers::RadioRegulations.new(
+            sector: Components::Sector.new(sector: data[:sector].to_s),
+            series: Components::Series.new(series: "RR"),
+            date: data[:year] ? build_date(data) : nil,
+            language: data[:language]&.to_s,
+          )
+        end
+
         # Check if this is a supplement identifier
         if data[:supplement_type]
           supp = build_supplement(data)
@@ -153,11 +163,12 @@ module Pubid
         nil
       end
 
-      # Build Special Publication (OB). Sector is silently dropped — OB is a
-      # cross-bureau publication and `Identifier` rejects sector+OB
-      # in its constructor.
+      # Build Special Publication (OB). The sector of the TSB spelling
+      # ("ITU-T OB.1096") is kept so the bulletin renders back as it was cited;
+      # SpecialPublication#== ignores it, since OB is cross-bureau.
       def build_special_publication(data)
         Identifiers::SpecialPublication.new(
+          sector: (Components::Sector.new(sector: data[:sector].to_s) if data[:sector]),
           series: Components::Series.new(series: "OB"),
           code: data[:number] ? build_code(data) : nil,
           date: data[:year] ? build_date(data) : nil,
@@ -344,10 +355,19 @@ module Pubid
         )
       end
 
+      # The Roman month of a bulletin date ("15.III.2016") is stored as the
+      # two-digit month every other ITU date uses; the day marks the spelling.
       def build_date(data)
+        month = if data[:roman_month]
+                  (Identifiers::SpecialPublication::ROMAN_MONTHS.index(data[:roman_month].to_s) + 1)
+                    .to_s.rjust(2, "0")
+                else
+                  data[:month]&.to_s
+                end
         Pubid::Components::Date.new(
           year: data[:year].to_s,
-          month: data[:month]&.to_s,
+          month: month,
+          day: data[:day]&.to_s,
         )
       end
 
