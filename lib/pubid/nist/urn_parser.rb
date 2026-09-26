@@ -42,12 +42,21 @@ module Pubid
         type_token, payload = parts
         code, revision = parse_payload(payload)
 
-        text = "NIST #{type_label(type_token)} #{code}"
+        text = "#{publisher_for(type_token)} #{type_label(type_token)} #{code}"
         text += revision if revision
         flavor_parse(text)
       end
 
       private
+
+      # The NBS-era series carry the NBS imprint in their canonical form
+      # ("NBS CSM 1") — the rebuild must name the publisher the document
+      # carries, or the flavor parse rejects its own URN's rebuild.
+      NBS_SERIES = ["csm"].freeze
+
+      def publisher_for(type_token)
+        NBS_SERIES.include?(type_token.downcase) ? "NBS" : "NIST"
+      end
 
       def parse_payload(payload)
         # Strip the trailing ".supp" supplement marker.
