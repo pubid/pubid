@@ -169,9 +169,11 @@ module Pubid
           # ("D08, September, 2018").
           if id.draft_obj
             printed = id.draft_obj.to_s
-            if id.publisher == "IEC" && id.copublisher == ["IEEE"]
-              printed = printed.split(", ").first
-            elsif id.publisher == "IEEE" && id.draft_status.to_s.empty?
+            # The draft designator carries its date on every lead
+            # (docs/IEEE-DRAFT-STAGES.md §3: "the draft designator with its
+            # date" — the IEC/IEEE-led date-drop contradicted the DCD
+            # convention and the raw records).
+            if id.publisher == "IEEE" && id.draft_status.to_s.empty?
               # The long comma form is for dated project drafts; an
               # unapproved-draft render keeps its pinned single-comma form
               # (pubid#318 idempotence).
