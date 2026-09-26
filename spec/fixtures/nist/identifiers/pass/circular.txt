@@ -875,8 +875,10 @@ NBS CIRC 9e8
 !NBS CIRC 25supp-1927!NBS CIRC 25sup1927
 !NBS CIRC 25supp-1928!NBS CIRC 25sup1928
 !NBS CIRC 25supp-1929!NBS CIRC 25sup1929
-!NBS.CIRC.154suprev!NBS.CIRC.154
-!NBS.CIRC.e2!NBS.CIRCe2
-!NBS.CIRC.sup!NBS.CIRC
+# C4/C5 (testsuite#5): the dotted spellings are the attested raw forms;
+# the old renderer's glued/marker-dropping outputs are no longer canonical.
+NBS.CIRC.154suprev
+NBS.CIRC.e2
+NBS.CIRC.sup
 !NBS.CIRC.supJun1925-Jun1926!NBS CIRC supJun1925-Jun1926
 !NBS.CIRC.supJun1925-Jun1927!NBS CIRC supJun1925-Jun1927
