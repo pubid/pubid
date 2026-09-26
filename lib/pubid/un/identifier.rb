@@ -32,7 +32,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Parser.parse(identifier)
+        parsed = Pubid::Pg::Backend.parse(:un, identifier, merge_top_sequence: false)
         Builder.build(parsed)
       end
     end
