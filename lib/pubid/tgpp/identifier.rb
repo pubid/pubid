@@ -113,7 +113,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Parser.parse(identifier)
+        parsed = Pubid::Pg::Backend.parse(:tgpp, identifier)
         Builder.build(parsed)
       end
     end

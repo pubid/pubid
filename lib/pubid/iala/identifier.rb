@@ -21,10 +21,19 @@ module Pubid
       # @return [Pubid::Iala::Identifier]
       # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
+        unless identifier.is_a?(String)
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
         if FormatDetector.detect(identifier) == :urn
           UrnParser.parse(identifier)
         else
-          parsed = Parser.parse(identifier)
+          parsed = Pubid::Pg::Backend.parse(:iala, identifier)
           Builder.build(parsed)
         end
       end
