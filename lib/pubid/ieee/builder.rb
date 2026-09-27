@@ -88,6 +88,14 @@ module Pubid
         date_info = nil
 
         if content
+          # A bare (unparenthesised) revision narrative printed after the
+          # code is the same relationship prose as the parenthetical form
+          # (C3 ruling) — peel it before the number tokenisation so both
+          # spellings collapse onto one canonical.
+          if (m = content.match(/\A(.+?) (Revis(?:ion|on) (?:of|to) IEEE Std .+)\z/))
+            content = "#{m[1]} (#{m[2]})"
+          end
+
           # Extract copublished number (everything before IEC: or comma or parenthesis)
           copublished_number = if content.include?("IEC:")
                                  content.split(" IEC:").first.strip
@@ -114,21 +122,42 @@ module Pubid
             end
           end
 
-          # Extract date info if present
+          # The parenthetical tail is classified, not swallowed (C3 ruling:
+          # a "(Revision of IEEE Std …)" narrative is a relationship, not
+          # identity — it lands in `relationships` so the URN carries it as
+          # the `rel.` segment and the canonical human drops it, exactly the
+          # joint ISO route's model; an "(MM/DD)" print date is non-identity
+          # and dropped; anything else keeps the historical date_info
+          # rendering).
           if content.include?(" (")
-            date_part = content.split(" (")[1]
-            if date_part&.include?(")")
-              date_info = date_part.split(")")[0]
+            tail = content.split(" (")[1].to_s.split(")")[0]
+            if (m = tail.match(/\ARevis(?:ion|on) (?:of|to) IEEE Std (.+)\z/))
+              related =
+                begin
+                  Identifier.parse(m[1])
+                rescue Parslet::ParseFailed
+                  Identifier.new(parenthetical_content: m[1])
+                end
+              relationships = [Components::Relationship.new(
+                relationship_type: Components::Relationship::REVISION_OF,
+                related_identifiers: [related],
+              )]
+            elsif tail.match?(/\A\d{2}\/\d{2}\z/)
+              # print date — non-identity, dropped
+            else
+              date_info = tail
             end
           end
         end
 
-        Identifiers::IecIeeeCopublished.new(
+        kwargs = {
           draft_info: draft_info,
           iec_year: iec_year,
           date_info: date_info,
           **copublished_structured(copublished_number),
-        )
+        }
+        kwargs[:relationships] = relationships if relationships
+        Identifiers::IecIeeeCopublished.new(**kwargs)
       end
 
       # Decompose an IEC/IEEE `copublished_number` into the split index columns

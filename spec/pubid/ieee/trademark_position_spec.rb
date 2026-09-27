@@ -118,18 +118,16 @@ RSpec.describe "IEEE trademark position" do
   # These forms do not round-trip to_s (the outer parentheses are dropped), so
   # they need their own expectation rather than the table's `to_s == ref` guard.
   #
-  # The two rows share an expectation because the builder's
-  # `content.split(" (")` swallows the trailing " - Redline" — so the redline
-  # document and its base
-  # collapse onto one `to_s` *and* one `to_hash`. That is a **pre-existing**
-  # data loss of the kind the "Redline suffix — preserve, don't drop" work fixed
-  # for plain standards, unrelated to where the mark sits; asserted here only to
-  # record today's behaviour, not to endorse it.
+  # Under the C3 ruling the "(Revision of IEEE Std …)" tail is a relationship,
+  # not identity: it is dropped from `to_s` (it lives in `relationships` and
+  # the URN's `rel.` segment), so both rows render their base designation.
+  # The Redline collapse onto the base remains the documented pre-existing
+  # loss; asserted here to record the ruled behaviour.
   revision_of = "IEC/IEEE 62271-37-082:2012(E) " \
                 "(Revision of IEEE Std C37.082-1982)"
   revision_of_rendered = [
-    "IEC/IEEE 62271-37-082:2012(E) Revision of IEEE Std C37.082-1982",
-    "IEC/IEEE 62271-37-082™:2012(E) Revision of IEEE Std C37.082-1982",
+    "IEC/IEEE 62271-37-082:2012(E)",
+    "IEC/IEEE 62271-37-082™:2012(E)",
   ]
 
   {
