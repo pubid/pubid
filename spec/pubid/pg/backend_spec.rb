@@ -23,5 +23,12 @@ RSpec.describe Pubid::Pg::Backend do
 
       expect(artifact.checksum).to start_with("sha256:")
     end
+
+    # parsanol renamed its grammar-language namespace from Parsanol::PG to
+    # Parsanol::PARG; the loader must use the name parsanol defines.
+    it "parses through the Parsanol::PARG runtime" do
+      expect(defined?(Parsanol::PARG::Artifact)).to eq("constant")
+      expect(Pubid::Xsf::Identifier.parse("XEP 0001").to_s).to eq("XEP 0001")
+    end
   end
 end
