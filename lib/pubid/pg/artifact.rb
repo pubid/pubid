@@ -20,8 +20,8 @@ module Pubid
       end
 
       def initialize(path)
-        @artifact = Parsanol::PG::Artifact.load(path)
-      rescue Parsanol::PG::Error => e
+        @artifact = Parsanol::PARG::Artifact.load(path)
+      rescue Parsanol::PARG::Error => e
         raise Pubid::Errors::ParseError,
               "PG artifact #{path} rejected: #{e.message}"
       end
