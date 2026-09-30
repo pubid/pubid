@@ -129,11 +129,15 @@ module Pubid
 
       root(:identifier)
 
-      # Preprocessing to normalize common typos
-      def parse(input)
+      # Pre-parse ingestion normalization (R2): every parse path feeds
+      # the grammar the same normalized string.
+      def self.normalize_input(input)
         # Normalize MPMP typo to MPMS
-        normalized = input.gsub("API MPMP", "API MPMS")
-        super(normalized)
+        input.gsub("API MPMP", "API MPMS")
+      end
+
+      def parse(input)
+        super(self.class.normalize_input(input))
       end
     end
   end

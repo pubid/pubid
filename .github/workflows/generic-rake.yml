@@ -155,12 +155,44 @@ jobs:
       with:
         submodules: true
 
+    # The parsanol gem (git pin) builds its Rust extension at bundle
+    # install. Windows runners ship without a Rust toolchain, and the
+    # msvc-host default cannot link the extension: Ruby's devkit drives
+    # gcc, so the gnu-host toolchain must be the default (plain cargo
+    # then builds x86_64-pc-windows-gnu into target/release, where the
+    # extension's Makefile expects it).
+    - uses: dtolnay/rust-toolchain@stable
+    - if: runner.os == 'Windows'
+      run: |
+        rustup toolchain install stable-x86_64-pc-windows-gnu
+        rustup default stable-x86_64-pc-windows-gnu
+
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby.version }}
-        bundler-cache: true
+        bundler-cache: false
         rubygems: ${{ matrix.ruby.rubygems }}
         bundler: ${{ matrix.ruby.bundler }}
+
+    # rb-sys runs bindgen against the Ruby headers at bundle install.
+    # Two MinGW gaps must be bridged for libclang: (1) it does not
+    # inherit the UCRT64 sysroot setup-ruby installs, so RubyInstaller's
+    # HAVE_STRINGS_H include dies without CPATH; (2) libclang's default
+    # windows target is msvc, and mingw-w64 headers only parse under
+    # their native GNU target — bindgen picks up
+    # BINDGEN_EXTRA_CLANG_ARGS even as a library, so set both.
+    - if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $devkit = $env:RI_DEVKIT
+        if (-not $devkit) { throw "RI_DEVKIT not set by setup-ruby" }
+        $inc = "-I$devkit\ucrt64\include -I$devkit\ucrt64\x86_64-w64-mingw32\include"
+        "CPATH=$devkit\ucrt64\include;$devkit\ucrt64\x86_64-w64-mingw32\include" >> $env:GITHUB_ENV
+        "BINDGEN_EXTRA_CLANG_ARGS=--target=x86_64-w64-mingw32 $inc" >> $env:GITHUB_ENV
+
+    # Explicit install (not setup-ruby's bundler-cache) so the CPATH
+    # above is in place while the parsanol extension compiles.
+    - run: bundle install --jobs 4 --retry 3
 
     - run: bundle exec rake
 
@@ -190,6 +222,10 @@ jobs:
     - uses: actions/checkout@v7
       with:
         submodules: true
+
+    # The parsanol gem (git pin) builds its Rust extension at bundle
+    # install; windows runners ship without a Rust toolchain.
+    - uses: dtolnay/rust-toolchain@stable
 
     - uses: ruby/setup-ruby@v1
       with:

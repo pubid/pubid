@@ -30,7 +30,7 @@ module Pubid
           # R2 ingestion hook: normalized strings reach the model through
           # the same parser of record as Identifier.parse (the baked PG
           # artifact), so every Tier-3 normalization feeds one grammar.
-          parsed = Pubid::Pg::Backend.parse(:iso, string)
+          parsed = Pubid::Parg::Backend.parse(:iso, string)
           Pubid::Iso.builder.build(parsed)
         end
 

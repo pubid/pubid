@@ -34,7 +34,7 @@ module Pubid
         # this was the one public parse in the gem that could return nil, which
         # a caller reading `id.to_s` sees as a NoMethodError far from the cause.
         # Both API fixture loaders already drop `#` lines themselves.
-        tree = Parser.new.parse(input)
+        tree = Pubid::Parg::Backend.parse(:api, Api::Parser.normalize_input(input))
         Builder.new.build(tree)
       end
     end

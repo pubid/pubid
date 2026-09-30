@@ -10,7 +10,16 @@ module Pubid
       # @return [Pubid::Ashrae::Identifier] The appropriate identifier object
       # @raise [Pubid::Errors::ParseError] If parsing fails
       def self.parse(identifier)
-        parsed = Parser.parse(identifier)
+        unless identifier.is_a?(String)
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if identifier.length > Pubid::MAX_INPUT_LENGTH
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
+        parsed = Pubid::Parg::Backend.parse(:ashrae, Parser.normalize_input(identifier))
         Builder.build(parsed)
       end
 

@@ -102,7 +102,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Parser.parse(identifier)
+        normalized = Parser.normalize_input(identifier)
+        parsed = Pubid::Parg::Backend.parse(:cen_cenelec, normalized)
         Builder.new.build(parsed)
       end
 

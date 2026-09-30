@@ -1468,7 +1468,10 @@ module Pubid
         cleaned
       end
 
-      def self.parse(string)
+      # Pre-parse ingestion normalizations (R2): every parse path —
+      # parslet and PG artifact alike — feeds the grammar the same
+      # normalized string.
+      def self.normalize_input(string)
         # Strip .pdf extension if present (Pattern 3: File Extensions)
         cleaned = string.sub(/\.pdf$/i, "")
 
@@ -1925,7 +1928,11 @@ module Pubid
         # Fix 2AF: "IEEE Std 1003.1/2003.l/lNT" -> fix typos
         # .l -> .1 and lNT -> INT handled by existing fixes
 
-        new.parse(cleaned)
+        cleaned
+      end
+
+      def self.parse(string)
+        new.parse(normalize_input(string))
       end
     end
   end

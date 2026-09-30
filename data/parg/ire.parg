@@ -1,0 +1,39 @@
+# Port of lib/pubid/ieee/ire/parser.rb — IRE (pre-IEEE) designations:
+# year-first and prefix-first forms, types (Trans./Standard/Std),
+# numbers (dotted letters, IRE-glued, letters-dash) and dates.
+# Consumed by the ieee grammar via `use ire`.
+
+grammar PubidIre version "0.1.0" {
+  digit = %x30-39
+  upper = %x41-5A
+  digits = 1*digit
+  space = " "
+  dash = "-"
+  dot = "."
+
+  year_short = (%x31-36 digit)
+  year_full = (("191" digit)) / (("19" ("2" / "3" / "4" / "5") digit)) / (("196" %x30-33))
+  year = year_full / year_short
+  ire_prefix = ("IEEE-IRE" / "IRE") as publisher
+  ire_type = ("Trans." / "Standard" / "Std") as type
+  number = (((digits (space / dot) upper digits)) / ((digits dot "IRE" digits dot digits upper digits)) / ((2*4upper dash digits)) / (digits)) as number
+  yr_sep = (space [(dash / ",")] [space]) / (dash / ",") / space
+  date = [yr_sep (year) as year]
+
+  # The trailing optional is flattened on purpose: a nested [([x] [y])]
+  # compiles to branches that commit past the leading space in the
+  # pure-Ruby VM, losing the backtrack the year-less forms need.
+  ire_identifier_year_first = ((year) as year) space ire_prefix space [(ire_type space)] number [yr_sep (year_full) as full_year]
+  ire_identifier_prefix_first = ire_prefix space [(ire_type space)] number date
+  ire_identifier = ire_identifier_year_first / ire_identifier_prefix_first
+
+  entry ire_identifier: ire_identifier
+
+  test {
+    accept "IRE Trans. PGI-7"
+    accept "1930 IRE 20"
+    accept "IRE Standard 15 S1"
+    accept "IRE 28"
+    reject "nonsense"
+  }
+}

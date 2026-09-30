@@ -18,7 +18,7 @@ module Pubid
           mismatchers(identifier, test_case, flavor_module)
             .flat_map(&:call)
         rescue StandardError => e
-          ["#{test_case.id} raised #{e.class}"]
+          ["#{test_case.id} raised #{e.class}: #{e.message}"]
         end
 
         # Each checker returns the case's mismatch list for its concern.

@@ -371,7 +371,7 @@ module Pubid
           result = PreParser.preprocess(normalized)
           return build_dual(result.parts) if result.dispatch == :dual_semicolon
         end
-        parsed = Parser.parse(normalized) # Use class method for preprocessing
+        parsed = Pubid::Parg::Backend.parse(:ieee, Parser.normalize_input(normalized))
         builder = Builder.new(Identifier)
         # Pass the original input string to builder for context
         builder.original_input = input

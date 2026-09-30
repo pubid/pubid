@@ -17,7 +17,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Pg::Backend.parse(:amca, identifier)
+        parsed = Pubid::Parg::Backend.parse(:amca, identifier)
         Builder.build(parsed)
       end
 

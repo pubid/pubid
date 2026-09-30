@@ -31,8 +31,7 @@ module Pubid
 
       # Apply legacy update_codes normalization first
       normalized = Core::UpdateCodes.apply(input, :plateau)
-      parser = Parser.new
-      parsed = parser.parse(normalized)
+      parsed = Pubid::Parg::Backend.parse(:plateau, normalized)
       Builder.build(parsed)
     end
 

@@ -64,7 +64,7 @@ module Pubid
 
       # @raise [Pubid::Errors::ParseError] if the string is not a valid ISBN
       def self.build_identifier(identifier)
-        parsed = Pubid::Pg::Backend.parse(:isbn, identifier)
+        parsed = Pubid::Parg::Backend.parse(:isbn, identifier)
         Builder.build(parsed)
       rescue ArgumentError => e
         # The Builder validates length and check digit. Surface that as a parse
