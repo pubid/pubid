@@ -575,6 +575,21 @@ module Pubid
       hash
     end
 
+    # A flavor-independent key for this identifier: the +to_hash+ of the lead
+    # publisher's reading when the identifier carries a joint prefix with a
+    # lead (Pubid::JOINT_LEADS), else +to_hash+ itself (pubid#465).
+    #
+    # "ISO/IEC 27001:2022" parses in Pubid::Iso and in Pubid::Iec, and the two
+    # +to_hash+ differ; both readings give the ISO +to_hash+ here, so one
+    # document has one cache or index key whichever flavor parsed it. The
+    # serialized shape itself (+to_hash+) is unchanged. Not memoised, because
+    # an identifier's attributes are writable.
+    #
+    # @return [Hash]
+    def canonical_hash
+      ::Pubid.canonical_reading(self).to_hash
+    end
+
     # Recursively drop attributes holding only their default (or empty) value
     # from +hash+, the serialization of +model+. Recurses into nested component
     # / identifier values because lutaml serializes those via its own transform

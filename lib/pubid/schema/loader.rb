@@ -25,6 +25,12 @@ module Pubid
           joint_prefixes
         end
 
+        # Joint prefix => lead flavor key, from the +joint_leads+ section of
+        # schema/core/joint_prefixes.yaml.
+        def joint_leads_map
+          @joint_leads_map ||= load_joint_core("joint_leads")
+        end
+
         def loaded_flavors
           declarations.keys.sort
         end
@@ -36,13 +42,13 @@ module Pubid
         end
 
         def joint_prefixes
-          @joint_prefixes ||= load_joint_prefixes
+          @joint_prefixes ||= load_joint_core("joint_prefixes")
         end
 
-        def load_joint_prefixes
+        def load_joint_core(section)
           path = File.join(CORE_DIR, "joint_prefixes.yaml")
           data = YAML.safe_load_file(path)
-          data.fetch("joint_prefixes")
+          data.fetch(section)
             .transform_values(&:freeze)
             .freeze
         rescue Errno::ENOENT, KeyError => e

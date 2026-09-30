@@ -140,6 +140,14 @@ module Pubid
   JOINT_PREFIXES = Schema::Loader.joint_prefixes_map
     .transform_keys(&:to_sym).freeze
 
+  # Joint prefix => the flavor key of its lead publisher, the flavor that owns
+  # the joint document ("ISO/IEC" => :iso). {parse} tries that flavor first
+  # for the prefix, and {Identifier#canonical_hash} takes its reading
+  # (pubid#465). Sourced from the +joint_leads+ section of
+  # schema/core/joint_prefixes.yaml.
+  JOINT_LEADS = Schema::Loader.joint_leads_map
+    .transform_values(&:to_sym).freeze
+
   autoload :Errors, "pubid/errors"
   autoload :Parser, "pubid/parser"
   autoload :Components, "pubid/components"
@@ -335,13 +343,20 @@ module Pubid
 
   # Route a human-readable identifier to its flavor by leading prefix token.
   #
-  # Three passes, widening each time — the pubid 1.x +Registry.parse+ shape:
+  # Two passes, widening each time — the pubid 1.x +Registry.parse+ shape:
   #
-  #   1. flavors owning the longest matching prefix ("ISO/IEC" before "ISO")
+  #   1. flavors owning the longest matching prefix ("ISO/IEC" before "ISO"),
+  #      the lead publisher of a joint prefix first ({JOINT_LEADS})
   #   2. every other flavor, in registry order
   #
   # A longest-match-first order matters because prefixes nest: "ISO/IEC 2131"
   # must not be handed to the flavor that merely owns "ISO".
+  #
+  # In the second pass, a reading that only puts a publisher in front of the
+  # unchanged input is refused: a flavor with no claim on the string's prefix
+  # that names a publisher the input did not name is guessing, not detecting
+  # (pubid#465: `ATN5014` came back as `IEC ATN5014`, `19115` as
+  # `ASTM 19115`). See {invented_publisher?}.
   #
   # @param string [String] a human-readable identifier
   # @return [Identifier]
@@ -379,6 +394,8 @@ module Pubid
       # structure that was not in the input. Same test isodoc applies before
       # it will annotate a parsed id.
       return parsed if parsed.to_s == string
+      claimed = prefix_owners.include?(mod)
+      next if !claimed && invented_publisher?(parsed.to_s, string)
 
       # A non-exact parse is still usable — several flavors legitimately
       # normalise on render, so the round trip is a preference, not a
@@ -393,10 +410,39 @@ module Pubid
     return fallback if fallback
     raise first_error if first_error
 
-    raise Parslet::ParseFailed,
-          "no registered flavor could parse #{string.inspect}"
+    # Reached when every flavor parsed the string and routing refused each
+    # reading, so no flavor error exists to re-raise. Raise pubid's own class
+    # (a Parslet::ParseFailed subclass that includes Pubid::Errors::Error), as
+    # every flavor parse does: relaton rescues the marker module.
+    raise Pubid::Errors::ParseError.new(
+      "no registered flavor could parse #{string.inspect}", input: string
+    )
   end
   private_class_method :parse_by_prefix
+
+  # True when +rendered+ is +string+ with something put in front of it — the
+  # reading added a publisher and changed nothing else.
+  #
+  # This is deliberately narrower than "not an exact round trip". A flavor
+  # routinely reads a spelling of its own that no registered prefix covers
+  # and normalises it (`ИСО 124` => `ISO 124`, `nist ir 8011-4` =>
+  # `NIST IR 8011-4`, the CSA `NO.` forms): refusing every non-exact
+  # second-pass reading stopped 595 pass-fixture ids from routing. Prefixing
+  # the unchanged input is the one shape that is a guess — measured over every
+  # pass fixture it matched only IEEE readings of a bare number or a title
+  # (`1900.5.1-2020` => `IEEE Std 1900.5.1-2020`). It is a known limit that a
+  # reading which also rewrites the input is not caught (`Std 802.3-2018`
+  # still reads as `ASHRAE Standard 802.3-2018`). Called only after the exact
+  # round trip has failed, so +rendered+ never equals +string+.
+  #
+  # @param rendered [String] the reading's +to_s+
+  # @param string [String] the input
+  # @return [Boolean]
+  # @api private
+  def self.invented_publisher?(rendered, string)
+    rendered.end_with?(string)
+  end
+  private_class_method :invented_publisher?
 
   # Flavor modules that own a prefix +string+ starts with, longest prefix
   # first. Deduplicated by module identity, so an alias registration is not
@@ -483,11 +529,25 @@ module Pubid
     @routing_table ||= begin
       index = prefix_flavors
       index.keys
-           .sort_by { |prefix| -prefix.length }
-           .to_h { |prefix| [prefix, index[prefix].map { |key| Registry.get(key) }] }
+        .sort_by { |prefix| -prefix.length }
+        .to_h { |prefix| [prefix, prefix_owners(prefix, index[prefix])] }
     end
   end
   private_class_method :routing_table
+
+  # The flavor modules owning +prefix+, the lead publisher first when the
+  # prefix is joint ({JOINT_LEADS}); the others keep registry order.
+  #
+  # @param prefix [String]
+  # @param keys [Array<Symbol>] flavor keys owning the prefix
+  # @return [Array<Module>]
+  # @api private
+  def self.prefix_owners(prefix, keys)
+    lead = JOINT_LEADS[prefix]
+    ordered = lead && keys.include?(lead) ? [lead] + (keys - [lead]) : keys
+    ordered.map { |key| Registry.get(key) }
+  end
+  private_class_method :prefix_owners
 
   # True when +string+ starts with +prefix+ at a token boundary, so "ISO" does
   # not claim "ISOFIX" and "BS" does not claim "BSI". A boundary is the end
@@ -509,6 +569,129 @@ module Pubid
     rest = string[prefix.length]
     rest.nil? || !/[A-Za-z0-9]/.match?(rest)
   end
+
+  # The reading of +identifier+ that {Identifier#canonical_hash} keys on: the
+  # same document as parsed by the lead publisher of its joint prefix.
+  #
+  # A joint identifier ("ISO/IEC 27001:2022") parses in every co-publisher's
+  # flavor, and the readings serialize differently, so a cache or an index
+  # keyed by +to_hash+ would hold one document twice (pubid#465). The owners
+  # of the longest {JOINT_LEADS} prefix of +to_s+ are tried lead first;
+  # reaching the identifier's own flavor ends the walk with +identifier+
+  # itself, so the lead's own reading is never reparsed. The whole string is
+  # reparsed, so a wrapper ("…/Cor 1:2014") needs no per-class code.
+  #
+  # An owner's reading is accepted only when it is the same document (see
+  # {same_reading?}); a reading that merely parses is not enough.
+  #
+  # Cost: an identifier whose flavor is not the lead reparses its rendering
+  # once or twice (about 2 ms against 0.1 ms for +to_hash+); a lead-flavor or
+  # non-joint identifier renders once and reparses nothing. Public only
+  # because {Identifier#canonical_hash} calls it; call that instead.
+  #
+  # @param identifier [Identifier]
+  # @return [Identifier] +identifier+ itself when it has no joint prefix with
+  #   a lead, or when no owner ahead of its own flavor reads it as the same
+  #   document
+  # @api private
+  def self.canonical_reading(identifier)
+    string = identifier.to_s
+    owners = joint_owners(string)
+    own = owners.find { |mod| identifier.is_a?(mod.const_get(:Identifier)) }
+    owners.take_while { |mod| mod != own }.each do |mod|
+      parsed = parse_or_nil(mod, string)
+      return parsed if parsed && same_reading?(parsed, identifier, string, own)
+    end
+    identifier
+  end
+
+  # The owners of the longest {JOINT_LEADS} prefix of +string+, lead first;
+  # empty when +string+ has no such prefix.
+  #
+  # @param string [String]
+  # @return [Array<Module>]
+  # @api private
+  def self.joint_owners(string)
+    prefix = JOINT_LEADS.keys
+      .select { |candidate| prefix_match?(string, candidate) }
+      .max_by(&:length)
+    return [] unless prefix
+
+    eager_load_flavors!
+    routing_table.fetch(prefix, []).compact.uniq
+  end
+  private_class_method :joint_owners
+
+  # True when +reading+ (another flavor's parse of +string+, the rendering of
+  # +identifier+) is the same document as +identifier+.
+  #
+  # Two tests, and both must hold. The identity fields must agree
+  # ({same_identity?}), because two grammars can read one string as two
+  # documents: IEC reads "ISO/IEC/IEEE 29148-2018" with 2018 as a part and no
+  # year, where IEEE reads a year. Then either the reading renders +string+
+  # exactly, or the identifier's own flavor reads the reading's rendering
+  # back to an identifier equal to +identifier+ — which lets a flavor that
+  # renders a joint wrapper its own way still share the key (IEC renders
+  # "ISO/IEC 27001:2013/Cor 1:2014" as "…/COR1:2014", ISO renders that as
+  # "…/COR 1:2014", and IEC reads the ISO rendering back unchanged).
+  #
+  # @api private
+  def self.same_reading?(reading, identifier, string, own)
+    return false unless same_identity?(reading, identifier)
+    return true if reading.to_s == string
+    return false unless own
+
+    parse_or_nil(own, reading.to_s) == identifier
+  end
+  private_class_method :same_reading?
+
+  # True when the fields that name a document agree across two flavors'
+  # readings: the year always, and the root document's number and part when
+  # both readings carry one.
+  #
+  # Flavors split a designation differently, so a number or a part agrees
+  # when the words of one are all words of the other, and one present on one
+  # side only is not a conflict. IEC keeps the type in the number where ISO
+  # models it as a type: "ISO/IEC DIR 2 IEC" is number "DIR 2 IEC" in IEC and
+  # number "2", part "IEC" in ISO; ISO reads "ISO/IEC DIR JTC 1 SUP:2023" with
+  # no number at all.
+  #
+  # @api private
+  def self.same_identity?(one, other)
+    return false unless one.year.to_s == other.year.to_s
+
+    %i[number part].all? do |field|
+      words_agree?(identity_words(one.root, field),
+                   identity_words(other.root, field))
+    end
+  end
+  private_class_method :same_identity?
+
+  # @api private
+  def self.words_agree?(one, other)
+    one.empty? || other.empty? || (one - other).empty? || (other - one).empty?
+  end
+  private_class_method :words_agree?
+
+  # @api private
+  def self.identity_words(identifier, field)
+    return [] unless identifier.respond_to?(field)
+
+    identifier.public_send(field).to_s.split
+  end
+  private_class_method :identity_words
+
+  # +mod.parse(string)+, or nil when the flavor rejects the string. Same narrow
+  # rescue as {parse_by_prefix}: only a parse failure means "not this flavor's
+  # reading"; anything else is a defect and propagates.
+  #
+  # @api private
+  def self.parse_or_nil(mod, string)
+    mod.parse(string)
+  rescue Parslet::ParseFailed
+    nil
+  end
+  private_class_method :parse_or_nil
 
   def self.detect_flavor_from_urn(urn)
     # urn:iso:std:... → "iso"
