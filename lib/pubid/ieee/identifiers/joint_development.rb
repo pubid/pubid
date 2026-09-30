@@ -130,28 +130,38 @@ module Pubid
           # Publishers (slash-separated)
           parts << publishers.join("/") if publishers && !publishers.empty?
 
-          # ISO stage code (only if this was originally ISO-led)
-          # For IEEE-led conversions, we skip the stage since we don't have ISO equivalent
-          if lead_party == "ISO" && (typed_stage || iso_stage)
-            if typed_stage
-              parts << typed_stage.to_iso_format
-            elsif iso_stage
-              parts << iso_stage
-            end
+          # The stage word is the ISO format's own position convention —
+          # it prints whenever the identifier carries one, regardless of
+          # lead party (the format face decides, not the arrangement). A
+          # stage-tracked D= designator decomposes into its stage word
+          # and date ("D=CD.2-2020" → "CD2", 2020); the iteration glues
+          # onto the word only for the stages whose printed ISO spellings
+          # carry it (CD2, DIS2 — the grammar's multi-digit families);
+          # the P project stage is IEEE convention and never prints here.
+          stage_word = iso_stage
+          draft_year = nil
+          if stage_word.nil? &&
+             ieee_draft.to_s.match(/\AD=([A-Z]+)(?:\.(\d+))?(?:-(\d{4}))?\z/)
+            word = Regexp.last_match(1)
+            iter = Regexp.last_match(2)
+            stage_word = iter && %w[CD DIS].include?(word) ? "#{word}#{iter}" : word
+            draft_year = Regexp.last_match(3)
           end
+          parts << stage_word if stage_word
 
           # IEEE semantics: P = project (a draft); no P = a standard. The
-          # P-state is identity-bearing and prints as spelled — it is never
-          # added or stripped here.
-          code_str = code.to_s
+          # P-state is identity-bearing in the model, but the ISO face does
+          # not print it — "P" is only IEEE convention (pubid#469 ruling):
+          # the same document renders "IEEE/ISO/IEC CD 42010:2020" in ISO
+          # format and "IEEE/ISO/IEC P42010/D=CD-2020" in IEEE format.
+          code_str = code.to_s.sub(/\AP/, "")
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
-          # Join with space and add year with colon; the joint stage-draft
-          # clause ("D=WD.5") rides after the year in the ISO-led print.
+          # Join with space and add year with colon (the ISO position
+          # convention; a decomposed D= date rides here as the year).
           result = parts.join(" ")
-          result += ":#{year}" if year
-          result += "/#{ieee_draft}" if ieee_draft && ieee_draft.start_with?("D=")
+          result += ":#{year || draft_year}" if year || draft_year
           # Only the language/edition marker ("(E)", "(E/F)") prints; a
           # trailing relationship narrative is metadata, not identity.
           if parenthetical_content&.match?(%r{\A[A-Z](?:\s*[/&]\s*[A-Z])*\z})
@@ -177,9 +187,21 @@ module Pubid
           # Mark after the number, before the draft and the year
           code_str += mark unless code_str.empty?
 
-          # Add IEEE draft notation if available (e.g., /D8)
+          # Add IEEE draft notation if available (e.g., /D8). An ISO stage
+          # word renders in IEEE's stage-tracked position as the ordinal-less
+          # stage draft (docs/IEEE-DRAFT-STAGES.md §1.3, spelling 7):
+          # "IEEE/ISO/IEC CD P42010:2020" → "IEEE/ISO/IEC P42010/D=CD-2020".
+          # The iso_stage branch is checked FIRST — the typed_stage registry
+          # lookup for a stage word answers a draft-equivalent ordinal ("D2"),
+          # which is not the canonical stage-tracked spelling.
           if ieee_draft
             code_str += "/#{ieee_draft}"
+          elsif iso_stage
+            # The ordinal-less stage draft: an iteration glued onto the
+            # printed word ("CD2") renders in the doctrine's ".iter" slot
+            # ("D=CD.2" — docs/IEEE-DRAFT-STAGES.md §1.3).
+            stage = iso_stage.match(/\A([A-Z]+?)(\d+)\z/)
+            code_str += stage ? "/D=#{stage[1]}.#{stage[2]}" : "/D=#{iso_stage}"
           elsif typed_stage&.ieee_draft_equivalent
             code_str += "/#{typed_stage.ieee_draft_equivalent}"
           end
