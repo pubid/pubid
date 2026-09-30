@@ -22,12 +22,3 @@ joint_prefixes:
     - ANSI/ASHRAE
   amca:
     - ANSI/AMCA
-# The lead publisher of a joint prefix: the flavor that owns the joint
-# document (pubid#465). Pubid.parse tries this flavor first for the prefix,
-# and Identifier#canonical_hash takes its reading, so every co-publisher's
-# parse of one joint identifier gives one key. A prefix that leads with an
-# accreditor rather than the publisher (ANSI/ASHRAE, ANSI/AMCA) has no entry.
-joint_leads:
-  ISO/IEC: iso
-  IEC/ISO: iec
-  ISO/IEC/IEEE: iso
