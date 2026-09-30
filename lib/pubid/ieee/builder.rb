@@ -401,12 +401,11 @@ module Pubid
         # Build the complete code string: "802.1AC-2016" or "535-2013" or "C37.41-2016"
         number_str = extract_value(base_data[:number])
 
-        # Add part if present (e.g., ".1AC" or ".41")
+        # Add part if present (e.g., ".1AC" or ".41") — captures carry
+        # their own separator, join verbatim
         if base_data[:part]
           part_val = extract_value(base_data[:part])
-          # Determine separator: dot for most cases, dash for some
-          separator = number_str.match?(/^[A-Z]/) ? "." : "." # Letter prefix uses dot
-          number_str += separator + part_val
+          number_str += part_val if part_val
         end
 
         # Add subpart if present
@@ -415,7 +414,7 @@ module Pubid
           subparts = [subparts] unless subparts.is_a?(Array)
           subparts.each do |sp|
             subpart_val = extract_value(sp)
-            number_str += ".#{subpart_val}" if subpart_val
+            number_str += subpart_val if subpart_val
           end
         end
 
@@ -574,11 +573,10 @@ module Pubid
         # Extract number with parts and year
         number_str = extract_value(base_data[:number])
 
-        # Add part if present
+        # Part captures carry their own separator — join verbatim.
         if base_data[:part]
           part_val = extract_value(base_data[:part])
-          separator = number_str.match?(/^[A-Z]/) ? "." : "."
-          number_str += separator + part_val
+          number_str += part_val if part_val
         end
 
         # Add subpart if present
@@ -587,7 +585,7 @@ module Pubid
           subparts = [subparts] unless subparts.is_a?(Array)
           subparts.each do |sp|
             subpart_val = extract_value(sp)
-            number_str += ".#{subpart_val}" if subpart_val
+            number_str += subpart_val if subpart_val
           end
         end
 
@@ -648,11 +646,10 @@ module Pubid
         # Extract number with parts and year
         number_str = extract_value(base_data[:number])
 
-        # Add part if present
+        # Part captures carry their own separator — join verbatim.
         if base_data[:part]
           part_val = extract_value(base_data[:part])
-          separator = number_str.match?(/^[A-Z]/) ? "." : "."
-          number_str += separator + part_val
+          number_str += part_val if part_val
         end
 
         # Add subpart if present
@@ -661,7 +658,7 @@ module Pubid
           subparts = [subparts] unless subparts.is_a?(Array)
           subparts.each do |sp|
             subpart_val = extract_value(sp)
-            number_str += ".#{subpart_val}" if subpart_val
+            number_str += subpart_val if subpart_val
           end
         end
 
@@ -1186,7 +1183,8 @@ module Pubid
         end
 
         if code_str && !code_parts.empty?
-          code_str += ".#{code_parts.join('.')}"
+          # Part/subpart captures carry their own separator — join verbatim.
+          code_str += code_parts.join
         end
 
         # Year detection: If code_str ends with year-like pattern (dash + 4 digits, 1884-2099)
