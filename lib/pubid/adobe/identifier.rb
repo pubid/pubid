@@ -28,7 +28,7 @@ module Pubid
         end
 
         # R1 parser swap: the baked PG artifact is the parser of record.
-        parsed = Pubid::Pg::Backend.parse(:adobe, identifier.strip)
+        parsed = Pubid::Parg::Backend.parse(:adobe, identifier.strip)
         Builder.build(parsed)
       end
 

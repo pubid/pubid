@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Pubid
-  module Pg
+  module Parg
     # The PG-artifact parse backend: runs the flavor's baked artifact on
     # an input and returns the builder-ready attribute hash the flavor's
     # Builder expects — the same hash its parslet parser produced.
@@ -35,7 +35,10 @@ module Pubid
       # flavor is not registered.
       def registered_name(flavor)
         mod = Pubid.const_get(flavor.to_s.split("_").map(&:capitalize).join)
-        Pubid::Registry.flavor_names.find { |name| Pubid::Registry.get(name) == mod }
+        names = Pubid::Registry.flavor_names.select { |name| Pubid::Registry.get(name) == mod }
+        # A module may register under several names; the longest is the
+        # canonical one ("cen_cenelec", not the "cen" alias).
+        names.max_by(&:length)
       rescue NameError
         nil
       end || flavor.to_s

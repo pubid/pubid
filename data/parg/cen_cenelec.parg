@@ -1,0 +1,42 @@
+# Port of lib/pubid/cen_cenelec/parser.rb. Pre-parse normalization
+# (U+2011/AD dashes, comment stripping, CEN-CLC/GUIDE forms) stays
+# binder-side: the grammar sees normalized input.
+
+grammar PubidCenCenelec version "0.1.0" {
+  digit = %x30-39
+  space = " "
+  dash = "-"
+  slash = "/"
+  plus = "+"
+  colon = ":"
+  publisher = (("CWA" / "HD" / "ES" / "CR" / "ENV") as publisher) / (("EN" / "CEN") as publisher [slash "CLC" as copublisher]) / ("CLC" as publisher [slash "CEN" as copublisher])
+  stage_prefix = ("FprEN" / "prEN") as type_with_stage
+  type = ("Guide" / "GUIDE" / "TR" / "TS") as type
+  number = (1*digit) as number
+  part = dash (1*(digit / dash)) as part
+  parts = (*part) as parts
+  month_digits = ("01" / "02" / "03" / "04" / "05" / "06" / "07" / "08" / "09" / "10" / "11" / "12") as month
+  year = colon (4digit) as year
+  year_with_month = colon (4digit) as year dash month_digits
+  date = year_with_month / year
+  amendment = (plus as amd_sep_plus / slash as amd_sep_slash) "A" (1*digit) as amd_number [(colon (4digit) as amd_year)]
+  corrigendum = (plus as amd_sep_plus / slash as amd_sep_slash) "AC" [(digit (*digit)) as cor_number] [(year_with_month / (colon (4digit) as year))]
+  supplement = (amendment / corrigendum) as supplement
+  supplements = (*supplement) as supplements
+  edition = space "ED" (1*digit) as edition
+  adopted_org_prefix = "ISO" / "IEC" / "CISPR"
+  adopted_string = (adopted_org_prefix *(!supplement !edition any_noln_char)) as adopted_string
+  any_noln_char = %x01-09 / %x0B-10FFFF
+  fragment_identifier = ((stage_prefix / publisher) space number parts space "AMD" (1*digit) as amendment_number space "FRAG" (1*digit) as fragment_number) / ((stage_prefix / publisher) space number parts [year] (plus / slash) "A" (1*digit) as amendment_number [(colon (4digit) as amendment_year)] space "FRAG" (1*digit) as fragment_number)
+  identifier = fragment_identifier / ((stage_prefix / publisher) [(space adopted_string)] [(space type / slash type)] [(space number parts [year])] supplements [edition])
+
+  entry identifier: identifier
+
+  test {
+    accept "EN 18216:2026"
+    accept "EN ISO 9001:2015"
+    accept "CEN/CLC TR 17161:2019"
+    accept "EN 196-1:2016+A1"
+    reject "nonsense"
+  }
+}

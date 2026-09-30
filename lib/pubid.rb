@@ -17,7 +17,7 @@ require "pubid/prefixes_support"
 module Pubid
   autoload :Schema, "pubid/schema"
   autoload :Conformance, "pubid/conformance"
-  autoload :Pg, "pubid/pg"
+  autoload :Parg, "pubid/parg"
   # Upper bound on the length of an identifier string accepted by any +parse+
   # entry point. Real-world standards identifiers are well under 200 characters;
   # this limit exists purely to keep pathological, attacker-controlled inputs

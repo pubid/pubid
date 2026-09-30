@@ -698,16 +698,10 @@ module Pubid
 
       root(:identifier)
 
-      def self.parse(string)
-        unless string.is_a?(String)
-          raise Pubid::Errors::InvalidInputError,
-                Pubid::INPUT_NOT_A_STRING_MESSAGE
-        end
-
-        if string.length > Pubid::MAX_INPUT_LENGTH
-          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
-        end
-
+      # Pre-parse ingestion normalizations (R2): every parse path —
+      # parslet and PG artifact alike — feeds the grammar the same
+      # normalized string.
+      def self.normalize_input(string)
         # Strip leading/trailing whitespace
         cleaned = string.strip
 
@@ -775,7 +769,20 @@ module Pubid
                                  "Addenda \\1, ")
         end
 
-        new.parse(cleaned)
+        cleaned
+      end
+
+      def self.parse(string)
+        unless string.is_a?(String)
+          raise Pubid::Errors::InvalidInputError,
+                Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        if string.length > Pubid::MAX_INPUT_LENGTH
+          raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
+        end
+
+        new.parse(normalize_input(string))
       end
     end
   end

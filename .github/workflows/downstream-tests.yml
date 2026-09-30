@@ -120,6 +120,15 @@ jobs:
         submodules: true
         path: dependent
 
+    # The PARG rename rides the unreleased parsanol-ruby branch; the
+    # engine override below points parsanol at it so the downstream
+    # bundle resolves the renamed Parsanol::PARG.
+    - uses: actions/checkout@v7
+      with:
+        repository: parsanol/parsanol-ruby
+        ref: main
+        path: parsanol-ruby
+
     - name: Initial Ruby setup to generate Gemfile.lock
       uses: ruby/setup-ruby@v1
       with:
@@ -164,6 +173,12 @@ jobs:
         # Map each gem to its local gemspec at ../ (V2 single-gem layout has only
         # pubid.gemspec). Skip any gem without a matching local gemspec.
         overrides = {}
+
+        # The renamed Parsanol::PARG lives on the unreleased pg-authoring
+        # branch; override the engine alongside pubid itself.
+        if os.path.isdir("../parsanol-ruby"):
+            overrides["parsanol"] = 'gem "parsanol", path: "../parsanol-ruby"'
+
         for gem in pubid_gems:
           if os.path.exists(f"../{gem}.gemspec"):
             overrides[gem] = f'gem "{gem}", path: "../"'

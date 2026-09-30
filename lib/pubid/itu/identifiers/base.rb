@@ -15,7 +15,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Parser.parse(normalize_whitespace(identifier))
+        parsed = Pubid::Parg::Backend.parse(:itu, normalize_whitespace(identifier))
         Builder.build(parsed)
       end
 

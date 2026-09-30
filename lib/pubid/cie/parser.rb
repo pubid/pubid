@@ -375,7 +375,10 @@ module Pubid
       end
 
       # Class method for parsing with preprocessing
-      def self.parse(string)
+      # Pre-parse ingestion normalizations (R2): every parse path —
+      # parslet and PG artifact alike — feeds the grammar the same
+      # normalized string.
+      def self.normalize_input(string)
         # Minimal preprocessing for data quality
         cleaned = string.strip
 
@@ -389,7 +392,11 @@ module Pubid
         # This is a data quality fix - correct format always has colon
         cleaned = cleaned.gsub(%r{/(E|F|G|DE|ES|CN|RU|FR)(\d{4})}, '/\1:\2')
 
-        new.parse(cleaned)
+        cleaned
+      end
+
+      def self.parse(string)
+        new.parse(normalize_input(string))
       end
     end
   end

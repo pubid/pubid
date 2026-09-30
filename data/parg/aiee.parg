@@ -1,0 +1,37 @@
+# Port of lib/pubid/ieee/aiee/parser.rb — AIEE (pre-IEEE) designations:
+# prefixes (IEEE-AIEE transitional, A.I.E.E. variants, AIEE), types
+# (Standard No./Std No./Nos/No/Trans.), numbers (letters-dash, dotted,
+# parenthetical alternates) and long/short dates. Consumed by the ieee
+# grammar via `use aiee`. Deviation: source "Sep"/"Sept" order is
+# lint-forced to longest-first.
+
+grammar PubidAiee version "0.1.0" {
+  digit = %x30-39
+  upper = %x41-5A
+  lower = %x61-7A
+  digits = 1*digit
+  space = " "
+  dash = "-"
+  dot = "."
+
+  year = (("18" 2digit)) / (("19" ("0" / "1" / "2" / "3" / "4" / "5") digit)) / (("196" %x30-33))
+  month_name = "September" / "November" / "December" / "February" / "August" / "June" / "January" / "March" / "April" / "October" / "July" / "May" / "Sept" / "Jan" / "Feb" / "Mar" / "Apr" / "Jun" / "Jul" / "Aug" / "Sep" / "Oct" / "Nov" / "Dec"
+  aiee_prefix = ("IEEE-AIEE" / "A.I.E.E." / "A. I. E. E." / "AIEE") as publisher
+  aiee_type = ("Standard No." / "Standard No" / "Std No." / "Std No" / "Std" / "Nos" / "No." / "No" / "no" / "Standard" / "Trans.") as type
+  number = (((2*3upper dash digits)) / ((digits upper !((space "and")))) / ((digits dot digits)) / (((digits) as main_number space ((( "(" (digits) as alt_number ")"))) as parenthetical)) / ((digits !((space "and" space digits))))) as number
+  date_long = ([space] (((("," / dot) as separator) [space] [((month_name) as month space)] (year) as year)) / (((space dash) as separator) [space] (year) as year) / (((month_name) as month dash (year) as year)))
+  date_short = ([space] dash (year) as year)
+  date = [(date_short / date_long)]
+
+  aiee_identifier = aiee_prefix space [(aiee_type space)] number date
+
+  entry aiee_identifier: aiee_identifier
+
+  test {
+    accept "AIEE No. 56"
+    accept "AIEE Std 800"
+    accept "IEEE-AIEE No 18-1938"
+    accept "AIEE Standard 19"
+    reject "nonsense"
+  }
+}

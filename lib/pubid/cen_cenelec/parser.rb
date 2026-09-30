@@ -131,7 +131,10 @@ module Pubid
 
       rule(:root) { identifier }
 
-      def self.parse(input)
+      # Pre-parse ingestion normalizations (R2): every parse path —
+      # parslet and PG artifact alike — feeds the grammar the same
+      # normalized string.
+      def self.normalize_input(input)
         # Normalize special dash characters
         normalized = input.gsub(/[\u2011\u00AD]/, "-")
 
@@ -145,7 +148,11 @@ module Pubid
         normalized = normalized.gsub("CEN-CLC", "CEN/CLC")
           .gsub("CLC-CEN", "CLC/CEN")
           .gsub("GUIDE", "Guide")
-        new.parse(normalized)
+        normalized
+      end
+
+      def self.parse(input)
+        new.parse(normalize_input(input))
       end
     end
   end

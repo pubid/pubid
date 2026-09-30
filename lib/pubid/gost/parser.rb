@@ -87,6 +87,13 @@ module Pubid
           adopted_part.maybe >> adopted_reference_part.maybe
       end
 
+      # Pre-parse ingestion normalizations (R2): every parse path —
+      # parslet and PG artifact alike — feeds the grammar the same
+      # normalized string.
+      def self.normalize_input(string)
+        string.strip
+      end
+
       def self.parse(string)
         unless string.is_a?(String)
           raise ::Pubid::Errors::InvalidInputError,
@@ -98,7 +105,7 @@ module Pubid
                 ::Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        new.parse(string.strip)
+        new.parse(normalize_input(string))
       end
     end
   end

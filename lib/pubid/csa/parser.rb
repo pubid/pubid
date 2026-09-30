@@ -366,13 +366,28 @@ module Pubid
 
       # Preprocessing to normalize input
       def parse(input)
+        prefix = self.class.publisher_prefix_for(input)
+        result = super(self.class.normalize_input(input))
+        if prefix && result.is_a?(Hash)
+          self.class.inject_publisher_prefix(result, prefix)
+        end
+        result
+      end
+
+      # Pre-parse ingestion normalizations (R2): every parse path —
+      # parslet and PG artifact alike — feeds the grammar the same
+      # normalized string.
+      def self.normalize_input(input)
         # Skip comment lines
         if input.strip.start_with?("#")
           raise Pubid::Errors::ParseError.new(
             "Comment line", input: input, flavor: "csa"
           )
         end
+        __normalize_input(input)
+      end
 
+      def self.__normalize_input(input)
         # Remove CONSOLIDATED notation FIRST (before other processing)
         normalized = input.gsub(/\s*\(\s*CONSOLIDATED\s*\)\s*/, " ")
         normalized = normalized.gsub(/\s*\bCONSOLIDATED\b\s*/, " ")
@@ -404,20 +419,22 @@ module Pubid
         # Clean up extra spaces
         normalized = normalized.gsub(/\s+/, " ").strip
 
-        # Parse and inject publisher_prefix into result
-        result = super(normalized)
+        normalized
+      end
 
-        # Inject publisher_prefix if we have one
-        if publisher_prefix && result.is_a?(Hash)
-          inject_publisher_prefix(result, publisher_prefix)
+      def self.publisher_prefix_for(input)
+        if input.start_with?("CAN/CSA-")
+          "CAN/CSA-"
+        elsif input.start_with?("CAN3-")
+          "CAN3-"
+        elsif input.start_with?("CSA ")
+          "CSA"
         end
-
-        result
       end
 
       private
 
-      def inject_publisher_prefix(hash, prefix)
+      def self.inject_publisher_prefix(hash, prefix)
         # For combined identifiers
         if hash[:first]
           hash[:first][:publisher_prefix] = prefix

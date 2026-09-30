@@ -2,7 +2,7 @@
 
 require "parsanol"
 
-RSpec.describe Pubid::Pg::Backend do
+RSpec.describe Pubid::Parg::Backend do
   describe ".parse" do
     it "raises ParseError for a malformed identifier" do
       expect { described_class.parse(:iso, "nonsense") }
@@ -17,7 +17,7 @@ RSpec.describe Pubid::Pg::Backend do
     end
   end
 
-  describe Pubid::Pg::Artifact do
+  describe Pubid::Parg::Artifact do
     it "loads the vendored iso artifact with a verified checksum" do
       artifact = described_class.for(:iso)
 

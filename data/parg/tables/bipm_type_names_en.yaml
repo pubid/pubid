@@ -1,0 +1,6 @@
+- name: "Recommendation"
+- name: "Declaration"
+- name: "Resolution"
+- name: "Statement"
+- name: "Decision"
+- name: "Action"
