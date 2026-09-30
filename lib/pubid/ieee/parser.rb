@@ -595,7 +595,10 @@ module Pubid
         # ISO/IEC/IEEE P26511/D8-2018 or ISO/IEEE P1003.1-2008 or IEC/IEEE P62582-1-2011
         # ALSO handle: IEC/IEEE P60780-323, CDV1 2014 (comma before stage code)
         # ALSO handle: IEEE/CSA P844.1/293.1/D2 (CSA dual numbering)
-        (str("ISO/IEC/IEEE") | str("ISO/IEEE") | str("IEC/IEEE") | str("IEEE/CSA")).as(:joint_publishers) >>
+        # ALSO handle: IEEE/ISO/IEC P42010/D=CD-2020 — the printed publisher
+        # order is the organization's perspective (pubid#469) and parses as
+        # printed; it is no longer rewritten to ISO-first.
+        (str("ISO/IEC/IEEE") | str("IEEE/ISO/IEC") | str("ISO/IEEE") | str("IEC/IEEE") | str("IEEE/CSA")).as(:joint_publishers) >>
           space >>
           # P = project (the document is a draft): identity-bearing, so it
           # is captured and preserved, never silently consumed.
@@ -605,14 +608,19 @@ module Pubid
           # CSA dual numbering: /293.1 (second number)
           (slash >> digits >> (dot >> digits).maybe >> (dash >> digits.as(:draft_version)).maybe).maybe >>
           (
-            # Variant 1b: the ordinal-less stage draft "D=CDV[:2020]" -
+            # Variant 1b: the ordinal-less stage draft "D=CDV-2020" -
             # D (draft) = CDV (the IEC stage it drafts). The year rides in
             # the draft clause (a distinct key, so the builder keeps the
-            # date inside the designator).
+            # date inside the designator). The year follows IEEE format:
+            # dash-joined ("D=CD-2020", the ruled canonical); the colon
+            # spelling ("D=CDV:2020") stays accepted as the alias it was
+            # frozen with. A dash-year is guarded to 19xx/20xx so a
+            # YYMM monthcode tail can never be read as a year.
             (slash >> str("D") >> str("=") >>
               (str("CDV") | str("FDIS") | str("PWI") | str("WD") |
                str("NP") | str("DIS") | str("CD")).as(:draft_iso_stage) >>
-              (str(":") >> year_digits.as(:draft_stage_year)).maybe) |
+              ((str(":") | str("-")) >>
+               ((str("19") | str("20")) >> digit >> digit).as(:draft_stage_year)).maybe) |
             # Variant 1: /D8 notation (original), with the compound
             # both-systems suffix "=DDIS.3" (docs/IEEE-DRAFT-STAGES.md §1.3)
             (slash >> str("D") >> digits.as(:draft_version) >>
@@ -1825,11 +1833,10 @@ module Pubid
         # Fix 2H: "IEC XXXX First edition YYYY-MM; IEEE NNNN" -> normalize semicolon
         # Already handled by earlier semicolon normalization
 
-        # Fix 2I: "IEEE/ISO/IEC PXXX/DIS" -> normalize to "ISO/IEC/IEEE PXXX/DIS"
-        cleaned = cleaned.gsub(/^IEEE\/ISO\/IEC\s+(P[\w.-]+)/,
-                               'ISO/IEC/IEEE \1')
-        cleaned = cleaned.gsub(/^IEEE\/IEC\/ISO\s+(P[\w.-]+)/,
-                               'IEC/ISO/IEEE \1')
+        # (Fix 2I removed: "IEEE/ISO/IEC PXXX/…" is no longer rewritten to
+        # ISO-first — the printed publisher order is the organization's
+        # perspective (pubid#469) and the joint P-form rule parses it as
+        # printed.)
 
         # Fix 2J: "IEEE/IEC PXXX D5" -> normalize space to slash before D
         cleaned = cleaned.gsub(/^(IEEE\/IEC P[\w.-]+)\s+D(\d)/, '\1/D\2')

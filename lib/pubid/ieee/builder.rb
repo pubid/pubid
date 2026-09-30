@@ -401,8 +401,11 @@ module Pubid
         # Build the complete code string: "802.1AC-2016" or "535-2013" or "C37.41-2016"
         number_str = extract_value(base_data[:number])
 
-        # Add part if present (e.g., ".1AC" or ".41") — captures carry
-        # their own separator, join verbatim
+        # Part and subpart captures carry their own separator (".15",
+        # "-10417", ".4j" — the grammar mirrors the original parser's
+        # `((dot | dash) >> words_digits).as(:part)`), so they join the
+        # code string verbatim; re-adding a separator here would double
+        # it ("802..15").
         if base_data[:part]
           part_val = extract_value(base_data[:part])
           number_str += part_val if part_val
@@ -573,7 +576,7 @@ module Pubid
         # Extract number with parts and year
         number_str = extract_value(base_data[:number])
 
-        # Part captures carry their own separator — join verbatim.
+        # Part/subpart captures carry their own separator — join verbatim.
         if base_data[:part]
           part_val = extract_value(base_data[:part])
           number_str += part_val if part_val
@@ -646,7 +649,7 @@ module Pubid
         # Extract number with parts and year
         number_str = extract_value(base_data[:number])
 
-        # Part captures carry their own separator — join verbatim.
+        # Part/subpart captures carry their own separator — join verbatim.
         if base_data[:part]
           part_val = extract_value(base_data[:part])
           number_str += part_val if part_val
@@ -780,10 +783,14 @@ module Pubid
                           "D=#{stage}"
                         end
           if parsed[:draft_iso_iteration]
-            joint_draft += ".#{extract_value(parsed[:draft_iso_iteration])}"
+            iter = extract_value(parsed[:draft_iso_iteration]).to_s.sub(/\A\./, "")
+            joint_draft += ".#{iter}" unless iter.empty?
           end
+          # The year follows IEEE convention: dash-joined inside the
+          # designator ("D=CD-2020", the pubid#469 ruling; the colon
+          # spelling parses as an alias).
           if parsed[:draft_stage_year]
-            joint_draft += ":#{extract_value(parsed[:draft_stage_year])}"
+            joint_draft += "-#{extract_value(parsed[:draft_stage_year])}"
           end
           attributes[:ieee_draft] = joint_draft
         end
@@ -853,8 +860,11 @@ module Pubid
 
         # Detect lead party based on pattern
         if parsed[:iso_stage]
-          # ISO format - lead party is ISO
-          attributes[:lead_party] = "ISO"
+          # ISO stage word present. The lead party is the PRINTED first
+          # publisher (pubid#469: the arrangement is the organization's
+          # perspective, shown by the print) — "IEEE/ISO/IEC CD P42010"
+          # is IEEE-led even though the stage word is ISO's.
+          attributes[:lead_party] = attributes[:publishers]&.first || "ISO"
           attributes[:iso_stage] = extract_value(parsed[:iso_stage])
 
           # Create typed_stage for ISO stage
@@ -1183,7 +1193,7 @@ module Pubid
         end
 
         if code_str && !code_parts.empty?
-          # Part/subpart captures carry their own separator — join verbatim.
+          # captures carry their own separator — join verbatim
           code_str += code_parts.join
         end
 
