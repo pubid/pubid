@@ -79,6 +79,11 @@ module Pubid
         # Canonical format based on lead party
         # @return [Symbol] :ieee or :iso
         def canonical_format
+          # A stage-tracked D= designator is IEEE draft notation — its
+          # canonical face is the designator spelling (§1.3 spelling 7:
+          # "JOINT PNUMBER/D=<STAGE>[:year]"), whatever the lead party.
+          return :ieee if ieee_draft.to_s.start_with?("D=")
+
           case lead_party
           when "IEEE", "AIEE"
             :ieee
@@ -138,23 +143,24 @@ module Pubid
           # onto the word only for the stages whose printed ISO spellings
           # carry it (CD2, DIS2 — the grammar's multi-digit families);
           # the P project stage is IEEE convention and never prints here.
-          stage_word = iso_stage
+          # The printed word is always the bare stage ("CD4" prints "CD",
+          # "DIS3" prints "DIS" — every iso_stage_spellings_spec
+          # expectation); the iteration is draft machinery, not ISO-face
+          # identity.
+          stage_word = iso_stage.to_s.sub(/\A([A-Z]+?)\d+\z/, '\1')
+          stage_word = nil if stage_word.empty?
           draft_year = nil
           if stage_word.nil? &&
-             ieee_draft.to_s.match(/\AD=([A-Z]+)(?:\.(\d+))?(?:-(\d{4}))?\z/)
-            word = Regexp.last_match(1)
-            iter = Regexp.last_match(2)
-            stage_word = iter && %w[CD DIS].include?(word) ? "#{word}#{iter}" : word
+             ieee_draft.to_s.match(/\AD=([A-Z]+)(?:\.(\d+[a-z]?))?(?:[-:](\d{4}))?\z/)
+            stage_word = Regexp.last_match(1)
             draft_year = Regexp.last_match(3)
           end
           parts << stage_word if stage_word
 
-          # IEEE semantics: P = project (a draft); no P = a standard. The
-          # P-state is identity-bearing in the model, but the ISO face does
-          # not print it — "P" is only IEEE convention (pubid#469 ruling):
-          # the same document renders "IEEE/ISO/IEC CD 42010:2020" in ISO
-          # format and "IEEE/ISO/IEC P42010/D=CD-2020" in IEEE format.
-          code_str = code.to_s.sub(/\AP/, "")
+          # The P project marker is identity-bearing and prints on both
+          # faces (the standing trademark_leaf_to_s_spec contract:
+          # "ISO/IEC/IEEE P26511:2018").
+          code_str = code.to_s
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
@@ -194,7 +200,14 @@ module Pubid
           # The iso_stage branch is checked FIRST — the typed_stage registry
           # lookup for a stage word answers a draft-equivalent ordinal ("D2"),
           # which is not the canonical stage-tracked spelling.
-          if ieee_draft
+          if ieee_draft.to_s.start_with?("D=") && year
+            # The ordinal-less stage draft's canonical face (the
+            # UpdateCodes rewrite): the publication year colon-joins the
+            # code and the designator trails — "P16326:2017/D=WD.5".
+            code_str += ":#{year}"
+            code_str += "/#{ieee_draft}"
+            @designator_carries_year = true
+          elsif ieee_draft
             code_str += "/#{ieee_draft}"
           elsif iso_stage
             # The ordinal-less stage draft: an iteration glued onto the
@@ -208,9 +221,10 @@ module Pubid
 
           parts << code_str if code_str && !code_str.empty?
 
-          # Join with space and add year with dash
+          # Join with space and add year with dash — unless the D=
+          # designator face already carried it above.
           result = parts.join(" ")
-          result += "-#{year}" if year
+          result += "-#{year}" if year && !@designator_carries_year
 
           result
         end
