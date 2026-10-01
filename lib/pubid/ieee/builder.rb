@@ -786,11 +786,12 @@ module Pubid
             iter = extract_value(parsed[:draft_iso_iteration]).to_s.sub(/\A\./, "")
             joint_draft += ".#{iter}" unless iter.empty?
           end
-          # The year follows IEEE convention: dash-joined inside the
-          # designator ("D=CD-2020", the pubid#469 ruling; the colon
-          # spelling parses as an alias).
+          # The date rides inside the designator colon-joined
+          # ("D=CDV:2020" — the standing joint_stage_draft_spec contract;
+          # the dash spelling the grammar newly accepts is an alias that
+          # normalizes to the colon face).
           if parsed[:draft_stage_year]
-            joint_draft += "-#{extract_value(parsed[:draft_stage_year])}"
+            joint_draft += ":#{extract_value(parsed[:draft_stage_year])}"
           end
           attributes[:ieee_draft] = joint_draft
         end
