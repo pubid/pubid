@@ -347,6 +347,37 @@ module Pubid
         end
 
         # Route to appropriate identifier class based on content
+        # The bare-IEEE fdraft clause (pubid#203): a slash-led stage word
+        # after the code ("IEEE P15026.2/FDIS, August 2010") captures the
+        # stage and its date; route them onto the identifier exactly like
+        # the joint stage-first spelling so the lossless stage-word face
+        # renders them instead of silently dropping them (the drop was the
+        # deferred residue noted in Parser.normalize_input).
+        if parsed[:fdraft].is_a?(Hash)
+          fd = parsed[:fdraft]
+          fd_stage = extract_value(fd[:fdraft_stage])
+          if fd_stage
+            # An IEEE identifier carrying an ISO stage renders the IEEE
+            # designator face with the IEEE date convention:
+            # "IEEE P15026.2/D=FDIS-201008" (pubid#203 ruling). The
+            # stage and date ride the designator; the ISO face is not
+            # elected.
+            year = extract_value(fd[:year])
+            month = extract_value(fd[:month])
+            date = ""
+            if year
+              date = "-#{year}"
+              date += format("%02d", Date.parse(month.to_s).month) if month
+            end
+            # The date rides inside the designator ("-201008"); a bare
+            # year attribute would print a second, colon-joined date on
+            # the code ("P15026.2:2010/D=…").
+            attributes[:publishers] ||= [attributes[:publisher] || "IEEE"].compact
+            attributes[:ieee_draft] = "D=#{fd_stage}#{date}"
+            attributes[:typed_stage] = Pubid::Ieee.locate_stage(fd_stage)
+          end
+        end
+
         identifier_class = determine_identifier_class(attributes)
         rename_supplement_keys(attributes)
         identifier_class.new(**attributes)
@@ -786,12 +817,11 @@ module Pubid
             iter = extract_value(parsed[:draft_iso_iteration]).to_s.sub(/\A\./, "")
             joint_draft += ".#{iter}" unless iter.empty?
           end
-          # The date rides inside the designator colon-joined
-          # ("D=CDV:2020" — the standing joint_stage_draft_spec contract;
-          # the dash spelling the grammar newly accepts is an alias that
-          # normalizes to the colon face).
+          # The designator date joins verbatim: the grammar captures the
+          # separator with the value (":2020", "-2017", "-201008" — the
+          # IEEE date convention for an ISO-staged draft, pubid#203).
           if parsed[:draft_stage_year]
-            joint_draft += ":#{extract_value(parsed[:draft_stage_year])}"
+            joint_draft += extract_value(parsed[:draft_stage_year]).to_s
           end
           attributes[:ieee_draft] = joint_draft
         end
@@ -859,26 +889,80 @@ module Pubid
           return Identifiers::Standard.new(**printed_attrs.compact)
         end
 
+        # The re-parse of the pubid#203 designator render ("IEEE
+        # P15026.2/D=FDIS-201008") captures the stage and the verbatim
+        # date token (":2020", "-201008") with no publisher slot; the
+        # designator is the IEEE face, so IEEE is the sole publisher.
+        if parsed[:iso_stage] && parsed[:draft_stage_year]
+          stage_word = extract_value(parsed[:iso_stage])
+          attributes[:publishers] ||= ["IEEE"]
+          attributes[:publisher] ||= "IEEE"
+          attributes[:copublisher] ||= []
+          attributes[:ieee_draft] =
+            "D=#{stage_word}#{extract_value(parsed[:draft_stage_year])}"
+          attributes[:typed_stage] = Pubid::Ieee.locate_stage(stage_word)
+          attributes[:lead_party] = "IEEE"
+          attributes.delete(:year)
+          attributes.delete(:month)
+        end
+
         # Detect lead party based on pattern
         if parsed[:iso_stage]
-          # ISO stage word present: the reference is printed in the ISO
-          # position ("IEEE FCD 15026.3:2010"), so it parses as printed
-          # (pubid#469) - lead ISO, ISO face, whatever the publisher
-          # order. The printed first publisher is not the arrangement, and
-          # the published relaton-data-ieee rows carry lead ISO (pubid#477).
-          attributes[:lead_party] = "ISO"
-          attributes[:iso_stage] = extract_value(parsed[:iso_stage])
+          stage_abbr = extract_value(parsed[:iso_stage])
+          bare_ieee_project = parsed[:project_marker] &&
+                              attributes[:publisher] == "IEEE" &&
+                              attributes[:copublisher] == []
+          if bare_ieee_project && parsed[:draft_stage_year].nil?
+            # pubid#203: a bare-IEEE project row carrying an ISO stage is
+            # an IEEE draft of joint ISO/IEC work ("IEEE FDIS P15026.2,
+            # August 2010"). The stage rides the IEEE designator with the
+            # IEEE date convention and the date rides inside the
+            # designator; the ISO stage-word face is not elected.
+            date = ""
+            if attributes[:year]
+              date = "-#{attributes[:year]}"
+              m = attributes[:month].to_s
+              unless m.empty?
+                month_num = m.match?(/\A\d+\z/) ? m.to_i : Date.parse(m).month
+                date += format("%02d", month_num)
+              end
+            end
+            attributes[:ieee_draft] = "D=#{stage_abbr}#{date}"
+            attributes[:typed_stage] = Pubid::Ieee.locate_stage(stage_abbr)
+            attributes[:lead_party] = "IEEE"
+            attributes.delete(:year)
+            attributes.delete(:month)
+          elsif !bare_ieee_project
+            # ISO stage word present: the reference is printed in the ISO
+            # position ("IEEE FCD 15026.3:2010"), so it parses as printed
+            # (pubid#469) - lead ISO, ISO face, whatever the publisher
+            # order. The printed first publisher is not the arrangement,
+            # and the published relaton-data-ieee rows carry lead ISO
+            # (pubid#477).
+            attributes[:lead_party] = "ISO"
+            attributes[:iso_stage] = stage_abbr
 
-          # Create typed_stage for ISO stage
-          stage_abbr = attributes[:iso_stage]
-          if stage_abbr
-            attributes[:typed_stage] =
-              Pubid::Ieee.locate_stage(stage_abbr)
+            # Create typed_stage for ISO stage
+            if stage_abbr
+              attributes[:typed_stage] =
+                Pubid::Ieee.locate_stage(stage_abbr)
+            end
           end
+          # bare_ieee_project with a designator date token: the block
+          # above already composed the D= designator (lead IEEE).
         elsif parsed[:iso_published]
-          # Stage-less PUBLISHED joint form (pubid#317): ISO-led spelling,
-          # no project marker, no typed stage - renders as printed.
-          attributes[:lead_party] = "ISO"
+          if parsed[:draft_iso_stage] && attributes[:publisher] == "IEEE" &&
+             attributes[:copublisher] == []
+            # The re-parse of the pubid#203 designator render ("IEEE
+            # P15026.2/D=FDIS-201008") lands here: bare IEEE publishers,
+            # the stage on the D= designator - lead IEEE, not ISO.
+            attributes[:lead_party] = "IEEE"
+          else
+            # Stage-less PUBLISHED joint form (pubid#317): ISO-led
+            # spelling, no project marker, no typed stage - renders as
+            # printed.
+            attributes[:lead_party] = "ISO"
+          end
         else
           # IEEE format - lead party is IEEE
           attributes[:lead_party] = "IEEE"
@@ -1010,6 +1094,15 @@ module Pubid
         # This must be checked before type-based routing because AIEE uses "No" as type
         if attributes[:publisher] == "AIEE"
           return Ieee::Aiee::Identifier
+        end
+
+        # A stage-bearing row is a joint development whatever its type
+        # code: the stage is the printed identity ("IEEE P15026.2/FDIS",
+        # pubid#203) and only JointDevelopment carries iso_stage and the
+        # D= designator.
+        if attributes[:iso_stage] ||
+           attributes[:ieee_draft].to_s.start_with?("D=")
+          return Identifiers::JointDevelopment
         end
 
         # Get type from attributes and use flavor module to locate class

@@ -161,13 +161,29 @@ RSpec.describe "IEEE joint stage-first and draft round trip (pubid#477)" do
       "ISO/IEC/IEEE CD2 P15026.4-2018-02",
       "IEC/IEEE P63113 CD4, April 2019",
       "IEC/IEEE CDV P63113-2020-05",
-      "IEEE FDIS P24748.1-2018-05",
     ].each do |input|
       it "#{input.inspect} keeps lead party ISO and round-trips" do
         id = Pubid::Ieee::Identifier.parse(input)
         expect(id.lead_party).to eq("ISO")
         expect(Pubid::Ieee::Identifier.parse(id.to_s)).to eq(id)
       end
+    end
+
+    # pubid#203: a bare-IEEE project row is an IEEE draft of joint
+    # ISO/IEC work - the stage rides the IEEE designator with the IEEE
+    # date convention ("D=FDIS-201805"), lead stays IEEE.
+    it "a bare-IEEE project row prints the stage on the D= designator" do
+      id = Pubid::Ieee::Identifier.parse("IEEE FDIS P24748.1-2018-05")
+      expect(id.lead_party).to eq("IEEE")
+      expect(id.to_s).to eq("IEEE P24748.1/D=FDIS-201805")
+      expect(Pubid::Ieee::Identifier.parse(id.to_s)).to eq(id)
+    end
+
+    it "the pubid#203 ruling row renders the IEEE designator face" do
+      id = Pubid::Ieee::Identifier.parse("IEEE FDIS P15026.2, August 2010")
+      expect(id.lead_party).to eq("IEEE")
+      expect(id.to_s).to eq("IEEE P15026.2/D=FDIS-201008")
+      expect(Pubid::Ieee::Identifier.parse(id.to_s)).to eq(id)
     end
   end
 end
