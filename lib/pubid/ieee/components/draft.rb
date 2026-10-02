@@ -143,7 +143,12 @@ day: nil, iso_stage: nil, iso_iteration: nil)
           result = "/D#{version}"
           result += "=#{iso_stage}" if iso_stage
           result += ".#{iso_iteration}" if iso_stage && iso_iteration
-          result += ".#{revision}" if revision
+          result += if revision.to_s.start_with?(".")
+                      # a captured revision may carry its separator dot
+                      revision.to_s
+                    else
+                      ".#{revision}"
+                    end if revision
 
           if year
             # Use original month format to preserve abbreviated vs full names
