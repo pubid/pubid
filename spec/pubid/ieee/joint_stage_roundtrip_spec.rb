@@ -179,6 +179,13 @@ RSpec.describe "IEEE joint stage-first and draft round trip (pubid#477)" do
       expect(Pubid::Ieee::Identifier.parse(id.to_s)).to eq(id)
     end
 
+    it "the IEC /V-iteration rides glued onto the stage word" do
+      id = Pubid::Ieee::Identifier.parse("IEC/IEEE P63195_CDV/V3, February 2020")
+      expect(id.iso_stage).to eq("CDV3")
+      expect(id.to_s).to eq("IEC/IEEE CDV3 P63195, February 2020")
+      expect(Pubid::Ieee::Identifier.parse(id.to_s)).to eq(id)
+    end
+
     it "the pubid#203 ruling row renders the IEEE designator face" do
       id = Pubid::Ieee::Identifier.parse("IEEE FDIS P15026.2, August 2010")
       expect(id.lead_party).to eq("IEEE")
