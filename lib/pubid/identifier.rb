@@ -158,13 +158,13 @@ module Pubid
         # the year on every round trip — the same collision
         # `fold_scalar_aliases` guards against on the constructor path.
         # `edition` keeps its own name, so it is never a collision.
-        return if flat_key != attr_name.to_s && declared_attribute?(flat_key)
+        return if flat_key != attr_name.name && declared_attribute?(flat_key)
 
         key = data.key?(flat_key) ? flat_key : flat_key.to_sym
         value = data[key]
         return if value.nil? || value.is_a?(::Hash)
 
-        field = flat_scalar_fields.fetch(attr_name).to_s
+        field = flat_scalar_fields.fetch(attr_name).name
         if value.is_a?(::Array)
           # A collection of components (`copublishers`) flattens to a list of
           # scalars; anything else in a list is not the flat form.
@@ -172,12 +172,12 @@ module Pubid
           return unless value.all? { |v| scalar_value?(v) }
 
           data.delete(key)
-          data[attr_name.to_s] = value.map { |v| { field => v.to_s } }
+          data[attr_name.name] = value.map { |v| { field => v.to_s } }
           return
         end
 
         data.delete(key)
-        data[attr_name.to_s] = { field => value.to_s }
+        data[attr_name.name] = { field => value.to_s }
       end
 
       # True when +name+ is declared as a collection on this class.
@@ -267,17 +267,19 @@ module Pubid
       # edition as a plain `year` attribute, and folding there would destroy it.
       def fold_scalar_aliases(attrs)
         SCALAR_ATTRIBUTE_ALIASES.each do |alias_name, (target, field)|
-          key = attrs.key?(alias_name) ? alias_name : alias_name.to_s
+          alias_str = alias_name.name
+          key = attrs.key?(alias_name) ? alias_name : alias_str
           next unless attrs.key?(key)
-          next if attributes.key?(alias_name) || attributes.key?(alias_name.to_s)
+          next if attributes.key?(alias_name) || attributes.key?(alias_str)
           next unless component_attribute?(target)
 
           value = attrs.delete(key)
           next if value.nil?
 
-          existing = attrs[target] || attrs[target.to_s] || {}
+          target_str = target.name
+          existing = attrs[target] || attrs[target_str] || {}
           existing = component_to_hash(existing)
-          attrs.delete(target.to_s)
+          attrs.delete(target_str)
           attrs[target] = existing.merge(field => value.to_s)
         end
       end
@@ -286,7 +288,7 @@ module Pubid
       # declares the attribute as a plain :string keeps the scalar untouched.
       def coerce_component_scalars(attrs)
         FLAT_SCALAR_FIELDS.each do |attr_name, field|
-          key = attrs.key?(attr_name) ? attr_name : attr_name.to_s
+          key = attrs.key?(attr_name) ? attr_name : attr_name.name
           next unless attrs.key?(key)
           next unless component_attribute?(attr_name)
 
@@ -774,16 +776,23 @@ module Pubid
       super
     end
 
+    # Pure function of the class name; relaton resolves it per registry
+    # lookup and per cache-key build, so the kebab-case rebuild (two gsub
+    # passes + interpolations) ran on every call — a top string
+    # allocation site in metanorma's bibliography phase. Singleton ivars
+    # are not inherited, so each concrete class memoizes its own.
     def self.polymorphic_name
       return nil unless name
 
-      parts = name.split("::")
-      flavor = parts[1]&.downcase
-      type_kebab = parts.last
-        .gsub(/([A-Z]+)([A-Z][a-z])/, '\1-\2')
-        .gsub(/([a-z\d])([A-Z])/, '\1-\2')
-        .downcase
-      "pubid:#{flavor}:#{type_kebab}"
+      @pubid_polymorphic_name ||= begin
+        parts = name.split("::")
+        flavor = parts[1]&.downcase
+        type_kebab = parts.last
+          .gsub(/([A-Z]+)([A-Z][a-z])/, '\1-\2')
+          .gsub(/([a-z\d])([A-Z])/, '\1-\2')
+          .downcase
+        "pubid:#{flavor}:#{type_kebab}"
+      end
     end
 
     def root
