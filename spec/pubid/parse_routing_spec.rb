@@ -118,6 +118,23 @@ RSpec.describe "Pubid.parse prefix routing" do
     it "still lets an any-slug flavor parse through its own module" do
       expect(Pubid::Iana.parse("IANA iec.60050")).to be_a(Pubid::Iana::Identifier)
     end
+
+    # A flavor can also claim a string it does not own by defaulting what the
+    # input never spelled: iec's grammar parses `CIE` as a number and its
+    # builder defaults the `IEC` publisher (`IEC CIE`), astm answers `123`
+    # with `ASTM 123`. Only a prefix owner may supply a non-exact fallback,
+    # so a string no flavor owns is reported as unparseable.
+    it "reports failure rather than inventing a publisher for an unowned string" do
+      expect { Pubid.parse("CIE") }.to raise_error(Parslet::ParseFailed)
+      expect { Pubid.parse("FOO") }.to raise_error(Parslet::ParseFailed)
+      expect { Pubid.parse("123") }.to raise_error(Parslet::ParseFailed)
+    end
+
+    # The defaulting parse stays reachable through the flavor's own module —
+    # a caller that knows it wants IEC asks IEC directly.
+    it "still lets a defaulting flavor parse through its own module" do
+      expect(Pubid::Iec.parse("CIE").to_s).to eq("IEC CIE")
+    end
   end
 
   # `Pubid::Parsers::MrString.detect_flavor` falls back to :iso for a publisher
