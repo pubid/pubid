@@ -69,6 +69,10 @@ module Pubid
           # Set lead_party if not provided - default to first publisher
           if args[:lead_party]
             self.lead_party = args[:lead_party]
+          elsif iso_stage
+            # A stage-first reference is lead ISO, as the builder sets it
+            # (pubid#477) — a hand-built id must agree with a parsed one.
+            self.lead_party = "ISO"
           elsif publishers && !publishers.empty?
             # Lead party defaults to first publisher if not explicitly set
             # Builder should override this with detected lead party
@@ -137,17 +141,13 @@ module Pubid
 
           # The stage word is the ISO format's own position convention —
           # it prints whenever the identifier carries one, regardless of
-          # lead party (the format face decides, not the arrangement). A
-          # stage-tracked D= designator decomposes into its stage word
-          # and date ("D=CD.2-2020" → "CD2", 2020); the iteration glues
-          # onto the word only for the stages whose printed ISO spellings
-          # carry it (CD2, DIS2 — the grammar's multi-digit families);
-          # the P project stage is IEEE convention and never prints here.
-          # The printed word is always the bare stage ("CD4" prints "CD",
-          # "DIS3" prints "DIS" — every iso_stage_spellings_spec
-          # expectation); the iteration is draft machinery, not ISO-face
-          # identity.
-          stage_word = iso_stage.to_s.sub(/\A([A-Z]+?)\d+\z/, '\1')
+          # lead party (the format face decides, not the arrangement).
+          # The stage prints as stored, iteration included ("DIS2",
+          # "CD4"): the face is lossless, so parse(to_s) == self
+          # (pubid#477). A stage-tracked D= designator decomposes into its
+          # stage word and date ("D=CD-2020" → "CD", 2020); the P project
+          # stage is IEEE convention and never prints here.
+          stage_word = iso_stage.to_s
           stage_word = nil if stage_word.empty?
           draft_year = nil
           if stage_word.nil? &&
@@ -164,10 +164,9 @@ module Pubid
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
-          # Join with space and add year with colon (the ISO position
-          # convention; a decomposed D= date rides here as the year).
-          result = parts.join(" ")
-          result += ":#{year || draft_year}" if year || draft_year
+          # Join with space and add the date (a decomposed D= date rides
+          # here as the year).
+          result = parts.join(" ") + iso_date_suffix(year || draft_year)
           # Only the language/edition marker ("(E)", "(E/F)") prints; a
           # trailing relationship narrative is metadata, not identity.
           if parenthetical_content&.match?(%r{\A[A-Z](?:\s*[/&]\s*[A-Z])*\z})
@@ -175,6 +174,21 @@ module Pubid
           end
 
           result
+        end
+
+        # The ISO-face date, in the spelling that parses back to the same
+        # year and month: the colon year (":2018"); a numeric month glued
+        # with dashes ("-2018-05"); a text month as ", February 2015".
+        def iso_date_suffix(date_year)
+          return "" unless date_year
+          return ":#{date_year}" unless month
+
+          if month.match?(/\A\d+\z/)
+            # The grammar reads only a two-digit month ("05", never "5").
+            "-#{date_year}-#{month.rjust(2, '0')}"
+          else
+            ", #{month} #{date_year}"
+          end
         end
 
         # Convert to IEEE format representation
@@ -195,8 +209,9 @@ module Pubid
 
           # Add IEEE draft notation if available (e.g., /D8). An ISO stage
           # word renders in IEEE's stage-tracked position as the ordinal-less
-          # stage draft (docs/IEEE-DRAFT-STAGES.md §1.3, spelling 7):
-          # "IEEE/ISO/IEC CD P42010:2020" → "IEEE/ISO/IEC P42010/D=CD-2020".
+          # stage draft (docs/IEEE-DRAFT-STAGES.md §1.3, spelling 7) — only
+          # on an explicit to_s(format: :ieee): a stage-first reference is
+          # lead ISO, so its canonical face is the ISO one (pubid#477).
           # The iso_stage branch is checked FIRST — the typed_stage registry
           # lookup for a stage word answers a draft-equivalent ordinal ("D2"),
           # which is not the canonical stage-tracked spelling.
