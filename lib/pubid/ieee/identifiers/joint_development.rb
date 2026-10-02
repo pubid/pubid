@@ -69,6 +69,10 @@ module Pubid
           # Set lead_party if not provided - default to first publisher
           if args[:lead_party]
             self.lead_party = args[:lead_party]
+          elsif iso_stage
+            # A stage-first reference is lead ISO, as the builder sets it
+            # (pubid#477) — a hand-built id must agree with a parsed one.
+            self.lead_party = "ISO"
           elsif publishers && !publishers.empty?
             # Lead party defaults to first publisher if not explicitly set
             # Builder should override this with detected lead party
@@ -79,20 +83,10 @@ module Pubid
         # Canonical format based on lead party
         # @return [Symbol] :ieee or :iso
         def canonical_format
-          # A PARSED stage-tracked D= designator is IEEE draft notation —
-          # its canonical face is the designator spelling (§1.3 spelling 7:
-          # "JOINT PNUMBER/D=<STAGE>[:year]"). Rows that carry an ISO stage
-          # word (from_hash, or stage-led parses) keep the stage-word face
-          # no matter what the render derives: their published spelling is
-          # "IEEE FCD 15026.3:2010", not a designator (#477).
-          if ieee_draft.to_s.start_with?("D=") && iso_stage.to_s.empty?
-            return :ieee
-          end
-          # A stage-word row (parsed stage-led spelling, or a serialized
-          # row carrying iso_stage) prints the stage-word face whatever
-          # the lead party — the stage word is the printed identity
-          # ("IEEE FCD 15026.3:2010", #477).
-          return :iso unless iso_stage.to_s.empty?
+          # A stage-tracked D= designator is IEEE draft notation — its
+          # canonical face is the designator spelling (§1.3 spelling 7:
+          # "JOINT PNUMBER/D=<STAGE>[:year]"), whatever the lead party.
+          return :ieee if ieee_draft.to_s.start_with?("D=")
 
           case lead_party
           when "IEEE", "AIEE"
@@ -147,23 +141,14 @@ module Pubid
 
           # The stage word is the ISO format's own position convention —
           # it prints whenever the identifier carries one, regardless of
-          # lead party (the format face decides, not the arrangement). A
-          # stage-tracked D= designator decomposes into its stage word
-          # and date ("D=CD.2-2020" → "CD2", 2020); the iteration glues
-          # onto the word only for the stages whose printed ISO spellings
-          # carry it (CD2, DIS2 — the grammar's multi-digit families);
-          # the P project stage is IEEE convention and never prints here.
-          # The stage word prints verbatim: parsed digit-suffixed
-          # spellings ("CD4") are normalized to the bare word with the
-          # iteration carried separately at build time, while serialized
-          # rows keep the full "DIS2" — both must round-trip (#477).
-          stage_word = iso_stage
-          stage_word = nil if stage_word.to_s.empty?
-          # A serialized row's stage iteration is identity: re-attach it
-          # to the printed word ("DIS2 24748.4:2015", #477). The parse
-          # path never sets stage_iteration for digit-suffixed spellings.
-          iter = stage_iteration.respond_to?(:number) ? stage_iteration.number : stage_iteration
-          stage_word = "#{stage_word}#{iter}" if stage_word && iter.to_s.match?(/\A\d+\z/)
+          # lead party (the format face decides, not the arrangement).
+          # The stage prints as stored, iteration included ("DIS2",
+          # "CD4"): the face is lossless, so parse(to_s) == self
+          # (pubid#477). A stage-tracked D= designator decomposes into its
+          # stage word and date ("D=CD-2020" → "CD", 2020); the P project
+          # stage is IEEE convention and never prints here.
+          stage_word = iso_stage.to_s
+          stage_word = nil if stage_word.empty?
           draft_year = nil
           if stage_word.nil? &&
              ieee_draft.to_s.match(/\AD=([A-Z]+)(?:\.(\d+[a-z]?))?(?:[-:](\d{4}))?\z/)
@@ -179,22 +164,31 @@ module Pubid
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
-          # Join with space and add year with colon (the ISO position
-          # convention; a decomposed D= date rides here as the year).
-          result = parts.join(" ")
-          result += ":#{year || draft_year}" if year || draft_year
+          # Join with space and add the date (a decomposed D= date rides
+          # here as the year).
+          result = parts.join(" ") + iso_date_suffix(year || draft_year)
           # Only the language/edition marker ("(E)", "(E/F)") prints; a
           # trailing relationship narrative is metadata, not identity.
           if parenthetical_content&.match?(%r{\A[A-Z](?:\s*[/&]\s*[A-Z])*\z})
             result += " (#{parenthetical_content})"
           end
 
-          # The revision narrative prints after the code: published joint
-          # rows carry it as identity spelling ("…:2012(E) Revision of
-          # IEEE Std C37.082-1982", #477).
-          result += " #{relationships.map(&:to_s).join(' ')}" if relationships && !relationships.empty?
-
           result
+        end
+
+        # The ISO-face date, in the spelling that parses back to the same
+        # year and month: the colon year (":2018"); a numeric month glued
+        # with dashes ("-2018-05"); a text month as ", February 2015".
+        def iso_date_suffix(date_year)
+          return "" unless date_year
+          return ":#{date_year}" unless month
+
+          if month.match?(/\A\d+\z/)
+            # The grammar reads only a two-digit month ("05", never "5").
+            "-#{date_year}-#{month.rjust(2, '0')}"
+          else
+            ", #{month} #{date_year}"
+          end
         end
 
         # Convert to IEEE format representation
@@ -215,8 +209,9 @@ module Pubid
 
           # Add IEEE draft notation if available (e.g., /D8). An ISO stage
           # word renders in IEEE's stage-tracked position as the ordinal-less
-          # stage draft (docs/IEEE-DRAFT-STAGES.md §1.3, spelling 7):
-          # "IEEE/ISO/IEC CD P42010:2020" → "IEEE/ISO/IEC P42010/D=CD-2020".
+          # stage draft (docs/IEEE-DRAFT-STAGES.md §1.3, spelling 7) — only
+          # on an explicit to_s(format: :ieee): a stage-first reference is
+          # lead ISO, so its canonical face is the ISO one (pubid#477).
           # The iso_stage branch is checked FIRST — the typed_stage registry
           # lookup for a stage word answers a draft-equivalent ordinal ("D2"),
           # which is not the canonical stage-tracked spelling.
@@ -230,9 +225,11 @@ module Pubid
           elsif ieee_draft
             code_str += "/#{ieee_draft}"
           elsif iso_stage
-            # A stage word never converts to a designator on the IEEE
-            # face: published stage rows print the stage-word face
-            # ("IEEE FCD 15026.3:2010", #477).
+            # The ordinal-less stage draft: an iteration glued onto the
+            # printed word ("CD2") renders in the doctrine's ".iter" slot
+            # ("D=CD.2" — docs/IEEE-DRAFT-STAGES.md §1.3).
+            stage = iso_stage.match(/\A([A-Z]+?)(\d+)\z/)
+            code_str += stage ? "/D=#{stage[1]}.#{stage[2]}" : "/D=#{iso_stage}"
           elsif typed_stage&.ieee_draft_equivalent
             code_str += "/#{typed_stage.ieee_draft_equivalent}"
           end

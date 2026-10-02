@@ -148,13 +148,16 @@ Rules:
 - `publishers` — the joint token split on `/` (`["ISO","IEC","IEEE"]`);
   order-normalized to the corpus spelling (`ISO/IEC/IEEE`).
 - `number`, `parts`, `separator` — the document number and its parts.
-- `iso_stage` — the bare ISO/IEC stage (`DIS`, `CD`, …) when the joint
-  document carries one; `typed_stage` resolves it through the registry
-  (`DIS` → stage_code `draft_international_standard`).
+- `iso_stage` — the ISO/IEC stage as printed, iteration included (`DIS`,
+  `CD`, `DIS2`, `CD4`, …) when the joint document carries one;
+  `typed_stage` resolves it through the registry (`DIS` → stage_code
+  `draft_international_standard`).
 - `draft` — the draft designator with its date; on joint drafts the
   designator is the `D`+stage token (`DCD, December, 2021`).
-- `lead_party` — the first publisher of the stage-first spelling; the
-  stage-less published joint form is lead `ISO`.
+- `lead_party` — `ISO` for the stage-first spelling, whatever the
+  publisher order (`IEEE FCD 15026.3:2010` is printed in the ISO
+  position, so it parses as printed — pubid#469, pubid#477); the
+  stage-less published joint form is lead `ISO` too.
 - Native drafts instead carry the ordinal in `draft` (`D2.0`) plus the
   ladder-derived `typed_stage`; `type`/`draft_status` carry the status
   words.
@@ -168,7 +171,7 @@ Rules:
 | Native draft | `IEEE Std 802.3/D2.0` | `IEEE Std 802.3/D2.0` |
 | Unapproved native | `IEEE Unapproved Draft Std P802.3/D2.0, Mar 2009` | `IEEE Unapproved P802.3/D2.0, Mar 2009` |
 | Joint stage draft | `ISO/IEC/IEEE 15026-3/DCD, December, 2021` | `ISO/IEC/IEEE 15026-3/DCD, December, 2021` |
-| Joint stage-first | `ISO/IEC/IEEE DIS 29119-2` | `ISO/IEC/IEEE 29119.2` (colon-year when a year is present) |
+| Joint stage-first | `ISO/IEC/IEEE DIS 29119-2` | `ISO/IEC/IEEE DIS 29119.2` (ISO face for every publisher order; the stage keeps its iteration; date `:2013`, `-2017-05` or `, April 2019` — the spelling that parses back) |
 | Joint printed published | `ISO/IEC/IEEE 21451-7, April 2011` | `ISO/IEC/IEEE 21451-7, April 2011` (Standard; dash-part, comma-date) |
 | Joint colon-year published | `ISO/IEEE 11073-20101:2004(E)` | `ISO/IEEE 11073.20101:2004` (JointDevelopment; dot-part) |
 | Joint with draft date | `ISO/IEC/IEEE 42010/D8, June 2010` | `ISO/IEC/IEEE 42010/D8, June 2010` (date stays in the draft) |

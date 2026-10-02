@@ -861,11 +861,12 @@ module Pubid
 
         # Detect lead party based on pattern
         if parsed[:iso_stage]
-          # ISO stage word present. The lead party is the PRINTED first
-          # publisher (pubid#469: the arrangement is the organization's
-          # perspective, shown by the print) — "IEEE/ISO/IEC CD P42010"
-          # is IEEE-led even though the stage word is ISO's.
-          attributes[:lead_party] = attributes[:publishers]&.first || "ISO"
+          # ISO stage word present: the reference is printed in the ISO
+          # position ("IEEE FCD 15026.3:2010"), so it parses as printed
+          # (pubid#469) - lead ISO, ISO face, whatever the publisher
+          # order. The printed first publisher is not the arrangement, and
+          # the published relaton-data-ieee rows carry lead ISO (pubid#477).
+          attributes[:lead_party] = "ISO"
           attributes[:iso_stage] = extract_value(parsed[:iso_stage])
 
           # A digit-suffixed stage word ("CD4", "DIS2") from a stage-FIRST
@@ -1484,7 +1485,12 @@ module Pubid
             version = version.sub(/\A-/, "") if version
           end
 
-          revision = extract_value(draft_data[:revision]) if draft_data[:revision]
+          # The PARG capture carries its separator (".12", the #471
+          # convention); Draft#to_s prints the dot itself, so keep only
+          # the digits or "D2022.10.12" renders "D2022.10..12" (pubid#477).
+          if draft_data[:revision]
+            revision = extract_value(draft_data[:revision])&.delete_prefix(".")
+          end
 
           # The compound both-systems form (docs/IEEE-DRAFT-STAGES.md
           # §1.3): the stage half of "=DDIS.3".
