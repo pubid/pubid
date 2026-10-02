@@ -79,10 +79,20 @@ module Pubid
         # Canonical format based on lead party
         # @return [Symbol] :ieee or :iso
         def canonical_format
-          # A stage-tracked D= designator is IEEE draft notation — its
-          # canonical face is the designator spelling (§1.3 spelling 7:
-          # "JOINT PNUMBER/D=<STAGE>[:year]"), whatever the lead party.
-          return :ieee if ieee_draft.to_s.start_with?("D=")
+          # A PARSED stage-tracked D= designator is IEEE draft notation —
+          # its canonical face is the designator spelling (§1.3 spelling 7:
+          # "JOINT PNUMBER/D=<STAGE>[:year]"). Rows that carry an ISO stage
+          # word (from_hash, or stage-led parses) keep the stage-word face
+          # no matter what the render derives: their published spelling is
+          # "IEEE FCD 15026.3:2010", not a designator (#477).
+          if ieee_draft.to_s.start_with?("D=") && iso_stage.to_s.empty?
+            return :ieee
+          end
+          # A stage-word row (parsed stage-led spelling, or a serialized
+          # row carrying iso_stage) prints the stage-word face whatever
+          # the lead party — the stage word is the printed identity
+          # ("IEEE FCD 15026.3:2010", #477).
+          return :iso unless iso_stage.to_s.empty?
 
           case lead_party
           when "IEEE", "AIEE"
@@ -143,12 +153,17 @@ module Pubid
           # onto the word only for the stages whose printed ISO spellings
           # carry it (CD2, DIS2 — the grammar's multi-digit families);
           # the P project stage is IEEE convention and never prints here.
-          # The printed word is always the bare stage ("CD4" prints "CD",
-          # "DIS3" prints "DIS" — every iso_stage_spellings_spec
-          # expectation); the iteration is draft machinery, not ISO-face
-          # identity.
-          stage_word = iso_stage.to_s.sub(/\A([A-Z]+?)\d+\z/, '\1')
-          stage_word = nil if stage_word.empty?
+          # The stage word prints verbatim: parsed digit-suffixed
+          # spellings ("CD4") are normalized to the bare word with the
+          # iteration carried separately at build time, while serialized
+          # rows keep the full "DIS2" — both must round-trip (#477).
+          stage_word = iso_stage
+          stage_word = nil if stage_word.to_s.empty?
+          # A serialized row's stage iteration is identity: re-attach it
+          # to the printed word ("DIS2 24748.4:2015", #477). The parse
+          # path never sets stage_iteration for digit-suffixed spellings.
+          iter = stage_iteration.respond_to?(:number) ? stage_iteration.number : stage_iteration
+          stage_word = "#{stage_word}#{iter}" if stage_word && iter.to_s.match?(/\A\d+\z/)
           draft_year = nil
           if stage_word.nil? &&
              ieee_draft.to_s.match(/\AD=([A-Z]+)(?:\.(\d+[a-z]?))?(?:[-:](\d{4}))?\z/)
@@ -173,6 +188,11 @@ module Pubid
           if parenthetical_content&.match?(%r{\A[A-Z](?:\s*[/&]\s*[A-Z])*\z})
             result += " (#{parenthetical_content})"
           end
+
+          # The revision narrative prints after the code: published joint
+          # rows carry it as identity spelling ("…:2012(E) Revision of
+          # IEEE Std C37.082-1982", #477).
+          result += " #{relationships.map(&:to_s).join(' ')}" if relationships && !relationships.empty?
 
           result
         end
@@ -210,11 +230,9 @@ module Pubid
           elsif ieee_draft
             code_str += "/#{ieee_draft}"
           elsif iso_stage
-            # The ordinal-less stage draft: an iteration glued onto the
-            # printed word ("CD2") renders in the doctrine's ".iter" slot
-            # ("D=CD.2" — docs/IEEE-DRAFT-STAGES.md §1.3).
-            stage = iso_stage.match(/\A([A-Z]+?)(\d+)\z/)
-            code_str += stage ? "/D=#{stage[1]}.#{stage[2]}" : "/D=#{iso_stage}"
+            # A stage word never converts to a designator on the IEEE
+            # face: published stage rows print the stage-word face
+            # ("IEEE FCD 15026.3:2010", #477).
           elsif typed_stage&.ieee_draft_equivalent
             code_str += "/#{typed_stage.ieee_draft_equivalent}"
           end
