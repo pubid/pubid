@@ -380,13 +380,18 @@ module Pubid
       # it will annotate a parsed id.
       return parsed if parsed.to_s == string
 
-      # A non-exact parse is still usable — several flavors legitimately
-      # normalise on render, so the round trip is a preference, not a
-      # requirement (OGC prints `06-121r9` for `OGC 06-121r9`, and 32 ASHRAE /
-      # ASME / CSA / IEEE identifiers route only this way). What it must NOT
-      # come from is a flavor that accepts anything: that is how `iec.60050`
-      # came back as `IANA iec.60050`. Reporting that no flavor could be
-      # determined beats inventing one.
+      # A non-exact parse is still usable, but only from a flavor with an
+      # actual claim on the string — several flavors legitimately normalise
+      # on render, so the round trip is a preference, not a requirement (OGC
+      # prints `06-121r9` for `OGC 06-121r9`, and 32 ASHRAE / ASME / CSA /
+      # IEEE identifiers route only this way). What it must NOT come from is
+      # a flavor without a claim, whatever the claim-miss looks like: a
+      # flavor that accepts anything (`iec.60050` came back as `IANA
+      # iec.60050`), or a flavor whose grammar only parses the string by
+      # defaulting what the input never spelled (iec answers `CIE` with
+      # `IEC CIE`, astm answers `123` with `ASTM 123`). Reporting that no
+      # flavor could be determined beats inventing one.
+      next unless prefix_owners.include?(mod)
       fallback ||= parsed unless accepts_anything?(mod)
     end
 
