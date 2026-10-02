@@ -20,18 +20,20 @@ RSpec.describe "IEEE embedded/stage-last ISO designations" do
     # ref => [bare root.number, iso_stage, numeric parts]
     {
       # dotted part + embedded stage (the corpus form)
-      "ISO/IEC/IEEE 29119.4.FDIS, April 2015" => ["29119", "FDIS", ["4"]],
-      "ISO/IEC/IEEE 24748.5.CD3, February 2015" => ["24748", "CD3", ["5"]],
-      "IEEE P24748.5.CD3, July 2015" => ["24748", "CD3", ["5"]],
-      "ISO/IEC/IEEE 29119.1.FDIS, March 2013" => ["29119", "FDIS", ["1"]],
-      "ISO/IEC/IEEE 29119.5.CD1, April 2014" => ["29119", "CD1", ["5"]],
-      "ISO/IEC/IEEE P29119.2.DIS, December 2011" => ["29119", "DIS", ["2"]],
+      "ISO/IEC/IEEE 29119.4.FDIS, April 2015" => ["29119", "FDIS", ["4"], nil],
+      "ISO/IEC/IEEE 24748.5.CD3, February 2015" => ["24748", "CD3", ["5"], nil],
+      # pubid#203: a bare-IEEE project row prints the stage on the IEEE
+      # designator with the IEEE date convention, not the ISO face.
+      "IEEE P24748.5.CD3, July 2015" => ["24748", "CD3", ["5"], "D=CD3-201507"],
+      "ISO/IEC/IEEE 29119.1.FDIS, March 2013" => ["29119", "FDIS", ["1"], nil],
+      "ISO/IEC/IEEE 29119.5.CD1, April 2014" => ["29119", "CD1", ["5"], nil],
+      "ISO/IEC/IEEE P29119.2.DIS, December 2011" => ["29119", "DIS", ["2"], nil],
       # dashed part + embedded stage (previously parsed as a Standard with the
       # stage mislabeled as a part — now unified to the correct model)
-      "ISO/IEC/IEEE 24748-5.CD3, February 2015" => ["24748", "CD3", ["5"]],
+      "ISO/IEC/IEEE 24748-5.CD3, February 2015" => ["24748", "CD3", ["5"], nil],
       # no part, just embedded stage
-      "ISO/IEC/IEEE 29119.FDIS, April 2015" => ["29119", "FDIS", []],
-    }.each do |ref, (number, stage, parts)|
+      "ISO/IEC/IEEE 29119.FDIS, April 2015" => ["29119", "FDIS", [], nil],
+    }.each do |ref, (number, stage, parts, designator)|
       context ref.inspect do
         let(:id) { klass.parse(ref) }
 
@@ -45,7 +47,11 @@ RSpec.describe "IEEE embedded/stage-last ISO designations" do
 
         it "recognizes the trailing token as the ISO stage (not a part)" do
           h = id.to_hash
-          expect(h["iso_stage"]).to eq(stage)
+          if designator
+            expect(h["ieee_draft"]).to eq(designator)
+          else
+            expect(h["iso_stage"]).to eq(stage)
+          end
           expect(h["parts"] || []).to eq(parts)
         end
 
