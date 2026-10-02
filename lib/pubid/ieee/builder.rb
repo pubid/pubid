@@ -869,19 +869,6 @@ module Pubid
           attributes[:lead_party] = "ISO"
           attributes[:iso_stage] = extract_value(parsed[:iso_stage])
 
-          # A digit-suffixed stage word ("CD4", "DIS2") from a stage-FIRST
-          # spelling prints bare in the ISO face (every
-          # iso_stage_spellings_spec expectation: the iteration is draft
-          # machinery, not identity). The embedded/stage-last form keeps
-          # its "CD3" whole — its trailing token IS the identity the
-          # embedded corpus keys on (embedded_iso_stage_spec) — and
-          # serialized rows keep theirs verbatim (#477).
-          # the marker is a zero-length capture: presence is the signal
-          embedded = !parsed[:stage_embedded].nil?
-          if !embedded && attributes[:iso_stage]&.match?(/\A[A-Z]+\d+\z/)
-            attributes[:iso_stage] = attributes[:iso_stage][/\A[A-Z]+/]
-          end
-
           # Create typed_stage for ISO stage
           stage_abbr = attributes[:iso_stage]
           if stage_abbr
