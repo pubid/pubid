@@ -4,8 +4,9 @@
       "owner": "relaton",
       "repo": "relaton",
       "gemspec": "relaton.gemspec",
-      "description": "Test dependent gem relaton"
+      "description": "Test dependent gem relaton",
+      "experimental": false
     }
   ],
-  "_comment": "To add more downstream repositories, add them to the repositories array. Each repository should have: owner, repo, gemspec (the .gemspec filename), and description (for the job name). Set \"experimental\": true only while a known integration migration is pending (its legs continue-on-error). relaton's flag is removed: pubid 2.0.0.pre.alpha.21 ships on the released parsanol 1.3.63 and relaton's fixtures are reconciled (#409)."
+  "_comment": "To add more downstream repositories, add them to the repositories array. Each repository should have: owner, repo, gemspec (the .gemspec filename), and description (for the job name). Set \"experimental\": true only while a known integration migration is pending (its legs continue-on-error); false keeps them required. relaton's legs are required again: pubid 2.0.0.pre.alpha.21 ships on the released parsanol 1.3.63 and relaton's fixtures are reconciled (#409)."
 }
