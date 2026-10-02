@@ -909,6 +909,12 @@ module Pubid
         # Detect lead party based on pattern
         if parsed[:iso_stage]
           stage_abbr = extract_value(parsed[:iso_stage])
+          # The IEC "/V<version>" iteration rides glued onto the stage word
+          # ("_CDV/V3" -> "CDV3"), the family's lossless spelling ("DIS2",
+          # "CD4" - pubid#477).
+          if parsed[:iso_stage_iteration]
+            stage_abbr += extract_value(parsed[:iso_stage_iteration])
+          end
           bare_ieee_project = parsed[:project_marker] &&
                               attributes[:publisher] == "IEEE" &&
                               attributes[:copublisher] == []
