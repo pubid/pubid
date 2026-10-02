@@ -153,7 +153,8 @@ ISO/IEC/IEEE CD P26513/D1, August 2015: ISO/IEC/IEEE P26513/D1, August 2015
 "ISO/IEC/IEEE/P21839, 2019(E)": "ISO/IEC/IEEE P21839-2019"
 "ISO/IEC/IEEE CD2 P12207-2: 201x(E), February 2019": "ISO/IEC/IEEE CD2 P12207.2-2019-02"
 "ISO/IEC/IEEE P42010.WD4:2019(E)": "ISO/IEC/IEEE P42010/D-4-2019"
-"IEC/IEEE P63195_CDV/V3, February 2020": "IEC/IEEE CDV P63195-2020-02"
+# the grammar parses the raw `_CDV/V3, Month YYYY` spelling directly
+# (joint_development_ieee_format slash-stage branch) — no shim needed
 "ISO/IEC/IEEE/P16085_DIS, March 2020": "ISO/IEC/IEEE DIS P16085-2020-03"
 "ANSI/IEEE Std: Outdoor Apparatus Bushings": "ANSI/IEEE Std 21-1976-11"
 "Draft National Electrical Safety Code, January 2016": "IEEE PC2-2016-01"

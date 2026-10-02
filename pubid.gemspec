@@ -28,6 +28,6 @@ Gem::Specification.new do |spec|
   # Parsanol::PARG (the Gemfile's git pin is the dev source; published
   # gems resolve this from rubygems). 1.3.57 is the first release whose
   # extension builds against the 0.10 engine line.
-  spec.add_dependency "parsanol", ">= 1.3.57"
+  spec.add_dependency "parsanol", ">= 1.3.62"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
