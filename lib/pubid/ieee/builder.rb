@@ -767,8 +767,17 @@ module Pubid
           attributes[:copublisher] = pubs.drop(1)
         end
 
-        # Build code with parts if present
+        # Build code with parts if present. A bare-P joint draft's dash
+        # date ("P42010/D-4-2019") rides the code as a year-part
+        # ("P42010.2019/D4") — the face the relaton fixtures pin — while
+        # stage-first joints keep the top-level year ("FDIS P15289:2017").
         code_parts = []
+        if parsed[:part].nil? && parsed[:iso_stage].nil? && parsed[:draft_version] &&
+           parsed[:printed_dash_year] && parsed[:year] &&
+           (parsed[:year].is_a?(Hash) ? parsed[:year][:value] : parsed[:year]).to_s.match?(/\A(19|20)\d\d\z/)
+          code_parts << extract_value(parsed[:year])
+          parsed[:year] = nil
+        end
         code_parts << extract_value(parsed[:part]) if parsed[:part]
 
         code_str = extract_value(parsed[:number])
