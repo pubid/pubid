@@ -299,7 +299,10 @@ module Pubid
             parsed_hash[:month] = dash[:dash_month]
           else
             # Year-only tail: the draft face carries it ("D9-2006"), matching
-            # the relaton-pinned renders for corrupted update_codes drafts.
+            # the relaton-pinned renders for corrupted update_codes drafts;
+            # the identifier year keeps the standard class routing (its
+            # number-print is suppressed while a draft is attached).
+            parsed_hash[:year] = dash[:dash_year]
             dash[:year] = dash.delete(:dash_year)
             dash.delete(:dash_month)
           end
