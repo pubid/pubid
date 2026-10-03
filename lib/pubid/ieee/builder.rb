@@ -294,9 +294,14 @@ module Pubid
                              drafts.any? { |d| d.is_a?(Hash) && d[:draft_version] }
           if bare_joint_draft
             parsed_hash[:part] = { value: dash[:dash_year] }
-          else
+          elsif dash[:dash_month]
             parsed_hash[:year] = dash[:dash_year]
-            parsed_hash[:month] = dash[:dash_month] if dash[:dash_month]
+            parsed_hash[:month] = dash[:dash_month]
+          else
+            # Year-only tail: the draft face carries it ("D9-2006"), matching
+            # the relaton-pinned renders for corrupted update_codes drafts.
+            dash[:year] = dash.delete(:dash_year)
+            dash.delete(:dash_month)
           end
         end
 
