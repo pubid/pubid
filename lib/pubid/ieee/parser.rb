@@ -701,9 +701,8 @@ module Pubid
             ((comma | space) >> month_name.as(:month) >> space >>
              year_digits.as(:year) >> str("").as(:printed_month_year))
           ).maybe >>
-          # Optional /D<draft> tail. normalize_relaton_suffixes repositions the
-          # historical "…/D-3-2017" onto the number as "…-2017/D3", so by the
-          # time this rule runs the draft usually trails the date (bucket 5);
+          # Optional /D<draft> tail; the historical hyphenated form
+          # "…/D-3-2017" carries its date inside the draft clause (bucket 5);
           # a date-less "/D-4" keeps its hyphen (bucket 7), hence dash.maybe.
           # A text date may trail the DRAFT itself (pubid#216:
           # "CD P26515/D1, March 2017", "FDIS P15289/D3, 2017") — distinct
@@ -912,7 +911,7 @@ module Pubid
           revision_suffix.maybe >>
           # …and the print date may also trail the repositioned revision
           # ("IEEE Unapproved Draft P802.16Rev2/D9a, March 2009" reaches the
-          # grammar as "…/D9a/R-2, March 2009" via normalize_revision_notation).
+          # grammar with its inline revision parsed natively).
           (comma >> space? >> month_name.as(:trailing_month) >> space >>
             year_digits.as(:trailing_year)).maybe >>
           # Trailing corrigendum after the draft ("…/D2.0/Cor. 1", or
@@ -1046,9 +1045,8 @@ module Pubid
           (str(".") >> year_digits.as(:year)).maybe >>
           # The date and the draft appear in EITHER order: the legacy
           # spelling puts the draft first ("PSI 10/D2, October 2015"),
-          # while normalize_relaton_suffixes repositions the rawbib
-          # hyphenated form onto the number ("PSI 10/D-3-2010" →
-          # "PSI 10-2010/D3"). Draft-first is tried first so the legacy
+          # the rawbib hyphenated form ("PSI 10/D-3-2010") parses in place
+          # with its date on the draft clause. Draft-first is tried first so the legacy
           # comma-date keeps its original match; each side is optional so
           # a date-only or draft-less form still parses.
           (
@@ -1243,140 +1241,6 @@ module Pubid
       end
 
       root(:identifier)
-
-      # Rewrite relaton's historical IEEE serialization into canonical pubid
-      # spellings. relaton's own formatter (Relaton::Ieee::PubId::Id#to_s) emits
-      # suffix tokens that differ from pubid's grammar:
-      #
-      #   /D-N-YYYY[-MM]  draft + trailing numeric date  (the dominant form)
-      #   /E-N[-YYYY[-MM]] edition
-      #   /R-N[-YYYY]      revision (pubid has no revision suffix)
-      #   " Redline"       redline suffix without the " - " pubid expects
-      #
-      # The draft/edition trailing date is repositioned onto the document number
-      # as a base year/month (a form pubid already parses), which also keeps the
-      # draft component clean so it round-trips through to_hash/from_hash.
-      def self.normalize_relaton_suffixes(cleaned)
-        # NOTE: the trailing " Redline"/" - Redline" suffix is NO LONGER stripped
-        # here — the grammar's `redline` rule captures it into a redline flag so
-        # a redline id stays distinct from its base standard.
-
-        # Combined draft + corrigendum: relaton emits "…/D-N/CorM-YYYY" (draft
-        # then corrigendum), but pubid's grammar accepts the corrigendum first.
-        # Swap them so the corrigendum keeps its own year and the draft trails.
-        # The hyphen after "D" is mandatory here: relaton's formatter always
-        # emits "/D-<draft>", whereas pubid's own canonical joint-development
-        # form is "/D<draft>-<year>" (no hyphen, year kept on the draft) — which
-        # already parses and must not be repositioned. A trailing corrigendum
-        # month (the "-MM" in "/CorM-YYYY-MM") is intentionally dropped: pubid's
-        # corrigendum model carries only a year.
-        cleaned = cleaned.sub(
-          %r{\A(.*)/D-([0-9A-Za-z][0-9A-Za-z.+]*?)/Cor\.?[ ]?(\d+)(?:-((?:19|20)\d\d))?(?:-\d\d)?\z},
-        ) do
-          base, draft, cor, year = Regexp.last_match.captures
-          "#{base}/Cor #{cor}#{year ? "-#{year}" : ''}/D#{draft}"
-        end
-
-        # Combined draft + revision, and the empty-draft revision-only form:
-        #   "…/D-<d>/R-<x>-YYYY[-MM]"  and  "…/D-/R-<x>-YYYY"   (nil-residue #2).
-        # Reposition the base publication date onto the number (pubid's
-        # "-YYYY[-MM]" shape), keep the draft as "/D<d>" (dropped when the draft
-        # is empty), and leave a trailing "/R-<x>" the grammar captures as the
-        # revision. Runs before the plain "/D-…" reposition, which the embedded
-        # "/R-" would otherwise defeat.
-        cleaned = cleaned.sub(
-          %r{\A(.*?)/D-([0-9A-Za-z.+]*)/R-([0-9A-Za-z]+)(?:-((?:19|20)\d\d)(?:-(0[1-9]|1[0-2]))?)?\z},
-        ) do
-          base, draft, rev, year, month = Regexp.last_match.captures
-          date = year ? "-#{year}#{month ? "-#{month}" : ''}" : ""
-          draft_part = draft.to_s.empty? ? "" : "/D#{draft}"
-          "#{base}#{date}#{draft_part}/R-#{rev}"
-        end
-
-        # /D-N drafts with a trailing numeric date, when the draft is the last
-        # suffix: reposition the -YYYY[-MM] date onto the number. A following
-        # /Cor, /Amd, /R or /E suffix carries its own year, so the `\z` anchor
-        # keeps this from firing on those combined forms.
-        cleaned = cleaned.sub(
-          %r{\A(.*)/D-([0-9A-Za-z][0-9A-Za-z.+]*?)-((?:19|20)\d\d)(?:-(0[1-9]|1[0-2]))?\z},
-        ) do
-          base, draft, year, month = Regexp.last_match.captures
-          "#{base}-#{year}#{month ? "-#{month}" : ''}/D#{draft}"
-        end
-
-        # /E-N editions: relaton's "/E-2-2023-02" → pubid's "Edition 2.0 2023-02".
-        cleaned = cleaned.sub(
-          %r{\A(.*?)/E-(\d+)(?:-((?:19|20)\d\d)(?:-(0[1-9]|1[0-2]))?)?\z},
-        ) do
-          base, edition, year, month = Regexp.last_match.captures
-          date = year ? " #{year}#{month ? "-#{month}" : ''}" : ""
-          "#{base} Edition #{edition}.0#{date}"
-        end
-
-        # /R-N revisions: PRESERVE them (the grammar's revision_suffix rule now
-        # captures a trailing "/R-<x>" into the `revision` attribute). Just
-        # reposition any trailing publication year onto the number, keeping the
-        # "/R-<x>" in place for the grammar.
-        cleaned.sub(
-          %r{\A(.*?)/R-([0-9A-Za-z]+)(?:-((?:19|20)\d\d))?\z},
-        ) do
-          base, rev, year = Regexp.last_match.captures
-          "#{year ? "#{base}-#{year}" : base}/R-#{rev}"
-        end
-      end
-
-      # Strip the IEEE rawbib revision-notation dialects. `REV`/`Rev`
-      # (case-insensitive) + a trailing revision id `[A-Za-z0-9]+`, glued to the
-      # number or separated by `-`, `/`, `_`, `.`, or a space, and preceding the
-      # draft. pubid's canonical "<num>/D<n>/R-<x>" form already drops the
-      # revision on render (normalize_relaton_suffixes strips a trailing /R-x),
-      # so the revision-less result is *the same identifier* — and stripping
-      # (rather than reordering) leaves any trailing date/parenthetical intact,
-      # which is why forms that already parse (`Draft P…-REVmb/D3.0, Mar 2010`)
-      # are NOT disturbed. Examples:
-      #   "P802.16.2-REVa/D8" -> "P802.16.2/D8"
-      #   "P802.16/REVd/D5"   -> "P802.16/D5"
-      #   "P802.15.1REVa/D5"  -> "P802.15.1/D5"
-      #   "P802.11REVmb"      -> "P802.11"   (no draft)
-      def self.normalize_revision_notation(cleaned)
-        # NUMBERED revisions ("Rev<digits>") are PRESERVED — repositioned to a
-        # trailing "/R-<n>" suffix the grammar captures as the `revision`
-        # attribute (IEEE's native inline spelling; numbered-revision hand-off).
-        # A "\d+" right after "Rev" both selects the numbered subset and keeps
-        # these off the English word "Revision". Three source positions:
-        #   after a draft : "PC37.30.2/D043 Rev 18" -> ".../D043/R-18"
-        # The draft captures accept relaton's hyphenated "/D-<n>" spelling
-        # (pubid#316): without the "-?" the before-draft regex matched only
-        # "/D" of "/D-3" and emitted the garbage "/D/R-2-3-2008-02".
-        cleaned = cleaned.sub(
-          %r{(/D-?[0-9A-Za-z.]+)\s+[Rr][Ee][Vv]\s*(\d+)}, '\1/R-\2'
-        )
-        #   before a draft: "P802.16Rev2/D3" -> "P802.16/D3/R-2"
-        cleaned = cleaned.sub(
-          %r{[-/_.]?\s?[Rr][Ee][Vv][-\s]?(\d+)(/D-?[0-9A-Za-z.]+)}, '\2/R-\1'
-        )
-        #   no draft, trailing: "P1722-rev1" -> "P1722/R-1"
-        cleaned = cleaned.sub(
-          %r{(\d)[-._]?\s?[Rr][Ee][Vv]\s*(\d+)\s*\z}, '\1/R-\2'
-        )
-
-        # LETTERED inline revisions ("REVa", "REVmb") have no pubid model and are
-        # still STRIPPED (unchanged behaviour). The numbered forms above already
-        # became "/R-<n>", so these regexes only see the lettered residue.
-        # Revision token that PRECEDES a draft: drop it (keep the /D…).
-        cleaned = cleaned.sub(
-          %r{[-/_.]?\s?[Rr][Ee][Vv][-\s]?[A-Za-z0-9]+(?=/D-?[0-9A-Za-z])},
-          "",
-        )
-        # Trailing revision glued to the number with no draft ("P802.11REVmb");
-        # a digit must immediately precede REV so a trailing English word like
-        # "…Revision" can't match.
-        cleaned.sub(%r{(\d)[Rr][Ee][Vv][A-Za-z0-9]+\s*\z}, '\1')
-      end
-
-      # Pre-parse ingestion normalizations (R2): every parse path —
-      # parslet and PG artifact alike — feeds the grammar the same
-      # normalized string.
       def self.normalize_input(string)
         # Strip .pdf extension if present (Pattern 3: File Extensions)
         cleaned = string.sub(/\.pdf$/i, "")
@@ -1390,14 +1254,6 @@ module Pubid
         # No valid IEEE identifier pattern needs more than 1 space
         cleaned = cleaned.gsub(/\s+/, " ")
 
-        # Rewrite the rawbib revision-notation dialects (REVa/REVd/glued) into
-        # the canonical /R-<x> form before the suffix normalization below.
-        cleaned = normalize_revision_notation(cleaned)
-
-        # Normalize relaton's bespoke historical serialization (the spellings
-        # emitted by Relaton::Ieee::PubId::Id#to_s) into canonical pubid forms
-        # so `relaton-data-ieee` parses. See #normalize_relaton_suffixes.
-        cleaned = normalize_relaton_suffixes(cleaned)
 
         # NEW Session 171: CONSERVATIVE data quality fixes for TODO.IEEE-MUST-DO.txt
         # Only fix clear typos: space before dash + 4-digit year, OR dash + space + 4-digit year

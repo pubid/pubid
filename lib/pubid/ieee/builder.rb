@@ -272,6 +272,26 @@ module Pubid
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
 
+        # Grammar-captured dash dates (relaton's "/D-3-2017-07" and
+        # "/R-x-2011-04" tails) land on the identifier's year/month exactly
+        # like the number's own date clause. The revision-suffix form sits at
+        # the top level; the draft tail nests under :draft — either as its
+        # own element or wrapped in a draft_version hash.
+        drafts = parsed_hash[:draft].is_a?(Array) ? parsed_hash[:draft] : [parsed_hash[:draft]].compact
+        drafts.each do |d|
+          next unless d.is_a?(Hash) && d[:draft_version].is_a?(Hash)
+          dv = d[:draft_version]
+          d[:dash_year] = dv[:dash_year] if dv[:dash_year]
+          d[:dash_month] = dv[:dash_month] if dv[:dash_month]
+          d.delete(:draft_version)
+        end
+        dash = parsed_hash[:dash_year] ? parsed_hash : nil
+        dash ||= drafts.find { |d| d.is_a?(Hash) && d[:dash_year] }
+        if dash && parsed_hash[:year].nil?
+          parsed_hash[:year] = dash[:dash_year]
+          parsed_hash[:month] = dash[:dash_month] if dash[:dash_month]
+        end
+
         # Handle multi-numbered identifiers (cross-reference and joint standards)
         # CRITICAL: Don't recurse when building secondary identifier to prevent infinite loop
         if !building_secondary && parsed_hash[:primary_identifier] && (parsed_hash[:secondary_crossref] || parsed_hash[:secondary_joint])
@@ -785,9 +805,13 @@ module Pubid
         end
         attributes[:parenthetical_content] ||= extract_value(parsed[:edition_marker]) if parsed[:edition_marker]
 
-        # Extract edition, from relaton's "/E-<n>" suffix (normalized to
-        # "Edition <n>.0"). nil-residue hand-off item 1.
-        attributes[:edition] = extract_value(parsed[:edition]) if parsed[:edition]
+        # Extract edition, from relaton's "/E-<n>" suffix. The grammar's /E
+        # alternative captures the bare ordinal (nil-residue hand-off item 1).
+        if parsed[:edition]
+          attributes[:edition] = extract_value(parsed[:edition])
+        elsif parsed[:edition_e]
+          attributes[:edition] = "#{extract_value(parsed[:edition_e])}.0"
+        end
         if parsed[:edition_month]
           attributes[:edition_month] = extract_value(parsed[:edition_month])
         end
@@ -1458,9 +1482,10 @@ module Pubid
                         extract_value(dv)
                       end
 
-            # Construct draft notation like "D1", "D2", etc.
             if version
-              draft_abbr = "D#{version}"
+              # relaton's hyphenated "/D-2" spelling captures the dash inside
+              # draft_version; the stage registry keys on "D2".
+              draft_abbr = "D#{version.to_s.sub(/\A-/, "")}"
               # Check if this specific draft stage is in registry
               stage = Pubid::Ieee.locate_stage(draft_abbr)
               return draft_abbr if stage&.abbr&.include?(draft_abbr)
