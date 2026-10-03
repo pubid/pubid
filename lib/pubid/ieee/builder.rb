@@ -288,8 +288,16 @@ module Pubid
         dash = parsed_hash[:dash_year] ? parsed_hash : nil
         dash ||= drafts.find { |d| d.is_a?(Hash) && d[:dash_year] }
         if dash && parsed_hash[:year].nil?
-          parsed_hash[:year] = dash[:dash_year]
-          parsed_hash[:month] = dash[:dash_month] if dash[:dash_month]
+          bare_joint_draft = parsed_hash[:joint_publishers] &&
+                             parsed_hash[:part].nil? &&
+                             parsed_hash[:iso_stage].nil? &&
+                             drafts.any? { |d| d.is_a?(Hash) && d[:draft_version] }
+          if bare_joint_draft
+            parsed_hash[:part] = { value: dash[:dash_year] }
+          else
+            parsed_hash[:year] = dash[:dash_year]
+            parsed_hash[:month] = dash[:dash_month] if dash[:dash_month]
+          end
         end
 
         # Handle multi-numbered identifiers (cross-reference and joint standards)
