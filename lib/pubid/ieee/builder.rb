@@ -306,9 +306,14 @@ module Pubid
             # drafts: standard class, stage from the type word (the compound
             # draft version misses the D-registry), no separate year.
             host = drafts.find { |d| d.is_a?(Hash) && d[:draft_version] }
-            host[:draft_version] = "#{joined}-#{dash[:dash_year]}" if host
-            dash.delete(:dash_year)
-            dash.delete(:dash_month)
+            if host
+              host[:draft_version] = "#{joined}-#{dash[:dash_year]}"
+              dash.delete(:dash_year)
+              dash.delete(:dash_month)
+            else
+              parsed_hash[:year] = dash[:dash_year]
+              parsed_hash[:month] = dash[:dash_month]
+            end
           end
         end
 
