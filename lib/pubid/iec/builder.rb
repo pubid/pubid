@@ -362,7 +362,10 @@ module Pubid
           build(value)
 
         when :publisher
-          Components::Publisher.new(body: value)
+          # CEI is IEC's French spelling (pubid#488): a French-printed
+          # "CEI …" identifier is the IEC publisher; the canonical
+          # rendering prints IEC.
+          Components::Publisher.new(body: value == "CEI" ? "IEC" : value)
 
         when :copublishers
           if value.nil? || value.empty?

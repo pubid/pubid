@@ -223,11 +223,12 @@ module Pubid
 
       rule(:language) do
         # IEC 60038:2009(en,fr)
+        # IEC 60038:2009(en-fr) (house style, pubid#491)
         # IEC 60038:2009(E/F)
         str("(") >>
           (
             # parse 2-char language codes: ru,en,fr,de,ar,es
-            (match["a-z"].repeat(1) >> str(",").maybe) |
+            (match["a-z"].repeat(1) >> (str(",") | str("-")).maybe) |
             # parse single language codes: R/E/F
             (match["EFARDS"] >> str("/").maybe)
           ).repeat.as(:languages) >>

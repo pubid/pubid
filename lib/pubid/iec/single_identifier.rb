@@ -78,11 +78,14 @@ module Pubid
       def language_portion(lang_single: false)
         return "" unless languages&.any?
 
+        # IEC house style joins multiple language codes with '-'
+        # ("IEC 60050-103:2020(en-fr)"), not ',' (pubid#491; pubid-iec 1.x
+        # behavior, which metanorma-iec's fixtures encode).
         [
           "(",
           languages.map do |lang|
             lang.to_s(lang_single: lang_single)
-          end.join(lang_single ? "/" : ","),
+          end.join(lang_single ? "/" : "-"),
           ")",
         ].join
       end
