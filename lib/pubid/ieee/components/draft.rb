@@ -151,6 +151,14 @@ day: nil, iso_stage: nil, iso_iteration: nil)
                     end if revision
 
           if year
+            if iso_stage && !original_month
+              # The D= designator face dash-joins its year
+              # (".../D=FDIS-2016", docs/IEEE-DRAFT-STAGES.md: the IEEE
+              # date convention for an ISO-staged draft).
+              result += "-#{year}"
+              return result
+            end
+
             # Use original month format to preserve abbreviated vs full names
             display_month = original_month
 
