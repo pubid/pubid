@@ -239,7 +239,8 @@ module Pubid
           # Join with space and add year with dash — unless the D=
           # designator face already carried it above.
           result = parts.join(" ")
-          result += "-#{year}" if year && !@designator_carries_year
+          result += "-#{year}" if year && !@designator_carries_year &&
+                           !ieee_draft.to_s.end_with?("-#{year}")
 
           result
         end

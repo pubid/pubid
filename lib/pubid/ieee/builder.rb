@@ -288,13 +288,16 @@ module Pubid
         dash = parsed_hash[:dash_year] ? parsed_hash : nil
         dash ||= drafts.find { |d| d.is_a?(Hash) && d[:dash_year] }
         if dash && parsed_hash[:year].nil?
+          joined = drafts.filter_map { |d| d.is_a?(Hash) ? d[:draft_version] : nil }
+                         .map { |v| v.is_a?(Hash) ? v[:value] : v.to_s }.join
           bare_joint_draft = parsed_hash[:joint_publishers] &&
                              parsed_hash[:part].nil? &&
                              parsed_hash[:iso_stage].nil? &&
                              drafts.any? { |d| d.is_a?(Hash) && d[:draft_version] }
-          if bare_joint_draft
+          dash_led = joined.start_with?("-")
+          if bare_joint_draft && dash_led
             parsed_hash[:part] = { value: dash[:dash_year] }
-          elsif dash[:dash_month]
+          elsif dash[:dash_month] || dash_led
             parsed_hash[:year] = dash[:dash_year]
             parsed_hash[:month] = dash[:dash_month]
           else
@@ -302,8 +305,6 @@ module Pubid
             # the relaton-pinned renders use for corrupted update_codes
             # drafts: standard class, stage from the type word (the compound
             # draft version misses the D-registry), no separate year.
-            joined = drafts.filter_map { |d| d.is_a?(Hash) ? d[:draft_version] : nil }
-                           .map { |v| v.is_a?(Hash) ? v[:value] : v.to_s }.join
             host = drafts.find { |d| d.is_a?(Hash) && d[:draft_version] }
             host[:draft_version] = "#{joined}-#{dash[:dash_year]}" if host
             dash.delete(:dash_year)
@@ -786,8 +787,18 @@ module Pubid
         if parsed[:part].nil? && parsed[:iso_stage].nil? && parsed[:draft_version] &&
            parsed[:printed_dash_year] && parsed[:year] &&
            (parsed[:year].is_a?(Hash) ? parsed[:year][:value] : parsed[:year]).to_s.match?(/\A(19|20)\d\d\z/)
-          code_parts << extract_value(parsed[:year])
-          parsed[:year] = nil
+          # A dash-led draft ("P42010/D-4-2019") takes the year-part face;
+          # an undashed one ("P26511/D8-2018") embeds the date in the draft
+          # face.
+          if extract_value(parsed[:draft_dash]).to_s == "-"
+            code_parts << extract_value(parsed[:year])
+            parsed[:year] = nil
+          else
+            # The year stays: the IEEE face suppresses it while a draft is
+            # attached, and the ISO face renders it ("P26511:2018").
+            parsed[:draft_version] =
+              "#{extract_value(parsed[:draft_version])}-#{extract_value(parsed[:year])}"
+          end
         end
         code_parts << extract_value(parsed[:part]) if parsed[:part]
 
