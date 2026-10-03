@@ -126,7 +126,8 @@ RSpec.describe "IEC URN stage and edition slots" do
       id = Pubid::Iec.parse_urn("urn:iec:std:iec:60050-102::::en-fr")
 
       expect(id.languages.map { |l| l.code.to_s }).to eq(%w[en fr])
-      expect(id.to_s).to include("(en,fr)")
+      # IEC house style joins with "-" (pubid#491)
+      expect(id.to_s).to include("(en-fr)")
     end
   end
 
