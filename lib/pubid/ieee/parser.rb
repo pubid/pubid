@@ -1488,22 +1488,9 @@ module Pubid
         # which standards are actually IEEE-related.
         # ISO-only standards are still filtered as they have separate handling.
 
-        # Pattern 3: Replace underscore before ISO stage codes with slash
-        # These are joint development drafts that use underscore instead of slash
-        cleaned = cleaned.gsub(/_(FDIS|CDV|CD|DIS|WD|PWI|NP)/, '/\1')
-
         # NEW: Normalize multiple spaces to single space
         # No valid IEEE identifier pattern needs more than 1 space
         cleaned = cleaned.gsub(/\s+/, " ")
-
-        # A joint ISO-led publisher list is sometimes crawled with a stray slash
-        # (or slash+space) before the ISO stage code — "ISO/IEC/IEEE/ FDIS …" or
-        # "ISO/IEC/IEEE/FDIS …". Restore the space separator so the stage parses
-        # (bucket 7).
-        cleaned = cleaned.gsub(
-          %r{\b(ISO/IEC/IEEE|IEEE/ISO/IEC|IEEE/IEC/ISO|ISO/IEEE|IEC/IEEE|IEEE/IEC|ISO/IEC)/ ?(FDIS|FCD|CDV|DIS\d?|CD\d?|WD|PWI|NP)\b},
-          '\1 \2',
-        )
 
         # Rewrite the rawbib revision-notation dialects (REVa/REVd/glued) into
         # the canonical /R-<x> form before the suffix normalization below.
@@ -1520,16 +1507,8 @@ module Pubid
         cleaned = cleaned.gsub(/(\d)\s+-(\d{4})\b/, '\1-\2')  # "C37.101 -2006" → "C37.101-2006"
         cleaned = cleaned.gsub(/(\d)-\s+(\d{4})\b/, '\1-\2')  # "C62.35- 2010" → "C62.35-2010"
 
-        # NEW Session 171: HTML entity for en dash (&#x2013;)
-        # ONLY convert if not already followed by a dash (avoid creating --)
-        cleaned = cleaned.gsub(/&#x2013;(?!-)/, "-")  # En dash → regular hyphen (if not followed by dash)
-        cleaned = cleaned.gsub("&#x2013;-", "-")      # En-dash-dash → single dash
-
         # NEW Session 171: Remove wrong ! prefix
         cleaned = cleaned.gsub(/^!IEEE /, "IEEE ")
-
-        # NEW Session 171: Fix "IEEE/ ASTM" spacing (extra space after slash)
-        cleaned = cleaned.gsub("IEEE/ ASTM", "IEEE/ASTM")
 
         # NEW Phase 1: Handle HTML entities comprehensively
         cleaned = cleaned.gsub("&#x2122;", "™") # Trademark symbol
