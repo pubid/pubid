@@ -1638,6 +1638,18 @@ module Pubid
             # Normalize a leading hyphen ("/D-3.0" -> "3.0"); the draft
             # designator is otherwise held verbatim so no digit is lost.
             version = version.sub(/\A-/, "") if version
+
+            # FDIS/CDV/… are ISO stage tokens, not draft ordinals (C1
+            # ruling, testsuite#2: "DFDIS" is hallucinated — the
+            # designator letter must not merge onto a stage word). They
+            # ride the draft's iso_stage slot, which Draft#to_s renders
+            # as the "D=" designator face ("…/D=FDIS-2016"); a draft
+            # month does not survive that face (the D= date convention
+            # is the dash-joined year).
+            if version.match?(/\A(FDIS|FCD|CDV|DIS|CD|WD|PWI|NP)\z/)
+              iso_stage = version
+              version = nil
+            end
           end
 
           # The PARG capture carries its separator (".12", the #471
@@ -1649,7 +1661,7 @@ module Pubid
 
           # The compound both-systems form (docs/IEEE-DRAFT-STAGES.md
           # §1.3): the stage half of "=DDIS.3".
-          iso_stage = extract_value(draft_data[:draft_iso_stage]) if draft_data[:draft_iso_stage]
+          iso_stage ||= extract_value(draft_data[:draft_iso_stage]) if draft_data[:draft_iso_stage]
           iso_iteration = extract_value(draft_data[:draft_iso_iteration]) if draft_data[:draft_iso_iteration]
 
           # Extract date information from draft data
@@ -1674,9 +1686,13 @@ module Pubid
           version = extract_value(draft_data)
         end
 
+        # A stage-token draft drops its month: the D= face carries only
+        # the dash-joined year.
+        month = nil if iso_stage && version.nil?
+
         # Create Draft component object if we have version info (or a
         # compound stage half without an ordinal, "D=CDV:2020")
-        if version || draft_data.is_a?(Hash) && draft_data[:draft_iso_stage]
+        if version || iso_stage || draft_data.is_a?(Hash) && draft_data[:draft_iso_stage]
           draft_obj = Components::Draft.new(
             version: version,
             revision: revision,
