@@ -1255,12 +1255,6 @@ module Pubid
         cleaned = cleaned.gsub(/\s+/, " ")
 
 
-        # NEW Session 171: CONSERVATIVE data quality fixes for TODO.IEEE-MUST-DO.txt
-        # Only fix clear typos: space before dash + 4-digit year, OR dash + space + 4-digit year
-        # Do NOT touch " - " (space-dash-space) which is valid formatting
-        cleaned = cleaned.gsub(/(\d)\s+-(\d{4})\b/, '\1-\2')  # "C37.101 -2006" → "C37.101-2006"
-        cleaned = cleaned.gsub(/(\d)-\s+(\d{4})\b/, '\1-\2')  # "C62.35- 2010" → "C62.35-2010"
-
         # NEW Session 171: Remove wrong ! prefix
         cleaned = cleaned.gsub(/^!IEEE /, "IEEE ")
 
@@ -1270,10 +1264,6 @@ module Pubid
         cleaned = cleaned.gsub("&amp;amp;", "&")   # Double-encoded ampersand
         cleaned = cleaned.gsub("&amp;", "&")       # Single-encoded ampersand
 
-        # NEW: Wrap P&V notation in parentheses (Paper & Video, etc.)
-        # Pattern: "IEEE Std 500-1984 P&V" → "IEEE Std 500-1984 (P&V)"
-        cleaned = cleaned.gsub(/\s+(P&V)\s*$/, ' (\1)')
-
         # NEW Phase 1: Fix number spacing issues (e.g., "C57.1 2.25" → "C57.12.25")
         # This handles cases where a space appears in the middle of a number
         cleaned = cleaned.gsub(/(\d+\.\d+)\s+(\d+\.)/, '\1\2')
@@ -1281,16 +1271,6 @@ module Pubid
         # NEW Phase 1: Fix year spacing issues (e.g., "1 996" → "1996")
         # Remove spaces within 4-digit years
         cleaned = cleaned.gsub(/\b(1|2)\s+(\d{3})\b/, '\1\2')
-
-        # NEW: Fix month+year spacing (e.g., "March2016" → "March 2016")
-        # Add space between month name and 4-digit year when they're concatenated
-        cleaned = cleaned.gsub(
-          /\b(January|February|March|April|May|June|July|August|September|October|November|December)(\d{4})\b/, '\1 \2'
-        )
-        # Also handle abbreviated months
-        cleaned = cleaned.gsub(
-          /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)(\d{4})\b/, '\1 \2'
-        )
 
         # NEW: Convert IEC/IEEE space-separated to semicolon format
         # Pattern: "IEC 61523-3 First edition 2004-09; IEEE 1497" → already semicolon
