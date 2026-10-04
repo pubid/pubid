@@ -200,6 +200,9 @@ module Pubid
           # Publishers (slash-separated)
           parts << publishers.join("/") if publishers && !publishers.empty?
 
+          # A status word ("Unapproved") marks the draft (pubid#318)
+          parts << draft_status if draft_status
+
           # Build code part — the P-state prints as spelled (P = project
           # draft; no P = standard). Never added or stripped.
           code_str = code.to_s
