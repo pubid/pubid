@@ -771,6 +771,11 @@ module Pubid
       def build_joint_development(parsed)
         attributes = {}
 
+        # The status-draft spelling ("IEEE Unapproved P15288/DFDIS") keeps
+        # its status word on the designator face (pubid#318: the word marks
+        # the draft).
+        attributes[:draft_status] = extract_value(parsed[:draft_status]) if parsed[:draft_status]
+
         # Extract publishers from joint_publishers
         if parsed[:joint_publishers]
           joint_pub_str = extract_value(parsed[:joint_publishers])
@@ -805,15 +810,16 @@ module Pubid
               "#{extract_value(parsed[:draft_version])}-#{extract_value(parsed[:year])}"
           end
         end
+        # The part/subpart captures carry their printed separator
+        # (C1: the part binds before the draft status and the year,
+        # separator-in-capture), so they concatenate verbatim - a
+        # synthetic separator here is what produced "61850..9".
         code_parts << extract_value(parsed[:part]) if parsed[:part]
+        code_parts << extract_value(parsed[:subpart]) if parsed[:subpart]
 
         code_str = extract_value(parsed[:number])
         if code_str && !code_parts.empty?
-          # The ISO/IEC label's part may be dash-joined ("8802-9") - keep
-          # the printed separator (the iso-format route's :part_dash
-          # prints as a dot in the joint code).
-          sep = parsed[:iec_label_dash] ? "-" : "."
-          code_str += "#{sep}#{code_parts.join(sep)}"
+          code_str += code_parts.map { |p| p.to_s.start_with?(".", "-", "_") ? p : ".#{p}" }.join
         end
         # P = project (a draft): identity-bearing, preserved as spelled.
         code_str = "P#{code_str}" if parsed[:project_marker] && code_str
