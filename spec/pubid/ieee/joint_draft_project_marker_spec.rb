@@ -13,7 +13,11 @@ RSpec.describe Pubid::Ieee::Identifier do
       id = described_class.parse("IEEE-P15026-3-DIS-January 2015")
 
       expect(id.typed_stage.stage_code).to eq("published")
-      expect(id.to_s).to eq("ISO/IEC/IEEE P15026-3/DDIS January, 2015")
+      # The stage-tracked draft renders the D= designator face; the
+      # month rides it zero-padded (pubid#203 convention). "DDIS" is a
+      # hallucinated concatenation - the designator D does not merge
+      # onto the ISO/IEC stage word.
+      expect(id.to_s).to eq("ISO/IEC/IEEE P15026-3/D=DIS-201501")
     end
 
     it "keeps the spelled P when the typed stage marks a draft" do
@@ -21,7 +25,7 @@ RSpec.describe Pubid::Ieee::Identifier do
 
       expect(id.typed_stage.stage_code).to eq("draft")
       expect(id.project_marker).to be(true)
-      expect(id.to_s).to eq("ISO/IEC/IEEE P24774/DDIS, July 2020")
+      expect(id.to_s).to eq("ISO/IEC/IEEE P24774/D=DIS-202007")
     end
   end
 end
