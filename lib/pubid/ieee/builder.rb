@@ -925,9 +925,18 @@ module Pubid
                          (parsed[:year].nil? && parsed[:parameters].is_a?(Hash) &&
                           parsed[:parameters][:parenthetical_content]))
         if printed_joint
-          sep = parsed[:part_dash] ? "-" : "."
-          printed_code = [extract_value(parsed[:number]),
-                          extract_value(parsed[:part])].compact.join(sep)
+          # The part capture carries its own separator (C1
+          # separator-in-capture); join verbatim, synthesizing one only
+          # for a bare capture.
+          part_val = extract_value(parsed[:part])
+          printed_code = extract_value(parsed[:number]).to_s
+          if part_val
+            printed_code += if part_val.start_with?(".", "-", "_")
+                              part_val
+                            else
+                              "#{parsed[:part_dash] ? "-" : "."}#{part_val}"
+                            end
+          end
           # P = project: the marker is identity, preserved as spelled.
           printed_code = "P#{printed_code}" if parsed[:project_marker]
           printed_attrs = { publisher: attributes[:publisher],
@@ -1394,6 +1403,15 @@ module Pubid
         if parsed[:year]
           year_str = extract_value(parsed[:year])
           attributes[:year] = year_str
+          # AIEE dash-glued date ("No 15-1928-05"): the tail binds as the
+          # year/month clause with no separator capture, and the AIEE
+          # long-form render is the dash form (a plain numeric month alone
+          # would render ", 05 1928").
+          if attributes[:publisher] == "AIEE" &&
+             original_input.to_s.match?(/-\d{4}(?:-\d{2})?\z/) &&
+             parsed[:month] && year_str.match?(/\A(19|20)\d\d\z/)
+            attributes[:date_separator] = "-"
+          end
         elsif parsed[:edition_year]
           # The `edition` rule captures its own year under :edition_year (not
           # :year) so it never collides with the base -YYYY (see parser.rb).
@@ -1646,16 +1664,13 @@ module Pubid
             version = version.sub(/\A-/, "") if version
 
             # FDIS/CDV/… are ISO stage tokens, not draft ordinals (C1
-            # ruling, testsuite#2: "DFDIS" is hallucinated — the
-            # designator letter must not merge onto a stage word). They
-            # ride the draft's iso_stage slot, which Draft#to_s renders
-            # as the "D=" designator face ("…/D=FDIS-2016"); a draft
-            # month does not survive that face (the D= date convention
-            # is the dash-joined year).
-            if version.match?(/\A(FDIS|FCD|CDV|DIS|CD|WD|PWI|NP)\z/)
-              iso_stage = version
-              version = nil
-            end
+            # ruling, testsuite#2). Kept as the draft version verbatim,
+            # Draft#to_s prepends the marker D — the stage-token
+            # canonical is the spelled "/D<stage>" form ("/DDIS",
+            # "/DFDIS", corpus-pinned); the D= designator face belongs
+            # to the inputs that spell it (= compounds, dash-year
+            # designators — the draft_iso_stage captures below).
+            # The trailing text date survives that face.
           end
 
           # The PARG capture carries its separator (".12", the #471
