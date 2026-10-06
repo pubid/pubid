@@ -447,31 +447,31 @@ module Pubid
         result += " #{number}" if number
         result += parts.map { |p| "-#{p}" }.join if parts&.any?
 
-        # Render volume and issue number in long form: "Vol. 6, No. 12"
+        # The 1.x corpus order: stage, volume, part, revision, version,
+        # supplement, section, update; an edition date trails as the
+        # parenthesised date before the translation
+        result += " #{stage.to_s(:long)}" if stage
+
+        # Volume and issue number in long form: "Volume 6, No. 12" - the
+        # component's own v-notation must not leak into the worded form
         if volume && issue_number
-          result += " Vol. #{volume}, #{issue_number.to_s(:long)}"
+          result += " Volume #{volume.value}, #{issue_number.to_s(:long)}"
         elsif volume
-          result += " Vol. #{volume}"
+          result += " Volume #{volume.value}"
         end
 
         result += " Part #{part.value}" if part
+        result += " #{edition.to_s(:long)}" if edition && !edition_year?
+        # A revision riding on a date edition composes at the revision
+        # slot ("... Part 2, Revision 3 ... (2001)")
+        if edition&.additional_text.to_s =~ /\Ar(\d+)\z/
+          result += " Revision #{Regexp.last_match[1]}"
+        end
+        result += " #{version_component.to_s(:long)}" if version_component
         result += " #{supplement.to_s(:long)}" if supplement
         result += " Section #{section}" if section
         result += " Index" if index
-
-        # A worded edition (Revision 3, Edition 2) composes with the
-        # body; an edition year renders as the trailing date, after the
-        # update and stage ("... Update 5 (2021)(en)")
-        result += " #{edition.to_s(:long)}" if edition && !edition_year?
-
-        # V2: Use version_component
-        result += " #{version_component.to_s(:long)}" if version_component
-
-        # V2: Use update_component
         result += " #{update_component.to_s(:long)}" if update_component
-
-        # V2: Use stage
-        result += " #{stage.to_s(:long)}" if stage
 
         result += " #{edition.to_s(:long)}" if edition && edition_year?
 
