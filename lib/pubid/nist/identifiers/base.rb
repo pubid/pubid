@@ -459,7 +459,10 @@ module Pubid
         result += " Section #{section}" if section
         result += " Index" if index
 
-        result += " #{edition.to_s(:long)}" if edition
+        # A worded edition (Revision 3, Edition 2) composes with the
+        # body; an edition year renders as the trailing date, after the
+        # update and stage ("... Update 5 (2021)(en)")
+        result += " #{edition.to_s(:long)}" if edition && !edition_year?
 
         # V2: Use version_component
         result += " #{version_component.to_s(:long)}" if version_component
@@ -469,6 +472,8 @@ module Pubid
 
         # V2: Use stage
         result += " #{stage.to_s(:long)}" if stage
+
+        result += " #{edition.to_s(:long)}" if edition && edition_year?
 
         # V2: Use translation_component (already includes space)
         result += translation_component.to_s(:long) if translation_component
@@ -751,6 +756,10 @@ module Pubid
         result += translation_component.to_s(:mr) if translation_component
 
         result
+      end
+
+      def edition_year?
+        edition&.type == "e" && edition.id.to_s =~ /\A\d{4}\z/
       end
 
       def series_full_name
