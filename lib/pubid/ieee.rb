@@ -21,6 +21,7 @@ module Pubid
     autoload :PreParser, "#{__dir__}/ieee/pre_parser"
     autoload :Compaction, "#{__dir__}/ieee/compaction"
     autoload :ProjectRenderer, "#{__dir__}/ieee/project_renderer"
+    autoload :LongRenderer, "#{__dir__}/ieee/long_renderer"
     autoload :Renderer, "#{__dir__}/ieee/renderer"
     autoload :TypedStages, "#{__dir__}/ieee/typed_stages"
     autoload :UrnGenerator, "#{__dir__}/ieee/urn_generator"
@@ -164,3 +165,4 @@ Pubid::Registry.register(:ieee, Pubid::Ieee)
 Pubid::Ieee::Identifier.format_registry = Pubid::FormatRegistry.new(parent: Pubid::Identifier.format_registry)
 Pubid::Ieee::Identifier.format_registry.register(:human, renderer: Pubid::Ieee::Renderer)
 Pubid::Ieee::Identifier.format_registry.register(:project, renderer: Pubid::Ieee::ProjectRenderer)
+Pubid::Ieee::Identifier.format_registry.register(:long, renderer: Pubid::Ieee::LongRenderer)

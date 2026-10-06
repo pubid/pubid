@@ -24,7 +24,29 @@ module Pubid
         # (Pubid::Identifier#render), so the flag is safe as instance state.
         @trademark = opts[:trademark]
 
-        render_id(@id)
+        result = render_id(@id)
+        # The long face spells draft months out ("Aug" → "August") over the
+        # bounded identifier — no title prose is ever in the string.
+        result = expand_months(result) if @long
+        result
+      end
+
+      # The long-form month names, longest key first ("Sept" before "Sep").
+      LONG_MONTHS = {
+        "Sept" => "September", "Jan" => "January", "Feb" => "February",
+        "Mar" => "March", "Apr" => "April", "Jun" => "June",
+        "Jul" => "July", "Aug" => "August", "Sep" => "September",
+        "Oct" => "October", "Nov" => "November", "Dec" => "December",
+      }.freeze
+      private_constant :LONG_MONTHS
+
+      # Expand abbreviated draft months to their long names (\b-bounded, so
+      # only whole month tokens move).
+      def expand_months(str)
+        LONG_MONTHS.each do |abbr, full|
+          str = str.gsub(/\b#{abbr}\b/, full)
+        end
+        str
       end
 
       private
@@ -125,6 +147,10 @@ module Pubid
             !id.draft_status.to_s.match?(/unapproved/i)
           type_str = id.type.dup
           type_str = type_str.sub(/^P/, "") if type_str.start_with?("P")
+          # The long face expands the type word ("IEEE Standard 495-2007");
+          # a draft never takes Std/Standard in any face, so the expansion
+          # only ever sees the published word.
+          type_str = "Standard" if @long && type_str == "Std"
           parts << type_str unless type_str.strip.empty?
         end
 

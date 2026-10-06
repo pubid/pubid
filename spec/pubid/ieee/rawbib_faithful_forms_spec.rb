@@ -14,14 +14,14 @@ RSpec.describe Pubid::Ieee::Identifier do
       id = described_class.parse("ISO /IEC/IEEE P24774_D1, February 2020")
 
       expect(id).to be_a(Pubid::Ieee::Identifiers::ProjectDraftIdentifier)
-      expect(id.to_s).to eq("ISO/IEC/IEEE P24774/D1, February, 2020")
+      expect(id.to_s).to eq("ISO/IEC/IEEE P24774/D1, Feb 2020")
       expect(id.project_marker).to be(true)
     end
 
     it "keeps the draft numeral and the text date together" do
       id = described_class.parse("ISO /IEC/IEEE P24774_D3, January 2021")
 
-      expect(id.to_s).to eq("ISO/IEC/IEEE P24774/D3, January, 2021")
+      expect(id.to_s).to eq("ISO/IEC/IEEE P24774/D3, Jan 2021")
     end
 
   end
