@@ -574,8 +574,8 @@ module Pubid
 
         # Volume and Part components (v6n1 notation for CSM, pt1 for SP)
         if volume.is_a?(Components::Volume) && effective_part.is_a?(Components::Part)
-          # CSM series: v#n# notation
-          result += " #{volume}#{effective_part}"
+          # volume and part attach ("v5pt2"), the 1.x corpus form
+          result += "#{volume}#{effective_part}"
         elsif effective_part.is_a?(Components::Part)
           # SP and other series: use Part.type to determine format
           result += effective_part.to_s

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "date"
 require "lutaml/model"
 
 module Pubid
@@ -123,11 +124,20 @@ module Pubid
         # Build long format: "Edition 2021", "Revision 5", etc.
         def build_long_format
           case type
-          # An edition year renders as the parenthesised date
-          # ("1000e2021" long: "... (2021)"), the 1.x corpus form; a
-          # numbered edition keeps its worded form ("Edition 2")
+          # An edition date renders as the parenthesised date
+          # ("1000e2021" long: "... (2021)", "ABCe20130101" long:
+          # "... (January 01, 2013)"), the 1.x corpus form; a numbered
+          # edition keeps its worded form ("Edition 2")
           when "e"
-            id.to_s =~ /\A\d{4}\z/ ? "(#{id})" : "Edition #{id}"
+            case id.to_s
+            when /\A\d{4}\z/ then "(#{id})"
+            when /\A(\d{4})(\d{2})(\d{2})\z/
+              "(#{::Date.new(Regexp.last_match[1].to_i,
+                             Regexp.last_match[2].to_i,
+                             Regexp.last_match[3].to_i)
+                   .strftime('%B %d, %Y')})"
+            else "Edition #{id}"
+            end
           when "r"
             "Revision #{id}"
           when "-"
