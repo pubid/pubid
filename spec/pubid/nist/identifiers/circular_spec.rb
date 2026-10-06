@@ -345,7 +345,7 @@ RSpec.describe Pubid::Nist::Identifiers::Circular do
         end
 
         it "round-trips correctly" do
-          expect(parsed.to_s).to eq(subject.gsub("supp", "sup"))
+          expect(parsed.to_s).to eq("NBS CIRC 54indx")
         end
       end
 

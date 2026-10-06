@@ -70,7 +70,7 @@ RSpec.describe "NIST Multi-Format Rendering" do
 
     it "renders identifier with translation in full format" do
       identifier = Pubid::Nist.parse("NIST IR 8115 chi")
-      expect(identifier.to_s(:full)).to include(" zho")
+      expect(identifier.to_s(:full)).to include("(zho)")
     end
   end
 

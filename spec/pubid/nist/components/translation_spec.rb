@@ -22,24 +22,24 @@ RSpec.describe Pubid::Nist::Components::Translation do
 
   describe "#to_s" do
     context "short format" do
-      it "renders spanish code with leading space" do
+      it "renders spanish code in parentheses" do
         translation = described_class.new(code: "spa")
-        expect(translation.to_s(:short)).to eq(" spa")
+        expect(translation.to_s(:short)).to eq("(spa)")
       end
 
-      it "renders portuguese code with leading space" do
+      it "renders portuguese code in parentheses" do
         translation = described_class.new(code: "por")
-        expect(translation.to_s(:short)).to eq(" por")
+        expect(translation.to_s(:short)).to eq("(por)")
       end
 
-      it "renders indonesian code with leading space" do
+      it "renders indonesian code in parentheses" do
         translation = described_class.new(code: "ind")
-        expect(translation.to_s(:short)).to eq(" ind")
+        expect(translation.to_s(:short)).to eq("(ind)")
       end
 
-      it "renders chinese code with leading space" do
+      it "renders chinese code in parentheses" do
         translation = described_class.new(code: "chi")
-        expect(translation.to_s(:short)).to eq(" chi")
+        expect(translation.to_s(:short)).to eq("(chi)")
       end
     end
 
@@ -63,19 +63,19 @@ RSpec.describe Pubid::Nist::Components::Translation do
     context "long format" do
       it "renders same as short format" do
         translation = described_class.new(code: "spa")
-        expect(translation.to_s(:long)).to eq(" spa")
+        expect(translation.to_s(:long)).to eq("(spa)")
       end
 
       it "renders portuguese in long format" do
         translation = described_class.new(code: "por")
-        expect(translation.to_s(:long)).to eq(" por")
+        expect(translation.to_s(:long)).to eq("(por)")
       end
     end
 
     context "default format" do
       it "uses short format when no format specified" do
         translation = described_class.new(code: "spa")
-        expect(translation.to_s).to eq(" spa")
+        expect(translation.to_s).to eq("(spa)")
       end
     end
 

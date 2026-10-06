@@ -187,7 +187,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
         end
 
         it "normalizes sp to spa language code" do
-          expect(parsed.to_s).to eq("NBS LC 1088 spa")
+          expect(parsed.to_s).to eq("NBS LC 1088(spa)")
         end
 
         it "parses language code" do
@@ -208,8 +208,8 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
           expect(parsed.language).not_to be_nil
         end
 
-        it "renders language in space format" do
-          expect(parsed.to_s).to eq("NBS LC 378 spa")
+        it "renders language in parentheses format" do
+          expect(parsed.to_s).to eq("NBS LC 378(spa)")
         end
       end
     end

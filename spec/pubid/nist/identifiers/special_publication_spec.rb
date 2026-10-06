@@ -357,7 +357,7 @@ RSpec.describe Pubid::Nist::Identifiers::SpecialPublication do
         end
 
         it "normalizes language code" do
-          expect(parsed.to_s).to eq("NIST SP 1262 spa")
+          expect(parsed.to_s).to eq("NIST SP 1262(spa)")
         end
 
         it "parses language" do

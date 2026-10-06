@@ -84,7 +84,7 @@ RSpec.describe "NIST Format Cross-Conversion" do
         mr = parsed.to_s(:mr)
 
         # Check normalized output (all should render as "spa")
-        expect(short).to eq("NIST SP 1262 spa")
+        expect(short).to eq("NIST SP 1262(spa)")
         expect(mr).to eq("NIST.SP.1262.spa")
 
         # Re-parse and verify

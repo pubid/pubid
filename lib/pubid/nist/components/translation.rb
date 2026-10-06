@@ -31,11 +31,13 @@ module Pubid
 
           case format
           when :short, :long
-            " #{code}"
+            # 1.x corpus shape: the trailing parenthesised suffix
+            # "(en)" (pubid#497), not a leading segment.
+            "(#{code})"
           when :mr
             ".#{code}"
           else
-            " #{code}"
+            "(#{code})"
           end
         end
       end
