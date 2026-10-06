@@ -1664,13 +1664,15 @@ module Pubid
             version = version.sub(/\A-/, "") if version
 
             # FDIS/CDV/… are ISO/IEC stage tokens, not draft ordinals (C1
-            # ruling, testsuite#2). The token stays the draft's version:
-            # "/D<stage>" is the draft designator D followed by the stage
-            # ("/DDIS" = draft of DIS), so Draft#to_s prepending the
-            # marker D renders the stage-token canonical verbatim
-            # (corpus-pinned). The D= designator face belongs to the
-            # inputs that spell it (= compounds, dash-year designators —
-            # the draft_iso_stage captures below).
+            # ruling, testsuite#2). "/DDIS" and "/DFDIS" are hallucinated
+            # concatenations — the designator D does not merge onto a
+            # stage word, and IEEE speak has no such token. The draft of
+            # a stage rides the iso_stage slot, which Draft#to_s renders
+            # as the D= designator face ("…/D=DIS-2020").
+            if version.match?(/\A(FDIS|FCD|CDV|DIS|CD|WD|PWI|NP)\z/)
+              iso_stage = version
+              version = nil
+            end
           end
 
           # The PARG capture carries its separator (".12", the #471
@@ -1707,9 +1709,8 @@ module Pubid
           version = extract_value(draft_data)
         end
 
-        # A stage-token draft drops its month: the D= face carries only
-        # the dash-joined year.
-        month = nil if iso_stage && version.nil?
+        # A stage-token draft's month rides the D= designator zero-padded
+        # ("-202007", the pubid#203 convention) — it must not drop.
 
         # Create Draft component object if we have version info (or a
         # compound stage half without an ordinal, "D=CDV:2020")
