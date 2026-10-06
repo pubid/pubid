@@ -268,7 +268,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes language code" do
-          expect(parsed.to_s).to eq("NIST IR 8115 zho")
+          expect(parsed.to_s).to eq("NIST IR 8115(zho)")
         end
 
         it "parses language" do
@@ -286,7 +286,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes language code" do
-          expect(parsed.to_s).to eq("NIST IR 8118r1 spa")
+          expect(parsed.to_s).to eq("NIST IR 8118r1(spa)")
         end
 
         it "parses revision and language" do
@@ -307,7 +307,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes language code" do
-          expect(parsed.to_s).to eq("NIST IR 8115 vie")
+          expect(parsed.to_s).to eq("NIST IR 8115(vie)")
         end
 
         it "parses language" do
@@ -325,7 +325,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes language code" do
-          expect(parsed.to_s).to eq("NIST IR 8178 por")
+          expect(parsed.to_s).to eq("NIST IR 8178(por)")
         end
 
         it "parses language" do
@@ -343,7 +343,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes language format" do
-          expect(parsed.to_s).to eq("NIST IR 8115 spa")
+          expect(parsed.to_s).to eq("NIST IR 8115(spa)")
         end
 
         it "parses language" do
@@ -361,7 +361,7 @@ RSpec.describe Pubid::Nist::Identifiers::InteragencyReport do
         end
 
         it "normalizes language code" do
-          expect(parsed.to_s).to eq("NIST IR 8259A spa")
+          expect(parsed.to_s).to eq("NIST IR 8259A(spa)")
         end
 
         it "parses letter suffix and language" do

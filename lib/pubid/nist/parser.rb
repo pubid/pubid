@@ -142,6 +142,7 @@ module Pubid
           # Match suffixes
           str("ec") |
           str("ndex") |
+          str("ndx") |
           str("nsert") |
           str("rrata") |
           str("raft") | # NEW: Exclude "draft" from number suffix matching

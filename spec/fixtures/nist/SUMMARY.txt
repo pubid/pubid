@@ -1,5 +1,5 @@
 Flavor: NIST
-Classified: 2026-06-20 16:36:34
+Classified: 2026-10-06 13:42:18
 ======================================================================
 
 OVERALL STATISTICS
@@ -10,7 +10,6 @@ Fail: 0 (0.0%)
 
 BY CLASS
 ----------------------------------------------------------------------
-base                                     Pass: 906/906 (100.0%)
 circular                                 Pass: 874/874 (100.0%)
 circular_supplement                      Pass: 11/11 (100.0%)
 commercial_standard                      Pass: 277/277 (100.0%)
@@ -20,6 +19,7 @@ crpl_report                              Pass: 417/417 (100.0%)
 federal_information_processing_standards Pass: 369/369 (100.0%)
 grant_contractor_report                  Pass: 116/116 (100.0%)
 handbook                                 Pass: 362/362 (100.0%)
+identifier                               Pass: 906/906 (100.0%)
 interagency_report                       Pass: 8099/8099 (100.0%)
 letter_circular                          Pass: 2233/2233 (100.0%)
 miscellaneous_publication                Pass: 299/299 (100.0%)

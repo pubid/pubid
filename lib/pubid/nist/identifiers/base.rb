@@ -578,6 +578,11 @@ module Pubid
           # Render volume and issue number in short form: "v6n12"
           vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
           result += "#{vol_str}n#{issue_number.number}"
+        elsif issue_number
+          # A standalone issue renders its own short form (pubid#497 -
+          # the metanorma-nist port passes the index here; n4 must not
+          # silently drop).
+          result += issue_number.to_s(:short)
         end
 
         # Use edition component properly (e2, e2021, r5, -3)
@@ -615,9 +620,12 @@ module Pubid
 
         # Add other attributes
         result += errata.to_s if errata
-        result += "index" if index
         result += "insert" if insert
+        # The 1.x order is section before index ("sup3sec2indx"); the index
+        # spelling is the abbreviated indx (pubid#497) — the full "index"
+        # input spelling canonicalizes onto it.
         result += "sec#{section}" if section
+        result += "indx" if index
         result += "app" if appendix
 
         # Add addendum - render as " Add." suffix
@@ -694,6 +702,9 @@ module Pubid
         elsif volume && issue_number
           vol_str = volume.is_a?(Components::Volume) ? volume.to_s : "v#{volume}"
           result += "#{vol_str}n#{issue_number.number}"
+        elsif issue_number
+          # A standalone issue renders its own short form (pubid#497)
+          result += issue_number.to_s(:mr)
         end
 
         # With a number, the edition glues to it per the NIST spec
@@ -726,6 +737,11 @@ module Pubid
         if addendum || addendum_number
           result += ".Add."
         end
+
+        # Section and index travel with the identifier in MR form too
+        # (pubid#497 - sec<N> / indx must not drop)
+        result += ".sec#{section}" if section
+        result += ".indx" if index
 
         # Use translation_component
         result += translation_component.to_s(:mr) if translation_component
