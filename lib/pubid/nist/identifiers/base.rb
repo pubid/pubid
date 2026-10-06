@@ -770,6 +770,7 @@ module Pubid
           "FIPS" => "Federal Information Processing Standards Publication",
           "IR" => "Interagency Report",
           "TN" => "Technical Note",
+          "CSWP" => "Cybersecurity White Papers",
         }[series.to_s] || series.to_s
       end
 
