@@ -1663,14 +1663,14 @@ module Pubid
             # designator is otherwise held verbatim so no digit is lost.
             version = version.sub(/\A-/, "") if version
 
-            # FDIS/CDV/… are ISO stage tokens, not draft ordinals (C1
-            # ruling, testsuite#2). Kept as the draft version verbatim,
-            # Draft#to_s prepends the marker D — the stage-token
-            # canonical is the spelled "/D<stage>" form ("/DDIS",
-            # "/DFDIS", corpus-pinned); the D= designator face belongs
-            # to the inputs that spell it (= compounds, dash-year
-            # designators — the draft_iso_stage captures below).
-            # The trailing text date survives that face.
+            # FDIS/CDV/… are ISO/IEC stage tokens, not draft ordinals (C1
+            # ruling, testsuite#2). The token stays the draft's version:
+            # "/D<stage>" is the draft designator D followed by the stage
+            # ("/DDIS" = draft of DIS), so Draft#to_s prepending the
+            # marker D renders the stage-token canonical verbatim
+            # (corpus-pinned). The D= designator face belongs to the
+            # inputs that spell it (= compounds, dash-year designators —
+            # the draft_iso_stage captures below).
           end
 
           # The PARG capture carries its separator (".12", the #471
