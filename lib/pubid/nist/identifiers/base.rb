@@ -765,7 +765,7 @@ module Pubid
       def series_full_name
         {
           "SP" => "Special Publication",
-          "FIPS" => "Federal Information Processing Standards",
+          "FIPS" => "Federal Information Processing Standards Publication",
           "IR" => "Interagency Report",
           "TN" => "Technical Note",
         }[series.to_s] || series.to_s

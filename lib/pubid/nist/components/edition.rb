@@ -81,6 +81,10 @@ module Pubid
               # For letter suffixes, append uppercase letter directly: " r5A" or "r5A"
               if additional_text.match?(/^[A-Za-z]$/)
                 result += additional_text.upcase
+              elsif additional_text.match?(/\Ar\d+\z/)
+                # A revision marker rides attached ("e2001r3"), the 1.x
+                # corpus form
+                result += additional_text
               else
                 # For other additional text (years, etc.), use dot separator
                 result += ".#{additional_text}"
