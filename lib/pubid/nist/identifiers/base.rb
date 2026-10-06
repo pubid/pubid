@@ -758,8 +758,10 @@ module Pubid
         result
       end
 
+      # An e-type edition whose id is a date (year or full date)
+      # composes as the trailing parenthesised date
       def edition_year?
-        edition&.type == "e" && edition.id.to_s =~ /\A\d{4}\z/
+        edition&.type == "e" && edition.id.to_s =~ /\A\d{4}(\d{2}(\d{2})?)?\z/
       end
 
       def series_full_name
