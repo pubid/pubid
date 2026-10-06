@@ -111,6 +111,10 @@ module Pubid
             # Use UPPERCASE for consistency: "r5A" for SP patterns like 800-53r5a
             elsif additional_text.match?(/^[A-Za-z]$/)
               result += additional_text.upcase # Normalize to UPPERCASE: r5A
+            elsif additional_text.match?(/\Ar\d+\z/)
+              # A revision marker rides attached ("e2001r3"), the 1.x
+              # corpus form
+              result += additional_text
             else
               # For ALL years (2-digit or 4-digit) and month+year, use DOT separator
               # Examples: e2.50, e2.1915, e2.June1908
