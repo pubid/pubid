@@ -55,7 +55,7 @@ RSpec.describe "NIST Multi-Format Rendering" do
   describe "full (long) format" do
     it "renders basic identifier in full format" do
       identifier = Pubid::Nist.parse("NIST SP 800-53")
-      expect(identifier.to_s(:full)).to eq("National Institute of Standards and Technology SP 800-53")
+      expect(identifier.to_s(:full)).to eq("National Institute of Standards and Technology Special Publication 800-53")
     end
 
     it "renders identifier with edition in full format" do
@@ -86,7 +86,7 @@ RSpec.describe "NIST Multi-Format Rendering" do
     it "renders identifier with revision in abbreviated format" do
       identifier = Pubid::Nist.parse("NIST SP 800-53r5")
       result = identifier.to_s(:abbrev)
-      expect(result).to include("r5")
+      expect(result).to include("Revision 5")
     end
 
     it "renders identifier with stage in abbreviated format" do

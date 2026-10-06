@@ -438,7 +438,10 @@ module Pubid
       end
 
       def to_full_style
-        # "National Institute of Standards and Technology Special Publication 800-27, Revision A"
+        # "National Institute of Standards and Technology Special
+        # Publication 1000 Part 1 Supplement 3 Section 2 Index Update 5
+        # (2021)(en)" - the edition renders its own long form ("Revision
+        # 5" / "(2021)"), never the derived revision view alongside it
         result = publisher_full_name
         result += " #{series_full_name}" if series
         result += " #{number}" if number
@@ -451,10 +454,12 @@ module Pubid
           result += " Vol. #{volume}"
         end
 
-        # NEW: Use edition component properly
-        result += " #{edition.to_s(:long)}" if edition
+        result += " Part #{part.value}" if part
+        result += " #{supplement.to_s(:long)}" if supplement
+        result += " Section #{section}" if section
+        result += " Index" if index
 
-        result += ", Revision #{revision.sub(/^r/, '')}" if revision
+        result += " #{edition.to_s(:long)}" if edition
 
         # V2: Use version_component
         result += " #{version_component.to_s(:long)}" if version_component
@@ -478,10 +483,9 @@ module Pubid
         result += " #{number}" if number
         result += " Part #{parts.first}" if parts&.any?
 
-        # NEW: Use edition component properly
-        result += " #{edition.to_s(:abbrev)}" if edition
-
-        result += ", Revision #{revision}" if revision
+        # The edition renders its own form ("Revision 5" / "(2021)");
+        # the derived revision view never renders alongside it
+        result += " #{edition.to_s(:long)}" if edition
 
         # V2: Use version_component
         result += " #{version_component.to_s(:abbrev)}" if version_component
@@ -755,7 +759,7 @@ module Pubid
           "FIPS" => "Federal Information Processing Standards",
           "IR" => "Interagency Report",
           "TN" => "Technical Note",
-        }[series] || series
+        }[series.to_s] || series.to_s
       end
 
       def series_abbreviated_name

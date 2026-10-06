@@ -119,8 +119,11 @@ module Pubid
         # Build long format: "Edition 2021", "Revision 5", etc.
         def build_long_format
           case type
+          # An edition year renders as the parenthesised date
+          # ("1000e2021" long: "... (2021)"), the 1.x corpus form; a
+          # numbered edition keeps its worded form ("Edition 2")
           when "e"
-            "Edition #{id}"
+            id.to_s =~ /\A\d{4}\z/ ? "(#{id})" : "Edition #{id}"
           when "r"
             "Revision #{id}"
           when "-"

@@ -151,7 +151,7 @@ RSpec.describe Pubid::Nist::Components::Edition do
 
     it "renders edition year in long format" do
       edition = described_class.new(type: "e", id: "2021")
-      expect(edition.to_s(:long)).to eq("Edition 2021")
+      expect(edition.to_s(:long)).to eq("(2021)")
     end
 
     it "renders revision number in long format" do
