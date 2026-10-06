@@ -159,8 +159,13 @@ module Pubid
 
           # The P project marker is identity-bearing and prints on both
           # faces (the standing trademark_leaf_to_s_spec contract:
-          # "ISO/IEC/IEEE P26511:2018").
+          # "ISO/IEC/IEEE P26511:2018"). A P-prefixed joint project
+          # prints its parts dot-joined on the ISO face ("ISO/IEEE DIS
+          # P11073.10418", #216); a plain ISO/IEC number keeps the
+          # printed separator ("IEC/IEEE FDIS 60079-30-2", "ISO/IEC
+          # 8802-3").
           code_str = code.to_s
+          code_str = code_str.tr("-", ".") if code_str.start_with?("P")
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
 
@@ -233,7 +238,8 @@ module Pubid
             # ("D=CD.2" — docs/IEEE-DRAFT-STAGES.md §1.3).
             stage = iso_stage.match(/\A([A-Z]+?)(\d+)\z/)
             code_str += stage ? "/D=#{stage[1]}.#{stage[2]}" : "/D=#{iso_stage}"
-          elsif typed_stage&.ieee_draft_equivalent
+          elsif typed_stage&.ieee_draft_equivalent &&
+                !code_str.start_with?(typed_stage.ieee_draft_equivalent)
             code_str += "/#{typed_stage.ieee_draft_equivalent}"
           end
 

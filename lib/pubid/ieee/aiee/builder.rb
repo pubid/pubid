@@ -38,9 +38,12 @@ module Pubid
 
           # Extract the long-form date separator ("," or ".") for rendering.
           # Named `date_separator` on the identifier to avoid colliding with the
-          # CodeNumber code-part `separator`.
+          # CodeNumber code-part `separator`. The dash-glued form ("-1928-05")
+          # carries no separator capture (its tail binds as the year/month
+          # clause itself), so a month without a separator capture IS the
+          # dash form.
           separator_str = extract_value(parsed[:separator])
-          attributes[:date_separator] = separator_str if separator_str
+          attributes[:date_separator] = separator_str || "-" if separator_str || month_str
 
           # Set original format based on parsed data
           attributes[:original_format] = if separator_str || month_str

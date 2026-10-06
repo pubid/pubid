@@ -59,20 +59,25 @@ module Pubid
           format ||= month || date_separator ? "long" : "short"
 
           if year
-            case format
-            when "short", :short
-              base += "-#{year}"
-            when "long", :long
-              sep = date_separator || "," # Default to comma for long form
-              base += "#{sep} #{"#{month} " if month}#{year}"
+            if date_separator == "-" && month
+              # The dash-glued numeric form renders whole ("No 15-1928-05")
+              base += "-#{year}-#{month}"
             else
-              base += if date_separator
-                        "#{date_separator} #{"#{month} " if month}#{year}"
-                      elsif month
-                        ", #{month} #{year}"
-                      else
-                        "-#{year}"
-                      end
+              case format
+              when "short", :short
+                base += "-#{year}"
+              when "long", :long
+                sep = date_separator || "," # Default to comma for long form
+                base += "#{sep} #{"#{month} " if month}#{year}"
+              else
+                base += if date_separator
+                          "#{date_separator} #{"#{month} " if month}#{year}"
+                        elsif month
+                          ", #{month} #{year}"
+                        else
+                          "-#{year}"
+                        end
+              end
             end
           end
 
