@@ -793,6 +793,17 @@ module Pubid
         # date ("P42010/D-4-2019") rides the code as a year-part
         # ("P42010.2019/D4") — the face the relaton fixtures pin — while
         # stage-first joints keep the top-level year ("FDIS P15289:2017").
+        # A part whose whole value is an ISO/IEC stage token is the
+        # stage-last spelling ("29119.FDIS"), not a part: promote it to
+        # the stage slot (the #311 embedded rule covers "29119.4.FDIS";
+        # this covers the part-less form the shared part capture claims
+        # first).
+        if parsed[:iso_stage].nil? && parsed[:part] &&
+           extract_value(parsed[:part]).to_s.match?(/\A[._-]?(FDIS|FCD|CDV|DIS|CD\d?|WD|PWI|NP)\z/)
+          # the stage is the bare token; the capture carries its separator
+          parsed[:iso_stage] = extract_value(parsed[:part]).to_s.sub(/\A[._-]/, "")
+          parsed[:part] = nil
+        end
         code_parts = []
         if parsed[:part].nil? && parsed[:iso_stage].nil? && parsed[:draft_version] &&
            parsed[:printed_dash_year] && parsed[:year] &&
@@ -814,7 +825,14 @@ module Pubid
         # (C1: the part binds before the draft status and the year,
         # separator-in-capture), so they concatenate verbatim - a
         # synthetic separator here is what produced "61850..9".
-        code_parts << extract_value(parsed[:part]) if parsed[:part]
+        # The 8802-family IEC label binds its part with a dash the
+        # grammar consumes separately (iec_label_dash): "8802-9", not
+        # the dot join a bare part would get.
+        if parsed[:part] && parsed[:iec_label_dash]
+          code_parts << "-#{extract_value(parsed[:part])}"
+        elsif parsed[:part]
+          code_parts << extract_value(parsed[:part])
+        end
         code_parts << extract_value(parsed[:subpart]) if parsed[:subpart]
 
         code_str = extract_value(parsed[:number])
@@ -915,7 +933,9 @@ module Pubid
         # must not become a printed Standard (which keeps the code's P).
         numeric_draft = parsed[:draft_version] &&
                         extract_value(parsed[:draft_version]).to_s.match?(/\A\d/)
-        printed_joint = parsed[:iso_published] &&
+        # A promoted stage ("29119.FDIS") is printed identity - the joint
+        # model carries it, never the printed Standard face.
+        printed_joint = parsed[:iso_published] && parsed[:iso_stage].nil? &&
                         (parsed[:printed_dash_year] || parsed[:printed_month_year] ||
                          (numeric_draft && parsed[:draft_month]) ||
                          # A date-less stage-less joint reference carrying only a
@@ -1337,6 +1357,11 @@ module Pubid
         # standards ("IEEE No148" prints "IEEE Std 148").
         type_value = "Std" if type_value&.match?(/\ANo\.?\z/) &&
                                original_input.to_s.match?(/\AIEEE\s/)
+        # The canonical type word is the short form (C2 ruling):
+        # "IEEE Standard 495-2007" and "IEEE Std 495-2007" are the same
+        # identifier, so the model normalizes to Std and matches? unifies
+        # the spellings; the long word is a render option (:long).
+        type_value = "Std" if type_value == "Standard"
         draft_status_value = extract_value(parsed[:draft_status])
 
         # Handle case where parser captured number without "P" prefix

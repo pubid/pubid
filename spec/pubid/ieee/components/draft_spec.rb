@@ -31,8 +31,8 @@ RSpec.describe Pubid::Ieee::Components::Draft do
     # round-trip, and must keep `version` clean (the SI/PSI renderer reads
     # `draft_obj.version` directly).
     {
-      "/D2, October, 2015" => "2",
-      "/D2 October, 2015" => "2",
+      "/D2, Oct 2015" => "2",
+      "/D2 Oct 2015" => "2",
       "/D7 Jul 2019" => "7",
       "/D7 2019" => "7",
     }.each do |rendered, clean_version|

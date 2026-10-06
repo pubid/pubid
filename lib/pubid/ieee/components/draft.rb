@@ -44,7 +44,11 @@ day: nil, iso_stage: nil, iso_iteration: nil)
           self.version = version
           self.revision = revision
           self.year = year
-          self.original_month = month # Store original format
+          # The canonical month form is the IEEE crawl abbreviation
+          # (C2 ruling: "Aug 2007" and "August 2007" are the same
+          # document, so the model normalizes and matches? unifies the
+          # spellings; the long face spells the name back out).
+          self.original_month = month && CANONICAL_ABBREVIATIONS[month.sub(/\.\z/, "")] || month
           self.month = convert_month(month)
           self.day = day
           # The grammar's ordered alternation captures the stage WITH its
@@ -57,6 +61,16 @@ day: nil, iso_stage: nil, iso_iteration: nil)
           self.iso_stage = iso_stage
           self.iso_iteration = iso_iteration
         end
+
+        # Canonical month spelling: the crawl abbreviation. Full names
+        # normalize onto these ("August" → "Aug"); "September" keeps its
+        # IEEE "Sept" form.
+        CANONICAL_ABBREVIATIONS = {
+          "January" => "Jan", "February" => "Feb", "March" => "Mar",
+          "April" => "Apr", "June" => "Jun", "July" => "Jul",
+          "August" => "Aug", "September" => "Sept", "October" => "Oct",
+          "November" => "Nov", "December" => "Dec",
+        }.freeze
 
         # Month names as an alternation, longest-first so "September" wins over
         # "Sep"; each may carry a trailing period ("Sept."). Used to split a
