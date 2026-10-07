@@ -119,8 +119,8 @@ ISO/IEC/IEEE CD P26513/D1, August 2015: ISO/IEC/IEEE P26513/D1, August 2015
 # add full-name->abbr rules (pubid accepts "June"/"September") or a blanket
 # underscore rule — a broader ruleset regressed 12 already-parsing normtitles.
 # Validated over relaton's 8,767 normtitles: +33 gained, 0 regressions.
-# 4-letter abbreviation
-/\bSept\b/: Sep
+# ("Sept" needs no rewrite: the grammar accepts it, and the Draft
+# component canonicalizes Sep/Sept/September onto "Sept".)
 # OCR typos seen in the IEEE rawbib feed
 /\bFeburary\b/: Feb
 /\bNovemer\b/: Nov

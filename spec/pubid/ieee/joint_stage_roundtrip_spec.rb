@@ -118,9 +118,9 @@ RSpec.describe "IEEE joint stage-first and draft round trip (pubid#477)" do
         { "_type" => "pubid:ieee:standard", "number" => "C95",
           "draft" => "D2022.10.12, Oct 2022", "prefix" => "P",
           "parts" => ["7"], "separator" => ".", "stage" => "Std" },
-      "IEEE Std PC95.7/D2022.9.01, Sep, 2022" =>
+      "IEEE Std PC95.7/D2022.9.01, Sept, 2022" =>
         { "_type" => "pubid:ieee:standard", "number" => "C95",
-          "draft" => "D2022.9.01, Sep 2022", "prefix" => "P",
+          "draft" => "D2022.9.01, Sept 2022", "prefix" => "P",
           "parts" => ["7"], "separator" => ".", "stage" => "Std" },
     }.each do |rendered, hash|
       it "parses #{rendered.inspect} without a doubled dot" do
