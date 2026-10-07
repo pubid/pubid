@@ -263,6 +263,12 @@ module Pubid
           if id.year && !id.edition
             result += " #{id.year}"
           end
+        elsif id.year && id.draft_obj && !id.edition &&
+              !(id.publisher == "IEC" && id.copublisher == ["IEEE"])
+          # A year-only date trailing the draft ("ANSI N42.34/D9a,
+          # 2015") keeps its comma form - the grammar's comma-year
+          # draft tail - instead of being silently dropped.
+          result += ", #{id.year}"
         end
 
         # Bounded parenthetical markers only. The unbounded relationship/
