@@ -34,8 +34,10 @@ RSpec.describe "IEEE unapproved drafts must not render 'Std' — issue #209" do
     expect(parsed.to_s).to eq("IEEE Std 802.3-2018")
   end
 
-  it "still renders 'Draft Std' for dotted-version drafts" do
+  it "renders the word Draft alone for dotted-version drafts" do
+    # The C2 ruling (testsuite#3): a draft's word is Draft in every
+    # face — "Draft Std" is banned from canonical output.
     parsed = Pubid::Ieee.parse("IEEE Draft Std P802.3/D2.0/Cor. 1")
-    expect(parsed.to_s).to eq("IEEE Draft Std P802.3/D2.0/Cor. 1")
+    expect(parsed.to_s).to eq("IEEE Draft P802.3/D2.0/Cor. 1")
   end
 end

@@ -114,11 +114,11 @@ RSpec.describe "IEEE joint stage-first and draft round trip (pubid#477)" do
 
   describe "a draft designator with a dotted revision" do
     {
-      "IEEE Std PC95.7/D2022.10.12, Oct, 2022" =>
+      "IEEE Draft PC95.7/D2022.10.12, Oct, 2022" =>
         { "_type" => "pubid:ieee:standard", "number" => "C95",
           "draft" => "D2022.10.12, Oct 2022", "prefix" => "P",
           "parts" => ["7"], "separator" => ".", "stage" => "Std" },
-      "IEEE Std PC95.7/D2022.9.01, Sept, 2022" =>
+      "IEEE Draft PC95.7/D2022.9.01, Sept, 2022" =>
         { "_type" => "pubid:ieee:standard", "number" => "C95",
           "draft" => "D2022.9.01, Sept 2022", "prefix" => "P",
           "parts" => ["7"], "separator" => ".", "stage" => "Std" },
