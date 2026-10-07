@@ -79,7 +79,11 @@ RSpec.describe "IEEE identifiers" do
       parsed = Pubid::Ieee.parse("IEEE Unapproved Draft Std P1234/D5, July 2019")
 
       expect(parsed.draft_status).to eq("Unapproved")
-      expect(parsed.type).to eq("Draft Std")
+      # A DRAFT type word never reaches the wire (the C2 ruling): the
+      # attribute materializes its "Std" default, but the serialized
+      # hash carries no type - the draft-ness rides draft_status and
+      # the draft component.
+      expect(parsed.to_hash).not_to include("type")
       expect(parsed.draft.version).to eq("5")
     end
   end
