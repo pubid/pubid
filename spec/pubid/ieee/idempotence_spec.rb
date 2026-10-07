@@ -42,9 +42,11 @@ RSpec.describe "IEEE render idempotence — issue #318" do
     expect(id.to_s).to eq("IEEE Active Unapproved P99/D2.0, May 2007")
   end
 
-  it "still renders the type word for dotted-version drafts" do
+  it "renders the word Draft alone for dotted-version drafts" do
+    # The C2 ruling (testsuite#3): a draft's word is Draft in every
+    # face — "Draft Std" is banned from canonical output.
     expect(Pubid::Ieee.parse("IEEE Draft Std P802.3/D2.0/Cor. 1").to_s)
-      .to eq("IEEE Draft Std P802.3/D2.0/Cor. 1")
+      .to eq("IEEE Draft P802.3/D2.0/Cor. 1")
   end
 
   it "still renders the type word for approved standards" do

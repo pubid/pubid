@@ -147,6 +147,11 @@ module Pubid
             !id.draft_status.to_s.match?(/unapproved/i)
           type_str = id.type.dup
           type_str = type_str.sub(/^P/, "") if type_str.start_with?("P")
+          # A draft carries the word Draft alone in every face (the C2
+          # ruling): Std/Standard never renders on a draft, whatever
+          # spelling the source used — a status-less draft ("IEEE Draft
+          # Std P802.3/D2.0") renders "IEEE Draft P802.3/D2.0".
+          type_str = "Draft" if id.draft_obj && !id.draft_status
           # The long face expands the type word ("IEEE Standard 495-2007");
           # a draft never takes Std/Standard in any face, so the expansion
           # only ever sees the published word.

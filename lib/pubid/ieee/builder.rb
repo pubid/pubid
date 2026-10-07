@@ -1512,7 +1512,13 @@ module Pubid
         # Set type attribute for backward compatibility (after P extraction)
         # NOTE: "P" IS a type code that maps to ProjectDraftIdentifier via flavor module
         # Type can be: "Std", "No", "P" (project draft), etc.
-        attributes[:type] = type_value if type_value
+        # A DRAFT type word never reaches the hash: the draft-ness is
+        # carried by draft_status and the draft component (the C2 ruling
+        # - a draft is a Draft, "Draft Std" is banned from canonical
+        # output), so an alias spelling and its canonical hash equal.
+        # The value still feeds determine_stage_abbr below (the
+        # version-less D1 fabrication, pubid#318).
+        attributes[:type] = type_value if type_value && type_value !~ /\ADraft/
 
         # Lookup typed_stage from registry
         typed_stage_abbr = determine_stage_abbr(type_value, draft_status_value,
