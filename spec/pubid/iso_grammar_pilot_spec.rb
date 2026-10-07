@@ -11,6 +11,10 @@ RSpec.describe "ISO grammar pilot" do
     File.expand_path("../../data/parg/iso.json", __dir__)
   end
 
+  let(:tables_dir) do
+    File.expand_path("../../data/parg/tables", __dir__)
+  end
+
   let(:iso_identifier_class) do
     Class.new(Lutaml::Model::Serializable) do
       attribute :publisher, :string
@@ -25,6 +29,12 @@ RSpec.describe "ISO grammar pilot" do
       format_name: :pubid_iso_pilot,
       artifact: artifact,
       entry: "identifier",
+      # parsanol 1.3.79's fast lane (rs#162) compiles the entry lazily
+      # and resolves table atoms at compile time; the load-path default
+      # is dirname(artifact) = data/parg, but the tables live in
+      # data/parg/tables (the runtime backend passes TABLES_DIR for
+      # the same reason).
+      tables_dir: tables_dir,
     )
 
     parsed = iso_identifier_class.from_pubid_iso_pilot("ISO 12345:2020")
@@ -39,6 +49,12 @@ RSpec.describe "ISO grammar pilot" do
       format_name: :pubid_iso_pilot_registry,
       artifact: artifact,
       entry: "identifier",
+      # parsanol 1.3.79's fast lane (rs#162) compiles the entry lazily
+      # and resolves table atoms at compile time; the load-path default
+      # is dirname(artifact) = data/parg, but the tables live in
+      # data/parg/tables (the runtime backend passes TABLES_DIR for
+      # the same reason).
+      tables_dir: tables_dir,
     )
 
     expect(Lutaml::Model::FormatRegistry.registered?(:pubid_iso_pilot_registry)).to be(true)
