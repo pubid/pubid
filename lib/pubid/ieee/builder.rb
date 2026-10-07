@@ -908,7 +908,12 @@ module Pubid
               attributes.delete(:year) if parsed[:year].nil?
               attributes.delete(:month) if parsed[:month].nil?
             elsif parsed[:draft_year] && parsed[:iso_stage].nil?
-              attributes[:draft] = "D#{draft_ver}, #{extract_value(parsed[:draft_year])}"
+              # The artifact's comma-year tail captures its separator
+              # with the value (", 2015") — strip it (the #471
+              # separator-in-capture rule: every capture a renderer
+              # re-joins gets checked).
+              draft_year = extract_value(parsed[:draft_year]).to_s.sub(/\A[, ]+/, "")
+              attributes[:draft] = "D#{draft_ver}, #{draft_year}"
               attributes.delete(:year) if parsed[:year].nil?
             else
               attributes[:ieee_draft] = "D#{draft_ver}"
