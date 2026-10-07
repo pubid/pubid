@@ -182,8 +182,14 @@ module Pubid
                          publishers: publishers_of(id))
 
 
-          # Only attach year to code if there's no edition, no month, and no draft
-          result += "-#{id.year}" if id.year && !id.draft_obj && !id.edition && !id.month
+          # A base year dash-attaches to the code when nothing else
+          # carries it: no edition, no identity-month date - and either
+          # no draft at all, or a draft that carries its OWN date (the
+          # draft+corrigendum family: "PC37.09-1999/D7.2, Nov 2006" -
+          # the 1999 is the base's year, the Nov 2006 the draft's).
+          year_on_code = id.year && !id.edition && !id.month &&
+                         (!id.draft_obj || id.draft_obj&.year)
+          result += "-#{id.year}" if year_on_code
 
           # Append the numbered/lettered revision inline, in IEEE's native
           # position — right after the code number and before the draft
@@ -263,11 +269,13 @@ module Pubid
           if id.year && !id.edition
             result += " #{id.year}"
           end
-        elsif id.year && id.draft_obj && !id.edition &&
+        elsif id.year && id.draft_obj && !id.edition && !year_on_code &&
               !(id.publisher == "IEC" && id.copublisher == ["IEEE"])
           # A year-only date trailing the draft ("ANSI N42.34/D9a,
           # 2015") keeps its comma form - the grammar's comma-year
-          # draft tail - instead of being silently dropped.
+          # draft tail - instead of being silently dropped. A year
+          # that dash-attached to the code above (the base year of a
+          # dated-draft family) does not repeat here.
           result += ", #{id.year}"
         end
 
