@@ -891,7 +891,29 @@ module Pubid
           draft_ver = extract_value(parsed[:draft_version])
           # Remove leading 'D' if present since draft_version already has it
           draft_ver = draft_ver.sub(/^D/, "") if draft_ver
-          attributes[:ieee_draft] = "D#{draft_ver}" if draft_ver
+          if draft_ver
+            # A date trailing the draft ("/D8, June 2010") belongs to the
+            # draft component (canonical month, comma form), and the
+            # identity year/month the earlier promotion filled from the
+            # same captures are vacated. Stage-first ISO rows are
+            # exempt: their canonical is the ISO face, which prints the
+            # date from the identity slots (", March 2017", pubid#216).
+            if parsed[:draft_month] && parsed[:iso_stage].nil?
+              draft = Components::Draft.new(
+                version: draft_ver,
+                month: extract_value(parsed[:draft_month]),
+                year: extract_value(parsed[:draft_year]))
+              draft.comma_before_month = true
+              attributes[:draft] = draft.to_s.sub(%r{\A/}, "")
+              attributes.delete(:year) if parsed[:year].nil?
+              attributes.delete(:month) if parsed[:month].nil?
+            elsif parsed[:draft_year] && parsed[:iso_stage].nil?
+              attributes[:draft] = "D#{draft_ver}, #{extract_value(parsed[:draft_year])}"
+              attributes.delete(:year) if parsed[:year].nil?
+            else
+              attributes[:ieee_draft] = "D#{draft_ver}"
+            end
+          end
         end
 
         # The joint stage-draft clause (docs/IEEE-DRAFT-STAGES.md §1.3):
@@ -1082,6 +1104,24 @@ module Pubid
           # Create typed_stage for IEEE project
           attributes[:typed_stage] =
             Pubid::Ieee.locate_stage("P")
+        end
+
+        # A plain IEEE-designator draft on joint publishers ("/D8,
+        # June 2010") carries no ISO stage machinery: it is the same
+        # document family as its bare-IEEE twin and the D= designator
+        # rows, so it builds as the project draft they pin (pubid#430)
+        # rather than the joint-development model.
+        if attributes[:draft] && parsed[:iso_stage].nil? &&
+           parsed[:iec_stage].nil? && parsed[:amd_number].nil?
+          draft_attrs = { code: attributes[:code],
+                          draft: attributes[:draft] }
+          if attributes[:publishers]
+            draft_attrs[:publisher] = attributes[:publishers].first
+            rest = attributes[:publishers][1..]
+            draft_attrs[:copublisher] = rest if rest
+          end
+          draft_attrs[:draft_status] = attributes[:draft_status] if attributes[:draft_status]
+          return Identifiers::ProjectDraftIdentifier.new(**draft_attrs)
         end
 
         joint = Identifiers::JointDevelopment.new(**attributes)

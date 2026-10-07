@@ -64,12 +64,12 @@ day: nil, iso_stage: nil, iso_iteration: nil)
 
         # Canonical month spelling: the crawl abbreviation. Full names
         # normalize onto these ("August" → "Aug"); "September" keeps its
-        # IEEE "Sept" form.
+        # IEEE "Sept" form, so the 3-letter "Sep" folds onto it too.
         CANONICAL_ABBREVIATIONS = {
           "January" => "Jan", "February" => "Feb", "March" => "Mar",
           "April" => "Apr", "June" => "Jun", "July" => "Jul",
           "August" => "Aug", "September" => "Sept", "October" => "Oct",
-          "November" => "Nov", "December" => "Dec",
+          "November" => "Nov", "December" => "Dec", "Sep" => "Sept",
         }.freeze
 
         # Month names as an alternation, longest-first so "September" wins over
