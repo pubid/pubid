@@ -34,7 +34,9 @@ RSpec.describe Pubid::Ieee::Components::Draft do
       "/D2, Oct 2015" => "2",
       "/D2 Oct 2015" => "2",
       "/D7 Jul 2019" => "7",
-      "/D7 2019" => "7",
+      # The year-only date joins with its comma (the grammar's
+      # comma-year draft tail), matching the dated-draft canonicals.
+      "/D7, 2019" => "7",
     }.each do |rendered, clean_version|
       it "reproduces #{rendered.inspect} and keeps a clean version" do
         parsed = described_class.parse(rendered)

@@ -81,7 +81,7 @@ day: nil, iso_stage: nil, iso_iteration: nil)
         private_constant :MONTH_ALTERNATION
 
         DATE_SUFFIX =
-          /(?:(, | )(#{MONTH_ALTERNATION})(?: (\d{1,2}))?(?:, | )| )((?:19|20)\d{2}[a-z]{0,2})\z/
+          /(?:(, | )(#{MONTH_ALTERNATION})(?: (\d{1,2}))?(?:, | )|, | )((?:19|20)\d{2}[a-z]{0,2})\z/
         private_constant :DATE_SUFFIX
 
         # Parse a rendered draft such as "/D3", "/D3.4", "/D7 Jul 2019", or a
@@ -196,7 +196,10 @@ day: nil, iso_stage: nil, iso_iteration: nil)
                           ", #{year}"
                         end
             else
-              result += " #{year}"
+              # The year-only date joins with its comma - the grammar's
+              # comma-year draft tail (pubid-grammar 17244fc) - so the
+              # render re-parses through the same clause.
+              result += ", #{year}"
             end
           end
 
