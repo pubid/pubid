@@ -22,7 +22,7 @@ grammar PubidNesc version "0.1.0" {
 
   c2_standard = (c2_code dash (year) as year [([comma] space)] nesc_full_name [registered] [(space "(" nesc_abbr [registered] ")")])
   year_first = ((year) as year) space (((nesc_full_name) as full_name [(registered) as name_registered] [(space "(" (nesc_abbr) as paren_abbr [(registered) as paren_registered] ")")]) / (((nesc_abbr) as abbr [(registered) as abbr_registered]))) [(space variant)] [(comma space edition)]
-  name_first = ((nesc_full_name [registered]) comma space c2_code dash (year) as year [(space "-" space (variant) as variant)])
+  name_first = ((nesc_full_name [registered]) comma space c2_code dash (year) as year [(space "-" space variant)])
   draft_nesc = (("Draft") as draft space nesc_name [registered] comma space (month) space (year) as year)
   nesc_identifier = draft_nesc / name_first / c2_standard / year_first
 
