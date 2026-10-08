@@ -1420,6 +1420,10 @@ module Pubid
         if !type_value && original_input&.match?(/ANSI\s+P/)
           # Extract P as type since it was in the original but parser stripped it
           type_value = "P"
+          # The P is identity on a non-IEEE-led publisher too (the C1
+          # ruling): record the marker so the render prepends it —
+          # "ANSI PN42.34/D9a, 2015" round-trips.
+          attributes[:project_marker] = true
         end
 
         # NOTE: "P" is a project/draft stage indicator, NOT a code prefix
