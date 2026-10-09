@@ -873,6 +873,10 @@ module Pubid
         end
         attributes[:parenthetical_content] ||= extract_value(parsed[:edition_marker]) if parsed[:edition_marker]
 
+        # A joint ISO-print redline is a distinct document of the same
+        # standard — same flag semantics as the generic path (pubid#215).
+        attributes[:redline] = true if parsed[:redline]
+
         # Extract edition, from relaton's "/E-<n>" suffix. The grammar's /E
         # alternative captures the bare ordinal (nil-residue hand-off item 1).
         if parsed[:edition]
