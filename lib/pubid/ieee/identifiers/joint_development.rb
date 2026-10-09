@@ -177,6 +177,9 @@ module Pubid
           if parenthetical_content&.match?(%r{\A[A-Z](?:\s*[/&]\s*[A-Z])*\z})
             result += " (#{parenthetical_content})"
           end
+          # The redline marker is identity — the joint ISO print spells it
+          # with the space-dash form ("15289:2015(E) - Redline", pubid#215).
+          result += " - Redline" if redline
 
           result
         end
@@ -250,6 +253,7 @@ module Pubid
           result = parts.join(" ")
           result += "-#{year}" if year && !@designator_carries_year &&
                            !ieee_draft.to_s.end_with?("-#{year}")
+          result += " - Redline" if redline
 
           result
         end
