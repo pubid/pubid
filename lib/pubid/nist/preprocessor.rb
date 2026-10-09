@@ -76,6 +76,7 @@ module Pubid
         normalize_supplement_and_part!
         normalize_version_notation!
         normalize_edition_year_suffix!
+        normalize_glued_dotted_edition!
         normalize_revision_with_letter!
         normalize_version_dotted_spaces!
         normalize_update_markers!
@@ -264,8 +265,20 @@ module Pubid
       end
 
       # Edition year suffix shorthand: "2006ed." → "e2006".
+      # A dotted minor after the dot stays attached (pubid#170): "2006ed.1" → "e2006.1",
+      # so the edition id binds atomically instead of corrupting into "e20061".
       def normalize_edition_year_suffix!
+        @cleaned = @cleaned.gsub(/(\d{4})ed\.(\d+)/, 'e\1.\2')
         @cleaned = @cleaned.gsub(/(\d{4})ed\./, 'e\1')
+      end
+
+      # A glued dotted e-edition needs the space the spaced form has (pubid#170):
+      # "800-53e2.1" → "800-53 e2.1", so the edition rule binds "2.1" atomically.
+      # Only dotted e-editions are unglued — the dot-less glued form "800-53e2"
+      # keeps its existing number-bound tree. Mirrors the "v1.1" unglue in
+      # normalize_draft_and_volume!.
+      def normalize_glued_dotted_edition!
+        @cleaned = @cleaned.gsub(/(\d)e(\d+\.\d+)/, '\1 e\2')
       end
 
       # Revision attached to a number with optional letter suffix. When

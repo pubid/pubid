@@ -138,7 +138,11 @@ module Pubid
       # Two-letter suffixes: Ur (Unclassified Revised), Ua (Unclassified Amended), Ub-Uj (series variants)
       # Single letter: any letter not followed by excluded keywords
       rule(:number_suffix) do
-        (str("U") >> lower_letter) | (match("[a-zA-Z]") >> (
+        (str("U") >> lower_letter) |
+          # An "r" directly followed by a digit is the revision marker (pubid#170),
+          # not a suffix — leave it for the second_number/edition rules.
+          # The guard sits before the letter so it tests the suffix start itself.
+          ((str("r") >> digit).absent? >> match("[a-zA-Z]") >> (
           # Match suffixes
           str("ec") |
           str("ndex") |
@@ -265,7 +269,9 @@ module Pubid
             (digits >> str("r") >> digits >> match("[a-zA-Z]")) |
             # NEW: Revision pattern with year (e.g., "126r2013")
             # This handles SP revision format where revision is attached to second_number
-            (digits.as(:number_only) >> str("r") >> digits.as(:edition_id)) |
+            # Dotted minor accepted atomically (pubid#170): "53r4.1" binds id "4.1"
+            (digits.as(:number_only) >> str("r") >>
+             (digits >> (str(".") >> digits).maybe).as(:edition_id)) |
             # CRPL range with underscore (e.g., "2_3-1A")
             (digits >> str("_") >> digits >> dash >> digits >> upper_letter.maybe) |
             # Letter followed by dash and digits (e.g., "m-5")
@@ -283,7 +289,9 @@ module Pubid
             # For patterns like NIST SP 800-27ra where revision 'ra' is attached directly to number
             (str("r") >> match("[a-zA-Z]")).as(:revision_letter_suffix) |
             # NEW: Simple revision pattern r followed by digits (e.g., "r1", "r2") for trailing revision
-            (str("r") >> digits.as(:edition_id)).as(:revision_simple) |
+            # Dotted minor accepted atomically (pubid#170): "r4.1" binds id "4.1"
+            (str("r") >>
+             (digits >> (str(".") >> digits).maybe).as(:edition_id)).as(:revision_simple) |
             # Special patterns like "NCNR", "PERMIS", "BFRL"
             str("NCNR") | str("PERMIS") | str("BFRL") |
             # Just capital letters (e.g., "A", "B", "C") - standalone
@@ -303,15 +311,22 @@ module Pubid
       # Enhanced: Support space-separated format from preprocessing (r1 separated from number)
       rule(:edition) do
         # Edition with "e" prefix: e2, e3, e2021 (1-4 digits for ID)
-        (space.maybe >> str("e") >> digits.as(:edition_id)).as(:edition_e) |
+        # Dotted minor accepted atomically (pubid#170): "e2006.1" binds id "2006.1"
+        (space.maybe >> str("e") >>
+         (digits >> (str(".") >> digits).maybe).as(:edition_id)).as(:edition_e) |
           # Revision with "r" prefix and SPACE, with letter: r 5A (preserve format)
-          (space >> str("r") >> digits.as(:edition_id) >> match("[a-zA-Z]").as(:edition_letter)).as(:edition_r_with_space_letter) |
+          # Dotted minor accepted atomically (pubid#170)
+          (space >> str("r") >> (digits >> (str(".") >> digits).maybe).as(:edition_id) >>
+           match("[a-zA-Z]").as(:edition_letter)).as(:edition_r_with_space_letter) |
           # Revision with "r" prefix and SPACE: r 5 (preserve format)
-          (space >> str("r") >> digits.as(:edition_id)).as(:edition_r_with_space) |
+          (space >> str("r") >>
+           (digits >> (str(".") >> digits).maybe).as(:edition_id)).as(:edition_r_with_space) |
           # Revision with "r" prefix NO space, with letter: r5A (compact format)
-          (str("r") >> digits.as(:edition_id) >> match("[a-zA-Z]").as(:edition_letter)).as(:edition_r_no_space_letter) |
+          (str("r") >> (digits >> (str(".") >> digits).maybe).as(:edition_id) >>
+           match("[a-zA-Z]").as(:edition_letter)).as(:edition_r_no_space_letter) |
           # Revision with "r" prefix NO space: r5 (compact format)
-          (str("r") >> digits.as(:edition_id)).as(:edition_r_no_space) |
+          (str("r") >>
+           (digits >> (str(".") >> digits).maybe).as(:edition_id)).as(:edition_r_no_space) |
           # Revision with "rev" prefix (verbose): rev2013, rev 2013
           (space.maybe >> str("rev") >> space.maybe >> digits.as(:edition_id)).as(:edition_rev) |
           # Historical with "-" prefix: -2, -3 (ONLY if followed by non-digit or end)
