@@ -274,11 +274,13 @@ module Pubid
 
       # A glued dotted e-edition needs the space the spaced form has (pubid#170):
       # "800-53e2.1" → "800-53 e2.1", so the edition rule binds "2.1" atomically.
-      # Only dotted e-editions are unglued — the dot-less glued form "800-53e2"
-      # keeps its existing number-bound tree. Mirrors the "v1.1" unglue in
+      # The minor is 1-2 digits — a 4-digit tail is the additional-text year of
+      # forms like "NBS CIRC 11e2.1915", which must keep its existing tree.
+      # Only dotted e-editions are unglued; the dot-less glued form "800-53e2"
+      # keeps its number-bound tree. Mirrors the "v1.1" unglue in
       # normalize_draft_and_volume!.
       def normalize_glued_dotted_edition!
-        @cleaned = @cleaned.gsub(/(\d)e(\d+\.\d+)/, '\1 e\2')
+        @cleaned = @cleaned.gsub(/(\d)e(\d+\.\d{1,2})(?!\d)/, '\1 e\2')
       end
 
       # Revision attached to a number with optional letter suffix. When
