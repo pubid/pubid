@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = Gem::Requirement.new(">= 3.0.0")
 
-  spec.add_dependency "lutaml-model"
+  spec.add_dependency "lutaml-model", "~> 0.8"
   spec.add_dependency "parslet"
   # The PARG artifact runtime: the baked flavor grammars parse through
   # Parsanol::PARG (the Gemfile's git pin is the dev source; published
