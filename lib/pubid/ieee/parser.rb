@@ -735,10 +735,19 @@ module Pubid
           (slash >> str("Amd") >> (dot | space).maybe >>
            digits.as(:amd_number) >>
            ((str(":") | dash) >> year_digits.as(:amd_year)).maybe).maybe >>
+          # Optional corrigendum tail, the ISO print's dotted spelling
+          # (pubid#215): "8802-1AC:2018/Cor.1:2020(E)". The shared
+          # corrigendum rule accepts the slash/dot/colon separators; the
+          # flat tree routes through build_flat_corrigendum.
+          corrigendum.maybe >>
           # Optional edition, from relaton's "/E-<n>" suffix normalized to
           # "Edition <n>.0[ YYYY]" (nil-residue hand-off item 1).
           edition.maybe >>
           revision_suffix.maybe >>
+          # A redline is a distinct document of the joint ISO print
+          # (pubid#215): "15289:2015(E) - Redline". Same flag semantics as
+          # the generic rules - the builder sets redline: true.
+          redline.maybe >>
           # Published joint docs print a language marker, after either the
           # year or the amendment tail: "9945:2009(E)", "...Amd.1:2014(E)".
           # The crawl sometimes spaces it ("…(E), January 2017" family,
@@ -1464,10 +1473,6 @@ module Pubid
         if cleaned.match?(/^(\d+[-.]\d+)\/D\d+/)
           cleaned = "IEEE P#{cleaned}"
         end
-
-        # Part D: Suffix Normalization
-        # 5. "/Preprint" -> remove (data quality - not standard suffix)
-        cleaned = cleaned.gsub(/\/Preprint\b/, "")
 
         # Part E: Relationship Text Normalization
         # 6. "Proposed Revision of" -> "Revision of"

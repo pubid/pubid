@@ -8,6 +8,7 @@ module Pubid
         autoload :Draft, "#{__dir__}/nesc/draft"
         autoload :Edition, "#{__dir__}/nesc/edition"
         autoload :Handbook, "#{__dir__}/nesc/handbook"
+        autoload :Preprint, "#{__dir__}/nesc/preprint"
         autoload :Redline, "#{__dir__}/nesc/redline"
         autoload :Standard, "#{__dir__}/nesc/standard"
       end

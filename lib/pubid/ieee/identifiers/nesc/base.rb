@@ -79,7 +79,7 @@ module Pubid
           #
           # @return [Boolean]
           def draft?
-            is_a?(Nesc::Draft)
+            is_a?(Nesc::Draft) || is_a?(Nesc::Preprint)
           end
 
           # Rendering for year-first NESC identifiers (the C2-code standard form
