@@ -88,6 +88,11 @@ module Pubid
         # @param parsed_hash [Hash] Parsed attributes
         # @return [Class] Identifier class to instantiate
         def determine_identifier_class(parsed_hash)
+          # Preprint — a draft STAGE of the C2 code (checked before the
+          # Standard route below: the c2-preprint tree carries :code "C2"
+          # too, and the verbose proposal forms carry none).
+          return Identifiers::Nesc::Preprint if parsed_hash[:preprint]
+
           # Draft identifiers
           return Identifiers::Nesc::Draft if parsed_hash[:draft]
 

@@ -40,6 +40,13 @@ module Pubid
           parts << "int"
         end
 
+        # A NESC preprint is a draft-stage document distinct from the
+        # published edition it precedes — without this component it would
+        # share the edition's URN (urn:ieee:ieee:C2:2012).
+        if identifier.is_a?(Identifiers::Nesc::Preprint)
+          parts << "preprint"
+        end
+
         # Conformance is always a ConformanceIdentifier wrapper (special_type
         # "conformance"), never inline on a base standard — the base no longer
         # carries a conf_number attribute, so there is no inline conf part.

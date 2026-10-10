@@ -235,6 +235,7 @@ module Pubid
           Identifiers::Nesc::Draft,
           Identifiers::Nesc::Edition,
           Identifiers::Nesc::Handbook,
+          Identifiers::Nesc::Preprint,
           Identifiers::Nesc::Redline,
           Identifiers::Nesc::Standard,
         ]

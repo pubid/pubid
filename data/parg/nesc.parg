@@ -9,6 +9,8 @@ grammar PubidNesc version "0.1.0" {
   space = " "
   comma = ","
   dash = "-"
+  dot = "."
+  slash = "/"
 
   year = 4digit
   c2_code = "C2" as code
@@ -24,7 +26,15 @@ grammar PubidNesc version "0.1.0" {
   year_first = ((year) as year) space (((nesc_full_name) as full_name [(registered) as name_registered] [(space "(" (nesc_abbr) as paren_abbr [(registered) as paren_registered] ")")]) / (((nesc_abbr) as abbr [(registered) as abbr_registered]))) [(space variant)] [(comma space edition)]
   name_first = ((nesc_full_name [registered]) comma space c2_code dash (year) as year [(space "-" space variant)])
   draft_nesc = (("Draft") as draft space nesc_name [registered] comma space (month) space (year) as year)
-  nesc_identifier = draft_nesc / name_first / c2_standard / year_first
+  # Preprint is a draft STAGE of the C2 code (NESC terminology for its
+  # pre-edition drafts), not a variant: dotted is the canonical spelling
+  # (C2.2012.Preprint); dash (C2-2012-Preprint) and the catalogue's
+  # slash tail (C2-2002/Preprint) are aliases. The verbose
+  # "Preprint Proposal(s) for the YYYY Edition of ..." forms cite the same
+  # draft by its target edition year.
+  c2_preprint = (c2_code ((dot (year) as year dot) / (dash (year) as year dash) / (dash (year) as year slash)) ("Preprint") as preprint)
+  preprint_proposal = (("Preprint") as preprint space ("Proposals" / "Proposal") space "for" space "the" space (year) as year space "Edition" space "of" space "the" space nesc_full_name [(space "(" nesc_abbr [registered] ")")])
+  nesc_identifier = draft_nesc / preprint_proposal / name_first / c2_preprint / c2_standard / year_first
 
   entry nesc_identifier: nesc_identifier
 
@@ -33,6 +43,11 @@ grammar PubidNesc version "0.1.0" {
     accept "2023 NESC"
     accept "National Electrical Safety Code, C2-2017"
     accept "Draft NESC, January 2016"
+    accept "C2.2012.Preprint"
+    accept "C2-2012-Preprint"
+    accept "C2-2002/Preprint"
+    accept "Preprint Proposal for the 2017 Edition of the National Electrical Safety Code"
+    accept "Preprint Proposals for the 2022 Edition of the National Electrical Safety Code (NESC(R))"
     reject "nonsense"
   }
 }
