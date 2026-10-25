@@ -1987,11 +1987,16 @@ module Pubid
             end
           end
 
-          # The PARG capture carries its separator (".12", the #471
-          # convention); Draft#to_s prints the dot itself, so keep only
-          # the digits or "D2022.10.12" renders "D2022.10..12" (pubid#477).
-          if draft_data[:revision]
-            revision = extract_value(draft_data[:revision])&.delete_prefix(".")
+          # The dotted ordinal stays part of the designator (the #601
+          # convergence): the grammar splits it only on the joint
+          # designation route, so a split field would make the parse and
+          # from_hash paths build different Draft objects on
+          # wire-identical rows ("DP62271-111_D6.1"). #to_s renders
+          # version + revision identically, so the whole tail rides the
+          # version on every route.
+          if draft_data[:revision] && version
+            tail = extract_value(draft_data[:revision])&.delete_prefix(".")
+            version = "#{version}.#{tail}"
           end
 
           # The compound both-systems form (docs/IEEE-DRAFT-STAGES.md
