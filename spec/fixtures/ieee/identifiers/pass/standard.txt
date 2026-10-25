@@ -190,7 +190,6 @@ IEEE Std P1205-Corrigendum1, Dec 2006
 !IEEE/EIA 12207.0-1996!IEEE/EIA Std 12207.0-1996
 !IEEE/EIA 12207.1-1997!IEEE/EIA Std 12207.1-1997
 !IEEE/EIA 12207.2-1997!IEEE/EIA Std 12207.2-1997
-!IEEE/IEC/ISO P80005-1/FDIS_March 2012!IEEE//IEC/ISO Draft P80005-1/DFDIS_March, 2012
 !ISO/IEC 10038-1993: Information technology-Telecommunications and information exchange between systems - Local area networks - Media access control (MAC) bridges!ISO/IEC 10038-1993
 !ISO/IEC 23026; IEEE Std 2001-2002, First edition!ISO/IEC 23026 (IEEE Std 2001-2002, First edition)
 !National Electrical Safety Code, C2-2012!C2-2012 National Electrical Safety Code
