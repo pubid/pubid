@@ -698,4 +698,7 @@ URN template methods — flavors override as needed
 ### `wrapped_document`
 
 The document a wrapper stands in front of: a supplement's base, or
+### `wrapped_edition_of?(other)`
+
+Self is a wrapped record of exactly the edition +other+ names: the
 ### `year`

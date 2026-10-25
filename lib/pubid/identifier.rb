@@ -1349,10 +1349,25 @@ module Pubid
       end
     end
 
+    # Self is a wrapped record of exactly the edition +other+ names: the
+    # wrapped document resolves to that edition (pubid#580 — a dated
+    # base query must reach the wrapped record of that edition, whose
+    # identity is one level down). Only wrappers answer true: a bare
+    # record is its own edition and is matched directly by ===. The
+    # resolution is exact — the wrapped base must equal the edition the
+    # query names, no wildcards.
+    def wrapped_edition_of?(other)
+      return false unless other.is_a?(::Pubid::Identifier)
+      return false unless wrapped_document
+
+      base_document == other
+    end
+
     # Any relational predicate holds.
     def related_to?(other)
       %i[supplement_of? has_supplement? dated_version_of? edition_of?
-         revision_of? sibling_of? includes? draft_of?].any? do |m|
+         revision_of? sibling_of? includes? draft_of?
+         wrapped_edition_of?].any? do |m|
         public_send(m, other)
       end
     end

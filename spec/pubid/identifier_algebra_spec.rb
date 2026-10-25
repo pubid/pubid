@@ -168,4 +168,30 @@ RSpec.describe "Pubid::Identifier algebra (pubid/pubid#247)" do
       expect(base_iso).not_to be_related_to(other)
     end
   end
+
+  describe "#wrapped_edition_of? (pubid#580)" do
+    let(:wrapper) { Pubid::Iec.parse("IEC CA 01:2020 CSV") }
+
+    it "resolves the wrapped record of the edition the query names" do
+      expect(wrapper).to be_wrapped_edition_of(Pubid::Iec.parse("IEC CA 01:2020"))
+    end
+
+    it "resolves exactly that edition, no wildcards" do
+      expect(wrapper).not_to be_wrapped_edition_of(Pubid::Iec.parse("IEC CA 01:2016"))
+      expect(wrapper).not_to be_wrapped_edition_of(Pubid::Iec.parse("IEC CA 01"))
+    end
+
+    it "answers only for wrappers — a bare record is its own edition" do
+      expect(Pubid::Iec.parse("IEC CA 01:2020"))
+        .not_to be_wrapped_edition_of(wrapper)
+    end
+
+    it "refuses non-identifiers" do
+      expect(wrapper).not_to be_wrapped_edition_of("IEC CA 01:2020")
+    end
+
+    it "rides the related_to? disjunction" do
+      expect(wrapper).to be_related_to(Pubid::Iec.parse("IEC CA 01:2020"))
+    end
+  end
 end
