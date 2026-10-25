@@ -1079,11 +1079,17 @@ module Pubid
         # P + a /D designator (any draft capture) is a DRAFT, never a
         # printed Std (the owner's 2026-10-24 ruling): the P marker is
         # project status, so the joint/project-draft family owns the row
-        # whatever date trails the designator. The non-P rows keep the
-        # printed-strip doctrine (the normalization ledger).
-        p_with_draft = parsed[:project_marker] &&
+        # whatever date trails the designator. The ruling extends to the
+        # P-less joint rows (pubid#597): a numeric /D designator alone is
+        # project status too — the row is a draft AND takes the P, so the
+        # marker is set below when the source spelling lacked it.
+        p_with_draft = (parsed[:project_marker] || numeric_draft) &&
                        (parsed[:draft_version] || parsed[:draft_iso_stage] ||
                         parsed[:draft_month] || parsed[:draft_year])
+        if p_with_draft && !parsed[:project_marker]
+          attributes[:project_marker] = true
+          parsed[:project_marker] = "P"
+        end
         printed_joint = parsed[:iso_published] && parsed[:iso_stage].nil? &&
                         !p_with_draft &&
                         (parsed[:printed_dash_year] || parsed[:printed_month_year] ||
@@ -1272,8 +1278,15 @@ module Pubid
         # rather than the joint-development model.
         if attributes[:draft] && parsed[:iso_stage].nil? &&
            parsed[:iec_stage].nil? && parsed[:amd_number].nil?
-          draft_attrs = { code: attributes[:code],
-                          draft: attributes[:draft] }
+          # The ruling (pubid#597): a joint row with a numeric /D designator
+          # is a draft AND takes the P project marker, whatever the source
+          # spelling printed — the marker is set on the identifier (and the
+          # code prepended) even when the row reached it without one.
+          draft_code = attributes[:code].to_s
+          draft_code = "P" + draft_code unless draft_code.start_with?("P")
+          draft_attrs = { code: draft_code,
+                          draft: attributes[:draft],
+                          project_marker: true }
           if attributes[:publishers]
             draft_attrs[:publisher] = attributes[:publishers].first
             rest = attributes[:publishers][1..]

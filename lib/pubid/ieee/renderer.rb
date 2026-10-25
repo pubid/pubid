@@ -141,11 +141,16 @@ module Pubid
         # so the WHOLE type word is dropped — not just "Std" (pubid#318: the
         # half-strip left "Draft" in the render, the re-parse dropped it, and
         # to_s needed three rounds to converge while losing the type).
-        should_render_type = id.publisher&.match?(/^(IEEE|AIEE)/)
+        # A project draft carries the word Draft whatever the lead
+        # publisher — the ISO-led joint drafts (pubid#597) print it too.
+        should_render_type = id.publisher&.match?(/^(IEEE|AIEE)/) ||
+                             id.is_a?(Identifiers::ProjectDraftIdentifier)
 
-        if should_render_type && !id.typed_stage&.project_status && id.type && !id.type.to_s.strip.empty? && id.type != "P" &&
+        if should_render_type && !id.typed_stage&.project_status &&
+           ((id.type && !id.type.to_s.strip.empty? && id.type != "P") ||
+            id.is_a?(Identifiers::ProjectDraftIdentifier)) &&
             !id.draft_status.to_s.match?(/unapproved/i)
-          type_str = id.type.dup
+          type_str = id.type ? id.type.dup : "Draft"
           type_str = type_str.sub(/^P/, "") if type_str.start_with?("P")
           # A draft carries the word Draft alone in every face (the C2
           # ruling): Std/Standard never renders on a draft, whatever
