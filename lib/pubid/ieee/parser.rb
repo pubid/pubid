@@ -1349,6 +1349,26 @@ module Pubid
             Regexp.last_match(0)
           end
         end
+        # The crawl glues the month onto the stage after the code's slash
+        # ("IEEE/IEC/ISO P80005-1/FDIS_March 2012", and its canonical
+        # comma form "… Draft P80005-1/FDIS_March, 2012"): the stage is
+        # the ISO/IEC token and the month belongs to the date (the
+        # 2026-10-25 ruling) — decode onto the D= designator face. Scoped
+        # to a real month name glued to a stage token; stage iteration
+        # ("_CDV/V3", "_CDV July 2015") has its own routes.
+        cleaned = cleaned.gsub(
+          %r{\A((?:IEEE|ISO|IEC)(?:/(?:IEEE|ISO|IEC))*\s+(?:Draft\s+)?P?[A-Z0-9][A-Z0-9.-]*/)(FDIS|FCD|CDV|DIS|CD|WD|PWI|NP)_([A-Za-z]+),?\s+(\d{4})\z}
+        ) do
+          month = ::Pubid::Ieee::Builder::REV_MONTH_NUMBERS[
+            Regexp.last_match(3).capitalize
+          ]
+          if month
+            "#{Regexp.last_match(1)}D=#{Regexp.last_match(2)}-" \
+              "#{Regexp.last_match(4)}#{month}"
+          else
+            Regexp.last_match(0)
+          end
+        end
         # The lettered REV spellings glue to the number ("P1310Rev3",
         # "P1722Rev1") or carry an after-word separator ("REV.ma",
         # "REV-ma"); the rev rules read a space or a bare word

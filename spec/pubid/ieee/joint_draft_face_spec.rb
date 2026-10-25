@@ -64,8 +64,29 @@ RSpec.describe "IEEE joint draft faces" do
       id = ieee.parse("IEEE/IEC/ISO P80005-1/FDIS_March 2012")
       expect(id.copublisher).to eq(%w[IEC ISO])
       face = id.to_s
-      expect(face).to eq("IEEE/IEC/ISO Draft P80005-1/FDIS_March, 2012")
+      # The glued stage-month spelling decodes onto the D= designator
+      # face (the 2026-10-25 ruling: the stage is the token, the month
+      # is the date).
+      expect(face).to eq("IEEE/IEC/ISO P80005-1/D=FDIS-201203")
       expect(ieee.parse(face)).to eq(id)
+    end
+  end
+
+  describe "the glued stage-month decode (pubid#600)" do
+    it "decodes the crawl glue onto the D= designator face" do
+      id = ieee.parse("IEEE/IEC/ISO P80005-1/FDIS_March 2012")
+      expect(id.to_s).to eq("IEEE/IEC/ISO P80005-1/D=FDIS-201203")
+      expect(id.to_hash["ieee_draft"]).to eq("D=FDIS-201203")
+    end
+
+    it "decodes the canonical comma form to the same face" do
+      id = ieee.parse("IEEE/IEC/ISO Draft P80005-1/FDIS_March, 2012")
+      expect(id.to_s).to eq("IEEE/IEC/ISO P80005-1/D=FDIS-201203")
+    end
+
+    it "leaves the stage-iteration routes alone" do
+      expect(ieee.parse("IEC/IEEE P61850-9-3_CDV July 2015").to_s)
+        .to eq("IEC/IEEE P61850-9-3/D=CDV-201507")
     end
   end
 end
