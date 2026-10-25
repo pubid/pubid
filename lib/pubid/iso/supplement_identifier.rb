@@ -54,6 +54,8 @@ module Pubid
       end
 
       def to_s(**opts)
+        return super if opts[:format] && opts[:format] != :human
+
         context = build_rendering_context(nil, format: :human, **opts)
         Pubid::Renderers::SupplementRenderer.new(self).render(context:,
                                                               **opts.slice(:with_edition))
