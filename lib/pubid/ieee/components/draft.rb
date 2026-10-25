@@ -8,13 +8,13 @@ module Pubid
       # IEEE draft version
       # Handles formats like:
       #   /D5              - version only
-      #   /D3.4            - version with revision
+      #   /D3.4            - dotted designator (the tail rides the version)
       #   /D7, July 2019   - with date
       class Draft < Lutaml::Model::Serializable
         include ::Pubid::SubsetMatch
 
-        attribute :version, :string       # D5, D3, etc.
-        attribute :revision, :string      # .4, .2 in D3.4
+        attribute :version, :string       # D5, D3.4, etc.
+        attribute :revision, :string      # unused on construction paths (#601)
         attribute :year, :string
         attribute :month, :string
         attribute :day, :string
@@ -94,8 +94,10 @@ day: nil, iso_stage: nil, iso_iteration: nil)
         # The compound stage suffix (docs/IEEE-DRAFT-STAGES.md §1.3):
         # "=DIS.3" is canonical — D (draft) = DIS (the stage), iteration 3.
         # "=DDIS.3", "=DDIS3", "=DDIS-3" (the stage echoed with its own D)
-        # are accepted aliases. Captures [stage, iteration].
-        COMPOUND_SUFFIX = /=D?(PWI|NP|WD|CDV|FDIS|DIS|CD)(?:[.-]?(\d+))?\z/.freeze
+        # are accepted aliases. Captures [stage, iteration]. The
+        # iteration is SHORT — a long digit run is a glued date
+        # ("=CDV-201507", the designator face), not an ordinal.
+        COMPOUND_SUFFIX = /=D?(PWI|NP|WD|CDV|FDIS|DIS|CD)(?:[.-]?(\d{1,2}))?\z/.freeze
         private_constant :COMPOUND_SUFFIX
 
         # The D-echo aliases ("DDIS3" = D + DIS + iteration 3) normalize
@@ -103,7 +105,7 @@ day: nil, iso_stage: nil, iso_iteration: nil)
         # ("CD1", "FCD", "CDV1") restores verbatim -- the compound split
         # would degrade the glued iterations and drop the stages the
         # alias list never knew, so from_hash(row) != parse(row).
-        ECHO_SUFFIX = /\AD(=?(PWI|NP|WD|CDV|FDIS|DIS|CD|FCD))(?:[.-]?\d+)?\z/.freeze
+        ECHO_SUFFIX = /\AD(=?(PWI|NP|WD|CDV|FDIS|DIS|CD|FCD))(?:[.-]?\d{1,2})?\z/.freeze
         private_constant :ECHO_SUFFIX
 
         def self.parse(value)
@@ -131,9 +133,19 @@ day: nil, iso_stage: nil, iso_iteration: nil)
           draft
         end
 
+        # The stage tokens #to_s renders verbatim (no D prepend). The
+        # strip_prefix must refuse them symmetrically: a wire form like
+        # "DIS2-1504" opens with the stage's own D, and stripping it
+        # corrupts the version ("IS2-1504") while still rendering alike.
+        STAGE_VERBATIM = /\A(ED\d|FDIS|FCD|CDV|DIS|CD|WD|PWI|NP)/
+        private_constant :STAGE_VERBATIM
+
         # Remove the leading "/D" (or a bare leading "D"/"/") that #to_s emits,
-        # leaving the version and any trailing date.
+        # leaving the version and any trailing date. A stage-token version
+        # keeps its whole spelling: #to_s renders it with no designator
+        # prepend, so the leading D is the stage's own letter.
         def self.strip_prefix(str)
+          return str if str.match?(STAGE_VERBATIM)
           return str[2..] if str.start_with?("/D")
           return str[1..] if str.start_with?("/")
           return str[1..] if str.start_with?("D") && str.length > 1
@@ -174,7 +186,7 @@ day: nil, iso_stage: nil, iso_iteration: nil)
           # as "FDIS_March") renders verbatim — prepending D
           # concatenates a hallucinated token ("DED4", "DFDIS") that no
           # face spells. Every other version keeps the D designator.
-          result = version&.match?(/\A(ED\d|(FDIS|FCD|CDV|DIS|CD|WD|PWI|NP))/) ? "/#{version}" : "/D#{version}"
+          result = version&.match?(STAGE_VERBATIM) ? "/#{version}" : "/D#{version}"
           result += "=#{iso_stage}" if iso_stage
           result += ".#{iso_iteration}" if iso_stage && iso_iteration
           result += if revision.to_s.start_with?(".")

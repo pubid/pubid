@@ -33,18 +33,38 @@ RSpec.describe "IEEE draft reader convergence (pubid#596)" do
     expect(id.class.from_hash(id.to_hash).to_s).to eq("IEEE P1/D5, Jan, 2026")
   end
 
-  # The residual, documented on pubid#596: on the PC-prefixed joint rows
-  # the parse path's Draft splits the designator (version "P62271-111_D6",
-  # revision "1") while Draft.parse keeps it verbatim ("P62271-111_D6.1").
-  # The rendered face, the serialized hash and the URN are identical — the
-  # inequality is confined to the Draft component's internal split, and
-  # converging it risks the dot-glued-year faces ("SI 10.1997") and the
-  # D2.1.1 verbatim doctrine.
-  it "round-trips the PC-prefixed joint row on the identity surfaces" do
+  # pubid#601: the grammar splits the dotted ordinal only on the joint
+  # designation route, so a split revision field made the parse and
+  # from_hash paths build different Draft objects on wire-identical
+  # rows. The designator now rides the version whole on every route
+  # (#to_s renders version + revision identically), and Draft.parse no
+  # longer strips a designator that belongs to a stage token.
+  it "builds the identical Draft component on the PC-prefixed joint row" do
     id = ieee.parse("IEC/IEEE PC37.60/DP62271-111_D6.1, Aug 2016")
     rebuilt = id.class.from_hash(id.to_hash)
     expect(rebuilt.to_hash).to eq(id.to_hash)
     expect(rebuilt.to_s).to eq(id.to_s)
     expect(rebuilt.code_obj).to eq(id.code_obj)
+    expect(rebuilt.draft_obj).to eq(id.draft_obj)
+    expect(id.draft_obj.version).to eq("P62271-111_D6.1")
+    expect(id.draft_obj.revision).to be_nil
+  end
+
+  it "keeps a stage-token draft version whole on both paths" do
+    id = ieee.parse("ISO/IEC/IEEE P29119-5/DDIS2-1504")
+    rebuilt = id.class.from_hash(id.to_hash)
+    expect(rebuilt.draft_obj).to eq(id.draft_obj)
+    expect(id.draft_obj.version).to eq("DIS2-1504")
+  end
+
+  # The D= designator aliases keep a documented component-level
+  # residual: the zero-padded face carries no original month spelling,
+  # so the alias parse (month "Jul") and the wire rebuild cannot build
+  # equal components. The identity surfaces (hash, to_s, URN) agree.
+  it "round-trips the D= designator wire on the identity surfaces" do
+    id = ieee.parse("IEC/IEEE P61850-9-3_CDV July 2015")
+    rebuilt = id.class.from_hash(id.to_hash)
+    expect(rebuilt.to_hash).to eq(id.to_hash)
+    expect(rebuilt.to_s).to eq(id.to_s)
   end
 end
