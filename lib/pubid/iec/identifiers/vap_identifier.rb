@@ -70,6 +70,13 @@ module Pubid
         def typed_stage
           base&.typed_stage
         end
+
+        # The wrapped document the VAP record is a view of (pubid#580):
+        # the peel lets a dated base query resolve the edition through
+        # the wrapper's relational predicates.
+        def base_document
+          base&.base_document || base
+        end
       end
     end
   end
