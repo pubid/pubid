@@ -64,9 +64,12 @@ module Pubid
           identifiers&.first&.typed_stage
         end
 
-        # Get the base document (first identifier)
+        # Get the base document (first identifier), peeled recursively —
+        # a consolidated edition of a supplement reduces to its origin
+        # standard, the BSI/CSA/CEN shape (the one-level peel left a
+        # supplement bundle resolving to the supplement).
         def base_document
-          identifiers&.first
+          identifiers&.first&.base_document || self
         end
 
         # The origin document. A consolidated bundle stores its members in
