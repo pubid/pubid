@@ -88,6 +88,7 @@ extract because the primary document cannot be fetched programmatically.
 | 50.00 | TDTS | Translation of DTS | TS |
 | 60.00 | TPUB | Translation of publication | IS, TR, TS, COR |
 | 95.99 | WPUB | Publication withdrawn | IS, TR, TS, PAS, ISH, COR |
+| — | SPE | Suppressed publication (observed on webstore payloads for withdrawn legacy publications, e.g. publication/12502 — IEC 60050:1975; **not** in IEC's published stage-code list) | IS |
 
 The modern API spells the enquiry/FDIS
 ladder with the C-prefixed circulation codes (CCDV/CFDIS/RFDIS/NFDIS…)
