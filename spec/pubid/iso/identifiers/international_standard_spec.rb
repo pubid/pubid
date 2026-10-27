@@ -1534,6 +1534,42 @@ RSpec.describe Pubid::Iso::Identifiers::InternationalStandard do
   #       it_behaves_like "converts pubid to urn"
   #       it_behaves_like "converts urn to pubid", "ISO/DIS 105-C12"
   #     end
+  # The "WD Study" consultation (relaton-iso#125): ISO accepts the spelled-out
+  # form; the canonical short form renders as WDS.
+  context "WD Study stage" do
+    describe "ISO/WD Study 42010" do
+      subject { "ISO/WD Study 42010" }
+
+      let(:parsed) { Pubid::Iso.parse(subject) }
+
+      it "parses to the WDS typed stage" do
+        expect(parsed.typed_stage.code).to eq("wds")
+      end
+
+      it "carries the WD Study harmonized stages" do
+        expect(parsed.typed_stage.harmonized_stages).to eq(%w[20.20 20.60])
+      end
+
+      it "renders the canonical short form" do
+        expect(parsed.to_s).to eq("ISO/WDS 42010")
+      end
+    end
+
+    describe "ISO/WDS 42010" do
+      subject { "ISO/WDS 42010" }
+
+      let(:parsed) { Pubid::Iso.parse(subject) }
+
+      it "round-trips" do
+        expect(parsed.to_s).to eq(subject)
+      end
+
+      it "generates the stage URN" do
+        expect(parsed.to_urn).to eq("urn:iso:std:iso:42010:stage-20.20")
+      end
+    end
+  end
+
 end
 
 #     context "ISO 14451-1:2013(en,fr,other)" do
