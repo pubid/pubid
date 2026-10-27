@@ -54,7 +54,9 @@ module Pubid
             code: :wds,
             stage_code: :wds,
             type_code: :is,
-            abbr: ["WDS"],
+            # ISO launched the "WD Study" WG consultation (stage 20.20/20.60,
+            # relaton-iso#125); its spelled-out form is an accepted input spelling.
+            abbr: ["WDS", "WD Study"],
             name: "Working Draft Study",
             harmonized_stages: %w[20.20 20.60],
           ),
