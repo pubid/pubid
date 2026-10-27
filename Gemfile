@@ -6,13 +6,16 @@ source "https://rubygems.org"
 gemspec
 
 gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
-# PG artifact engine (R1 parser swap). The published parsanol release
-# predates Parsanol::PARG::Artifact — flip this to a rubygems pin once a
-# release carrying the PG runtime is cut (owner call at PR time). Until
-# then bundler builds the Rust extension from the git checkout. To use a
-# local clone instead, run:
+# PG artifact engine (R1 parser swap). The flip condition the old comment
+# waited for is met: the released parsanol carries Parsanol::PARG::Artifact.
+# 1.3.110 additionally made the v2 named-tree dialect the default — every
+# uncaptured rule reference surfaces as a capture, so plain references
+# break two ways ("Unknown parameter type: space" on the whitespace glue;
+# digit runs parse as per-atom lists) — parsanol#352. Pin the last
+# classic-dialect release until the v2 migration lands. To use a local
+# clone instead, run:
 #   bundle config set local.parsanol ../../parsanol/parsanol-ruby
-gem "parsanol", github: "parsanol/parsanol-ruby", branch: "main"
+gem "parsanol", "1.3.109"
 gem "json_schemer" # testsuite schema validation (tools/validate_schema.rb)
 # benchmark is used by spec/pubid/iso/performance_spec.rb and is no longer a
 # default gem as of Ruby 4.0, so it must be declared explicitly.
