@@ -28,6 +28,13 @@ Gem::Specification.new do |spec|
   # Parsanol::PARG (the Gemfile's git pin is the dev source; published
   # gems resolve this from rubygems). 1.3.57 is the first release whose
   # extension builds against the 0.10 engine line.
-  spec.add_dependency "parsanol", ">= 1.3.62"
+  # The "< 1.3.110" cap: 1.3.110 made the v2 named-tree dialect the
+  # default (parsanol#352), and pubid's grammars then fold per-atom
+  # captures into their values ("number" => "[{digit: ...}]"). The
+  # Gemfile pin does not reach a bundle that depends on pubid, so the cap
+  # must live here. Drop it, with the Gemfile pin and
+  # spec/pubid/parsanol_dependency_spec.rb, when pubid parses the v2
+  # dialect.
+  spec.add_dependency "parsanol", ">= 1.3.62", "< 1.3.110"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
