@@ -12,8 +12,9 @@ gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
 # uncaptured rule reference surfaces as a capture, so plain references
 # break two ways ("Unknown parameter type: space" on the whitespace glue;
 # digit runs parse as per-atom lists) — parsanol#352. Pin the last
-# classic-dialect release until the v2 migration lands. To use a local
-# clone instead, run:
+# classic-dialect release until the v2 migration lands; pubid.gemspec
+# carries the same cap ("< 1.3.110") for bundles that depend on pubid.
+# To use a local clone instead, run:
 #   bundle config set local.parsanol ../../parsanol/parsanol-ruby
 gem "parsanol", "1.3.109"
 gem "json_schemer" # testsuite schema validation (tools/validate_schema.rb)
