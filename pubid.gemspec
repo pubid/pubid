@@ -28,13 +28,12 @@ Gem::Specification.new do |spec|
   # Parsanol::PARG (the Gemfile's git pin is the dev source; published
   # gems resolve this from rubygems). 1.3.57 is the first release whose
   # extension builds against the 0.10 engine line.
-  # The "< 1.3.110" cap: 1.3.110 made the v2 named-tree dialect the
-  # default (parsanol#352), and pubid's grammars then fold per-atom
-  # captures into their values ("number" => "[{digit: ...}]"). The
-  # Gemfile pin does not reach a bundle that depends on pubid, so the cap
-  # must live here. Drop it, with the Gemfile pin and
-  # spec/pubid/parsanol_dependency_spec.rb, when pubid parses the v2
-  # dialect.
-  spec.add_dependency "parsanol", ">= 1.3.62", "< 1.3.110"
+  # The floor rides the v2-dialect migration (parsanol#352): 1.3.110 made
+  # the named-tree dialect the default and broke plain parses; 1.3.111
+  # shipped the trivia exemption (parsanol#355) and this gem ships the
+  # artifacts re-baked at it (emission-2 trees, parameter-shaped), so
+  # anything older fails ("Unknown parameter type: space"; per-atom digit
+  # runs). Capped below 1.4 until the v2 line declares stability.
+  spec.add_dependency "parsanol", ">= 1.3.111", "< 1.4"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
