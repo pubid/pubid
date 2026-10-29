@@ -12,7 +12,7 @@ require "spec_helper"
 # and their full conformance corpus runs in CI's conformance gate.
 SAE_REFS = ["SAE AIR1936", "SAE AMS5000:2020", "SAE J1939",
             "SAE J300:2019", "SAE ARP4754A"].freeze
-SHAPE_COMPATIBLE = %i[doi easc gb ietf jis oasis ogc sae w3c xsf isbn iana ecma omg ccsds tgpp gost].freeze
+SHAPE_COMPATIBLE = %i[doi easc gb ietf jis oasis ogc sae w3c xsf isbn iana ecma omg ccsds tgpp gost astm].freeze
 ADAPTED = %i[etsi].freeze
 
 RSpec.describe "typed model binding parity" do
@@ -39,11 +39,14 @@ RSpec.describe "typed model binding parity" do
         entries = flavor == :sae ? SAE_REFS : pass_entries(flavor).map(&:first)
         expect(entries).not_to be_empty
 
+        build = lambda do |hash|
+          builder = flavor_module(flavor)::Builder
+          builder.respond_to?(:build) ? builder.build(hash) : builder.new.build(hash)
+        end
+
         differences = entries.filter_map do |input|
           typed = flavor_module(flavor).parse(input)
-          tree = flavor_module(flavor)::Builder.build(
-            Pubid::Parg::Backend.parse(flavor, input),
-          )
+          tree = build.call(Pubid::Parg::Backend.parse(flavor, input))
 
           next if typed.to_hash == tree.to_hash && typed.to_s == tree.to_s
 

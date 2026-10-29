@@ -109,14 +109,18 @@ module Pubid
 
         # Manual
         if identifier.is_a?(Identifiers::Manual)
-          identifier.edition = parsed_hash[:edition].to_s if parsed_hash[:edition]
+          identifier.edition = parsed_hash[:edition]&.to_s
+          identifier.edition ||= parsed_hash[:edition_ordinal].to_s if parsed_hash[:edition_ordinal]
+          identifier.edition ||= parsed_hash[:edition_number].to_s if parsed_hash[:edition_number]
           identifier.supplement = true if parsed_hash[:supplement]
           identifier.tp_designation = parsed_hash[:tp_designation].to_s if parsed_hash[:tp_designation]
         end
 
         # Monograph
-        if identifier.is_a?(Identifiers::Monograph) && parsed_hash[:edition]
-          identifier.edition = parsed_hash[:edition].to_s
+        if identifier.is_a?(Identifiers::Monograph)
+          identifier.edition = parsed_hash[:edition]&.to_s
+          identifier.edition ||= parsed_hash[:edition_ordinal].to_s if parsed_hash[:edition_ordinal]
+          identifier.edition ||= parsed_hash[:edition_number].to_s if parsed_hash[:edition_number]
         end
 
         # Data Series
@@ -146,6 +150,11 @@ module Pubid
               # Ordinal notation: "1ST"
               identifier.edition = edition_data.to_s
             end
+          elsif parsed_hash[:edition_number] || parsed_hash[:edition_ordinal]
+            # The bindings carry the edition flat: the e-notation form
+            # binds its digits (:edition_number) and the ordinals bind
+            # whole (:edition_ordinal); the :edition capture is gone.
+            identifier.edition = (parsed_hash[:edition_number] || parsed_hash[:edition_ordinal]).to_s
           end
         end
       end
