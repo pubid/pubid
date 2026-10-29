@@ -40,7 +40,7 @@ module Pubid
           # `super` is handed a SYMBOL below, so the base's annotation hook
           # never sees the flag. Capture it here and wrap what comes back —
           # exactly once, because the base returned plain text.
-          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          flags = plain_render_flags(format)
 
           # Handle both keyword argument (hash) and positional argument (symbol/string)
           effective_format = if format.is_a?(Hash)
@@ -56,7 +56,7 @@ module Pubid
                        super(effective_format)
                      end
 
-          annotate_plain_render(rendered, annotated: annotated)
+          annotate_plain_render(rendered, **flags)
         end
       end
     end

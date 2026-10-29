@@ -41,7 +41,7 @@ module Pubid
           # Hash. Normalise it away before `super`, so the annotation is applied
           # once, here, and covers the date-range branch too — that branch
           # returns a hand-composed string and never reached `super` at all.
-          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          flags = plain_render_flags(format)
           format = format[:format] || :short if format.is_a?(Hash)
 
           # Handle date range supplements (no base identifier)
@@ -52,7 +52,7 @@ module Pubid
                      super(format)
                    end
 
-          annotate_plain_render(result, annotated: annotated)
+          annotate_plain_render(result, **flags)
         end
       end
     end

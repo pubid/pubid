@@ -346,7 +346,7 @@ module Pubid
       # @param format [:full, :long, :abbreviated, :short, :mr] output format
       def to_s(format = nil)
         # Handle both keyword argument (hash) and positional argument (symbol/string)
-        annotated = format.is_a?(Hash) ? format[:annotated] : nil
+        flags = plain_render_flags(format)
         format = format[:format] if format.is_a?(Hash)
 
         # Default to parsed_format if available (preserves input format on round-trip)
@@ -358,7 +358,42 @@ module Pubid
         # NIST's `to_s` takes a POSITIONAL format and its `render` override
         # builds no rendering context, so neither the flag nor the context
         # reaches the shared hook. Apply the annotation fallback here.
-        annotate_plain_render(rendered, annotated: annotated)
+        annotate_plain_render(rendered, **flags)
+      end
+
+      # The keyword flags a positional-format `to_s` hands to
+      # `annotate_plain_render`. Ruby fills the positional `format` with a
+      # Hash when a caller passes keywords, so they arrive here.
+      #
+      # `with_publisher: false` cuts the leading `NIST`/`NBS` from the
+      # finished string ({#publisher_prefixes}), which covers every place a
+      # NIST style prints a publisher — the compound `NBS …` series, the
+      # `default_publisher` subclasses and a supplement's base — in one
+      # step.
+      def plain_render_flags(format)
+        return {} unless format.is_a?(Hash)
+
+        format.slice(:annotated, :with_publisher)
+      end
+      private :plain_render_flags
+
+      # The MR style (`NIST.SP.800-53`) is a fixed machine form and ignores
+      # `with_publisher:`. The test reads the OUTPUT, not the requested
+      # format: several subclasses pick their style themselves (an id parsed
+      # from an MR string still renders the short style), so the format a
+      # caller asked for does not say which style came back.
+      def apply_with_publisher(result, format, with_publisher)
+        mr_style = result.is_a?(String) && result.match?(/\A(?:NIST|NBS)\./)
+        return result if mr_style
+
+        super
+      end
+      private :apply_with_publisher
+
+      # Every leading publisher token a NIST short style can print: the
+      # parsed publisher, and the two `default_publisher` values.
+      def publisher_prefixes
+        [publisher.to_s, "NIST", "NBS"]
       end
 
       # NIST has its own defined MR format (to_mr_style) used by relaton-nist

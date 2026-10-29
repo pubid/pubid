@@ -11,8 +11,8 @@ module Pubid
     #   "ECMA MEM/1970"      memento
     #   "ECMA-269 ed3 vol2"  with the edition and volume suffixes
     #
-    # With `with_publisher: false` the leading ECMA token is dropped, yielding
-    # "-411" / "TR/101" / "MEM/1970".
+    # The ECMA token is part of the designation and is always rendered; see
+    # `Pubid::Ecma::Identifier#publisher_prefixes`.
     class Renderer < ::Pubid::Renderers::Base
       PUBLISHER = "ECMA"
 
@@ -32,7 +32,7 @@ module Pubid
         # with a space ("ECMA TR/101"). type_prefix is nil only for standards.
         sep = id.type_prefix.nil? ? "" : " "
         core = id.type_prefix.nil? ? standard_core(id) : typed_core(id)
-        result = with_publisher?(id) ? "#{PUBLISHER}#{sep}#{core}" : core
+        result = "#{PUBLISHER}#{sep}#{core}"
         result + suffixes(id, with_edition, with_volume)
       end
 
@@ -57,10 +57,6 @@ module Pubid
       # Technical Report / Memento: "<TYPE>/<number>".
       def typed_core(id)
         "#{id.type_prefix}/#{id.number}"
-      end
-
-      def with_publisher?(id)
-        id.with_publisher != false
       end
     end
   end

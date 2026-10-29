@@ -42,6 +42,13 @@ module Pubid
         render(format: :human, **opts)
       end
 
+      # Every EVS form starts with the `EVS` publisher, welded to an adopted
+      # designation by a dash (`EVS-EN 18216:2026`); `with_publisher: false`
+      # leaves the adopted designation (`EN 18216:2026`).
+      def publisher_prefixes
+        ["EVS"]
+      end
+
       def self.parse(string)
         unless string.is_a?(String)
           raise Pubid::Errors::InvalidInputError,

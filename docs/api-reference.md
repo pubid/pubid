@@ -649,6 +649,9 @@ Hook for flavors whose identity includes a volume discriminator — ECMA-269
 ### `mr_year`
 ### `new_edition_of?(other)`
 ### `part?`
+### `publisher_prefixes`
+
+The publisher tokens this identifier's human rendering can start with,
 ### `related_to?(other)`
 
 Any relational predicate holds.

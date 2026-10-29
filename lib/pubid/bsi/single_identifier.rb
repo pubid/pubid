@@ -28,8 +28,45 @@ module Pubid
           return Pubid::Iec.parse(string)
         end
 
-        parsed = Pubid::Parg::Backend.parse(:bsi, string)
+        parsed = Pubid::Parg::Backend.parse(:bsi, strip_bsi_prefix(string))
         Builder.build(parsed)
+      end
+
+      # The document series that BSI cites with its `BSI` publisher prefix
+      # in front (`BSI PAS 2031:2019`). `BS` is the British Standard series
+      # itself and is never preceded by it.
+      BSI_PREFIXED_SERIES = %w[PAS PD DD BIP].freeze
+
+      BSI_PREFIX = /\ABSI\s+(?=(?:#{BSI_PREFIXED_SERIES.join('|')})\b)/
+
+      # `BSI PAS 2031:2019` is the external spelling of `PAS 2031:2019`. The
+      # prefix is not part of the identity, so it is dropped before the baked
+      # grammar runs, and `to_s(with_publisher: true)` puts it back.
+      def self.strip_bsi_prefix(string)
+        string.sub(BSI_PREFIX, "")
+      end
+
+      # `with_publisher: false` drops only a real `BSI` prefix
+      # (`BSI Flex 1888` -> `Flex 1888`). `BS` in `BS 8611:2016` is the
+      # British Standard series, part of the designation, and stays.
+      def publisher_prefixes
+        ["BSI"]
+      end
+
+      # `with_publisher: true` renders the external form of a PAS / PD / DD /
+      # BIP document, with the `BSI` prefix in front. Every other form already
+      # starts with its publisher (`BS`, `BSI Flex`), or with a token that
+      # BSI does not prefix, and is left as it is.
+      def to_s(**opts)
+        rendered = super
+        return rendered unless opts[:with_publisher] == true
+
+        plain = rendered.gsub(%r{</?span[^>]*>}, "")
+        return rendered unless BSI_PREFIXED_SERIES.include?(plain[/\A\S+/])
+
+        prefix = "BSI"
+        prefix = %(<span class="publisher">#{prefix}</span>) if opts[:annotated]
+        "#{prefix} #{rendered}"
       end
 
       attribute :publisher, Bsi::Components::Publisher, default: -> {

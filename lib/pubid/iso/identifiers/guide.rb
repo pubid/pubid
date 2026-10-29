@@ -91,9 +91,12 @@ module Pubid
         def to_s(**opts)
           return super if opts[:format] && opts[:format] != :human
 
-          context = build_rendering_context(nil, format: :human, **opts)
-          Pubid::Renderers::GuideRenderer.new(self).render(context:,
-                                                           **opts.slice(:with_edition))
+          context = build_rendering_context(
+            nil, format: :human, **opts.except(:with_publisher)
+          )
+          rendered = Pubid::Renderers::GuideRenderer.new(self)
+            .render(context:, **opts.slice(:with_edition))
+          apply_with_publisher(rendered, :human, opts[:with_publisher])
         end
       end
     end

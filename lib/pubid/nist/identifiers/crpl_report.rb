@@ -91,7 +91,7 @@ module Pubid
           # a Hash — Ruby converts keywords for a method that accepts none.
           # The same idiom `Identifiers::Base#to_s` uses. This renderer
           # ignores `format`, so only the flag is read.
-          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          flags = plain_render_flags(format)
 
           # Use actual series attribute if it contains subseries (e.g., "CRPL-F-B")
           # Otherwise use default series_code ("CRPL")
@@ -129,7 +129,7 @@ module Pubid
           result += append_short_components
 
           result += range_notation if range_notation
-          annotate_plain_render(result, annotated: annotated)
+          annotate_plain_render(result, **flags)
         end
       end
     end

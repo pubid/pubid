@@ -28,6 +28,21 @@ module Pubid
       # repeat one entry of the stage registry, so they move together.
       subset_strict :type, :stage, :typed_stage
 
+      # The bodies that print as a publisher prefix (`CEN/TS 16931-3-1`,
+      # `CLC/TR 50600`, `CEN ISO/TS 12180-1`). The `publisher` attribute also
+      # holds the deliverable types `EN`, `HD`, `CR`, `CWA`, `ES` and `ENV`,
+      # which are the designation itself (`EN 13256:2000`): those stay under
+      # `with_publisher: false`, as `BS` does for BSI. The test reads the
+      # first token only, so a joint group drops whole
+      # (`CEN/CLC/ETSI/TR 101551` -> `TR 101551`).
+      PUBLISHER_PREFIXES = %w[CEN CLC CENELEC].freeze
+
+      def publisher_prefixes
+        super.select do |prefix|
+          PUBLISHER_PREFIXES.include?(prefix.split("/").first)
+        end
+      end
+
       # The publisher serializes as a bare string ("publisher" => "CEN"), and
       # the copublishers as a list of strings. The shared table does not do
       # this for every flavor, because IEEE has a published index whose rows

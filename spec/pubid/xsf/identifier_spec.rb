@@ -21,8 +21,8 @@ RSpec.describe Pubid::Xsf::Identifier do
         expect(parsed.to_s).to eq(input)
       end
 
-      it "renders the bare number without the publisher" do
-        expect(parsed.to_s(with_publisher: false)).to eq("0001")
+      it "keeps the XEP series token under with_publisher: false" do
+        expect(parsed.to_s(with_publisher: false)).to eq("XEP 0001")
       end
     end
 
@@ -58,9 +58,9 @@ RSpec.describe Pubid::Xsf::Identifier do
           expect(described_class.parse("XEP #{name}").to_s).to eq("XEP #{name}")
         end
 
-        it "renders the bare name without the publisher for #{name}" do
+        it "keeps the XEP series token for #{name}" do
           id = described_class.parse("XEP #{name}")
-          expect(id.to_s(with_publisher: false)).to eq(name)
+          expect(id.to_s(with_publisher: false)).to eq("XEP #{name}")
         end
 
         it "round-trips XEP #{name} through its URN" do

@@ -817,13 +817,85 @@ module Pubid
       # consumed by the renderer, not the rendering context — and some flavors
       # override build_rendering_context with a strict signature, so strip them
       # here rather than widening that signature.
-      ctx_opts = opts.except(:trademark, :with_volume)
+      # `:with_publisher` is a render-time flag too. It reaches the renderer
+      # only for the human format and only when given, so a renderer that
+      # reads it (BIPM, NIST) sees it and the default call is unchanged.
+      with_publisher = opts[:with_publisher]
+      ctx_opts = opts.except(:trademark, :with_volume, :with_publisher)
       context = build_rendering_context(renderer, format:, **ctx_opts)
       render_opts = opts.slice(:with_edition, :trademark, :with_volume)
+      if format == :human && !with_publisher.nil?
+        render_opts[:with_publisher] = with_publisher
+      end
       result = renderer.new(self).render(context:, **render_opts)
+      result = apply_with_publisher(result, format, with_publisher)
 
       annotate_rendered(result, format, ctx_opts[:annotated], context)
     end
+
+    # The publisher tokens this identifier's human rendering can start with,
+    # for `to_s(with_publisher: false)` ({Renderers::PublisherStripper}).
+    #
+    # The default is the rendered publisher, and the publisher joined by `/`
+    # to its copublishers in either order, so a co-published `ISO/IEC 27001`
+    # or `ANSI/AMCA 210-16` drops the whole group. Copublishers come from the
+    # shared `copublishers` collection or from a flavor's own `copublisher`
+    # (a String or an Array of them: AMCA, ASHRAE, IEEE). A wrapper with no
+    # publisher of its own prints the document it wraps, so it asks `base`.
+    #
+    # A flavor overrides this where the generic answer is wrong: where the
+    # leading token is a series that belongs to the designation (`BS 8611`,
+    # `GB/T 20223`, `ECMA-262`), the answer is `[]`; where the publisher is
+    # welded to another token (`ITU-T`), the answer is the welded group.
+    #
+    # @return [Array<String>]
+    def publisher_prefixes
+      pubs = publisher_texts(:publisher)
+      copubs = publisher_texts(:copublishers) + publisher_texts(:copublisher)
+      # A supplement can name its own publisher while the co-published group
+      # lives on the document it supplements, so `base` is always asked too.
+      # The stripper tries the longest prefix first, so order does not matter.
+      publisher_groups(pubs, copubs) + base_publisher_prefixes
+    end
+
+    # Each publisher alone, and the `/`-joined group in either order.
+    def publisher_groups(pubs, copubs)
+      return pubs + copubs if pubs.empty? || copubs.empty?
+
+      [[*pubs, *copubs].join("/"), [*copubs, *pubs].join("/"), *pubs, *copubs]
+    end
+    private :publisher_groups
+
+    # The printed form of a publisher-like attribute: a component, a String,
+    # or an Array of either (IEEE `DualPublished` returns an Array).
+    def publisher_texts(name)
+      return [] unless respond_to?(name)
+
+      value = public_send(name)
+      values = value.is_a?(Array) ? value : [value]
+      values.compact.map { |v| v.to_s.strip }.reject(&:empty?)
+    end
+    private :publisher_texts
+
+    def base_publisher_prefixes
+      nested = respond_to?(:base) ? base : nil
+      return [] unless nested.is_a?(::Pubid::Identifier) && !nested.equal?(self)
+
+      nested.publisher_prefixes
+    end
+    private :base_publisher_prefixes
+
+    # `with_publisher: false` on the human format drops the leading publisher
+    # token. Every other value, and every other format, leaves the string as
+    # the renderer produced it — `true` is the default rendering for every
+    # flavor whose default carries the prefix, and a flavor whose default
+    # omits it (3GPP, OGC, IETF) handles `true` itself.
+    def apply_with_publisher(result, format, with_publisher)
+      return result unless with_publisher == false && format == :human
+
+      Renderers::PublisherStripper.new(self).strip(result)
+    end
+    private :apply_with_publisher
 
     # Apply semantic spans when the renderer did not.
     #
@@ -867,7 +939,12 @@ module Pubid
     # @param rendered [String] the plain rendering this method produced
     # @param opts [Hash] the render options it was called with
     # @return [String] annotated when `annotated:` was asked for, else as-is
+    #
+    # `with_publisher: false` is applied here too, before the annotation, so a
+    # hand-composed `to_s` drops its publisher token the same way {#render}
+    # does.
     def annotate_plain_render(rendered, **opts)
+      rendered = apply_with_publisher(rendered, :human, opts[:with_publisher])
       annotate_rendered(rendered, :human, opts[:annotated], nil)
     end
     protected :annotate_plain_render

@@ -30,12 +30,12 @@ module Pubid
       # and `to_s` wraps its single result. `super` is not reachable from a
       # private method, so it is handed in as a block.
       def to_s(format = :short)
-        annotated = format.is_a?(Hash) ? format[:annotated] : nil
+        flags = plain_render_flags(format)
         format = format[:format] || :short if format.is_a?(Hash)
 
         rendered = render_plain(format) { super(format) }
 
-        annotate_plain_render(rendered, annotated: annotated)
+        annotate_plain_render(rendered, **flags)
       end
 
       private

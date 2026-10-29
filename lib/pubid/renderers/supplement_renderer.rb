@@ -3,7 +3,7 @@
 module Pubid
   module Renderers
     class SupplementRenderer < HumanReadable
-      def render(context:, with_edition: false)
+      def render(context:, with_edition: false, **_opts)
         parts = []
 
         base_str = @id.base.to_s(

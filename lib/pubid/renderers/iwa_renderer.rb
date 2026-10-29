@@ -3,7 +3,7 @@
 module Pubid
   module Renderers
     class IwaRenderer < HumanReadable
-      def render(context:, with_edition: false)
+      def render(context:, with_edition: false, **_opts)
         parts = []
         if @id.typed_stage
           parts << annotate(@id.typed_stage.render(context:),

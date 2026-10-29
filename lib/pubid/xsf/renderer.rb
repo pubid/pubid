@@ -4,8 +4,8 @@ module Pubid
   module Xsf
     # Human-readable renderer for XSF identifiers.
     #
-    # Produces strings like "XEP 0001". With `with_publisher: false` it emits
-    # just the bare number ("0001").
+    # Produces strings like "XEP 0001". The `XEP` token is the series and is
+    # always rendered.
     #
     # Registered as the `:human` format in the XSF format registry and invoked
     # via `render(format: :human)`.
@@ -14,8 +14,6 @@ module Pubid
 
       def render(context: nil, **opts)
         id = @id
-        return id.number.to_s if id.with_publisher == false
-
         "#{PUBLISHER} #{id.number}"
       end
     end

@@ -64,8 +64,24 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Parg::Model.bound(:ietf, identifier)
+        parsed = Pubid::Parg::Model.bound(:ietf, strip_prefix(identifier))
         Builder.build(parsed)
+      end
+
+      # The external spellings `IETF RFC 8341`, `IETF I-D draft-…`,
+      # `IETF Internet-Draft draft-…`, `Internet-Draft draft-…` and
+      # `I-D draft-…` name the same document as the bare form. The publisher
+      # and the draft label are not part of the identity, so they are dropped
+      # before the baked grammar runs, and `to_s(with_publisher:)` renders
+      # them again. The lookahead keeps the strip off anything that is not
+      # followed by an IETF designation.
+      EXTERNAL_PREFIX = /
+        \A(?:IETF\s+)?(?:(?:I-D|Internet-Draft)\s+(?=draft-))?
+        (?=(?:RFC|BCP|STD|FYI)\s|draft-)
+      /x
+
+      def self.strip_prefix(identifier)
+        identifier.sub(EXTERNAL_PREFIX, "")
       end
     end
   end

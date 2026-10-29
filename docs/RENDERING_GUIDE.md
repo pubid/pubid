@@ -126,6 +126,32 @@ Pubid::Iec.parse("IEC/WD TR 62048").to_s     # => "IEC WD TR 62048"
 Pubid::Iec.parse("IEC/CD Guide 104").to_s    # => "IEC CD Guide 104"
 ```
 
+## With or Without the Publisher
+
+Every flavor accepts `to_s(with_publisher:)`. It gives the external form of
+an identifier, or the internal form that an SDO uses when it cites its own
+documents.
+
+- `with_publisher: false` drops the leading publisher token and its
+  separator. A co-published group drops whole.
+- `with_publisher: true` gives the full external form. Most flavors print it
+  by default; IETF, BSI PAS/PD/DD/BIP, 3GPP and OGC add it.
+- Without the option, the output is the default rendering.
+- The machine-readable forms (`to_mr_string`, `to_urn`) ignore the option.
+
+```ruby
+Pubid::Nist.parse("NIST SP 800-113").to_s(with_publisher: false)  # => "SP 800-113"
+Pubid::Iso.parse("ISO/IEC 27001:2013").to_s(with_publisher: false) # => "27001:2013"
+Pubid::Itu.parse("ITU-T G.711").to_s(with_publisher: false)       # => "G.711"
+Pubid::Bsi.parse("PAS 2031:2019").to_s(with_publisher: true)      # => "BSI PAS 2031:2019"
+Pubid::Ietf.parse("draft-ietf-quic-transport-34").to_s(with_publisher: true)
+# => "IETF Internet-Draft draft-ietf-quic-transport-34"
+```
+
+A token that is part of the designation is not a publisher prefix, so it
+stays: `BS 8611:2016`, `GB/T 20223-2006`, `GOST 26951-2025`, `ECMA-262`,
+`XEP 0001`, and the CEN deliverables `EN`, `HD`, `CR`, `CWA`, `ES` and `ENV`.
+
 ## Round-Trip Fidelity
 
 All rendering methods preserve parsed information:

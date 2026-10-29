@@ -3,7 +3,7 @@
 module Pubid
   module Renderers
     class DirectivesRenderer < HumanReadable
-      def render(context:, with_edition: false)
+      def render(context:, with_edition: false, **_opts)
         parts = []
         parts << render_publisher_portion(context)
         num_port = render_number_portion(context)
