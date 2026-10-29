@@ -129,7 +129,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Parg::Backend.parse(:ecma, identifier)
+        parsed = Pubid::Parg::Model.bound(:ecma, identifier)
         Builder.build(parsed)
       end
 

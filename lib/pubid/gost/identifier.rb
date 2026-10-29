@@ -23,7 +23,7 @@ module Pubid
                 ::Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Parg::Backend.parse(:gost, Parser.normalize_input(identifier))
+        parsed = Pubid::Parg::Model.bound(:gost, Parser.normalize_input(identifier))
         Builder.build(parsed)
       end
 

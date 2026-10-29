@@ -12,7 +12,7 @@ require "spec_helper"
 # and their full conformance corpus runs in CI's conformance gate.
 SAE_REFS = ["SAE AIR1936", "SAE AMS5000:2020", "SAE J1939",
             "SAE J300:2019", "SAE ARP4754A"].freeze
-SHAPE_COMPATIBLE = %i[doi easc gb ietf jis oasis ogc sae w3c xsf].freeze
+SHAPE_COMPATIBLE = %i[doi easc gb ietf jis oasis ogc sae w3c xsf isbn iana ecma omg ccsds tgpp gost].freeze
 ADAPTED = %i[etsi].freeze
 
 RSpec.describe "typed model binding parity" do
