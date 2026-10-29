@@ -16,7 +16,7 @@ module Pubid
         parser = Parser.new
         builder = Builder.new
 
-        parsed = Pubid::Parg::Backend.parse(:astm, str)
+        parsed = Pubid::Parg::Model.bound(:astm, str)
         builder.build(parsed)
       end
     end
