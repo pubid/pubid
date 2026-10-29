@@ -523,6 +523,14 @@ module Pubid
         nil
       end
 
+      # The leading publisher prefixes a CSA rendering can carry
+      # (`publisher_prefix` records which one the input used). The national
+      # forms `CAN/CSA-` and `CAN3-` are dropped whole, so
+      # `with_publisher: false` gives `C22.2 NO. 60601-1:14`, not `CSA-C22.2…`.
+      def publisher_prefixes
+        ["CAN/CSA", "CAN3", "CSA"]
+      end
+
       # CSA stores the publication year in its own plain `year` string
       # attribute (not a `Components::Date`), so the base `#exclude`'s
       # `:year`->`:date` remap nils the unused inherited `date` and leaves

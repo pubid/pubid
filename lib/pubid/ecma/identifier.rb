@@ -63,19 +63,24 @@ module Pubid
       # would otherwise fail serialization type validation.
       PUBLISHER = "ECMA"
 
-      # Whether the last `to_s` should include the "ECMA" publisher token.
-      attr_reader :with_publisher
-
-      # Basic string representation. Delegates to renderer. `with_publisher:
-      # false` drops the ECMA token (e.g. "-411", "TR/84").
+      # Basic string representation. Delegates to renderer.
       #
       # The edition and volume suffixes are rendered by DEFAULT and are opted
       # out of with `to_s(with_edition: false, with_volume: false)`. Both flags
       # ride in `opts` to the renderer, which owns their defaults — see
       # Pubid::Ecma::Renderer for why the default is "with".
-      def to_s(with_publisher: true, **opts)
-        @with_publisher = with_publisher
+      #
+      # `with_publisher:` is accepted and has no effect: `ECMA` is part of the
+      # designation (`ECMA-262`), not a publisher prefix, so the internal form
+      # is the external one (see {#publisher_prefixes}).
+      def to_s(**opts)
         render(format: :human, **opts)
+      end
+
+      # `ECMA-262` is how ECMA itself cites the standard; dropping the token
+      # leaves `-262` or `262`, which is no designation at all.
+      def publisher_prefixes
+        []
       end
 
       # Type token that precedes the number ("TR"/"MEM"), or nil for standards.

@@ -23,8 +23,8 @@ RSpec.describe Pubid::Ecma::Identifier do
         expect(parsed.to_s).to eq("ECMA-411")
       end
 
-      it "renders without publisher" do
-        expect(parsed.to_s(with_publisher: false)).to eq("-411")
+      it "keeps the ECMA token under with_publisher: false" do
+        expect(parsed.to_s(with_publisher: false)).to eq("ECMA-411")
       end
     end
 
@@ -44,8 +44,8 @@ RSpec.describe Pubid::Ecma::Identifier do
         expect(parsed.to_s).to eq("ECMA-418-1")
       end
 
-      it "renders without publisher" do
-        expect(parsed.to_s(with_publisher: false)).to eq("-418-1")
+      it "keeps the ECMA token under with_publisher: false" do
+        expect(parsed.to_s(with_publisher: false)).to eq("ECMA-418-1")
       end
     end
 
@@ -64,8 +64,8 @@ RSpec.describe Pubid::Ecma::Identifier do
         expect(parsed.to_s).to eq("ECMA TR/101")
       end
 
-      it "renders without publisher" do
-        expect(parsed.to_s(with_publisher: false)).to eq("TR/101")
+      it "keeps the ECMA token under with_publisher: false" do
+        expect(parsed.to_s(with_publisher: false)).to eq("ECMA TR/101")
       end
     end
 
@@ -84,8 +84,8 @@ RSpec.describe Pubid::Ecma::Identifier do
         expect(parsed.to_s).to eq("ECMA MEM/1970")
       end
 
-      it "renders without publisher" do
-        expect(parsed.to_s(with_publisher: false)).to eq("MEM/1970")
+      it "keeps the ECMA token under with_publisher: false" do
+        expect(parsed.to_s(with_publisher: false)).to eq("ECMA MEM/1970")
       end
     end
 

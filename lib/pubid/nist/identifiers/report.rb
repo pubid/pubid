@@ -43,7 +43,7 @@ module Pubid
         # Hash — Ruby converts keywords for a method that accepts none. The same
         # idiom `Identifiers::Base#to_s` uses.
         def to_s(format = :short)
-          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          flags = plain_render_flags(format)
           format = format[:format] || :short if format.is_a?(Hash)
 
           rendered = case format
@@ -53,7 +53,7 @@ module Pubid
                        to_short_style
                      end
 
-          annotate_plain_render(rendered, annotated: annotated)
+          annotate_plain_render(rendered, **flags)
         end
 
         private

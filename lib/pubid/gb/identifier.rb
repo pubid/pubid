@@ -67,6 +67,12 @@ module Pubid
         render(format: :human, **opts)
       end
 
+      # `GB` is the standard code, welded to the mandate (`GB/T`), not a
+      # publisher prefix: `with_publisher: false` keeps it, as BSI keeps `BS`.
+      def publisher_prefixes
+        []
+      end
+
       # Parse a Chinese Standard identifier string.
       # @param identifier [String]
       # @return [Pubid::Gb::Identifier]

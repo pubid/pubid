@@ -185,6 +185,13 @@ module Pubid
         render(format: :human, **opts)
       end
 
+      # The SI Brochure and the full MEP / guide content forms print a leading
+      # `BIPM ` from the renderer; `with_publisher: false` drops it. Committee,
+      # meeting and Metrologia forms never print it, so they are unchanged.
+      def publisher_prefixes
+        [PUBLISHER]
+      end
+
       # --- MR string / slug -------------------------------------------------
       #
       # `to_slug` is what consumers use as an output FILENAME, so every BIPM

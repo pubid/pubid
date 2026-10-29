@@ -3,6 +3,7 @@
 module Pubid
   module Renderers
     autoload :Annotator, "pubid/renderers/annotator"
+    autoload :PublisherStripper, "pubid/renderers/publisher_stripper"
     autoload :Base, "pubid/renderers/base"
     autoload :DirectivesRenderer, "pubid/renderers/directives_renderer"
     autoload :GuideRenderer, "pubid/renderers/guide_renderer"

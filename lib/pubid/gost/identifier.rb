@@ -38,6 +38,14 @@ module Pubid
       # document.
       subset_strict :copublisher
 
+      # `GOST` (and `GOST R`) is the national standard designation, as `GB`
+      # and `BS` are, not a publisher prefix: `GOST 26951-2025` without it is
+      # no designation, and `GOST IEC 62868` would read as the IEC document.
+      # `with_publisher: false` therefore keeps it.
+      def publisher_prefixes
+        []
+      end
+
       GOST_TYPE_MAP = {
         "pubid:gost:interstate-standard" => "Pubid::Gost::Identifiers::InterstateStandard",
         "pubid:gost:national-standard"   => "Pubid::Gost::Identifiers::NationalStandard",

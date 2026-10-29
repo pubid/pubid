@@ -8,10 +8,25 @@ module Pubid
     #   "RFC 2119"
     #   "BCP 3" / "STD 66" / "FYI 1"
     #   "draft-giuliano-treedn-02" / "draft-giuliano-treedn"
+    #
+    # The default form carries no publisher, which is how IETF documents are
+    # cited. `with_publisher:` names the two forms relaton#49 asks for:
+    #   true  -> "IETF RFC 2119" / "IETF Internet-Draft draft-giuliano-treedn"
+    #   false -> "RFC 2119"      / "Internet-Draft draft-giuliano-treedn"
+    # A draft slug says nothing about its type, so both explicit forms label
+    # it; the default keeps the bare slug.
     class Renderer < ::Pubid::Renderers::Base
-      def render(context: nil, **_opts)
+      INTERNET_DRAFT_LABEL = "Internet-Draft"
+
+      def render(context: nil, with_publisher: nil, **_opts)
         require_number!(@id)
-        render_identifier(@id)
+        result = render_identifier(@id)
+        return result if with_publisher.nil?
+
+        if @id.is_a?(Identifiers::InternetDraft)
+          result = "#{INTERNET_DRAFT_LABEL} #{result}"
+        end
+        with_publisher ? "#{Identifier::PUBLISHER} #{result}" : result
       end
 
       private

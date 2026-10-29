@@ -99,8 +99,8 @@ RSpec.describe "Pubid::Ecma edition and volume" do
         .to eq("ECMA-269")
     end
 
-    it "composes with with_publisher: false" do
-      expect(id.to_s(with_publisher: false)).to eq("-269 ed3 vol2")
+    it "keeps the ECMA token under with_publisher: false" do
+      expect(id.to_s(with_publisher: false)).to eq("ECMA-269 ed3 vol2")
     end
 
     it "renders a dotted edition verbatim" do

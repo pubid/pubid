@@ -38,7 +38,7 @@ module Pubid
           # string: with the flag set, `super` returns a string ending in
           # "</span>" and the anchor no longer matches. Render plain, rewrite,
           # then annotate.
-          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          flags = plain_render_flags(format)
           format = format[:format] if format.is_a?(Hash)
 
           # Use the base to_s method first
@@ -50,7 +50,7 @@ module Pubid
                                  "#{edition.type}#{edition.id}-#{edition.additional_text}")
           end
 
-          annotate_plain_render(result, annotated: annotated)
+          annotate_plain_render(result, **flags)
         end
       end
     end

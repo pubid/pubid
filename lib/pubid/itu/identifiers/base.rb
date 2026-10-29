@@ -209,7 +209,20 @@ module Pubid
         result += " | #{common_text_twin}" if common_text_twin
         # ITU composes its own string rather than going through `render`, so it
         # never reaches the shared annotation hook. Apply it here.
-        annotate_plain_render(result, annotated: annotated)
+        annotate_plain_render(result, annotated: annotated,
+                                      with_publisher: opts[:with_publisher])
+      end
+
+      # The publisher is welded to the sector (`ITU-T`), and the sector is part
+      # of the publisher, not of the designation: `with_publisher: false`
+      # drops the whole group (`ITU-T G.711` -> `G.711`), never just `ITU-`.
+      # A wrapper with no sector of its own (an annex or appendix) prints the
+      # sector of the document it wraps, so it asks `base`.
+      def publisher_prefixes
+        return ["#{publisher}-#{sector}"] if sector
+        return base.publisher_prefixes if base.is_a?(::Pubid::Identifier)
+
+        super
       end
 
       def render_base(**_opts)

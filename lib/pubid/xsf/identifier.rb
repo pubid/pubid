@@ -30,13 +30,17 @@ module Pubid
       # publisher name in an identifier — the leading token is "XEP".
       PUBLISHER = "XSF"
 
-      attr_reader :with_publisher
-
-      # Basic string representation. Delegates to renderer; `with_publisher:
-      # false` yields the bare number.
-      def to_s(with_publisher: true, **opts)
-        @with_publisher = with_publisher
+      # Basic string representation. Delegates to renderer.
+      #
+      # `with_publisher:` is accepted and has no effect: `XEP` names the
+      # series, and XSF itself cites `XEP 0001`, so the internal form is the
+      # external one (see {#publisher_prefixes}).
+      def to_s(**opts)
         render(format: :human, **opts)
+      end
+
+      def publisher_prefixes
+        []
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier;

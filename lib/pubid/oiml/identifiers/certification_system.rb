@@ -28,6 +28,13 @@ module Pubid
         def type_string
           "CS"
         end
+
+        # `OIML-CS` names the OIML Certification System as one unit, so
+        # `with_publisher: false` drops it whole (`PD-05 Edition 6`) and never
+        # leaves a bare `CS`.
+        def publisher_prefixes
+          ["#{publisher}-#{type_string}", "#{publisher} #{type_string}"]
+        end
       end
     end
   end

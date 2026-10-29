@@ -45,7 +45,7 @@ module Pubid
           # a Hash — Ruby converts keywords for a method that accepts none.
           # The same idiom `Identifiers::Base#to_s` uses. This renderer
           # ignores `format`, so only the flag is read.
-          annotated = format.is_a?(Hash) ? format[:annotated] : nil
+          flags = plain_render_flags(format)
 
           result = "#{publisher} #{series}"
 
@@ -61,7 +61,7 @@ module Pubid
             result += " #{vol_str}n#{issue_number.number}"
           end
 
-          annotate_plain_render(result, annotated: annotated)
+          annotate_plain_render(result, **flags)
         end
       end
     end

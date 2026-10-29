@@ -43,6 +43,11 @@ module Pubid
         render(format: :human, **opts)
       end
 
+      # OMG keeps its publisher in the PUBLISHER constant, not the attribute.
+      def publisher_prefixes
+        [PUBLISHER]
+      end
+
       def self.parse(identifier)
         unless identifier.is_a?(String)
           raise Pubid::Errors::InvalidInputError,
