@@ -4,5 +4,6 @@ module Pubid
   module Parg
     autoload :Artifact, "pubid/parg/artifact"
     autoload :Backend, "pubid/parg/backend"
+    autoload :Model, "pubid/parg/model"
   end
 end
