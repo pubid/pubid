@@ -174,7 +174,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Parg::Backend.parse(:jis, identifier)
+        parsed = Pubid::Parg::Model.bound(:jis, identifier)
         Builder.build(parsed)
       end
     end

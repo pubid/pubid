@@ -9,12 +9,14 @@ module Pubid
 
       def build(data)
         # Handle supplement case first; the SYMBOL clause (if any) attaches to
-        # the outermost identifier, be it the base or the supplement.
-        identifier = if data[:amendment]
+        # the outermost identifier, be it the base or the supplement. The
+        # bindings bind the supplement's fields flat (amd_type/amd_number/…),
+        # so their presence marks the supplement kind.
+        identifier = if data[:amd_type]
                        build_amendment(data)
-                     elsif data[:explanation]
+                     elsif data[:expl_type]
                        build_explanation(data)
-                     elsif data[:corrigendum]
+                     elsif data[:corr_type]
                        build_corrigendum(data)
                      else
                        build_single_identifier(data)
@@ -58,49 +60,36 @@ module Pubid
       end
 
       def build_amendment(data)
-        amd_data = data[:amendment]
+        # The bindings carry the supplement's fields at the top level; the
+        # base document shares them.
+        base = build_single_identifier(data)
 
-        # Build base document (without supplement)
-        base_data = data.except(:amendment)
-        base = build_single_identifier(base_data)
-
-        # Build amendment
         Identifiers::Amendment.new(
           base: base,
-          number: amd_data[:amd_number].to_i,
-          year: amd_data[:amd_year].to_i,
-          reaffirmed: (true if amd_data[:amd_reaffirmed]),
+          number: data[:amd_number].to_i,
+          year: data[:amd_year].to_i,
+          reaffirmed: (true if data[:amd_reaffirmed]),
         )
       end
 
       def build_explanation(data)
-        expl_data = data[:explanation]
+        base = build_single_identifier(data)
 
-        # Build base document (without supplement)
-        base_data = data.except(:explanation)
-        base = build_single_identifier(base_data)
-
-        # Build explanation
         Identifiers::Explanation.new(
           base: base,
-          number: expl_data[:expl_number]&.to_i,
+          number: data[:expl_number]&.to_i,
           year: base.year,
         )
       end
 
       def build_corrigendum(data)
-        corr_data = data[:corrigendum]
+        base = build_single_identifier(data)
 
-        # Build base document (without supplement)
-        base_data = data.except(:corrigendum)
-        base = build_single_identifier(base_data)
-
-        # Build corrigendum
         Identifiers::Corrigendum.new(
           base: base,
-          number: corr_data[:corr_number].to_i,
-          year: corr_data[:corr_year].to_i,
-          reaffirmed: (true if corr_data[:corr_reaffirmed]),
+          number: data[:corr_number].to_i,
+          year: data[:corr_year].to_i,
+          reaffirmed: (true if data[:corr_reaffirmed]),
         )
       end
 
