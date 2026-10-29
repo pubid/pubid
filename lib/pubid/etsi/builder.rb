@@ -28,17 +28,20 @@ module Pubid
         supplements_array = data[:supplements]
         supplements_array = [supplements_array] unless supplements_array.is_a?(Array)
 
-        # Build supplements recursively - each wraps the previous
+        # Build supplements recursively - each wraps the previous. The
+        # bindings pair each supplement's kind ("/A", "/C") with its number
+        # by occurrence index.
         supplements_array.reduce(base) do |current_base, supp|
-          if supp[:amendment]
+          case supp[:supplement_kind]
+          when "/A"
             Identifiers::Amendment.new(
               base: current_base,
-              number: supp[:amendment][:number].to_i,
+              number: supp[:supplement_number].to_i,
             )
-          elsif supp[:corrigendum]
+          when "/C"
             Identifiers::Corrigendum.new(
               base: current_base,
-              number: supp[:corrigendum][:number].to_i,
+              number: supp[:supplement_number].to_i,
             )
           else
             current_base # Skip unknown supplement types
