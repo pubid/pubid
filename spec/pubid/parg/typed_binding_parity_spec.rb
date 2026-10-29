@@ -9,7 +9,7 @@ require "spec_helper"
 # as the oracle until the last flavor migrates.
 SAE_REFS = ["SAE AIR1936", "SAE AMS5000:2020", "SAE J1939",
             "SAE J300:2019", "SAE ARP4754A"].freeze
-FLAVORS = %i[doi easc gb ietf oasis ogc sae w3c xsf].freeze
+FLAVORS = %i[doi easc gb ietf jis oasis ogc sae w3c xsf].freeze
 
 RSpec.describe "typed model binding parity" do
   include FixtureFileHelper
