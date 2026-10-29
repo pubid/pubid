@@ -118,7 +118,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        Builder.build(Pubid::Parg::Backend.parse(:calconnect, identifier))
+        Pubid::Parg::Model.parse(:calconnect, Identifiers::Standard, identifier)
       end
     end
   end
