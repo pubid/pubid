@@ -44,6 +44,13 @@ module Pubid
         @artifact.parse(entry, input)
       end
 
+      # The artifact tree with the entry's declared bindings applied —
+      # the builder-ready attribute hash the grammar's bindings block
+      # declares, types cast at the engine.
+      def parse_and_bind(entry, input)
+        @artifact.parse_and_bind(entry, input)
+      end
+
       # The bindings the grammar declared for +entry+, empty when it
       # declares none.
       def bindings(entry)
