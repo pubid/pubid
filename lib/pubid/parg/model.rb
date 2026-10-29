@@ -4,8 +4,9 @@ module Pubid
   module Parg
     # Typed model binding for one artifact entry point. The grammar declares
     # which captures bind to which attributes (its `bindings` block); this
-    # module registers the flavor's model class for that entry and parses
-    # straight into it, so consumers never see the artifact's wire tree.
+    # module parses through those bindings — either straight into the
+    # flavor's model class (`parse`) or into the builder-ready hash its
+    # Builder consumes (`bound`) — so consumers never see the wire tree.
     module Model
       ALL_PARTS_SUFFIX = "(all parts)"
       ALL_PARTS_PATTERN = /\s*\(all parts\)\s*\z/
@@ -14,6 +15,22 @@ module Pubid
       @mutex = Mutex.new
 
       class << self
+        # Parse +input+ through the artifact's declared bindings into the
+        # builder-ready attribute hash, without materializing a model. For
+        # flavors whose Builder still owns type dispatch and component
+        # construction: the bindings replace tree normalization, not the
+        # builder. The "(all parts)" suffix keeps its contract — stripped
+        # before parsing, marked on the hash for the builder's AllPartsWrap.
+        def bound(flavor, input, entry: "identifier")
+          ensure_bindings!(flavor, entry)
+          all_parts = input.end_with?(ALL_PARTS_SUFFIX)
+          source = all_parts ? input.sub(ALL_PARTS_PATTERN, "") : input
+          hash = Artifact.for(flavor).parse_and_bind(entry, source)
+          all_parts ? Backend.mark_all_parts(hash) : hash
+        rescue Parsanol::ParseFailed => e
+          parse_error(e, input, flavor)
+        end
+
         # Parse +input+ into +model_class+ through the artifact's declared
         # bindings. The "(all parts)" suffix is stripped before parsing and
         # re-applied to the model, exactly as the tree backend does.
@@ -22,15 +39,19 @@ module Pubid
           model, all_parts = materialize(flavor, model_class, input)
           all_parts ? model.to_all_parts : model
         rescue Parsanol::ParseFailed => e
+          parse_error(e, input, flavor)
+        end
+
+        private
+
+        def parse_error(error, input, flavor)
           raise Pubid::Errors::ParseError.new(
-            e.message,
+            error.message,
             nil,
             input: input,
             flavor: Backend.registered_name(flavor),
           )
         end
-
-        private
 
         def materialize(flavor, model_class, input)
           all_parts = input.end_with?(ALL_PARTS_SUFFIX)
