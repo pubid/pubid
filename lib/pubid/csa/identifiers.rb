@@ -4,6 +4,7 @@ module Pubid
   module Csa
     module Identifiers
       autoload :Base, "#{__dir__}/identifiers/base"
+      autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Bundled, "#{__dir__}/identifiers/bundled"
       autoload :CanadianAdopted, "#{__dir__}/identifiers/canadian_adopted"
       autoload :Cec, "#{__dir__}/identifiers/cec"

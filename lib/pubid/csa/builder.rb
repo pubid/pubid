@@ -33,12 +33,12 @@ module Pubid
         end
 
         # Handle bundled identifiers (with + notation)
-        if parsed_hash.key?(:bundled_first)
+        if parsed_hash[:plus_separator]
           return build_bundled(parsed_hash)
         end
 
         # Handle combined identifiers (with / notation)
-        if parsed_hash[:first] && parsed_hash[:second]
+        if parsed_hash[:csa_code_part] && !parsed_hash[:plus_separator]
           return build_combined(parsed_hash)
         end
 
@@ -417,17 +417,11 @@ module Pubid
         bundled = Identifiers::Bundled.new
 
         # Build base identifier
-        bundled.base = build_single(parsed_hash[:base])
+        parts = parsed_hash[:csa_code_part]
+        bundled.base = build_single(strip_part_prefix(parts.first))
 
-        # Build bundled portions (amendments/supplements)
-        # Combine bundled_first with bundled_rest array
-        bundled_portions = [parsed_hash[:bundled_first]]
-        if parsed_hash[:bundled_rest] && !parsed_hash[:bundled_rest].empty?
-          bundled_portions += parsed_hash[:bundled_rest]
-        end
-
-        bundled.bundled_with = bundled_portions.map do |portion|
-          build_single(portion)
+        bundled.bundled_with = parts[1..].map do |portion|
+          build_single(strip_part_prefix(portion))
         end
 
         # Reaffirmation - supports both 2-digit and 4-digit years
@@ -450,13 +444,33 @@ module Pubid
         bundled
       end
 
+
+      # Strips the part_-prefix the combined/bundled array group carries,
+      # leaving the plain field names build_single reads.
+      def strip_part_prefix(part)
+        part.each_with_object({}) do |(key, value), acc|
+          acc[key.to_s.delete_prefix("part_").to_sym] = value
+        end
+      end
+
       def build_combined(parsed_hash)
         combined = Identifiers::Combined.new
 
+        parts = parsed_hash[:csa_code_part].map(&:dup)
+        # SERIES and series_prefix bind as top-level scalars: the capture
+        # only fires in the parts that carry the keyword, and array
+        # bindings pair occurrences by index, so a sparse capture would
+        # land on the wrong part. The keyword qualifies the designation it
+        # follows — the last part in every combined form.
+        if parsed_hash[:part_series]
+          parts.last[:part_series] = parsed_hash[:part_series]
+          parts.last[:part_series_prefix] = parsed_hash[:part_series_prefix] if
+            parsed_hash[:part_series_prefix]
+        end
+
         # Build each designation, in printed order, into one collection.
-        combined.identifiers = %i[first second third]
-          .filter_map { |key| parsed_hash[key] }
-          .map { |part| build_single(part) }
+        combined.identifiers = parts
+          .map { |part| build_single(strip_part_prefix(part)) }
 
         # Detect separator from parser marker
         combined.separator = if parsed_hash[:comma_separator]
@@ -625,6 +639,15 @@ module Pubid
         # Package portion
         if data[:package_portion]
           identifier.package = data[:package_portion].to_s
+        end
+
+        # Amendment riding on the identifier ("/A1:15" after the base)
+        if data[:amendment_number]
+          return Identifiers::Amendment.new(
+            base: identifier,
+            amendment_number: data[:amendment_number].to_s,
+            amendment_year: data[:amendment_year]&.to_s,
+          )
         end
 
         identifier

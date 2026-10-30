@@ -435,30 +435,21 @@ module Pubid
       private
 
       def self.inject_publisher_prefix(hash, prefix)
-        # For combined identifiers
-        if hash[:first]
-          hash[:first][:publisher_prefix] = prefix
-        end
-        # For combined_comma (has comma_separator), both first and second are full csa_code
-        # For combined_slash (no comma_separator), second is continuation that may have has_publisher
-        if hash[:second] && (hash[:comma_separator] || hash[:second][:has_publisher])
-          hash[:second][:publisher_prefix] = prefix
-        end
-        if hash[:third] && hash[:third][:has_publisher]
-          hash[:third][:publisher_prefix] =
-            prefix
+        # Combined and bundled identifiers carry their parts under the
+        # csa_code_part[] group; the first part always takes the prefix,
+        # later ones only when they spell their own publisher token (a
+        # slash continuation like "CSA X/60601-1-6" does not).
+        if (parts = hash[:csa_code_part])
+          parts.each_with_index do |part, index|
+            next if index.positive? && !part[:part_has_publisher] &&
+                    !hash[:comma_separator]
+
+            part[:publisher_prefix] = prefix
+          end
+          return hash
         end
 
-        # For bundled identifiers
-        if hash[:base]
-          inject_publisher_prefix(hash[:base], prefix)
-        end
-
-        # For single identifiers (no :first, no :base, just raw attributes)
-        if !hash[:first] && !hash[:base] && !hash[:bundled_first]
-          hash[:publisher_prefix] = prefix
-        end
-
+        hash[:publisher_prefix] = prefix
         hash
       end
     end
