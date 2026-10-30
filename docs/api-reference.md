@@ -32,7 +32,7 @@ Static leading prefix tokens for a single flavor.
 ### `Pubid::Errors::InvalidInputError < ArgumentError`
 
 The input was not a String, or was longer than {Pubid::MAX_INPUT_LENGTH}.
-### `Pubid::Errors::ParseError < ParseFailed`
+### `Pubid::Errors::ParseError < StandardError`
 
 A printed identifier could not be turned into an identifier object.
 ### `Pubid::Errors::UrnParseError < StandardError`
