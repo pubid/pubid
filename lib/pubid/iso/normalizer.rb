@@ -71,7 +71,7 @@ module Pubid
           supplement_number = match[3] # "1"
           supplement_year = match[4]   # "1987" or nil
 
-          base_parsed = Pubid::Iso.parser.parse(base_str)
+          base_parsed = Pubid::Parg::Backend.parse(:iso, base_str)
           base = Pubid::Iso.builder.build(base_parsed)
 
           addendum = Identifiers::Addendum.new

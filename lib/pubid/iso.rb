@@ -181,12 +181,6 @@ module Pubid
       @builder ||= Builder.new
     end
 
-    # Memoized parser instance used by Normalizer
-    # @return [Pubid::Iso::Parser]
-    def self.parser
-      @parser ||= Parser.new
-    end
-
     # Lookup: type code -> identifier class
     # @param code [String, Symbol] the type key to find
     # @return [Class, nil] the matching identifier class

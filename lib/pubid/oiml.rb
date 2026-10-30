@@ -34,7 +34,6 @@ module Pubid
         return dual if dual
       end
 
-      parser = Parser.new
       builder = Builder.new
 
       parsed = Pubid::Parg::Backend.parse(:oiml, identifier)
