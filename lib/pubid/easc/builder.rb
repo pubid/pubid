@@ -2,7 +2,7 @@
 
 module Pubid
   module Easc
-    # Builds an EASC identifier object from the Parslet parse tree.
+    # Builds an EASC identifier object from the parg artifact parse tree.
     class Builder
       def build(parsed)
         series_cyr = stringify(parsed[:series])&.upcase

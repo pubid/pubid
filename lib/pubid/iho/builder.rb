@@ -2,7 +2,7 @@
 
 module Pubid
   module Iho
-    # Build IHO identifier objects from parslet parse output.
+    # Build IHO identifier objects from the parg artifact parse tree.
     class Builder
       def build(parsed)
         hash = parsed.is_a?(Array) ? parsed.reduce({}, :merge) : parsed
