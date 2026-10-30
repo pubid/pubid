@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require "parslet"
-
 module Pubid
   module Oasis
-    # Parslet grammar for printed OASIS identifiers, e.g.
+    # Grammar for printed OASIS identifiers, e.g.
     #   "OASIS OSLC-CoreShapes-3.0-PS01-Pt8"
     #   "OASIS amqp-core"
     #
@@ -16,19 +14,7 @@ module Pubid
     # Builder with order-independent fragment classification. Keeping
     # decomposition out of the PEG avoids brittle backtracking and guarantees a
     # lossless round-trip.
-    class Parser < ::Pubid::Parser::Grammar
-      rule(:prefix) { str("OASIS") >> str(" ") }
-
-      # The whole slug, captured verbatim (any character, incl. spaces / "]").
-      rule(:slug) { any.repeat(1).as(:original) }
-
-      rule(:identifier) { prefix >> slug }
-
-      rule(:root) { identifier }
-
-      def self.parse(input)
-        new.parse(input)
-      end
+    class Parser
     end
   end
 end
