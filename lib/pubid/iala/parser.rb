@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require "parslet"
-
 module Pubid
   module Iala
-    # Parslet grammar for IALA identifiers.
+    # Grammar for IALA identifiers.
     #
     # Accepts every shape that appears on the IALA website or cover page:
     #
@@ -15,124 +13,7 @@ module Pubid
     #   R1016:ed2.0(F)
     #   C0103-1
     #   C0103-1 Ed 3.0
-    class Parser < ::Pubid::Parser::Grammar
-      include ::Pubid::Parser::CommonParseRules
-
-      root :identifier
-
-      rule(:space)  { str(" ") }
-      rule(:space?) { space.maybe }
-      rule(:dash)   { str("-") }
-      rule(:colon)  { str(":") }
-      rule(:dot)    { str(".") }
-      rule(:lparen) { str("(") }
-      rule(:rparen) { str(")") }
-
-      # Type prefix — IALA document classes. GA must be tried before G so it
-      # isn't left with a dangling "A". Captured to route to the right
-      # Identifiers::* subclass.
-      rule(:type_letter) do
-        (str("GA") | str("S") | str("R") | str("G") | str("M") |
-         str("C") | str("A") | str("L") | str("X") | str("P")).as(:type_letter)
-      end
-
-      # Document number — one or more decimal digits. The dataset historically
-      # zero-pads to 4 (S1070, R0126, M0001) but the canonical form going
-      # forward is unpadded (M1, GA1.1). Accept any length so both shapes
-      # round-trip; the number attribute preserves whatever was parsed.
-      rule(:doc_number) do
-        match("[0-9]").repeat(1).as(:doc_number)
-      end
-
-      # Dotted continuation that some prefixes use as part of the number:
-      # GA01.01 (series.index), L2.1.11 (series.sub.item). Captured into the
-      # same :doc_number atom so the number attribute stays a single string
-      # (e.g. "01.01", "2.1.11") and the existing builder needs no changes.
-      rule(:dotted_number) do
-        dot >> match("[0-9]").repeat(1)
-      end
-
-      rule(:number_with_dots) do
-        doc_number >> dotted_number.repeat.as(:doc_number_dots)
-      end
-
-      # Numeric sub-part suffix(es): "-1", "-9-10", "-11". The catalogue
-      # uses ranges like R0124-9-10 & 11 — that compound is captured
-      # verbatim and resolved by the caller, not here.
-      rule(:subpart) do
-        (dash >> digits.as(:subpart_number)).repeat(1).as(:subpart)
-      end
-
-      rule(:code) do
-        type_letter >> number_with_dots >> subpart.maybe
-      end
-
-      # Edition forms observed on covers and listing pages:
-      #   " Ed 2.0"      — cover-page human form
-      #   ":ed2.0"       — listing-page compact form
-      rule(:edition_human) do
-        (space >> str("Ed") >> space >> edition_value).as(:edition)
-      end
-
-      rule(:edition_compact) do
-        (colon >> str("ed") >> edition_value).as(:edition)
-      end
-
-      rule(:edition_value) do
-        (digits >> (dot >> digits).repeat).as(:edition_value)
-      end
-
-      rule(:edition) do
-        edition_human | edition_compact
-      end
-
-      # Language is a single uppercase letter inside parens: (E), (F), …
-      rule(:language) do
-        (space? >> lparen >>
-          (str("E") | str("F") | str("S") | str("C") | str("A") | str("R")).as(:language) >>
-          rparen).as(:language_group)
-      end
-
-      # Optional "IALA " prefix.
-      rule(:publisher) do
-        (str("IALA") >> space).maybe
-      end
-
-      rule(:identifier) do
-        annex_identifier | (publisher >> code >> edition.maybe >> language.maybe)
-      end
-
-      # Annex to a base publication. Wraps the base code and adds an
-      # "Annex" / "ANNEX" marker (case preserved verbatim), an optional
-      # single-letter suffix (A/B/C/D), then the usual edition + language.
-      # Tried before the flat `identifier` so the annex marker isn't left
-      # dangling after a successful base-code match.
-      #
-      # The letter suffix uses a negative lookahead for a following lowercase
-      # letter so the "E" in "Ed 1" isn't mis-captured as annex letter "E".
-      rule(:annex_identifier) do
-        (publisher >> type_letter >> number_with_dots >> subpart.maybe).as(:base) >>
-          space >> (str("Annex") | str("ANNEX")).as(:annex_marker) >>
-          (space >> match("[A-Z]").as(:annex_letter) >> match("[a-z]").absent?).maybe >>
-          edition.maybe >> language.maybe
-      end
-
-      # Parse a string and return the raw parslet tree.
-      # @param string [String]
-      # @return [Hash]
-      def self.parse(string)
-        unless string.is_a?(String)
-          raise ::Pubid::Errors::InvalidInputError,
-                ::Pubid::INPUT_NOT_A_STRING_MESSAGE
-        end
-
-        if string.length > ::Pubid::MAX_INPUT_LENGTH
-          raise ::Pubid::Errors::InvalidInputError,
-                ::Pubid::INPUT_TOO_LONG_MESSAGE
-        end
-
-        new.parse(string.strip)
-      end
+    class Parser
     end
   end
 end

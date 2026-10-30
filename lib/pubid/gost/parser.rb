@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require "parslet"
-
 module Pubid
   module Gost
-    # Parslet grammar for GOST identifiers.
+    # Grammar for GOST identifiers.
     #
     # Accepts the Latin and Cyrillic surface forms observed in the wild:
     #
@@ -26,86 +24,11 @@ module Pubid
     #
     # The builder interprets prefix_text (splits copublisher vs subtype,
     # normalizes Cyrillic to Latin) and raw (splits number vs year).
-    class Parser < ::Pubid::Parser::Grammar
-      include ::Pubid::Parser::CommonParseRules
-
-      root :identifier
-
-      rule(:space)  { str(" ") }
-      rule(:space?) { space.maybe }
-      rule(:dot)    { str(".") }
-
-      rule(:year_sep) do
-        (str("-") | str("—") | str("–")) >> space?.maybe
-      end
-
-      rule(:gost_word) do
-        (str("GOST") | str("ГОСТ")).as(:gost_word) >> space
-      end
-
-      rule(:scope_r) do
-        (match("R") | match("Р")).as(:scope_r) >> space
-      end
-
-      # Everything between scope_r and the first digit: copublisher,
-      # subtype, or both. Captured as a raw string — the builder splits
-      # it into copublisher + subtype. Matches uppercase letters (Latin
-      # and Cyrillic), forward slashes, and spaces between words.
-      rule(:prefix_text) do
-        (match("[A-ZА-Яa-zа-я/]").repeat(1) >>
-          (space >> match("[A-ZА-Яa-zа-я/]").repeat(1)).repeat).as(:prefix_text) >> space
-      end
-
-      rule(:digits) do
-        match("[0-9]").repeat(1)
-      end
-
-      rule(:raw_body) do
-        (digits >> ((dot | year_sep) >> digits).repeat).as(:raw)
-      end
-
-      # IDT adoption suffix: "/<foreign-identifier>". The slash is
-      # consumed but NOT captured — only the foreign identifier text
-      # goes into :adopted_raw. Captures everything after the first
-      # slash, including subsequent slashes (the adopted identifier
-      # may itself contain slashes, e.g. "ISO/TR 25901-1:2016").
-      rule(:adopted_part) do
-        space?.maybe >> str("/") >> match(".").repeat(1).as(:adopted_raw)
-      end
-
-      # Adoption reference in parens: "(<foreign-id>)". The parens
-      # themselves are consumed but NOT captured. The content goes
-      # into :adopted_reference_raw. This form appears for MOD/NEQ
-      # adoptions where the foreign standard is referenced but not
-      # identical (IDT would use the slash form instead).
-      rule(:adopted_reference_part) do
-        space?.maybe >> str("(") >> match("[^)]").repeat(1).as(:adopted_reference_raw) >> str(")")
-      end
-
-      rule(:identifier) do
-        gost_word >> scope_r.maybe >> prefix_text.maybe >> raw_body >>
-          adopted_part.maybe >> adopted_reference_part.maybe
-      end
-
-      # Pre-parse ingestion normalizations (R2): every parse path —
-      # parslet and PG artifact alike — feeds the grammar the same
-      # normalized string.
+    class Parser
+      # Pre-parse ingestion normalizations (R2): every parse path feeds
+      # the grammar the same normalized string.
       def self.normalize_input(string)
         string.strip
-      end
-
-      def self.parse(string)
-        unless string.is_a?(String)
-          raise ::Pubid::Errors::InvalidInputError,
-                ::Pubid::INPUT_NOT_A_STRING_MESSAGE
-        end
-
-        if string.length > ::Pubid::MAX_INPUT_LENGTH
-          raise ::Pubid::Errors::InvalidInputError,
-                ::Pubid::INPUT_TOO_LONG_MESSAGE
-        end
-
-        new.parse(normalize_input(string))
       end
     end
   end
