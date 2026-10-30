@@ -13,8 +13,8 @@ module Pubid
         # The shared Grammar strips a trailing "(all parts)", but the NIST
         # preprocessor runs first and would swallow it — strip before it and
         # carry the marker to the tree like Grammar#parse does.
-        all_parts = input.is_a?(String) && input.match?(::Pubid::Parser::Grammar::ALL_PARTS_SUFFIX)
-        input = input.sub(::Pubid::Parser::Grammar::ALL_PARTS_SUFFIX, "") if all_parts
+        all_parts = input.is_a?(String) && input.match?(::Pubid::Parser::ALL_PARTS_SUFFIX)
+        input = input.sub(::Pubid::Parser::ALL_PARTS_SUFFIX, "") if all_parts
         result = Preprocessor.new(input).call
         parsed = Pubid::Parg::Backend.parse(:nist, result.cleaned)
         if all_parts

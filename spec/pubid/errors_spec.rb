@@ -52,14 +52,8 @@ RSpec.describe Pubid::Errors do
   end
 
   describe Pubid::Errors::ParseError do
-    it "accepts parslet's two positional arguments" do
-      cause = nil
-      begin
-        Pubid::Iso::Parser.new.parse("@@@ not an identifier @@@")
-      rescue described_class => e
-        cause = e.parse_failure_cause
-      end
-
+    it "accepts the two positional arguments (message, cause)" do
+      cause = Object.new
       error = described_class.new("boom", cause)
       expect(error.message).to eq("boom")
       expect(error.parse_failure_cause).to equal(cause)
