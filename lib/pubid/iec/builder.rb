@@ -27,80 +27,112 @@ module Pubid
           raise(ArgumentError, "Unknown type code: #{typed_stage.type_code}")
       end
 
+      # Bound-hash layer fields: the base, the first supplement and the
+      # second supplement capture into disjoint key sets, so each
+      # wrapper's data can be peeled off the flat hash by name.
+      SUPP_KEYS = %i[supp_type_with_stage supp_number_with_part
+                     supp_stage_iteration supp_date supp_undated_marker
+                     supp_edition].freeze
+      SUPP2_KEYS = %i[supp2_type_with_stage supp2_number_with_part
+                      supp2_stage_iteration supp2_date supp2_undated_marker
+                      supp2_edition].freeze
+      FRAG_ABBRS = (Identifiers::FragmentIdentifier::TYPED_STAGES
+        .flat_map(&:abbr) + ["FRAGC"]).freeze
+      # third_part's /FRAGN notation wraps the OUTERMOST layer, so every
+      # early-return branch applies it and every inner base build strips
+      # it.
+      FRAG_NOTATION_KEYS = %i[fragment_type fragment_number].freeze
+
+      # third_part's /FRAGN notation (distinct from a FRAG typed stage)
+      # wraps the finished identifier.
+      def apply_fragment_notation(identifier, parsed_hash)
+        if parsed_hash[:fragment_type] && parsed_hash[:fragment_number]
+          return wrap_with_fragment(identifier,
+                                    parsed_hash[:fragment_number].to_s,
+                                    nil, Pubid::Iec.locate_stage("FRAG"))
+        end
+        identifier
+      end
+
       def build(parsed_hash)
         all_parts = parsed_hash.delete(:all_parts)
 
-        # Handle sheet_supplement_identifier pattern:
-        # {base: {...}, sheet_number: ..., sheet_year: ..., type_with_stage: "COR", number_with_part: "1", date: "1995"}
-        # This is a Corrigendum/Amendment wrapping a SheetIdentifier
-        if parsed_hash[:base] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year]) && parsed_hash[:type_with_stage]
-          # Extract sheet info first
-          sheet_number = parsed_hash.delete(:sheet_number)
-          sheet_year = parsed_hash.delete(:sheet_year)
-
-          # Build the base identifier (IEC 60695-2-1 with /1:1994 -> SheetIdentifier)
-          base_parsed = parsed_hash[:base].dup
-          base_parsed[:sheet_number] = sheet_number
-          base_parsed[:sheet_year] = sheet_year if sheet_year
-          sheet_id = wrap_with_sheet(build(base_parsed), sheet_number,
-                                     sheet_year)
-
-          # Now build the supplement on top of the sheet
-          # We need to preserve the supplement data and create a wrapper
-          supplement_type = parsed_hash.delete(:type_with_stage)
-          supplement_number = parsed_hash.delete(:number_with_part)
-          supplement_date = parsed_hash.delete(:date)
-          supplement_edition = parsed_hash.delete(:edition)
-
-          # Locate the supplement identifier class
-          typed_stage = locate_typed_stage(supplement_type)
-          identifier_class = Pubid::Iec.locate_type(typed_stage.type_code) ||
-            raise(ArgumentError, "Unknown type code: #{typed_stage.type_code}")
-
-          # Create the supplement identifier
-          supplement = identifier_class.new
-          supp_attrs = identifier_class.attributes
-          if supp_attrs.key?(:number)
-            supplement.number = supplement_number.to_s
-          end
-          if supplement_date && supp_attrs.key?(:date)
-            supplement.date = cast(:date, supplement_date)
-          end
-          if supplement_edition && supp_attrs.key?(:edition)
-            supplement.edition = cast(:edition, supplement_edition)
-          end
-          supplement.typed_stage = typed_stage
-
-          # Wrap the sheet with the supplement
-          return wrap_with_supplement(sheet_id, supplement)
+        # Second supplement layer (/AMD1:2018/COR1:2019): build the
+        # first-supplement form, then wrap the second supplement around
+        # it.
+        if parsed_hash[:supp2_type_with_stage]
+          supp2 = supplement_fields(parsed_hash, SUPP2_KEYS)
+          inner = build(parsed_hash.reject { |key, _| SUPP2_KEYS.include?(key) })
+          return apply_fragment_notation(wrap_supplement_layer(inner, supp2),
+                                         parsed_hash)
         end
 
-        # Handle sheet_identifier pattern: {base: {...}, sheet_number: ..., sheet_year: ...}
-        if parsed_hash[:base] && (parsed_hash[:sheet_number] || parsed_hash[:sheet_year])
-          # Build the base identifier first
-          base_id = build(parsed_hash[:base])
-          # Wrap with SheetIdentifier
+        # Sheet + supplement (…/1:1994/COR1): the sheet wraps the base,
+        # the supplement wraps the sheet. build re-enters the sheet
+        # branch for the base.
+        if parsed_hash[:sheet_number] && parsed_hash[:supp_type_with_stage]
+          supp = supplement_fields(parsed_hash, SUPP_KEYS)
+          base_hash = parsed_hash.reject { |key, _| SUPP_KEYS.include?(key) }
+          sheet_id = build(base_hash)
+          return apply_fragment_notation(wrap_supplement_layer(sheet_id, supp),
+                                         parsed_hash)
+        end
+
+        # Sheet notation (…/1:1994 or …/1): the remaining fields are the
+        # sheet's base identifier.
+        if parsed_hash[:sheet_number]
           sheet_number = parsed_hash.delete(:sheet_number)
           sheet_year = parsed_hash.delete(:sheet_year)
-          return wrap_with_sheet(base_id, sheet_number, sheet_year)
+          rest = parsed_hash.reject { |key, _| FRAG_NOTATION_KEYS.include?(key) }
+          return apply_fragment_notation(
+            wrap_with_sheet(build(rest), sheet_number, sheet_year),
+            parsed_hash,
+          )
+        end
+
+        # Standalone supplement (IEC/AMD 1:2017 — no base designation):
+        # the supplement's own fields are the primary ones.
+        if parsed_hash[:supp_type_with_stage] && !parsed_hash[:number_with_part] &&
+            !parsed_hash[:trf_org] && !parsed_hash[:technical_committee]
+          return build(standalone_supplement_hash(parsed_hash))
         end
 
         # Extract FRAG/FRAGC indicator if present
         frag_abbrs = Pubid::Iec::Identifiers::FragmentIdentifier::TYPED_STAGES
           .flat_map(&:abbr)
         is_fragment = frag_abbrs.include?(parsed_hash[:type_with_stage]) ||
-          parsed_hash[:type_with_stage] == "FRAGC"
+          parsed_hash[:type_with_stage] == "FRAGC" ||
+          frag_abbrs.include?(parsed_hash[:supp_type_with_stage]) ||
+          parsed_hash[:supp_type_with_stage] == "FRAGC"
         fragment_typed_stage = nil
         fragment_number = nil
         fragment_edition = nil
 
         if is_fragment
           # For FRAG typed stages, look up the fragment's own typed stage
-          fragment_typed_stage = Pubid::Iec.locate_stage(parsed_hash[:type_with_stage])
+          fragment_typed_stage = Pubid::Iec.locate_stage(parsed_hash[:type_with_stage] ||
+            parsed_hash[:supp_type_with_stage])
 
           # FRAGC is a rendering notation, not a typed stage abbreviation;
           # fall back to the canonical "FRAG" typed stage
           fragment_typed_stage ||= Pubid::Iec.locate_stage("FRAG")
+
+          # For FRAG/FRAGC, we need to build the base Amendment/Corrigendum
+          # then wrap it with FragmentIdentifier
+          if parsed_hash[:supp_type_with_stage] &&
+              (parsed_hash[:number_with_part] || parsed_hash[:trf_org])
+            # FRAG riding the supplement layer: the base is the rest.
+            fragment_number = parsed_hash[:supp_number_with_part].to_s
+            fragment_edition = parsed_hash[:supp_edition]
+            base_id = build(parsed_hash.reject do |key, _|
+              SUPP_KEYS.include?(key) || FRAG_NOTATION_KEYS.include?(key)
+            end)
+            return apply_fragment_notation(
+              wrap_with_fragment(base_id, fragment_number,
+                                 fragment_edition, fragment_typed_stage),
+              parsed_hash,
+            )
+          end
 
           # For FRAG/FRAGC, we need to build the base Amendment/Corrigendum
           # then wrap it with FragmentIdentifier
@@ -134,6 +166,18 @@ module Pubid
             cispr_id.public_send("#{k}=", v) if attrs.key?(k.to_sym)
           end
           parsed_hash[:cispr_identifier] = cispr_id
+        end
+
+        # Supplement over a base designation (…/AMD1:2021): build the
+        # base from the remaining fields, then wrap.
+        if parsed_hash[:supp_type_with_stage]
+          supp = supplement_fields(parsed_hash, SUPP_KEYS)
+          base_hash = parsed_hash.reject do |key, _|
+            SUPP_KEYS.include?(key) || FRAG_NOTATION_KEYS.include?(key)
+          end
+          base = build(base_hash)
+          return apply_fragment_notation(wrap_supplement_layer(base, supp),
+                                         parsed_hash)
         end
 
         # Extract and store wrapper data before building
@@ -280,6 +324,70 @@ module Pubid
           sheet_number: sheet_number.to_s,
           year: year_value,
         )
+      end
+
+      # Peels one supplement layer's supp_* / supp2_* fields off the
+      # flat bound hash.
+      def supplement_fields(parsed_hash, keys)
+        parsed_hash.slice(*keys).transform_keys { |key|
+          key.to_s.delete_prefix("supp").delete_prefix("2_").gsub(/\A_/, "").to_sym
+        }
+      end
+
+      # Wraps one supplement layer around its base: a FRAG/FRAGC layer
+      # is a FragmentIdentifier wrapper, anything else is an
+      # Amendment/Corrigendum built from the layer's fields.
+      def wrap_supplement_layer(base, supp)
+        abbr = supp[:type_with_stage].to_s
+        if FRAG_ABBRS.include?(abbr)
+          typed_stage = Pubid::Iec.locate_stage(abbr) ||
+                        Pubid::Iec.locate_stage("FRAG")
+          return wrap_with_fragment(base, supp[:number_with_part].to_s,
+                                    supp[:edition], typed_stage)
+        end
+        wrap_with_supplement(base, build_supplement(supp))
+      end
+
+      # Materializes one supplement (Amendment/Corrigendum/…) from its
+      # layer's fields.
+      def build_supplement(fields)
+        typed_stage = locate_typed_stage(fields[:type_with_stage])
+        identifier_class = Pubid::Iec.locate_type(typed_stage.type_code) ||
+          raise(ArgumentError, "Unknown type code: #{typed_stage.type_code}")
+
+        supplement = identifier_class.new
+        supp_attrs = identifier_class.attributes
+        if supp_attrs.key?(:number) && fields[:number_with_part]
+          supplement.number = fields[:number_with_part].to_s
+        end
+        if supp_attrs.key?(:date)
+          if fields[:date]
+            supplement.date = parse_date(fields[:date])
+          elsif fields[:undated_marker]
+            supplement.date = Pubid::Components::Date.new(undated: true)
+          end
+        end
+        if supp_attrs.key?(:edition) && fields[:edition]
+          supplement.edition = Pubid::Components::Edition.new(number: fields[:edition].to_s)
+        end
+        supplement.typed_stage = typed_stage
+        supplement
+      end
+
+      # A standalone supplement (IEC/AMD 1:2017) has no base designation:
+      # its supp_* fields become the primary ones.
+      def standalone_supplement_hash(parsed_hash)
+        parsed_hash
+          .slice(:publisher, :copublishers, :type_with_stage_fr,
+                 :languages, :fragment_type, :fragment_number, :all_parts)
+          .merge(
+            type_with_stage: parsed_hash[:supp_type_with_stage],
+            number_with_part: parsed_hash[:supp_number_with_part],
+            stage_iteration: parsed_hash[:supp_stage_iteration],
+            date: parsed_hash[:supp_date],
+            undated_marker: parsed_hash[:supp_undated_marker],
+            edition: parsed_hash[:supp_edition],
+          ).compact
       end
 
       # Wrap base identifier with supplement (Amendment/Corrigendum)

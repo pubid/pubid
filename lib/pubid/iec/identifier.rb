@@ -323,7 +323,7 @@ module Pubid
 
         # Apply legacy update_codes normalization first, before any other preprocessing
         normalized = Core::UpdateCodes.apply(string, :iec)
-        parsed = Pubid::Parg::Backend.parse(:iec, Pubid::Iec::Parser.normalize_input(normalized))
+        parsed = Pubid::Parg::Model.bound(:iec, Pubid::Iec::Parser.normalize_input(normalized))
         Pubid::Iec::Builder.new.build(parsed)
       end
 
