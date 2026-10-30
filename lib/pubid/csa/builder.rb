@@ -101,7 +101,7 @@ module Pubid
           else
             begin
               Pubid::Iso.parse(base_str)
-            rescue Parslet::ParseFailed
+            rescue Pubid::Errors::ParseError
               Pubid::Iec.parse(base_str)
             end
           end
@@ -135,7 +135,7 @@ module Pubid
                  else
                    begin
                      Pubid::Iso.parse(amendment_str)
-                   rescue Parslet::ParseFailed
+                   rescue Pubid::Errors::ParseError
                      Pubid::Iec.parse(amendment_str)
                    end
                  end
@@ -155,7 +155,7 @@ module Pubid
                  else
                    begin
                      Pubid::Iso.parse(wrapped_id_str)
-                   rescue Parslet::ParseFailed
+                   rescue Pubid::Errors::ParseError
                      Pubid::Iec.parse(wrapped_id_str)
                    end
                  end

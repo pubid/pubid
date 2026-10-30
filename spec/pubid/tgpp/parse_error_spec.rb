@@ -3,7 +3,7 @@
 require "spec_helper"
 
 RSpec.describe "3GPP parse error class" do
-  # An unrecognized reference must raise Parslet::ParseFailed (matching ISO and
+  # An unrecognized reference must raise Pubid::Errors::ParseError (matching ISO and
   # ETSI, and what relaton-cli's fetch handler rescues) rather than a bare
   # RuntimeError, which escapes relaton-cli as a raw Ruby backtrace.
   [
@@ -13,13 +13,13 @@ RSpec.describe "3GPP parse error class" do
     "",           # empty input
   ].each do |bad|
     context "with the unrecognized reference #{bad.inspect}" do
-      it "raises Parslet::ParseFailed from Identifier.parse" do
+      it "raises Pubid::Errors::ParseError from Identifier.parse" do
         expect { Pubid::Tgpp::Identifier.parse(bad) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
 
-      it "raises Parslet::ParseFailed from the module-level parse" do
-        expect { Pubid::Tgpp.parse(bad) }.to raise_error(Parslet::ParseFailed)
+      it "raises Pubid::Errors::ParseError from the module-level parse" do
+        expect { Pubid::Tgpp.parse(bad) }.to raise_error(Pubid::Errors::ParseError)
       end
     end
   end

@@ -30,7 +30,7 @@ RSpec.describe "NIST /Upd update round-trip" do
   end
 
   describe "the unpadded /Upd strings parse directly" do
-    # These previously raised Parslet::ParseFailed (the dangling 5th digit was
+    # These previously raised Pubid::Errors::ParseError (the dangling 5th digit was
     # not consumed by the year(4)+month(2) grammar).
     ["NBS LC 145/Upd1-19256", "NBS LC 59/Upd1-19245"].each do |str|
       it "parses #{str} without error" do

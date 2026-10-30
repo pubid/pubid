@@ -40,7 +40,7 @@ RSpec.describe Pubid::Omg::Identifier do
 
     it "raises on malformed input" do
       expect { described_class.parse("OMG") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
   end
 
@@ -327,7 +327,7 @@ RSpec.describe Pubid::Omg::Identifier do
      "OMG +DDS"].each do |ref|
       it "rejects #{ref.inspect}" do
         expect { described_class.parse(ref) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
   end
@@ -338,6 +338,6 @@ RSpec.describe Pubid::Omg::Identifier do
     title = "OMG Model Driven Architecture Guide rev. 2.0"
 
     expect { described_class.parse(title) }
-      .to raise_error(Parslet::ParseFailed)
+      .to raise_error(Pubid::Errors::ParseError)
   end
 end

@@ -97,7 +97,7 @@ RSpec.describe "IEEE split document number (relaton index key)" do
     ["IEEE S", "IEEE Std S", "IEEE WHITE", "IEEE NESC", "IEEE SA"].each do |ref|
       it "#{ref.inspect} raises rather than yielding a numberless Standard" do
         expect { Pubid::Ieee::Identifier.parse(ref) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
   end
@@ -110,7 +110,7 @@ RSpec.describe "IEEE split document number (relaton index key)" do
     ["IEC/IEEE TR", "IEC/IEEE PAS"].each do |ref|
       it "#{ref.inspect} raises rather than yielding a numberless row" do
         expect { Pubid::Ieee::Identifier.parse(ref) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
   end

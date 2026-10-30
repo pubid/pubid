@@ -312,7 +312,7 @@ module Pubid
         else
           parse_single(result.input)
         end
-      rescue Parslet::ParseFailed
+      rescue Pubid::Errors::ParseError
         parse_single(input)
       end
 

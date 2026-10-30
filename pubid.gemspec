@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = Gem::Requirement.new(">= 3.0.0")
 
   spec.add_dependency "lutaml-model", "~> 0.8"
-  spec.add_dependency "parslet"
   # The PARG artifact runtime: the baked flavor grammars parse through
   # Parsanol::PARG (the Gemfile's git pin is the dev source; published
   # gems resolve this from rubygems). 1.3.57 is the first release whose

@@ -149,12 +149,12 @@ RSpec.describe Pubid::Evs do
   describe "invalid input" do
     it "rejects non-EVS strings" do
       expect { described_class.parse("BS EN 18216:2026") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
 
     it "rejects garbage after the adoption prefix" do
       expect { described_class.parse("EVS-EN nonsense!") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
   end
 
@@ -206,7 +206,7 @@ RSpec.describe Pubid::Evs do
   describe "case sensitivity" do
     it "rejects a lowercase national prefix" do
       expect { described_class.parse("evs-en 18216:2026") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
   end
 end

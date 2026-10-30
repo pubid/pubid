@@ -67,7 +67,7 @@ module Pubid
           NIST_IDENTIFIERS.each do |id|
             Pubid::Nist.parse(id)
             valid_nist << id
-          rescue Parslet::ParseFailed
+          rescue Pubid::Errors::ParseError
             # Skip unparsable identifiers
             next
           end

@@ -301,7 +301,7 @@ RSpec.describe Pubid::Nist::Identifiers::LetterCircular do
       # Single-digit revision: year+revision fuse into an unpadded 5-digit Upd
       # suffix (1925 + 6 -> "19256", not "192506"). Regression guard for the
       # round-trip fix — this generated output previously raised
-      # Parslet::ParseFailed when fed back in.
+      # Pubid::Errors::ParseError when fed back in.
       describe "NBS.LC.145r6/1925" do
         subject { "NBS.LC.145r6/1925" }
 

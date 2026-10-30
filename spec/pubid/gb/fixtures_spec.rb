@@ -88,7 +88,7 @@ RSpec.describe "GB fixtures" do
           accepted = inputs.reject do |input|
             Pubid::Gb.parse(input)
             false
-          rescue Parslet::ParseFailed, Pubid::Errors::Error
+          rescue Pubid::Errors::ParseError, Pubid::Errors::Error
             true
           end
 

@@ -20,7 +20,7 @@ module Pubid
     # Neutral error vocabulary. Each implementation maps its native
     # exceptions onto these codes; the corpus never records Ruby classes.
     ERROR_CODES = {
-      "Parslet::ParseFailed" => "parse_failed",
+      "Pubid::Errors::ParseError" => "parse_failed",
       "ArgumentError" => "invalid_argument",
     }.freeze
 

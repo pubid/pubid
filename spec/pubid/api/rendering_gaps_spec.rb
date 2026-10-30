@@ -88,9 +88,8 @@ RSpec.describe "Pubid::Api rendering" do
         .root.number
     end
 
-    it "is now a String, not a Parslet::Slice" do
+    it "is now a String, not a parser artifact" do
       expect(number).to be_a(String)
-      expect(number).not_to be_a(Parslet::Slice)
     end
 
     it "carries the document number" do

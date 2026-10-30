@@ -51,7 +51,7 @@ RSpec.describe "Pubid::Amca rendering" do
         .each do |line|
           urn = begin
             Pubid::Amca.parse(line).to_urn
-          rescue Parslet::ParseFailed
+          rescue Pubid::Errors::ParseError
             next
           end
           expect(urn).not_to include("{"), line
