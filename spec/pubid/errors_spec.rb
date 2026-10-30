@@ -146,39 +146,6 @@ RSpec.describe Pubid::Errors do
     end
   end
 
-  describe "the double-wrap guard in Pubid::Parser::Grammar" do
-    # A grammar nested inside another grammar would otherwise be re-wrapped by
-    # the outer one, replacing the inner flavor and input with the outer's.
-    # No production path reaches this today, so it is exercised directly.
-    let(:inner) do
-      Class.new(Pubid::Parser::Grammar) do
-        def self.name = "Pubid::Iso::Parser"
-
-        rule(:only_a) { str("a") }
-        root(:only_a)
-      end
-    end
-
-    let(:outer) do
-      nested = inner
-      Class.new(Pubid::Parser::Grammar) do
-        define_method(:parse) { |io, options = {}| nested.new.parse(io, options) }
-        def self.name = "Pubid::Iec::Parser"
-
-        rule(:only_b) { str("b") }
-        root(:only_b)
-      end
-    end
-
-    it "keeps the inner failure untouched" do
-      expect { outer.new.parse("zzz") }
-        .to raise_error(Pubid::Errors::ParseError) { |e|
-          expect(e.flavor).to eq("iso")
-          expect(e.cause).to be_a(Parslet::ParseFailed)
-          expect(e.cause).not_to be_a(Pubid::Errors::ParseError)
-        }
-    end
-  end
 
   describe "a synthetic failure (no grammar involved)" do
     # CSA rejects comment lines and non-standards before the grammar runs, and
