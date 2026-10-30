@@ -19,7 +19,7 @@ module Pubid
         all_parts = input.is_a?(String) && input.match?(::Pubid::Parser::Grammar::ALL_PARTS_SUFFIX)
         input = input.sub(::Pubid::Parser::Grammar::ALL_PARTS_SUFFIX, "") if all_parts
         result = Preprocessor.new(input).call
-        parsed = new.parse(result.cleaned)
+        parsed = Pubid::Parg::Backend.parse(:nist, result.cleaned)
         if all_parts
           parsed = case parsed
                    when Hash then parsed.merge(all_parts: true)
