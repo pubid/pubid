@@ -11,7 +11,6 @@ module Pubid
     autoload :Builder,      "#{__dir__}/iho/builder"
     autoload :Identifier, "#{__dir__}/iho/identifiers/base"
     autoload :Identifiers,  "#{__dir__}/iho/identifiers"
-    autoload :Parser,       "#{__dir__}/iho/parser"
     autoload :Renderer,     "#{__dir__}/iho/renderer"
     autoload :UrnGenerator, "#{__dir__}/iho/urn_generator"
     autoload :UrnParser, "#{__dir__}/iho/urn_parser"

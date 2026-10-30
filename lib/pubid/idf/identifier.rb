@@ -83,7 +83,7 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Idf::Parser.new.parse(string)
+        parsed = Pubid::Parg::Backend.parse(:idf, string)
         Pubid::Idf::Builder.new.build(parsed)
       end
     end

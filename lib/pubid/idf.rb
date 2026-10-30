@@ -28,10 +28,9 @@ module Pubid
         raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
       end
 
-      parser = Parser.new
       builder = Builder.new
 
-      parsed = parser.parse(identifier)
+      parsed = Pubid::Parg::Backend.parse(:idf, identifier)
       builder.build(parsed)
     end
 

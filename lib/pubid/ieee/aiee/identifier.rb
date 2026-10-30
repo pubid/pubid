@@ -35,7 +35,8 @@ module Pubid
 
         # Parse AIEE identifier string
         def self.parse(input)
-          parsed = Parser.new.parse(input)
+          parsed = Pubid::Parg::Backend.parse(:aiee, input,
+                                    entry: "aiee_identifier")
           Builder.new.build(parsed)
         end
 

@@ -13,6 +13,11 @@ module Pubid
       }.freeze
 
       def build(parsed_hash)
+        # The Parslet tree carried a zero-width type_with_stage (an empty
+        # capture when no type is spelled) whose cast drove the default
+        # stage; the artifact tree omits the key entirely — restore the
+        # default input.
+        parsed_hash[:type_with_stage] ||= ""
         all_parts = parsed_hash.delete(:all_parts)
         typed_stage = Pubid::Idf.locate_stage(parsed_hash[:type_with_stage])
         identifier = Pubid::Idf.locate_type(typed_stage.type_code).new
