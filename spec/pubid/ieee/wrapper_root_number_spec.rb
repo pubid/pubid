@@ -34,7 +34,7 @@ module IeeeWrapperKeySpec
     @parsed_corpus ||= FIXTURE_LINES.filter_map do |line|
       id = begin
         Pubid::Ieee.parse(line)
-      rescue StandardError, Parslet::ParseFailed
+      rescue StandardError, Pubid::Errors::ParseError
         nil
       end
       [line, id] if id

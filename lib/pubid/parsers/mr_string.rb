@@ -116,7 +116,7 @@ module Pubid
         # failure — the class the cross-flavor contract requires, and the one
         # `Pubid.parse` treats as "try the next flavor".
         if identifier_string == mr_string && flavor_module == Pubid::Iso
-          raise Parslet::ParseFailed,
+          raise Pubid::Errors::ParseError,
                 "#{mr_string.inspect} is not an MR string"
         end
 

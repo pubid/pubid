@@ -128,7 +128,7 @@ RSpec.describe "Pubid::Ecma edition and volume" do
     ].each do |input|
       it "rejects #{input.inspect}" do
         expect { Pubid::Ecma::Identifier.parse(input) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
   end

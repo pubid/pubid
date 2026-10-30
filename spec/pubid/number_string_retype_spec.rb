@@ -192,7 +192,7 @@ module NumberStringRetypeSpec
 
     def try_parse(klass, line)
       klass.parse(line)
-    rescue StandardError, Parslet::ParseFailed
+    rescue StandardError, Pubid::Errors::ParseError
       nil
     end
   end

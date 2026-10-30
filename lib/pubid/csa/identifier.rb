@@ -433,7 +433,7 @@ module Pubid
         result.year_format = "dash" if has_dash_year && result.year_format.nil?
 
         result
-      rescue Parslet::ParseFailed => e
+      rescue Pubid::Errors::ParseError => e
         raise e
       end
 
@@ -459,7 +459,7 @@ module Pubid
       # it is the one caller that genuinely wants a nil rather than a raise.
       def self.try_parse(input)
         parse(input)
-      rescue Parslet::ParseFailed, ArgumentError
+      rescue Pubid::Errors::ParseError, ArgumentError
         nil
       end
 

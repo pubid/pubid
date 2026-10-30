@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "parslet"
 
 module Pubid
   module Iso
@@ -28,7 +27,7 @@ module Pubid
           candidate = match[1]
           begin
             return Pubid::Iso.parse(candidate)
-          rescue Parslet::ParseFailed
+          rescue Pubid::Errors::ParseError
             # Continue to next method
           end
         end
@@ -52,7 +51,7 @@ module Pubid
         end
         matches.each do |m|
           return Pubid::Iso.parse(m[0].strip)
-        rescue Parslet::ParseFailed
+        rescue Pubid::Errors::ParseError
           # Try next match
         end
 
@@ -62,7 +61,7 @@ module Pubid
           candidate = words[-count..].join(" ")
           begin
             return Pubid::Iso.parse(candidate)
-          rescue Parslet::ParseFailed
+          rescue Pubid::Errors::ParseError
             # Try with fewer words
           end
         end
@@ -74,7 +73,7 @@ module Pubid
 
           begin
             return Pubid::Iso.parse(part.strip)
-          rescue Parslet::ParseFailed
+          rescue Pubid::Errors::ParseError
             # Try next part
           end
         end

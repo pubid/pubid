@@ -127,7 +127,7 @@ module Pubid
         # which starts with an OIML prefix), parses each side through its
         # own flavor and returns the wrapper. Returns nil for anything else,
         # so the caller (Pubid::Oiml.parse) falls through to the ordinary
-        # grammar, which raises the standard Parslet::ParseFailed for a
+        # grammar, which raises the standard Pubid::Errors::ParseError for a
         # string containing "|" (the grammar defines no rule for it).
         def self.build(identifier)
           sides = split_sides(identifier)
@@ -164,7 +164,7 @@ module Pubid
 
         def self.parse_side(str, oiml:)
           oiml ? Oiml.parse(str) : ::Pubid.parse(str)
-        rescue Parslet::ParseFailed, Pubid::Errors::InvalidInputError
+        rescue Pubid::Errors::ParseError, Pubid::Errors::InvalidInputError
           nil
         end
         private_class_method :parse_side

@@ -60,7 +60,7 @@ module CsaIndexKeySpec
   def self.parsed_corpus
     @parsed_corpus ||= FIXTURE_LINES.filter_map do |line|
       [line, Pubid::Csa::Identifier.parse(line)]
-    rescue Parslet::ParseFailed, ArgumentError
+    rescue Pubid::Errors::ParseError, ArgumentError
       nil
     end
   end
@@ -212,16 +212,16 @@ RSpec.describe "Pubid::Csa index key (root.number)" do
       "an unparseable string" => "ZZZ nonsense 999",
       "a generator artifact" => "!CAN/CSA-ISO 10993.11-98 (R2003)!",
     }.each do |what, input|
-      it "raises Parslet::ParseFailed for #{what}" do
+      it "raises Pubid::Errors::ParseError for #{what}" do
         expect { Pubid::Csa::Identifier.parse(input) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
 
     it "never returns nil across the whole fixture corpus" do
       nils = CsaIndexKeySpec::FIXTURE_LINES.select do |line|
         Pubid::Csa::Identifier.parse(line).nil?
-      rescue Parslet::ParseFailed, ArgumentError
+      rescue Pubid::Errors::ParseError, ArgumentError
         false
       end
 

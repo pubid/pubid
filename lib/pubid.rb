@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "lutaml/model"
-require "parslet"
 
 # Eagerly load the Lutaml::Model patch (disables reference store to avoid
 # unbounded memory growth during bulk parsing, and adds a default +to_urn+
@@ -114,7 +113,7 @@ module Pubid
       #
       # @param string [String] the identifier string
       # @return [Pubid::Identifier]
-      # @raise [Parslet::ParseFailed] when no flavor can parse it
+      # @raise [Pubid::Errors::ParseError] when no flavor can parse it
       def parse(string, **opts)
         Pubid.parse(string, **opts)
       end
@@ -238,7 +237,7 @@ module Pubid
   # @param format [Symbol] :auto, :human, :mr_string, or :urn
   # @return [Identifier] The parsed identifier
   # @raise [ArgumentError] for a non-String, or one over {MAX_INPUT_LENGTH}
-  # @raise [Parslet::ParseFailed] when no flavor can parse the string — the
+  # @raise [Pubid::Errors::ParseError] when no flavor can parse the string — the
   #   class every flavor's own +parse+ raises (see the parse-failure contract)
   def self.parse(string, format: :auto)
     unless string.is_a?(String)
@@ -259,13 +258,13 @@ module Pubid
       # standing example. Fall through to prefix routing when the MR parse
       # fails, rather than reporting an MR error for a string that was never
       # an MR string. A genuine MR failure still surfaces, from the second
-      # attempt, as Parslet::ParseFailed.
+      # attempt, as Pubid::Errors::ParseError.
       #
       # Narrow, for the reason spelled out on {parse_by_prefix}: only a parse
       # failure means "wrong shape". Anything else is a defect and propagates.
       begin
         Parsers::MrString.parse(string)
-      rescue Parslet::ParseFailed
+      rescue Pubid::Errors::ParseError
         parse_by_prefix(string)
       end
     when :urn
@@ -358,7 +357,7 @@ module Pubid
   #
   # @param string [String] a human-readable identifier
   # @return [Identifier]
-  # @raise [Parslet::ParseFailed] when no flavor accepts the string
+  # @raise [Pubid::Errors::ParseError] when no flavor accepts the string
   # @api private
   def self.parse_by_prefix(string)
     eager_load_flavors!
@@ -370,7 +369,7 @@ module Pubid
     (prefix_owners + other_candidates(prefix_owners)).each do |mod|
       begin
         parsed = mod.parse(string)
-      rescue Parslet::ParseFailed => e
+      rescue Pubid::Errors::ParseError => e
         # ONLY a parse failure means "not this flavor's identifier". Every
         # other exception is a defect in that flavor and must propagate.
         #
@@ -411,7 +410,7 @@ module Pubid
     return fallback if fallback
     raise first_error if first_error
 
-    raise Parslet::ParseFailed,
+    raise Pubid::Errors::ParseError,
           "no registered flavor could parse #{string.inspect}"
   end
   private_class_method :parse_by_prefix
@@ -474,7 +473,7 @@ module Pubid
       begin
         mod.parse(ROUTING_PROBE)
         true
-      rescue StandardError, Parslet::ParseFailed
+      rescue StandardError, Pubid::Errors::ParseError
         false
       end
   end

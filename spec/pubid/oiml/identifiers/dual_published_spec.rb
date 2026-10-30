@@ -46,20 +46,20 @@ RSpec.describe Pubid::Oiml::Identifiers::DualPublished do
     end
 
     context "malformed dual-published strings" do
-      it "raises Parslet::ParseFailed when neither side is OIML" do
+      it "raises Pubid::Errors::ParseError when neither side is OIML" do
         expect { Pubid::Oiml.parse("ISO 4064-1:2024|ISO 4064-2:2024") }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
 
-      it "raises Parslet::ParseFailed when both sides are OIML" do
+      it "raises Pubid::Errors::ParseError when both sides are OIML" do
         expect { Pubid::Oiml.parse("OIML R 49-1:2024|OIML R 49-2:2024") }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
 
-      it "raises Parslet::ParseFailed for a three-part pipe string" do
+      it "raises Pubid::Errors::ParseError for a three-part pipe string" do
         expect do
           Pubid::Oiml.parse("ISO 4064-1:2024|OIML R 49-1:2024|IEC 60050")
-        end.to raise_error(Parslet::ParseFailed)
+        end.to raise_error(Pubid::Errors::ParseError)
       end
     end
   end

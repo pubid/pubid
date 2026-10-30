@@ -15,7 +15,7 @@ RSpec.describe "IEEE nil-residue forms" do
 
   def parses(str)
     klass.parse(str)
-  rescue Parslet::ParseFailed
+  rescue Pubid::Errors::ParseError
     nil
   end
 

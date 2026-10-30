@@ -33,8 +33,8 @@ end
 # cross-flavor spec/pubid/parse_error_spec.rb locks this for every registered
 # flavor; this shared example is for a per-flavor spec that wants it inline.
 RSpec.shared_examples "parse rejection" do
-  it "rejects empty input with Parslet::ParseFailed" do
-    expect { described_class.parse("") }.to raise_error(Parslet::ParseFailed)
+  it "rejects empty input with Pubid::Errors::ParseError" do
+    expect { described_class.parse("") }.to raise_error(Pubid::Errors::ParseError)
   end
 
   it "rejects nil input with ArgumentError" do
@@ -43,7 +43,7 @@ RSpec.shared_examples "parse rejection" do
   end
 
   # The same two raises, seen through the classes pubid owns. Both hold at
-  # once: Pubid::Errors::ParseError inherits Parslet::ParseFailed and
+  # once: Pubid::Errors::ParseError inherits Pubid::Errors::ParseError and
   # Pubid::Errors::InvalidInputError inherits ArgumentError.
   it "rejects empty input with Pubid::Errors::ParseError" do
     expect { described_class.parse("") }

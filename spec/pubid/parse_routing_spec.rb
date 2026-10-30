@@ -43,13 +43,13 @@ RSpec.describe "Pubid.parse prefix routing" do
     expect(Pubid.parse("urn:iso:std:iso:1234:-1:ed-1")).to be_a(Pubid::Iso::Identifier)
   end
 
-  it "raises Parslet::ParseFailed when no flavor can parse it" do
+  it "raises Pubid::Errors::ParseError when no flavor can parse it" do
     expect { Pubid.parse("@@@ not an identifier @@@") }
-      .to raise_error(Parslet::ParseFailed)
+      .to raise_error(Pubid::Errors::ParseError)
   end
 
   # Routing must not become a place where a real defect looks like a rejection.
-  # Only Parslet::ParseFailed means "not this flavor"; a blanket
+  # Only Pubid::Errors::ParseError means "not this flavor"; a blanket
   # `rescue StandardError` in the candidate loop would swallow the
   # `ArgumentError: unknown attribute…` that the constructor contract raises —
   # the error that turned three silent data-loss bugs into visible ones — and
@@ -65,9 +65,9 @@ RSpec.describe "Pubid.parse prefix routing" do
         .to raise_error(ArgumentError, /unknown attribute/)
     end
 
-    it "still reports a genuine rejection as Parslet::ParseFailed" do
+    it "still reports a genuine rejection as Pubid::Errors::ParseError" do
       expect { Pubid.parse("@@@ still not an identifier @@@") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
   end
 
@@ -109,7 +109,7 @@ RSpec.describe "Pubid.parse prefix routing" do
     # excluded from the fallback whichever came first in registry order
     # claimed this and answered `IANA iec.60050`.
     it "reports failure rather than inventing a flavor for an unclaimed string" do
-      expect { Pubid.parse("iec.60050") }.to raise_error(Parslet::ParseFailed)
+      expect { Pubid.parse("iec.60050") }.to raise_error(Pubid::Errors::ParseError)
     end
 
     # The any-slug flavors are found by probing, not by a hardcoded list, so
@@ -125,9 +125,9 @@ RSpec.describe "Pubid.parse prefix routing" do
     # with `ASTM 123`. Only a prefix owner may supply a non-exact fallback,
     # so a string no flavor owns is reported as unparseable.
     it "reports failure rather than inventing a publisher for an unowned string" do
-      expect { Pubid.parse("CIE") }.to raise_error(Parslet::ParseFailed)
-      expect { Pubid.parse("FOO") }.to raise_error(Parslet::ParseFailed)
-      expect { Pubid.parse("123") }.to raise_error(Parslet::ParseFailed)
+      expect { Pubid.parse("CIE") }.to raise_error(Pubid::Errors::ParseError)
+      expect { Pubid.parse("FOO") }.to raise_error(Pubid::Errors::ParseError)
+      expect { Pubid.parse("123") }.to raise_error(Pubid::Errors::ParseError)
     end
 
     # The defaulting parse stays reachable through the flavor's own module —
@@ -145,7 +145,7 @@ RSpec.describe "Pubid.parse prefix routing" do
   describe "MR detection cannot recurse forever" do
     it "raises ParseFailed instead of SystemStackError on a fixed point" do
       expect { Pubid::Iso.parse("ECMA-426 ed1") }
-        .to raise_error(Parslet::ParseFailed, /not an MR string/)
+        .to raise_error(Pubid::Errors::ParseError, /not an MR string/)
     end
 
     it "lets the routed parse reach the flavor that owns it" do
@@ -171,9 +171,9 @@ RSpec.describe "Pubid::Registry.parse" do
       .to eq(Pubid.parse("IEC 60038:2009").to_s)
   end
 
-  it "raises Parslet::ParseFailed for junk, like every flavor parse" do
+  it "raises Pubid::Errors::ParseError for junk, like every flavor parse" do
     expect { Pubid::Registry.parse("@@@ not an identifier @@@") }
-      .to raise_error(Parslet::ParseFailed)
+      .to raise_error(Pubid::Errors::ParseError)
   end
 
   it "leaves the flavor-name registry intact" do

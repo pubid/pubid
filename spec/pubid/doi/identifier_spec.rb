@@ -48,7 +48,7 @@ RSpec.describe Pubid::Doi::Identifier do
     %w[doi: doi:10 doi:10.X/abc doi:10.1000/].each do |bad|
       it "rejects #{bad.inspect}" do
         expect { described_class.parse(bad) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
   end

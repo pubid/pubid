@@ -60,6 +60,6 @@ RSpec.describe "IEEE S-designation (IPCEA cable) identifier" do
   # The Defect-1 fix (numberless reject) must NOT be loosened: a bare letter
   # series with no dash+digit is still not a valid identifier.
   it "still rejects the numberless \"IEEE S\"" do
-    expect { klass.parse("IEEE S") }.to raise_error(Parslet::ParseFailed)
+    expect { klass.parse("IEEE S") }.to raise_error(Pubid::Errors::ParseError)
   end
 end

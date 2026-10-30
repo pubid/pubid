@@ -8,7 +8,7 @@ Pubid.eager_load_flavors!
 
 # Cross-flavor contract for what `parse` does with input it cannot turn into an
 # identifier. Consumers rescue by CLASS, so the class is the contract:
-# relaton-cli rescues `Parslet::ParseFailed` (command.rb,
+# relaton-cli rescues `Pubid::Errors::ParseError` (command.rb,
 # subcommand_collection.rb) to print `"<code>" is not a recognized standards
 # identifier`, and nothing else on that path rescues — so a flavor that
 # re-wrapped the parser's error as a bare RuntimeError handed the user a raw
@@ -16,7 +16,7 @@ Pubid.eager_load_flavors!
 #
 # Four rules, locked here for every registered flavor:
 #
-#   unparseable string -> Parslet::ParseFailed
+#   unparseable string -> Pubid::Errors::ParseError
 #   over-long string   -> ArgumentError (a DIFFERENT failure: the ReDoS guard,
 #                         which must fire before the input reaches a regex)
 #   non-String (nil)   -> ArgumentError (not the NoMethodError that reaching
@@ -56,18 +56,18 @@ RSpec.describe "parse failure contract (cross-flavor)" do
       end
 
       UNPARSABLE.each do |bad|
-        it "raises Parslet::ParseFailed for #{bad.inspect}" do
+        it "raises Pubid::Errors::ParseError for #{bad.inspect}" do
           each_entry_point(mod, identifier_class) do |label, receiver|
             expect { receiver.parse(bad) }
-              .to raise_error(Parslet::ParseFailed),
+              .to raise_error(Pubid::Errors::ParseError),
                   "#{flavor_name} #{label} did not raise " \
-                  "Parslet::ParseFailed for #{bad.inspect}"
+                  "Pubid::Errors::ParseError for #{bad.inspect}"
           end
         end
 
         # The class pubid OWNS. The assertion above is the backward-compatible
         # half of the same raise: `Pubid::Errors::ParseError` inherits
-        # `Parslet::ParseFailed`, so both hold at once and a consumer can
+        # `Pubid::Errors::ParseError`, so both hold at once and a consumer can
         # rescue either.
         it "raises Pubid::Errors::ParseError for #{bad.inspect}" do
           each_entry_point(mod, identifier_class) do |label, receiver|
@@ -87,7 +87,7 @@ RSpec.describe "parse failure contract (cross-flavor)" do
           each_entry_point(mod, identifier_class) do |label, receiver|
             result = begin
               receiver.parse(bad)
-            rescue Parslet::ParseFailed
+            rescue Pubid::Errors::ParseError
               :raised
             end
             expect(result).not_to be_nil,
@@ -138,17 +138,17 @@ RSpec.describe "parse failure contract (cross-flavor)" do
   describe "cross-flavor delegation raises the delegate's failure uniformly" do
     it "Pubid::Iso.parse routes an ITU-shaped string through the MR parser" do
       expect { Pubid::Iso.parse("ITU-T G.711") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
 
     it "Pubid::Bsi.parse delegates an IEC CSV form to Pubid::Iec" do
       expect { Pubid::Bsi.parse("IEC 99999999 CSV zz") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
 
     it "Pubid::Csa.parse delegates an adopted ISO form to Pubid::Iso" do
       expect { Pubid::Csa.parse("CAN/CSA-ISO ###") }
-        .to raise_error(Parslet::ParseFailed)
+        .to raise_error(Pubid::Errors::ParseError)
     end
   end
 

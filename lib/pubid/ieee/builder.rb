@@ -146,7 +146,7 @@ module Pubid
               related =
                 begin
                   Identifier.parse(m[1])
-                rescue Parslet::ParseFailed
+                rescue Pubid::Errors::ParseError
                   Identifier.new(parenthetical_content: m[1])
                 end
               relationships = [Components::Relationship.new(
@@ -2278,7 +2278,7 @@ module Pubid
         id_strings.map do |id_str|
           # Use Identifier.parse for recursive parsing
           Identifier.parse(id_str)
-        rescue Parslet::ParseFailed
+        rescue Pubid::Errors::ParseError
           # If parsing fails, create minimal identifier with just the string
           # This maintains graceful degradation
           Identifier.new(parenthetical_content: id_str)

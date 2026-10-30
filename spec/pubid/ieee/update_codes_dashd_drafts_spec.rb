@@ -82,7 +82,7 @@ RSpec.describe "IEEE /D- corrupted draft docids — update_codes normalization" 
     IEEE_DASHD_STILL_UNPARSEABLE.each do |raw|
       it "#{raw.inspect} still raises" do
         expect { Pubid::Ieee::Identifier.parse(raw) }
-          .to raise_error(Parslet::ParseFailed)
+          .to raise_error(Pubid::Errors::ParseError)
       end
     end
   end

@@ -411,19 +411,19 @@ RSpec.describe Pubid::Iso::Parser do
       it "raises error for invalid pattern" do
         expect do
           Pubid::Iso.parse("INVALID 12345")
-        end.to raise_error(Parslet::ParseFailed)
+        end.to raise_error(Pubid::Errors::ParseError)
       end
 
       it "raises error for missing number" do
         expect do
           Pubid::Iso.parse("ISO :2003")
-        end.to raise_error(Parslet::ParseFailed)
+        end.to raise_error(Pubid::Errors::ParseError)
       end
 
       it "raises error for malformed supplement" do
         expect do
           Pubid::Iso.parse("ISO 12345:2020/INVALID")
-        end.to raise_error(Parslet::ParseFailed)
+        end.to raise_error(Pubid::Errors::ParseError)
       end
     end
 

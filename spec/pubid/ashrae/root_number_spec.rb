@@ -110,7 +110,7 @@ module AshraeIndexKeySpec
     @parsed_corpus ||= FIXTURE_INPUTS.filter_map do |line|
       id = begin
         Pubid::Ashrae.parse(line)
-      rescue StandardError, Parslet::ParseFailed
+      rescue StandardError, Pubid::Errors::ParseError
         nil
       end
       [line, id] if id

@@ -308,7 +308,7 @@ module Pubid
         when :number
           # For TC documents, number is the document number (N number)
           # For regular identifiers, this is handled in :number_with_part
-          if value.is_a?(Parslet::Slice) || value.is_a?(String) ||
+          if value.is_a?(String) ||
               value.is_a?(Integer)
             value.to_s
           else

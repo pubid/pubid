@@ -8,14 +8,14 @@ require "spec_helper"
 # the marker module `Pubid::Errors::Error`, so `rescue Pubid::Errors::Error`
 # is exhaustive:
 #
-#   Pubid::Errors::ParseError        < ::Parslet::ParseFailed   a printed id
+#   Pubid::Errors::ParseError        < ::StandardError          a printed id
 #   Pubid::Errors::UrnParseError     < ::StandardError          a URN
 #   Pubid::Errors::InvalidInputError < ::ArgumentError          bad input
 #
-# The superclasses are the backward-compatibility contract, not an accident:
-# every pre-existing `rescue Parslet::ParseFailed` (relaton-cli) and
-# `rescue ArgumentError` keeps working by inheritance. A URN failure has no
-# parslet cause, so it deliberately does NOT inherit `Parslet::ParseFailed` —
+# ParseError's superclass was `Parslet::ParseFailed` while the grammars ran
+# on parslet; with the parg artifacts as the only engines, the class stands
+# on `StandardError` and callers rescue `Pubid::Errors::ParseError` (or the
+# marker module) directly. A URN failure does not inherit ParseError —
 # the marker module, not a shared superclass, is what unifies the two.
 RSpec.describe Pubid::Errors do
   describe "the tree" do
@@ -33,16 +33,15 @@ RSpec.describe Pubid::Errors do
       end
     end
 
-    it "keeps the pre-existing superclasses, so old rescues still fire" do
-      expect(Pubid::Errors::ParseError.superclass)
-        .to eq(Parslet::ParseFailed)
+    it "stands on StandardError, parslet gone from the hierarchy" do
+      expect(Pubid::Errors::ParseError.superclass).to eq(StandardError)
       expect(Pubid::Errors::InvalidInputError.superclass).to eq(ArgumentError)
       expect(Pubid::Errors::UrnParseError.superclass).to eq(StandardError)
     end
 
     it "does not make a URN failure look like a grammar failure" do
       expect(Pubid::Errors::UrnParseError.ancestors)
-        .not_to include(Parslet::ParseFailed)
+        .not_to include(Pubid::Errors::ParseError)
     end
 
     it "keeps Pubid::UrnParser::Errors::ParseError as an alias" do
@@ -87,10 +86,6 @@ RSpec.describe Pubid::Errors do
 
     it "is a Pubid::Errors::ParseError" do
       expect(error).to be_a(Pubid::Errors::ParseError)
-    end
-
-    it "still satisfies the old rescue" do
-      expect(error).to be_a(Parslet::ParseFailed)
     end
 
     it "is caught by the marker" do
@@ -191,7 +186,7 @@ RSpec.describe Pubid::Errors do
     end
 
     it "is not disguised as a parslet failure" do
-      expect(error).not_to be_a(Parslet::ParseFailed)
+      expect(error).not_to be_a(Pubid::Errors::ParseError)
     end
 
     it "still satisfies the old alias" do
