@@ -61,7 +61,7 @@ module Pubid
             normalized = normalized.gsub(/\s+/, " ").strip
 
             # Parse normally (will create Bundled or Combined identifier)
-            tree = Pubid::Parg::Backend.parse(:csa, Parser.normalize_input(normalized))
+            tree = Pubid::Parg::Model.bound(:csa, Parser.normalize_input(normalized))
         prefix = Parser.publisher_prefix_for(normalized)
         Parser.inject_publisher_prefix(tree, prefix) if prefix && tree.is_a?(Hash)
             result = build!(tree, input)
@@ -421,7 +421,7 @@ module Pubid
         # Normalize CAN3- to CSA (historical prefix)
         normalized = normalized.gsub("CAN3-", "CSA ")
 
-        tree = Pubid::Parg::Backend.parse(:csa, Parser.normalize_input(normalized))
+        tree = Pubid::Parg::Model.bound(:csa, Parser.normalize_input(normalized))
         prefix = Parser.publisher_prefix_for(normalized)
         Parser.inject_publisher_prefix(tree, prefix) if prefix && tree.is_a?(Hash)
         result = build!(tree, input)
