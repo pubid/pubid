@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-require "pubid"
 module Pubid
   module Parser
-    autoload :Grammar, "pubid/parser/grammar"
-    autoload :CommonParseMethods, "pubid/parser/common_parse_methods"
-    autoload :CommonParseRules, "pubid/parser/common_parse_rules"
+    # A trailing "(all parts)" marks the reference as the whole document.
+    # NIST's parse path strips it before preprocessing and carries the
+    # marker into the tree (:all_parts) for the builder to wrap; the
+    # shared Builder::Base reads the same marker for every other flavor.
+    ALL_PARTS_SUFFIX = "(all parts)".freeze
   end
 end

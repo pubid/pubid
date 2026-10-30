@@ -1,27 +1,22 @@
 require "spec_helper"
 
 RSpec.describe Pubid::CenCenelec::Identifiers::CenWorkshopAgreement do
-  let(:parser) { Pubid::CenCenelec::Parser.new }
-  let(:builder) { Pubid::CenCenelec::Builder.new }
 
   describe "#to_s" do
     context "basic CWA identifiers" do
       it "renders CWA with part and date" do
-        parsed = parser.parse("CWA 17145-2:2017")
-        identifier = builder.build(parsed)
+        identifier = Pubid::CenCenelec.parse("CWA 17145-2:2017")
         expect(identifier).to be_a(described_class)
         expect(identifier.to_s).to eq("CWA 17145-2:2017")
       end
 
       it "renders CWA without date" do
-        parsed = parser.parse("CWA 17145-2")
-        identifier = builder.build(parsed)
+        identifier = Pubid::CenCenelec.parse("CWA 17145-2")
         expect(identifier.to_s).to eq("CWA 17145-2")
       end
 
       it "renders CWA with single number" do
-        parsed = parser.parse("CWA 1234:2020")
-        identifier = builder.build(parsed)
+        identifier = Pubid::CenCenelec.parse("CWA 1234:2020")
         expect(identifier.to_s).to eq("CWA 1234:2020")
       end
     end
@@ -33,8 +28,7 @@ RSpec.describe Pubid::CenCenelec::Identifiers::CenWorkshopAgreement do
         "CWA 1234:2020",
       ].each do |pubid|
         it "round-trips #{pubid}" do
-          parsed = parser.parse(pubid)
-          identifier = builder.build(parsed)
+          identifier = Pubid::CenCenelec.parse(pubid)
           expect(identifier.to_s).to eq(pubid)
         end
       end

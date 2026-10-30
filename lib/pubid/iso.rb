@@ -148,12 +148,6 @@ module Pubid
     # This is the public seam: callers should never instantiate
     # `Pubid::Iso::Parser` directly.
     #
-    # @param rule_name [Symbol] the parser rule to expose
-    # @return [Parslet::Atoms::Base]
-    def self.joint_grammar_atom(rule_name)
-      parser.public_send(rule_name)
-    end
-
     # Auto-discover all identifier types from the Identifiers namespace
     # @return [Array<Class>] identifier classes that define a self.type Hash
     def self.identifier_types
