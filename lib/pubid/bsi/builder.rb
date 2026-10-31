@@ -684,8 +684,7 @@ module Pubid
         # Handle nested hash from parser (when using .as with alternatives)
         data = data[:supplement_document] if data[:supplement_document].is_a?(Hash)
 
-        # Extract values from nested hashes (parser returns {:number => {:number => "1000"}})
-        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val = data[:number].to_s if data[:number]
         iteration_val = data[:iteration][:iteration][0][:iteration] if data[:iteration].is_a?(Hash) && data[:iteration][:iteration].is_a?(Array) && data[:iteration][:iteration].any?
         iteration_val = nil if iteration_val.is_a?(String) && iteration_val.empty?
         parts_val = data[:parts][:parts] if data[:parts].is_a?(Hash)
@@ -734,8 +733,7 @@ module Pubid
       end
 
       def build_addendum_document(data)
-        # Extract values from nested hashes (parser returns {:number => {:number => "1000"}})
-        number_val = data[:number][:number] if data[:number].is_a?(Hash)
+        number_val = data[:number].to_s if data[:number]
         iteration_val = data[:iteration][:iteration][0][:iteration] if data[:iteration].is_a?(Hash) && data[:iteration][:iteration].is_a?(Array) && data[:iteration][:iteration].any?
         iteration_val = nil if iteration_val.is_a?(String) && iteration_val.empty?
         parts_val = data[:parts][:parts] if data[:parts].is_a?(Hash)
