@@ -18,6 +18,20 @@ module Pubid
         # resolves to.
         twin = parse_common_text_twin(data.delete(:common_text_twin))
 
+        # Check if this is a supplement identifier. This check comes BEFORE
+        # the annex/appendix branches because the bound map collects every
+        # capture occurrence by name across the tree: a supplement whose
+        # base is an annex ("... Annex B (1996) Cor. 3 (03/2001)") hoists the
+        # nested annex_number to the top level, and an annex-first dispatch
+        # would build the annex and drop the supplement. The nested
+        # annex/appendix data stays intact inside the raw :base subtree and
+        # is picked up by the recursive build below.
+        if data[:supplement_type]
+          supp = build_supplement(data)
+          supp.common_text_twin = twin if twin && supp
+          return supp
+        end
+
         # Labelled annex of a Recommendation — "ITU-T A.23 Annex A (06/2014)".
         # The annexed document is the :base subtree; :year/:month at this level
         # are the annex's own date, not the base's.
@@ -58,13 +72,6 @@ module Pubid
             date: data[:year] ? build_date(data) : nil,
             language: data[:language]&.to_s,
           )
-        end
-
-        # Check if this is a supplement identifier
-        if data[:supplement_type]
-          supp = build_supplement(data)
-          supp.common_text_twin = twin if twin && supp
-          return supp
         end
 
         # Handbook — "ITU-R 42.HDB"
@@ -318,21 +325,27 @@ module Pubid
 
       private
 
-      # Build the additional designations of a combined recommendation from the
-      # repeated parse subtrees (each `{ designation: { series:, number:, … } }`).
+      # Build the additional designations of a combined recommendation from
+      # the repeated raw subtrees (each `{ designation: { series:, d_number:,
+      # … } }`). The designation tail repeats the code-suffix shapes under
+      # d_* capture names (see grammars/itu.parg): a capture name occurring
+      # at two structural depths pairs into one top-level bound key, which
+      # would corrupt the primary's Code with the designation's tail, so the
+      # designation's tail captures are distinct and only ever read here,
+      # inside the raw subtree.
       def build_designations(combined_data)
         Array(combined_data).map do |element|
           d = element[:designation] || element
           Components::Designation.new(
             series: Components::Series.new(series: d[:series].to_s),
             code: Components::Code.new(
-              number: d[:number].to_s,
-              series_suffix: d[:series_suffix]&.to_s,
-              series_suffix_spaced: !d[:series_suffix_spaced].nil?,
-              subseries: d[:subseries]&.to_s,
-              parts: extract_parts(d[:parts]),
-              qualifier: d[:qualifier]&.to_s,
-              qualifier_glued: !d[:qualifier].nil? && d[:qualifier_spaced].nil?,
+              number: d[:d_number].to_s,
+              series_suffix: d[:d_series_suffix]&.to_s,
+              series_suffix_spaced: !d[:d_series_suffix_spaced].nil?,
+              subseries: d[:d_subseries]&.to_s,
+              parts: extract_parts(d[:d_parts], :d_part),
+              qualifier: d[:d_qualifier]&.to_s,
+              qualifier_glued: !d[:d_qualifier].nil? && d[:d_qualifier_spaced].nil?,
             ),
           )
         end
@@ -371,16 +384,19 @@ module Pubid
         )
       end
 
-      def extract_parts(parts_data)
+      # +key+ names the part capture inside the wrapper: :part for the
+      # top-level `parts` array, :d_part for a combined designation's
+      # d_parts (see build_designations).
+      def extract_parts(parts_data, key = :part)
         return [] unless parts_data
 
         parts = []
         if parts_data.is_a?(Array)
           parts_data.each do |part_hash|
-            parts << part_hash[:part].to_s if part_hash[:part]
+            parts << part_hash[key].to_s if part_hash[key]
           end
-        elsif parts_data.is_a?(Hash) && parts_data[:part]
-          parts << parts_data[:part].to_s
+        elsif parts_data.is_a?(Hash) && parts_data[key]
+          parts << parts_data[key].to_s
         end
 
         parts
