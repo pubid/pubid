@@ -24,7 +24,7 @@ module Pubid
         # The code is stored as flat index columns on the leaf (see
         # Identifiers::Standard) — `number` is what relaton-index keys on — so
         # the Code built below is unpacked rather than assigned.
-        if parsed_hash[:designator]
+        if parsed_hash[:designator] || parsed_hash[:designator_code]
           identifier.number = build_code(parsed_hash).to_s
         elsif parsed_hash[:number]
           # A joint-published reference ("ISO/ASME 14414-2015") parses to a bare
@@ -94,9 +94,11 @@ module Pubid
       private
 
       def build_code(parsed_hash)
-        # Handle BPVC subdivision
-        if parsed_hash[:designator].is_a?(Hash) && parsed_hash[:designator][:bpvc_code]
-          bpvc_data = parsed_hash[:designator][:bpvc_code]
+        # Handle BPVC subdivision — the composite designator arrives under
+        # :designator_code ((raw) wrapper); :designator is the plain
+        # (string) form, so the composite cannot collide with it.
+        if parsed_hash[:designator_code].is_a?(Hash) && parsed_hash[:designator_code][:bpvc_code]
+          bpvc_data = parsed_hash[:designator_code][:bpvc_code]
 
           # Build BPVC designator string
           designator_str = "BPVC"
