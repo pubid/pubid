@@ -13,7 +13,7 @@ require "spec_helper"
 SAE_REFS = ["SAE AIR1936", "SAE AMS5000:2020", "SAE J1939",
             "SAE J300:2019", "SAE ARP4754A"].freeze
 SHAPE_COMPATIBLE = %i[doi easc gb ietf jis oasis ogc sae w3c xsf isbn iana ecma omg ccsds tgpp gost astm].freeze
-ADAPTED = %i[etsi csa iec].freeze
+ADAPTED = %i[etsi csa iec nist].freeze
 
 RSpec.describe "typed model binding parity" do
   include FixtureFileHelper
