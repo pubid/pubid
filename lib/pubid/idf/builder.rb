@@ -13,6 +13,7 @@ module Pubid
       }.freeze
 
       def build(parsed_hash)
+        parsed_hash = split_supplement_base(parsed_hash)
         # The Parslet tree carried a zero-width type_with_stage (an empty
         # capture when no type is spelled) whose cast drove the default
         # stage; the artifact tree omits the key entirely — restore the
@@ -37,7 +38,43 @@ module Pubid
         all_parts ? identifier.to_all_parts : identifier
       end
 
+      # The bound grammar flattens the supplement's base wrapper (the
+      # bindings cannot nest): the supplement layer keeps the canonical
+      # number_with_part/date/type_with_stage captures and the base
+      # portion captures under base_* names. Rebuild the nested shape
+      # the builder has always consumed — the base_* keys rename onto
+      # their canonical counterparts and the shared publisher capture
+      # belongs to the base (the tree backend captured it inside the
+      # base subtree, so the supplement itself carries no publisher).
+      BASE_KEY_MAP = {
+        base_number_with_part: :number_with_part,
+        base_date: :date,
+        base_type_with_stage: :type_with_stage,
+        base_stage_iteration: :stage_iteration,
+      }.freeze
+
       private
+
+      def split_supplement_base(parsed_hash)
+        unless BASE_KEY_MAP.keys.any? { |k| parsed_hash.key?(k) }
+          return parsed_hash
+        end
+
+        base_hash = {}
+        BASE_KEY_MAP.each do |bound_key, tree_key|
+          next unless parsed_hash.key?(bound_key)
+
+          base_hash[tree_key] = parsed_hash.delete(bound_key)
+        end
+        if parsed_hash[:publisher]
+          base_hash[:publisher] = parsed_hash.delete(:publisher)
+        end
+        # Keep the base as a raw hash: the shared assign_attributes loop
+        # routes :base through cast, which recursively builds it — the
+        # same path the tree backend's nested subtree took.
+        parsed_hash[:base] = base_hash
+        parsed_hash
+      end
 
       def default_identifier_class
         Identifiers::InternationalStandard
