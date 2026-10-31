@@ -39,7 +39,7 @@ module Pubid
 
         # Parse IRE identifier string
         def self.parse(input)
-          parsed = Pubid::Parg::Backend.parse(:ire, input,
+          parsed = Pubid::Parg::Model.bound(:ire, input,
                                    entry: "ire_identifier")
           builder = Builder.new
           builder.build(parsed)

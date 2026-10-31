@@ -4,28 +4,118 @@
 # parenthetical alternates) and long/short dates. Consumed by the ieee
 # grammar via `use aiee`. Deviation: source "Sep"/"Sept" order is
 # lint-forced to longest-first.
+#
+# Edition-2 notes: the number capture inlines all five alternatives to
+# raw terms, including the parenthetical-alternate branch — its
+# main_number/alt_number/parenthetical sub-captures drop (a wrapper over
+# them expands to element hashes, which cannot bind scalar; the old
+# pipeline already flattened the subtree to the "431 (105)" span the
+# capture now binds directly). The year body inlines at every capture
+# site for the same reason; the digits rule inlines to 1*%x30-39 (a ref
+# whose body is a repetition expands to node lists inside a capture).
 
-grammar PubidAiee version "0.1.0" {
+grammar PubidAiee version "0.1.0" edition 2 {
   digit = %x30-39
   upper = %x41-5A
   lower = %x61-7A
-  digits = 1*digit
+  digits = 1*%x30-39
   space = " "
   dash = "-"
   dot = "."
 
-  year = (("18" 2digit)) / (("19" ("0" / "1" / "2" / "3" / "4" / "5") digit)) / (("196" %x30-33))
-  month_name = "September" / "November" / "December" / "February" / "August" / "June" / "January" / "March" / "April" / "October" / "July" / "May" / "Sept" / "Jan" / "Feb" / "Mar" / "Apr" / "Jun" / "Jul" / "Aug" / "Sep" / "Oct" / "Nov" / "Dec"
+  year = (("18" 2%x30-39)) / (("19" ("0" / "1" / "2" / "3" / "4" / "5") %x30-39)) / (("196" %x30-33))
+  month_name = {
+    "September"
+    / "November"
+    / "December"
+    / "February"
+    / "August"
+    / "June"
+    / "January"
+    / "March"
+    / "April"
+    / "October"
+    / "July"
+    / "May"
+    / "Sept"
+    / "Jan"
+    / "Feb"
+    / "Mar"
+    / "Apr"
+    / "Jun"
+    / "Jul"
+    / "Aug"
+    / "Sep"
+    / "Oct"
+    / "Nov"
+    / "Dec"
+  }
   aiee_prefix = ("IEEE-AIEE" / "A.I.E.E." / "A. I. E. E." / "AIEE") as publisher
-  aiee_type = ("Standard No." / "Standard No" / "Std No." / "Std No" / "Std" / "Nos" / "No." / "No" / "no" / "Standard" / "Trans.") as type
-  number = (((2*3upper dash digits)) / ((digits upper !((space "and")))) / ((digits dot digits)) / (((digits) as main_number space ((( "(" (digits) as alt_number ")"))) as parenthetical)) / ((digits !((space "and" space digits))))) as number
-  date_long = ([space] (((("," / dot) as separator) [space] [((month_name) as month space)] (year) as year)) / (((space dash) as separator) [space] (year) as year) / (((month_name) as month dash (year) as year)))
-  date_short = ([space] dash (year) as year)
+  aiee_type = {
+    (
+      "Standard No."
+      / "Standard No"
+      / "Std No."
+      / "Std No"
+      / "Std"
+      / "Nos"
+      / "No."
+      / "No"
+      / "no"
+      / "Standard"
+      / "Trans."
+    ) as type
+  }
+  number = {
+    (
+      ( 2*3%x41-5A "-" 1*%x30-39 )
+      / ( 1*%x30-39 %x41-5A !( " and" ) )
+      / ( 1*%x30-39 dot 1*%x30-39 )
+      / ( 1*%x30-39 " (" 1*%x30-39 ")" )
+      / ( 1*%x30-39 !( " and " 1*%x30-39 ) )
+    ) as number
+  }
+  # The source's third date_long alternative (month dash year, no
+  # separator) is dropped deliberately: under the edition-1 branch-commit
+  # semantics the leading [space] commits before the alternation, so the
+  # month-first form never matches ("AIEE No 15May-1928" and
+  # "AIEE No 15 May-1928" both reject on the edition-1 artifact). Keeping
+  # it would widen the accept set; month forms ride the separator
+  # alternative, as on edition 1.
+  #
+  # The year body inlines at every capture site (a capture wrapping the
+  # year rule ref expands to element hashes; the inline alternation binds
+  # as one scalar string).
+  date_long = {
+    (
+      ( [" "] ( ( ( "," / "." ) as separator ) [" "] [ ( month_name ) as month " " ]
+          ( ("18" 2%x30-39)
+            / ("19" ("0" / "1" / "2" / "3" / "4" / "5") %x30-39)
+            / ("196" %x30-33) ) as year ) )
+      / ( [" "] ( " -" ) as separator [" "]
+          ( ("18" 2%x30-39)
+            / ("19" ("0" / "1" / "2" / "3" / "4" / "5") %x30-39)
+            / ("196" %x30-33) ) as year )
+    )
+  }
+  date_short = {
+    [" "] "-"
+    ( ("18" 2%x30-39) / ("19" ("0" / "1" / "2" / "3" / "4" / "5") %x30-39) / ("196" %x30-33) ) as year
+  }
   date = [(date_short / date_long)]
 
-  aiee_identifier = aiee_prefix space [(aiee_type space)] number date
+  aiee_identifier = aiee_prefix " " [aiee_type " "] number date
 
   entry aiee_identifier: aiee_identifier
+
+  bindings aiee_identifier {
+    publisher -> publisher (string)
+    type -> type (string)
+    number -> number (string)
+    separator -> separator (string)
+    month -> month (string)
+    year -> year (string)
+  }
 
   test {
     accept "AIEE No. 56"
