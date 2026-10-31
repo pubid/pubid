@@ -1392,9 +1392,12 @@ module Pubid
         # Extract SI type (SI or PSI)
         si_type = extract_value(parsed[:si_type])
 
-        # Extract publishers (should be "IEEE/ASTM")
-        if parsed[:publishers]
-          publishers_str = extract_value(parsed[:publishers])
+        # Extract publishers (should be "IEEE/ASTM") — the SI rule's bare
+        # publishers clause binds as publishers_scalar (string); the
+        # composite joint rows deliver :publishers (raw).
+        pub_src = parsed[:publishers] || parsed[:publishers_scalar]
+        if pub_src
+          publishers_str = extract_value(pub_src)
           # Split by slash to get individual publishers
           pubs = publishers_str.split("/")
           attributes[:publisher] = pubs.first
