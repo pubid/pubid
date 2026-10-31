@@ -5,7 +5,7 @@ module Pubid
     # Parser class for NIST identifiers
     # Single Responsibility: Parsing NIST identifier syntax
     class Parser
-      # The bound hash passes engine nodes through for the (any) wrapper
+      # The bound hash passes engine nodes through for the (raw) wrapper
       # bindings: Parsanol::Slice spans, single-element repetition arrays,
       # and named-node hashes. The Parslet tree gave the caster plain
       # strings and hashes of strings; this restores that shape.

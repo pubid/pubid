@@ -104,7 +104,10 @@ module Pubid
 
         # Check for CS variants (works for both compound "NBS CS" and simple "CS")
         if series == "CS"
-          first_num = parsed_hash[:first_number]
+          # The composite branch of the split first_number wrapper (the
+          # grammar's v#n# branch) arrives under :first_number_composite.
+          first_num = parsed_hash[:first_number] ||
+                      parsed_hash[:first_number_composite]
 
           # Check for CSM (monthly) - v#n# pattern inside first_number hash
           if first_num.is_a?(Hash) && first_num[:volume_number] && first_num[:issue_number]
