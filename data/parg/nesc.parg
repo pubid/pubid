@@ -80,7 +80,7 @@ grammar PubidNesc version "0.1.0" edition 2 {
     [((space "-" space (variant)))]
   }
   draft_nesc = {
-    (("Draft")) as draft space nesc_name [registered] (comma space) (month) space
+    ("Draft") as nesc_draft_marker space nesc_name [registered] (comma space) (month) space
     ((4digit)) as year
   }
   # Preprint is a draft STAGE of the C2 code (NESC terminology for its
@@ -119,7 +119,6 @@ grammar PubidNesc version "0.1.0" edition 2 {
     abbr_registered -> abbr_registered (string)
     variant -> variant (string)
     edition -> edition (string)
-    draft -> draft (string)
     month -> month (string)
     preprint -> preprint (string)
   }

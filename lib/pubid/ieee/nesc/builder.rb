@@ -94,7 +94,7 @@ module Pubid
           return Identifiers::Nesc::Preprint if parsed_hash[:preprint]
 
           # Draft identifiers
-          return Identifiers::Nesc::Draft if parsed_hash[:draft]
+          return Identifiers::Nesc::Draft if parsed_hash[:draft] || parsed_hash[:nesc_draft_marker]
 
           # Variant-based identifiers
           if parsed_hash[:variant]
