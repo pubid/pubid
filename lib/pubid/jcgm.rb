@@ -34,7 +34,7 @@ module Pubid
 
       builder = Builder.new
 
-      parsed = Pubid::Parg::Backend.parse(:jcgm, identifier)
+      parsed = Pubid::Parg::Model.bound(:jcgm, identifier)
       builder.build(parsed)
     end
 

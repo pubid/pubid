@@ -30,7 +30,7 @@ module Pubid
 
       builder = Builder.new
 
-      parsed = Pubid::Parg::Backend.parse(:idf, identifier)
+      parsed = Pubid::Parg::Model.bound(:idf, identifier)
       builder.build(parsed)
     end
 
