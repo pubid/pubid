@@ -1039,8 +1039,9 @@ module Pubid
 
         when :edition_month, :edition_year, :edition_day, :edition_has_rev
           # These work together: edition_month + edition_year -> single edition ID
-          # Skip processing if this is edition_month alone (will be processed with edition_year)
-          return nil if type == :edition_month
+          # Skip processing if this is edition_month or edition_day alone
+          # (both are consumed by the edition_year branch via parsed_hash)
+          return nil if type == :edition_month || type == :edition_day
 
           # Process edition_year, combining with edition_month if present
           return nil if value.nil? || value.to_s.strip.empty?
