@@ -298,6 +298,16 @@ module Pubid
 
           e[:draft_version] = e.delete(:draft_version_composite)
         end
+        # The subpart run ("7.4-3-2" carries two) binds as the subparts[]
+        # array of harvest hashes — the flat scalar binding kept only the
+        # first occurrence. Flatten to the bare separator-led strings and
+        # surface them under the key every consumer interpolates.
+        if parsed_hash[:subpart].nil? && parsed_hash[:subparts]
+          parsed_hash[:subpart] = parsed_hash[:subparts].map do |sp|
+            sp.is_a?(Hash) ? sp[:subpart] : sp
+          end
+          parsed_hash.delete(:subparts)
+        end
 
         # Grammar-captured dash dates (relaton's "/D-3-2017-07" and
         # "/R-x-2011-04" tails) land on the identifier's year/month exactly
@@ -608,11 +618,14 @@ module Pubid
           number_str += part_val if part_val
         end
 
-        # Add subpart if present
+        # Add subpart if present — the bound run arrives as subparts[]
+        # harvest hashes ({subpart: …}); v1's flat spelling stays as the
+        # fallback.
         if base_data[:subpart]
           subparts = base_data[:subpart]
           subparts = [subparts] unless subparts.is_a?(Array)
           subparts.each do |sp|
+            sp = sp[:subpart] if sp.is_a?(Hash) && sp.key?(:subpart)
             subpart_val = extract_value(sp)
             number_str += subpart_val if subpart_val
           end
@@ -786,11 +799,14 @@ module Pubid
           number_str += part_val if part_val
         end
 
-        # Add subpart if present
+        # Add subpart if present — the bound run arrives as subparts[]
+        # harvest hashes ({subpart: …}); v1's flat spelling stays as the
+        # fallback.
         if base_data[:subpart]
           subparts = base_data[:subpart]
           subparts = [subparts] unless subparts.is_a?(Array)
           subparts.each do |sp|
+            sp = sp[:subpart] if sp.is_a?(Hash) && sp.key?(:subpart)
             subpart_val = extract_value(sp)
             number_str += subpart_val if subpart_val
           end
@@ -859,11 +875,14 @@ module Pubid
           number_str += part_val if part_val
         end
 
-        # Add subpart if present
+        # Add subpart if present — the bound run arrives as subparts[]
+        # harvest hashes ({subpart: …}); v1's flat spelling stays as the
+        # fallback.
         if base_data[:subpart]
           subparts = base_data[:subpart]
           subparts = [subparts] unless subparts.is_a?(Array)
           subparts.each do |sp|
+            sp = sp[:subpart] if sp.is_a?(Hash) && sp.key?(:subpart)
             subpart_val = extract_value(sp)
             number_str += subpart_val if subpart_val
           end
