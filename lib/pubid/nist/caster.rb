@@ -128,7 +128,16 @@ module Pubid
                                                  id: value[:owmwp_year])
           { first_number: Components::Code.new(value: number_part), edition: edition_part }
 
-        when :first_number, :second_number
+        # The polymorphic number wrappers split per branch in the grammar
+        # (asme's designator/designator_code pattern): first_number /
+        # second_number (string) arrive over the bare branches,
+        # first_number_composite / second_number_composite (raw) over the
+        # branches carrying inner captures. The composite keys map onto
+        # the same dispatch.
+        when :first_number, :first_number_composite, :second_number,
+             :second_number_composite
+          type = :first_number if type == :first_number_composite
+          type = :second_number if type == :second_number_composite
           return nil if value.nil? || value.to_s.strip.empty?
 
           # NEW: Handle OWMWP date-based number (nested hash structure)
