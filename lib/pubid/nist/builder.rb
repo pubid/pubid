@@ -85,9 +85,13 @@ module Pubid
 
         # NEW: Check for CIRC supplement pattern
         # Note: :base_portion is lost during parser merge, so check for supplement indicators
+        # circ_series routes the bare "NBS.CIRC.sup" form: the edition-2
+        # grammar cannot carry the zero-width supplement_empty marker the
+        # Parslet tree used, and the series capture marks every circular
+        # supplement head.
         if parsed_hash[:supplement_date_range] || parsed_hash[:supplement_slash_year] ||
             parsed_hash[:supplement_month_year] || parsed_hash[:supplement_year] ||
-            parsed_hash[:supplement_empty] ||
+            parsed_hash[:supplement_empty] || parsed_hash[:circ_series] ||
             parsed_hash[:supplement] || parsed_hash[:base_portion]
           return build_circular_supplement(parsed_hash)
         end
