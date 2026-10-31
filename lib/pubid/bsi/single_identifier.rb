@@ -28,7 +28,7 @@ module Pubid
           return Pubid::Iec.parse(string)
         end
 
-        parsed = Pubid::Parg::Backend.parse(:bsi, strip_bsi_prefix(string))
+        parsed = Pubid::Parg::Model.bound(:bsi, strip_bsi_prefix(string))
         Builder.build(parsed)
       end
 
