@@ -284,7 +284,7 @@ module Pubid
         # Normalize legacy/docnumber-style spellings before parsing
         # (data/bipm/update_codes.yaml), mirroring Pubid::Ccsds / Pubid::Plateau.
         normalized = Core::UpdateCodes.apply(identifier, :bipm)
-        parsed = Pubid::Parg::Backend.parse(:bipm, normalized)
+        parsed = Pubid::Parg::Model.bound(:bipm, normalized)
         Builder.build(parsed)
       end
     end
