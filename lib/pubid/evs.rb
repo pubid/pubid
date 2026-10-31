@@ -39,7 +39,7 @@ module Pubid
       language = identifier[/ (et-en|et|en)\z/, 1]
       body = language ? identifier.sub(/ #{Regexp.escape(language)}\z/, "") : identifier
 
-      parsed = Pubid::Parg::Backend.parse(:evs, body)
+      parsed = Pubid::Parg::Model.bound(:evs, body)
       built = Builder.new.build(parsed)
       # An "(all parts)" parse wraps the identifier — the language belongs
       # to the inner EVS identifier, not the flavor-less wrapper.

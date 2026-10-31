@@ -120,7 +120,7 @@ module Pubid
         end
 
         normalized = Parser.normalize_input(identifier)
-        parsed = Pubid::Parg::Backend.parse(:cen_cenelec, normalized)
+        parsed = Pubid::Parg::Model.bound(:cen_cenelec, normalized)
         Builder.new.build(parsed)
       end
 
