@@ -93,7 +93,7 @@ module NumberStringRetypeSpec
   # bsi.consolidated_identifier.1161/1476).
   KNOWN_ROUND_TRIP_FAILURES = {
     "ansi" => 0,
-    "api" => 1,
+    "api" => 0,
     "bsi" => 0,
     "ccsds" => 0,
     "cen_cenelec" => 0,
