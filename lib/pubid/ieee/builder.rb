@@ -283,6 +283,15 @@ module Pubid
         # Parslet can return array of hashes - merge them
         parsed_hash = parsed.is_a?(Array) ? merge_parsed_array(parsed) : parsed
 
+        # The grammar binds the bare top-level draft clause as
+        # :draft_version_scalar (string) — the only cross-engine-stable
+        # scalar — and keeps :draft_version (raw) for the composite rule
+        # inside the draft wrapper. Surface the scalar under the key the
+        # rest of the builder has always read.
+        if parsed_hash[:draft_version].nil? && parsed_hash[:draft_version_scalar]
+          parsed_hash[:draft_version] = parsed_hash.delete(:draft_version_scalar)
+        end
+
         # Grammar-captured dash dates (relaton's "/D-3-2017-07" and
         # "/R-x-2011-04" tails) land on the identifier's year/month exactly
         # like the number's own date clause. The revision-suffix form sits at
@@ -1390,6 +1399,10 @@ module Pubid
 
         # For PSI (draft), create proper Draft component object
         if si_type == "PSI"
+          # The bare top-level draft clause binds as :draft_version_scalar
+          # (string) — surface it under the key this builder reads.
+          parsed[:draft_version] = parsed.delete(:draft_version_scalar) if
+            parsed[:draft_version].nil? && parsed[:draft_version_scalar]
           if parsed[:draft_version]
             draft_version = extract_value(parsed[:draft_version])
             # Create Draft component (Lutaml::Model object)
