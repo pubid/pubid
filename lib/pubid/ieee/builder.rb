@@ -285,11 +285,18 @@ module Pubid
 
         # The grammar binds the bare top-level draft clause as
         # :draft_version_scalar (string) — the only cross-engine-stable
-        # scalar — and keeps :draft_version (raw) for the composite rule
-        # inside the draft wrapper. Surface the scalar under the key the
-        # rest of the builder has always read.
+        # scalar — and the composite draft rule as :draft_version_composite
+        # (raw). Surface the scalar under the top-level key the rest of the
+        # builder has always read, and the composite under the interior key
+        # the draft-element walks read.
         if parsed_hash[:draft_version].nil? && parsed_hash[:draft_version_scalar]
           parsed_hash[:draft_version] = parsed_hash.delete(:draft_version_scalar)
+        end
+        draft_elems = parsed_hash[:draft].is_a?(Array) ? parsed_hash[:draft] : [parsed_hash[:draft]]
+        draft_elems.each do |e|
+          next unless e.is_a?(Hash) && e[:draft_version].nil? && e[:draft_version_composite]
+
+          e[:draft_version] = e.delete(:draft_version_composite)
         end
 
         # Grammar-captured dash dates (relaton's "/D-3-2017-07" and
