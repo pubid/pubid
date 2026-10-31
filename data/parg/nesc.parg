@@ -2,41 +2,127 @@
 # Code designations: C2-year, year-first, name-first and Draft forms
 # with (R) marks, editions and variants. Consumed by the ieee grammar
 # via `use nesc`.
+#
+# Edition-2 notes: the year body (4digit — a bounded repetition of a
+# ref) inlines at every capture site, since a capture wrapping a
+# repetition ref expands to node lists inside the capture while the
+# inlined body binds as one scalar string. The month / edition /
+# variant captures stay on their rules — pure literal alternations
+# bind as spans — and the (R)/NESC abbreviation marks capture their
+# literal tokens directly.
 
-grammar PubidNesc version "0.1.0" {
+grammar PubidNesc version "0.1.0" edition 2 {
   digit = %x30-39
-  digits = 1*digit
   space = " "
   comma = ","
   dash = "-"
   dot = "."
   slash = "/"
 
-  year = 4digit
   c2_code = "C2" as code
   nesc_full_name = "National Electrical Safety Code" / "National Electric Safety Code"
   nesc_abbr = "NESC"
   nesc_name = nesc_full_name / nesc_abbr
   registered = "(R)"
-  edition = ("Premier Edition" / "Second Edition" / "Third Edition" / "Fourth Edition" / "Fifth Edition" / "Sixth Edition" / "Seventh Edition" / "Eighth Edition" / "Ninth Edition" / "Tenth Edition" / "First Edition") as edition
-  variant = ("Handbook" / "Redline") as variant
-  month = ("January" / "February" / "March" / "April" / "May" / "June" / "July" / "August" / "September" / "October" / "November" / "December") as month
+  edition = {
+    (
+        "Premier Edition"
+      / "Second Edition"
+      / "Third Edition"
+      / "Fourth Edition"
+      / "Fifth Edition"
+      / "Sixth Edition"
+      / "Seventh Edition"
+      / "Eighth Edition"
+      / "Ninth Edition"
+      / "Tenth Edition"
+      / "First Edition"
+    ) as edition
+  }
+  variant = {
+    ("Handbook" / "Redline") as variant
+  }
+  month = {
+    (
+        "January"
+      / "February"
+      / "March"
+      / "April"
+      / "May"
+      / "June"
+      / "July"
+      / "August"
+      / "September"
+      / "October"
+      / "November"
+      / "December"
+    ) as month
+  }
 
-  c2_standard = (c2_code dash (year) as year [([comma] space)] nesc_full_name [registered] [(space "(" nesc_abbr [registered] ")")])
-  year_first = ((year) as year) space (((nesc_full_name) as full_name [(registered) as name_registered] [(space "(" (nesc_abbr) as paren_abbr [(registered) as paren_registered] ")")]) / (((nesc_abbr) as abbr [(registered) as abbr_registered]))) [(space variant)] [(comma space edition)]
-  name_first = ((nesc_full_name [registered]) comma space c2_code dash (year) as year [(space "-" space variant)])
-  draft_nesc = (("Draft") as draft space nesc_name [registered] comma space (month) space (year) as year)
+  c2_standard = {
+    (c2_code) (dash) ((4digit)) as year [([comma] space)] nesc_full_name
+    [registered]
+    [(space "(" (nesc_abbr) [(registered)] ")")]
+  }
+  year_first = {
+    ((4digit)) as year space
+    (
+      ((nesc_full_name)) as full_name [(registered) as name_registered]
+        [(space "(" (nesc_abbr) as paren_abbr [(registered) as paren_registered] ")")]
+      / ((nesc_abbr)) as abbr [(registered) as abbr_registered]
+    )
+    [(space (variant))]
+    [((comma space edition))]
+  }
+  name_first = {
+    ((nesc_full_name [registered])) (comma space) c2_code (dash)
+    ((4digit)) as year
+    [((space "-" space (variant)))]
+  }
+  draft_nesc = {
+    (("Draft")) as draft space nesc_name [registered] (comma space) (month) space
+    ((4digit)) as year
+  }
   # Preprint is a draft STAGE of the C2 code (NESC terminology for its
   # pre-edition drafts), not a variant: dotted is the canonical spelling
   # (C2.2012.Preprint); dash (C2-2012-Preprint) and the catalogue's
   # slash tail (C2-2002/Preprint) are aliases. The verbose
   # "Preprint Proposal(s) for the YYYY Edition of ..." forms cite the same
   # draft by its target edition year.
-  c2_preprint = (c2_code ((dot (year) as year dot) / (dash (year) as year dash) / (dash (year) as year slash)) ("Preprint") as preprint)
-  preprint_proposal = (("Preprint") as preprint space ("Proposals" / "Proposal") space "for" space "the" space (year) as year space "Edition" space "of" space "the" space nesc_full_name [(space "(" nesc_abbr [registered] ")")])
+  c2_preprint = {
+    c2_code
+    (
+      (dot ((4digit)) as year dot)
+      / (dash ((4digit)) as year dash)
+      / (dash ((4digit)) as year slash)
+    )
+    (("Preprint")) as preprint
+  }
+  preprint_proposal = {
+    (("Preprint")) as preprint space ("Proposals" / "Proposal") space "for" space
+    "the" space ((4digit)) as year space "Edition" space "of" space "the" space
+    nesc_full_name
+    [(space "(" (nesc_abbr) [registered] ")")]
+  }
   nesc_identifier = draft_nesc / preprint_proposal / name_first / c2_preprint / c2_standard / year_first
 
   entry nesc_identifier: nesc_identifier
+
+  bindings nesc_identifier {
+    code -> code (string)
+    year -> year (string)
+    full_name -> full_name (string)
+    name_registered -> name_registered (string)
+    paren_abbr -> paren_abbr (string)
+    paren_registered -> paren_registered (string)
+    abbr -> abbr (string)
+    abbr_registered -> abbr_registered (string)
+    variant -> variant (string)
+    edition -> edition (string)
+    draft -> draft (string)
+    month -> month (string)
+    preprint -> preprint (string)
+  }
 
   test {
     accept "C2-2023 National Electrical Safety Code"

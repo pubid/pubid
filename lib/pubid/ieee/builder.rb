@@ -288,16 +288,60 @@ module Pubid
         # like the number's own date clause. The revision-suffix form sits at
         # the top level; the draft tail nests under :draft — either as its
         # own element or wrapped in a draft_version hash.
+        # A revision element INSIDE the draft array is the draft rule's own
+        # split artifact (the version's trailing ".1" segment) — the spine
+        # captured the same value, and leaving it there makes the REV-date
+        # embed glue the draft date into the designator. A rev_inline
+        # capture never lands inside the draft array, so this only ever
+        # drops the artifact.
+        if parsed_hash[:draft].is_a?(Array) && parsed_hash[:revision]
+          artifact = parsed_hash[:draft].any? do |e|
+            e.is_a?(Hash) && e.key?(:revision) && e[:revision].to_s == parsed_hash[:revision].to_s
+          end
+          parsed_hash.delete(:revision) if artifact
+        end
+        # The edition-2 tree materializes a multi-segment draft version
+        # ("D2.1.1") as per-token nodes carrying no :draft_version key. The
+        # v1 tree degraded such a clause to a whole-clause LEAF string when
+        # no draft date follows (the designator survives through the
+        # Draft.parse inverse), and to a date-only hash when it does (the
+        # version is dropped, no draft built). Normalize to the v1 shape
+        # here — before the stage derivation and draft handling read it —
+        # so every consumer sees what v1 saw.
+        if parsed_hash[:draft].is_a?(Array)
+          draft_elems = parsed_hash[:draft].select { |e| e.is_a?(Hash) }
+          if !draft_elems.empty? && draft_elems.none? { |e| e.key?(:draft_version) }
+            has_date = draft_elems.any? { |e| e.key?(:draft_date_month) || e.key?(:draft_date_year) }
+            if has_date
+              date_elems = draft_elems.select do |e|
+                e.key?(:draft_date_month) || e.key?(:draft_date_year) || e.key?(:draft_date_day)
+              end
+              parsed_hash[:draft] = date_elems.inject({}, :merge)
+            else
+              parsed_hash[:draft] = draft_elems.flat_map { |e| e.values }.join
+            end
+          end
+        end
         drafts = parsed_hash[:draft].is_a?(Array) ? parsed_hash[:draft] : [parsed_hash[:draft]].compact
         drafts.each do |d|
           next unless d.is_a?(Hash) && d[:draft_version].is_a?(Hash)
           dv = d[:draft_version]
-          d[:dash_year] = dv[:dash_year] if dv[:dash_year]
-          d[:dash_month] = dv[:dash_month] if dv[:dash_month]
+          # The edition-2 grammar renames the nested draft-version dash
+          # captures (draft_version_dash_year/month) to keep them out of the
+          # flat bound map; the v1 tree spelling stays as the fallback.
+          d[:dash_year] = (dv[:draft_version_dash_year] || dv[:dash_year]) if
+            dv[:draft_version_dash_year] || dv[:dash_year]
+          d[:dash_month] = (dv[:draft_version_dash_month] || dv[:dash_month]) if
+            dv[:draft_version_dash_month] || dv[:dash_month]
           d.delete(:draft_version)
         end
         dash = parsed_hash[:dash_year] ? parsed_hash : nil
-        dash ||= drafts.find { |d| d.is_a?(Hash) && d[:dash_year] }
+        # The draft_date captures rename with the draft_date_ prefix on the
+        # edition-2 grammar (nested-only, kept off the identity keys); v1
+        # spelling stays as the fallback.
+        dash ||= drafts.find do |d|
+          d.is_a?(Hash) && (d[:draft_date_dash_year] || d[:dash_year])
+        end
         if dash.nil? && parsed_hash[:draft]
           # A numeric month trailing a draft is the draft's own date: it
           # embeds in the designator ("D09, 04 2011" -> "D09-2011-04")
@@ -323,25 +367,32 @@ module Pubid
         if dash
           joined = drafts.filter_map { |d| d.is_a?(Hash) ? d[:draft_version] : nil }
                          .map { |v| v.is_a?(Hash) ? v[:value] : v.to_s }.join
+          # dash is either the top-level spine (dash_year/dash_month) or the
+          # draft's own hash (draft_date_dash_year/month on the edition-2
+          # grammar, dash_year/month on v1) — read both spellings.
+          dash_y = dash[:dash_year] || dash[:draft_date_dash_year]
+          dash_m = dash[:dash_month] || dash[:draft_date_dash_month]
           bare_joint_draft = parsed_hash[:joint_publishers] &&
                              parsed_hash[:part].nil? &&
                              parsed_hash[:iso_stage].nil? &&
                              drafts.any? { |d| d.is_a?(Hash) && d[:draft_version] }
           dash_led = joined.start_with?("-")
           if bare_joint_draft && dash_led
-            parsed_hash[:part] = { value: dash[:dash_year] }
-          elsif dash[:dash_month] &&
+            parsed_hash[:part] = { value: dash_y }
+          elsif dash_m &&
                 (host = drafts.find { |d| d.is_a?(Hash) && d[:draft_version] })
             # The draft's own numeric date embeds in the designator
             # ("D2-2015-04") — the "D2, 04 2015" comma spelling
             # normalizes onto it (pubid ruling 2026-10-13).
             host[:draft_version] =
-              [joined, dash[:dash_year], dash[:dash_month]].compact.join("-")
+              [joined, dash_y, dash_m].compact.join("-")
             dash.delete(:dash_year)
             dash.delete(:dash_month)
-          elsif (dash[:dash_month] || dash_led) && parsed_hash[:year].nil?
-            parsed_hash[:year] = dash[:dash_year]
-            parsed_hash[:month] = dash[:dash_month]
+            dash.delete(:draft_date_dash_year)
+            dash.delete(:draft_date_dash_month)
+          elsif (dash_m || dash_led) && parsed_hash[:year].nil?
+            parsed_hash[:year] = dash_y
+            parsed_hash[:month] = dash_m
           else
             # Year-only tail embeds in the draft face ("D9-2006"), the model
             # the relaton-pinned renders use for corrupted update_codes
@@ -353,15 +404,17 @@ module Pubid
               # ("D9-2006", and with its month "D2-2015-04") — the
               # "D2, 04 2015" comma spelling normalizes onto it.
               host[:draft_version] =
-                [joined, dash[:dash_year], dash[:dash_month]].compact.join("-")
+                [joined, dash_y, dash_m].compact.join("-")
               dash.delete(:dash_year)
               dash.delete(:dash_month)
+              dash.delete(:draft_date_dash_year)
+              dash.delete(:draft_date_dash_month)
               # the hyphenated "/D-2-2007" spelling's year the spine
               # captured at top level is the draft's own — vacate it
-              parsed_hash.delete(:year) if parsed_hash[:year] == dash[:dash_year]
+              parsed_hash.delete(:year) if parsed_hash[:year] == dash_y
             else
-              parsed_hash[:year] = dash[:dash_year]
-              parsed_hash[:month] = dash[:dash_month]
+              parsed_hash[:year] = dash_y
+              parsed_hash[:month] = dash_m
             end
           end
         end
@@ -456,8 +509,11 @@ module Pubid
             # "IEEE P15026.2/D=FDIS-201008" (pubid#203 ruling). The
             # stage and date ride the designator; the ISO face is not
             # elected.
-            year = extract_value(fd[:year])
-            month = extract_value(fd[:month])
+            # fdraft's month/year rename with the fdraft_ prefix on the
+            # edition-2 grammar (nested-only); v1 spelling stays as the
+            # fallback.
+            year = extract_value(fd[:fdraft_year] || fd[:year])
+            month = extract_value(fd[:fdraft_month] || fd[:month])
             date = ""
             if year
               date = "-#{year}"
@@ -2004,15 +2060,20 @@ module Pubid
           iso_stage ||= extract_value(draft_data[:draft_iso_stage]) if draft_data[:draft_iso_stage]
           iso_iteration = extract_value(draft_data[:draft_iso_iteration]) if draft_data[:draft_iso_iteration]
 
-          # Extract date information from draft data
-          month_slice = draft_data[:month]
+          # Extract date information from draft data. The edition-2 grammar
+          # renames draft_date's nested month/year/day captures with the
+          # draft_date_ prefix (kept off the identity keys); the v1
+          # spellings stay as the fallback.
+          month_slice = draft_data[:draft_date_month] || draft_data[:month]
           month = extract_value(month_slice) if month_slice
-          year = extract_value(draft_data[:year]) if draft_data[:year]
+          year = extract_value(draft_data[:draft_date_year] || draft_data[:year]) if
+            draft_data[:draft_date_year] || draft_data[:year]
           # The apostrophe-year catalogue convention ("P1484.20.1/D7,
           # May 07"): the 2-digit year expands with the <30 pivot so the
           # hash carries an unambiguous year.
           year = "#{year.to_i < 30 ? 20 : 19}#{year}" if year.to_s.match?(/\A\d{2}\z/)
-          day = extract_value(draft_data[:day]) if draft_data[:day]
+          day = extract_value(draft_data[:draft_date_day] || draft_data[:day]) if
+            draft_data[:draft_date_day] || draft_data[:day]
 
           # A REV-carrying draft embeds its print date into the designator
           # with the month canonicalized numeric (pubid ruling 2026-10-14):
@@ -2103,7 +2164,11 @@ module Pubid
       def handle_reaffirmed(parsed, attributes)
         if parsed[:reaffirmed].is_a?(Hash)
           reaf_data = parsed[:reaffirmed]
-          attributes[:reaffirmed] = extract_value(reaf_data[:year])
+          # The edition-2 grammar renames the nested year capture
+          # (reaffirmed_year) so the reaffirmation year cannot leak onto
+          # the identity year key; v1 spelling stays as the fallback.
+          attributes[:reaffirmed] =
+            extract_value(reaf_data[:reaffirmed_year] || reaf_data[:year])
         elsif parsed[:reaffirmed]
           attributes[:reaffirmed] = extract_value(parsed[:reaffirmed])
         end

@@ -403,7 +403,10 @@ module Pubid
           return build_dual(result.parts) if result.dispatch == :dual_semicolon
         end
         parser_input = Parser.normalize_input(normalized)
-        parsed = Pubid::Parg::Backend.parse(:ieee, parser_input)
+        # The edition-2 artifact's bindings block produces the builder-ready
+        # hash at the engine (typed scalars + raw wrappers); the tree
+        # backend's normalization it replaces read the edition-1 shapes.
+        parsed = Pubid::Parg::Model.bound(:ieee, parser_input)
         builder = Builder.new(Identifier)
         # Pass the original input string to builder for context
         builder.original_input = input
