@@ -496,6 +496,13 @@ module Pubid
           # Handle JTC 1 subgroup in directives (ISO/IEC JTC 1 DIR)
           value.to_s
 
+        when :publisher_name
+          # The grammar's publisher_names preprocess binding (the ISO
+          # organization's full name, consumed by the ts artifact's
+          # schema materialization). The Ruby identifier carries only
+          # the Publisher component, so the field assigns nothing.
+          nil
+
         when :supplements
           # Handle bundled supplements (+ operator)
           # Each supplement is a hash that needs to be built
