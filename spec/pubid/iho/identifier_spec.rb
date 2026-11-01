@@ -57,6 +57,17 @@ RSpec.describe Pubid::Iho::Identifier do
       "S-100 Annex A 5.2.0" => "IHO S-100 Annex A 5.2.0",
       "S-44 5.0.0" => "IHO S-44 5.0.0",
       "S-66 Suppl 1 1.0.0" => "IHO S-66 Suppl 1 1.0.0",
+      # year-identified series (relaton#407): B-7/P-5/P-6 carry a year
+      # instead of the placeholder a.b.c edition
+      "IHO P-5 2024" => "IHO P-5 2024",
+      "IHO B-7 2023" => "IHO B-7 2023",
+      "P-5 2024" => "IHO P-5 2024",
+      # volume/issue-identified series (P-1, the IHR)
+      "IHO P-1 Vol. 30" => "IHO P-1 Vol. 30",
+      "IHO P-1 Vol. 30 (2)" => "IHO P-1 Vol. 30 (2)",
+      # the "Issue N" spelling is an input alias; the parenthesized
+      # form is the canonical print
+      "IHO P-1 Vol. 30 Issue 2" => "IHO P-1 Vol. 30 (2)",
     }.each do |input, canonical|
       context "with #{input.inspect}" do
         let(:input)     { input }
@@ -69,6 +80,16 @@ RSpec.describe Pubid::Iho::Identifier do
     it "raises on garbage input" do
       expect do
         Pubid::Iho.parse("not an IHO identifier")
+      end.to raise_error(Pubid::Errors::ParseError)
+    end
+
+    # A two-segment version is deliberately not a tail discriminator:
+    # no IHO series carries one in the corpus, and neither new rule
+    # swallows it (a year needs all four digits of 19xx/20xx; a dotted
+    # version needs all three segments).
+    it "raises on a two-segment version" do
+      expect do
+        Pubid::Iho.parse("IHO B-12 3.0")
       end.to raise_error(Pubid::Errors::ParseError)
     end
   end
@@ -100,6 +121,10 @@ RSpec.describe Pubid::Iho::Identifier do
       "IHO P-1/21 1.0.0",
       "IHO M-3 2.0.0",
       "IHO C-13 1.0.0",
+      "IHO B-12 3.0.0",
+      "IHO P-5 2024",
+      "IHO P-1 Vol. 30",
+      "IHO P-1 Vol. 30 (2)",
     ].each do |canonical|
       context "with #{canonical.inspect}" do
         let(:pubid) { Pubid::Iho.parse(canonical) }
@@ -107,6 +132,14 @@ RSpec.describe Pubid::Iho::Identifier do
         it "round-trips losslessly through to_hash/from_hash" do
           expect(Pubid::Iho::Identifier.from_hash(pubid.to_hash).to_s)
             .to eq(canonical)
+        end
+
+        # == is what #matches? compares through (it excludes and
+        # rebuilds), so the deserialized id must equal the parsed one,
+        # not merely render alike.
+        it "rebuilds an == identifier from its own hash" do
+          expect(Pubid::Iho::Identifier.from_hash(pubid.to_hash))
+            .to eq(pubid)
         end
 
         it "stores the document number under :number" do
@@ -127,6 +160,43 @@ RSpec.describe Pubid::Iho::Identifier do
       expected = Pubid::Iho.identifier_types.map(&:polymorphic_name).sort
       expect(Pubid::Iho::Identifier::IHO_TYPE_MAP.keys.sort)
         .to eq(expected)
+    end
+  end
+
+  describe "series components (relaton#407)" do
+    # The grammar's tail picks exactly one discriminator; the issue
+    # only ever rides beside a volume.
+    it "parses a year into a plain string year" do
+      id = Pubid::Iho.parse("IHO P-5 2024")
+      expect(id.year).to eq("2024")
+      expect(id.version).to be_nil
+      expect(id.volume).to be_nil
+    end
+
+    it "parses a volume and issue into plain string scalars" do
+      id = Pubid::Iho.parse("IHO P-1 Vol. 30 (2)")
+      expect(id.volume).to eq("30")
+      expect(id.issue).to eq("2")
+      expect(id.version).to be_nil
+      expect(id.year).to be_nil
+    end
+
+    # "P-1 Vol. 30" must match "P-1 Vol. 30 (2)" under exclude(:volume):
+    # the issue is the volume's scalar sibling, so the exclusion nils
+    # the whole cluster (the base's :year -> :date alias shape).
+    it "nils the volume/issue cluster on exclude(:volume)" do
+      dated = Pubid::Iho.parse("IHO P-1 Vol. 30 (2)")
+      bare = Pubid::Iho.parse("IHO P-1 Vol. 30")
+      excluded = dated.exclude(:volume)
+      expect(excluded.volume).to be_nil
+      expect(excluded.issue).to be_nil
+      expect(excluded).to eq(bare.exclude(:volume))
+    end
+
+    # A lone scalar year needs no override: the base nils a declared
+    # :year directly (the additive :year -> :date alias).
+    it "nils the year on exclude(:year)" do
+      expect(Pubid::Iho.parse("IHO P-5 2024").exclude(:year).year).to be_nil
     end
   end
 end
