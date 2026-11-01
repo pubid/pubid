@@ -23,13 +23,21 @@ module Pubid
         attribute :parts, :string, collection: true # Array of part strings
         attribute :original_separator, :string # Original separator (. or -) from parsing
 
+        # The separator BEFORE each part, when the source mixed them
+        # ("7.4-3-2" — dot after the number, dashes before the subparts).
+        # Runtime-only (a plain accessor, not a lutaml attribute): the
+        # serialized columns keep the single original_separator, and only
+        # a fresh parse knows the per-part spelling.
+        attr_accessor :original_separators
+
         def initialize(prefix: nil, number: nil, parts: nil,
-original_separator: nil)
+original_separator: nil, original_separators: nil)
           super()
           self.prefix = prefix
           self.number = number
           self.parts = parts || []
           self.original_separator = original_separator
+          self.original_separators = original_separators
         end
 
         # Parse code string into components
@@ -55,15 +63,45 @@ original_separator: nil)
           components = remainder.split(/[.-]/)
           number = components.shift
 
+          # The separators AS PRINTED, one per part boundary — a code may
+          # mix them ("7.4-3-2": dot after the number, dashes before the
+          # subparts), and to_s re-joins with these instead of the uniform
+          # original_separator when they were captured.
+          separators = remainder.scan(/[.-]/)
+          per_part = separators.length == components.length ? separators : nil
+
           new(
             prefix: prefix,
             number: number,
             parts: components.empty? ? nil : components,
             original_separator: separator,
+            original_separators: per_part,
           )
         end
 
+        # The printed face: keeps the separator each part was printed
+        # with ("7.4-3-2"), per Pubid::SubsetMatch. Spellings that differ
+        # only in part separators denote the same document, so faces that
+        # must be spelling-stable — the URN and the joint IEEE/ISO faces —
+        # render through #canonical_to_s instead.
         def to_s
+          render_code(per_part: true)
+        end
+
+        # The canonical face: one uniform separator across every part
+        # boundary (the first distinct one the source printed, the same
+        # face this class rendered before per-part separators were kept).
+        def canonical_to_s
+          render_code(per_part: false)
+        end
+
+        def render(context: nil)
+          to_s
+        end
+
+        private
+
+        def render_code(per_part:)
           result = ""
           result += prefix if prefix
           result += number if number # Guard against nil number (e.g., "ANSI X")
@@ -95,16 +133,17 @@ original_separator: nil)
               separator = "."
             end
 
-            parts.each do |part|
-              result += separator + part
+            parts.each_with_index do |part, idx|
+              # A fresh parse of mixed-separator codes ("7.4-3-2") carries
+              # the separator each part was printed with; the canonical
+              # face (and an unknown per-part spelling) falls back to the
+              # uniform original separator (the serialized shape).
+              sep = (per_part && original_separators&.at(idx)) || separator
+              result += sep + part
             end
           end
 
           result
-        end
-
-        def render(context: nil)
-          to_s
         end
       end
     end
