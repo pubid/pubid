@@ -14,10 +14,14 @@ RSpec.describe Pubid::Iho::UrnGenerator do
       "IHO M-3 2.0.0" => "urn:iho:m:3:2.0.0",
       "IHO B-4 2.19.0" => "urn:iho:b:4:2.19.0",
       "IHO C-13 1.0.0" => "urn:iho:c:13:1.0.0",
-      # series components: a year is a bare trailing segment, a volume
-      # (with its optional issue) is a vol.N/issue.N part-kind segment
-      "IHO P-5 2024" => "urn:iho:p:5:2024",
-      "IHO B-7 2023" => "urn:iho:b:7:2023",
+      # series components: a year is a y.N tagged segment, a volume
+      # (with its optional issue) is a vol.N/issue.N tagged segment
+      "IHO P-5 2024" => "urn:iho:p:5:y.2024",
+      "IHO B-7 2023" => "urn:iho:b:7:y.2023",
+      # the number keeps its colon; a year after it stays tagged, so
+      # the two identifiers below get different URNs
+      "IHO S-158:2024" => "urn:iho:s:158:2024",
+      "IHO S-158 2024" => "urn:iho:s:158:y.2024",
       "IHO P-1 Vol. 30" => "urn:iho:p:1:vol.30",
       "IHO P-1 Vol. 30 (2)" => "urn:iho:p:1:vol.30:issue.2",
     }.each do |input, urn|
