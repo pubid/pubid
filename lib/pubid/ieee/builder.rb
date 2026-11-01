@@ -298,16 +298,15 @@ module Pubid
 
           e[:draft_version] = e.delete(:draft_version_composite)
         end
-        # The subpart run ("7.4-3-2" carries two) binds as the subparts[]
-        # array of harvest hashes — the flat scalar binding kept only the
-        # first occurrence. Flatten to the bare separator-led strings and
-        # surface them under the key every consumer interpolates.
-        if parsed_hash[:subpart].nil? && parsed_hash[:subparts]
-          parsed_hash[:subpart] = parsed_hash[:subparts].map do |sp|
-            sp.is_a?(Hash) ? sp[:subpart] : sp
-          end
-          parsed_hash.delete(:subparts)
-        end
+        # The subpart run ("7.4-3-2" carries two) rides the raw
+        # part_subpart_year wrapper — the subparts[] array harvest emitted
+        # empty hashes for non-firing rep iterations on wasm
+        # (parsanol-ruby#399), so the run no longer binds top-level.
+        # Hoist the wrapper's part/year and deep-collect its interior
+        # subparts so every consumer — and every raw subtree built through
+        # here (the CSA dual's ieee_portion, the multi-numbered primary,
+        # the supplement bases) — sees the flat keys it has always read.
+        parsed_hash = unwrap_part_subpart_year(parsed_hash)
 
         # Grammar-captured dash dates (relaton's "/D-3-2017-07" and
         # "/R-x-2011-04" tails) land on the identifier's year/month exactly
@@ -582,6 +581,11 @@ module Pubid
       def reconstruct_base_string(base_data)
         base_parts = []
 
+        # The part/subpart/year captures sit one level down, inside the
+        # raw part_subpart_year wrapper (parsanol-ruby#399) — hoist them
+        # before the flat reads below.
+        base_data = unwrap_part_subpart_year(base_data)
+
         # Extract publisher
         if base_data[:publishers]
           pub_data = base_data[:publishers]
@@ -766,7 +770,7 @@ module Pubid
       def build_interpretation_supplement(parsed_hash)
         # Reconstruct base identifier string from parsed components (same logic as corrigendum)
         base_parts = []
-        base_data = parsed_hash[:base]
+        base_data = unwrap_part_subpart_year(parsed_hash[:base])
 
         # Extract publisher
         if base_data[:publishers]
@@ -842,7 +846,7 @@ module Pubid
       def build_conformance_supplement(parsed_hash)
         # Reconstruct base identifier string from parsed components (same logic as corrigendum)
         base_parts = []
-        base_data = parsed_hash[:base]
+        base_data = unwrap_part_subpart_year(parsed_hash[:base])
 
         # Extract publisher
         if base_data[:publishers]
@@ -2000,6 +2004,42 @@ module Pubid
 
         str_value = value.to_s.strip
         str_value.length.positive? ? str_value : nil
+      end
+
+      # Deep-first collection of every :subpart node under a raw
+      # part_subpart_year wrapper (Hash or Array, any nesting).
+      def collect_subparts(node, out = [])
+        case node
+        when Hash
+          node.each do |key, value|
+            if key.to_sym == :subpart
+              out << value
+            else
+              collect_subparts(value, out)
+            end
+          end
+        when Array then node.each { |item| collect_subparts(item, out) }
+        end
+        out
+      end
+
+      # The part/subpart/year captures ride the raw part_subpart_year
+      # wrapper inside raw subtrees (parsanol-ruby#399: the subparts[]
+      # array harvest is not cross-engine stable, so the run does not
+      # bind top-level). Hoist the wrapper's part/year onto a copy of the
+      # subtree and surface the interior subpart run under :subpart, so
+      # the flat reads downstream see the shapes they always read.
+      def unwrap_part_subpart_year(node)
+        return node unless node.is_a?(Hash) && (run = node[:part_subpart_year])
+
+        nodes = run.is_a?(Array) ? run : [run]
+        flat = nodes.select { |item| item.is_a?(Hash) }.inject({}, :merge)
+        node = node.merge(flat.slice(:part, :year))
+        unless node[:subpart]
+          collected = collect_subparts(run)
+          node = node.merge(subpart: collected) unless collected.empty?
+        end
+        node
       end
 
       # Extract optional attribute if present
