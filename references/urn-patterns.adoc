@@ -190,8 +190,8 @@ methods.
 |`BCP 3` → `urn:ietf:bcp:3`
 
 |iho
-|`urn:iho:{type}:{number}[:ap.N][:part.N][:annex.N][:suppl.N]`
-|`IHO B-1 1.0.0` → `urn:iho:b:1:1.0.0`
+|`urn:iho:{type}:{number}[:ap.N][:part.N][:annex.N][:suppl.N][:vol.N[:issue.N]][:{version}][:y.N]`
+|`IHO B-1 1.0.0` → `urn:iho:b:1:1.0.0`; `IHO P-5 2024` → `urn:iho:p:5:y.2024`
 
 |itu
 |`urn:itu:[:sector|"itu"][:report]:{series code, joined by `.` or `-` per series_dash}`

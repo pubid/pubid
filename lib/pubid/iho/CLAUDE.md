@@ -62,12 +62,21 @@ and volume/issue only ride part-less ids, which cannot join
 `spec/pubid/all_parts_edition_keys_audit_spec.rb` covers the
 version-bearing S-series collapse.
 
-**URN conventions:** a year is a bare trailing segment
-(`urn:iho:p:5:2024`); a volume is a `vol.N` part-kind segment with an
-optional `issue.N` after it (`urn:iho:p:1:vol.30.issue.2`). The URN
-parser walks part-kind tokens as a run and hands the rebuilt text
-back through the flavor parse, so a URN round-trip exercises the same
-grammar as a string.
+**URN conventions:** only the dotted `version` is an untagged
+segment. A year is tagged `y.N` (`urn:iho:p:5:y.2024`); a volume is a
+`vol.N` segment with an optional `issue.N` segment after it
+(`urn:iho:p:1:vol.30:issue.2`). The URN parser walks the tagged
+segments as a run and hands the rebuilt text back through the flavor
+parse, so a URN round-trip exercises the same grammar as a string.
+**The number is not escaped and can hold a colon** (`IHO S-158:100`
+gives `urn:iho:s:158:100`), so the parser joins every untagged segment
+that is not an a.b.c version back into the number. That is why the
+year must carry a tag: with the bare year that pubid 2.0.2 emitted,
+`IHO S-158:2024` and `IHO S-158 2024` both gave `urn:iho:s:158:2024`,
+and no colon number round-tripped at all. A 2.0.2 year URN such as
+`urn:iho:p:5:2024` now decodes as the number `5:2024`; it was emitted
+only by 2.0.2. A tagged segment with an unknown tag raises
+`Pubid::Errors::UrnParseError`.
 
 ## Fixtures run through the classify pipeline
 
