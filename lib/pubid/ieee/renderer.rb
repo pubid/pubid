@@ -472,8 +472,10 @@ module Pubid
                  end
 
         # Code (number) with draft version for PSI — the mark goes after the
-        # code, before the draft and the date.
-        code_part = id.code.to_s
+        # code, before the draft and the date. Canonical code: the PSI
+        # code is reassembled from parse-tree captures (synthetic
+        # separators — see Components::Code#canonical_to_s).
+        code_part = id.code.canonical_to_s
         code_part += mark(id.code_obj&.number, id.code_obj&.prefix,
                           publishers: publishers_of(id))
         if id.draft_obj
