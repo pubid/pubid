@@ -33,7 +33,7 @@ module Pubid
         if FormatDetector.detect(identifier) == :urn
           UrnParser.parse(identifier)
         else
-          parsed = Pubid::Parg::Backend.parse(:iala, identifier)
+          parsed = Pubid::Parg::Model.bound(:iala, identifier)
           Builder.build(parsed)
         end
       end
