@@ -15,6 +15,9 @@ module Pubid
           annex: stringify(hash[:annex]),
           supplement: stringify(hash[:supplement]),
           version: stringify(hash[:version]),
+          year: stringify(hash[:year]),
+          volume: stringify(hash[:volume]),
+          issue: stringify(hash[:issue]),
         }.compact
 
         Pubid::Iho.identifier_klass_for_type_letter(type_letter).new(**attrs)
