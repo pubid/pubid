@@ -211,6 +211,19 @@ class FixturesClassifier
     when "idf" then detect_idf_class(id_str)
     when "csa" then detect_csa_class(id_str)
     when "ashrae" then detect_ashrae_class(id_str)
+    when "iho" then detect_iho_class(id_str)
+    else "unknown"
+    end
+  end
+
+  def detect_iho_class(id_str)
+    # The series letter is the token after the optional IHO prefix.
+    case id_str.sub(/\AIHO\s+/i, "").upcase[0]
+    when "B" then "bibliographic"
+    when "C" then "circular_letter"
+    when "M" then "miscellaneous"
+    when "P" then "publication"
+    when "S" then "standard"
     else "unknown"
     end
   end
