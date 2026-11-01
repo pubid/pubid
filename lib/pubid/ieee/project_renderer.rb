@@ -14,8 +14,12 @@ module Pubid
 
       def render(context: nil, **_opts)
         id = @id
+        # Canonical code: a project draft's code is reassembled from
+        # parse-tree captures, and the assembled separators are synthetic
+        # — the printed face is the uniform spelling (the same document
+        # spelled with all dashes or all dots renders identically).
         body = if id.respond_to?(:code_obj) && id.code_obj
-                 id.code_obj.to_s
+                 id.code_obj.canonical_to_s
                else
                  id.number.to_s
                end
