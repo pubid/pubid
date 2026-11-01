@@ -164,7 +164,10 @@ module Pubid
           # P11073.10418", #216); a plain ISO/IEC number keeps the
           # printed separator ("IEC/IEEE FDIS 60079-30-2", "ISO/IEC
           # 8802-3").
-          code_str = code.to_s
+          # Canonical (uniform-separator) code: a joint document parses
+          # from both the dotted IEEE face and the dashed IEC face, and
+          # both spellings must render — and URN — identically.
+          code_str = code.canonical_to_s
           code_str = code_str.tr("-", ".") if code_str.start_with?("P")
           code_str += mark unless code_str.empty?
           parts << code_str if code_str && !code_str.empty?
@@ -213,8 +216,9 @@ module Pubid
           parts << draft_status if draft_status
 
           # Build code part — the P-state prints as spelled (P = project
-          # draft; no P = standard). Never added or stripped.
-          code_str = code.to_s
+          # draft; no P = standard). Never added or stripped. Canonical
+          # code for the same both-faces reason as the ISO face above.
+          code_str = code.canonical_to_s
 
           # Mark after the number, before the draft and the year
           code_str += mark unless code_str.empty?

@@ -190,7 +190,10 @@ module Pubid
 
         return nil unless identifier.code_obj
 
-        identifier.code_obj.to_s
+        # The URN is spelling-stable: codes printed with mixed part
+        # separators ("7.4-3-2") share one identity with their uniform
+        # spelling, so the segment renders canonically, not as printed.
+        identifier.code_obj.canonical_to_s
       end
 
       # A multi-designation wrapper (AdoptedStandard, DualPublished,
