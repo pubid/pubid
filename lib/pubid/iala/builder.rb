@@ -13,8 +13,8 @@ module Pubid
         klass = Iala.identifier_klass_for_type_letter(type_letter)
 
         attrs = {
-          number:   build_number(parsed, klass),
-          edition:  stringify(parsed[:edition_value]),
+          number: build_number(parsed, klass),
+          edition: stringify(parsed[:edition_value]),
           language: stringify(parsed[:language])&.upcase,
         }.compact
 
@@ -38,11 +38,11 @@ module Pubid
         base = base_klass.new(number: build_number(hash, base_klass))
 
         attrs = {
-          base:       base,
+          base: base,
           annex_form: stringify(hash[:annex_marker]),
-          letter:     stringify(hash[:annex_letter]),
-          edition:    stringify(hash[:edition_value]),
-          language:   stringify(hash[:language])&.upcase,
+          letter: stringify(hash[:annex_letter]),
+          edition: stringify(hash[:edition_value]),
+          language: stringify(hash[:language])&.upcase,
         }.compact
 
         Identifiers::Annex.new(**attrs)
@@ -65,12 +65,12 @@ module Pubid
         base = canonical_base(base, klass)
 
         dots = canonical_dots(
-          number_segments(hash[:doc_number_dots], :dotted_segment), klass,
+          number_segments(hash[:doc_number_dots], :dotted_segment), klass
         )
         dots_str = dots.empty? ? "" : ".#{dots}"
 
         subparts = number_segments(hash[:subpart], :subpart_number)
-        subpart_str = subparts.empty? ? "" : "-#{subparts.join("-")}"
+        subpart_str = subparts.empty? ? "" : "-#{subparts.join('-')}"
 
         "#{base}#{dots_str}#{subpart_str}"
       end
