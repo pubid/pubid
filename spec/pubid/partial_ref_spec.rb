@@ -48,7 +48,7 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "api" => { ref: "API 1509", omits: [:year] },
     "easc" => { ref: "ПМГ 126", omits: [:year] },
     "astm" => { ref: "ASTM A6", omits: [:year] },
-    "iho" => { ref: "IHO P-5", omits: [:version] },
+    "iho" => { ref: "IHO P-5", omits: %i[version year volume issue] },
     "oasis" => { ref: "OASIS EDXL", omits: [:version] },
     "sae" => { ref: "SAE AIR1936", omits: [:date] },
     "adobe" => { ref: "Adobe TN 5014", omits: [] },

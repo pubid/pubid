@@ -6,7 +6,20 @@ module Pubid
     # every concrete IHO identifier (Identifiers::*) descends from it.
     #
     # IHO identifiers have the form:
-    #   IHO {S|P|M|B|C}-{number}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {version}]
+    #   IHO {S|P|M|B|C}-{number}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {tail}]
+    #
+    # where the optional {tail} is exactly ONE of:
+    #   {version}                 dotted a.b.c edition, e.g. "IHO S-44 5.0.0"
+    #   {year}                    four digits, for a series with no edition
+    #                             (P-5 Yearbook, P-6 Assembly proceedings,
+    #                             P-7 Annual Report), e.g. "IHO P-5 2024"
+    #   Vol. {volume}[ No. {issue}]
+    #                             the International Hydrographic Review (P-1),
+    #                             e.g. "IHO P-1 Vol. 30 No. 1"
+    #
+    # A nil year/volume/issue is a wildcard for `===`: "IHO P-5" matches every
+    # year of the yearbook. The legacy "IHO P-1/30" number form still parses
+    # with number "1/30".
     #
     # The leading IHO publisher prefix is optional on input but always
     # emitted on output.
@@ -40,6 +53,15 @@ module Pubid
       attribute :annex,      :string
       attribute :supplement, :string
       attribute :version,    :string
+      attribute :year,       :string
+      attribute :volume,     :string
+      attribute :issue,      :string
+
+      # A volume and its issue are the edition of a journal (IHO P-1), so an
+      # "all parts" identity drops them as it drops the year and version.
+      def self.all_parts_edition_keys
+        super + %i[volume issue]
+      end
 
       # Polymorphic type map for lutaml::Model key_value serialization: maps
       # each subclass's polymorphic_name to its class name so `from_hash` can
@@ -65,6 +87,9 @@ module Pubid
         map "annex",      to: :annex
         map "supplement", to: :supplement
         map "version",    to: :version
+        map "year",       to: :year
+        map "volume",     to: :volume
+        map "issue",      to: :issue
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
