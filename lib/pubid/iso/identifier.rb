@@ -135,8 +135,10 @@ module Pubid
         map "languages", to: :languages
         # publisher emitted only when the primary isn't the type default;
         # copublishers (the other bodies) as an array, omitted when empty.
-        map "publisher", with: { to: :publisher_to_kv, from: :publisher_from_kv }
-        map "copublishers", with: { to: :copublishers_to_kv, from: :copublishers_from_kv }
+        map "publisher",
+            with: { to: :publisher_to_kv, from: :publisher_from_kv }
+        map "copublishers",
+            with: { to: :copublishers_to_kv, from: :copublishers_from_kv }
         map "locality", to: :locality
         # `type` and generic `stage` are fully derived from `typed_stage`
         # (builder sets them via to_type/to_stage), so we serialize only the
@@ -169,8 +171,10 @@ module Pubid
         # instead of falling back. The IEC twin (iec/identifier.rb) was
         # migrated at the time; ISO was missed.
         ts = (model.class.const_defined?(:TYPED_STAGES) &&
-              model.class::TYPED_STAGES.find { |t| t.code.to_s == value.to_s }) ||
-             Pubid::Iso.locate_stage_by_code(value)
+              model.class::TYPED_STAGES.find do |t|
+                t.code.to_s == value.to_s
+              end) ||
+          Pubid::Iso.locate_stage_by_code(value)
         return unless ts
 
         # The renderer prefers `original_abbr` (the parsed surface form); without
@@ -196,7 +200,7 @@ module Pubid
         return if v.nil? || v.to_s.empty?
 
         doc.add_child(Lutaml::KeyValue::DataModel::Element.new("stage_iteration",
-                                                                v.to_s))
+                                                               v.to_s))
       end
 
       def stage_iteration_from_kv(model, value)
@@ -219,7 +223,11 @@ module Pubid
       # --- date serialized flat as year/month/day ---
       def year_to_kv(model, doc) = emit_date_part(doc, "year", model.date&.year)
       def year_from_kv(model, value) = date_for(model).year = value.to_s
-      def month_to_kv(model, doc) = emit_date_part(doc, "month", model.date&.month)
+
+      def month_to_kv(model, doc)
+        emit_date_part(doc, "month", model.date&.month)
+      end
+
       def month_from_kv(model, value) = date_for(model).month = value.to_s
       def day_to_kv(model, doc) = emit_date_part(doc, "day", model.date&.day)
       def day_from_kv(model, value) = date_for(model).day = value.to_s
@@ -252,7 +260,8 @@ module Pubid
         pub = model.publisher&.publisher
         return if pub.nil? || pub == model.class.default_publisher&.publisher
 
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("publisher", pub))
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("publisher",
+                                                               pub))
       end
 
       def publisher_from_kv(model, value)
@@ -264,7 +273,8 @@ module Pubid
         return unless cp&.any?
 
         doc.add_child(
-          Lutaml::KeyValue::DataModel::Element.new("copublishers", cp.map(&:to_s)),
+          Lutaml::KeyValue::DataModel::Element.new("copublishers",
+                                                   cp.map(&:to_s)),
         )
       end
 
@@ -304,10 +314,10 @@ module Pubid
         when :mr_string
           Pubid::Parsers::MrString.parse(string)
         else
-          # R1 parser swap: the baked PG artifact is the identifier
-          # parser of record; the Builder consumes the same attribute
-          # hash it always has.
-          parsed = Pubid::Parg::Backend.parse(:iso, string)
+          # The baked PG artifact parses through the grammar's declared
+          # bindings: the Builder consumes the typed bound map (every
+          # capture bound by name, supplement layers position-scoped).
+          parsed = Pubid::Parg::Model.bound(:iso, string)
           Pubid::Iso::Builder.new.build(parsed)
         end
       end

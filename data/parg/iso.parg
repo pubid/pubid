@@ -1,0 +1,745 @@
+# Pubid ISO flavor — port of lib/pubid/iso/parser.rb (pubid monorepo).
+#
+# Scope: the full identifier root — NSB stage prefixes (FprISO, WD/ISO),
+# TC documents (ISO/TC 184/SC 4/WG 3 N 123), directives (plain,
+# supplement, bundled "DIR 1 + IEC SUP"), JCGM, legacy ISO/R forms
+# (including supplements), the three-level supplement chains
+# (/Amd/../Cor/../Amd..), the copublisher identifier spine, and the
+# joint "ISO x|IDF y" form (the IDF grammar's rules are inlined under
+# idf_* names so their captures never collide with the ISO ones).
+#
+# Edition 2 with typed model bindings: every capture the builder
+# consumes is bound. Supplement layers capture into position-scoped
+# names (supp_* on the first supplement, supp2_* on the second,
+# supp3_* on the third, isor_supp_* on an ISO/R supplement,
+# dsupp_*/bs1_/bs2_/bs3_ on directive supplements, idf_*/idf_supp_* on the
+# joint's IDF side): captures are collected globally by name, so shared
+# names across layers would collapse the layer's number/date onto the
+# base's. The base document's own edition is base_edition wherever a
+# supplement layer's third_part can carry its own edition.
+
+grammar PubidIso version "0.4.0" edition 2 {
+
+  # ---- lexical (pubid/parser/common_parse_rules.rb + ISO override) ----
+  digit = %x30-39
+  digits = 1*digit
+  letter = %x41-5A / %x61-7A
+  lower = %x61-7A
+  word_digit = %x30-39 / %x41-5A / %x61-7A
+  word_char = %x30-39 / %x41-5A / %x61-7A / %x5F
+  space = " "
+  dash = "-" / "‑" / "‐"
+  dot = "."
+  slash = "/"
+  colon = ":"
+
+  century = "19" / "20"
+  year_digits = century 2*digit !digit
+  month_digits = 2*digit
+  day_digits = 2*digit
+
+  # ---- stage-abbreviation vocabularies (uncaptured; capture sites
+  # inline the alt so the capture holds one scalar span) ----
+  typed_stage_abbrev = alt from_table "typed_stages" column "abbr"
+  supp_stage_abbrev = alt from_table "typed_stages_supplements" column "abbr"
+  directives_stage_abbrev = alt from_table "directives_typed_stages" column "abbr"
+  directives_supp_stage_abbrev = alt from_table "directives_supplements_typed_stages" column "abbr"
+  idf_stage_abbrev = alt from_table "idf_typed_stages" column "abbr"
+  idf_supp_stage_abbrev = alt from_table "idf_typed_stages_supplements" column "abbr"
+
+  # ---- publishers and copublishers ----
+  ## The leading organization token. Copublishers follow after a slash;
+  ## the whole tail captures as ONE scalar span ("/IEC/IEEE") because
+  ## the engine's array-group harvest pads non-firing reps with empty
+  ## hashes (parsanol-ruby#399) — the builder splits the span.
+  publisher = ("ISO" / "IEC") as publisher
+  organization = alt from_table "organizations" column "name"
+  ## At least one item: the optional around [copublishers] keeps the
+  ## key absent when the identifier has no copublisher (a zero-width
+  ## capture would bind an empty array, not a scalar span).
+  copublishers = {
+    (
+      (slash [space] (alt from_table "organizations" column "name"))
+      *(slash [space] (alt from_table "organizations" column "name"))
+    ) as copublishers
+  }
+  prefix_sole_publisher = publisher
+  prefix_with_copublishers = prefix_sole_publisher [space] [copublishers]
+
+  # ---- number and parts ----
+  ## number/part bodies inlined at every capture site so each capture
+  ## holds one scalar span; part_legacy's negative lookahead keeps a
+  ## "/Amd"-style tail from being read as a legacy slash part.
+  part_modern_body = dash [space] 1*word_digit *(dash 1*word_digit)
+  part_legacy_body = slash [space] !supp_stage_abbrev 1*word_digit
+  number_with_part = {
+    (
+      (1*5digit)
+      [
+        (
+          (dash [space] 1*word_digit *(dash 1*word_digit))
+          / (slash [space] !supp_stage_abbrev 1*word_digit)
+        )
+      ]
+    ) as number_with_part
+  }
+
+  # ---- stage iteration: "ISO 11243.1" ----
+  stage_iteration = dot digit as stage_iteration
+
+  # ---- date: ":2005-02", ":--", ":—", legacy dash form ----
+  date_core = (("--" / "—")) as undated_marker / (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as date
+  date = (colon / dash) [date_core]
+
+  second_part = {
+    number_with_part
+    [stage_iteration]
+    [[space] date]
+  }
+
+  # ---- typed stages ----
+  type_with_stage = {
+    (
+      (alt from_table "typed_stages" column "abbr")
+    ) as type_with_stage
+    [digit as stage_iteration space]
+  }
+
+  # ---- third part: edition, language, all-parts ----
+  edition_body = ("Edition" / "Ed." / "ED" / "Ed") [space] [1*digit]
+  edition = {
+    (
+      (("Edition" / "Ed." / "ED" / "Ed") [space] [1*digit])
+    ) as edition
+  }
+  lang_word = 1*letter [","]
+  # Separator-first: "(E/F)" and "(E,F)" only parse if each code item
+  # claims its following separator before the bare-word alternative
+  # commits (PEG ordered choice — parslet retries fewer iterations, PG
+  # does not).
+  lang_sep = slash / ","
+  lang_code = %x45 / %x46 / %x41 / %x52 / %x44 / %x53
+  languages = {
+    (
+      *( ((%x45 / %x46 / %x41 / %x52 / %x44 / %x53) [(slash / ",")]) / (1*letter [","]) )
+    ) as languages
+  }
+  language = "(" languages ")"
+  all_parts = "(all parts)" as all_parts
+  third_part_edition = [space] [edition]
+  third_part = third_part_edition [language] [space] [all_parts]
+
+  # ---- guide prefix ----
+  guide_prefix = "Guide" / "GUIDE"
+
+  # ---- the copublisher identifier form ----
+  identifier_copublishers_no_third = {
+    [ (("Guide" / "GUIDE") as type_with_stage_fr) space ]
+    [prefix_with_copublishers]
+    [space]
+    [slash]
+    [type_with_stage]
+    [space]
+    second_part
+    third_part_edition
+  }
+  identifier_copublishers = identifier_copublishers_no_third third_part
+
+  # The supplement-base variant: identical, but the edition captures as
+  # base_edition so the supplement layer's own third_part edition is the
+  # top-level one.
+  base_third_part_edition = {
+    [space] [
+      (
+        (("Edition" / "Ed." / "ED" / "Ed") [space] [1*digit])
+      ) as base_edition
+    ]
+  }
+  supplement_base_no_third = {
+    [ (("Guide" / "GUIDE") as type_with_stage_fr) space ]
+    [prefix_with_copublishers]
+    [space]
+    [slash]
+    [type_with_stage]
+    [space]
+    second_part
+    base_third_part_edition
+  }
+
+  # ---- JCGM: "JCGM 200:2008(F)" ----
+  jcgm_identifier = "JCGM" as publisher space second_part third_part
+
+  # ---- NSB stage prefixes: "FprISO 105-A03", "WD/ISO 10360-5:2000" ----
+  nsb_iso_identifier = {
+    (
+      ("Fpr" as nsb_stage) prefix_sole_publisher [space] [copublishers] [space] [type_with_stage] [space] second_part third_part
+    )
+    /
+    (
+      ("WD" as nsb_stage) slash prefix_sole_publisher [space] [copublishers] [space] [type_with_stage] [space] second_part third_part
+    )
+  }
+
+  # ---- TC documents: "ISO/TC 184/SC 4/WG 3 N 123" ----
+  tc_type = (alt from_table "tc_types" column "name") as tc_type
+  wg_type = (alt from_table "wg_types" column "name") as wg_type
+  sc_type = ("SC/QC" / "SC") as sc_type
+  tc_subcommittee_part = {
+    (
+      slash sc_type space (1*digit) as sc_number slash wg_type space (1*digit) as wg_number
+    )
+    /
+    (
+      slash sc_type space (1*digit) as sc_number
+    )
+  }
+  tc_document = prefix_sole_publisher (slash / space) tc_type space (1*digit) as tc_number [tc_subcommittee_part] space "N" [space] (1*digit) as number [(colon (("19" / "20") 2*digit !digit) as year)]
+  bare_tc_document = {
+    (1*digit) as tc_number
+    slash sc_type space (1*digit) as sc_number
+    [ slash wg_type space (1*digit) as wg_number ]
+    space "N" [space] (1*digit) as number
+    [(colon (("19" / "20") 2*digit !digit) as year)]
+  }
+
+  # ---- legacy ISO/R ----
+  iso_r_prefix = ("ISO/R") as iso_r_prefix
+  iso_r_identifier = iso_r_prefix space second_part third_part
+  iso_r_supplement_separator = slash / ([space] "—" [space]) / (space dash space)
+  iso_r_supplement_identifier = {
+    iso_r_prefix space second_part
+    iso_r_supplement_separator
+    (
+      (alt from_table "typed_stages_supplements" column "abbr")
+    ) as isor_supp_type_with_stage
+    [space] supplement_second_part_isor
+    third_part
+  }
+
+  # ---- supplements (up to three levels) ----
+  ## ISO/R supplement layer second_part: isor_supp_* names.
+  supplement_second_part_isor = {
+    (
+      (
+        (1*5digit)
+        [
+          (
+            (dash [space] 1*word_digit *(dash 1*word_digit))
+            / (slash [space] !supp_stage_abbrev 1*word_digit)
+          )
+        ]
+      ) as isor_supp_number_with_part
+    )
+    [ dot digit as isor_supp_stage_iteration ]
+    [
+      [space] (
+        (colon / dash) [
+          (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as isor_supp_date
+          / (("--" / "—")) as isor_supp_undated_marker
+        ]
+      )
+    ]
+  }
+
+  ## First supplement layer: /Amd 1:2021 after the base designation.
+  supplement_second_part = {
+    (
+      (
+        (1*5digit)
+        [
+          (
+            (dash [space] 1*word_digit *(dash 1*word_digit))
+            / (slash [space] !supp_stage_abbrev 1*word_digit)
+          )
+        ]
+      ) as supp_number_with_part
+    )
+    [ dot digit as supp_stage_iteration ]
+    [
+      [space] (
+        (colon / dash) [
+          (
+            (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)])
+          ) as supp_date
+          / (("--" / "—")) as supp_undated_marker
+        ]
+      )
+    ]
+  }
+  supplement_type_with_stage = {
+    (
+      (alt from_table "typed_stages_supplements" column "abbr")
+    ) as supp_type_with_stage
+  }
+  supp_date_tail = {
+    (colon / dash) [
+      (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as supp_date
+      / (("--" / "—")) as supp_undated_marker
+    ]
+  }
+  supplement_identifier_no_third = {
+    supplement_base_no_third
+    slash supplement_type_with_stage
+    [
+      ( [space] supplement_second_part )
+      / ( dot (1*digit) as supp_number )
+      / ( [space] supp_date_tail )
+    ]
+  }
+  supplement_identifier = supplement_identifier_no_third third_part
+
+  ## Second supplement layer (/Amd1:2018/Cor1:2019): supp2_* names.
+  supplement_second_part2 = {
+    (
+      (
+        (1*5digit)
+        [
+          (
+            (dash [space] 1*word_digit *(dash 1*word_digit))
+            / (slash [space] !supp_stage_abbrev 1*word_digit)
+          )
+        ]
+      ) as supp2_number_with_part
+    )
+    [ dot digit as supp2_stage_iteration ]
+    [
+      [space] (
+        (colon / dash) [
+          (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as supp2_date
+          / (("--" / "—")) as supp2_undated_marker
+        ]
+      )
+    ]
+  }
+  supplement_type_with_stage2 = {
+    (
+      (alt from_table "typed_stages_supplements" column "abbr")
+    ) as supp2_type_with_stage
+  }
+  supplement_third_part2_edition = {
+    [space] [
+      (
+        (("Edition" / "Ed." / "ED" / "Ed") [space] [1*digit])
+      ) as supp2_edition
+    ]
+  }
+  language2 = "(" ( ( *( ((%x45 / %x46 / %x41 / %x52 / %x44 / %x53) [(slash / ",")]) / (1*letter [","]) ) ) as supp2_languages ) ")"
+  supplement_third_part2 = {
+    supplement_third_part2_edition
+    [ (language2) ]
+    [space]
+    [ (("(all parts)")) as supp2_all_parts ]
+  }
+  supplement_supplement_identifier = {
+    supplement_identifier_no_third
+    slash supplement_type_with_stage2
+    (
+      ( [space] supplement_second_part2 supplement_third_part2 )
+      / ( dot (1*digit) as supp2_number supplement_third_part2 )
+    )
+  }
+
+  ## Third supplement layer (/Cor1:2014 riding a two-level chain): supp3_*.
+  supplement_second_part3 = {
+    (
+      (
+        (1*5digit)
+        [
+          (
+            (dash [space] 1*word_digit *(dash 1*word_digit))
+            / (slash [space] !supp_stage_abbrev 1*word_digit)
+          )
+        ]
+      ) as supp3_number_with_part
+    )
+    [ dot digit as supp3_stage_iteration ]
+    [
+      [space] (
+        (colon / dash) [
+          (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as supp3_date
+          / (("--" / "—")) as supp3_undated_marker
+        ]
+      )
+    ]
+  }
+  supplement_type_with_stage3 = {
+    (
+      (alt from_table "typed_stages_supplements" column "abbr")
+    ) as supp3_type_with_stage
+  }
+  supplement_third_part3_edition = {
+    [space] [
+      (
+        (("Edition" / "Ed." / "ED" / "Ed") [space] [1*digit])
+      ) as supp3_edition
+    ]
+  }
+  language3 = "(" ( ( *( ((%x45 / %x46 / %x41 / %x52 / %x44 / %x53) [(slash / ",")]) / (1*letter [","]) ) ) as supp3_languages ) ")"
+  supplement_third_part3 = {
+    supplement_third_part3_edition
+    [ (language3) ]
+    [space]
+    [ (("(all parts)")) as supp3_all_parts ]
+  }
+  supplement_supplement_supplement_identifier = {
+    supplement_supplement_identifier
+    slash supplement_type_with_stage3
+    (
+      ( [space] supplement_second_part3 supplement_third_part3 )
+      / ( dot (1*digit) as supp3_number supplement_third_part3 )
+    )
+  }
+
+  # ---- directives: "ISO/IEC DIR 1", "ISO/IEC JTC 1 DIR", supplements,
+  # bundled "ISO/IEC DIR 1:2022 + IEC SUP:2022" ----
+  directives_publisher_subgroup = ("JTC 1") as subgroup
+  directives_number_with_part = {
+    (
+      (1*5digit)
+      [ (space ("ISO" / "IEC") !slash !(space "SUP")) ]
+    ) as number_with_part
+  }
+  directives_identifier_no_third = {
+    prefix_with_copublishers
+    [space]
+    [ (directives_publisher_subgroup) space ]
+    (
+      (alt from_table "directives_typed_stages" column "abbr")
+    ) as type_with_stage
+    [ space directives_publisher_subgroup !(space "SUP") ]
+    [
+      [space directives_number_with_part]
+      [(colon date)]
+    ]
+  }
+  directives_identifier = directives_identifier_no_third [third_part] [space] [date]
+
+  ## Non-bundled directives supplement (ISO/IEC DIR 1 ISO SUP): dsupp_*.
+  directives_supp_publisher = ("ISO/IEC" / "ISO" / "IEC" / "JTC 1") as dsupp_publisher
+  dsupp_date_tail = {
+    (colon / dash) [
+      (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as dsupp_date
+      / (("--" / "—")) as dsupp_undated_marker
+    ]
+  }
+  directives_supplement_part_no_third = {
+    [ ([space] "--" [space] "Consolidated" space) ]
+    directives_supp_publisher
+    ( space (alt from_table "directives_supplements_typed_stages" column "abbr") as dsupp_type_with_stage )
+    [ dsupp_date_tail ]
+  }
+  dsupp_third_part_edition = {
+    [space] [
+      (
+        (("Edition" / "Ed." / "ED" / "Ed") [space] [1*digit])
+      ) as dsupp_edition
+    ]
+  }
+  dsupp_language = "(" ( ( *( ((%x45 / %x46 / %x41 / %x52 / %x44 / %x53) [(slash / ",")]) / (1*letter [","]) ) ) as dsupp_languages ) ")"
+  directives_supplement_part = {
+    directives_supplement_part_no_third
+    dsupp_third_part_edition
+    [ (dsupp_language) ]
+    [space]
+    [ (("(all parts)")) as dsupp_all_parts ]
+  }
+  directives_supplement_identifier = directives_identifier_no_third [space] directives_supplement_part
+
+  ## Bundled directives ("DIR 1:2022 + IEC SUP:2022"): the base document
+  ## keeps the plain names, and each bundle item captures into its own
+  ## position-scoped prefix (bs1_* on the first, bs2_*/bs3_* on the
+  ## second and third). The engine's array-group harvest pads non-firing
+  ## reps with empty hashes (parsanol-ruby#399), so bundle items cannot
+  ## collect through an array binding; three items bound. The source
+  ## parser's 1* accepted any count — a fourth "+ SUP" item now fails
+  ## to parse rather than mis-bind.
+  directives_base_document = {
+    directives_identifier_no_third
+    [[third_part] [space]]
+    [[date] [space]]
+  }
+  bs1_publisher = ("ISO/IEC" / "ISO" / "IEC" / "JTC 1") as bs1_publisher
+  bs1_date_tail = {
+    (colon / dash) [
+      (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as bs1_date
+      / (("--" / "—")) as bs1_undated_marker
+    ]
+  }
+  bundled_supplement1 = {
+    "+ "
+    [ ([space] "--" [space] "Consolidated" space) ]
+    bs1_publisher
+    ( space (alt from_table "directives_supplements_typed_stages" column "abbr") as bs1_type_with_stage )
+    [ bs1_date_tail ]
+  }
+  bs2_publisher = ("ISO/IEC" / "ISO" / "IEC" / "JTC 1") as bs2_publisher
+  bs2_date_tail = {
+    (colon / dash) [
+      (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as bs2_date
+      / (("--" / "—")) as bs2_undated_marker
+    ]
+  }
+  bundled_supplement2 = {
+    "+ "
+    [ ([space] "--" [space] "Consolidated" space) ]
+    bs2_publisher
+    ( space (alt from_table "directives_supplements_typed_stages" column "abbr") as bs2_type_with_stage )
+    [ bs2_date_tail ]
+  }
+  bs3_publisher = ("ISO/IEC" / "ISO" / "IEC" / "JTC 1") as bs3_publisher
+  bs3_date_tail = {
+    (colon / dash) [
+      (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as bs3_date
+      / (("--" / "—")) as bs3_undated_marker
+    ]
+  }
+  bundled_supplement3 = {
+    "+ "
+    [ ([space] "--" [space] "Consolidated" space) ]
+    bs3_publisher
+    ( space (alt from_table "directives_supplements_typed_stages" column "abbr") as bs3_type_with_stage )
+    [ bs3_date_tail ]
+  }
+  directives_bundled_identifier = {
+    directives_base_document
+    bundled_supplement1
+    [bundled_supplement2]
+    [bundled_supplement3]
+  }
+  directives_identifiers = directives_bundled_identifier / directives_supplement_identifier / directives_identifier
+
+  # ---- joint: "ISO 5537|IDF 26" — the IDF grammar's rules inlined
+  # under idf_* names (captures must not collide with the ISO ones) ----
+  idf_publisher = ("IDF") as idf_publisher
+  idf_number_with_part = {
+    (
+      (1*5word_char)
+      [ (dash [space] 1*word_char *1(dash 1*word_char)) ]
+    ) as idf_number_with_part
+  }
+  idf_stage_iteration = dot digit as idf_stage_iteration
+  idf_date = {
+    (
+      (
+        (("19" / "20") 2*digit !digit)
+        [(dash 2*digit)]
+        [(dash 2*digit)]
+      )
+    ) as idf_date
+  }
+  idf_second_part = {
+    idf_number_with_part
+    [idf_stage_iteration]
+    [space]
+    [ (colon idf_date) ]
+  }
+  idf_language = {
+    "(" (
+      (
+        *( 1*lower [","] / ((%x45 / %x46 / %x41 / %x52 / %x44 / %x53) [slash]) )
+      ) as idf_languages
+    ) ")"
+  }
+  idf_all_parts = ("(all parts)") as idf_all_parts
+  idf_third_part = [space] [idf_language] [idf_all_parts]
+  idf_type_with_stage = {
+    (
+      (alt from_table "idf_typed_stages" column "abbr")
+    ) as idf_type_with_stage
+    [digit as idf_stage_iteration space]
+  }
+  idf_identifier_publisher_no_third = {
+    idf_publisher
+    [space]
+    [slash]
+    [idf_type_with_stage]
+    [space]
+    idf_second_part
+  }
+  ## IDF supplement side of the joint (a true IDF supplement keeps its
+  ## fields under idf_supp_*2 names).
+  idf_supp_type_with_stage = {
+    (
+      (alt from_table "idf_typed_stages_supplements" column "abbr")
+    ) as idf_supp_type_with_stage
+  }
+  idf_supp_number_with_part2 = {
+    (
+      (1*5word_char)
+      [ (dash [space] 1*word_char *1(dash 1*word_char)) ]
+    ) as idf_supp_number_with_part2
+  }
+  idf_supp_stage_iteration2 = dot digit as idf_supp_stage_iteration2
+  idf_supp_date2 = {
+    (
+      (
+        (("19" / "20") 2*digit !digit)
+        [(dash 2*digit)]
+        [(dash 2*digit)]
+      )
+    ) as idf_supp_date2
+  }
+  idf_supplement_identifier = {
+    idf_identifier_publisher_no_third
+    [space] slash [space]
+    idf_supp_type_with_stage
+    [space]
+    idf_supp_number_with_part2
+    [ dot digit as idf_supp_stage_iteration2 ]
+    [
+      [space] (
+        (colon / dash) [
+          (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as idf_supp_date2
+          / (("--" / "—")) as idf_supp_undated_marker
+        ]
+      )
+    ]
+    [space] [idf_language] [idf_all_parts]
+  }
+  joint_idf_identifier = idf_supplement_identifier / idf_identifier_publisher_no_third idf_third_part
+  joint_identifier = {
+    supplement_base_no_third
+    [space] "|" [space]
+    joint_idf_identifier
+  }
+
+  ## The ISO identifier root: common-text twin form first, then the
+  ## single spine.
+  identifier = {
+      bare_tc_document
+    / nsb_iso_identifier
+    / tc_document
+    / directives_identifiers
+    / jcgm_identifier
+    / iso_r_supplement_identifier
+    / iso_r_identifier
+    / supplement_supplement_supplement_identifier
+    / supplement_supplement_identifier
+    / supplement_identifier
+    / joint_identifier
+    / identifier_copublishers
+  }
+
+  entry identifier: identifier
+
+  bindings identifier {
+    publisher -> publisher (string)
+    copublishers -> copublishers (string)
+    type_with_stage -> type_with_stage (string)
+    type_with_stage_fr -> type_with_stage_fr (string)
+    base_edition -> base_edition (string)
+    nsb_stage -> nsb_stage (string)
+    iso_r_prefix -> iso_r_prefix (string)
+    number_with_part -> number_with_part (string)
+    stage_iteration -> stage_iteration (string)
+    date -> date (string)
+    undated_marker -> undated_marker (string)
+    edition -> edition (string)
+    languages -> languages (string)
+    all_parts -> all_parts (string)
+    year -> year (string)
+    tc_type -> tc_type (string)
+    tc_number -> tc_number (string)
+    sc_type -> sc_type (string)
+    sc_number -> sc_number (string)
+    wg_type -> wg_type (string)
+    wg_number -> wg_number (string)
+    number -> number (string)
+    subgroup -> subgroup (string)
+    supp_type_with_stage -> supp_type_with_stage (string)
+    supp_number_with_part -> supp_number_with_part (string)
+    supp_stage_iteration -> supp_stage_iteration (string)
+    supp_number -> supp_number (string)
+    supp_date -> supp_date (string)
+    supp_undated_marker -> supp_undated_marker (string)
+    supp2_type_with_stage -> supp2_type_with_stage (string)
+    supp2_number_with_part -> supp2_number_with_part (string)
+    supp2_stage_iteration -> supp2_stage_iteration (string)
+    supp2_number -> supp2_number (string)
+    supp2_date -> supp2_date (string)
+    supp2_undated_marker -> supp2_undated_marker (string)
+    supp2_edition -> supp2_edition (string)
+    supp2_languages -> supp2_languages (string)
+    supp2_all_parts -> supp2_all_parts (string)
+    supp3_type_with_stage -> supp3_type_with_stage (string)
+    supp3_number_with_part -> supp3_number_with_part (string)
+    supp3_stage_iteration -> supp3_stage_iteration (string)
+    supp3_number -> supp3_number (string)
+    supp3_date -> supp3_date (string)
+    supp3_undated_marker -> supp3_undated_marker (string)
+    supp3_edition -> supp3_edition (string)
+    supp3_languages -> supp3_languages (string)
+    supp3_all_parts -> supp3_all_parts (string)
+    isor_supp_type_with_stage -> isor_supp_type_with_stage (string)
+    isor_supp_number_with_part -> isor_supp_number_with_part (string)
+    isor_supp_stage_iteration -> isor_supp_stage_iteration (string)
+    isor_supp_date -> isor_supp_date (string)
+    isor_supp_undated_marker -> isor_supp_undated_marker (string)
+    dsupp_publisher -> dsupp_publisher (string)
+    dsupp_type_with_stage -> dsupp_type_with_stage (string)
+    dsupp_date -> dsupp_date (string)
+    dsupp_undated_marker -> dsupp_undated_marker (string)
+    dsupp_edition -> dsupp_edition (string)
+    dsupp_languages -> dsupp_languages (string)
+    dsupp_all_parts -> dsupp_all_parts (string)
+bs1_publisher -> bs1_publisher (string)
+bs1_type_with_stage -> bs1_type_with_stage (string)
+bs1_date -> bs1_date (string)
+bs1_undated_marker -> bs1_undated_marker (string)
+bs2_publisher -> bs2_publisher (string)
+bs2_type_with_stage -> bs2_type_with_stage (string)
+bs2_date -> bs2_date (string)
+bs2_undated_marker -> bs2_undated_marker (string)
+bs3_publisher -> bs3_publisher (string)
+bs3_type_with_stage -> bs3_type_with_stage (string)
+bs3_date -> bs3_date (string)
+bs3_undated_marker -> bs3_undated_marker (string)
+    idf_publisher -> idf_publisher (string)
+    idf_type_with_stage -> idf_type_with_stage (string)
+    idf_stage_iteration -> idf_stage_iteration (string)
+    idf_number_with_part -> idf_number_with_part (string)
+    idf_date -> idf_date (string)
+    idf_languages -> idf_languages (string)
+    idf_all_parts -> idf_all_parts (string)
+    idf_supp_type_with_stage -> idf_supp_type_with_stage (string)
+    idf_supp_number_with_part2 -> idf_supp_number_with_part2 (string)
+    idf_supp_stage_iteration2 -> idf_supp_stage_iteration2 (string)
+    idf_supp_date2 -> idf_supp_date2 (string)
+    idf_supp_undated_marker -> idf_supp_undated_marker (string)
+  }
+
+  ## In-file grammar tests: run at compile time, embedded in the artifact,
+  ## and re-runnable by every consumer (accept / reject / example with
+  ## expected bound captures).
+  test {
+    accept "ISO 8601-1:2019"
+    accept "ISO/IEC WD TS 25025"
+    accept "ISO/WD Study 42010"
+    accept "ISO/WDS 42010"
+    accept "Guide ISO/CEI 51:1999"
+    accept "ISO/IEC DIR 1:2022 + IEC SUP:2022"
+    accept "184/SC 4/WG 12 N10291"
+    accept "ISO 5537|IDF 26"
+    accept "ISO 4055/Amd 1:2021"
+    accept "ISO/R 9:1962"
+    reject "nonsense"
+    example "ISO/IEC WD TS 25025" { publisher: "ISO" }
+    example "JCGM 200:2008(F)" { publisher: "JCGM" }
+  }
+}
+
+preprocess publisher_names {
+  table_lookup iso_publishers abbrev -> name
+}
+
+derive urn "urn:iso:std:{number_with_part}:{date}"
+
+render default {
+  field publisher
+  literal "-"
+  field number_with_part
+  cond date {
+    literal ":"
+    field date
+  }
+}

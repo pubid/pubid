@@ -45,3 +45,56 @@
   needs a lookbehind, because `tc_number.value` and `edition.number.value` are
   different attributes — the first pass stripped `edition.number.value` too,
   and two corrigendum examples caught it.
+
+- **Typed model bindings (Phase D): the builder consumes the grammar's bound
+  map, not a parse tree.** `Identifier.parse` and `Normalizer` parse through
+  `Pubid::Parg::Model.bound(:iso, …)`; `UrnParser#build_identifier` constructs
+  the same bound-map dialect. The grammar is edition 2 with every
+  builder-consumed capture bound (`grammars/iso.parg`, `bindings identifier`).
+  The conversion preserved byte fidelity: `to_s` and `to_hash` are identical
+  for all 7,859 fixture inputs replayed against a `main` baseline, and the
+  wasm engine agrees with Ruby on every tree and bound map (the
+  `corpus-parity` gate). **What to know before editing either side:**
+
+  - **Supplement layers capture into position-scoped prefixes** — `supp_*`
+    (first supplement), `supp2_*`/`supp3_*` (chain layers), `isor_supp_*`
+    (ISO/R supplement), `dsupp_*` (directive supplement), `bs1_/bs2_/bs3_`
+    (bundle items), `idf_*/idf_supp_*` (the joint's IDF side, whose rules are
+    inlined from the imported idf grammar so the names never collide with the
+    ISO ones). Bindings.collect_captures collects captures globally by name
+    and delivers the FIRST occurrence, so shared names across layers would
+    collapse a layer's number/date onto the base's. `Builder#build` peels the
+    layers outermost-first, re-keying each prefix onto the builder-input
+    names and nesting the rest as the layer's `:base`.
+  - **The base document's own edition captures as `base_edition`** wherever a
+    supplement layer's third_part can carry its own edition
+    (`supplement_base_no_third`, the joint base). The builder re-keys it onto
+    `:edition` only at the innermost base — moving it inside a peel step
+    mis-assigns the edition to the wrapper on multi-layer chains (the
+    `ISO/IEC Guide 98-3 ED1/Suppl 1:2008/Cor 1:2009` spec caught that).
+  - **No array bindings.** The wasm engine's array-group harvest pads
+    non-firing reps with empty hashes (parsanol-ruby#399), so Ruby and wasm
+    bound maps disagree on any input whose parse backtracks past the array
+    branch. Two consequences: copublishers capture as ONE scalar span
+    (`"/IEC/IEEE"`, at-least-one item, absent when none) that the builder
+    splits, and bundle items capture into `bs1_/bs2_/bs3_` prefixes the
+    builder assembles into `supplements`. A newer engine's `(raw)` wrapper
+    interiors would replace both shapes — re-visit when the pin moves.
+  - **Captures must inline their bodies to raw terms.** A capture wrapping a
+    bare rule ref exposes the ref's child nodes and cannot bind as a string
+    (`cannot bind a Array capture`), and date/language bodies are inlined at
+    all capture sites for that reason. Multi-line rules must be brace bodies
+    (line-mode rejects newlines inside groups).
+  - **The URN parser emits the same dialect**: its supplement loop writes
+    `supp_`/`supp2_`/`supp3_`-prefixed flat keys (the prefixes the builder
+    peels), not `{base:, **supp}` nesting; the builder peels `supp_year` and
+    `supp_supplement_version` the same way by prefix. Its raw-stage fallback
+    (`:stage`), `:document_type` and `:supplement_version` keys are
+    builder-input names, not grammar captures, and pass through `cast`
+    unchanged.
+  - **Grammar probes**: `ruby -e 'gem "parsanol", "1.3.114"; …'` against the
+    artifact (`parse_and_bind`) shows the bound map; `Model.bound(:iso, …)`
+    shows the builder's actual input. The artifact and its vendored twin
+    (`data/parg/iso.parg`) must move together — the twin is the embedded
+    source's provenance copy.
+

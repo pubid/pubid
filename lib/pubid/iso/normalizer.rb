@@ -7,7 +7,7 @@ module Pubid
     # update_codes regex rewrites, and the DAD/FDAM pattern that the PEG
     # parser cannot recognize because it treats "/" as a copublisher separator.
     class Normalizer
-      DAD_PATTERN = /^(.+?)\/(F?DAD)\s+(\d+)(?::(\d{4}))?$/.freeze
+      DAD_PATTERN = /^(.+?)\/(F?DAD)\s+(\d+)(?::(\d{4}))?$/
 
       class << self
         # Apply all normalizations to an identifier string and return the
@@ -29,8 +29,9 @@ module Pubid
         def parse_with_builder(string)
           # R2 ingestion hook: normalized strings reach the model through
           # the same parser of record as Identifier.parse (the baked PG
-          # artifact), so every Tier-3 normalization feeds one grammar.
-          parsed = Pubid::Parg::Backend.parse(:iso, string)
+          # artifact's bindings), so every Tier-3 normalization feeds one
+          # grammar.
+          parsed = Pubid::Parg::Model.bound(:iso, string)
           Pubid::Iso.builder.build(parsed)
         end
 
@@ -71,7 +72,7 @@ module Pubid
           supplement_number = match[3] # "1"
           supplement_year = match[4]   # "1987" or nil
 
-          base_parsed = Pubid::Parg::Backend.parse(:iso, base_str)
+          base_parsed = Pubid::Parg::Model.bound(:iso, base_str)
           base = Pubid::Iso.builder.build(base_parsed)
 
           addendum = Identifiers::Addendum.new

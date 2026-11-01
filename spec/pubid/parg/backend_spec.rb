@@ -10,7 +10,17 @@ RSpec.describe Pubid::Parg::Backend do
     end
 
     it "returns a builder-ready hash whose build renders the input" do
-      hash = described_class.parse(:iso, "ISO 8601-1:2019")
+      hash = described_class.parse(:iho, "IHO S-5")
+      built = Pubid::Iho::Builder.new.build(hash)
+
+      expect(built.to_s).to eq("IHO S-5")
+    end
+
+    # The ISO flavor is fully converted to the bound-map contract (Phase
+    # D): its builder consumes the grammar's declared bindings, not the
+    # parse tree the Backend scalarizes.
+    it "binds iso through the model layer, whose build renders the input" do
+      hash = Pubid::Parg::Model.bound(:iso, "ISO 8601-1:2019")
       built = Pubid::Iso::Builder.new.build(hash)
 
       expect(built.to_s).to eq("ISO 8601-1:2019")
