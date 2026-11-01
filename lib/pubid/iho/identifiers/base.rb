@@ -6,7 +6,7 @@ module Pubid
     # every concrete IHO identifier (Identifiers::*) descends from it.
     #
     # IHO identifiers have the form:
-    #   IHO {S|P|M|B|C}-{number}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {version}]
+    #   IHO {S|P|M|B|C}-{number}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {version|year|Vol. N [issue]}]
     #
     # The leading IHO publisher prefix is optional on input but always
     # emitted on output.
@@ -40,6 +40,17 @@ module Pubid
       attribute :annex,      :string
       attribute :supplement, :string
       attribute :version,    :string
+      # Series identity components (relaton#407): the year-identified
+      # series (B-7, P-5, P-6) and the volume/issue-identified ones
+      # (P-1 and the IHR) carry no a.b.c edition — their trailing
+      # component is a year or a "Vol. N [issue]" pair instead. Plain
+      # scalars, like every other IHO attribute; the grammar's tail
+      # picks exactly one discriminator, so only one of
+      # version/year/volume is ever present, with issue only
+      # alongside volume.
+      attribute :year,       :string
+      attribute :volume,     :string
+      attribute :issue,      :string
 
       # Polymorphic type map for lutaml::Model key_value serialization: maps
       # each subclass's polymorphic_name to its class name so `from_hash` can
@@ -65,10 +76,25 @@ module Pubid
         map "annex",      to: :annex
         map "supplement", to: :supplement
         map "version",    to: :version
+        map "year",       to: :year
+        map "volume",     to: :volume
+        map "issue",      to: :issue
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
       # IHO_TYPE_MAP remains as the key_value polymorphic_map.
+
+      # The volume/issue pair is a scalar cluster: a reference that omits
+      # the issue must still match a hit that carries one ("P-1 Vol. 30"
+      # vs "P-1 Vol. 30 (2)"), so excluding the volume nils the issue
+      # with it — the same additive-alias shape the base applies to
+      # :year -> :date. A lone scalar :year needs no override here: the
+      # base nils a declared :year directly (the additive :year -> :date
+      # alias nils whichever name the flavor declares).
+      def exclude(*args)
+        args << :issue if args.include?(:volume)
+        super
+      end
     end
 
   end
