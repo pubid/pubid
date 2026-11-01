@@ -66,6 +66,84 @@ module Pubid
         Pubid::Iso.locate_type(typed_stage.type_code)
       end
 
+      # Bound-hash layer fields: the grammar captures every supplement
+      # layer into a disjoint prefix (supp_ on the first supplement,
+      # supp2_ / supp3_ on the chain's later layers, isor_supp_ on an
+      # ISO/R supplement, dsupp_ on a directive supplement), so each
+      # wrapper's fields peel off the flat bound hash by prefix and
+      # re-key onto the builder-input names.
+      SUPPLEMENT_LAYERS = [
+        {
+          prefix: "supp3_",
+          keys: %i[supp3_type_with_stage supp3_number_with_part supp3_stage_iteration
+                   supp3_number supp3_date supp3_undated_marker supp3_edition
+                   supp3_languages supp3_all_parts],
+          plain_third_part: false,
+        },
+        {
+          prefix: "supp2_",
+          keys: %i[supp2_type_with_stage supp2_number_with_part supp2_stage_iteration
+                   supp2_number supp2_date supp2_undated_marker supp2_edition
+                   supp2_languages supp2_all_parts],
+          plain_third_part: false,
+        },
+        {
+          prefix: "supp_",
+          keys: %i[supp_type_with_stage supp_number_with_part supp_stage_iteration
+                   supp_number supp_date supp_undated_marker supp_edition
+                   supp_languages supp_all_parts],
+          # The first supplement's third_part keeps the plain names: the
+          # base document's own edition captures as base_edition, so the
+          # plain edition/languages/all_parts belong to the supplement.
+          plain_third_part: true,
+        },
+        {
+          prefix: "isor_supp_",
+          keys: %i[isor_supp_type_with_stage isor_supp_number_with_part
+                   isor_supp_stage_iteration isor_supp_date isor_supp_undated_marker],
+          plain_third_part: true,
+        },
+      ].freeze
+      PLAIN_THIRD_PART_KEYS = %i[edition languages all_parts].freeze
+
+      # Directive-supplement layer (ISO/IEC DIR 1 ISO SUP): dsupp_* fields
+      # re-key onto the supplement hash, the base directive's fields stay
+      # plain.
+      DSUPP_KEYS = %i[dsupp_publisher dsupp_type_with_stage dsupp_date
+                      dsupp_undated_marker dsupp_edition dsupp_languages
+                      dsupp_all_parts].freeze
+
+      # Bundled directive items capture into position-scoped prefixes
+      # (one per bundle item — the engine's array-group harvest pads
+      # non-firing reps with empty hashes, parsanol-ruby#399, so bundle
+      # items cannot collect through an array binding).
+      BUNDLE_PREFIXES = %w[bs1_ bs2_ bs3_].freeze
+
+      # Joint identifier (ISO x|IDF y): the IDF side captures under idf_*
+      # names; they re-key onto the tree-shape hash Pubid::Idf.build_from_parse
+      # consumes.
+      IDF_KEYS = %i[idf_publisher idf_type_with_stage idf_stage_iteration
+                    idf_number_with_part idf_date idf_languages idf_all_parts
+                    idf_supp_type_with_stage idf_supp_number_with_part2
+                    idf_supp_stage_iteration2 idf_supp_date2
+                    idf_supp_undated_marker].freeze
+      IDF_REKEY = {
+        idf_publisher: :publisher,
+        idf_type_with_stage: :type_with_stage,
+        idf_stage_iteration: :stage_iteration,
+        idf_number_with_part: :number_with_part,
+        idf_date: :date,
+        idf_languages: :languages,
+        idf_all_parts: :all_parts,
+      }.freeze
+      IDF_SUPP_REKEY = {
+        idf_supp_type_with_stage: :type_with_stage,
+        idf_supp_number_with_part2: :number_with_part,
+        idf_supp_stage_iteration2: :stage_iteration,
+        idf_supp_date2: :date,
+        idf_supp_undated_marker: :undated_marker,
+      }.freeze
+
       def build(parsed_hash)
         # "(all parts)" and the ":ser" URN name every part of the document,
         # so they build an AllPartsIdentifier around the document (the URN
@@ -73,12 +151,63 @@ module Pubid
         # reason). The document itself holds no all-parts mark.
         all_parts = parsed_hash.delete(:all_parts)
 
+        # The copublisher tail captures as one scalar span ("/IEC/IEEE");
+        # split it into the {copublisher:} element hashes the merge and
+        # the :copublishers cast consume. A pre-built array (the URN
+        # parser) passes through.
+        if parsed_hash[:copublishers].is_a?(String)
+          parsed_hash[:copublishers] = parsed_hash.delete(:copublishers)
+            .split("/").map(&:strip).reject(&:empty?)
+            .map { |cp| { copublisher: cp } }
+        end
+
+        # Peel supplement layers outermost-first: each layer re-keys its
+        # prefixed fields onto the builder-input names, nests the rest as
+        # its :base, and re-enters build — the same shape the grammar's
+        # tree used to nest.
+        SUPPLEMENT_LAYERS.each do |layer|
+          next unless parsed_hash.keys.any? do |key|
+            key.to_s.start_with?(layer[:prefix])
+          end
+
+          return build_supplement_layer(parsed_hash, layer, all_parts)
+        end
+
+        # Joint identifier (ISO x|IDF y): the base designation's fields
+        # stay plain, the IDF side re-keys into the tree-shape hash the
+        # IDF builder consumes, and the pair routes through the
+        # CombinedIdentifier via the :joint_identifier key.
+        if parsed_hash.key?(:idf_publisher)
+          return build_joint_identifier(parsed_hash, all_parts)
+        end
+
+        # Directive supplement (ISO/IEC DIR 1 ISO SUP): the dsupp_* fields
+        # are the supplement's, the plain fields its base directive's.
+        if parsed_hash.key?(:dsupp_type_with_stage)
+          return build_directive_supplement(parsed_hash, all_parts)
+        end
+
+        # Bundled directives ("DIR 1:2022 + IEC SUP:2022"): the plain
+        # fields are the base document's; each bundle item captures under
+        # its bs1_/bs2_/bs3_ prefix.
+        if BUNDLE_PREFIXES.any? do |prefix|
+          parsed_hash.keys.any? { |key| key.to_s.start_with?(prefix) }
+        end
+          return build_bundled(parsed_hash, all_parts)
+        end
+
         # For ISO/R legacy format, split into publisher and type
         if parsed_hash[:iso_r_prefix]
           parsed_hash[:publisher] = "ISO"
           parsed_hash[:type_with_stage] = "R"
           parsed_hash.delete(:iso_r_prefix)
         end
+
+        # The base document's own edition captures as base_edition (the
+        # supplement layers' third_part editions own the plain key), so
+        # it re-keys onto :edition only here — at the innermost base,
+        # after every wrapper layer has been peeled off.
+        parsed_hash[:edition] = parsed_hash.delete(:base_edition) if parsed_hash.key?(:base_edition)
 
         # For NSB-prefixed identifiers (FprISO, WD/ISO), set stage
         if parsed_hash[:nsb_stage]
@@ -94,12 +223,11 @@ module Pubid
 
         # For French GUIDE entries: "Guide ISO/CEI 37:1995". The rename
         # must happen BEFORE class selection — locate_identifier_klass
-        # reads :type_with_stage, and the tree of a guide-first spelling
-        # carries an empty :type_with_stage plus the type under
-        # :type_with_stage_fr, so deferring the rename selected the
-        # default International Standard class for every guide-first
-        # (and Cyrillic "Руководства ИСО …") reference.
-        if type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr)
+        # reads :type_with_stage, and the bound map of a guide-first
+        # spelling carries the type under :type_with_stage_fr, so
+        # deferring the rename selected the default International
+        # Standard class for every guide-first reference.
+        if (type_with_stage_fr = parsed_hash.delete(:type_with_stage_fr))
           parsed_hash[:type_with_stage] = type_with_stage_fr
         end
 
@@ -136,6 +264,89 @@ module Pubid
         all_parts ? identifier.to_all_parts : identifier
       end
 
+      # "ISO 5537|IDF 26": the ISO side builds as the combined
+      # identifier's base, the IDF side re-keys into the tree-shape hash
+      # Pubid::Idf.build_from_parse consumes and lands in
+      # :joint_identifier.
+      def build_joint_identifier(hash, all_parts)
+        base_fields = hash.except(*IDF_KEYS)
+        idf_fields = rekey(hash.slice(*IDF_REKEY.keys), IDF_REKEY)
+
+        if (supp_keys = IDF_SUPP_REKEY.keys & hash.keys).any?
+          idf_fields = {
+            base: idf_fields,
+            **rekey(hash.slice(*supp_keys), IDF_SUPP_REKEY),
+          }
+        end
+
+        inner = { base: base_fields, joint_identifier: idf_fields }
+        inner[:all_parts] = all_parts if all_parts
+        build(inner)
+      end
+
+      # One supplement layer: re-key the layer's prefixed fields, move
+      # the shared plain third-part fields onto the layer where the
+      # grammar captures them there, nest everything else as the layer's
+      # base, and re-enter build.
+      def build_supplement_layer(hash, layer, all_parts)
+        prefix = layer[:prefix]
+        layer_hash = hash.select { |key, _| key.to_s.start_with?(prefix) }
+        fields = rekey_prefix(layer_hash, prefix)
+
+        if layer[:plain_third_part]
+          third_part = hash.slice(*PLAIN_THIRD_PART_KEYS)
+          fields = { **third_part, **fields }
+        end
+
+        rest = hash.except(*layer_hash.keys)
+        rest = rest.except(*PLAIN_THIRD_PART_KEYS) if layer[:plain_third_part]
+
+        inner = { **fields, base: rest }
+        inner[:all_parts] = all_parts if all_parts
+        build(inner)
+      end
+
+      def build_directive_supplement(hash, all_parts)
+        fields = rekey_prefix(hash.slice(*DSUPP_KEYS), "dsupp_")
+        rest = hash.except(*DSUPP_KEYS)
+
+        inner = { **fields, base: rest }
+        inner[:all_parts] = all_parts if all_parts
+        build(inner)
+      end
+
+      # Bundled directives: each bundle item's prefixed fields re-key to
+      # the supplement hash and build a DirectivesSupplement, the plain
+      # fields build the base document, and the pair lands on a
+      # BundledIdentifier.
+      def build_bundled(hash, all_parts)
+        bundle_keys = BUNDLE_PREFIXES.flat_map do |prefix|
+          hash.keys.select { |key| key.to_s.start_with?(prefix) }
+        end
+        supplements = BUNDLE_PREFIXES.filter_map do |prefix|
+          keys = hash.keys.select { |key| key.to_s.start_with?(prefix) }
+          next if keys.empty?
+
+          build(rekey_prefix(hash.slice(*keys), prefix))
+        end
+        identifier = BundledIdentifier.new
+        identifier.base_document = build(hash.except(*bundle_keys))
+        identifier.supplements = supplements
+        all_parts ? identifier.to_all_parts : identifier
+      end
+
+      # Strip a layer prefix from every key ("supp_" / "supp2_" /
+      # "supp3_" / "isor_supp_" / "dsupp_").
+      def rekey_prefix(hash, prefix)
+        hash.to_h do |key, value|
+          [key.to_s.delete_prefix(prefix).to_sym, value]
+        end
+      end
+
+      def rekey(hash, map)
+        hash.to_h { |key, value| [map[key], value] }
+      end
+
       def handle_key(identifier, key, value)
         if key == :joint_identifier
           identifier.additional_identifiers ||= []
@@ -150,8 +361,8 @@ module Pubid
       # "4037/1979", "4037-1979", and "ISO/IEC DIR 1 IEC" all split cleanly.
       def normalize_number_with_part(value)
         value.to_s
-             .tr("#{Parser::DASH_CHARS.join}/", "-")
-             .gsub(" ", "-")
+          .tr("#{Parser::DASH_CHARS.join}/", "-")
+          .gsub(" ", "-")
       end
 
       # LEGACY: "ISO 4037-1979" used a hyphen where the modern form is
@@ -190,7 +401,7 @@ module Pubid
             # (e.g. a TC document, which skips the copublisher merge) matches
             # the [] convention used by copublisher-merged parses and by
             # Identifier.create. Otherwise equality fails on [] vs nil.
-            Pubid::Iso::Components::Publisher.new(publisher: value, 
+            Pubid::Iso::Components::Publisher.new(publisher: value,
                                                   copublisher: [])
           end
 
@@ -288,7 +499,7 @@ module Pubid
         when :supplements
           # Handle bundled supplements (+ operator)
           # Each supplement is a hash that needs to be built
-          value.map { |supplement_hash| build(supplement_hash[:supplement]) }
+          value.map { |supplement_hash| build(supplement_hash) }
 
         when :base_document
           # For bundled identifiers, build the base document
@@ -300,10 +511,6 @@ module Pubid
 
         when :tc_number, :sc_number, :wg_number
           value.to_s
-
-        when :year
-          # For TC documents with year, convert to Date
-          Pubid::Components::Date.new(year: value.to_s)
 
         when :number
           # For TC documents, number is the document number (N number)

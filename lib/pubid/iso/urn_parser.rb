@@ -437,9 +437,14 @@ module Pubid
           base_hash[:languages] = languages.join("/")
         end
 
-        # Build supplements recursively (forward order: first supplement wraps base,
-        # second wraps first, etc. -- matching URN left-to-right semantics)
-        supplements.each do |supp|
+        # Build supplements (forward order: first supplement wraps base,
+        # second wraps first, etc. -- matching URN left-to-right
+        # semantics). Each layer captures into the bound hash's
+        # position-scoped prefix (supp_ / supp2_ / supp3_), the same
+        # names the grammar binds, so the builder peels the wrappers the
+        # same way for both parse paths.
+        supplements.each_with_index do |supp, index|
+          prefix = index.zero? ? "supp_" : "supp#{index + 1}_"
           # A bare language token with no supplement identity names the BASE
           # document: wrapping it would build a supplement with no type,
           # number or base attribute, and a plain standard drops its base —
@@ -499,11 +504,11 @@ typed_stage
             supp_hash[:languages] = supp[:languages].join("/")
           end
 
-          # Wrap current identifier with supplement
-          base_hash = {
-            base: base_hash,
-            **supp_hash,
-          }
+          # Layer the supplement onto the flat bound hash under its
+          # position-scoped prefix
+          supp_hash.each do |key, value|
+            base_hash[:"#{prefix}#{key}"] = value
+          end
         end
 
         # all_parts belongs on the outermost identifier (after any supplement wrapping)
