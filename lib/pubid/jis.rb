@@ -5,9 +5,10 @@ module Pubid
   module Jis
     extend Pubid::PrefixesSupport
 
-    # Sole JIS publisher token (see the parser's `jis_prefix` rule). Document
+    # The JIS publisher token, and WES, the root of a Japan Welding
+    # Engineering Society id (the grammar's `wes_identifier` rule). Document
     # types (TR/TS) follow the JIS prefix and are excluded.
-    PREFIXES = ["JIS"].freeze
+    PREFIXES = ["JIS", "WES"].freeze
 
     autoload :Builder, "#{__dir__}/jis/builder"
     autoload :Identifier, "#{__dir__}/jis/identifier"

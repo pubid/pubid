@@ -44,7 +44,7 @@ module Pubid
       def render_single(id)
         with_pub = with_publisher?(id)
         parts = []
-        parts << PUBLISHER if with_pub
+        parts << id.publisher_prefix if with_pub && id.publisher_prefix
         parts << id.type_prefix if id.class.method_defined?(:type_prefix) && id.type_prefix
         result = parts.join(" ")
         result += " " if result.length.positive?

@@ -37,26 +37,26 @@ module Pubid
 
       def build_single_identifier(data)
         attrs = {
-          series: data[:series].to_s,
           number: data[:number].to_s,
           parts: extract_part_strings(data[:parts]),
           year: data[:year]&.to_i,
           language: data[:language]&.to_s,
           reaffirmed: (true if data[:reaffirmed]),
         }
+        # A WES id carries no series letter, so its series stays nil.
+        wes = Identifiers::WeldingEngineeringStandard
+        return wes.new(**attrs) if data[:wes]
 
-        # Determine identifier class from type
-        type = data[:type]&.to_s
-        klass = case type
-                when "TR"
-                  Identifiers::TechnicalReport
-                when "TS"
-                  Identifiers::TechnicalSpecification
-                else
-                  Identifiers::JapaneseIndustrialStandard
-                end
+        jis_class_for_type(data[:type]&.to_s)
+          .new(series: data[:series].to_s, **attrs)
+      end
 
-        klass.new(**attrs)
+      def jis_class_for_type(type)
+        case type
+        when "TR" then Identifiers::TechnicalReport
+        when "TS" then Identifiers::TechnicalSpecification
+        else Identifiers::JapaneseIndustrialStandard
+        end
       end
 
       def build_amendment(data)
