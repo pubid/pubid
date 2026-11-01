@@ -38,12 +38,12 @@ module Pubid
       end
 
       def ==(other)
-        return false unless other.is_a?(SupplementIdentifier)
-        return false unless other.class == self.class
+        return false unless other.instance_of?(self.class)
 
-        base == other.base &&
-          number == other.number &&
-          year == other.year
+        # A supplement carries its own reaffirmation and SYMBOL clause.
+        %i[base number year reaffirmed? symbol].all? do |field|
+          public_send(field) == other.public_send(field)
+        end
       end
     end
   end

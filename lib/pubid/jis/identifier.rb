@@ -43,6 +43,8 @@ module Pubid
         "pubid:jis:amendment" => "Pubid::Jis::Identifiers::Amendment",
         "pubid:jis:corrigendum" => "Pubid::Jis::Identifiers::Corrigendum",
         "pubid:jis:explanation" => "Pubid::Jis::Identifiers::Explanation",
+        "pubid:jis:welding-engineering-standard" =>
+          "Pubid::Jis::Identifiers::WeldingEngineeringStandard",
       }.freeze
 
       key_value do
@@ -62,6 +64,12 @@ module Pubid
       # so it doesn't shadow the inherited lutaml `publisher` attribute, which
       # would otherwise fail serialization type validation.
       PUBLISHER = "JIS"
+
+      # The token the human render prints before the designation, and drops
+      # for `to_s(with_publisher: false)`; nil when the designation has none.
+      def publisher_prefix
+        PUBLISHER
+      end
 
       def reaffirmed?
         reaffirmed == true
@@ -88,8 +96,10 @@ module Pubid
         result
       end
 
+      # The class is part of the identity: "JIS TR X 0014:1999" is not
+      # "JIS X 0014:1999", and "WES 7700" is not a JIS standard.
       def ==(other)
-        return false unless other.is_a?(Identifier)
+        return false unless other.instance_of?(self.class)
 
         series == other.series &&
           number == other.number &&

@@ -13,6 +13,8 @@ module Pubid
       autoload :TechnicalReport, "#{__dir__}/identifiers/technical_report"
       autoload :TechnicalSpecification,
                "#{__dir__}/identifiers/technical_specification"
+      autoload :WeldingEngineeringStandard,
+               "#{__dir__}/identifiers/welding_engineering_standard"
     end
   end
 end
