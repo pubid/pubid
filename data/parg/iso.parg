@@ -5,8 +5,11 @@
 # supplement, bundled "DIR 1 + IEC SUP"), JCGM, legacy ISO/R forms
 # (including supplements), the three-level supplement chains
 # (/Amd/../Cor/../Amd..), the copublisher identifier spine, and the
-# joint "ISO x|IDF y" form (the IDF grammar's rules are inlined under
-# idf_* names so their captures never collide with the ISO ones).
+# joint "ISO x|IDF y" form. The IDF grammar is imported via `use idf`
+# so the artifact exposes the idf.identifier entry beside identifier;
+# the joint's IDF side itself is spelled with the inlined idf_* rules
+# below, whose captures carry the idf_ prefix so they never collide
+# with the ISO ones and can bind as scalars.
 #
 # Edition 2 with typed model bindings: every capture the builder
 # consumes is bound. Supplement layers capture into position-scoped
@@ -17,6 +20,8 @@
 # names across layers would collapse the layer's number/date onto the
 # base's. The base document's own edition is base_edition wherever a
 # supplement layer's third_part can carry its own edition.
+
+use idf
 
 grammar PubidIso version "0.4.0" edition 2 {
 
@@ -624,6 +629,7 @@ grammar PubidIso version "0.4.0" edition 2 {
 
   bindings identifier {
     publisher -> publisher (string)
+    publisher -> publisher_name (string) preprocess: publisher_names
     copublishers -> copublishers (string)
     type_with_stage -> type_with_stage (string)
     type_with_stage_fr -> type_with_stage_fr (string)

@@ -78,8 +78,21 @@
     branch. Two consequences: copublishers capture as ONE scalar span
     (`"/IEC/IEEE"`, at-least-one item, absent when none) that the builder
     splits, and bundle items capture into `bs1_/bs2_/bs3_` prefixes the
-    builder assembles into `supplements`. A newer engine's `(raw)` wrapper
-    interiors would replace both shapes — re-visit when the pin moves.
+    builder assembles into `supplements`. Verified to hold unchanged at the
+    1.3.121 pin (the capture-flatten release): the re-baked artifact's
+    grammar/entries/bindings/tests/tables are byte-identical to the 1.3.114
+    bake. A newer engine's `(raw)` wrapper interiors would replace both
+    shapes — re-visit when such a wrapper ships.
+  - **The artifact exposes `["identifier", "idf.identifier"]`** — the
+    `use idf` import survives the conversion so the joint composition's
+    entry surface stays available (the fleet gate asserts the entry list).
+    The joint's IDF side itself binds as `idf_*` scalars; the pilot's
+    `publisher -> publisher_name (string) preprocess: publisher_names`
+    binding is also kept (the T1 materialization asserts the full
+    organization name), and the Ruby builder's `cast` returns nil for
+    `:publisher_name` — the Ruby identifier has no such attribute. The
+    Ruby artifact load resolves `use idf` against `data/parg/idf.parg`,
+    which sits beside the vendored artifact.
   - **Captures must inline their bodies to raw terms.** A capture wrapping a
     bare rule ref exposes the ref's child nodes and cannot bind as a string
     (`cannot bind a Array capture`), and date/language bodies are inlined at
@@ -92,7 +105,7 @@
     (`:stage`), `:document_type` and `:supplement_version` keys are
     builder-input names, not grammar captures, and pass through `cast`
     unchanged.
-  - **Grammar probes**: `ruby -e 'gem "parsanol", "1.3.114"; …'` against the
+  - **Grammar probes**: `ruby -e 'gem "parsanol", "1.3.121"; …'` against the
     artifact (`parse_and_bind`) shows the bound map; `Model.bound(:iso, …)`
     shows the builder's actual input. The artifact and its vendored twin
     (`data/parg/iso.parg`) must move together — the twin is the embedded
