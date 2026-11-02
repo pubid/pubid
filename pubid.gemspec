@@ -27,12 +27,11 @@ Gem::Specification.new do |spec|
   # Parsanol::PARG (the Gemfile's git pin is the dev source; published
   # gems resolve this from rubygems). 1.3.57 is the first release whose
   # extension builds against the 0.10 engine line.
-  # The floor rides parsanol's single dialect axis (ruby#357): 1.3.114
-  # records `edition` ("v1"/"v2") in the artifact envelope in place of
-  # the `mode` + `emission` pair, and this gem ships the artifacts
-  # re-baked at it. Anything older reads no `edition` field — it would
-  # treat these artifacts as the implicit v1 default — so the floor
-  # names 1.3.114. Capped below 1.4 until the v2 line declares stability.
-  spec.add_dependency "parsanol", ">= 1.3.114", "< 1.4"
+  # Pessimistic on 1.3.121: the artifacts this gem ships are re-baked
+  # at the 1.3.121 compiler (the fleet-wide rebake; `edition` records
+  # "v1"/"v2" in the artifact envelope — 1.3.114 introduced the field),
+  # and 1.3.121 is the released engine build the grammar sources bake
+  # byte-identically against. 1.4 is the next minor line.
+  spec.add_dependency "parsanol", "~> 1.3.121"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
