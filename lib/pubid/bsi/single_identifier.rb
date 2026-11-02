@@ -37,7 +37,16 @@ module Pubid
       # itself and is never preceded by it.
       BSI_PREFIXED_SERIES = %w[PAS PD DD BIP].freeze
 
-      BSI_PREFIX = /\ABSI\s+(?=(?:#{BSI_PREFIXED_SERIES.join('|')})\b)/
+      # Series tokens whose `BSI `-prefixed spelling parses (the strip below
+      # drops the prefix before the baked grammar runs). That is the
+      # BSI_PREFIXED_SERIES plus `BS`: `BS` is never PRINTED with the prefix
+      # by BSI itself, but external references do cite the British Standard
+      # series as `BSI BS 5950` (pubid#644), so the prefixed spelling is
+      # accepted on parse and normalizes to the canonical `BS 5950`. Render
+      # never re-adds the prefix for `BS` — only BSI_PREFIXED_SERIES does.
+      STRIPPABLE_SERIES = (BSI_PREFIXED_SERIES + %w[BS]).freeze
+
+      BSI_PREFIX = /\ABSI\s+(?=(?:#{STRIPPABLE_SERIES.join('|')})\b)/
 
       # `BSI PAS 2031:2019` is the external spelling of `PAS 2031:2019`. The
       # prefix is not part of the identity, so it is dropped before the baked

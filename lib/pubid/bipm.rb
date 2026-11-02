@@ -6,13 +6,19 @@ module Pubid
     extend Pubid::PrefixesSupport
 
     # Leading tokens a printed BIPM identifier can start with: the 13 committee
-    # acronyms, "Metrologia" (journal), and "BIPM" (the SI Brochure). JCGM is
-    # deliberately excluded — it is owned by the separate Pubid::Jcgm flavor,
-    # so BIPM never emits pubid:jcgm:* rows. French full-name forms that lead
-    # with a type word ("Recommandation 1 du CCL …") are omitted per the
+    # acronyms, "Metrologia" (journal), "BIPM" (the publisher prefix the SI
+    # Brochure / MEP / guide families print), and the two SI-family series
+    # tokens that can lead a reference on their own — "SI Brochure 9e …" and
+    # "SI MEP 10" are printed without the leading BIPM by consumers that strip
+    # it (relaton's Bibliography#search among them), so both spellings must
+    # route. JCGM is deliberately excluded — it is owned by the separate
+    # Pubid::Jcgm flavor, so BIPM never emits pubid:jcgm:* rows. French
+    # full-name forms that lead with a type word ("Recommandation 1 du CCL …")
+    # and the generic French word "Rapport" are omitted per the
     # "exclude ambiguous tokens" policy.
     PREFIXES = %w[
       BIPM Metrologia
+      SI\ Brochure SI\ MEP
       CIPM CGPM JCRB CCTF CCQM CCT CCL CCAUV CCU CCM CCEM CCPR CCRI
     ].freeze
 
