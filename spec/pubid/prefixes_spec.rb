@@ -62,6 +62,18 @@ RSpec.describe "Flavor prefixes API" do
     it "NIST owns NIST, NBS and reference-leading series" do
       expect(Pubid::Nist.prefixes).to include("NIST", "NBS", "FIPS", "SP")
     end
+
+    # pubid#644: the external publisher-prefixed spelling ("IETF RFC 2119")
+    # begins references in the wild, so it must route to IETF.
+    it "IETF owns the IETF publisher prefix" do
+      expect(Pubid::Ietf.prefixes).to include("IETF")
+    end
+
+    # pubid#644: the SI-family series tokens that lead a reference without the
+    # BIPM publisher prefix (consumers strip it before parsing).
+    it "BIPM owns the SI Brochure and SI MEP series tokens" do
+      expect(Pubid::Bipm.prefixes).to include("SI Brochure", "SI MEP")
+    end
   end
 
   describe "joint-publication symmetry" do
@@ -126,6 +138,14 @@ RSpec.describe "Flavor prefixes API" do
 
     it "routes the non-obvious BSI prefix DD to :bsi" do
       expect(index["DD"]).to include(:bsi)
+    end
+
+    # pubid#644: 3GPP's Ruby constant is Pubid::Tgpp, but its registry key,
+    # `_type` namespace and URN namespace are all "3gpp". The derived key must
+    # match the registry, or the prefix resolves to a module nothing has
+    # registered and the routing table drops the owner entirely.
+    it "attributes the 3GPP prefix to the external key :\"3gpp\"" do
+      expect(index["3GPP"]).to eq([:"3gpp"])
     end
   end
 end

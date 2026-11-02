@@ -11,8 +11,11 @@ module Pubid
     extend Pubid::PrefixesSupport
 
     # Leading tokens a printed IETF id can begin with. "draft" covers the
-    # "draft-<slug>" Internet-Draft form. No joint/co-publication prefixes.
-    PREFIXES = ["RFC", "BCP", "STD", "FYI", "draft"].freeze
+    # "draft-<slug>" Internet-Draft form. "IETF" covers the external
+    # publisher-prefixed spelling ("IETF RFC 2119", "IETF I-D draft-…") that
+    # the flavor's own strip_prefix parses and `to_s(with_publisher: true)`
+    # prints back. No joint/co-publication prefixes.
+    PREFIXES = ["IETF", "RFC", "BCP", "STD", "FYI", "draft"].freeze
 
     autoload :Builder, "#{__dir__}/ietf/builder"
     autoload :Identifier, "#{__dir__}/ietf/identifiers/base"

@@ -39,6 +39,24 @@ RSpec.describe "Pubid.parse prefix routing" do
     expect(Pubid.parse("ISO/IEC 2131:2013").to_s).to eq("ISO/IEC 2131:2013")
   end
 
+  # pubid#644: {Pubid.prefix_flavors} keys prefixes by each flavor's
+  # `prefix_flavor_key`, and the routing table resolves those keys through
+  # {Pubid::Registry.get}. A flavor whose external key differs from the name
+  # its Ruby constant derives (3GPP: registry key "3gpp", derived :tgpp)
+  # silently resolved to `nil`, the `compact` in candidates_by_prefix dropped
+  # it, and the prefix owner — the only module allowed to supply a
+  # non-exact fallback — vanished from the routing decision. Every
+  # attributed key must name a registered flavor.
+  it "resolves every prefix table entry to a registered flavor module" do
+    Pubid.prefix_flavors.each do |prefix, keys|
+      keys.each do |key|
+        expect(Pubid::Registry.get(key)).not_to be_nil,
+          "prefix #{prefix.inspect} is attributed to #{key.inspect}, " \
+          "which no flavor is registered under"
+      end
+    end
+  end
+
   it "still routes a URN" do
     expect(Pubid.parse("urn:iso:std:iso:1234:-1:ed-1")).to be_a(Pubid::Iso::Identifier)
   end

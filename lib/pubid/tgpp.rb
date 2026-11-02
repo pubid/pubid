@@ -16,6 +16,17 @@ module Pubid
     # excluded. The parser still accepts an optional leading "3GPP ".
     PREFIXES = ["3GPP"].freeze
 
+    # The external flavor key is "3gpp" (the registry key, the `pubid:3gpp:*`
+    # `_type` namespace and the `urn:3gpp:` URN namespace), but the default
+    # derivation spells it from the Ruby constant as :tgpp. That mismatch made
+    # {Pubid.prefix_flavors} attribute "3GPP" to a key nothing is registered
+    # under, so {Pubid}'s routing table resolved the prefix to no module and
+    # the "3GPP TS …" printed form lost its prefix-owner status (pubid#644).
+    # Return the real external key, matching the registry registration below.
+    def self.prefix_flavor_key
+      :"3gpp"
+    end
+
     autoload :Builder, "#{__dir__}/tgpp/builder"
     autoload :Identifier, "#{__dir__}/tgpp/identifier"
     autoload :Identifiers, "#{__dir__}/tgpp/identifiers"

@@ -7,3 +7,17 @@
 # the docnumber and docidentifier spellings map onto the bare "CIPM 2005-06" form.
 "CIPM/2005-06(REV)": CIPM 2005-06
 "CIPM 2005-06(REV)": CIPM 2005-06
+
+# The SI Brochure cited by its title: the brochure IS "The International
+# System of Units", and external references cite it in quotes (pubid#644).
+# Map the quoted-title spelling onto the parseable "BIPM SI Brochure" section
+# form — a partial reference with no edition, so it wildcards every edition
+# under the matching primitives, exactly like "SI Brochure Part 1". A
+# normalizing parse like the CIPM MRA ones above: never a byte-exact fixture
+# (see spec/pubid/bipm/loose_consumer_forms_spec.rb).
+#
+# The French title is deliberately NOT mapped: it names the F-language record
+# specifically, and mapping it would silently drop language information the
+# user typed (the loose-forms rule). English is language-neutral, so it stays.
+/^BIPM "The International System of Units"$/: BIPM SI Brochure
+/^"The International System of Units"$/: SI Brochure
