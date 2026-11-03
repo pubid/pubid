@@ -24,7 +24,7 @@ module Pubid
         end
 
         to_builder_hash(Artifact.for(flavor).parse(entry, input), merge: merge_top_sequence)
-      rescue Parsanol::ParseFailed => e
+      rescue *ENGINE_ERRORS => e
         raise Pubid::Errors::ParseError.new(e.message, nil,
                                             input: input,
                                             flavor: registered_name(flavor))

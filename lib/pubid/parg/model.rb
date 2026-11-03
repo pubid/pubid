@@ -27,7 +27,7 @@ module Pubid
           source = all_parts ? input.sub(ALL_PARTS_PATTERN, "") : input
           hash = Artifact.for(flavor).parse_and_bind(entry, source)
           all_parts ? Backend.mark_all_parts(hash) : hash
-        rescue Parsanol::ParseFailed => e
+        rescue *ENGINE_ERRORS => e
           parse_error(e, input, flavor)
         end
 
@@ -38,12 +38,17 @@ module Pubid
           register(flavor, model_class, entry)
           model, all_parts = materialize(flavor, model_class, input)
           all_parts ? model.to_all_parts : model
-        rescue Parsanol::ParseFailed => e
+        rescue *ENGINE_ERRORS => e
           parse_error(e, input, flavor)
         end
 
         private
 
+        # The uniform error contract (CLAUDE.md "One error namespace"):
+        # every grammar/binding failure surfaces as Pubid::Errors::ParseError
+        # so `rescue Pubid::Errors::Error` stays exhaustive. Binding failures
+        # raise Parsanol::PARG::BindError (< PARG::Error, NOT ParseFailed) —
+        # left unrescued it escaped Pubid.parse raw (issue #646).
         def parse_error(error, input, flavor)
           raise Pubid::Errors::ParseError.new(
             error.message,
