@@ -55,6 +55,12 @@ module Pubid
         "data" => :data,
       }.freeze
 
+      # An ISO 639 language field: 2-3 letter codes, comma-separated
+      # ("en", "fr", "en,fr"). Item-path segments ("tech", "ACTIVITY_MIM")
+      # do not match it and are cut as the URN's item path instead
+      # (issue #645).
+      LANGUAGE_FIELD_RE = /\A[a-zA-Z]{2,3}(?:,[a-zA-Z]{2,3})*\z/
+
       # Parse ISO URN string
       # @param urn [String] URN string to parse
       # @return [Identifier] parsed identifier
@@ -126,12 +132,21 @@ module Pubid
           edition = parts.shift.sub("ed-", "").to_i
         end
 
+        # RFC 5141-bis document version token ("v1" in "…:ed-1:v1:en"). The
+        # base identifier has no version attribute -- the edition is the
+        # version axis -- so the token is dropped here, before the
+        # supplement loop mistakes it for a type-less supplement number,
+        # which wrapped the document as that phantom supplement and
+        # collapsed "ISO 10303-2" to "ISO 1" (issue #645).
+        parts.shift if parts.first&.match?(/\Av\d/)
+
         # Parse language if present (2-letter codes like "en" or comma-separated)
         languages = nil
         if parts.first && !parts.first.match(/^\d+$/) &&
             !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-|ed-)/i) &&
             !TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase) &&
-            !parts.first.match?(/^[A-Z]+\.\d+$/i)
+            !parts.first.match?(/^[A-Z]+\.\d+$/i) &&
+            parts.first.match?(LANGUAGE_FIELD_RE)
           languages = parse_languages(parts.shift)
         end
 
@@ -181,6 +196,17 @@ module Pubid
         # Check for supplements (amd, cor, sup, add)
         supplements = []
         while parts.any?
+          # Item path (issue #645): trailing URN segments naming a resource
+          # inside the document ("...:en:tech:ACTIVITY_MIM", and the
+          # Glossarist-era duplicated ":tech:X:tech:X:X" extraction
+          # tails). They are not document identity: the first token that
+          # cannot be a stage, supplement field, version or language
+          # starts the path, and it and everything after it are dropped so
+          # the duplication cannot derail the fields parsed before it.
+          if item_path_segment?(parts.first)
+            break
+          end
+
           supp_type = nil
           supp_number = nil
           supp_version = nil
@@ -194,6 +220,16 @@ module Pubid
           elsif TYPED_STAGE_REVERSE_MAP.key?(parts.first&.upcase)
             supp_stage_abbr = parts.shift.upcase
             supp_stage = TYPED_STAGE_REVERSE_MAP[supp_stage_abbr]
+          elsif parts.first&.match?(/\A[A-Za-z]+\.\d+\z/) &&
+              TYPED_STAGE_REVERSE_MAP.key?(parts.first.upcase.split(".").first)
+            # "FDAM.3" -- a supplement-family stage abbreviation with an
+            # iteration, meant for the supplement that follows
+            # ("...:FDAM.3:amd:..."). The supplement layer has no
+            # stage-iteration slot, so the token is consumed here and
+            # dropped: the previous catch-all language branch carried it
+            # as a bogus base language, surfacing only in the generated
+            # URN (issue #645).
+            parts.shift
           end
 
           # Check for supplement type (amd, cor, sup, add)
@@ -218,8 +254,8 @@ module Pubid
           # the NUMBER. The RFC 5141 additive extension ("amd:1:2007:v2")
           # keeps the number in its own slot, so a v-token after a number
           # is the true <supplversion>.
-          if parts.first&.start_with?("v")
-            version_str = parts.shift.sub("v", "")
+          if parts.first&.match?(/\Av\d/)
+            version_str = parts.shift.delete_prefix("v")
             value = version_str.split(".").first.to_i
             if supp_number.nil?
               supp_number = value
@@ -236,8 +272,8 @@ module Pubid
           # A v-token after the year ("amd:1:2007:v1") would otherwise be
           # left for the next loop iteration, wrapping a type-less
           # supplement around the real one and losing the base.
-          if parts.first&.start_with?("v")
-            version_str = parts.shift.sub("v", "")
+          if parts.first&.match?(/\Av\d/)
+            version_str = parts.shift.delete_prefix("v")
             value = version_str.split(".").first.to_i
             if supp_number.nil?
               supp_number = value
@@ -248,7 +284,9 @@ module Pubid
 
           # Check for language after supplement
           supp_languages = nil
-          if parts.first && !parts.first.match(/^\d+$/) && !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-)/i)
+          if parts.first && !parts.first.match(/^\d+$/) &&
+              !parts.first.match?(/^(amd|cor|sup|add|v\d+|stage-)/i) &&
+              parts.first.match?(LANGUAGE_FIELD_RE)
             supp_languages = parse_languages(parts.shift)
           end
 
@@ -269,6 +307,25 @@ module Pubid
       end
 
       private
+
+      # True when the token can only be an item-path segment (issue #645):
+      # it is not a stage, supplement type, number/year, version or
+      # language field, so it -- and everything after it -- names a
+      # resource inside the document rather than a component of the
+      # identifier. The allow-list mirrors exactly what the supplement
+      # loop can consume, so every token it lets through makes progress.
+      def item_path_segment?(token)
+        return false if token.nil?
+        return false if token.match?(/\A\d+\z/)
+        return false if token.match?(/\Av\d/)
+        return false if token.start_with?("stage-")
+        return false if TYPED_STAGE_REVERSE_MAP.key?(token.upcase)
+        return false if token.match?(/\A[A-Za-z]+\.\d+\z/) &&
+                        TYPED_STAGE_REVERSE_MAP.key?(token.upcase.split(".").first)
+        return false if SUPPLEMENT_TYPE_MAP.key?(token.downcase)
+
+        !token.match?(LANGUAGE_FIELD_RE)
+      end
 
       # Helper to find IS-type TypedStage by harmonized stage code
       # Used when URN doesn't specify a type code (defaults to IS)
