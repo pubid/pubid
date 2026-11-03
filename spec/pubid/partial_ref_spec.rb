@@ -48,11 +48,11 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "api" => { ref: "API 1509", omits: [:year] },
     "easc" => { ref: "ПМГ 126", omits: [:year] },
     "astm" => { ref: "ASTM A6", omits: [:year] },
-    # IHO's trailing component is one discriminator of version / year /
-    # volume [issue] (relaton#407: the B-7/P-5/P-6 series are identified
-    # by year and P-1 by volume, not by the placeholder edition), so a
+    # IHO's trailing component is one discriminator of edition / volume
+    # [issue] (P-1 and P-6 are volume-keyed and the yearbook year IS a
+    # volume; S-series carry the dotted edition, never a year), so a
     # bare reference leaves all four nil and wildcards the series.
-    "iho" => { ref: "IHO P-5", omits: %i[version year volume issue] },
+    "iho" => { ref: "IHO P-5", omits: %i[edition year volume issue] },
     "oasis" => { ref: "OASIS EDXL", omits: [:version] },
     "sae" => { ref: "SAE AIR1936", omits: [:date] },
     "adobe" => { ref: "Adobe TN 5014", omits: [] },
