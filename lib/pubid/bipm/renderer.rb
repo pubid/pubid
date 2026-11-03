@@ -40,8 +40,18 @@ module Pubid
         # leading space) rather than emit a double space.
         lang = id.language ? ", #{id.language}" : ""
         type = id.type_code ? " #{id.type_code}" : ""
-        "#{id.group}#{type}#{number_segment(id)}" \
+        "#{id.group}#{type}#{number_segment(id)}#{appendix_segment(id)}" \
           "#{year_segment(id, lang: lang)}"
+      end
+
+      # The complement tail "{identifier} A{appendix}[.{annex}]" of the guide's
+      # resource-specific-id numbering (parts/subparts are dash forms inside
+      # `number` itself; appendices/annexes are this separate tail).
+      def appendix_segment(id)
+        return "" unless id.appendix
+
+        annex = id.annex ? ".#{id.annex}" : ""
+        " A#{id.appendix}#{annex}"
       end
 
       def render_committee_long(id)
@@ -79,10 +89,15 @@ module Pubid
         # to print either — just the brochure, optionally down to one part.
         return "BIPM SI Brochure#{part_segment(id)}" unless id.edition
 
+        # The version is optional (the guide's "SI Brochure 9e (2019, E)" form)
+        # and the language code too (the language-independent form), so both
+        # segments are conditional.
         phrase = id.language == "F" ? "sur le SI " : ""
         lang = id.language ? ", #{id.language}" : ""
-        "BIPM SI Brochure #{phrase}#{id.edition} #{id.version} " \
-          "(#{id.years}#{lang})"
+        result = +"BIPM SI Brochure #{phrase}#{id.edition}"
+        result << " #{id.version}" if id.version
+        result << " (#{id.years}#{lang})"
+        result
       end
 
       # Optional " Part <n>" segment of an SI Brochure section reference.

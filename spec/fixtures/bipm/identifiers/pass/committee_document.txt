@@ -36,6 +36,29 @@ Action 10-1 du JCRB (2003)
 CIPM 2005-06
 CIPM 2005-06 (2005)
 
+# --- CIPM decisions, 101-1 family (relaton-data-bipm docidentifiers) ---
+CIPM DECN 101-1 (2012)
+CIPM DECN 101-1 (2012, E)
+CIPM DECN 101-1 (2012, F)
+Décision 101-1 du CIPM (2012)
+
+# --- Publisher-prefixed + body-qualified spellings, normalize onto the
+# --- unprefixed forms above (metanorma-bipm fetch queue, pubid#657;
+# --- the guide's French body-prefixed pattern for CIPM/JCRB outcomes) ---
+BIPM DECN CIPM/101-1 (2012, EN)
+BIPM DECN CIPM/101-1 (2012, FR)
+Décision CIPM/101-1 (2012)
+Recommandation 43-1 du JCRB (2021)
+Recommandation JCRB/43-1 (2021)
+
+# --- Part-numbered resource-specific ids (guide numbering: part/subpart are
+# --- dash forms inside the number; appendix/annex are the " A<n>[.<m>]" tail) ---
+CIPM DECN 111 (2022, F)
+CIPM DECN 111-10 (2022, F)
+CIPM DECN 111-10-2 (2022, F)
+CIPM DECN 112 A3 (2022, F)
+CIPM DECN 112 A3.5 (2022, F)
+
 # --- Partial references (date omitted; year left nil for collection matching) ---
 CCTF REC 2
 CGPM DECL

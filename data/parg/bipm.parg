@@ -1,0 +1,290 @@
+# Port of lib/pubid/bipm/parser.rb — BIPM identifiers: committee forms
+# (short/long EN/FR, meetings incl. French <sup>e</sup>), Metrologia,
+# the SI Brochure family, MEP/Guide reports. Groups and type names come
+# from gem-extracted tables (bipm_*.yaml), longest-first.
+#
+# Edition-2 conversion. The builder dispatches on the branch-wrapper
+# keys (committee_short, committee_long_en, committee_long_fr,
+# committee_bare, meeting_en, meeting_fr, metrologia, si_brochure,
+# si_brochure_variant, si_brochure_section, mep, guide), so every
+# wrapper is kept as a v1-shaped capture whose value is the inner-leaf
+# hash (or the bare scalar for the journal-level Metrologia record) and
+# binds uncast with the (raw) type; the leaves additionally bind flat.
+# Pure-raw rule bodies are inlined at capture sites (digits, alnum) so
+# every capture subtree carries only its own named leaves.
+
+grammar PubidBipm version "0.1.0" edition 2 {
+  digit = %x30-39
+  dot = "."
+  letter = %x41-5A / %x61-7A
+  space = " "
+  dash = "-"
+  slash = "/"
+  colon = ":"
+  lparen = "("
+  rparen = ")"
+
+  number = (1*digit *(dash 1*digit)) as number
+  year = (4digit) as year
+  lang = ("EN" / "FR" / %x45 / %x46) as language
+  year_paren = "(" year [(", " lang)] ")"
+  year_paren_nolang = "(" year ")"
+  group = alt from_table "bipm_groups" column "name" as group
+  type_abbrev = alt from_table "bipm_type_codes" column "name" as type_word
+  type_name_en = alt from_table "bipm_type_names_en" column "name" as type_word
+  type_name_fr = alt from_table "bipm_type_names_fr" column "name" as type_word
+  connective = "de la" / "du"
+  ordinal = "st" / "nd" / "rd" / "th"
+  meeting_word_fr = "Réunion" / "réunion"
+
+  committee_short = {
+    (
+      (
+        group
+        space
+        type_abbrev
+        [(space number [(space "A" (1*digit) as appendix [dot (1*digit) as annex])])]
+        [(space year_paren)]
+      ) as committee_short
+    )
+  }
+  # The publisher-prefixed decision form the corpus cites
+  # ("BIPM DECN CIPM/101-1 (2012, EN)"): a literal BIPM publisher lead, the
+  # outcome type, then the body-qualified resource-specific-id "{body}/{id}".
+  # It names the same document as the unprefixed "<body> <TYPE> <id>" form, so
+  # the builder dispatches it through the same CommitteeDocument path.
+  committee_prefixed = {
+    (
+      (
+        "BIPM"
+        space
+        type_abbrev
+        space
+        group
+        slash
+        number
+        [(space year_paren)]
+      ) as committee_prefixed
+    )
+  }
+  committee_long_en = {
+    (
+      (
+        group
+        space
+        type_name_en
+        [(space number)]
+        [(space year_paren_nolang)]
+      ) as committee_long_en
+    )
+  }
+  committee_long_fr = {
+    (
+      (
+        (type_name_fr [(space number)] space connective space group [(space year_paren_nolang)])
+        / (type_name_fr space group slash number [(space year_paren_nolang)])
+      ) as committee_long_fr
+    )
+  }
+  committee_group_fr = {
+    (
+      (
+        group
+        space
+        type_name_fr
+        [(space number)]
+        [(space year_paren_nolang)]
+      ) as committee_long_fr
+    )
+  }
+  committee_bare = ((group space number [(space year_paren)]) as committee_bare)
+
+  meeting_en = {
+    (
+      (
+        (group space number ordinal space "Meeting" [(space year_paren)])
+        / (group space "Meeting" space number [(space year_paren)])
+        / (group space "--" space number ordinal space "Meeting" [(space year_paren)])
+        / (group space "--" space "Meeting" space number [(space year_paren)])
+      ) as meeting_en
+    )
+  }
+  meeting_fr = {
+    (
+      (
+        (group space number "<sup>e</sup>" space "réunion" [(space year_paren)])
+        / (group space number "e" space meeting_word_fr [(space year_paren)])
+        / (group space meeting_word_fr space number [(space year_paren)])
+      ) as meeting_fr
+    )
+  }
+
+  metrologia = {
+    (
+      "Metrologia"
+      [
+        (
+          space (1*digit) as volume
+          [
+            (
+              space (1*(digit / letter)) as issue
+              [
+                (space (1*(digit / letter)) as article)
+              ]
+            )
+          ]
+        )
+      ]
+    ) as metrologia
+  }
+
+  edition = ((1*digit) "e") as edition
+  version = ("v" 1*(digit / dot)) as version
+  years = ((1*digit) [(slash (1*digit))]) as years
+  si_brochure = {
+    (
+      (
+        ("BIPM SI Brochure" / "SI Brochure" / "Brochure sur le SI")
+        space
+        ["sur le SI" space]
+        edition
+        [space version]
+        space
+        "(" years [(", " lang)] ")"
+      ) as si_brochure
+    )
+  }
+  # The guide's language-independent form drops the language code and the
+  # version is optional ("SI Brochure 9e (2019, E)"); the guide's French
+  # publication identifier leads with "Brochure sur le SI" instead of the
+  # English brochure name. All render in the canonical "BIPM SI Brochure …"
+  # spelling. The corpus-cited ordinal-edition spelling normalizes the
+  # English "9th edition" onto the canonical "9e" edition value.
+  si_brochure_ordinal_edition = {
+    (
+      (
+        "SI Brochure"
+        space
+        ((1*digit) ordinal) as ordinal_edition
+        space
+        "edition"
+        [(space year_paren)]
+      ) as si_brochure_ordinal_edition
+    )
+  }
+  brochure_variant = (("Appendix" space (1*digit)) / "Concise" / "FAQ") as variant
+  si_brochure_variant = {
+    (
+      ("BIPM SI Brochure" / "SI Brochure")
+      space
+      brochure_variant
+    ) as si_brochure_variant
+  }
+  si_brochure_section = {
+    (
+      ("BIPM SI Brochure" / "SI Brochure")
+      [(space "Part" space (1*digit) as part)]
+    ) as si_brochure_section
+  }
+
+  appendix_part = {
+    "Appendix"
+    space
+    (1*digit) as appendix
+    [(space "Annex" space (1*digit) as annex)]
+    space
+    "Part"
+    space
+    (((1*digit) [(dot (1*digit))]) as part)
+  }
+  mep_code = (1*(digit / letter)) as mep_code
+  report_code = ("BIPM-" (1*digit) slash (1*digit)) as report_code
+  mep_body = (("SI MEP" space mep_code) / ("Rapport" space report_code))
+  mep = (("BIPM" space mep_body space appendix_part) / mep_body) as mep
+  guide_kind = ("MeP" / "RSI") as guide_kind
+  guide_body = group "-GD-" guide_kind dash (1*digit) as number
+  guide = (("BIPM" space guide_body space appendix_part) / guide_body) as guide
+
+  group_leading = {
+    meeting_en
+    / meeting_fr
+    / committee_short
+    / committee_long_en
+    / committee_group_fr
+    / committee_bare
+  }
+  identifier = {
+    metrologia
+    / si_brochure
+    / si_brochure_variant
+    / si_brochure_section
+    / si_brochure_ordinal_edition
+    / mep
+    / guide
+    / committee_long_fr
+    / committee_prefixed
+    / group_leading
+  }
+
+  entry identifier: identifier
+
+  bindings identifier {
+    committee_short -> committee_short (raw)
+    committee_prefixed -> committee_prefixed (raw)
+    committee_long_en -> committee_long_en (raw)
+    committee_long_fr -> committee_long_fr (raw)
+    committee_bare -> committee_bare (raw)
+    meeting_en -> meeting_en (raw)
+    meeting_fr -> meeting_fr (raw)
+    metrologia -> metrologia (raw)
+    si_brochure -> si_brochure (raw)
+    si_brochure_ordinal_edition -> si_brochure_ordinal_edition (raw)
+    si_brochure_variant -> si_brochure_variant (raw)
+    si_brochure_section -> si_brochure_section (raw)
+    mep -> mep (raw)
+    guide -> guide (raw)
+    group -> group (string)
+    type_word -> type_word (string)
+    number -> number (string)
+    year -> year (string)
+    language -> language (string)
+    volume -> volume (string)
+    issue -> issue (string)
+    article -> article (string)
+    edition -> edition (string)
+    version -> version (string)
+    years -> years (string)
+    variant -> variant (string)
+    part -> part (string)
+    appendix -> appendix (string)
+    annex -> annex (string)
+    mep_code -> mep_code (string)
+    report_code -> report_code (string)
+    guide_kind -> guide_kind (string)
+    ordinal_edition -> ordinal_edition (string)
+  }
+
+  test {
+    accept "SI Brochure 9e v3.0 (2019, EN)"
+    accept "SI MEP 10"
+    accept "CGPM 26th Meeting (2018)"
+    accept "Metrologia 24 3"
+    accept "CGPM 12"
+    accept "CCTF REC 2"
+    accept "BIPM SI Brochure Appendix 2"
+    accept "SI Brochure Part 1"
+    accept "CGPM -- Meeting 1 (1889)"
+    accept "BIPM DECN CIPM/101-1 (2012, EN)"
+    accept "BIPM DECN CIPM/101-1 (2012, FR)"
+    accept "Décision CIPM/111-10 (2022)"
+    accept "Recommandation JCRB/43-1 (2021)"
+    accept "CIPM DECN 111-10-2 (2022, F)"
+    accept "CIPM DECN 112 A3 (2022, F)"
+    accept "CIPM DECN 112 A3.5 (2022, F)"
+    accept "SI Brochure 9e v3.01 (2019/2024)"
+    accept "SI Brochure 9e (2019, E)"
+    accept "Brochure sur le SI 9e v3.01 (2019/2024, F)"
+    accept "SI Brochure 9th edition (2019)"
+    reject "nonsense"
+  }
+}

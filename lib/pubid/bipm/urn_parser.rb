@@ -27,12 +27,25 @@ module Pubid
             group: group, number: parts[2].to_s, year: parts[3]&.to_i,
           )
         else
+          number, appendix, annex = split_appendix(parts[2])
           Identifiers::CommitteeDocument.new(
             group: group,
             type_code: (parts[1].empty? ? nil : parts[1].upcase),
-            number: (parts[2].empty? ? nil : parts[2]), year: parts[3]&.to_i
+            number: (number.empty? ? nil : number), year: parts[3]&.to_i,
+            appendix: appendix, annex: annex,
           )
         end
+      end
+
+      # Inverse of UrnGenerator#committee_number_segment: splits the folded
+      # "-a{appendix}[.{annex}]" tail back out of the identifier segment. A
+      # bare number is digits and dashes only, so the letter-prefixed tail is
+      # unambiguous.
+      def split_appendix(segment)
+        match = segment.to_s.match(/\A(.+?)-a(\d+)(?:\.(\d+))?\z/)
+        return [segment, nil, nil] unless match
+
+        [match[1], match[2], match[3]]
       end
 
       # `number` is the relaton index key and is derived, not printed, so it has
