@@ -1812,7 +1812,12 @@ module Pubid
         # Optional attributes (excluding part/subpart since they're in code)
         extract_optional(parsed, attributes, :edition)
         extract_optional(parsed, attributes, :revision)
-        extract_optional(parsed, attributes, :rev_sep)
+# A printed separator before the revision is notation residue: once the
+# revision is repositioned to the canonical face (and every corpus
+# expectation for these variants renders it absent), carrying rev_sep
+# would make the variant hash differ from its canonical equivalent.
+# Keep it only for a bare "Rev" with no number.
+extract_optional(parsed, attributes, :rev_sep) unless attributes[:revision] =~ /\A\d/
         attributes[:rev_bare] = true if parsed[:rev_bare]
 
         # Month/day - always extract if present (but not if already extracted from year)
