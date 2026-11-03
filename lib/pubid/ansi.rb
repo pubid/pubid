@@ -14,6 +14,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/ansi/identifier"
     autoload :Identifiers, "#{__dir__}/ansi/identifiers"
     autoload :Parser, "#{__dir__}/ansi/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/ansi/pubid_urn_schema"
     autoload :Renderer, "#{__dir__}/ansi/renderer"
     autoload :SingleIdentifier, "#{__dir__}/ansi/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/ansi/urn_generator"
