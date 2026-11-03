@@ -62,9 +62,11 @@ RSpec.describe "all_parts_edition_keys audit" do
                      Pubid::Adobe::Identifiers::Publication.parse("adobe-japan1-7"))
   end
 
-  it "IHO (version)" do
-    assert_collapses(Pubid::Iho::Identifier.parse("IHO S-100 Part 1 1.0.0"),
-                     Pubid::Iho::Identifier.parse("IHO S-100 Part 1 2.0.0"))
+  # The two part editions are the separately-published mode (ruling
+  # 2026-11-03), so the audit inputs become the within-edition pair.
+  it "IHO (edition)" do
+    assert_collapses(Pubid::Iho::Identifier.parse("IHO S-100 1.0.0 Part 1"),
+                     Pubid::Iho::Identifier.parse("IHO S-100 2.0.0 Part 1"))
   end
 
   it "OIML (date)" do

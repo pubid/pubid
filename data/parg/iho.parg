@@ -1,0 +1,358 @@
+# Port of lib/pubid/iho/parser.rb — IHO identifiers: letter series
+# (S/P/M/B/C), a number with an optional suffix, and the full component
+# tail (edition, supplement, part, annex, appendix + subnumber, volume,
+# issue, year qualifier).
+#
+# == Component model (owner rulings, 2026-11-03)
+#
+# Every component below is a first-class semantic component: its own
+# named capture, its own typed binding, independently addressable in
+# the model, URN-encodable and matchable — never a regex/string suffix.
+#
+#   component    face                capture             binding type
+#   edition      x.y.z (bare)        edition             string
+#   edition      v1 / v5.1 (alias)   edition_shorthand   string (parse-only;
+#                                                        the builder pads to
+#                                                        x.y.0 — official IHO
+#                                                        edition is dotted
+#                                                        x.y.z WITHOUT a year)
+#   supplement   Sup N (Suppl N)     supplement          string
+#   part         Part X / Part S-102 part                string (letter,
+#                                                        number, or SERIES
+#                                                        REFERENCE)
+#   part         -X / -S-102 (short) part                string (hyphenated)
+#   annex        Annex A             annex               string
+#   appendix     Appendix B          appendix            string
+#   appendix     Appendix D-2        appendix_subnumber  string (the -2)
+#   volume       Vol. N              volume              string
+#   volume       /N (short)          volume              string (the slash
+#                                                        chain, P-1/21 or
+#                                                        P-5/2020)
+#   volume       N (bare, legacy)    volume              string (the yearbook
+#                                                        year IS a volume —
+#                                                        one serial-locator
+#                                                        component)
+#   issue        (N) / Issue N       issue               string
+#   year         (2024)              year                string (the with-year
+#                                                        qualifier on
+#                                                        standards; NOT a
+#                                                        serial locator)
+#
+# == Component-edition duality (owner ruling: "this can happen with any
+#    independently publishable artifacts")
+#
+# Supplement, part, annex, appendix and volume can be published on
+# their own publication cycle, so EACH carries an optional
+# `<kind>_edition` (+ `<kind>_year` qualifier) of its own, mutually
+# exclusive with the base edition context:
+#
+#   within-edition:        IHO P-6 1.0.0 Vol. 2       (the volume rides
+#                                                   the base's edition)
+#   separately-published:  IHO P-6 Vol. 2 1.0.1       (the volume carries
+#                          IHO S-98 Part A 1.0.0       its own edition;
+#                          IHO S-158 Part S-102 0.2.0  the base is
+#                                                      cited edition-less)
+#
+# In the URN the ed- segment attaches to the node it follows, so the
+# same positional slot records both modes.
+#
+# The part has a COMPACT face, hyphenated onto the code — `IHO S-5-B`
+# (lettered part), `IHO S-100-1` (numbered part), `IHO S-158-S-102`
+# (series-reference part) — which both parses and renders; the
+# canonical expanded face stays `IHO S-100 x.y.z Part 1`. Gluing a part
+# onto the code without a separator (S-5A) is DISALLOWED as a form: it
+# cannot extend to numbered parts without ambiguity (S-1001 = series
+# 1001 vs series 100 part 1). The four lettered bases the corpus
+# records (S-5A, S-5B, S-8A, S-8B) are LEGACY data spellings: they
+# still parse as aliases (S-5A == S-5 Part A) but are never rendered;
+# the owner rules later whether to reject them outright.
+#
+# Series-reference parts: a check standard applied to another IHO
+# series cites the applied series as its part — `IHO S-158 0.2.0 Part
+# S-102` (the wild glued `S-158-102` spelling is a legacy alias whose
+# normalization to Part S-102 needs an IHO series table; the syntax
+# alone cannot tell it from S-100-1 = Part 1, so it currently parses
+# as the plain number part).
+#
+# Two main syntaxes per the owner ruling: `IHO S-100 1.0.0` (dated =
+# edition-specific) and `IHO S-100` (undated = edition-non-specific).
+# A year beside an edition is the with-year variant qualifier
+# (`IHO S-100 1.0.0 Part X (2024)`), never a year-keyed docidentifier —
+# year-keyed docidentifiers for edition-keyed products are wrong. The
+# continuously-updated series have ONE serial locator, the volume:
+# P-1 and P-6 are volume-keyed (`IHO P-1 Vol. 30 (1)`), and the
+# yearbook year IS a volume (`IHO P-5 Vol. 2020`) — the bare year
+# (`IHO P-5 2020`) and all year-faced forms are parse-only legacy
+# aliases that bind into the volume component, never rendered.
+#
+# Aliases: "Suppl" (canonical face Sup, the M-2 spelling — why abbreviate
+# by two letters when Annex and Appendix stay full-length), "App"/"Ap."
+# (canonical face Appendix), the hyphenated compact part face (S-5-B ==
+# S-5 Part B, S-100-1 == S-100 Part 1), the legacy glued lettered bases
+# (S-5A, parse-only), "S-100 v1..v5.1" (edition shorthand), "Issue N"
+# (canonical (N)), the bare year (canonical Vol. N).
+#
+# == URN segment grammar (positional, containment-ordered)
+#
+# The URN mirrors the containment tree, one semantic atom per segment:
+# Part contains Annexes; Annex contains Appendices; a D-2 subnumber is
+# a child atom of Appendix D. No key.value concatenations — every
+# non-number component is a marker-prefixed segment whose marker is the
+# lowercased human-face token (edition follows ISO's ed- precedent):
+#
+#   urn:iho:<type>:<number>[:ed-<x.y.z>][:year-<yyyy>]
+#     [:sup-<n>[:ed-<x.y.z>][:year-<yyyy>]]
+#     [:part-<X>[:ed-<x.y.z>][:year-<yyyy>]]
+#     [:annex-<A>[...]]
+#     [:appendix-<B>[:<sub>][...]]
+#     [:vol-<n>[:issue-<n>][...]]
+#     [:year-<yyyy>]
+#
+#   position  segment          value vocabulary            containment
+#   --------  ---------------  --------------------------  ------------------
+#   1         <type>           s / p / m / b / c           namespace root
+#   2         <number>         digits + : suffix; may      document code
+#                              span bare segments until
+#                              the first marker
+#   3         ed-<x.y.z>       dotted a.b.c                edition qualifier;
+#   4         year-<yyyy>      19xx/20xx                   ATTACHES TO THE
+#                                                      NODE IT FOLLOWS: the
+#                                                      base (no component
+#                                                      before it) or the
+#                                                      component whose
+#                                                      segment precedes
+#   5         sup-<n>          1*digit                     wraps the base
+#   6         part-<X>         letter (case kept),         contains annexes
+#                              digits [*letter], or a
+#                              series reference
+#                              [SPMBC]-<digits>
+#   7         annex-<A>        upper letter (case kept)    contains appendices
+#   8         appendix-<B>     upper letter or digits      contains subnumber
+#   9         <sub>            1*digit, BARE, only         child of appendix
+#                              directly after appendix-
+#   10        vol-<n>          1*digit (incl. yearbook     contains issue
+#                              years, Vol. 2020)
+#   11        issue-<n>        1*digit, only after vol-    child of volume
+#
+# The number occupies every leading bare segment up to the first
+# marker, so a colon number (S-158:100) round-trips without escaping;
+# after the markers the only bare segment allowed is the appendix
+# subnumber in its own slot. Both the year qualifier and the volume are
+# marker-tagged so neither can collide with a colon-number segment (the
+# #637 hazard, kept under the positional scheme). Letters are
+# case-preserved: part-A and part-a are distinct documents.
+#
+# Legacy 2.0.x spellings remain decodable but are never emitted: the
+# bare a.b.c segment (edition), the dotted keys part./annex./suppl./
+# ap./appendix./vol./issue. and the single-letter y. year tag (whose
+# value decodes into the volume — the serial-locator unification).
+#
+# Edition 2: ruby#400's capture-flatten keeps text captures over
+# reference-built rules as the matched text, so the v2 tree is the v1
+# tree plus named leaves for non-captured structure.
+
+grammar PubidIho version "0.2.0" edition 2 {
+  digit = %x30-39
+  upper = %x41-5A
+  lower = %x61-7A
+  letter = upper / lower
+  space = " "
+  dash = "-"
+  dot = "."
+
+  series = ("S" / "P" / "M" / "B" / "C") as type
+  number_suffix = (":" 1*digit)
+  number = (1*digit [number_suffix]) as number
+  # The compact part face, hyphenated onto the code: S-5-B (lettered),
+  # S-100-1 (numbered) and S-158-S-102 (series reference) — the dash
+  # replaces the old bare-glued suffix, so a number like S-1001 stays a
+  # whole number (the dash is what makes the part unambiguous). The
+  # dash is an inlined literal: a named dash ref here collides with the
+  # sequence's own dash node in the edition-2 tree.
+  compact_part = "-" ((("S" / "P" / "M" / "B" / "C") dash (1*digit)) / (1*digit [*letter]) / upper) as part
+  # LEGACY glued lettered bases (S-5A, S-5B, S-8A, S-8B in the corpus):
+  # parse-only aliases, never rendered. Kept because the records exist;
+  # the owner rules later whether to reject them.
+  glued = upper as part
+
+  # The official edition is the dotted x.y.z; "v1"/"v5.1" is the S-100
+  # shorthand (parse-only, the builder pads to x.y.0).
+  edition = space (1*digit dot 1*digit dot 1*digit) as edition
+  v_edition = space "v" ((1*digit) ["." (1*digit)]) as edition_shorthand
+  # The with-year qualifier on standards: a parenthesized year beside an
+  # edition. This is the ONLY base-level year capture — periodical
+  # years are volumes (the serial-locator unification).
+  year_qualifier = space "(" (("19" / "20") 2*digit) as year ")"
+
+  # The series-reference part value: a check standard applied to
+  # another IHO series (S-158 checks S-102). Ordered FIRST so "Part
+  # S-102" takes the series-reference branch, not the lone letter.
+  part_series_ref = (("S" / "P" / "M" / "B" / "C") dash (1*digit))
+  part_value = (part_series_ref / (1*digit [*letter]) / upper) as part
+
+  # Component-edition duality: each independently-publishable component
+  # may carry its own edition (+ year qualifier), mutually exclusive
+  # with the base edition context. The captures are position-scoped
+  # (<kind>_edition / <kind>_year) so the model knows which component
+  # the edition belongs to and the URN attaches ed- to the node it
+  # follows.
+  part = space "Part" space part_value [part_dated]
+  part_dated = {
+    part_edition_rule
+    [part_year_rule]
+  }
+  part_edition_rule = space (1*digit dot 1*digit dot 1*digit) as part_edition
+  part_year_rule = space "(" (("19" / "20") 2*digit) as part_year ")"
+
+  supplement = space ("Suppl" / "Sup") space (1*digit) as supplement [supplement_dated]
+  supplement_dated = {
+    supplement_edition_rule
+    [supplement_year_rule]
+  }
+  supplement_edition_rule = space (1*digit dot 1*digit dot 1*digit) as supplement_edition
+  supplement_year_rule = space "(" (("19" / "20") 2*digit) as supplement_year ")"
+
+  annex = space "Annex" space upper as annex [annex_dated]
+  annex_dated = {
+    annex_edition_rule
+    [annex_year_rule]
+  }
+  annex_edition_rule = space (1*digit dot 1*digit dot 1*digit) as annex_edition
+  annex_year_rule = space "(" (("19" / "20") 2*digit) as annex_year ")"
+
+  appendix_value = (upper / (1*digit)) as appendix
+  appendix_subnumber = dash (1*digit) as appendix_subnumber
+  appendix = space ("Appendix" / "App" / "Ap.") space appendix_value [appendix_subnumber] [appendix_dated]
+  appendix_dated = {
+    appendix_edition_rule
+    [appendix_year_rule]
+  }
+  appendix_edition_rule = space (1*digit dot 1*digit dot 1*digit) as appendix_edition
+  appendix_year_rule = space "(" (("19" / "20") 2*digit) as appendix_year ")"
+
+  volume = space "Vol." space (1*digit) as volume [volume_issue]
+  volume_issue = (space "Issue" space (1*digit) as issue) / (space "(" (1*digit) as issue ")")
+  # The volume's short face — the slash chain ("IHO P-1/21",
+  # "IHO P-5/2020"). The slash no longer joins the number.
+  volume_short = "/" ((1*digit) as volume) [volume_dated]
+  # LEGACY bare year ("IHO P-5 2024"): the yearbook year IS a volume,
+  # so a bare year binds INTO the volume component. Parse-only alias;
+  # the canonical print is "Vol. N".
+  volume_bare_year = space (("19" / "20") 2*digit) as volume
+  # The volume's own edition (+ year), shared by the Vol. and slash
+  # forms.
+  volume_dated = {
+    volume_edition_rule
+    [volume_year_rule]
+  }
+  volume_edition_rule = space (1*digit dot 1*digit dot 1*digit) as volume_edition
+  volume_year_rule = space "(" (("19" / "20") 2*digit) as volume_year ")"
+
+  # The edition slot accepts the dotted form or the v-shorthand; the
+  # with-year qualifier may sit right after it.
+  dated = {
+    (edition / v_edition)
+    [year_qualifier]
+  }
+
+  # The serial tail picks exactly one discriminator: the long volume
+  # (with its optional issue) or the legacy bare year — both bind the
+  # volume component, and both may carry the volume's own edition.
+  serial = {
+    (volume / volume_bare_year)
+    [volume_dated]
+  }
+
+  identifier = {
+    [("IHO" space)]
+    series
+    dash
+    number
+    [compact_part]
+    [glued]
+    [volume_short]
+    [dated]
+    [supplement]
+    [part]
+    [annex]
+    [appendix]
+    [serial]
+    [year_qualifier]
+  }
+
+  entry identifier: identifier
+
+  test {
+    accept "S-5"
+    accept "IHO S-5 Appendix 2"
+    accept "IHO B-12 3.0.0"
+    accept "IHO P-5 2024"
+    accept "P-5 2024"
+    accept "IHO P-5 Vol. 2024"
+    accept "IHO P-5/2024"
+    accept "IHO B-7 Vol. 2023"
+    accept "IHO P-1 Vol. 30"
+    accept "IHO P-1 Vol. 30 (2)"
+    accept "IHO P-1 Vol. 30 Issue 2"
+    accept "IHO P-1/21"
+    accept "IHO P-1/21 1.0.0"
+    accept "IHO S-100 5.0.0 Part 2"
+    accept "IHO S-98 1.0.0 Part A"
+    accept "IHO S-65 1.1.0 Annex A"
+    accept "IHO S-122 1.0.0 Appendix D-2"
+    accept "IHO S-52 4.0.0 Appendix 1"
+    accept "IHO M-2 Sup 1"
+    accept "IHO M-2 Suppl 6"
+    accept "IHO S-66 2.0.0 Sup 4"
+    accept "IHO S-5-B"
+    accept "IHO S-100-1"
+    accept "IHO S-100-1 1.0.0"
+    accept "IHO P-6-3 1.0.0"
+    accept "IHO S-5A"
+    accept "IHO S-5A 1.0.2"
+    accept "IHO S-5 1.0.2 Part A"
+    accept "IHO S-100 5.0.0 Part 2 (2024)"
+    accept "IHO S-100 v5.1"
+    accept "IHO S-100 v1"
+    accept "IHO S-100 1.0.0 (2024) Part A"
+    accept "IHO S-53 Ap. 1 1.0.0"
+    accept "IHO S-98 Part A 1.0.0"
+    accept "IHO S-158:100 1.0.0"
+    accept "IHO S-158:100 Part 2 1.0.0"
+    accept "IHO S-1001"
+    accept "IHO S-158 Part S-102 0.2.0"
+    accept "IHO S-158-S-102 0.2.0"
+    accept "IHO P-6 1.0.0 Vol. 2"
+    accept "IHO P-6 Vol. 2 1.0.1"
+    accept "IHO S-98 1.0.0 Annex A"
+    accept "IHO S-100 5.0.0 Sup 1 2.0.0"
+    reject "nonsense"
+    reject "IHO B-12 3.0"
+    reject "IHO P-5 1850"
+  }
+
+  bindings identifier {
+    type -> type (string)
+    number -> number (string)
+    part -> part (string)
+    part_edition -> part_edition (string)
+    part_year -> part_year (string)
+    annex -> annex (string)
+    annex_edition -> annex_edition (string)
+    annex_year -> annex_year (string)
+    appendix -> appendix (string)
+    appendix_subnumber -> appendix_subnumber (string)
+    appendix_edition -> appendix_edition (string)
+    appendix_year -> appendix_year (string)
+    supplement -> supplement (string)
+    supplement_edition -> supplement_edition (string)
+    supplement_year -> supplement_year (string)
+    edition -> edition (string)
+    edition_shorthand -> edition_shorthand (string)
+    year -> year (string)
+    volume -> volume (string)
+    volume_edition -> volume_edition (string)
+    volume_year -> volume_year (string)
+    issue -> issue (string)
+  }
+}
