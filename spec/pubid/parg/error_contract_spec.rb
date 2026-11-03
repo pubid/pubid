@@ -51,44 +51,53 @@ RSpec.describe Pubid::Parg do
     end
   end
 
-  describe "a binding failure surfacing through pubid" do
-    # The known live BindError repro (parsanol-ruby#427): the bsi grammar
-    # accepts the bundled form but its `part` capture reaches the bound map
-    # nowhere, and the engine raises PARG::BindError mid-bind.
-    subject(:error) do
-      Pubid::Bsi.parse("BS 9113 N001 to 004:1973")
-    rescue StandardError => e
-      e
-    end
-
-    it "raises Pubid::Errors::ParseError, not the engine's BindError" do
-      expect(error).to be_a(Pubid::Errors::ParseError)
-      expect(error).not_to be_a(Parsanol::PARG::BindError)
-    end
-
-    it "is caught by the marker, like every pubid failure" do
-      expect(error).to be_a(Pubid::Errors::Error)
-    end
-
-    it "chains the engine's BindError as the Ruby cause" do
-      expect(error.cause).to be_a(Parsanol::PARG::BindError)
-    end
-
-    it "carries the input and the flavor" do
-      expect(error.input).to eq("BS 9113 N001 to 004:1973")
-      expect(error.flavor).to eq("bsi")
-    end
+describe "an engine failure surfacing through pubid" do
+  # parsanol 1.3.129 (#435) fixed the last live BindError repro (the bsi
+  # bundled row, parsanol-ruby#427) — that input parses now, pinned below.
+  # The wrapping contract is exercised on an engine-failing input through
+  # the same choke points: whatever the engine raises (ParseFailed or any
+  # PARG::Error, BindError included), the caller sees a pubid error.
+  subject(:error) do
+    Pubid::Bsi.parse("BS 0ENotAGrammarForm")
+  rescue StandardError => e
+    e
   end
+
+  it "the formerly-broken bundled row parses (parsanol-ruby#427 fixed)" do
+    expect { Pubid::Bsi.parse("BS 9113 N001 to 004:1973") }
+      .not_to raise_error
+  end
+
+  it "raises Pubid::Errors::ParseError, not a parser-internal class" do
+    expect(error).to be_a(Pubid::Errors::ParseError)
+    expect(error).not_to be_a(Parsanol::ParseFailed)
+    expect(error).not_to be_a(Parsanol::PARG::Error)
+  end
+
+  it "is caught by the marker, like every pubid failure" do
+    expect(error).to be_a(Pubid::Errors::Error)
+  end
+
+  it "chains an engine error as the Ruby cause" do
+    expect(described_class::ENGINE_ERRORS.any? { |klass| error.cause.is_a?(klass) })
+      .to be(true)
+  end
+
+  it "carries the input and the flavor" do
+    expect(error.input).to eq("BS 0ENotAGrammarForm")
+    expect(error.flavor).to eq("bsi")
+  end
+end
 
   describe "Pubid.parse never leaks a parser-internal exception" do
     # Routing-level: a flavor whose engine raises a binding failure must
     # hand the caller a pubid error, whatever input triggered it.
-    it "surfaces the hostile bundled input inside the pubid hierarchy" do
-      expect { Pubid.parse("BS 9113 N001 to 004:1973") }
+    it "surfaces an engine-failing input inside the pubid hierarchy" do
+      expect { Pubid.parse("BS 0ENotAGrammarForm") }
         .to raise_error(Pubid::Errors::Error)
-      expect { Pubid.parse("BS 9113 N001 to 004:1973") }
+      expect { Pubid.parse("BS 0ENotAGrammarForm") }
         .not_to raise_error(Parsanol::ParseFailed)
-      expect { Pubid.parse("BS 9113 N001 to 004:1973") }
+      expect { Pubid.parse("BS 0ENotAGrammarForm") }
         .not_to raise_error(Parsanol::PARG::Error)
     end
 
