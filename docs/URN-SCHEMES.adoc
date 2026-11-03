@@ -1,0 +1,1437 @@
+= URN schemes: the pubid scheme and the official URN
+:toc:
+
+Design for issue #656. Every flavor has two URN forms.
+
+[cols="1,3,3",options="header"]
+|===
+| | pubid scheme | official URN
+
+| Method | `Identifier#to_pubid_urn` | `Identifier#to_urn`
+| Parse | `Pubid.parse_urn` (routes `urn:pubid:`), `Pubid.parse_pubid_urn` (accepts only this scheme) | `Pubid.parse_urn` (routes by namespace to the flavor `UrnParser`)
+| Namespace | `urn:pubid:<flavor>:` | the namespace of the organization (`urn:iso:std:`, `urn:ietf:rfc:` …)
+| Contract | always round-trips: `Pubid.parse_urn(id.to_pubid_urn).to_hash == id.to_hash`, corpus-wide; injective; path-safe | as faithful as the registered grammar allows; may be lossy
+| Use | relaton slug for HTTP paths, API and parsing (relaton/relaton#441) | outward-facing render form; never a slug source
+|===
+
+The pubid scheme is implemented once, in `lib/pubid/pubid_urn/`, and reads
+`#to_hash`. A flavor supplies only a schema (`lib/pubid/<flavor>/pubid_urn_schema.rb`)
+that names its type tokens, its positional core and its atoms. `#to_urn` is
+not changed by this design.
+
+== The pubid-scheme grammar
+
+----
+pubid-urn = "urn:pubid:" flavor ":" body
+body      = node *( ":" node ) [ ":f" 1*( ":" facet ) ]
+node      = type-token *( ":" core ) *( ":" atom )
+type-token= name / flavor "." name        ; qualified when the node is of another flavor
+core      = value / "~"                   ; "~" = absent, only before a present core value
+atom      = name "-" atom-value
+atom-value= value / list / nested / nested *( "," nested )
+list      = item *( "," item )            ; item = value / "~" (an empty item is "")
+nested    = "(" flavor ":" body ")"
+facet     = node-index "." name "-" ( value / list )
+name      = %x61-7A *( %x61-7A / DIGIT )   ; a lower-case letter, then letters and digits
+value     = *( ALPHA / DIGIT / "." / "_" / "-" / escape )
+escape    = "~" 2HEXDIG-UPPER              ; one UTF-8 byte
+----
+
+Example: `ISO/IEC 13818-1:2015/Amd 3:2016` is
+`urn:pubid:iso:is:13818:co-IEC:part-1:year-2015:amd:3:co-IEC:year-2016`.
+
+=== Rules
+
+Flavor:: The flavor segment of `_type` (`iso`, `cencenelec`, `3gpp`), so a
+URN routes with `Pubid::TypeResolver` and needs no second table. The URN uses
+the flavor of the identifier itself (the leaf); a node of another flavor
+(for example the CEN layer of a BSI adoption) has a qualified token
+(`cencenelec.aen`).
+
+Nodes go root first:: A supplement (`amd`, `cor` …) is a node after the
+node that it modifies, along `base`. So all supplements of a document share
+the slug prefix of that document, and the chain is hierarchical.
+
+Positional core:: A value that a type always has (normally the document
+number) is a bare positional segment. The schema fixes the order of the core,
+so the code layout cannot move it.
+
+Prefixed atoms:: A value that can be absent is an atom `<prefix>-<value>`,
+found by its prefix and not by its position. An absent atom leaves no
+segment. The atoms of a type have one canonical order, declared in the
+schema; the parser refuses an atom out of that order, a repeated atom and an
+unknown atom.
+
+No empty segment:: An absent value never leaves `::`. In a slug, `::`
+becomes `//`, which servers and proxies collapse. An absent core value in the
+middle of the core is `~`; absent core values at the end are dropped.
+
+Escape:: Every byte outside `[A-Za-z0-9._-]` is `~XX` (upper-case hex).
+`%` is not used, because servers decode `%2F` before they route, or refuse
+it. So `:`, `,`, `(`, `)`, `/` and `~` never occur raw in a value.
+
+Structure by shape:: A core value that has the *shape* of structure gets its
+first character escaped: a lower-case letter first and then letters and
+digits up to the end or up to a `-` (a type token, `f`, an atom), or
+`<name>.<name>` with a letter in each part (a token of another flavor). So the
+number `amd` is `~61md` and `iec.is` is `~69ec.is`, while `9001`, `802.11`,
+`800-53` and `G.711` stay as they are. The rule reads the shape only, never
+the schemas that exist, so a published URN keeps its meaning when a flavor,
+a type token or an atom is added later. That is also why every type token,
+atom prefix and facet name starts with a lower-case letter.
+
+Canonical form:: Exactly one string for each identifier. The parser decodes,
+rebuilds the identifier, encodes it again and refuses the input when the two
+strings differ (a needless escape, an atom out of order, a trailing `~`).
+
+Facets:: A value that records only a spelling (`original_code` "E" for
+"en", `edition.original_text` "Ed 13") goes in the trailing `f` group, as
+`<node-index>.<name>-<value>`. The full URN keeps facets, so the round trip
+holds. A consumer can cut the `f` group off a slug, but then the slug no
+longer round-trips (see <<open>>).
+
+Nested identifiers:: A nested identifier that is not the `base` chain (an
+adoption's `adopted`, an all-parts or consolidated `identifiers` list, a
+bundle's `supplements`) is an atom whose value is a bracketed body,
+`ids-(iso:is:9001)`.
+
+Reserved tokens:: `f` (the facet group) and `type`
+(`Pubid::IdentifierMetadata` already uses `urn:pubid:<flavor>:type:<key>` to
+name a type, not a document; the parser refuses it).
+
+Length:: An escape takes up to 9 characters for one CJK character, so the
+1000-character limit of a printed identifier is too small for its URN. The
+limit is `Pubid::PubidUrn::MAX_LENGTH` (16,000) on both sides: `#to_pubid_urn`
+does not emit, and `Pubid.parse_urn` does not read, a longer URN. The
+parser is linear-time, so the limit is a guard on size, not a ReDoS barrier.
+
+Strict failures:: A malformed, unknown or non-canonical URN raises
+`Pubid::Errors::UrnParseError`, also when its values decode but cannot be
+cast into the identifier (the original error is the cause). `#to_pubid_urn` raises
+`Pubid::Errors::InvalidInputError` when the flavor has no schema yet, and
+when the schema does not place a value of `#to_hash` — a schema gap is loud,
+never a silent drop.
+
+=== The slug
+
+The slug is the URN without `urn:pubid:`, with `:` replaced by `/`:
+`iso/is/9001/year-2015/amd/1/year-2016`. The mapping is reversible, because
+no value contains a raw `:` or `/`. A `/` inside brackets (a nested body) is
+reversed in the same way.
+
+=== Why per-flavor schemas and not a generic dump of `to_hash`
+
+A generic `key-value` dump of `#to_hash` would round-trip with no schema, but
+it is not positional, and it makes the URN depend on the attribute names of
+the code. Issue #656 asks for a positional scheme derived from the ISO
+grammar. The codec is shared; only the schema is per flavor. Every schema
+draws its prefixes from one vocabulary, so the same concept has the same
+atom in every flavor:
+
+[cols="1,1",options="header"]
+|===
+| prefix | value
+| `pub` / `co` | publisher / copublishers
+| `series`, `subseries`, `sector` | series of the document
+| `part`, `subpart`, `section`, `vol`, `issue` | sub-numbers, each its own atom
+| `year`, `month`, `day` | publication date
+| `ed`, `v`, `rev`, `upd`, `reaff` | edition, version, revision, update, reaffirmation
+| `stage`, `iter` | stage and its iteration
+| `sup`, `appendix`, `annex` | component families
+| `lang` | languages
+| `ids`, `sups`, `adopted` | nested identifiers
+|===
+
+[[open]]
+== Open decisions for the owner
+
+. *Facets in the slug.* The full URN must round-trip, so it keeps facets.
+  If relaton wants one slug for each document (and not for each spelling),
+  it cuts the `f` group, and the slug then does not round-trip. Decide which
+  of the two the slug is.
+. *Pubid-invented official URNs.* Only 14 flavors have an official namespace
+  (below). The other flavors emit a `urn:<org>:…` form today that no
+  organization registered. Keep it as legacy `#to_urn` with no round-trip
+  promise, deprecate it, or make it round-trip as well.
+. *The `pubid` NID.* `urn:pubid:` is not in the IANA registry. RFC 8141 asks
+  for a formal or informal registration before public use.
+. *Wire-format lock.* When the first slugs are published, the contract spec
+  needs a stored snapshot of the URNs, so that a schema change that moves a
+  published slug fails until a person approves it.
+
+== Wave order
+
+From issue #656, hard first. A flavor lands with its schema, its corpus row
+in `spec/pubid/pubid_urn_contract_spec.rb` (removed from `PENDING`) and its
+section here moved from "proposed" to "landed".
+
+. iso (*landed*), ieee, itu, nist, astm
+. ashrae, asme, gost, oiml, api, plateau, jcgm, etsi
+. ansi, cen_cenelec, cie
+. bsi, csa, idf, sae
+. doi, gb, isbn, omg, un
+. the remaining flavors (most already round-trip their `to_urn`): 3gpp, adobe, amca, bipm,
+  calconnect, ccsds, easc, ecma, evs, iala, iana, iec, ietf, iho, jis, oasis,
+  ogc, w3c, xsf
+
+== Side-findings of the audit
+
+Measured on `main` @ f404a7ca with the pinned engine (parsanol 1.3.122).
+
+* `to_urn` raises for BIPM `Identifiers::Guide` (`Cannot build URN`), CSA
+  (`undefined method 'publisher_prefix'`, 292 of 400 sampled ids), CCSDS
+  translations (`undefined method 'code' for String`) and ETSI
+  (`Integer("08")` on a month — the octal-literal hazard of `Integer()`).
+* ISO `to_urn` drops the year (`ISO 4507:2007` → `urn:iso:std:iso:4507`):
+  the RFC 5141 grammar carries no year, so the official form is lossy by
+  design. This is the case that the pubid scheme exists for.
+* IEC `to_urn` emits trailing empty segments (`…:2020:::`) for 74 of 400
+  sampled ids.
+* Under parsanol 1.3.127 (newer than the pin), every OIML parse raises
+  `Parsanol::PARG::BindError` (`capture "doc_number" … bound nowhere`), and
+  CIE parses 99 more ids than under 1.3.122. Re-check both before the next
+  engine bump.
+* `to_hash` serializes the internals of a component (stage registry data,
+  typed-stage names) for some flavors, marked "Finding" below. Reduce those
+  to the identifying value before their schema lands, or the URN carries
+  registry data.
+* adobe and sae have no pass fixtures, so their contract row has no corpus.
+
+== Flavors
+
+Each section gives the official namespace, the state of the current
+`#to_urn` (≤400 sampled pass ids: round-trip by `to_hash`, reshape, no
+re-parse, raise, empty, collisions), and the pubid-scheme schema.
+
+=== Landed
+
+[[urn-iso]]
+==== iso
+
+Namespace: `urn:pubid:iso:`. Schema: `lib/pubid/iso/pubid_urn_schema.rb`.
+
+Official URN: `urn:iso:std:…`, IANA-registered, RFC 5141. Current `to_urn`:
+400 ids, 72 round-trip, 326 reshape, 2 do not re-parse, 8 colliding URNs.
+
+pubid scheme: all 7,647 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give no collision.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:iso:international-standard` | `is`
+| `pubid:iso:technical-report` | `tr`
+| `pubid:iso:technical-specification` | `ts`
+| `pubid:iso:guide` | `guide`
+| `pubid:iso:pas` | `pas`
+| `pubid:iso:recommendation` | `r`
+| `pubid:iso:international-standardized-profile` | `isp`
+| `pubid:iso:international-workshop-agreement` | `iwa`
+| `pubid:iso:technology-trends-assessments` | `tta`
+| `pubid:iso:data` | `data`
+| `pubid:iso:tc-document` | `tcdoc`
+| `pubid:iso:directives` | `dir`
+| `pubid:iso:directives-supplement` | `dirsup`
+| `pubid:iso:amendment` | `amd`
+| `pubid:iso:corrigendum` | `cor`
+| `pubid:iso:addendum` | `add`
+| `pubid:iso:extract` | `ext`
+| `pubid:iso:supplement` | `sup`
+| `pubid:iso:all-parts` | `all`
+| `pubid:iso:bundled-identifier` | `bundle`
+|===
+
+Core: `number`. Atoms, canonical order: `pub-`, `co-` (list), `part-`,
+`subpart-`, `year-`, `month-`, `day-`, `undated-` (bool), `ed-`
+(`edition.number`), `stage-`, `iter-` (`stage_iteration`), `v-`
+(`supplement_version`), `lang-` (`languages.*.code`, list), `loc-`;
+`tcdoc` adds `tctype-`, `tc-`, `sctype-`, `sc-`, `wgtype-`, `wg-`; `dir`
+adds `subgroup-`; `all` adds `ids-(…)`; `bundle` adds `sups-(…)`. Facets:
+`langsrc` (`languages.*.original_code`), `edsrc` (`edition.original_text`).
+
+----
+ISO 9001                            urn:pubid:iso:is:9001
+ISO/IEC/IEEE 8802-3:2021            urn:pubid:iso:is:8802:co-IEC,IEEE:part-3:year-2021
+ISO/DIS 9001                        urn:pubid:iso:is:9001:stage-dis
+ISO 9001:2015(E)                    urn:pubid:iso:is:9001:year-2015:lang-en:f:0.langsrc-E
+ISO 9001:2015/Amd 1:2016/Cor 1:2017 urn:pubid:iso:is:9001:year-2015:amd:1:year-2016:cor:1:year-2017
+ISO 9001 (all parts)                urn:pubid:iso:all:ids-(iso:is:9001)
+----
+
+=== Proposed
+
+Drafted from the `_type`s of each flavor and the `to_hash` keys observed over
+its pass corpus (`ids` = how many identifiers of that type the corpus holds,
+nested ones included). Tokens and prefixes are a proposal: they are fixed
+when the flavor lands, against the vocabulary above. "core: number" means
+that the type carries a `number`; an atom that always occurs can move into
+the core when the flavor lands.
+
+[[urn-3gpp]]
+==== 3gpp
+
+Namespace: `urn:pubid:3gpp:` (the `_type` flavor segment).
+
+Official URN: `urn:3gpp:…`, IANA-registered, RFC 5279.
+
+Current `to_urn`: not audited (no fixture directory under the registry name).
+
+Corpus: 32 of 32 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:3gpp:identifier` | `id` | number | 0 | —
+| `pubid:3gpp:technical-report` | `tr` | number | 12 | `TR 01.00:REL-96/5.0.0`
+| `pubid:3gpp:technical-specification` | `ts` | number | 20 | `TS 01.01:REL-96/5.0.0`
+|===
+
+Atoms, canonical order: `part-` (`parts`, list), `v-` (`version`), `release-` (`release`), `suffix-` (`suffix`).
+
+[[urn-adobe]]
+==== adobe
+
+Namespace: `urn:pubid:adobe:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:adobe:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn`: not audited (no fixture directory under the registry name).
+
+Corpus: 0 of 0 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:adobe:publication` | `pub` | — | 0 | —
+| `pubid:adobe:tech-note` | `technote` | number | 0 | —
+|===
+
+[[urn-amca]]
+==== amca
+
+Namespace: `urn:pubid:amca:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:amca:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 46 ids, 46 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 46 of 46 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:amca:identifier` | `id` | number | 0 | —
+| `pubid:amca:interpretation` | `interp` | number | 7 | `AMCA 99 JW Interp`
+| `pubid:amca:publication` | `pub` | number | 8 | `AMCA Publication 211-22 (Rev. 01-23)`
+| `pubid:amca:standard` | `std` | number | 31 | `ANSI/AMCA 210-16 /ASHRAE 51-16`
+|===
+
+Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `rev-` (`revision`), `interpretationcode-` (`interpretation_code`), `reaffirmed-` (`reaffirmed`).
+
+[[urn-ansi]]
+==== ansi
+
+Namespace: `urn:pubid:ansi:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:ansi:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 175 ids, 0 round-trip, 0 reshape, 175 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 175 of 175 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ansi:american-national-standard` | `ans` | number | 0 | —
+| `pubid:ansi:identifier` | `id` | number | 0 | —
+| `pubid:ansi:standard` | `std` | number | 175 | `ANSI 802.3-2012`
+|===
+
+Atoms, canonical order: `pubbody-` (`publisher.body`), `cobody-` (`copublishers.*.body`, list), `part-` (`part`), `year-` (`year`).
+
+[[urn-api]]
+==== api
+
+Namespace: `urn:pubid:api:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:api:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 193 ids, 40 round-trip, 153 reshape, 0 do not re-parse, 0 raise, 0 empty, 11 colliding URNs.
+
+Corpus: 193 of 193 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:api:base` | `base` | number | 0 | —
+| `pubid:api:bulletin` | `bulletin` | number | 5 | `API BULL 11L2`
+| `pubid:api:continuous-operations-standard` | `cos` | number | 3 | `API COS 1-08`
+| `pubid:api:identifier` | `id` | number | 0 | —
+| `pubid:api:mpms` | `mpms` | number | 30 | `API MPMP CH 10.10`
+| `pubid:api:publication` | `pub` | number | 10 | `API PUBL 1628B`
+| `pubid:api:recommended-practice` | `rp` | number | 56 | `API RP 1637`
+| `pubid:api:specification` | `spec` | number | 22 | `API SPEC 11P`
+| `pubid:api:standard` | `std` | number | 40 | `API STD 1104`
+| `pubid:api:technical-report` | `tr` | number | 19 | `API TR 21C`
+| `pubid:api:typeless-standard` | `ts` | number | 8 | `API 1509`
+|===
+
+Atoms, canonical order: `part-` (`part`), `section-` (`section`), `subsection-` (`subsection`).
+
+[[urn-ashrae]]
+==== ashrae
+
+Namespace: `urn:pubid:ashrae:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:ashrae:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 42 round-trip, 352 reshape, 6 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 2103 of 2103 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ashrae:addenda-package` | `ap` | number | 25 | `ASHRAE Standard 15-2007 Addenda Supplement Package (Contains Addenda a, b, c, d, and e)`
+| `pubid:ashrae:addendum` | `add` | number | 1320 | `ASHRAE Addendum a to Guideline 1.4-2019`
+| `pubid:ashrae:combined-addenda` | `ca` | number | 93 | `ASHRAE Guideline 0: Addenda a, b, c, d`
+| `pubid:ashrae:errata` | `err` | number | 160 | `ASHRAE Guideline 0-2005 Errata (September 28, 2011) (PDF)`
+| `pubid:ashrae:guideline` | `g` | number | 159 | `ASHRAE Guideline 14-2023 (May 10, 2024)`
+| `pubid:ashrae:identifier` | `id` | number | 0 | —
+| `pubid:ashrae:interpretation` | `interp` | number | 51 | `Interpretations for Standard 15.2-2022`
+| `pubid:ashrae:standard` | `std` | number | 1944 | `ANSI/ASHRAE Standard 103-2007 (May 10, 2022) (PDF)`
+|===
+
+Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `dateday-` (`date.day`), `datemonth-` (`date.month`), `dateyear-` (`date.year`), `addendumcode-` (`addendum_code`), `addendumcodes-` (`addendum_codes`), `packagedescription-` (`package_description`), `reaffirmed-` (`reaffirmed`), `suffix-` (`suffix`).
+
+Finding: `to_hash` serializes the internals of a component (`date`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
+
+[[urn-asme]]
+==== asme
+
+Namespace: `urn:pubid:asme:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:asme:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 381 round-trip, 5 reshape, 14 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 731 of 731 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:asme:base` | `base` | number | 0 | —
+| `pubid:asme:identifier` | `id` | number | 0 | —
+| `pubid:asme:standard` | `std` | number | 731 | `ASME B18.3-20XX [Draft Proposed Revision of ASME B18.3-2012 (R2017)]`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `year-` (`year`), `lang-` (`language`), `csanumber-` (`csa_number`), `draftyear-` (`draft_year`), `firstcode-` (`first_code`), `firstpublisher-` (`first_publisher`), `handbook-` (`handbook`, bool), `jointpublisher-` (`joint_publisher`), `parentheticalrevision-` (`parenthetical_revision`), `ptcsuffix-` (`ptc_suffix`), `revisionnote-` (`revision_note`), `secondpublisher-` (`second_publisher`).
+
+[[urn-astm]]
+==== astm
+
+Namespace: `urn:pubid:astm:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:astm:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 245 ids, 25 round-trip, 153 reshape, 67 do not re-parse, 0 raise, 0 empty, 31 colliding URNs.
+
+Corpus: 245 of 248 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:astm:adjunct` | `adjunct` | number | 1 | `ASTM ADJF3504-EA`
+| `pubid:astm:base` | `base` | number | 0 | —
+| `pubid:astm:data-series` | `ds` | number | 33 | `ASTM DS4B-EB`
+| `pubid:astm:identifier` | `id` | number | 0 | —
+| `pubid:astm:iso-dual-published` | `idp` | number | 5 | `ASTM 52303-24e1`
+| `pubid:astm:manual` | `manual` | number | 74 | `ASTM MNL1-9TH-EB`
+| `pubid:astm:monograph` | `m` | number | 11 | `ASTM MONO1-EB`
+| `pubid:astm:research-report` | `rr` | number | 59 | `ASTM RR:A01-1001`
+| `pubid:astm:standard` | `std` | number | 47 | `ASTM E2938-15(2023)`
+| `pubid:astm:technical-report` | `tr` | number | 12 | `ISO/ASTMTR52916-EB # or parse using ISO: ISO/ASTM TR 52916`
+| `pubid:astm:work-in-progress` | `wip` | number | 3 | `ASTM WK91249`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `subseries-` (`subseries`), `year-` (`year`), `ed-` (`edition`), `sup-` (`supplement`, bool), `committee-` (`committee`), `dualm-` (`dual_m`, bool), `easuffix-` (`ea_suffix`, bool), `formatsuffix-` (`format_suffix`), `holsuffix-` (`hol_suffix`, bool), `letter-` (`letter`), `reapproval-` (`reapproval`), `suffix-` (`suffix`), `tpdesignation-` (`tp_designation`).
+
+[[urn-bipm]]
+==== bipm
+
+Namespace: `urn:pubid:bipm:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:bipm:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 90 ids, 33 round-trip, 21 reshape, 0 do not re-parse, 36 raise, 0 empty, 10 colliding URNs.
+
+Corpus: 90 of 90 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:bipm:committee-document` | `cd` | number | 26 | `CCTF REC 2 (2012)`
+| `pubid:bipm:guide` | `guide` | number | 12 | `CCL-GD-MeP-1`
+| `pubid:bipm:identifier` | `id` | number | 0 | —
+| `pubid:bipm:meeting` | `meeting` | number | 14 | `CCAUV 1st Meeting (1999)`
+| `pubid:bipm:mep` | `mep` | number | 24 | `SI MEP A1`
+| `pubid:bipm:metrologia-article` | `ma` | number | 9 | `Metrologia 1`
+| `pubid:bipm:si-brochure` | `sb` | number | 5 | `BIPM SI Brochure 9e v3.01 (2019/2024, E)`
+|===
+
+Atoms, canonical order: `part-` (`part`), `issue-` (`issue`), `year-` (`year`, int), `ed-` (`edition`), `v-` (`version`), `appendix-` (`appendix`), `annex-` (`annex`), `lang-` (`language`), `article-` (`article`), `form-` (`form`), `group-` (`group`), `guidekind-` (`guide_kind`), `mepcode-` (`mep_code`), `reportcode-` (`report_code`), `typecode-` (`type_code`), `variant-` (`variant`), `years-` (`years`).
+
+[[urn-bsi]]
+==== bsi
+
+Namespace: `urn:pubid:bsi:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:bsi:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 34 round-trip, 84 reshape, 282 do not re-parse, 0 raise, 0 empty, 6 colliding URNs.
+
+Corpus: 1499 of 1501 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:bsi:addendum-document` | `ad` | number | 22 | `BS 1902-2.3:Addendum No. 1:1976`
+| `pubid:bsi:adopted-european-norm` | `aen` | number | 448 | `BS HD 60269-3`
+| `pubid:bsi:adopted-international-standard` | `ais` | number | 95 | `BS IEC 60747-8:2000`
+| `pubid:bsi:aerospace-standard` | `as` | number | 366 | `BS A 109:2024`
+| `pubid:bsi:amendment` | `amd` | number | 114 | —
+| `pubid:bsi:british-industrial-practice` | `bip` | number | 0 | —
+| `pubid:bsi:british-standard` | `bs` | number | 411 | `BS 1501-2 Addendum No. 1:1973`
+| `pubid:bsi:bundled-identifier` | `bundle` | number | 25 | `BS 2SP 68 to BS 2SP 71:1973`
+| `pubid:bsi:committee-document` | `cd` | number | 6 | `14/30300822 DC`
+| `pubid:bsi:consolidated-identifier` | `consol` | number | 106 | `BS A 242-A 245:1974+A1:2017`
+| `pubid:bsi:corrigendum` | `cor` | number | 0 | —
+| `pubid:bsi:detailed-specification` | `ds` | number | 16 | `BS 9074 N002:1974`
+| `pubid:bsi:disc` | `disc` | number | 9 | `DISC PD 2000-2:1997`
+| `pubid:bsi:draft-document` | `dd` | number | 13 | `DD 13:1974`
+| `pubid:bsi:electronic-book` | `eb` | number | 0 | —
+| `pubid:bsi:expert-commentary` | `ec` | number | 25 | `BS EN ISO 13485 Expert Commentary`
+| `pubid:bsi:explanatory-supplement` | `es` | number | 1 | `BS 5655-1:Explanatory Supplement:1981`
+| `pubid:bsi:flex` | `flex` | number | 23 | `BSI Flex 1886 v2.0:2024-09`
+| `pubid:bsi:handbook` | `hb` | number | 0 | —
+| `pubid:bsi:identifier` | `id` | number | 59 | —
+| `pubid:bsi:index` | `index` | number | 13 | `BS 5000:Index:1981`
+| `pubid:bsi:method` | `method` | number | 14 | `BS 2782-1:Method 131B:1983`
+| `pubid:bsi:national-annex` | `na` | number | 18 | `NA to BS EN 1999-1-1:2007+A1:2009`
+| `pubid:bsi:practice-guide` | `pg` | number | 0 | —
+| `pubid:bsi:publicly-available-specification` | `pas` | number | 58 | `PAS 003:1994`
+| `pubid:bsi:published-document` | `pd` | number | 84 | `PD 0017:2001`
+| `pubid:bsi:section` | `section` | number | 11 | `DD 51:Section 0:1977`
+| `pubid:bsi:set` | `set` | number | 1 | `BS ISO 20400 + BS ISO 44001+BS ISO 44002`
+| `pubid:bsi:standalone-amendment` | `sa` | number | 4 | `AMD 11015`
+| `pubid:bsi:supplement-document` | `sd` | number | 18 | `BS 1000[9]:Supplement No. 1:1972`
+| `pubid:bsi:supplementary-index` | `si` | number | 1 | `BS 185 Supplementary Index:1965`
+| `pubid:bsi:technical-specification` | `ts` | number | 3 | `TS 3:1993`
+| `pubid:bsi:test-method` | `tm` | number | 6 | `BS 1006:B01C:LFS1:1982`
+| `pubid:bsi:value-added-publication` | `vap` | number | 6 | `PP 7722:2006 BOOK`
+|===
+
+Atoms, canonical order: `pubbody-` (`publisher.body`), `typeabbr-` (`type.abbr`), `typename-` (`type.name`), `typetypecode-` (`type.type_code`), `part-` (`part`), `year-` (`year`), `month-` (`month`, int), `ed-` (`edition`), `stageabbr-` (`stage.abbr`), `stageharmonizedstages-` (`stage.harmonized_stages`), `stagename-` (`stage.name`), `stagestagecode-` (`stage.stage_code`), `addendumnumber-` (`addendum_number`), `addendumyear-` (`addendum_year`, int), `amdsuffixform-` (`amd_suffix_form`, bool), `bundletype-` (`bundle_type`), `commonyearyear-` (`common_year.year`), `explicitpublisher-` (`explicit_publisher`, bool), `format-` (`format`), `isplural-` (`is_plural`, bool), `issuenumber-` (`issue_number`), `iteration-` (`iteration`), `methodand-` (`method_and`), `methodcode-` (`method_code`), `methodto-` (`method_to`), `prefix-` (`prefix`), `secondnumber-` (`second_number.value`), `sectionid-` (`section_id`), `separators-` (`separators`, list), `speccode-` (`spec_code.value`), `supplementnumber-` (`supplement_number`), `supplementyear-` (`supplement_year`, int), `testid-` (`test_id`), `testseries-` (`test_series`), `topic-` (`topic`), `translationlang-` (`translation_lang`), `typedstageabbr-` (`typed_stage.abbr`), `typedstage-` (`typed_stage.code`), `typedstageharmonizedstages-` (`typed_stage.harmonized_stages`), `typedstagename-` (`typed_stage.name`), `typedstagestagecode-` (`typed_stage.stage_code`), `typedstagetypecode-` (`typed_stage.type_code`).
+
+Nested identifiers: `ids-(…)` (`identifiers`, ids), `nasupplements-(…)` (`na_supplements`, ids).
+
+Facet candidates (spelling-only): `separator`, `flex_prefix`, `explicit_prefix`, `index_format`, `section_format`, `reverse_format`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `cencenelec`, `iec`, `iso`.
+
+Finding: `to_hash` serializes the internals of a component (`type`, `stage`, `typed_stage`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
+
+[[urn-calconnect]]
+==== calconnect
+
+Namespace: `urn:pubid:calconnect:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:calconnect:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 189 ids, 187 round-trip, 0 reshape, 2 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 189 of 189 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:calconnect:identifier` | `id` | number | 0 | —
+| `pubid:calconnect:standard` | `std` | number | 189 | `CC 11001:2024`
+|===
+
+Atoms, canonical order: `series-` (`series`), `year-` (`year`), `month-` (`month`), `day-` (`day`).
+
+[[urn-ccsds]]
+==== ccsds
+
+Namespace: `urn:pubid:ccsds:` (the `_type` flavor segment).
+
+Official URN: `urn:ccsds:…`, IANA-registered, RFC 7738.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 365 round-trip, 0 reshape, 33 do not re-parse, 2 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 490 of 490 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ccsds:base` | `base` | number | 490 | `CCSDS 100.0-G-1-S`
+| `pubid:ccsds:corrigendum` | `cor` | number | 41 | `CCSDS 121.0-B-1-S Cor. 1`
+| `pubid:ccsds:identifier` | `id` | number | 0 | —
+|===
+
+Atoms, canonical order: `type-` (`type`), `part-` (`part`), `ed-` (`edition`), `lang-` (`language`), `suffix-` (`suffix`).
+
+[[urn-cen_cenelec]]
+==== cen_cenelec
+
+Namespace: `urn:pubid:cencenelec:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:cen_cenelec:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 192 ids, 89 round-trip, 69 reshape, 34 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 192 of 192 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:cencenelec:adopted-european-norm` | `aen` | number | 26 | `EN ISO 14090:2019`
+| `pubid:cencenelec:amendment` | `amd` | number | 33 | `EN 60335-1:2012/A1`
+| `pubid:cencenelec:base` | `base` | number | 0 | —
+| `pubid:cencenelec:cen-report` | `cr` | number | 22 | `CR 13933:2000`
+| `pubid:cencenelec:cen-workshop-agreement` | `cwa` | number | 1 | `CWA 14050-21:2000`
+| `pubid:cencenelec:cenelec-harmonization-document` | `chd` | number | 0 | —
+| `pubid:cencenelec:consolidated-identifier` | `consol` | number | 18 | `EN 196-3:2005+A1:2008`
+| `pubid:cencenelec:corrigendum` | `cor` | number | 19 | `EN 60335-1:2012/AC:2014`
+| `pubid:cencenelec:european-norm` | `en` | number | 105 | `EN 302 326-2 V2.2.1:2026`
+| `pubid:cencenelec:european-prestandard` | `ep` | number | 7 | `ENV 50166`
+| `pubid:cencenelec:european-specification` | `es` | number | 2 | `ES 59008-6-1:1999`
+| `pubid:cencenelec:fragment` | `fragment` | number | 1 | `EN 60038 AMD1 FRAG2`
+| `pubid:cencenelec:guide` | `guide` | number | 11 | `CLC GUIDE 1`
+| `pubid:cencenelec:harmonization-document` | `hd` | number | 7 | `HD 60269-3`
+| `pubid:cencenelec:identifier` | `id` | number | 0 | —
+| `pubid:cencenelec:technical-report` | `tr` | number | 7 | `CEN/CLC/ETSI/TR 101551:2026`
+| `pubid:cencenelec:technical-specification` | `ts` | number | 4 | `CEN/CLC/TS 17880:2022`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `part-` (`part`), `year-` (`year`), `month-` (`month`), `v-` (`version`), `stage-` (`stage`).
+
+Nested identifiers: `adopted-(…)` (`adopted`, id), `ids-(…)` (`identifiers`, ids).
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iec`, `iso`.
+
+[[urn-cie]]
+==== cie
+
+Namespace: `urn:pubid:cie:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:cie:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 264 ids, 126 round-trip, 68 reshape, 70 do not re-parse, 0 raise, 0 empty, 13 colliding URNs.
+
+Corpus: 264 of 363 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:cie:bundle` | `bundle` | number | 1 | `CIE 198-SP1.1:2011,198-SP1.2:2011,198-SP1.3:2011,198-SP1.4:2011`
+| `pubid:cie:conference` | `c` | number | 45 | `CIE x005-1992`
+| `pubid:cie:corrigendum` | `cor` | number | 2 | `CIE 198-SP1.4:2011/Cor1:2013`
+| `pubid:cie:dual-published` | `dp` | number | 1 | `CIE S 009:2002/IEC 62471:2006`
+| `pubid:cie:identical` | `i` | number | 16 | `CIE S 006.1/1998 (ISO 16508:1999)`
+| `pubid:cie:identifier` | `id` | number | 0 | —
+| `pubid:cie:joint-published` | `jp` | number | 23 | `CIE ISO 10916:2024`
+| `pubid:cie:proceedings` | `p` | number | 11 | `CIE x043-OP01`
+| `pubid:cie:standard` | `std` | number | 167 | `CIE S 004/E-2001`
+| `pubid:cie:supplement` | `sup` | number | 8 | `CIE 121-SP1:2009`
+| `pubid:cie:tutorial-bundle` | `tb` | number | 1 | `CIE Tutorials Bundle 1`
+|===
+
+Atoms, canonical order: `co-` (`copublisher`), `part-` (`part`), `year-` (`year`), `stage-` (`stage`), `lang-` (`language.code`), `langformat-` (`language.format`), `amendmentnumber-` (`amendment_number`), `conference-` (`conference`), `doctype-` (`doc_type`), `iecidentifier-` (`iec_identifier`), `isoreference-` (`iso_reference`), `iteration-` (`iteration`), `page-` (`page`), `style-` (`style`), `variant-` (`variant`).
+
+Nested identifiers: `ids-(…)` (`ids`, ids).
+
+Facet candidates (spelling-only): `s_prefix`, `part_separator`, `d_prefix`.
+
+[[urn-csa]]
+==== csa
+
+Namespace: `urn:pubid:csa:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:csa:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 9 round-trip, 77 reshape, 22 do not re-parse, 292 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 829 of 829 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:csa:amendment` | `amd` | number | 0 | —
+| `pubid:csa:base` | `base` | number | 0 | —
+| `pubid:csa:bundled` | `bundled` | number | 5 | `CAN/CSA-C22.2 NO. 60601-1-6:11 + A1:15 + A2:21 (R2021) (CONSOLIDATED)`
+| `pubid:csa:canadian-adopted` | `ca` | number | 475 | `CAN/CSA-A123.2-03 (R2023)`
+| `pubid:csa:cec` | `cec` | number | 155 | `CSA C22.2 NO. 286:23`
+| `pubid:csa:combined` | `combined` | number | 34 | `CSA A23.1:24/CSA A23.2:24`
+| `pubid:csa:csa-adopted` | `ca2` | number | 323 | `CSA ISO/IEC 8824-1:22`
+| `pubid:csa:identifier` | `id` | number | 0 | —
+| `pubid:csa:package` | `package` | number | 12 | `CSA B149.1:25 Code, Handbook & Training Package`
+| `pubid:csa:series` | `series` | number | 15 | `CSA Z240 MH SERIES:16 (R2025)`
+| `pubid:csa:standard` | `std` | number | 378 | `CSA B149.1:F20`
+|===
+
+Atoms, canonical order: `series-` (`series`, bool), `year-` (`year`), `reaff-` (`reaffirmation`), `cecpart-` (`cec_part`), `codeonly-` (`code_only`, bool), `materialsafterkeyword-` (`materials_after_keyword`, bool), `nonumber-` (`no_number`), `packagekeyword-` (`package_keyword`), `packagematerials-` (`package_materials`).
+
+Nested identifiers: `bundledwith-(…)` (`bundled_with`, ids), `ids-(…)` (`identifiers`, ids).
+
+Facet candidates (spelling-only): `original_reaffirmation_4digit`, `year_format`, `has_publisher`, `publisher_prefix`, `year_prefix`, `original_year_4digit`, `separator`, `series_prefix`, `french`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iec`, `iso`.
+
+[[urn-doi]]
+==== doi
+
+Namespace: `urn:pubid:doi:` (the `_type` flavor segment).
+
+Official URN: `urn:doi:…`, IANA-registered (formal template `doi`).
+
+Current `to_urn` (≤400 sampled pass ids): 4 ids, 0 round-trip, 0 reshape, 4 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
+
+Corpus: 4 of 4 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:doi:identifier` | `id` | — | 0 | —
+| `pubid:doi:resource` | `resource` | — | 4 | `doi:10.1000/182`
+|===
+
+Atoms, canonical order: `prefix-` (`prefix`), `suffix-` (`suffix`).
+
+[[urn-easc]]
+==== easc
+
+Namespace: `urn:pubid:easc:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:easc:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 167 ids, 167 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 167 of 167 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:easc:identifier` | `id` | number | 0 | —
+| `pubid:easc:pmg` | `pmg` | number | 56 | `ПМГ В 31-2001`
+| `pubid:easc:rmg` | `rmg` | number | 111 | `РМГ 151-2025`
+|===
+
+Atoms, canonical order: `series-` (`series`), `year-` (`year`), `variant-` (`variant`).
+
+[[urn-ecma]]
+==== ecma
+
+Namespace: `urn:pubid:ecma:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:ecma:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 400 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 833 of 833 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ecma:identifier` | `id` | number | 0 | —
+| `pubid:ecma:memento` | `memento` | number | 64 | `ECMA MEM/2026`
+| `pubid:ecma:standard` | `std` | number | 699 | `ECMA-434 ed1`
+| `pubid:ecma:technical-report` | `tr` | number | 70 | `ECMA TR/114 ed1`
+|===
+
+Atoms, canonical order: `part-` (`part`), `vol-` (`volume`), `ed-` (`edition`).
+
+[[urn-etsi]]
+==== etsi
+
+Namespace: `urn:pubid:etsi:` (the `_type` flavor segment).
+
+Official URN: `urn:etsi:…`, IANA-registered, RFC 8515.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 324 round-trip, 0 reshape, 21 do not re-parse, 55 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 24718 of 24718 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:etsi:amendment` | `amd` | number | 120 | `ETSI ETR 108/A1 ed.1 (1995-08)`
+| `pubid:etsi:corrigendum` | `cor` | number | 49 | `ETSI ETR 053/C1 ed.2 (1997-03)`
+| `pubid:etsi:etsi-standard` | `es` | number | 24718 | `ETSI EG 200 053 V1.5.1 (2004-06)`
+| `pubid:etsi:identifier` | `id` | number | 0 | —
+| `pubid:etsi:supplement-identifier` | `si` | number | 0 | —
+|===
+
+Atoms, canonical order: `type-` (`type`), `part-` (`parts`, list), `year-` (`year`), `month-` (`month`), `v-` (`version`), `isedition-` (`is_edition`, bool).
+
+[[urn-evs]]
+==== evs
+
+Namespace: `urn:pubid:evs:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:evs:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 36 ids, 29 round-trip, 7 reshape, 0 do not re-parse, 0 raise, 0 empty, 4 colliding URNs.
+
+Corpus: 36 of 36 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:evs:estonian-standard` | `es` | number | 6 | `EVS 921:2019`
+| `pubid:evs:identifier` | `id` | number | 0 | —
+| `pubid:evs:international-adoption` | `ia` | number | 2 | `EVS-ISO 9001:2015`
+| `pubid:evs:national-adoption` | `na` | number | 28 | `EVS-EN 18216:2026`
+|===
+
+Atoms, canonical order: `part-` (`part`), `year-` (`year`), `lang-` (`language`), `amdkind-` (`amd_kind`), `amdnumber-` (`amd_number`), `amdyear-` (`amd_year`), `corkind-` (`cor_kind`), `coryear-` (`cor_year`), `evstype-` (`evs_type`), `intlorg-` (`intl_org`), `nayear-` (`na_year`).
+
+Facet candidates (spelling-only): `separator`, `amd_separator`, `cor_separator`, `na_separator`, `draft_prefix`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `cencenelec`, `iec`, `iso`.
+
+[[urn-gb]]
+==== gb
+
+Namespace: `urn:pubid:gb:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:gb:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 10 ids, 0 round-trip, 0 reshape, 10 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
+
+Corpus: 10 of 10 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:gb:all-parts` | `all` | number | 1 | `GB/T 5606 (all parts)`
+| `pubid:gb:identifier` | `id` | number | 0 | —
+| `pubid:gb:standard` | `std` | number | 10 | `JB/T 13368-2018`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `part-` (`part`), `year-` (`year`), `mandate-` (`mandate`).
+
+Nested identifiers: `ids-(…)` (`identifiers`, ids).
+
+[[urn-gost]]
+==== gost
+
+Namespace: `urn:pubid:gost:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:gost:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 200 ids, 77 round-trip, 123 reshape, 0 do not re-parse, 0 raise, 0 empty, 9 colliding URNs.
+
+Corpus: 200 of 200 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:gost:foreign-reference` | `fr` | number | 17 | —
+| `pubid:gost:harmonized` | `h` | number | 46 | `ГОСТ 35311.2-2025 (EN 1129-2:1995)`
+| `pubid:gost:identical-adoption` | `ia` | number | 10 | `ГОСТ Р 58904-2020/ISO/TR 25901-1:2016`
+| `pubid:gost:identifier` | `id` | number | 0 | —
+| `pubid:gost:interstate-standard` | `is` | number | 151 | `ГОСТ ISO 6848`
+| `pubid:gost:national-standard` | `ns` | number | 49 | `ГОСТ Р 71039—2023`
+|===
+
+Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `subtype-` (`subtype`).
+
+Nested identifiers: `adoptedidentifiers-(…)` (`adopted_identifiers`, ids), `adopted-(…)` (`adopted`, id).
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `astm`, `cencenelec`, `iec`, `ieee`, `iso`.
+
+[[urn-iala]]
+==== iala
+
+Namespace: `urn:pubid:iala:` (the `_type` flavor segment).
+
+Official URN: `urn:mrn:iala:…`, IANA-registered `mrn` namespace (formal template `mrn`).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 400 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 715 of 715 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:iala:advice` | `advice` | number | 11 | `IALA A12-01`
+| `pubid:iala:annex` | `annex` | number | 10 | `IALA G1045 Annex Ed 1`
+| `pubid:iala:general-assembly` | `ga` | number | 26 | `IALA GA01.01`
+| `pubid:iala:guideline` | `g` | number | 355 | `urn:mrn:iala:pub:g1195:ed1.0`
+| `pubid:iala:identifier` | `id` | number | 0 | —
+| `pubid:iala:letter` | `letter` | number | 6 | `IALA L2.1.11 Ed 2`
+| `pubid:iala:manual` | `manual` | number | 9 | `IALA M0001 Ed 9.0`
+| `pubid:iala:model-course` | `mc` | number | 85 | `urn:mrn:iala:pub:c0103-1:ed3.0`
+| `pubid:iala:recommendation` | `rec` | number | 206 | `urn:mrn:iala:pub:r1023:ed1.0`
+| `pubid:iala:report` | `rpt` | number | 0 | —
+| `pubid:iala:resolution` | `r` | number | 0 | —
+| `pubid:iala:standard` | `std` | number | 17 | `urn:mrn:iala:pub:s1040:ed2.0`
+|===
+
+Atoms, canonical order: `ed-` (`edition`), `lang-` (`language`), `annexform-` (`annex_form`), `letter-` (`letter`).
+
+[[urn-iana]]
+==== iana
+
+Namespace: `urn:pubid:iana:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:iana:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 30 ids, 30 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 30 of 30 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:iana:identifier` | `id` | — | 0 | —
+| `pubid:iana:registry` | `registry` | number | 30 | `IANA _6lowpan-parameters`
+|===
+
+Atoms, canonical order: `subregistry-` (`sub_registry`).
+
+[[urn-idf]]
+==== idf
+
+Namespace: `urn:pubid:idf:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:idf:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 67 ids, 11 round-trip, 47 reshape, 9 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 67 of 67 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:idf:all-parts` | `all` | number | 0 | —
+| `pubid:idf:amendment` | `amd` | number | 2 | `IDF 146:2003 / AMD 1:2023`
+| `pubid:idf:corrigendum` | `cor` | number | 1 | `IDF 148-1:2008 / COR 1:2009`
+| `pubid:idf:identifier` | `id` | number | 0 | —
+| `pubid:idf:international-standard` | `is` | number | 41 | `IDF 1:2010`
+| `pubid:idf:reviewed-method` | `rm` | number | 26 | `IDF RM 254:2022`
+|===
+
+Atoms, canonical order: `pubbody-` (`publisher.body`), `typeabbr-` (`type.abbr`), `typename-` (`type.name`), `typetypecode-` (`type.type_code`), `part-` (`part`), `year-` (`year`), `stageabbr-` (`stage.abbr`), `stageharmonizedstages-` (`stage.harmonized_stages`), `stagename-` (`stage.name`), `stagestagecode-` (`stage.stage_code`), `typedstageabbr-` (`typed_stage.abbr`), `typedstage-` (`typed_stage.code`), `typedstageharmonizedstages-` (`typed_stage.harmonized_stages`), `typedstagelongabbr-` (`typed_stage.long_abbr`), `typedstagename-` (`typed_stage.name`), `typedstageshortabbr-` (`typed_stage.short_abbr`), `typedstagestagecode-` (`typed_stage.stage_code`), `typedstagetypecode-` (`typed_stage.type_code`).
+
+Finding: `to_hash` serializes the internals of a component (`type`, `stage`, `typed_stage`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
+
+[[urn-iec]]
+==== iec
+
+Namespace: `urn:pubid:iec:` (the `_type` flavor segment).
+
+Official URN: none in the IANA registry. pubid emits the RFC 5141-style `urn:iec:std:…`; keep it as the IEC render form.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 249 round-trip, 71 reshape, 6 do not re-parse, 0 raise, 74 empty, 0 colliding URNs.
+
+Corpus: 12331 of 12331 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:iec:all-parts` | `all` | number | 0 | —
+| `pubid:iec:amendment` | `amd` | number | 2464 | `CISPR 12:2007/AMD1:2009`
+| `pubid:iec:base` | `base` | number | 0 | —
+| `pubid:iec:component-specification` | `cs` | number | 0 | —
+| `pubid:iec:conformity-assessment` | `ca` | number | 0 | —
+| `pubid:iec:consolidated-identifier` | `consol` | — | 1270 | —
+| `pubid:iec:corrigendum` | `cor` | number | 195 | `CISPR 16-1-3:2004/COR1:2006`
+| `pubid:iec:fragment-identifier` | `fi` | — | 16 | `IEC 60050-111/AMD1/FRAG1 ED2`
+| `pubid:iec:guide` | `guide` | number | 59 | `IEC GUIDE 103:1980`
+| `pubid:iec:identifier` | `id` | — | 0 | —
+| `pubid:iec:international-standard` | `is` | number | 5455 | `CISPR 12 ED7`
+| `pubid:iec:interpretation-sheet` | `is2` | number | 120 | `CISPR 14-1:2016/ISH1:2017`
+| `pubid:iec:operational-document` | `od` | number | 0 | —
+| `pubid:iec:publicly-available-specification` | `pas` | number | 12 | `IEC PAS 60050-732:2007`
+| `pubid:iec:sheet-identifier` | `si` | — | 7 | `IEC 60695-2-1/0:1994`
+| `pubid:iec:single-identifier` | `si2` | number | 0 | —
+| `pubid:iec:societal-technology-trend-report` | `sttr` | number | 0 | —
+| `pubid:iec:systems-reference-document` | `srd` | number | 21 | `IEC SRD 62559-4:2020`
+| `pubid:iec:technical-group` | `tg` | number | 0 | —
+| `pubid:iec:technical-report` | `tr` | number | 1418 | `CISPR TR 16-2-5:2008`
+| `pubid:iec:technical-specification` | `ts` | number | 836 | `IEC TS 60034-16-3:1996`
+| `pubid:iec:technology-report` | `tr2` | number | 0 | —
+| `pubid:iec:test-report-form` | `trf` | number | 2180 | `IECEE TRF 10079-1A:2020`
+| `pubid:iec:vap-identifier` | `vi` | — | 1999 | `CISPR 11:1975+AMD1:1976 CSV`
+| `pubid:iec:white-paper` | `wp` | number | 0 | —
+| `pubid:iec:working-document` | `wd` | number | 2350 | `1/2457/FDIS`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `part-` (`part`), `subpart-` (`subpart`), `year-` (`year`), `month-` (`month`), `ed-` (`edition`), `lang-` (`languages.*.code`, list), `database-` (`database`, bool), `fragmentnumber-` (`fragment_number`), `sheetnumber-` (`sheet_number`), `sheetyear-` (`sheet_year`), `undated-` (`undated`, bool), `vap-` (`vap`, list).
+
+Nested identifiers: `ids-(…)` (`identifiers`, ids).
+
+Facet candidates (spelling-only): `languages.*.original_code`.
+
+[[urn-ieee]]
+==== ieee
+
+Namespace: `urn:pubid:ieee:` (the `_type` flavor segment).
+
+Official URN: `urn:ieee:std:…`, IANA-registered, RFC 8069.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 66 round-trip, 136 reshape, 198 do not re-parse, 0 raise, 0 empty, 3 colliding URNs.
+
+Corpus: 9045 of 9048 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ieee:adopted-standard` | `as` | number | 66 | `55 IRE 2.S1 (IEEE Std No 147)`
+| `pubid:ieee:aiee` | `aiee` | number | 113 | `AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)`
+| `pubid:ieee:amendment` | `amd` | number | 43 | `IS0/IEC/IEEE 8802-11:2012/Amd.5:2015(E) (Adoption of IEEE Std 802.11af-2014)`
+| `pubid:ieee:conformance-identifier` | `ci` | number | 6 | `IEEE Std 1904.1(TM)/Conformance02-2014 (Conformance to IEEE Std 1904.1-2013)`
+| `pubid:ieee:corrigendum` | `cor` | number | 201 | `IEEE P802.1AS&#x2013;2020/Cor1/D3.0, July 2021 (Corrigendum to IEEE Std 802.1AS-2020)`
+| `pubid:ieee:csa-dual-published` | `cdp` | number | 4 | `IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17`
+| `pubid:ieee:dual-identifier` | `di` | number | 0 | —
+| `pubid:ieee:dual-published` | `dp` | number | 30 | `IEEE P1680.4_D1 and NSF/ANSI 426, August 2016`
+| `pubid:ieee:identifier` | `id` | number | 0 | —
+| `pubid:ieee:iec-ieee-copublished` | `iic` | number | 47 | `IEC/IEEE 60079-30-2/D5 IEC:2013 (10/07)`
+| `pubid:ieee:interpretation-identifier` | `ii` | number | 5 | `IEEE Std 1003.1-1988/INT, 1992 Edition`
+| `pubid:ieee:ire` | `ire` | number | 8 | `52 IRE 7.S2`
+| `pubid:ieee:joint-development` | `jd` | number | 277 | `IEC/IEEE FDIS P60079-30-1, 2015`
+| `pubid:ieee:multi-numbered-identifier` | `mni` | number | 1 | `IEEE Std 1299/C62.22.1-1 996`
+| `pubid:ieee:nesc-draft` | `nd` | number | 0 | —
+| `pubid:ieee:nesc-edition` | `ne` | number | 1 | `2017 National Electrical Safety Code(R) (NESC(R))`
+| `pubid:ieee:nesc-handbook` | `nh` | number | 2 | `2012 NESC Handbook, Seventh Edition`
+| `pubid:ieee:nesc-preprint` | `np` | number | 6 | `C2-2012-Preprint`
+| `pubid:ieee:nesc-redline` | `nr` | number | 1 | `National Electrical Safety Code, C2-2012 - Redline`
+| `pubid:ieee:nesc-standard` | `ns` | number | 2 | `C2-1997 National Electric Safety Code (NESC)`
+| `pubid:ieee:parenthetical-identifier` | `pi` | number | 0 | —
+| `pubid:ieee:project-draft-identifier` | `pdi` | number | 2468 | `ISO/IEC/IEEE P42010.WD4:2019(E)`
+| `pubid:ieee:redlined-standard` | `rs` | number | 0 | —
+| `pubid:ieee:si-standard` | `ss` | number | 8 | `IEEE PSI 10/D2, October 2010`
+| `pubid:ieee:standard` | `std` | number | 6179 | `IEEE 1076-CONC-I99O`
+| `pubid:ieee:supplement-identifier` | `si` | number | 0 | —
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublisher`, list), `type-` (`type`), `part-` (`parts`, list), `year-` (`year`), `month-` (`month`), `ed-` (`edition`), `rev-` (`revision`), `stage-` (`stage`), `abbrsuffix-` (`abbr_suffix`, bool), `abbrsuffixregistered-` (`abbr_suffix_registered`, bool), `ashraenumber-` (`ashrae_number`), `ashraeyear-` (`ashrae_year`), `draft-` (`draft`), `draftinfo-` (`draft_info`), `draftstatus-` (`draft_status`), `editionmonth-` (`edition_month`), `iecyear-` (`iec_year`), `ieeedraft-` (`ieee_draft`), `isostage-` (`iso_stage`), `leadparty-` (`lead_party`), `nickname-` (`nickname`), `parentheticalcontent-` (`parenthetical_content`), `prefix-` (`prefix`), `projectmarker-` (`project_marker`, bool), `publishers-` (`publishers`, list), `reaffirmed-` (`reaffirmed`), `redline-` (`redline`, bool), `registered-` (`registered`, bool), `relationshipsrelationshiptype-` (`relationships.*.relationship_type`, list), `revbare-` (`rev_bare`, bool), `revsep-` (`rev_sep`), `separators-` (`separators`, list), `spacebeforedraft-` (`space_before_draft`, bool), `typedstageabbr-` (`typed_stage.abbr`), `typedstagestagecode-` (`typed_stage.stage_code`), `typedstagetypecode-` (`typed_stage.type_code`), `variant-` (`variant`), `yearsep-` (`year_sep`).
+
+Nested identifiers: `ieeeidentifier-(…)` (`ieee_identifier`, id), `adoptedidentifiers-(…)` (`adopted_identifiers`, ids), `firstidentifier-(…)` (`first_identifier`, id), `secondidentifier-(…)` (`second_identifier`, id), `primaryidentifier-(…)` (`primary_identifier`, id), `secondaryidentifier-(…)` (`secondary_identifier`, id), `revisionof-(…)` (`revision_of`, id).
+
+Facet candidates (spelling-only): `original_format`, `separator`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `ansi`, `iec`.
+
+Finding: `to_hash` serializes the internals of a component (`typed_stage`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
+
+[[urn-ietf]]
+==== ietf
+
+Namespace: `urn:pubid:ietf:` (the `_type` flavor segment).
+
+Official URN: `urn:ietf:rfc:…`, IANA-registered, RFC 2648.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 400 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 2526 of 2526 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ietf:bcp` | `bcp` | number | 236 | `BCP 3`
+| `pubid:ietf:fyi` | `fyi` | number | 36 | `FYI 2`
+| `pubid:ietf:identifier` | `id` | number | 0 | —
+| `pubid:ietf:internet-draft` | `id2` | number | 2144 | `draft-3gpp-collaboration-01`
+| `pubid:ietf:rfc` | `rfc` | number | 17 | `RFC 1`
+| `pubid:ietf:std` | `std` | number | 93 | `STD 3`
+|===
+
+Atoms, canonical order: `v-` (`version`).
+
+[[urn-iho]]
+==== iho
+
+Namespace: `urn:pubid:iho:` (the `_type` flavor segment).
+
+Official URN: `urn:mrn:iho:…` under the IANA-registered `mrn` namespace (formal template `mrn`).
+
+Current `to_urn` (≤400 sampled pass ids): 138 ids, 138 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 138 of 138 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:iho:bibliographic` | `b` | number | 12 | `IHO B-1 1.0.0`
+| `pubid:iho:circular-letter` | `cl` | number | 8 | `IHO C-13 1.0.0`
+| `pubid:iho:identifier` | `id` | number | 0 | —
+| `pubid:iho:miscellaneous` | `m` | number | 10 | `IHO M-1 2.1.0`
+| `pubid:iho:publication` | `pub` | number | 17 | `IHO P-1 1.0.0`
+| `pubid:iho:standard` | `std` | number | 91 | `IHO S-100 1.0.0`
+|===
+
+Atoms, canonical order: `vol-` (`volume`), `issue-` (`issue`), `year-` (`year`), `v-` (`version`), `appendix-` (`appendix`).
+
+[[urn-isbn]]
+==== isbn
+
+Namespace: `urn:pubid:isbn:` (the `_type` flavor segment).
+
+Official URN: `urn:isbn:…`, IANA-registered (formal template `isbn`).
+
+Current `to_urn` (≤400 sampled pass ids): 4 ids, 0 round-trip, 0 reshape, 4 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
+
+Corpus: 4 of 4 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:isbn:book` | `book` | — | 4 | `ISBN 0-306-40615-2`
+| `pubid:isbn:identifier` | `id` | — | 0 | —
+|===
+
+Atoms, canonical order: `hyphenated-` (`hyphenated`), `raw-` (`raw`).
+
+[[urn-itu]]
+==== itu
+
+Namespace: `urn:pubid:itu:` (the `_type` flavor segment).
+
+Official URN: `urn:itu:…`, IANA-registered (formal template `itu`).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 299 round-trip, 84 reshape, 17 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 2752 of 2752 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:itu:addendum` | `add` | number | 22 | `ITU-T I.363 (1993) Add. 1 (11/1993)`
+| `pubid:itu:amendment` | `amd` | number | 28 | `ITU-T G.722.2 App. I (2002) Amd. 1 (07/2003)`
+| `pubid:itu:annex` | `annex` | — | 5 | `Annex to ITU OB No. 1`
+| `pubid:itu:annex-of-recommendation` | `aor` | number | 17 | `ITU-T A.23 Annex A (06/2014)`
+| `pubid:itu:appendix-of-recommendation` | `aor2` | number | 39 | `ITU-T G.101 App. I (05/2000)`
+| `pubid:itu:combined-identifier` | `ci` | number | 13 | `ITU-T D.81/F.80 bis (11/1980)`
+| `pubid:itu:contribution` | `c` | number | 0 | —
+| `pubid:itu:corrigendum` | `cor` | number | 163 | `ITU-T G.729 Annex B (1996) Cor. 3 (03/2001)`
+| `pubid:itu:errata` | `err` | number | 3 | `ITU-T G.722.2 Annex B (2002) Err. 1 (07/2003)`
+| `pubid:itu:handbook` | `hb` | number | 20 | `ITU-R 01.HDB`
+| `pubid:itu:identifier` | `id` | number | 0 | —
+| `pubid:itu:question` | `question` | number | 35 | `ITU-R 37-7/5:`
+| `pubid:itu:radio-regulations` | `rr` | number | 3 | `ITU-R RR`
+| `pubid:itu:recommendation` | `rec` | number | 2540 | `ITU-T D.200 R (10/1976)`
+| `pubid:itu:report` | `rpt` | number | 13 | `Report ITU-R BT.2020-1`
+| `pubid:itu:special-publication` | `sp` | number | 21 | `ITU OB No. 1`
+| `pubid:itu:supplement` | `sup` | number | 111 | `ITU-T V.25 ter Suppl. 1 (04/1995)`
+|===
+
+Atoms, canonical order: `sector-` (`sector`), `series-` (`series`), `subseries-` (`subseries`), `part-` (`parts`, list), `year-` (`year`), `month-` (`month`), `day-` (`day`), `v-` (`version`), `lang-` (`language`), `attachment-` (`attachment`, bool), `combined-` (`combined.*.number`, list), `combinedseries-` (`combined.*.series`, list), `material-` (`material`), `numberglued-` (`number_glued`, bool), `qualifier-` (`qualifier`), `qualifierglued-` (`qualifier_glued`, bool), `rangeend-` (`range_end`), `seriesdash-` (`series_dash`, bool), `seriessuffix-` (`series_suffix`), `seriessuffixspaced-` (`series_suffix_spaced`, bool), `seriesword-` (`series_word`, bool), `slashjoined-` (`slash_joined`, bool), `studygroup-` (`study_group`), `technical-` (`technical`, bool).
+
+Facet candidates (spelling-only): `has_colon`, `has_bl`, `bracketed`.
+
+[[urn-jcgm]]
+==== jcgm
+
+Namespace: `urn:pubid:jcgm:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:jcgm:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 31 ids, 29 round-trip, 2 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 31 of 31 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:jcgm:amendment` | `amd` | number | 3 | `JCGM 100:2008/Amd 1`
+| `pubid:jcgm:corrigendum` | `cor` | number | 2 | `JCGM 200:2008 Corrigendum`
+| `pubid:jcgm:guide` | `guide` | number | 13 | `JCGM 100`
+| `pubid:jcgm:gum-guide` | `gumguide` | number | 2 | `JCGM GUM-1:2022-11-28`
+| `pubid:jcgm:identifier` | `id` | number | 0 | —
+| `pubid:jcgm:meeting` | `meeting` | number | 16 | `JCGM 11st Meeting (2006)`
+|===
+
+Atoms, canonical order: `year-` (`year`), `month-` (`month`), `day-` (`day`), `lang-` (`languages.*.code`, list).
+
+Facet candidates (spelling-only): `languages.*.original_code`.
+
+[[urn-jis]]
+==== jis
+
+Namespace: `urn:pubid:jis:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:jis:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 400 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 10561 of 10561 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:jis:all-parts` | `all` | number | 0 | —
+| `pubid:jis:amendment` | `amd` | number | 0 | —
+| `pubid:jis:corrigendum` | `cor` | number | 0 | —
+| `pubid:jis:explanation` | `e` | number | 0 | —
+| `pubid:jis:identifier` | `id` | number | 0 | —
+| `pubid:jis:japanese-industrial-standard` | `jis` | number | 10556 | `JIS A 0001:1999`
+| `pubid:jis:standard` | `std` | number | 0 | —
+| `pubid:jis:technical-report` | `tr` | number | 0 | —
+| `pubid:jis:technical-specification` | `ts` | number | 0 | —
+| `pubid:jis:welding-engineering-standard` | `wes` | number | 5 | `WES 7700-1:2019`
+|===
+
+Atoms, canonical order: `series-` (`series`), `part-` (`parts`, list), `year-` (`year`, int), `reaffirmed-` (`reaffirmed`, bool).
+
+[[urn-nist]]
+==== nist
+
+Namespace: `urn:pubid:nist:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:nist:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 130 round-trip, 247 reshape, 23 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 21362 of 21362 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:nist:circular` | `circular` | number | 874 | `NBS CIRC 1`
+| `pubid:nist:circular-supplement` | `cs` | number | 11 | `NBS LC 118supp3/1926`
+| `pubid:nist:commercial-standard` | `cs2` | number | 277 | `NBS CS 0-30`
+| `pubid:nist:commercial-standard-emergency` | `cse` | number | 11 | `NBS CS-E 104e1943`
+| `pubid:nist:commercial-standards-monthly` | `csm` | number | 99 | `NBS CSM 1`
+| `pubid:nist:crpl-report` | `cr` | number | 417 | `NBS CRPL 1-1`
+| `pubid:nist:dated-document` | `dd` | number | 0 | —
+| `pubid:nist:federal-information-processing-standards` | `fips` | number | 369 | `NBS FIPS 1`
+| `pubid:nist:grant-contractor-report` | `gcr` | number | 116 | `NBS GCR 80-287`
+| `pubid:nist:handbook` | `hb` | number | 362 | `NBS HB 1`
+| `pubid:nist:identifier` | `id` | number | 908 | `NBS BH 1`
+| `pubid:nist:interagency-report` | `ir` | number | 8099 | `NBS IR 73-101`
+| `pubid:nist:letter-circular` | `lc` | number | 2244 | `NBS LC 1`
+| `pubid:nist:miscellaneous-publication` | `mp` | number | 299 | `NBS MP 1`
+| `pubid:nist:monograph` | `m` | number | 252 | `NBS MONO 1`
+| `pubid:nist:ncstar` | `ncstar` | number | 90 | `NIST NCSTAR 1`
+| `pubid:nist:nsrds` | `nsrds` | number | 118 | `NBS NSRDS 1`
+| `pubid:nist:owmwp` | `owmwp` | number | 1 | `NIST OWMWP 06-13-2018`
+| `pubid:nist:report` | `rpt` | number | 1815 | `NBS RPT 10003`
+| `pubid:nist:special-publication` | `sp` | number | 2887 | `NBS SP 236e1970`
+| `pubid:nist:technical-note` | `tn` | number | 2124 | `NBS TN 1`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `series-` (`series`), `subseries-` (`subseries`), `parttype-` (`part.type`), `part-` (`part.value`), `section-` (`section`), `vol-` (`volume`), `edid-` (`edition.id`), `edtype-` (`edition.type`), `updmonth-` (`update.month`), `upd-` (`update.number`), `updprefix-` (`update.prefix`), `updyear-` (`update.year`), `stageid-` (`stage.id`), `stagetype-` (`stage.type`), `sup-` (`supplement.number`), `supsuffix-` (`supplement.suffix`), `supyear-` (`supplement.year`), `appendix-` (`appendix`), `addendum-` (`addendum`), `draft-` (`draft`), `editionyear-` (`edition_year`), `errata-` (`errata`), `implicitsupplement-` (`implicit_supplement`, bool), `index-` (`index`), `insert-` (`insert`), `translation-` (`translation`), `translationcomponent-` (`translation_component.code`), `updatecomponentmonth-` (`update_component.month`), `updatecomponent-` (`update_component.number`), `updatecomponentprefix-` (`update_component.prefix`), `updatecomponentyear-` (`update_component.year`), `versioncomponent-` (`version_component.value`).
+
+Facet candidates (spelling-only): `parsed_format`.
+
+Finding: `to_hash` serializes the internals of a component (`update`, `update_component`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
+
+[[urn-oasis]]
+==== oasis
+
+Namespace: `urn:pubid:oasis:` (the `_type` flavor segment).
+
+Official URN: `urn:oasis:…`, IANA-registered, RFC 3121.
+
+Current `to_urn` (≤400 sampled pass ids): 45 ids, 45 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 45 of 45 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:oasis:identifier` | `id` | number | 0 | —
+| `pubid:oasis:standard` | `std` | number | 45 | `OASIS EDXL`
+|===
+
+Atoms, canonical order: `part-` (`part`), `v-` (`version`), `stage-` (`stage`), `label-` (`label`), `original-` (`original`).
+
+[[urn-ogc]]
+==== ogc
+
+Namespace: `urn:pubid:ogc:` (the `_type` flavor segment).
+
+Official URN: `urn:ogc:…`, IANA-registered, RFC 5165.
+
+Current `to_urn` (≤400 sampled pass ids): 88 ids, 88 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 88 of 88 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ogc:document` | `document` | number | 88 | `01-009a`
+| `pubid:ogc:identifier` | `id` | number | 0 | —
+|===
+
+Atoms, canonical order: `year-` (`year`), `rev-` (`revision`).
+
+[[urn-oiml]]
+==== oiml
+
+Namespace: `urn:pubid:oiml:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:oiml:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 105 ids, 3 round-trip, 96 reshape, 6 do not re-parse, 0 raise, 0 empty, 6 colliding URNs.
+
+Corpus: 105 of 105 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:oiml:amendment` | `amd` | number | 5 | `Amendment (2009) to OIML R 138 Edition 2007 (E)`
+| `pubid:oiml:annex` | `annex` | number | 3 | `OIML R 60 Annexes Edition 2021 (E)`
+| `pubid:oiml:basic-publication` | `bp` | number | 6 | `OIML B 18:2018`
+| `pubid:oiml:bulletin` | `bulletin` | number | 0 | —
+| `pubid:oiml:certification-system` | `cs` | number | 6 | `OIML-CS PD-05 Edition 6 (Amendment 1)`
+| `pubid:oiml:document` | `document` | number | 16 | `OIML D 11:2008`
+| `pubid:oiml:dual-published` | `dp` | — | 2 | `ISO 4064-1:2024\|OIML R 49-1:2024`
+| `pubid:oiml:errata` | `err` | number | 0 | —
+| `pubid:oiml:expert-report` | `er` | number | 3 | `OIML E 5:2015(en)`
+| `pubid:oiml:guide` | `guide` | number | 4 | `OIML G 1-100:2008`
+| `pubid:oiml:identifier` | `id` | — | 0 | —
+| `pubid:oiml:recommendation` | `rec` | number | 61 | `OIML R 106`
+| `pubid:oiml:seminar-report` | `sr` | number | 2 | `OIML S 6:2011(en)`
+| `pubid:oiml:vocabulary` | `v` | number | 7 | `OIML V 1:2012`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `part-` (`part`), `year-` (`year`), `ed-` (`edition`), `stage-` (`stage`), `lang-` (`language`), `amendment-` (`amendment`), `family-` (`family`), `iteration-` (`iteration`), `letter-` (`letter`), `trailing-` (`trailing`, bool).
+
+Nested identifiers: `first-(…)` (`first`, id), `second-(…)` (`second`, id).
+
+Facet candidates (spelling-only): `parsed_format`, `space_separator`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iso`.
+
+[[urn-omg]]
+==== omg
+
+Namespace: `urn:pubid:omg:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:omg:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 21 ids, 0 round-trip, 0 reshape, 21 do not re-parse, 0 raise, 0 empty, 2 colliding URNs.
+
+Corpus: 21 of 21 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:omg:identifier` | `id` | — | 0 | —
+| `pubid:omg:specification` | `spec` | — | 21 | `OMG AMI4CCM 1.0`
+|===
+
+Atoms, canonical order: `part-` (`part`), `v-` (`version`), `acronym-` (`acronym`).
+
+[[urn-plateau]]
+==== plateau
+
+Namespace: `urn:pubid:plateau:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:plateau:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 115 ids, 83 round-trip, 32 reshape, 0 do not re-parse, 0 raise, 0 empty, 10 colliding URNs.
+
+Corpus: 115 of 115 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:plateau:annex` | `annex` | number | 0 | —
+| `pubid:plateau:handbook` | `hb` | number | 32 | `PLATEAU Handbook #00 第1.0版`
+| `pubid:plateau:identifier` | `id` | number | 0 | —
+| `pubid:plateau:technical-report` | `tr` | number | 83 | `PLATEAU Technical Report #00`
+|===
+
+Atoms, canonical order: `ed-` (`edition`), `annex-` (`annex`, int).
+
+[[urn-sae]]
+==== sae
+
+Namespace: `urn:pubid:sae:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:sae:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn`: not audited (no fixture directory under the registry name).
+
+Corpus: 0 of 0 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:sae:identifier` | `id` | number | 0 | —
+|===
+
+[[urn-un]]
+==== un
+
+Namespace: `urn:pubid:un:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:un:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 5 ids, 0 round-trip, 0 reshape, 5 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 5 of 5 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:un:document` | `document` | number | 5 | `A/RES/78/1`
+| `pubid:un:identifier` | `id` | number | 0 | —
+|===
+
+Atoms, canonical order: `path-` (`path`, list).
+
+[[urn-w3c]]
+==== w3c
+
+Namespace: `urn:pubid:w3c:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:w3c:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 29 ids, 29 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 29 of 29 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:w3c:candidate-recommendation` | `cr` | number | 1 | `W3C CR-exi-20091208`
+| `pubid:w3c:candidate-recommendation-draft` | `crd` | number | 2 | `W3C CRD-accelerometer-20250212`
+| `pubid:w3c:draft-note` | `dn` | number | 2 | `W3C DNOTE-webcodecs-flac-codec-registration-20240419`
+| `pubid:w3c:identifier` | `id` | number | 0 | —
+| `pubid:w3c:note` | `note` | number | 6 | `W3C NOTE-did-spec-registries-20230124`
+| `pubid:w3c:obsolete-recommendation` | `or` | number | 1 | `W3C OBSL-widgets-apis-20181011`
+| `pubid:w3c:proposed-edited-recommendation` | `per` | number | 1 | `W3C PER-rif-dtb-20121211`
+| `pubid:w3c:proposed-recommendation` | `pr` | number | 2 | `W3C PR-InkML-20110510`
+| `pubid:w3c:recommendation` | `rec` | number | 3 | `W3C REC-CSS1-19990111`
+| `pubid:w3c:standard` | `std` | number | 5 | `W3C becss`
+| `pubid:w3c:superseded-recommendation` | `sr` | number | 1 | `W3C SPSD-2dcontext-20210128`
+| `pubid:w3c:working-draft` | `wd` | number | 5 | `W3C WD-charmod-19991129`
+|===
+
+Atoms, canonical order: `date-` (`date`).
+
+[[urn-xsf]]
+==== xsf
+
+Namespace: `urn:pubid:xsf:` (the `_type` flavor segment).
+
+Official URN: `urn:xmpp:…`, IANA-registered, RFC 4854 (XSF protocol namespaces).
+
+Current `to_urn` (≤400 sampled pass ids): 51 ids, 51 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 51 of 51 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:xsf:identifier` | `id` | number | 0 | —
+| `pubid:xsf:xep` | `xep` | number | 51 | `XEP 0001`
+|===
+

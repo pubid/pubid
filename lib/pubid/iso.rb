@@ -20,6 +20,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/iso/identifiers"
     autoload :Normalizer, "#{__dir__}/iso/normalizer"
     autoload :Parser, "#{__dir__}/iso/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/iso/pubid_urn_schema"
     autoload :RenderingStyle, "#{__dir__}/iso/rendering_style"
     autoload :SingleIdentifier, "#{__dir__}/iso/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/iso/supplement_identifier"

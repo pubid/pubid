@@ -1114,6 +1114,20 @@ module Pubid
       resolve_urn_generator.new(self).generate
     end
 
+    # The pubid-scheme URN ("urn:pubid:…", issue #656): pubid's own
+    # namespace, which carries every value of #to_hash and always
+    # round-trips through Pubid.parse_urn. Not the same as #to_urn, the
+    # official, possibly lossy URN of the organization. Defined once, here,
+    # from #to_hash and the flavor's PubidUrnSchema; flavors do not
+    # override it.
+    #
+    # @return [String]
+    # @raise [Pubid::Errors::InvalidInputError] when the flavor has no
+    #   pubid-scheme schema yet
+    def to_pubid_urn
+      Pubid::PubidUrn.generate(self)
+    end
+
     def resolve_urn_generator
       flavor = self.class.name.split("::")[1]
       Object.const_get("Pubid::#{flavor}::UrnGenerator")
