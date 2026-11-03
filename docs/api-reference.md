@@ -684,6 +684,9 @@ A new identifier for every part of this document. It holds this
 
 Canonicalize the serialized hash so it never carries a defaulted attribute
 ### `to_mr_string`
+### `to_pubid_urn`
+
+The lossless pubid-scheme URN ("urn:pubid:…").
 ### `to_s(**opts)`
 ### `to_slug`
 
