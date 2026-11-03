@@ -11,10 +11,15 @@
   jis_identifier`. The WES branch is `"WES" space number parts …` with the same
   tail as JIS (year, `R`, language, 規格群, supplements, SYMBOL) and binds a
   `wes` capture, which the builder keys on. `JIS WES 7700` and `WES X 7700`
-  are rejected: the JIS prefix and a series letter belong only to JIS. The
-  source of record is pubid/pubid-grammar; the artifact was rebaked here with
-  parsanol **1.3.114** — the PATH `parsanol` shim may be a newer version, so
-  bake with the 1.3.114 gem's `exe/parsanol` and check `compiler_version`.
+  are rejected: the JIS prefix and a series letter belong only to JIS.
+- **The artifact is vendored, not baked here.** `data/parg/jis.json` is a
+  verbatim copy of pubid/pubid-grammar `artifacts/jis.json` (main `31fb965`,
+  parsanol **1.3.121**). Change the grammar there and copy the artifact back;
+  `spec/pubid/jis/parg_reaffirmed_spec.rb` pins its `source_hash`, so a local
+  rebake fails that spec.
+- **`reaffirmed` binds the whole run of R's** (`":1997R"` → `"R"`, `":1997RR"`
+  → `"RR"`; same for `amd_reaffirmed`/`corr_reaffirmed`). The builder reads
+  each only for truth (`true if data[:reaffirmed]`), so `RR` renders as `R`.
 - **`series` is nil** for WES (JIS keeps its `""`-coerced String), so the hash
   carries no `series` key. `number` is the bare number (`"7700"`), the index
   key.
