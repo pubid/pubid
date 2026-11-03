@@ -21,6 +21,11 @@ CIPM 101-1st Meeting (2012)
 CCAUV 10<sup>e</sup> réunion (2015)
 CCAUV 13<sup>e</sup> réunion (2021)
 
+# --- Em-dash "Meeting N" word order (metanorma-bipm fetch queue, pubid#657);
+# --- normalizes onto the canonical spelling below ---
+CGPM 1st Meeting (1889)
+CGPM -- Meeting 1 (1889)
+
 # --- Partial references (date omitted; year left nil for collection matching) ---
 CCAUV 1st Meeting
 CCAUV 10<sup>e</sup> réunion

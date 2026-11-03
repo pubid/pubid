@@ -5,6 +5,17 @@
 BIPM SI Brochure 9e v3.01 (2019/2024, E)
 BIPM SI Brochure sur le SI 9e v3.01 (2019/2024, F)
 
+# --- Language-independent and version-optional forms (guide, pubid#657) ---
+BIPM SI Brochure 9e v3.01 (2019/2024)
+BIPM SI Brochure 9e (2019, E)
+BIPM SI Brochure 9e (2019)
+
+# --- Normalizing spellings onto the forms above: the corpus-cited ordinal
+# --- edition ("9th edition" onto the canonical "9e") and the guide's French
+# --- brochure lead phrase ---
+SI Brochure 9th edition (2019)
+Brochure sur le SI 9e v3.01 (2019/2024, F)
+
 # Appendix and derived products, keyed on the full "BIPM SI Brochure …"
 # primary-docidentifier content (data/sib-a3.yaml, data/si-brochure-concise.yaml,
 # data/si-brochure-faq.yaml). The bare "SI Brochure Appendix 3" docnumber also

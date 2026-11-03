@@ -28,7 +28,19 @@ module Pubid
         # The group has to be in the number segment or `CCTF REC 2` and
         # `CCEM REC 2` would share a slug.
         def mr_number_with_part
-          mr_slug(group, number)
+          mr_slug(group, number, appendix_tail)
+        end
+
+        private
+
+        # The appendix/annex complement distinguishes the separately published
+        # subresources, so it joins the number segment (the language rule: what
+        # upstream stores as distinct files must slug distinctly). `mr_slug`
+        # collapses the annex dot, as it does the brochure's "v3.01".
+        def appendix_tail
+          return nil unless appendix
+
+          annex ? "a#{appendix}.#{annex}" : "a#{appendix}"
         end
       end
     end

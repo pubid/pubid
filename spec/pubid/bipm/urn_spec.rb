@@ -15,6 +15,13 @@ RSpec.describe "Pubid::Bipm URN" do
     "BIPM SI Brochure 9e v3.01 (2019/2024, E)",
     "BIPM SI Brochure sur le SI 9e v3.01 (2019/2024, F)",
     "CIPM 2005-06",
+    # The corpus round's new canonical forms (pubid#657): the complement tail
+    # folds into the identifier segment; the brochure partials carry empty
+    # version/language segments.
+    "CIPM DECN 112 A3 (2022, F)",
+    "CIPM DECN 112 A3.5 (2022, F)",
+    "BIPM SI Brochure 9e v3.01 (2019/2024)",
+    "BIPM SI Brochure 9e (2019, E)",
   ]
 
   describe "#to_urn" do
@@ -31,6 +38,24 @@ RSpec.describe "Pubid::Bipm URN" do
       expect(Pubid::Bipm.parse("CGPM DECL (1889)").to_urn)
         .to eq("urn:bipm:cgpm:decl::1889")
     end
+
+    it "folds the appendix/annex complement into the identifier segment" do
+      expect(Pubid::Bipm.parse("CIPM DECN 112 A3 (2022, F)").to_urn)
+        .to eq("urn:bipm:cipm:decn:112-a3:2022")
+      expect(Pubid::Bipm.parse("CIPM DECN 112 A3.5 (2022, F)").to_urn)
+        .to eq("urn:bipm:cipm:decn:112-a3.5:2022")
+    end
+
+    # `String#to_s` on a String attribute returns the attribute itself, so a
+    # `<<`-built fold mutates `number` in place and every later render and
+    # serialize of the same identifier sees the folded value.
+    it "leaves the identifier's number untouched after a URN is emitted" do
+      id = Pubid::Bipm.parse("CIPM DECN 112 A3.5 (2022, F)")
+      id.to_urn
+      expect(id.number).to eq("112")
+      expect(id.to_s).to eq("CIPM DECN 112 A3.5 (2022, F)")
+      expect(id.to_hash["number"]).to eq("112")
+    end
   end
 
   describe "UrnParser" do
@@ -39,7 +64,8 @@ RSpec.describe "Pubid::Bipm URN" do
     # a URN round-trip silently empties the key a parsed identifier has.
     it "keeps the index key across a URN round-trip" do
       ["CCTF REC 2 (2012)", "CGPM 17th Meeting (1983)", "Metrologia 51 1 128",
-       "BIPM SI Brochure 9e v3.01 (2019/2024, E)"].each do |ref|
+       "BIPM SI Brochure 9e v3.01 (2019/2024, E)",
+       "CIPM DECN 112 A3 (2022, F)"].each do |ref|
         id = Pubid::Bipm.parse(ref)
         back = Pubid::Bipm::UrnParser.parse(id.to_urn)
         expect(back.root.number).to eq(id.root.number)
@@ -52,6 +78,18 @@ RSpec.describe "Pubid::Bipm URN" do
         .to eq("CCTF REC 2 (2012)")
       expect(Pubid::Bipm::UrnParser.parse("urn:bipm:cgpm:decl::1889").to_s)
         .to eq("CGPM DECL (1889)")
+    end
+
+    it "splits the folded complement tail back out of the identifier segment" do
+      back = Pubid::Bipm::UrnParser.parse("urn:bipm:cipm:decn:112-a3.5:2022")
+      expect(back).to be_a(Pubid::Bipm::Identifiers::CommitteeDocument)
+      expect(back.number).to eq("112")
+      expect(back.appendix).to eq("3")
+      expect(back.annex).to eq("5")
+      # A plain dash-part number never carries letters, so it never splits.
+      plain = Pubid::Bipm::UrnParser.parse("urn:bipm:cipm:decn:111-10:2022")
+      expect(plain.number).to eq("111-10")
+      expect(plain.appendix).to be_nil
     end
   end
 end

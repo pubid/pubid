@@ -54,6 +54,26 @@ module BipmLooseSpec
     # DECL as "Statement" in both languages, which is what they normalize to.
     "CGPM Declaration 1 (1971)" => "CGPM Statement 1 (1971)",
     "Déclaration 1 du CGPM (1971)" => "Statement 1 de la CGPM (1971)",
+    # --- pubid#657: the corpus-cited spellings (metanorma-bipm suite) and the
+    # --- guide's own alternate printings. All normalize onto the forms the
+    # --- flavor already canonicalized; none is a byte-round-trip.
+    # The em-dash "Meeting N" word order the corpus cites (`CGPM -- Meeting 1`).
+    "CGPM -- Meeting 1 (1889)" => "CGPM 1st Meeting (1889)",
+    "CGPM -- 1st Meeting (1889)" => "CGPM 1st Meeting (1889)",
+    # The publisher-prefixed decision with a body-qualified id ("{body}/{id}");
+    # the BIPM lead is the constant publisher, so it names the unprefixed doc.
+    "BIPM DECN CIPM/101-1 (2012, EN)" => "CIPM DECN 101-1 (2012, E)",
+    "BIPM DECN CIPM/101-1 (2012, FR)" => "CIPM DECN 101-1 (2012, F)",
+    # The guide's French full-length body-prefixed pattern for CIPM decisions
+    # (since 2012) and JCRB outcomes. The canonical French long form stays the
+    # connective spelling the corpus already freezes.
+    "Décision CIPM/101-1 (2012)" => "Décision 101-1 du CIPM (2012)",
+    "Recommandation JCRB/43-1 (2021)" => "Recommandation 43-1 du JCRB (2021)",
+    # The guide's French brochure lead and the corpus-cited ordinal-edition
+    # spelling, both onto the canonical "BIPM SI Brochure …" printing.
+    "Brochure sur le SI 9e v3.01 (2019/2024, F)" =>
+      "BIPM SI Brochure sur le SI 9e v3.01 (2019/2024, F)",
+    "SI Brochure 9th edition (2019)" => "BIPM SI Brochure 9e (2019)",
   }.freeze
 
   # The hand-off's contract table: loose form => [class, number].
@@ -70,6 +90,13 @@ module BipmLooseSpec
       [Pubid::Bipm::Identifiers::CommitteeDocument, "2"],
     "SI Brochure" => [Pubid::Bipm::Identifiers::SiBrochure, nil],
     "SI Brochure Part 1" => [Pubid::Bipm::Identifiers::SiBrochure, nil],
+    "CGPM -- Meeting 1 (1889)" => [Pubid::Bipm::Identifiers::Meeting, "1"],
+    "BIPM DECN CIPM/101-1 (2012, EN)" =>
+      [Pubid::Bipm::Identifiers::CommitteeDocument, "101-1"],
+    "Décision CIPM/101-1 (2012)" =>
+      [Pubid::Bipm::Identifiers::CommitteeDocument, "101-1"],
+    "SI Brochure 9th edition (2019)" =>
+      [Pubid::Bipm::Identifiers::SiBrochure, "9e"],
   }.freeze
 
   # Real rows lifted from the published `relaton-data-bipm` `index-v2.yaml`
@@ -119,6 +146,25 @@ module BipmLooseSpec
     "CCTF REC 2 (2009, EN)" => {
       "_type" => "pubid:bipm:committee-document", "group" => "CCTF",
       "type_code" => "REC", "number" => "2", "year" => 2009
+    },
+    # The two corpus-cited #657 spellings resolve to the rows the unprefixed
+    # spellings already resolve to — that equality is what lets the metanorma
+    # fetch queue use them as references.
+    "CGPM -- Meeting 1 (1889)" => {
+      "_type" => "pubid:bipm:meeting", "group" => "CGPM",
+      "number" => "1", "year" => 1889
+    },
+    "BIPM DECN CIPM/101-1 (2012, EN)" => {
+      "_type" => "pubid:bipm:committee-document", "group" => "CIPM",
+      "type_code" => "DECN", "number" => "101-1", "year" => 2012
+    },
+    "BIPM DECN CIPM/101-1 (2012, FR)" => {
+      "_type" => "pubid:bipm:committee-document", "group" => "CIPM",
+      "type_code" => "DECN", "number" => "101-1", "year" => 2012
+    },
+    "Décision CIPM/101-1 (2012)" => {
+      "_type" => "pubid:bipm:committee-document", "group" => "CIPM",
+      "type_code" => "DECN", "number" => "101-1", "year" => 2012
     },
   }.freeze
 end

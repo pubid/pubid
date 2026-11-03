@@ -13,6 +13,11 @@ module Pubid
       def build(data)
         if data[:committee_short]
           build_committee(data[:committee_short], form: "short")
+        elsif data[:committee_prefixed]
+          # The corpus's "BIPM DECN CIPM/101-1 (2012, EN)" publisher-prefixed
+          # spelling names the same document as the unprefixed short form; the
+          # BIPM lead is the constant publisher, so it carries no attribute.
+          build_committee(data[:committee_prefixed], form: "short")
         elsif data[:committee_long_en]
           build_committee(data[:committee_long_en], form: "long", language: "E")
         elsif data[:committee_bare]
@@ -32,6 +37,8 @@ module Pubid
           build_si_brochure_variant(data[:si_brochure_variant])
         elsif data.key?(:si_brochure_section)
           build_si_brochure_section(data[:si_brochure_section])
+        elsif data.key?(:si_brochure_ordinal_edition)
+          build_si_brochure_ordinal_edition(data[:si_brochure_ordinal_edition])
         elsif data[:mep]
           build_mep(data[:mep])
         elsif data[:guide]
@@ -55,6 +62,8 @@ module Pubid
           year: node[:year]&.to_s&.to_i,
           language: Identifier.normalize_language(language || node[:language]),
           form: form,
+          appendix: node[:appendix]&.to_s,
+          annex: node[:annex]&.to_s,
         )
       end
 
@@ -103,11 +112,13 @@ module Pubid
       # The SI Brochure has no document number of its own, so the edition is
       # the index key — it clusters the English and French records of one
       # edition. The grammar makes `edition` mandatory here, so it is never nil.
+      # The version and the language code are optional (the guide's
+      # language-independent form), so they may be nil.
       def build_si_brochure(node)
         Identifiers::SiBrochure.new(
           number: node[:edition].to_s,
           edition: node[:edition].to_s,
-          version: node[:version].to_s,
+          version: node[:version]&.to_s,
           years: node[:years].to_s,
           language: Identifier.normalize_language(node[:language]),
         )
@@ -126,6 +137,20 @@ module Pubid
       def build_si_brochure_section(node)
         node = {} unless node.is_a?(Hash)
         Identifiers::SiBrochure.new(part: node[:part]&.to_s)
+      end
+
+      # The guide prints the edition "9e"; the corpus-cited "9th edition"
+      # spelling is the English ordinal form of the same edition, normalized
+      # onto the canonical "9e" value. The version is absent from the input, so
+      # it stays nil and drops from the serialized hash (a partial reference).
+      def build_si_brochure_ordinal_edition(node)
+        edition = "#{node[:ordinal_edition].to_s.sub(/(st|nd|rd|th)\z/, "")}e"
+        Identifiers::SiBrochure.new(
+          number: edition,
+          edition: edition,
+          years: node[:year]&.to_s,
+          language: Identifier.normalize_language(node[:language]),
+        )
       end
 
       # The Appendix/Annex/Part tail is the full-content spelling of the SAME
