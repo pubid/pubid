@@ -11,3 +11,6 @@ IHO M-3 2.0.0
 IHO M-7 3.0.0
 IHO M-7 8.0.0
 IHO M-7 9.0.0
+IHO M-2 Sup 1
+IHO M-2 Sup 6
+!IHO M-2 Suppl 3!IHO M-2 Sup 3
