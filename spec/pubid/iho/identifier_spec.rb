@@ -26,13 +26,13 @@ RSpec.describe Pubid::Iho::Identifier do
       # --- parts (lettered and numbered; compound "4a") ---
       "IHO S-98 1.0.0 Part A" => "IHO S-98 1.0.0 Part A",
       "IHO S-100 5.0.0 Part 2" => "IHO S-100 5.0.0 Part 2",
-      "IHO S-100 Part 1 1.0.0" => "IHO S-100 1.0.0 Part 1", # legacy order
-      "IHO S-100 Part A 1.0.0" => "IHO S-100 1.0.0 Part A",
+      "IHO S-100 Part 1 1.0.0" => "IHO S-100 Part 1 1.0.0", # part edition
+      "IHO S-100 Part A 1.0.0" => "IHO S-100 Part A 1.0.0", # part edition
       "IHO S-100 Part A" => "IHO S-100 Part A",
-      "IHO S-4 Part 2 4.9.0" => "IHO S-4 4.9.0 Part 2",
-      "IHO S-100 Part 4a 1.0.0" => "IHO S-100 1.0.0 Part 4a", # relaton-iho#23
-      "IHO S-100 Part 4b 1.0.0" => "IHO S-100 1.0.0 Part 4b",
-      "IHO S-100 Part 17a 1.0.0" => "IHO S-100 1.0.0 Part 17a",
+      "IHO S-4 Part 2 4.9.0" => "IHO S-4 Part 2 4.9.0", # part edition
+      "IHO S-100 Part 4a 1.0.0" => "IHO S-100 Part 4a 1.0.0", # 4a part
+      "IHO S-100 Part 4b 1.0.0" => "IHO S-100 Part 4b 1.0.0",
+      "IHO S-100 Part 17a 1.0.0" => "IHO S-100 Part 17a 1.0.0",
       "IHO S-100 Part 4a" => "IHO S-100 Part 4a",
       # compact face (hyphenated onto the code); parses and renders
       "IHO S-5-B" => "IHO S-5 Part B",
@@ -45,18 +45,18 @@ RSpec.describe Pubid::Iho::Identifier do
 
       # --- annexes ---
       "IHO S-65 1.1.0 Annex A" => "IHO S-65 1.1.0 Annex A",
-      "IHO S-100 Annex A 5.2.0" => "IHO S-100 5.2.0 Annex A",
+      "IHO S-100 Annex A 5.2.0" => "IHO S-100 Annex A 5.2.0", # annex edition
       "IHO S-100 Annex A" => "IHO S-100 Annex A",
-      "IHO S-98 Annex C 1.0.0" => "IHO S-98 1.0.0 Annex C",
+      "IHO S-98 Annex C 1.0.0" => "IHO S-98 Annex C 1.0.0",
 
       # --- appendices (canonical Appendix; App/Ap. are input aliases;
       #     the subnumber keeps its own component) ---
       "IHO S-122 1.0.0 Appendix D-2" => "IHO S-122 1.0.0 Appendix D-2",
-      "IHO S-122 Ap. D-2 1.0.0" => "IHO S-122 1.0.0 Appendix D-2",
+      "IHO S-122 Ap. D-2 1.0.0" => "IHO S-122 Appendix D-2 1.0.0",
       "IHO S-52 4.0.0 Appendix 1" => "IHO S-52 4.0.0 Appendix 1",
-      "IHO S-52 App 1 4.0.0" => "IHO S-52 4.0.0 Appendix 1",
-      "IHO S-53 Ap. 1 1.0.0" => "IHO S-53 1.0.0 Appendix 1",
-      "IHO S-65 Ap. B 1.2.0" => "IHO S-65 1.2.0 Appendix B",
+      "IHO S-52 App 1 4.0.0" => "IHO S-52 Appendix 1 4.0.0",
+      "IHO S-53 Ap. 1 1.0.0" => "IHO S-53 Appendix 1 1.0.0",
+      "IHO S-65 Ap. B 1.2.0" => "IHO S-65 Appendix B 1.2.0",
 
       # --- supplements (canonical Sup; Suppl is the S-66 input alias) ---
       "IHO M-2 Sup 1" => "IHO M-2 Sup 1",
@@ -69,7 +69,7 @@ RSpec.describe Pubid::Iho::Identifier do
       "IHO P-1 Vol. 30 (2)" => "IHO P-1 Vol. 30 (2)",
       "IHO P-1 Vol. 30 Issue 2" => "IHO P-1 Vol. 30 (2)", # the Issue N alias
       "IHO P-1/21" => "IHO P-1 Vol. 21", # the slash chain
-      "IHO P-1/21 1.0.0" => "IHO P-1 1.0.0 Vol. 21",
+      "IHO P-1/21 1.0.0" => "IHO P-1 Vol. 21 1.0.0",
       "IHO P-5 Vol. 2024" => "IHO P-5 Vol. 2024", # yearbook year IS a volume
       "IHO P-5/2024" => "IHO P-5 Vol. 2024",
       "IHO P-5 2024" => "IHO P-5 Vol. 2024", # the bare year, a legacy alias
@@ -81,11 +81,20 @@ RSpec.describe Pubid::Iho::Identifier do
       "IHO S-100 5.0.0 Part 2 (2024)" => "IHO S-100 5.0.0 Part 2 (2024)",
       "IHO S-100 1.0.0 (2024) Part A" => "IHO S-100 1.0.0 Part A (2024)",
 
+      # --- component-edition duality (within-edition vs
+      #     separately-published components) ---
+      "IHO P-6 1.0.0 Vol. 2" => "IHO P-6 1.0.0 Vol. 2", # within-edition volume
+      "IHO P-6 Vol. 2 1.0.1" => "IHO P-6 Vol. 2 1.0.1", # volume edition
+      "IHO S-158 Part S-102 0.2.0" => "IHO S-158 Part S-102 0.2.0",
+      "IHO S-158-S-102 0.2.0" => "IHO S-158 0.2.0 Part S-102",
+      "IHO S-100 Sup 1 2.0.0" => "IHO S-100 Sup 1 2.0.0", # supplement edition
+      "IHO S-98 1.0.0 Annex A" => "IHO S-98 1.0.0 Annex A",
+
       # colon-separated sub-publication and the optional IHO prefix
       "IHO S-158:100 1.0.0" => "IHO S-158:100 1.0.0",
-      "IHO S-158:100 Part 2 1.0.0" => "IHO S-158:100 1.0.0 Part 2",
+      "IHO S-158:100 Part 2 1.0.0" => "IHO S-158:100 Part 2 1.0.0",
       "S-44 5.0.0" => "IHO S-44 5.0.0",
-      "S-66 Sup 1 1.0.0" => "IHO S-66 1.0.0 Sup 1",
+      "S-66 Sup 1 1.0.0" => "IHO S-66 Sup 1 1.0.0", # supplement edition
     }.each do |input, canonical|
       context "with #{input.inspect}" do
         let(:input)     { input }
@@ -180,14 +189,63 @@ RSpec.describe Pubid::Iho::Identifier do
     end
   end
 
+  describe "component-edition duality" do
+    # Owner ruling: the two publication modes are per component kind and
+    # mutually exclusive with the base edition context.
+    it "rides the base edition in within-edition mode" do
+      id = Pubid::Iho.parse("IHO P-6 1.0.0 Vol. 2")
+      expect(id.edition).to eq("1.0.0")
+      expect(id.volume).to eq("2")
+      expect(id.volume_edition).to be_nil
+    end
+
+    it "carries its own edition in separately-published mode" do
+      id = Pubid::Iho.parse("IHO P-6 Vol. 2 1.0.1")
+      expect(id.edition).to be_nil
+      expect(id.volume).to eq("2")
+      expect(id.volume_edition).to eq("1.0.1")
+    end
+
+    it "keeps the component year beside its component edition" do
+      id = Pubid::Iho.parse("IHO S-98 Part A 1.0.0 (2024)")
+      expect(id.part_edition).to eq("1.0.0")
+      expect(id.part_year).to eq("2024")
+      expect(id.year).to be_nil
+    end
+
+    it "rejects a base edition and a component edition together" do
+      expect { Pubid::Iho.parse("IHO S-98 1.0.0 Part A 2.0.0") }
+        .to raise_error(ArgumentError, /mutually exclusive/)
+    end
+  end
+
+  describe "series-reference parts" do
+    it "parses the expanded series-reference part" do
+      id = Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0")
+      expect(id.part).to eq("S-102")
+      expect(id.part_edition).to eq("0.2.0")
+    end
+
+    it "parses and canonicalizes the compact series-reference face" do
+      id = Pubid::Iho.parse("IHO S-158-S-102 0.2.0")
+      expect(id.part).to eq("S-102")
+      expect(id.edition).to eq("0.2.0")
+      expect(id.to_s).to eq("IHO S-158 0.2.0 Part S-102")
+    end
+
+    it "keeps the numbered part distinct from a series reference" do
+      expect(Pubid::Iho.parse("IHO S-100-1").part).to eq("1")
+    end
+  end
+
   describe "key_value serialization" do
     # Used by the relaton index: each id is stored as #to_hash and rebuilt via
     # .from_hash, so the round-trip must be lossless and the hash must be lean.
     [
       "IHO S-100 5.2.0",
-      "IHO S-100 1.0.0 Part 4b",
-      "IHO S-122 1.0.0 Appendix D-2",
-      "IHO S-100 5.2.0 Annex A",
+      "IHO S-100 Part 4b 1.0.0",
+      "IHO S-122 Appendix D-2 1.0.0",
+      "IHO S-100 Annex A 5.2.0",
       "IHO S-66 2.0.0 Sup 1",
       "IHO M-2 Sup 3",
       "IHO B-1 1.0.0",

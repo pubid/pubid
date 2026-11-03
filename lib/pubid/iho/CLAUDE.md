@@ -41,13 +41,14 @@ never a string suffix. All of them live flat on `Pubid::Iho::Identifier`
 |-------------|--------------------|-------------------|------------------------------|
 | edition     | `edition`          | `1.0.0` (bare)    | `v1`/`v5.1` (padded)         |
 | supplement  | `supplement`       | `Sup 1`           | `Suppl 1`                    |
-| part        | `part`             | `Part A`/`Part 1` | `S-5-B`, `S-100-1` (compact) |
+| part        | `part`             | `Part A`/`Part 1`/`Part S-102` | `S-5-B`, `S-100-1`, `S-158-S-102` (compact) |
 | annex       | `annex`            | `Annex A`         | —                            |
 | appendix    | `appendix`         | `Appendix D`      | `App`, `Ap.`                 |
 | subnumber   | `appendix_subnumber` | `-2` (joined)   | —                            |
 | volume      | `volume`           | `Vol. 30`/`Vol. 2024` | `/21` (slash chain), bare `2024` |
 | issue       | `issue`            | `(2)`             | `Issue 2`                    |
 | year (qualifier) | `year`        | `(2024)`          | —                            |
+| component edition | `<kind>_edition` (+ `<kind>_year`) | `<kind> x.y.z (2024)` | —     |
 
 - **Two main syntaxes:** `IHO S-100 1.0.0` (dated = edition-specific)
   and `IHO S-100` (undated = edition-non-specific). The official IHO
@@ -67,7 +68,23 @@ never a string suffix. All of them live flat on `Pubid::Iho::Identifier`
   `IHO P-5/2024`). The bare year (`IHO P-5 2024`) is a legacy alias
   that binds INTO `volume` — `year` never carries a serial locator.
 - **The with-year qualifier** (`IHO S-100 5.0.0 Part 2 (2024)`) is the
-  only `year` face, always parenthesized beside an edition.
+  only base `year` face, always parenthesized beside an edition.
+- **Component-edition duality** (owner: "this can happen with any
+  independently publishable artifacts"): supplement, part, annex,
+  appendix and volume each carry an optional `<kind>_edition` (+
+  `<kind>_year`) of their own, MUTUALLY EXCLUSIVE with the base edition
+  context — within-edition (`IHO P-6 1.0.0 Vol. 2`, the component rides
+  the base's edition) vs separately-published (`IHO P-6 Vol. 2 1.0.1`,
+  `IHO S-98 Part A 1.0.0`, `IHO S-158 Part S-102 0.2.0`; the base is
+  cited edition-less). The builder raises when both appear. Every
+  trailing edition now follows a component, so the historical
+  edition-last spellings reinterpret as component editions.
+- **Series-reference parts**: a check standard applied to another IHO
+  series cites it as its part — `IHO S-158 0.2.0 Part S-102`, compact
+  `IHO S-158-S-102` (the part value vocabulary is letter | number |
+  `[SPMBC]-<digits>`). The wild glued `S-158-102` stays a plain number
+  part: the syntax cannot distinguish it from `S-100-1` = Part 1, and
+  normalizing it needs an IHO series table (owner call pending).
 - **Supplement canonical face is `Sup`** (the M-2 spelling — why save
   two characters when Annex and Appendix stay full-length); `Suppl`
   (the S-66 wild spelling) is the parse-only alias, never rendered.
@@ -106,6 +123,12 @@ the segment grammar table lives in the grammar header
 
 - Markers are the lowercased face tokens (`ed-` follows ISO's
   RFC 5141 precedent); letters are case-preserved.
+- `ed-` and `year-` are POSITIONAL: the edition attaches to the node it
+  follows — the base when no component precedes it, else that
+  component's own edition (`vol-2:ed-1.0.1` = separately-published
+  volume). A `year-` belongs to a component only when it follows that
+  component's own edition; otherwise it is the base with-year
+  qualifier.
 - Containment: part ⊃ annex ⊃ appendix ⊃ subnumber (bare digit atom,
   only directly after its appendix); vol ⊃ issue.
 - The number occupies every leading bare segment up to the first

@@ -38,14 +38,23 @@ module Pubid
         @identifier = identifier
       end
 
-      # Component => URN marker, in the containment/canonical-face order.
-      # nil markers emit their component as a BARE atom (the appendix
-      # subnumber directly after its appendix).
-      MARKERS = {
-        edition: "ed", supplement: "sup", part: "part", annex: "annex",
-        appendix: "appendix", appendix_subnumber: nil, volume: "vol",
-        issue: "issue", year: "year"
-      }.freeze
+      # [component, marker] pairs in the containment/canonical-face
+      # order. A component edition/year emits right after its component
+      # (the ed- segment attaches to the node it follows, recording the
+      # separately-published mode). nil markers emit their component as
+      # a BARE atom (the appendix subnumber directly after its
+      # appendix).
+      SEGMENTS = [
+        [:edition, "ed"], [:year, "year"],
+        [:supplement, "sup"], [:supplement_edition, "ed"],
+        [:supplement_year, "year"],
+        [:part, "part"], [:part_edition, "ed"], [:part_year, "year"],
+        [:annex, "annex"], [:annex_edition, "ed"], [:annex_year, "year"],
+        [:appendix, "appendix"], [:appendix_subnumber, nil],
+        [:appendix_edition, "ed"], [:appendix_year, "year"],
+        [:volume, "vol"], [:issue, "issue"], [:volume_edition, "ed"],
+        [:volume_year, "year"]
+      ].freeze
 
       def generate
         parts = ["urn", "iho"]
@@ -57,11 +66,8 @@ module Pubid
 
       private
 
-      # One segment per component, in the containment/canonical-face
-      # order; nil markers emit their component as a BARE atom (the
-      # appendix subnumber directly after its appendix).
       def component_segments
-        MARKERS.filter_map do |component, marker|
+        SEGMENTS.filter_map do |component, marker|
           value = identifier.public_send(component)
           next unless value
 

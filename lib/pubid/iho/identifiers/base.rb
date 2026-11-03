@@ -53,17 +53,34 @@ module Pubid
       # legacy year input ("IHO P-5 2024") binds into `volume`, so this
       # attribute never carries a serial locator.
       attribute :year,       :string
+      # Supplement, part, annex, appendix and volume are independently
+      # publishable (owner ruling: "this can happen with any independently
+      # publishable artifacts"), so each carries an optional edition (+ year
+      # qualifier) of its own, mutually exclusive with the base edition
+      # context: `IHO P-6 1.0.0 Vol. 2` (within-edition) vs
+      # `IHO P-6 Vol. 2 1.0.1` (separately-published). The URN attaches
+      # ed- to the node it follows, so one positional slot records both.
       attribute :supplement, :string
-      attribute :part,       :string
-      attribute :annex,      :string
+      attribute :supplement_edition, :string
+      attribute :supplement_year,    :string
+      attribute :part, :string
+      attribute :part_edition, :string
+      attribute :part_year,    :string
+      attribute :annex, :string
+      attribute :annex_edition, :string
+      attribute :annex_year,    :string
       # The appendix is a letter or a number; a subnumbered appendix
       # ("Appendix D-2") keeps the letter in `appendix` and the "2" in
       # `appendix_subnumber` — two independently addressable components,
       # not one string.
-      attribute :appendix,   :string
+      attribute :appendix, :string
       attribute :appendix_subnumber, :string
+      attribute :appendix_edition,   :string
+      attribute :appendix_year,      :string
       attribute :volume,     :string
       attribute :issue,      :string
+      attribute :volume_edition, :string
+      attribute :volume_year,    :string
 
       # Polymorphic type map for lutaml::Model key_value serialization: maps
       # each subclass's polymorphic_name to its class name so `from_hash` can
@@ -86,13 +103,23 @@ module Pubid
         map "number",     to: :number
         map "edition",    to: :edition
         map "year",       to: :year
-        map "supplement", to: :supplement
-        map "part",       to: :part
-        map "annex",      to: :annex
-        map "appendix",   to: :appendix
+        map "supplement",         to: :supplement
+        map "supplement_edition", to: :supplement_edition
+        map "supplement_year",    to: :supplement_year
+        map "part",               to: :part
+        map "part_edition",       to: :part_edition
+        map "part_year",          to: :part_year
+        map "annex",              to: :annex
+        map "annex_edition",      to: :annex_edition
+        map "annex_year",         to: :annex_year
+        map "appendix",           to: :appendix
         map "appendix_subnumber", to: :appendix_subnumber
-        map "volume",     to: :volume
-        map "issue",      to: :issue
+        map "appendix_edition",   to: :appendix_edition
+        map "appendix_year",      to: :appendix_year
+        map "volume",             to: :volume
+        map "volume_edition",     to: :volume_edition
+        map "volume_year",        to: :volume_year
+        map "issue",              to: :issue
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.

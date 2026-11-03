@@ -14,11 +14,21 @@ module Pubid
     # dotted x.y.z edition ("1" -> "1.0.0", "5.1" -> "5.1.0").
     class Builder
       ATTRIBUTES = %i[number appendix appendix_subnumber part annex
-                      supplement year volume issue].freeze
+                      supplement year volume issue
+                      part_edition part_year supplement_edition
+                      supplement_year annex_edition annex_year
+                      appendix_edition appendix_year volume_edition
+                      volume_year].freeze
+      # The independently-publishable components' own editions; the
+      # base edition context is mutually exclusive with them (owner
+      # ruling on the two publication modes).
+      COMPONENT_EDITIONS = %i[part_edition supplement_edition annex_edition
+                              appendix_edition volume_edition].freeze
 
       def build(parsed)
         hash = parsed.is_a?(Array) ? parsed.reduce({}, :merge) : parsed
         attrs = stringified_attrs(hash)
+        assert_edition_mode!(attrs)
         klass = Pubid::Iho.identifier_klass_for_type_letter(stringify(hash[:type]))
         klass.new(**attrs)
       end
@@ -28,6 +38,20 @@ module Pubid
       end
 
       private
+
+      # The two publication modes are mutually exclusive: an identifier
+      # is either within-edition (a base edition its components ride) or
+      # separately-published (a component carries its own edition and
+      # the base is cited edition-less).
+      def assert_edition_mode!(attrs)
+        return unless attrs[:edition]
+        return unless COMPONENT_EDITIONS.any? { |key| attrs[key] }
+
+        owned = attrs.slice(*COMPONENT_EDITIONS).compact.keys.join(", ")
+        raise ArgumentError,
+              "a base edition and a component edition are mutually " \
+              "exclusive: #{owned} cannot ride edition #{attrs[:edition]}"
+      end
 
       def stringified_attrs(hash)
         attrs = ATTRIBUTES.to_h { |key| [key, stringify(hash[key])] }

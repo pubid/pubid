@@ -28,19 +28,22 @@ module Pubid
     # bases, Suppl, bare years) parse but are never rendered.
     class Renderer < ::Pubid::Renderers::Base
       # The canonical component faces in print order: edition BEFORE the
-      # part; the appendix joins its subnumber; the issue rides
-      # parenthesized after its volume; the year prints only as the
-      # parenthesized with-year qualifier.
+      # part; each independently-publishable component carries its own
+      # edition (+ parenthesized year) right after it; the appendix joins
+      # its subnumber; the issue rides parenthesized after its volume;
+      # the base year prints only as the parenthesized with-year
+      # qualifier.
       FACES = [
-        [:edition, ->(v) { " #{v}" }],
-        [:supplement, ->(v) { " Sup #{v}" }],
-        [:part, ->(v) { " Part #{v}" }],
-        [:annex, ->(v) { " Annex #{v}" }],
-        [:appendix, ->(v) { " Appendix #{v}" }],
-        [:appendix_subnumber, ->(v) { "-#{v}" }],
-        [:volume, ->(v) { " Vol. #{v}" }],
-        [:issue, ->(v) { " (#{v})" }],
-        [:year, ->(v) { " (#{v})" }],
+        [:edition, " %s"],
+        [:supplement, " Sup %s"], [:supplement_edition, " %s"],
+        [:supplement_year, " (%s)"],
+        [:part, " Part %s"], [:part_edition, " %s"], [:part_year, " (%s)"],
+        [:annex, " Annex %s"], [:annex_edition, " %s"], [:annex_year, " (%s)"],
+        [:appendix, " Appendix %s"], [:appendix_subnumber, "-%s"],
+        [:appendix_edition, " %s"], [:appendix_year, " (%s)"],
+        [:volume, " Vol. %s"], [:issue, " (%s)"],
+        [:volume_edition, " %s"], [:volume_year, " (%s)"],
+        [:year, " (%s)"]
       ].freeze
 
       def render(context: nil, **opts)
@@ -48,7 +51,7 @@ module Pubid
         rendered = "#{id.publisher} #{id.class.type[:short]}-#{id.number}"
         FACES.each do |component, face|
           value = id.public_send(component)
-          rendered << face.call(value) if value
+          rendered << (face % value) if value
         end
         rendered
       end
