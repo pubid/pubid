@@ -423,5 +423,85 @@ RSpec.describe "ISO URN Generation and Parsing" do
         expect(id.to_s).to eq("AWI 36")
       end
     end
+
+    context "document versions and item paths (issue #645)" do
+      # Glossarist-rendered vocabulary corpora cite parent documents with
+      # URNs carrying concept/item paths (metanorma-plugin-glossarist#96).
+      # Neither the document-version token nor the item path is document
+      # identity: the root identifier keeps the document's own fields and
+      # drops both, so the rendered form stays a parseable identifier.
+      it "keeps the docnumber when duplicated item-path segments follow" do
+        id = Pubid::Iso::Identifier.parse(
+          "urn:iso:std:iso:10303:-2:ed-1:v1:en:tech:ACTIVITY_MIM:tech:ACTIVITY_MIM:ACTIVITY_MIM",
+        )
+        expect(id.number).to eq("10303")
+        expect(id.part).to eq("2")
+        expect(id.to_s).to eq("ISO 10303-2(EN)")
+        expect(id.languages.map(&:code)).to eq(["EN"])
+      end
+
+      it "round-trips the flat item-path form through the rendered identifier" do
+        id = Pubid::Iso::Identifier.parse(
+          "urn:iso:std:iso:10303:-2:ed-1:en:tech:ACTIVITY_MIM",
+        )
+        rendered = id.to_s
+        expect(rendered).to eq("ISO 10303-2(EN)")
+
+        round = Pubid.parse(rendered)
+        expect(round.to_s).to eq(rendered)
+        # the human face carries no edition, so the re-parse cannot recover
+        # it -- the same loss any "…:ed-N" URN suffers through to_s
+        expect(round.exclude(:edition)).to eq(id.exclude(:edition))
+      end
+
+      it "round-trips the duplicated item-path form through the rendered identifier" do
+        id = Pubid::Iso::Identifier.parse(
+          "urn:iso:std:iso:10303:-2:ed-1:v1:en:tech:ACTIVITY_MIM:tech:ACTIVITY_MIM:ACTIVITY_MIM",
+        )
+        round = Pubid.parse(id.to_s)
+        expect(round.to_s).to eq(id.to_s)
+        expect(round.exclude(:edition)).to eq(id.exclude(:edition))
+      end
+
+      it "canonicalizes the duplicated item-path form to the clean URN" do
+        id = Pubid::Iso::Identifier.parse(
+          "urn:iso:std:iso:10303:-2:ed-1:v1:en:tech:ACTIVITY_MIM:tech:ACTIVITY_MIM:ACTIVITY_MIM",
+        )
+        expect(id.to_urn).to eq("urn:iso:std:iso:10303:-2:ed-1:en")
+      end
+
+      # The bare "v1" (no item path at all) fell into the supplement loop
+      # and became a type-less supplement number, collapsing the document
+      # to "ISO 1(EN)".
+      it "drops a document version token after the edition" do
+        id = Pubid::Iso.parse_urn("urn:iso:std:iso:10303:-2:ed-1:v1:en")
+        expect(id.to_s).to eq("ISO 10303-2(EN)")
+        expect(id.to_urn).to eq("urn:iso:std:iso:10303:-2:ed-1:en")
+      end
+
+      it "drops an item path when no language token precedes it" do
+        id = Pubid::Iso.parse_urn("urn:iso:std:iso:10303:-2:ed-1:tech:ACTIVITY_MIM")
+        expect(id.to_s).to eq("ISO 10303-2")
+      end
+
+      it "keeps the supplement and its language when an item path follows" do
+        id = Pubid::Iso.parse_urn(
+          "urn:iso:std:iso:10993:-4:amd:2006:v1:en:tech:ACTIVITY_MIM",
+        )
+        expect(id.to_s).to eq("ISO 10993-4/AMD 1:2006(EN)")
+      end
+
+      it "keeps the bare trailing language and drops the item path after it" do
+        id = Pubid::Iso.parse_urn(
+          "urn:iso:std:iso-astm:52920:DIS:fr:tech:ACTIVITY_MIM",
+        )
+        expect(id.to_s).to eq("ISO/ASTM DIS 52920(FR)")
+      end
+
+      it "keeps a document version token that rides a comma language field" do
+        id = Pubid::Iso.parse_urn("urn:iso:std:iso:10303:-2:ed-1:v1:en,fr:tech:ACTIVITY_MIM")
+        expect(id.to_s).to eq("ISO 10303-2(EN,FR)")
+      end
+    end
   end
 end

@@ -46,6 +46,38 @@
   different attributes — the first pass stripped `edition.number.value` too,
   and two corrigendum examples caught it.
 
+- **URN item paths and document versions are cut, not parsed (issue #645).**
+  Glossarist-rendered corpora cite parent documents with URNs like
+  `urn:iso:std:iso:10303:-2:ed-1:v1:en:tech:ACTIVITY_MIM` and a duplicated
+  `:tech:X:tech:X:X` extraction tail. Neither tail is document identity, so
+  `UrnParser` drops both: the bare document-version token (`v1` right after
+  `ed-N` — the base identifier has no version attribute, and before this fix
+  the supplement loop consumed it as a type-less supplement number, which
+  wrapped the document as that phantom supplement and collapsed
+  "ISO 10303-2" to "ISO 1"), and the item path, cut at the first
+  supplement-loop token that can be nothing else (`item_path_segment?`).
+  Two invariants to keep when editing this loop:
+  **the cut's allow-list must mirror exactly what the loop consumes** —
+  `stage-`, a bare typed-stage abbr, the `ABBR.N` form, a supplement type,
+  digits, a `\Av\d` version, or a language field (`LANGUAGE_FIELD_RE`,
+  2-3-letter ISO 639 codes, comma-separated). A token allowed through that
+  no branch consumes spins the loop forever: the language branch used to be
+  the loose catch-all that guaranteed progress, and gating it on
+  `LANGUAGE_FIELD_RE` (so item-path segments stop overwriting the base
+  language as a bogus "(ACTIVITY_MIM)" suffix) removed that guarantee —
+  `FDAM.3` in `urn:iso:std:iso:17301:-1:FDAM.3:amd:2022:v1.3` exposed it.
+  That is also why the loop gained an explicit `ABBR.N` arm: the base stage
+  block deliberately skips a supplement-family stage when its own supplement
+  follows, and the loop had to consume the token instead. It is consumed
+  **and dropped** — the supplement layer has no stage-iteration slot, and
+  the old catch-all carried it as a bogus base language visible only in the
+  generated URN (`…:fdam.3:amd:1:2022:v1` → now `…:amd:1:2022:v1`; the
+  locked `to_s` "ISO 17301-1/AMD 1:2022" is unchanged). Net effect:
+  `parse(render(parse(urn)))` round-trips for both item-path forms — the
+  face renders `(EN)` (a form the grammar accepts) instead of the
+  unparseable `(ACTIVITY_MIM)` — and identifiers without an item path
+  render byte-identically. No grammar or renderer change was needed.
+
 - **Typed model bindings (Phase D): the builder consumes the grammar's bound
   map, not a parse tree.** `Identifier.parse` and `Normalizer` parse through
   `Pubid::Parg::Model.bound(:iso, …)`; `UrnParser#build_identifier` constructs
