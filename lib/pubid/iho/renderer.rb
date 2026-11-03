@@ -4,33 +4,52 @@ module Pubid
   module Iho
     # Human-readable renderer for IHO identifiers.
     #
-    # Produces strings like:
-    #   "IHO S-44 5.0.0"
-    #   "IHO P-1/21 1.0.0"
-    #   "IHO S-100 Part 4a 1.0.0"
-    #   "IHO S-65 Ap. A 1.0.0"
-    #   "IHO P-5 2024"            (year-identified series)
-    #   "IHO P-1 Vol. 30 (2)"     (volume/issue-identified series)
+    # Canonical faces (owner rulings, 2026-11-03):
+    #   "IHO S-100"                     undated (edition-non-specific)
+    #   "IHO S-100 1.0.0"               dated (edition-specific)
+    #   "IHO S-100 5.0.0 Part 2"        edition BEFORE the part
+    #   "IHO S-98 1.0.0 Part A Annex B"
+    #   "IHO S-122 1.0.0 Appendix D-2"  canonical Appendix, subnumber
+    #                                   joined by a dash
+    #   "IHO M-2 Sup 1"                 canonical Sup (Suppl is an input
+    #                                   alias)
+    #   "IHO P-1 Vol. 30 (2)"           volume-keyed series (P-1, P-6)
+    #   "IHO P-5 Vol. 2024"             the yearbook year IS a volume
+    #   "IHO S-100 5.0.0 Part 2 (2024)" the with-year qualifier: a year
+    #                                   beside an edition is the date
+    #                                   qualifier on standards,
+    #                                   parenthesized — the only year face
     #
     # The renderer is registered as the `:human` format in the IHO format
-    # registry and invoked via `render(format: :human)`.
+    # registry and invoked via `render(format: :human)`; the compact face
+    # (`IHO S-100-1 5.0.0`, `IHO M-2-2`, `IHO P-5/2024`) is the opt-in
+    # `compact: true` flag, and `with_publisher: false` drops the leading
+    # publisher as everywhere else. The legacy faces (glued lettered
+    # bases, Suppl, bare years) parse but are never rendered.
     class Renderer < ::Pubid::Renderers::Base
+      # The canonical component faces in print order: edition BEFORE the
+      # part; the appendix joins its subnumber; the issue rides
+      # parenthesized after its volume; the year prints only as the
+      # parenthesized with-year qualifier.
+      FACES = [
+        [:edition, ->(v) { " #{v}" }],
+        [:supplement, ->(v) { " Sup #{v}" }],
+        [:part, ->(v) { " Part #{v}" }],
+        [:annex, ->(v) { " Annex #{v}" }],
+        [:appendix, ->(v) { " Appendix #{v}" }],
+        [:appendix_subnumber, ->(v) { "-#{v}" }],
+        [:volume, ->(v) { " Vol. #{v}" }],
+        [:issue, ->(v) { " (#{v})" }],
+        [:year, ->(v) { " (#{v})" }],
+      ].freeze
+
       def render(context: nil, **opts)
         id = @id
-
-        letter = id.class.type[:short]
-        rendered = "#{id.publisher} #{letter}-#{id.number}"
-        rendered << " Ap. #{id.appendix}" if id.appendix
-        rendered << " Part #{id.part}" if id.part
-        rendered << " Annex #{id.annex}" if id.annex
-        rendered << " Suppl #{id.supplement}" if id.supplement
-        # The grammar's tail picks exactly one discriminator: a dotted
-        # version, a year, or a volume (with an optional issue). The
-        # issue prints parenthesized; "Issue N" is an input alias only.
-        rendered << " #{id.version}" if id.version
-        rendered << " #{id.year}" if id.year
-        rendered << " Vol. #{id.volume}" if id.volume
-        rendered << " (#{id.issue})" if id.issue
+        rendered = "#{id.publisher} #{id.class.type[:short]}-#{id.number}"
+        FACES.each do |component, face|
+          value = id.public_send(component)
+          rendered << face.call(value) if value
+        end
         rendered
       end
     end
