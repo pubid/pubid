@@ -17,20 +17,27 @@ RSpec.describe Pubid::Iho::UrnGenerator do
       "IHO S-52 4.0.0 Appendix 1" => "urn:iho:s:52:ed-4.0.0:appendix-1",
       "IHO M-2 Sup 1" => "urn:iho:m:2:sup-1",
       "IHO S-66 2.0.0 Sup 4" => "urn:iho:s:66:ed-2.0.0:sup-4",
-      "IHO P-1/21 1.0.0" => "urn:iho:p:1:ed-1.0.0:vol-21",
+      "IHO P-1/21 1.0.0" => "urn:iho:p:1:vol-21:ed-1.0.0",
       # serial locators: the yearbook year IS a volume — no year segment
       "IHO P-5 Vol. 2024" => "urn:iho:p:5:vol-2024",
       "IHO P-1 Vol. 30" => "urn:iho:p:1:vol-30",
       "IHO P-1 Vol. 30 (2)" => "urn:iho:p:1:vol-30:issue-2",
       # the standards with-year qualifier keeps its own segment
+      # the base year qualifier emits beside the base edition
       "IHO S-100 5.0.0 Part 2 (2024)" =>
-        "urn:iho:s:100:ed-5.0.0:part-2:year-2024",
+        "urn:iho:s:100:ed-5.0.0:year-2024:part-2",
+      # component editions: the ed- segment attaches to the node it
+      # follows (the separately-published mode)
+      "IHO P-6 Vol. 2 1.0.1" => "urn:iho:p:6:vol-2:ed-1.0.1",
+      "IHO S-98 Part A 1.0.0 (2024)" =>
+        "urn:iho:s:98:part-A:ed-1.0.0:year-2024",
+      "IHO S-158 Part S-102 0.2.0" => "urn:iho:s:158:part-S-102:ed-0.2.0",
+      "IHO P-6 1.0.0 Vol. 2" => "urn:iho:p:6:ed-1.0.0:vol-2",
       # the number keeps its colon; no component segment can collide
       # with it, so a colon number and a volume stay distinct
       "IHO S-158:100" => "urn:iho:s:158:100",
       "IHO S-158:100 1.0.0" => "urn:iho:s:158:100:ed-1.0.0",
       "IHO S-158 Vol. 2024" => "urn:iho:s:158:vol-2024",
-      "IHO P-1/21 1.0.0" => "urn:iho:p:1:ed-1.0.0:vol-21",
       "IHO M-3 2.0.0" => "urn:iho:m:3:ed-2.0.0",
       "IHO B-4 2.19.0" => "urn:iho:b:4:ed-2.19.0",
       "IHO C-13 1.0.0" => "urn:iho:c:13:ed-1.0.0",

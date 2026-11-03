@@ -34,7 +34,7 @@ RSpec.describe Pubid::Iho::UrnParser do
   {
     "urn:iho:s:158:100" => "IHO S-158:100",
     "urn:iho:s:158:100:ed-1.0.0" => "IHO S-158:100 1.0.0",
-    "urn:iho:s:158:100:part-2:ed-1.0.0" => "IHO S-158:100 1.0.0 Part 2",
+    "urn:iho:s:158:100:part-2:ed-1.0.0" => "IHO S-158:100 Part 2 1.0.0",
     "urn:iho:s:158:2024" => "IHO S-158:2024",
     "urn:iho:s:158:vol-2024" => "IHO S-158 Vol. 2024",
     "urn:iho:s:122:ed-1.0.0:appendix-D:2" => "IHO S-122 1.0.0 Appendix D-2",
@@ -43,6 +43,13 @@ RSpec.describe Pubid::Iho::UrnParser do
     "urn:iho:s:100:ed-5.0.0:part-2:year-2024" =>
       "IHO S-100 5.0.0 Part 2 (2024)",
     "urn:iho:m:2:sup-1" => "IHO M-2 Sup 1",
+    # the positional ed- attach: a component edition lands on its
+    # component, a bare base edition on the base
+    "urn:iho:p:6:vol-2:ed-1.0.1" => "IHO P-6 Vol. 2 1.0.1",
+    "urn:iho:p:6:ed-1.0.0:vol-2" => "IHO P-6 1.0.0 Vol. 2",
+    "urn:iho:s:158:part-S-102:ed-0.2.0" => "IHO S-158 Part S-102 0.2.0",
+    "urn:iho:s:98:part-A:ed-1.0.0:year-2024" => "IHO S-98 Part A 1.0.0 (2024)",
+    "urn:iho:s:122:appendix-D:2:ed-1.0.0" => "IHO S-122 Appendix D-2 1.0.0",
   }.each do |urn, text|
     it "decodes #{urn.inspect} as #{text.inspect}" do
       expect(described_class.new.parse_urn(urn).to_s).to eq(text)
@@ -95,6 +102,8 @@ RSpec.describe Pubid::Iho::UrnParser do
   # parse -> URN -> parse AND parse -> hash -> parse.
   {
     "IHO S-98 1.0.0 Annex A" => %i[edition annex],
+    "IHO P-6 Vol. 2 1.0.1" => %i[volume volume_edition],
+    "IHO S-158 Part S-102 0.2.0" => %i[part part_edition],
     "IHO S-122 1.0.0 Appendix D-2" => %i[edition appendix appendix_subnumber],
     "IHO S-100 5.0.0 Part 2 (2024)" => %i[edition part year],
   }.each do |text, components|

@@ -49,7 +49,7 @@ module Pubid
       MARKERS = {
         "ed" => [:edition, /\A\d+\.\d+\.\d+\z/],
         "sup" => [:supplement, /\A\d+\z/],
-        "part" => [:part, /\A(?:\d+[a-zA-Z]*|[A-Z])\z/],
+        "part" => [:part, /\A(?:\d+[a-zA-Z]*|[A-Z]|[SPMBC]-\d+)\z/],
         "annex" => [:annex, /\A[A-Z]\z/],
         "appendix" => [:appendix, /\A(?:[A-Z]|\d+)\z/],
         "vol" => [:volume, /\A\d+\z/],
@@ -58,6 +58,10 @@ module Pubid
       }.freeze
 
       MARKER_RE = /\A(#{MARKERS.keys.join('|')})-(.+)\z/
+
+      # The positional markers: their attribute depends on the node they
+      # follow (the component-edition duality).
+      POSITIONAL_MARKERS = %i[edition year].freeze
 
       # Legacy dotted keys (deprecated; decodable, never emitted).
       # "ap" is the pre-positional appendix tag; "suppl" the pre-positional
@@ -87,7 +91,12 @@ module Pubid
         segments = split_parts(strip_namespace(urn))
         type_token = read_type!(segments, urn)
         attrs = { number: consume_number!(segments, urn) }
-        consume_segments!(attrs, segments, urn)
+        # Positional context: the component the upcoming ed-/year- would
+        # attach to, and the owner of the edition just consumed (a year
+        # belongs to a component only when it follows that component's
+        # own edition).
+        ctx = { component: nil, edition_owner: nil }
+        consume_segments!(attrs, segments, ctx, urn)
         Builder.build({ type: type_token.upcase, **attrs })
       end
 
@@ -101,9 +110,9 @@ module Pubid
               "Unknown IHO series #{type_token.inspect} in #{urn.inspect}"
       end
 
-      def consume_segments!(attrs, segments, urn)
+      def consume_segments!(attrs, segments, ctx, urn)
         until segments.empty?
-          consume_segment!(attrs, segments, urn)
+          consume_segment!(attrs, segments, ctx, urn)
         end
       end
 
@@ -123,12 +132,11 @@ module Pubid
         number.join(":")
       end
 
-      def consume_segment!(attrs, segments, urn)
+      def consume_segment!(attrs, segments, ctx, urn)
         segment = segments.shift
         case segment
-        when MARKER_RE then consume_marker!(attrs, Regexp.last_match, segments, 
-                                            urn)
-        when LEGACY_RE then consume_legacy!(attrs, Regexp.last_match, urn)
+        when MARKER_RE then consume_marker!(segment, attrs, segments, ctx, urn)
+        when LEGACY_RE then consume_legacy!(segment, attrs, urn)
         when LEGACY_EDITION_RE then store!(attrs, :edition, segment, urn)
         else raise_unexpected!(segment, urn)
         end
@@ -142,20 +150,56 @@ module Pubid
       # A marker segment: validate the value against the marker's own
       # pattern, store it, and claim the bare atom that follows an
       # appendix (its subnumber — the only bare atom allowed after a
-      # marker).
-      def consume_marker!(attrs, match, segments, urn)
-        key, pattern = MARKERS.fetch(match[1])
-        value = match[2]
-        unless value.match?(pattern)
-          raise Pubid::Errors::UrnParseError,
-                "Invalid #{match[1]} value #{value.inspect} in #{urn.inspect}"
+      # marker). The ed- and year- markers are POSITIONAL: the edition
+      # attaches to the component it follows (the base when no component
+      # precedes it), and a year belongs to a component only when it
+      # follows that component's own edition — the separately-published
+      # mode; otherwise it is the base with-year qualifier.
+      def consume_marker!(segment, attrs, segments, ctx, urn)
+        marker, value = MARKER_RE.match(segment).captures
+        key, pattern = MARKERS.fetch(marker)
+        raise_invalid!(marker, value, urn) unless value.match?(pattern)
+
+        if POSITIONAL_MARKERS.include?(key)
+          return consume_positional!(attrs, key, value, ctx, urn)
         end
 
         store!(attrs, key, value, urn)
-        consume_subnumber!(attrs, key, segments, urn)
+        ctx[:component] = key
+        ctx[:edition_owner] = nil
+        consume_subnumber!(attrs, key, segments, ctx, urn)
       end
 
-      def consume_subnumber!(attrs, key, segments, urn)
+      def raise_invalid!(marker, value, urn)
+        raise Pubid::Errors::UrnParseError,
+              "Invalid #{marker} value #{value.inspect} in #{urn.inspect}"
+      end
+
+      # ed- and year- are POSITIONAL markers (see the marker docs): the
+      # edition attaches to the component it follows, the year to the
+      # edition owner.
+      def consume_positional!(attrs, key, value, ctx, urn)
+        if key == :edition
+          return store_component_scoped!(attrs, :edition, value, ctx, urn)
+        end
+
+        store_year!(attrs, value, ctx, urn)
+      end
+
+      def store_component_scoped!(attrs, stem, value, ctx, urn)
+        owner = ctx[:component]
+        store!(attrs, owner ? :"#{owner}_#{stem}" : stem, value, urn)
+        ctx[:edition_owner] = owner
+      end
+
+      def store_year!(attrs, value, ctx, urn)
+        owner = ctx[:edition_owner]
+        attrs_key = owner && owner != :base ? :"#{owner}_year" : :year
+        ctx[:edition_owner] = nil
+        store!(attrs, attrs_key, value, urn)
+      end
+
+      def consume_subnumber!(attrs, key, segments, ctx, urn)
         return unless key == :appendix && segments.first&.match?(SUBNUMBER_RE)
 
         store!(attrs, :appendix_subnumber, segments.shift, urn)
@@ -164,10 +208,11 @@ module Pubid
       # Legacy dotted-key decode. The legacy appendix value stored the
       # subnumber inside one string ("appendix.D-2"); it decodes into the
       # two components.
-      def consume_legacy!(attrs, match, urn)
+      def consume_legacy!(segment, attrs, urn)
+        match = LEGACY_RE.match(segment)
         key = LEGACY_KEYS.fetch(match[1]) do
           raise Pubid::Errors::UrnParseError,
-                "Unexpected segment #{match[0].inspect} in #{urn.inspect}"
+                "Unexpected segment #{segment.inspect} in #{urn.inspect}"
         end
 
         store_legacy!(attrs, key, match[2], urn)
