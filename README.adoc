@@ -88,6 +88,22 @@ id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
 * ✅ Multi-level supplement support with correct nesting order
 * ✅ Round-trip parsing (parse_urn -> to_urn) for ISO and IEC
 
+=== The pubid-scheme URN
+
+`#to_urn` follows the registered grammar of the organization, which can
+drop values (RFC 5141 has no year). `#to_pubid_urn` is pubid's own URN: it
+carries every value, always round-trips through `Pubid.parse_urn`, and is
+safe to use as an HTTP path. ISO supports it now; the other flavors follow
+(link:docs/URN-SCHEMES.adoc[URN schemes]).
+
+[source,ruby]
+----
+id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2016")
+id.to_pubid_urn
+# => "urn:pubid:iso:is:9001:year-2015:amd:1:year-2016"
+Pubid.parse_urn(id.to_pubid_urn).to_s  # => "ISO 9001:2015/Amd 1:2016"
+----
+
 === Key Difference: ISO vs IEC Part Numbering
 
 ISO URNs (RFC 5141): part number is a separate colon-separated field:

@@ -29,6 +29,18 @@ module Pubid
         shared_class(type) || flavor_class(type)
       end
 
+      # The flavor module that the flavor segment of a +_type+ names
+      # ("iso", "cencenelec", "3gpp").
+      #
+      # @param segment [String]
+      # @return [Module, nil]
+      def flavor_module(segment)
+        return nil unless segment.is_a?(String)
+
+        ::Pubid.eager_load_flavors!
+        ::Pubid::Registry.get(segment) || flavor_by_module_segment(segment)
+      end
+
       private
 
       def shared_class(type)

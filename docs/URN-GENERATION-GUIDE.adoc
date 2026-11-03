@@ -2,6 +2,10 @@
 
 PubID generates RFC 5141-bis compliant URNs for ISO, IEC, and other standards identifiers. This guide covers URN format, usage, and round-trip guarantees.
 
+NOTE: This guide covers the official URN (`#to_urn`). The pubid-scheme URN
+(`#to_pubid_urn`, `urn:pubid:…`), which always round-trips and is the relaton
+slug source, is designed in link:URN-SCHEMES.adoc[URN schemes].
+
 == Quick Start
 
 [source,ruby]

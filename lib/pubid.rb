@@ -160,6 +160,7 @@ module Pubid
   autoload :Version, "pubid/version"
   autoload :Core, "pubid/core"
   autoload :TypeResolver, "pubid/type_resolver"
+  autoload :PubidUrn, "pubid/pubid_urn"
 
 
   # Require all flavor modules
@@ -281,8 +282,13 @@ module Pubid
   #
   # @param string [String] the URN
   # @return [Identifier] the parsed identifier
+  #
+  # A pubid-scheme URN ("urn:pubid:…", see {PubidUrn}) is decoded by the
+  # shared codec; every other namespace goes to its flavor's UrnParser.
   def self.parse_urn(string)
     eager_load_flavors!
+    return PubidUrn.parse(string) if PubidUrn.pubid_urn?(string)
+
     flavor = detect_flavor_from_urn(string)
     flavor_module = Registry.get(flavor)
     unless flavor_module
@@ -292,6 +298,18 @@ module Pubid
 
     urn_parser = flavor_module.const_get(:UrnParser)
     urn_parser.parse(string)
+  end
+
+  # Parse a pubid-scheme URN, and only that: an official URN such as
+  # "urn:iso:std:…" raises. For a consumer that takes a slug and must not
+  # accept a lossy official URN by mistake (relaton/relaton#441).
+  #
+  # @param string [String] a "urn:pubid:…" URN
+  # @return [Identifier]
+  # @raise [Pubid::Errors::UrnParseError]
+  def self.parse_pubid_urn(string)
+    eager_load_flavors!
+    PubidUrn.parse(string)
   end
 
   # Build an identifier from its serialized hash, without naming its flavor —
