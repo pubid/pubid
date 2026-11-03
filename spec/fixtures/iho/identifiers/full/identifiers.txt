@@ -1,7 +1,8 @@
 # IHO identifier corpus. Inputs feed classify_fixtures.rb, which
 # regenerates identifiers/pass/ and identifiers/fail/ from this file.
 # Seeded from the hand-curated pass files plus the relaton/relaton#407
-# year/volume series forms.
+# serial-locator forms and the component-model matrix (owner rulings
+# 2026-11-03).
 
 IHO B-1 1.0.0
 IHO B-10 5.0.0
@@ -50,6 +51,47 @@ IHO S-100 4.0.0
 IHO S-100 5.0.0
 IHO S-100 5.1.0
 IHO S-100 5.2.0
+# component model (owner rulings 2026-11-03): the dotted x.y.z edition,
+# parts, annexes, appendices, supplements, volumes; the component faces
+# render canonically (edition before part, Sup, Appendix, Vol.).
+IHO S-98 1.0.0 Part A
+IHO S-98 1.0.0 Part B
+IHO S-98 Part D
+IHO S-98 1.0.0 Annex A
+IHO S-98 1.0.0 Annex C
+IHO S-101 1.2.0 Annex A
+IHO S-121 1.0.0 Annex A
+IHO S-121 1.0.0 Annex B
+IHO S-128 1.0.0 Annex A
+IHO S-130 1.0.0 Annex A
+IHO S-122 1.0.0 Appendix A
+IHO S-122 1.0.0 Appendix D-2
+IHO S-122 1.0.0 Appendix E
+IHO S-123 1.0.0 Appendix A
+IHO S-123 1.0.0 Appendix D-2
+IHO S-131 1.0.0 Appendix C
+IHO S-131 1.0.0 Appendix D
+IHO S-52 4.0.0 Appendix 1
+IHO S-52 App 1 4.0.0
+IHO M-2 Sup 1
+IHO M-2 Sup 6
+IHO M-2 Suppl 3
+IHO S-66 Sup 1
+IHO S-66 Suppl 4
+IHO S-66 2.0.0 Sup 4
+IHO S-100 5.0.0 Part 2
+IHO S-100 5.0.0 Part 2 (2024)
+IHO S-100 1.0.0 (2024) Part A
+IHO S-100 v5.1
+IHO S-100 v1
+IHO S-5-B
+IHO S-100-1 1.0.0
+IHO P-6-3 1.0.0
+IHO P-5 Vol. 2024
+IHO P-5/2024
+IHO B-7 Vol. 2023
+IHO P-1/21 1.0.0
+IHO P-1/30
 IHO S-101 1.0.0
 IHO S-101 1.1.0
 IHO S-101 1.2.0
@@ -134,8 +176,9 @@ IHO S-97 1.1.0
 IHO S-98 1.0.0
 IHO S-99 1.1.0
 IHO S-99 2.0.0
-# relaton/relaton#407 - the series publications are identified by year or
-# volume, not by the placeholder a.b.c edition:
+# relaton/relaton#407 - the series publications carry one serial
+# locator, the volume; the yearbook year IS a volume, so a bare year is
+# a legacy alias that renders as Vol. N:
 IHO B-7 2023
 IHO P-5 2024
 IHO P-6 2024

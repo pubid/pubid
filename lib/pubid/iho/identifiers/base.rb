@@ -6,10 +6,17 @@ module Pubid
     # every concrete IHO identifier (Identifiers::*) descends from it.
     #
     # IHO identifiers have the form:
-    #   IHO {S|P|M|B|C}-{number}[ Ap. {appendix}][ Part {part}][ Annex {annex}][ Suppl {supplement}][ {version|year|Vol. N [issue]}]
+    #   IHO {S|P|M|B|C}-{number}[ {edition}| Vol. N [(issue)]]
+    #       [ Sup N][ Part X][ Annex A][ Appendix B[-2]] [(2024)]
     #
-    # The leading IHO publisher prefix is optional on input but always
-    # emitted on output.
+    # Every tail component is a first-class semantic component: a typed
+    # attribute, independently addressable, URN-encodable and matchable.
+    # The canonical faces order the edition BEFORE the part
+    # (`IHO S-100 1.0.0 Part 2`), print the supplement as "Sup" and the
+    # appendix as "Appendix" (with the subnumber after a dash), the
+    # volume issue parenthesized (`IHO P-1 Vol. 30 (2)`), and the
+    # with-year qualifier parenthesized (`IHO S-100 5.0.0 Part 2 (2024)`
+    # — the only year face: a periodical year IS a volume).
     class Identifier < ::Pubid::Identifier
       # Parse an IHO identifier string into an identifier object
       # @param identifier [String] The IHO identifier string to parse
@@ -25,30 +32,36 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        parsed = Pubid::Parg::Backend.parse(:iho, identifier.strip)
+        parsed = Pubid::Parg::Model.bound(:iho, identifier.strip)
         Builder.build(parsed)
       end
 
       # `number` overrides the generic Components::Code attribute with a plain
-      # string (same pattern as `part` below); it holds the IHO document
-      # number (e.g. "100", "1/21"). Kept as the generic `number` so the
-      # relaton index sorts/binary-searches on it natively via `id.number`.
+      # string (same pattern as the other string components); it holds the IHO
+      # document number (e.g. "100", "1/21" until the slash-chain volume
+      # parse, "158:100"). Kept as the generic `number` so the relaton index
+      # sorts/binary-searches on it natively via `id.number`.
       attribute :number,     :string
       attribute :publisher,  :string, default: "IHO"
-      attribute :appendix,   :string
+      # The official IHO edition is the dotted x.y.z (a plain string — the
+      # ~16 string-edition flavors precede this). `IHO S-100 1.0.0` is
+      # edition-specific, `IHO S-100` edition-non-specific; a year beside an
+      # edition is the with-year qualifier, never a year-keyed docidentifier.
+      attribute :edition,    :string
+      # The with-year qualifier on standards (`(2024)` beside an edition) —
+      # the only year component. A periodical year IS a volume: the bare
+      # legacy year input ("IHO P-5 2024") binds into `volume`, so this
+      # attribute never carries a serial locator.
+      attribute :year,       :string
+      attribute :supplement, :string
       attribute :part,       :string
       attribute :annex,      :string
-      attribute :supplement, :string
-      attribute :version,    :string
-      # Series identity components (relaton#407): the year-identified
-      # series (B-7, P-5, P-6) and the volume/issue-identified ones
-      # (P-1 and the IHR) carry no a.b.c edition — their trailing
-      # component is a year or a "Vol. N [issue]" pair instead. Plain
-      # scalars, like every other IHO attribute; the grammar's tail
-      # picks exactly one discriminator, so only one of
-      # version/year/volume is ever present, with issue only
-      # alongside volume.
-      attribute :year,       :string
+      # The appendix is a letter or a number; a subnumbered appendix
+      # ("Appendix D-2") keeps the letter in `appendix` and the "2" in
+      # `appendix_subnumber` — two independently addressable components,
+      # not one string.
+      attribute :appendix,   :string
+      attribute :appendix_subnumber, :string
       attribute :volume,     :string
       attribute :issue,      :string
 
@@ -71,31 +84,88 @@ module Pubid
       key_value do
         map "_type",      to: :_type, polymorphic_map: IHO_TYPE_MAP
         map "number",     to: :number
-        map "appendix",   to: :appendix
+        map "edition",    to: :edition
+        map "year",       to: :year
+        map "supplement", to: :supplement
         map "part",       to: :part
         map "annex",      to: :annex
-        map "supplement", to: :supplement
-        map "version",    to: :version
-        map "year",       to: :year
+        map "appendix",   to: :appendix
+        map "appendix_subnumber", to: :appendix_subnumber
         map "volume",     to: :volume
         map "issue",      to: :issue
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
-      # IHO_TYPE_MAP remains as the key_value polymorphic_map.
+      # IHO_TYPE_MAP remains the key_value polymorphic_map.
 
-      # The volume/issue pair is a scalar cluster: a reference that omits
-      # the issue must still match a hit that carries one ("P-1 Vol. 30"
-      # vs "P-1 Vol. 30 (2)"), so excluding the volume nils the issue
-      # with it — the same additive-alias shape the base applies to
-      # :year -> :date. A lone scalar :year needs no override here: the
-      # base nils a declared :year directly (the additive :year -> :date
-      # alias nils whichever name the flavor declares).
+      # The volume/issue and appendix/subnumber pairs are scalar clusters:
+      # a reference that omits the finer component must still match a hit
+      # that carries one ("P-1 Vol. 30" vs "P-1 Vol. 30 (2)"), so excluding
+      # the coarser component nils the finer one with it — the same
+      # additive-alias shape the base applies to :year -> :date. A lone
+      # scalar :year needs no override here: the base nils a declared :year
+      # directly (the additive :year -> :date alias nils whichever name the
+      # flavor declares).
       def exclude(*args)
+        args = args.dup
         args << :issue if args.include?(:volume)
+        args << :appendix_subnumber if args.include?(:appendix)
         super
       end
-    end
 
+      # Render the compact face: the code-adjacent components folded onto
+      # the code with separators — the supplement and the part hyphenated
+      # (`IHO M-2-2` for `IHO M-2 Sup 2`, `IHO S-5-B` for `IHO S-5 Part B`,
+      # `IHO S-100-1` for `IHO S-100 Part 1`) and the volume as the slash
+      # chain (`IHO P-5/2024` for `IHO P-5 Vol. 2024`). The canonical
+      # render stays expanded; compact is opt-in. The legacy faces (glued
+      # lettered bases, Suppl, bare years) parse but are never rendered in
+      # any form.
+      def render(format: :human, **opts)
+        compact = opts.delete(:compact)
+        result = super
+        compact && format == :human ? compact_face(result) : result
+      end
+
+      # The shared mr_string path reads `edition&.number` (the base
+      # declares edition as Components::Edition); IHO's edition is a plain
+      # string, so the segment is built from it directly.
+      def mr_edition
+        return nil unless edition
+
+        "ed#{edition}"
+      end
+
+      private
+
+      # Fold " Sup N" / " Part X" / " Vol. N" into the code as "-N" /
+      # "-X" / "/N", keeping everything else in place (the edition
+      # follows the compact code, as in the legacy "S-5A 1.0.2" print
+      # order). The issue keeps its parenthesized print.
+      def compact_face(rendered)
+        result = rendered.sub(/\A#{publisher} #{base_code}(?= |$)/,
+                              "#{publisher} #{compact_code}")
+        folded_segments.each { |segment| result = result.sub(segment, "") }
+        result
+      end
+
+      def base_code
+        "#{self.class.type[:short]}-#{number}"
+      end
+
+      def compact_code
+        code = base_code.dup
+        code << "-#{supplement}" if supplement
+        code << "-#{part}" if part
+        code << "/#{volume}" if volume
+        code
+      end
+
+      def folded_segments
+        [supplement && " Sup #{supplement}",
+         part && " Part #{part}",
+         volume && " Vol. #{volume}"].compact
+      end
+    end
   end
 end
