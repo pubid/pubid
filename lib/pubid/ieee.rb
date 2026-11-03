@@ -18,6 +18,7 @@ module Pubid
     autoload :Ire, "#{__dir__}/ieee/ire"
     autoload :Nesc, "#{__dir__}/ieee/nesc"
     autoload :Parser, "#{__dir__}/ieee/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/ieee/pubid_urn_schema"
     autoload :PreParser, "#{__dir__}/ieee/pre_parser"
     autoload :Compaction, "#{__dir__}/ieee/compaction"
     autoload :ProjectRenderer, "#{__dir__}/ieee/project_renderer"

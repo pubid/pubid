@@ -93,7 +93,7 @@ id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
 `#to_urn` follows the registered grammar of the organization, which can
 drop values (RFC 5141 has no year). `#to_pubid_urn` is pubid's own URN: it
 carries every value, always round-trips through `Pubid.parse_urn`, and is
-safe to use as an HTTP path. ISO supports it now; the other flavors follow
+safe to use as an HTTP path. ISO, IEEE and ANSI support it now; the other flavors follow
 (link:docs/URN-SCHEMES.adoc[URN schemes]).
 
 [source,ruby]

@@ -17,6 +17,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/iec/single_identifier"
     autoload :SupplementIdentifier, "#{__dir__}/iec/supplement_identifier"
     autoload :Parser, "#{__dir__}/iec/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/iec/pubid_urn_schema"
     autoload :Builder, "#{__dir__}/iec/builder"
     autoload :UrnParser, "#{__dir__}/iec/urn_parser"
     autoload :UrnGenerator, "#{__dir__}/iec/urn_generator"

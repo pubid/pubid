@@ -28,9 +28,9 @@ module PubidUrnContract
   FIXTURE_DIRS = { "3gpp" => "tgpp" }.freeze
 
   PENDING = %w[
-    3gpp adobe amca ansi api ashrae asme astm bipm bsi calconnect ccsds
+    3gpp adobe amca api ashrae asme astm bipm bsi calconnect ccsds
     cen_cenelec cie csa doi easc ecma etsi evs gb gost iala iana idf iec
-    ieee ietf iho isbn itu jcgm jis nist oasis ogc oiml omg plateau sae un
+    ietf iho isbn itu jcgm jis nist oasis ogc oiml omg plateau sae un
     w3c xsf
   ].freeze
 
@@ -67,8 +67,26 @@ module PubidUrnContract
     end
   end
 
+  # A fixture that does not parse is the fixture spec's concern, not this
+  # contract's. Two classes mean "does not parse": the contract's own
+  # ParseError, and the engine's BindError, which some grammars still leak
+  # (recorded in docs/URN-SCHEMES.adoc). Any other error from parse — a
+  # builder crash — is NOT skipped: it is reported as a failure here.
+  # Resolved when the rescue runs: the engine loads with the first parse.
+  def parse_failures
+    [Pubid::Errors::ParseError,
+     (::Parsanol::PARG::BindError if defined?(::Parsanol::PARG::BindError))]
+      .compact
+  end
+
+  def parsed(mod, input)
+    mod.parse(input)
+  rescue *parse_failures
+    nil
+  end
+
   def check(mod, input, seen)
-    id = mod.parse(input)
+    id = parsed(mod, input) or return
     hash = id.to_hash
     urn = id.to_pubid_urn
     return "#{input}: not path-safe: #{urn}" unless path_safe?(urn)
@@ -79,8 +97,6 @@ module PubidUrnContract
 
     seen[urn] = hash
     nil
-  rescue Pubid::Errors::ParseError
-    nil # a fixture that no longer parses is the fixture spec's concern
   rescue StandardError => e
     "#{input}: #{e.class}: #{e.message[0, 120]}"
   end

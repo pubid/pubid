@@ -148,7 +148,10 @@ atom in every flavor:
 . *Facets in the slug.* The full URN must round-trip, so it keeps facets.
   If relaton wants one slug for each document (and not for each spelling),
   it cuts the `f` group, and the slug then does not round-trip. Decide which
-  of the two the slug is.
+  of the two the slug is. Measured on the two landed flavors: cutting the
+  facets merges only spellings of one document (ISO: 6 groups, such as
+  `(R)`/`(ru)`; IEEE: none of 9,049), so the cut slug stays injective over
+  the documents themselves.
 . *Pubid-invented official URNs.* Only 14 flavors have an official namespace
   (below). The other flavors emit a `urn:<org>:…` form today that no
   organization registered. Keep it as legacy `#to_urn` with no round-trip
@@ -165,9 +168,9 @@ From issue #656, hard first. A flavor lands with its schema, its corpus row
 in `spec/pubid/pubid_urn_contract_spec.rb` (removed from `PENDING`) and its
 section here moved from "proposed" to "landed".
 
-. iso (*landed*), ieee, itu, nist, astm
+. iso (*landed*), ieee (*landed*), itu, nist, astm
 . ashrae, asme, gost, oiml, api, plateau, jcgm, etsi
-. ansi, cen_cenelec, cie
+. ansi (*landed*, with ieee), cen_cenelec, cie
 . bsi, csa, idf, sae
 . doi, gb, isbn, omg, un
 . the remaining flavors (most already round-trip their `to_urn`): 3gpp, adobe, amca, bipm,
@@ -258,6 +261,164 @@ ISO 9001:2015/Amd 1:2016/Cor 1:2017 urn:pubid:iso:is:9001:year-2015:amd:1:year-2
 ISO 9001 (all parts)                urn:pubid:iso:all:ids-(iso:is:9001)
 ----
 
+[[urn-ieee]]
+==== ieee
+
+Namespace: `urn:pubid:ieee:`. Schema: `lib/pubid/ieee/pubid_urn_schema.rb`.
+
+Official URN: `urn:ieee:std:…`, IANA-registered, RFC 8069. Current `to_urn`:
+400 ids, 66 round-trip, 136 reshape, 198 do not re-parse, 3 colliding URNs.
+
+pubid scheme: all 9,049 parseable pass ids (of 9,051) emit, round-trip by
+`to_hash`, are path-safe, and give no collision (8,983 distinct URNs). The
+longest URN is 264 characters, the median 78, and 10 are over 200. *A slug
+used as a file name must be shortened or hashed:* 264 is above the 255-byte
+limit that once made `relaton-data-ieee` lose crawl batches to
+`Errno::ENAMETOOLONG`.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:ieee:standard` | `std`
+| `pubid:ieee:project-draft-identifier` | `proj`
+| `pubid:ieee:si-standard` | `si`
+| `pubid:ieee:redlined-standard` | `redlined`
+| `pubid:ieee:joint-development` | `joint`
+| `pubid:ieee:iec-ieee-copublished` | `iecieee`
+| `pubid:ieee:dual-identifier` | `dual`
+| `pubid:ieee:dual-published` | `dualpub`
+| `pubid:ieee:csa-dual-published` | `csadual`
+| `pubid:ieee:multi-numbered-identifier` | `multi`
+| `pubid:ieee:adopted-standard` | `adopted`
+| `pubid:ieee:parenthetical-identifier` | `paren`
+| `pubid:ieee:amendment` | `amd`
+| `pubid:ieee:corrigendum` | `cor`
+| `pubid:ieee:interpretation-identifier` | `int`
+| `pubid:ieee:conformance-identifier` | `conf`
+| `pubid:ieee:supplement-identifier` | `sup`
+| `pubid:ieee:aiee` | `aiee`
+| `pubid:ieee:ire` | `ire`
+| `pubid:ieee:nesc-standard` | `nesc`
+| `pubid:ieee:nesc-edition` | `nescedition`
+| `pubid:ieee:nesc-handbook` | `nescbook`
+| `pubid:ieee:nesc-draft` | `nescdraft`
+| `pubid:ieee:nesc-preprint` | `nescpre`
+| `pubid:ieee:nesc-redline` | `nescredline`
+|===
+
+Core: `number` (the bare digits, the relaton index key: `C37.09` is `37` with
+`prefix-C`). Atoms, in the schema order: who (`pub`, `pubs`, `lead`, `co`,
+`copubs`), what (`prefix`, `type`, `variant`), which part (`part` = `parts`,
+`pt`, `subpart`), when (`year`, `month`, `day`, `date*`, `dateinfo`,
+`iecyear`), which edition (`ed`, `edmonth`, `rev`, `reaff`), which state
+(`stage`, `iter`, `isostage`, `ieeedraft`, `draft`, `draftinfo`,
+`draftstatus`, `ts*` for a `typed_stage` that does not collapse to `stage`),
+`lang`, `loc`, the IEEE flags (`project`, `redline`, `interp`, …), the
+free-text designations (`nick`, `note`, `paren`, `rel` …), then the nested
+identifiers. Facets: `sep`, `seps`, `revsep`, `yearsep`, `datesep`,
+`format`, `langsrc`.
+
+----
+IEEE Std 802.11-2016           urn:pubid:ieee:std:802:part-11:year-2016:stage-Std:f:0.sep-.
+IEEE P802.1AS-2020/Cor. 1      urn:pubid:ieee:proj:802:type-P:part-1AS:year-2020:stage-P:project-true:cor:1:f:0.sep-.
+52 IRE 7.S2                    urn:pubid:ieee:ire:7:part-S2:year-1952:f:0.sep-.
+C2-2012-Preprint               urn:pubid:ieee:nescpre:2:prefix-C:year-2012
+IEEE Std 844.1-2017/CSA …      urn:pubid:ieee:csadual:year-2017:stage-Std:ieeeid-(ieee:std:844:part-1:year-2017:stage-Std:f:0.sep-.)
+----
+
+Rulings of this wave:
+
+* *Wrappers keep their parent slot names.* `AdoptedStandard`,
+  `CsaDualPublished`, `DualPublished`, `DualIdentifier`, `MultiNumbered` and
+  `IecIeeeCopublished` name the wrapped document `ieee_identifier`,
+  `first_identifier`, `primary_identifier` …, not `base`. The codec builds the
+  root-first chain only along `base`, so these documents are nested atoms
+  (`ieeeid-(…)`, `first-(…)`) and the wrapper does *not* share the slug prefix
+  of the document it wraps. Renaming the slots to `base` changes `to_hash`
+  (`adopted_identifiers` is a key in 73 published `relaton-data-ieee` rows)
+  and needs a re-crawl, so it is a separate decision.
+* *`typed_stage` needs no `to_hash` change.* `Ieee::Compaction` already
+  collapses it to the scalar `stage`; the 8 `si-standard` ids whose stage
+  does not collapse map their `abbr`, `stage_code` and `type_code` to `ts*`
+  atoms.
+* *Nested ANSI and IEC nodes.* IEEE ids nest 36 `pubid:ansi:standard` and 3
+  `pubid:iec:international-standard` nodes. ANSI has only three types, so
+  ANSI landed whole with this wave (<<urn-ansi>>). IEC has 26, so it has a
+  partial schema for the one type the corpus nests (<<urn-iec>>). An IEEE
+  adoption of any other IEC type — `IEEE Std 1234-2010 (IEC TR 62271-1)`,
+  an IEC `TS`, an `/AMD1:2011`, a `CSV` — makes `#to_pubid_urn` raise "no
+  pubid URN schema" until IEC's own wave lands. None is in the corpus.
+* *The IEEE base class has a token too* (`id`). The builder makes a bare
+  `Pubid::Ieee::Identifier` for a parenthetical inside a relationship; its
+  related ids are not serialized today, but one in any other slot still
+  emits.
+* *The prefix `part` means the part sequence.* IEEE models its parts as the
+  list `parts` (`802.16.1` is `part-16,1`), so `part-` is that list, and the
+  rare scalar `part` attribute is `pt-`. In ANSI and IEC, `part-` is a
+  scalar, because that is the only part they have.
+* *Cutting the facets merges nothing.* Over the corpus, the URN without its
+  `f` group is unique for every IEEE id (8,983 slugs, 0 shared). The ISO
+  figure is 6 groups, each the same document in two spellings (`(R)`/`(ru)`,
+  `Ed 13`/`Edition 13`).
+
+Findings that the URN inherits, because it carries exactly what `to_hash`
+carries (pinned in `spec/pubid/ieee/pubid_urn_spec.rb`):
+
+* `to_hash` drops the CSA half of a CSA dual publication (`csa_identifier`
+  is a plain accessor): `IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17` comes
+  back as `IEEE Std 844.1-2017/CSA `, through `from_hash` alone and so
+  through the URN. 4 corpus ids. Two such documents with the same IEEE half
+  share one hash and one URN.
+* `to_hash` keeps one `separator` for all parts, so a mixed-separator number
+  (`IEEE Std 7-4.3.2-2016`, `C57.18-10`, `C95.1-2345`) comes back as
+  `7.4.3.2`. 14 corpus ids.
+* `from_hash(to_hash)` is not idempotent for a supplement with a non-IEEE
+  publisher *nested* in an adoption (`IEEE Std 1234-2010 (ISO 1234/Amd
+  1:2001)`): `SupplementIdentifier#to_hash` drops the delegated `publisher`
+  only on a top-level wrapper. The URN carries the first hash, the rebuilt
+  identifier re-encodes to a different one, and `Pubid.parse_urn` refuses
+  the URN as not canonical. Not in the corpus. The repair is in `to_hash`.
+* 2 corpus ids (`IEC/IEEE P62582-6, FDIS May 2019`,
+  `ISO/IEC/IEEE P21840, DIS-2019`) raise `Parsanol::PARG::BindError` from
+  `parse`, not `Pubid::Errors::ParseError` — a leak in the parse-error
+  contract.
+
+[[urn-ansi]]
+==== ansi
+
+Namespace: `urn:pubid:ansi:`. Schema: `lib/pubid/ansi/pubid_urn_schema.rb`.
+Landed with the IEEE wave, which nests ANSI ids.
+
+Official URN: none. ANSI has no namespace in the IANA registry, and the
+current `urn:ansi:…` form of `to_urn` is pubid-invented. Current `to_urn`: 175
+ids, 0 round-trip, all 175 do not re-parse.
+
+pubid scheme: all 175 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:ansi:standard` | `std`
+| `pubid:ansi:american-national-standard` | `ans`
+| `pubid:ansi:identifier` | `id`
+|===
+
+Core: `number`. Atoms: `pub-` (`publisher.body`), `co-`
+(`copublishers.*.body`), `type-` (`type.abbr`), `part-`, `subpart-`,
+`year-`, `dateyear-`/`datemonth-`/`dateday-`/`undated-`, `ed-`
+(`edition.number`), `stage-` (`stage.abbr`), `iter-`, `lang-`, `loc-`.
+Facets: `langsrc`, `edsrc`. A component maps through its identifying field
+only; its registry fields (`name`, `harmonized_stages`) are not placed, so a
+value there raises rather than enter the URN.
+
+----
+ANSI 802.3-2012                urn:pubid:ansi:std:802.3:pub-ANSI:part-2012
+----
+
+Finding: ANSI stores the year of `ANSI 802.3-2012` in `part` (`2012`), and
+the URN keeps it as it is (`part-2012`).
+
 === Proposed
 
 Drafted from the `_type`s of each flavor and the `to_hash` keys observed over
@@ -327,27 +488,6 @@ Corpus: 46 of 46 pass ids parse.
 |===
 
 Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `rev-` (`revision`), `interpretationcode-` (`interpretation_code`), `reaffirmed-` (`reaffirmed`).
-
-[[urn-ansi]]
-==== ansi
-
-Namespace: `urn:pubid:ansi:` (the `_type` flavor segment).
-
-Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:ansi:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
-
-Current `to_urn` (≤400 sampled pass ids): 175 ids, 0 round-trip, 0 reshape, 175 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
-
-Corpus: 175 of 175 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:ansi:american-national-standard` | `ans` | number | 0 | —
-| `pubid:ansi:identifier` | `id` | number | 0 | —
-| `pubid:ansi:standard` | `std` | number | 175 | `ANSI 802.3-2012`
-|===
-
-Atoms, canonical order: `pubbody-` (`publisher.body`), `cobody-` (`copublishers.*.body`, list), `part-` (`part`), `year-` (`year`).
 
 [[urn-api]]
 ==== api
@@ -931,6 +1071,8 @@ Finding: `to_hash` serializes the internals of a component (`type`, `stage`, `ty
 [[urn-iec]]
 ==== iec
 
+Partial schema landed with the IEEE wave: only `pubid:iec:international-standard` (`is`), which IEEE ids nest.
+
 Namespace: `urn:pubid:iec:` (the `_type` flavor segment).
 
 Official URN: none in the IANA registry. pubid emits the RFC 5141-style `urn:iec:std:…`; keep it as the IEC render form.
@@ -975,58 +1117,6 @@ Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `par
 Nested identifiers: `ids-(…)` (`identifiers`, ids).
 
 Facet candidates (spelling-only): `languages.*.original_code`.
-
-[[urn-ieee]]
-==== ieee
-
-Namespace: `urn:pubid:ieee:` (the `_type` flavor segment).
-
-Official URN: `urn:ieee:std:…`, IANA-registered, RFC 8069.
-
-Current `to_urn` (≤400 sampled pass ids): 400 ids, 66 round-trip, 136 reshape, 198 do not re-parse, 0 raise, 0 empty, 3 colliding URNs.
-
-Corpus: 9045 of 9048 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:ieee:adopted-standard` | `as` | number | 66 | `55 IRE 2.S1 (IEEE Std No 147)`
-| `pubid:ieee:aiee` | `aiee` | number | 113 | `AIEE No 19-1943 (Supercedes A. I. E. E. Standard No. 19-1938)`
-| `pubid:ieee:amendment` | `amd` | number | 43 | `IS0/IEC/IEEE 8802-11:2012/Amd.5:2015(E) (Adoption of IEEE Std 802.11af-2014)`
-| `pubid:ieee:conformance-identifier` | `ci` | number | 6 | `IEEE Std 1904.1(TM)/Conformance02-2014 (Conformance to IEEE Std 1904.1-2013)`
-| `pubid:ieee:corrigendum` | `cor` | number | 201 | `IEEE P802.1AS&#x2013;2020/Cor1/D3.0, July 2021 (Corrigendum to IEEE Std 802.1AS-2020)`
-| `pubid:ieee:csa-dual-published` | `cdp` | number | 4 | `IEEE Std 844.1-2017/CSA C22.2 No. 293.1-17`
-| `pubid:ieee:dual-identifier` | `di` | number | 0 | —
-| `pubid:ieee:dual-published` | `dp` | number | 30 | `IEEE P1680.4_D1 and NSF/ANSI 426, August 2016`
-| `pubid:ieee:identifier` | `id` | number | 0 | —
-| `pubid:ieee:iec-ieee-copublished` | `iic` | number | 47 | `IEC/IEEE 60079-30-2/D5 IEC:2013 (10/07)`
-| `pubid:ieee:interpretation-identifier` | `ii` | number | 5 | `IEEE Std 1003.1-1988/INT, 1992 Edition`
-| `pubid:ieee:ire` | `ire` | number | 8 | `52 IRE 7.S2`
-| `pubid:ieee:joint-development` | `jd` | number | 277 | `IEC/IEEE FDIS P60079-30-1, 2015`
-| `pubid:ieee:multi-numbered-identifier` | `mni` | number | 1 | `IEEE Std 1299/C62.22.1-1 996`
-| `pubid:ieee:nesc-draft` | `nd` | number | 0 | —
-| `pubid:ieee:nesc-edition` | `ne` | number | 1 | `2017 National Electrical Safety Code(R) (NESC(R))`
-| `pubid:ieee:nesc-handbook` | `nh` | number | 2 | `2012 NESC Handbook, Seventh Edition`
-| `pubid:ieee:nesc-preprint` | `np` | number | 6 | `C2-2012-Preprint`
-| `pubid:ieee:nesc-redline` | `nr` | number | 1 | `National Electrical Safety Code, C2-2012 - Redline`
-| `pubid:ieee:nesc-standard` | `ns` | number | 2 | `C2-1997 National Electric Safety Code (NESC)`
-| `pubid:ieee:parenthetical-identifier` | `pi` | number | 0 | —
-| `pubid:ieee:project-draft-identifier` | `pdi` | number | 2468 | `ISO/IEC/IEEE P42010.WD4:2019(E)`
-| `pubid:ieee:redlined-standard` | `rs` | number | 0 | —
-| `pubid:ieee:si-standard` | `ss` | number | 8 | `IEEE PSI 10/D2, October 2010`
-| `pubid:ieee:standard` | `std` | number | 6179 | `IEEE 1076-CONC-I99O`
-| `pubid:ieee:supplement-identifier` | `si` | number | 0 | —
-|===
-
-Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublisher`, list), `type-` (`type`), `part-` (`parts`, list), `year-` (`year`), `month-` (`month`), `ed-` (`edition`), `rev-` (`revision`), `stage-` (`stage`), `abbrsuffix-` (`abbr_suffix`, bool), `abbrsuffixregistered-` (`abbr_suffix_registered`, bool), `ashraenumber-` (`ashrae_number`), `ashraeyear-` (`ashrae_year`), `draft-` (`draft`), `draftinfo-` (`draft_info`), `draftstatus-` (`draft_status`), `editionmonth-` (`edition_month`), `iecyear-` (`iec_year`), `ieeedraft-` (`ieee_draft`), `isostage-` (`iso_stage`), `leadparty-` (`lead_party`), `nickname-` (`nickname`), `parentheticalcontent-` (`parenthetical_content`), `prefix-` (`prefix`), `projectmarker-` (`project_marker`, bool), `publishers-` (`publishers`, list), `reaffirmed-` (`reaffirmed`), `redline-` (`redline`, bool), `registered-` (`registered`, bool), `relationshipsrelationshiptype-` (`relationships.*.relationship_type`, list), `revbare-` (`rev_bare`, bool), `revsep-` (`rev_sep`), `separators-` (`separators`, list), `spacebeforedraft-` (`space_before_draft`, bool), `typedstageabbr-` (`typed_stage.abbr`), `typedstagestagecode-` (`typed_stage.stage_code`), `typedstagetypecode-` (`typed_stage.type_code`), `variant-` (`variant`), `yearsep-` (`year_sep`).
-
-Nested identifiers: `ieeeidentifier-(…)` (`ieee_identifier`, id), `adoptedidentifiers-(…)` (`adopted_identifiers`, ids), `firstidentifier-(…)` (`first_identifier`, id), `secondidentifier-(…)` (`second_identifier`, id), `primaryidentifier-(…)` (`primary_identifier`, id), `secondaryidentifier-(…)` (`secondary_identifier`, id), `revisionof-(…)` (`revision_of`, id).
-
-Facet candidates (spelling-only): `original_format`, `separator`.
-
-Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `ansi`, `iec`.
-
-Finding: `to_hash` serializes the internals of a component (`typed_stage`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
 
 [[urn-ietf]]
 ==== ietf
