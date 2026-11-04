@@ -16,6 +16,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/api/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/api/urn_generator"
     autoload :UrnParser, "#{__dir__}/api/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/api/pubid_urn_schema"
 
     def self.parse(input)
       Identifier.parse(input)

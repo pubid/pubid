@@ -17,6 +17,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/asme/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/asme/urn_generator"
     autoload :UrnParser, "#{__dir__}/asme/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/asme/pubid_urn_schema"
 
     def self.parse(str)
       Identifier.parse(str)
