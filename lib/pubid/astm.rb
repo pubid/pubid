@@ -13,6 +13,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/astm/identifiers"
     autoload :SingleIdentifier, "#{__dir__}/astm/single_identifier"
     autoload :Parser, "#{__dir__}/astm/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/astm/pubid_urn_schema"
     autoload :Builder, "#{__dir__}/astm/builder"
     autoload :Renderer, "#{__dir__}/astm/renderer"
     autoload :UrnGenerator, "#{__dir__}/astm/urn_generator"

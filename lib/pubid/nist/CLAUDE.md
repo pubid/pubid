@@ -80,3 +80,16 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   `to_short_style`: the publisher prefixes only when the input carried one
   (`NIST.`/`NBS.`), and a bare `FIPS 140-3` still renders `FIPS.140-3`.
   Locked by `spec/pubid/nist/identifiers/fips_spec.rb`.
+
+- **pubid-scheme URN (issue #656).** `lib/pubid/nist/pubid_urn_schema.rb`
+  covers all 22 types; rulings in `docs/URN-SCHEMES.adoc` (`[[urn-nist]]`).
+  `update` and `update_component` serialize every field, so each field is
+  its own atom (`upd-`, `updyear-`, `uc-` …); reducing them changes
+  `to_hash` and needs a `relaton-data-nist` re-crawl, so it was not done.
+  `publisher_was_parsed` (`false` for a bare `FIPS 140-3`),
+  `parsed_format`, `edition.original_prefix` and the bracketed
+  `translation` are facets. No pass fixture sets `publisher_was_parsed`,
+  `supplement.year_end` or the Integer `year`; the review found them by a
+  sweep of `full/` and the spec literals, so sweep those too when a schema
+  changes. Found in passing, not fixed:
+  `NIST.IR.8259Apt` parses as `NIST IR 8259(por)` and loses the `A`.

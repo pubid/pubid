@@ -7,3 +7,11 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 ## From the root note "AMCA / ASME / ASTM index key (`root.number`): three flavors, three different shapes"
 
 **(3) ASTM — the mixin, on EVERY concrete class.** `Astm::Components::Code` is a five-field taxonomy (`letter`/`number`/`suffix`/`subseries`/`dual_m`) that the renderer reads field-by-field, so it keeps its structure: `Identifiers::CodeNumber` installs the five columns plus a derived `#code`. **It is included by `Standard` AND by `IsoDualPublished`, which inherits `Standard` — deliberately, not redundantly**: a class that is itself inherited from must still declare the columns so its subclass holds its own snapshot rather than relying on a parent table. `Adjunct` has no code at all, so its designation IS its number: the `designation` attribute was **removed** and the value stored in `number` directly, because keeping both made `to_hash` emit the same string twice and a `def number` shadowing the attribute is the construct CLAUDE.md forbids.
+
+## pubid-scheme URN (issue #656)
+
+`lib/pubid/astm/pubid_urn_schema.rb` covers all 12 types; rulings in
+`docs/URN-SCHEMES.adoc` (`[[urn-astm]]`). Every suffix marker (`-EB`, `-EA`,
+`DVD`, the metric `M`, `TP`) names a different catalogue record, so all are
+atoms and ASTM has no facet. A new marker attribute needs an atom there, or
+`#to_pubid_urn` raises for every id that sets it.
