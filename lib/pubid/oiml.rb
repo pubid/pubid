@@ -18,6 +18,7 @@ module Pubid
     autoload :SupplementIdentifier, "#{__dir__}/oiml/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/oiml/urn_generator"
     autoload :UrnParser, "#{__dir__}/oiml/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/oiml/pubid_urn_schema"
 
     def self.parse(identifier)
       unless identifier.is_a?(String)
