@@ -8,17 +8,17 @@ RSpec.describe Pubid::Sae::Identifier do
 
     it "parses basic SAE J standard" do
       id = described_class.parse("SAE J300")
-      expect(id.to_s).to eq("SAE J 300")
+      expect(id.to_s).to eq("SAE J300")
     end
 
     it "parses SAE J with year" do
       id = described_class.parse("SAE J300:2019")
-      expect(id.to_s).to eq("SAE J 300:2019")
+      expect(id.to_s).to eq("SAE J300:2019")
     end
 
     it "parses SAE J with letter suffix" do
       id = described_class.parse("SAE J790F")
-      expect(id.to_s).to eq("SAE J 790F")
+      expect(id.to_s).to eq("SAE J790F")
     end
 
     it "parses SAE AMS aerospace material spec" do

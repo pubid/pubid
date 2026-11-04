@@ -2,34 +2,31 @@
 
 module Pubid
   module Sae
-    # Human-readable renderer for SAE identifiers.
+    # Human-readable renderer for SAE identifiers, in the form SAE prints:
     #
-    # Produces strings like:
-    #   "SAE AS5553"
-    #   "SAE ARP4754A"
-    #   "SAE AMS2475:2023"
+    #   "SAE J3016"            "SAE AMS4121J"
+    #   "SAE J3016_202104"     "SAE ARP4754A:2010"
+    #   "SAE AS22520/45A"      "SAE AMS-QQ-A-250/4B"
+    #   "SAE AS5259/7A_A1"     "SAE USCAR-2-6"
     #
-    # The renderer is registered as the +:human+ format in the SAE format
-    # registry and invoked via +render(format: :human)+.
+    # A dated edition with a month renders SAE's native edition code
+    # (+_YYYYMM+); a year alone renders +:YYYY+.
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **_opts)
         id = @id
+        type = id.type
+        code = type ? "#{type.abbr}#{type.separator}" : ""
+        result = [id.publisher, code + id.designation].compact.join(" ")
+        result + date_suffix(id, context)
+      end
 
-        parts = []
+      private
 
-        # Publisher and type
-        parts << id.publisher if id.publisher
-        parts << id.type.to_s if id.type
+      def date_suffix(id, context)
+        return "" unless id.date&.year
 
-        # Number
-        parts << id.number.to_s if id.number
-
-        result = parts.join(" ")
-
-        # Date
-        result += ":#{id.date.render(context:)}" if id.date
-
-        result
+        separator = id.date.month ? "_" : ":"
+        "#{separator}#{id.date.render(context:)}"
       end
     end
   end
