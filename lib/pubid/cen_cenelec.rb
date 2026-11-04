@@ -19,6 +19,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/cen_cenelec/identifier"
     autoload :Identifiers, "#{__dir__}/cen_cenelec/identifiers"
     autoload :Parser, "#{__dir__}/cen_cenelec/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/cen_cenelec/pubid_urn_schema"
     autoload :Renderer, "#{__dir__}/cen_cenelec/renderer"
     autoload :SingleIdentifier, "#{__dir__}/cen_cenelec/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/cen_cenelec/urn_generator"

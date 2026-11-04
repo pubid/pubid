@@ -17,6 +17,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/etsi/identifiers/base"
     autoload :Identifiers, "#{__dir__}/etsi/identifiers"
     autoload :Parser, "#{__dir__}/etsi/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/etsi/pubid_urn_schema"
     autoload :Renderer, "#{__dir__}/etsi/renderer"
     autoload :UrnGenerator, "#{__dir__}/etsi/urn_generator"
     autoload :UrnParser, "#{__dir__}/etsi/urn_parser"

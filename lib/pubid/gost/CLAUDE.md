@@ -62,3 +62,15 @@ a deterministic reproduction of the race (not a reliance on catching the rare
 full-suite failure): it temporarily `Registry.unregister(:bsi)`s the usual
 race winner and asserts routing still resolves to `Pubid::Iso` correctly —
 proving the fix is prefix routing, not a lucky alphabetical ordering.
+
+## pubid-scheme URN (issue #656)
+
+`lib/pubid/gost/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-gost]]`). The adopted documents nest with their own flavor's schema,
+so this wave added a partial `lib/pubid/cen_cenelec/pubid_urn_schema.rb`.
+**Open gap:** `ForeignReference#raw` is not mapped in `key_value`, so
+`to_hash` drops the text of an adopted document of an unknown flavor
+(`(OECD 460:2017)`): two such adoptions share one hash and one URN, and
+`from_hash` loses the parenthesis. Mapping `raw` changes `to_hash`, and the
+`pubid-testsuite` GOST cases store the hash without it, so the fix must land
+together with a testsuite update. The schema's `raw-` atom is ready for it.

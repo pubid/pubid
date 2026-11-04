@@ -14,6 +14,7 @@ module Pubid
     autoload :Identifier,   "#{__dir__}/gost/identifier"
     autoload :Identifiers,  "#{__dir__}/gost/identifiers"
     autoload :Parser,       "#{__dir__}/gost/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/gost/pubid_urn_schema"
     autoload :Renderer,     "#{__dir__}/gost/renderer"
     autoload :UrnGenerator, "#{__dir__}/gost/urn_generator"
     autoload :UrnParser,    "#{__dir__}/gost/urn_parser"

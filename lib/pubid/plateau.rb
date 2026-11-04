@@ -13,6 +13,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/plateau/identifiers/base"
     autoload :Identifiers, "#{__dir__}/plateau/identifiers"
     autoload :Parser, "#{__dir__}/plateau/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/plateau/pubid_urn_schema"
     autoload :Renderer, "#{__dir__}/plateau/renderer"
     autoload :SupplementIdentifier, "#{__dir__}/plateau/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/plateau/urn_generator"

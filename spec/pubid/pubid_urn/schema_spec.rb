@@ -42,6 +42,57 @@ RSpec.describe "pubid URN kinds" do
       expect { schema { facet "base", "b", kind: :id } }
         .to raise_error(ArgumentError, /unknown facet kind/)
     end
+
+    it "reads a core path as a String by default" do
+      s = schema { type "pubid:x:a", "a" }
+      expect(s.for_token("a").core_kinds).to eq([:string])
+    end
+
+    it "takes [path, :int] for an Integer core value" do
+      s = schema { type "pubid:x:a", "a", core: [["number", :int]] }
+      expect(s.for_token("a").core).to eq([%w[number]])
+      expect(s.for_token("a").core_kinds).to eq([:int])
+    end
+
+    it "refuses a kind a core value cannot have" do
+      expect { schema { type "pubid:x:a", "a", core: [["number", :list]] } }
+        .to raise_error(ArgumentError, /unknown core kind/)
+    end
+  end
+
+  # An Integer core value (PLATEAU numbers, ETSI supplement ordinals):
+  # written in decimal, read back as an Integer, and refused when the hash
+  # holds a String or the URN holds no decimal.
+  describe "Integer core values" do
+    before do
+      Pubid::PubidUrn.define("xint") do
+        type "pubid:xint:a", "a", core: [["number", :int]]
+      end
+    end
+
+    def encode(hash)
+      Pubid::PubidUrn::Encoder.new(hash).body
+    end
+
+    def decode(body)
+      Pubid::PubidUrn::Decoder.new(body).to_identifier_hash
+    end
+
+    it "writes an Integer and reads it back as an Integer" do
+      expect(encode("_type" => "pubid:xint:a", "number" => 0)).to eq("xint:a:0")
+      expect(decode("xint:a:12")).to eq("_type" => "pubid:xint:a",
+                                        "number" => 12)
+    end
+
+    it "refuses a String where the core is an Integer" do
+      expect { encode("_type" => "pubid:xint:a", "number" => "12") }
+        .to raise_error(Pubid::Errors::InvalidInputError, /not int/)
+    end
+
+    it "refuses a core segment that is not a decimal" do
+      expect { decode("xint:a:1x") }
+        .to raise_error(Pubid::Errors::UrnParseError, /not an integer/)
+    end
   end
 
   # The boolean kinds through the real codec, on ITU: a joint

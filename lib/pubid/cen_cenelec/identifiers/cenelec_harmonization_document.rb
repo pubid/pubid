@@ -19,8 +19,11 @@ module Pubid
           ),
         ].freeze
 
+        # Its own key: CenCenelec.locate_type returns the first class with
+        # a matching key, and HarmonizationDocument owns :hd ("HD 123:2020").
+        # A shared key made the class choice depend on load order.
         def self.type
-          { key: :hd, title: "CENELEC Harmonization Document", short: "HD" }
+          { key: :chd, title: "CENELEC Harmonization Document", short: "HD" }
         end
       end
     end

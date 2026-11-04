@@ -57,3 +57,20 @@ keeps `#matches?(other, ignore:)`.
   decision, on the reading that a published norm should carry a published
   stage by default. It is fixed at the matching layer instead: no grammar
   change, no index re-crawl.
+
+## `locate_type` and `CenelecHarmonizationDocument`
+
+`CenCenelec.locate_type` returns the **first** class in `identifier_types`
+whose `type[:key]` matches, and `identifier_types` reads
+`Identifiers.constants`, whose order Ruby does not guarantee.
+`CenelecHarmonizationDocument` shared the key `:hd` with
+`HarmonizationDocument`, and its autoload was misspelled
+(`CENelecHarmonizationDocument`), so it joined the list only when something
+else had loaded its file before the list was memoized. Then `HD 123:2020`
+could build the CENELEC class: 6 CEN examples failed in one spec order only,
+exposed by the pubid-URN GOST wave, not caused by it. The autoload is fixed
+and the class has its own key `:chd` (the token `docs/URN-SCHEMES.adoc`
+gives it); `spec/pubid/cen_cenelec/type_key_spec.rb` loads the class and
+rebuilds the list, so it does not depend on order. **Every type key in a
+flavor must be unique**; ANSI has the same shape (`Standard` and
+`AmericanNationalStandard` both declare `ans`) and is not checked here.

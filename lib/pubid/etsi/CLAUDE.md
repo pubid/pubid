@@ -32,3 +32,12 @@ keeps `#matches?(other, ignore:)`.
 - `SUBSET_PAIRS["etsi"]` in `spec/pubid/subset_match_spec.rb` moved from
   `ETSI EN 300 175` to `ETSI EN 300 175-1`: the reference now states its
   part, and the version and the date are what it omits.
+
+## pubid-scheme URN (issue #656)
+
+`lib/pubid/etsi/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-etsi]]`). A supplement's `number` is an Integer ordinal, so its core
+is `:int` (`core: [["number", :int]]`), and the codec refuses a String there.
+`minor` and `day` are placed although no pass fixture sets them, because
+`EtsiStandard`'s `key_value` block maps them: a schema must place every key
+the mapping can write, not only the keys the corpus shows.

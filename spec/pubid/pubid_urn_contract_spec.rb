@@ -29,8 +29,8 @@ module PubidUrnContract
 
   PENDING = %w[
     3gpp adobe amca bipm bsi calconnect ccsds
-    cen_cenelec cie csa doi easc ecma etsi evs gb gost iala iana idf iec
-    ietf iho isbn jis oasis ogc omg plateau sae un
+    cen_cenelec cie csa doi easc ecma evs gb iala iana idf iec
+    ietf iho isbn jis oasis ogc omg sae un
     w3c xsf
   ].freeze
 
