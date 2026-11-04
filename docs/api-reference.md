@@ -611,7 +611,9 @@ The standard this identifier supplements, dropping its own supplement
 ### `edition_of?(other)`
 
 Self and +other+ are editions of the same document: the edition-year
-### `eql?(other)`
+### `eql?(other, _compared_objects = nil)`
+
+The second parameter is lutaml's: ComparableModel#== (an alias of its
 ### `exclude(*args)`
 
 Excluded attributes are nilled; every other value is passed through

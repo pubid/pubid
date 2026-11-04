@@ -1468,7 +1468,13 @@ module Pubid
       @hash ||= compute_hash
     end
 
-    def eql?(other)
+    # The second parameter is lutaml's: ComparableModel#== (an alias of its
+    # #eql?(other, compared_objects = {})) recurses with two arguments when
+    # an attribute holds a model of the SAME class, such as the standard
+    # an IEEE "Revision of" id revises. A one-parameter override made #==
+    # raise ArgumentError there. The cycle guard is lutaml's; this method
+    # keeps its own semantics and does not need it.
+    def eql?(other, _compared_objects = nil)
       return false unless other.is_a?(self.class)
 
       hash == other.hash && self == other
