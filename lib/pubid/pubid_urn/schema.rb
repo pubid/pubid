@@ -7,27 +7,42 @@ module Pubid
     #
     # +path+ is a dotted key path into the node's +to_hash+; "*" walks the
     # elements of an Array ("languages.*.code"). +kind+ is one of
-    # :string, :list, :bool, :int, :id (a nested identifier hash) or :ids
-    # (an Array of them). A path with "*" is always a :list.
+    # :string, :list (of Strings), :bool, :bools (a list of booleans), :int,
+    # :id (a nested identifier hash) or :ids (an Array of them). A path with
+    # "*" is always a list: :list, or :bools when its elements are booleans.
     Atom = Struct.new(:path, :prefix, :kind) do
       def parts
         @parts ||= path.split(".")
       end
 
       def list?
-        kind == :list
+        LIST_KINDS.key?(kind)
+      end
+
+      # @return [Symbol] the kind of one value (of one element of a list)
+      def element
+        LIST_KINDS.fetch(kind, kind)
       end
     end
 
+    # A list kind => the kind of its elements.
+    LIST_KINDS = { list: :string, bools: :bool }.freeze
+
     # A spelling-only value (+original_code+, +original_text+ …). Facets are
     # written in the trailing "f" group, so a consumer can cut them off a slug.
-    Facet = Struct.new(:path, :name) do
+    # +kind+ is :string, :list, :bool or :bools, as for an Atom; a spelling
+    # flag ("V.25 ter" against "V.25ter") is a :bool facet.
+    Facet = Struct.new(:path, :name, :kind) do
       def parts
         @parts ||= path.split(".")
       end
 
       def list?
-        parts.include?("*")
+        LIST_KINDS.key?(kind)
+      end
+
+      def element
+        LIST_KINDS.fetch(kind, kind)
       end
     end
 
@@ -69,7 +84,8 @@ module Pubid
     # has the shape PubidUrn::STRUCTURE reads as structure.
     class FlavorSchema
       NAME = /\A[a-z][a-z0-9]*\z/
-      KINDS = %i[string list bool int id ids].freeze
+      KINDS = %i[string list bool bools int id ids].freeze
+      FACET_KINDS = %i[string list bool bools].freeze
       # "f" opens the facet group; "type" is the type-metadata URN
       # (Pubid::IdentifierMetadata, "urn:pubid:<flavor>:type:<key>").
       RESERVED_TOKENS = %w[f type].freeze
@@ -88,15 +104,15 @@ module Pubid
         @atoms << build_atom(path, prefix, kind)
       end
 
-      def facet(path, name)
-        check_name!(name, "facet name")
-        @facets << Facet.new(path, name)
+      def facet(path, name, kind: nil)
+        @facets << build_facet(path, name, kind)
       end
 
       # @param type [String] the +_type+ the class serializes
       # @param token [String] the short type token of the URN
       # @param core [Array<String>] the positional core paths
       # @param atoms [Array<Array>] extra atoms: [path, prefix, kind]
+      # @param facets [Array<Array>] extra facets: [path, name, kind]
       def type(type, token, core: %w[number], atoms: [], facets: [])
         check_name!(token, "type token")
         if RESERVED_TOKENS.include?(token) || @tokens.key?(token)
@@ -106,7 +122,7 @@ module Pubid
 
         all_atoms = @atoms + atoms.map { |spec| build_atom(*spec) }
         check_unique!(all_atoms.map(&:prefix), "atom prefix", type)
-        all_facets = @facets + facets.map { |path, name| Facet.new(path, name) }
+        all_facets = @facets + facets.map { |spec| build_facet(*spec) }
         check_unique!(all_facets.map(&:name), "facet name", type)
 
         schema = TypeSchema.new(flavor: flavor, type: type, token: token,
@@ -128,12 +144,27 @@ module Pubid
 
       def build_atom(path, prefix, kind = nil)
         check_name!(prefix, "atom prefix")
-        kind ||= path.include?("*") ? :list : :string
-        unless KINDS.include?(kind)
-          raise ArgumentError, "unknown atom kind #{kind.inspect}"
+        Atom.new(path, prefix, check_kind!(path, kind, KINDS, "atom"))
+      end
+
+      def build_facet(path, name, kind = nil)
+        check_name!(name, "facet name")
+        Facet.new(path, name, check_kind!(path, kind, FACET_KINDS, "facet"))
+      end
+
+      # A path with "*" reads a list, so its kind must be a list kind.
+      def check_kind!(path, kind, kinds, what)
+        listed = path.split(".").include?("*")
+        kind ||= listed ? :list : :string
+        unless kinds.include?(kind)
+          raise ArgumentError, "unknown #{what} kind #{kind.inspect}"
+        end
+        if listed && !LIST_KINDS.key?(kind)
+          raise ArgumentError, "#{what} #{path.inspect} reads a list, " \
+                               "so its kind must be one of #{LIST_KINDS.keys}"
         end
 
-        Atom.new(path, prefix, kind)
+        kind
       end
 
       def check_name!(name, what)

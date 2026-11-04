@@ -113,3 +113,18 @@ a replay of all 24,382 rows and every ITU pass fixture showed 0 changes.
   **Not done:** an RR supplement (`ITU-R RR (2020) Amd 1` fails; the
   base-less `ITU-R RR Amd 1` still builds an Amendment on series `RR`), and
   `ITU-R RR-E` is still a Recommendation numbered `E` — both as on `main`.
+
+## pubid-scheme URN (issue #656)
+
+`lib/pubid/itu/pubid_urn_schema.rb` covers all 17 types; design and rulings
+in `docs/URN-SCHEMES.adoc` (`[[urn-itu]]`). **A new rendering flag needs a
+place in that schema, or `#to_pubid_urn` raises for every id that sets it.**
+Declare it as a `:bool` *facet* when it is spelling only (the
+`number_glued`/`series_suffix_spaced` kind — "the same document") and as a
+`:bool` *atom* when it names a different document (`technical`,
+`attachment`, `series_word`). The facet/atom choice is what decides whether
+a slug without its `f` group keeps two ids apart. Not placed today:
+`combined.*.parts` (a list inside a list; no pass fixture has one).
+`imp_marker` (`G.Imp712`) and `common_text_twin` (`| ISO/IEC …`, an `:id`
+atom) are in no pass fixture either; the contract spec reads only `pass/`,
+so sweep `full/` and the spec literals as well after a schema change.

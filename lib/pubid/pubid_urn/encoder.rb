@@ -100,19 +100,28 @@ module Pubid
 
       def atom_value(value, atom, schema)
         case atom.kind
-        when :list then list_value(value, atom, schema)
-        when :bool then typed(value, [true, false], atom, schema).to_s
         when :int then typed(value, Integer, atom, schema).to_s
         when :id then nested(typed(value, Hash, atom, schema))
         when :ids then nested_list(typed(value, Array, atom, schema))
-        else Escape.encode(typed(value, String, atom, schema))
+        else slot_value(value, atom, schema)
         end
       end
 
-      def list_value(value, atom, schema)
-        typed(value, Array, atom, schema).map do |item|
-          item.nil? ? NULL : Escape.encode(typed(item, String, atom, schema))
+      # The value of a :string, :bool or list atom, or of a facet.
+      def slot_value(value, slot, schema)
+        return scalar(value, slot, schema) unless slot.list?
+
+        typed(value, Array, slot, schema).map do |item|
+          item.nil? ? NULL : scalar(item, slot, schema)
         end.join(",")
+      end
+
+      def scalar(value, slot, schema)
+        if slot.element == :bool
+          typed(value, [true, false], slot, schema).to_s
+        else
+          Escape.encode(typed(value, String, slot, schema))
+        end
       end
 
       def nested(hash)
@@ -128,18 +137,11 @@ module Pubid
           value = Paths.take(node, facet.parts)
           next if value.nil?
 
-          encoded = if facet.list?
-                      value.map do |v|
-                        v.nil? ? NULL : Escape.encode(v.to_s)
-                      end.join(",")
-                    else
-                      Escape.encode(value.to_s)
-                    end
-          "#{index}.#{facet.name}-#{encoded}"
+          "#{index}.#{facet.name}-#{slot_value(value, facet, schema)}"
         end
       end
 
-      def typed(value, expected, atom, schema)
+      def typed(value, expected, slot, schema)
         ok = if expected.is_a?(Array)
                expected.include?(value)
              else
@@ -148,8 +150,8 @@ module Pubid
         return value if ok
 
         raise Errors::InvalidInputError,
-              "#{schema.type} #{atom.path}: #{value.inspect} " \
-              "is not #{atom.kind}"
+              "#{schema.type} #{slot.path}: #{value.inspect} " \
+              "is not #{slot.kind}"
       end
 
       def check_placed!(node, schema)

@@ -28,9 +28,9 @@ module PubidUrnContract
   FIXTURE_DIRS = { "3gpp" => "tgpp" }.freeze
 
   PENDING = %w[
-    3gpp adobe amca api ashrae asme astm bipm bsi calconnect ccsds
+    3gpp adobe amca api ashrae asme bipm bsi calconnect ccsds
     cen_cenelec cie csa doi easc ecma etsi evs gb gost iala iana idf iec
-    ietf iho isbn itu jcgm jis nist oasis ogc oiml omg plateau sae un
+    ietf iho isbn jcgm jis oasis ogc oiml omg plateau sae un
     w3c xsf
   ].freeze
 

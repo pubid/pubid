@@ -21,6 +21,7 @@ module Pubid
     autoload :Caster, "#{__dir__}/nist/caster"
     autoload :CircularSupplementBuilder, "#{__dir__}/nist/circular_supplement_builder"
     autoload :Components, "#{__dir__}/nist/components"
+    autoload :PubidUrnSchema, "#{__dir__}/nist/pubid_urn_schema"
     autoload :Configuration, "#{__dir__}/nist/configuration"
     autoload :Identifier, "#{__dir__}/nist/identifiers/base"
     autoload :Identifiers, "#{__dir__}/nist/identifiers"

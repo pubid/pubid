@@ -93,19 +93,24 @@ module Pubid
 
       def atom_value(raw, atom)
         case atom.kind
-        when :list then list(raw)
-        when :bool then boolean(raw)
         when :int then integer(raw)
         when :id then nested(raw)
         when :ids then PubidUrn.split_top(raw, ",").map { |item| nested(item) }
-        else Escape.decode(raw)
+        else slot_value(raw, atom)
         end
       end
 
-      def list(raw)
+      # The value of a :string, :bool or list atom, or of a facet.
+      def slot_value(raw, slot)
+        return scalar(raw, slot) unless slot.list?
+
         PubidUrn.split_top(raw, ",", allow_empty: true).map do |item|
-          item == NULL ? nil : Escape.decode(item)
+          item == NULL ? nil : scalar(item, slot)
         end
+      end
+
+      def scalar(raw, slot)
+        slot.element == :bool ? boolean(raw) : Escape.decode(raw)
       end
 
       def boolean(raw)
@@ -139,8 +144,7 @@ module Pubid
           index = Integer(match[1], 10)
           schema = schemas[index] || fail!("facet #{token.inspect} has no node")
           facet = schema.facet(match[2]) || fail!("bad facet #{token.inspect}")
-          value = facet.list? ? list(match[3]) : Escape.decode(match[3])
-          Paths.put(nodes[index], facet.parts, value)
+          Paths.put(nodes[index], facet.parts, slot_value(match[3], facet))
         end
       end
 

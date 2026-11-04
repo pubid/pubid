@@ -90,6 +90,14 @@ Facets:: A value that records only a spelling (`original_code` "E" for
 holds. A consumer can cut the `f` group off a slug, but then the slug no
 longer round-trips (see <<open>>).
 
+[[rules-kinds]]
+Kinds:: The schema gives each atom and facet a kind, and the parser casts
+the value by it: `:string` (the default), `:bool` (`true`, `false`),
+`:int`, `:list` (a list of Strings, `,`-separated, `~` for an absent
+element), `:bools` (a list of booleans), `:id` and `:ids` (nested bodies;
+atoms only). A path with `*` reads a list, so its kind must be `:list` or
+`:bools`. A spelling flag is a `:bool` facet (ITU `0.numberglued-true`).
+
 Nested identifiers:: A nested identifier that is not the `base` chain (an
 adoption's `adopted`, an all-parts or consolidated `identifiers` list, a
 bundle's `supplements`) is an atom whose value is a bracketed body,
@@ -148,10 +156,11 @@ atom in every flavor:
 . *Facets in the slug.* The full URN must round-trip, so it keeps facets.
   If relaton wants one slug for each document (and not for each spelling),
   it cuts the `f` group, and the slug then does not round-trip. Decide which
-  of the two the slug is. Measured on the two landed flavors: cutting the
+  of the two the slug is. Measured on the landed flavors: cutting the
   facets merges only spellings of one document (ISO: 6 groups, such as
-  `(R)`/`(ru)`; IEEE: none of 9,049), so the cut slug stays injective over
-  the documents themselves.
+  `(R)`/`(ru)`; NIST: 104 pairs, such as the MR string against the printed
+  form, or `Rev. 5` against `r5`; IEEE, ANSI, ITU and ASTM: none), so the
+  cut slug stays injective over the documents themselves.
 . *Pubid-invented official URNs.* Only 14 flavors have an official namespace
   (below). The other flavors emit a `urn:<org>:…` form today that no
   organization registered. Keep it as legacy `#to_urn` with no round-trip
@@ -168,7 +177,7 @@ From issue #656, hard first. A flavor lands with its schema, its corpus row
 in `spec/pubid/pubid_urn_contract_spec.rb` (removed from `PENDING`) and its
 section here moved from "proposed" to "landed".
 
-. iso (*landed*), ieee (*landed*), itu, nist, astm
+. iso, ieee, itu, nist, astm (all *landed*)
 . ashrae, asme, gost, oiml, api, plateau, jcgm, etsi
 . ansi (*landed*, with ieee), cen_cenelec, cie
 . bsi, csa, idf, sae
@@ -419,6 +428,230 @@ ANSI 802.3-2012                urn:pubid:ansi:std:802.3:pub-ANSI:part-2012
 Finding: ANSI stores the year of `ANSI 802.3-2012` in `part` (`2012`), and
 the URN keeps it as it is (`part-2012`).
 
+[[urn-itu]]
+==== itu
+
+Namespace: `urn:pubid:itu:`. Schema: `lib/pubid/itu/pubid_urn_schema.rb`.
+
+Official URN: `urn:itu:…`, IANA-registered (formal template `itu`). Current
+`to_urn`: 400 ids, 299 round-trip, 84 reshape, 17 do not re-parse, 0
+colliding URNs.
+
+pubid scheme: all 2,752 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give no collision (2,752 distinct URNs). The longest URN is
+154 characters, the median 48.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:itu:recommendation` | `rec`
+| `pubid:itu:report` | `rpt`
+| `pubid:itu:combined-identifier` | `comb`
+| `pubid:itu:question` | `q`
+| `pubid:itu:handbook` | `hb`
+| `pubid:itu:radio-regulations` | `rr`
+| `pubid:itu:special-publication` | `sp`
+| `pubid:itu:contribution` | `c`
+| `pubid:itu:identifier` | `id`
+| `pubid:itu:annex` | `annex`
+| `pubid:itu:annex-of-recommendation` | `anx`
+| `pubid:itu:appendix-of-recommendation` | `app`
+| `pubid:itu:supplement` | `sup`
+| `pubid:itu:amendment` | `amd`
+| `pubid:itu:corrigendum` | `cor`
+| `pubid:itu:addendum` | `add`
+| `pubid:itu:errata` | `err`
+|===
+
+Core: `number` (of a supplement, its ordinal). Atoms, in the schema order:
+`sector-`, `series-`, `seriesword-` and `seriesdash-` (bool), `imp-`
+(`imp_marker`, the `Imp` of an implementer's guide), `subseries-`,
+`part-` (`parts`, list), `suffix-` (`series_suffix`), `qualifier-`,
+`rangeend-`, `attachment-` (bool), the second designations of a joint
+Recommendation (`combseries-`, `combnumber-`, `combsubseries-`,
+`combsuffix-`, `combqualifier-`, lists over `combined.*`), the Question
+values `sg-` (`study_group`), `bl-`, `bracketed-` and `colon-` (bool),
+`technical-` (bool), `material-`, `v-` (`version`), `year-`, `month-`,
+`day-`, `lang-` (`language`), `twin-(…)` (`common_text_twin`, the nested
+ISO/IEC id of `ITU-T H.222.0 (2021) | ISO/IEC 13818-1:2022`, with the ISO
+schema). Facets (bool): `suffixspaced`,
+`qualifierglued`, `combsuffixspaced` and `combqualifierglued` (lists),
+`numberglued`, `slashjoined`.
+
+----
+ITU-T G.729 Annex B (1996) Cor. 3 (03/2001)  urn:pubid:itu:rec:729:sector-T:series-G:anx:B:year-1996:cor:3:year-2001:month-03
+ITU-T H.264 (V14) (08/2021)                  urn:pubid:itu:rec:264:sector-T:series-H:v-14:year-2021:month-08
+Report ITU-R BT.2020-1                       urn:pubid:itu:rpt:2020:sector-R:series-BT:part-1
+ITU-T D.81/F.80 bis (11/1980)                urn:pubid:itu:comb:81:sector-T:series-D:combseries-F:combnumber-80:combsuffix-bis:year-1980:month-11:f:0.combsuffixspaced-true
+ITU-R 37-7/5:                                urn:pubid:itu:q:37:sector-R:part-7:sg-5:colon-true
+ITU-T E Suppl.1                              urn:pubid:itu:sup:1:sector-T:series-E:f:0.numberglued-true
+----
+
+Rulings of this wave:
+
+* *Facets are the flags that the ITU classes call rendering-only*: the same
+  document printed two ways (`Suppl.1`/`Suppl. 1`, `V.25 ter`/`V.25ter`,
+  `D.502R`/`D.502 R`, `Amd. 1/Cor. 1`/`Amd. 1 Cor. 1`). Each is a boolean,
+  so the codec has boolean facets now (`kind: :bool`, and `:bools` for a
+  list, see <<rules-kinds>>). Every other flag is an atom, because it names a
+  different document: `Technical Cor.`, `attachment`, the word `series`, a
+  series code joined by a dash. The Question flags `/BL`, the brackets and
+  the trailing `:` are atoms too: the design proposal had them as facets,
+  but nothing in the ITU code says that they are spelling only.
+* *The supplement chain is the `base` chain.* Supplements, annexes and
+  appendixes all name their parent `base`, so they share the slug prefix of
+  the Recommendation.
+* *Not placed:* the `parts` of a second designation (`G.780/Y.1351-2`) is
+  a list inside a list, which the codec cannot write, so `#to_pubid_urn`
+  raises for it (pinned). No pass fixture has one. Neither are the shared
+  attributes of `Pubid::Identifier` that no ITU builder sets (`date`,
+  `languages`, `stage` …).
+* *Coverage beyond the pass fixtures.* Every `full/` input and every
+  `parse("…")` literal of the ITU specs that parses also round-trips.
+* *Cutting the facets merges nothing:* 2,752 slugs without the `f` group, 0
+  shared.
+
+[[urn-nist]]
+==== nist
+
+Namespace: `urn:pubid:nist:`. Schema: `lib/pubid/nist/pubid_urn_schema.rb`.
+
+Official URN: none. NIST has no namespace in the IANA registry, and the
+current `urn:nist:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 400 ids, 130 round-trip, 247 reshape,
+23 do not re-parse, 0 colliding URNs.
+
+pubid scheme: all 21,362 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give no collision. They give 19,803 distinct URNs, because
+the corpus has spellings with one hash (`NBS CIRC 1` and `NBS.CIRC.1` differ
+only in `parsed_format`, which is a facet). The longest URN is 154
+characters, the median 42.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:nist:identifier` | `id`
+| `pubid:nist:circular` | `circ`
+| `pubid:nist:circular-supplement` | `circsup`
+| `pubid:nist:commercial-standard` | `cs`
+| `pubid:nist:commercial-standard-emergency` | `cse`
+| `pubid:nist:commercial-standards-monthly` | `csm`
+| `pubid:nist:crpl-report` | `crpl`
+| `pubid:nist:dated-document` | `dd`
+| `pubid:nist:federal-information-processing-standards` | `fips`
+| `pubid:nist:grant-contractor-report` | `gcr`
+| `pubid:nist:handbook` | `hb`
+| `pubid:nist:interagency-report` | `ir`
+| `pubid:nist:letter-circular` | `lc`
+| `pubid:nist:miscellaneous-publication` | `mp`
+| `pubid:nist:monograph` | `mono`
+| `pubid:nist:ncstar` | `ncstar`
+| `pubid:nist:nsrds` | `nsrds`
+| `pubid:nist:owmwp` | `owmwp`
+| `pubid:nist:report` | `rpt`
+| `pubid:nist:special-publication` | `sp`
+| `pubid:nist:technical-note` | `tn`
+| `pubid:nist:supplement-identifier` | `sup`
+|===
+
+Core: `number`. `publisher` and `series` are atoms (`pub-`, `series-`),
+because the series spelling varies inside one type (`CIRC`, `NBS.CIRC`,
+`LCIRC`). Atoms, in the schema order: `pub-`, `series-`, `subseries-`,
+`parttype-`/`part-` (`part.type`/`part.value`), `section-`, `vol-`,
+`edtype-`/`ed-`/`edtext-` (`edition.type`/`id`/`additional_text`),
+`edyear-`, `sup-`/`supsuffix-`/`supyear-`/`supmonth-`/`supyearend-`/`suprev-`
+(`supplement.*`), `suprangestart-`/`suprangeend-`, `implicitsup-`,
+`updprefix-`/`upd-`/`updyear-`/`updmonth-` (`update.*`),
+`ucprefix-`/`uc-`/`ucyear-`/`ucmonth-` (`update_component.*`), `revyear-`,
+`revmonth-`, `reviseddate-`, `updnumber-`, `updnumberyear-`,
+`stagetype-`/`stage-`, `draftnumber-`, `v-` (`version_component.value`),
+`version-`, `year-` and `month-` (Integer, `NIST Research Library (2022)`),
+`dateyear-`/`datemonth-`/`dateday-`/`datedseq-` (`dated-document`),
+`prefix-` and `range-` (`crpl-report`), `lang-`
+(`translation_component.code`), `draft-`, `index-`, `insert-`, `errata-`,
+`appendix-`, `addendum-`, `addendumnumber-`. Facets: `pubparsed`
+(`publisher_was_parsed`, bool: `false` for a bare `FIPS 140-3`), `format`
+(`parsed_format`), `edprefix` (`edition.original_prefix`), `translationsrc`
+(`translation`, the bracketed `(spa)` of the `lang-` code).
+
+----
+NIST SP 800-53r5        urn:pubid:nist:sp:800-53:pub-NIST:series-SP:subseries-800:edtype-r:ed-5
+NIST SP 800-53 Rev. 5   urn:pubid:nist:sp:800-53:pub-NIST:series-SP:subseries-800:edtype-r:ed-5:f:0.edprefix-~20Rev.~20
+NIST.SP.800-53r5        urn:pubid:nist:sp:800-53:pub-NIST:series-SP:subseries-800:edtype-r:ed-5:f:0.format-mr
+NBS CIRC 11e2-1915      urn:pubid:nist:circ:11:pub-NBS:series-CIRC:edtype-e:ed-2:edtext-1915
+NBS LC 800 rJun1992     urn:pubid:nist:lc:800:pub-NBS:series-LCIRC:updprefix-slash:upd-1:updyear-1992:updmonth-06:ucprefix-slash:uc-1:ucyear-1992:ucmonth-06
+----
+
+Rulings of this wave:
+
+* *No `to_hash` change.* `update` and `update_component` serialize every
+  field of their component (the "Finding" of the proposal), so each field
+  is its own atom. Reducing them to one identifying value changes `to_hash`
+  and needs a `relaton-data-nist` re-crawl; that is a separate decision.
+  The two components often hold the same values (`NBS LC 800 rJun1992`),
+  so such a URN carries them twice.
+* *Cutting the facets merges only spellings of one document:* 19,699 slugs
+  without the `f` group, of which 104 are shared by two URNs. In each pair
+  only the facets differ: the MR string against the printed form, `Rev. 5`
+  against `r5`, `(spa)` against `es`.
+* *Not placed:* the component-typed `issue_number`, `first_number`,
+  `second_number` and `parts`, and the shared `Pubid::Identifier`
+  attributes that no NIST builder sets. No input sets them, so their
+  serialized shape is unknown; `#to_pubid_urn` raises if one appears.
+  Every `full/` input and every `parse("…")` literal of the NIST specs that
+  parses round-trips.
+
+Finding (not the URN's, recorded for NIST): `NIST.IR.8259Apt` parses as
+`NIST IR 8259(por)` and loses the `A`, so its URN is that of document 8259,
+not 8259A.
+
+[[urn-astm]]
+==== astm
+
+Namespace: `urn:pubid:astm:`. Schema: `lib/pubid/astm/pubid_urn_schema.rb`.
+
+Official URN: none. ASTM has no namespace in the IANA registry, and the
+current `urn:astm:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 245 ids, 25 round-trip, 153 reshape,
+67 do not re-parse, 31 colliding URNs.
+
+pubid scheme: all 248 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision (the 3 ids that the audit could not parse parse on
+`main` now). The longest URN is 75 characters.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:astm:identifier` | `id`
+| `pubid:astm:single-identifier` | `single`
+| `pubid:astm:base` | `base`
+| `pubid:astm:standard` | `std`
+| `pubid:astm:iso-dual-published` | `isodual`
+| `pubid:astm:adjunct` | `adj`
+| `pubid:astm:data-series` | `ds`
+| `pubid:astm:manual` | `mnl`
+| `pubid:astm:monograph` | `mono`
+| `pubid:astm:research-report` | `rr`
+| `pubid:astm:technical-report` | `tr`
+| `pubid:astm:work-in-progress` | `wk`
+|===
+
+Core: `number`. Atoms, in the schema order: `pub-`, `committee-`,
+`letter-`, `subseries-`, `suffix-`, `metric-` (`dual_m`, bool), `year-`,
+`subyear-`, `reapproval-`, `ed-`, `sup-` (bool), `tp-`
+(`tp_designation`), `format-` (`format_suffix`), `ea-`, `dvd-`, `hol-`
+(bool). No facets: each suffix marker names a different catalogue record.
+
+----
+ASTM E2938-15(2023)     urn:pubid:astm:std:2938:letter-E:year-2015:reapproval-2023
+ASTM DS4B-EB            urn:pubid:astm:ds:4:suffix-B:format--EB
+ASTM RR:A01-1001        urn:pubid:astm:rr:1001:committee-A01
+ISO/ASTMTR52916-EB      urn:pubid:astm:tr:52916:pub-ISO~2FASTM:format--EB
+----
+
+The `format_suffix` value keeps its own dash (`-EB`), so the atom reads
+`format--EB`; the prefix ends at the first `-`.
+
 === Proposed
 
 Drafted from the `_type`s of each flavor and the `to_hash` keys observed over
@@ -566,35 +799,6 @@ Corpus: 731 of 731 pass ids parse.
 |===
 
 Atoms, canonical order: `pub-` (`publisher`), `year-` (`year`), `lang-` (`language`), `csanumber-` (`csa_number`), `draftyear-` (`draft_year`), `firstcode-` (`first_code`), `firstpublisher-` (`first_publisher`), `handbook-` (`handbook`, bool), `jointpublisher-` (`joint_publisher`), `parentheticalrevision-` (`parenthetical_revision`), `ptcsuffix-` (`ptc_suffix`), `revisionnote-` (`revision_note`), `secondpublisher-` (`second_publisher`).
-
-[[urn-astm]]
-==== astm
-
-Namespace: `urn:pubid:astm:` (the `_type` flavor segment).
-
-Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:astm:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
-
-Current `to_urn` (≤400 sampled pass ids): 245 ids, 25 round-trip, 153 reshape, 67 do not re-parse, 0 raise, 0 empty, 31 colliding URNs.
-
-Corpus: 245 of 248 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:astm:adjunct` | `adjunct` | number | 1 | `ASTM ADJF3504-EA`
-| `pubid:astm:base` | `base` | number | 0 | —
-| `pubid:astm:data-series` | `ds` | number | 33 | `ASTM DS4B-EB`
-| `pubid:astm:identifier` | `id` | number | 0 | —
-| `pubid:astm:iso-dual-published` | `idp` | number | 5 | `ASTM 52303-24e1`
-| `pubid:astm:manual` | `manual` | number | 74 | `ASTM MNL1-9TH-EB`
-| `pubid:astm:monograph` | `m` | number | 11 | `ASTM MONO1-EB`
-| `pubid:astm:research-report` | `rr` | number | 59 | `ASTM RR:A01-1001`
-| `pubid:astm:standard` | `std` | number | 47 | `ASTM E2938-15(2023)`
-| `pubid:astm:technical-report` | `tr` | number | 12 | `ISO/ASTMTR52916-EB # or parse using ISO: ISO/ASTM TR 52916`
-| `pubid:astm:work-in-progress` | `wip` | number | 3 | `ASTM WK91249`
-|===
-
-Atoms, canonical order: `pub-` (`publisher`), `subseries-` (`subseries`), `year-` (`year`), `ed-` (`edition`), `sup-` (`supplement`, bool), `committee-` (`committee`), `dualm-` (`dual_m`, bool), `easuffix-` (`ea_suffix`, bool), `formatsuffix-` (`format_suffix`), `holsuffix-` (`hol_suffix`, bool), `letter-` (`letter`), `reapproval-` (`reapproval`), `suffix-` (`suffix`), `tpdesignation-` (`tp_designation`).
 
 [[urn-bipm]]
 ==== bipm
@@ -1186,43 +1390,6 @@ Corpus: 4 of 4 pass ids parse.
 
 Atoms, canonical order: `hyphenated-` (`hyphenated`), `raw-` (`raw`).
 
-[[urn-itu]]
-==== itu
-
-Namespace: `urn:pubid:itu:` (the `_type` flavor segment).
-
-Official URN: `urn:itu:…`, IANA-registered (formal template `itu`).
-
-Current `to_urn` (≤400 sampled pass ids): 400 ids, 299 round-trip, 84 reshape, 17 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
-
-Corpus: 2752 of 2752 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:itu:addendum` | `add` | number | 22 | `ITU-T I.363 (1993) Add. 1 (11/1993)`
-| `pubid:itu:amendment` | `amd` | number | 28 | `ITU-T G.722.2 App. I (2002) Amd. 1 (07/2003)`
-| `pubid:itu:annex` | `annex` | — | 5 | `Annex to ITU OB No. 1`
-| `pubid:itu:annex-of-recommendation` | `aor` | number | 17 | `ITU-T A.23 Annex A (06/2014)`
-| `pubid:itu:appendix-of-recommendation` | `aor2` | number | 39 | `ITU-T G.101 App. I (05/2000)`
-| `pubid:itu:combined-identifier` | `ci` | number | 13 | `ITU-T D.81/F.80 bis (11/1980)`
-| `pubid:itu:contribution` | `c` | number | 0 | —
-| `pubid:itu:corrigendum` | `cor` | number | 163 | `ITU-T G.729 Annex B (1996) Cor. 3 (03/2001)`
-| `pubid:itu:errata` | `err` | number | 3 | `ITU-T G.722.2 Annex B (2002) Err. 1 (07/2003)`
-| `pubid:itu:handbook` | `hb` | number | 20 | `ITU-R 01.HDB`
-| `pubid:itu:identifier` | `id` | number | 0 | —
-| `pubid:itu:question` | `question` | number | 35 | `ITU-R 37-7/5:`
-| `pubid:itu:radio-regulations` | `rr` | number | 3 | `ITU-R RR`
-| `pubid:itu:recommendation` | `rec` | number | 2540 | `ITU-T D.200 R (10/1976)`
-| `pubid:itu:report` | `rpt` | number | 13 | `Report ITU-R BT.2020-1`
-| `pubid:itu:special-publication` | `sp` | number | 21 | `ITU OB No. 1`
-| `pubid:itu:supplement` | `sup` | number | 111 | `ITU-T V.25 ter Suppl. 1 (04/1995)`
-|===
-
-Atoms, canonical order: `sector-` (`sector`), `series-` (`series`), `subseries-` (`subseries`), `part-` (`parts`, list), `year-` (`year`), `month-` (`month`), `day-` (`day`), `v-` (`version`), `lang-` (`language`), `attachment-` (`attachment`, bool), `combined-` (`combined.*.number`, list), `combinedseries-` (`combined.*.series`, list), `material-` (`material`), `numberglued-` (`number_glued`, bool), `qualifier-` (`qualifier`), `qualifierglued-` (`qualifier_glued`, bool), `rangeend-` (`range_end`), `seriesdash-` (`series_dash`, bool), `seriessuffix-` (`series_suffix`), `seriessuffixspaced-` (`series_suffix_spaced`, bool), `seriesword-` (`series_word`, bool), `slashjoined-` (`slash_joined`, bool), `studygroup-` (`study_group`), `technical-` (`technical`, bool).
-
-Facet candidates (spelling-only): `has_colon`, `has_bl`, `bracketed`.
-
 [[urn-jcgm]]
 ==== jcgm
 
@@ -1276,49 +1443,6 @@ Corpus: 10561 of 10561 pass ids parse.
 |===
 
 Atoms, canonical order: `series-` (`series`), `part-` (`parts`, list), `year-` (`year`, int), `reaffirmed-` (`reaffirmed`, bool).
-
-[[urn-nist]]
-==== nist
-
-Namespace: `urn:pubid:nist:` (the `_type` flavor segment).
-
-Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:nist:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
-
-Current `to_urn` (≤400 sampled pass ids): 400 ids, 130 round-trip, 247 reshape, 23 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
-
-Corpus: 21362 of 21362 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:nist:circular` | `circular` | number | 874 | `NBS CIRC 1`
-| `pubid:nist:circular-supplement` | `cs` | number | 11 | `NBS LC 118supp3/1926`
-| `pubid:nist:commercial-standard` | `cs2` | number | 277 | `NBS CS 0-30`
-| `pubid:nist:commercial-standard-emergency` | `cse` | number | 11 | `NBS CS-E 104e1943`
-| `pubid:nist:commercial-standards-monthly` | `csm` | number | 99 | `NBS CSM 1`
-| `pubid:nist:crpl-report` | `cr` | number | 417 | `NBS CRPL 1-1`
-| `pubid:nist:dated-document` | `dd` | number | 0 | —
-| `pubid:nist:federal-information-processing-standards` | `fips` | number | 369 | `NBS FIPS 1`
-| `pubid:nist:grant-contractor-report` | `gcr` | number | 116 | `NBS GCR 80-287`
-| `pubid:nist:handbook` | `hb` | number | 362 | `NBS HB 1`
-| `pubid:nist:identifier` | `id` | number | 908 | `NBS BH 1`
-| `pubid:nist:interagency-report` | `ir` | number | 8099 | `NBS IR 73-101`
-| `pubid:nist:letter-circular` | `lc` | number | 2244 | `NBS LC 1`
-| `pubid:nist:miscellaneous-publication` | `mp` | number | 299 | `NBS MP 1`
-| `pubid:nist:monograph` | `m` | number | 252 | `NBS MONO 1`
-| `pubid:nist:ncstar` | `ncstar` | number | 90 | `NIST NCSTAR 1`
-| `pubid:nist:nsrds` | `nsrds` | number | 118 | `NBS NSRDS 1`
-| `pubid:nist:owmwp` | `owmwp` | number | 1 | `NIST OWMWP 06-13-2018`
-| `pubid:nist:report` | `rpt` | number | 1815 | `NBS RPT 10003`
-| `pubid:nist:special-publication` | `sp` | number | 2887 | `NBS SP 236e1970`
-| `pubid:nist:technical-note` | `tn` | number | 2124 | `NBS TN 1`
-|===
-
-Atoms, canonical order: `pub-` (`publisher`), `series-` (`series`), `subseries-` (`subseries`), `parttype-` (`part.type`), `part-` (`part.value`), `section-` (`section`), `vol-` (`volume`), `edid-` (`edition.id`), `edtype-` (`edition.type`), `updmonth-` (`update.month`), `upd-` (`update.number`), `updprefix-` (`update.prefix`), `updyear-` (`update.year`), `stageid-` (`stage.id`), `stagetype-` (`stage.type`), `sup-` (`supplement.number`), `supsuffix-` (`supplement.suffix`), `supyear-` (`supplement.year`), `appendix-` (`appendix`), `addendum-` (`addendum`), `draft-` (`draft`), `editionyear-` (`edition_year`), `errata-` (`errata`), `implicitsupplement-` (`implicit_supplement`, bool), `index-` (`index`), `insert-` (`insert`), `translation-` (`translation`), `translationcomponent-` (`translation_component.code`), `updatecomponentmonth-` (`update_component.month`), `updatecomponent-` (`update_component.number`), `updatecomponentprefix-` (`update_component.prefix`), `updatecomponentyear-` (`update_component.year`), `versioncomponent-` (`version_component.value`).
-
-Facet candidates (spelling-only): `parsed_format`.
-
-Finding: `to_hash` serializes the internals of a component (`update`, `update_component`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
 
 [[urn-oasis]]
 ==== oasis

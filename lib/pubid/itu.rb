@@ -23,6 +23,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/itu/identifiers/base"
     autoload :Identifiers, "#{__dir__}/itu/identifiers"
     autoload :Parser, "#{__dir__}/itu/parser"
+    autoload :PubidUrnSchema, "#{__dir__}/itu/pubid_urn_schema"
     autoload :UrnGenerator, "#{__dir__}/itu/urn_generator"
     autoload :UrnParser, "#{__dir__}/itu/urn_parser"
     autoload :Model, "#{__dir__}/itu/model"
