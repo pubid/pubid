@@ -6,7 +6,7 @@ module Pubid
     # docs/URN-SCHEMES.adoc).
     #
     #   CISPR 12:2007/AMD1:2009  ->
-    #   urn:pubid:iec:is:12:pub-CISPR:year-2007:amd:1:year-2009
+    #   urn:pubid:iec:is:12:pub-CISPR:year-2007:amd:1:pub-CISPR:year-2009
     #
     # The partial schema landed with IEEE named the one type IEEE nests; the
     # GOST wave added the TS, TR, amendment and consolidated identifier a
