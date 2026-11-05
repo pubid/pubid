@@ -21,6 +21,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/xsf/renderer"
     autoload :UrnGenerator, "#{__dir__}/xsf/urn_generator"
     autoload :UrnParser, "#{__dir__}/xsf/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/xsf/pubid_urn_schema"
 
     # Parse an XSF identifier string
     def self.parse(identifier)

@@ -16,6 +16,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/w3c/renderer"
     autoload :UrnGenerator, "#{__dir__}/w3c/urn_generator"
     autoload :UrnParser, "#{__dir__}/w3c/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/w3c/pubid_urn_schema"
 
     # Parse a W3C identifier string
     def self.parse(identifier)

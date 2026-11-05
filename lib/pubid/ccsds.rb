@@ -16,6 +16,7 @@ module Pubid
     autoload :SupplementIdentifier, "#{__dir__}/ccsds/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/ccsds/urn_generator"
     autoload :UrnParser, "#{__dir__}/ccsds/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/ccsds/pubid_urn_schema"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

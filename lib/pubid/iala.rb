@@ -15,6 +15,7 @@ module Pubid
     autoload :Renderer,     "#{__dir__}/iala/renderer"
     autoload :UrnGenerator, "#{__dir__}/iala/urn_generator"
     autoload :UrnParser,    "#{__dir__}/iala/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/iala/pubid_urn_schema"
 
     # Parse an IALA identifier string into an identifier object.
     # @param identifier [String] The IALA identifier string to parse

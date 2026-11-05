@@ -20,6 +20,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/ogc/renderer"
     autoload :UrnGenerator, "#{__dir__}/ogc/urn_generator"
     autoload :UrnParser, "#{__dir__}/ogc/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/ogc/pubid_urn_schema"
 
     # Parse an OGC identifier string
     def self.parse(identifier)

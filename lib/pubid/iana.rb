@@ -18,6 +18,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/iana/renderer"
     autoload :UrnGenerator, "#{__dir__}/iana/urn_generator"
     autoload :UrnParser, "#{__dir__}/iana/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/iana/pubid_urn_schema"
 
     # Parse an IANA identifier string
     def self.parse(identifier)

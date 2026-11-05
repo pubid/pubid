@@ -17,6 +17,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/oasis/renderer"
     autoload :UrnGenerator, "#{__dir__}/oasis/urn_generator"
     autoload :UrnParser, "#{__dir__}/oasis/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/oasis/pubid_urn_schema"
 
     # Parse an OASIS identifier string
     def self.parse(identifier)
