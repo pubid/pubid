@@ -2,6 +2,11 @@
 
 module Pubid
   module Sae
+    # urn:sae:{type|std}:{designation}[:{yyyy|yyyymm}]
+    #
+    # The designation is the printed code after the type (Identifier#
+    # designation): "4121J", "22520/45A", "5259/7A_A1". The date segment is
+    # the year, or SAE's year-and-month edition date.
     class UrnGenerator < Pubid::UrnGenerator::Base
       def urn_type
         return "std" unless identifier.type
@@ -12,7 +17,7 @@ module Pubid
       def urn_number
         return nil unless identifier.number
 
-        identifier.number.to_s
+        identifier.designation
       end
 
       def generate

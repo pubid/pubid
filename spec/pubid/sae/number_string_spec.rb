@@ -14,13 +14,13 @@ module SaeNumberStringSpec
   # Namespaced: a bare constant inside an RSpec block leaks into Object and
   # collides with another spec file (annotated_rendering_spec also has REFS).
   REFS = {
-    "SAE AIR1936" => ["SAE AIR 1936", "urn:sae:air:1936", "1936"],
-    "SAE AMS5000:2020" => ["SAE AMS 5000:2020", "urn:sae:ams:5000:2020", "5000"],
-    "SAE J1939" => ["SAE J 1939", "urn:sae:j:1939", "1939"],
-    "SAE J300:2019" => ["SAE J 300:2019", "urn:sae:j:300:2019", "300"],
-    # The URN keeps the letter suffix's case; only the type segment is
-    # lowercased. Pinned as measured, not as preferred.
-    "SAE ARP4754A" => ["SAE ARP 4754A", "urn:sae:arp:4754A", "4754A"],
+    "SAE AIR1936" => ["SAE AIR1936", "urn:sae:air:1936", "1936"],
+    "SAE AMS5000:2020" => ["SAE AMS5000:2020", "urn:sae:ams:5000:2020", "5000"],
+    "SAE J1939" => ["SAE J1939", "urn:sae:j:1939", "1939"],
+    "SAE J300:2019" => ["SAE J300:2019", "urn:sae:j:300:2019", "300"],
+    # The revision letter is its own attribute, so `number` is "4754". The
+    # URN keeps its case; only the type segment is lowercased.
+    "SAE ARP4754A" => ["SAE ARP4754A", "urn:sae:arp:4754A", "4754"],
   }.freeze
 end
 

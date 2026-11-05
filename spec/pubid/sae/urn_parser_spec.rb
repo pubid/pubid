@@ -15,7 +15,7 @@ RSpec.describe Pubid::Sae::UrnParser do
   describe ".parse" do
     it "parses urn:sae:j:300:2019 into a SAE identifier" do
       id = Pubid::Sae::UrnParser.parse("urn:sae:j:300:2019")
-      expect(id.to_s).to eq("SAE J 300:2019")
+      expect(id.to_s).to eq("SAE J300:2019")
     end
 
     it "raises on invalid URN" do
