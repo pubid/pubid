@@ -199,23 +199,66 @@ RSpec.describe Pubid::Errors do
     end
   end
 
-  describe "an input-validation failure" do
-    it "raises InvalidInputError for a non-String" do
-      expect { Pubid::Iso.parse(nil) }
-        .to raise_error(Pubid::Errors::InvalidInputError, /must be a String/)
+  # Issue #670: the degenerate URN and encoding inputs used to leak the
+  # classes the detection and the flavor parsers raise (`ArgumentError`).
+  # Every decode failure on the umbrella surface is a pubid error.
+  describe "degenerate inputs (issue #670)" do
+    describe "parse_urn" do
+      it "raises UrnParseError for the empty string" do
+        expect { Pubid.parse_urn("") }
+          .to raise_error(Pubid::Errors::UrnParseError, /unknown URN namespace/)
+      end
+
+      it "raises UrnParseError for a URN without a namespace segment" do
+        expect { Pubid.parse_urn("urn:") }
+          .to raise_error(Pubid::Errors::UrnParseError, /unknown URN namespace/)
+      end
+
+      it "raises UrnParseError for an unknown namespace" do
+        expect { Pubid.parse_urn("urn:bogus:whatever") }
+          .to raise_error(Pubid::Errors::UrnParseError,
+                          /unknown URN namespace: "bogus"/)
+      end
+
+      it "raises UrnParseError for invalid encoding bytes" do
+        expect { Pubid.parse_urn("\xFF\xFEbad".b) }
+          .to raise_error(Pubid::Errors::UrnParseError)
+      end
+
+      it "keeps a pubid-scheme decode failure as UrnParseError" do
+        expect { Pubid.parse_urn("urn:pubid:") }
+          .to raise_error(Pubid::Errors::UrnParseError, /no type segment/)
+      end
+
+      it "wraps a flavor parser's raw ArgumentError as the cause" do
+        Pubid.parse_urn("urn:iso:notaurn")
+      rescue Pubid::Errors::UrnParseError => e
+        expect(e.cause).to be_an(ArgumentError)
+        expect(e.message).to include("does not parse as \"iso\"")
+      end
+
+      it "raises InvalidInputError for a non-String" do
+        expect { Pubid.parse_urn(nil) }
+          .to raise_error(Pubid::Errors::InvalidInputError, /must be a String/)
+      end
+
+      it "keeps the marker exhaustive on the new paths" do
+        ["", "urn:", "urn:bogus:x", "\xFF".b].each do |input|
+          expect { Pubid.parse_urn(input) }.to raise_error(Pubid::Errors::Error)
+        end
+      end
     end
 
-    it "raises InvalidInputError for an over-long string" do
-      expect { Pubid::Iso.parse("A#{'9' * Pubid::MAX_INPUT_LENGTH}") }
-        .to raise_error(Pubid::Errors::InvalidInputError, /maximum length/)
-    end
+    describe "parse" do
+      it "raises InvalidInputError for invalid encoding bytes" do
+        expect { Pubid.parse("\xFF\xFEbad".b) }
+          .to raise_error(Pubid::Errors::InvalidInputError,
+                          /invalid encoding/)
+      end
 
-    it "still satisfies the old rescue" do
-      expect { Pubid::Iso.parse(nil) }.to raise_error(ArgumentError)
-    end
-
-    it "is caught by the marker" do
-      expect { Pubid::Iso.parse(nil) }.to raise_error(Pubid::Errors::Error)
+      it "still satisfies the old ArgumentError rescue on it" do
+        expect { Pubid.parse("\xFF\xFEbad".b) }.to raise_error(ArgumentError)
+      end
     end
   end
 
@@ -228,6 +271,9 @@ RSpec.describe Pubid::Errors do
       "an over-long string" => lambda {
         Pubid::Iso.parse("A#{'9' * Pubid::MAX_INPUT_LENGTH}")
       },
+      "an empty URN" => -> { Pubid.parse_urn("") },
+      "an unknown URN namespace" => -> { Pubid.parse_urn("urn:bogus:x") },
+      "invalid encoding" => -> { Pubid.parse("\xFF\xFE".b) },
     }.each do |name, call|
       it "catches #{name}" do
         expect { call.call }.to raise_error(Pubid::Errors::Error)
