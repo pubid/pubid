@@ -6,7 +6,7 @@ module Pubid
     # docs/URN-SCHEMES.adoc).
     #
     #   EN 302 326-2 V2.2.1:2026  ->
-    #   urn:pubid:cencenelec:en:302~20326:part-2:v-~20V2.2.1:year-2026
+    #   urn:pubid:cencenelec:en:302~20326:part-2:year-2026:v-~20V2.2.1
     #
     # The partial schema landed with GOST named the types a GOST adoption
     # can reach; this wave adds the rest of the flavor (CR, CWA, the two
