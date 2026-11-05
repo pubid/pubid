@@ -44,9 +44,9 @@ RSpec.describe "the pubid-scheme URN leaf waves" do
     ["amca", "AMCA 99 JW Interp",
      "urn:pubid:amca:interp:99:co-AMCA:interpcode-JW"],
     ["ccsds", "CCSDS 100.0-G-1-S",
-     "urn:pubid:ccsds:base:100:part-0:type-G:ed-1:suffix-S"],
+     "urn:pubid:ccsds:base:100:type-G:part-0:ed-1:suffix-S"],
     ["ccsds", "CCSDS 121.0-B-1-S Cor. 1",
-     "urn:pubid:ccsds:base:121:part-0:type-B:ed-1:suffix-S:cor:1"],
+     "urn:pubid:ccsds:base:121:type-B:part-0:ed-1:suffix-S:cor:1"],
     ["jis", "JIS A 0001:1999", "urn:pubid:jis:jis:0001:series-A:year-1999"],
     ["jis", "WES 7700-1:2019", "urn:pubid:jis:wes:7700:part-1:year-2019"],
     # a draft name ("draft-…") reads as a type token by shape
@@ -68,6 +68,10 @@ RSpec.describe "the pubid-scheme URN leaf waves" do
     ["sae", "SAE J3016_202104",
      "urn:pubid:sae:id:3016:typeabbr-J:year-2021:month-4"],
   ].each do |flavor, input, urn|
+    # The registry maps are populated at flavor-module load (autoload is
+    # lazy), so load the flavor before looking it up.
+    require "pubid/#{flavor == "3gpp" ? "tgpp" : flavor}"
+
     describe "#{flavor}: #{input}" do
       it "renders as #{urn}" do
         expect(Pubid::Registry.get(flavor).parse(input).to_pubid_urn).to eq(urn)
