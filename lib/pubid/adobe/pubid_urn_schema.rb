@@ -2,11 +2,18 @@
 
 module Pubid
   module Adobe
-    # The pubid-scheme URN of adobe (issue #656; docs/URN-SCHEMES.adoc).
+    # The pubid-scheme URN of Adobe (issue #670; docs/URN-SCHEMES.adoc).
     #
-    # Declared from the doc's section: the atom, facet and type tables
-    # below are the doc's design, conforming token-for-token.
+    #   Adobe Technical Note #5014  ->  urn:pubid:adobe:technote:5014
+    #
+    # A named publication has no positional core: its slug names it, and the
+    # version (`adobe-japan1` + `7`) is an atom. The current urn:adobe:…
+    # form of #to_urn is pubid-invented and stays there.
     PubidUrnSchema = Pubid::PubidUrn.define("adobe") do
+      atom "slug", "slug"
+      atom "version", "v"
+
+      type "pubid:adobe:identifier", "id", core: []
       type "pubid:adobe:publication", "pub", core: []
       type "pubid:adobe:tech-note", "technote"
     end

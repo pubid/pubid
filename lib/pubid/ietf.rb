@@ -24,6 +24,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/ietf/renderer"
     autoload :UrnGenerator, "#{__dir__}/ietf/urn_generator"
     autoload :UrnParser, "#{__dir__}/ietf/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/ietf/pubid_urn_schema"
 
     # Parse an IETF identifier string
     def self.parse(identifier)

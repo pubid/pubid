@@ -20,6 +20,7 @@ module Pubid
     autoload :SupplementIdentifier, "#{__dir__}/cie/supplement_identifier"
     autoload :UrnGenerator, "#{__dir__}/cie/urn_generator"
     autoload :UrnParser, "#{__dir__}/cie/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/cie/pubid_urn_schema"
 
     # Main entry point for CIE identifiers
     # Delegates to Identifier.parse

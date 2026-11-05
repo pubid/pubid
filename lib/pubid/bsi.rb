@@ -37,6 +37,7 @@ module Pubid
     autoload :SingleIdentifier, "#{__dir__}/bsi/single_identifier"
     autoload :UrnGenerator, "#{__dir__}/bsi/urn_generator"
     autoload :UrnParser, "#{__dir__}/bsi/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/bsi/pubid_urn_schema"
 
     # TYPED_STAGES_REGISTRY for native BSI types. Used by Pubid::Bsi.locate_stage
     # to map abbreviations (e.g. "BS", "PD", "Handbook") to typed stages.

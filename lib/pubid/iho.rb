@@ -14,6 +14,7 @@ module Pubid
     autoload :Renderer,     "#{__dir__}/iho/renderer"
     autoload :UrnGenerator, "#{__dir__}/iho/urn_generator"
     autoload :UrnParser, "#{__dir__}/iho/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/iho/pubid_urn_schema"
 
     # Parse an IHO identifier string into an identifier object
     # @param identifier [String] The IHO identifier string to parse

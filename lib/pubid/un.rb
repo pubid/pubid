@@ -12,6 +12,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/un/identifiers"
     autoload :Parser, "#{__dir__}/un/parser"
     autoload :Renderer, "#{__dir__}/un/renderer"
+    autoload :PubidUrnSchema, "#{__dir__}/un/pubid_urn_schema"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

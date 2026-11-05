@@ -121,7 +121,15 @@ Strict failures:: A malformed, unknown or non-canonical URN raises
 cast into the identifier (the original error is the cause). `#to_pubid_urn` raises
 `Pubid::Errors::InvalidInputError` when the flavor has no schema yet, and
 when the schema does not place a value of `#to_hash` — a schema gap is loud,
-never a silent drop.
+never a silent drop. The umbrella `Pubid.parse_urn` keeps the same
+discipline for every namespace (issue #670): the empty string, a missing or
+unknown namespace, invalid encoding bytes, and a URN a flavor parser
+rejects all surface as `UrnParseError` (a non-String as
+`InvalidInputError`); the raw `ArgumentError` the detection and the flavor
+parsers raise is the wrapped failure cause. `Pubid.parse` rejects
+invalid-encoding bytes as `InvalidInputError` for the same reason, and the
+lutaml mirror (`Identifier.from_urn`) wraps both decode-failure classes as
+`InvalidFormatError`, its one failure shape.
 
 === The slug
 
@@ -190,6 +198,13 @@ section here moved from "proposed" to "landed".
 . the remaining flavors (most already round-trip their `to_urn`): 3gpp, adobe, amca, bipm,
   calconnect, ccsds, easc, ecma, evs, iala, iana, iec, ietf, iho, jis, oasis,
   ogc, w3c, xsf
+
+Issue #670 completed the table: every flavor of the second list and the
+stragglers above now carry a schema, and `PENDING` in the contract spec is
+empty. The sections below keep their proposal tables — they became the
+landed schemas, with the deviations each flavor's ruling produced recorded
+in its section. adobe and sae have no fixture corpus; the contract spec
+parses a fixed literal list for them.
 
 == Side-findings of the audit
 
@@ -800,6 +815,11 @@ PLATEAU Technical Report #46-1  urn:pubid:plateau:tr:46:annex-1
 
 === Proposed
 
+*Landed by issue #670* — the tables below are the landed schemas. The
+per-flavor rulings that deviated from the draft are recorded in the
+sections; the corpus gate is the contract spec, which now runs for every
+flavor (green over 31,430 fixture rows, plus the adobe and sae literals).
+
 Drafted from the `_type`s of each flavor and the `to_hash` keys observed over
 its pass corpus (`ids` = how many identifiers of that type the corpus holds,
 nested ones included). Tokens and prefixes are a proposal: they are fixed
@@ -828,6 +848,7 @@ Corpus: 32 of 32 pass ids parse.
 
 Atoms, canonical order: `part-` (`parts`, list), `v-` (`version`), `release-` (`release`), `suffix-` (`suffix`).
 
+Landed (issue #670) as drafted. All 32 corpus rows emit.
 [[urn-adobe]]
 ==== adobe
 
@@ -845,6 +866,11 @@ Corpus: 0 of 0 pass ids parse.
 | `pubid:adobe:publication` | `pub` | — | 0 | —
 | `pubid:adobe:tech-note` | `technote` | number | 0 | —
 |===
+
+*Landed (issue #670)* as drafted (`slug-`/`v-` atoms; the publication has
+no core). Adobe has no fixture corpus — the contract spec parses a fixed
+literal list (`LITERALS`) and `spec/pubid/pubid_urn_leaf_spec.rb` pins
+five URNs, so the schema has a net without fixtures.
 
 [[urn-amca]]
 ==== amca
@@ -867,6 +893,8 @@ Corpus: 46 of 46 pass ids parse.
 |===
 
 Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `rev-` (`revision`), `interpretationcode-` (`interpretation_code`), `reaffirmed-` (`reaffirmed`).
+
+Landed (issue #670), with `reaffirmed-` the String year the corpus serializes (`reaffirmed-2010`), not the bool the draft guessed. All 39 corpus rows emit.
 
 [[urn-api]]
 ==== api
@@ -971,6 +999,14 @@ Corpus: 90 of 90 pass ids parse.
 
 Atoms, canonical order: `part-` (`part`), `issue-` (`issue`), `year-` (`year`, int), `ed-` (`edition`), `v-` (`version`), `appendix-` (`appendix`), `annex-` (`annex`), `lang-` (`language`), `article-` (`article`), `form-` (`form`), `group-` (`group`), `guidekind-` (`guide_kind`), `mepcode-` (`mep_code`), `reportcode-` (`report_code`), `typecode-` (`type_code`), `variant-` (`variant`), `years-` (`years`).
 
+*Landed (issue #670) as drafted*, with the years Integer atoms
+(`year-2012`). A committee document with no number (`CGPM DECL (1889)`)
+emits no core segment — the atom list carries it:
+`urn:pubid:bipm:cd:year-1889:group-CGPM:typecode-DECL`. The current
+`urn:bipm:…` form of `#to_urn` stays as-is (owner-pinned deviations,
+`lib/pubid/bipm/CLAUDE.md`); the schema reads `#to_hash` only, so the codec
+needed no deviation knob. All 111 corpus rows emit.
+
 [[urn-bsi]]
 ==== bsi
 
@@ -1029,7 +1065,21 @@ Facet candidates (spelling-only): `separator`, `flex_prefix`, `explicit_prefix`,
 
 Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `cencenelec`, `iec`, `iso`.
 
-Finding: `to_hash` serializes the internals of a component (`type`, `stage`, `typed_stage`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
+*Landed (issue #670) with all 34 types.* The draft's atom list is the
+landed one, with three kind corrections the corpus forced:
+`typed_stage.abbr` is a list (the stage's abbreviation array), the Flex
+month is an Integer and `reverse_format` is a bool. An adopted norm
+carries the European document along `base`, so the wrapper shares the slug
+prefix of the document it wraps (`BS EN 1073-2:2002` is
+`urn:pubid:bsi:cencenelec.en:1073:part-2:year-2002:aen`) — the qualified
+`cencenelec.` token keeps the document's own schema. All 1,495 corpus rows
+emit (5 fail `parse`, the fixture spec's concern).
+
+Finding (resolved by the NIST ruling, no `to_hash` change): `type`,
+`stage` and `typed_stage` serialize every registry field of their
+components, so each field is its own atom (`typeabbr-`, `stagehs-`,
+`tsabbr-` …). Reducing them to one identifying value would change
+`to_hash` and need a re-crawl — a separate decision.
 
 [[urn-calconnect]]
 ==== calconnect
@@ -1048,8 +1098,9 @@ Corpus: 189 of 189 pass ids parse.
 | `pubid:calconnect:identifier` | `id` | number | 0 | —
 | `pubid:calconnect:standard` | `std` | number | 189 | `CC 11001:2024`
 |===
-
 Atoms, canonical order: `series-` (`series`), `year-` (`year`), `month-` (`month`), `day-` (`day`).
+
+Landed (issue #670) as drafted. All 189 corpus rows emit.
 
 [[urn-ccsds]]
 ==== ccsds
@@ -1071,6 +1122,8 @@ Corpus: 490 of 490 pass ids parse.
 |===
 
 Atoms, canonical order: `type-` (`type`), `part-` (`part`), `ed-` (`edition`), `lang-` (`language`), `suffix-` (`suffix`).
+
+Landed (issue #670) as drafted; a corrigendum carries its document along `base`, so the two share the slug prefix (`urn:pubid:ccsds:base:121:part-0:type-B:ed-1:suffix-S:cor:1`). All 490 corpus rows emit.
 
 [[urn-cen_cenelec]]
 ==== cen_cenelec
@@ -1120,14 +1173,20 @@ atoms stays. `aen` and `consol` have no core: an adopted EN keeps its number
 on the `adopted` document, and a consolidated identifier has only its
 `identifiers`
 (`urn:pubid:cencenelec:consol:ids-(cencenelec:en:14988:year-2017),(cencenelec:amd:1:year-2020)`).
-cen_cenelec stays in `PENDING` until its wave.
 
-Open for the CEN wave: shapes the partial schema does not place, which no
-parse makes today. An EN with a month serializes a nested
-`"date" => {"year", "month"}` (only a year-only date flattens), an EN whose
-stage is not in the registry keeps nested `type`/`typed_stage` (CEN's
-`compact_hash` declines), and `subpart` has no atom. Each raises "does not
-place" instead of a silent drop.
+*Landed (issue #670)* — the wave declares the remaining types (`cr`,
+`cwa`, the two harmonization documents, `ep`, `es`, `fragment`, `guide`,
+plus the `base` and `id` tokens) and adds `subpart-` (between `part-` and
+`year-`, a placement no GOST-nested row can see) and the nested-date atoms
+`dateyear-`/`datemonth-` after `month-`. The GOST wave's URNs encode
+identically. All 189 corpus rows emit.
+
+The "open" shapes of the partial schema, resolved: an EN with a month
+serializes `"date" => {year, month}` and carries `dateyear-`/`datemonth-`
+now; `subpart` has its atom. An EN whose stage is not in the registry
+keeps nested `type`/`typed_stage` (CEN's `compact_hash` declines) — no
+parse makes that shape today, so it stays unplaced and keeps raising
+"does not place" instead of a silent drop.
 
 [[urn-cie]]
 ==== cie
@@ -1161,6 +1220,12 @@ Atoms, canonical order: `co-` (`copublisher`), `part-` (`part`), `year-` (`year`
 Nested identifiers: `ids-(…)` (`ids`, ids).
 
 Facet candidates (spelling-only): `s_prefix`, `part_separator`, `d_prefix`.
+
+*Landed (issue #670) as drafted*, with the facet set above (bool facets for
+the `S`/`D` prefixes) and the draft's one gap closed: the translation year
+of a paren-year language rides `transyear-`. The wrapped documents — a
+supplement's base, a bundle's members (`ids-`) — follow the wrapper
+precedents. All 363 corpus rows emit.
 
 [[urn-csa]]
 ==== csa
@@ -1197,6 +1262,14 @@ Facet candidates (spelling-only): `original_reaffirmation_4digit`, `year_format`
 
 Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iec`, `iso`.
 
+*Landed (issue #670) as drafted*, with `original_year_4digit` the bool the
+corpus serializes, and the wrapper precedents: a combined identifier's
+members are `ids-`, a bundled one's followers `bundledwith-`, and an
+adoption's document goes along `base`, keeping its own flavor's schema
+(`CSA ISO/IEC 8824-1:22` is
+`urn:pubid:csa:iso.is:8824:co-IEC:part-1:year-2022:ca2`). All 829 corpus
+rows emit.
+
 [[urn-doi]]
 ==== doi
 
@@ -1216,6 +1289,8 @@ Corpus: 4 of 4 pass ids parse.
 |===
 
 Atoms, canonical order: `prefix-` (`prefix`), `suffix-` (`suffix`).
+
+Landed (issue #670) as drafted, with no core: the prefix/suffix pair is the whole DOI. All 4 corpus rows emit.
 
 [[urn-easc]]
 ==== easc
@@ -1237,6 +1312,8 @@ Corpus: 167 of 167 pass ids parse.
 |===
 
 Atoms, canonical order: `series-` (`series`), `year-` (`year`), `variant-` (`variant`).
+
+Landed (issue #670) as drafted; the series the parser records is the Latin transliteration (`ПМГ В 31-2001` emits `series-PMG:variant-V`). All 167 corpus rows emit.
 
 [[urn-ecma]]
 ==== ecma
@@ -1260,6 +1337,8 @@ Corpus: 833 of 833 pass ids parse.
 
 Atoms, canonical order: `part-` (`part`), `vol-` (`volume`), `ed-` (`edition`).
 
+Landed (issue #670) as drafted. All 833 corpus rows emit.
+
 [[urn-evs]]
 ==== evs
 
@@ -1281,6 +1360,14 @@ Corpus: 36 of 36 pass ids parse.
 |===
 
 Atoms, canonical order: `part-` (`part`), `year-` (`year`), `lang-` (`language`), `amdkind-` (`amd_kind`), `amdnumber-` (`amd_number`), `amdyear-` (`amd_year`), `corkind-` (`cor_kind`), `coryear-` (`cor_year`), `evstype-` (`evs_type`), `intlorg-` (`intl_org`), `nayear-` (`na_year`).
+
+*Landed (issue #670) as drafted*, with two kind corrections: `draft_prefix`
+is the bool the corpus serializes, and an adoption of a European document
+carries it along `base`, so it keeps the CEN/CENELEC schema with a
+qualified token (`EVS-EN 18216:2026` is
+`urn:pubid:evs:cencenelec.en:18216:year-2026:na`); `intlorg-` covers an
+adoption of an organization pubid does not model as a nested identifier.
+All 36 corpus rows emit.
 
 Facet candidates (spelling-only): `separator`, `amd_separator`, `cor_separator`, `na_separator`, `draft_prefix`.
 
@@ -1306,6 +1393,8 @@ Corpus: 10 of 10 pass ids parse.
 |===
 
 Atoms, canonical order: `pub-` (`publisher`), `part-` (`part`), `year-` (`year`), `mandate-` (`mandate`).
+
+Landed (issue #670) as drafted; `all` carries its members as `ids-`. All 10 corpus rows emit.
 
 Nested identifiers: `ids-(…)` (`identifiers`, ids).
 
@@ -1339,6 +1428,8 @@ Corpus: 715 of 715 pass ids parse.
 
 Atoms, canonical order: `ed-` (`edition`), `lang-` (`language`), `annexform-` (`annex_form`), `letter-` (`letter`).
 
+Landed (issue #670) as drafted. All 715 corpus rows emit.
+
 [[urn-iana]]
 ==== iana
 
@@ -1358,6 +1449,8 @@ Corpus: 30 of 30 pass ids parse.
 |===
 
 Atoms, canonical order: `subregistry-` (`sub_registry`).
+
+Landed (issue #670) as drafted; the registry name keeps its leading `_` (`_6lowpan-parameters`), which never reads as structure. All 30 corpus rows emit.
 
 [[urn-idf]]
 ==== idf
@@ -1382,6 +1475,8 @@ Corpus: 67 of 67 pass ids parse.
 |===
 
 Atoms, canonical order: `pubbody-` (`publisher.body`), `typeabbr-` (`type.abbr`), `typename-` (`type.name`), `typetypecode-` (`type.type_code`), `part-` (`part`), `year-` (`year`), `stageabbr-` (`stage.abbr`), `stageharmonizedstages-` (`stage.harmonized_stages`), `stagename-` (`stage.name`), `stagestagecode-` (`stage.stage_code`), `typedstageabbr-` (`typed_stage.abbr`), `typedstage-` (`typed_stage.code`), `typedstageharmonizedstages-` (`typed_stage.harmonized_stages`), `typedstagelongabbr-` (`typed_stage.long_abbr`), `typedstagename-` (`typed_stage.name`), `typedstageshortabbr-` (`typed_stage.short_abbr`), `typedstagestagecode-` (`typed_stage.stage_code`), `typedstagetypecode-` (`typed_stage.type_code`).
+
+Landed (issue #670), with `typed_stage.abbr` a list (the stage's abbreviation array) — the same correction as BSI. The URNs run long, because `type`, `stage` and `typed_stage` serialize every registry field (the NIST ruling). All 65 corpus rows emit.
 
 Finding: `to_hash` serializes the internals of a component (`type`, `stage`, `typed_stage`). Reduce it to the identifying value first (the ISO `Components::Code` precedent), or the URN carries registry data.
 
@@ -1433,6 +1528,19 @@ Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `par
 
 Nested identifiers: `ids-(…)` (`identifiers`, ids).
 
+*Landed (issue #670)* — the wave declares all 26 types and keeps every
+earlier wave's atom in its place (`database` moves to the bool the corpus
+serializes, before any URN carried it; `frag-`/`sheet-`/`sheetyear-`/`vap-`
+sit after `database`, before `lang-`, whose landed URNs never move). All
+12,330 corpus rows emit. The URN inherits two identity gaps exactly as
+`to_hash` has them (pinned in `lib/pubid/iec/CLAUDE.md`, unserialized
+identity attributes are a separate wire-format decision): a
+WorkingDocument serializes only `_type`, so its URN is `urn:pubid:iec:wd`
+and all 2,350 WD rows share that one hash — a shared hash, not a collision;
+and a TestReportForm's CISPR document sits in the unserialized
+`cispr_identifier`. A wrapper's month/day leak (`iec-wrapper-month-day-leak`
+in `lib/pubid/iec/CLAUDE.md`) rides the URN as it rides the hash.
+
 Facet candidates (spelling-only): `languages.*.original_code`.
 
 [[urn-ietf]]
@@ -1459,6 +1567,8 @@ Corpus: 2526 of 2526 pass ids parse.
 
 Atoms, canonical order: `v-` (`version`).
 
+Landed (issue #670) as drafted; the internet-draft token is `id2` (the draft reserved `id` for the bare identifier), and a draft name (`draft-…`) escapes its first byte. All 2,526 corpus rows emit.
+
 [[urn-iho]]
 ==== iho
 
@@ -1483,6 +1593,20 @@ Corpus: 138 of 138 pass ids parse.
 
 Atoms, canonical order: `vol-` (`volume`), `issue-` (`issue`), `year-` (`year`), `v-` (`version`), `appendix-` (`appendix`).
 
+*Landed (issue #670).* The component-model rulings are LAW
+(`lib/pubid/iho/CLAUDE.md`), so the atoms follow the containment order of
+the official URN generator, not the draft list: the document's `ed-`/`year-`
+first, then each component with its own edition/year right after it —
+`sup-`/`suped-`/`supyear-`, `part-`/`parted-`/`party-`, `annex-`/…,
+`appendix-`/`appsub-`/`apped-`/`appyear-`, `vol-`/`issue-`/`voled-`/`voly-`.
+The edition the component model stores is `ed-` (the draft's `v-` named a
+field that no longer exists). Case is preserved (`part-A`), the Appendix
+subnumber is its own atom (`appendix-D-2` is `appendix-D:appsub-2`), and the
+yearbook year is a volume — `IHO P-5 Vol. 2024` emits `vol-2024` and no
+`year-` value; the legacy `y.` marker stays decodable in the official URN
+parser, never emitted. All 173 corpus rows emit; the official
+`urn:mrn:iho:…` form stays on `#to_urn`.
+
 [[urn-isbn]]
 ==== isbn
 
@@ -1491,7 +1615,6 @@ Namespace: `urn:pubid:isbn:` (the `_type` flavor segment).
 Official URN: `urn:isbn:…`, IANA-registered (formal template `isbn`).
 
 Current `to_urn` (≤400 sampled pass ids): 4 ids, 0 round-trip, 0 reshape, 4 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
-
 Corpus: 4 of 4 pass ids parse.
 
 [cols="3,1,1,1,4",options="header"]
@@ -1502,6 +1625,8 @@ Corpus: 4 of 4 pass ids parse.
 |===
 
 Atoms, canonical order: `hyphenated-` (`hyphenated`), `raw-` (`raw`).
+
+Landed (issue #670) as drafted, with no core: both spellings are optional atoms. All 4 corpus rows emit.
 
 [[urn-jcgm]]
 ==== jcgm
@@ -1526,6 +1651,8 @@ Corpus: 31 of 31 pass ids parse.
 |===
 
 Atoms, canonical order: `year-` (`year`), `month-` (`month`), `day-` (`day`), `lang-` (`languages.*.code`, list).
+
+Landed (issue #670) as drafted. All 31 corpus rows emit.
 
 Facet candidates (spelling-only): `languages.*.original_code`.
 
@@ -1557,6 +1684,8 @@ Corpus: 10561 of 10561 pass ids parse.
 
 Atoms, canonical order: `series-` (`series`), `part-` (`parts`, list), `year-` (`year`, int), `reaffirmed-` (`reaffirmed`, bool).
 
+Landed (issue #670) as drafted; the year is an int atom (`year-1999`) and the zero-padded printed number stays the core (`jis:0001`). All 10,561 corpus rows emit.
+
 [[urn-oasis]]
 ==== oasis
 
@@ -1577,11 +1706,12 @@ Corpus: 45 of 45 pass ids parse.
 
 Atoms, canonical order: `part-` (`part`), `v-` (`version`), `stage-` (`stage`), `label-` (`label`), `original-` (`original`).
 
+Landed (issue #670) as drafted. All 45 corpus rows emit.
+
 [[urn-ogc]]
 ==== ogc
 
 Namespace: `urn:pubid:ogc:` (the `_type` flavor segment).
-
 Official URN: `urn:ogc:…`, IANA-registered, RFC 5165.
 
 Current `to_urn` (≤400 sampled pass ids): 88 ids, 88 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
@@ -1596,6 +1726,8 @@ Corpus: 88 of 88 pass ids parse.
 |===
 
 Atoms, canonical order: `year-` (`year`), `rev-` (`revision`).
+
+Landed (issue #670) as drafted; the year atom keeps the printed two-digit form (`year-06`) — it is identity here, not a date. All 88 corpus rows emit.
 
 [[urn-oiml]]
 ==== oiml
@@ -1655,6 +1787,8 @@ Corpus: 21 of 21 pass ids parse.
 
 Atoms, canonical order: `part-` (`part`), `v-` (`version`), `acronym-` (`acronym`).
 
+Landed (issue #670) as drafted, with no core: the acronym names the document. All 21 corpus rows emit.
+
 [[urn-sae]]
 ==== sae
 
@@ -1671,6 +1805,8 @@ Corpus: 0 of 0 pass ids parse.
 | `_type` | token | core | ids | example
 | `pubid:sae:identifier` | `id` | number | 0 | —
 |===
+
+*Landed (issue #670)* as drafted (`typeabbr-`, `rev-`, `amd-`, the Integer date atoms). SAE has no fixture corpus — the contract spec parses a fixed literal list (`LITERALS`) and `spec/pubid/pubid_urn_leaf_spec.rb` pins its URNs.
 
 [[urn-un]]
 ==== un
@@ -1691,6 +1827,8 @@ Corpus: 5 of 5 pass ids parse.
 |===
 
 Atoms, canonical order: `path-` (`path`, list).
+
+Landed (issue #670) as drafted (`path-A,RES,78`). All 5 corpus rows emit.
 
 [[urn-w3c]]
 ==== w3c
@@ -1722,6 +1860,8 @@ Corpus: 29 of 29 pass ids parse.
 
 Atoms, canonical order: `date-` (`date`).
 
+Landed (issue #670) as drafted; `becss` reads as a type token by shape, so its first byte escapes (`std:~62ecss`). All 29 corpus rows emit.
+
 [[urn-xsf]]
 ==== xsf
 
@@ -1739,4 +1879,6 @@ Corpus: 51 of 51 pass ids parse.
 | `pubid:xsf:identifier` | `id` | number | 0 | —
 | `pubid:xsf:xep` | `xep` | number | 51 | `XEP 0001`
 |===
+
+Landed (issue #670) as drafted; the printed zero-padding stays the core (`xep:0001`). All 51 corpus rows emit.
 

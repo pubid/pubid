@@ -19,6 +19,7 @@ module Pubid
     autoload :WrapperIdentifier, "#{__dir__}/csa/wrapper_identifier"
     autoload :CompositeIdentifier, "#{__dir__}/csa/composite_identifier"
     autoload :Components, "#{__dir__}/csa/components"
+    autoload :PubidUrnSchema, "#{__dir__}/csa/pubid_urn_schema"
 
     def self.parse(identifier_string)
       unless identifier_string.is_a?(String)

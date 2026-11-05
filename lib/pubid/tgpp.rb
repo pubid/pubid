@@ -34,6 +34,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/tgpp/renderer"
     autoload :UrnGenerator, "#{__dir__}/tgpp/urn_generator"
     autoload :UrnParser, "#{__dir__}/tgpp/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/tgpp/pubid_urn_schema"
 
     # Parse a 3GPP identifier string
     def self.parse(identifier)

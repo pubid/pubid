@@ -74,3 +74,14 @@ gives it); `spec/pubid/cen_cenelec/type_key_spec.rb` loads the class and
 rebuilds the list, so it does not depend on order. **Every type key in a
 flavor must be unique**; ANSI has the same shape (`Standard` and
 `AmericanNationalStandard` both declare `ans`) and is not checked here.
+
+## pubid-scheme URN (issue #670)
+
+`lib/pubid/cen_cenelec/pubid_urn_schema.rb` completes the partial schema
+the GOST wave landed; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-cen_cenelec]]`). Every atom added after that wave sits after the
+ones it placed (`subpart-` between `part-` and `year-` never fires on
+them; `dateyear-`/`datemonth-` after `month-`), so a GOST-nested URN
+encodes identically. The nested `type`/`typed_stage` of an EN whose stage
+is not in the registry stays unplaced — no parse makes that shape today,
+and it keeps raising "does not place" instead of a silent drop.

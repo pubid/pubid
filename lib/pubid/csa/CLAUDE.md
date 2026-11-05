@@ -39,3 +39,15 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 Moved from the root `CLAUDE.md`'s `#exclude` bullet (`metanorma__pubid__exclude-recursion-depth`), where it had grown that bullet past the 100,000-byte session-load budget `spec/pubid/flavor_notes_spec.rb` enforces.
 
 **CSA follows the same scalar-year pattern** (`Csa::Identifier#exclude`): its `year` is a plain `:string`, but unlike BIPM the year carries *format metadata* stored in sibling attributes (`year_format`, `year_prefix`, `original_year_4digit`, and `french` — the last set **only** from a `:F` year prefix, the French-edition form `CSA B149.1:F20`). A year-less parse leaves all of these nil/false, so the override must reset **every** year-derived attribute (not just `year`) after `super`, or `==` — and thus `matches?` — would still diverge (e.g. a bare `CSA B149.1` would fail to match the French edition `CSA B149.1:F20`). The `respond_to?(:year=)` guard skips the adoption wrappers (`CanadianAdopted`/`CsaAdopted`), which delegate year to a nested inner id and lack a `year` accessor — those are handled by the base recursion.
+
+## pubid-scheme URN (issue #670)
+
+`lib/pubid/csa/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-csa]]`). The spelling/format cluster of the year — `year_format`,
+`year_prefix`, `publisher_prefix`, `has_publisher`,
+`original_reaffirmation_4digit`, `original_year_4digit`, `separator`,
+`series_prefix`, `french` — is facets, so the same document printed two
+ways merges only spellings; everything else is an atom. An adoption's
+document goes along `base` and keeps its own flavor's schema (`CSA
+ISO/IEC 8824-1:22` is
+`urn:pubid:csa:iso.is:8824:co-IEC:part-1:year-2022:ca2`).

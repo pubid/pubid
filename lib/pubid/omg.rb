@@ -17,6 +17,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/omg/identifiers"
     autoload :Parser, "#{__dir__}/omg/parser"
     autoload :Renderer, "#{__dir__}/omg/renderer"
+    autoload :PubidUrnSchema, "#{__dir__}/omg/pubid_urn_schema"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

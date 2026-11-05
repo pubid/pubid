@@ -13,10 +13,11 @@ require "spec_helper"
 #
 # The official URN (#to_urn) is NOT under this contract: it may be lossy.
 #
-# A flavor whose schema has not landed yet is in PENDING. Its example runs
-# as `pending`: once the flavor passes, RSpec reports "expected pending to
-# fail", and that red is the signal to delete the entry. The wave order of
-# the remaining flavors is in docs/URN-SCHEMES.adoc.
+# The table is complete (issue #670): every flavor carries a schema and
+# passes, so PENDING is empty. A flavor added tomorrow lands with its
+# schema, its docs/URN-SCHEMES.adoc section and its corpus row in the same
+# change; until then its example runs as `pending` (list it here), and the
+# red "expected pending to fail" is the signal to delete the entry.
 module PubidUrnContract
   extend FixtureFileHelper
 
@@ -27,10 +28,17 @@ module PubidUrnContract
   # flavor registry name => fixture directory, where the two differ.
   FIXTURE_DIRS = { "3gpp" => "tgpp" }.freeze
 
-  PENDING = %w[
-    3gpp amca bipm bsi cen_cenelec cie csa doi gb idf iec
-    ietf iho isbn jis omg sae un
-    ].freeze
+  # Flavors with no fixture corpus (adobe and sae have no pass/ files):
+  # the literals stand in for one, so the contract exercises their schema
+  # all the same.
+  LITERALS = {
+    "adobe" => ["Adobe TN 5014", "Adobe Technical Note 5902", "adobe-glyph-list",
+                "adobe-japan1-7", "adobe-postscript-3"],
+    "sae" => ["SAE J3016_202104", "SAE J3016", "SAE AS6108A", "SAE ARP5548",
+              "SAE AMS2750F"],
+  }.freeze
+
+  PENDING = [].freeze
 
   module_function
 
@@ -43,6 +51,10 @@ module PubidUrnContract
   end
 
   def inputs(flavor)
+    return LITERALS.fetch(flavor) if LITERALS.key?(flavor) &&
+                                     Dir.glob(File.join(FIXTURE_ROOT, flavor,
+                                                        "**", "pass", "*.txt")).empty?
+
     dir = File.join(FIXTURE_ROOT, FIXTURE_DIRS.fetch(flavor, flavor))
     Dir.glob(File.join(dir, "**", "pass", "*.txt")).flat_map do |file|
       read_pass_fixture_entries(file).map(&:first)
