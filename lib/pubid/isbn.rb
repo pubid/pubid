@@ -18,6 +18,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/isbn/identifiers"
     autoload :Parser, "#{__dir__}/isbn/parser"
     autoload :Renderer, "#{__dir__}/isbn/renderer"
+    autoload :PubidUrnSchema, "#{__dir__}/isbn/pubid_urn_schema"
 
     def self.parse(identifier)
       Identifier.parse(identifier)

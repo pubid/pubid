@@ -56,3 +56,12 @@ Read this before you change `lib/pubid/cie/` or `spec/pubid/cie/`. The root
   year `2009` — lives on `base`. Wrapping its `to_s` changed nothing,
   because the annotator only read the wrapper's own attributes. It is fixed
   by `Annotator#emit_tokens` walking `base`, not by anything in CIE.
+
+## pubid-scheme URN (issue #670)
+
+`lib/pubid/cie/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-cie]]`). `s_prefix`/`d_prefix` and `part_separator` are bool/value
+facets (spelling only); `style` names how the designation reads and is an
+atom; the language format rides `langformat-` and a paren-year
+translation's year `transyear-`. A bundle's members are `ids-`; a
+supplement's document goes along `base`.

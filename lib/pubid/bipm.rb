@@ -29,6 +29,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/bipm/renderer"
     autoload :UrnGenerator, "#{__dir__}/bipm/urn_generator"
     autoload :UrnParser, "#{__dir__}/bipm/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/bipm/pubid_urn_schema"
 
     # Parse a BIPM identifier string into an identifier object.
     # @param identifier [String] the printed identifier

@@ -17,6 +17,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/sae/renderer"
     autoload :UrnGenerator, "#{__dir__}/sae/urn_generator"
     autoload :UrnParser, "#{__dir__}/sae/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/sae/pubid_urn_schema"
 
     def self.parse(input)
       Identifier.parse(input)

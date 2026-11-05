@@ -95,3 +95,16 @@ Verified: `spec/pubid/supplement_date_attributes_spec.rb` exercises the mechanis
 ## The `BSI `-prefixed spelling of the BS series parses (pubid#644)
 
 `BSI BS 5950` used to be a hard parse failure: the strip in `Pubid::Bsi::Identifier.parse` (`strip_bsi_prefix`) only dropped the `BSI ` prefix before PAS/PD/DD/BIP (`BSI_PREFIXED_SERIES`), and `BS` was deliberately absent because **BSI never prints `BSI` in front of its own BS series**. That remains true of the **render** — `to_s(with_publisher: true)` still answers `BS 5950` for a British Standard, and the `BSI` prefix is re-added only for `BSI_PREFIXED_SERIES` — but **external references do cite the series as `BSI BS 5950`**, so the prefixed spelling is now accepted on **parse**: `STRIPPABLE_SERIES = BSI_PREFIXED_SERIES + ["BS"]` drives the strip, and the input normalizes to the canonical `BS 5950` (a normalizing parse — never a byte-exact fixture). Two lists, one line apart, because the parse and render halves of the same question legitimately differ: `BSI_PREFIXED_SERIES` answers "which series does BSI *print* its publisher in front of", `STRIPPABLE_SERIES` answers "which series does an *external* citation print it in front of". Locked by `spec/pubid/router_printed_forms_spec.rb` (routing + canonical render + stable reparse).
+
+## pubid-scheme URN (issue #670)
+
+`lib/pubid/bsi/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-bsi]]`). An adopted norm carries the European document along
+`base`, so the wrapper shares the slug prefix of the document it wraps
+(`BS EN 1073-2:2002` is
+`urn:pubid:bsi:cencenelec.en:1073:part-2:year-2002:aen` — qualified
+`cencenelec.` token, the document keeps its own schema). `type`, `stage`
+and `typed_stage` serialize every registry field, so each field is its own
+atom (`typeabbr-`, `stagehs-`, `tsabbr-` …; `typed_stage.abbr` is a list)
+— the NIST ruling; reducing them would change `to_hash` and need a
+re-crawl.

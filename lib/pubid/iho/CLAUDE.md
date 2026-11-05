@@ -172,3 +172,14 @@ edition rename (the serialized key moved `version` → `edition`) and
 the volume unification; relaton-cli's `MachineIndex::REFINABLE_KEYS`
 needs `edition`/`volume` beside the retired `version`/`year` keys; the
 pubid pin moves in step with the relaton-data-iho re-key.
+
+## pubid-scheme URN (issue #670)
+
+`lib/pubid/iho/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
+(`[[urn-iho]]`). The atoms follow the containment order of
+`UrnGenerator::SEGMENTS` — the document's `ed-`/`year-` first, then each
+component with its own edition/year right after it (`sup-`, `part-`,
+`parted-`, `appendix-`, `appsub-`, `vol-`, `issue-` …). Case is preserved
+(`part-A`); the yearbook year is a volume (`vol-2024`, no `year-` value —
+the legacy `y.` marker stays decodable in the official URN parser, never
+emitted). The official `urn:mrn:iho:…` form stays on `#to_urn`.

@@ -41,6 +41,7 @@ module Pubid
     autoload :Identifiers, "#{__dir__}/gb/identifiers"
     autoload :Parser, "#{__dir__}/gb/parser"
     autoload :Renderer, "#{__dir__}/gb/renderer"
+    autoload :PubidUrnSchema, "#{__dir__}/gb/pubid_urn_schema"
 
     # Parse a Chinese Standard identifier string.
     # @param identifier [String] e.g. "GB/T 20223-2006"

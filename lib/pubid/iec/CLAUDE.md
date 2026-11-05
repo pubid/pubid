@@ -31,3 +31,16 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
   **Two parent-slot gaps recorded by the cross-flavor `base` survey** (`lib/pubid/bsi/CLAUDE.md` has the measured version). `Identifiers::TestReportForm#cispr_identifier` is a polymorphic `Identifier` parent slot with no `#root` override, so `root` returns the form itself. And `Identifiers::ConsolidatedIdentifier#base_document` returns `identifiers&.first` **without** the recursive `&.base_document` that its BSI, CSA and CEN counterparts use — a one-level peel where the others peel fully, so a consolidated edition of a supplement does not reduce to the bare standard. Neither is chased here; both are pinned by nothing, which is why they are written down.
 
   **Stage codes — the SSOT and what is settled.** The authoritative source for IEC stage abbreviations is committed in this repo: **`data/iec/stage-codes.md`** — the 52-row IEC/ISO stage-code correspondence table transcribed from IEC's official *IEC/ISO Harmonized APIs* documents (v0.0.8 2023-06, api-portal.iec.ch; v0.0.7 2021-05, iec-apiportal.apigee.io — the successors that replace the IEC Data Feeds), the legacy Data-Feeds field examples, and the IS-lifecycle ladder from `StageCodes_IS_v2.pdf` (2023-06). `www.iec.ch` itself is fully WAF-gated to non-browsers and the Wayback Machine holds no snapshots of its PDFs, so the extract — not the unreachable original — is the reference. **`Pubid::Iec.locate_stage` reads `TYPED_STAGES` only** (`lib/pubid/iec.rb`); `PROJECT_STAGES` (AFDIS, TCDV, PRVC…) are not queryable through it. Every one of metanorma-iec's 55 `STAGE_CODES` — the list quoted in pubid#237 — resolves, locked by `spec/pubid/iec/typed_stages_spec.rb` in the issue's own order; aliases are always **appended, never prepended**, so `abbr.first` (what renders) is unchanged. Notable rulings from that pass: **ADIS** is the legacy Data-Feeds spelling of AFDIS ("Approved for FDIS circulation", ISO_LEVEL 40.99) and is an alias on `cdv` (the typed stage claiming 40.99); **CDISH/CDPAS** are the 50.20 rows of the DISH/DPAS deliverables, not "committee draft ISH/PAS" (30.xx); **Reconciliation items recorded in the extract, deliberately not applied:** DELPUB sits at 99.60 there while the `is` ladder does not claim 99.60; CAN carries two codes (30.98 IS/TR/TS, 50.98 PAS/ISH/COR); the rows CDISH-table-siblings DECDISH/MERGED/SPLIT/PCC/PRVN/DEL/RPUB/TPUB and the per-deliverable translation/preparation families are not registered as typed-stage abbreviations.
+
+## pubid-scheme URN (issue #670)
+
+`lib/pubid/iec/pubid_urn_schema.rb` completes the partial schema the IEEE
+and GOST waves landed; rulings in `docs/URN-SCHEMES.adoc` (`[[urn-iec]]`).
+Invariant: every atom added after those waves sits after `database-` and
+before `lang-`, so a landed URN encodes identically (`database` became the
+bool the corpus serializes before any URN carried it). The URN inherits
+the unserialized-identity gaps pinned above: a WorkingDocument's URN is
+the type-only `urn:pubid:iec:wd` (all WD rows share one hash — a shared
+hash, not a collision), and a TestReportForm's CISPR document rides
+`cispr_identifier`. Mapping them stays the wire-format decision it
+already was.
