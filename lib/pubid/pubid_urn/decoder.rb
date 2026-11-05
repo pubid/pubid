@@ -62,16 +62,22 @@ module Pubid
       end
 
       def decode_core(tokens, index, node, schema)
-        schema.core.each do |parts|
+        schema.core.each_with_index do |parts, i|
           break if index >= tokens.size
 
           token = tokens[index]
           break if PubidUrn.structural?(token)
 
-          Paths.put(node, parts, Escape.decode(token)) unless token == NULL
+          unless token == NULL
+            Paths.put(node, parts, core_value(token, schema.core_kinds[i]))
+          end
           index += 1
         end
         index
+      end
+
+      def core_value(token, kind)
+        kind == :int ? integer(token) : Escape.decode(token)
       end
 
       def decode_atoms(tokens, index, node, schema)

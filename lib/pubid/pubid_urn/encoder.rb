@@ -69,9 +69,21 @@ module Pubid
       def core_segments(node, schema)
         values = schema.core.map { |parts| Paths.take(node, parts) }
         values.pop while !values.empty? && values.last.nil?
-        values.map do |value|
-          value.nil? ? NULL : core_value(value, schema)
+        values.each_with_index.map do |value, i|
+          next NULL if value.nil?
+          next core_integer(value, schema, i) if schema.core_kinds[i] == :int
+
+          core_value(value, schema)
         end
+      end
+
+      # A decimal never has the shape of structure, so it needs no escape.
+      def core_integer(value, schema, index)
+        return value.to_s if value.is_a?(Integer)
+
+        raise Errors::InvalidInputError,
+              "#{schema.type} #{schema.core[index].join('.')}: " \
+              "#{value.inspect} is not int"
       end
 
       # A core value that has the shape of structure (PubidUrn::STRUCTURE)

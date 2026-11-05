@@ -7,7 +7,7 @@ module Pubid
                "#{__dir__}/identifiers/adopted_european_norm"
       autoload :Amendment, "#{__dir__}/identifiers/amendment"
       autoload :Base, "#{__dir__}/identifiers/base"
-      autoload :CENelecHarmonizationDocument,
+      autoload :CenelecHarmonizationDocument,
                "#{__dir__}/identifiers/cenelec_harmonization_document"
       autoload :CenReport, "#{__dir__}/identifiers/cen_report"
       autoload :CenWorkshopAgreement,

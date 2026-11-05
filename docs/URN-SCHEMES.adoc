@@ -97,6 +97,9 @@ the value by it: `:string` (the default), `:bool` (`true`, `false`),
 element), `:bools` (a list of booleans), `:id` and `:ids` (nested bodies;
 atoms only). A path with `*` reads a list, so its kind must be `:list` or
 `:bools`. A spelling flag is a `:bool` facet (ITU `0.numberglued-true`).
+A core value is `:string` (the default) or `:int`, declared as
+`core: [["number", :int]]`: PLATEAU numbers and ETSI supplement ordinals are
+Integers. An `:int` core is written in decimal, so `01` is not canonical.
 
 Nested identifiers:: A nested identifier that is not the `base` chain (an
 adoption's `adopted`, an all-parts or consolidated `identifiers` list, a
@@ -178,8 +181,10 @@ in `spec/pubid/pubid_urn_contract_spec.rb` (removed from `PENDING`) and its
 section here moved from "proposed" to "landed".
 
 . iso, ieee, itu, nist, astm (all *landed*)
-. ashrae, asme, gost, oiml, api, plateau, jcgm, etsi
-. ansi (*landed*, with ieee), cen_cenelec, cie
+. ashrae, asme, gost, oiml, api, plateau, jcgm, etsi (all *landed*: five in
+  #663, whose sections are still under "Proposed"; etsi, gost and plateau
+  under "Landed")
+. ansi (*landed*, with ieee), cen_cenelec (*partial*, with gost), cie
 . bsi, csa, idf, sae
 . doi, gb, isbn, omg, un
 . the remaining flavors (most already round-trip their `to_urn`): 3gpp, adobe, amca, bipm,
@@ -353,10 +358,11 @@ Rulings of this wave:
 * *Nested ANSI and IEC nodes.* IEEE ids nest 36 `pubid:ansi:standard` and 3
   `pubid:iec:international-standard` nodes. ANSI has only three types, so
   ANSI landed whole with this wave (<<urn-ansi>>). IEC has 26, so it has a
-  partial schema for the one type the corpus nests (<<urn-iec>>). An IEEE
-  adoption of any other IEC type — `IEEE Std 1234-2010 (IEC TR 62271-1)`,
-  an IEC `TS`, an `/AMD1:2011`, a `CSV` — makes `#to_pubid_urn` raise "no
-  pubid URN schema" until IEC's own wave lands. None is in the corpus.
+  partial schema for the one type the corpus nests (<<urn-iec>>). The GOST
+  wave added the IEC `TR`, `TS`, amendment and consolidated identifier, so
+  `IEEE Std 1234-2010 (IEC TR 62271-1)` and an `/AMD1:2011` now nest; any
+  other IEC type (a `CSV`, a fragment) still makes `#to_pubid_urn` raise
+  "no pubid URN schema" until IEC's own wave lands. None is in the corpus.
 * *The IEEE base class has a token too* (`id`). The builder makes a bare
   `Pubid::Ieee::Identifier` for a parenthetical inside a relationship; its
   related ids are not serialized today, but one in any other slot still
@@ -651,6 +657,146 @@ ISO/ASTMTR52916-EB      urn:pubid:astm:tr:52916:pub-ISO~2FASTM:format--EB
 
 The `format_suffix` value keeps its own dash (`-EB`), so the atom reads
 `format--EB`; the prefix ends at the first `-`.
+
+[[urn-etsi]]
+==== etsi
+
+Namespace: `urn:pubid:etsi:`. Schema: `lib/pubid/etsi/pubid_urn_schema.rb`.
+
+Official URN: `urn:etsi:…`, IANA-registered, RFC 8515. It stays on `#to_urn`.
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 324 round-trip, 21 do not
+re-parse, 55 raise (the raises came from the audit script, not the gem; see
+#656).
+
+pubid scheme: all 24,718 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give one URN each, with no collision. The longest URN is 93
+characters.
+
+[cols="3,1,1",options="header"]
+|===
+| `_type` | token | core
+| `pubid:etsi:etsi-standard` | `es` | `number`
+| `pubid:etsi:amendment` | `amd` | `number` (`:int`)
+| `pubid:etsi:corrigendum` | `cor` | `number` (`:int`)
+| `pubid:etsi:supplement-identifier` | `si` | `number` (`:int`)
+| `pubid:etsi:identifier` | `id` | `number`
+|===
+
+Atoms, in the schema order: `type-`, `part-` (`parts`, list), `minor-`,
+`year-`, `month-`, `day-`, `v-` (`version`), `isedition-` (`is_edition`,
+bool). No facets. `minor` and `day` are not in the pass corpus; they are
+placed because `EtsiStandard` serializes them. `is_edition` is an atom:
+`ed.1` and `V1` are two documents.
+
+A supplement's number is its Integer ordinal, so its core is `:int`
+(<<rules-kinds>>). The document it supplements comes first, along `base`.
+
+The parser accepts what the model accepts: `urn:pubid:etsi:amd:1` builds an
+Amendment with no `base`, which round-trips but whose `to_s` raises. The URN
+makes that object reachable; it does not make it valid. The PLATEAU
+`urn:pubid:plateau:tr:1:annex` (an Annex with no letter) is the same case.
+
+----
+ETSI EN 300 175-1 V2.9.1 (2022-01)  urn:pubid:etsi:es:300~20175:type-EN:part-1:year-2022:month-01:v-2.9.1
+ETSI EN 300 019-1-0 V2.1.2 (2003-09) urn:pubid:etsi:es:300~20019:type-EN:part-1,0:year-2003:month-09:v-2.1.2
+ETSI ETR 108/A1 ed.1 (1995-08)      urn:pubid:etsi:es:108:type-ETR:year-1995:month-08:v-1:isedition-true:amd:1
+----
+
+[[urn-gost]]
+==== gost
+
+Namespace: `urn:pubid:gost:`. Schema: `lib/pubid/gost/pubid_urn_schema.rb`.
+
+Official URN: none. GOST has no namespace in the IANA registry, and the
+current `urn:gost:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 200 ids, 77 round-trip, 123 reshape,
+9 colliding URNs.
+
+pubid scheme: all 200 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision. They give 199 URNs, because `ГОСТ Р 71039—2023` and
+`ГОСТ Р 71039— 2023` are one document with one `to_hash`. The longest URN is
+181 characters (a harmonized standard that nests a consolidated EN).
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:gost:interstate-standard` | `is`
+| `pubid:gost:national-standard` | `ns`
+| `pubid:gost:harmonized` | `h`
+| `pubid:gost:identical-adoption` | `ia`
+| `pubid:gost:foreign-reference` | `fr`
+| `pubid:gost:identifier` | `id`
+|===
+
+Core: `number`. Atoms, in the schema order: `pub-`, `co-` (`copublisher`),
+`year-`, `subtype-`, `raw-`, `adoptedidentifiers-` (`adopted_identifiers`,
+ids), `adopted-` (id). No facets.
+
+A harmonized or identical adoption holds the GOST standard in `base`, and its
+`to_hash` repeats that standard's number and year, so the URN writes them
+twice: once in the base node, once in the adoption node. The adopted
+documents nest with their own flavor's schema: `astm`, `cencenelec`, `iec`,
+`ieee`, `iso`. `cencenelec` has a *partial* schema for this wave (see
+<<urn-cen_cenelec>>).
+
+----
+ГОСТ ISO 6848                          urn:pubid:gost:is:6848:co-ISO
+ГОСТ Р 58904-2020/ISO/TR 25901-1:2016  urn:pubid:gost:ns:58904:year-2020:ia:58904:year-2020:adopted-(iso:tr:25901:part-1:year-2016)
+ГОСТ 1437-2024 (ASTM D129-18)          urn:pubid:gost:is:1437:year-2024:h:1437:year-2024:adoptedidentifiers-(astm:std:129:letter-D:year-2018)
+----
+
+Known gap, pinned by `spec/pubid/gost/pubid_urn_spec.rb`: a
+`ForeignReference` (`(OECD 460:2017)`, the form for a document of a flavor
+pubid does not know) keeps its text in `raw`, which `to_hash` does not write.
+Two adoptions of different unknown documents therefore have one hash and one
+URN, and `from_hash` renders `GOST 34853-2022 (OECD 460:2017)` as
+`GOST 34853-2022`. The fallback is wider than unknown flavors: a known
+document that the adopted flavor cannot parse also becomes a
+`ForeignReference` (`(EN 1234:2010-05)`, `(CEN/CENELEC EN 1234:2010)`,
+`(EN 1234:2010/prA1)`). The fix (map `raw` in `key_value`) changes `to_hash`, so it
+needs a `pubid-testsuite` update and ships separately; the `raw-` atom is
+already declared for it. `relaton-data-gost` holds no foreign-reference row.
+
+Found in passing, not fixed: `ГОСТ 35294.2-2025 (ISO 8124-2: 2023)` (a space
+after the colon) routes its adopted document to IEEE and drops the year:
+`to_s` is `GOST 35294.2-2025 (ISO 8124-2)`.
+
+[[urn-plateau]]
+==== plateau
+
+Namespace: `urn:pubid:plateau:`. Schema:
+`lib/pubid/plateau/pubid_urn_schema.rb`.
+
+Official URN: none. PLATEAU has no namespace in the IANA registry, and the
+current `urn:plateau:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 115 ids, 83 round-trip, 32 reshape,
+10 colliding URNs.
+
+pubid scheme: all 115 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision. The longest URN is 37 characters.
+
+[cols="3,1,1",options="header"]
+|===
+| `_type` | token | core
+| `pubid:plateau:handbook` | `hb` | `number` (`:int`)
+| `pubid:plateau:technical-report` | `tr` | `number` (`:int`)
+| `pubid:plateau:annex` | `annex` | none
+| `pubid:plateau:identifier` | `id` | `number` (`:int`)
+|===
+
+Atoms, in the schema order: `pub-`, `ed-` (`edition`), `annex-` (int);
+the Annex adds `letter-`. No facets.
+
+PLATEAU keeps `number` an Integer (the one flavor outside the `:string`
+retype), so its core is `:int`: `#00` is the core `0`. No input makes an
+Annex; one built by hand writes its document first and its letter as an atom
+(`urn:pubid:plateau:tr:46:annex:letter-A`).
+
+----
+PLATEAU Handbook #00 第1.0版      urn:pubid:plateau:hb:0:ed-1.0
+PLATEAU Handbook #03-1 第2.0版    urn:pubid:plateau:hb:3:ed-2.0:annex-1
+PLATEAU Technical Report #46-1  urn:pubid:plateau:tr:46:annex-1
+----
 
 === Proposed
 
@@ -965,6 +1111,24 @@ Nested identifiers: `adopted-(…)` (`adopted`, id), `ids-(…)` (`identifiers`,
 
 Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iec`, `iso`.
 
+*Partial schema* (`lib/pubid/cen_cenelec/pubid_urn_schema.rb`), landed with
+GOST, for the types a GOST adoption can name: `en`, `aen`, `amd`, `cor`,
+`consol`, `tr` and `ts`. It declares the atom order above plus `adopted-` and
+`ids-`. An absent atom writes nothing, so the CEN wave can add types and
+atoms without changing these URNs, as long as the relative order of these
+atoms stays. `aen` and `consol` have no core: an adopted EN keeps its number
+on the `adopted` document, and a consolidated identifier has only its
+`identifiers`
+(`urn:pubid:cencenelec:consol:ids-(cencenelec:en:14988:year-2017),(cencenelec:amd:1:year-2020)`).
+cen_cenelec stays in `PENDING` until its wave.
+
+Open for the CEN wave: shapes the partial schema does not place, which no
+parse makes today. An EN with a month serializes a nested
+`"date" => {"year", "month"}` (only a year-only date flattens), an EN whose
+stage is not in the registry keeps nested `type`/`typed_stage` (CEN's
+`compact_hash` declines), and `subpart` has no atom. Each raises "does not
+place" instead of a silent drop.
+
 [[urn-cie]]
 ==== cie
 
@@ -1096,29 +1260,6 @@ Corpus: 833 of 833 pass ids parse.
 
 Atoms, canonical order: `part-` (`part`), `vol-` (`volume`), `ed-` (`edition`).
 
-[[urn-etsi]]
-==== etsi
-
-Namespace: `urn:pubid:etsi:` (the `_type` flavor segment).
-
-Official URN: `urn:etsi:…`, IANA-registered, RFC 8515.
-
-Current `to_urn` (≤400 sampled pass ids): 400 ids, 324 round-trip, 0 reshape, 21 do not re-parse, 55 raise, 0 empty, 0 colliding URNs.
-
-Corpus: 24718 of 24718 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:etsi:amendment` | `amd` | number | 120 | `ETSI ETR 108/A1 ed.1 (1995-08)`
-| `pubid:etsi:corrigendum` | `cor` | number | 49 | `ETSI ETR 053/C1 ed.2 (1997-03)`
-| `pubid:etsi:etsi-standard` | `es` | number | 24718 | `ETSI EG 200 053 V1.5.1 (2004-06)`
-| `pubid:etsi:identifier` | `id` | number | 0 | —
-| `pubid:etsi:supplement-identifier` | `si` | number | 0 | —
-|===
-
-Atoms, canonical order: `type-` (`type`), `part-` (`parts`, list), `year-` (`year`), `month-` (`month`), `v-` (`version`), `isedition-` (`is_edition`, bool).
-
 [[urn-evs]]
 ==== evs
 
@@ -1167,34 +1308,6 @@ Corpus: 10 of 10 pass ids parse.
 Atoms, canonical order: `pub-` (`publisher`), `part-` (`part`), `year-` (`year`), `mandate-` (`mandate`).
 
 Nested identifiers: `ids-(…)` (`identifiers`, ids).
-
-[[urn-gost]]
-==== gost
-
-Namespace: `urn:pubid:gost:` (the `_type` flavor segment).
-
-Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:gost:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
-
-Current `to_urn` (≤400 sampled pass ids): 200 ids, 77 round-trip, 123 reshape, 0 do not re-parse, 0 raise, 0 empty, 9 colliding URNs.
-
-Corpus: 200 of 200 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:gost:foreign-reference` | `fr` | number | 17 | —
-| `pubid:gost:harmonized` | `h` | number | 46 | `ГОСТ 35311.2-2025 (EN 1129-2:1995)`
-| `pubid:gost:identical-adoption` | `ia` | number | 10 | `ГОСТ Р 58904-2020/ISO/TR 25901-1:2016`
-| `pubid:gost:identifier` | `id` | number | 0 | —
-| `pubid:gost:interstate-standard` | `is` | number | 151 | `ГОСТ ISO 6848`
-| `pubid:gost:national-standard` | `ns` | number | 49 | `ГОСТ Р 71039—2023`
-|===
-
-Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `subtype-` (`subtype`).
-
-Nested identifiers: `adoptedidentifiers-(…)` (`adopted_identifiers`, ids), `adopted-(…)` (`adopted`, id).
-
-Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `astm`, `cencenelec`, `iec`, `ieee`, `iso`.
 
 [[urn-iala]]
 ==== iala
@@ -1275,7 +1388,7 @@ Finding: `to_hash` serializes the internals of a component (`type`, `stage`, `ty
 [[urn-iec]]
 ==== iec
 
-Partial schema landed with the IEEE wave: only `pubid:iec:international-standard` (`is`), which IEEE ids nest.
+Partial schema landed with the IEEE wave: only `pubid:iec:international-standard` (`is`), which IEEE ids nest. The GOST wave added `amd`, `consol` (no core; its members ride `ids-`), `tr` and `ts`, which GOST adoptions can name, and the `ids-` atom at the end of the atom order.
 
 Namespace: `urn:pubid:iec:` (the `_type` flavor segment).
 
@@ -1541,28 +1654,6 @@ Corpus: 21 of 21 pass ids parse.
 |===
 
 Atoms, canonical order: `part-` (`part`), `v-` (`version`), `acronym-` (`acronym`).
-
-[[urn-plateau]]
-==== plateau
-
-Namespace: `urn:pubid:plateau:` (the `_type` flavor segment).
-
-Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:plateau:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
-
-Current `to_urn` (≤400 sampled pass ids): 115 ids, 83 round-trip, 32 reshape, 0 do not re-parse, 0 raise, 0 empty, 10 colliding URNs.
-
-Corpus: 115 of 115 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:plateau:annex` | `annex` | number | 0 | —
-| `pubid:plateau:handbook` | `hb` | number | 32 | `PLATEAU Handbook #00 第1.0版`
-| `pubid:plateau:identifier` | `id` | number | 0 | —
-| `pubid:plateau:technical-report` | `tr` | number | 83 | `PLATEAU Technical Report #00`
-|===
-
-Atoms, canonical order: `ed-` (`edition`), `annex-` (`annex`, int).
 
 [[urn-sae]]
 ==== sae

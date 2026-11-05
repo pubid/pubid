@@ -105,11 +105,12 @@ RSpec.describe "IEEE pubid-scheme URN" do
       .to raise_error(Pubid::Errors::UrnParseError, /not canonical/)
   end
 
-  # Pinned: the IEC schema is partial until IEC's own wave lands.
-  it "raises for an adopted IEC type that the partial IEC schema lacks" do
+  # The partial IEC schema gained the TR with the GOST wave, so this
+  # adoption, pinned as a raise before, now nests the IEC report.
+  it "nests an adopted IEC technical report" do
     id = Pubid::Ieee.parse("IEEE Std 1234-2010 (IEC TR 62271-1)")
-    expect { id.to_pubid_urn }
-      .to raise_error(Pubid::Errors::InvalidInputError, /iec:technical-report/)
+    expect(id.to_pubid_urn).to end_with(":adopted-(iec:tr:62271:part-1)")
+    expect(Pubid.parse_urn(id.to_pubid_urn).to_hash).to eq(id.to_hash)
   end
 
   it "emits a URN for the IEEE base class" do

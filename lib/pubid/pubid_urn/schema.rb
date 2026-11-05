@@ -48,13 +48,15 @@ module Pubid
 
     # The URN shape of one concrete identifier type.
     class TypeSchema
-      attr_reader :flavor, :type, :token, :core, :atoms, :facets
+      attr_reader :flavor, :type, :token, :core, :core_kinds, :atoms, :facets
 
+      # +core+ is a list of [path, kind] pairs; kind is :string or :int.
       def initialize(flavor:, type:, token:, core:, atoms:, facets:)
         @flavor = flavor
         @type = type
         @token = token
-        @core = core.map { |path| path.split(".") }.freeze
+        @core = core.map { |path, _| path.split(".") }.freeze
+        @core_kinds = core.map { |_, kind| kind }.freeze
         @atoms = atoms.freeze
         @facets = facets.freeze
         @atom_index = atoms.each_with_index.to_h { |atom, i| [atom.prefix, i] }
@@ -86,6 +88,7 @@ module Pubid
       NAME = /\A[a-z][a-z0-9]*\z/
       KINDS = %i[string list bool bools int id ids].freeze
       FACET_KINDS = %i[string list bool bools].freeze
+      CORE_KINDS = %i[string int].freeze
       # "f" opens the facet group; "type" is the type-metadata URN
       # (Pubid::IdentifierMetadata, "urn:pubid:<flavor>:type:<key>").
       RESERVED_TOKENS = %w[f type].freeze
@@ -110,7 +113,9 @@ module Pubid
 
       # @param type [String] the +_type+ the class serializes
       # @param token [String] the short type token of the URN
-      # @param core [Array<String>] the positional core paths
+      # @param core [Array<String, Array>] the positional core paths; an
+      #   entry is a path (a String value) or [path, kind], kind :string or
+      #   :int
       # @param atoms [Array<Array>] extra atoms: [path, prefix, kind]
       # @param facets [Array<Array>] extra facets: [path, name, kind]
       def type(type, token, core: %w[number], atoms: [], facets: [])
@@ -126,7 +131,8 @@ module Pubid
         check_unique!(all_facets.map(&:name), "facet name", type)
 
         schema = TypeSchema.new(flavor: flavor, type: type, token: token,
-                                core: core, atoms: all_atoms,
+                                core: core.map { |spec| build_core(*spec) },
+                                atoms: all_atoms,
                                 facets: all_facets)
         @types[type] = schema
         @tokens[token] = schema
@@ -141,6 +147,14 @@ module Pubid
       end
 
       private
+
+      def build_core(path, kind = :string)
+        unless CORE_KINDS.include?(kind)
+          raise ArgumentError, "unknown core kind #{kind.inspect}"
+        end
+
+        [path, kind]
+      end
 
       def build_atom(path, prefix, kind = nil)
         check_name!(prefix, "atom prefix")
