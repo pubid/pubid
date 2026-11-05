@@ -75,7 +75,11 @@ module Pubid
         mapping_class: ::Lutaml::Model::Mapping,
         adapter_class: adapter,
         transformer: transformer,
-        error_types: [Pubid::Errors::ParseError],
+        # Both decode-failure classes wrap as InvalidFormatError here, so
+        # `Identifier.from_urn` keeps its one failure shape (issue #670:
+        # the umbrella raises UrnParseError where it leaked raw
+        # ArgumentError, and a grammar failure is ParseError).
+        error_types: [Pubid::Errors::ParseError, Pubid::Errors::UrnParseError],
       )
     end
   end

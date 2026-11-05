@@ -27,9 +27,12 @@ RSpec.describe "URN flavor routing" do
       .to be_a(Pubid::Iala::Identifiers::Guideline)
   end
 
-  it "raises for an unknown MRN authority" do
+  it "raises UrnParseError for an unknown MRN authority" do
+    # issue #670: a decode failure is a pubid error, never the raw
+    # ArgumentError the flavor table used to raise
     expect { Pubid.parse("urn:mrn:unknown-org:pub:g1") }
-      .to raise_error(ArgumentError, /Unknown flavor in URN: unknown-org/)
+      .to raise_error(Pubid::Errors::UrnParseError,
+                      /unknown URN namespace: "unknown-org"/)
   end
 
   describe "Identifier.from_urn (the lutaml :urn parse side)" do
@@ -71,9 +74,11 @@ RSpec.describe "URN flavor routing" do
 
     it "rejects a URN without a docnumber" do
       # RFC 5141 requires docnumber; the lenient parse built the
-      # identity-free "ISO "
+      # identity-free "ISO ". The lutaml mirror wraps the decode failure
+      # (now UrnParseError, issue #670) as InvalidFormatError, its one
+      # failure shape.
       expect { Pubid::Iso::Identifier.from_urn("urn:iso:std:iso") }
-        .to raise_error(Pubid::Errors::UrnParseError, /missing docnumber/)
+        .to raise_error(Lutaml::Model::InvalidFormatError, /missing docnumber/)
     end
   end
 end

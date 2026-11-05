@@ -238,6 +238,7 @@ module Pubid
   # @param format [Symbol] :auto, :human, :mr_string, or :urn
   # @return [Identifier] The parsed identifier
   # @raise [ArgumentError] for a non-String, or one over {MAX_INPUT_LENGTH}
+  #   (as {Errors::InvalidInputError}, which is one)
   # @raise [Pubid::Errors::ParseError] when no flavor can parse the string — the
   #   class every flavor's own +parse+ raises (see the parse-failure contract)
   def self.parse(string, format: :auto)
@@ -248,6 +249,15 @@ module Pubid
     if string.length > MAX_INPUT_LENGTH
       raise Pubid::Errors::InvalidInputError,
             Pubid::INPUT_TOO_LONG_MESSAGE
+    end
+    # Invalid encoding is bad input, not a grammar failure: the detectors
+    # and normalization regexes raise raw `ArgumentError` (invalid byte
+    # sequence) or `Encoding::CompatibilityError` on it, which is the leak
+    # the contract closes (issue #670). The bytes are read as UTF-8 — a
+    # binary string of ASCII bytes (".b") is fine, high bytes are not.
+    unless string.dup.force_encoding(Encoding::UTF_8).valid_encoding?
+      raise Pubid::Errors::InvalidInputError,
+            "input string has invalid encoding"
     end
 
     format = FormatDetector.detect(string) if format == :auto
@@ -282,22 +292,38 @@ module Pubid
   #
   # @param string [String] the URN
   # @return [Identifier] the parsed identifier
+  # @raise [Pubid::Errors::InvalidInputError] for a non-String
   #
   # A pubid-scheme URN ("urn:pubid:…", see {PubidUrn}) is decoded by the
   # shared codec; every other namespace goes to its flavor's UrnParser.
+  # Every decode failure on this surface is a pubid error (issue #670): an
+  # empty string, a missing or unknown namespace, invalid encoding, and a
+  # URN a flavor's parser rejects all raise {Errors::UrnParseError} — the
+  # raw `ArgumentError` the detection and the flavor parsers raise is the
+  # wrapped failure's cause, never the raised class.
   def self.parse_urn(string)
+    unless string.is_a?(String)
+      raise Pubid::Errors::InvalidInputError,
+            Pubid::INPUT_NOT_A_STRING_MESSAGE
+    end
     eager_load_flavors!
     return PubidUrn.parse(string) if PubidUrn.pubid_urn?(string)
 
     flavor = detect_flavor_from_urn(string)
     flavor_module = Registry.get(flavor)
     unless flavor_module
-      raise ArgumentError,
-            "Unknown flavor in URN: #{flavor}"
+      raise Errors::UrnParseError,
+            "unknown URN namespace: #{flavor.inspect} (in #{string.inspect})"
     end
 
     urn_parser = flavor_module.const_get(:UrnParser)
     urn_parser.parse(string)
+  rescue Errors::Error
+    raise
+  rescue StandardError => e
+    raise Errors::UrnParseError,
+          "URN #{string.inspect} does not parse as #{flavor.inspect}: #{e.message}",
+          cause: e
   end
 
   # The slug form (relaton#441): the pubid-scheme URN of +source+ in
