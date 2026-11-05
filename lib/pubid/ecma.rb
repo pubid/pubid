@@ -16,6 +16,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/ecma/renderer"
     autoload :UrnGenerator, "#{__dir__}/ecma/urn_generator"
     autoload :UrnParser, "#{__dir__}/ecma/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/ecma/pubid_urn_schema"
 
     # Parse an ECMA identifier string
     def self.parse(identifier)

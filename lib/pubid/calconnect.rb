@@ -22,6 +22,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/calconnect/renderer"
     autoload :UrnGenerator, "#{__dir__}/calconnect/urn_generator"
     autoload :UrnParser, "#{__dir__}/calconnect/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/calconnect/pubid_urn_schema"
 
     # Parse a CalConnect identifier string
     def self.parse(identifier)

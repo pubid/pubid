@@ -19,6 +19,7 @@ module Pubid
     autoload :Renderer,     "#{__dir__}/adobe/renderer"
     autoload :UrnGenerator, "#{__dir__}/adobe/urn_generator"
     autoload :UrnParser,    "#{__dir__}/adobe/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/adobe/pubid_urn_schema"
 
     # Parse an Adobe identifier string into an identifier object.
     # @param identifier [String]

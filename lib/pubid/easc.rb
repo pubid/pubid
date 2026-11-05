@@ -18,6 +18,7 @@ module Pubid
     autoload :Renderer,     "#{__dir__}/easc/renderer"
     autoload :UrnGenerator, "#{__dir__}/easc/urn_generator"
     autoload :UrnParser,    "#{__dir__}/easc/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/easc/pubid_urn_schema"
 
     # @param identifier [String]
     # @return [Pubid::Easc::Identifier]

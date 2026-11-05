@@ -1,0 +1,6 @@
+# Adobe Tech Note - Pass
+# From the adobe grammar's own test section (the corpus promotion rule:
+# an artifact test input that parses on the reference becomes a case).
+!Adobe TN 15!Adobe TN 15
+!ATN 30!ATN 30
+!Adobe Technical Note #12!Adobe Technical Note #12

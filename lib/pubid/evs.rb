@@ -22,6 +22,7 @@ module Pubid
     autoload :Renderer, "#{__dir__}/evs/renderer"
     autoload :UrnGenerator, "#{__dir__}/evs/urn_generator"
     autoload :UrnParser, "#{__dir__}/evs/urn_parser"
+    autoload :PubidUrnSchema, "#{__dir__}/evs/pubid_urn_schema"
 
     def self.parse(identifier)
       unless identifier.is_a?(String)
