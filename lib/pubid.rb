@@ -300,6 +300,26 @@ module Pubid
     urn_parser.parse(string)
   end
 
+  # The slug form (relaton#441): the pubid-scheme URN of +source+ in
+  # HTTP-path clothes — "/"-joined segments after the "urn:pubid:"
+  # prefix ("iso/is/9001/year-2015"). Bijective with
+  # {PubidUrn.from_slug}.
+  #
+  # @param source [Identifier, String] an identifier or its pubid-scheme URN
+  # @return [String]
+  def self.to_slug(source)
+    PubidUrn.to_slug(source)
+  end
+
+  # Parse a slug (see {PubidUrn.from_slug}).
+  #
+  # @param string [String] the slug
+  # @return [Identifier]
+  def self.from_slug(string)
+    eager_load_flavors!
+    PubidUrn.from_slug(string)
+  end
+
   # Parse a pubid-scheme URN, and only that: an official URN such as
   # "urn:iso:std:…" raises. For a consumer that takes a slug and must not
   # accept a lossy official URN by mistake (relaton/relaton#441).
