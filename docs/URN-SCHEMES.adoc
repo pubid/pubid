@@ -895,7 +895,7 @@ Corpus: 193 of 193 pass ids parse.
 | `pubid:api:typeless-standard` | `ts` | number | 8 | `API 1509`
 |===
 
-Atoms, canonical order: `part-` (`part`), `section-` (`section`), `subsection-` (`subsection`).
+Atoms, canonical order: `part-` (`part`), `section-` (`section`), `subsection-` (`subsection`), `year-` (`year`; the typeless standard dates itself, `API 650:2020`).
 
 [[urn-ashrae]]
 ==== ashrae

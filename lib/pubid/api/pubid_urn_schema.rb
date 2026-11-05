@@ -12,6 +12,8 @@ module Pubid
       atom "part", "part"
       atom "section", "section"
       atom "subsection", "subsection"
+      # typeless standards date themselves ("API 650:2020")
+      atom "year", "year"
 
       type "pubid:api:base", "base"
       type "pubid:api:bulletin", "bulletin"
