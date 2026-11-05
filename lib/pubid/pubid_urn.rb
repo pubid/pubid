@@ -106,6 +106,46 @@ module Pubid
         string.is_a?(String) && string.b[0, PREFIX.length].downcase == PREFIX
       end
 
+      # The slug form (relaton#441): the URN wearing HTTP-path clothes.
+      # Each ":" segment becomes a "/" segment, after the "urn:pubid:"
+      # prefix is cut — "urn:pubid:iso:is:9001:year-2015" is
+      # "iso/is/9001/year-2015". The contract's path-safety gate
+      # guarantees no segment carries a "/", so the transform is
+      # bijective: {from_slug} rebuilds the exact URN.
+      #
+      # @param source [Identifier, String] an identifier or its
+      #   pubid-scheme URN
+      # @return [String] the slug, with no leading or trailing "/"
+      # @raise [Errors::InvalidInputError] when a String is not a
+      #   canonical pubid-scheme URN
+      def to_slug(source)
+        urn = source.respond_to?(:to_pubid_urn) ? source.to_pubid_urn : source
+        parse(urn) unless source.respond_to?(:to_pubid_urn)
+        urn.delete_prefix(PREFIX).tr(":", "/")
+      end
+
+      # The slug parse side: "/"-joined segments rebuild the URN and
+      # parse through the canonical gate, so a slug of a landed flavor
+      # round-trips by +to_hash+ exactly like its URN.
+      #
+      # @param string [String] the slug
+      # @return [Identifier]
+      # @raise [Errors::InvalidInputError] when +string+ is not a String
+      #   or is longer than MAX_LENGTH
+      # @raise [Errors::UrnParseError] for a malformed, unknown or
+      #   non-canonical slug
+      def from_slug(string)
+        unless string.is_a?(String)
+          raise Errors::InvalidInputError, Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+        raise Errors::InvalidInputError,
+              "slug exceeds #{MAX_LENGTH} characters" if string.length > MAX_LENGTH
+        raise Errors::UrnParseError, "slug has empty segments" if
+          string.split("/", -1).any?(&:empty?)
+
+        parse("#{PREFIX}#{string.tr('/', ':')}")
+      end
+
       # @return [FlavorSchema, nil]
       def flavor_schema(flavor)
         return @schemas[flavor] if @schemas.key?(flavor)
