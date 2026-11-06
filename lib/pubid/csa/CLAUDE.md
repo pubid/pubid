@@ -46,8 +46,12 @@ Moved from the root `CLAUDE.md`'s `#exclude` bullet (`metanorma__pubid__exclude-
 (`[[urn-csa]]`). The spelling/format cluster of the year — `year_format`,
 `year_prefix`, `publisher_prefix`, `has_publisher`,
 `original_reaffirmation_4digit`, `original_year_4digit`, `separator`,
-`series_prefix`, `french` — is facets, so the same document printed two
-ways merges only spellings; everything else is an atom. An adoption's
+`series_prefix` — is facets, so the same document printed two ways merges
+only spellings; everything else is an atom. `french` was a facet when the
+schema landed; it became the `french-` atom, because the French edition is
+another publication and a facet is skipped by `==` and `===`
+(`equality_ignored` on `Pubid::Csa::Identifier`). `#exclude(:year)` still
+clears it with the rest of the year cluster. An adoption's
 document goes along `base` and keeps its own flavor's schema (`CSA
 ISO/IEC 8824-1:22` is
 `urn:pubid:csa:iso.is:8824:co-IEC:part-1:year-2022:ca2`).

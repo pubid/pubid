@@ -203,38 +203,29 @@ module Pubid
         # See lib/pubid/nist/builder.rb lines 368-472 for compound number logic
       end
 
-      # Attributes that are build artifacts or rendering aliases, not part
-      # of an identifier's logical identity. They diverge between equally-
-      # valid spellings of the same id (e.g. long "Rev. 1" vs short "r1"):
+      # Attributes that are not part of an identifier's logical identity, so
+      # `==`, `hash` and `===` skip them (Pubid::EqualityIgnored). They
+      # diverge between equally-valid spellings of the same id (e.g. long
+      # "Rev. 1" vs short "r1"):
       #   - first_number/second_number: decomposed parts of the canonical
       #     :number, retained from the parse for building
-      #   - parsed_format: records the input format for round-trip rendering
       #   - subseries: derived from series+number (which SP subseries the
       #     document belongs to); populated by the Builder for known SP
-      #     subseries codes. Ignored in equality so a manually-built id
-      #     without subseries set still equals a parsed one.
+      #     subseries codes. Ignored so a manually-built id without
+      #     subseries set still equals a parsed one. Derived, not spelled,
+      #     so it stays an atom of the pubid-scheme URN.
+      #   - parsed_format: records the input format for round-trip rendering
+      # `#weight` and the older `#matches?` read this list too.
       EQUALITY_IGNORED_ATTRS = %i[
         first_number second_number parsed_format subseries
       ].freeze
 
-      # Logical identity comparison: equal when every attribute except the
-      # build artifacts/aliases above matches. (Edition#== already ignores
-      # its rendering-only original_prefix.)
-      def ==(other)
-        return false unless other.instance_of?(self.class)
-
-        self.class.attributes.each_key.all? do |name|
-          EQUALITY_IGNORED_ATTRS.include?(name) || public_send(name) == other.public_send(name)
-        end
-      end
-
-      alias eql? ==
-
-      # A subset match skips the same attributes: `to_hash` drops the build
-      # artifacts, so an index row rebuilt by `from_hash` never has them.
-      def self.subset_ignored_attributes
-        EQUALITY_IGNORED_ATTRS
-      end
+      # The list above, plus the other input spellings that are facets of
+      # the pubid-scheme URN (issue #656): publisher_was_parsed and
+      # translation. (Edition ignores its rendering-only original_prefix
+      # the same way.)
+      equality_ignored(*EQUALITY_IGNORED_ATTRS, :publisher_was_parsed,
+                       :translation)
 
       # `edition` is the primary edition/revision carrier and is already in
       # the default %i[date year edition version] list. `update`/
@@ -252,13 +243,6 @@ module Pubid
       # what `edition`/`update` already do.)
       def self.all_parts_edition_keys
         super + %i[update update_component]
-      end
-
-      def hash
-        vals = self.class.attributes.each_key.reject do |name|
-          EQUALITY_IGNORED_ATTRS.include?(name)
-        end.map { |name| public_send(name) }
-        [self.class, *vals].hash
       end
 
       # Wildcard / partial-identifier match. Treats +self+ as a QUERY pattern

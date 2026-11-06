@@ -3,6 +3,10 @@
 module Pubid
   module Oiml
     class Identifier < Pubid::Identifier
+      # Spelling-only values, the facets of the pubid-scheme URN: `==`,
+      # `hash` and `===` skip them (Pubid::EqualityIgnored, issue #656).
+      equality_ignored :parsed_format, :space_separator
+
       # Maps each concrete identifier's polymorphic_name => class name, so
       # key_value (de)serialization can re-instantiate the correct subclass
       # from the `_type` discriminator. Kept in sync with the Identifiers

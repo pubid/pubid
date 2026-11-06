@@ -147,6 +147,7 @@ module Pubid
   autoload :AllPartsIdentifier, "pubid/all_parts_identifier"
   autoload :Identifier, "pubid/identifier"
   autoload :SubsetMatch, "pubid/subset_match"
+  autoload :EqualityIgnored, "pubid/equality_ignored"
   autoload :IdentifierMetadata, "pubid/identifier_metadata"
   autoload :Rendering, "pubid/rendering"
   autoload :Renderers, "pubid/renderers"

@@ -4,6 +4,10 @@ module Pubid
   module Itu
     # Base class for all ITU identifiers. Canonical name Pubid::Itu::Identifier.
     class Identifier < ::Pubid::Identifier
+      # Spelling-only values, the facets of the pubid-scheme URN: `==`,
+      # `hash` and `===` skip them (Pubid::EqualityIgnored, issue #656).
+      equality_ignored :number_glued, :slash_joined
+
       # Parse an ITU identifier string into an identifier object.
       def self.parse(identifier)
         unless identifier.is_a?(String)

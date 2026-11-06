@@ -10,6 +10,11 @@ module Pubid
     # Pubid::Ieee::Identifier. IEEE
     # builds its identifiers as instances of this class directly.
     class Identifier < ::Pubid::Identifier
+      # Spelling-only values, the facets of the pubid-scheme URN: `==`,
+      # `hash` and `===` skip them (Pubid::EqualityIgnored, issue #656).
+      equality_ignored :separator, :separators, :rev_sep, :year_sep,
+                       :date_separator, :original_format
+
       # Generate URN for this identifier
       #
       # @return [String] URN representation
