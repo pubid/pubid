@@ -1,0 +1,6 @@
+# SAE - Fail
+# The grammar's negative forms (pubid-grammar grammars/sae.parg test block).
+
+#nonsense# Pubid::Errors::ParseError: "Failed to match: expected one of ['SAE'] at line 1 char 1."
+#SAE J3016_2021# Pubid::Errors::ParseError: "Failed to match: expected one of [[\x30-\x39]] at line 1 char 15."
+#SAE XYZ1# Pubid::Errors::ParseError: "Failed to match: expected one of ['AMS-QQ-A', 'AMS-QQ-C', 'AMS-QQ-N', 'AMS-QQ-P', 'AMS-QQ-S', 'AMS-QQ-W', 'AMS-WW-T', 'GEIA-STD', 'AMS-DTL', 'AMS-PRF', 'AMS-STD', 'EIA-STD', 'GEIA-HB', 'GEIA-OP', 'GEIA-TB', 'GEIASTD', 'AMSDTL', 'AMSPRF', 'AMSQQA', 'AMSQQC', 'AMSQQN', 'AMSQQP', 'AMSQQS', 'AMSQQW', 'AMSSTD', 'AMSWWT', 'EIA-IS', 'EIASTD', 'GEIAHB', 'GEIAOP', 'GEIATB', 'AMS-A', 'AMS-B', 'AMS-C', 'AMS-D', 'AMS-F', 'AMS-G', 'AMS-H', 'AMS-I', 'AMS-L', 'AMS-M', 'AMS-P', 'AMS-R', 'AMS-S', 'AMS-T', 'AMS-W', 'EIAIS', 'USCAR', 'AMSA', 'AMSB', 'AMSC', 'AMSD', 'AMSF', 'AMSG', 'AMSH', 'AMSI', 'AMSL', 'AMSM', 'AMSP', 'AMSR', 'AMSS', 'AMST', 'AMSW', 'GEIA', 'AIR', 'AMS', 'ARD', 'ARP', 'CMB', 'CRP', 'EIA', 'MAM', 'MAP', 'SSB', 'TSB', 'AS', 'JA', 'MA', 'MS', 'J'] at line 1 char 5."

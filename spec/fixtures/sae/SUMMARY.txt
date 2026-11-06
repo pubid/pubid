@@ -1,0 +1,21 @@
+Flavor: SAE
+Classified: 2026-11-06 09:35:00
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 19
+Pass: 16 (84.2%)
+Fail: 3 (15.8%)
+
+BY CLASS
+----------------------------------------------------------------------
+sae                                      Pass: 16/16 (100.0%)
+unknown                                  Pass: 0/3 (0.0%)
+
+NOTES
+----------------------------------------------------------------------
+Seeded from the grammar corpus (pubid-grammar corpora/sae/corpus.json,
+landed with pubid#665): the printed renderings differ from four input
+spellings, recorded as !input!rendered normalization pairs. The three
+negatives are the grammar's own reject cases.

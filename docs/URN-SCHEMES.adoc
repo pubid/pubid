@@ -1806,7 +1806,7 @@ Corpus: 0 of 0 pass ids parse.
 | `pubid:sae:identifier` | `id` | number | 0 | —
 |===
 
-*Landed (issue #670)* as drafted (`typeabbr-`, `rev-`, `amd-`, the Integer date atoms). SAE has no fixture corpus — the contract spec parses a fixed literal list (`LITERALS`) and `spec/pubid/pubid_urn_leaf_spec.rb` pins its URNs.
+*Landed (issue #670)* as drafted (`typeabbr-`, `rev-`, `amd-`, the Integer date atoms), then *completed by the corpus round (issue #669)*: the gem fixture corpus landed (`spec/fixtures/sae/`), which exposed two hash shapes the literals never exercised. A part is top-level (`part-`). The date keeps the canonical flattening's dual shape (pubid#360; per-instance, not per-flavor), so a year has one prefix per shape — the ashrae ruling: the nested year+month form keeps the released `year-`/`month-` Integer atoms, and the flat year-alone form is `yearflat-` (string). No URN emitted before the round changes form. `spec/pubid/pubid_urn_leaf_spec.rb` pins the URNs of both shapes.
 
 [[urn-un]]
 ==== un
