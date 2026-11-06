@@ -30,6 +30,12 @@ module Pubid
       #   Edition.new(type: "r", id: "5", original_prefix: " Rev. ").to_s    # => "Rev. 5"
       class Edition < Lutaml::Model::Serializable
         include ::Pubid::SubsetMatch
+        include ::Pubid::EqualityIgnored
+
+        # The `edprefix` facet of the pubid-scheme URN. `==` and `hash`
+        # below skip it by hand; this declaration makes `===` skip it too
+        # (issue #656).
+        equality_ignored :original_prefix
 
         attribute :type, :string            # "-", "e", or "r"
         attribute :id, :string              # Edition ID (number or year)

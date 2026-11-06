@@ -18,13 +18,14 @@ module Pubid
       atom "evs_type", "evstype"
       atom "intl_org", "intlorg"
       atom "na_year", "nayear"
-
+      # The "pr" of "prEVS-EN 100:2026": a draft is another document than
+      # the published standard, so it is identity, not a facet (issue #656).
+      atom "draft_prefix", "draftprefix", kind: :bool
 
       facet "separator", "separator"
       facet "amd_separator", "amdseparator"
       facet "cor_separator", "corseparator"
       facet "na_separator", "naseparator"
-      facet "draft_prefix", "draftprefix", kind: :bool
 
       type "pubid:evs:estonian-standard", "es"
       type "pubid:evs:identifier", "id"

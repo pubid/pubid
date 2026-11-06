@@ -8,10 +8,15 @@ module Pubid
     # URN render: "ed-#{number}" per RFC 5141-bis.
     class Edition < Lutaml::Model::Serializable
       include ::Pubid::SubsetMatch
+      include ::Pubid::EqualityIgnored
 
       attribute :year, :string
       attribute :number, Lutaml::Model::Type::Value
       attribute :original_text, :string
+
+      # The input spelling ("Ed 13"): the `edsrc` facet of the pubid-scheme
+      # URN, so `==`, `hash` and `===` skip it (issue #656).
+      equality_ignored :original_text
 
       def to_s
         number_value = number.is_a?(Components::Code) ? number.value : number

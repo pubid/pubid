@@ -4,6 +4,8 @@ module Pubid
   class Identifier < Lutaml::Model::Serializable
     # `reference === candidate`: a subset match (see Pubid::SubsetMatch).
     include SubsetMatch
+    # Attributes that `==`, `hash` and `===` skip (see Pubid::EqualityIgnored).
+    include EqualityIgnored
 
     # Components that serialize as a bare scalar when they carry only their
     # single significant field: attribute name => the key the scalar is emitted

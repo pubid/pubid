@@ -22,8 +22,8 @@ RSpec.describe "CSA pubid-scheme URN" do
       "urn:pubid:csa:std:A123.2:year-2003:reaff-2023:ca:reaff-2023:" \
       "f:0.yearformat-dash:0.pubprefix-CSA-:0.haspublisher-true:0.origreaff4-true",
     "CSA B149.1:F20" =>
-      "urn:pubid:csa:std:B149.1:year-2020:f:0.yearformat-colon:" \
-      "0.yearprefix-F:0.pubprefix-CSA:0.haspublisher-true:0.french-true",
+      "urn:pubid:csa:std:B149.1:year-2020:french-true:f:0.yearformat-colon:" \
+      "0.yearprefix-F:0.pubprefix-CSA:0.haspublisher-true",
     "CSA C22.2 NO. 286:23" =>
       "urn:pubid:csa:cec:C22.2-286:year-2023:cecpart-C22.2:nonumber-286:" \
       "f:0.yearformat-colon:0.pubprefix-CSA",

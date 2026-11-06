@@ -84,11 +84,26 @@ Canonical form:: Exactly one string for each identifier. The parser decodes,
 rebuilds the identifier, encodes it again and refuses the input when the two
 strings differ (a needless escape, an atom out of order, a trailing `~`).
 
+[[rules-facets]]
 Facets:: A value that records only a spelling (`original_code` "E" for
 "en", `edition.original_text` "Ed 13") goes in the trailing `f` group, as
 `<node-index>.<name>-<value>`. The full URN keeps facets, so the round trip
 holds. A consumer can cut the `f` group off a slug, but then the slug no
 longer round-trips (see <<open>>).
++
+*A value is a facet only if identity ignores it* (issue #656, decided
+2026-11-05): `==`, `eql?`, `hash` and the subset match `===` skip every
+facet, so two spellings of one document are one document to a search. The
+owning class declares it with `equality_ignored` (`Pubid::EqualityIgnored`).
+A value that names another document is an atom, even when it is printed as
+a prefix or a marker: the EVS draft `pr` (`draftprefix-`) and the CSA French
+edition (`french-`). `spec/pubid/pubid_urn_contract_spec.rb` guards the rule
+over every pass fixture: with every `f` group cut (nested ids included), the
+URN must build an id that is `==`, hash-equal and `===` (both ways) to the
+id of the full URN, and its canonical form may differ from the cut only in
+facets. That last clause admits a facet written from another value, which
+re-encoding brings back: NIST `translation` is always `(<code>)` of the
+`lang-` atom.
 
 [[rules-kinds]]
 Kinds:: The schema gives each atom and facet a kind, and the parser casts
@@ -172,6 +187,10 @@ atom in every flavor:
   `(R)`/`(ru)`; NIST: 104 pairs, such as the MR string against the printed
   form, or `Rev. 5` against `r5`; IEEE, ANSI, ITU and ASTM: none), so the
   cut slug stays injective over the documents themselves.
+  *Decided in part* (2026-11-05): identity ignores the facets (see
+  <<rules-facets,Facets>>), so an id built from the cut slug is `==` and
+  `===` to the original. `Pubid.to_slug` (#668) keeps the `f` group, so the
+  slug itself still round-trips.
 . *Pubid-invented official URNs.* Only 14 flavors have an official namespace
   (below). The other flavors emit a `urn:<org>:…` form today that no
   organization registered. Keep it as legacy `#to_urn` with no round-trip
@@ -1258,7 +1277,12 @@ Atoms, canonical order: `series-` (`series`, bool), `year-` (`year`), `reaff-` (
 
 Nested identifiers: `bundledwith-(…)` (`bundled_with`, ids), `ids-(…)` (`identifiers`, ids).
 
-Facet candidates (spelling-only): `original_reaffirmation_4digit`, `year_format`, `has_publisher`, `publisher_prefix`, `year_prefix`, `original_year_4digit`, `separator`, `series_prefix`, `french`.
+Facet candidates (spelling-only): `original_reaffirmation_4digit`, `year_format`, `has_publisher`, `publisher_prefix`, `year_prefix`, `original_year_4digit`, `separator`, `series_prefix`.
+
+`french` was a facet when the schema landed and is an atom now (`french-`,
+bool, after `bundledwith-`): `CSA B149.1:F20` is the French edition, another
+publication than `CSA B149.1:20`, so identity compares it (issue #656). The
+`F` it is printed with stays the `year_prefix` facet.
 
 Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iec`, `iso`.
 
@@ -1369,7 +1393,12 @@ qualified token (`EVS-EN 18216:2026` is
 adoption of an organization pubid does not model as a nested identifier.
 All 36 corpus rows emit.
 
-Facet candidates (spelling-only): `separator`, `amd_separator`, `cor_separator`, `na_separator`, `draft_prefix`.
+Facet candidates (spelling-only): `separator`, `amd_separator`, `cor_separator`, `na_separator`.
+
+`draft_prefix` was a facet when the schema landed and is an atom now
+(`draftprefix-`, bool, after `nayear-`): `prEVS-EN 100:2026` is the draft,
+another document than `EVS-EN 100:2026`, so identity compares it (issue
+#656), as CEN/CENELEC's strict stage does for `prEN`.
 
 Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `cencenelec`, `iec`, `iso`.
 

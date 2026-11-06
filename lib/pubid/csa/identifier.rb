@@ -10,6 +10,12 @@ module Pubid
     # containers used to be separate Lutaml::Model types, which is what made
     # `root.number` raise rather than return the relaton index key.
     class Identifier < ::Pubid::Identifier
+      # Spelling-only values, the facets of the pubid-scheme URN: `==`,
+      # `hash` and `===` skip them (Pubid::EqualityIgnored, issue #656).
+      equality_ignored :year_format, :year_prefix, :publisher_prefix,
+                       :has_publisher, :original_reaffirmation_4digit,
+                       :original_year_4digit, :separator, :series_prefix
+
       def self.parse(input)
         unless input.is_a?(String)
           raise Pubid::Errors::InvalidInputError,

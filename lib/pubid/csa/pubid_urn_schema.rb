@@ -10,7 +10,7 @@ module Pubid
     # The current urn:csa:… form of #to_urn is pubid-invented and stays
     # there. The spelling/format cluster of the CSA year (`year_format`,
     # `year_prefix`, the publisher prefix it is printed with, the
-    # original-digit spellings of a reaffirmation, the French marker) is
+    # original-digit spellings of a reaffirmation) is
     # facets — the same document prints two ways; everything else is an
     # atom. A combined identifier carries its members in `identifiers`, a
     # bundled one in `bundled_with` (both bracketed lists); the adopted
@@ -31,6 +31,10 @@ module Pubid
       atom "package_materials", "packagematerials"
       atom "identifiers", "ids", kind: :ids
       atom "bundled_with", "bundledwith", kind: :ids
+      # The French edition ("CSA B149.1:F20") is another publication than
+      # the English one, so it is identity, not a facet (issue #656). The
+      # "F" it is printed with stays the year_prefix facet.
+      atom "french", "french", kind: :bool
 
       facet "year_format", "yearformat"
       facet "year_prefix", "yearprefix"
@@ -40,7 +44,6 @@ module Pubid
       facet "original_year_4digit", "origyear4", kind: :bool
       facet "separator", "separator"
       facet "series_prefix", "seriesprefix"
-      facet "french", "french", kind: :bool
 
       type "pubid:csa:amendment", "amd"
       type "pubid:csa:base", "base"

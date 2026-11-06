@@ -60,8 +60,11 @@
 ## pubid-scheme URN (issue #670)
 
 `lib/pubid/evs/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
-(`[[urn-evs]]`). The separators and the draft marker are facets; the
-amendment/corrigendum columns are atoms. An adoption of a European
+(`[[urn-evs]]`). The separators are facets; the draft marker and the
+amendment/corrigendum columns are atoms. `draft_prefix` was a facet when the
+schema landed; it became the `draftprefix-` atom because `prEVS-EN 100:2026`
+is a draft, another document than the published standard, and a facet is
+skipped by `==` and `===` (`equality_ignored` on `Pubid::Evs::Identifier`). An adoption of a European
 document carries it along `base` and it keeps the CEN/CENELEC schema
 (`EVS-EN 18216:2026` is
 `urn:pubid:evs:cencenelec.en:18216:year-2026:na`); `intlorg-` covers an

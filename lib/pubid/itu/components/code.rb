@@ -21,6 +21,12 @@ module Pubid
       # (dash-separated).
       class Code < Lutaml::Model::Serializable
         include ::Pubid::SubsetMatch
+        include ::Pubid::EqualityIgnored
+
+        # The spacing flags are spelling only (facets of the pubid-scheme
+        # URN): `==` below does not compare them, and `hash` and `===`
+        # skip them through this declaration (issue #656).
+        equality_ignored :series_suffix_spaced, :qualifier_glued
 
         attribute :imp_marker, :string
         attribute :number, :string
