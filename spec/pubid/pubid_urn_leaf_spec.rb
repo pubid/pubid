@@ -67,6 +67,10 @@ RSpec.describe "the pubid-scheme URN leaf waves" do
     ["adobe", "adobe-japan1-7", "urn:pubid:adobe:pub:slug-adobe-japan1:v-7"],
     ["sae", "SAE J3016_202104",
      "urn:pubid:sae:id:3016:typeabbr-J:year-2021:month-4"],
+    ["sae", "SAE ARP4754A:2010",
+     "urn:pubid:sae:id:4754:typeabbr-ARP:rev-A:yearflat-2010"],
+    ["sae", "SAE AMS-QQ-A-250/4B",
+     "urn:pubid:sae:id:250:typeabbr-AMS-QQ-A:rev-B:part-4"],
   ].each do |flavor, input, urn|
     # The registry maps are populated at flavor-module load (autoload is
     # lazy), so load the flavor before looking it up.

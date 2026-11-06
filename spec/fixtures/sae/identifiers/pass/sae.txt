@@ -1,0 +1,22 @@
+# SAE - Pass
+# Seeded from the grammar corpus (pubid-grammar corpora/sae/corpus.json,
+# landed with the #665 Crossref coverage). Spellings whose printed
+# rendering differs from the input are recorded as !input!rendered
+# normalization pairs.
+
+SAE J1939
+!SAE J 3016!SAE J3016
+SAE AMS2430
+SAE ARP4754A:2010
+SAE AMS-QQ-A-250/4B
+!SAE AMSQQA250/4B!SAE AMS-QQ-A-250/4B
+SAE J3016_202104
+SAE AMS4121J
+SAE AS22520/45A
+SAE AMS5622/H1025
+SAE J2945/AS
+SAE J1939-71:2020
+!SAE EIA649_1A!SAE EIA-649-1A
+SAE AS5259/7A_A1
+!SAE AMSSTD595!SAE AMS-STD-595
+SAE GEIA-STD-0001
