@@ -69,6 +69,17 @@ module Pubid
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
       # OGC_TYPE_MAP remains as the key_value polymorphic_map.
 
+      # The "<yy>" token is the document's core identity: the grammar's
+      # printed form is `<yy>-<nnn>` and its parse demands the year run, so a
+      # year-less form ("-000") is not a reference any OGC grammar can read.
+      # An exclusion that would leave the identifier unprintable is not a
+      # mutation, so :year is a no-op here — the same reasoning that keeps it
+      # out of all_parts_edition_keys. Every other key behaves as the base
+      # #exclude does.
+      def exclude(*args)
+        super(*(args - [:year]))
+      end
+
       # Parse an OGC identifier string into an identifier object.
       # @param identifier [String] The OGC identifier string to parse
       # @return [Identifier] The document identifier object

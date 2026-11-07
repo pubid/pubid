@@ -93,3 +93,22 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   sweep of `full/` and the spec literals, so sweep those too when a schema
   changes. Found in passing, not fixed:
   `NIST.IR.8259Apt` parses as `NIST IR 8259(por)` and loses the `A`.
+- **The from_hash shape residual (part letter suffix and SP subseries)**:
+  the parse path builds two shapes the stored rows lost on the way through
+  the wire, and the relaton corpus gate's Law 1b
+  (parse(render(x)).to_hash == x.to_hash) failed for every affected row
+  (run 42204581379, 16–22 NEW nist-structure per slice; the class the
+  relaton manifest describes as "the n+UPPER token's structural placement
+  differs between the parsed and deserialized forms"). (1) A `part` hash
+  without a `type` is the letter suffix — the parse of the printed face
+  ("NIST NCSTAR 1A") carries `type: ""`; left nil the component fell back
+  to the annex face and rendered "1nA", a different document (the true
+  faces are in the relaton-data-nist document records: NIST NCSTAR 1A, NBS
+  HR 1-1A). Every type-less part value in the published index is a single
+  letter, so the inference is safe. This also repaired the three
+  nist-fidelity rows ("NIST SP 1075-NCNnR", "NIST SP 1113-BFRnL",
+  "NIST SP 1113-PERMInS"). (2) An SP row's `subseries` is derived metadata
+  ("800" from "800-53", Appendix A.2) that parse always recomputes;
+  `from_hash` now derives it by the Builder's own condition and rules
+  (`derive_subseries_code`, sharing SP_SUBSERIES). Locked by
+  `spec/pubid/nist/from_hash_shapes_spec.rb`.

@@ -142,6 +142,7 @@ module Pubid
   autoload :Errors, "pubid/errors"
   autoload :Parser, "pubid/parser"
   autoload :Components, "pubid/components"
+  autoload :LegacyTreeValue, "pubid/legacy_tree_value"
   autoload :BundledIdentifier, "pubid/bundled_identifier"
   autoload :AllParts, "pubid/all_parts"
   autoload :AllPartsIdentifier, "pubid/all_parts_identifier"
