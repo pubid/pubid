@@ -94,15 +94,16 @@ RSpec.describe "IEEE pubid-scheme URN" do
       .to eq("IEEE Std 844.1-2017/CSA ")
   end
 
-  # Pinned: SupplementIdentifier#to_hash drops the delegated publisher only
-  # on a top-level wrapper, so from_hash(to_hash) is not idempotent for a
-  # nested non-IEEE supplement and the URN is refused as not canonical. A
-  # fix to #to_hash turns this red.
-  it "refuses the URN of an adopted non-IEEE supplement (a to_hash gap)" do
+  # Was pinned as a to_hash gap: SupplementIdentifier#to_hash drops the
+  # delegated publisher only on a top-level wrapper, so from_hash(to_hash)
+  # was not idempotent for a nested non-IEEE supplement and the URN was
+  # refused as not canonical. The from_hash legacy-shape normalization
+  # re-derives the row from its own render, so the gap is closed: the hash
+  # round-trips and the URN is canonical.
+  it "accepts the URN of an adopted non-IEEE supplement (the to_hash gap is closed)" do
     id = Pubid::Ieee.parse("IEEE Std 1234-2010 (ISO 1234/Amd 1:2001)")
-    expect(Pubid.from_hash(id.to_hash).to_hash).not_to eq(id.to_hash)
-    expect { Pubid.parse_urn(id.to_pubid_urn) }
-      .to raise_error(Pubid::Errors::UrnParseError, /not canonical/)
+    expect(Pubid.from_hash(id.to_hash).to_hash).to eq(id.to_hash)
+    expect(Pubid.parse_urn(id.to_pubid_urn).to_pubid_urn).to eq(id.to_pubid_urn)
   end
 
   # The partial IEC schema gained the TR with the GOST wave, so this

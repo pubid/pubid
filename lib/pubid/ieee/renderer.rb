@@ -146,7 +146,16 @@ module Pubid
         should_render_type = id.publisher&.match?(/^(IEEE|AIEE)/) ||
                              id.is_a?(Identifiers::ProjectDraftIdentifier)
 
-        if should_render_type && !id.typed_stage&.project_status &&
+        # An ISO/IEC stage-token draft (CD1, FDIS — the draft_obj carries the
+        # stage) is its own draft marker: the designator face it renders
+        # ("…/D=CD1", pubid#203) never takes the word Draft, so the type word
+        # is skipped whatever the publisher arrangement — the joint rows
+        # ("IEEE/IEC Draft P60076-57-129/D=FDIS-201707") would otherwise print
+        # Draft on one construction path and drop it on the re-parsed
+        # designation path, and the render would not re-parse to itself.
+        stage_draft = id.draft_obj&.iso_stage && true
+
+        if should_render_type && !stage_draft && !id.typed_stage&.project_status &&
            ((id.type && !id.type.to_s.strip.empty? && id.type != "P") ||
             id.is_a?(Identifiers::ProjectDraftIdentifier)) &&
             !id.draft_status.to_s.match?(/unapproved/i)
