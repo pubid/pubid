@@ -64,8 +64,12 @@ module Pubid
       # Parse ISO URN string
       # @param urn [String] URN string to parse
       # @return [Identifier] parsed identifier
+      # @raise [Pubid::Errors::InvalidInputError] for a non-String
+      # @raise [Pubid::Errors::UrnParseError] for a URN that does not parse
       def self.parse(urn)
-        new.parse_urn(urn)
+        ::Pubid::UrnParser::Base.guarded_parse(urn) do |utf8|
+          new.parse_urn(utf8)
+        end
       end
 
       # Parse URN string into identifier
@@ -74,11 +78,17 @@ module Pubid
       def parse_urn(urn)
         # Remove urn:iso:std: prefix
         unless urn.start_with?("urn:iso:std:")
-          raise ArgumentError,
+          raise ::Pubid::Errors::UrnParseError,
                 "Invalid ISO URN: #{urn}"
         end
 
         parts = urn.sub("urn:iso:std:", "").split(":")
+        # "urn:iso:std:" has no originator; reading it as a publisher
+        # reached `split` on nil (issue #670).
+        if parts.empty?
+          raise ::Pubid::Errors::UrnParseError,
+                "missing originator: #{urn}"
+        end
 
         # Series suffix: a trailing "ser" marks an all-parts identifier. Strip
         # it before component parsing so it is not misread as a language or

@@ -22,8 +22,12 @@ module Pubid
       # Parse IEC URN string
       # @param urn [String] URN string to parse
       # @return [Identifier] parsed identifier
+      # @raise [Pubid::Errors::InvalidInputError] for a non-String
+      # @raise [Pubid::Errors::UrnParseError] for a URN that does not parse
       def self.parse(urn)
-        new.parse_urn(urn)
+        ::Pubid::UrnParser::Base.guarded_parse(urn) do |utf8|
+          new.parse_urn(utf8)
+        end
       end
 
       # Parse URN string into identifier

@@ -39,6 +39,57 @@ module Pubid
   # point rejects a non-String before it measures the length.
   INPUT_NOT_A_STRING_MESSAGE = "identifier must be a String"
 
+  # Raised when an input string cannot be read as UTF-8.
+  INPUT_INVALID_ENCODING_MESSAGE = "input string has invalid encoding"
+
+  # Encodings whose strings are read as raw bytes: their bytes are taken as
+  # UTF-8 without a conversion.
+  BYTE_ENCODINGS = [Encoding::UTF_8, Encoding::BINARY,
+                    Encoding::US_ASCII].freeze
+
+  # Return +string+ as a valid UTF-8 string, or raise a pubid error
+  # (issue #670). Invalid encoding is bad input, not a grammar failure:
+  # without this step the detectors, the normalization regexes and the
+  # parser raise raw `ArgumentError` (invalid byte sequence), `EncodingError`
+  # or `Encoding::CompatibilityError`, which are outside the {Errors::Error}
+  # marker.
+  #
+  # A UTF-8, binary or US-ASCII string is read as UTF-8 bytes, so ".b" of
+  # ASCII text passes and a stray high byte does not. A string labelled with
+  # another encoding (ISO-8859-1, Windows-1252, UTF-16LE …) is converted, so
+  # a valid "café" in Latin-1 parses as it does in UTF-8. A valid UTF-8
+  # string comes back as the same object.
+  #
+  # Every public +parse+ entry point assigns the result after its inline
+  # length guard. The length guard stays inline because it is the CodeQL
+  # barrier; this step is not one, so it can be a shared method.
+  #
+  # @param string [String]
+  # @param error_class [Class] the pubid error to raise
+  # @return [String] a valid UTF-8 string
+  # @raise [Errors::InvalidInputError] (or +error_class+) when the string
+  #   cannot be read as UTF-8
+  def self.utf8_input(string, error_class = Errors::InvalidInputError)
+    utf8 = if BYTE_ENCODINGS.include?(string.encoding)
+             utf8_bytes(string)
+           else
+             string.encode(Encoding::UTF_8)
+           end
+    return utf8 if utf8.valid_encoding?
+
+    raise error_class, INPUT_INVALID_ENCODING_MESSAGE
+  rescue EncodingError
+    raise error_class, INPUT_INVALID_ENCODING_MESSAGE
+  end
+
+  # The bytes of +string+ labelled UTF-8 (the same object when they are).
+  def self.utf8_bytes(string)
+    return string if string.encoding == Encoding::UTF_8
+
+    string.dup.force_encoding(Encoding::UTF_8)
+  end
+  private_class_method :utf8_bytes
+
   # Registry for tracking all loaded flavors
   class Registry
     @flavors = {}
@@ -250,15 +301,7 @@ module Pubid
       raise Pubid::Errors::InvalidInputError,
             Pubid::INPUT_TOO_LONG_MESSAGE
     end
-    # Invalid encoding is bad input, not a grammar failure: the detectors
-    # and normalization regexes raise raw `ArgumentError` (invalid byte
-    # sequence) or `Encoding::CompatibilityError` on it, which is the leak
-    # the contract closes (issue #670). The bytes are read as UTF-8 — a
-    # binary string of ASCII bytes (".b") is fine, high bytes are not.
-    unless string.dup.force_encoding(Encoding::UTF_8).valid_encoding?
-      raise Pubid::Errors::InvalidInputError,
-            "input string has invalid encoding"
-    end
+    string = utf8_input(string)
 
     format = FormatDetector.detect(string) if format == :auto
 
@@ -306,6 +349,7 @@ module Pubid
       raise Pubid::Errors::InvalidInputError,
             Pubid::INPUT_NOT_A_STRING_MESSAGE
     end
+    string = utf8_input(string, Errors::UrnParseError)
     eager_load_flavors!
     return PubidUrn.parse(string) if PubidUrn.pubid_urn?(string)
 

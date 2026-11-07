@@ -281,6 +281,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        identifier = ::Pubid.utf8_input(identifier)
+
         # Normalize legacy/docnumber-style spellings before parsing
         # (data/bipm/update_codes.yaml), mirroring Pubid::Ccsds / Pubid::Plateau.
         normalized = Core::UpdateCodes.apply(identifier, :bipm)

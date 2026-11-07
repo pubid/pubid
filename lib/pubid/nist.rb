@@ -78,6 +78,8 @@ module Pubid
         raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
       end
 
+      identifier = ::Pubid.utf8_input(identifier)
+
       # Use the Parser class's preprocessing method
       # Note: We call the class method directly to ensure preprocessing is applied
       parsed = Parser.class_parse_with_preprocessing(identifier)

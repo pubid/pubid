@@ -14,13 +14,15 @@ Pubid.eager_load_flavors!
 # re-wrapped the parser's error as a bare RuntimeError handed the user a raw
 # Ruby backtrace instead of a sentence.
 #
-# Four rules, locked here for every registered flavor:
+# Five rules, locked here for every registered flavor:
 #
 #   unparseable string -> Pubid::Errors::ParseError
 #   over-long string   -> ArgumentError (a DIFFERENT failure: the ReDoS guard,
 #                         which must fire before the input reaches a regex)
 #   non-String (nil)   -> ArgumentError (not the NoMethodError that reaching
 #                         `.length` on nil used to produce)
+#   invalid encoding   -> Pubid::Errors::InvalidInputError (an ArgumentError;
+#                         issue #670 — never a raw encoding error)
 #   anything           -> never nil
 #
 # This is registry-driven rather than table-driven, mirroring
@@ -37,6 +39,18 @@ RSpec.describe "parse failure contract (cross-flavor)" do
   ].freeze
 
   OVERLONG = "A#{'9' * Pubid::MAX_INPUT_LENGTH}".freeze
+
+  # A UTF-8 string with a stray high byte, and the same bytes tagged binary.
+  INVALID_ENCODING = {
+    "invalid UTF-8 bytes" =>
+      (+"ISO 9001 \xFF").force_encoding(Encoding::UTF_8).freeze,
+    "binary non-UTF-8 bytes" => "ISO 9001 \xFF".b.freeze,
+  }.freeze
+
+  # Labelled encodings other than UTF-8, binary and US-ASCII; the high-byte
+  # Latin-1 case is valid in its own encoding and must convert, too.
+  OTHER_ENCODINGS = [Encoding::ISO_8859_1, Encoding::Windows_1252,
+                     Encoding::UTF_16LE].freeze
 
   it "covers every registered flavor" do
     expect(Pubid::Registry.flavor_names).not_to be_empty
@@ -128,6 +142,63 @@ RSpec.describe "parse failure contract (cross-flavor)" do
           end
         end
       end
+
+      # Invalid encoding is bad input, not a grammar failure (issue #670).
+      # Without the check, the normalization regexes raised raw
+      # ArgumentError, EncodingError or Encoding::CompatibilityError — a
+      # parser-internal class outside the Pubid::Errors::Error marker.
+      INVALID_ENCODING.each do |label_bytes, bad_bytes|
+        it "raises Pubid::Errors::InvalidInputError for #{label_bytes}" do
+          each_entry_point(mod, identifier_class) do |label, receiver|
+            expect { receiver.parse(bad_bytes) }
+              .to raise_error(Pubid::Errors::InvalidInputError,
+                              /invalid encoding/),
+                  "#{flavor_name} #{label} leaked a raw encoding error " \
+                  "for #{label_bytes}"
+          end
+        end
+      end
+
+      # A binary string of ASCII bytes is valid UTF-8 and must not be refused.
+      it "does not refuse an ASCII-only binary string" do
+        each_entry_point(mod, identifier_class) do |label, receiver|
+          expect { receiver.parse(UNPARSABLE.first.b) }
+            .to raise_error(Pubid::Errors::ParseError),
+                "#{flavor_name} #{label} refused ASCII bytes as bad encoding"
+        end
+      end
+
+      # The parser checks the encoding LABEL, not only the bytes, so a
+      # string in another encoding is converted, not read as UTF-8 bytes:
+      # it then fails as a grammar failure, the same as its UTF-8 twin.
+      OTHER_ENCODINGS.each do |encoding|
+        it "converts #{encoding} input before it reaches the parser" do
+          each_entry_point(mod, identifier_class) do |label, receiver|
+            expect { receiver.parse(UNPARSABLE.first.encode(encoding)) }
+              .to raise_error(Pubid::Errors::ParseError),
+                  "#{flavor_name} #{label} did not convert #{encoding} input"
+          end
+        end
+      end
+    end
+  end
+
+  describe "a string in another encoding" do
+    it "parses ASCII-only ISO-8859-1 text as its UTF-8 twin" do
+      latin1 = "ISO 9001:2015".encode(Encoding::ISO_8859_1)
+      expect(Pubid::Iso.parse(latin1).to_s).to eq("ISO 9001:2015")
+      expect(Pubid.parse(latin1).to_s).to eq("ISO 9001:2015")
+    end
+
+    it "parses UTF-16LE text as its UTF-8 twin" do
+      utf16 = "ISO 9001:2015".encode(Encoding::UTF_16LE)
+      expect(Pubid::Iso.parse(utf16).to_s).to eq("ISO 9001:2015")
+    end
+
+    it "raises InvalidInputError for UTF-16LE with a lone surrogate" do
+      bad = (+"\x00\xD8").force_encoding(Encoding::UTF_16LE)
+      expect { Pubid::Iso.parse(bad) }
+        .to raise_error(Pubid::Errors::InvalidInputError, /invalid encoding/)
     end
   end
 
