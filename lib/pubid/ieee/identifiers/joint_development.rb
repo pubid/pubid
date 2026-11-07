@@ -253,11 +253,24 @@ module Pubid
 
           parts << code_str if code_str && !code_str.empty?
 
-          # Join with space and add year with dash — unless the D=
-          # designator face already carried it above.
+          # Join with space and add the date — unless the D= designator face
+          # already carried the year. The month face follows the standing
+          # month rule: a text month is the comma long form (", February
+          # 2018", which re-parses through the joint date clause), a numeric
+          # month the glued short form ("-2018-05"); dropping the month
+          # published a different date ("P90003, February 2018 (E)" printed
+          # as "P90003-2018").
           result = parts.join(" ")
-          result += "-#{year}" if year && !@designator_carries_year &&
-                           !ieee_draft.to_s.end_with?("-#{year}")
+          if year && !@designator_carries_year &&
+             !ieee_draft.to_s.end_with?("-#{year}")
+            result += if month.to_s.match?(/\A\d+\z/)
+                        "-#{year}-#{month.to_s.rjust(2, '0')}"
+                      elsif month
+                        ", #{month} #{year}"
+                      else
+                        "-#{year}"
+                      end
+          end
           # Lossless on the IEEE face too: the parenthetical rides after
           # the year, before the redline marker.
           result += " (#{parenthetical_content})" if parenthetical_content

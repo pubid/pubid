@@ -237,14 +237,112 @@ module Pubid
       # deserializes, so nested bases rebuild their component too. `draft` needs
       # no expansion (Draft.parse accepts the slashless form).
       def self.from_hash(data, options = {})
-        data = Compaction.expand(Compaction.deep_dup(data)) if data.is_a?(::Hash)
+        if data.is_a?(::Hash)
+          # The canonical comparison reads the wire AS STORED — the expand
+          # below rewrites `stage` into the typed_stage sub-hash that
+          # to_hash re-collapses, so the expanded form never equals a
+          # to_hash and would brand every canonical row legacy.
+          original_wire = Compaction.deep_dup(data)
+          # expand mutates its argument, so it works on another dup —
+          # original_wire must stay as the wire was stored.
+          data = Compaction.expand(Compaction.deep_dup(data))
+        end
         identifier = super
         # == compares the raw ivars: a rebuild whose lazy readers have not
         # run carries @code_obj/@draft_obj nil while a parse has them set,
         # so the objects compare unequal although their serialized hashes
         # agree (pubid#596). Materialize the runtime components eagerly.
         identifier.materialize_runtime_components
+        if original_wire
+          identifier = normalize_legacy_wire_shape(identifier, original_wire)
+        end
         identifier
+      end
+
+      # The legacy crawls stored shapes the 1.3.x-era renderer printed that
+      # the current grammar reads differently (the stage-token drafts the D=
+      # designator face superseded — "DCD1" —, the project drafts stored as
+      # plain standards, the draft-less month dates the joint IEEE face now
+      # prints). A row whose deserialized canonical hash differs from the
+      # wire hash it came from is such a legacy shape: re-derive the
+      # identifier from its own render — the shape a parse of the printed
+      # form produces — so the deserialized row answers the corpus laws
+      # (render(parse(x)) == x, parse(render(x)) == x) like every
+      # parse-built one. The re-derived shape is accepted only when it is
+      # itself stable (parse∘render idempotent on string and hash), so the
+      # normalization never lands on a drifting spelling. A canonical wire
+      # hash — the current serializer's output, `to_hash == wire` — never
+      # heals, so `from_hash(to_hash(id)) == id` keeps holding for every
+      # parse-built identifier (the relaton-index round-trip invariant).
+      MAX_NORMALIZE_CYCLES = 3
+
+      def self.normalize_legacy_wire_shape(identifier, wire_hash)
+        # The base class dispatches this hash to the concrete class's
+        # from_hash AFTER expand rewrote `stage` into the typed_stage
+        # sub-hash, so the comparison collapses the wire back to the
+        # serialized shape to_hash emits (collapse is lossless and a no-op
+        # on an already-collapsed wire).
+        wire = canonical_wire_hash(wire_hash)
+        return identifier if identifier.to_hash == wire
+
+        original = identifier
+        MAX_NORMALIZE_CYCLES.times do
+          round = reparse(identifier)
+          return original unless round
+
+          same = round.to_s == identifier.to_s &&
+            round.to_hash == identifier.to_hash
+          return identifier if same
+
+          # Land only on a shape that is itself parse∘render-stable, so the
+          # healed identifier satisfies the corpus laws; an unstable round
+          # becomes the vantage of the next cycle, and an exhausted cycle
+          # budget keeps the legacy shape (never a drifting spelling).
+          return round if stable_shape?(round)
+
+          identifier = round
+        end
+        original
+      end
+
+      # The wire as the canonicalizer emits it: key-normalized (string and
+      # symbol callers alike) and collapsed back from the expand rewrite.
+      def self.canonical_wire_hash(wire_hash)
+        normalized = normalize_wire_keys(Compaction.deep_dup(wire_hash))
+        Compaction.collapse(normalized)
+      end
+
+      # One parse of the identifier's own render, or nil when the render is
+      # not grammar-readable (the legacy shape is kept, as recorded).
+      def self.reparse(identifier)
+        Pubid::Ieee::Identifier.parse(identifier.to_s)
+      rescue StandardError
+        nil
+      end
+
+      # A shape is landable when parse∘render is idempotent on it, string
+      # and hash — the Law 1a + Law 1b pair the corpus gate asserts.
+      def self.stable_shape?(round)
+        again = reparse(round)
+        !again.nil? && again.to_s == round.to_s &&
+          again.to_hash == round.to_hash
+      end
+
+      # Wire hashes arrive string-keyed (the published indexes) or
+      # symbol-keyed (direct spec calls); to_hash emits string keys, so the
+      # canonical comparison normalizes the wire keys the same way,
+      # recursing into nested bases.
+      def self.normalize_wire_keys(node)
+        case node
+        when ::Hash
+          node.each_with_object({}) do |(key, value), out|
+            out[key.to_s] = normalize_wire_keys(value)
+          end
+        when ::Array
+          node.map { |item| normalize_wire_keys(item) }
+        else
+          node
+        end
       end
 
       # Rebuild the runtime components from the wire strings. Safe on every
