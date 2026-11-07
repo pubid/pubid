@@ -32,3 +32,13 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
   silently skips a name a class doesn't declare. Locked by
   `spec/pubid/ogc/all_parts_spec.rb` and
   `spec/pubid/all_parts_edition_keys_audit_spec.rb`.
+- **`exclude(:year)` is a no-op**: the "<yy>" token is the document's core
+  identity — the grammar's printed form is `<yy>-<nnn>` and its parse demands
+  the year run — so excluding it cannot leave a valid identifier. The base
+  `#exclude` nilled the year and the renderer printed the dangling separator
+  (`"-000"`, `"-002r1"`), which never re-parsed: the relaton corpus gate's
+  114 ogc-fuzz failures (run 42204581379). An exclusion that would leave the
+  identifier unprintable is not a mutation, so `#exclude` drops `:year` from
+  its args — the same reasoning that keeps `year` out of
+  `all_parts_edition_keys`. Every other key behaves as the base does.
+  Locked by `spec/pubid/ogc/exclude_year_spec.rb`.

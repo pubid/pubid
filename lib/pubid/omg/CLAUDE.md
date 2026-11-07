@@ -13,3 +13,16 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 - **`root.number` is nil for every OMG identifier, and so is the MR slug. Neither moved here, and nothing depends on either yet.** OMG models `acronym`/`version`/`part` and never sets the `number` it inherits, so the index key the root file requires of every leaf is empty and `to_mr_string` is `""` for every identifier — both were already true before this branch and both are unchanged by it (the base `mr_number_with_part` reads `number`, not `part`, so adding the part does not populate the slug). OMG has **no index and no `relaton-data-omg`** — it is scraped from `www.omg.org/spec` with Mechanize — and the relaton migration hand-off explicitly forbids adding one, so the binary-search degradation the root file describes cannot bite today. Do not "fix" it by mirroring `acronym` into `number` without checking the renderer first: that is the precondition the BIPM entry names, and the NIST attempt recorded in the root file is what happens when it does not hold.
 - **The fixture corpus is hand-written.** OMG has no `spec/fixtures/omg/identifiers/full/` tree and no entry in `spec/fixtures/classify_fixtures.rb`, so `validation:classify` never rewrites `pass/` or `fail/` and the root file's rule against hand-editing them does not apply. `spec/pubid/omg/fixtures_spec.rb` skips `#` lines, so the files carry comments.
 - **relaton note**: `relaton/relaton` moves its OMG flavor off the hand-written regex at `lib/relaton/omg/scraper.rb:19` onto this flavor. Both blockers it named are fixed. Its probe expected `OMG DDS 1.4/PDF` to round-trip byte for byte; it now sees a normalizing parse, which is harmless there because the flavor reads `acronym` and `version` off the parsed object and keeps the document part out of the request URL. (hand-offs: `metanorma__pubid__omg-document-part-and-bare-beta`, `relaton__relaton__omg-pubid-migration`.)
+- **The legacy named-tree version emission (from_hash)**: the parsanol 1.3.111
+  era wrote five relaton-data-omg rows (the beta documents, e.g. DPROD
+  `version: '[{digit: "2"}]'` for "1.0 beta 2") with the parse tree's node
+  list in place of the version, because that emission drops every unnamed
+  literal and only the beta tail's `digit` nodes are named in the grammar's
+  version rule. The version body is lost information; the one faithful
+  recovery is the digits themselves (the IEEE builder's per-token join), so
+  `Identifier.from_hash` assembles the emission into the joined scalar and
+  the row renders "OMG DPROD 2" — a print that re-parses to the same
+  structure (the relaton corpus gate's omg-fidelity failures). Plain
+  "1.0 beta 2"-style scalars pass through untouched. The emission shape is
+  defined once in `Pubid::LegacyTreeValue`. Locked by
+  `spec/pubid/omg/legacy_tree_version_spec.rb`.

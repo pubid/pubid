@@ -43,3 +43,26 @@ keeps `#matches?(other, ignore:)`.
   matching side. relaton had two committed specs breaking on this.
 
 - **The flavor key is `:"3gpp"`, not the derived `:tgpp` (pubid#644)**: `PrefixesSupport#prefix_flavor_key` derives the key from the Ruby constant's name (`Pubid::Tgpp` → `:tgpp`), but the external key is "3gpp" — the registry registration, the `pubid:3gpp:*` `_type` namespace and the `urn:3gpp:` URN namespace all spell it with the digit. The derived mismatch made `Pubid.prefix_flavors` attribute the "3GPP" prefix to a key **nothing is registered under**, so the router's routing table resolved `Registry.get(:tgpp)` to `nil`, `candidates_by_prefix`'s `compact` silently dropped the owner, and `Pubid.parse("3GPP TS 38.101")` — which `Pubid::Tgpp.parse` handles fine (the prefixed spelling is a normalizing parse; canonical render drops the publisher, `with_publisher: true` puts it back) — lost its prefix-owner fallback and raised. The fix is a one-line `prefix_flavor_key` override in `lib/pubid/tgpp.rb` returning `:"3gpp"`; `Pubid.prefix_flavors["3GPP"]` now reads `[:\"3gpp\"]` and `Registry.canonical_name(Pubid::Tgpp)` answers the real key. The registry-driven tripwire `spec/pubid/parse_routing_spec.rb` ("resolves every prefix table entry to a registered flavor module") is the guard that turns any future key/registry mismatch of this shape red at the table level.
+
+## The legacy named-tree version emission (from_hash)
+
+The parsanol 1.3.111 edition-2 emission serialized the grammar's per-digit
+`version` tree as the node list alone — the unnamed "." literals never
+reached the stored row — and the 3gpp crawler of that era wrote ~89,000
+published `relaton-data-3gpp` rows with
+`version: '[{digit: "3"}, {digit: "0"}, {digit: "0"}]'` where the document's
+version is `3.0.0`. Rendered verbatim the row printed the node hashes and the
+print never re-parsed (the relaton corpus gate's Law 1a; run 42204581379,
+~22,000 NEW 3gpp fidelity failures). `Identifier.from_hash` now assembles the
+digits back into the three-segment version (see `Pubid::LegacyTreeValue` for
+the emission shape and `assemble_legacy_tree_version` for the rule): the
+release names the version major for the legacy year-releases (REL-99 → 3.x.y)
+and for `REL-<n>`; otherwise a two-digit leading pair wins when it is a
+plausible major (≤ REL-21) and a leading zero is always the minor's. The
+segmentation was validated against the index's own clean rows — the crawler
+wrote both forms per document, 89,223 pairs, 165 irrecoverable (identical
+digit tuples whose documents genuinely differ, e.g. `1.10.0` vs `11.0.0`
+from `[1,1,0,0]`); the deterministic choice there still parses and
+round-trips. Current parses are unaffected: the runtime binds `version` as a
+scalar, so only deserialization of those legacy rows reaches the assembly.
+Locked by `spec/pubid/tgpp/legacy_tree_version_spec.rb`.

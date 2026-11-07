@@ -36,7 +36,53 @@ module Pubid
       # do the real work. Nested `base` documents are expanded recursively by
       # their own from_hash via apply_mappings, so only this level is touched.
       def self.from_hash(data, options = {})
-        super(expand_compact_hash(data), options)
+        id = super(normalize_deserialized_shapes(expand_compact_hash(data)),
+                   options)
+        derive_subseries(id)
+        id
+      end
+
+      # The parse path builds a shape the stored rows lost on the way
+      # through the wire, and Law 1b (parse(render(x)).to_hash == x.to_hash)
+      # needs it restored on deserialization: a `part` hash without a `type`
+      # is the letter suffix — the parse of the printed face ("NIST NCSTAR
+      # 1A") carries `type: ""`, and Part#to_s renders just the letter for
+      # it; left nil the component fell back to the annex face ("1nA")
+      # instead, a different document. Every type-less value in the published
+      # index is a single letter, so the inference is safe.
+      def self.normalize_deserialized_shapes(data)
+        return data unless data.is_a?(::Hash)
+
+        part = data["part"]
+        return data unless part.is_a?(::Hash) && !part.key?("type") && !part.key?(:type)
+
+        out = data.dup
+        out[out.key?("part") ? "part" : :part] = { **part, "type" => "" }
+        out
+      end
+
+      # An SP row's `subseries` is derived metadata ("800" from "800-53",
+      # Appendix A.2), computed by the Builder on parse but absent from rows
+      # written before that derivation existed — parse always recomputes it,
+      # so from_hash must too, by the Builder's own condition.
+      def self.derive_subseries(id)
+        return unless id.is_a?(Identifiers::SpecialPublication) && id.subseries.nil?
+
+        code = derive_subseries_code(id.number.to_s)
+        id.subseries = Components::Code.new(value: code) if code
+      end
+
+      # The SP subseries code of a report-num-like first number ("800-53" →
+      # "800", "1190GB-12" → "1190GB"), or nil. The same two rules the
+      # Builder applies on parse (Identifiers::SpecialPublication).
+      def self.derive_subseries_code(number)
+        first = number.to_s.split("-").first.to_s
+        if Identifiers::SpecialPublication::SP_SUBSERIES.include?(first)
+          first
+        elsif (m = first.match(/\A(\d+GB)\b/)) &&
+            Identifiers::SpecialPublication::SP_SUBSERIES.include?(m[1])
+          m[1]
+        end
       end
 
       # Expand a compact hash in place-safe fashion: a scalar series/number
