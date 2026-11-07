@@ -316,6 +316,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        string = ::Pubid.utf8_input(string)
+
         # Route URN strings to the URN parser (mirrors Iso::Identifier.parse)
         if Pubid::FormatDetector.detect(string) == :urn
           return Pubid::Iec::UrnParser.parse(string)

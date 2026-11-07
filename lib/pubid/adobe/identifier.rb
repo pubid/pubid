@@ -27,6 +27,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        identifier = ::Pubid.utf8_input(identifier)
+
         # R1 parser swap: the baked PG artifact is the parser of record.
         parsed = Pubid::Parg::Model.bound(:adobe, identifier.strip)
         Builder.build(parsed)

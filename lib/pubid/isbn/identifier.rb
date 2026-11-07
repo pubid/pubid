@@ -53,7 +53,9 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        # The two guards above must stay OUTSIDE build_identifier: this method
+        identifier = ::Pubid.utf8_input(identifier)
+
+        # The guards above must stay OUTSIDE build_identifier: this method
         # rescues ArgumentError to convert the Builder's check-digit and
         # length validation into a parse failure, and that rescue used to
         # swallow the guards' own ArgumentError and re-raise it as a

@@ -28,6 +28,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        input = ::Pubid.utf8_input(input)
+
         # There used to be a `return nil if input.start_with?("#")` here, to
         # skip the comment lines of a fixture file. A comment is not an
         # identifier, so it must be rejected like any other unparseable string:

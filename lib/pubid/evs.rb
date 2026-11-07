@@ -34,6 +34,8 @@ module Pubid
         raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
       end
 
+      identifier = ::Pubid.utf8_input(identifier)
+
       # The trailing language code (" et" / " en" / " et-en") extracts
       # before the grammar runs — the CEN adopted_string is greedy over
       # plain text and would swallow it.
