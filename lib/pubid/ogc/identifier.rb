@@ -96,6 +96,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        identifier = ::Pubid.utf8_input(identifier)
+
         Builder.build(Pubid::Parg::Model.bound(:ogc, identifier))
       end
     end

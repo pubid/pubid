@@ -64,6 +64,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        string = ::Pubid.utf8_input(string)
+
         Pubid::Evs.parse(string)
       end
     end

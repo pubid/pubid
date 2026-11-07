@@ -16,10 +16,50 @@ module Pubid
     # {number}:{year}` shape.
     class Base
       # Parse a URN string into an Identifier.
+      #
       # @param urn [String]
       # @return [Pubid::Identifier]
+      # @raise [Pubid::Errors::InvalidInputError] for a non-String
+      # @raise [Pubid::Errors::UrnParseError] for a URN that does not parse
       def self.parse(urn)
-        new.parse_urn(urn)
+        guarded_parse(urn) { |utf8| new.parse_urn(utf8) }
+      end
+
+      # Run a URN decode under the pubid error contract (issue #670). The
+      # input checks run first, before a parser reaches +downcase+ or a
+      # regex on the string. A decode then fails as a pubid error only:
+      # the raw classes a malformed body produced (+NoMethodError+ on a
+      # missing segment, +IndexError+ from +fetch+, +ArgumentError+) are
+      # wrapped as {Pubid::Errors::UrnParseError}, with the raw error kept
+      # as the cause so a parser defect stays visible. This is the same
+      # wrap +Pubid.parse_urn+ applies; here it also covers a direct call.
+      # ISO and IEC have their own parser classes and call this too.
+      #
+      # @param urn [Object]
+      # @yieldparam utf8 [String] the URN as a valid UTF-8 string
+      # @return [Pubid::Identifier] the block's result
+      def self.guarded_parse(urn)
+        yield validate_input!(urn)
+      rescue ::Pubid::Errors::Error
+        raise
+      rescue StandardError => e
+        raise ::Pubid::Errors::UrnParseError,
+              "#{name} cannot parse URN #{urn.inspect}: #{e.message}"
+      end
+
+      # The input checks every URN parser runs first.
+      # @param urn [Object]
+      # @return [String] the URN as a valid UTF-8 string (see
+      #   {Pubid.utf8_input})
+      # @raise [Pubid::Errors::InvalidInputError] for a non-String
+      # @raise [Pubid::Errors::UrnParseError] for invalid encoding bytes
+      def self.validate_input!(urn)
+        unless urn.is_a?(String)
+          raise ::Pubid::Errors::InvalidInputError,
+                ::Pubid::INPUT_NOT_A_STRING_MESSAGE
+        end
+
+        ::Pubid.utf8_input(urn, ::Pubid::Errors::UrnParseError)
       end
 
       # Subclasses override.

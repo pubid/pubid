@@ -29,6 +29,8 @@ module Pubid
         raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
       end
 
+      input = ::Pubid.utf8_input(input)
+
       # Apply legacy update_codes normalization first
       normalized = Core::UpdateCodes.apply(input, :plateau)
       parsed = Pubid::Parg::Model.bound(:plateau, normalized)

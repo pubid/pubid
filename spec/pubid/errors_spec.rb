@@ -230,11 +230,22 @@ RSpec.describe Pubid::Errors do
           .to raise_error(Pubid::Errors::UrnParseError, /no type segment/)
       end
 
+      # No flavor URN parser raises a raw class any more (the per-flavor
+      # half of #670, spec/pubid/urn_parse_error_spec.rb), so a stub stands
+      # in for a future one: the umbrella must still wrap it.
       it "wraps a flavor parser's raw ArgumentError as the cause" do
-        Pubid.parse_urn("urn:iso:notaurn")
-      rescue Pubid::Errors::UrnParseError => e
-        expect(e.cause).to be_an(ArgumentError)
-        expect(e.message).to include("does not parse as \"iso\"")
+        allow(Pubid::Iso::UrnParser).to receive(:parse)
+          .and_raise(ArgumentError, "raw")
+        expect { Pubid.parse_urn("urn:iso:std:iso:1") }
+          .to raise_error(Pubid::Errors::UrnParseError,
+                          /does not parse as "iso": raw/) { |e|
+            expect(e.cause).to be_an(ArgumentError)
+          }
+      end
+
+      it "passes a flavor parser's own UrnParseError through unwrapped" do
+        expect { Pubid.parse_urn("urn:iso:notaurn") }
+          .to raise_error(Pubid::Errors::UrnParseError, /Invalid ISO URN/)
       end
 
       it "raises InvalidInputError for a non-String" do

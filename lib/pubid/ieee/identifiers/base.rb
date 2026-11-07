@@ -389,6 +389,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        input = ::Pubid.utf8_input(input)
+
         result = PreParser.preprocess(input)
 
         case result.dispatch

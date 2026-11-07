@@ -26,6 +26,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        input = ::Pubid.utf8_input(input)
+
         # Filter out comments
         if input.start_with?("#")
           raise Pubid::Errors::ParseError.new(

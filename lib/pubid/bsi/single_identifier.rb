@@ -18,6 +18,8 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
+        string = ::Pubid.utf8_input(string)
+
         # Delegate to IEC for bare IEC identifiers. This handles IEC-specific
         # features like VAP suffixes (CSV, RLV, etc.) and consolidated
         # supplements (+AMD1:2001).
