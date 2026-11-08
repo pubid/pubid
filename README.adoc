@@ -63,24 +63,24 @@ construction, `Pubid.from_hash`, supplement-with-base, copublishers, stages,
 and the cross-flavor keyword conventions (spec-tested by
 `spec/pubid/attribute_construction_spec.rb`).
 
-|link:docs/flavors/iso.md[ISO: usage, rendering formats and stage mapping]
+|link:docs/flavor-guides/iso.md[ISO: usage, rendering formats and stage mapping]
 |ISO rendering options (`lang_single`, `stage_format_long`, `with_date`,
 `with_edition`), the DAM/FDAM and DCor/FDCor supplement-stage abbreviations,
 the per-doctype harmonized-stage mapping tables, stage iteration, and typed
 stage queries. Ported from the archived pubid-iso README, restated for v2.
 
-|link:docs/flavors/ieee.md[IEEE identifier patterns]
+|link:docs/flavor-guides/ieee.md[IEEE identifier patterns]
 |The Type I / Type II pattern series (with the full historic regexes), the
 filename generator (`to_mr_string`/`to_slug`), relationship clauses, and the
 AIEE/IRE predecessor-organization forms. Ported from the archived pubid-ieee
 README.
 
-|link:docs/flavors/iec.md[IEC: TRF format grammars]
+|link:docs/flavor-guides/iec.md[IEC: TRF format grammars]
 |IECEE and IECEx Test Report Form patterns — the `&` part join, the
 `F_II`-style sub-versions, the `_EMC`/`_PS`/`_SOF` test-type suffixes, and the
 IECEx `_`/`v` separator. Ported from the archived pubid-iec README.
 
-|link:docs/flavors/plateau.md[PLATEAU: the Handbook #11 edition split]
+|link:docs/flavor-guides/plateau.md[PLATEAU: the Handbook #11 edition split]
 |Why an edition-1–3 "Handbook #11" reference with a part suffix parses as
 Handbook #06 / #04 (the rule encoded in `data/plateau/update_codes.yaml`).
 Ported from the archived pubid-plateau README.
@@ -182,7 +182,7 @@ their pattern records live in the archived per-gem READMEs
   described in the archived link:https://github.com/pubid/pubid-nist#readme[pubid-nist README];
   the v2 parser accepts them and preserves the NBS publisher.
 * *AIEE and IRE IEEE* — the predecessor organizations (1884–1963) are covered
-  in link:docs/flavors/ieee.md[the IEEE patterns doc] and the archived
+  in link:docs/flavor-guides/ieee.md[the IEEE patterns doc] and the archived
   link:https://github.com/pubid/pubid-ieee#readme[pubid-ieee README].
 
 
