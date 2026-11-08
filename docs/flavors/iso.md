@@ -154,7 +154,7 @@ Technical Corrigendum:
 | `60.00` | `{base}/PRF Cor {num}` |
 | `60.60` | `{base}/Cor {num}` |
 
-(The historic v1 spellings `DAmd`, `FDAmd`, `DIS Cor`, `FDCor` parse and
+(The historic v1 spellings `DAmd`, `FDAmd`, `DIS Cor`, `FDIS Cor` parse and
 canonicalize — see the section above.)
 
 When the publisher element contains a slash, the separator in front of the
