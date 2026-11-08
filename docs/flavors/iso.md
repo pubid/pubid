@@ -36,7 +36,7 @@ the same dimensions are controlled by explicit keywords):
 | `lang_single: true` | 1-letter language codes (`E`, `F`, `R`… when the identifier carries languages) + short stage abbreviations | `ISO 1234:2019/AMD 1:2021` |
 | `stage_format_long: true` | long stage abbreviations (`Amd`, `DCor`, `FDCor`) | `ISO 1234:2019/Amd 1:2021` |
 | `with_date: false` | undated form (drops the year) | `ISO 1234/AMD 1` |
-| `with_edition: true` | append the edition portion when the identifier carries one | `ISO 1234:2019/Amd 1:2021 Ed 2` |
+| `with_edition: true` | append the edition portion when the identifier carries one (the edition renders on the base document) | `ISO 1234:2019 ED2/Amd 1:2021` |
 | `lang: :french` / `:russian` | **historic (v1)** — v1 rendered localized publisher words (`Guide ISO/CEI…`, `ИСО…`); v2 renders the canonical English words and preserves the language code in parentheses | — |
 
 Equivalent dimension mapping (historic v1 names, for orientation):
