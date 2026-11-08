@@ -13,20 +13,13 @@ module Pubid
           annotated: context.annotated,
         )
 
-        # A supplement without a typed_stage is malformed per ISO DIR
-        # composition (pubid#680): emitting "#{base}/" hides upstream state
-        # corruption, so fail loudly at the render seam. The historic nil
-        # producer (metanorma-iso's draft-biblio flow) now stops stripping
-        # the stage (metanorma-iso#1696).
-        unless @id.typed_stage
-          raise ArgumentError,
-                "cannot render supplement without a typed_stage: #{base_str}"
-        end
-
-        stage_str = annotate(@id.typed_stage.render(context:),
+        # A supplement without a stage renders without the stage segment.
+        # Flavors that require a stage raise in their own identifier class.
+        stage_str = @id.typed_stage &&
+                    annotate(@id.typed_stage.render(context:),
                              typed_stage_css(@id.typed_stage),
                              annotated: context.annotated)
-        parts << "#{base_str}/#{stage_str}"
+        parts << (stage_str ? "#{base_str}/#{stage_str}" : "#{base_str}")
 
         num_port = render_number_portion(context)
         if num_port && !num_port.empty? && !num_port.start_with?(":")
