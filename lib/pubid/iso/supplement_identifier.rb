@@ -56,6 +56,14 @@ module Pubid
       def to_s(**opts)
         return super if opts[:format] && opts[:format] != :human
 
+        # A supplement segment without a stage is malformed per ISO DIR
+        # composition (pubid#680): raise instead of emitting a bare "/".
+        unless typed_stage
+          raise ArgumentError,
+                "cannot render supplement without a typed_stage: " \
+                "#{base.respond_to?(:to_s) ? base : self}"
+        end
+
         context = build_rendering_context(
           nil, format: :human, **opts.except(:with_publisher)
         )
