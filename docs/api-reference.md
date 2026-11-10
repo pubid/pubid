@@ -580,6 +580,9 @@ Lookup: type code -> identifier class
 Parse an XSF identifier string
 ## `Pubid::Identifier` (instance methods)
 
+### `==(other)`
+
+lutaml's attribute walk, without the ignored attributes, and with a
 ### `===(other)`
 ### `all_parts`
 
@@ -614,6 +617,9 @@ Self and +other+ are editions of the same document: the edition-year
 ### `eql?(other, _compared_objects = nil)`
 
 The second parameter is lutaml's: ComparableModel#== (an alias of its
+### `equality_ignored_attributes`
+
+The attributes this instance does not compare: the class's list. A
 ### `exclude(*args)`
 
 Excluded attributes are nilled; every other value is passed through
@@ -621,6 +627,8 @@ Excluded attributes are nilled; every other value is passed through
 
 Inverse of #supplement_of? — self is the base document and +other+
 ### `hash`
+### `identity_blank?`
+### `identity_equal?(name, other)`
 ### `includes?(other)`
 
 Self is an all-parts collection that covers +other+.

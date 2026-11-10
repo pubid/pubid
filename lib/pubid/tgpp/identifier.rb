@@ -118,6 +118,111 @@ module Pubid
         parsed = Pubid::Parg::Model.bound(:tgpp, identifier)
         Builder.build(parsed)
       end
+
+      # The version run the grammar binds is `1*digit "." 1*digit "." 1*digit`,
+      # whose named-tree materialization is per-digit `digit` nodes joined by
+      # unnamed "." literals. The parsanol 1.3.111 edition-2 emission serialized
+      # that tree as the node list alone — the dots were unnamed, so they never
+      # reached the stored row, and ~89,000 published relaton-data-3gpp rows
+      # carry `version: '[{digit: "3"}, {digit: "0"}, {digit: "0"}]'` (the
+      # node list's inspect) where the document's version is `3.0.0`. Rendered
+      # verbatim the row prints the node hashes and the print never re-parses
+      # (the relaton corpus gate's Law 1a). Current parses are unaffected —
+      # only deserialization of those legacy rows needs the assembly.
+      #
+      # The dots are lost information, so the segmentation is a deterministic
+      # reconstruction, validated against the index's own clean rows (the
+      # crawler wrote both forms per document): the release names the version
+      # major for the legacy year-releases (REL-99 documents carry version
+      # 3.x.y) and for `REL-<n>`; otherwise a two-digit leading pair wins when
+      # it is a plausible major (the largest 3GPP release is REL-21) and a
+      # leading zero is always the minor's. The residue — identical digit
+      # tuples whose documents genuinely differ, e.g. `1.10.0` vs `11.0.0`
+      # from `[1,1,0,0]` — is unrecoverable from the row; any 3-segment choice
+      # still parses and round-trips.
+      LEGACY_RELEASE_MAJORS = {
+        # The 3GPP release numbering starts Release 1999 = version 3.x.y; the
+        # earlier year-releases continue the ETSI sequence backwards.
+        "REL-96" => "5", "REL-97" => "6", "REL-98" => "7", "REL-99" => "3",
+        "UMTS" => "3", "Ph1" => "3", "Ph2" => "4"
+      }.freeze
+
+      def self.from_hash(data, options = {})
+        super(normalize_legacy_tree_version(data), options)
+      end
+
+      # Assemble a legacy named-tree version emission (see
+      # {Pubid::LegacyTreeValue}) back into the dotted scalar. Leaves every
+      # other value untouched; answers nil when +value+ is not the emission.
+      def self.assemble_legacy_tree_version(value, release)
+        digits = LegacyTreeValue.digit_values(value)
+        return nil unless digits
+
+        major = release_major(release)
+        if major
+          head = digits[0, major.length].join
+          rest = digits.drop(major.length)
+          if head == major && rest.length.between?(2, 4)
+            return assemble_version_segments(major, rest)
+          end
+        end
+
+        assemble_version_segments(nil, digits)
+      end
+
+      # The version major a release row names, when the release spelling maps
+      # to one ("REL-18" → "18", the legacy year-releases per the table).
+      def self.release_major(release)
+        return nil unless release.is_a?(::String)
+
+        LEGACY_RELEASE_MAJORS.fetch(release) do
+          release.match?(/\AREL-\d+\z/) ? release.delete_prefix("REL-") : nil
+        end
+      end
+
+      # Split a digit run into the three version segments. +major+ pins the
+      # first segment when the release names it; the run then carries the
+      # minor and patch digits, which the observed corpus always splits as
+      # two-digit-minor (`18.1.0`), one-digit-minor/two-digit-patch
+      # (`8.1.10`-era rows do not occur) or singles (`3.0.0`).
+      def self.assemble_version_segments(major, rest)
+        if major
+          case rest.length
+          when 2 then "#{major}.#{rest[0]}.#{rest[1]}"
+          when 3 then "#{major}.#{rest[0]}#{rest[1]}.#{rest[2]}"
+          when 4 then "#{major}.#{rest[0]}#{rest[1]}.#{rest[2]}#{rest[3]}"
+          end
+        else
+          case rest.length
+          when 3 then rest.join(".")
+          when 4
+            pair = rest[0] + rest[1]
+            if rest[0] == "0"
+              "0.#{rest[1]}#{rest[2]}.#{rest[3]}"
+            elsif pair.to_i <= 21
+              "#{pair}.#{rest[2]}.#{rest[3]}"
+            else
+              "#{rest[0]}.#{rest[1]}#{rest[2]}.#{rest[3]}"
+            end
+          when 5 then "#{rest[0]}#{rest[1]}.#{rest[2]}.#{rest[3]}#{rest[4]}"
+          else rest.join(".")
+          end
+        end
+      end
+
+      def self.normalize_legacy_tree_version(data)
+        return data unless data.is_a?(::Hash)
+
+        release = data["release"] || data[:release]
+        assembled = assemble_legacy_tree_version(
+          data["version"] || data[:version], release,
+        )
+        return data unless assembled
+
+        out = data.dup
+        out[data.key?("version") ? "version" : :version] = assembled
+        out
+      end
     end
   end
 end

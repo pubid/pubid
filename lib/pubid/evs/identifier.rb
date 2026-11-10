@@ -18,6 +18,11 @@ module Pubid
     # ("+X" a full standard plus the supplement, "/X" the supplement only)
     # and are preserved as captured.
     class Identifier < ::Pubid::Identifier
+      # Spelling-only values, the facets of the pubid-scheme URN: `==`,
+      # `hash` and `===` skip them (Pubid::EqualityIgnored, issue #656).
+      equality_ignored :separator, :amd_separator, :cor_separator,
+                       :na_separator
+
       attribute :base, ::Pubid::Identifier, polymorphic: true
       # "-" or " " — preserves the printed separator ("EVS-EN" vs "EVS EN")
       attribute :separator, :string, default: -> { "-" }

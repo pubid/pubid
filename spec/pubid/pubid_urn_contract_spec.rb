@@ -10,6 +10,8 @@ require "spec_helper"
 #   (b) round-trip: Pubid.parse_urn(id.to_pubid_urn).to_hash == id.to_hash;
 #   (c) be injective: two different hashes never share a URN;
 #   (d) be path-safe: only [A-Za-z0-9._~,()-] and ":", no empty segment.
+#   (e) keep its facets spelling only: with every `f` group cut, the URN
+#       parses to an id that is ==, hash-equal and === to the original.
 #
 # The official URN (#to_urn) is NOT under this contract: it may be lossy.
 #
@@ -110,6 +112,77 @@ module PubidUrnContract
   rescue StandardError => e
     "#{input}: #{e.class}: #{e.message[0, 120]}"
   end
+
+  # The facets are spelling only (issue #656): an id whose facets are cut
+  # must still be ==, have the same hash, and match with === in both
+  # directions. So a value can be a facet only if those all skip it.
+  # @return [Array<String>] the failures over the corpus of +flavor+
+  def facet_failures(flavor)
+    mod = Pubid::Registry.get(flavor)
+    inputs(flavor).filter_map { |input| facet_check(mod, input) }
+  end
+
+  def facet_check(mod, input)
+    id = parsed(mod, input) or return
+    urn = id.to_pubid_urn
+    cut = cut_facets(urn)
+    return if cut == urn
+
+    # Against the id of the FULL URN, not the parsed one: a field that
+    # `from_hash` does not restore (ISO's typed_stage.original_abbr) is the
+    # round-trip spec's concern, and would hide what the cut does.
+    full = Pubid.parse_urn(urn)
+    back = build_cut(cut)
+    broken = { "==" => back == full && full == back,
+               "hash" => back.hash == full.hash,
+               "===" => (full === back) && (back === full),
+               "canonical" => cut_facets(back.to_pubid_urn) == cut }
+      .reject { |_, ok| ok }
+    "#{input}: #{urn}: #{broken.keys.join(', ')}" unless broken.empty?
+  rescue StandardError => e
+    "#{input}: cut #{cut}: #{e.class}: #{e.message[0, 120]}"
+  end
+
+  # The id of a cut URN, without the canonical gate of Pubid.parse_urn. A
+  # facet that is written from another value (NIST's "translation" is
+  # "(<code>)" of the lang atom) comes back on re-encoding, so the cut URN
+  # itself is not canonical; the "canonical" check above still requires
+  # that the canonical form differ from the cut only in facets.
+  def build_cut(cut)
+    body = cut.delete_prefix(Pubid::PubidUrn::PREFIX)
+    Pubid.from_hash(Pubid::PubidUrn::Decoder.new(body).to_identifier_hash)
+  end
+
+  # +urn+ without any facet group, nested identifiers included.
+  def cut_facets(urn)
+    "#{Pubid::PubidUrn::PREFIX}#{cut_body(urn.delete_prefix(Pubid::PubidUrn::PREFIX))}"
+  end
+
+  def cut_body(body)
+    flavor, rest = body.split(":", 2)
+    tokens = Pubid::PubidUrn.split_top(rest, ":")
+    tokens = tokens.take_while { |token| token != "f" }
+    "#{flavor}:#{tokens.map { |token| cut_nested(token) }.join(':')}"
+  end
+
+  # Cut the facets inside every bracketed identifier of a segment.
+  def cut_nested(segment)
+    out = +""
+    depth = 0
+    start = nil
+    segment.each_char.with_index do |char, index|
+      if char == "("
+        start = index if depth.zero?
+        depth += 1
+      elsif char == ")"
+        depth -= 1
+        out << "(#{cut_body(segment[(start + 1)...index])})" if depth.zero?
+      elsif depth.zero?
+        out << char
+      end
+    end
+    out
+  end
 end
 
 RSpec.describe "pubid-scheme URN contract" do
@@ -137,6 +210,13 @@ RSpec.describe "pubid-scheme URN contract" do
         expect(PubidUrnContract.inputs(flavor)).not_to be_empty
 
         failures = PubidUrnContract.failures(flavor)
+        expect(failures).to be_empty,
+                            "#{failures.size} failures:\n" \
+                            "#{failures.first(20).join("\n")}"
+      end
+
+      it "keeps an id with its facets cut ==, hash-equal and === to the original" do
+        failures = PubidUrnContract.facet_failures(flavor)
         expect(failures).to be_empty,
                             "#{failures.size} failures:\n" \
                             "#{failures.first(20).join("\n")}"

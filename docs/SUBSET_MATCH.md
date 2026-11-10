@@ -65,7 +65,14 @@ pressure, because reference matching no longer goes through `#exclude`.
   rather than naming a different document, and ISO, IEC and BSI all rely on
   it. This was decided for CalConnect, where `CC/WD 51017:2024` matches the
   row dated `2024-07-23`, and it applies to every flavor.
-- `#==` does not change. An error from an attribute reader propagates.
+- Subset match leaves `#==` as it is. An error from an attribute reader propagates.
+- **Spelling-only attributes are skipped by both.** An attribute that a class
+  declares with `equality_ignored` (`Pubid::EqualityIgnored`) is skipped by
+  `==`, `eql?`, `hash` and `===` alike, and a component with no identity left
+  (every other attribute empty) reads as nil. Every facet of the pubid-scheme
+  URN is declared this way (issue #656), so a reference spelled `Rev. 5`
+  matches a row spelled `r5` under `===` and under relaton's
+  `exclude(…) ==`. See *Spelling-only attributes* below.
 
 ## Why it walks objects, not `to_hash`
 
@@ -167,6 +174,19 @@ match `ISO 9001 (all parts)`, because a default is stated.
 
 `#matches?(other, ignore:)` and `#exclude` do not change, so a caller that
 prefers to name the parts to ignore still can.
+
+## Spelling-only attributes
+
+`equality_ignored(*names)` (`lib/pubid/equality_ignored.rb`) declares the
+attributes that are not identity: the input spelling, such as
+`Components::Language#original_code` (`E` for `en`),
+`Components::Edition#original_text`, the IEEE separators, the CSA year
+format flags and OIML's `parsed_format`. `SubsetMatch#subset_skipped_attributes`
+adds the declared list to `subset_ignored_attributes`, so a class that
+overrides that hook does not need to repeat the list. A class that writes
+its own `==` (ITU, NIST `Edition`) must skip the list there too; the
+facet-cut example of `spec/pubid/pubid_urn_contract_spec.rb` fails when it
+does not.
 
 ## Hooks
 

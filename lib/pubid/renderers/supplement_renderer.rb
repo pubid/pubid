@@ -13,14 +13,13 @@ module Pubid
           annotated: context.annotated,
         )
 
-        # A nil typed_stage means "no stage" (metanorma-iso's draft-biblio
-        # flow assigns nil through the public setter); render the supplement
-        # without the stage segment instead of crashing on nil.render.
+        # A supplement without a stage renders without the stage segment.
+        # Flavors that require a stage raise in their own identifier class.
         stage_str = @id.typed_stage &&
                     annotate(@id.typed_stage.render(context:),
                              typed_stage_css(@id.typed_stage),
                              annotated: context.annotated)
-        parts << (stage_str ? "#{base_str}/#{stage_str}" : "#{base_str}/")
+        parts << (stage_str ? "#{base_str}/#{stage_str}" : "#{base_str}")
 
         num_port = render_number_portion(context)
         if num_port && !num_port.empty? && !num_port.start_with?(":")

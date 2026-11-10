@@ -12,6 +12,10 @@ module Pubid
     # It defaults to "current" (the dominant value), so canonicalize_hash drops
     # it from the majority of rows and from_hash restores it.
     class Identifier < ::Pubid::Identifier
+      # Spelling-only values, the facets of the pubid-scheme URN: `==`,
+      # `hash` and `===` skip them (Pubid::EqualityIgnored, issue #656).
+      equality_ignored :s_prefix, :part_separator, :d_prefix
+
       attribute :style, :string, default: -> { "current" }
 
       def self.parse(input)

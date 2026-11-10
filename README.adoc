@@ -51,6 +51,141 @@ both humans and machines, in a round-trippable manner.
 
 See <<v2-migration-status>> for detailed status and <<v2-usage-examples>> for examples.
 
+== Documentation
+
+[cols="1,2", options="header"]
+|===
+|Document |Contents
+
+|link:docs/CONSTRUCTION.md[Constructing identifiers programmatically]
+|The v2 replacement for the v1 `Identifier.create`: `.new` keyword
+construction, `Pubid.from_hash`, supplement-with-base, copublishers, stages,
+and the cross-flavor keyword conventions (spec-tested by
+`spec/pubid/attribute_construction_spec.rb`).
+
+|link:docs/flavor-guides/iso.md[ISO: usage, rendering formats and stage mapping]
+|ISO rendering options (`lang_single`, `stage_format_long`, `with_date`,
+`with_edition`), the DAM/FDAM and DCor/FDCor supplement-stage abbreviations,
+the per-doctype harmonized-stage mapping tables, stage iteration, and typed
+stage queries. Ported from the archived pubid-iso README, restated for v2.
+
+|link:docs/flavor-guides/ieee.md[IEEE identifier patterns]
+|The Type I / Type II pattern series (with the full historic regexes), the
+filename generator (`to_mr_string`/`to_slug`), relationship clauses, and the
+AIEE/IRE predecessor-organization forms. Ported from the archived pubid-ieee
+README.
+
+|link:docs/flavor-guides/iec.md[IEC: TRF format grammars]
+|IECEE and IECEx Test Report Form patterns — the `&` part join, the
+`F_II`-style sub-versions, the `_EMC`/`_PS`/`_SOF` test-type suffixes, and the
+IECEx `_`/`v` separator. Ported from the archived pubid-iec README.
+
+|link:docs/flavor-guides/plateau.md[PLATEAU: the Handbook #11 edition split]
+|Why an edition-1–3 "Handbook #11" reference with a part suffix parses as
+Handbook #06 / #04 (the rule encoded in `data/plateau/update_codes.yaml`).
+Ported from the archived pubid-plateau README.
+
+|link:docs/RENDERING_GUIDE.md[Advanced Rendering Styles Guide]
+|ISO short/long supplement abbreviation preservation and IEC `AMD1` vs
+`Amd 1` spacing.
+
+|link:docs/identifier-patterns/README.md[Identifier pattern reference (generated)]
+|Per-flavor reference docs (`docs/identifier-patterns/<flavor>.md`) generated
+from the code by `rake docs:patterns` — identifier types, typed stages,
+harmonized codes.
+
+|link:docs/URN-GENERATION-GUIDE.adoc[URN Generation Guide]
+|`#to_urn` and `#to_pubid_urn`, RFC 5141-bis.
+|===
+
+=== Flavor index
+
+All flavors live in the one gem under `lib/pubid/<flavor>/`; each has a
+publisher page on https://pubid.github.io/publishers[pubid.github.io].
+
+// Compatibility aliases (:cen -> :cen_cenelec, :3gpp -> module Tgpp) are noted inline.
+|===
+|Flavor |Flavor |Flavor
+
+|link:https://pubid.github.io/publishers/iso[ISO]
+|link:https://pubid.github.io/publishers/iec[IEC]
+|link:https://pubid.github.io/publishers/ieee[IEEE]
+
+|link:https://pubid.github.io/publishers/nist[NIST]
+|link:https://pubid.github.io/publishers/itu[ITU]
+|link:https://pubid.github.io/publishers/bsi[BSI]
+
+|link:https://pubid.github.io/publishers/cen-cenelec[CEN/CENELEC]
+|link:https://pubid.github.io/publishers/etsi[ETSI]
+|link:https://pubid.github.io/publishers/jis[JIS]
+
+|link:https://pubid.github.io/publishers/tgpp[3GPP]
+|link:https://pubid.github.io/publishers/ansi[ANSI]
+|link:https://pubid.github.io/publishers/api[API]
+
+|link:https://pubid.github.io/publishers/astm[ASTM]
+|link:https://pubid.github.io/publishers/ashrae[ASHRAE]
+|link:https://pubid.github.io/publishers/asme[ASME]
+
+|link:https://pubid.github.io/publishers/bipm[BIPM]
+|link:https://pubid.github.io/publishers/ccsds[CCSDS]
+|link:https://pubid.github.io/publishers/cie[CIE]
+
+|link:https://pubid.github.io/publishers/csa[CSA]
+|link:https://pubid.github.io/publishers/doi[DOI]
+|link:https://pubid.github.io/publishers/easc[EASC]
+
+|link:https://pubid.github.io/publishers/ecma[ECMA]
+|link:https://pubid.github.io/publishers/evs[EVS]
+|link:https://pubid.github.io/publishers/gb[GB]
+
+|link:https://pubid.github.io/publishers/gost[GOST]
+|link:https://pubid.github.io/publishers/iala[IALA]
+|link:https://pubid.github.io/publishers/iana[IANA]
+
+|link:https://pubid.github.io/publishers/idf[IDF]
+|link:https://pubid.github.io/publishers/ietf[IETF]
+|link:https://pubid.github.io/publishers/iho[IHO]
+
+|link:https://pubid.github.io/publishers/isbn[ISBN]
+|link:https://pubid.github.io/publishers/jcgm[JCGM]
+|link:https://pubid.github.io/publishers/oasis[OASIS]
+
+|link:https://pubid.github.io/publishers/ogc[OGC]
+|link:https://pubid.github.io/publishers/oiml[OIML]
+|link:https://pubid.github.io/publishers/omg[OMG]
+
+|link:https://pubid.github.io/publishers/plateau[PLATEAU]
+|link:https://pubid.github.io/publishers/sae[SAE]
+|link:https://pubid.github.io/publishers/un[UN]
+
+|link:https://pubid.github.io/publishers/w3c[W3C]
+|link:https://pubid.github.io/publishers/xsf[XSF]
+|link:https://pubid.github.io/publishers/adobe[Adobe]
+
+|link:https://pubid.github.io/publishers/amca[AMCA]
+|link:https://pubid.github.io/publishers/calconnect[CalConnect]
+|
+|===
+
+(The gem's 3GPP flavor key is `3gpp`; its publisher page is `tgpp`. CEN and
+CENELEC share the `cen_cenelec` flavor, publisher page `cen-cenelec`.)
+
+=== Historic identifier patterns
+
+Some identifier eras predate the flavors and are not fully re-documented here;
+their pattern records live in the archived per-gem READMEs
+(`gh api repos/pubid/pubid-<flavor>/contents/README.adoc`):
+
+* *NBS-era NIST* — the National Bureau of Standards series (1920s–1988:
+  `NBS CIRC`, `NBS LCIRC`, `NBS CSM`, `FIPS` before the NIST rename) are
+  described in the archived link:https://github.com/pubid/pubid-nist#readme[pubid-nist README];
+  the v2 parser accepts them and preserves the NBS publisher.
+* *AIEE and IRE IEEE* — the predecessor organizations (1884–1963) are covered
+  in link:docs/flavor-guides/ieee.md[the IEEE patterns doc] and the archived
+  link:https://github.com/pubid/pubid-ieee#readme[pubid-ieee README].
+
+
 == URN Generation (RFC 5141-bis)
 
 PubID V2 implements RFC 5141-bis compliant URN generation for ISO and IEC identifiers with **full test coverage**.

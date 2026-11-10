@@ -93,3 +93,45 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   sweep of `full/` and the spec literals, so sweep those too when a schema
   changes. Found in passing, not fixed:
   `NIST.IR.8259Apt` parses as `NIST IR 8259(por)` and loses the `A`.
+- **The from_hash shape residual (part letter suffix and SP subseries)**:
+  the parse path builds two shapes the stored rows lost on the way through
+  the wire, and the relaton corpus gate's Law 1b
+  (parse(render(x)).to_hash == x.to_hash) failed for every affected row
+  (run 42204581379, 16–22 NEW nist-structure per slice; the class the
+  relaton manifest describes as "the n+UPPER token's structural placement
+  differs between the parsed and deserialized forms"). (1) A `part` hash
+  without a `type` is the letter suffix — the parse of the printed face
+  ("NIST NCSTAR 1A") carries `type: ""`; left nil the component fell back
+  to the annex face and rendered "1nA", a different document (the true
+  faces are in the relaton-data-nist document records: NIST NCSTAR 1A, NBS
+  HR 1-1A). Every type-less part value in the published index is a single
+  letter, so the inference is safe. This also repaired the three
+  nist-fidelity rows ("NIST SP 1075-NCNnR", "NIST SP 1113-BFRnL",
+  "NIST SP 1113-PERMInS"). (2) An SP row's `subseries` is derived metadata
+  ("800" from "800-53", Appendix A.2) that parse always recomputes;
+  `from_hash` now derives it by the Builder's own condition and rules
+  (`derive_subseries_code`, sharing SP_SUBSERIES). Locked by
+  `spec/pubid/nist/from_hash_shapes_spec.rb`.
+
+- **The bare compound series is the SERIES REFERENCE (owner ruling on the
+  relaton fuzz gate's `NBS CS` mutant).** The compound-series branch of the
+  grammar demanded a separator after the series token, so the bare
+  abbreviation of a named series failed to parse; the fuzz gate drops the
+  edition from a published `NBS CS e15`-style row and kept recording the
+  mutant. The ruling: the bare form is a legitimate identity — the v1
+  pubid-nist `series.yaml` names CS as Commercial Standards, CSM as
+  Commercial Standards Monthly, CIS as Consumer Information Series, CS-E
+  as the emergency form — the same partial/bare-reference pattern as
+  BIPM's `SI Brochure`. The grammar (pubid-grammar, fleet compiler
+  1.3.121) makes the compound branch's separator+tail one optional group,
+  so every previously accepted form parses byte-identically and exactly
+  the bare compound-series forms join the accept set; simple-series bare
+  forms (`CS` alone, no publisher) are deliberately NOT covered. The bare
+  forms route through the normal series classes (`NBS CS` →
+  CommercialStandard …, `NBS CIS`/`NIST PS`/`NIST DCI` → the base
+  `Identifier`), render the short face as the abbreviation and the MR
+  face per the v1 series table (`NBS.CS`), and match their series members
+  as wildcard queries (`#matches?`). Locked by
+  `spec/pubid/nist/bare_series_reference_spec.rb`; the corpus round froze
+  the six rows (`NBS CS`, `NBS CSM`, `NBS CIS`, `NBS CS-E`, `NIST PS`,
+  `NIST DCI`) into the testsuite with the gem twin in lockstep.

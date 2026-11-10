@@ -37,7 +37,10 @@ module Pubid
   #   `part`, `parts`, `subpart` and `all_parts` itself are skipped.
   # - A nested identifier or component that includes this module is compared
   #   with its own `===`. Any other value is compared with `==`.
-  # - `#==` does not change. An error from an attribute reader propagates.
+  # - Subset match leaves `#==` as it is. An error from an attribute reader
+  #   propagates.
+  # - An attribute declared with `equality_ignored` (Pubid::EqualityIgnored)
+  #   is skipped, as `==` and `hash` skip it.
   #
   # The match walks the attributes of the objects, not their `to_hash`, so a
   # class can change the rule for its own attributes:
@@ -120,6 +123,9 @@ module Pubid
     # @return [Array<Symbol>] the attributes this match does not compare
     def subset_skipped_attributes
       ignored = self.class.subset_ignored_attributes
+      if respond_to?(:equality_ignored_attributes)
+        ignored |= equality_ignored_attributes
+      end
       return ignored unless subset_all_parts_wildcard?
 
       ignored | ALL_PARTS_ATTRIBUTES
@@ -189,9 +195,11 @@ module Pubid
         mine.each_with_index.all? { |value, i| value_match?(value, theirs[i]) }
     end
 
-    # @return [Boolean] true for nil and for an empty string or collection
+    # @return [Boolean] true for nil, for an empty string or collection, and
+    #   for a component with no identity left (EqualityIgnored.identity_blank?)
     def self.blank?(value)
-      value.nil? || Lutaml::Model::Utils.empty?(value)
+      value.nil? || Lutaml::Model::Utils.empty?(value) ||
+        EqualityIgnored.identity_blank?(value)
     end
   end
 end

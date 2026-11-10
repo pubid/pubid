@@ -6,10 +6,12 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Ribose Inc."]
   spec.email         = ["open.source@ribose.com"]
 
-  spec.homepage      = "https://github.com/metanorma/pubid"
+  spec.homepage      = "https://github.com/pubid/pubid"
   spec.summary       = "The international publication identifier (PubID) library for Ruby."
   spec.description   = "PubID is a Ruby library for parsing and generating international publication identifiers (PubIDs). It provides a simple and flexible API for working with PubIDs, allowing developers to easily create, manipulate, and validate PubIDs in their applications."
   spec.license       = "BSD-2-Clause"
+  spec.metadata["changelog_uri"] = "https://github.com/pubid/pubid/releases"
+  spec.metadata["documentation_uri"] = "https://rubydoc.info/gems/pubid"
 
   spec.files         = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`.split("\x0").select do |f|

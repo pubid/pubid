@@ -63,6 +63,28 @@ module Pubid
         parsed = Pubid::Parg::Model.bound(:omg, identifier)
         Builder.build(parsed)
       end
+
+      # A legacy named-tree version emission (see {Pubid::LegacyTreeValue}) —
+      # the parsanol 1.3.111 era wrote five relaton-data-omg rows (the beta
+      # documents, `version: '[{digit: "2"}]'` for "1.0 beta 2") with the
+      # node list in place of the version, because that emission drops every
+      # unnamed literal and only the beta tail's `digit` nodes are named in
+      # the grammar's version rule. The version body is lost information; the
+      # one faithful recovery is the digits themselves (the IEEE builder's
+      # per-token join), which re-parse as a version and keep the print
+      # stable. Current parses are unaffected — only those rows deserialize
+      # through here.
+      def self.from_hash(data, options = {})
+        return super unless data.is_a?(::Hash)
+
+        value = data["version"] || data[:version]
+        digits = LegacyTreeValue.digit_values(value)
+        return super unless digits
+
+        out = data.dup
+        out[data.key?("version") ? "version" : :version] = digits.join
+        super(out, options)
+      end
     end
   end
 end

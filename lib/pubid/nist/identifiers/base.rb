@@ -36,7 +36,53 @@ module Pubid
       # do the real work. Nested `base` documents are expanded recursively by
       # their own from_hash via apply_mappings, so only this level is touched.
       def self.from_hash(data, options = {})
-        super(expand_compact_hash(data), options)
+        id = super(normalize_deserialized_shapes(expand_compact_hash(data)),
+                   options)
+        derive_subseries(id)
+        id
+      end
+
+      # The parse path builds a shape the stored rows lost on the way
+      # through the wire, and Law 1b (parse(render(x)).to_hash == x.to_hash)
+      # needs it restored on deserialization: a `part` hash without a `type`
+      # is the letter suffix — the parse of the printed face ("NIST NCSTAR
+      # 1A") carries `type: ""`, and Part#to_s renders just the letter for
+      # it; left nil the component fell back to the annex face ("1nA")
+      # instead, a different document. Every type-less value in the published
+      # index is a single letter, so the inference is safe.
+      def self.normalize_deserialized_shapes(data)
+        return data unless data.is_a?(::Hash)
+
+        part = data["part"]
+        return data unless part.is_a?(::Hash) && !part.key?("type") && !part.key?(:type)
+
+        out = data.dup
+        out[out.key?("part") ? "part" : :part] = { **part, "type" => "" }
+        out
+      end
+
+      # An SP row's `subseries` is derived metadata ("800" from "800-53",
+      # Appendix A.2), computed by the Builder on parse but absent from rows
+      # written before that derivation existed — parse always recomputes it,
+      # so from_hash must too, by the Builder's own condition.
+      def self.derive_subseries(id)
+        return unless id.is_a?(Identifiers::SpecialPublication) && id.subseries.nil?
+
+        code = derive_subseries_code(id.number.to_s)
+        id.subseries = Components::Code.new(value: code) if code
+      end
+
+      # The SP subseries code of a report-num-like first number ("800-53" →
+      # "800", "1190GB-12" → "1190GB"), or nil. The same two rules the
+      # Builder applies on parse (Identifiers::SpecialPublication).
+      def self.derive_subseries_code(number)
+        first = number.to_s.split("-").first.to_s
+        if Identifiers::SpecialPublication::SP_SUBSERIES.include?(first)
+          first
+        elsif (m = first.match(/\A(\d+GB)\b/)) &&
+            Identifiers::SpecialPublication::SP_SUBSERIES.include?(m[1])
+          m[1]
+        end
       end
 
       # Expand a compact hash in place-safe fashion: a scalar series/number
@@ -203,38 +249,29 @@ module Pubid
         # See lib/pubid/nist/builder.rb lines 368-472 for compound number logic
       end
 
-      # Attributes that are build artifacts or rendering aliases, not part
-      # of an identifier's logical identity. They diverge between equally-
-      # valid spellings of the same id (e.g. long "Rev. 1" vs short "r1"):
+      # Attributes that are not part of an identifier's logical identity, so
+      # `==`, `hash` and `===` skip them (Pubid::EqualityIgnored). They
+      # diverge between equally-valid spellings of the same id (e.g. long
+      # "Rev. 1" vs short "r1"):
       #   - first_number/second_number: decomposed parts of the canonical
       #     :number, retained from the parse for building
-      #   - parsed_format: records the input format for round-trip rendering
       #   - subseries: derived from series+number (which SP subseries the
       #     document belongs to); populated by the Builder for known SP
-      #     subseries codes. Ignored in equality so a manually-built id
-      #     without subseries set still equals a parsed one.
+      #     subseries codes. Ignored so a manually-built id without
+      #     subseries set still equals a parsed one. Derived, not spelled,
+      #     so it stays an atom of the pubid-scheme URN.
+      #   - parsed_format: records the input format for round-trip rendering
+      # `#weight` and the older `#matches?` read this list too.
       EQUALITY_IGNORED_ATTRS = %i[
         first_number second_number parsed_format subseries
       ].freeze
 
-      # Logical identity comparison: equal when every attribute except the
-      # build artifacts/aliases above matches. (Edition#== already ignores
-      # its rendering-only original_prefix.)
-      def ==(other)
-        return false unless other.instance_of?(self.class)
-
-        self.class.attributes.each_key.all? do |name|
-          EQUALITY_IGNORED_ATTRS.include?(name) || public_send(name) == other.public_send(name)
-        end
-      end
-
-      alias eql? ==
-
-      # A subset match skips the same attributes: `to_hash` drops the build
-      # artifacts, so an index row rebuilt by `from_hash` never has them.
-      def self.subset_ignored_attributes
-        EQUALITY_IGNORED_ATTRS
-      end
+      # The list above, plus the other input spellings that are facets of
+      # the pubid-scheme URN (issue #656): publisher_was_parsed and
+      # translation. (Edition ignores its rendering-only original_prefix
+      # the same way.)
+      equality_ignored(*EQUALITY_IGNORED_ATTRS, :publisher_was_parsed,
+                       :translation)
 
       # `edition` is the primary edition/revision carrier and is already in
       # the default %i[date year edition version] list. `update`/
@@ -252,13 +289,6 @@ module Pubid
       # what `edition`/`update` already do.)
       def self.all_parts_edition_keys
         super + %i[update update_component]
-      end
-
-      def hash
-        vals = self.class.attributes.each_key.reject do |name|
-          EQUALITY_IGNORED_ATTRS.include?(name)
-        end.map { |name| public_send(name) }
-        [self.class, *vals].hash
       end
 
       # Wildcard / partial-identifier match. Treats +self+ as a QUERY pattern
