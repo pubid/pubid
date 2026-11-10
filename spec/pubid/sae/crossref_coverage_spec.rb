@@ -169,7 +169,10 @@ RSpec.describe "SAE Crossref coverage" do
   end
 
   describe "rejects" do
+    # CP* codes are SAE J1349 "Certified Power" data products, not standards
+    # (pubid#686). relaton's SAE specs rely on SAE CPGM2016 failing to parse.
     ["SAE XYZ1", "SAE J3016_2021", "SAE CPGM1_16SPKMR8",
+     "SAE CPGM2016", "SAE CPGM2_15LFXCOCA",
      "SAE J3016_202113", "SAE J3016_202100",
      "SAE AMS4121J/2", "SAE USCAR2-6A"].each do |bad|
       it bad do

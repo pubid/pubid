@@ -12,8 +12,17 @@ Measured on the full deposit list (2026-11-04, 47,692 DOIs): **46,726
 parse**, and every parsed code round-trips through `to_s`, `from_hash` and
 the URN, with **0 `to_hash` collisions**. The 966 that do not parse are:
 
-- **791 CP\*** (`CPGM`, `CPFD`, `CPKW`, …): collected-paper products, not
-  standards. Out of scope by decision.
+- **791 CP\*** (`CPGM`, `CPFD`, `CPKW`, …): SAE "Certified Power" data
+  products — engine power/torque data certified under SAE J1349, one per
+  vehicle and level (`CPGM2_15LFXCOCA`: "J1349 Certified Power Engine Data
+  for GM as used in 2015 LFX Colorado/Canyon - Level 2"). The letters after
+  `CP` name the manufacturer (`GM`, `FD` Ford, `FC` FCA, …). They are data
+  products, not standards, and stay out of `TYPES` by decision (pubid#686).
+  `SAE CPGM2016` in pubid#686 is not a deposit: it is the synthetic DOI of
+  relaton's "reports a record pubid cannot parse" spec
+  (`spec/sae/relaton/sae/data_fetcher_spec.rb`), which, with
+  `bibliography_spec.rb` and `docs/sae.md`, relies on it failing to parse.
+  `spec/pubid/sae/crossref_coverage_spec.rb` pins the rejection.
 - **175 one-offs**, none more than 32 of a kind: `SUP1` supplements
   (`AS4468SUP1A`, `ARP4737SUP1`), language tails (`AS9101F_PTBR`,
   `IA9137_DEDE`), `J2534-2/10_5_00`, `_4Q2012`, type-less `SAE6857`,
