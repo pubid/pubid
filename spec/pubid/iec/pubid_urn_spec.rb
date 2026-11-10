@@ -4,11 +4,12 @@ require "spec_helper"
 
 # The IEC wave of the pubid-scheme URN (issue #670) completes the partial
 # schema the IEEE and GOST waves landed. Two invariants are load-bearing:
-# every atom this wave adds sits after the ones earlier waves placed, so a
+# every atom a wave adds sits after the ones earlier waves placed, so a
 # URN a landed wave publishes encodes identically; and the URN carries
-# exactly what to_hash carries — a WorkingDocument serializes only _type
-# (lib/pubid/iec/CLAUDE.md), so its URN is `urn:pubid:iec:wd`, and rows
-# that share that hash share it honestly (not a collision).
+# exactly what to_hash carries. Issue #687 closed the last identity gaps:
+# a WorkingDocument now serializes its committee/number/stage (and the
+# work-programme stage/type), so its URN is per document, and a
+# CISPR-bearing TestReportForm nests its document under `cispr-`.
 RSpec.describe "IEC pubid-scheme URN" do
   def expect_round_trip(string)
     id = Pubid::Iec.parse(string)
@@ -65,13 +66,41 @@ RSpec.describe "IEC pubid-scheme URN" do
     expect(Pubid.parse_urn(urn).to_hash).to eq(id.to_hash)
   end
 
-  it "emits the type-only WorkingDocument URN and reads it back" do
-    # to_hash is {"_type" => …} by pinned decision (unserialized identity
-    # attributes); every WD row shares one hash and one URN
+  it "emits one WorkingDocument URN per document and reads it back" do
+    # Issue #687: the working document's identity attributes serialize, so
+    # the document number sits in the positional core and the committee,
+    # language and stage ride atoms — the old shared type-only
+    # `urn:pubid:iec:wd` named 2,318 documents with one segment.
     id = Pubid::Iec.parse("1/2457/FDIS")
-    expect(id.to_hash).to eq("_type" => "pubid:iec:working-document")
-    expect(id.to_pubid_urn).to eq("urn:pubid:iec:wd")
-    expect(Pubid.parse_urn("urn:pubid:iec:wd").to_hash).to eq(id.to_hash)
+    expect(id.to_hash).to eq(
+      "_type" => "pubid:iec:working-document",
+      "number" => "2457",
+      "technical_committee" => "1",
+      "wd_stage" => "FDIS",
+    )
+    expect(id.to_pubid_urn).to eq("urn:pubid:iec:wd:2457:tc-1:wdstage-FDIS")
+    expect(Pubid.parse_urn(id.to_pubid_urn).to_hash).to eq(id.to_hash)
+  end
+
+  it "carries the working document's language and the work-programme form" do
+    expect(Pubid::Iec.parse("100/3705(F)/FDIS").to_pubid_urn)
+      .to eq("urn:pubid:iec:wd:3705:tc-100:wdlang-F:wdstage-FDIS")
+    expect(Pubid::Iec.parse("PWI TR 100-36 ED1").to_pubid_urn)
+      .to eq("urn:pubid:iec:wd:100:part-36:ed-1:wpstage-PWI:wptype-TR")
+    expect_round_trip("100/3705(F)/FDIS")
+    expect_round_trip("PWI TR 100-36 ED1")
+  end
+
+  it "nests the CISPR document of a test report form" do
+    # The form is about the CISPR document, not a wrapper of it (#687
+    # ruling): #root stays the form, and the document rides `cispr-` as a
+    # nested id.
+    id = Pubid::Iec.parse("IECEE TRF CISPR 11A:2008")
+    expect(id.to_pubid_urn)
+      .to eq("urn:pubid:iec:trf:pub-IECEE:year-2008:" \
+             "cispr-(iec:is:11A:pub-CISPR)")
+    expect(Pubid.parse_urn(id.to_pubid_urn).to_hash).to eq(id.to_hash)
+    expect(Pubid.parse_urn(id.to_pubid_urn).root).to eq(id.root)
   end
 
   it "gives a consolidated identifier only its ids list" do

@@ -11,6 +11,35 @@ module Pubid
         attribute :cispr_identifier, Identifier, polymorphic: true, default: -> {
         }
 
+        # The embedded CISPR document is part of the form's identity, so it
+        # serializes under its own key (issue #687 — before it, a
+        # CISPR-bearing TRF hashed to just its publisher and year and never
+        # matched after a from_hash round trip). The converter shape is
+        # VapIdentifier#base_to_kv / #base_from_kv: the nested identifier
+        # carries its own polymorphic `_type`, so to_hash embeds the nested
+        # hash and from_hash dispatches back through the type map.
+        key_value do
+          map "cispr_identifier",
+              with: { to: :cispr_identifier_to_kv,
+                      from: :cispr_identifier_from_kv }
+        end
+
+        def cispr_identifier_to_kv(model, doc)
+          cispr = model.cispr_identifier
+          return unless cispr
+
+          doc.add_child(
+            Lutaml::KeyValue::DataModel::Element.new("cispr_identifier",
+                                                     cispr.to_hash),
+          )
+        end
+
+        def cispr_identifier_from_kv(model, value)
+          if value
+            model.cispr_identifier = ::Pubid::Iec::Identifier.from_hash(value)
+          end
+        end
+
         # TRF has type abbreviation for parsing
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(

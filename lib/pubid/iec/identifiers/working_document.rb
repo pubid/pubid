@@ -11,11 +11,27 @@ module Pubid
       #   Working Document: "100/3705(F)/FDIS"
       class WorkingDocument < Base
         attribute :technical_committee, :string, default: -> {}
-        attribute :wd_number, :string, default: -> {}
         attribute :wd_language, :string, default: -> {}
         attribute :wd_stage, :string, default: -> {}
         attribute :wp_stage, :string, default: -> {}
         attribute :wp_type, :string, default: -> {}
+
+        # The working document's identity attributes are plain strings, so no
+        # converter is needed: lutaml writes the scalar, and
+        # ::Pubid::Identifier#to_hash drops a nil (the `-> {}` defaults are
+        # nil). This is the serialization that issue #687 restored — before
+        # it, `to_hash` was `{"_type" => "pubid:iec:working-document"}` alone,
+        # all 2,318 working documents shared one hash and one URN
+        # (`urn:pubid:iec:wd`), and no row of this class ever matched after a
+        # from_hash round trip.
+        key_value do
+          map "technical_committee", to: :technical_committee,
+                                     render_default: false
+          map "wd_language", to: :wd_language, render_default: false
+          map "wd_stage", to: :wd_stage, render_default: false
+          map "wp_stage", to: :wp_stage, render_default: false
+          map "wp_type", to: :wp_type, render_default: false
+        end
 
         # Working documents have no TYPED_STAGES - they use PROJECT_STAGES only
         TYPED_STAGES = [].freeze
@@ -29,14 +45,15 @@ module Pubid
         end
 
         # A working document prints its committee, number, language and stage —
-        # `1/2457(F)/FDIS` — and none of those is the `number` the shared token
-        # table looks for, so it had no annotatable token. `wd_stage` is the
-        # printed stage token ("FDIS"); the derived `#stage` reader covers only
-        # the PWI/PNW work-programme form and is nil here.
+        # `1/2457(F)/FDIS` — and the document number is the inherited
+        # `number` (issue #687: it used to sit in a parallel `wd_number`
+        # attribute that nothing serialized). `wd_stage` is the printed stage
+        # token ("FDIS"); the derived `#stage` reader covers only the PWI/PNW
+        # work-programme form and is nil here.
         def annotation_tokens
           super + [
             [:technical_committee, "docnumber"],
-            [:wd_number, "docnumber"],
+            [:number, "docnumber"],
             [:wd_language, "language"],
             [:wd_stage, "stage"],
             [:wp_stage, "stage"],

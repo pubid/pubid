@@ -85,7 +85,9 @@ attributes, so each class can own a rule. The measurement matters:
   `WorkingDocument` fields (111), ISO `original_abbr`.
 - A `to_hash` subset failed 12. But the hash view is blind in the other
   direction: IEC `1/2457/FDIS` serializes to `{"_type"}` alone, so a hash subset
-  matched every working document to every other one.
+  matched every working document to every other one. (Both halves of this
+  measurement are history now: issue #687 mapped the `WorkingDocument` fields,
+  so the id serializes its identity and no two of them share a hash.)
 
 The object walk plus a few hooks gets both right.
 

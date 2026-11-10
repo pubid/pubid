@@ -484,9 +484,27 @@ module Pubid
             end
           end
 
-        when :technical_committee, :subcommittee, :wd_number, :wd_stage, :wd_language, :wp_stage, :wp_type
+        when :technical_committee, :subcommittee, :wd_stage, :wd_language, :wp_stage
           # Working document/programme fields - just return as string
           value.to_s
+
+        when :wd_number
+          # The working document's own number IS the inherited `number`
+          # (issue #687, the "prefer the inherited attribute over a parallel
+          # one" rule): `root.number`, the index key and `to_hash` all read
+          # `number`, so a parallel `wd_number` attribute left every working
+          # document keyed on the empty string. The returned hash routes the
+          # value through assign_attributes onto `number`.
+          { number: value.to_s }
+
+        when :wp_type
+          # The grammar captures a trailing space ("PWI TR 100-36" → "TR ");
+          # the renderer used to strip it at print time. Strip at the
+          # construction site instead, so the stored value — and therefore
+          # to_hash and the URN — is what renders. An all-space value drops
+          # out entirely (nil is skipped by assign_attributes).
+          stripped = value.to_s.strip
+          stripped.empty? ? nil : stripped
 
         when :cispr_identifier
           # CISPR identifier object for TRF

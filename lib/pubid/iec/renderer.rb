@@ -208,8 +208,10 @@ module Pubid
           # International Standard, so rendering would not be a fixed point.
           parts = []
           parts << id.wp_stage
-          if id.wp_type && !id.wp_type.strip.empty?
-            parts << " #{id.wp_type.strip}"
+          if id.wp_type && !id.wp_type.empty?
+            # wp_type is stripped at the construction site (Builder#cast),
+            # so the stored value is what renders.
+            parts << " #{id.wp_type}"
           end
 
           if id.number
@@ -226,8 +228,10 @@ module Pubid
         parts = []
         parts << id.technical_committee if id.technical_committee
 
-        if id.wd_number
-          num_part = id.wd_number.to_s
+        # The working document's own number is the inherited `number`
+        # (issue #687).
+        if id.number
+          num_part = id.number.to_s
           num_part += "(#{id.wd_language})" if id.wd_language
           parts << num_part
         end
