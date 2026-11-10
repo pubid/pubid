@@ -1553,22 +1553,30 @@ Corpus: 12331 of 12331 pass ids parse.
 | `pubid:iec:working-document` | `wd` | number | 2350 | `1/2457/FDIS`
 |===
 
-Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `part-` (`part`), `subpart-` (`subpart`), `year-` (`year`), `month-` (`month`), `ed-` (`edition`), `lang-` (`languages.*.code`, list), `database-` (`database`, bool), `fragmentnumber-` (`fragment_number`), `sheetnumber-` (`sheet_number`), `sheetyear-` (`sheet_year`), `undated-` (`undated`, bool), `vap-` (`vap`, list).
+Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `part-` (`part`), `subpart-` (`subpart`), `year-` (`year`), `month-` (`month`), `ed-` (`edition`), `lang-` (`languages.*.code`, list), `database-` (`database`, bool), `fragmentnumber-` (`fragment_number`), `sheetnumber-` (`sheet_number`), `sheetyear-` (`sheet_year`), `undated-` (`undated`, bool), `vap-` (`vap`, list), `tc-` (`technical_committee`), `wdlang-` (`wd_language`), `wdstage-` (`wd_stage`), `wpstage-` (`wp_stage`), `wptype-` (`wp_type`).
 
-Nested identifiers: `ids-(…)` (`identifiers`, ids).
+Nested identifiers: `ids-(…)` (`identifiers`, ids), `cispr-(…)` (`cispr_identifier`, id).
 
 *Landed (issue #670)* — the wave declares all 26 types and keeps every
 earlier wave's atom in its place (`database` moves to the bool the corpus
 serializes, before any URN carried it; `frag-`/`sheet-`/`sheetyear-`/`vap-`
 sit after `database`, before `lang-`, whose landed URNs never move). All
-12,330 corpus rows emit. The URN inherits two identity gaps exactly as
-`to_hash` has them (pinned in `lib/pubid/iec/CLAUDE.md`, unserialized
-identity attributes are a separate wire-format decision): a
-WorkingDocument serializes only `_type`, so its URN is `urn:pubid:iec:wd`
-and all 2,350 WD rows share that one hash — a shared hash, not a collision;
-and a TestReportForm's CISPR document sits in the unserialized
+12,330 corpus rows emit. The wave inherited two identity gaps exactly as
+`to_hash` had them (pinned in `lib/pubid/iec/CLAUDE.md`): a
+WorkingDocument serialized only `_type`, so its URN was `urn:pubid:iec:wd`
+and all 2,350 WD rows shared that one hash — a shared hash, not a collision;
+and a TestReportForm's CISPR document sat in the unserialized
 `cispr_identifier`. A wrapper's month/day leak (`iec-wrapper-month-day-leak`
 in `lib/pubid/iec/CLAUDE.md`) rides the URN as it rides the hash.
+
+*Closed (issue #687)* — the two gaps are gone: the working document's
+committee, language, stage and work-programme stage/type serialize, the
+document number sits in the positional core, and a CISPR-bearing
+TestReportForm nests its document under `cispr-` (the form stays `#root` —
+a TRF is about the CISPR document, not a wrapper of it). The new atoms sit
+after `vap-` and before `lang-`, so no landed URN moves; the working
+document goes from the shared type-only form to one URN per document
+(`urn:pubid:iec:wd:2457:tc-1:wdstage-FDIS`).
 
 Facet candidates (spelling-only): `languages.*.original_code`.
 

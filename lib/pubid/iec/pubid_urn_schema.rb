@@ -16,13 +16,15 @@ module Pubid
     # published URNs are unchanged. `database` was a string atom before any
     # URN carried it — the corpus holds only `true`, so it is a bool.
     #
-    # Known identity gaps the URN inherits, because it carries exactly what
-    # to_hash carries (pinned in lib/pubid/iec/CLAUDE.md): a WorkingDocument
-    # serializes only `_type`, and a TestReportForm's CISPR document sits in
-    # the unserialized `cispr_identifier` — such rows emit type-only URNs
-    # (`urn:pubid:iec:wd`) and are one hash, so they are not a collision.
-    # Mapping them is a wire-format change and stays the separate decision
-    # it already was. The official RFC 5141-style urn:iec:std: form stays
+    # The identity gaps this schema used to inherit are closed (issue #687):
+    # the working document's committee/number/language/stage and work-programme
+    # stage/type serialize (`tc-`, `wdlang-`, `wdstage-`, `wpstage-`,
+    # `wptype-`, with the document number in the positional core), and a
+    # TestReportForm's CISPR document rides `cispr-` as a nested id — so a
+    # working document URNs per document instead of the shared type-only
+    # `urn:pubid:iec:wd` it used to be. The new atoms sit after `vap-` and
+    # before `lang-`, per the invariant below, so every landed URN encodes
+    # identically. The official RFC 5141-style urn:iec:std: form stays
     # on #to_urn.
     PubidUrnSchema = Pubid::PubidUrn.define("iec") do
       atom "publisher", "pub"
@@ -41,6 +43,12 @@ module Pubid
       atom "sheet_number", "sheet"
       atom "sheet_year", "sheetyear"
       atom "vap", "vap", kind: :list
+      atom "technical_committee", "tc"
+      atom "wd_language", "wdlang"
+      atom "wd_stage", "wdstage"
+      atom "wp_stage", "wpstage"
+      atom "wp_type", "wptype"
+      atom "cispr_identifier", "cispr", kind: :id
       atom "languages.*.code", "lang"
       atom "identifiers", "ids", kind: :ids
 
