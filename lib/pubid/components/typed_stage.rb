@@ -8,12 +8,7 @@ module Pubid
     # URN render: stage code (RFC 5141-bis: stage-XX.XX format handled by urn_generator).
     class TypedStage < Lutaml::Model::Serializable
       include ::Pubid::SubsetMatch
-
-      # `original_abbr` records the input spelling ("Amd" or "AMD"), not the
-      # stage, so a subset match skips it.
-      def self.subset_ignored_attributes
-        %i[original_abbr]
-      end
+      include ::Pubid::EqualityIgnored
 
       attribute :name, :string
       attribute :code, :string
@@ -24,6 +19,12 @@ module Pubid
       attribute :original_abbr, :string
       attribute :short_abbr, :string
       attribute :long_abbr, :string
+
+      # `original_abbr` records the input spelling ("Amd.", "AMD", "DAmd"),
+      # not the stage, so `==`, `hash` and `===` skip it (issue #656). It is
+      # not serialized: the parse path keeps the input spelling and
+      # `from_hash` rebuilds the canonical one, and the two ids must be ==.
+      equality_ignored :original_abbr
 
       def to_stage
         Stage.new(

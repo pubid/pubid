@@ -169,9 +169,7 @@ module Pubid
     # Exactness composes rather than flattening: a nested value that
     # includes this module is matched in BOTH directions with its own
     # `===`, so the class that owns it keeps its rule. A plain `==` would
-    # override it — `Components::TypedStage` ignores `original_abbr`
-    # (the input spelling, `Amd` against `AMD`), and CEN/CENELEC declares
-    # `typed_stage` strict.
+    # override it — CEN/CENELEC declares `typed_stage` strict.
     # @return [Boolean]
     def self.exact_match?(mine, theirs)
       return true if blank?(mine) && blank?(theirs)
