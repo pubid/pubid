@@ -35,5 +35,7 @@ Gem::Specification.new do |spec|
   # `edition` records "v1"/"v2" in the artifact envelope — 1.3.114
   # introduced the field. 1.4 is the next minor line.
   spec.add_dependency "parsanol", "~> 1.3.122"
+  # Bundled gem required by lib code: benchmark in lib/tasks/benchmark.rake (metanorma/metanorma#669)
+  spec.add_dependency "benchmark"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
