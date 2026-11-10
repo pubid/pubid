@@ -143,3 +143,18 @@
     (`data/parg/iso.parg`) must move together — the twin is the embedded
     source's provenance copy.
 
+- **`typed_stage.original_abbr` is spelling, so `==` skips it (issue #656).**
+  The parse path stores the input token (`Amd.`, `COR`, `DAmd`, `pDCOR`) and
+  `stage_from_kv` stores the canonical one (`Amd`, `Cor`, `DAM`); the value is
+  not serialized. Before the fix, 90 pass ids (supplements, Directives,
+  Guides, `ISO/NWIP`) were not `==` after `from_hash(to_hash)`, so
+  `#matches?` against an index row returned false with no error. ISO cannot
+  delete the write as JCGM and IEC did, because `detect_stage_format_long`
+  reads it. `Components::TypedStage` now declares
+  `equality_ignored :original_abbr`. Since `to_s` reads the value, two `==`
+  ids may render differently, which the #656 rule allows. Locked by
+  `spec/pubid/iso/typed_stage_round_trip_spec.rb`.
+  **Still open, and not covered by that spec**: 14 pass ids stay unequal for
+  another reason — `DirectivesSupplement#supplement_publisher` is an
+  `Iso::Components::Publisher` after `parse` and a `Pubid::Components::Publisher`
+  after `from_hash` (11 supplements, 3 bundles).

@@ -117,10 +117,8 @@ the parsed identifier.
 
 **Exactness composes; it does not flatten.** A strict value that is itself
 a component is matched in both directions with its own `===`, so the class
-that owns it keeps its rule. A plain `==` would override it:
-`Components::TypedStage` ignores `original_abbr` (the input spelling, `Amd`
-against `AMD`) and CEN/CENELEC declares `typed_stage` strict, so a flat
-comparison would read the spelling as identity. A strict collection is
+that owns it keeps its rule. A plain `==` would override it: CEN/CENELEC
+declares `typed_stage` strict. A strict collection is
 compared element by element under the same rule.
 
 In use, with the pair each flavor was losing:
@@ -203,7 +201,7 @@ In use:
 | Class | Hook | Reason |
 |---|---|---|
 | `Nist::Identifiers::Base` | ignores `EQUALITY_IGNORED_ATTRS` | the build artifacts that `==` also skips; not serialized |
-| `Components::TypedStage` | ignores `original_abbr` | input spelling (`Amd`/`AMD`) |
+| `Components::TypedStage` | ignores `original_abbr` (declared with `equality_ignored`, so `==` and `hash` skip it too) | input spelling (`Amd.`/`Amd`/`AMD`); not serialized, so `from_hash` rebuilds the canonical one |
 | `Itu::Identifiers::Supplement` | ignores `number_glued`, `slash_joined`; skips `sector`/`series`/`code`/`series_word` when `base` is set | mirrors its `==`: rendering flags, and unserialized copies of `base` |
 | `Oasis::Identifier` | ignores `original` | verbatim slug; its `#exclude` clears it for the same reason |
 | `Csa::SingleIdentifier` | skips the year format flags when `year` is nil, `original_reaffirmation_4digit` when `reaffirmation` is nil | default is stated |
