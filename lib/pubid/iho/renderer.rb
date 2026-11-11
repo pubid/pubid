@@ -19,6 +19,13 @@ module Pubid
     #                                   beside an edition is the date
     #                                   qualifier on standards,
     #                                   parenthesized — the only year face
+    #   "IHO S-4 B-401"                 the S-4 spec citation (the long
+    #                                   form "S-4 Part B, Section 400"
+    #                                   parses to the same identity and
+    #                                   renders compact: the citation
+    #                                   replaces the Part face; the
+    #                                   section is derivable, never
+    #                                   printed)
     #
     # The renderer is registered as the `:human` format in the IHO format
     # registry and invoked via `render(format: :human)`; the compact face
@@ -32,12 +39,17 @@ module Pubid
       # edition (+ parenthesized year) right after it; the appendix joins
       # its subnumber; the issue rides parenthesized after its volume;
       # the base year prints only as the parenthesized with-year
-      # qualifier.
+      # qualifier. The S-4 spec citation face (" B-401") sits where the
+      # Part face sits — it REPLACES the Part face when a spec is
+      # present (the citation letter is the part), printing
+      # "<letter>-<number>" with the dotted sub and the parenthesized
+      # variant folded on.
       FACES = [
         [:edition, " %s"],
         [:supplement, " Sup %s"], [:supplement_edition, " %s"],
         [:supplement_year, " (%s)"],
         [:part, " Part %s"], [:part_edition, " %s"], [:part_year, " (%s)"],
+        [:spec, " %s"],
         [:annex, " Annex %s"], [:annex_edition, " %s"], [:annex_year, " (%s)"],
         [:appendix, " Appendix %s"], [:appendix_subnumber, "-%s"],
         [:appendix_edition, " %s"], [:appendix_year, " (%s)"],
@@ -50,10 +62,35 @@ module Pubid
         id = @id
         rendered = "#{id.publisher} #{id.class.type[:short]}-#{id.number}"
         FACES.each do |component, face|
-          value = id.public_send(component)
+          value = face_value(id, component)
           rendered << (face % value) if value
         end
         rendered
+      end
+
+      private
+
+      # nil = the face does not print. The citation face replaces the
+      # Part face (same containment slot: the citation letter IS the
+      # part), and it prints only on a spec citation.
+      def face_value(id, component)
+        if component == :spec
+          return nil unless id.spec
+
+          return spec_citation(id)
+        end
+        return nil if component == :part && id.spec
+
+        id.public_send(component)
+      end
+
+      # "B-401", "B-122.1", "B-521(I)", "B-351.1(I)" — the citation the
+      # S-4 contents and cross-references print.
+      def spec_citation(id)
+        citation = "#{id.part}-#{id.spec}"
+        citation << ".#{id.spec_sub}" if id.spec_sub
+        citation << "(#{id.spec_variant})" if id.spec_variant
+        citation
       end
     end
   end

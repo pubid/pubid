@@ -194,3 +194,23 @@ IHO P-1 Vol. 30 (2)
 IHO P-1 Vol. 30 Issue 2
 # a two-segment version is not a tail discriminator:
 IHO B-12 3.0
+# pubid#691 - the S-4 loose-leaf section/spec citations. The compact
+# citation is canonical; the long ("Part B, Section 400") and bare
+# ("B-401", implicit S-4 anchor) forms are normalizing parses of the
+# same identity, recorded as `!input!rendered` rows. B-400 is the
+# section-level citation; B-170 is a reserved number ("NOT CURRENTLY
+# USED" in the contents) that parses and resolves AS RESERVED.
+IHO S-4 B-401
+IHO S-4 4.10.0 B-401
+IHO S-4 B-122.1
+IHO S-4 B-521(I)
+IHO S-4 B-351.1(I)
+IHO S-4 B-400
+IHO S-4 B-170
+!B-401!IHO S-4 B-401
+!IHO B-401!IHO S-4 B-401
+!B-122.1!IHO S-4 B-122.1
+!B-521(I)!IHO S-4 B-521(I)
+!S-4 Part B, Section 400!IHO S-4 B-400
+!IHO S-4 Part B, Section 400!IHO S-4 B-400
+!S-4 Part B, Section 400, B-401!IHO S-4 B-401

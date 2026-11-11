@@ -66,4 +66,36 @@ RSpec.describe "IHO pubid-scheme URN" do
     expect(Pubid::Iho.parse("IHO S-44 5.0.0").to_pubid_urn)
       .to start_with("urn:pubid:iho:")
   end
+
+  # The S-4 loose-leaf spec citation (issue #691): the citation letter
+  # rides the part- atom, the spec and its sub/variant are the atoms
+  # after it, and the section is never an atom (derivable).
+  describe "S-4 spec citations" do
+    {
+      "IHO S-4 B-401" => "urn:pubid:iho:std:4:part-B:spec-401",
+      "IHO S-4 4.10.0 B-401" =>
+        "urn:pubid:iho:std:4:ed-4.10.0:part-B:spec-401",
+      "IHO S-4 B-122.1" => "urn:pubid:iho:std:4:part-B:spec-122:specsub-1",
+      "IHO S-4 B-521(I)" => "urn:pubid:iho:std:4:part-B:spec-521:specvar-I",
+      "IHO S-4 B-351.1(I)" =>
+        "urn:pubid:iho:std:4:part-B:spec-351:specsub-1:specvar-I",
+      "IHO S-4 B-400" => "urn:pubid:iho:std:4:part-B:spec-400",
+      "IHO S-4 B-170" => "urn:pubid:iho:std:4:part-B:spec-170",
+      "B-401" => "urn:pubid:iho:std:4:part-B:spec-401", # the bare form
+      "S-4 Part B, Section 400" => "urn:pubid:iho:std:4:part-B:spec-400",
+    }.each do |input, urn|
+      it "renders #{input} as #{urn}" do
+        expect(Pubid::Iho.parse(input).to_pubid_urn).to eq(urn)
+      end
+
+      it "round-trips #{input}" do
+        expect_round_trip(input)
+      end
+    end
+
+    it "emits no section atom for a spec citation" do
+      expect(Pubid::Iho.parse("IHO S-4 B-401").to_pubid_urn)
+        .not_to include("section")
+    end
+  end
 end

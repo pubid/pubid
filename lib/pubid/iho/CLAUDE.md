@@ -96,6 +96,58 @@ The compact face (`compact: true`) folds the code-adjacent components
 onto the code: supplement and part hyphenated, volume as the slash
 chain — `IHO M-2-2`, `IHO S-100-2 5.0.0`, `IHO P-5/2024`.
 
+## S-4 loose-leaf sections and specs (owner rulings, 2026-11-11)
+
+The S-4 loose-leaf publication (Parts A/B/C → Sections 100-600, Part C
+100-500 → Regulations/Specifications cited `<letter>-<hundreds><seq>`)
+is modeled ONE COMPONENT DEEP, not two tiers: the spec number IS the
+leaf. `B-401` binds the letter into `part` ("B") and the number into
+`spec` ("401"); the SECTION (the hundreds digit) is DERIVED —
+`#spec_section` (`B-401` → `"400"`) — never stored, never emitted, and
+the `00` slot (B-400) IS the section-level citation, so `S-4 Part B,
+Section 400` ≡ `IHO S-4 B-400` (one identity, two spellings).
+
+| component    | attribute    | canonical face      | parse-only forms                    |
+|--------------|--------------|---------------------|-------------------------------------|
+| spec         | `spec`       | `B-401` (with part) | the spelled section (", Section 400") |
+| spec sub     | `spec_sub`   | `.1`                | —                                   |
+| spec variant | `spec_variant` | `(I)`             | —                                   |
+
+- **Faces**: canonical compact `IHO S-4 B-401` (dated:
+  `IHO S-4 4.10.0 B-401` — the edition precedes the citation, as it
+  precedes the part). The citation face REPLACES the Part face in the
+  renderer (`compact: true` is a no-op on it — it is already compact).
+  Subs and variants combine (`B-351.1(I)` is in the 4.9.0 text).
+- **Three forms parse to one identity**: the anchored citation, the
+  LONG form `S-4 Part B, Section 400[, B-401]` (normalizing parse; the
+  spelled section becomes `spec` alone, and beside a citation it only
+  cross-checks the citation's derived section — "Section 500, B-401"
+  raises) and the BARE `B-401` (implicit S-4 anchor; B only — bare
+  C-x stays the Circular Letter series, and the 3-digit `[1-6]xx`
+  shape keeps the B Bibliographic series (B-12) on the main branch).
+  `IHO B-401` (publisher + bare) parses to the spec too.
+- **The anchor is load-bearing**: a spec citation requires the S-4
+  anchor (series S number 4 — the builder raises otherwise), a
+  lettered Part (A/B/C, not a numbered part), and no component
+  editions or S-4-foreign components (supplement/annex/appendix/
+  volume/issue); the citation letter must agree with a Part-rule
+  capture.
+- **Reserved numbers** (`B-170`, `B-230`, `B-305`, `B-323` — "NOT
+  CURRENTLY USED" in the Ed 4.9.0 and 4.10.0 contents) parse and
+  resolve AS RESERVED, never invalid: `#reserved?` answers from
+  `data/iho/s4-reserved-specs.yaml` (edition-keyed, provenance in the
+  file; an edition-less reference is reserved when ANY seeded edition
+  reserves the number). `lib/pubid/iho/reserved_specs.rb` is the
+  loader (`Pubid::Iho::ReservedSpecs`).
+- **URN atoms**: the citation is a child of its part — the letter rides
+  the existing `part-` atom (case preserved: `part-B`, never the
+  lowercase `part-b` sketch), then `spec-`, `specsub-`, `specvar-`
+  (the `appsub-` naming convention; the `:sub-1`/`:variant-i` in the
+  ruling's sketch are these atoms). `urn:iho:s:4:ed-4.10.0:part-B:
+  spec-401`; the section is not emitted. No `ed-`/`year-` after a
+  spec node (UrnParseError — the spec rides its publication's
+  edition); `specsub-`/`specvar-` only after `spec-`.
+
 ## Identity semantics
 
 - The components are identity-bearing in `==`/`matches?`; a bare
