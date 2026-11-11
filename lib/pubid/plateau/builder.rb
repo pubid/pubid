@@ -34,6 +34,10 @@ module Pubid
         if parsed[:edition] && klass == Identifiers::Handbook
           params[:edition] = parsed[:edition].to_s
         end
+        # The grammar accepts an ASCII "+"; MLIT prints the full-width "＋".
+        if parsed[:volume] && klass == Identifiers::Handbook
+          params[:volume] = parsed[:volume].to_s.tr("+", "＋")
+        end
 
         klass.new(**params)
       end
