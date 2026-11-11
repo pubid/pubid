@@ -39,6 +39,8 @@ module Pubid
           build_si_brochure_section(data[:si_brochure_section])
         elsif data.key?(:si_brochure_ordinal_edition)
           build_si_brochure_ordinal_edition(data[:si_brochure_ordinal_edition])
+        elsif data.key?(:si_brochure_bare_edition)
+          build_si_brochure_bare_edition(data[:si_brochure_bare_edition])
         elsif data[:mep]
           build_mep(data[:mep])
         elsif data[:guide]
@@ -119,7 +121,7 @@ module Pubid
           number: node[:edition].to_s,
           edition: node[:edition].to_s,
           version: node[:version]&.to_s,
-          years: node[:years].to_s,
+          years: node[:years]&.to_s,
           language: Identifier.normalize_language(node[:language]),
         )
       end
@@ -145,6 +147,23 @@ module Pubid
       # it stays nil and drops from the serialized hash (a partial reference).
       def build_si_brochure_ordinal_edition(node)
         edition = "#{node[:ordinal_edition].to_s.sub(/(st|nd|rd|th)\z/, "")}e"
+        Identifiers::SiBrochure.new(
+          number: edition,
+          edition: edition,
+          years: node[:year]&.to_s,
+          language: Identifier.normalize_language(node[:language]),
+        )
+      end
+
+      # The unmerged si-brochure-id proposal spells the edition as a bare
+      # number ("SI Brochure 9 (2024) (F)"); the guide's canonical edition
+      # carries the trailing "e", so the bare number normalizes onto it the
+      # same way the corpus-cited ordinal spelling does. The proposal puts the
+      # year and the language in separate parentheses; they map onto the same
+      # attributes the canonical form prints, and an absent year stays nil (a
+      # partial reference, like "SI Brochure 9th edition" without a year).
+      def build_si_brochure_bare_edition(node)
+        edition = "#{node[:bare_edition]}e"
         Identifiers::SiBrochure.new(
           number: edition,
           edition: edition,

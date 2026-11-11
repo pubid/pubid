@@ -68,15 +68,18 @@ RSpec.describe Pubid::Bipm::Identifier do
         expect(subject.group).to eq("CCL")
         expect(subject.type_code).to eq("REC")
         expect(subject.language).to eq("F")
-        expect(subject.to_s).to eq("Recommandation 1 du CCL (2001)")
+        # The guide's body-prefixed pattern is the canonical French long
+        # face (ruling of 2026-11-11); the connective spelling is a
+        # parse-in alias of it.
+        expect(subject.to_s).to eq("Recommandation CCL/1 (2001)")
       end
     end
 
     context "French connective for the feminine CGPM" do
       subject { described_class.parse("Résolution 1 de la CGPM (1927)") }
 
-      it "renders 'de la' for CGPM" do
-        expect(subject.to_s).to eq("Résolution 1 de la CGPM (1927)")
+      it "normalizes onto the body-prefixed canonical" do
+        expect(subject.to_s).to eq("Résolution CGPM/1 (1927)")
       end
     end
 
@@ -102,7 +105,9 @@ RSpec.describe Pubid::Bipm::Identifier do
       end
 
       it "builds a URN without raising" do
-        expect(subject.to_urn.to_s).to eq("urn:bipm:cipm::2005-06")
+        # The v1 version segment leads the official face; the type segment
+        # stays empty for the type-less bare MRA form.
+        expect(subject.to_urn.to_s).to eq("urn:bipm:v1:cipm::2005-06")
       end
 
       it "carries an optional publication year when present" do

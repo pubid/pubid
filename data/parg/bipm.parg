@@ -4,9 +4,11 @@
 # from gem-extracted tables (bipm_*.yaml), longest-first.
 #
 # Edition-2 conversion. The builder dispatches on the branch-wrapper
-# keys (committee_short, committee_long_en, committee_long_fr,
-# committee_bare, meeting_en, meeting_fr, metrologia, si_brochure,
-# si_brochure_variant, si_brochure_section, mep, guide), so every
+# keys (committee_short, committee_prefixed, committee_long_en,
+# committee_long_fr, committee_bare, meeting_en, meeting_fr,
+# metrologia, si_brochure, si_brochure_variant, si_brochure_section,
+# si_brochure_ordinal_edition, si_brochure_bare_edition, mep, guide),
+# so every
 # wrapper is kept as a v1-shaped capture whose value is the inner-leaf
 # hash (or the bare scalar for the journal-level Metrologia record) and
 # binds uncast with the (raw) type; the leaves additionally bind flat.
@@ -149,17 +151,26 @@ grammar PubidBipm version "0.1.0" edition 2 {
         ["sur le SI" space]
         edition
         [space version]
-        space
-        "(" years [(", " lang)] ")"
+        [
+          space
+          (
+            "(" years [(", " lang)] ")"
+            / "(" lang ")"
+          )
+        ]
       ) as si_brochure
     )
   }
-  # The guide's language-independent form drops the language code and the
-  # version is optional ("SI Brochure 9e (2019, E)"); the guide's French
-  # publication identifier leads with "Brochure sur le SI" instead of the
-  # English brochure name. All render in the canonical "BIPM SI Brochure …"
-  # spelling. The corpus-cited ordinal-edition spelling normalizes the
-  # English "9th edition" onto the canonical "9e" edition value.
+  # The language-independent form drops the language code and the version is
+  # optional ("SI Brochure 9e (2019, E)"); the guide's French publication
+  # identifier leads with "Brochure sur le SI" instead of the English brochure
+  # name. A language code may also stand alone in the parens, and the whole
+  # parenthetical is optional: the bare-number alias below and the year-less
+  # ordinal spelling both name an edition with no year, and their canonical
+  # render ("BIPM SI Brochure 9e") has to re-parse. All render in the
+  # canonical "BIPM SI Brochure …" spelling. The corpus-cited ordinal-edition
+  # spelling normalizes the English "9th edition" onto the canonical "9e"
+  # edition value.
   si_brochure_ordinal_edition = {
     (
       (
@@ -170,6 +181,22 @@ grammar PubidBipm version "0.1.0" edition 2 {
         "edition"
         [(space year_paren)]
       ) as si_brochure_ordinal_edition
+    )
+  }
+  # The unmerged si-brochure-id proposal's bare-number edition spellings
+  # ("SI Brochure 9", "SI Brochure 9 (E)", "SI Brochure 9 (2024) (F)"): the
+  # edition carries no trailing "e", and the year and the language may each
+  # sit in their own parentheses. A parse-in alias of the canonical "9e"
+  # edition — the builder appends the "e" the proposal drops.
+  si_brochure_bare_edition = {
+    (
+      (
+        "SI Brochure"
+        space
+        (1*digit) as bare_edition
+        [(space "(" year ")")]
+        [(space "(" lang ")")]
+      ) as si_brochure_bare_edition
     )
   }
   brochure_variant = (("Appendix" space (1*digit)) / "Concise" / "FAQ") as variant
@@ -219,6 +246,7 @@ grammar PubidBipm version "0.1.0" edition 2 {
     / si_brochure_variant
     / si_brochure_section
     / si_brochure_ordinal_edition
+    / si_brochure_bare_edition
     / mep
     / guide
     / committee_long_fr
@@ -239,6 +267,7 @@ grammar PubidBipm version "0.1.0" edition 2 {
     metrologia -> metrologia (raw)
     si_brochure -> si_brochure (raw)
     si_brochure_ordinal_edition -> si_brochure_ordinal_edition (raw)
+    si_brochure_bare_edition -> si_brochure_bare_edition (raw)
     si_brochure_variant -> si_brochure_variant (raw)
     si_brochure_section -> si_brochure_section (raw)
     mep -> mep (raw)
@@ -262,6 +291,7 @@ grammar PubidBipm version "0.1.0" edition 2 {
     report_code -> report_code (string)
     guide_kind -> guide_kind (string)
     ordinal_edition -> ordinal_edition (string)
+    bare_edition -> bare_edition (string)
   }
 
   test {
@@ -285,6 +315,11 @@ grammar PubidBipm version "0.1.0" edition 2 {
     accept "SI Brochure 9e (2019, E)"
     accept "Brochure sur le SI 9e v3.01 (2019/2024, F)"
     accept "SI Brochure 9th edition (2019)"
+    accept "SI Brochure 9"
+    accept "SI Brochure 9 (E)"
+    accept "SI Brochure 9 (2024) (F)"
+    accept "BIPM SI Brochure 9e"
+    accept "BIPM SI Brochure 9e (E)"
     reject "nonsense"
   }
 }

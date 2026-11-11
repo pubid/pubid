@@ -31,8 +31,15 @@ module BipmLooseSpec
     "CIPM 111e Réunion (2022)" => "CIPM 111<sup>e</sup> réunion (2022)",
     "CCAUV 10e réunion (2015)" => "CCAUV 10<sup>e</sup> réunion (2015)",
     # A French type name in the group-leading (English) word order.
-    "CIPM Décision 101-1 (2012)" => "Décision 101-1 du CIPM (2012)",
-    "CGPM Résolution 1 (1889)" => "Résolution 1 de la CGPM (1889)",
+    # The canonical French long face is the guide's body-prefixed pattern
+    # (ruling of 2026-11-11); both the connective and the group-leading
+    # word orders normalize onto it.
+    "CIPM Décision 101-1 (2012)" => "Décision CIPM/101-1 (2012)",
+    "CGPM Résolution 1 (1889)" => "Résolution CGPM/1 (1889)",
+    "Décision 101-1 du CIPM (2012)" => "Décision CIPM/101-1 (2012)",
+    "Résolution 1 de la CGPM (1889)" => "Résolution CGPM/1 (1889)",
+    "Recommandation 43-1 du JCRB (2021)" =>
+      "Recommandation JCRB/43-1 (2021)",
     # The historic committee name.
     "CCDS Recommendation 2 (2009)" => "CCTF Recommendation 2 (2009)",
     "CCDS REC 2 (2009)" => "CCTF REC 2 (2009)",
@@ -53,7 +60,7 @@ module BipmLooseSpec
     # renderer emitted a corrupt "CGPM  1 (1971)". BIPM's source data prints
     # DECL as "Statement" in both languages, which is what they normalize to.
     "CGPM Declaration 1 (1971)" => "CGPM Statement 1 (1971)",
-    "Déclaration 1 du CGPM (1971)" => "Statement 1 de la CGPM (1971)",
+    "Déclaration 1 du CGPM (1971)" => "Statement CGPM/1 (1971)",
     # --- pubid#657: the corpus-cited spellings (metanorma-bipm suite) and the
     # --- guide's own alternate printings. All normalize onto the forms the
     # --- flavor already canonicalized; none is a byte-round-trip.
@@ -65,15 +72,23 @@ module BipmLooseSpec
     "BIPM DECN CIPM/101-1 (2012, EN)" => "CIPM DECN 101-1 (2012, E)",
     "BIPM DECN CIPM/101-1 (2012, FR)" => "CIPM DECN 101-1 (2012, F)",
     # The guide's French full-length body-prefixed pattern for CIPM decisions
-    # (since 2012) and JCRB outcomes. The canonical French long form stays the
-    # connective spelling the corpus already freezes.
-    "Décision CIPM/101-1 (2012)" => "Décision 101-1 du CIPM (2012)",
-    "Recommandation JCRB/43-1 (2021)" => "Recommandation 43-1 du JCRB (2021)",
+    # (since 2012) and JCRB outcomes is now the canonical face itself, so the
+    # body-prefixed spellings are byte round-trips (pass fixtures) and only
+    # the connective and group-leading word orders stay loose (above).
     # The guide's French brochure lead and the corpus-cited ordinal-edition
     # spelling, both onto the canonical "BIPM SI Brochure …" printing.
     "Brochure sur le SI 9e v3.01 (2019/2024, F)" =>
       "BIPM SI Brochure sur le SI 9e v3.01 (2019/2024, F)",
     "SI Brochure 9th edition (2019)" => "BIPM SI Brochure 9e (2019)",
+    # --- The unmerged si-brochure-id proposal's bare-number edition
+    # --- spellings (adopted as parse-in aliases, ruling of 2026-11-11): the
+    # --- bare number carries the "e" the proposal drops, the year and the
+    # --- language fold into one canonical parenthetical, and a year-less
+    # --- alias prints no parens at all.
+    "SI Brochure 9" => "BIPM SI Brochure 9e",
+    "SI Brochure 9 (E)" => "BIPM SI Brochure 9e (E)",
+    "SI Brochure 9 (2024) (F)" =>
+      "BIPM SI Brochure sur le SI 9e (2024, F)",
   }.freeze
 
   # The hand-off's contract table: loose form => [class, number].
@@ -96,6 +111,10 @@ module BipmLooseSpec
     "Décision CIPM/101-1 (2012)" =>
       [Pubid::Bipm::Identifiers::CommitteeDocument, "101-1"],
     "SI Brochure 9th edition (2019)" =>
+      [Pubid::Bipm::Identifiers::SiBrochure, "9e"],
+    "SI Brochure 9" => [Pubid::Bipm::Identifiers::SiBrochure, "9e"],
+    "SI Brochure 9 (E)" => [Pubid::Bipm::Identifiers::SiBrochure, "9e"],
+    "SI Brochure 9 (2024) (F)" =>
       [Pubid::Bipm::Identifiers::SiBrochure, "9e"],
   }.freeze
 
@@ -165,6 +184,13 @@ module BipmLooseSpec
     "Décision CIPM/101-1 (2012)" => {
       "_type" => "pubid:bipm:committee-document", "group" => "CIPM",
       "type_code" => "DECN", "number" => "101-1", "year" => 2012
+    },
+    # The bare-number alias normalizes onto the same stored row the "9e"
+    # spellings resolve to (the SI Brochure row in si-brochure.yaml, whose
+    # French record this F spelling names; the reduction widens the language).
+    "SI Brochure 9 (2024) (F)" => {
+      "_type" => "pubid:bipm:si-brochure", "number" => "9e",
+      "language" => "F", "edition" => "9e", "years" => "2024"
     },
   }.freeze
 end

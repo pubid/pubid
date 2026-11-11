@@ -212,8 +212,8 @@ RSpec.describe "Pubid::Bipm index key (root.number)" do
 
   # The two groups that stay number-less on purpose: 7 of the 7,922 published
   # rows (99.91% coverage). Pinned so the gap stays visible — filling them would
-  # move `urn:bipm:cgpm:decl::1889`'s documented empty number segment and the
-  # nil assertions in identifier_spec.rb / partial_spec.rb.
+  # move `urn:bipm:v1:cgpm:statement::1889`'s documented empty number segment
+  # and the nil assertions in identifier_spec.rb / partial_spec.rb.
   describe "the documented number-less exceptions" do
     it "leaves an ordinal-less committee declaration number-less" do
       id = parse("CGPM DECL (1889)")
@@ -223,7 +223,7 @@ RSpec.describe "Pubid::Bipm index key (root.number)" do
 
     it "keeps that declaration's empty URN number segment" do
       expect(parse("CGPM DECL (1889)").to_urn)
-        .to eq("urn:bipm:cgpm:decl::1889")
+        .to eq("urn:bipm:v1:cgpm:statement::1889")
     end
 
     it "leaves the journal-level Metrologia record number-less" do
