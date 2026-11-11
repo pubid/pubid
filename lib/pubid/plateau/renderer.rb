@@ -39,7 +39,12 @@ module Pubid
 
       def render_handbook(id)
         result = "#{id.publisher} #{id.type_string} #{id.formatted_number}#{id.formatted_annex}"
-        result += " #{id.formatted_edition}" if id.edition
+        return result unless id.edition
+
+        # The grammar reads a volume label only after an edition, so a
+        # volume without one (e.g. after exclude(:edition)) is not printed.
+        result += " #{id.formatted_edition}"
+        result += " #{id.volume}" if id.volume
         result
       end
 

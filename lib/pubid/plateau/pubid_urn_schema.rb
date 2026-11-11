@@ -13,6 +13,7 @@ module Pubid
       atom "publisher", "pub"
       atom "edition", "ed"
       atom "annex", "annex", kind: :int
+      atom "volume", "vol"
 
       number = [["number", :int]]
       type "pubid:plateau:annex", "annex", core: [],

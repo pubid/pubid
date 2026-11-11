@@ -818,8 +818,9 @@ and give no collision. The longest URN is 37 characters.
 | `pubid:plateau:identifier` | `id` | `number` (`:int`)
 |===
 
-Atoms, in the schema order: `pub-`, `ed-` (`edition`), `annex-` (int);
-the Annex adds `letter-`. No facets.
+Atoms, in the schema order: `pub-`, `ed-` (`edition`), `annex-` (int),
+`vol-` (`volume`, the Handbook label `本編` or `本編＋付録`, written in
+`~XX` escapes); the Annex adds `letter-`. No facets.
 
 PLATEAU keeps `number` an Integer (the one flavor outside the `:string`
 retype), so its core is `:int`: `#00` is the core `0`. No input makes an
