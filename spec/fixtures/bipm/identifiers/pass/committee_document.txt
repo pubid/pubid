@@ -27,10 +27,13 @@ CGPM Resolution 1 (1927)
 CGPM Statement 1 (1901)
 CGPM Statement (1889)
 
-# --- Full French name (connective: "de la" for CGPM, else "du") ---
-Recommandation 1 du CCL (2001)
-Résolution 1 de la CGPM (1927)
-Action 10-1 du JCRB (2003)
+# --- Full French name (body-prefixed canonical face; ruling of 2026-11-11.
+# --- The guide's connective spellings — "Recommandation 1 du CCL (2001)",
+# --- "Résolution 1 de la CGPM (1927)", "Action 10-1 du JCRB (2003)" — parse
+# --- in as normalizing aliases of these, per loose_consumer_forms_spec) ---
+Recommandation CCL/1 (2001)
+Résolution CGPM/1 (1927)
+Action JCRB/10-1 (2003)
 
 # --- Bare MRA-interpretation form (no type word) ---
 CIPM 2005-06
@@ -40,15 +43,16 @@ CIPM 2005-06 (2005)
 CIPM DECN 101-1 (2012)
 CIPM DECN 101-1 (2012, E)
 CIPM DECN 101-1 (2012, F)
-Décision 101-1 du CIPM (2012)
+# The guide's own decision example.
+Décision CIPM/111-10 (2022)
 
 # --- Publisher-prefixed + body-qualified spellings, normalize onto the
-# --- unprefixed forms above (metanorma-bipm fetch queue, pubid#657;
-# --- the guide's French body-prefixed pattern for CIPM/JCRB outcomes) ---
+# --- unprefixed forms above (metanorma-bipm fetch queue, pubid#657);
+# --- the guide's body-prefixed French pattern itself is the canonical face,
+# --- so it is a byte round-trip (above), while the connective French
+# --- spellings are normalizing aliases (loose_consumer_forms_spec) ---
 BIPM DECN CIPM/101-1 (2012, EN)
 BIPM DECN CIPM/101-1 (2012, FR)
-Décision CIPM/101-1 (2012)
-Recommandation 43-1 du JCRB (2021)
 Recommandation JCRB/43-1 (2021)
 
 # --- Part-numbered resource-specific ids (guide numbering: part/subpart are
@@ -63,4 +67,4 @@ CIPM DECN 112 A3.5 (2022, F)
 CCTF REC 2
 CGPM DECL
 CCL Recommendation 1
-Recommandation 1 du CCL
+Recommandation CCL/1

@@ -57,6 +57,15 @@ module Pubid
       def render_committee_long(id)
         if id.language == "F"
           name = Identifier::TYPE_NAME_FR[id.type_code]
+          # The guide's body-prefixed French pattern ("Décision CIPM/111-10
+          # (2022)") is the canonical long face: the group qualifies the
+          # resource-specific id with a slash. A number-less document has no
+          # id to qualify, so it keeps the connective spelling the guide's
+          # general French pattern uses ("Statement de la CGPM (1889)").
+          if id.number
+            return "#{name} #{id.group}/#{id.number}#{year_segment(id)}"
+          end
+
           conn = Identifier.french_connective(id.group)
           "#{name}#{number_segment(id)} #{conn} #{id.group}#{year_segment(id)}"
         else
@@ -91,12 +100,15 @@ module Pubid
 
         # The version is optional (the guide's "SI Brochure 9e (2019, E)" form)
         # and the language code too (the language-independent form), so both
-        # segments are conditional.
+        # segments are conditional. The parens carry the year, the language or
+        # both, and stay off entirely when the reference names neither ("SI
+        # Brochure 9e", the bare-number alias without a year).
         phrase = id.language == "F" ? "sur le SI " : ""
         lang = id.language ? ", #{id.language}" : ""
+        tail = id.years ? "#{id.years}#{lang}" : id.language.to_s
         result = +"BIPM SI Brochure #{phrase}#{id.edition}"
         result << " #{id.version}" if id.version
-        result << " (#{id.years}#{lang})"
+        result << " (#{tail})" if id.years || id.language
         result
       end
 

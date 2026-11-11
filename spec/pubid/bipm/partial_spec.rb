@@ -13,7 +13,10 @@ RSpec.describe "Pubid::Bipm partial references" do
     "CCTF REC 2",
     "CGPM DECL",
     "CCL Recommendation 1",
-    "Recommandation 1 du CCL",
+    # The body-prefixed French long face (the connective spelling parses in
+    # as a normalizing alias — loose_consumer_forms_spec — so it is not a
+    # byte round-trip and lives off this list).
+    "Recommandation CCL/1",
     "CCAUV 1st Meeting",
     "CCAUV 10<sup>e</sup> réunion",
   ]
@@ -88,11 +91,15 @@ RSpec.describe "Pubid::Bipm partial references" do
   end
 
   describe "committee long French form" do
-    subject(:id) { Pubid::Bipm.parse("Recommandation 1 du CCL") }
+    subject(:id) { Pubid::Bipm.parse("Recommandation CCL/1") }
 
     it "parses with a nil year and round-trips" do
       expect(id.year).to be_nil
-      expect(id.to_s).to eq("Recommandation 1 du CCL")
+      expect(id.to_s).to eq("Recommandation CCL/1")
+    end
+
+    it "keeps the French language the type word typed" do
+      expect(id.language).to eq("F")
     end
   end
 

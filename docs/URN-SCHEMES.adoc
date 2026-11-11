@@ -998,9 +998,43 @@ Atoms, canonical order: `pub-` (`publisher`), `year-` (`year`), `lang-` (`langua
 
 Namespace: `urn:pubid:bipm:` (the `_type` flavor segment).
 
-Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:bipm:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+Official URN: adopted (ruling of 2026-11-11). BIPM still has no namespace in
+the IANA registry, but the guide-of-record (bipm-editor-guides,
+`sources/bipm-references-en.adoc`, "URN" clauses) defines the official
+`urn:bipm:` shapes, and `to_urn` now emits them. Every landed
+`urn:bipm:` URN moved (a relaton-data-bipm re-crawl follows, accepted by the
+owner); the pre-adoption faces stay parseable as documented parse-in aliases
+(`lib/pubid/bipm/CLAUDE.md`) but are never emitted. The pubid-scheme URN
+below is untouched.
 
-Current `to_urn` (≤400 sampled pass ids): 90 ids, 33 round-trip, 21 reshape, 0 do not re-parse, 36 raise, 0 empty, 10 colliding URNs.
+Official `to_urn` faces, one shape per family:
+
+[cols="1,3,3",options="header"]
+|===
+| family | shape | example
+| committee document | `urn:bipm:v1:{group}:{type-word}:{identifier}[:{year}]` | `CIPM DECN 110-17 (2021)` → `urn:bipm:v1:cipm:decision:110-17:2021`
+| meeting | `urn:bipm:v1:{group}:meeting:{n}[:{year}]` | `CGPM 17th Meeting (1983)` → `urn:bipm:v1:cgpm:meeting:17:1983`
+| Metrologia | `urn:bipm:v1:metrologia:{vol}[:{issue}[:{article}]]` | `Metrologia 51 1 128` → `urn:bipm:v1:metrologia:51:1:128`
+| SI Brochure | `urn:bipm:v1:bipm:si-brochure:{edition-no-e}:{version-no-v}:{latest-year}` | `BIPM SI Brochure 9e v3.01 (2019/2024, E)` → `urn:bipm:v1:bipm:si-brochure:9:3.01:2024`
+|===
+
+The general pattern the guide states is
+`urn:bipm:{version}:{group}:{venue-type}:{venue-id}:{type}:{identifier}:{date}`
+with the venue slots optional. The flavor holds no venue attribute — the
+venue qualification lives inside the document number — so the venue slots
+stay unfilled. The type-word segment is the English type name lowercased
+(recommendation/resolution/decision/action/statement), never the REC/RES
+abbreviation; the brochure form strips the edition's `e` and the version's
+`v`, drops the language segment, and carries the latest year of the `years`
+range (the version segment stays empty when absent, per the guide's
+`urn:bipm:v1:bipm:si-brochure:9::2019`). MEP and the CC guides still emit no
+official URN: the guide's URN sections for them are empty. Two guide
+examples do not fit the guide's own stated pattern and are documented rather
+than reproduced (`urn:bipm:v1:cipm:resolution:95-2006:1`,
+`urn:bipm:v1:cgpm:26:2018:resolution:1` — venue-id placements the flavor has
+no attribute for; see `lib/pubid/bipm/CLAUDE.md`).
+
+Current `to_urn` (≤400 sampled pass ids): 90 ids, 33 round-trip, 21 reshape, 0 do not re-parse, 36 raise, 0 empty, 10 colliding URNs. *(Sampled on the pre-adoption face; the table above is the adopted face.)*
 
 Corpus: 90 of 90 pass ids parse.
 
@@ -1021,10 +1055,10 @@ Atoms, canonical order: `part-` (`part`), `issue-` (`issue`), `year-` (`year`, i
 *Landed (issue #670) as drafted*, with the years Integer atoms
 (`year-2012`). A committee document with no number (`CGPM DECL (1889)`)
 emits no core segment — the atom list carries it:
-`urn:pubid:bipm:cd:year-1889:group-CGPM:typecode-DECL`. The current
-`urn:bipm:…` form of `#to_urn` stays as-is (owner-pinned deviations,
-`lib/pubid/bipm/CLAUDE.md`); the schema reads `#to_hash` only, so the codec
-needed no deviation knob. All 111 corpus rows emit.
+`urn:pubid:bipm:cd:year-1889:group-CGPM:typecode-DECL`. The
+`urn:bipm:…` form of `#to_urn` is now the guide's official face (ruling of
+2026-11-11, above); the schema reads `#to_hash` only and is untouched by
+that ruling — the codec needed no deviation knob. All 111 corpus rows emit.
 
 [[urn-bsi]]
 ==== bsi

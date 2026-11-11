@@ -10,6 +10,13 @@ BIPM SI Brochure 9e v3.01 (2019/2024)
 BIPM SI Brochure 9e (2019, E)
 BIPM SI Brochure 9e (2019)
 
+# --- The year-less and language-only edition faces the bare-number alias
+# --- (ruling of 2026-11-11) canonicalizes onto; the alias spellings
+# --- themselves are normalizing parses and live in loose_consumer_forms_spec.
+BIPM SI Brochure 9e
+BIPM SI Brochure 9e (E)
+BIPM SI Brochure sur le SI 9e (2024, F)
+
 # --- Normalizing spellings onto the forms above: the corpus-cited ordinal
 # --- edition ("9th edition" onto the canonical "9e") and the guide's French
 # --- brochure lead phrase ---
