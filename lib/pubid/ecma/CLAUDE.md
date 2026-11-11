@@ -33,3 +33,15 @@ keeps `#matches?(other, ignore:)`.
   stripper (root `CLAUDE.md`, the `with_publisher:` bullet) leaves the string
   alone, and the `@with_publisher` ivar and the renderer branch that read it
   were deleted. XSF made the same change for `XEP 0001`.
+
+- **Human edition spellings are pre-parse aliases (pubid#698).** The
+  grammar reads exactly one edition face — the glued " ed<N>" — so
+  `Parser.normalize_input` (wired into `Identifier.parse`, the
+  ashrae/cie ingestion precedent) rewrites the human faces onto it before
+  the artifact sees them: the case-insensitive cover form
+  ("ECMA-262 Edition 5.1"), the dotted and spaced ed variants, and the
+  bare trailing edition ("ECMA 262 5.1"), which fires only behind an
+  already-present document number so the space-separator form ("ECMA 6")
+  keeps its number and a " vol<N>" is never rewritten. Every rule
+  rewrites INTO the canonical face, so a canonical string passes through
+  byte-identically and the index key stays "ECMA-262 ed5.1".

@@ -370,3 +370,10 @@ NIST FIPS 87
 NIST.FIPS.197-upd1
 !NIST.FIPS.54-1-Jan15!NIST.FIPS.54-1e1501
 !NIST.FIPS.54-1-Jan17!NIST.FIPS.54-1e1701
+# pubid#697 - the series' own printed face "FIPS PUB <number>" parses as an
+# alias of the canonical "NIST FIPS <number>" (field-reported via
+# metanorma/metanorma-pdfa#114: FIPS PUB 204/205). The hyphenated-number
+# and Rev. forms ride the same prefix alias.
+!FIPS PUB 205!NIST FIPS 205
+!FIPS PUB 180-4!NIST FIPS 180-4
+!FIPS PUB 199 Rev. 1!NIST FIPS 199 Rev. 1

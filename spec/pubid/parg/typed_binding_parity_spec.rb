@@ -44,9 +44,24 @@ RSpec.describe "typed model binding parity" do
           builder.respond_to?(:build) ? builder.build(hash) : builder.new.build(hash)
         end
 
+        # Parse-entry ingestion (the ashrae/cie/ecma Parser.normalize_input
+        # precedent) aliases human spellings onto the grammar's own face
+        # before the engine sees them, so the differential runs over the
+        # flavor's ingestion face: the parity question is per-face, not
+        # per-spelling (pubid#698).
+        ingest = lambda do |input|
+          parser = flavor_module(flavor)::Parser
+          next input unless parser.respond_to?(:normalize_input)
+
+          parser.normalize_input(input)
+        rescue NameError
+          input
+        end
+
         differences = entries.filter_map do |input|
-          typed = flavor_module(flavor).parse(input)
-          tree = build.call(Pubid::Parg::Backend.parse(flavor, input))
+          face = ingest.call(input)
+          typed = flavor_module(flavor).parse(face)
+          tree = build.call(Pubid::Parg::Backend.parse(flavor, face))
 
           next if typed.to_hash == tree.to_hash && typed.to_s == tree.to_s
 
