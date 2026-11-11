@@ -10,15 +10,15 @@ module Pubid
     # Iso::BundledIdentifier.) Fragment keeps its own stage/edition, so it
     # suppresses a subset inline instead of including this.
     #
-    # number/part/subpart are NOT here, and deliberately so: their maps live on
-    # SingleIdentifier, which the four wrappers do not inherit from, so the
-    # exclusion is structural rather than a denylist that can drift. Only a
-    # converter can be no-opped this way, so a key that needs `with:` for
-    # another reason — year, publisher, copublishers, stage — still lists here.
-    # (`month`/`day`/`undated` are missing from that list and leak a duplicated
-    # top-level key on a wrapper; pre-existing, see lib/pubid/iec/CLAUDE.md.)
+    # number/part/subpart and the date keys (year/month/day/undated) are NOT
+    # here, and deliberately so: their maps live on SingleIdentifier, which
+    # the wrappers do not inherit from, so the exclusion is structural rather
+    # than a denylist that can drift. (The denylist did drift: it once listed
+    # `year` but not `month`/`day`/`undated`, and those three leaked a
+    # duplicated top-level key on every wrapper.) Only publisher,
+    # copublishers and stage stay here, because those maps are still wanted
+    # on the parent block.
     module DelegatedFieldSuppression
-      def year_to_kv(_model, _doc); end
       def publisher_to_kv(_model, _doc); end
       def copublishers_to_kv(_model, _doc); end
       def stage_to_kv(_model, _doc); end
@@ -165,7 +165,7 @@ module Pubid
       key_value do
         map "_type", to: :_type, polymorphic_map: IEC_TYPE_MAP
         # number/part/subpart are NOT mapped here — they live on
-        # SingleIdentifier, the seam that excludes the four delegating wrappers.
+        # SingleIdentifier, the seam that excludes the delegating wrappers.
         # See the comment on that block.
         #
         # stage_iteration is a degenerate Components::Iteration (one :string
@@ -173,13 +173,9 @@ module Pubid
         # ::Pubid::Identifier flattens it to a bare scalar and inflates it back.
         # A plain map is enough; no converter.
         map "stage_iteration", to: :stage_iteration, render_default: false
-        # date serialized flat as year/month/day, nils omitted.
-        map "year", with: { to: :year_to_kv, from: :year_from_kv }
-        map "month", with: { to: :month_to_kv, from: :month_from_kv }
-        map "day", with: { to: :day_to_kv, from: :day_from_kv }
-        # IEC undated reference (e.g. IEC 60050:--). The `false` default is
-        # omitted; only the meaningful `true` round-trips via to_hash.
-        map "undated", with: { to: :undated_to_kv, from: :undated_from_kv }
+        # year/month/day/undated are NOT mapped here either — they live on
+        # SingleIdentifier for the same reason as number/part/subpart: a
+        # wrapper delegates `date` to what it wraps.
         map "edition", to: :edition, render_default: false
         map "languages", to: :languages, render_default: false
         # publisher emitted only when the primary isn't the IEC default;
@@ -193,59 +189,6 @@ module Pubid
         map "stage", with: { to: :stage_to_kv, from: :stage_from_kv }
         # A Boolean attribute whose `false` default ::Pubid::Identifier#to_hash
         # already drops, so a plain map suffices (the GB spelling).
-      end
-
-      # --- date serialized flat as year/month/day ---
-      def year_to_kv(model, doc)
-        y = model.date&.year
-        return if y.nil? || y.to_s.empty?
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("year", y.to_s))
-      end
-
-      def year_from_kv(model, value)
-        return if value.nil? || value.to_s.empty?
-
-        (model.date ||= ::Pubid::Components::Date.new).year = value.to_s
-      end
-
-      def month_to_kv(model, doc)
-        m = model.date&.month
-        return if m.nil? || m.to_s.empty?
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("month", m.to_s))
-      end
-
-      def month_from_kv(model, value)
-        return if value.nil? || value.to_s.empty?
-
-        (model.date ||= ::Pubid::Components::Date.new).month = value.to_s
-      end
-
-      def day_to_kv(model, doc)
-        d = model.date&.day
-        return if d.nil? || d.to_s.empty?
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("day", d.to_s))
-      end
-
-      def day_from_kv(model, value)
-        return if value.nil? || value.to_s.empty?
-
-        (model.date ||= ::Pubid::Components::Date.new).day = value.to_s
-      end
-
-      # --- date undated flag (IEC undated reference, e.g. IEC 60050:--) ---
-      # The `false` default is omitted; only the meaningful `true` round-trips
-      # via to_hash / from_hash.
-      def undated_to_kv(model, doc)
-        return unless model.date&.undated?
-
-        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("undated", true))
-      end
-
-      def undated_from_kv(model, value)
-        (model.date ||= ::Pubid::Components::Date.new).undated = value.to_s == "true"
       end
 
       # --- publisher: primary only when non-default; copublishers as a list ---

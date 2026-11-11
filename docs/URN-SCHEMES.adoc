@@ -1566,8 +1566,10 @@ sit after `database`, before `lang-`, whose landed URNs never move). All
 WorkingDocument serialized only `_type`, so its URN was `urn:pubid:iec:wd`
 and all 2,350 WD rows shared that one hash — a shared hash, not a collision;
 and a TestReportForm's CISPR document sat in the unserialized
-`cispr_identifier`. A wrapper's month/day leak (`iec-wrapper-month-day-leak`
-in `lib/pubid/iec/CLAUDE.md`) rides the URN as it rides the hash.
+`cispr_identifier`. A wrapper also repeated its base's `month`/`day`/`undated`
+at the top level, in the hash and so in the URN (`…:vi:month-10:…`); that
+leak is closed (the date keys map on `SingleIdentifier`, see
+`lib/pubid/iec/CLAUDE.md`), and no fixture URN moved.
 
 *Closed (issue #687)* — the two gaps are gone: the working document's
 committee, language, stage and work-programme stage/type serialize, the
