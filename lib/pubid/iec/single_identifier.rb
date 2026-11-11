@@ -22,15 +22,80 @@ module Pubid
       # their own (Identifiers::Base and SupplementIdentifier).
       #
       # That is a structural exclusion, not a denylist of no-op converters that
-      # a later key can be forgotten from — which is how `month`/`day` came to
-      # leak (see DelegatedFieldSuppression).
+      # a later key can be forgotten from. The date keys live here for the
+      # same reason: the wrappers delegate `date` too, and when the date maps
+      # sat on Iec::Identifier the denylist no-opped `year` but not
+      # `month`/`day`/`undated`, so `IEC CA 01:2025-10 CSV` emitted a second,
+      # top-level "month" beside the one inside "base".
       #
-      # The values are plain strings, so no converter is needed: lutaml writes
-      # the scalar, and ::Pubid::Identifier#to_hash drops a nil.
+      # number/part/subpart are plain strings, so no converter is needed:
+      # lutaml writes the scalar, and ::Pubid::Identifier#to_hash drops a nil.
+      # The date keys keep converters, because they split one `date`
+      # attribute across four keys.
       key_value do
         map "number", to: :number
         map "part", to: :part
         map "subpart", to: :subpart
+        # date serialized flat as year/month/day, nils omitted.
+        map "year", with: { to: :year_to_kv, from: :year_from_kv }
+        map "month", with: { to: :month_to_kv, from: :month_from_kv }
+        map "day", with: { to: :day_to_kv, from: :day_from_kv }
+        # IEC undated reference (e.g. IEC 60050:--). The `false` default is
+        # omitted; only the meaningful `true` round-trips via to_hash.
+        map "undated", with: { to: :undated_to_kv, from: :undated_from_kv }
+      end
+
+      # --- date serialized flat as year/month/day ---
+      def year_to_kv(model, doc)
+        y = model.date&.year
+        return if y.nil? || y.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("year", y.to_s))
+      end
+
+      def year_from_kv(model, value)
+        return if value.nil? || value.to_s.empty?
+
+        (model.date ||= ::Pubid::Components::Date.new).year = value.to_s
+      end
+
+      def month_to_kv(model, doc)
+        m = model.date&.month
+        return if m.nil? || m.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("month", m.to_s))
+      end
+
+      def month_from_kv(model, value)
+        return if value.nil? || value.to_s.empty?
+
+        (model.date ||= ::Pubid::Components::Date.new).month = value.to_s
+      end
+
+      def day_to_kv(model, doc)
+        d = model.date&.day
+        return if d.nil? || d.to_s.empty?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("day", d.to_s))
+      end
+
+      def day_from_kv(model, value)
+        return if value.nil? || value.to_s.empty?
+
+        (model.date ||= ::Pubid::Components::Date.new).day = value.to_s
+      end
+
+      # --- date undated flag (IEC undated reference, e.g. IEC 60050:--) ---
+      # The `false` default is omitted; only the meaningful `true` round-trips
+      # via to_hash / from_hash.
+      def undated_to_kv(model, doc)
+        return unless model.date&.undated?
+
+        doc.add_child(Lutaml::KeyValue::DataModel::Element.new("undated", true))
+      end
+
+      def undated_from_kv(model, value)
+        (model.date ||= ::Pubid::Components::Date.new).undated = value.to_s == "true"
       end
 
       # Generate URN for this identifier
