@@ -144,8 +144,9 @@ RSpec.describe "IEC number/part/subpart as :string" do
   end
 
   # Moving the maps onto SingleIdentifier makes "number" arrive AFTER the keys
-  # of the parent block, and SupplementIdentifier#base_from_kv calls
-  # mark_synthetic_standalone!, which reads @number. If from_hash walked the
+  # of the parent block, and a standalone supplement's synthetic base is
+  # rebuilt from "base" while its own number comes from "number". If from_hash
+  # walked the
   # INPUT hash's key order rather than the declared rule order, a hand-authored
   # hash listing "base" before "number" would reconstruct a standalone
   # supplement with the wrong supplement number — and silently, since nothing

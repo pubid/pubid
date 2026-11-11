@@ -326,7 +326,13 @@ module Pubid
         # Apply legacy update_codes normalization first, before any other preprocessing
         normalized = Core::UpdateCodes.apply(string, :iec)
         parsed = Pubid::Parg::Model.bound(:iec, Pubid::Iec::Parser.normalize_input(normalized))
-        Pubid::Iec::Builder.new.build(parsed)
+        id = Pubid::Iec::Builder.new.build(parsed)
+        # A standalone supplement stores its numbers in the layout from_hash
+        # rebuilds only after #ensure_base runs; run it here, so a fresh
+        # parse holds that layout before any reader runs
+        # (SupplementIdentifier#number).
+        id.ensure_base if id.is_a?(SupplementIdentifier)
+        id
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
