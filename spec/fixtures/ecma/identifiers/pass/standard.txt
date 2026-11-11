@@ -22,3 +22,17 @@ ECMA-434
 # Standards split into parts (only ECMA-418 in the data)
 ECMA-418-1
 ECMA-418-2
+
+# pubid#698 - human edition spellings parse as aliases of the glued
+# " ed<N>" token (field-reported via metanorma/metanorma-pdfa#114: ECMA-262
+# edition 5.1). The canonical render — the index key — stays "ECMA-262
+# ed5.1"; each spelling below parses to that canonical face and is
+# exported as an alias of the existing "ECMA-262 ed5.1" canonical case.
+# (This file is hand-maintained: ECMA has no full/ corpus, so the
+# classifier cannot run on it and reclassify these into marker lines.)
+ECMA-262 Edition 5.1
+ECMA-262 ed. 5.1
+ECMA-262 ed 5.1
+ECMA-262 ed.5.1
+ECMA 262 5.1
+ECMA-262 5.1

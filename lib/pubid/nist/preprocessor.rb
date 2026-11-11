@@ -68,6 +68,7 @@ module Pubid
         end
         normalize_spurious_u_suffix!
         normalize_publisher_and_series!
+        normalize_fips_pub_alias!
         normalize_lcirc_supplement_contexts!
         normalize_revision_spacing!
         normalize_letter_suffix_casing!
@@ -122,6 +123,21 @@ module Pubid
         )
         @cleaned = @cleaned.sub(/\b(ir|sp|tn|hb|fips|ams|vts)\b/i, &:upcase)
         @cleaned = @cleaned.gsub(/\bLC\b(?!IRC)/, "LCIRC")
+      end
+
+      # The FIPS series' own printed face: NIST prints the series as
+      # "FIPS PUB <number>" (document cover and catalogue style), so the
+      # grammar accepts the publisher-prefixed canonical form only through
+      # this alias (pubid#697). Rewrites the prefix to "NIST FIPS", the
+      # spelling the grammar already reads, and the printed-form parse
+      # therefore lands on exactly the model "NIST FIPS <number>" builds
+      # (same to_hash, same render, revision spellings like
+      # "FIPS PUB 199 Rev. 1" included). Anchored at the head and run
+      # before every other stage so later digit/marker stages see the
+      # canonical face; "FIPS" alone (publisher_was_parsed: false) is
+      # untouched.
+      def normalize_fips_pub_alias!
+        @cleaned = @cleaned.sub(/\AFIPS PUB\b/i, "NIST FIPS")
       end
 
       # LCIRC series: combine with NBS prefix when a supplement marker

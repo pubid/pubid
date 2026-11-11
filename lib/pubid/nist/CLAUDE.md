@@ -135,3 +135,14 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   `spec/pubid/nist/bare_series_reference_spec.rb`; the corpus round froze
   the six rows (`NBS CS`, `NBS CSM`, `NBS CIS`, `NBS CS-E`, `NIST PS`,
   `NIST DCI`) into the testsuite with the gem twin in lockstep.
+
+- **"FIPS PUB <number>" is a preprocessor alias, not a grammar face
+  (pubid#697).** NIST prints the series as "FIPS PUB <number>" but the
+  grammar reads "NIST FIPS <number>", so `normalize_fips_pub_alias!`
+  (head-anchored, immediately after the publisher/series stage) rewrites
+  the printed prefix and the parse lands on exactly the canonical model —
+  hash-, render-, URN- and MR-identical to "NIST FIPS <number>". The
+  hyphenated numbers and the revision forms the grammar models
+  ("FIPS PUB 199 Rev. 1" with its `original_prefix` facet, compact
+  "rev1") ride the prefix alias; bare "FIPS <number>"
+  (publisher_was_parsed: false) and NBS FIPS are untouched.
