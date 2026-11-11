@@ -12,6 +12,7 @@ module Pubid
     autoload :Identifier, "#{__dir__}/iho/identifiers/base"
     autoload :Identifiers,  "#{__dir__}/iho/identifiers"
     autoload :Renderer,     "#{__dir__}/iho/renderer"
+    autoload :ReservedSpecs, "#{__dir__}/iho/reserved_specs"
     autoload :UrnGenerator, "#{__dir__}/iho/urn_generator"
     autoload :UrnParser, "#{__dir__}/iho/urn_parser"
     autoload :PubidUrnSchema, "#{__dir__}/iho/pubid_urn_schema"

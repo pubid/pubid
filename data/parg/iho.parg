@@ -98,11 +98,15 @@
 # Part contains Annexes; Annex contains Appendices; a D-2 subnumber is
 # a child atom of Appendix D. No key.value concatenations — every
 # non-number component is a marker-prefixed segment whose marker is the
-# lowercased human-face token (edition follows ISO's ed- precedent):
+# lowercased human-face token (edition follows ISO's ed- precedent).
+# An S-4 specification is a child of its Part (the citation letter rides
+# the part- atom), with the dotted sub and the parenthesized variant as
+# its own children:
 #
 #   urn:iho:<type>:<number>[:ed-<x.y.z>][:year-<yyyy>]
 #     [:sup-<n>[:ed-<x.y.z>][:year-<yyyy>]]
 #     [:part-<X>[:ed-<x.y.z>][:year-<yyyy>]]
+#     [:spec-<n>[:specsub-<n>][:specvar-<X>]]
 #     [:annex-<A>[...]]
 #     [:appendix-<B>[:<sub>][...]]
 #     [:vol-<n>[:issue-<n>][...]]
@@ -123,16 +127,25 @@
 #                                                      segment precedes
 #   5         sup-<n>          1*digit                     wraps the base
 #   6         part-<X>         letter (case kept),         contains annexes
-#                              digits [*letter], or a
+#                              digits [*letter], or a      and S-4 specs
 #                              series reference
 #                              [SPMBC]-<digits>
-#   7         annex-<A>        upper letter (case kept)    contains appendices
-#   8         appendix-<B>     upper letter or digits      contains subnumber
-#   9         <sub>            1*digit, BARE, only         child of appendix
+#   7         spec-<n>         [1-6]dd, only under an      child of part (the
+#                              S-4 anchor (s:4)            S-4 leaf; the
+#                                                          section is the
+#                                                          hundreds digit,
+#                                                          derivable, never
+#                                                          emitted)
+#   8         specsub-<n>      1*digit, only after spec-   child of spec
+#   9         specvar-<X>      upper letters, after        child of spec
+#                              spec- or specsub-
+#   10        annex-<A>        upper letter (case kept)    contains appendices
+#   11        appendix-<B>     upper letter or digits      contains subnumber
+#   12        <sub>            1*digit, BARE, only         child of appendix
 #                              directly after appendix-
-#   10        vol-<n>          1*digit (incl. yearbook     contains issue
+#   13        vol-<n>          1*digit (incl. yearbook     contains issue
 #                              years, Vol. 2020)
-#   11        issue-<n>        1*digit, only after vol-    child of volume
+#   14        issue-<n>        1*digit, only after vol-    child of volume
 #
 # The number occupies every leading bare segment up to the first
 # marker, so a colon number (S-158:100) round-trips without escaping;
@@ -147,11 +160,50 @@
 # ap./appendix./vol./issue. and the single-letter y. year tag (whose
 # value decodes into the volume — the serial-locator unification).
 #
+# == S-4 loose-leaf sections and specifications (issue #691; owner
+#    rulings of 2026-11-11)
+#
+# The S-4 loose-leaf publication cites its regulations/specifications as
+# <letter>-<hundreds><seq>: B-401 is Part B, Section 400, item 01. ONE
+# component, not two tiers: the spec number IS the leaf; the SECTION is
+# the hundreds digit, DERIVED (never stored, never emitted). The `00`
+# slot (B-400) IS the section-level citation, so "S-4 Part B, Section
+# 400" and "IHO S-4 B-400" are one identity, two spellings.
+#
+#   capture         example            role
+#   spec            B-401 -> "401"     the leaf number (3 digits,
+#                                      hundreds 1-6: sections 100-600)
+#   spec_sub        B-122.1 -> "1"     the dotted sub
+#   spec_variant    B-521(I) -> "I"    the parenthesized variant
+#   spec_part       B-401 -> "B"       the citation letter (the builder
+#                                      binds it into `part`; a Part-rule
+#                                      capture must agree)
+#   spec_section    ", Section 400" -> "400"  the long form's spelled
+#                                      section (becomes `spec` alone;
+#                                      checked against a citation)
+#
+# Faces: canonical compact "IHO S-4 B-401" (dated: "IHO S-4 4.10.0
+# B-401"); long "S-4 Part B, Section 400" (a normalizing parse; also
+# takes a trailing citation: "S-4 Part B, Section 400, B-401", where the
+# spelled section only cross-checks the citation's derived section); bare
+# "B-401" (implicit S-4 anchor; B only — bare C-x stays the Circular
+# Letter series). The builder binds the anchor: a citation requires the
+# S-4 anchor (or synthesizes it for the bare form).
+#
+# Reserved numbers ("NOT CURRENTLY USED" in the S-4 contents — B-170,
+# B-230, B-305, B-323 in Ed 4.9.0 and 4.10.0) parse and resolve AS
+# RESERVED, never invalid; the edition-keyed registry lives in the pubid
+# gem (data/iho/s4-reserved-specs.yaml).
+#
+# URN atoms: part-<letter>:spec-<n>[:specsub-<n>][:specvar-<X>] — the
+# section is NOT emitted (derivable); the citation letter rides the
+# existing part- atom (case preserved: part-B).
+#
 # Edition 2: ruby#400's capture-flatten keeps text captures over
 # reference-built rules as the matched text, so the v2 tree is the v1
 # tree plus named leaves for non-captured structure.
 
-grammar PubidIho version "0.2.0" edition 2 {
+grammar PubidIho version "0.3.0" edition 2 {
   digit = %x30-39
   upper = %x41-5A
   lower = %x61-7A
@@ -196,13 +248,46 @@ grammar PubidIho version "0.2.0" edition 2 {
   # (<kind>_edition / <kind>_year) so the model knows which component
   # the edition belongs to and the URN attaches ed- to the node it
   # follows.
-  part = space "Part" space part_value [part_dated]
+  part = space "Part" space part_value [part_dated] [part_section_tail]
   part_dated = {
     part_edition_rule
     [part_year_rule]
   }
   part_edition_rule = space (1*digit dot 1*digit dot 1*digit) as part_edition
   part_year_rule = space "(" (("19" / "20") 2*digit) as part_year ")"
+
+  # --- S-4 loose-leaf sections and specifications (see the header) ---
+  # The spec number's vocabulary: the S-4 sections run 100-600 (Part C
+  # 100-500), so the leaf number is 3 digits with hundreds digit 1-6 —
+  # the same shape the bare citation branch leans on to keep the B
+  # Bibliographic series (B-1..B-13 style) distinct from B-4xx specs.
+  spec_shape = ("1" / "2" / "3" / "4" / "5" / "6") digit digit
+  spec_number = spec_shape as spec
+  spec_subnumber = dot (1*digit) as spec_sub
+  spec_variant = "(" (1*upper) as spec_variant ")"
+  # The citation letter is the spec's part (A/B/C); the builder binds it
+  # into `part` and rejects a conflicting Part-rule capture.
+  spec_citation_body = ("A" / "B" / "C") as spec_part dash spec_number [spec_subnumber] [spec_variant]
+  # The compact anchor form: the citation follows the code after one
+  # space ("IHO S-4 B-401").
+  spec_citation = space spec_citation_body
+  # The spelled section long form: "Part B, Section 400" — the spelled
+  # number becomes the spec (the section-level citation), and a trailing
+  # citation (", Section 400, B-401") makes it a cross-check only. The
+  # commas are inlined literals: named comma refs collide as duplicate
+  # edition-2 tree nodes under the entry's alternation (the same node
+  # collision the compact_part dash-ref comment documents).
+  part_section_tail = {
+    "," space "Section" space (spec_shape as spec_section)
+    ["," space spec_citation_body]
+  }
+
+  # The bare citation branch (the entry's FIRST alternative): "B-401" /
+  # "IHO B-401" — implicit S-4 anchor (the builder synthesizes series S
+  # number 4). B only: bare C-x stays the Circular Letter series, and the
+  # 3-digit [1-6]xx shape keeps the B Bibliographic series (B-12) on the
+  # main branch.
+  bare_spec_citation = [("IHO" space)] ("B" as spec_part) dash spec_number [spec_subnumber] [spec_variant]
 
   supplement = space ("Suppl" / "Sup") space (1*digit) as supplement [supplement_dated]
   supplement_dated = {
@@ -274,13 +359,21 @@ grammar PubidIho version "0.2.0" edition 2 {
     [dated]
     [supplement]
     [part]
+    [spec_citation]
     [annex]
     [appendix]
     [serial]
     [year_qualifier]
   }
 
-  entry identifier: identifier
+  # The entry dispatches the bare citation branch first (PEG order): a
+  # bare "B-401"-shaped input takes the S-4 branch, everything else the
+  # main identifier.
+  identifier_entry = {
+    bare_spec_citation / identifier
+  }
+
+  entry identifier: identifier_entry
 
   test {
     accept "S-5"
@@ -326,12 +419,31 @@ grammar PubidIho version "0.2.0" edition 2 {
     accept "IHO P-6 Vol. 2 1.0.1"
     accept "IHO S-98 1.0.0 Annex A"
     accept "IHO S-100 5.0.0 Sup 1 2.0.0"
+    # --- S-4 loose-leaf sections and specifications ---
+    accept "IHO S-4 B-401"
+    accept "IHO S-4 4.10.0 B-401"
+    accept "IHO S-4 B-122.1"
+    accept "IHO S-4 B-521(I)"
+    accept "IHO S-4 B-351.1(I)"
+    accept "IHO S-4 B-400"
+    accept "IHO S-4 B-170"
+    accept "B-401"
+    accept "IHO B-401"
+    accept "B-122.1"
+    accept "B-521(I)"
+    accept "IHO S-4 Part B, Section 400"
+    accept "S-4 Part B, Section 400"
+    accept "IHO S-4 Part B, Section 400, B-401"
+    accept "B-12"
+    reject "IHO S-4 B-4"
+    reject "IHO S-4 B-40"
+    reject "IHO S-4 B-800"
     reject "nonsense"
     reject "IHO B-12 3.0"
     reject "IHO P-5 1850"
   }
 
-  bindings identifier {
+  bindings identifier_entry {
     type -> type (string)
     number -> number (string)
     part -> part (string)
@@ -354,5 +466,10 @@ grammar PubidIho version "0.2.0" edition 2 {
     volume_edition -> volume_edition (string)
     volume_year -> volume_year (string)
     issue -> issue (string)
+    spec -> spec (string)
+    spec_sub -> spec_sub (string)
+    spec_variant -> spec_variant (string)
+    spec_part -> spec_part (string)
+    spec_section -> spec_section (string)
   }
 }

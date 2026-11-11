@@ -8,6 +8,11 @@ module Pubid
     # IHO identifiers have the form:
     #   IHO {S|P|M|B|C}-{number}[ {edition}| Vol. N [(issue)]]
     #       [ Sup N][ Part X][ Annex A][ Appendix B[-2]] [(2024)]
+    # The S-4 loose-leaf publication adds the spec citation
+    #   IHO S-4 [edition] <letter>-<hundreds><seq>[.sub][(variant)]
+    # ("IHO S-4 B-401", the long form "S-4 Part B, Section 400" and the
+    # bare "B-401" all parse to it; `spec` stores the leaf number, the
+    # citation letter rides `part`, the section is a derived reader).
     #
     # Every tail component is a first-class semantic component: a typed
     # attribute, independently addressable, URN-encodable and matchable.
@@ -83,6 +88,15 @@ module Pubid
       attribute :issue,      :string
       attribute :volume_edition, :string
       attribute :volume_year,    :string
+      # The S-4 loose-leaf spec citation (issue #691): `spec` is the leaf
+      # number ("401" of B-401), the citation letter rides `part` (the
+      # builder folds it in), the dotted sub and the parenthesized
+      # variant keep their own components. The SECTION (the hundreds
+      # digit) is never stored — a derived reader — and the `00` slot
+      # (B-400) IS the section-level citation.
+      attribute :spec,         :string
+      attribute :spec_sub,     :string
+      attribute :spec_variant, :string
 
       # Polymorphic type map for lutaml::Model key_value serialization: maps
       # each subclass's polymorphic_name to its class name so `from_hash` can
@@ -122,6 +136,9 @@ module Pubid
         map "volume_edition",     to: :volume_edition
         map "volume_year",        to: :volume_year
         map "issue",              to: :issue
+        map "spec",               to: :spec
+        map "spec_sub",           to: :spec_sub
+        map "spec_variant",       to: :spec_variant
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
@@ -139,7 +156,38 @@ module Pubid
         args = args.dup
         args << :issue if args.include?(:volume)
         args << :appendix_subnumber if args.include?(:appendix)
+        # The spec citation is the leaf: a reference that omits the spec
+        # nils its sub and variant with it.
+        args.push(:spec_sub, :spec_variant) if args.include?(:spec)
         super
+      end
+
+      # The citation letter of an S-4 spec (nil unless the identifier IS
+      # a spec citation): the part carries the letter, the same way the
+      # long form spells it ("Part B" of "B-401").
+      def spec_part
+        spec && part
+      end
+
+      # The section an S-4 spec belongs to: the hundreds digit of the
+      # spec number, zero-padded (B-401 -> "400"; B-400 derives its own
+      # section). DERIVED, never stored, never emitted — the owner
+      # ruling keeps the spec number the leaf.
+      def spec_section
+        return nil unless spec
+
+        "#{spec[0]}00"
+      end
+
+      # True when the spec number is reserved ("NOT CURRENTLY USED") in
+      # the edition's S-4 contents (data/iho/s4-reserved-specs.yaml). An
+      # edition-less reference is reserved when any seeded edition
+      # reserves the number. A reserved citation parses and resolves AS
+      # RESERVED, never invalid (issue #691).
+      def reserved?
+        return false unless spec
+
+        ReservedSpecs.reserved?(edition, part, spec)
       end
 
       # Render the compact face: the code-adjacent components folded onto
@@ -153,7 +201,10 @@ module Pubid
       def render(format: :human, **opts)
         compact = opts.delete(:compact)
         result = super
-        compact && format == :human ? compact_face(result) : result
+        # A spec citation's canonical face IS the compact form (the
+        # citation is already folded onto the code: "IHO S-4 B-401"), so
+        # the compact flag is a no-op for it.
+        compact && format == :human && !spec ? compact_face(result) : result
       end
 
       # The shared mr_string path reads `edition&.number` (the base

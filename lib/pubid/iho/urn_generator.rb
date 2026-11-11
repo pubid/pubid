@@ -31,6 +31,7 @@ module Pubid
     # - urn:iho:m:2:sup-1                         IHO M-2 Sup 1
     # - urn:iho:p:5:vol-2024                      IHO P-5 Vol. 2024
     # - urn:iho:p:1:vol-30:issue-2                IHO P-1 Vol. 30 (2)
+    # - urn:iho:s:4:ed-4.10.0:part-B:spec-401     IHO S-4 4.10.0 B-401
     class UrnGenerator
       attr_reader :identifier
 
@@ -49,6 +50,11 @@ module Pubid
         [:supplement, "sup"], [:supplement_edition, "ed"],
         [:supplement_year, "year"],
         [:part, "part"], [:part_edition, "ed"], [:part_year, "year"],
+        # the S-4 spec citation: a child of its part (the citation
+        # letter rides the part- atom), the dotted sub and the
+        # parenthesized variant its own children. The SECTION is NOT
+        # emitted — derivable from the spec's hundreds digit.
+        [:spec, "spec"], [:spec_sub, "specsub"], [:spec_variant, "specvar"],
         [:annex, "annex"], [:annex_edition, "ed"], [:annex_year, "year"],
         [:appendix, "appendix"], [:appendix_subnumber, nil],
         [:appendix_edition, "ed"], [:appendix_year, "year"],

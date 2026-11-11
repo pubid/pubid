@@ -52,4 +52,32 @@ RSpec.describe Pubid::Iho::UrnGenerator do
         .not_to eq(Pubid::Iho.parse("IHO S-158 Vol. 2024").to_urn)
     end
   end
+
+  # The S-4 loose-leaf spec citation (pubid#691): the citation letter
+  # rides the part- atom (case preserved: part-B), the spec number and
+  # its sub/variant are the atoms after it, and the SECTION is never
+  # emitted — it is the spec number's hundreds digit, derivable.
+  describe "S-4 spec citations" do
+    {
+      "IHO S-4 B-401" => "urn:iho:s:4:part-B:spec-401",
+      "IHO S-4 4.10.0 B-401" => "urn:iho:s:4:ed-4.10.0:part-B:spec-401",
+      "IHO S-4 B-122.1" => "urn:iho:s:4:part-B:spec-122:specsub-1",
+      "IHO S-4 B-521(I)" => "urn:iho:s:4:part-B:spec-521:specvar-I",
+      "IHO S-4 B-351.1(I)" => "urn:iho:s:4:part-B:spec-351:specsub-1:specvar-I",
+      "IHO S-4 B-400" => "urn:iho:s:4:part-B:spec-400", # the section-level slot
+      "IHO S-4 B-170" => "urn:iho:s:4:part-B:spec-170", # reserved
+      # the loose forms are the same identity: one URN
+      "B-401" => "urn:iho:s:4:part-B:spec-401",
+      "S-4 Part B, Section 400" => "urn:iho:s:4:part-B:spec-400",
+      "S-4 Part B, Section 400, B-401" => "urn:iho:s:4:part-B:spec-401",
+    }.each do |input, urn|
+      it "renders #{input.inspect} as #{urn.inspect}" do
+        expect(Pubid::Iho.parse(input).to_urn).to eq(urn)
+      end
+    end
+
+    it "emits no section atom" do
+      expect(Pubid::Iho.parse("IHO S-4 B-401").to_urn).not_to include("section")
+    end
+  end
 end

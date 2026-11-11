@@ -1,0 +1,15 @@
+# IHO S-4 reserved specification numbers ("NOT CURRENTLY USED" in the
+# publication's contents), keyed by the S-4 edition whose contents list
+# them, then by the citation's Part letter. A reserved number parses and
+# resolves AS RESERVED, never invalid (issue #691): the identifier is
+# well-formed, the number just names no specification in that edition.
+#
+# Provenance:
+# - Ed 4.10.0: the owner's list in pubid/pubid#691.
+# - Ed 4.9.0 (March 2021): verified against the publication's Part B
+#   contents (reference-docs/iho/S-4_Ed4.9.0_March_2021.pdf) — the same
+#   four numbers print "NOT CURRENTLY USED".
+"4.10.0":
+  B: ["170", "230", "305", "323"]
+"4.9.0":
+  B: ["170", "230", "305", "323"]

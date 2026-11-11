@@ -7,8 +7,8 @@ module Pubid
     # the segment table lives in the grammar header and the flavor notes):
     #
     #   urn:iho:<type>:<number>[:ed-<x.y.z>][:sup-<n>][:part-<X>]
-    #     [:annex-<A>][:appendix-<B>][:<sub>][:vol-<n>][:issue-<n>]
-    #     [:year-<yyyy>]
+    #     [:spec-<n>[:specsub-<n>][:specvar-<X>]][:annex-<A>]
+    #     [:appendix-<B>][:<sub>][:vol-<n>][:issue-<n>][:year-<yyyy>]
     #
     # Segment discipline (mirrors the ISO URN parser's strictness):
     # - the docnumber occupies every leading bare number segment up to
@@ -22,7 +22,11 @@ module Pubid
     #   directly after its appendix segment (a year is always
     #   marker-tagged, so a bare digit there can only be the subnumber);
     # - the issue is allowed only beside its volume and validated as
-    #   digits.
+    #   digits;
+    # - the S-4 spec atom is a child of its part (the citation letter
+    #   rides the part- atom): specsub-/specvar- only after spec-, and
+    #   no ed-/year- after a spec node (the spec rides its publication's
+    #   edition; the section is derivable, never emitted).
     #
     # Legacy 2.0.x spellings remain decodable but are never emitted:
     # the bare a.b.c edition segment, the dotted keys part./annex./
@@ -38,6 +42,7 @@ module Pubid
     # - urn:iho:p:5:vol-2024                   → IHO P-5 Vol. 2024
     # - urn:iho:p:1:vol-30:issue-2             → IHO P-1 Vol. 30 (2)
     # - urn:iho:s:158:100                      → IHO S-158:100
+    # - urn:iho:s:4:ed-4.10.0:part-B:spec-401  → IHO S-4 4.10.0 B-401
     class UrnParser < Pubid::UrnParser::Base
       TYPE_LETTERS = %w[s p m b c].freeze
 
@@ -50,6 +55,9 @@ module Pubid
         "ed" => [:edition, /\A\d+\.\d+\.\d+\z/],
         "sup" => [:supplement, /\A\d+\z/],
         "part" => [:part, /\A(?:\d+[a-zA-Z]*|[A-Z]|[SPMBC]-\d+)\z/],
+        "spec" => [:spec, /\A[1-6]\d\d\z/],
+        "specsub" => [:spec_sub, /\A\d+\z/],
+        "specvar" => [:spec_variant, /\A[A-Z]+\z/],
         "annex" => [:annex, /\A[A-Z]\z/],
         "appendix" => [:appendix, /\A(?:[A-Z]|\d+)\z/],
         "vol" => [:volume, /\A\d+\z/],
@@ -62,6 +70,12 @@ module Pubid
       # The positional markers: their attribute depends on the node they
       # follow (the component-edition duality).
       POSITIONAL_MARKERS = %i[edition year].freeze
+
+      # The S-4 spec node and its children: specsub-/specvar- are only
+      # allowed after their parent, and an S-4 spec rides its
+      # publication's edition — no ed-/year- inside a spec.
+      SPEC_NODES = %i[spec spec_sub spec_variant].freeze
+      SPEC_PARENTS = %i[spec spec_sub].freeze
 
       # Legacy dotted keys (deprecated; decodable, never emitted).
       # "ap" is the pre-positional appendix tag; "suppl" the pre-positional
@@ -97,10 +111,21 @@ module Pubid
         # own edition).
         ctx = { component: nil, edition_owner: nil }
         consume_segments!(attrs, segments, ctx, urn)
-        Builder.build({ type: type_token.upcase, **attrs })
+        build_identifier({ type: type_token.upcase, **attrs }, urn)
       end
 
       private
+
+      # The semantic validations the builder applies to the decoded shape
+      # (the S-4 anchor, the citation letter) are URN validation at this
+      # layer: a URN that asserts a citation it cannot carry is a
+      # malformed URN, and the raw ArgumentError stays as the cause.
+      def build_identifier(hash, urn)
+        Builder.build(hash)
+      rescue ArgumentError => e
+        raise Pubid::Errors::UrnParseError,
+              "#{e.message} in #{urn.inspect}"
+      end
 
       def read_type!(segments, urn)
         type_token = segments.shift.to_s.downcase
@@ -159,15 +184,24 @@ module Pubid
         marker, value = MARKER_RE.match(segment).captures
         key, pattern = MARKERS.fetch(marker)
         raise_invalid!(marker, value, urn) unless value.match?(pattern)
-
-        if POSITIONAL_MARKERS.include?(key)
-          return consume_positional!(attrs, key, value, ctx, urn)
-        end
+        assert_spec_parent!(key, ctx, urn)
+        return consume_positional!(attrs, key, value, ctx, urn) if
+          POSITIONAL_MARKERS.include?(key)
 
         store!(attrs, key, value, urn)
         ctx[:component] = key
         ctx[:edition_owner] = nil
         consume_subnumber!(attrs, key, segments, ctx, urn)
+      end
+
+      # specsub-/specvar- are children of the spec atom — allowed only
+      # in their parent's slot (the SEGMENTS table in the generator).
+      def assert_spec_parent!(key, ctx, urn)
+        return unless %i[spec_sub spec_variant].include?(key)
+        return if SPEC_PARENTS.include?(ctx[:component])
+
+        raise Pubid::Errors::UrnParseError,
+              "#{key}- is only allowed after spec- in #{urn.inspect}"
       end
 
       def raise_invalid!(marker, value, urn)
@@ -177,8 +211,15 @@ module Pubid
 
       # ed- and year- are POSITIONAL markers (see the marker docs): the
       # edition attaches to the component it follows, the year to the
-      # edition owner.
+      # edition owner. An S-4 spec carries neither — it rides its
+      # publication's edition.
       def consume_positional!(attrs, key, value, ctx, urn)
+        if SPEC_NODES.include?(ctx[:component])
+          raise Pubid::Errors::UrnParseError,
+                "an S-4 spec rides its publication's edition: #{key}- " \
+                "cannot follow a spec segment in #{urn.inspect}"
+        end
+
         if key == :edition
           return store_component_scoped!(attrs, :edition, value, ctx, urn)
         end

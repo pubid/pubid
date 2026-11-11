@@ -13,10 +13,11 @@ module Pubid
     # edition/year right after it — supplement, part, annex, appendix (the
     # two-level Appendix D-2 keeps the subnumber as its own atom), volume
     # (the unified locator, yearbook volumes included: `vol-2024`), issue.
-    # Letters stay case-preserved (`part-A`). The legacy `y.` yearbook
-    # marker is decodable in the official URN parser, never emitted here:
-    # a periodical has no `year-` atom value, its volume carries the year.
-    # The official urn:mrn:iho:… form stays on #to_urn.
+    # The S-4 spec citation sits inside its part (`spec-`, `specsub-`,
+    # `specvar-`). Letters stay case-preserved (`part-A`). The legacy
+    # `y.` yearbook marker is decodable in the official URN parser, never
+    # emitted here: a periodical has no `year-` atom value, its volume
+    # carries the year. The official urn:mrn:iho:… form stays on #to_urn.
     PubidUrnSchema = Pubid::PubidUrn.define("iho") do
       atom "edition", "ed"
       atom "year", "year"
@@ -26,6 +27,12 @@ module Pubid
       atom "part", "part"
       atom "part_edition", "parted"
       atom "part_year", "party"
+      # The S-4 loose-leaf spec citation (issue #691): a child of the
+      # part (the citation letter rides `part-`); the section is
+      # derivable from the spec's hundreds digit — never an atom.
+      atom "spec", "spec"
+      atom "spec_sub", "specsub"
+      atom "spec_variant", "specvar"
       atom "annex", "annex"
       atom "annex_edition", "anned"
       atom "annex_year", "annyear"

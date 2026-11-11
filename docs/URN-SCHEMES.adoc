@@ -1680,6 +1680,19 @@ yearbook year is a volume — `IHO P-5 Vol. 2024` emits `vol-2024` and no
 parser, never emitted. All 173 corpus rows emit; the official
 `urn:mrn:iho:…` form stays on `#to_urn`.
 
+*Landed (issue #691).* The S-4 loose-leaf spec citation is a child of its
+part — the citation letter rides the existing `part-` atom (case preserved:
+`part-B`), placed after the part's own edition/year and before `annex-`:
+`IHO S-4 4.10.0 B-401` emits `urn:pubid:iho:std:4:ed-4.10.0:part-B:spec-401`.
+The dotted sub and the parenthesized variant are the spec's own children
+(`specsub-`, `specvar-`; `B-122.1` is `spec-122:specsub-1`, `B-521(I)` is
+`spec-521:specvar-I`, `B-351.1(I)` chains both). The section is the spec
+number's hundreds digit — derivable, never stored, never an atom — so the
+section-level citation `B-400` emits `spec-400` like any leaf; the long
+form "S-4 Part B, Section 400" parses to that same identity. No `ed-`/
+`year-` attaches to a spec (it rides its publication's edition), and a
+spec-less URN is byte-identical to the pre-#691 emission.
+
 [[urn-isbn]]
 ==== isbn
 

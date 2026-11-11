@@ -106,6 +106,11 @@ RSpec.describe Pubid::Iho::UrnParser do
     "IHO S-158 Part S-102 0.2.0" => %i[part part_edition],
     "IHO S-122 1.0.0 Appendix D-2" => %i[edition appendix appendix_subnumber],
     "IHO S-100 5.0.0 Part 2 (2024)" => %i[edition part year],
+    "IHO S-4 4.10.0 B-401" => %i[edition part spec],
+    "IHO S-4 B-122.1" => %i[part spec spec_sub],
+    "IHO S-4 B-521(I)" => %i[part spec spec_variant],
+    "IHO S-4 B-351.1(I)" => %i[part spec spec_sub spec_variant],
+    "IHO S-4 B-400" => %i[part spec],
   }.each do |text, components|
     it "round-trips #{text.inspect} through the URN and the hash" do
       id = Pubid::Iho.parse(text)
@@ -119,6 +124,46 @@ RSpec.describe Pubid::Iho::UrnParser do
       from_hash = Pubid::Iho::Identifier.from_hash(id.to_hash)
       expect(from_hash).to eq(id)
       expect(from_hash.to_urn).to eq(id.to_urn)
+    end
+  end
+
+  describe "the S-4 spec segments (pubid#691)" do
+    {
+      "urn:iho:s:4:part-B:spec-401" => "IHO S-4 B-401",
+      "urn:iho:s:4:ed-4.10.0:part-B:spec-401" => "IHO S-4 4.10.0 B-401",
+      "urn:iho:s:4:part-B:spec-122:specsub-1" => "IHO S-4 B-122.1",
+      "urn:iho:s:4:part-B:spec-521:specvar-I" => "IHO S-4 B-521(I)",
+      "urn:iho:s:4:part-B:spec-351:specsub-1:specvar-I" => "IHO S-4 B-351.1(I)",
+      "urn:iho:s:4:part-B:spec-400" => "IHO S-4 B-400",
+      "urn:iho:s:4:part-A:spec-401" => "IHO S-4 A-401",
+    }.each do |urn, text|
+      it "decodes #{urn.inspect} as #{text.inspect}" do
+        expect(described_class.new.parse_urn(urn).to_s).to eq(text)
+      end
+    end
+
+    {
+      # the spec vocabulary is the S-4 sections (100-600)
+      "urn:iho:s:4:part-B:spec-800" => "invalid spec value",
+      # specsub-/specvar- are children of the spec, not free markers
+      "urn:iho:s:4:part-B:specvar-I" => "only allowed after spec-",
+      "urn:iho:s:4:part-B:spec-401:specsub-1:specsub-2" =>
+        "duplicate spec_sub segment",
+      # an S-4 spec rides its publication's edition — no ed-/year- inside
+      "urn:iho:s:4:part-B:spec-401:ed-1.0.0" =>
+        "rides its publication's edition",
+      "urn:iho:s:4:ed-4.10.0:part-B:spec-401:year-2024" =>
+        "rides its publication's edition",
+      # a spec without its part has no citation letter
+      "urn:iho:s:4:spec-401" => "lettered Part",
+      # the citation letter must be an uppercase S-4 Part letter
+      "urn:iho:s:4:part-b:spec-401" => "invalid part value",
+      "urn:iho:s:4:part-2:spec-401" => "lettered Part",
+    }.each do |urn, reason|
+      it "rejects #{urn.inspect} (#{reason})" do
+        expect { described_class.new.parse_urn(urn) }
+          .to raise_error(Pubid::Errors::UrnParseError)
+      end
     end
   end
 end
