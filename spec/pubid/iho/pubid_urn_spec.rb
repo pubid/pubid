@@ -8,8 +8,9 @@ require "spec_helper"
 # unified vol- locator (a yearbook year IS a volume), sup-, and no legacy
 # `y.` yearbook marker emitted — its volume carries the year instead. This
 # schema bridges those rulings into the shared codec: the same atoms, in
-# the containment order of the official URN generator. The official
-# urn:mrn:iho:… form stays on #to_urn.
+# the containment order of the official URN generator. The positional
+# urn:iho:… form of UrnGenerator stays on #to_urn — pubid emits no
+# urn:mrn:iho:… URN.
 RSpec.describe "IHO pubid-scheme URN" do
   def expect_round_trip(string)
     id = Pubid::Iho.parse(string)

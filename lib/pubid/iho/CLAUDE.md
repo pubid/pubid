@@ -234,4 +234,5 @@ component with its own edition/year right after it (`sup-`, `part-`,
 `parted-`, `appendix-`, `appsub-`, `vol-`, `issue-` …). Case is preserved
 (`part-A`); the yearbook year is a volume (`vol-2024`, no `year-` value —
 the legacy `y.` marker stays decodable in the official URN parser, never
-emitted). The official `urn:mrn:iho:…` form stays on `#to_urn`.
+emitted). The positional `urn:iho:` form of `UrnGenerator` stays on
+`#to_urn` — pubid emits no `urn:mrn:iho:…` URN.

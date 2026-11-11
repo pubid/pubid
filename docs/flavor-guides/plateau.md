@@ -42,3 +42,30 @@ PLATEAU identifiers follow `PLATEAU {Type} #{Number}[-{annex}] 第{X.X}版`,
 with types Handbook, Technical Report, and Annex. Legacy Latin edition forms
 (`v1.0`, `Version 1.0`) parse and normalize to the canonical Japanese
 `第X.X版`; an annex joins with `-` (`PLATEAU Handbook #01-1 第1.2版`).
+
+## Handbook volume label (本編 / 本編＋付録)
+
+MLIT publishes Handbook #00 edition 5.0 twice on one date: `第5.0版　本編`
+(the main volume) and `第5.0版　本編＋付録` (main volume and appendix, one
+PDF); edition 6.0 ships only as `本編＋付録`. The label is the Handbook's
+`volume` attribute, kept as Japanese text exactly as `edition` keeps
+`第X.Y版`:
+
+```ruby
+require "pubid"
+
+id = Pubid::Plateau.parse("PLATEAU Handbook #00 第5.0版　本編＋付録")
+id.to_s     # => "PLATEAU Handbook #00 第5.0版 本編＋付録"
+id.volume   # => "本編＋付録"
+```
+
+The grammar accepts the label only after an edition, separated by an ASCII or
+a full-width (`U+3000`) space, with `＋` or ASCII `+`; a `+` normalizes to
+`＋` and `to_s` writes one ASCII space before the label. An edition without a
+label keeps parsing (`PLATEAU Handbook #00 第5.0版`, `volume` nil). The
+pubid-scheme URN carries the label as the `vol-` atom in `~XX` escapes
+(`urn:pubid:plateau:hb:0:ed-5.0:vol-~E6~9C~AC~E7~B7~A8`); `to_urn` is
+unchanged. `volume` participates in `==` and is matched strict, so a bare
+`#00 第5.0版` reference matches neither labelled publication; a nil volume
+leaves no key in `to_hash`, so existing index rows keep their hash.
+

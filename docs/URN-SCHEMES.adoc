@@ -1648,7 +1648,11 @@ Landed (issue #670) as drafted; the internet-draft token is `id2` (the draft res
 
 Namespace: `urn:pubid:iho:` (the `_type` flavor segment).
 
-Official URN: `urn:mrn:iho:…` under the IANA-registered `mrn` namespace (formal template `mrn`).
+Official URN: none emitted. IHO's own shapes live under the IANA-registered
+`mrn` namespace (formal template `mrn`, `urn:mrn:iho:…`), but pubid does not
+emit them: `#to_urn` emits the positional `urn:iho:` grammar of
+`lib/pubid/iho/urn_generator.rb` (the shape the atoms and examples below
+document), and `#to_pubid_urn` the `urn:pubid:iho:` scheme.
 
 Current `to_urn` (≤400 sampled pass ids): 138 ids, 138 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
 
@@ -1678,8 +1682,8 @@ field that no longer exists). Case is preserved (`part-A`), the Appendix
 subnumber is its own atom (`appendix-D-2` is `appendix-D:appsub-2`), and the
 yearbook year is a volume — `IHO P-5 Vol. 2024` emits `vol-2024` and no
 `year-` value; the legacy `y.` marker stays decodable in the official URN
-parser, never emitted. All 173 corpus rows emit; the official
-`urn:mrn:iho:…` form stays on `#to_urn`.
+parser, never emitted. All 173 corpus rows emit; the positional
+`urn:iho:` form stays on `#to_urn`.
 
 *Landed (issue #691).* The S-4 loose-leaf spec citation is a child of its
 part — the citation letter rides the existing `part-` atom (case preserved:

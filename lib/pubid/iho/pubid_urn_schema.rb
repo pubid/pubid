@@ -17,7 +17,8 @@ module Pubid
     # `specvar-`). Letters stay case-preserved (`part-A`). The legacy
     # `y.` yearbook marker is decodable in the official URN parser, never
     # emitted here: a periodical has no `year-` atom value, its volume
-    # carries the year. The official urn:mrn:iho:… form stays on #to_urn.
+    # carries the year. The positional urn:iho:… form of UrnGenerator
+    # stays on #to_urn — pubid emits no urn:mrn:iho:… URN.
     PubidUrnSchema = Pubid::PubidUrn.define("iho") do
       atom "edition", "ed"
       atom "year", "year"

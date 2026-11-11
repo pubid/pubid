@@ -80,3 +80,27 @@ suffixes (CSV, CMV, RLV), CISPR designations, and undated references
 (`IEC 60050:--`). Languages render in parentheses with editions
 (`IEC 1000-1:2023 ED2(en)`); the URN follows the IEC URI model
 (`urn:iec:std:iec:1000-1:2023::ed-2:en`).
+
+## Standalone supplements
+
+A supplement face also parses without its base — `IEC/FDAM 60038-1`,
+`IEC/DCOR 60038-1`, `IEC/DISH 60038-1` (the FDAM/DISH stages print on IEC
+documents as slash faces before the number). The standalone form renders the
+canonical spelling (`IEC FDAM 60038-1`), its `#root` is the bare base number
+(`IEC60038`), and it is `==` its `from_hash(to_hash)` round trip — so
+`#matches?` against an index row holds:
+
+```ruby
+require "pubid"
+
+id = Pubid::Iec.parse("IEC/FDAM 60038-1")
+id.to_s   # => "IEC FDAM 60038-1"
+id.class  # => Pubid::Iec::Identifiers::Amendment
+id.root.to_s                  # => "IEC60038"
+Pubid.from_hash(id.to_hash) == id  # => true
+```
+
+The standalone base is synthetic — `#base` answers a bare
+`SingleIdentifier` carrying the number, never a typed stage. Supplements
+written with a base (`IEC 60038:2009/AMD1:2017`) are untouched.
+
