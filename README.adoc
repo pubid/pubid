@@ -7,10 +7,13 @@ image:https://img.shields.io/github/commits-since/metanorma/pubid/latest.svg["Co
 
 == Quick Start
 
-[source,ruby]
+[source,shell]
 ----
 gem install pubid
+----
 
+[source,ruby]
+----
 require 'pubid/iso'
 
 # Parse an identifier
@@ -18,13 +21,13 @@ id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
 
 # Access components
 id.publisher.body  # => "ISO"
-id.number.number   # => "9001"
+id.root.number     # => "9001"
 
 # Render back to string (round-trip)
 id.to_s  # => "ISO 9001:2015/Amd 1:2020"
 
 # Generate URN
-id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
+id.to_urn  # => "urn:iso:std:iso:9001:amd:1:2020:v1"
 ----
 
 == Overview
@@ -78,12 +81,15 @@ README.
 |link:docs/flavor-guides/iec.md[IEC: TRF format grammars]
 |IECEE and IECEx Test Report Form patterns — the `&` part join, the
 `F_II`-style sub-versions, the `_EMC`/`_PS`/`_SOF` test-type suffixes, and the
-IECEx `_`/`v` separator. Ported from the archived pubid-iec README.
+IECEx `_`/`v` separator — plus the general IEC forms (supplement faces,
+CSV/CMV/RLV wrappers, standalone supplements). Ported from the archived
+pubid-iec README.
 
 |link:docs/flavor-guides/plateau.md[PLATEAU: the Handbook #11 edition split]
 |Why an edition-1–3 "Handbook #11" reference with a part suffix parses as
-Handbook #06 / #04 (the rule encoded in `data/plateau/update_codes.yaml`).
-Ported from the archived pubid-plateau README.
+Handbook #06 / #04 (the rule encoded in `data/plateau/update_codes.yaml`),
+and the Handbook volume label (本編 / 本編＋付録). Ported from the
+archived pubid-plateau README.
 
 |link:docs/RENDERING_GUIDE.md[Advanced Rendering Styles Guide]
 |ISO short/long supplement abbreviation preservation and IEC `AMD1` vs
@@ -192,23 +198,22 @@ PubID V2 implements RFC 5141-bis compliant URN generation for ISO and IEC identi
 
 [source,ruby]
 ----
-require 'pubid/iso'
-require 'pubid/iec'
+require 'pubid'
 
 # ISO: Parse and generate URN
 id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016")
 id.to_urn
-# => "urn:iso:std:iso-iec:13818:-1:amd:2016:v3"
+# => "urn:iso:std:iso-iec:13818:-1:amd:3:2016:v1"
 
 # IEC: Parse and generate URN
 id = Pubid::Iec.parse("IEC 60068-2-2:1974/Amd 1:1993")
 id.to_urn
-# => "urn:iec:std:iec:60068-2-2:1974:amd:1993:v1"
+# => "urn:iec:std:iec:60068-2-2:1974:::::amd:1:1993"
 
 # Round-trip: parse URN back to identifier
-id = Pubid::Iso.parse_urn("urn:iso:std:iso:9001:amd:2020:v1")
-id.to_s  # => "ISO 9001/Amd 1:2020"
-id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
+id = Pubid::Iso.parse_urn("urn:iso:std:iso:9001:amd:1:2020:v1")
+id.to_s  # => "ISO 9001/AMD 1:2020"
+id.to_urn  # => "urn:iso:std:iso:9001:amd:1:2020:v1"
 ----
 
 === Features
@@ -228,9 +233,9 @@ id.to_urn  # => "urn:iso:std:iso:9001:amd:2020:v1"
 `#to_urn` follows the registered grammar of the organization, which can
 drop values (RFC 5141 has no year). `#to_pubid_urn` is pubid's own URN: it
 carries every value, always round-trips through `Pubid.parse_urn`, and is
-safe to use as an HTTP path. ISO, IEEE, ANSI, ITU, NIST, ASTM, API, ASHRAE,
-ASME, JCGM, OIML, ETSI, GOST and PLATEAU support it now; the other flavors follow
-(link:docs/URN-SCHEMES.adoc[URN schemes]).
+safe to use as an HTTP path. Every flavor supports it (the per-flavor
+schemas live in `lib/pubid/<flavor>/pubid_urn_schema.rb`;
+link:docs/URN-SCHEMES.adoc[URN schemes] documents each).
 
 [source,ruby]
 ----
@@ -410,6 +415,9 @@ Pubid::Ecma.parse("ECMA-418") === Pubid::Ecma.parse("ECMA-418-1")
 # => false (ECMA-418 has no part)
 Pubid::Ecma.parse("ECMA-418-1") === Pubid::Ecma.parse("ECMA-418-1 ed1")
 # => true
+Pubid::Ecma.parse("ECMA-262 Edition 5.1") === Pubid::Ecma.parse("ECMA-262 ed5.1")
+# => true (the human edition faces — "Edition 5.1", "ed 5.1", a bare
+# trailing edition — parse in as aliases of the canonical " ed<N>" face)
 ----
 
 A reference asks for every part of a document with `all_parts`:
@@ -480,15 +488,18 @@ backend, without parsing.
 ----
 require 'pubid'
 
+Pubid.eager_load_flavors!  # flavor modules register lazily; load them all
+
 Pubid::Iso.prefixes
-# => ["ISO", "ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE"]
+# => ["ISO", "ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE", "ISO/IEEE"]
 
 Pubid::Bsi.prefixes
-# => ["BS", "BSI", "DD", "PD", "PAS", "NA", "TS", "HB", ... , "BS EN ISO"]
+# => ["BS", "BSI", "DD", "PD", "PAS", "NA", "TS", "HB", "PP", "BIP", "EP",
+#     "BS EN", "BS ISO", "BS IEC", "BS EN ISO", "BS EN IEC"]
 
 # Look up a single flavor by name
 Pubid.prefixes(:iec)
-# => ["IEC", "CISPR", "IECEE", "IECEx", "IECQ", "ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE"]
+# => ["IEC", "CISPR", "IECEE", "IECEx", "IECQ", "ISO/IEC", "IEC/ISO", "ISO/IEC/IEEE", "IEC/IEEE"]
 
 # Reverse index: prefix token => owning flavor(s)
 Pubid.prefix_flavors["ISO/IEC"]       # => [:iec, :iso]
@@ -1012,7 +1023,7 @@ require 'pubid'
 id = Pubid::Nist.parse("NIST SP 800-53r5")
 
 # Access components
-id.series    # => "SP"
+id.series.to_s # => "SP"
 id.number    # => "800-53"
 id.revision  # => "r5"
 
@@ -1021,7 +1032,7 @@ id.to_s      # => "NIST SP 800-53r5"
 
 # Parse historical NBS patterns
 id = Pubid::Nist.parse("NBS LCIRC 1019r1963")
-id.to_s      # => "NBS LCIRC 1019r1963"
+id.to_s      # => "NBS LC 1019r1963"
 
 # CSM volume-number format
 id = Pubid::Nist.parse("NBS CSM v6n1")
@@ -1029,7 +1040,19 @@ id.to_s      # => "NBS CSM v6n1"
 
 # Supplement with revision
 id = Pubid::Nist.parse("NBS CIRC 154supprev")
-id.to_s      # => "NBS CIRC 154supprev"
+id.to_s      # => "NBS CIRC 154sup"
+
+# FIPS PUB printed form: NIST prints the series as "FIPS PUB <number>";
+# the alias rewrites it onto the canonical "NIST FIPS <number>" model
+# (same hash, render, URN and MR string as the canonical parse)
+id = Pubid::Nist.parse("FIPS PUB 205")
+id.to_s      # => "NIST FIPS 205"
+
+# Hyphenated numbers and the revision forms ride the alias too
+id = Pubid::Nist.parse("FIPS PUB 180-4")
+id.to_s      # => "NIST FIPS 180-4"
+id = Pubid::Nist.parse("FIPS PUB 140-3 rev1")
+id.to_s      # => "NIST FIPS 140-3r1"
 ----
 
 **Language:**
@@ -1039,20 +1062,34 @@ id.to_s      # => "NBS CIRC 154supprev"
 
 ==== IEC
 
-The IEC parser handles complex patterns including adopted standards and dual-published identifiers:
+The IEC parser handles the supplement faces, the value-added wrappers, the
+project-committee working documents, and the standalone supplements:
 
 [source,ruby]
 ----
 require 'pubid'
 
-# Parse standard IEC identifier
-id = Pubid::Iec.parse("IEC 62014-5 IEEE Std 1734-2011")
-id.class  # => Pubid::Iec::Identifiers::DualPublished
-id.to_s   # => "IEC 62014-5 and IEEE Std 1734-2011"  # normalized
+# Supplements render the compact official face (AMD1 vs the long "Amd 1")
+id = Pubid::Iec.parse("IEC 60050-351:2013/AMD1:2016")
+id.to_s   # => "IEC 60050-351:2013/AMD1:2016"
 
-# Space-separated dual identifiers are auto-detected
-id = Pubid::Iec.parse("ANSI C37.61-1973 and IEEE Std 321-1973")
-id.to_s   # => "ANSI C37.61-1973 and IEEE Std 321-1973"
+# Value-added editions are VapIdentifier wrappers (+AMD… CSV)
+id = Pubid::Iec.parse("IEC 60950-1:2005+AMD1:2009+AMD2:2013 CSV")
+id.class  # => Pubid::Iec::Identifiers::VapIdentifier
+id.to_s   # => "IEC 60950-1:2005+AMD1:2009+AMD2:2013 CSV"
+
+# Working documents
+id = Pubid::Iec.parse("1/2457/FDIS")
+id.class  # => Pubid::Iec::Identifiers::WorkingDocument
+id.to_s   # => "1/2457/FDIS"
+
+# A standalone supplement (a supplement face without its base) parses on
+# its own, is == its from_hash(to_hash) round trip, and its root is the
+# bare base number
+id = Pubid::Iec.parse("IEC/FDAM 60038-1")
+id.to_s   # => "IEC FDAM 60038-1"
+Pubid.from_hash(id.to_hash) == id  # => true
+id.root.to_s  # => "IEC60038"
 ----
 
 ===== Pattern 4: Relationship Identifiers ✨
@@ -2206,12 +2243,14 @@ require 'pubid/nist'
 id = Pubid::Nist.parse("NIST SP 800-53r5")
 
 # Access components
-id.series    # => "SP"
+id.series.to_s # => "SP"
 id.number    # => "800-53"
 id.revision  # => "r5"
 
 # Render to string
 id.to_s      # => "NIST SP 800-53r5"
+----
+
 ==== OIML
 
 OIML supports 9 identifier types with edition and supplement support:

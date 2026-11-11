@@ -212,6 +212,13 @@ Pubid::Iec::Identifiers::Amendment.new(number: "1", year: 2016, base: base).to_s
 # => "IEC 60050-351:2013/AMD1:2016"
 ```
 
+An IEC supplement face can also stand alone: parsed or built without a
+`base`, the supplement synthesizes a bare base from its own number —
+`IEC/FDAM 60038-1` renders `IEC FDAM 60038-1`, its `#root` is `IEC60038`,
+and it is `==` its `from_hash(to_hash)` round trip. The standalone faces and
+their identity contract are documented in
+link:flavor-guides/iec.md#standalone-supplements[the IEC flavor guide].
+
 IEEE supplements:
 
 ```ruby
