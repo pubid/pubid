@@ -11,6 +11,20 @@
 # below, whose captures carry the idf_ prefix so they never collide
 # with the ISO ones and can bind as scalars.
 #
+# Historic TYPE-first ballot faces (decode-to-modern, owner ruling
+# 2026-11-12): the DAM-family token in TYPE position — "ISO/IEC FDAM 1
+# 14496-12:2004", "ISO/PDAM 19973-2" — and the space-attached ballot
+# face "ISO 15877-5:2009 FDAM 1". Both branches sit LAST in the
+# identifier alternation, so they are purely additive: every face an
+# earlier branch parses keeps its exact parse. The ballot token
+# captures as ballot_type_with_stage; a number on the TYPE token is
+# space-bounded (ballot_number) so "PDAM 19973-2" keeps 19973 in the
+# base; an on-base stamp's number/date capture as ballot_stamp_* (the
+# stamp token itself matches uncaptured — the ballot's stage comes
+# from the TYPE token and the decode keeps no spelling). The builder
+# folds the captures into ONE amendment layer over the whole base, the
+# number taken from the TYPE token, the stamp, or the implied 1.
+#
 # Edition 2 with typed model bindings: every capture the builder
 # consumes is bound. Supplement layers capture into position-scoped
 # names (supp_* on the first supplement, supp2_* on the second,
@@ -23,7 +37,7 @@
 
 use idf
 
-grammar PubidIso version "0.4.0" edition 2 {
+grammar PubidIso version "0.5.0" edition 2 {
 
   # ---- lexical (pubid/parser/common_parse_rules.rb + ISO override) ----
   digit = %x30-39
@@ -47,6 +61,7 @@ grammar PubidIso version "0.4.0" edition 2 {
   # inline the alt so the capture holds one scalar span) ----
   typed_stage_abbrev = alt from_table "typed_stages" column "abbr"
   supp_stage_abbrev = alt from_table "typed_stages_supplements" column "abbr"
+  ballot_stage_abbrev = alt from_table "typed_stages_ballots" column "abbr"
   directives_stage_abbrev = alt from_table "directives_typed_stages" column "abbr"
   directives_supp_stage_abbrev = alt from_table "directives_supplements_typed_stages" column "abbr"
   idf_stage_abbrev = alt from_table "idf_typed_stages" column "abbr"
@@ -395,6 +410,76 @@ grammar PubidIso version "0.4.0" edition 2 {
     )
   }
 
+  # ---- historic TYPE-first ballot faces (decode-to-modern) ----
+  ## The DAM-family ballot token in TYPE position. Captured under its
+  ## own name: the supplement tables' captures stay reserved for the
+  ## on-base layers, and the ballot's stage is the one the decode keeps.
+  ballot_type_with_stage = {
+    (
+      (alt from_table "typed_stages_ballots" column "abbr")
+    ) as ballot_type_with_stage
+  }
+  ## An on-base stamp riding a ballot face ("/Amd 9:2001", "/Amd.1",
+  ## "/Am1:2006"): it carries the amendment's number and ballot date
+  ## while its own token letters are decode-away (matched uncaptured —
+  ## the ballot's stage comes from the TYPE token). Mirrors the three
+  ## supplement tails: a (glued or spaced) number with an optional
+  ## date, or a dot number.
+  ballot_stamp = {
+    slash supp_stage_abbrev
+    (
+      (
+        [space]
+        ((1*5digit)) as ballot_stamp_number
+        [
+          [space]
+          (
+            (colon / dash) [
+              (("19" / "20") 2*digit !digit [(dash 2*digit)] [(dash 2*digit)]) as ballot_stamp_date
+              / (("--" / "—")) as ballot_stamp_undated_marker
+            ]
+          )
+        ]
+      )
+      / ( dot (1*digit) as ballot_stamp_dot_number )
+    )
+  }
+  ## "ISO/IEC FDAM 1 14496-12:2004", "ISO/PDAM 19973-2": the ballot
+  ## token first, then the base kept whole. The TYPE-token number is
+  ## space-bounded on both sides — mandatory trailing space — so
+  ## "PDAM 19973-2" cannot read 19973 as the ballot number: with no
+  ## second space the group backtracks and 19973 parses in second_part.
+  ballot_supplement_identifier = {
+    prefix_with_copublishers
+    [space]
+    [slash]
+    ballot_type_with_stage
+    [ space ((1*digit)) as ballot_number space ]
+    [space]
+    [type_with_stage]
+    [space]
+    second_part
+    [ ballot_stamp ]
+  }
+  ## The space-attached ballot face: "ISO 15877-5:2009 FDAM 1" — the
+  ## base designation first, then the ballot token attached by a space.
+  ## The base front is inlined (not supplement_base_no_third): that
+  ## rule ends in base_third_part_edition, whose own optional space
+  ## would consume the separator the ballot token needs. No base
+  ## edition is served here — none of the stored or owner-cited ballot
+  ## faces carries one.
+  ballot_space_supplement_identifier = {
+    [ (("Guide" / "GUIDE") as type_with_stage_fr) space ]
+    [prefix_with_copublishers]
+    [space]
+    [slash]
+    [type_with_stage]
+    [space]
+    second_part
+    space ballot_type_with_stage
+    [ space ((1*digit)) as ballot_number ]
+  }
+
   # ---- directives: "ISO/IEC DIR 1", "ISO/IEC JTC 1 DIR", supplements,
   # bundled "ISO/IEC DIR 1:2022 + IEC SUP:2022" ----
   directives_publisher_subgroup = ("JTC 1") as subgroup
@@ -609,7 +694,8 @@ grammar PubidIso version "0.4.0" edition 2 {
   }
 
   ## The ISO identifier root: common-text twin form first, then the
-  ## single spine.
+  ## single spine. The historic ballot faces go last — purely additive
+  ## branches (an input an earlier member parses keeps that parse).
   identifier = {
       bare_tc_document
     / nsb_iso_identifier
@@ -623,6 +709,8 @@ grammar PubidIso version "0.4.0" edition 2 {
     / supplement_identifier
     / joint_identifier
     / identifier_copublishers
+    / ballot_space_supplement_identifier
+    / ballot_supplement_identifier
   }
 
   entry identifier: identifier
@@ -712,6 +800,12 @@ bs3_undated_marker -> bs3_undated_marker (string)
     idf_supp_stage_iteration2 -> idf_supp_stage_iteration2 (string)
     idf_supp_date2 -> idf_supp_date2 (string)
     idf_supp_undated_marker -> idf_supp_undated_marker (string)
+    ballot_type_with_stage -> ballot_type_with_stage (string)
+    ballot_number -> ballot_number (string)
+    ballot_stamp_number -> ballot_stamp_number (string)
+    ballot_stamp_dot_number -> ballot_stamp_dot_number (string)
+    ballot_stamp_date -> ballot_stamp_date (string)
+    ballot_stamp_undated_marker -> ballot_stamp_undated_marker (string)
   }
 
   ## In-file grammar tests: run at compile time, embedded in the artifact,
@@ -728,9 +822,55 @@ bs3_undated_marker -> bs3_undated_marker (string)
     accept "ISO 5537|IDF 26"
     accept "ISO 4055/Amd 1:2021"
     accept "ISO/R 9:1962"
+    accept "ISO/IEC FDAM 1 14496-12:2004"
+    accept "ISO/PDAM 19973-2"
+    accept "ISO/IEC FPDAM 9075/1"
+    accept "ISO/IEC FPDAM 10373-6/Amd 9:2001"
+    accept "ISO/PDAM 19110:2005/Amd.1"
+    accept "ISO/IEC PDAM TR 9573-11/Amd.1"
+    accept "ISO/IEC PDAM 9541-1/Amd.4"
+    accept "ISO/IEC PDAM 2 10646:2012"
+    accept "ISO 15877-5:2009 FDAM 1"
+    accept "ISO 19776-2:2005/Am1:2006"
     reject "nonsense"
+    reject "ISO/PDAM"
+    reject "ISO/FDAM"
     example "ISO/IEC WD TS 25025" { publisher: "ISO" }
     example "JCGM 200:2008(F)" { publisher: "JCGM" }
+    example "ISO/IEC FDAM 1 14496-12:2004" {
+      ballot_type_with_stage: "FDAM"
+      ballot_number: "1"
+      number_with_part: "14496-12"
+      date: "2004"
+    }
+    example "ISO/PDAM 19973-2" {
+      ballot_type_with_stage: "PDAM"
+      number_with_part: "19973-2"
+    }
+    example "ISO/IEC FPDAM 10373-6/Amd 9:2001" {
+      ballot_type_with_stage: "FPDAM"
+      ballot_stamp_number: "9"
+      ballot_stamp_date: "2001"
+    }
+    example "ISO/PDAM 19110:2005/Amd.1" {
+      ballot_type_with_stage: "PDAM"
+      ballot_stamp_number: "1"
+    }
+    example "ISO/IEC FPDAM 9075/1" {
+      ballot_type_with_stage: "FPDAM"
+      number_with_part: "9075/1"
+    }
+    example "ISO 15877-5:2009 FDAM 1" {
+      ballot_type_with_stage: "FDAM"
+      ballot_number: "1"
+      number_with_part: "15877-5"
+      date: "2009"
+    }
+    example "ISO/IEC FDAM 19776-2:2005/Am1:2006" {
+      ballot_type_with_stage: "FDAM"
+      ballot_stamp_number: "1"
+      ballot_stamp_date: "2006"
+    }
   }
 }
 

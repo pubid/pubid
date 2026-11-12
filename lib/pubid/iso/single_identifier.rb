@@ -36,7 +36,13 @@ module Pubid
         return false unless typed_stage
 
         ts = typed_stage
-        if ts.long_abbr && ts.original_abbr&.start_with?(ts.long_abbr)
+        original = ts.original_abbr
+        if ts.long_abbr && original && (original.start_with?(ts.long_abbr) ||
+                                        ts.long_abbr.start_with?(original))
+          # The long family: the canonical long spelling, its punctuated
+          # forms ("Amd." of "Amd"), and shorter long-family spellings
+          # ("Am" — the alias of "Amd" the owner ruled renders canonical).
+          # The short family ("AMD") matches neither direction.
           true
         elsif ts.long_abbr && ts.original_abbr&.include?("Directives")
           true

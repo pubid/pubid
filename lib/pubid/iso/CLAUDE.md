@@ -158,3 +158,52 @@
   another reason — `DirectivesSupplement#supplement_publisher` is an
   `Iso::Components::Publisher` after `parse` and a `Pubid::Components::Publisher`
   after `from_hash` (11 supplements, 3 bundles).
+
+- **Historic TYPE-first ballot faces decode to the canonical on-base slash
+  form (owner ruling 2026-11-12, Option B — IHO-style decode-to-modern;
+  SSOT `data/iso/historic-schemes.md`).** The DAM-family token in TYPE
+  position (`ISO/IEC FDAM 1 14496-12:2004`, `ISO/PDAM 19973-2`) and the
+  space-attached ballot face (`ISO 15877-5:2009 FDAM 1`) used to raise; the
+  grammar (v0.5.0) gained two additive branches at the END of the
+  identifier alternation, so every face an existing member parses keeps its
+  exact parse (replayed: 15,307 fixture inputs and 213,414 stored
+  docidentifier faces byte-identical on `to_s`/`to_urn`/`to_hash`/
+  `to_mr_string`). What to know before editing either side:
+  - **The ballot token captures as `ballot_type_with_stage`** (table
+    `typed_stages_ballots`: PDAM, DAM, DAmd, FDAM, FDAmd, FPDAM), NOT as
+    `supp_type_with_stage` — a shared name would make the builder's
+    supplement-prefix peel wrap a second layer, while the stored twins keep
+    ONE level. `Builder#build_ballot_supplement` assembles the single
+    amendment layer and nests the rest (prefix, copublishers, the base's
+    own `type_with_stage` — the `TR` of `PDAM TR 9573-11` — and
+    `number_with_part`/`date`) as `:base`.
+  - **`ballot_number` is space-bounded on both sides** (mandatory trailing
+    space in the grammar group) so `PDAM 19973-2` cannot read 19973 as the
+    ballot number: with no second space the group backtracks and 19973
+    stays in `second_part`. This is the base-whole guard — the IEC-flavor
+    hazard (#693's `ensure_base`) of a base part migrating into the
+    supplement slot cannot happen here; the legacy slash-part of
+    `FPDAM 9075/1` stays a base part (`9075-1`).
+  - **The number precedence is TYPE token → on-base stamp → implied "1"**;
+    the stamp's number/date capture as `ballot_stamp_*` while its token
+    letters match UNCAPTURED (Option B keeps no spelling — the ballot's
+    stage is the TYPE token's). The implied 1 is the owner's no-number
+    rule, applied by `Builder#apply_implied_amendment_number` on EVERY
+    builder path (parse, URN, bundle members) for `Identifiers::Amendment`
+    with a nil number and `typed_stage.code` ∈ `{pdam, damd, fdamd, fpdam}`
+    — by `#code`, NOT `#stage_code` (PDAM's stage_code is `:cd`), and
+    `to_sym`-ed (the bound map delivers strings). The published stage
+    (abbr `Amd`) is out of scope: a numberless `ISO 1234/Amd` stays nil.
+  - **The `Am` spelling** joined `typed_stages_supplements` (after the Amd
+    entries) and the published stage's abbr list, so `/Am1:2006` parses as
+    an alias of `/Amd 1` through the EXISTING supplement branch and the
+    ballot stamp accepts it the same way. `detect_stage_format_long` now
+    treats an original spelling that is a prefix of the long abbr as the
+    long family, so `Am` renders canonical `Amd`; `AMD` still renders short
+    (facets keep spelling on render), `Amd.` still renders `Amd`.
+  - **The decode is one-way**: parse-in only, canonical renders emit the
+    on-base slash face, and a ballot face == its canonical spelling
+    (original_abbr is equality-ignored). Locked by
+    `spec/pubid/iso/ballot_face_decode_spec.rb` (all 13 SSOT anchors, the
+    no-number rule, base-whole guards, Am alias, stored-twin agreement, and
+    the website-face-vs-stored-face drift rows the SSOT §5 records).

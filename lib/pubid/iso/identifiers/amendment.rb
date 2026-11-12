@@ -112,7 +112,7 @@ module Pubid
           ),
           ::Pubid::Components::TypedStage.new(
             code: :published,
-            abbr: ["Amd", "AMD", "Amd."],
+            abbr: ["Amd", "AMD", "Amd.", "Am"],
             short_abbr: "AMD",
             long_abbr: "Amd",
             type_code: :amd,
