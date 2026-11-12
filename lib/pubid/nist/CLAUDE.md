@@ -136,16 +136,26 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   the six rows (`NBS CS`, `NBS CSM`, `NBS CIS`, `NBS CS-E`, `NIST PS`,
   `NIST DCI`) into the testsuite with the gem twin in lockstep.
 
-- **"FIPS PUB <number>" is a preprocessor alias, not a grammar face
-  (pubid#697).** NIST prints the series as "FIPS PUB <number>" but the
-  grammar reads "NIST FIPS <number>", so `normalize_fips_pub_alias!`
-  (head-anchored, immediately after the publisher/series stage) rewrites
-  the printed prefix and the parse lands on exactly the canonical model —
-  hash-, render-, URN- and MR-identical to "NIST FIPS <number>". The
-  hyphenated numbers and the revision forms the grammar models
-  ("FIPS PUB 199 Rev. 1" with its `original_prefix` facet, compact
-  "rev1") ride the prefix alias; bare "FIPS <number>"
-  (publisher_was_parsed: false) and NBS FIPS are untouched.
+- **"FIPS PUB <number>" is the official RENDER face; the preprocessor
+  alias exists so the spellings parse (pubid#697; owner ruling
+  2026-11-12).** FIPS is government-published and "PUB" (Federal
+  Information Processing Standards PUBlication) is part of the official
+  designation, so
+  `FederalInformationProcessingStandards#fips_render_lead` renders the
+  spelled-NIST-publisher rows as "FIPS PUB <number>" with the tails
+  riding the lead; the lead reads `printed_publisher`, so the
+  series-default NIST a bare parse fills (#704) is not a printed
+  publisher and the bare face stays bare. The grammar reads "NIST FIPS
+  <number>", so `normalize_fips_pub_alias!` (head-anchored, immediately
+  after the publisher/series stage) folds every printed spelling —
+  "FIPS PUB 205" and the publisher-prefixed "NIST FIPS PUB 205"
+  (pubid#702) — onto that canonical model, and all the spellings
+  converge on one identity: hash-, URN- and MR-identical, and one
+  render. The hyphenated numbers and the revision forms the grammar
+  models ("FIPS PUB 199 Rev. 1" with its `original_prefix` facet,
+  compact "rev1") ride the prefix alias; bare "FIPS <number>"
+  (publisher_was_parsed: false), the historical NBS-prefixed rows, and
+  the MR face ("NIST.FIPS.197", an identity surface) are untouched.
 
 - **A bare "FIPS <number>" carries the series' NIST publisher (hand-off
   nist-bare-fips-publisher, metanorma-pdfa#114).** relaton keeps a CSRC hit

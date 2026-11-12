@@ -25,7 +25,10 @@ RSpec.describe "to_s(with_publisher:)" do
     ["nist", "NIST SP 800-113", false] => "SP 800-113",
     ["nist", "NIST SP 800-113", true] => "NIST SP 800-113",
     ["nist", "NBS CIRC 25sup", false] => "CIRC 25sup",
-    ["nist", "NIST FIPS 197/Upd1 ipd", false] => "FIPS 197/Upd1 ipd",
+    ["nist", "NIST FIPS 197/Upd1 ipd", false] => "FIPS PUB 197/Upd1 ipd",
+    # "PUB" is part of the official FIPS designation (Federal Information
+    # Processing Standards PUBlication), not a publisher prefix — the
+    # with_publisher strip never touches it.
     ["bipm", "BIPM SI Brochure Part 1", false] => "SI Brochure Part 1",
     ["bipm", "BIPM SI Brochure Part 1", true] => "BIPM SI Brochure Part 1",
     ["bipm", "CGPM RES (1889)", false] => "CGPM RES (1889)",

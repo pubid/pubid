@@ -6,7 +6,9 @@ module Pubid
       # NIST Federal Information Processing Standards (FIPS)
       # Examples:
       # - "FIPS 140-3" (no NIST prefix)
-      # - "NIST FIPS 140-3" (also accepted, normalizes to FIPS 140-3)
+      # - "NIST FIPS 140-3" / "FIPS PUB 140-3" (also accepted; both parse
+      #   to the same identity, and the NIST-published face renders as
+      #   "FIPS PUB 140-3")
       class FederalInformationProcessingStandards < Identifier
         TYPED_STAGES = [
           Pubid::Components::TypedStage.new(
@@ -67,10 +69,28 @@ module Pubid
 
         public
 
+        # The short-face lead: the official printed "FIPS PUB" for a spelled
+        # NIST publisher (owner ruling 2026-11-12), the spelled historical
+        # publisher for NBS rows, and the bare series code when the input
+        # spelled no publisher — the series-default NIST a bare parse fills
+        # (#704) is not a printed publisher, so the bare face stays bare.
+        def fips_render_lead
+          lead_publisher = printed_publisher
+          return "FIPS PUB" if lead_publisher == "NIST"
+          return "#{lead_publisher} #{series_code}" if lead_publisher && !lead_publisher.empty?
+
+          series_code.to_s
+        end
+
         def to_short_style
-          # FIPS format: "FIPS 14e1971" or "NIST FIPS 140-3" (preserve publisher if set)
-          result = printed_publisher ? "#{printed_publisher} " : ""
-          result += series_code
+          # The official published face is "FIPS PUB <number>": FIPS is
+          # government-published, and "PUB" (Federal Information Processing
+          # Standards PUBlication) is part of the official designation
+          # (owner ruling 2026-11-12). The tail (volume/part/edition/
+          # supplement/update/draft) rides the lead unchanged, and the MR
+          # face ("NIST.FIPS.197") is an identity surface that does not
+          # move.
+          result = fips_render_lead
 
           if number
             # Convert dash-year patterns to edition format for FIPS

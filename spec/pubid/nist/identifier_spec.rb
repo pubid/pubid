@@ -92,7 +92,7 @@ RSpec.describe "Pubid::Nist identifier parsing" do
 
     context "FIPS identifiers" do
       it "parses basic FIPS" do
-        expect(Pubid::Nist.parse("NIST FIPS 140-3").to_s).to eq("NIST FIPS 140-3")
+        expect(Pubid::Nist.parse("NIST FIPS 140-3").to_s).to eq("FIPS PUB 140-3")
       end
     end
 

@@ -1042,17 +1042,20 @@ id.to_s      # => "NBS CSM v6n1"
 id = Pubid::Nist.parse("NBS CIRC 154supprev")
 id.to_s      # => "NBS CIRC 154sup"
 
-# FIPS PUB printed form: NIST prints the series as "FIPS PUB <number>";
-# the alias rewrites it onto the canonical "NIST FIPS <number>" model
-# (same hash, render, URN and MR string as the canonical parse)
+# FIPS PUB printed form: the official FIPS face is "FIPS PUB <number>"
+# ("PUB" is part of the Federal Information Processing Standards
+# PUBlication designation); every printed spelling parses to the same
+# identity (same hash, URN and MR string as the canonical parse)
 id = Pubid::Nist.parse("FIPS PUB 205")
-id.to_s      # => "NIST FIPS 205"
+id.to_s      # => "FIPS PUB 205"
+id = Pubid::Nist.parse("NIST FIPS PUB 205")
+id.to_s      # => "FIPS PUB 205"
 
 # Hyphenated numbers and the revision forms ride the alias too
 id = Pubid::Nist.parse("FIPS PUB 180-4")
-id.to_s      # => "NIST FIPS 180-4"
+id.to_s      # => "FIPS PUB 180-4"
 id = Pubid::Nist.parse("FIPS PUB 140-3 rev1")
-id.to_s      # => "NIST FIPS 140-3r1"
+id.to_s      # => "FIPS PUB 140-3r1"
 ----
 
 **Language:**
