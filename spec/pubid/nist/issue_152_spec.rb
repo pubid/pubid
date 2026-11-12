@@ -15,7 +15,7 @@ RSpec.describe "Pubid::Nist issue #152 identifiers" do
     "NIST VTS 100-1" => "NIST VTS 100-1",
     "NIST VTS 400-5" => "NIST VTS 400-5",
     "NIST AMS 100-48-upd1" => "NIST AMS 100-48/Upd1",
-    "NIST FIPS 197-upd1" => "NIST FIPS 197/Upd1",
+    "NIST FIPS 197-upd1" => "FIPS PUB 197/Upd1",
     "NIST IR 8165-upd1" => "NIST IR 8165/Upd1",
     "NIST IR 8455-upd1" => "NIST IR 8455/Upd1",
     "NIST TN 2221-upd1" => "NIST TN 2221/Upd1",

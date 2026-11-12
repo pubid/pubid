@@ -60,10 +60,26 @@ RSpec.describe "NIST v2 Implementation" do
           identifier = Pubid::Nist.parse(test_case)
           rendered = identifier.to_s
 
-          if test_case == rendered
+          # The raw export spellings carry the "NIST FIPS" input face; the
+          # official render face is "FIPS PUB <number>" ("PUB" is part of
+          # the Federal Information Processing Standards PUBlication
+          # designation; owner ruling 2026-11-12), so the FIPS rows compare
+          # against the printed face while the raw source line is kept.
+          fips_class =
+            Pubid::Nist::Identifiers::FederalInformationProcessingStandards
+          fips_row = identifier.is_a?(fips_class) &&
+            identifier.publisher.to_s == "NIST"
+          expected =
+            if fips_row
+              test_case.sub(/\ANIST FIPS\b/, "FIPS PUB")
+            else
+              test_case
+            end
+
+          if expected == rendered
             results.record_pass
           else
-            results.record_fail(test_case, test_case, rendered)
+            results.record_fail(expected, expected, rendered)
           end
         rescue StandardError => e
           results.record_error(test_case, e)
@@ -135,16 +151,18 @@ RSpec.describe "NIST v2 Implementation" do
   end
 
   describe "sample test cases" do
+    # [input, canonical render] — the FIPS row renders the official printed
+    # face ("FIPS PUB <number>", owner ruling 2026-11-12)
     [
-      "NIST SP 800-53 Rev. 5",
-      "NIST FIPS 140-3",
-      "NIST IR 8259A",
-      "NIST CSWP 29",
-      "NIST TN 2050",
-    ].each do |test_case|
-      it "correctly parses and renders '#{test_case}'" do
-        identifier = Pubid::Nist.parse(test_case)
-        expect(identifier.to_s).to eq(test_case)
+      ["NIST SP 800-53 Rev. 5", "NIST SP 800-53 Rev. 5"],
+      ["NIST FIPS 140-3", "FIPS PUB 140-3"],
+      ["NIST IR 8259A", "NIST IR 8259A"],
+      ["NIST CSWP 29", "NIST CSWP 29"],
+      ["NIST TN 2050", "NIST TN 2050"],
+    ].each do |input, rendered|
+      it "correctly parses and renders '#{input}'" do
+        identifier = Pubid::Nist.parse(input)
+        expect(identifier.to_s).to eq(rendered)
       end
     end
   end

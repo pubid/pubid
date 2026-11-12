@@ -125,19 +125,21 @@ module Pubid
         @cleaned = @cleaned.gsub(/\bLC\b(?!IRC)/, "LCIRC")
       end
 
-      # The FIPS series' own printed face: NIST prints the series as
-      # "FIPS PUB <number>" (document cover and catalogue style), so the
-      # grammar accepts the publisher-prefixed canonical form only through
-      # this alias (pubid#697). Rewrites the prefix to "NIST FIPS", the
-      # spelling the grammar already reads, and the printed-form parse
-      # therefore lands on exactly the model "NIST FIPS <number>" builds
-      # (same to_hash, same render, revision spellings like
-      # "FIPS PUB 199 Rev. 1" included). Anchored at the head and run
-      # before every other stage so later digit/marker stages see the
-      # canonical face; "FIPS" alone (publisher_was_parsed: false) is
-      # untouched.
+      # The FIPS series' official printed face: FIPS is government-published
+      # and "PUB" (Federal Information Processing Standards PUBlication) is
+      # part of the official designation, so the RENDERER emits
+      # "FIPS PUB <number>" directly (owner ruling 2026-11-12). The grammar
+      # itself reads the publisher-bearing spelling only through this alias
+      # (pubid#697): it folds the printed spellings — "FIPS PUB 205" and the
+      # publisher-prefixed "NIST FIPS PUB 205" (pubid#702/#703) — onto the
+      # one model "NIST FIPS <number>" the grammar already builds (same
+      # to_hash, same URN, same MR string; revision spellings like
+      # "FIPS PUB 199 Rev. 1" included), while the renderer owns the printed
+      # face the fold converges to. Anchored at the head and run before
+      # every other stage so later digit/marker stages see the canonical
+      # spelling; "FIPS" alone (publisher_was_parsed: false) is untouched.
       def normalize_fips_pub_alias!
-        @cleaned = @cleaned.sub(/\AFIPS PUB\b/i, "NIST FIPS")
+        @cleaned = @cleaned.sub(/\A(?:NIST )?FIPS PUB\b/i, "NIST FIPS")
       end
 
       # LCIRC series: combine with NBS prefix when a supplement marker

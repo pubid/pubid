@@ -14,7 +14,7 @@ module Pubid
     # Examples:
     # - urn:nist:sp:800-53.supp        → NIST SP 800-53
     # - urn:nist:sp:800-53.r5.supp     → NIST SP 800-53r5
-    # - urn:nist:fips:199.supp         → NIST FIPS 199
+    # - urn:nist:fips:199.supp         → FIPS PUB 199
     class UrnParser < Pubid::UrnParser::Base
       TYPE_UPCASE = {
         "sp" => "SP",
