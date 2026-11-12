@@ -34,6 +34,12 @@ module PubidUrnContract
   # the literals stand in for one, so the contract exercises their schema
   # all the same.
   LITERALS = {
+    # The PFS-compiled dev alias of doi has no fixture corpus; the same
+    # doi literals stand in for one (its parity spec carries the full
+    # inventory).
+    "doi_pfs" => ["doi:10.1000/182", "10.1006/jmbi.1998.2354",
+                  "DOI:10.6028/NIST.2022-04-15.001",
+                  "https://doi.org/10.1000/182"],
     "adobe" => ["Adobe TN 5014", "Adobe Technical Note 5902", "adobe-glyph-list",
                 "adobe-japan1-7", "adobe-postscript-3"],
     "sae" => ["SAE J3016_202104", "SAE J3016", "SAE AS6108A", "SAE ARP5548",

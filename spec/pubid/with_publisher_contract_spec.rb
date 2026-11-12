@@ -16,6 +16,8 @@ module WithPublisherContractSample
   # Flavors with no pass fixtures, and a reference for each.
   REFS = {
     "adobe" => ["Adobe TN 5014"],
+    # The PFS-compiled dev alias of doi (no fixture corpus).
+    "doi_pfs" => ["doi:10.1000/182", "DOI:10.6028/NIST.2022-04-15.001"],
     "sae" => ["SAE J300:2019"],
   }.freeze
 

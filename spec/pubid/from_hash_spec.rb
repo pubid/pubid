@@ -33,6 +33,8 @@ RSpec.describe "Pubid.from_hash" do
     "cie" => "CIE 198:2011",
     "csa" => "CAN/CSA-A123.2-03 (R2023)",
     "doi" => "doi:10.1000/182",
+    # The PFS-compiled dev alias of doi.
+    "doi_pfs" => "doi:10.1000/182",
     "easc" => "ПМГ В 31-2001",
     "ecma" => "ECMA-434 ed1",
     "evs" => "EVS-EN 18216:2026",
@@ -63,6 +65,16 @@ RSpec.describe "Pubid.from_hash" do
     "xsf" => "XEP 0001",
   }.freeze
 
+  # A PFS-compiled dev alias (pubid#706) carries its SCHEME's canonical
+  # wire tag — declared in the definition — so a GLOBAL from_hash resolves
+  # the scheme's coded class. That is the coexistence semantic: one scheme,
+  # one _type, one global resolution. The alias's own flavor-local round
+  # trip (DoiPfs::Identifier.from_hash == id) is asserted in
+  # spec/pubid/doi_pfs/parity_spec.rb.
+  GLOBAL_ROUTE_ALIASES = {
+    "doi_pfs" => "Pubid::Doi::Identifiers::Resource",
+  }.freeze
+
   it "has a sample for every registered flavor" do
     expect(Pubid::Registry.flavor_names - FROM_HASH_SAMPLES.keys).to eq([])
   end
@@ -82,7 +94,9 @@ RSpec.describe "Pubid.from_hash" do
         it "builds the same concrete class with the same hash" do
           built = Pubid.from_hash(id.to_hash)
 
-          expect(built.class).to eq(id.class)
+          expected_class = GLOBAL_ROUTE_ALIASES.fetch(flavor, id.class)
+            .then { |name| name.is_a?(String) ? Object.const_get(name) : name }
+          expect(built.class).to eq(expected_class)
           expect(built.to_hash).to eq(id.to_hash)
         end
       end

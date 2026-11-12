@@ -1351,6 +1351,27 @@ Atoms, canonical order: `prefix-` (`prefix`), `suffix-` (`suffix`).
 
 Landed (issue #670) as drafted, with no core: the prefix/suffix pair is the whole DOI. All 4 corpus rows emit.
 
+[[urn-doi_pfs]]
+==== doi_pfs
+
+The PFS-compiled dev alias of doi (pubid#706): the same scheme, compiled
+from `pubid-grammar`'s `definitions/doi.pfs` and registered beside the
+coded flavor. It carries the SCHEME's canonical `_type` tag
+(`pubid:doi:resource`) and the scheme's `to_urn` namespace (`doi`), so
+its pubid-scheme URNs are byte-identical with the coded flavor's and
+encode through the `[[urn-doi]]` schema above. Its own schema registers
+under this key (same atoms, same shape), so a future cutover changes no
+URN.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:doi_pfs:identifier` | `id` | — | 0 | —
+| `pubid:doi_pfs:resource` | `resource` | — | 4 | `doi:10.1000/182`
+|===
+
+Atoms, canonical order: `prefix-` (`prefix`), `suffix-` (`suffix`).
+
 [[urn-easc]]
 ==== easc
 
