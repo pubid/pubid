@@ -47,6 +47,13 @@ module PubidUrnContract
                    "ETSI GTS GSM 02.01 V5.5.0 (1999-08)",
                    "ETSI GR NFV-EVE 008 V3.1.1 (2017-12)",
                    "ETSI EN 300 175"],
+    # The PFS-compiled dev aliases have no fixture corpus; the faces the
+    # parity harnesses carry stand in for one.
+    "calconnect_pfs" => ["CC 18011", "CC 18011:2018", "CC/DIR 10006:2019",
+                         "CC/Adv 0707.1:2007", "CC/A 0812-1:2008",
+                         "CC/WD 51017:2024-07-23"],
+    "cen_pfs" => ["EN 1325", "EN 10160:1999", "EN 12464-1:2011",
+                  "EN 1177:2018"],
     "adobe" => ["Adobe TN 5014", "Adobe Technical Note 5902", "adobe-glyph-list",
                 "adobe-japan1-7", "adobe-postscript-3"],
     "sae" => ["SAE J3016_202104", "SAE J3016", "SAE AS6108A", "SAE ARP5548",

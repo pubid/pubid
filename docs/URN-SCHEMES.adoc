@@ -1182,6 +1182,29 @@ Atoms, canonical order: `series-` (`series`), `year-` (`year`), `month-` (`month
 
 Landed (issue #670) as drafted. All 189 corpus rows emit.
 
+[[urn-calconnect_pfs]]
+==== calconnect_pfs
+
+The PFS-compiled dev alias of calconnect (pubid/pubid#706 §8 — the
+acceptance port). The definition declares the scheme-canonical schema:
+same atoms, tokens and core as [[urn-calconnect]], registered under the
+`calconnect_pfs` flavor key, so `to_pubid_urn` stays byte-identical with
+the coded flavor. Its literal corpus is the parity harness's faces
+(`spec/pubid/calconnect_pfs/`).
+
+[[urn-cen_pfs]]
+==== cen_pfs
+
+The PFS-compiled module-composition surface of cen_cenelec
+(pubid/pubid#706 §4 — the NSB port). The composed definition models the
+published EN face and declares the scheme-canonical tag
+(`pubid:cencenelec:european-norm`) with the atoms of the composed model
+(`part-`, `year-`); its URN parity with the coded flavor on to_urn /
+to_mr_string is the measured boundary (the typed-stage machinery is
+blocker 2 of `definitions/cen.pfs`), while to_pubid_urn emits and
+round-trips over the absorbed rows. Its literal corpus is the
+measurement harness's absorbed faces (`spec/pubid/cen_pfs/`).
+
 [[urn-ccsds]]
 ==== ccsds
 

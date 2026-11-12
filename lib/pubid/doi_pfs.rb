@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
 # Source: definitions/doi.pfs (pfs:1) sha256:60abc3c403c61019d727ee44d9a72591c1549672451e6609a72d36189cae6340
@@ -17,6 +16,7 @@ module Pubid
     extend Pubid::PrefixesSupport
 
     PREFIXES = ["doi:", "DOI:", "10."].freeze
+    
 
     autoload :Builder, "#{__dir__}/doi_pfs/builder"
     autoload :Identifier, "#{__dir__}/doi_pfs/identifier"
@@ -35,11 +35,7 @@ module Pubid
 
     def self.identifier_types
       @identifier_types ||= Identifiers.constants
-        .filter_map do |c| 
-        
-        Identifiers.const_get(c); rescue NameError; nil 
-        
-      end
+        .filter_map { |c| begin; Identifiers.const_get(c); rescue NameError; nil; end }
         .select { |c| c.is_a?(Class) && c.singleton_methods(false).include?(:type) }
         .select { |c| c.type.is_a?(Hash) }
     end
@@ -56,11 +52,7 @@ module Pubid
 
     def self.locate_stage(abbr)
       abbr_str = abbr.to_s.upcase
-      all_typed_stages.find do |s| 
-        s.abbr.any? do |a|
-          a.to_s.upcase == abbr_str
-        end
-      end
+      all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
     end
   end
 end
