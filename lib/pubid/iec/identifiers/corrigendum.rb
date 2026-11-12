@@ -44,7 +44,12 @@ module Pubid
             code: :cdcor,
             stage_code: :cd,
             type_code: :cor,
-            abbr: ["CDCor"],
+            # "CDCOR" is the all-caps spelling the attached-supplement
+            # renderer emits (abbr.first.upcase) when a legacy prefix face
+            # decodes onto a CDCor draft ("IEC/CDCor 60038-1" renders
+            # "IEC 60038-1/CDCOR1"); appended as an alias so the canonical
+            # render re-parses. abbr.first stays "CDCor" (spelling-only).
+            abbr: ["CDCor", "CDCOR"],
             short_abbr: "CDCor",
             long_abbr: "CD Cor",
             name: "Committee Draft Corrigendum",
