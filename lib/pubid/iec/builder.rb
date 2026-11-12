@@ -78,7 +78,6 @@ module Pubid
           base_hash = {}
           {
             publisher: :publisher,
-            copublishers: :copublishers,
             legacy_base_number_with_part: :number_with_part,
             date: :date,
             undated_marker: :undated_marker,
@@ -86,6 +85,14 @@ module Pubid
             languages: :languages,
           }.each do |source, target|
             base_hash[target] = parsed_hash[source] if parsed_hash[source]
+          end
+          # The grammar binds the legacy face's copublisher as a top-level
+          # scalar (legacy_copublisher) — the wasm binder scatters array
+          # bindings over the sibling list when a bare copublisher node
+          # rides a flat shape — so the builder attaches it here, in the
+          # same shape the parse path used to carry.
+          if parsed_hash[:legacy_copublisher]
+            base_hash[:copublishers] = [{ copublisher: parsed_hash[:legacy_copublisher] }]
           end
           # The slash-part designation ("9075/1") captured number and part
           # separately; they go on straight as the plain strings the retyped
