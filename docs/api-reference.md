@@ -170,6 +170,12 @@ Lookup: type code -> identifier class
 ### `parse(identifier)`
 
 Parse a CalConnect identifier string
+## `Pubid::CalconnectPfs`
+
+### `all_typed_stages`
+### `locate_stage(abbr)`
+### `locate_type(code)`
+### `parse(identifier)`
 ## `Pubid::Ccsds`
 
 ### `all_typed_stages`
@@ -211,6 +217,12 @@ Lookup: harmonized stage code -> typed stage ("43.20" -> the FV EN
 ### `locate_type(code)`
 
 Lookup: type code -> identifier class
+### `parse(identifier)`
+## `Pubid::CenPfs`
+
+### `all_typed_stages`
+### `locate_stage(abbr)`
+### `locate_type(code)`
 ### `parse(identifier)`
 ## `Pubid::Cie`
 
