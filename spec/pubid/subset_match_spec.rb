@@ -71,6 +71,9 @@ SUBSET_PAIRS = {
   "doi" => { ref: "doi:10.1000/182", candidate: "doi:10.1000/182" },
   # The PFS-compiled dev alias of doi.
   "doi_pfs" => { ref: "doi:10.1000/182", candidate: "doi:10.1000/182" },
+  # The PFS-compiled dev alias of etsi (pubid#706 phase 2).
+  "etsi_pfs" => { ref: "ETSI EG 200 053 V1.5.1 (2004-06)",
+                  candidate: "ETSI EG 200 053 V1.5.1 (2004-06)" },
   "isbn" => { ref: "ISBN 978-3-16-148410-0",
               candidate: "ISBN 978-3-16-148410-0" },
 }.freeze
@@ -112,7 +115,8 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
   # A PFS-compiled dev alias (pubid#706) carries its scheme's canonical
   # wire tag, so a GLOBAL hash rebuild resolves the scheme's coded class;
   # the alias's own rebuild goes through its flavor-local from_hash.
-  ALIAS_REBUILD = { "doi_pfs" => "Pubid::DoiPfs::Identifier" }.freeze
+  ALIAS_REBUILD = { "doi_pfs" => "Pubid::DoiPfs::Identifier",
+                    "etsi_pfs" => "Pubid::EtsiPfs::Identifier" }.freeze
 
   def rebuild(identifier, flavor: nil)
     klass = ALIAS_REBUILD[flavor]

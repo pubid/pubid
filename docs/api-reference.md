@@ -279,6 +279,12 @@ Lookup: abbreviation -> typed stage
 
 Lookup: type code -> identifier class
 ### `parse(identifier)`
+## `Pubid::EtsiPfs`
+
+### `all_typed_stages`
+### `locate_stage(abbr)`
+### `locate_type(code)`
+### `parse(identifier)`
 ## `Pubid::Evs`
 
 ### `all_typed_stages`

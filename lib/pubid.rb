@@ -239,6 +239,10 @@ module Pubid
   autoload :Csa, "pubid/csa"
   autoload :Ecma, "pubid/ecma"
   autoload :Etsi, "pubid/etsi"
+  # The PFS-compiled dev alias of etsi (pubid/pubid#706): registered
+  # beside the coded flavor, never routed by Pubid.parse (registry keys
+  # sort "etsi" first).
+  autoload :EtsiPfs, "pubid/etsi_pfs"
   autoload :Evs, "pubid/evs"
   autoload :Gost, "pubid/gost"
   autoload :Gb, "pubid/gb"

@@ -39,6 +39,8 @@ RSpec.describe "Pubid.from_hash" do
     "ecma" => "ECMA-434 ed1",
     "evs" => "EVS-EN 18216:2026",
     "etsi" => "ETSI EG 200 053 V1.5.1 (2004-06)",
+    # The PFS-compiled dev alias of etsi (pubid#706 phase 2).
+    "etsi_pfs" => "ETSI EG 200 053 V1.5.1 (2004-06)",
     "gb" => "JB/T 13368-2018",
     "gost" => "GOST R 34.12-2015",
     "iala" => "IALA S1070",
@@ -73,6 +75,7 @@ RSpec.describe "Pubid.from_hash" do
   # spec/pubid/doi_pfs/parity_spec.rb.
   GLOBAL_ROUTE_ALIASES = {
     "doi_pfs" => "Pubid::Doi::Identifiers::Resource",
+    "etsi_pfs" => "Pubid::Etsi::Identifiers::EtsiStandard",
   }.freeze
 
   it "has a sample for every registered flavor" do

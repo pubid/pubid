@@ -18,6 +18,9 @@ module WithPublisherContractSample
     "adobe" => ["Adobe TN 5014"],
     # The PFS-compiled dev alias of doi (no fixture corpus).
     "doi_pfs" => ["doi:10.1000/182", "DOI:10.6028/NIST.2022-04-15.001"],
+    # The PFS-compiled dev alias of etsi (pubid#706 phase 2).
+    "etsi_pfs" => ["ETSI EG 200 053 V1.5.1 (2004-06)",
+                   "ETSI GTS GSM 02.01 V5.5.0 (1999-08)"],
     "sae" => ["SAE J300:2019"],
   }.freeze
 
