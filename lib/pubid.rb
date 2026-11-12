@@ -224,6 +224,10 @@ module Pubid
   autoload :Ashrae, "pubid/ashrae"
   autoload :Asme, "pubid/asme"
   autoload :Doi, "pubid/doi"
+  # The PFS-compiled dev alias of doi (pubid/pubid#706): registered
+  # beside the coded flavor, never routed by Pubid.parse (registry keys
+  # sort "doi" first).
+  autoload :DoiPfs, "pubid/doi_pfs"
   autoload :Easc, "pubid/easc"
   autoload :Astm, "pubid/astm"
   autoload :Bipm, "pubid/bipm"

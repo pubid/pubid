@@ -93,6 +93,9 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "evs" => { ref: "EVS-EN 18216", omits: [:year] },
     # DOI: identifier has no separable date.
     "doi" => { ref: "doi:10.1000/182", omits: [] },
+    # The PFS-compiled dev alias of doi: a whole-identity scheme,
+    # no separable trailing component.
+    "doi_pfs" => { ref: "doi:10.1000/182", omits: [] },
     # ISBN: identifier has no separable date.
     "isbn" => { ref: "ISBN 978-3-16-148410-0", omits: [] },
   }.freeze
