@@ -149,8 +149,12 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
         expect(parsed.typed_stage.canonical_abbreviation).to eq("DCOR")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject.sub("/", " "))
+      # The legacy prefix face decodes onto the modern identity: the whole
+      # designation stays with the base, the corrigendum gets number 1.
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60038-1/DCOR1")
+        expect(parsed.base.part).to eq("1")
+        expect(parsed).to eq(described_class.parse("IEC 60038-1/DCOR 1"))
       end
     end
   end
@@ -186,8 +190,9 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
         expect(parsed.typed_stage.canonical_abbreviation).to eq("FDCOR")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject.sub("/", " "))
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60038-1/FDCOR1")
+        expect(parsed.base.part).to eq("1")
       end
     end
   end
@@ -223,8 +228,9 @@ RSpec.describe Pubid::Iec::Identifiers::Corrigendum do
         expect(parsed.typed_stage.canonical_abbreviation).to eq("CDCor")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject.sub("/", " "))
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60038-1/CDCOR1")
+        expect(parsed.base.part).to eq("1")
       end
     end
   end

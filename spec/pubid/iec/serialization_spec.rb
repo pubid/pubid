@@ -14,7 +14,7 @@ RSpec.describe "Pubid::Iec serialization (lean to_hash / from_hash round-trip)" 
     "IEC 60050-351:1975/AMD1:1978",                # amendment (attached)
     "CISPR 1:1961/AMD1:1967",                       # copublisher amendment
     "IEC 60034-1:1983/COR1:1985",                  # corrigendum
-    "IEC/FDAM 60038-1",                             # standalone supplement
+    "IEC/FDAM 60038-1",                             # legacy prefix face (decoded)
     "IEC 60335-2-58:2002+AMD1:2008 CSV",           # vap (consolidated) CSV
     "IEC 61000-4-17:1999+AMD1:2001+AMD2:2008 CSV", # vap, multi-amendment
     "IEC 60811-508:2012+AMD1:2017 RLV",            # vap RLV

@@ -101,15 +101,14 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses number" do
-        # For "IEC DISH 60050-191", the supplement number (ISH) is not explicitly specified
-        # "60050-191" is the base document number with part
+        # For "IEC DISH 60050-191", the whole designation "60050-191" is the
+        # base document's: number 60050, part 191.
         expect(parsed.base.number).to eq("60050")
       end
 
       it "parses part" do
-        # For "IEC DISH 60050-191", "-191" is parsed as the supplement number
-        # This represents the part of the base document "60050-191"
-        expect(parsed.number).to eq("191")
+        # "-191" is the base document's part, not a supplement number.
+        expect(parsed.base.part).to eq("191")
       end
 
       it "provides stage code" do
@@ -120,8 +119,11 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
         expect(parsed.typed_stage.abbreviation).to eq("DISH")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq("IEC DISH 60050-191")
+      # The legacy prefix face decodes onto the modern identity: the whole
+      # designation stays with the base, the sheet gets number 1.
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60050-191/DISH1")
+        expect(parsed.base.part).to eq("191")
       end
     end
   end
@@ -142,9 +144,10 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses number" do
-        # For "IEC CDISH 60050-191", the supplement number (ISH) is not explicitly specified
-        # "60050-191" is the base document number with part
+        # "60050-191" is the base document's designation: number 60050,
+        # part 191 on the base.
         expect(parsed.base.number).to eq("60050")
+        expect(parsed.base.part).to eq("191")
       end
 
       it "provides stage code" do
@@ -155,8 +158,9 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
         expect(parsed.typed_stage.abbreviation).to eq("CDISH")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq("IEC CDISH 60050-191")
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60050-191/CDISH1")
+        expect(parsed.base.part).to eq("191")
       end
     end
   end
@@ -244,15 +248,18 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "parses date" do
-        expect(parsed.date.year).to eq("2014")
+        expect(parsed.base.date.year).to eq("2014")
       end
 
       it "provides stage code" do
         expect(parsed.stage.stage_code).to eq("draft")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq("IEC DISH 60050-191:2014")
+      # The legacy face's year rides with the designation, onto the base.
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60050-191:2014/DISH1")
+        expect(parsed.base.date.year).to eq("2014")
+        expect(parsed.date).to be_nil
       end
     end
   end

@@ -81,26 +81,39 @@ suffixes (CSV, CMV, RLV), CISPR designations, and undated references
 (`IEC 1000-1:2023 ED2(en)`); the URN follows the IEC URI model
 (`urn:iec:std:iec:1000-1:2023::ed-2:en`).
 
-## Standalone supplements
+## Legacy supplement faces
 
-A supplement face also parses without its base — `IEC/FDAM 60038-1`,
-`IEC/DCOR 60038-1`, `IEC/DISH 60038-1` (the FDAM/DISH stages print on IEC
-documents as slash faces before the number). The standalone form renders the
-canonical spelling (`IEC FDAM 60038-1`), its `#root` is the bare base number
-(`IEC60038`), and it is `==` its `from_hash(to_hash)` round trip — so
-`#matches?` against an index row holds:
+The old notation prints the supplement stage BEFORE the base designation:
+`IEC/FDAM 60038-1`, `IEC/DCOR 60038-1`, `IEC/DISH 60038-1`, and the JTC1
+ballot faces `ISO/IEC PDAM 12207`, `ISO/IEC PDAM 2 10646:2012`,
+`ISO/IEC FPDAM 9075/1`, `ISO/IEC FDAM 1 14496-12:2004`. These decode onto
+the modern identity (2026-11-12 ruling): the whole designation stays with
+the base, the unnumbered stage token means supplement 1, and the modern
+on-base slash face is what renders — a legacy face and the modern form of
+the same document are one identifier, `==` and hash-equal, so `#matches?`
+against an index row holds:
 
 ```ruby
 require "pubid"
 
 id = Pubid::Iec.parse("IEC/FDAM 60038-1")
-id.to_s   # => "IEC FDAM 60038-1"
+id.to_s   # => "IEC 60038-1/FDAM1"
 id.class  # => Pubid::Iec::Identifiers::Amendment
-id.root.to_s                  # => "IEC60038"
-Pubid.from_hash(id.to_hash) == id  # => true
+id.number     # => "1"      (the unnumbered face defaults to 1)
+id.base.number  # => "60038"
+id.base.part    # => "1"    (the designation stays whole on the base)
+id == Pubid::Iec.parse("IEC 60038-1/FDAM 1")  # => true
 ```
 
-The standalone base is synthetic — `#base` answers a bare
-`SingleIdentifier` carrying the number, never a typed stage. Supplements
-written with a base (`IEC 60038:2009/AMD1:2017`) are untouched.
+Each face keeps its own draft stage (FDAM is a final draft amendment, DAM a
+draft amendment, DCOR a draft corrigendum, DISH a draft interpretation
+sheet), and the old slash-part spelling carries the base's part
+(`ISO/IEC FPDAM 9075/1` → `ISO/IEC 9075-1/FPDAM1`). The stage token's date
+rides with the designation: `IEC DCOR 60038-1:2019` → `IEC
+60038-1:2019/DCOR1`, with the year on the base.
+
+A supplement written with no designation after the token — the true
+standalone `IEC/AMD 1:2017` — keeps the synthetic self-base: the bare
+ordinal is the supplement's own number. Supplements written with a base
+(`IEC 60038:2009/AMD1:2017`) are untouched.
 

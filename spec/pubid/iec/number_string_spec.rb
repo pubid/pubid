@@ -144,12 +144,13 @@ RSpec.describe "IEC number/part/subpart as :string" do
   end
 
   # Moving the maps onto SingleIdentifier makes "number" arrive AFTER the keys
-  # of the parent block, and a standalone supplement's synthetic base is
-  # rebuilt from "base" while its own number comes from "number". If from_hash
-  # walked the
+  # of the parent block, and a legacy prefix face's base is rebuilt from
+  # "base" while the supplement's own number comes from "number" (the decode
+  # ruling gives the base the whole designation and defaults the supplement
+  # to 1). If from_hash walked the
   # INPUT hash's key order rather than the declared rule order, a hand-authored
-  # hash listing "base" before "number" would reconstruct a standalone
-  # supplement with the wrong supplement number — and silently, since nothing
+  # hash listing "base" before "number" would reconstruct the supplement with
+  # the wrong number — and silently, since nothing
   # raises. It does not: these assert the reconstruction is order-independent.
   describe "from_hash does not depend on the input hash's key order" do
     %w[
