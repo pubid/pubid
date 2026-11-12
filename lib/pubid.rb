@@ -233,6 +233,15 @@ module Pubid
   autoload :Bipm, "pubid/bipm"
   autoload :Bsi, "pubid/bsi"
   autoload :Calconnect, "pubid/calconnect"
+  # The PFS-compiled dev alias of calconnect (pubid/pubid#706 §8): the
+  # acceptance port, registered beside the coded flavor, never routed by
+  # Pubid.parse (registry keys sort the coded key first).
+  autoload :CalconnectPfs, "pubid/calconnect_pfs"
+  # The PFS-compiled module-composition surface of cen_cenelec
+  # (pubid/pubid#706 §4): the EN face composed from the module library —
+  # the measured boundary of what the modules absorb
+  # (spec/pubid/cen_pfs/parity_spec.rb's ledger).
+  autoload :CenPfs, "pubid/cen_pfs"
   autoload :Ccsds, "pubid/ccsds"
   autoload :CenCenelec, "pubid/cen_cenelec"
   autoload :Cie, "pubid/cie"

@@ -14,7 +14,14 @@
           map "suffix", to: :suffix
         end
 
-        PUBLISHER = "DOI".freeze
+        PUBLISHER = "DOI"
+
+        # The scheme's declared publisher token: the internal-form
+        # cut (to_s(with_publisher: false)) strips it from the
+        # rendered face.
+        def publisher_prefixes
+          [PUBLISHER]
+        end
 
         def self.parse(identifier)
           unless identifier.is_a?(String)
