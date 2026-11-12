@@ -46,6 +46,17 @@ module Pubid
 
         series = parsed_hash[:series]&.to_s
 
+        # The default-series plain-number branch (pubid#711): the grammar's
+        # trailing alternatives accept a bare report number ("800-90B") and
+        # its publisher-led spelling ("NIST 800-90B") with NO series token.
+        # The SP series is the default: the docid-derived citation of
+        # NIST.SP.800-90B is exactly the bare docnumber "800-90B", and the
+        # Builder fills the same SP series the spelled form carries, so the
+        # two spellings are one identity to a lookup. No other branch can
+        # arrive here series-less (dated shapes returned above; every
+        # series-bearing branch captures :series).
+        return Identifiers::SpecialPublication if series.nil?
+
         # Handle compound series that include publisher (both space and dot separated)
         if series&.start_with?("NBS ")
           simple_series = series.sub("NBS ", "")
