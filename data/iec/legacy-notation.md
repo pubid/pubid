@@ -1,7 +1,8 @@
 # IEC legacy notation — old faces, modern counterparts, and the DAM family
 
-**Status: DRAFT for the owner's ruling (2026-11-12). Research only — no
-grammar, builder, or fixture change is proposed here.** Companion to
+**Status: RULED and LANDED (owner ruling 2026-11-12, "Yes, do this now").**
+Sections 1–6 are the research record the ruling was made on; section 7
+records the disposition as implemented. Companion to
 `data/iec/stage-codes.md` (same precedent: provenance, sources, tables,
 reconciliation with the pubid registry).
 
@@ -237,3 +238,61 @@ whether the already-accepted faces (`IEC/FDAM 60038-1`, the on-base
 resolution — §3 shows the space form shares the defect, so the correction
 cannot be scoped to the slash form alone. This doc records the evidence
 for that decision; no implementation is proposed until the owner rules.
+
+## 7. Disposition as implemented (the owner's ruling)
+
+**Option B — IHO-style decode-to-modern — on ALL the already-accepted
+faces too** (the §6 owner call): `IEC/FDAM 60038-1` and `IEC FDAM 60038-1`
+both decode to the modern identity; the space form shares the defect, so
+the correction is not scoped to the slash form alone.
+
+The decode rule, as landed:
+
+- **Base kept whole.** The designation after the stage token is the BASE's:
+  number, part, subpart and the date (old notation prints the base's year;
+  a draft supplement carries no publication date of its own). The base is a
+  concrete InternationalStandard, so the legacy face hash-matches — and
+  equals — the modern on-base parse: `parse("IEC/DCOR 60038-1") ==
+  parse("IEC 60038-1/DCOR 1")`.
+- **Unnumbered = 1.** The supplement's number is the captured N, defaulting
+  to 1 (the DAM-family no-number rule, extended to the DCOR/DISH faces the
+  fixtures carry).
+- **Draft-ness preserved.** Each face keeps its own stage: FDAM → `fdamd`
+  (50.xx), DAM → `damd` (40.xx), DCOR → `dcor`, DISH → `dish`, CDISH →
+  `cd`, FDCOR → `fdcor`; the joint ladder's PDAM (30.xx, CD level) and
+  FPDAM (50.xx, FDIS level) registered with the circulation slots 30.20 /
+  50.20 leading their harmonized lists (CDAM and FDAM own the
+  (type, leading-code) URN keys 30.00 / 50.00).
+- **Slash-part.** `FPDAM 9075/1` — the `/1` is the base's part (base
+  9075 part 1), consistent with the ISO-side reading of the old
+  slash-part spelling.
+- **Modern canonical face emitted.** `IEC/FDAM 60038-1` → `IEC 60038-1/FDAM1`;
+  the legacy face is decoded, not preserved as a spelling facet.
+- **Stays untouched:** the modern on-base forms — `IEC 60038:1983/AMD1:1994`,
+  `IEC 60038-1/FDAM 1`, `ISO/IEC 19772:2009/DAM 1:2019(E)` — and the true
+  standalone self-base (`IEC/AMD 1:2017` → `IEC Amd 1-1:2017`).
+
+Split of labour: the DAM-family prefix faces needed a new grammar rule
+(`legacy_supplement`, pubid-grammar) — they raised before; the DCOR/DISH
+(and CDISH/FDCOR/CDCor) faces already parsed through the standalone and
+typed branches and were corrected in the builder
+(`SupplementIdentifier#ensure_base`: the part-to-number move deleted, the
+designation moved whole onto a concrete base, the supplement numbered 1).
+A bare number after a DAM-family token is a base designation under the
+JTC1 reading (`IEC FDAM 60038` → `IEC 60038/FDAM1`); a bare ordinal after
+a non-DAM token stays the supplement's own number.
+
+Replay gate (all 26,838 full-fixture inputs, main baseline vs the branch):
+byte-identical everywhere except the six §3 rows (rows 2195–2200 of
+`full/iec-pubid.txt`), which re-resolve; 0 inputs stopped parsing; the
+prefix faces go raise→parse (pass 12,337 → 12,359 of 12,491; fail steady
+at 132). The testsuite mirror normalization pairs
+(FDAM/DCOR/DISH `60038-1`) flip to the corrected identities in the same
+round.
+
+Still raising, deliberately (gap 4 of §5, not chased here): the dotted
+on-base `/Amd.1` spelling, and the stamped prefix faces whose base
+designation carries an amendment stamp (`FPDAM 10373-6/Amd 9:2001`,
+`PDAM 9541-1/Amd.4`, `FDAM 19776-2:2005/Am1:2006`, `PDAM TR
+9573-11/Amd.1`) — they need the dotted/ISO stamp spellings the IEC flavor
+does not carry; the ISO-side study owns that family.

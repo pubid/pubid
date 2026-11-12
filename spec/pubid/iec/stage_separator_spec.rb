@@ -20,9 +20,11 @@ RSpec.describe "IEC stage separator" do
       "IEC/CDV 60038" => "IEC CDV 60038",
       "IEC/FDIS 60038" => "IEC FDIS 60038",
       "IEC/NP 60038" => "IEC NP 60038",
-      "IEC/DISH 60050-191" => "IEC DISH 60050-191",
-      "IEC/FDAM 60038-1" => "IEC FDAM 60038-1",
-      "IEC/DCOR 60038-1" => "IEC DCOR 60038-1",
+      # The legacy prefix faces decode onto the modern identity (owner
+      # ruling 2026-11-12), so their render is the modern on-base face.
+      "IEC/FDAM 60038-1" => "IEC 60038-1/FDAM1",
+      "IEC/DCOR 60038-1" => "IEC 60038-1/DCOR1",
+      "IEC/DISH 60050-191" => "IEC 60050-191/DISH1",
       # Already rendered with a space by a per-type override; must not move.
       "IEC TS 60038" => "IEC TS 60038",
       "IEC/DTR 62048" => "IEC DTR 62048",
@@ -49,6 +51,13 @@ RSpec.describe "IEC stage separator" do
         expect(from_slash.to_s).to eq(from_space.to_s)
         expect(from_slash.to_hash).to eq(from_space.to_hash)
       end
+    end
+
+    # Both faces of the old notation are one identity: the modern on-base
+    # form (the owner's decode ruling).
+    it "decodes both FDAM faces onto the modern on-base form" do
+      expect(Pubid::Iec.parse("IEC/FDAM 60038-1"))
+        .to eq(Pubid::Iec.parse("IEC 60038-1/FDAM 1"))
     end
   end
 

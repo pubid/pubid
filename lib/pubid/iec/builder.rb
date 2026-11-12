@@ -57,6 +57,46 @@ module Pubid
       def build(parsed_hash)
         all_parts = parsed_hash.delete(:all_parts)
 
+        # Legacy DAM-family prefix face (IEC/FDAM 60038-1, ISO/IEC PDAM 2
+        # 10646:2012, ISO/IEC FPDAM 9075/1): the JTC1 ballot spelling puts
+        # the stage token before the base designation. Decode onto the
+        # modern identity (owner ruling 2026-11-12, with data/iec/
+        # legacy-notation.md): the designation is the BASE's, kept whole —
+        # the old slash-part spelling "9075/1" is base 9075 part 1 — and
+        # the supplement's number is the captured N, defaulting to 1 (the
+        # no-number rule: unnumbered DAM/PDAM/FDAM/FPDAM means Amendment 1).
+        # The date rides with the designation (old notation prints the
+        # base's year); a draft supplement carries none of its own. The
+        # base builds through the ordinary single-document path, so it is
+        # the same InternationalStandard the modern on-base parse holds and
+        # `parse(legacy) == parse(modern)`.
+        if parsed_hash[:legacy_stage]
+          supp = build_supplement(
+            type_with_stage: parsed_hash[:legacy_stage],
+            number_with_part: parsed_hash[:legacy_supplement_number] || "1",
+          )
+          base_hash = {}
+          {
+            publisher: :publisher,
+            copublishers: :copublishers,
+            legacy_base_number_with_part: :number_with_part,
+            date: :date,
+            undated_marker: :undated_marker,
+            edition: :edition,
+            languages: :languages,
+          }.each do |source, target|
+            base_hash[target] = parsed_hash[source] if parsed_hash[source]
+          end
+          # The slash-part designation ("9075/1") captured number and part
+          # separately; they go on straight as the plain strings the retyped
+          # attributes are, not through cast (which has no :part type).
+          base = build(base_hash)
+          base.number = parsed_hash[:legacy_base_number].to_s if parsed_hash[:legacy_base_number]
+          base.part = parsed_hash[:legacy_base_part].to_s if parsed_hash[:legacy_base_part]
+          return apply_fragment_notation(wrap_with_supplement(base, supp),
+                                         parsed_hash)
+        end
+
         # Second supplement layer (/AMD1:2018/COR1:2019): build the
         # first-supplement form, then wrap the second supplement around
         # it.

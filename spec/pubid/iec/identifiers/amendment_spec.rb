@@ -57,6 +57,10 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
         expect(parsed.base.number).to eq("60038")
       end
 
+      it "parses the designation's part on the base" do
+        expect(parsed.base.part).to eq("1")
+      end
+
       it "parses amendment number" do
         expect(parsed.number).to eq("1")
       end
@@ -69,8 +73,11 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
         expect(parsed.stage.stage_code).to eq("fdamd")
       end
 
-      it "round-trips" do
-        expect(parsed.to_s).to eq(subject.sub("/", " "))
+      # The legacy prefix face decodes onto the modern identity (owner
+      # ruling 2026-11-12): the same object as the on-base parse.
+      it "decodes to the modern on-base form" do
+        expect(parsed.to_s).to eq("IEC 60038-1/FDAM1")
+        expect(parsed).to eq(described_class.parse("IEC 60038-1/FDAM 1"))
       end
     end
   end

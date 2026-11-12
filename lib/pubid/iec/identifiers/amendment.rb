@@ -54,6 +54,25 @@ module Pubid
             name: "Committee Draft Amendment",
             harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
           ),
+          # The JTC1 ladder's pre-DAM ballot face (zero IEC-only record usage
+          # — the DAM family rides on joint work only; see
+          # data/iec/legacy-notation.md). Stage codes mirror the ISO flavor's
+          # entry for the same letter: PDAM sits at the CD level (30.xx).
+          # The LEAD harmonized code is the circulation slot (30.20
+          # "circulated as CD"), not ISO's 30.00 — the URN writes
+          # stage-{harmonized_stages.first} and parses it back by
+          # (type, leading code), which CDAM (30.00) already claims; see
+          # spec/pubid/iec/pnw_stage_spec.rb.
+          Pubid::Components::TypedStage.new(
+            code: :pdam,
+            stage_code: :cd,
+            type_code: :amd,
+            abbr: ["PDAM"],
+            short_abbr: nil,
+            long_abbr: nil,
+            name: "Proposed Draft Amendment",
+            harmonized_stages: %w[30.20 30.00 30.60 30.92 30.93 30.98 30.99],
+          ),
           Pubid::Components::TypedStage.new(
             code: :damd,
             stage_code: :damd,
@@ -73,6 +92,21 @@ module Pubid
             long_abbr: "FDIS",
             name: "Final Draft Amendment",
             harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+          ),
+          # The JTC1 ladder's pre-FDAM ballot face (same provenance as PDAM
+          # above): FPDAM mirrors the ISO flavor's entry, at the FDIS level
+          # (50.xx). Its LEAD harmonized code is the circulation slot
+          # (50.20), not ISO's 50.00, which FDAM already claims as its
+          # (type, leading code) URN key.
+          Pubid::Components::TypedStage.new(
+            code: :fpdam,
+            stage_code: :fdamd,
+            type_code: :amd,
+            abbr: ["FPDAM"],
+            short_abbr: nil,
+            long_abbr: nil,
+            name: "Final Proposed Draft Amendment",
+            harmonized_stages: %w[50.20 50.00 50.60 50.92 50.98 50.99],
           ),
           Pubid::Components::TypedStage.new(
             code: :pubamd,
