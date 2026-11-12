@@ -86,6 +86,34 @@ RSpec.describe "NIST FIPS PUB printed-form alias" do
     end
   end
 
+  describe "the publisher-prefixed printed form (pubid#702)" do
+    it "parses NIST FIPS PUB 205 (publisher combined with the printed form)" do
+      id = Pubid::Nist::Identifier.parse("NIST FIPS PUB 205")
+
+      expect(id).to be_a(Pubid::Nist::Identifiers::FederalInformationProcessingStandards)
+      expect(id.publisher.to_s).to eq("NIST")
+      expect(id.series.to_s).to eq("FIPS")
+      expect(id.number).to eq("205")
+      expect(id.to_s).to eq("NIST FIPS 205")
+    end
+
+    it "hash-matches the canonical NIST FIPS parse" do
+      printed = Pubid::Nist::Identifier.parse("NIST FIPS PUB 205")
+      canonical = Pubid::Nist::Identifier.parse("NIST FIPS 205")
+
+      expect(printed.to_hash).to eq(canonical.to_hash)
+      expect(printed.to_urn).to eq(canonical.to_urn)
+    end
+
+    it "parses NIST FIPS PUB 205 Rev. 1 and hash-matches the canonical parse" do
+      printed = Pubid::Nist::Identifier.parse("NIST FIPS PUB 205 Rev. 1")
+      canonical = Pubid::Nist::Identifier.parse("NIST FIPS 205 Rev. 1")
+
+      expect(printed.to_hash).to eq(canonical.to_hash)
+      expect(printed.to_s).to eq(canonical.to_s)
+    end
+  end
+
   describe "case and scope of the alias" do
     it "aliases the lowercase printed form" do
       expect(Pubid::Nist::Identifier.parse("fips pub 205").to_s)

@@ -132,12 +132,13 @@ module Pubid
       # spelling the grammar already reads, and the printed-form parse
       # therefore lands on exactly the model "NIST FIPS <number>" builds
       # (same to_hash, same render, revision spellings like
-      # "FIPS PUB 199 Rev. 1" included). Anchored at the head and run
-      # before every other stage so later digit/marker stages see the
-      # canonical face; "FIPS" alone (publisher_was_parsed: false) is
-      # untouched.
+      # "FIPS PUB 199 Rev. 1" included). The publisher may ride along
+      # ("NIST FIPS PUB 205", pubid#702) — the same fold. Anchored at the
+      # head and run before every other stage so later digit/marker stages
+      # see the canonical face; "FIPS" alone (publisher_was_parsed: false)
+      # is untouched.
       def normalize_fips_pub_alias!
-        @cleaned = @cleaned.sub(/\AFIPS PUB\b/i, "NIST FIPS")
+        @cleaned = @cleaned.sub(/\A(?:NIST )?FIPS PUB\b/i, "NIST FIPS")
       end
 
       # LCIRC series: combine with NBS prefix when a supplement marker
