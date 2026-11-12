@@ -244,6 +244,12 @@ Lookup: type code -> identifier class
 ### `locate_stage(abbr)`
 ### `locate_type(code)`
 ### `parse(identifier)`
+## `Pubid::DoiPfs`
+
+### `all_typed_stages`
+### `locate_stage(abbr)`
+### `locate_type(code)`
+### `parse(identifier)`
 ## `Pubid::Easc`
 
 ### `parse(identifier)`
