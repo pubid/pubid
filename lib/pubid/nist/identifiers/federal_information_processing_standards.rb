@@ -77,7 +77,9 @@ module Pubid
         def fips_render_lead
           lead_publisher = printed_publisher
           return "FIPS PUB" if lead_publisher == "NIST"
-          return "#{lead_publisher} #{series_code}" if lead_publisher && !lead_publisher.empty?
+
+          spelled = lead_publisher && !lead_publisher.empty?
+          return "#{lead_publisher} #{series_code}" if spelled
 
           series_code.to_s
         end
