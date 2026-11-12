@@ -422,6 +422,11 @@ module Pubid
         # to_hash) when one was. Keeps the common publisher-bearing id lean.
         identifier.publisher_was_parsed = false unless identifier.publisher
 
+        # A series that implies its publisher (bare "FIPS 197" is
+        # "NIST FIPS 197") gets it now, after the flag above, so the two
+        # spellings are == while the bare face keeps rendering bare.
+        identifier.apply_series_default_publisher
+
         # NEW: Convert revision with month+year to update component (V1 compatibility)
         # Patterns like "NIST IR 4743rJun1992" should be rendered as "NIST IR 4743/Upd1-199206"
         if parsed_hash[:revision_month] && parsed_hash[:revision_year]

@@ -39,6 +39,10 @@ module Pubid
         id = super(normalize_deserialized_shapes(expand_compact_hash(data)),
                    options)
         derive_subseries(id)
+        # A bare-FIPS row written before the series default existed holds
+        # `publisher_was_parsed: false` and no publisher; parse now fills
+        # it, so from_hash must too, or the row is no longer == the parse.
+        id.apply_series_default_publisher if id.is_a?(Identifier)
         id
       end
 
@@ -291,6 +295,29 @@ module Pubid
         super + %i[update update_component]
       end
 
+      # The publisher a series implies when the input spells none. The
+      # Builder fills it after it records `publisher_was_parsed: false`, so
+      # the bare face still renders without the prefix. nil: no default.
+      def self.series_default_publisher
+        nil
+      end
+
+      # Fill the series default publisher on an id whose input spelled
+      # none. Shared by the Builder and from_hash, so both construction
+      # paths agree.
+      def apply_series_default_publisher
+        return if publisher || publisher_was_parsed
+
+        self.publisher = self.class.series_default_publisher
+      end
+
+      # `===` (subset match) follows #matches?: a publisher the reference
+      # did not spell is a wildcard, so bare "FIPS 46" finds "NBS FIPS 46".
+      def subset_skipped_attributes
+        skipped = super
+        publisher_was_parsed ? skipped : skipped | [:publisher]
+      end
+
       # Wildcard / partial-identifier match. Treats +self+ as a QUERY pattern
       # and +candidate+ as a concrete document: every ID part SET on the query
       # must equal the candidate's, while parts left unset (nil/empty) are
@@ -301,11 +328,16 @@ module Pubid
       # Asymmetric (unlike ==): "NBS CIRC 25".matches?("NBS CIRC 25sup1924")
       # is true, but not the reverse. The candidate must be the same class or
       # a subclass so series-level identity still holds.
+      #
+      # `publisher_was_parsed` records only how the query was spelled, so it
+      # is never a criterion; and a publisher the query did not spell (the
+      # series default a bare "FIPS 46" fills in) is a wildcard, so the bare
+      # query still finds the NBS-era "NBS FIPS 46".
       def matches?(candidate)
         return false unless candidate.is_a?(self.class)
 
         self.class.attributes.each_key.all? do |name|
-          next true if EQUALITY_IGNORED_ATTRS.include?(name)
+          next true unless match_criterion?(name)
 
           query_val = public_send(name)
           next true if query_val.nil?
@@ -315,6 +347,15 @@ module Pubid
           query_val == candidate.public_send(name)
         end
       end
+
+      # Whether #matches? compares attribute +name+ at all.
+      def match_criterion?(name)
+        return false if EQUALITY_IGNORED_ATTRS.include?(name)
+        return false if name == :publisher_was_parsed
+
+        name != :publisher || publisher_was_parsed
+      end
+      private :match_criterion?
 
       # NIST inherits Pubid::Identifier#exclude directly: it now rebuilds via
       # `self.class.new(**attrs)`, so NIST's keyword-only initialize

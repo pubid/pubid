@@ -146,3 +146,31 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   ("FIPS PUB 199 Rev. 1" with its `original_prefix` facet, compact
   "rev1") ride the prefix alias; bare "FIPS <number>"
   (publisher_was_parsed: false) and NBS FIPS are untouched.
+
+- **A bare "FIPS <number>" carries the series' NIST publisher (hand-off
+  nist-bare-fips-publisher, metanorma-pdfa#114).** relaton keeps a CSRC hit
+  only when the parsed citation is `==` to the row, and every row is
+  "NIST FIPS …", so a bare "FIPS 197" (publisher nil) answered "Not found".
+  The Builder now fills `identifier.class.series_default_publisher`
+  ("NIST" on `FederalInformationProcessingStandards`, nil on the base)
+  **after** it records `publisher_was_parsed: false`. The flag is
+  `equality_ignored`, so the two spellings are `==`; the short and MR faces
+  print the publisher only when it was spelled (`printed_publisher`), so the
+  bare face still renders `FIPS 197` / `FIPS.197`. The long and abbreviated
+  styles now name NIST (before, they began with a stray space). "NBS FIPS"
+  keeps its parsed NBS and is not `==` to the bare form. **NBS-era ruling**:
+  `#matches?` treats a publisher the query did not spell as a wildcard (and
+  no longer compares `publisher_was_parsed`, a spelling), so the query
+  "FIPS 46" still finds "NBS FIPS 46" — before this, a bare query matched
+  neither the NIST nor the NBS row. `===` needs the same rule
+  (`subset_skipped_attributes`), because the filled publisher is no longer
+  the nil the subset match read as "anything"; **the two primitives must
+  agree, so change them together.** `to_hash` of a bare parse gains
+  `publisher: NIST`; the 21,365-id `full/` corpus has no bare FIPS row, so
+  no fixture output moved. `from_hash` fills the default by the same rule
+  (`apply_series_default_publisher`, shared with the Builder), so a row
+  stored before this change (`publisher_was_parsed: false`, no publisher)
+  is still `==` to the parse. Not covered: `new(series:, number:)` fills
+  nothing (its flag defaults to true, so it means a spelled form anyway).
+  Locked by
+  `spec/pubid/nist/bare_fips_publisher_spec.rb`.

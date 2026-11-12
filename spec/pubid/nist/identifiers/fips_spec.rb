@@ -14,8 +14,10 @@ RSpec.describe Pubid::Nist::Identifiers::FederalInformationProcessingStandards d
           expect(parsed).to be_a(described_class)
         end
 
-        it "parses publisher (FIPS has no publisher prefix by default)" do
-          expect(parsed.publisher.to_s).to eq("")
+        it "fills the series publisher NIST, which it does not print" do
+          expect(parsed.publisher.to_s).to eq("NIST")
+          expect(parsed.publisher_was_parsed).to be(false)
+          expect(parsed.to_s).to eq("FIPS 1")
         end
 
         it "parses series" do
