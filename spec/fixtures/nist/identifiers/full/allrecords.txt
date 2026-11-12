@@ -19498,3 +19498,13 @@ NIST AMS 100-51
 FIPS PUB 205
 FIPS PUB 180-4
 FIPS PUB 199 Rev. 1
+
+# pubid#711 - the default-series plain-number branch: a citation shaped
+# like the docnumber ("800-90B"; the docid-derived citation of
+# NIST.SP.800-90B) and its publisher-led spelling ("NIST 800-90B")
+# parse onto the SP identity, == to the spelled form (the pass file
+# carries the !RAW!NORMALIZED markers).
+800-90B
+NIST 800-90B
+800-53
+NIST 800-53

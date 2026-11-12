@@ -99,6 +99,16 @@ module Pubid
         # Locate the appropriate identifier class via Router
         identifier = @router.locate_identifier_klass(parsed_hash).new
 
+        # The default-series plain-number branch (pubid#711): the grammar's
+        # trailing alternatives carry no series token ("800-90B" /
+        # "NIST 800-90B"), so the identity gains the class's default series
+        # and parses == to the spelled "NIST SP 800-90B" form. The bare
+        # publisher rides the #704 rule below (apply_series_default_publisher).
+        if parsed_hash[:series].nil? &&
+            (default = identifier.class.default_series)
+          identifier.series = Components::Code.new(value: default)
+        end
+
         # Resolve the series policy once — every series-specific decision
         # flows through this object instead of branching on the parsed shape.
         series = Series.for(parsed_hash)

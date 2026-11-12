@@ -2888,3 +2888,11 @@ NIST.SP.800-108r1-upd1
 !NIST.SP.800-38e!NIST.SP.800-38E
 !NIST.SP.955.Suppl!NIST.SP.955
 !NIST.SP.984.4!NIST.SP.984-4
+# pubid#711 - the default-series plain-number branch: the docid-derived
+# citation of NIST.SP.800-90B is the bare docnumber "800-90B"; the
+# publisher-led "NIST 800-90B" rides the same branch. Both parse onto
+# the SP identity, == to the spelled form.
+!800-90B!SP 800-90B
+!NIST 800-90B!NIST SP 800-90B
+!800-53!SP 800-53
+!NIST 800-53!NIST SP 800-53

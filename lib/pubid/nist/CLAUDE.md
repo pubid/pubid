@@ -184,3 +184,39 @@ Read this before you change `lib/pubid/nist/` or `spec/pubid/nist/`. The root
   nothing (its flag defaults to true, so it means a spelled form anyway).
   Locked by
   `spec/pubid/nist/bare_fips_publisher_spec.rb`.
+
+- **The default-series plain-number branch (pubid#711).** A citation
+  shaped like the docnumber — "800-90B", the docid-derived citation face
+  of NIST.SP.800-90B — and its publisher-led spelling "NIST 800-90B"
+  carry NO series token, and the grammar's series alternatives never
+  reached them: every branch demanded a series token (or, after a bare
+  publisher, only the dated ISO-date digits). The grammar (nist.parg,
+  fleet compiler 1.3.126) gained two trailing `identifier` alternatives
+  that ride the SAME report-number tail as the series-bearing branches —
+  `(publisher) (space) (report_number) …` and bare `(report_number) …` —
+  placed LAST so PEG ordering leaves every previously accepted form on
+  its original alternative (they only catch inputs that previously
+  failed outright). The identity defaults onto the SP series: the Router
+  dispatches `SpecialPublication` when the parse carries no series and
+  no dated date, and the Builder fills `series` from the new
+  `Identifier.default_series` class method (SP is the default — the
+  docid of the real document is NIST.SP.800-90B). The publisher rides
+  the #704 machinery: `SpecialPublication.series_default_publisher` is
+  now "NIST", so the bare parse fills the publisher after
+  `publisher_was_parsed: false` and is `==` to the spelled form (URN-,
+  MR- and hash-equal but for that equality-ignored flag; the MR face is
+  the exact "NIST.SP.800-90B" DOI surface relaton-data-nist stores).
+  The SHORT face keeps the bare spelling (publisher suppressed);
+  the MR face always carries the publisher (`to_mr_style` prints
+  `(publisher || "NIST")`), so the bare parse lands on the DOI-style
+  face directly. The dated alternative keeps priority
+  ("NIST 2023-04-15 001" stays `DatedDocument`), and the routing probe
+  ("zzqx-nonsense-9714") still fails, so NIST is not disqualified as a
+  `Pubid.parse` fallback. `to_hash` of the two bare-series probes
+  ("SP 123", "SP 800-90B") gained `publisher: NIST` — the #704 ruling
+  generalized to the SP series; no corpus row moved. Locked by
+  `spec/pubid/nist/default_series_plain_number_spec.rb`; the corpus
+  round froze the four faces (the two publisher-led spellings as
+  non-normalized aliases of the canonical cases, the two bare ones as
+  canonical `publisher_was_parsed: false` cases) with the gem twin in
+  lockstep.

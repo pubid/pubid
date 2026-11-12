@@ -302,6 +302,16 @@ module Pubid
         nil
       end
 
+      # The series an input implies when it spells none — the grammar's
+      # default-series plain-number branch (pubid#711: "800-90B" /
+      # "NIST 800-90B" carry no series token). The Router dispatches the
+      # class from this default and the Builder fills the attribute, so a
+      # docnumber-shaped citation parses onto the same identity as the
+      # spelled form. nil: no default.
+      def self.default_series
+        nil
+      end
+
       # Fill the series default publisher on an id whose input spelled
       # none. Shared by the Builder and from_hash, so both construction
       # paths agree.

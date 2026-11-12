@@ -35,6 +35,21 @@ module Pubid
             { key: :sp,
             web: :special_publication, title: "NIST Special Publication", short: "SP" }
           end
+
+          # The default-series plain-number branch (pubid#711): a citation
+          # shaped like the docnumber ("800-90B", publisher-led
+          # "NIST 800-90B") names an SP document — the docid-derived
+          # citation of NIST.SP.800-90B is exactly "800-90B".
+          def default_series
+            "SP"
+          end
+
+          # A bare plain-number parse carries the series' NIST publisher
+          # (the #704 shape), so it is == to the spelled
+          # "NIST SP 800-90B" form a lookup compares against.
+          def series_default_publisher
+            "NIST"
+          end
         end
 
         def series_code
