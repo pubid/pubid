@@ -40,6 +40,13 @@ module PubidUrnContract
     "doi_pfs" => ["doi:10.1000/182", "10.1006/jmbi.1998.2354",
                   "DOI:10.6028/NIST.2022-04-15.001",
                   "https://doi.org/10.1000/182"],
+    # The PFS-compiled dev alias of etsi has no fixture corpus; these
+    # corpus literals stand in for one (its parity spec carries the full
+    # 24,718-row inventory).
+    "etsi_pfs" => ["ETSI EG 200 053 V1.5.1 (2004-06)",
+                   "ETSI GTS GSM 02.01 V5.5.0 (1999-08)",
+                   "ETSI GR NFV-EVE 008 V3.1.1 (2017-12)",
+                   "ETSI EN 300 175"],
     "adobe" => ["Adobe TN 5014", "Adobe Technical Note 5902", "adobe-glyph-list",
                 "adobe-japan1-7", "adobe-postscript-3"],
     "sae" => ["SAE J3016_202104", "SAE J3016", "SAE AS6108A", "SAE ARP5548",
