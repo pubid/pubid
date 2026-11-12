@@ -21,6 +21,13 @@ module Pubid
             TYPED_STAGES
           end
 
+          # Bare "FIPS 197" names the NIST document (NIST/CSRC list every
+          # FIPS, NBS-era ones included, as "NIST FIPS"). A parsed "NBS"
+          # stays NBS.
+          def series_default_publisher
+            "NIST"
+          end
+
           def type
             { key: :fips,
             web: :federal_information_processing_standards, title: "Federal Information Processing Standards",
@@ -41,8 +48,10 @@ module Pubid
         def to_mr_style
           # "NIST.FIPS.197" keeps a parsed publisher (the DOI suffix NIST
           # publishes); "FIPS.46e1977" has none and invents none.
+          # A bare "FIPS 197" carries the series default publisher NIST but
+          # did not spell it, so it prints no prefix either.
           # Note: edition is appended directly to number without dot for FIPS
-          result = [publisher, series_code].compact.join(".")
+          result = [printed_publisher, series_code].compact.join(".")
           result += ".#{number}" if number
 
           # FIPS uses dash notation for parts; render here and skip the generic
@@ -60,7 +69,7 @@ module Pubid
 
         def to_short_style
           # FIPS format: "FIPS 14e1971" or "NIST FIPS 140-3" (preserve publisher if set)
-          result = publisher ? "#{publisher} " : ""
+          result = printed_publisher ? "#{printed_publisher} " : ""
           result += series_code
 
           if number
@@ -89,6 +98,14 @@ module Pubid
           result += append_short_components(skip_part: true)
 
           result
+        end
+
+        private
+
+        # The publisher the short and MR faces print: only one the input
+        # spelled, never the series default.
+        def printed_publisher
+          publisher if publisher_was_parsed
         end
       end
     end
