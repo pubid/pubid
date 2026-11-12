@@ -69,6 +69,8 @@ SUBSET_PAIRS = {
               candidate: "AMCA Publication 211-22" },
   "un" => { ref: "TRADE/WP.4/1068", candidate: "TRADE/WP.4/1068" },
   "doi" => { ref: "doi:10.1000/182", candidate: "doi:10.1000/182" },
+  # The PFS-compiled dev alias of doi.
+  "doi_pfs" => { ref: "doi:10.1000/182", candidate: "doi:10.1000/182" },
   "isbn" => { ref: "ISBN 978-3-16-148410-0",
               candidate: "ISBN 978-3-16-148410-0" },
 }.freeze
@@ -107,8 +109,18 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
     end
   end
 
-  def rebuild(identifier)
-    Pubid::Identifier.from_hash(identifier.to_hash)
+  # A PFS-compiled dev alias (pubid#706) carries its scheme's canonical
+  # wire tag, so a GLOBAL hash rebuild resolves the scheme's coded class;
+  # the alias's own rebuild goes through its flavor-local from_hash.
+  ALIAS_REBUILD = { "doi_pfs" => "Pubid::DoiPfs::Identifier" }.freeze
+
+  def rebuild(identifier, flavor: nil)
+    klass = ALIAS_REBUILD[flavor]
+    if klass
+      Object.const_get(klass).from_hash(identifier.to_hash)
+    else
+      Pubid::Identifier.from_hash(identifier.to_hash)
+    end
   end
 
   it "has a subset pair for every registered flavor" do
@@ -133,7 +145,7 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
       end
 
       it "matches the candidate rebuilt from its hash (an index row)" do
-        expect(ref === rebuild(candidate)).to be(true)
+        expect(ref === rebuild(candidate, flavor: flavor)).to be(true)
       end
 
       it "matches itself" do
