@@ -100,6 +100,13 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     # separable trailing components, exactly as the coded flavor's entry
     # above (%i[version date]) — the grammar's trailing optionals.
     "etsi_pfs" => { ref: "ETSI EG 200 053", omits: %i[version date] },
+    # The PFS-compiled dev alias of calconnect: the calendar binding is
+    # the separable trailing component, exactly as the coded flavor's
+    # entry above.
+    "calconnect_pfs" => { ref: "CC 11001", omits: [:date] },
+    # The PFS-compiled dev alias of cen_cenelec: the published year is
+    # separable, exactly as the coded flavor's entry above.
+    "cen_pfs" => { ref: "EN 13485", omits: [:year] },
     # ISBN: identifier has no separable date.
     "isbn" => { ref: "ISBN 978-3-16-148410-0", omits: [] },
   }.freeze

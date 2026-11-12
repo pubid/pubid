@@ -21,6 +21,10 @@ module WithPublisherContractSample
     # The PFS-compiled dev alias of etsi (pubid#706 phase 2).
     "etsi_pfs" => ["ETSI EG 200 053 V1.5.1 (2004-06)",
                    "ETSI GTS GSM 02.01 V5.5.0 (1999-08)"],
+    # The PFS-compiled dev aliases of calconnect and cen_cenelec
+    # (pubid#706 phase 2).
+    "calconnect_pfs" => ["CC 11001:2024", "CC/DIR 10006:2019"],
+    "cen_pfs" => ["EN 12464-1:2011", "EN 1325"],
     "sae" => ["SAE J300:2019"],
   }.freeze
 
