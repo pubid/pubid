@@ -151,6 +151,16 @@ module Pubid
         # reason). The document itself holds no all-parts mark.
         all_parts = parsed_hash.delete(:all_parts)
 
+        # Historic TYPE-first ballot face ("ISO/IEC FDAM 1 14496-12:2004",
+        # "ISO/PDAM 19973-2", "ISO 15877-5:2009 FDAM 1"): the ballot_* keys
+        # are one amendment layer over the whole base, never a second
+        # supplement layer (the stored twins keep one level), so the layer
+        # is assembled here, before the supplement-prefix peel could read
+        # the ballot token as an outer wrapper.
+        if parsed_hash.key?(:ballot_type_with_stage)
+          return build_ballot_supplement(parsed_hash, all_parts)
+        end
+
         # The copublisher tail captures as one scalar span ("/IEC/IEEE");
         # split it into the {copublisher:} element hashes the merge and
         # the :copublishers cast consume. A pre-built array (the URN
@@ -261,6 +271,10 @@ module Pubid
           identifier.type = default_typed_stage.to_type
         end
 
+        # The owner's no-number rule: a numberless DAM-family ballot-stage
+        # amendment is Amendment 1 (see the method comment).
+        apply_implied_amendment_number(identifier)
+
         all_parts ? identifier.to_all_parts : identifier
       end
 
@@ -304,6 +318,69 @@ module Pubid
         inner = { **fields, base: rest }
         inner[:all_parts] = all_parts if all_parts
         build(inner)
+      end
+
+      # Historic TYPE-first ballot face (owner ruling 2026-11-12, Option B
+      # decode-to-modern): "[P|F]?DAM [N] BASE [stamp]" decodes to ONE
+      # amendment over the WHOLE base, rendered as the canonical on-base
+      # slash face. The stage comes from the ballot token; the number from
+      # the TYPE token, then the on-base stamp, then the owner's no-number
+      # rule (a ballot face with no number anywhere names Amendment 1 —
+      # identity-bearing, so it is set here at build time and serialized,
+      # not at render time); the stamp's date is the ballot supplement's
+      # date. The base keeps every component it carried: a legacy
+      # slash-part stays a part of the base number ("ISO/IEC FPDAM 9075/1"
+      # → base "9075-1"), and the base's own type token stays the base's
+      # ("ISO/IEC PDAM TR 9573-11" → base "TR 9573-11") — nothing migrates
+      # into the supplement slot. The stamp's token letters (Amd/Am/…) are
+      # decode-away: the ballot's stage is the TYPE token's.
+      #
+      # The rest of the hash — prefix, copublishers, the base's
+      # type_with_stage / number_with_part / date — is exactly the builder
+      # input of the base document, so it nests as :base and re-enters
+      # build.
+      def build_ballot_supplement(hash, all_parts)
+        fields = { type_with_stage: hash.fetch(:ballot_type_with_stage) }
+
+        number = hash[:ballot_number] ||
+                 hash[:ballot_stamp_number] ||
+                 hash[:ballot_stamp_dot_number] ||
+                 "1"
+        fields[:number_with_part] = number
+
+        if (stamp_date = hash[:ballot_stamp_date])
+          fields[:date] = stamp_date
+        end
+        if hash[:ballot_stamp_undated_marker]
+          fields[:undated_marker] = hash[:ballot_stamp_undated_marker]
+        end
+
+        rest = hash.except(:ballot_type_with_stage, :ballot_number,
+                           :ballot_stamp_number, :ballot_stamp_dot_number,
+                           :ballot_stamp_date, :ballot_stamp_undated_marker)
+
+        inner = { **fields, base: rest }
+        inner[:all_parts] = all_parts if all_parts
+        build(inner)
+      end
+
+      # The owner's no-number rule, applied on every construction path that
+      # routes through this builder (parse, URN, joint/bundle members): a
+      # DAM-family ballot-stage amendment token with no number anywhere
+      # names Amendment 1 ("ISO 19973-2/PDAM", "ISO/IEC PDAM 12207"). The
+      # number is identity-bearing, so the default lands at build time and
+      # to_hash serializes it — parse and from_hash(to_hash) agree because
+      # both carry the filled number. The ballot stages are matched by
+      # TypedStage#code (the per-typed-stage key) — PDAM's #stage_code is
+      # :cd, the harmonized range it lives in.
+      BALLOT_STAGE_CODES = %i[pdam damd fdamd fpdam].freeze
+
+      def apply_implied_amendment_number(identifier)
+        return unless identifier.is_a?(Identifiers::Amendment)
+        return unless identifier.number.nil?
+        return unless BALLOT_STAGE_CODES.include?(identifier.typed_stage&.code&.to_sym)
+
+        identifier.number = "1"
       end
 
       def build_directive_supplement(hash, all_parts)
