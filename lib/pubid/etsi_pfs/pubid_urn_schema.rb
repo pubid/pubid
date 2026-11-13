@@ -12,8 +12,10 @@
         atom "year", "year"
         atom "month", "month"
         atom "version", "v"
-        type "pubid:etsi_pfs:identifier", "id", core: []
-        type "pubid:etsi_pfs:standard", "es", core: []
+        type "pubid:etsi:etsi-standard", "es", core: []
+        type "pubid:etsi:amendment", "amd", core: [["number", :int]]
+        type "pubid:etsi:corrigendum", "cor", core: [["number", :int]]
+        type "pubid:etsi:identifier", "id", core: []
       end
     end
   end

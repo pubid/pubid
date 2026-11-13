@@ -7,8 +7,8 @@
 
         def build(data)
           Identifiers::Resource.new(
-            prefix: data[:prefix],
-            suffix: data[:suffix],
+          prefix: data[:prefix],
+          suffix: data[:suffix],
           )
         end
       end
