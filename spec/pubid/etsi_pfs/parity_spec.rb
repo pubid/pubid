@@ -1,39 +1,40 @@
 # frozen_string_literal: true
 
-# The etsi parity gate (pubid/pubid#706 phase 2): the PFS-compiled
-# `etsi_pfs` flavor versus the coded `Pubid::Etsi` over the FULL fixture
-# inventory (24,718 pass fixtures — the largest corpus a compiled flavor
-# has been bracketed against) plus constructed edge cases. Drift is a
-# defect in the DEFINITION (pubid-grammar's definitions/etsi.pfs) or the
-# compiler — never a reason to relax an expectation here.
+# The etsi parity gate (pubid/pubid#706 phase 2 + phase 3): the
+# PFS-compiled `etsi_pfs` flavor versus the coded `Pubid::Etsi` over the
+# FULL fixture inventory (24,718 pass fixtures — the largest corpus a
+# compiled flavor has been bracketed against) plus constructed edge
+# cases. Drift is a defect in the DEFINITION (pubid-grammar's
+# definitions/etsi.pfs) or the compiler — never a reason to relax an
+# expectation here.
 #
-# Measured parity, per surface (2026-11, parsanol 1.3.126):
+# Measured parity, per surface (2026-11, parsanol 1.3.126, compiler v2):
 #
 #   accept        24,718 / 24,718  (100% — the language bracket)
 #   negatives     same Pubid::Errors::ParseError on both sides
-#   to_hash       18,945 / 24,718  (exactly the rows whose identity
-#                 carries none of: collection parts, the ed.N edition
-#                 face, a supplement wrapper — the three constructs
-#                 pfs:1 cannot declare; see the bucket examples below)
-#   to_pubid_urn  18,945 / 24,718  (the same rows — purn parity is a
-#                 function of hash parity: the alias's hash carries the
-#                 scheme's canonical _type, so it encodes through the
-#                 coded schema)
-#   to_s          the canonical CORE face only — pfs:1 render faces
-#                 cannot render optionals, so every corpus row (all of
-#                 which carry version/ed + date) renders shorter;
-#                 bare and partial ids agree byte-for-byte
-#   to_urn        the coded generator is hand-written Ruby
-#                 (urn:etsi:{type}:{code}:{version}:{date}); the
-#                 generated generator pins the namespace only
-#   to_mr_string  the coded slug reads the flavor's mr_* hooks
-#                 (type/parts/edition/date segments); the base hooks
-#                 find none of them on the compiled columns
-#
-# The bucket examples pin each divergence to its construct, so compiler
-# progress (collection bindings, the edition face, supplement wrappers,
-# render tails, URN/MR declaration surface) turns them red — the signal
-# to move the row into the parity examples above.
+#   to_hash       24,718 / 24,718  (FULL parity — phase 3 closed all
+#                 three constructs: collection bindings (`parts` binds
+#                 its item per repetition), the ed.N face (the fold
+#                 onto version + is_edition), and the supplement
+#                 wrappers (the synthesized Amendment/Corrigendum
+#                 classes over the base standard))
+#   to_pubid_urn  24,718 / 24,718  (purn parity is a function of hash
+#                 parity: the alias's hash carries the scheme's
+#                 canonical _type, so it encodes through the coded
+#                 schema)
+#   to_s          the full printed face — the canonical template's
+#                 presence-guarded optionals and the V/ed alternated
+#                 tail render what the input carried
+#   to_urn        the ordered segments the definition's urn.official
+#                 declares (type lowercased, the composed code, the
+#                 v/ed version face, the year-month date group) —
+#                 byte-identical with the coded generator on every row
+#                 where the coded one renders at all; the coded
+#                 generator's month-08/09 ArgumentError is a pre-existing
+#                 defect the compiled generator does not share
+#   to_mr_string  the `mr:` hooks (type / number / year / edition) over
+#                 the columns, plus the wrapper's supplement suffix —
+#                 byte-identical with the coded hooks
 
 require "pubid"
 
@@ -42,9 +43,8 @@ INVENTORY = File.readlines(File.expand_path(
   __dir__,
 )).map(&:strip).reject { |line| line.empty? || line.start_with?("#") }.freeze
 
-# Bare and partial references — the identities pfs:1 CAN represent in
-# full: no parts run, no ed.N face, no supplement wrapper. Bare ids
-# agree on to_s too; partial ids agree on to_hash and to_pubid_urn.
+# Bare, partial and dated references — bare ids render as the core face,
+# dated ids carry their tails.
 PARITY_INPUTS = [
   "ETSI EN 300 175",            # bare
   "ETSI TS 103 702",            # bare
@@ -91,17 +91,6 @@ PARITY_NEGATIVES = [
 ].freeze
 
 RSpec.describe "Pubid::EtsiPfs parity with the coded Pubid::Etsi" do
-  # Which coded construct a row carries. The buckets are the three
-  # pfs:1 compiler gaps plus the representable rest.
-  def bucket_of(coded)
-    hash = coded.to_hash
-    return :supplement if hash.key?("base")
-    return :edition if hash.key?("is_edition")
-    return :parts if hash.key?("parts")
-
-    :plain
-  end
-
   describe "the language bracket (accept surface)" do
     it "parses every one of the #{INVENTORY.size} inventory inputs the coded flavor parses" do
       expect(INVENTORY.size).to eq(24_718)
@@ -130,14 +119,12 @@ RSpec.describe "Pubid::EtsiPfs parity with the coded Pubid::Etsi" do
     end
   end
 
-  describe "byte parity on the surfaces pfs:1 can represent" do
-    it "agrees on to_hash and to_pubid_urn for every inventory row in the plain bucket" do
+  describe "byte parity on every surface" do
+    it "agrees on to_hash and to_pubid_urn for every one of the #{INVENTORY.size} inventory rows" do
       parity = 0
 
       INVENTORY.each do |input|
         coded = Pubid::Etsi.parse(input)
-        next unless bucket_of(coded) == :plain
-
         compiled = Pubid::EtsiPfs.parse(input)
         expect(compiled.to_hash).to eq(coded.to_hash)
         expect(compiled.to_pubid_urn).to eq(coded.to_pubid_urn)
@@ -146,9 +133,23 @@ RSpec.describe "Pubid::EtsiPfs parity with the coded Pubid::Etsi" do
         parity += 1
       end
 
-      # The inventory's bucket split, pinned so a corpus change that
-      # moves a row across buckets is visible.
-      expect(parity).to eq(18_945)
+      expect(parity).to eq(24_718)
+    end
+
+    it "agrees on to_s for every one of the #{INVENTORY.size} inventory rows " \
+       "(the conditional render segments render the printed form)" do
+      INVENTORY.each do |input|
+        expect(Pubid::EtsiPfs.parse(input).to_s)
+          .to eq(Pubid::Etsi.parse(input).to_s)
+      end
+    end
+
+    it "agrees on to_mr_string for every one of the #{INVENTORY.size} inventory rows " \
+       "(the mr: hooks over the columns)" do
+      INVENTORY.each do |input|
+        expect(Pubid::EtsiPfs.parse(input).to_mr_string)
+          .to eq(Pubid::Etsi.parse(input).to_mr_string)
+      end
     end
 
     PARITY_INPUTS.each do |input|
@@ -167,81 +168,90 @@ RSpec.describe "Pubid::EtsiPfs parity with the coded Pubid::Etsi" do
         expect(Pubid::EtsiPfs::Identifier.from_hash(compiled.to_hash)).to eq(compiled)
       end
     end
-
-    it "renders every PARITY_INPUT as the coded flavor's to_s" do
-      # to_s parity is the bare sub-set: a row with version or date
-      # renders the tail in the coded flavor, which the canonical core
-      # face cannot (the render-face gap).
-      ["ETSI EN 300 175", "ETSI TS 103 702", "ETSI GTS GSM 02.01",
-       "ETSI EG 200 053"].each do |input|
-        expect(Pubid::EtsiPfs.parse(input).to_s).to eq(Pubid::Etsi.parse(input).to_s)
-      end
-    end
   end
 
-  describe "the compiler gaps, pinned per construct" do
-    it "collection bindings (gap): a parts row carries the printed dash run, " \
-       "not the coded array" do
+  describe "the former gaps, now features (phase 3)" do
+    it "collection bindings: a parts row carries the coded array, dropped when bare" do
       coded = Pubid::Etsi.parse("ETSI EN 300 019-1-0 V2.1.2 (2003-09)")
       compiled = Pubid::EtsiPfs.parse("ETSI EN 300 019-1-0 V2.1.2 (2003-09)")
 
-      expect(coded.to_hash["parts"]).to eq(%w[1 0])
-      expect(compiled.to_hash["parts"]).to eq("-1-0")
+      expect(compiled.to_hash["parts"]).to eq(%w[1 0])
+      expect(compiled.to_hash).to eq(coded.to_hash)
+      expect(Pubid::EtsiPfs.parse("ETSI EN 300 175").to_hash).not_to include("parts")
     end
 
-    it "the edition face (gap): an ed.N row carries `edition`, not the " \
-       "coded `version` + `is_edition` pair" do
+    it "the edition face: an ed.N row folds onto version + is_edition" do
       coded = Pubid::Etsi.parse("ETSI I-ETS 300 003 ed.1 (1991-08)")
       compiled = Pubid::EtsiPfs.parse("ETSI I-ETS 300 003 ed.1 (1991-08)")
 
-      expect(coded.to_hash["version"]).to eq("1")
-      expect(coded.to_hash["is_edition"]).to be(true)
-      expect(compiled.to_hash["edition"]).to eq("1")
-      expect(compiled.to_hash).not_to include("version", "is_edition")
+      expect(compiled.to_hash["version"]).to eq("1")
+      expect(compiled.to_hash["is_edition"]).to be(true)
+      expect(compiled.to_hash).not_to include("edition")
+      expect(compiled.to_hash).to eq(coded.to_hash)
+      # a V row carries the bare version, no flag
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_hash)
+        .not_to include("is_edition")
     end
 
-    it "supplement wrappers (gap): a /A//C row stays a flat etsi-standard " \
-       "row carrying the printed run" do
+    it "supplement wrappers: a /A//C run folds into the synthesized wrapper chain" do
       coded = Pubid::Etsi.parse("ETSI ETR 108/A1 ed.1 (1995-08)")
       compiled = Pubid::EtsiPfs.parse("ETSI ETR 108/A1 ed.1 (1995-08)")
 
-      expect(coded.to_hash["_type"]).to eq("pubid:etsi:amendment")
-      expect(coded.to_hash["number"]).to eq(1)
-      expect(compiled.to_hash["_type"]).to eq("pubid:etsi:etsi-standard")
-      expect(compiled.to_hash["supplements"]).to eq("/A1")
+      expect(compiled).to be_a(Pubid::EtsiPfs::Identifiers::Amendment)
+      expect(compiled.number).to eq(1)
+      expect(compiled.base).to be_a(Pubid::EtsiPfs::Identifiers::Standard)
+      expect(compiled.base.type).to eq("ETR")
+      expect(compiled.to_hash).to eq(coded.to_hash)
+      expect(compiled.to_hash["_type"]).to eq("pubid:etsi:amendment")
+
+      chained = Pubid::Etsi.parse("ETSI ETS 300 092-1/A1/C1 ed.1 (1994-04)")
+      compiled_chain = Pubid::EtsiPfs.parse("ETSI ETS 300 092-1/A1/C1 ed.1 (1994-04)")
+      # the printed run's order IS the nesting: C1 over A1 over the standard
+      expect(compiled_chain).to be_a(Pubid::EtsiPfs::Identifiers::Corrigendum)
+      expect(compiled_chain.base).to be_a(Pubid::EtsiPfs::Identifiers::Amendment)
+      expect(compiled_chain.base.base).to be_a(Pubid::EtsiPfs::Identifiers::Standard)
+      expect(compiled_chain.to_hash).to eq(chained.to_hash)
     end
 
-    it "render tails (gap): the canonical face renders the core only, so " \
-       "a dated row renders shorter than the coded flavor" do
-      compiled = Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)")
-
-      expect(compiled.to_s).to eq("ETSI EG 200 053")
-      expect(Pubid::Etsi.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_s)
+    it "conditional render segments: the printed tail renders what the input carried" do
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_s)
         .to eq("ETSI EG 200 053 V1.5.1 (2004-06)")
+      expect(Pubid::EtsiPfs.parse("ETSI I-ETS 300 003 ed.1 (1991-08)").to_s)
+        .to eq("ETSI I-ETS 300 003 ed.1 (1991-08)")
+      expect(Pubid::EtsiPfs.parse("ETSI EN 300 019-1-0 V2.1.2 (2003-09)").to_s)
+        .to eq("ETSI EN 300 019-1-0 V2.1.2 (2003-09)")
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 053").to_s)
+        .to eq("ETSI EG 200 053")
     end
 
-    it "official URN (gap): the compiled to_urn pins the namespace only — " \
-       "and the coded generator itself raises on months 08/09 (pre-existing)" do
-      compiled = Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)")
-
-      expect(compiled.to_urn).to eq("urn:etsi:200 053:2004")
-      expect(Pubid::Etsi.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_urn)
+    it "the official URN segments: the declared composition is byte-identical " \
+       "with the coded generator where the coded one renders at all" do
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_urn)
         .to eq("urn:etsi:eg:200 053:v1.5.1:2004-06")
-      # The coded flavor's pre-existing defect: format('%02d', month)
-      # on the zero-padded string raises for 08 and 09.
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 053").to_urn)
+        .to eq("urn:etsi:eg:200 053")
+      expect(Pubid::EtsiPfs.parse("ETSI EN 300 019-1-0 V2.1.2 (2003-09)").to_urn)
+        .to eq("urn:etsi:en:300 019-1-0:v2.1.2:2003-09")
+
+      # The coded flavor's pre-existing defect: format('%02d', month) on
+      # the zero-padded string raises for 08 and 09. The compiled
+      # generator renders the captured month verbatim — the same URN the
+      # coded one produces for every other month, and no raise here.
       expect { Pubid::Etsi.parse("ETSI EG 200 351 V2.2.2 (1998-09)").to_urn }
         .to raise_error(ArgumentError)
-      expect { Pubid::EtsiPfs.parse("ETSI EG 200 351 V2.2.2 (1998-09)").to_urn }
-        .not_to raise_error
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 351 V2.2.2 (1998-09)").to_urn)
+        .to eq("urn:etsi:eg:200 351:v2.2.2:1998-09")
     end
 
-    it "MR slug (gap): the compiled slug carries the bare number segment — " \
-       "the coded mr_* hooks (type/parts/edition/date) are not declarable" do
-      compiled = Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)")
-
-      expect(compiled.to_mr_string).to eq("200 053")
-      expect(Pubid::Etsi.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_mr_string)
+    it "MR slug hooks: the declared segments compose the coded slug byte-for-byte" do
+      expect(Pubid::EtsiPfs.parse("ETSI EG 200 053 V1.5.1 (2004-06)").to_mr_string)
         .to eq("etsi.eg.200-053.2004-06.1-5-1")
+      expect(Pubid::EtsiPfs.parse("ETSI I-ETS 300 003 ed.1 (1991-08)").to_mr_string)
+        .to eq("etsi.i-ets.300-003.1991-08.1")
+      expect(Pubid::EtsiPfs.parse("ETSI EN 300 019-1-0 V2.1.2 (2003-09)").to_mr_string)
+        .to eq("etsi.en.300-019-1-0.2003-09.2-1-2")
+      expect(Pubid::EtsiPfs.parse("ETSI ETR 108/A1 ed.1 (1995-08)").to_mr_string)
+        .to eq("etsi.etr.108.1995-08.1_a1.1")
     end
   end
 

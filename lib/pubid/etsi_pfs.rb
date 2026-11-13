@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
-# Source: definitions/etsi.pfs (pfs:1) sha256:9343088bf087b55ea790057e6be0bbebe2272407ee81f035b52e5f9a4d5c7b76
+# Source: definitions/etsi.pfs (pfs:1) sha256:490ba9435f44dbd2d59429ae6d9527909c39444f19fec5a33a8cad91e89e3581
 # Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
 # Regenerate: ruby scripts/pfs compile definitions/etsi.pfs --as etsi_pfs --ruby-out <dir>
 
@@ -16,6 +16,7 @@ module Pubid
     extend Pubid::PrefixesSupport
 
     PREFIXES = ["ETSI"].freeze
+    
 
     autoload :Builder, "#{__dir__}/etsi_pfs/builder"
     autoload :Identifier, "#{__dir__}/etsi_pfs/identifier"
