@@ -4,29 +4,33 @@ module Pubid
   module Itu
     module Identifiers
       # ITU Special Publication — currently models the Operational Bulletin (OB).
-      # OB is a cross-bureau publication. ITU prints it without a sector
-      # ("ITU OB No. 1283 (01/2024)"); the TSB spelling carries one
-      # ("ITU-T OB.1096 (2016)"), which is kept and rendered back. The sector
-      # is not part of the identity: `==`, the URN and the MR slug ignore it,
-      # so both spellings name one bulletin.
+      # OB is an org-level publication: it never carries a sector
+      # ("ITU OB No. 1283 (01/2024)", never "ITU-T OB"). The TSB spelling
+      # ("ITU-T OB.1096 (2016)") parses, but the sector is discarded here, so
+      # both spellings are one value on every surface — `to_s`, `to_hash`,
+      # `==`, the URN and the pubid-scheme URN (issue #696).
       class SpecialPublication < Identifier
         include StandardSerialization
 
         ROMAN_MONTHS = %w[I II III IV V VI VII VIII IX X XI XII].freeze
 
-        def render_base(**_opts)
-          number = code&.number
-          result = if sector
-                     "#{publisher}-#{sector} #{series}.#{number}"
-                   else
-                     "#{publisher} #{series} No. #{number}"
-                   end
-
-          result + render_ob_date
+        # Drop a sector given on construction (the parse path never passes
+        # one; a caller or a legacy hash row may).
+        def initialize(**kwargs)
+          super(**kwargs.except(:sector))
         end
 
-        # Cross-bureau: the sector is how one bureau cites the bulletin, not
-        # which bulletin it is.
+        # Drop a sector set later — `from_hash` of a legacy row with
+        # `"sector" => "T"` comes through this setter.
+        def sector=(_value)
+          super(nil)
+        end
+
+        def render_base(**_opts)
+          "#{publisher} #{series} No. #{code&.number}#{render_ob_date}"
+        end
+
+        # Only the fields a bulletin carries. The sector is always nil now.
         def ==(other)
           return false unless other.instance_of?(self.class)
 
@@ -37,8 +41,7 @@ module Pubid
             common_text_twin == other.common_text_twin
         end
 
-        # Keep the MR slug sector-free, like `==` (it was always so, because
-        # the sector used to be dropped).
+        # A bulletin has no type token in its MR slug.
         def mr_type
           nil
         end

@@ -44,10 +44,10 @@ RSpec.describe Pubid::Itu::Identifiers::Annex do
       expect(identifier.to_s).to eq("Annex to ITU OB No. 1")
     end
 
-    # The bulletin keeps the sector it was cited with (SpecialPublication).
-    it "keeps the sector of 'Annex to ITU-T OB.1283 (01/2024)'" do
+    # An OB never carries a sector (#696), so it is dropped in an annex too.
+    it "drops the sector of 'Annex to ITU-T OB.1283 (01/2024)'" do
       identifier = Pubid::Itu.parse("Annex to ITU-T OB.1283 (01/2024)")
-      expect(identifier.to_s).to eq("Annex to ITU-T OB.1283 (01/2024)")
+      expect(identifier.to_s).to eq("Annex to ITU OB No. 1283 (01/2024)")
       expect(identifier)
         .to eq(Pubid::Itu.parse("Annex to ITU OB No. 1283 (01/2024)"))
     end

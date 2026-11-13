@@ -82,20 +82,31 @@ a replay of all 24,382 rows and every ITU pass fixture showed 0 changes.
   code, so `#number` returns the series and `root.number` is `"RR"`. The rule
   ends in `any.absent?`: it sits before `with_series`, and PEG never re-enters
   the alternation, so a partial match on `ITU-R RR.1` must fail inside it.
-- **Operational Bulletins keep their sector.** This reverses the old
-  "cross-bureau, sector must not be set" rule: `validate_ob_no_sector!` is
-  gone, `ITU-T OB.1096 (2016)` renders back as it is, and the sector-less
-  `ITU OB No. 1096` is unchanged. The long forms with a sector (`ITU-T OB No.
-  1096`) now normalise to `ITU-T OB.1096`. `No.` stays in the default
-  render — it is how ITU's bulletin site and pubid v1 write it — and
-  metanorma-itu's `ITU OB 1000` / `Annex to ITU OB 1000` (its i18n template
-  omits `No.`) is accepted on parse (`ob_bare_body`) and rendered with it.
-  The sector is a spelling, not
-  identity: `SpecialPublication#==` skips it, the URN keeps `urn:itu:itu:…`
-  and `mr_type` stays nil, so both spellings are one bulletin on every
-  surface except `to_s`/`to_hash`. The printed date `- 15.III.2016` sets
-  `date.day`, which only this form does, so `render_ob_date` uses the day as
-  the spelling marker; `day_to_kv` emits only then.
+- **An Operational Bulletin never carries a sector (#696).** OB is an
+  org-level publication: "ITU OB", never "ITU-T OB". This reverses the
+  "Operational Bulletins keep their sector" rule of `27454393`, which kept the
+  sector as a spelling but left it in `to_hash`, so `ITU OB No. 1096` and
+  `ITU-T OB.1096` were `==` and had two pubid-scheme URNs (two relaton slugs).
+  The TSB spellings (`ITU-T OB.1096`, `ITU-T OB No. 1096`, `ITU-T Operational
+  Bulletin No. 1096`, also as an `Annex to …` base) still **parse** — the
+  grammar is unchanged — but `build_special_publication` passes no sector and
+  `SpecialPublication` drops one given to `new` or to `sector=` (the path a
+  legacy `from_hash` row with `"sector" => "T"` takes). So every surface,
+  `to_s` included, is sector-free: `ITU-T OB.1096 (2016)` renders `ITU OB
+  No. 1096 (2016)`. The `ITU-T OB…` lines in `pass/special_publication.txt`
+  are therefore `!input!rendered`. `No.` stays in the default render — it is
+  how ITU's bulletin site and pubid v1 write it — and metanorma-itu's `ITU OB
+  1000` / `Annex to ITU OB 1000` (its i18n template omits `No.`) is accepted
+  on parse (`ob_bare_body`) and rendered with it. The printed date
+  `- 15.III.2016` sets `date.day`, which only this form does, so
+  `render_ob_date` uses the day as the spelling marker; `day_to_kv` emits only
+  then. `build_supplement` does not take the sector of a TSB-spelled OB base
+  either, so `ITU-T OB.1096 Amd. 1` stores no sector and slugs
+  `itu.ob-1096…`. **Known gap:** the grammar has no sector-less OB
+  supplement, so that id renders `ITU OB No. 1096 Amd. 1`, which does not
+  parse back. No corpus holds an OB supplement; a grammar rule would be a
+  pubid-grammar change. Sources that cite `ITU-T OB` (relaton's
+  `publication_code`, the pubid-testsuite rows) are fixed in their own repos.
 - **`-YYYYMM` is a date, never a part.** `part` refuses a six-digit run with a
   19xx/20xx year and a 01–12 month (`yyyymm_shape`), and `id_date` reads it as
   year+month. `-200313`, `-180001` stay parts. `ITU-T REC T.4` drops the

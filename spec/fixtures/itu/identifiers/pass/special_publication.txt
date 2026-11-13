@@ -1,7 +1,7 @@
 # ITU Special Publication (Operational Bulletin) - Pass
-# Round-trip canonical forms only. The long forms ("ITU-T OB No. X",
-# "ITU-T Operational Bulletin No. X") normalize to "ITU-T OB.X" and are
-# covered by special_publication_spec.rb instead of round-trip fixtures.
+# An OB never carries a sector (#696): the TSB spelling "ITU-T OB.X" parses
+# and normalizes to "ITU OB No. X" (the !input!rendered lines). The long forms
+# are covered by special_publication_spec.rb.
 
 ITU OB No. 1
 ITU OB No. 100
@@ -15,7 +15,7 @@ ITU OB No. 1000-R
 ITU OB No. 1000-A
 ITU OB No. 1000-C
 ITU OB No. 1000-E
-ITU-T OB.1096
-ITU-T OB.1096 (2016)
-ITU-T OB.1096 (03/2016)
-ITU-T OB.1096 - 15.III.2016
+!ITU-T OB.1096!ITU OB No. 1096
+!ITU-T OB.1096 (2016)!ITU OB No. 1096 (2016)
+!ITU-T OB.1096 (03/2016)!ITU OB No. 1096 (03/2016)
+!ITU-T OB.1096 - 15.III.2016!ITU OB No. 1096 - 15.III.2016

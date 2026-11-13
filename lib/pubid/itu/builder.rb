@@ -170,12 +170,10 @@ module Pubid
         nil
       end
 
-      # Build Special Publication (OB). The sector of the TSB spelling
-      # ("ITU-T OB.1096") is kept so the bulletin renders back as it was cited;
-      # SpecialPublication#== ignores it, since OB is cross-bureau.
+      # Build Special Publication (OB). An OB never carries a sector, so the
+      # sector of the TSB spelling ("ITU-T OB.1096") is discarded (#696).
       def build_special_publication(data)
         Identifiers::SpecialPublication.new(
-          sector: (Components::Sector.new(sector: data[:sector].to_s) if data[:sector]),
           series: Components::Series.new(series: "OB"),
           code: data[:number] ? build_code(data) : nil,
           date: data[:year] ? build_date(data) : nil,
@@ -289,8 +287,12 @@ module Pubid
         # it via #root; otherwise a supplement of an annex would carry none of
         # them and its MR string would collapse to a bare "itu.<date>".
         base_identity = base&.sector ? base : base&.root
+        # An Operational Bulletin never carries a sector (#696), so a
+        # supplement of one does not take the sector of its TSB spelling.
+        own_sector = data[:sector] &&
+          !base_identity.is_a?(Identifiers::SpecialPublication)
         sector = base_identity&.sector ||
-          (Components::Sector.new(sector: data[:sector].to_s) if data[:sector])
+          (Components::Sector.new(sector: data[:sector].to_s) if own_sector)
         series = base_identity&.series ||
           (Components::Series.new(series: data[:series].to_s) if data[:series])
 

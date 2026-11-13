@@ -16,10 +16,9 @@ module Pubid
       def generate_base_urn
         parts = ["urn", "itu"]
 
-        # An Operational Bulletin is cross-bureau: its sector is a spelling,
-        # not identity (see SpecialPublication#==), so it stays out of the URN.
-        if identifier.sector &&
-            !identifier.is_a?(Identifiers::SpecialPublication)
+        # An Operational Bulletin never carries a sector (#696), so it gets
+        # the `itu` segment here.
+        if identifier.sector
           sector = identifier.sector.to_s
           parts << sector.to_s.downcase
         else
