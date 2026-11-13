@@ -29,6 +29,41 @@
   `UrnParser` does not prepend `JIS ` to a code that starts with `WES `.
 - `PREFIXES` includes `"WES"`, so `Pubid.parse("WES …")` routes to JIS.
 
+## WES `(E)` before the year, `WES TR`, `WES TS` (relaton-jis#18)
+
+- JSA Webdesk lists 14 WES ids that the grammar does not read:
+  `WES 1112(E):2022`, `WES TR 2032:2024`, `WES TS 2816(E):2015`.
+- **A Ruby shim reads them, not the grammar.** `Parser.ingest` cuts
+  the `TR`/`TS` token and a `(E)`/`(J)` that comes before `:year`, and
+  binds them as `wes_type` and `wes_language`. Other input passes unchanged.
+  The hand-off `pubid__pubid-grammar__jis-wes-language-tr-ts` asks
+  pubid-grammar to bind the same two captures. After that lands, re-vendor
+  `jis.json`, re-pin `parg_reaffirmed_spec.rb`, and delete the shim. The
+  builder does not change.
+- **`WES TR`/`WES TS` are classes**: `WeldingEngineeringTechnicalReport`
+  and `…TechnicalSpecification` < `WeldingEngineeringStandard`, with
+  `WES_TYPE` in `code` (`WES TR 2032`) and in `mr_type`. Class-strict `==`
+  keeps them apart from `WES 2032` and `JIS TR Z 2032`.
+- **`language_before_year`** records where the source put the language. It
+  is spelling only (`equality_ignored`, a `langfirst` facet in the pubid
+  URN): `WES 1112(E):2022 == WES 1112:2022(E)`, and each renders as written.
+  The language itself is identity, so the `(E)` edition is not the Japanese
+  one. JIS ids never set the flag; `JIS X 0208(E):1997` still fails.
+- The pubid URN schema now places `language` and the supplement ordinal
+  (`core: [["number", :int]]`; an `EXPL` number is the atom `n`). Before,
+  every `(E)` id and every supplement raised in `to_pubid_urn`, and no
+  supplement was in the fixture corpus to show it.
+- **`Builder` reads both parse shapes.** The typed bindings
+  (`Parg::Model.bound`) carry a supplement flat (`amd_type`, …); the raw
+  tree (`Parg::Backend.parse`) nests it under `:amendment`/`:explanation`/
+  `:corrigendum`. `flatten_supplement` folds the nested form. Before, the
+  tree path dropped every supplement silently (`…/AMD 1:2000` built as the
+  bare base). `typed_binding_parity_spec.rb` found it when the first
+  supplement entered the pass corpus.
+- **The shim lives in `Parser.ingest`** and returns `[face, bindings]`.
+  `typed_binding_parity_spec.rb` calls it on the tree path too and merges
+  the bindings, as `Identifier.parse` does.
+
 ## Equality includes the class
 
 - `Identifier#==` requires `other.instance_of?(self.class)`: `JIS TR X

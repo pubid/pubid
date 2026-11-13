@@ -8,6 +8,7 @@ module Pubid
       end
 
       def build(data)
+        data = flatten_supplement(data)
         # Handle supplement case first; the SYMBOL clause (if any) attaches to
         # the outermost identifier, be it the base or the supplement. The
         # bindings bind the supplement's fields flat (amd_type/amd_number/…),
@@ -29,6 +30,19 @@ module Pubid
 
       private
 
+      SUPPLEMENT_KEYS = %i[amendment explanation corrigendum].freeze
+
+      # The typed bindings carry a supplement's fields flat (amd_type, …).
+      # The raw parse tree nests them under :amendment, :explanation or
+      # :corrigendum. Read both shapes, or the tree path drops the
+      # supplement.
+      def flatten_supplement(data)
+        key = SUPPLEMENT_KEYS.find { |k| data[k].is_a?(Hash) }
+        return data unless key
+
+        data.except(key).merge(data[key].compact)
+      end
+
       # nil => no SYMBOL clause; "" => bare "SYMBOL" keyword; otherwise value.
       def attach_symbol(identifier, data)
         identifier.symbol = data[:symbol_value].to_s if data[:symbol_present]
@@ -44,11 +58,28 @@ module Pubid
           reaffirmed: (true if data[:reaffirmed]),
         }
         # A WES id carries no series letter, so its series stays nil.
-        wes = Identifiers::WeldingEngineeringStandard
-        return wes.new(**attrs) if data[:wes]
+        return build_wes(data, attrs) if data[:wes]
 
         jis_class_for_type(data[:type]&.to_s)
           .new(series: data[:series].to_s, **attrs)
+      end
+
+      # `wes_type` ("TR"/"TS") picks the WES class. `wes_language` is a
+      # language printed before the year ("WES 1112(E):2022").
+      def build_wes(data, attrs)
+        attrs = attrs.merge(wes_language_attrs(data)) if data[:wes_language]
+        Identifiers::WeldingEngineeringStandard
+          .class_for_type(data[:wes_type]&.to_s).new(**attrs)
+      end
+
+      def wes_language_attrs(data)
+        if data[:language]
+          raise Pubid::Errors::ParseError.new(
+            "a WES id carries one language, not two", nil
+          )
+        end
+
+        { language: data[:wes_language].to_s, language_before_year: true }
       end
 
       def jis_class_for_type(type)

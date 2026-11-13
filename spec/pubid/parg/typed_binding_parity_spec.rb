@@ -49,19 +49,26 @@ RSpec.describe "typed model binding parity" do
         # before the engine sees them, so the differential runs over the
         # flavor's ingestion face: the parity question is per-face, not
         # per-spelling (pubid#698).
+        # A flavor whose ingestion also binds tokens the grammar cannot read
+        # yet (JIS `Parser.ingest`: WES TR/TS and a language before the
+        # year) gives the face plus those bindings; the tree path merges
+        # them, as the typed path does.
         ingest = lambda do |input|
           parser = flavor_module(flavor)::Parser
-          next input unless parser.respond_to?(:normalize_input)
+          next parser.ingest(input) if parser.respond_to?(:ingest)
+          next [input, {}] unless parser.respond_to?(:normalize_input)
 
-          parser.normalize_input(input)
+          [parser.normalize_input(input), {}]
         rescue NameError
-          input
+          [input, {}]
         end
 
         differences = entries.filter_map do |input|
-          face = ingest.call(input)
-          typed = flavor_module(flavor).parse(face)
-          tree = build.call(Pubid::Parg::Backend.parse(flavor, face))
+          face, bindings = ingest.call(input)
+          typed = flavor_module(flavor).parse(bindings.empty? ? face : input)
+          tree = build.call(
+            Pubid::Parg::Backend.parse(flavor, face).merge(bindings),
+          )
 
           next if typed.to_hash == tree.to_hash && typed.to_s == tree.to_s
 

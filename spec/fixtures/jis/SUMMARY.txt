@@ -1,14 +1,17 @@
 Flavor: JIS
-Classified: 2026-11-02 04:48:06
+Classified: 2026-11-12 22:58:32
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 10561
-Pass: 10561 (100.0%)
+Total: 10575
+Pass: 10575 (100.0%)
 Fail: 0 (0.0%)
 
 BY CLASS
 ----------------------------------------------------------------------
+amendment                                Pass: 1/1 (100.0%)
 japanese_industrial_standard             Pass: 10556/10556 (100.0%)
-welding_engineering_standard             Pass: 5/5 (100.0%)
+welding_engineering_standard             Pass: 15/15 (100.0%)
+welding_engineering_technical_report     Pass: 1/1 (100.0%)
+welding_engineering_technical_specification Pass: 2/2 (100.0%)

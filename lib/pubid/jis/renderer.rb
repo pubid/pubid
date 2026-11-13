@@ -49,8 +49,7 @@ module Pubid
         result = parts.join(" ")
         result += " " if result.length.positive?
         result += id.code.to_s
-        result += ":#{id.year_with_reaffirmation}" if id.year
-        result += "(#{id.language})" if id.language
+        result += id.year_and_language
         result += id.symbol_suffix
         result
       end

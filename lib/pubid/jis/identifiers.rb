@@ -15,6 +15,11 @@ module Pubid
                "#{__dir__}/identifiers/technical_specification"
       autoload :WeldingEngineeringStandard,
                "#{__dir__}/identifiers/welding_engineering_standard"
+      autoload :WeldingEngineeringTechnicalReport,
+               "#{__dir__}/identifiers/welding_engineering_technical_report"
+      autoload :WeldingEngineeringTechnicalSpecification,
+               "#{__dir__}/identifiers/" \
+               "welding_engineering_technical_specification"
     end
   end
 end
