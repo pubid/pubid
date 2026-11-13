@@ -3,24 +3,24 @@
 require "spec_helper"
 require_relative "../../../../lib/pubid/itu"
 
-# OB (Operational Bulletin) is a cross-bureau ITU publication. ITU itself
-# prints it without a sector ("ITU OB No. 1283"); the TSB spelling carries one
-# ("ITU-T OB.1096 (2016)"), and relaton writes that docid, so the sector is
-# kept and rendered back. It is not part of the identity: both spellings name
-# one bulletin (hand-off itu-relaton-query-forms, item 2).
+# OB (Operational Bulletin) is an org-level ITU publication: it never carries
+# a sector ("ITU OB No. 1283", never "ITU-T OB"). The TSB spelling
+# ("ITU-T OB.1096 (2016)") still parses, but the sector is discarded, so both
+# spellings are one value on every surface (issue #696).
 RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
   describe "round-trip parsing and rendering" do
     {
       "ITU OB No. 1283" => ["ITU OB No. 1283", nil],
-      "ITU-T OB.1096" => ["ITU-T OB.1096", "T"],
-      "ITU-T OB No. 1096" => ["ITU-T OB.1096", "T"],
+      "ITU-T OB.1096" => ["ITU OB No. 1096", nil],
+      "ITU-T OB No. 1096" => ["ITU OB No. 1096", nil],
       # metanorma-itu's spelling, without "No.": accepted, rendered with it.
       "ITU OB 1283" => ["ITU OB No. 1283", nil],
       "ITU OB 1283 (01/2024)" => ["ITU OB No. 1283 (01/2024)", nil],
-      "ITU-T OB 1096 (2016)" => ["ITU-T OB.1096 (2016)", "T"],
-      "ITU-T Operational Bulletin No. 1096" => ["ITU-T OB.1096", "T"],
-      "ITU-T OB.1096 (2016)" => ["ITU-T OB.1096 (2016)", "T"],
-      "ITU-T OB.1096 (03/2016)" => ["ITU-T OB.1096 (03/2016)", "T"],
+      "ITU-T OB 1096 (2016)" => ["ITU OB No. 1096 (2016)", nil],
+      "ITU-T Operational Bulletin No. 1096" => ["ITU OB No. 1096", nil],
+      "ITU-T OB.1096 (2016)" => ["ITU OB No. 1096 (2016)", nil],
+      "ITU-T OB.1096 (03/2016)" => ["ITU OB No. 1096 (03/2016)", nil],
+      "ITU-R OB.1096" => ["ITU OB No. 1096", nil],
     }.each do |input, (expected, sector)|
       it "parses #{input.inspect} as #{expected.inspect}" do
         identifier = Pubid::Itu.parse(input)
@@ -50,8 +50,8 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
         .to eq(%w[2016 03 15])
     end
 
-    it "renders back byte-exactly" do
-      expect(id.to_s).to eq("ITU-T OB.1096 - 15.III.2016")
+    it "renders the printed date without the sector" do
+      expect(id.to_s).to eq("ITU OB No. 1096 - 15.III.2016")
     end
 
     { "I" => "01", "IV" => "04", "IX" => "09", "XII" => "12" }
@@ -59,7 +59,7 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
       it "accepts the month #{roman}" do
         parsed = Pubid::Itu.parse("ITU-T OB.1096 - 01.#{roman}.2016")
         expect(parsed.date.month).to eq(month)
-        expect(parsed.to_s).to eq("ITU-T OB.1096 - 01.#{roman}.2016")
+        expect(parsed.to_s).to eq("ITU OB No. 1096 - 01.#{roman}.2016")
       end
     end
 
@@ -84,33 +84,53 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
     end
   end
 
-  describe "sector and identity" do
+  describe "the sector is never stored (issue #696)" do
     let(:with_sector) { Pubid::Itu.parse("ITU-T OB.1096 (2016)") }
     let(:without) { Pubid::Itu.parse("ITU OB No. 1096 (2016)") }
 
-    it "serializes the sector" do
+    it "does not serialize a sector" do
       expect(with_sector.to_hash).to eq(
         "_type" => "pubid:itu:special-publication",
-        "sector" => "T",
         "series" => "OB",
         "number" => "1096",
         "year" => "2016",
       )
     end
 
-    it "round-trips the sector through from_hash" do
-      rebuilt = Pubid::Itu::Identifier.from_hash(with_sector.to_hash)
-      expect(rebuilt.to_s).to eq("ITU-T OB.1096 (2016)")
-      expect(rebuilt).to eq(with_sector)
+    it "gives both spellings one value on every surface" do
+      expect(with_sector).to eq(without)
+      expect(with_sector.to_s).to eq(without.to_s)
+      expect(with_sector.to_hash).to eq(without.to_hash)
+      expect(with_sector.to_urn).to eq(without.to_urn)
+      expect(with_sector.to_pubid_urn).to eq(without.to_pubid_urn)
+    end
+
+    it "round-trips through from_hash and the pubid-scheme URN" do
+      expect(Pubid::Itu::Identifier.from_hash(with_sector.to_hash))
+        .to eq(with_sector)
+      expect(Pubid.parse_urn(with_sector.to_pubid_urn).to_hash)
+        .to eq(with_sector.to_hash)
+    end
+
+    it "drops the sector of a legacy hash row" do
+      legacy = without.to_hash.merge("sector" => "T")
+      rebuilt = Pubid::Itu::Identifier.from_hash(legacy)
+      expect(rebuilt.sector).to be_nil
+      expect(rebuilt.to_hash).to eq(without.to_hash)
+    end
+
+    it "drops a sector given on direct construction" do
+      id = described_class.new(
+        sector: Pubid::Itu::Components::Sector.new(sector: "T"),
+        series: Pubid::Itu::Components::Series.new(series: "OB"),
+        code: Pubid::Itu::Components::Code.new(number: "1"),
+      )
+      expect(id.sector).to be_nil
+      expect(id.to_s).to eq("ITU OB No. 1")
     end
 
     it "treats the spelling without No. as the same bulletin" do
       expect(Pubid::Itu.parse("ITU OB 1096 (2016)")).to eq(without)
-    end
-
-    it "treats both spellings as one bulletin" do
-      expect(with_sector).to eq(without)
-      expect(without).to eq(with_sector)
     end
 
     it "still tells two bulletins apart" do
@@ -122,14 +142,23 @@ RSpec.describe Pubid::Itu::Identifiers::SpecialPublication do
         .matches?(without, ignore: %i[year month])).to be(true)
     end
 
-    it "accepts a sector on direct construction" do
-      expect do
-        described_class.new(
-          sector: Pubid::Itu::Components::Sector.new(sector: "T"),
-          series: Pubid::Itu::Components::Series.new(series: "OB"),
-          code: Pubid::Itu::Components::Code.new(number: "1"),
-        )
-      end.not_to raise_error
+    ["ITU-T OB.1096 Amd. 1", "ITU-T OB.1096 (2016) Cor. 1",
+     "ITU-T OB.1096 Suppl. 1"].each do |input|
+      # The sector-less supplement form ("ITU OB No. 1096 Amd. 1") is not in
+      # the grammar, so it cannot be parsed for a comparison here.
+      it "drops the sector of a supplement: #{input}" do
+        id = Pubid::Itu.parse(input)
+        expect(id.sector).to be_nil
+        expect(id.to_s).to start_with("ITU OB No. 1096")
+        expect(id.to_mr_string).to start_with("itu.ob-1096")
+      end
+    end
+
+    it "drops the sector inside an annex" do
+      annex = Pubid::Itu.parse("Annex to ITU-T OB.1096 (2016)")
+      expect(annex.to_s).to eq("Annex to ITU OB No. 1096 (2016)")
+      expect(annex.to_pubid_urn)
+        .to eq(Pubid::Itu.parse("Annex to ITU OB No. 1096 (2016)").to_pubid_urn)
     end
   end
 
