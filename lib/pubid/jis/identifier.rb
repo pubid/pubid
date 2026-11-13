@@ -21,6 +21,11 @@ module Pubid
       attribute :parts, :string, collection: true # Optional multi-level parts
       attribute :year, :integer
       attribute :language, :string # "E" or "J"
+      # A WES id can print its language before the year ("WES 1112(E):2022")
+      # or after it ("WES 1112:2022(E)"). This records the source position.
+      # It is spelling only, so `==` does not read it.
+      attribute :language_before_year, :boolean
+      equality_ignored :language_before_year
       # Reaffirmation (再確認): a trailing "R" on the year marks an edition
       # that was reaffirmed without revision (e.g. ":2019R").
       attribute :reaffirmed, :boolean
@@ -45,6 +50,10 @@ module Pubid
         "pubid:jis:explanation" => "Pubid::Jis::Identifiers::Explanation",
         "pubid:jis:welding-engineering-standard" =>
           "Pubid::Jis::Identifiers::WeldingEngineeringStandard",
+        "pubid:jis:welding-engineering-technical-report" =>
+          "Pubid::Jis::Identifiers::WeldingEngineeringTechnicalReport",
+        "pubid:jis:welding-engineering-technical-specification" =>
+          "Pubid::Jis::Identifiers::WeldingEngineeringTechnicalSpecification",
       }.freeze
 
       key_value do
@@ -54,6 +63,7 @@ module Pubid
         map "parts", to: :parts
         map "year", to: :year
         map "language", to: :language
+        map "language_before_year", to: :language_before_year
         map "reaffirmed", to: :reaffirmed
         # render_empty keeps a bare "SYMBOL" (empty-string value) in the hash so
         # it round-trips distinctly from "no symbol" (nil).
@@ -73,6 +83,17 @@ module Pubid
 
       def reaffirmed?
         reaffirmed == true
+      end
+
+      def language_before_year?
+        language_before_year == true
+      end
+
+      # The ":year[R]" and "(lang)" tail, in the order the source used.
+      def year_and_language
+        year_part = year ? ":#{year_with_reaffirmation}" : ""
+        lang_part = language ? "(#{language})" : ""
+        language_before_year? ? lang_part + year_part : year_part + lang_part
       end
 
       # Render a year with its reaffirmation marker, e.g. "2019R".
@@ -184,10 +205,9 @@ module Pubid
           raise Pubid::Errors::InvalidInputError, Pubid::INPUT_TOO_LONG_MESSAGE
         end
 
-        identifier = ::Pubid.utf8_input(identifier)
-
-        parsed = Pubid::Parg::Model.bound(:jis, identifier)
-        Builder.build(parsed)
+        face, bindings = Parser.ingest(::Pubid.utf8_input(identifier))
+        parsed = Pubid::Parg::Model.bound(:jis, face)
+        Builder.build(parsed.merge(bindings))
       end
     end
   end
