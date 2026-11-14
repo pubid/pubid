@@ -202,10 +202,12 @@ module Pubid
         end
       end
 
+      # The flavor's declared attribute surface, from lutaml-model's public
+      # class-level introspection (`attributes` returns name => Attribute).
+      # #720: the previous `model_attributes` call targeted a method that does
+      # not exist, so the column was always empty.
       def extract_attributes(klass)
-        klass.model_attributes.keys.map(&:to_s)
-      rescue NoMethodError
-        []
+        klass.attributes.keys.map(&:to_s)
       end
 
       def extract_wrapper_types
