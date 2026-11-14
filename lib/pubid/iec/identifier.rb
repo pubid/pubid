@@ -276,6 +276,7 @@ module Pubid
         # (SupplementIdentifier#number).
         id.ensure_base if id.is_a?(SupplementIdentifier)
         reject_standalone_dotted_supplement(id, string)
+        reject_unrenderable_fragment(id, string)
         id
       end
 
@@ -310,6 +311,79 @@ module Pubid
             )
           end
           node = node.base
+        end
+      end
+
+      # pubid#731: the fragment-ladder spellings ("CDFRAG", "DFRAG",
+      # "FDFRAG", "PRF Frag", "PWI Frag" and the NP/ANW/WD " Frag" siblings)
+      # parse into broken shapes, and one condition on the BUILT object
+      # covers every route (the check is the shape, not a grammar route —
+      # the same ruling as reject_standalone_dotted_supplement above):
+      #
+      # * a fragment built WITHOUT its base designation — the ladder token
+      #   (or even the published "FRAG" token) in the primary type position.
+      #   The input's designation, date and edition are dropped (the
+      #   fragment delegates number/date to a base that is not there), the
+      #   fragment renders bare "/FRAG" — which is itself unparseable — and
+      #   the official URN is nil, so the shape silently corrupts
+      #   downstream.
+      # * a fragment carrying a NON-PUBLISHED ladder stage — the token in a
+      #   supplement layer ("IEC 60038/CDFRAG 1"). The renderer prints the
+      #   published "/FRAG<n>" face only, so the stage facet is dropped at
+      #   render and parse(to_s) != parse.
+      #
+      # No IEC source prints either shape: the gem fixtures, the testsuite
+      # ledger and the IEC/ISO Harmonized APIs data feeds (which carry an
+      # empty <FRAG/> element plus <stdFragment> for the number) attest only
+      # the on-base "/FRAG<n>" notation of the published fragment, and the
+      # stage-codes extract (data/iec/stage-codes.md) has no ladder rows. So
+      # the ladder spellings are rejected at parse — the #726/#727 ruling
+      # for unattested, un-renderable faces. from_hash stays open
+      # (stored-data compatibility): parse can no longer produce the shape,
+      # and no stored row carries it. The walk reaches a broken fragment
+      # under the wrappers ("IEC DFRAG 60038 (all parts)" is an AllParts
+      # over one; "IEC 60038/FRAG1 CSV" a Vap over a sound one — which
+      # passes).
+      FRAGMENT_LADDER_MESSAGE =
+        "the fragment-ladder spellings (\"CDFRAG\", \"DFRAG\", \"FDFRAG\", " \
+        "\"PRF Frag\", \"PWI Frag\" and the NP/ANW/WD \" Frag\" siblings) " \
+        "build a fragment identifier that cannot render or round-trip: no " \
+        "IEC source prints a fragment-ladder token (the attested fragment " \
+        "face is the on-base \"/FRAG<n>\" notation), and the built fragment " \
+        "either holds no base designation — rendering bare \"/FRAG\" with " \
+        "nothing attached and an empty official URN — or carries a " \
+        "non-published fragment stage with no printed token"
+
+      def self.reject_unrenderable_fragment(id, input)
+        node = id
+        while node
+          reject_fragment_ladder_shape(node, input)
+          node = descend_wrapper(node)
+        end
+      end
+
+      # The rejected fragment shape: either facet of the ladder spellings.
+      # A sound fragment (a base AND the published stage) passes; a nil
+      # stage also fails the check, defensively — no parse route builds one.
+      def self.reject_fragment_ladder_shape(node, input)
+        return unless node.is_a?(Identifiers::FragmentIdentifier)
+        return if node.base && node.typed_stage&.stage_code.to_s == "published"
+
+        raise Pubid::Errors::ParseError.new(
+          FRAGMENT_LADDER_MESSAGE, nil,
+          input: input, flavor: "iec"
+        )
+      end
+
+      # The next node the walk reaches: a wrapper's child. Supplements,
+      # Vap, Sheet and Fragment carry it in `base`; the AllParts and
+      # Consolidated members in `identifiers`. A leaf resolves neither and
+      # ends the walk.
+      def self.descend_wrapper(node)
+        if node.class.attributes.key?(:base)
+          node.base
+        elsif node.class.attributes.key?(:identifiers)
+          node.identifiers.first
         end
       end
 
