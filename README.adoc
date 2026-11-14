@@ -272,23 +272,18 @@ PubID V2 provides two-way machine-readable conversion for all identifiers, suppo
 
 === Export to Hash
 
+(The v1 reader chain `id.to_h` is historic and was removed; pubid 2 serializes
+through `#to_hash`.)
+
 [source,ruby]
 ----
 require 'pubid/iso'
 
 id = Pubid::Iso.parse("ISO 9001:2015/Amd 1:2020")
-id.to_h
-# => {
-#      flavor: "iso",
-#      type: "amendment",
-#      publisher: "ISO",
-#      number: "9001",
-#      year: "2015",
-#      supplements: [
-#        { type: "amendment", number: "1", year: "2020" }
-#      ],
-#      urn: "urn:iso:std:iso:9001:amd:2020:v1"
-#    }
+id.to_hash
+# => {"_type" => "pubid:iso:amendment", "number" => "1", "year" => "2020",
+#     "base" => {"_type" => "pubid:iso:international-standard",
+#                "number" => "9001", "year" => "2015"}}
 ----
 
 === Export to JSON
@@ -299,7 +294,7 @@ require 'pubid/iso'
 
 id = Pubid::Iso.parse("ISO 9001:2015")
 id.to_json
-# => '{"flavor":"iso","publisher":"ISO","number":"9001","year":"2015",...}'
+# => '{"_type":"pubid:iso:international-standard","number":"9001","year":"2015"}'
 ----
 
 === Import from Hash
@@ -337,12 +332,17 @@ Pubid.from_hash({ "number" => "9001" })
 
 === Import from JSON
 
+(The v1 `Pubid::Serializable` import surface is historic; pubid 2 imports
+through `Pubid.from_hash`, the hash counterpart of `Pubid.parse` documented
+above, fed with `JSON.parse`.)
+
 [source,ruby]
 ----
+require 'json'
 require 'pubid/iso'
 
-json = '{"flavor":"iso","publisher":"ISO","number":"9001","year":"2015"}'
-id = Pubid::Serializable.from_json(json)
+json = '{"_type":"pubid:iso:international-standard","number":"9001","year":"2015"}'
+id = Pubid.from_hash(JSON.parse(json))
 id.to_s # => "ISO 9001:2015"
 ----
 
@@ -598,9 +598,10 @@ bundle exec rake export:website_data
 bundle exec rake export:audit
 ----
 
-The export task produces a JSON file covering 23 flavors and 162 identifier
-types. Each flavor's identifier classes, typed stages, abbreviations, and up to
-10 fixture examples are extracted automatically from the library source.
+The export task produces a JSON file covering all 33 registered flavors and
+228 identifier types (2.0.26). Each flavor's identifier classes, typed stages,
+abbreviations, and up to 10 fixture examples are extracted automatically from
+the library source.
 
 === Programmatic API
 
@@ -613,9 +614,9 @@ data = Pubid::Export::Exporter.export_all
 # => { "iso" => { identifier_types: [...], attributes: [...] }, ... }
 
 # Export a single flavor
-exporter = Pubid::Export::SchemeExporter.new(:iso)
+exporter = Pubid::Export::FlavorExporter.new(:iso)
 result = exporter.export
-result.to_h  # => { identifier_types: [...], attributes: [...] }
+result.to_h  # => { identifier_types: [...], attributes: [...], ... }
 ----
 
 === Output Schema
@@ -644,7 +645,7 @@ The exported JSON follows this structure:
         "examples": ["ISO 9001:2015", "ISO/IEC 17031-1:2020", ...]
       }
     ],
-    "attributes": ["number", "part", "date", "edition", ...]
+    "attributes": []
   }
 }
 ----
@@ -700,50 +701,26 @@ The exported JSON follows this structure:
 
 |`attributes`
 |`string[]`
-|Lutaml::Model attribute names on the identifier class
+|Lutaml::Model attribute names on the identifier class (currently always
+empty on 2.0.26)
 
 |`wrapper_types`
 |`object[]`
-|Value-added overlay types (VAP, Redline, etc.) — same schema as `identifier_types`
+|Value-added overlay types (VAP, Redline, etc.) — same schema as `identifier_types`;
+present when the flavor lists wrapper classes (`iec`, `bsi`)
 |===
 
-=== Extraction Strategies
+=== Extraction
 
-Different flavors use different internal architectures. The export layer uses
-the Strategy pattern to handle each without modifying existing code:
+One extractor, `Pubid::Export::FlavorExporter`, covers every flavor: it reads
+the flavor module's self-describing `identifier_types` interface (falling back
+to scanning the flavor's `Identifiers` namespace), the classes' `TYPED_STAGES`,
+and fixture examples. Wrapper (overlay) types are discovered per flavor through
+`FlavorExporter::WRAPPER_CLASSES` (IEC `VapIdentifier`, BSI
+`ValueAddedPublication`).
 
-.Strategy classes
-[cols="1,2,2", options="header"]
-|===
-|Strategy |Flavors |Pattern
-
-|`SchemeExporter`
-|ISO, IEC, ASTM, ASHRAE, ASME, CCSDS, CIE, CSA, JIS, JCGM, OIML, IDF, API, SAE, ANSI
-|`Scheme.identifiers` + per-class `def self.type` + `TYPED_STAGES`
-
-|`RegistryExporter`
-|BSI, CEN
-|`TYPED_STAGES_REGISTRY` on Scheme class (centralized registry)
-
-|`IeeeExporter`
-|IEEE
-|`KEY_IDENTIFIER_CLASSES` from Identifiers module + module-level typed stages
-
-|`NistExporter`
-|NIST
-|`Scheme.identifiers` + per-class `typed_stages` class method (not constant)
-
-|`ItuExporter`
-|ITU
-|Sector-based types with transform/model pattern
-
-|`DataClassExporter`
-|ETSI, Plateau
-|`Lutaml::Model::Serializable` as Scheme (no per-class identifiers)
-|===
-
-Adding a new flavor requires only registering it in `FLAVOR_STRATEGIES` within
-`Exporter` — no existing strategy code changes.
+Adding a new flavor requires only registering it in `Exporter::FLAVORS` —
+no existing extractor code changes.
 
 === Adding a New Flavor to Export
 
@@ -755,42 +732,15 @@ it with the export layer:
   returning `{ key: :sym, title: "Name", short: "Abbr" }`. This is the primary
   source of metadata.
 
-. **Choose the right strategy** — Most flavors use one of the existing strategies:
-
-  * `SchemeExporter` — if the flavor has a `Scheme` class with a class-level
-    `identifiers` method that returns identifier classes. This is the most
-    common pattern (ISO, IEC, ASTM, ASHRAE, etc.).
-  * `RegistryExporter` — if the flavor uses a centralized `TYPED_STAGES_REGISTRY`
-    on the Scheme class instead of per-class `TYPED_STAGES` (BSI, CEN).
-  * `IeeeExporter` — only for IEEE, which has a unique constant-based discovery.
-  * `NistExporter` — if typed stages come from a class method (not constant).
-  * `ItuExporter` — for sector-based types with transform/model patterns.
-  * `DataClassExporter` — for flavors where Scheme inherits from
-    `Lutaml::Model::Serializable` (ETSI, Plateau).
-
 . **Register the flavor** in `lib/pubid/export/exporter.rb`:
 
   [source,ruby]
   ----
   FLAVORS = %i[iso iec ... new_flavor].freeze
-
-  FLAVOR_STRATEGIES = {
-    iso: :scheme,
-    # ...
-    new_flavor: :scheme,  # or :registry, :data_class, etc.
-  }.freeze
-  ----
-
-. **Add the module mapping** in `FlavorExporter#scheme_module` (in
-  `lib/pubid/export/flavor_exporter.rb`):
-
-  [source,ruby]
-  ----
-  when "new_flavor" then Pubid::NewFlavor
   ----
 
 . **If the flavor has wrapper types** (value-added formats like VAP, Redline),
-  add them to `WRAPPER_CLASSES` in `FlavorExporter`:
+  add them to `WRAPPER_CLASSES` in `lib/pubid/export/flavor_exporter.rb`:
 
   [source,ruby]
   ----
@@ -812,7 +762,7 @@ it with the export layer:
   require "spec_helper"
   require "pubid/export"
 
-  RSpec.describe Pubid::Export::SchemeExporter, "for new_flavor" do
+  RSpec.describe Pubid::Export::FlavorExporter, "for new_flavor" do
     subject(:result) { described_class.new(:new_flavor).export }
 
     it "exports identifier types" do
@@ -851,14 +801,8 @@ puts auditor.summary(results)
 lib/pubid/export.rb                  # Module entry point
 lib/pubid/export/
 ├── result.rb                        # Immutable value objects (IdentifierTypeResult, TypedStageResult, FlavorResult)
-├── flavor_exporter.rb               # Abstract base class
-├── scheme_exporter.rb               # Strategy: Scheme.identifiers pattern
-├── registry_exporter.rb             # Strategy: TYPED_STAGES_REGISTRY pattern
-├── ieee_exporter.rb                 # Strategy: IEEE identifier discovery
-├── nist_exporter.rb                 # Strategy: NIST per-class typed_stages
-├── itu_exporter.rb                  # Strategy: ITU transform/model pattern
-├── data_class_exporter.rb           # Strategy: Lutaml::Model::Serializable Scheme
-├── exporter.rb                      # Orchestrator (FLAVOR_STRATEGIES dispatch)
+├── flavor_exporter.rb               # Unified per-flavor extractor (WRAPPER_CLASSES dispatch)
+├── exporter.rb                      # Orchestrator (FLAVORS list)
 └── auditor.rb                       # Library vs website gap analysis
 lib/tasks/export.rake                # Rake tasks: export:website_data, export:audit
 ----
@@ -1249,16 +1193,16 @@ IEEE corrigenda are now first-class SupplementIdentifier objects with full base 
 [source,ruby]
 ----
 cor = Pubid::Ieee.parse("IEEE Std 535-2013/Cor. 1-2017")
-cor.class                  # => Pubid::Ieee::Identifiers::Corrigendum
-cor.cor_number             # => "1"
-cor.cor_year               # => "2017"
-cor.base_identifier        # => <Base identifier object>
-cor.base_identifier.to_s   # => "IEEE Std 535-2013"
-cor.to_s                   # => "IEEE Std 535-2013/Cor. 1-2017"
+cor.class     # => Pubid::Ieee::Identifiers::Corrigendum
+cor.number    # => "1"
+cor.year      # => "2017"
+cor.base      # => <the wrapped standard identifier>
+cor.base.to_s # => "IEEE Std 535-2013"
+cor.to_s      # => "IEEE Std 535-2013/Cor. 1-2017"
 
 # Round-trip fidelity preserved
 cor2 = Pubid::Ieee.parse("IEEE Std 802.1AC-2016/Cor. 1-2018")
-cor2.to_s                  # => "IEEE Std 802.1AC-2016/Cor. 1-2018"
+cor2.to_s     # => "IEEE Std 802.1AC-2016/Cor. 1-2018"
 ----
 
 **Extended Relationship Types:**
@@ -1438,33 +1382,32 @@ ASME uses 23+ multi-character codes for specialized document types:
 ----
 require 'pubid/asme'
 
-# Parse standard code
+# Parse standard (designator + number in one `number` string)
 id = Pubid::Asme.parse("ASME B16.5-2020")
-id.code.designator  # => "B"
-id.code.number      # => "16.5"
-id.year             # => "2020"
-id.to_s             # => "ASME B16.5-2020"
+id.number # => "B16.5"
+id.year   # => "2020"
+id.to_s   # => "ASME B16.5-2020"
 
 # Parse BPVC subdivision
 bpvc = Pubid::Asme.parse("ASME BPVC.III.1.NB-2021")
-bpvc.code.designator  # => "BPVC.III.1.NB"
-bpvc.code.number      # => ""
-bpvc.year             # => "2021"
-bpvc.to_s             # => "ASME BPVC.III.1.NB-2021"
+bpvc.number # => "BPVC.III.1.NB"
+bpvc.year   # => "2021"
+bpvc.to_s   # => "ASME BPVC.III.1.NB-2021"
 
 # Parse multi-char designator
 ptc = Pubid::Asme.parse("ASME PTC-1-2022")
-ptc.code.designator   # => "PTC"
-ptc.code.number       # => "1"
-ptc.to_s              # => "ASME PTC-1-2022"
+ptc.number # => "PTC-1"
+ptc.to_s   # => "ASME PTC-1-2022"
 
 # Parse CSA dual-published
 dual = Pubid::Asme.parse("ASME A17.1/CSA B44-2022")
-dual.code.designator  # => "A"
-dual.code.number      # => "17.1"
-dual.csa_number       # => "B44"
-dual.to_s             # => "ASME A17.1/CSA B44-2022"
+dual.number     # => "A17.1"
+dual.csa_number # => "B44"
+dual.to_s       # => "ASME A17.1/CSA B44-2022"
 ----
+
+(The v1 `id.code.designator` / `id.code.number` component reader is historic;
+v2 stores the whole designation in the `number` attribute.)
 
 **Known Limitations:**
 All 731 ASME identifiers are normative (from official ASME sources). Current parser handles 75.51% (552/731) with opportunities for further enhancement in specialized patterns.
@@ -1557,15 +1500,22 @@ bsi.to_s  # => "BS ISO 37101:2016"
 
 # Adopted European Norm with ISO (three-level)
 bsi = Pubid::Bsi.parse("BS EN ISO 13485:2016+A11:2021")
-bsi.publisher.body  # => "BS"
-bsi.adopted_identifier.publisher.body  # => "EN"
+bsi.class # => Pubid::Bsi::Identifiers::ConsolidatedIdentifier
+bsi.identifiers.map(&:to_s)
+# => ["BS EN ISO 13485:2016", "BS EN ISO 13485:2016+A11:2021"]
+bsi.identifiers.first.publisher.body     # => "BS"
+bsi.identifiers.first.base.adopted.to_s  # => "ISO 13485:2016"
 # Three-level: BS wraps EN wraps ISO
 
 # National Annex with supplements
 na = Pubid::Bsi.parse("NA+A1:2012 to BS EN 1993-5:2007")
-na.supplements.first.number  # => "1"
-na.supplements.first.year    # => "2012"
+na.na_supplements.first.number # => "1"
+na.na_supplements.first.year   # => "2012"
 ----
+
+(The v1 `adopted_identifier` reader is historic — v2 uses the uniform `base`
+parent accessor on the adopted identifier and the `identifiers` collection on
+the consolidated wrapper.)
 
 **Features:**
 - Short year expansion: `A1:15` → `A1:2015`
@@ -1621,23 +1571,28 @@ Features: EN documents, technical specifications/reports, joint committee public
 [source,ruby]
 ----
 # CEN Technical Specification (slash separator!)
-cen = Pubid::Cen.parse("CEN/TS 14972")
+cen = Pubid::CenCenelec.parse("CEN/TS 14972")
 cen.to_s  # => "CEN/TS 14972" (slash, not space!)
 
 # CLC Technical Report
-clc = Pubid::Cen.parse("CLC/TR 62125:2008")
+clc = Pubid::CenCenelec.parse("CLC/TR 62125:2008")
 clc.to_s  # => "CLC/TR 62125:2008"
 
 # Joint committee
-joint = Pubid::Cen.parse("CEN/CLC/TR 17602-80-12:2021")
-joint.publisher.copublisher  # => ["CLC"]
+joint = Pubid::CenCenelec.parse("CEN/CLC/TR 17602-80-12:2021")
+joint.copublishers.map(&:to_s) # => ["CLC"]
 joint.to_s  # => "CEN/CLC/TR 17602-80-12:2021"
 
-# European Prestandard with ISO adoption (NEW)
-env = Pubid::Cen.parse("ENV ISO 11079:1999")
-env.adopted_identifier.to_s  # => "ISO 11079:1999"
+# European Prestandard with ISO adoption
+env = Pubid::CenCenelec.parse("ENV ISO 11079:1999")
+env.adopted.to_s # => "ISO 11079:1999"
 env.to_s  # => "ENV ISO 11079:1999"
 ----
+
+(The v1 `Pubid::Cen` module name is historic — CEN and CENELEC share the
+`cen_cenelec` flavor module, `Pubid::CenCenelec`; the v1
+`publisher.copublisher` and `adopted_identifier` readers are the v2
+`copublishers` collection and uniform `base`/`adopted` accessors.)
 
 **Key Architectural Decision:** CEN uses **slash separator** between publisher and type (unlike ISO's space), implemented consistently throughout all identifier classes.
 
@@ -1864,9 +1819,9 @@ id.type.abbr # => "DATA"
 ----
 # Amendment
 id = Pubid::Iso.parse("ISO 19110:2005/Amd 1:2011")
-id.class # => Pubid::Iso::Identifiers::Amendment
-id.base_identifier.to_s # => "ISO 19110:2005"
-id.number.value # => "1"
+id.class     # => Pubid::Iso::Identifiers::Amendment
+id.base.to_s # => "ISO 19110:2005"
+id.number    # => "1"
 
 # Staged amendment (FDAM = Final Draft Amendment)
 id = Pubid::Iso.parse("ISO/IEC 8802-3:2021/FDAM 1")
@@ -1879,9 +1834,9 @@ id.class # => Pubid::Iso::Identifiers::Corrigendum
 
 # Multi-level (Amendment to Amendment gets Corrigendum)
 id = Pubid::Iso.parse("ISO/IEC 13818-1:2015/Amd 3:2016/Cor 1:2017")
-id.class # => Pubid::Iso::Identifiers::Corrigendum
-id.base_identifier.class # => Pubid::Iso::Identifiers::Amendment
-id.base_identifier.base_identifier.class # => Pubid::Iso::Identifiers::InternationalStandard
+id.class           # => Pubid::Iso::Identifiers::Corrigendum
+id.base.class      # => Pubid::Iso::Identifiers::Amendment
+id.base.base.class # => Pubid::Iso::Identifiers::InternationalStandard
 ----
 
 ===== Special patterns
@@ -1890,13 +1845,13 @@ id.base_identifier.base_identifier.class # => Pubid::Iso::Identifiers::Internati
 ----
 # Directives
 id = Pubid::Iso.parse("ISO/IEC DIR 1:2022")
-id.class # => Pubid::Iso::Identifiers::Directives
-id.number.value # => "1"
+id.class    # => Pubid::Iso::Identifiers::Directives
+id.number   # => "1"
 
 # Directives Supplement
 id = Pubid::Iso.parse("ISO/IEC DIR 1 ISO SUP:2022")
-id.class # => Pubid::Iso::Identifiers::DirectivesSupplement
-id.base_identifier.class # => Pubid::Iso::Identifiers::Directives
+id.class         # => Pubid::Iso::Identifiers::DirectivesSupplement
+id.base.class    # => Pubid::Iso::Identifiers::Directives
 id.supplement_publisher.to_s # => "ISO"
 
 # Bundled Directives (combined document + supplement)
@@ -2270,13 +2225,13 @@ rec.to_s(format: :long)   # => "OIML R 138 Edition 2007 (E)"
 
 # With edition number
 guide = Pubid::Oiml.parse("OIML E 5 6th Edition 2015 (E)")
-guide.edition    # => "6"
+guide.edition    # => "6th"
 guide.year       # => "2015"
 
 # Amendment with recursive parsing
 amd = Pubid::Oiml.parse("Amendment (2009) to OIML R 138 Edition 2007 (E)")
-amd.base_identifier.to_s  # => "OIML R 138 Edition 2007 (E)"
-amd.year                  # => "2009"
+amd.base.to_s    # => "OIML R 138 Edition 2007"
+amd.year         # => "2009"
 ----
 
 ==== CCSDS: Space Data Systems Standards
@@ -2289,43 +2244,36 @@ require 'pubid/ccsds'
 
 # Standard CCSDS document
 doc = Pubid::Ccsds.parse("CCSDS 727.0-B-5")
-doc.code.number     # => "727.0"
-doc.version         # => "B"
-doc.revision        # => "5"
-doc.to_s            # => "CCSDS 727.0-B-5"
-
-# With color code
-doc = Pubid::Ccsds.parse("CCSDS 211.2-B-1 Magenta Book")
-doc.color           # => "Magenta"
-doc.to_s            # => "CCSDS 211.2-B-1 Magenta Book"
+doc.number  # => "727"
+doc.part    # => "0"
+doc.type    # => "B"
+doc.edition # => "5"
+doc.to_s    # => "CCSDS 727.0-B-5"
 
 # Corrigendum supplement (with lutaml-model)
 cor = Pubid::Ccsds.parse("CCSDS 727.0-B-5 Cor. 1")
-cor.class                  # => Pubid::Ccsds::Identifiers::Corrigendum
-cor.cor_number             # => 1
-cor.base_identifier.to_s   # => "CCSDS 727.0-B-5"
-cor.to_s                   # => "CCSDS 727.0-B-5 Cor. 1"
-
-# Language translation
-doc = Pubid::Ccsds.parse("CCSDS 211.0-B-5 (Chinese)")
-doc.language        # => "Chinese"
-doc.to_s            # => "CCSDS 211.0-B-5 (Chinese)"
+cor.class     # => Pubid::Ccsds::Identifiers::Corrigendum
+cor.number    # => "1"
+cor.base.to_s # => "CCSDS 727.0-B-5"
+cor.to_s      # => "CCSDS 727.0-B-5 Cor. 1"
 ----
+
+(The color-book label (`Magenta Book`) and the bracketed translation forms of
+the archived pre-monogem parser are historic — they are not part of the v2
+CCSDS grammar and no longer parse; see the archived
+link:https://github.com/pubid/pubid-ccsds#readme[pubid-ccsds README].)
 
 **Architecture Quality:**
 
 * **Lutaml::Model refactoring** - SupplementIdentifier inherits from `Identifiers::Base`
-* **Polymorphic attributes** - `attribute :base_identifier, Identifiers::Base, polymorphic: true`
-* **Type safety** - Corrigendum uses `attribute :cor_number, :integer`
-* ✅ **Serialization support** - Automatic JSON/YAML/XML via lutaml-model
-* ✅ **Zero breaking changes** - All 16 tests passing (100%)
+* **Polymorphic attributes** - the wrapped document is the uniform polymorphic `base` attribute
+* **Type safety** - the corrigendum ordinal is the shared `number` attribute
+* ✅ **Serialization support** - round-trip via `#to_hash` / `Pubid.from_hash`
 * ✅ **Consistent pattern** - Matches ISO, IEC, NIST architecture exactly
 
 **Key Features:**
 
-* Version-revision numbering (e.g., B-5 = Version B, Revision 5)
-* Color book system (Green, Blue, Magenta, Yellow, Silver, Orange, Pink)
+* Version-revision numbering (e.g., B-5 = Version B, Edition 5, carried as `type` and `edition`)
 * Corrigenda as proper supplement identifiers with recursive base parsing
-* Language translation support
 * Round-trip fidelity preserved
 

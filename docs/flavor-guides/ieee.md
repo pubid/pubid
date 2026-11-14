@@ -102,7 +102,7 @@ Pubid::Ieee.parse("IEEE Std 802.11-2020").class
 ```
 
 Composite forms resolve to dedicated classes: `/Cor. 1-2017` to
-`Identifiers::Corrigendum` (with `cor_number`, `cor_year`, `base`),
+`Identifiers::Corrigendum` (with `number`, `year`, `base`),
 CSA dual publications to `Identifiers::CsaDualPublished` (`IEEE Std
 844.1-2017/CSA C22.2 No. 293.1-17`), adoptions to
 `Identifiers::AdoptedStandard` (`IEEE No 18-1934 (ASA C55 1934)` renders
