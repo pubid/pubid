@@ -103,7 +103,7 @@ module Pubid
       # 2026-11-12, reversing #693's part-to-number move, which stole the
       # base's part for the supplement). The concrete base is what makes the
       # decode hash-match (and equal) the modern on-base parse of the same
-      # document: `parse("IEC/DCOR 60038-1") == parse("IEC 60038-1/DCOR1")`.
+      # document: `parse("IEC/DCOR 60038-1") == parse("IEC 60038-1/DCOR 1")`.
       #
       # A supplement with no part (a true standalone like "IEC/AMD 1:2017",
       # or a bare "+AMD1:2008" in a consolidation) keeps its own number and

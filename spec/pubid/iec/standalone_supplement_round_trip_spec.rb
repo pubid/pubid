@@ -120,7 +120,7 @@ RSpec.describe "IEC legacy standalone supplement decode" do
     expect(slash).to eq(space)
     expect(slash.to_hash).to eq(dam.to_hash.merge("stage" => "fdamd"))
     expect(dam.stage.stage_code).to eq("damd")
-    expect(dam.to_s).to eq("IEC 60038-1/DAM1")
+    expect(dam.to_s).to eq("IEC 60038-1/DAM 1")
   end
 
   it "decodes a bare designation as the base, numbering the supplement 1" do
@@ -129,7 +129,7 @@ RSpec.describe "IEC legacy standalone supplement decode" do
     expect(id.base.number).to eq("60038")
     expect(id.base.part).to be_nil
     expect(id.number).to eq("1")
-    expect(id.to_s).to eq("IEC 60038/FDAM1")
+    expect(id.to_s).to eq("IEC 60038/FDAM 1")
   end
 
   # The supplement's own date moves with the designation: old notation
@@ -139,7 +139,7 @@ RSpec.describe "IEC legacy standalone supplement decode" do
 
     expect(id.base.date.year).to eq("2019")
     expect(id.date).to be_nil
-    expect(id.to_s).to eq("IEC 60038-1:2019/DCOR1")
+    expect(id.to_s).to eq("IEC 60038-1:2019/DCOR 1")
   end
 
   it "stores the supplement number in number and the designation on base" do
@@ -149,7 +149,7 @@ RSpec.describe "IEC legacy standalone supplement decode" do
     expect(id.instance_variable_get(:@part)).to be_nil
     expect(id.base.number).to eq("60038")
     expect(id.base.part).to eq("1")
-    expect(id.to_s).to eq("IEC 60038-1/FDAM1")
+    expect(id.to_s).to eq("IEC 60038-1/FDAM 1")
   end
 
   # The TRUE standalone keeps the synthetic self-base: no base designation

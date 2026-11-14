@@ -76,7 +76,7 @@ RSpec.describe Pubid::Iec::Identifiers::Amendment do
       # The legacy prefix face decodes onto the modern identity (owner
       # ruling 2026-11-12): the same object as the on-base parse.
       it "decodes to the modern on-base form" do
-        expect(parsed.to_s).to eq("IEC 60038-1/FDAM1")
+        expect(parsed.to_s).to eq("IEC 60038-1/FDAM 1")
         expect(parsed).to eq(described_class.parse("IEC 60038-1/FDAM 1"))
       end
     end

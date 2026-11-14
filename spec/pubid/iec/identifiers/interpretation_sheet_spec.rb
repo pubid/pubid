@@ -122,7 +122,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       # The legacy prefix face decodes onto the modern identity: the whole
       # designation stays with the base, the sheet gets number 1.
       it "decodes to the modern on-base form" do
-        expect(parsed.to_s).to eq("IEC 60050-191/DISH1")
+        expect(parsed.to_s).to eq("IEC 60050-191/DISH 1")
         expect(parsed.base.part).to eq("191")
       end
     end
@@ -159,7 +159,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
       end
 
       it "decodes to the modern on-base form" do
-        expect(parsed.to_s).to eq("IEC 60050-191/CDISH1")
+        expect(parsed.to_s).to eq("IEC 60050-191/CDISH 1")
         expect(parsed.base.part).to eq("191")
       end
     end
@@ -257,7 +257,7 @@ RSpec.describe Pubid::Iec::Identifiers::InterpretationSheet do
 
       # The legacy face's year rides with the designation, onto the base.
       it "decodes to the modern on-base form" do
-        expect(parsed.to_s).to eq("IEC 60050-191:2014/DISH1")
+        expect(parsed.to_s).to eq("IEC 60050-191:2014/DISH 1")
         expect(parsed.base.date.year).to eq("2014")
         expect(parsed.date).to be_nil
       end
