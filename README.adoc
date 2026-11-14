@@ -645,7 +645,8 @@ The exported JSON follows this structure:
         "examples": ["ISO 9001:2015", "ISO/IEC 17031-1:2020", ...]
       }
     ],
-    "attributes": []
+    "attributes": ["_type", "number", "part", "subpart", "stage_iteration",
+      "date", "edition", "languages", ...]
   }
 }
 ----
@@ -701,8 +702,8 @@ The exported JSON follows this structure:
 
 |`attributes`
 |`string[]`
-|Lutaml::Model attribute names on the identifier class (currently always
-empty on 2.0.26)
+|Lutaml::Model attribute names declared on the flavor's lead identifier
+class (read through lutaml's class-level `attributes` introspection)
 
 |`wrapper_types`
 |`object[]`

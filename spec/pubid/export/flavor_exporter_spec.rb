@@ -93,5 +93,37 @@ RSpec.describe Pubid::Export::FlavorExporter do
         expect(result.identifier_types.size).to be > 0
       end
     end
+
+    # Regression guard for #720: extract_attributes called lutaml's
+    # nonexistent `model_attributes`, so the attributes column was always
+    # empty for every flavor.
+    context "attributes column (#720)" do
+      let(:exporter) { described_class.new(:iso) }
+
+      it "is non-empty" do
+        expect(exporter.export.attributes).not_to be_empty
+      end
+
+      it "names the flavor's declared attributes" do
+        expect(exporter.export.attributes).to include("number", "publisher")
+      end
+
+      it "matches the lead identifier class's declared lutaml attributes" do
+        klass = Pubid::Iso.identifier_types.first
+        expected = klass.attributes.keys.map(&:to_s)
+        expect(exporter.export.attributes).to eq(expected)
+      end
+    end
+  end
+
+  describe "#export over every registered flavor (#720)" do
+    it "exports a non-empty attributes column for every flavor" do
+      Pubid::Export::Exporter::FLAVORS.each do |flavor|
+        result = described_class.new(flavor).export
+        expect(result).not_to be_nil, "no export for #{flavor}"
+        expect(result.attributes).not_to be_empty,
+                                         "empty attributes column for #{flavor}"
+      end
+    end
   end
 end
