@@ -83,6 +83,10 @@ module Pubid
             undated_marker: :undated_marker,
             edition: :edition,
             languages: :languages,
+            # The designation's dotted sub-number is the base's
+            # ("IEC/FDAM 60038-2.3" — base 60038-2, stage iteration 3;
+            # pubid#725), the same facet the plain on-base parse carries.
+            stage_iteration: :stage_iteration,
           }.each do |source, target|
             base_hash[target] = parsed_hash[source] if parsed_hash[source]
           end
@@ -413,6 +417,17 @@ module Pubid
           elsif fields[:undated_marker]
             supplement.date = Pubid::Components::Date.new(undated: true)
           end
+        end
+        # The dotted sub-number of the supplement's own designation
+        # ("/DAM 2.3:2022" — number 2, stage iteration 3; pubid#725). The
+        # ISO flavor carries the same facet as a `stage_iteration`
+        # attribute, and the supplement layer's grammar capture
+        # (supp_stage_iteration) peels to `stage_iteration` through
+        # supplement_fields, so the supplement holds it the same way the
+        # ISO one does.
+        if supp_attrs.key?(:stage_iteration) && fields[:stage_iteration]
+          supplement.stage_iteration = cast(:stage_iteration,
+                                            fields[:stage_iteration])
         end
         if supp_attrs.key?(:edition) && fields[:edition]
           supplement.edition = Pubid::Components::Edition.new(number: fields[:edition].to_s)

@@ -31,6 +31,12 @@ module Pubid
           # Add subpart if present
           result += "-#{subpart}" if subpart && subpart.to_s != ""
 
+          # The dotted sub-number rides the designation ("IEC 60038-2.3";
+          # pubid#725). SingleIdentifier#number_portion already prints it;
+          # this override dropped it, so the dotted base lost its sub-number
+          # at render while to_hash and the pubid URN carried it.
+          result += ".#{stage_iteration}" if stage_iteration
+
           # Render the date (year[-month[-day]], or `--` for undated).
           result += ":#{date.render}" if date
 

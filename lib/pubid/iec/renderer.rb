@@ -120,6 +120,11 @@ module Pubid
 
         abbr = id.typed_stage.abbr.first.upcase
         supp_part = "/#{abbr}#{ballot_number_separator(id)}#{id.number}"
+        # The dotted sub-number rides the supplement's own designation,
+        # before the date ("/DAM 2.3:2022"; pubid#725) — the spaced ballot
+        # faces the #724 ruling named print it, and dropping it here would
+        # silently renumber the supplement again.
+        supp_part += ".#{id.stage_iteration.render(context:)}" if id.stage_iteration
         supp_part += ":#{id.date.render(context:)}" if id.date
         parts << supp_part
 
