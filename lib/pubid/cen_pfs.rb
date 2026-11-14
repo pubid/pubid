@@ -1,34 +1,25 @@
 # frozen_string_literal: true
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
-# Source: definitions/cen.pfs (pfs:1) sha256:bc1edd5874f8938b5f946416a2b052d9d9b9df3d99f6c20a3d88fcab9ae1d70c
+# Source: definitions/cen.pfs (pfs:1) sha256:b8f2c00e392dbc03c1fddedad141afa7c930c5430738721b7df0ac69a371d028
 # Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
 # Regenerate: ruby scripts/pfs compile definitions/cen.pfs --as cen_pfs --ruby-out <dir>
 
 require "pubid"
 
 module Pubid
-  # CEN/CENELEC European Norms (module composition) flavor, compiled from its PFS definition
+  # CEN/CENELEC flavor, compiled from its PFS definition
   # (pubid/pubid#706). A compiled flavor is a peer of the coded
   # flavors: same registry, same input guards, same error
   # namespace, same URN contracts.
   module CenPfs
     extend Pubid::PrefixesSupport
 
-    PREFIXES = ["EN", "CEN/", "CLC/"].freeze
-    # The module composition the definition binds (issue #706 §4):
-    # each entry names the library module, the version it was bound
-    # at, and — where the module declares one — its IDENTITY
-    # composition (wrapper-with-adopted: the adopted document is
-    # the base). Carried so consumers and the wizard can
-    # introspect what the flavor is composed of.
-    MODULES = [
-      { name: "iso.inner", version: 1, identity: { composition: "wrapper-with-adopted", base_module: "iso.inner", adopted_field: :adopted } },
-      { name: "en.overlay", version: 1, identity: { composition: "wrapper-with-adopted", base_module: "iso.inner", adopted_field: :adopted } },
-      { name: "national.prefix", version: 1, identity: { composition: "wrapper-with-adopted", base_module: "iso.inner", adopted_field: :adopted } },
-      { name: "supplements.core", version: 1, identity: { composition: "wrapper-with-adopted", adopted_field: :base } },
-    ].freeze
-
+    PREFIXES = ["CEN", "CLC", "CENELEC", "EN", "CWA", "HD", "ES", "CR", "ENV"].freeze
+    # The adopted-base dispatch hook (the §4 coded escape hatch):
+    # vendored beside the generated classes — a missing hook file
+    # fails loudly on the first adoption, never silently.
+    autoload :AdoptedBase, "#{__dir__}/cen_pfs/adopted_base"
     autoload :Builder, "#{__dir__}/cen_pfs/builder"
     autoload :Identifier, "#{__dir__}/cen_pfs/identifier"
     autoload :Identifiers, "#{__dir__}/cen_pfs/identifiers"
