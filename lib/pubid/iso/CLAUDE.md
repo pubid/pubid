@@ -207,3 +207,24 @@
     `spec/pubid/iso/ballot_face_decode_spec.rb` (all 13 SSOT anchors, the
     no-number rule, base-whole guards, Am alias, stored-twin agreement, and
     the website-face-vs-stored-face drift rows the SSOT §5 records).
+
+- **The unassigned-part placeholder `-_` is dropped before the parse
+  (relaton/relaton-data-iso#43).** ISO's open data
+  (`iso_deliverables_metadata.jsonl`) writes `-_` where a multipart project
+  has no part number yet — record 95616 is `ISO/NP TS 6041-_`, stage 10.20,
+  title "… Part _: _No part". The grammar's part body is word characters and
+  digits, so the id failed, and the relaton crawler left the file unindexed.
+  A `data/iso/update_codes.yaml` regex removes `-_` after a digit when a
+  separator (`:`, `/`, `(`, space) or the end follows, so the id parses as
+  `ISO/NP TS 6041` with a nil part. A nil part is the honest model (the part
+  is unknown), and `Pubid::Iso.parse` of the `-_` form (the call relaton's
+  crawler and lookup make) gives the same identifier as the index row. The
+  render is normalized, not byte-exact. No grammar or artifact change.
+  **Known gap:** the rule is ISO-only, and IEC's grammar accepts `_` as a
+  part, so `Pubid.parse("ISO 6041-_")` routes to IEC (an exact round trip
+  wins) with part `"_"`. The reported `ISO/NP TS 6041-_` still reaches ISO,
+  because IEC cannot read the NP stage. BSI and CSA delegate to ISO and get
+  the normalization. Over the whole open-data file (81,625
+  non-`Withdrawn` references, 2026-11-14) this was the only failure; the
+  `Withdrawn …` rows fail too, but the crawler skips them. Locked by
+  `spec/pubid/iso/update_codes_spec.rb`.

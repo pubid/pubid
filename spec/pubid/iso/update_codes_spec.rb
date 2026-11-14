@@ -37,6 +37,41 @@ RSpec.describe "ISO update_codes normalizations" do
                      "ISO/IEC 19757-2:2003/AMD 1:2006/DCOR 1"
   end
 
+  # ISO's open data writes `-_` where a part number is not assigned yet
+  # (record 95616: "ISO/NP TS 6041-_", title "… Part _: _No part").
+  # The placeholder carries no identity, so it is dropped and the part
+  # stays nil (relaton/relaton-data-iso#43).
+  describe "unassigned-part placeholder `-_`" do
+    it_behaves_like "normalizes to", "ISO/NP TS 6041-_", "ISO/NP TS 6041"
+    it_behaves_like "normalizes to", "ISO/NP 6041-_", "ISO/NP 6041"
+    it_behaves_like "normalizes to", "ISO 1234-_:2020", "ISO 1234:2020"
+    it_behaves_like "normalizes to", "ISO 1234-_/Amd 1", "ISO 1234/Amd 1"
+    it_behaves_like "normalizes to", "ISO 1234-_(E)", "ISO 1234(E)"
+
+    it "leaves the part nil and keeps the typed stage" do
+      id = Pubid::Iso.parse("ISO/NP TS 6041-_")
+      expect(id.number.to_s).to eq("6041")
+      expect(id.part).to be_nil
+      expect(id).to eq(Pubid::Iso.parse("ISO/NP TS 6041"))
+    end
+
+    it "serializes like the bare form (the index row shape)" do
+      expect(Pubid::Iso.parse("ISO/NP TS 6041-_").to_hash)
+        .to eq(Pubid::Iso.parse("ISO/NP TS 6041").to_hash)
+    end
+
+    # Only a stage IEC cannot read reaches ISO through `Pubid.parse`; a bare
+    # `ISO 6041-_` routes to IEC, which keeps `_` as the part (see
+    # lib/pubid/iso/CLAUDE.md).
+    it "parses the reported NP form through prefix routing" do
+      expect(Pubid.parse("ISO/NP TS 6041-_").to_s).to eq("ISO/NP TS 6041")
+    end
+
+    it "does not touch a real part" do
+      expect(Pubid::Iso.parse("ISO 1234-1").part).to eq("1")
+    end
+  end
+
   describe "negatives — must NOT be rewritten" do
     # FDIS Suppl is itself a canonical typed-stage abbr (in TYPED_STAGES_SUPPLEMENTS)
     # and gets rendered as the short form FDSuppl by the renderer, not by update_codes.
