@@ -130,9 +130,18 @@ module Pubid
           base.part = @part
           base.subpart = @subpart if @subpart
           base.date = date if date
+          # The designation's dotted sub-part moves with it (pubid#725):
+          # "IEC/FDAM 60038-2.3" is base 60038-2 with stage iteration 3 —
+          # the same identity the plain on-base parse of "IEC 60038-2.3"
+          # holds — not a facet of the implied FDAM 1. Only the
+          # designation-shaped layout (@part present) carries it; a true
+          # standalone's own iteration ("IEC/AMD 1.2:2017", no part) stays
+          # where it is.
+          base.stage_iteration = @stage_iteration if @stage_iteration
           @number = LEGACY_STANDALONE_SUPPLEMENT_NUMBER
           @part = nil
           @date = nil
+          @stage_iteration = nil
         else
           base = SingleIdentifier.new
           base.publisher = publisher

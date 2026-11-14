@@ -230,7 +230,17 @@ module Pubid
         token = ADJUNCT_TOKENS[id.class.name.split("::").last]
         return adjunct_slots(id.respond_to?(:base) ? id.base : nil) unless token
 
-        [plus ? "plus" : "", token, id.number.to_s,
+        # The supplement's dotted sub-number rides its number slot
+        # ("amd:2.3:2022"; pubid#725): ISO's official URN keeps the facet
+        # through its version atom, and this scheme has no version slot,
+        # so the number slot carries the designation as printed. The
+        # parser rebuilds "/AMD2.3:2022" from the slot, which re-parses
+        # losslessly.
+        number = id.number.to_s
+        iteration = maybe_of(id, :stage_iteration)
+        number += ".#{iteration}" if iteration
+
+        [plus ? "plus" : "", token, number,
          maybe_of(id, :date)&.render(context: URN_CONTEXT).to_s]
       end
 
