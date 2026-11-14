@@ -149,4 +149,134 @@ RSpec.describe "IEC dotted supplement sub-number" do
       end
     end
   end
+
+  # pubid#727: the standalone (no-base, no-part) face with a dotted number —
+  # "IEC/AMD 1.2:2017". The shape parsed and then LOST the dot at render:
+  # render_supplement_standalone prints the base number and the supplement
+  # number only, so the stored stage_iteration was dropped and
+  # parse(to_s) != parse. No IEC source prints a no-part standalone face
+  # with a dotted number (the facet is attested only on the on-base draft
+  # faces), so the shape is rejected at parse — the same ruling as the
+  # prefix-face dotted ballot numbers above — rather than left building an
+  # identifier whose canonical face cannot carry its own stored facet.
+  describe "the standalone no-part dotted face is rejected at parse" do
+    raising = [
+      "IEC/AMD 1.2:2017", "IEC/AMD 1.2",
+      "IEC/COR 1.2:2017",
+      "IEC/DCOR 1.3:2017", "IEC/DCOR 1.3",
+      "IEC/DISH 1.2:2017",
+      # the mixed-case token and the publisher-less and copublished
+      # spellings bind the same standalone layout
+      "IEC/Amd 1.2:2017", "AMD 1.2:2017", "ISO/IEC/AMD 1.2:2017",
+      # a dotted layer under an undotted second supplement rides the same
+      # self-base face one level down
+      "IEC/AMD 1.2:2017/COR 1:2018"
+    ].freeze
+
+    raising.each do |input|
+      it "raises for #{input.inspect}" do
+        expect { Pubid::Iec.parse(input) }
+          .to raise_error(Pubid::Errors::ParseError, /dotted sub-number/)
+      end
+    end
+
+    it "reports the input and flavor on the synthetic raise" do
+      expect { Pubid::Iec.parse("IEC/AMD 1.2:2017") }
+        .to raise_error(Pubid::Errors::ParseError) do |error|
+          expect(error.input).to eq("IEC/AMD 1.2:2017")
+          expect(error.flavor).to eq("iec")
+          expect(error.parse_failure_cause).to be_nil
+        end
+    end
+  end
+
+  describe "faces that keep their dot on a printable layer keep parsing" do
+    # Every parseable neighbour of the rejected shape, probed on #727:
+    # the single-document draft faces carry the dot on the BASE (they are
+    # not supplements), the DAM-family prefix faces decode the dotted
+    # designation onto the base, and the on-base faces have a real base —
+    # all of them render the dot and re-parse to the same identifier.
+    keep = {
+      "IEC/CD 1.2:2017" => "IEC CD 1.2:2017",
+      "IEC/FDIS 1.2:2017" => "IEC FDIS 1.2:2017",
+      "IEC/DTR 1.2:2017" => "IEC DTR 1.2:2017",
+      "IEC/DTS 1.2:2017" => "IEC DTS 1.2:2017",
+      "IEC/DAM 1.2" => "IEC 1.2/DAM 1",
+      "IEC/FDAM 1.2:2017" => "IEC 1.2:2017/FDAM 1",
+      "IEC/DAM 2.3:2022" => "IEC 2.3:2022/DAM 1",
+      "IEC 60038-2/DAM 2.3:2022" => "IEC 60038-2/DAM 2.3:2022",
+      "IEC 60038-2/DCOR 1.3" => "IEC 60038-2/DCOR 1.3",
+      "IEC/FDAM 60038-2.3" => "IEC 60038-2.3/FDAM 1",
+      "IEC/AMD 60038-1:2017" => "IEC 60038-1:2017/AMD1",
+    }.freeze
+
+    keep.each do |input, render|
+      context input do
+        let(:id) { Pubid::Iec.parse(input) }
+
+        it "renders #{render.inspect}" do
+          expect(id.to_s).to eq(render)
+        end
+
+        it "is == its from_hash(to_hash) round trip" do
+          expect(Pubid::Iec::Identifier.from_hash(id.to_hash)).to eq(id)
+        end
+
+        it "re-parses its own render to the same identifier" do
+          expect(Pubid::Iec.parse(id.to_s)).to eq(id)
+        end
+      end
+    end
+  end
+
+  describe "the undotted standalone faces keep parsing" do
+    # The render of the self-base standalone prints its number twice (the
+    # documented #693 residue: "IEC/AMD 1:2017" renders "IEC Amd 1-1:2017",
+    # which re-parses as Amd 1 of base 1-1) — unchanged by #727, which
+    # rejects only the DOTTED standalone face.
+    keep = {
+      "IEC/AMD 1:2017" => "IEC Amd 1-1:2017",
+      "IEC/AMD 1" => "IEC Amd 1-1",
+      "IEC/DCOR 1:2017" => "IEC DCOR 1-1:2017",
+      "IEC/DISH 1:2017" => "IEC DISH 1-1:2017",
+    }.freeze
+
+    keep.each do |input, render|
+      context input do
+        let(:id) { Pubid::Iec.parse(input) }
+
+        it "renders #{render.inspect}" do
+          expect(id.to_s).to eq(render)
+        end
+
+        it "is == its from_hash(to_hash) round trip" do
+          expect(Pubid::Iec::Identifier.from_hash(id.to_hash)).to eq(id)
+        end
+      end
+    end
+  end
+
+  describe "a pre-#727 stored hash still deserializes (deliberate residue)" do
+    # from_hash is the deserialization path: a hash produced by a pre-#727
+    # parse (the shape parsed before the reject) still builds. No published
+    # relaton-data-iec row carries the shape — no source prints the face —
+    # so nothing stored moves; the built object renders the undotted self-
+    # base face, as it always did. Parse rejects the shape instead, so no
+    # NEW hash of this shape can be produced by parsing.
+    let(:id) do
+      stored = {
+        "_type" => "pubid:iec:amendment", "stage_iteration" => "2",
+        "number" => "1", "year" => "2017"
+      }
+      Pubid::Iec::Identifier.from_hash(stored)
+    end
+
+    it "builds the amendment" do
+      expect(id).to be_a(Pubid::Iec::Identifiers::Amendment)
+    end
+
+    it "renders the undotted self-base face" do
+      expect(id.to_s).to eq("IEC Amd 1-1:2017")
+    end
+  end
 end

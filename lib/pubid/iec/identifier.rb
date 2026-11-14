@@ -275,7 +275,42 @@ module Pubid
         # parse holds that layout before any reader runs
         # (SupplementIdentifier#number).
         id.ensure_base if id.is_a?(SupplementIdentifier)
+        reject_standalone_dotted_supplement(id, string)
         id
+      end
+
+      # A supplement's OWN dotted sub-number has nowhere to print on the
+      # standalone (self-base) face: render_supplement_standalone prints the
+      # base number and the supplement number only, so the parsed dot was
+      # dropped at render and parse(to_s) != parse. No IEC source prints a
+      # no-part standalone face with a dotted sub-number — the facet is
+      # attested only on the on-base draft faces ("IEC 60038-2/DAM 2.3:2022")
+      # — so the shape is rejected here instead of being built unrenderable
+      # (pubid#727; the same ruling as the prefix-face dotted ballot numbers,
+      # which the grammar keeps raising). The walk reaches the dotted layer
+      # when it sits under an undotted second supplement ("/AMD 1.2:2017" as
+      # the base of a "/COR 1" chain). The single-document draft faces
+      # ("IEC CD 1.2:2017") and the DAM-family decodes ("IEC/DAM 1.2") keep
+      # their dot on a non-supplement layer and pass; the on-base faces have
+      # a real base, so synthetic_base? is false and they pass too.
+      STANDALONE_DOTTED_SUPPLEMENT_MESSAGE =
+        "the standalone no-part supplement face carries a dotted sub-number " \
+        "(e.g. \"IEC/AMD 1.2:2017\"): no IEC source prints one, and the " \
+        "standalone face has no layer to print the dot on, so the stored " \
+        "sub-number would be dropped at render — the dotted sub-number is " \
+        "attested only on the on-base draft forms"
+
+      def self.reject_standalone_dotted_supplement(id, input)
+        node = id
+        while node.is_a?(SupplementIdentifier)
+          if node.stage_iteration && node.synthetic_base?
+            raise Pubid::Errors::ParseError.new(
+              STANDALONE_DOTTED_SUPPLEMENT_MESSAGE, nil,
+              input: input, flavor: "iec"
+            )
+          end
+          node = node.base
+        end
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
