@@ -97,7 +97,7 @@ against an index row holds:
 require "pubid"
 
 id = Pubid::Iec.parse("IEC/FDAM 60038-1")
-id.to_s   # => "IEC 60038-1/FDAM1"
+id.to_s   # => "IEC 60038-1/FDAM 1"
 id.class  # => Pubid::Iec::Identifiers::Amendment
 id.number     # => "1"      (the unnumbered face defaults to 1)
 id.base.number  # => "60038"
@@ -108,9 +108,9 @@ id == Pubid::Iec.parse("IEC 60038-1/FDAM 1")  # => true
 Each face keeps its own draft stage (FDAM is a final draft amendment, DAM a
 draft amendment, DCOR a draft corrigendum, DISH a draft interpretation
 sheet), and the old slash-part spelling carries the base's part
-(`ISO/IEC FPDAM 9075/1` → `ISO/IEC 9075-1/FPDAM1`). The stage token's date
+(`ISO/IEC FPDAM 9075/1` → `ISO/IEC 9075-1/FPDAM 1`). The stage token's date
 rides with the designation: `IEC DCOR 60038-1:2019` → `IEC
-60038-1:2019/DCOR1`, with the year on the base.
+60038-1:2019/DCOR 1`, with the year on the base.
 
 A supplement written with no designation after the token — the true
 standalone `IEC/AMD 1:2017` — keeps the synthetic self-base: the bare

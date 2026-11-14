@@ -10,7 +10,7 @@ module Pubid
     #   "IEC 60038:2009"
     #   "IEC/CD 60038"
     #   "IEC 60038:2009/AMD1:2011"
-    #   "IEC/FDAM 60038-1"
+    #   "IEC 60038-1/FDAM 1"  (draft supplement: spaced ballot face)
     #   "IEC 60529:1989+AMD1:1999 CSV"
     #
     # The renderer is registered as the `:human` format in the IEC format
@@ -119,13 +119,29 @@ module Pubid
         parts << id.base.to_s(**opts)
 
         abbr = id.typed_stage.abbr.first.upcase
-        supp_part = "/#{abbr}#{id.number}"
+        supp_part = "/#{abbr}#{ballot_number_separator(id)}#{id.number}"
         supp_part += ":#{id.date.render(context:)}" if id.date
         parts << supp_part
 
         parts << " #{id.edition.render(context:)}" if id.edition&.number
 
         parts.join
+      end
+
+      # Draft-stage supplements carry the ballot face: stage token, SPACE,
+      # number ("60038-1/FDAM 1", "60038-1/DCOR 1.3") — the spaced
+      # citation form the stored twins carry (the ISO corpus holds
+      # /FDAM 1, /PDAM 1, /FPDAM 2, /DAM 2.3:2022, /DCOR 1.3, /DISH 1 …;
+      # the published faces have no spaced twin). The published stages
+      # (stage_code :published — Amd/Cor/ISH) keep the glued
+      # corpus-dominant face ("60038-1/AMD1:2011"). The separator only
+      # rides when there is a number, so a numberless supplement renders
+      # the bare stage token on either side.
+      def ballot_number_separator(id)
+        return "" unless id.number
+        return "" if id.typed_stage.stage_code.to_s == "published"
+
+        " "
       end
 
       def render_consolidated(id, opts, _context)

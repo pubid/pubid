@@ -21,10 +21,12 @@ RSpec.describe "IEC stage separator" do
       "IEC/FDIS 60038" => "IEC FDIS 60038",
       "IEC/NP 60038" => "IEC NP 60038",
       # The legacy prefix faces decode onto the modern identity (owner
-      # ruling 2026-11-12), so their render is the modern on-base face.
-      "IEC/FDAM 60038-1" => "IEC 60038-1/FDAM1",
-      "IEC/DCOR 60038-1" => "IEC 60038-1/DCOR1",
-      "IEC/DISH 60050-191" => "IEC 60050-191/DISH1",
+      # ruling 2026-11-12), so their render is the modern on-base face —
+      # the spaced ballot face for a draft stage (owner ruling
+      # 2026-11-14: the stored/citation twins are "/FDAM 1", "/DCOR 1").
+      "IEC/FDAM 60038-1" => "IEC 60038-1/FDAM 1",
+      "IEC/DCOR 60038-1" => "IEC 60038-1/DCOR 1",
+      "IEC/DISH 60050-191" => "IEC 60050-191/DISH 1",
       # Already rendered with a space by a per-type override; must not move.
       "IEC TS 60038" => "IEC TS 60038",
       "IEC/DTR 62048" => "IEC DTR 62048",
@@ -81,6 +83,34 @@ RSpec.describe "IEC stage separator" do
     inputs.each do |input|
       once = Pubid::Iec.parse(input).to_s
       expect(Pubid::Iec.parse(once).to_s).to eq(once)
+    end
+  end
+
+  # Draft-stage supplements print the ballot face: stage token, SPACE,
+  # number ("60038-1/FDAM 1") — the spaced citation form the stored
+  # twins carry (ISO corpus /FDAM 1, /PDAM 1, /FPDAM 2, /DCOR 1.3,
+  # /DISH 1 …). The published stages keep the glued corpus-dominant
+  # face ("60038-1/AMD1:2011"). The discriminator is the typed stage's
+  # own published mark (stage_code :published), not a token list.
+  describe "draft vs published supplement faces" do
+    {
+      # Draft stages: spaced.
+      "IEC 60038-1/FDAM 1" => "IEC 60038-1/FDAM 1",
+      "IEC 60038-1/DAM 1" => "IEC 60038-1/DAM 1",
+      "ISO/IEC 12207/PDAM 1" => "ISO/IEC 12207/PDAM 1",
+      "ISO/IEC 9075-1/FPDAM 1" => "ISO/IEC 9075-1/FPDAM 1",
+      "IEC 60038-1/DCOR 1" => "IEC 60038-1/DCOR 1",
+      "IEC 60038-1/FDCOR 1" => "IEC 60038-1/FDCOR 1",
+      "IEC 60038-1/DISH 1" => "IEC 60038-1/DISH 1",
+      "IEC 60050-191/CDISH 1" => "IEC 60050-191/CDISH 1",
+      # Published stages: glued.
+      "IEC 60038:2009/AMD1:2011" => "IEC 60038:2009/AMD1:2011",
+      "IEC 60038:2009/COR1:2011" => "IEC 60038:2009/COR1:2011",
+      "IEC 60038-1/ISH1" => "IEC 60038-1/ISH1",
+    }.each do |input, expected|
+      it "renders #{input.inspect} as #{expected.inspect}" do
+        expect(Pubid::Iec.parse(input).to_s).to eq(expected)
+      end
     end
   end
 end
