@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Pubid
-  VERSION = "2.0.29"
+  VERSION = "2.0.30"
 end
