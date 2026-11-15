@@ -53,9 +53,56 @@ module Pubid
             code: :dtr,
             stage_code: :draft,
             type_code: :tr,
-            abbr: %w[DTR ADTR CDTR DTRM NDTR DTSM DTRM],
+            # Plain DTR keeps the folded 50.00 ladder (the registration
+            # step). The point spellings below are rows of their own, each
+            # with the exact code IEC's stage-code correspondence table
+            # gives it (pubid#733).
+            abbr: %w[DTR],
             name: "Draft Technical Report",
             harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+          ),
+          # The TR ladder's point spellings, with the codes from IEC's
+          # stage-code correspondence table (IEC/ISO Harmonized APIs,
+          # section 3 "IEC/ISO Stage Code correspondance", identical in
+          # v0.0.7 2021-05 and v0.0.8 2023-06; extracted at
+          # data/iec/stage-codes.md). The per-spelling data was already in
+          # PROJECT_STAGES below; wiring it into rows makes the official
+          # URN's stage slot (harmonized_stages.first) carry the table's
+          # code instead of folding every spelling onto 50.00 (pubid#733).
+          # Row order follows the correspondence table; NDTR and DTRM
+          # share 50.92 there, so their official-URN slot is the same and
+          # the reverse lookup resolves the first row (DTRM).
+          Pubid::Components::TypedStage.new(
+            code: :adtr,
+            stage_code: :draft,
+            type_code: :tr,
+            abbr: %w[ADTR],
+            name: "Approved for DTR",
+            harmonized_stages: %w[40.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :cdtr,
+            stage_code: :draft,
+            type_code: :tr,
+            abbr: %w[CDTR],
+            name: "Draft circulated as DTR",
+            harmonized_stages: %w[50.20],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :dtrm,
+            stage_code: :draft,
+            type_code: :tr,
+            abbr: %w[DTRM],
+            name: "Rejected DTR to be discussed at meeting",
+            harmonized_stages: %w[50.92],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :ndtr,
+            stage_code: :draft,
+            type_code: :tr,
+            abbr: %w[NDTR],
+            name: "DTR rejected",
+            harmonized_stages: %w[50.92],
           ),
           Pubid::Components::TypedStage.new(
             code: :tr,

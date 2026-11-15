@@ -53,9 +53,56 @@ module Pubid
             code: :dts,
             stage_code: :draft,
             type_code: :ts,
-            abbr: %w[DTS ADTS CDTS NDTS],
+            # Plain DTS keeps the folded 50.00 ladder (the registration
+            # step). The point spellings below are rows of their own, each
+            # with the exact code IEC's stage-code correspondence table
+            # gives it (pubid#733).
+            abbr: %w[DTS],
             name: "Draft Technical Specification",
             harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
+          ),
+          # The TS ladder's point spellings, with the codes from IEC's
+          # stage-code correspondence table (IEC/ISO Harmonized APIs,
+          # section 3 "IEC/ISO Stage Code correspondance", identical in
+          # v0.0.7 2021-05 and v0.0.8 2023-06; extracted at
+          # data/iec/stage-codes.md). The per-spelling data was already in
+          # PROJECT_STAGES below; wiring it into rows makes the official
+          # URN's stage slot (harmonized_stages.first) carry the table's
+          # code instead of folding every spelling onto 50.00 (pubid#733).
+          # Row order follows the correspondence table; NDTS and DTSM
+          # share 50.92 there, so their official-URN slot is the same and
+          # the reverse lookup resolves the first row (DTSM).
+          Pubid::Components::TypedStage.new(
+            code: :adts,
+            stage_code: :draft,
+            type_code: :ts,
+            abbr: %w[ADTS],
+            name: "Approved for DTS",
+            harmonized_stages: %w[40.99],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :cdts,
+            stage_code: :draft,
+            type_code: :ts,
+            abbr: %w[CDTS],
+            name: "Draft circulated as DTS",
+            harmonized_stages: %w[50.20],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :dtsm,
+            stage_code: :draft,
+            type_code: :ts,
+            abbr: %w[DTSM],
+            name: "Rejected DTS to be discussed at meeting",
+            harmonized_stages: %w[50.92],
+          ),
+          Pubid::Components::TypedStage.new(
+            code: :ndts,
+            stage_code: :draft,
+            type_code: :ts,
+            abbr: %w[NDTS],
+            name: "DTS rejected",
+            harmonized_stages: %w[50.92],
           ),
           Pubid::Components::TypedStage.new(
             code: :ts,
