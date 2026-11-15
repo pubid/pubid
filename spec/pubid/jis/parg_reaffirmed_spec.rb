@@ -19,10 +19,11 @@ RSpec.describe "JIS PARG artifact: reaffirmed capture" do
       Pubid::Parg::Artifact.path_for(:jis),
     )
 
-    # pubid-grammar main 31fb965, parsanol 1.3.121. A local rebake changes
-    # this hash; re-vendor from pubid-grammar instead.
+    # pubid-grammar branch jis/745-yearless-amendment (84e7804), baked with
+    # parsanol 1.3.126 under Ruby 3.4.8 — the CI toolchain. A local rebake
+    # changes this hash; re-vendor from pubid-grammar instead.
     expect(artifact.source_hash)
-      .to eq("bb68f75e3e1d9b7e79613bd6cff60ccd77f6e2e68ace2569a2fbc968543b1f3d")
+      .to eq("1983ff0aabd2b969cf75a7b97426d89bce448ab890109299e6d4539b938c6075")
   end
 
   {

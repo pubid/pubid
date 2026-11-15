@@ -37,6 +37,21 @@ module Pubid
         raise NotImplementedError, "Subclass must implement supplement_notation"
       end
 
+      # The ":year[R]" tail a supplement prints after its notation, or the
+      # bare "R" when it reaffirms without a year. A supplement with no
+      # year prints NO colon at all ("…/AMD 1", pubid#745) — a dangling
+      # ":" is a form the grammar rejects, and the renderer and the
+      # grammar must agree.
+      def year_tail
+        if year
+          ":#{year_with_reaffirmation}"
+        elsif reaffirmed?
+          "R"
+        else
+          ""
+        end
+      end
+
       def ==(other)
         return false unless other.instance_of?(self.class)
 
