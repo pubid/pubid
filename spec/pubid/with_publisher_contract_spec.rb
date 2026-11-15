@@ -25,6 +25,8 @@ module WithPublisherContractSample
     # (pubid#706 phase 2).
     "calconnect_pfs" => ["CC 11001:2024", "CC/DIR 10006:2019"],
     "cen_pfs" => ["EN 12464-1:2011", "EN 1325"],
+    # The PFS-compiled module-composition alias of bsi (no fixture corpus).
+    "bsi_pfs" => ["BS 10005:1995", "BS 1016-107.2:1991", "BS EN 1073-2:2002"],
     "sae" => ["SAE J300:2019"],
   }.freeze
 

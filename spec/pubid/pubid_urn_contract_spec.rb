@@ -54,6 +54,13 @@ module PubidUrnContract
                          "CC/WD 51017:2024-07-23"],
     "cen_pfs" => ["EN 1325", "EN 10160:1999", "EN 12464-1:2011",
                   "EN 1177:2018"],
+    # The PFS-compiled module-composition alias of bsi has no fixture
+    # corpus; the absorbed faces (plus the composed consolidated and the
+    # PAS designation) stand in for one — the full 1,500-row ledger lives
+    # in spec/pubid/bsi_pfs/parity_spec.rb.
+    "bsi_pfs" => ["BS 10005:1995", "BS 1016-107.2:1991", "BS 1000A:1961",
+                  "BS 5550-1.3.3:1980", "PAS 003:1994", "PD 5730",
+                  "BS 10125:2014+A1:2016"],
     "adobe" => ["Adobe TN 5014", "Adobe Technical Note 5902", "adobe-glyph-list",
                 "adobe-japan1-7", "adobe-postscript-3"],
     "sae" => ["SAE J3016_202104", "SAE J3016", "SAE AS6108A", "SAE ARP5548",
