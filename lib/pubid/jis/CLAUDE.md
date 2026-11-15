@@ -1,5 +1,32 @@
 # JIS flavor notes
 
+## Yearless supplements print no colon (pubid#745)
+
+- A supplement whose year is nil renders `…/AMD 1`, **not** `…/AMD 1:` —
+  the dangling colon was a form pubid's own grammar rejected, so the
+  year-omitted render of a parsed amendment could not re-parse (the class
+  relaton's JIS corpus fuzz kept harvesting; all 938 attested amendment
+  rows in relaton-data-jis carry a year, the yearless space is
+  fuzzer-only).
+- **The grammar owns the shape**: the amendment/corrigendum tail is
+  `[(colon (1*digit) as amd_year)]` — colon and digits as ONE optional
+  unit, mirroring the base `[year]` rule. The bare trailing colon
+  (`…/AMD 1:`, full-width included) stays rejected, exactly as the base
+  face rejects `JIS G 0558:`. The reaffirmed run binds independently of
+  the year, so yearless `…/AMD 1R` reads.
+- **`SupplementIdentifier#year_tail`** is the shared tail helper:
+  `":#{year_with_reaffirmation}"` when the year exists, a bare `"R"` for
+  a yearless reaffirmation, `""` otherwise. `Amendment`/`Corrigendum`
+  interpolate it after their notation. `Explanation` never prints a year
+  and is untouched.
+- **The builder nil-safes the optional capture** (`data[:amd_year]&.to_i`,
+  not `.to_i`): with the year optional, a plain `.to_i` would fabricate
+  `year: 0` — a phantom year in the hash and a `…/AMD 1:0` render.
+- The fuzz operation round-trips: `exclude(:year)` on a parsed yearful
+  amendment renders `…/AMD 1` and re-parses equal. Yearful faces are
+  byte-identical to the pre-#745 renders. Locked by
+  `spec/pubid/jis/yearless_supplement_spec.rb`.
+
 ## WES lives in the JIS flavor (relaton-jis#18)
 
 - WES (Japan Welding Engineering Society) ids — `WES 7700-1:2019`,
@@ -13,10 +40,23 @@
   `wes` capture, which the builder keys on. `JIS WES 7700` and `WES X 7700`
   are rejected: the JIS prefix and a series letter belong only to JIS.
 - **The artifact is vendored, not baked here.** `data/parg/jis.json` is a
-  verbatim copy of pubid/pubid-grammar `artifacts/jis.json` (main `31fb965`,
-  parsanol **1.3.121**). Change the grammar there and copy the artifact back;
+  verbatim copy of pubid/pubid-grammar `artifacts/jis.json` (branch
+  `jis/745-yearless-amendment` `84e7804`, parsanol **1.3.126** under Ruby
+  **3.4.8** — the CI toolchain; the checksum covers the
+  `unicode_tables` stamp, so a bake under a different Ruby moves it).
+  Change the grammar there and copy the artifact back;
   `spec/pubid/jis/parg_reaffirmed_spec.rb` pins its `source_hash`, so a local
-  rebake fails that spec.
+  rebake fails that spec. pubid-grammar CI regenerates the contracts at
+  parsanol 1.3.126 (`PARSANOL_VERSION` in its workflow), so a bake at the
+  runtime line (1.5.1.0) would fail its `contracts:check` — bake with the
+  CI pair and verify the stamp in-process (`scripts/bake-one.rb jis
+  1.3.126` forces it; `scripts/regen-contracts.rb` does NOT pin, set
+  `PARSANOL_RUBY` to the 1.3.126 gem's directory or it loads the newest
+  installed gem silently). The vendored artifact is now ahead of the old
+  1.3.121 bake: it also carries the grammar-side WES `TR`/`TS`/
+  `(E)`-before-year bindings (pubid-grammar `3d91384`), which the
+  `Parser.ingest` shim below masks — **deleting the shim is still open**
+  (behavior is identical on both paths; the specs cover it).
 - **`reaffirmed` binds the whole run of R's** (`":1997R"` → `"R"`, `":1997RR"`
   → `"RR"`; same for `amd_reaffirmed`/`corr_reaffirmed`). The builder reads
   each only for truth (`true if data[:reaffirmed]`), so `RR` renders as `R`.

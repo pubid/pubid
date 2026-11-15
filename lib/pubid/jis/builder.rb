@@ -98,7 +98,9 @@ module Pubid
         Identifiers::Amendment.new(
           base: base,
           number: data[:amd_number].to_i,
-          year: data[:amd_year].to_i,
+          # The year is optional in the grammar (pubid#745); a yearless
+          # amendment keeps year nil, never a fabricated 0.
+          year: data[:amd_year]&.to_i,
           reaffirmed: (true if data[:amd_reaffirmed]),
         )
       end
@@ -119,7 +121,8 @@ module Pubid
         Identifiers::Corrigendum.new(
           base: base,
           number: data[:corr_number].to_i,
-          year: data[:corr_year].to_i,
+          # Optional year, as the amendment (pubid#745).
+          year: data[:corr_year]&.to_i,
           reaffirmed: (true if data[:corr_reaffirmed]),
         )
       end
