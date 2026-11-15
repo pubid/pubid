@@ -15,7 +15,7 @@ gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
 # 1.5.0.0 runtime gem. To use a
 # local clone instead, run:
 #   bundle config set local.parsanol ../../parsanol/parsanol-ruby
-gem "parsanol", "1.5.0.0"
+gem "parsanol", "1.5.1.0"
 gem "json_schemer" # testsuite schema validation (tools/validate_schema.rb)
 # benchmark is used by spec/pubid/iso/performance_spec.rb and is no longer a
 # default gem as of Ruby 4.0, so it must be declared explicitly.
