@@ -26,7 +26,9 @@ RSpec.describe Pubid::Iala::Identifier do
       "IALA M0001 Ed 9.0"          => "IALA M0001 Ed 9.0",
       "IALA M0002 Ed 8.5"          => "IALA M0002 Ed 8.5",
       "IALA M0003 Ed 2.0 (S)"      => "IALA M0003 Ed 2.0 (S)",
-      # Advices (A prefix). Dashed numbering, no edition in the corpus.
+      # General Assembly resolutions in the legacy A session form
+      # (A12/A13). Dashed numbering, no edition in the corpus; the A
+      # letter is preserved verbatim.
       "IALA A12-01"                => "IALA A12-01",
       "IALA A13-04 (E)"            => "IALA A13-04 (E)",
       # General Assembly resolutions (GA prefix). Dotted numbering, each
@@ -68,8 +70,21 @@ RSpec.describe Pubid::Iala::Identifier do
       expect(Pubid::Iala.parse("IALA M0001 Ed 9.0")).to be_a(Pubid::Iala::Identifiers::Manual)
     end
 
-    it "routes Advices to Identifiers::Advice" do
-      expect(Pubid::Iala.parse("IALA A12-01")).to be_a(Pubid::Iala::Identifiers::Advice)
+    it "routes legacy A-session resolutions to Identifiers::GeneralAssembly" do
+      expect(Pubid::Iala.parse("IALA A12-01"))
+        .to be_a(Pubid::Iala::Identifiers::GeneralAssembly)
+    end
+
+    it "preserves the legacy A letter form through to_s and the URN" do
+      id = Pubid::Iala.parse("IALA A13-04")
+      expect(id.to_s).to eq("IALA A13-04")
+      expect(id.to_urn).to eq("urn:mrn:iala:pub:a13-04")
+    end
+
+    it "preserves the GA letter form through to_s and the URN" do
+      id = Pubid::Iala.parse("IALA GA01.13")
+      expect(id.to_s).to eq("IALA GA01.13")
+      expect(id.to_urn).to eq("urn:mrn:iala:pub:ga01.13")
     end
 
     it "routes General Assembly resolutions to Identifiers::GeneralAssembly" do
@@ -201,8 +216,9 @@ RSpec.describe Pubid::Iala::Identifier do
 
   describe "polymorphic round-trip via to_hash / from_hash" do
     # Samples span every identifier class: Standard, Recommendation,
-    # Guideline, ModelCourse (existing); Manual, Advice, GeneralAssembly,
-    # Letter, Annex (new). Drawn from relaton-data-iala primary docids.
+    # Guideline, ModelCourse (existing); Manual, GeneralAssembly (both
+    # letter forms), Letter, Annex (new). Drawn from relaton-data-iala
+    # primary docids.
     %w[
       S1070
       S1070\ Ed\ 2.0

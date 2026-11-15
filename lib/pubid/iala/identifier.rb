@@ -51,7 +51,6 @@ module Pubid
         "pubid:iala:guideline"         => "Pubid::Iala::Identifiers::Guideline",
         "pubid:iala:manual"            => "Pubid::Iala::Identifiers::Manual",
         "pubid:iala:model-course"      => "Pubid::Iala::Identifiers::ModelCourse",
-        "pubid:iala:advice"            => "Pubid::Iala::Identifiers::Advice",
         "pubid:iala:general-assembly"  => "Pubid::Iala::Identifiers::GeneralAssembly",
         "pubid:iala:letter"            => "Pubid::Iala::Identifiers::Letter",
         "pubid:iala:annex"             => "Pubid::Iala::Identifiers::Annex",
@@ -99,6 +98,14 @@ module Pubid
 
         def dotted_segment_width(width)
           @canonical_dotted_segment_width = width
+        end
+
+        public
+
+        # Additional type letters that route to this class; empty by
+        # default (GeneralAssembly aliases the legacy "A" session letter).
+        def type_letter_aliases(*_letters)
+          []
         end
       end
     end

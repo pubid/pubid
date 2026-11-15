@@ -60,11 +60,15 @@ module Pubid
       all_typed_stages.find { |s| s.abbr.any? { |a| a.to_s.upcase == abbr_str } }
     end
 
-    # Look up an identifier class by its IALA type letter (S, R, G, M, C, X, P).
+    # Look up an identifier class by its IALA type letter (S, R, G, M,
+    # C, X, P, GA) or a class-declared alias of one (GeneralAssembly
+    # answers to the legacy "A" session letter).
     # @param letter [String]
     # @return [Class<Identifier>]
     def self.identifier_klass_for_type_letter(letter)
-      @by_letter ||= identifier_types.to_h { |klass| [klass.type[:short], klass] }
+      @by_letter ||= identifier_types.flat_map do |klass|
+        ([klass.type[:short]] + Array(klass.type_letter_aliases)).map { |l| [l, klass] }
+      end.to_h
       @by_letter.fetch(letter.to_s.upcase)
     end
   end
