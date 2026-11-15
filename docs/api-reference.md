@@ -156,6 +156,12 @@ Lookup: abbreviation -> typed stage
 
 Lookup: type code -> identifier class
 ### `parse(string)`
+## `Pubid::BsiPfs`
+
+### `all_typed_stages`
+### `locate_stage(abbr)`
+### `locate_type(code)`
+### `parse(identifier)`
 ## `Pubid::Calconnect`
 
 ### `all_typed_stages`
