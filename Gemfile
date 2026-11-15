@@ -11,11 +11,11 @@ gem "lutaml-model", github: "lutaml/lutaml-model", branch: "main"
 # `edition` (ruby#357): the envelope records `edition` ("v1"/"v2") and
 # the grammar header keyword is `edition` (`mode` stays a deprecated
 # alias). The engine graduated to the engine-linked line (parsanol-rs#519):
-# the gemspec floor is ~> 1.5.0 and the dev pin rides the graduation
-# branch's git source until the 1.5.0.0 runtime gem publishes. To use a
+# the gemspec floor is ~> 1.5.0 and the dev pin rides the published
+# 1.5.0.0 runtime gem. To use a
 # local clone instead, run:
 #   bundle config set local.parsanol ../../parsanol/parsanol-ruby
-gem "parsanol", github: "parsanol/parsanol-ruby", branch: "chore/engine-1.5.0.0"
+gem "parsanol", "1.5.0.0"
 gem "json_schemer" # testsuite schema validation (tools/validate_schema.rb)
 # benchmark is used by spec/pubid/iso/performance_spec.rb and is no longer a
 # default gem as of Ruby 4.0, so it must be declared explicitly.
