@@ -232,6 +232,12 @@ module Pubid
   autoload :Astm, "pubid/astm"
   autoload :Bipm, "pubid/bipm"
   autoload :Bsi, "pubid/bsi"
+  # The PFS-compiled module-composition surface of bsi (pubid/pubid#706
+  # §4): the first module-composition proof flavor — the BS face composed
+  # from the module library (national.prefix + en.overlay over the
+  # adopted ISO/IEC inners), measured against the coded flavor over the
+  # bsi corpus (spec/pubid/bsi_pfs/parity_spec.rb's ledger).
+  autoload :BsiPfs, "pubid/bsi_pfs"
   autoload :Calconnect, "pubid/calconnect"
   # The PFS-compiled dev alias of calconnect (pubid/pubid#706 §8): the
   # acceptance port, registered beside the coded flavor, never routed by

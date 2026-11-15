@@ -107,6 +107,10 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     # The PFS-compiled dev alias of cen_cenelec: the published year is
     # separable, exactly as the coded flavor's entry above.
     "cen_pfs" => { ref: "EN 13485", omits: [:year] },
+    # The PFS-compiled module-composition alias of bsi: the publication
+    # year is the separable trailing component, exactly as the coded
+    # flavor's entry above.
+    "bsi_pfs" => { ref: "BS 10005", omits: [:year] },
     # ISBN: identifier has no separable date.
     "isbn" => { ref: "ISBN 978-3-16-148410-0", omits: [] },
   }.freeze

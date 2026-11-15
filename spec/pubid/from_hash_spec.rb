@@ -45,6 +45,8 @@ RSpec.describe "Pubid.from_hash" do
     # (pubid#706 phase 2).
     "calconnect_pfs" => "CC 11001:2024",
     "cen_pfs" => "EN 12464-1:2011",
+    # The PFS-compiled module-composition alias of bsi (pubid#706 §4).
+    "bsi_pfs" => "BS 10005:1995",
     "gb" => "JB/T 13368-2018",
     "gost" => "GOST R 34.12-2015",
     "iala" => "IALA S1070",
@@ -82,6 +84,7 @@ RSpec.describe "Pubid.from_hash" do
     "etsi_pfs" => "Pubid::Etsi::Identifiers::EtsiStandard",
     "calconnect_pfs" => "Pubid::Calconnect::Identifiers::Standard",
     "cen_pfs" => "Pubid::CenCenelec::Identifiers::EuropeanNorm",
+    "bsi_pfs" => "Pubid::Bsi::Identifiers::BritishStandard",
   }.freeze
 
   it "has a sample for every registered flavor" do

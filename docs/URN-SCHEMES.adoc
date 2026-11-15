@@ -1161,6 +1161,21 @@ components, so each field is its own atom (`typeabbr-`, `stagehs-`,
 `tsabbr-` …). Reducing them to one identifying value would change
 `to_hash` and need a re-crawl — a separate decision.
 
+[[urn-bsi_pfs]]
+==== bsi_pfs
+
+The PFS-compiled module-composition flavor of bsi (pubid/pubid#706 §4 —
+the first module-composition proof flavor, `definitions/bsi.pfs` in
+pubid-grammar). The composed definition declares the scheme-canonical
+tags with a narrowed atom table (`pub-`, `part-`, `year-`, the adopted
+node and the consolidated `ids`), registered under the `bsi_pfs` flavor
+key. to_pubid_urn emits and round-trips on the absorbed BS face (the
+composed consolidated and the PAS designation included); the adoption
+rows RAISE — the codec composes nested nodes root-first along `base`,
+and the generated adopted attribute is `adopted` — the measured
+wrapper-emission boundary (pubid-grammar follow-up). Its literal corpus
+is the parity harness's absorbed faces (`spec/pubid/bsi_pfs/`).
+
 [[urn-calconnect]]
 ==== calconnect
 

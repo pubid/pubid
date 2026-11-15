@@ -78,6 +78,8 @@ SUBSET_PAIRS = {
   # (pubid#706 phase 2).
   "calconnect_pfs" => { ref: "CC 11001:2024", candidate: "CC 11001:2024" },
   "cen_pfs" => { ref: "EN 12464-1:2011", candidate: "EN 12464-1:2011" },
+  # The PFS-compiled module-composition alias of bsi (pubid#706 §4).
+  "bsi_pfs" => { ref: "BS 10005", candidate: "BS 10005:1995" },
   "isbn" => { ref: "ISBN 978-3-16-148410-0",
               candidate: "ISBN 978-3-16-148410-0" },
 }.freeze
@@ -122,7 +124,8 @@ RSpec.describe "Pubid::Identifier#=== (subset match)" do
   ALIAS_REBUILD = { "doi_pfs" => "Pubid::DoiPfs::Identifier",
                     "etsi_pfs" => "Pubid::EtsiPfs::Identifier",
                     "calconnect_pfs" => "Pubid::CalconnectPfs::Identifier",
-                    "cen_pfs" => "Pubid::CenPfs::Identifier" }.freeze
+                    "cen_pfs" => "Pubid::CenPfs::Identifier",
+                    "bsi_pfs" => "Pubid::BsiPfs::Identifier" }.freeze
 
   def rebuild(identifier, flavor: nil)
     klass = ALIAS_REBUILD[flavor]
