@@ -19,12 +19,18 @@ followed by a number whose shape varies per series.
 | G | Guideline | 4 digits, zero-padded | `IALA G1015 Ed 2.2` |
 | C | Model Course | 4 digits + `-` part | `IALA C0103-1 Ed 3.0` |
 | M | Manual (planned) | 4 digits, zero-padded | `IALA M0001 Ed 9.0` |
-| A | Advice | dashed, no edition in the corpus | `IALA A12-01` |
-| GA | General Assembly resolution | dotted, each segment 2 digits | `IALA GA01.01` |
+| GA | General Assembly resolution | dotted, each segment 2 digits (`GA01.01`); legacy A-session form dashed (`A12-01`) | `IALA GA01.01`, `IALA A12-01` |
 | L | Letter | dotted + dashed, verbatim | `IALA L2.1.11 Ed 2` |
 | X | Report (reserved) | 4 digits | `IALA X0123` |
 | P | Resolution/Council publication (reserved) | 4 digits | `IALA P0123` |
 | — | Annex wrapper over any base | bare or lettered | `IALA G1128 ANNEX A Ed 1.6` |
+
+The A letter is GeneralAssembly's legacy session form, not a separate
+series: all 11 A-shaped primary docidentifiers in relaton-data-iala
+(A12-01, A13-01 through A13-04) are GA resolutions, the covers read
+"GA Resolution A12-01", and no Advice-series document exists in the
+catalogue. The letter the input used (GA or A) round-trips verbatim
+through to_s and the URN; there is no Advice type.
 
 The Annex class has no prefix of its own: it wraps a base identifier of
 another series and preserves the annex marker case (`Annex` vs `ANNEX`).

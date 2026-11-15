@@ -13,7 +13,6 @@ module Pubid
       atom "letter", "letter"
 
 
-      type "pubid:iala:advice", "advice"
       type "pubid:iala:annex", "annex"
       type "pubid:iala:general-assembly", "ga"
       type "pubid:iala:guideline", "g"
