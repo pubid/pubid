@@ -148,3 +148,15 @@ stage RFDIS/50.00 — a snapshot of the project's plan, not a code rename.
   harmonized system is joint ISO/IEC and #237's own list maps RR to
   9092 — IEC's table simply does not name IEC stage codes for the
   review sub-states. Locked by `spec/pubid/iec/stage_reconciliation_spec.rb`.
+- **Registry alignment (pubid#733, applied):** the TR/TS/PAS point rows
+  this table gives codes of their own — `CDPAS` 50.20, `CDTR`/`CDTS`
+  50.20, `ADTR`/`ADTS` 40.99, `NDTR`/`NDTS`/`DTRM`/`DTSM` 50.92 — are
+  typed-stage rows (`TYPED_STAGES`), not PROJECT_STAGES entries, so the
+  official `urn:iec:std:` stage slot carries the table's code per
+  spelling instead of folding every point spelling onto the 50.00
+  ladder. `DTRM`/`NDTR` and `DTSM`/`NDTS` share 50.92 in the table, so
+  each pair shares one official-URN slot; the pair stays distinct in the
+  pubid-scheme URN and the reverse lookup resolves the first row. The
+  translation/preparation families (`TDTR`/`TDTS`/`PRVDTR`/`PRVDTS`/
+  `PRVDPAS`, …) stay PROJECT_STAGES — queryable, deliberately
+  unparseable. Locked by `spec/pubid/iec/stage_point_codes_spec.rb`.

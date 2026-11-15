@@ -250,7 +250,9 @@ RSpec.describe Pubid::Iec::Identifiers::PubliclyAvailableSpecification do
       end
 
       it "parses stage" do
-        expect(parsed.stage.stage_code).to eq("cd")
+        # CDPAS is PAS's 50.20 correspondence-table row ("Draft circulated
+        # as DPAS", pubid#733) — a draft state, not a committee draft.
+        expect(parsed.stage.stage_code).to eq("draft")
       end
 
       it "provides typed_stage with abbreviation CDPAS" do

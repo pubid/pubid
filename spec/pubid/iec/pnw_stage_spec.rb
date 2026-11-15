@@ -9,6 +9,21 @@ require "spec_helper"
 # back as `IEC/PWI 1000-1:2023 ED2` — the wrong stage and the wrong separator.
 #
 # See https://github.com/pubid/pubid/issues/360 items 1 and 2.
+
+# pubid#733 split the TR/TS ladder's point spellings into rows of their
+# own, and IEC's correspondence table gives two spellings of each
+# deliverable the SAME rejection code: DTRM and NDTR share 50.92 (TR),
+# DTSM and NDTS share 50.92 (TS). Those pairs are allow-listed as the
+# owner-ruled shared rows — the shared code is IEC's data, not a registry
+# accident; the official-URN slot is the same for both spellings and the
+# reverse lookup resolves the first row (see
+# spec/pubid/iec/stage_point_codes_spec.rb). Any OTHER collision still
+# fails in the uniqueness example below.
+ALLOWED_COLLISIONS = [
+  %w[tr 50.92], # DTRM / NDTR — the correspondence table's own rows
+  %w[ts 50.92], # DTSM / NDTS — likewise
+].freeze
+
 RSpec.describe "IEC PNW stage" do
   describe "the registry" do
     let(:stages) { Pubid::Iec.all_typed_stages }
@@ -47,10 +62,13 @@ RSpec.describe "IEC PNW stage" do
     # new-proposal buckets — harmlessly, because it is not first — so the
     # invariant is a property of ORDERING, and this example is what keeps a
     # reordering from silently reopening the ambiguity.
+    #
+    # The pubid#733 shared pairs are allow-listed at the top of this file.
     it "identifies a stage uniquely by its type and leading harmonized code" do
       collisions = stages
         .group_by { |s| [s.type_code.to_s, s.harmonized_stages&.first.to_s] }
         .select { |_, group| group.size > 1 }
+        .except(*ALLOWED_COLLISIONS)
 
       shown = collisions.transform_values { |g| g.map { |s| s.code.to_s } }
 

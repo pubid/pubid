@@ -43,19 +43,23 @@ module Pubid
           ),
           Pubid::Components::TypedStage.new(
             code: :cdpas,
-            stage_code: :cd,
+            stage_code: :draft,
             type_code: :pas,
+            # CDPAS is PAS's 50.20 row of IEC's stage-code correspondence
+            # table ("Draft circulated as DPAS") — IEC/ISO Harmonized APIs,
+            # section 3 "IEC/ISO Stage Code correspondance", identical in
+            # v0.0.7 (2021-05) and v0.0.8 (2023-06); extracted at
+            # data/iec/stage-codes.md (pubid#733). It is not a
+            # committee-draft state and claims no 30.xx code.
             abbr: ["CDPAS"],
-            name: "Committee Draft Publicly Available Specification",
-            harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+            name: "Draft circulated as DPAS",
+            harmonized_stages: %w[50.20],
           ),
           Pubid::Components::TypedStage.new(
             code: :dpas,
             stage_code: :draft,
             type_code: :pas,
-            # CDPAS is the 50.20 row of IEC's stage-code table
-            # ("Draft circulated as DPAS") — see data/iec/stage-codes.md
-            abbr: ["DPAS", "CDPAS"],
+            abbr: ["DPAS"],
             name: "Draft Publicly Available Specification",
             harmonized_stages: %w[50.00 50.20 50.60 50.92 50.98 50.99],
           ),
