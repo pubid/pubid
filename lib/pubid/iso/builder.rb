@@ -222,6 +222,13 @@ module Pubid
         # For NSB-prefixed identifiers (FprISO, WD/ISO), set stage
         if parsed_hash[:nsb_stage]
           nsb_stage = parsed_hash.delete(:nsb_stage)
+          # The WD face's stage-to-publisher join captures as
+          # nsb_stage_slash (pubid-grammar#118) so the grammar's render
+          # can emit the slash face back byte-exactly. This builder
+          # decodes to the modern stage face ("WD/ISO 10360-2" renders
+          # "ISO/WD 10360-2"), which keeps no spelling, so the join is
+          # consumed here and dropped.
+          parsed_hash.delete(:nsb_stage_slash)
           # Map NSB stage to typed stage
           case nsb_stage
           when "Fpr"
@@ -578,6 +585,22 @@ module Pubid
           # organization's full name, consumed by the ts artifact's
           # schema materialization). The Ruby identifier carries only
           # the Publisher component, so the field assigns nothing.
+          nil
+
+        when :tc_join
+          # pubid-grammar#118: the tc_document face's publisher-to-type
+          # join ("/" or " ") captures as tc_join so the grammar's render
+          # emits the input's own join back (a canonical slash would
+          # re-bind a space-joined input to the other alternative). This
+          # flavor renders the canonical slash join ("ISO TC 46 N 3064"
+          # renders "ISO/TC 46 N 3064"), so the spelling assigns nothing.
+          nil
+
+        when :nsb_stage_slash
+          # pubid-grammar#118: reached on paths that skip the nsb_stage
+          # decode above (none today — the capture binds only beside
+          # nsb_stage), kept total so an unknown bound key stays a
+          # consumed no-op instead of a parse failure.
           nil
 
         when :supplements

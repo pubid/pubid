@@ -1,11 +1,11 @@
 Flavor: ISO
-Classified: 2026-11-12 14:44:24
+Classified: 2026-11-16 20:46:43
 ======================================================================
 
 OVERALL STATISTICS
 ----------------------------------------------------------------------
-Total: 7667
-Pass: 7664 (99.96%)
+Total: 7674
+Pass: 7671 (99.96%)
 Fail: 3 (0.04%)
 
 BY CLASS
@@ -21,6 +21,7 @@ international_standardized_profile       Pass: 13/13 (100.0%)
 international_workshop_agreement         Pass: 20/20 (100.0%)
 pas                                      Pass: 51/51 (100.0%)
 recommendation                           Pass: 44/44 (100.0%)
+tc_document                              Pass: 7/7 (100.0%)
 technical_report                         Pass: 267/267 (100.0%)
 technical_specification                  Pass: 274/275 (99.64%)
 technology_trends_assessments            Pass: 9/9 (100.0%)

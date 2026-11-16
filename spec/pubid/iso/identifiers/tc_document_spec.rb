@@ -61,6 +61,18 @@ RSpec.describe Pubid::Iso::Identifiers::TcDocument do
       expect(id.wg_type).to be_nil
       expect(id.number).to eq("789")
     end
+
+    it "parses the space-joined TC document (pubid-grammar#118's tc_join)" do
+      # The publisher-to-type join captures as tc_join ("/" or " ") so
+      # the grammar's render emits the input's own join back; this
+      # flavor renders the canonical slash join.
+      id = Pubid::Iso.parse("ISO TC 46 N 3064")
+      expect(id).to be_a(described_class)
+      expect(id.tc_type).to eq("TC")
+      expect(id.tc_number).to eq("46")
+      expect(id.number).to eq("3064")
+      expect(id.to_s).to eq("ISO/TC 46 N 3064")
+    end
   end
 
   describe "#to_s" do

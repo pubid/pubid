@@ -228,3 +228,28 @@
   non-`Withdrawn` references, 2026-11-14) this was the only failure; the
   `Withdrawn …` rows fail too, but the crawler skips them. Locked by
   `spec/pubid/iso/update_codes_spec.rb`.
+
+- **The artifact runs the #118 grammar at parsanol 1.5.1.0 (the fleet
+  re-seal's last hold-out, pubid#749).** Grammar#118 (1f84627) added two
+  spelling-preserving captures — `nsb_stage_slash` (the WD face's
+  stage-to-publisher join: "WD" carries a slash, "Fpr" glues) and
+  `tc_join` (the tc_document face's publisher-to-type join, "/" or " ")
+  — so the grammar's own render emits the input's join back byte-exactly.
+  This builder **decodes** both faces to the canonical form instead, so
+  the capture spellings are consumed and dropped: the nsb decode deletes
+  `:nsb_stage_slash` beside `:nsb_stage`, and `cast` returns nil for
+  `:tc_join`. Without that consumption the ISO `cast`'s unknown-key raise
+  (`Unknown parameter type:`) rejects every WD/ISO and tc face — the new
+  artifact alone is NOT loadable by the old builder. Net behavior is
+  byte-identical to the 1.3.126 bake: all 7,852 stored corpus faces
+  replay identically on `to_s`/`to_hash`/URNs (only the raw bound map of
+  the two WD faces gains `nsb_stage_slash: "/"`; zero accept deltas).
+  The canonical renders: "WD/ISO 10360-2" → "ISO/WD 10360-2",
+  "FprISO 105-A03" → "ISO/PRF 105-A03", "ISO TC 46 N 3064" (space join)
+  → "ISO/TC 46 N 3064". Locked by `spec/pubid/iso/nsb_tc_captures_spec.rb`
+  (artifact stamp: compiler_version 1.5.1.0 + the #118 source_hash; the
+  bound captures; the canonical decodes; from_hash round-trips on all 13
+  attested faces). The tc cluster now rides the fixture corpus
+  (`identifiers/full/iso-pubid-tc-documents.txt` →
+  `pass/tc_document.txt`, 7 faces) and the testsuite exports them as
+  `tests/iso/tc_document.yaml` rows.
