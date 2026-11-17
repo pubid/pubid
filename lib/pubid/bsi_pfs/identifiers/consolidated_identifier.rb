@@ -2,7 +2,8 @@ module Pubid
   module BsiPfs
     module Identifiers
       # The consolidated (plus-run) bundle: the base document is
-      # the first member; the supplements carry no base.
+      # the first member; each member amends it, so the members
+      # carry it as their base (the coded builder's shape).
       class ConsolidatedIdentifier < ::Pubid::BsiPfs::Identifier
         attribute :identifiers, ::Pubid::BsiPfs::Identifier,
                   polymorphic: true, collection: true
@@ -21,15 +22,30 @@ module Pubid
           identifiers&.first || self
         end
 
-        # The base document, then each member's own supplement
-        # suffix behind the plus marker — the coded shape.
-        def to_mr_string
-          base, *supplements = identifiers
-          return "" unless base
+        # The declared marker-less bundle (the coded-BSI shape): the
+        # wrapper reads the base document's identity and drops the
+        # member suffixes — the delegated publisher (off the wrapper's
+        # own wire entry, the coded compact-hash rule), the typed trio
+        # the base document carries, and the root-through MR hooks.
+        def type
+          member = identifiers&.first
+          member.respond_to?(:typed_stage) && member.typed_stage ? member.type : nil
+        end
 
-          ([base.to_mr_string] +
-            supplements.map { |s| "plus-#{s.mr_supplement_suffix}" })
-            .join(::Pubid::Renderers::MrString::SEPARATOR_SUPPLEMENT)
+        def publisher
+          identifiers&.first&.publisher
+        end
+
+        def self.compact_hash(_model, hash)
+          hash.delete("publisher")
+        end
+
+        def mr_number_with_part
+          root.equal?(self) ? super : root.mr_number_with_part
+        end
+
+        def mr_year
+          root.equal?(self) ? super : root.mr_year
         end
 
         def self.polymorphic_name

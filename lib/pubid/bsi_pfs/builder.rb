@@ -23,6 +23,23 @@ module Pubid
 
       }.freeze
 
+      # The designation trios (the typed trio's declaration): the
+      # token that selected the class is the designation face, not
+      # a publisher — the column keeps the class default and the
+      # identifier carries the stage entry's type/stage/typed_stage
+      # (the coded builder's cast).
+      DESIGNATION_STAGES = {
+        "PAS" => { code: "pubpas", stage_code: "published", type_code: "pas", abbr: ["PAS"], name: "Publicly Available Specification", harmonized_stages: ["60.00", "60.60"] },
+        "PD" => { code: "pubpd", stage_code: "published", type_code: "pd", abbr: ["PD"], name: "Published Document", harmonized_stages: ["60.00", "60.60"] },
+        "DD" => { code: "pubdd", stage_code: "published", type_code: "dd", abbr: ["DD"], name: "Draft Document", harmonized_stages: ["60.00", "60.60"] },
+        "TS" => { code: "pubts", stage_code: "published", type_code: "ts", abbr: ["TS"], name: "Technical Specification", harmonized_stages: ["60.00", "60.60"] },
+      }.freeze
+
+      # The model column the adopted document lands on (the vendored
+      # hook's wrapper slot) and the declared edition face, if any.
+      ADOPTED_ATTRIBUTE = "base"
+      ADOPTED_EDITION_FACE = "ED"
+
       def self.build(parsed_data)
         new.build(parsed_data)
       end
@@ -78,7 +95,9 @@ module Pubid
         identifier.number = data[:number]&.to_s
         identifier.part = data[:part]&.to_s
         identifier.version = present_string(data[:version])
-        if data[:publisher]
+        # A designation token selects the class but is not a publisher:
+        # the column keeps the class default (the organization's).
+        if data[:publisher] && !DESIGNATION_STAGES.key?(data[:publisher].to_s)
           identifier.publisher = ::Pubid::Components::Publisher.new(body: data[:publisher].to_s)
         end
         copubs = Array(data[:copublishers]).map do |row|
@@ -88,6 +107,19 @@ module Pubid
         identifier.copublishers = copubs unless copubs.empty?
         type_token = data[:guide] || data[:type]
         identifier.type = ::Pubid::Components::Type.new(abbr: type_token.to_s) if type_token
+        # The typed trio (the designation's stage entry): type, stage
+        # and typed_stage carry the registry row — the wire keys the
+        # coded flavor serializes.
+        if (row = DESIGNATION_STAGES[data[:publisher].to_s])
+          typed_stage = ::Pubid::Components::TypedStage.new(
+            code: row[:code], stage_code: row[:stage_code],
+            type_code: row[:type_code], abbr: row[:abbr],
+            name: row[:name], harmonized_stages: row[:harmonized_stages],
+          )
+          identifier.typed_stage = typed_stage
+          identifier.type = typed_stage.to_type
+          identifier.stage = typed_stage.to_stage
+        end
         captured = data[:stage]
         return unless captured
 
@@ -131,7 +163,10 @@ module Pubid
           inner
         end
         if items.any? { |item| item[:supplements_plus] || item["supplements_plus"] }
-          members = items.map { |item| supplement_from(item) }
+          # The declared marker-less bundle (the coded-BSI shape): each
+          # member amends THE bundle's base document, so the members
+          # carry it (the coded builder's wrap_with_consolidated).
+          members = items.map { |item| supplement_from(item, base: base) }
           Identifiers::ConsolidatedIdentifier.new(identifiers: [base] + members)
         else
           supplement_from(items.first, base: base)
