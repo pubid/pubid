@@ -27,16 +27,11 @@ module Pubid
         end
       end
 
-      # The publisher serializes as a bare string, the copublishers
-      # as a list of strings (the coded flavor's flat-scalar table).
-      def self.flat_scalar_components
-        super.merge(publisher: "publisher", copublishers: "copublishers")
-      end
-
-      def self.flat_scalar_fields
-        super.merge(publisher: :body, copublishers: :body)
-      end
-
+                  # The publisher and copublishers keep the lutaml
+                  # component shapes ({"body" => "DD"} — the coded
+                  # flavor's own wire form): the definition's
+                  # serialization declaration declines the flat-scalar
+                  # table.
       # The declared draft stages: the serialized code is the key,
       # the official-URN code the declared `urn:` value.
       STAGE_CODES = {
@@ -46,9 +41,13 @@ module Pubid
       # A draft stage serializes as its typed-stage code
       # ("stage" => "pren"); #inflate_scalar_components rebuilds
       # the three components from it (the coded compact-hash shape).
+      # A PUBLISHED trio stays nested: the coded flavors that
+      # carry one (the designations) serialize type/stage/
+      # typed_stage in full — only a draft stage compacts.
       def self.compact_hash(model, hash)
         stage = model.typed_stage
         return unless stage && hash.key?("typed_stage")
+        return if stage.stage_code.to_s == "published"
         return unless model.type == stage.to_type &&
                       model.stage == stage.to_stage
 

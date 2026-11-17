@@ -4,6 +4,11 @@ module Pubid
       # Concrete Published Document identifier type (PFS type `published_document`).
       class PublishedDocument < Identifier
           TYPED_STAGES = [
+          ::Pubid::Components::TypedStage.new(
+            code: :pubpd, stage_code: :published,
+            type_code: :pd, abbr: ["PD"],
+            name: "Published Document", harmonized_stages: ["60.00", "60.60"],
+          ),
           ].freeze
 
         def self.type
@@ -13,15 +18,10 @@ module Pubid
         # The publisher default (feature 5): the type's own token
         # when the type is its designation, else the scheme default.
         def self.default_publisher
-          ::Pubid::Components::Publisher.new(body: "PD")
+          ::Pubid::Components::Publisher.new(body: "BS")
         end
 
         attribute :publisher, ::Pubid::Components::Publisher, default: -> { self.class.default_publisher }
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.default_type }
-
-        def self.default_type
-          ::Pubid::Components::Type.new(abbr: type[:short])
-        end
 
         # The scheme-canonical wire tag declared in the definition:
         # to_hash stays byte-identical with the scheme's coded

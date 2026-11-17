@@ -17,6 +17,13 @@ module Pubid
     #     chains — "BS EN ISO 105-B06:2020" is this wrapper over a CEN
     #     adoption over the ISO document); anything else is the adopted
     #     international standard (BS ISO …, BS IEC …);
+    #   * the adopted document lands on the builder's declared
+    #     ADOPTED_ATTRIBUTE — the uniform `base` (the codec's root-first
+    #     walk, the from_hash key and the MR join read it);
+    #   * the wrapper's own glued edition face (the declared
+    #     ADOPTED_EDITION_FACE, "BS HD IEC 60364-8-81 ED1") lifts out of
+    #     the run BEFORE the delegation — the owning flavor drops it, the
+    #     wrapper column carries it (the coded builder's own extraction);
     #   * a run no flavor owns, or a run the owning flavor rejects, is a
     #     REJECTION (Pubid::Errors::ParseError) — never a silently empty
     #     wrapper (the parse-failure contract's nil/raise rule).
@@ -29,20 +36,12 @@ module Pubid
         # The adoption identifier the captured run builds. Raises when the
         # run names no known flavor or the owning flavor rejects it.
         def build(builder, data)
-          adopted_str = builder.unwrap(data[:adopted])&.to_s&.strip
-          if adopted_str.nil? || adopted_str.empty?
-            raise ::Pubid::Errors::ParseError,
-                  "an adopted run captured no document (#{builder.flavor_name})"
-          end
+          adopted_str = captured_run(builder, data)
+          run, edition = extract_edition(builder, adopted_str)
+          adopted_id = parse_adopted(run)
 
-          adopted_id = parse_adopted(adopted_str)
-          publisher = builder.unwrap(data[:publisher])&.to_s
-
-          attrs = { adopted: adopted_id }
-          attrs[:publisher] =
-            ::Pubid::Components::Publisher.new(body: publisher) if publisher
-
-          wrapper_class(adopted_id).new(**attrs)
+          wrapper_class(adopted_id).new(**wrapper_attrs(builder, data,
+                                                        adopted_id, edition))
         end
 
         # The implicit probe: BSI carries none — the coded builder's
@@ -54,6 +53,60 @@ module Pubid
         end
 
         private
+
+        # The captured run, stripped — or the rejection (the parse-failure
+        # contract's nil/raise rule: an adopted run that captured no
+        # document never builds a silently empty wrapper).
+        def captured_run(builder, data)
+          adopted_str = builder.unwrap(data[:adopted])&.to_s&.strip
+          if adopted_str.nil? || adopted_str.empty?
+            raise ::Pubid::Errors::ParseError,
+                  "an adopted run captured no document (#{builder.flavor_name})"
+          end
+
+          adopted_str
+        end
+
+        # The wrapper's attributes: the adopted document under the
+        # builder's declared model column, the captured head token as the
+        # publisher, and the lifted edition face when the run carried one.
+        def wrapper_attrs(builder, data, adopted_id, edition)
+          attrs = { adopted_attribute(builder) => adopted_id }
+          publisher = builder.unwrap(data[:publisher])&.to_s
+          if publisher
+            attrs[:publisher] =
+              ::Pubid::Components::Publisher.new(body: publisher)
+          end
+          attrs[:edition] = edition if edition
+          attrs
+        end
+
+        # The wrapper's model column for the adopted document, from the
+        # generated builder's declaration (the capture name when it
+        # declares none — the legacy slot).
+        def adopted_attribute(builder)
+          if builder.class.const_defined?(:ADOPTED_ATTRIBUTE)
+            builder.class::ADOPTED_ATTRIBUTE.to_sym
+          else
+            :adopted
+          end
+        end
+
+        # The declared glued edition face, lifted from the run's tail
+        # ("BS HD IEC 60364-8-81 ED1" — the ordinal glues to the face,
+        # there is no edition_space). Returns the cleaned run and the
+        # ordinal; a run with no face passes through untouched.
+        def extract_edition(builder, adopted_str)
+          unless builder.class.const_defined?(:ADOPTED_EDITION_FACE)
+            return [adopted_str, nil]
+          end
+
+          face = builder.class::ADOPTED_EDITION_FACE
+          match = adopted_str.match(/\s+#{face}(\d+)\s*\z/)
+          return [adopted_str, nil] unless match
+
+          [adopted_str.sub(/\s+#{face}#{match[1]}\s*\z/, ""), match[1]]
+        end
 
         # The wrapper class by what the owning flavor came back with: a
         # CEN identifier (including a CEN adoption of an ISO/IEC document)
@@ -77,7 +130,7 @@ module Pubid
           klass = dispatch(lead)
           if klass.nil?
             raise ::Pubid::Errors::ParseError,
-                  "no owning flavor parses the adopted run #{adopted_str.inspect}"
+                  "no owning flavor parses the run #{adopted_str.inspect}"
           end
 
           klass.parse(adopted_str)

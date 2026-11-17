@@ -4,6 +4,11 @@ module Pubid
       # Concrete Publicly Available Specification identifier type (PFS type `publicly_available_specification`).
       class PubliclyAvailableSpecification < Identifier
           TYPED_STAGES = [
+          ::Pubid::Components::TypedStage.new(
+            code: :pubpas, stage_code: :published,
+            type_code: :pas, abbr: ["PAS"],
+            name: "Publicly Available Specification", harmonized_stages: ["60.00", "60.60"],
+          ),
           ].freeze
 
         def self.type
@@ -13,15 +18,10 @@ module Pubid
         # The publisher default (feature 5): the type's own token
         # when the type is its designation, else the scheme default.
         def self.default_publisher
-          ::Pubid::Components::Publisher.new(body: "PAS")
+          ::Pubid::Components::Publisher.new(body: "BS")
         end
 
         attribute :publisher, ::Pubid::Components::Publisher, default: -> { self.class.default_publisher }
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.default_type }
-
-        def self.default_type
-          ::Pubid::Components::Type.new(abbr: type[:short])
-        end
 
         # The scheme-canonical wire tag declared in the definition:
         # to_hash stays byte-identical with the scheme's coded

@@ -10,46 +10,29 @@
 # (pubid-grammar's definitions/bsi.pfs) or the compiler — never a reason
 # to relax an expectation here.
 #
-# MEASURED LEDGER (2026-11, parsanol 1.3.126, grammar origin/main with
-# the #121 declared-emission features):
+# MEASURED LEDGER (2026-11, parsanol 1.5.1.0, grammar origin/main with
+# the bsi-absorption compiler features — the adopted attribute-name
+# parameterization (`adopted.attribute: base`), the root-through
+# identity, the typed-trio designation surface (type/stage/typed_stage
+# with harmonized_stages), the glued adopted edition face, the
+# marker-less consolidated bundle and the nested publisher wire shape):
 #
-#   absorbed    304 / 1,500 — the plain BS face (numbers with glued
-#               letters, dashed/dotted/multi-level parts, years) at byte
-#               parity on every identity surface (class, to_s, to_hash,
-#               to_urn, to_pubid_urn, to_mr_string) plus from_hash
-#               round-trip.
-#   classified  539 — rows the composed flavor PARSES with the right
-#               class and the printed face (to_s), whose SERIALIZATION
-#               carries coded-flavor machinery the declared emission does
-#               not fill. Four named divergence families, each a
-#               follow-up on the module library / the generated emission
-#               (see BOUNDARY below):
-#
-#     wrapper-emission  393 (the adoption rows + the plus-run
-#               consolidated rows) — to_hash carries `adopted` where the
-#               coded wrapper renamed the slot to the uniform `base`
-#               (and the DD-adoption rows keep the nested
-#               `{"body" => "DD"}` publisher the cen flat-scalar table
-#               flattens); to_urn reads the ROOT document's identity
-#               (urn:bsi:bs:1073:-2:2002) — a root-through read the
-#               ordered segment declaration does not carry;
-#               to_pubid_urn RAISES — the codec composes nested nodes
-#               root-first along `base`, the generated adopted attribute
-#               is (hard-coded) `adopted`; to_mr_string fuses the
-#               adopted MR (bs.en.1073-2.2002) where the coded
-#               RootIdentity slug reads the root number
-#               (bs.1073-2.2002), and the coded consolidated slug drops
-#               the member suffixes the generated one appends.
-#     typed-trio        146 (the PAS/PD/DD/TS designation rows) — the
-#               coded rows serialize type/stage/typed_stage with names,
-#               type_codes and harmonized_stages the type declaration
-#               (code/stage_code/abbr) cannot express; the coded URN
-#               appends the type abbr and ":stage.published" (a
-#               string-vs-symbol comparison in the coded generator).
-#     printed-face      1 — "BS HD IEC 60364-8-81 ED1": the ED edition
-#               face stays inside the delegated cen parse, whose render
-#               drops it (the coded flavor carries the edition column).
-#
+#   absorbed    843 / 1,500 — byte parity on every identity surface
+#               (class, to_s, to_hash, to_urn, to_pubid_urn,
+#               to_mr_string) plus from_hash round-trip: the plain BS
+#               face (304), the adoption wrappers with the uniform
+#               `base` slot, the root-through URN/MR reads and the
+#               nested publisher (aen 267 including the "BS HD IEC
+#               60364-8-81 ED1" glued-ED face, ais 74), the typed trio
+#               (PAS 56 / PD 74 / DD 13 / TS 3) with the full
+#               type/stage/typed_stage serialization and the
+#               ":stage.published" URN segment, and the marker-less
+#               consolidated bundles (52 — the members carry the
+#               bundle's base, the URN appends the members' chains
+#               directly, the MR slug is the base document's own).
+#   classified  0 — the #737 ledger's wrapper-emission (393) and
+#               typed-trio (146) families closed: every divergence the
+#               measured boundary recorded flipped to byte parity.
 #   unabsorbed  657 — rows outside the composition surface, rejected
 #               (ParseError, never a wrong class): the thirty-plus coded
 #               families the module library does not model (aerospace,
@@ -164,7 +147,12 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
         expect(pfs.to_hash).to eq(coded.to_hash)
         expect(pfs.to_urn).to eq(coded.to_urn)
         expect(pfs.to_pubid_urn).to eq(coded.to_pubid_urn)
-        expect(pfs.to_mr_string).to eq(coded.to_mr_string)
+        # through the measurement's own lens: a surface that RAISES is
+        # part of the identity contract too (the coded BSI mr_edition
+        # raises on the wrappers' String edition — pinned behavior), so
+        # parity means the same value OR the same raise on both sides
+        expect(safe_call.call(pfs, :to_mr_string))
+          .to eq(safe_call.call(coded, :to_mr_string))
       end
 
       it "[#{fname}] #{test_case.id} round-trips through its own from_hash" do
@@ -217,59 +205,30 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
   # consciously.
   BSI_PFS_LEDGER = {
     "addendum_document" => { absorbed: 0, classified: {}, unabsorbed: 22 },
-    "adopted_european_norm" => { absorbed: 0,
-                                 classified: {
-                                   "to_hash+to_urn+to_pubid_urn+to_mr_string" => 266,
-                                   "to_s+to_hash+to_urn+to_pubid_urn+to_mr_string" => 1,
-                                 },
-                                 unabsorbed: 0 },
-    "adopted_international_standard" => { absorbed: 0,
-                                          classified: {
-                                            "to_hash+to_urn+to_pubid_urn+to_mr_string" => 74,
-                                          },
-                                          unabsorbed: 7 },
+    "adopted_european_norm" => { absorbed: 267, classified: {}, unabsorbed: 0 },
+    "adopted_international_standard" => { absorbed: 74, classified: {}, unabsorbed: 7 },
     "aerospace_standard" => { absorbed: 0, classified: {}, unabsorbed: 339 },
     "british_standard" => { absorbed: 304, classified: {}, unabsorbed: 42 },
     "bundled_identifier" => { absorbed: 0, classified: {}, unabsorbed: 27 },
     "committee_document" => { absorbed: 0, classified: {}, unabsorbed: 6 },
-    "consolidated_identifier" => { absorbed: 0,
-                                   classified: {
-                                     "to_hash+to_urn+to_pubid_urn+to_mr_string" => 52,
-                                   },
-                                   unabsorbed: 46 },
+    "consolidated_identifier" => { absorbed: 52, classified: {}, unabsorbed: 46 },
     "detailed_specification" => { absorbed: 0, classified: {}, unabsorbed: 16 },
     "disc" => { absorbed: 0, classified: {}, unabsorbed: 9 },
-    "draft_document" => { absorbed: 0,
-                          classified: {
-                            "to_hash+to_urn+to_pubid_urn+to_mr_string" => 13,
-                          },
-                          unabsorbed: 0 },
+    "draft_document" => { absorbed: 13, classified: {}, unabsorbed: 0 },
     "expert_commentary" => { absorbed: 0, classified: {}, unabsorbed: 25 },
     "explanatory_supplement" => { absorbed: 0, classified: {}, unabsorbed: 1 },
     "flex" => { absorbed: 0, classified: {}, unabsorbed: 23 },
     "index" => { absorbed: 0, classified: {}, unabsorbed: 13 },
     "method" => { absorbed: 0, classified: {}, unabsorbed: 14 },
     "national_annex" => { absorbed: 0, classified: {}, unabsorbed: 18 },
-    "publicly_available_specification" => { absorbed: 0,
-                                            classified: {
-                                              "to_hash+to_urn+to_pubid_urn+to_mr_string" => 56,
-                                            },
-                                            unabsorbed: 0 },
-    "published_document" => { absorbed: 0,
-                              classified: {
-                                "to_hash+to_urn+to_pubid_urn+to_mr_string" => 74,
-                              },
-                              unabsorbed: 2 },
+    "publicly_available_specification" => { absorbed: 56, classified: {}, unabsorbed: 0 },
+    "published_document" => { absorbed: 74, classified: {}, unabsorbed: 2 },
     "section" => { absorbed: 0, classified: {}, unabsorbed: 11 },
     "set" => { absorbed: 0, classified: {}, unabsorbed: 1 },
     "standalone_amendment" => { absorbed: 0, classified: {}, unabsorbed: 4 },
     "supplement_document" => { absorbed: 0, classified: {}, unabsorbed: 18 },
     "supplementary_index" => { absorbed: 0, classified: {}, unabsorbed: 1 },
-    "technical_specification" => { absorbed: 0,
-                                   classified: {
-                                     "to_hash+to_urn+to_pubid_urn+to_mr_string" => 3,
-                                   },
-                                   unabsorbed: 0 },
+    "technical_specification" => { absorbed: 3, classified: {}, unabsorbed: 0 },
     "test_method" => { absorbed: 0, classified: {}, unabsorbed: 6 },
     "value_added_publication" => { absorbed: 0, classified: {}, unabsorbed: 6 },
   }.freeze
@@ -287,9 +246,13 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
     expect(actual.keys).to match_array(BSI_PFS_LEDGER.keys)
   end
 
-  it "absorbs the composed BS face (304 rows) at full byte parity" do
+  it "absorbs the #737 classified families in full (843 rows) at byte parity" do
     absorbed_total = measured.values.sum { |g| g[:absorbed].size }
-    expect(absorbed_total).to eq(304)
+    expect(absorbed_total).to eq(843)
+    classified_total = measured.values.sum do |g|
+      g[:classified].values.map(&:size).sum
+    end
+    expect(classified_total).to eq(0)
   end
 
   it "no row raises a non-parse error anywhere (the rejection contract)" do
@@ -327,42 +290,58 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
       id = Pubid::BsiPfs.parse("BS EN 1073-2:2002")
       expect(id).to be_a(Pubid::BsiPfs::Identifiers::AdoptedEuropeanNorm)
       expect(id.to_s).to eq("BS EN 1073-2:2002")
-      # the adopted document is the base of the wrapper (the identity
-      # composition the modules declare)
-      expect(id.adopted).to be_a(Pubid::CenCenelec::Identifier)
+      # the adopted document is the wrapper's uniform `base` (the identity
+      # composition the modules declare), and the wrapper's identity is
+      # the ROOT document's: the coded URN, MR slug and hash slot
+      expect(id.base).to be_a(Pubid::CenCenelec::Identifier)
+      expect(id.to_hash).to eq(Pubid::Bsi.parse("BS EN 1073-2:2002").to_hash)
+      expect(id.to_urn).to eq("urn:bsi:bs:1073:-2:2002")
+      expect(id.to_mr_string).to eq("bs.1073-2.2002")
+      expect(id.to_pubid_urn)
+        .to eq("urn:pubid:bsi:cencenelec.en:1073:part-2:year-2002:aen")
     end
 
     it "the multi-level chain: BS EN ISO is a BSI wrapper over a CEN " \
        "adoption over the ISO document" do
       id = Pubid::BsiPfs.parse("BS EN ISO 105-B06:2020")
       expect(id).to be_a(Pubid::BsiPfs::Identifiers::AdoptedEuropeanNorm)
-      expect(id.adopted).to be_a(Pubid::CenCenelec::Identifier)
-      expect(id.adopted.adopted).to be_a(Pubid::Iso::Identifier)
+      # the BSI wrapper's uniform `base`, the CEN adoption's own
+      # `adopted` slot (the CEN flavor's naming — each flavor names its
+      # own wrapper slot), and the ISO document under it
+      expect(id.base).to be_a(Pubid::CenCenelec::Identifier)
+      expect(id.base.adopted).to be_a(Pubid::Iso::Identifier)
       expect(id.to_s).to eq("BS EN ISO 105-B06:2020")
+      expect(id.to_urn).to eq("urn:bsi:bs:105:-B06:2020")
     end
 
     it "iso.inner and iec.inner as the adopted inners (BS ISO / BS IEC)" do
       iso = Pubid::BsiPfs.parse("BS ISO 8601:2019")
       expect(iso).to be_a(Pubid::BsiPfs::Identifiers::AdoptedInternationalStandard)
-      expect(iso.adopted).to be_a(Pubid::Iso::Identifier)
+      expect(iso.base).to be_a(Pubid::Iso::Identifier)
       expect(iso.to_s).to eq("BS ISO 8601:2019")
+      expect(iso.to_urn).to eq("urn:bsi:bs:8601:2019")
 
       iec = Pubid::BsiPfs.parse("BS IEC 60747-8:2000")
-      expect(iec.adopted).to be_a(Pubid::Iec::Identifier)
+      expect(iec.base).to be_a(Pubid::Iec::Identifier)
       expect(iec.to_s).to eq("BS IEC 60747-8:2000")
     end
 
     it "the national head over the DD/PD designations adopting CEN documents" do
-      dd = Pubid::BsiPfs.parse("DD CEN ISO/TS 12180-1:2007")
+      input = "DD CEN ISO/TS 12180-1:2007"
+      dd = Pubid::BsiPfs.parse(input)
       expect(dd).to be_a(Pubid::BsiPfs::Identifiers::AdoptedEuropeanNorm)
-      expect(dd.adopted).to be_a(Pubid::CenCenelec::Identifier)
-      expect(dd.to_s).to eq("DD CEN ISO/TS 12180-1:2007")
+      expect(dd.base).to be_a(Pubid::CenCenelec::Identifier)
+      expect(dd.to_s).to eq(input)
+      # the nested publisher body form (the nested {"body" => "DD"} the
+      # serialization declaration keeps) and the root-through identity
+      expect(dd.to_hash).to eq(Pubid::Bsi.parse(input).to_hash)
+      expect(dd.to_urn).to eq("urn:bsi:dd:12180:-1:2007")
     end
 
     it "the IEC-internal runs stay inside the delegated adoption" do
       frag = Pubid::BsiPfs.parse("BS EN IEC 60601-1/FRAG1")
       expect(frag.to_s).to eq("BS EN IEC 60601-1/FRAG1")
-      expect(frag.adopted.adopted).to be_a(Pubid::Iec::Identifier)
+      expect(frag.base.adopted).to be_a(Pubid::Iec::Identifier)
 
       amd_frag = Pubid::BsiPfs.parse("BS EN IEC 61535/AMD1/FRAG1")
       expect(amd_frag.to_s).to eq("BS EN IEC 61535/AMD1/FRAG1")
@@ -376,16 +355,58 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
         .to be_a(Pubid::BsiPfs::Identifiers::BritishStandard)
       expect(plain.identifiers.last).to be_a(Pubid::BsiPfs::Identifiers::Amendment)
       expect(plain.to_s).to eq("BS 10125:2014+A1:2016")
-      # the generated consolidated URN marks each member with the plus
-      # marker (the cen shape); the coded BSI generator omits it — the
-      # classified to_urn divergence family
-      expect(plain.to_urn).to eq("urn:bsi:bs:10125:2014:plus:amd:1:2016")
+      # the marker-less bundle (the coded-BSI shape): the members carry
+      # the bundle's base, the URN appends the member chains directly,
+      # and the MR slug is the base document's own
+      expect(plain.identifiers.last.base).to eq(plain.identifiers.first)
+      expect(plain.to_urn).to eq("urn:bsi:bs:10125:2014:amd:1:2016")
+      expect(plain.to_mr_string).to eq("bs.10125.2014")
+      expect(plain.to_pubid_urn)
+        .to eq("urn:pubid:bsi:consol:ids-(bsi:bs:10125:year-2014)," \
+               "(bsi:bs:10125:year-2014:amd:1:year-2016)")
 
       adopted = Pubid::BsiPfs.parse("BS EN 1005-1:2001+A1:2008")
       expect(adopted).to be_a(Pubid::BsiPfs::Identifiers::ConsolidatedIdentifier)
       expect(adopted.identifiers.first)
         .to be_a(Pubid::BsiPfs::Identifiers::AdoptedEuropeanNorm)
       expect(adopted.to_s).to eq("BS EN 1005-1:2001+A1:2008")
+      expect(adopted.to_urn).to eq("urn:bsi:bs:1005:-1:2001:amd:1:2008")
+    end
+
+    it "the marker-less bundle's to_hash is byte-identical with the coded " \
+       "flavor's" do
+      plain = Pubid::BsiPfs.parse("BS 10125:2014+A1:2016")
+      expect(plain.to_hash).to eq(Pubid::Bsi.parse("BS 10125:2014+A1:2016").to_hash)
+    end
+
+    it "the typed trio carries the declared stage registry row " \
+       "(type/stage/typed_stage, harmonized stages included)" do
+      pas = Pubid::BsiPfs.parse("PAS 003:1994")
+      expect(pas.to_hash).to eq(Pubid::Bsi.parse("PAS 003:1994").to_hash)
+      expect(pas.typed_stage.code).to eq("pubpas")
+      expect(pas.typed_stage.harmonized_stages).to eq(%w[60.00 60.60])
+      # the coded URN's type abbr and stage segments (a stage_code String
+      # is never the :published Symbol — the coded generator's own
+      # comparison, reproduced byte-for-byte)
+      expect(pas.to_urn).to eq("urn:bsi:bs:003:1994:pas:stage.published")
+      expect(pas.to_mr_string).to eq("bs.pas.003.1994")
+
+      pd = Pubid::BsiPfs.parse("PD 5730")
+      expect(pd.to_hash).to eq(Pubid::Bsi.parse("PD 5730").to_hash)
+      expect(pd.to_urn).to eq("urn:bsi:bs:5730:pd:stage.published")
+      expect(pd.to_mr_string).to eq("bs.pd.5730")
+    end
+
+    it "the glued adopted edition face renders (BS HD IEC 60364-8-81 ED1)" do
+      input = "BS HD IEC 60364-8-81 ED1"
+      id = Pubid::BsiPfs.parse(input)
+      expect(id.to_s).to eq(input)
+      expect(id.edition).to eq("1")
+      expect(id.to_hash).to eq(Pubid::Bsi.parse(input).to_hash)
+      expect(id.to_urn).to eq("urn:bsi:bs:60364:-8:-81:v1")
+      expect(id.to_pubid_urn)
+        .to eq("urn:pubid:bsi:cencenelec.aen:pub-HD:adopted-" \
+               "(iec:is:60364:part-8:subpart-81):aen:ed-1")
     end
 
     it "the publisher-type designation faces (PAS/PD/DD/TS) parse with the " \
