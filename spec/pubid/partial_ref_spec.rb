@@ -113,6 +113,9 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     "bsi_pfs" => { ref: "BS 10005", omits: [:year] },
     # ISBN: identifier has no separable date.
     "isbn" => { ref: "ISBN 978-3-16-148410-0", omits: [] },
+    # arXiv: the trailing vN version is separable; a bare id matches every
+    # version under ===.
+    "arxiv" => { ref: "arXiv:2301.00001", omits: [:version] },
   }.freeze
 
   it "has a partial-ref entry for every registered flavor" do

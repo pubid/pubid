@@ -971,6 +971,26 @@ Corpus: 193 of 193 pass ids parse.
 
 Atoms, canonical order: `part-` (`part`), `section-` (`section`), `subsection-` (`subsection`), `year-` (`year`; the typeless standard dates itself, `API 650:2020`).
 
+[[urn-arxiv]]
+==== arxiv
+
+Namespace: `urn:pubid:arxiv:` (the `_type` flavor segment).
+
+Official URN: none. arXiv has no namespace in the IANA registry.
+
+[cols="3,1,1,4",options="header"]
+|===
+| `_type` | token | core | example
+| `pubid:arxiv:eprint` | `eprint` | year (int), month (int), number | `arXiv:2301.00001v1` -> `urn:pubid:arxiv:eprint:2023:1:00001:v-1`
+| `pubid:arxiv:identifier` | `id` | year (int), month (int), number | —
+|===
+
+Atoms, canonical order: `archive-` (`archive`), `sc-` (`subject_class`),
+`v-` (`version`, int). Every e-print has a year, a month and a number, so
+they are the core; the archive and subject class exist on old ids only
+(`arXiv:math.GT/0309136` -> `urn:pubid:arxiv:eprint:2003:9:136:archive-math:sc-GT`),
+and the version is optional. Landed with the flavor (relaton#42).
+
 [[urn-ashrae]]
 ==== ashrae
 

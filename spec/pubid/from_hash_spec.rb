@@ -57,6 +57,7 @@ RSpec.describe "Pubid.from_hash" do
     "ietf" => "RFC 2119",
     "iho" => "IHO B-1 1.0.0",
     "isbn" => "ISBN 0-306-40615-2",
+    "arxiv" => "arXiv:math.GT/0309136v2",
     "iso" => "ISO 9001:2015",
     "itu" => "ITU-T G.711",
     "jcgm" => "JCGM 100:2008/Amd 1",

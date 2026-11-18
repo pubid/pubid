@@ -221,6 +221,7 @@ module Pubid
   autoload :Amca, "pubid/amca"
   autoload :Ansi, "pubid/ansi"
   autoload :Api, "pubid/api"
+  autoload :Arxiv, "pubid/arxiv"
   autoload :Ashrae, "pubid/ashrae"
   autoload :Asme, "pubid/asme"
   autoload :Doi, "pubid/doi"

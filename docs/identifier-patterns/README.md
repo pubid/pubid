@@ -6,6 +6,7 @@
 | AMCA | 4 | 0 | Yes | No |
 | ANSI | 2 | 0 | Yes | No |
 | API | 10 | 0 | Yes | No |
+| ARXIV | 1 | 0 | No | No |
 | ASHRAE | 8 | 11 | Yes | No |
 | ASME | 2 | 0 | Yes | No |
 | ASTM | 11 | 0 | Yes | No |
