@@ -15,6 +15,7 @@ RSpec.describe "all parts in every flavor" do
 "Pubid::Ansi::Identifier" => "ANSI X3.4:1963",
 "Pubid::Api::Identifier" => "API RP 500",
 "Pubid::Ashrae::Identifier" => "ASHRAE Guideline 14-2002 Errata (October 10, 2008)",
+"Pubid::Arxiv::Identifier" => "arXiv:2301.00001v1",
 "Pubid::Asme::Identifier" => "ASME B16.5-2020",
 "Pubid::Astm::Identifier" => "ASTM 52303-24e1",
 "Pubid::Bipm::Identifier" => "CCTF REC 2 (2012)",

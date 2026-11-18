@@ -84,6 +84,8 @@ SUBSET_PAIRS = {
   "bsi_pfs" => { ref: "BS 10005", candidate: "BS 10005:1995" },
   "isbn" => { ref: "ISBN 978-3-16-148410-0",
               candidate: "ISBN 978-3-16-148410-0" },
+  # A version-less arXiv id is a version wildcard.
+  "arxiv" => { ref: "arXiv:2301.00001", candidate: "arXiv:2301.00001v2" },
 }.freeze
 
 # The corpus sweep reads at most this many ids per flavor, spread evenly.
