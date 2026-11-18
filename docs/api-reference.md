@@ -100,6 +100,12 @@ Lookup: abbreviation -> typed stage
 
 Lookup: type code -> identifier class
 ### `parse(input)`
+## `Pubid::Arxiv`
+
+### `all_typed_stages`
+### `locate_stage(abbr)`
+### `locate_type(code)`
+### `parse(identifier)`
 ## `Pubid::Ashrae`
 
 ### `all_typed_stages`
