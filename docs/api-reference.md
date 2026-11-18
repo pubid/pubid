@@ -303,6 +303,12 @@ Lookup: type code -> identifier class
 ### `locate_stage(abbr)`
 ### `locate_type(code)`
 ### `parse(identifier)`
+## `Pubid::Eu`
+
+### `all_typed_stages`
+### `locate_stage(_abbr)`
+### `locate_type(code)`
+### `parse(identifier)`
 ## `Pubid::Evs`
 
 ### `all_typed_stages`
