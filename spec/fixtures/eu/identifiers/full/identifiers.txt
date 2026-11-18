@@ -1,0 +1,30 @@
+EU Regulation 1227/2011
+EU Regulation 2016/679
+EU Directive 2016/680
+EU Regulation 2003/2003
+EU Decision 2010/87
+EU Decision 1082/2013
+EU Directive 2014/24
+Regulation (EU) No 1227/2011
+Regulation (EU) 2016/679
+Directive (EU) 2016/680
+Regulation (EC) No 1907/2006
+Directive 2010/75/EU
+Decision No 1082/2013/EU
+Regulation (Euratom) No 1493/93
+CELEX 32011R1227
+CELEX:32016R0679
+32016L0680
+http://data.europa.eu/eli/reg/2011/1227/oj
+https://data.europa.eu/eli/dir/2016/680/oj
+http://data.europa.eu/eli/dec/2010/87
+EU Regulation 1227
+EU Regulation 12/34
+Directive 95/46/EC
+EU Regulation No 2015/2014
+Regulation 1227/2011
+CELEX: 32011R1227
+32015R2014
+32014R2015
+Regulation (EU) No 1227/2011/EC
+30000R0000

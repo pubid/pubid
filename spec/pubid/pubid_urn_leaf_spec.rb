@@ -19,6 +19,7 @@ RSpec.describe "the pubid-scheme URN leaf waves" do
     ["doi", "doi:10.1000/182",
      "urn:pubid:doi:resource:prefix-10.1000:suffix-182"],
     ["omg", "OMG AMI4CCM 1.0", "urn:pubid:omg:spec:v-1.0:acronym-AMI4CCM"],
+    ["eu", "Regulation (EU) No 1227/2011", "urn:pubid:eu:reg:2011:1227:family-EU"],
     ["un", "A/RES/78/1", "urn:pubid:un:document:1:path-A,RES,78"],
     ["w3c", "W3C REC-CSS1-19990111", "urn:pubid:w3c:rec:CSS1:date-19990111"],
     # "becss" reads as a type token by shape, so its first byte escapes

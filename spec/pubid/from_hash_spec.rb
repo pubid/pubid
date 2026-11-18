@@ -68,6 +68,7 @@ RSpec.describe "Pubid.from_hash" do
     "omg" => "OMG AMI4CCM 1.0",
     "plateau" => "PLATEAU Handbook #00",
     "sae" => "SAE J1939",
+    "eu" => "EU Regulation 1227/2011",
     "un" => "A/RES/78/1",
     "w3c" => "W3C WD-charmod-19991129",
     "xsf" => "XEP 0001",

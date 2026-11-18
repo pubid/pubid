@@ -67,6 +67,8 @@ SUBSET_PAIRS = {
   "ogc" => { ref: "24-032r1", candidate: "24-032r1" },
   "amca" => { ref: "AMCA Publication 211-22",
               candidate: "AMCA Publication 211-22" },
+  "eu" => { ref: "EU Regulation 1227/2011",
+            candidate: "Regulation (EU) No 1227/2011" },
   "un" => { ref: "TRADE/WP.4/1068", candidate: "TRADE/WP.4/1068" },
   "doi" => { ref: "doi:10.1000/182", candidate: "doi:10.1000/182" },
   # The PFS-compiled dev alias of doi.
