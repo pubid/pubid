@@ -49,6 +49,7 @@ RSpec.describe "all parts in every flavor" do
 "Pubid::Omg::Identifier" => "OMG AMI4CCM 1.0",
 "Pubid::Sae::Identifier" => "SAE J300",
 "Pubid::Tgpp::Identifier" => "3GPP TS 23.207:REL-4/4.0.0",
+"Pubid::Eu::Identifier" => "EU Regulation 1227/2011",
 "Pubid::Un::Identifier" => "TRADE/CEFACT/2004/32",
 "Pubid::W3c::Identifier" => "W3C WD-charmod-19991129",
 "Pubid::Xsf::Identifier" => "XEP 0060",

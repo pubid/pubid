@@ -20,6 +20,7 @@
 | EASC | 2 | 0 | Yes | No |
 | ECMA | 3 | 3 | Yes | No |
 | ETSI | 5 | 0 | Yes | No |
+| EU | 3 | 0 | No | No |
 | EVS | 1 | 0 | Yes | No |
 | GB | 1 | 1 | No | No |
 | GOST | 5 | 0 | Yes | No |

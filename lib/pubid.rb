@@ -258,6 +258,7 @@ module Pubid
   # beside the coded flavor, never routed by Pubid.parse (registry keys
   # sort "etsi" first).
   autoload :EtsiPfs, "pubid/etsi_pfs"
+  autoload :Eu, "pubid/eu"
   autoload :Evs, "pubid/evs"
   autoload :Gost, "pubid/gost"
   autoload :Gb, "pubid/gb"

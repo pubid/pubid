@@ -86,6 +86,9 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     # OMG: no date, but the trailing version and document part are both
     # separable, so a bare acronym is a wildcard over every version and volume.
     "omg" => { ref: "OMG UML", omits: %i[version part] },
+    # EU: a reference always states the year ("EU Regulation 1227/2011"),
+    # because a bare number cannot tell a regulation of 2011 from 1227.
+    "eu" => { ref: "EU Regulation 1227/2011", omits: [] },
     # UN: identifier has no separable date; the bare committee path parses.
     "un" => { ref: "TRADE/WP.4/1068", omits: [] },
     # EVS: year is the trailing ":YYYY" of the adopted EN reference and is
