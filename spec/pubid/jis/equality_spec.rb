@@ -52,3 +52,37 @@ RSpec.describe "Pubid::Jis identifier equality" do
     expect(parse("JIS C 0617（規格群）") === parse("JIS C 0617-2")).to be(true)
   end
 end
+
+RSpec.describe "Pubid::Jis the bare SYMBOL face vs no symbol" do
+  def from(hash)
+    Pubid::Jis::Identifier.from_hash(
+      { "_type" => "pubid:jis:japanese-industrial-standard",
+        "series" => "Z", "number" => "8211", "parts" => ["3"],
+        "year" => 2025 }.merge(hash),
+    )
+  end
+
+  let(:plain) { from({}) }
+  let(:bare_symbol) { from({ "symbol" => "" }) }
+
+  it "renders distinctly" do
+    expect(plain.to_s).to eq("JIS Z 8211-3:2025")
+    expect(bare_symbol.to_s).to eq("JIS Z 8211-3:2025 SYMBOL")
+  end
+
+  it "does not match mutually (subset_strict :symbol)" do
+    expect(plain === bare_symbol).to be false
+    expect(bare_symbol === plain).to be false
+  end
+
+  it "matches its own kind" do
+    expect(plain === from({})).to be true
+    expect(bare_symbol === from({ "symbol" => "" })).to be true
+  end
+
+  it "round-trips the bare SYMBOL face" do
+    reparsed = Pubid::Jis::Identifier.parse(bare_symbol.to_s)
+    expect(reparsed.to_s).to eq("JIS Z 8211-3:2025 SYMBOL")
+    expect(reparsed.symbol).to eq("")
+  end
+end
