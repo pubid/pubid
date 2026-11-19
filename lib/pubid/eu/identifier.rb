@@ -22,6 +22,29 @@ module Pubid
       # CELEX number 32013D1082 name one act.
       equality_ignored :number_first
 
+      # The ELI type subtype: "impl" (implementing act), "del" (delegated
+      # act) or "financ" (financial regulation), from an ELI such as
+      # http://data.europa.eu/eli/reg_impl/2016/1356/oj. Such an act shares
+      # the numbering of its type (the Official Journal cites it as
+      # "Commission Implementing Regulation (EU) 2016/1356"), so the subtype
+      # is not identity: "EU Regulation 2016/1356" is the same act. #to_eli
+      # reads it to give the ELI back.
+      attribute :subtype, :string
+      equality_ignored :subtype
+
+      # The subtypes CELLAR gives each ELI type: implementing and delegated
+      # acts of every type, and the financial regulation.
+      ELI_SUBTYPES = {
+        "reg" => %w[impl del financ],
+        "dir" => %w[impl del],
+        "dec" => %w[impl del],
+      }.freeze
+
+      # The subtype of an ELI input, removed before the baked grammar (which
+      # knows only reg/dir/dec), as BSI and IETF strip their prefixes.
+      ELI_SUBTYPE =
+        %r{\A(https?://data\.europa\.eu/eli/(reg|dir|dec))_([a-z]+)/}
+
       EU_TYPE_MAP = {
         "pubid:eu:regulation" => "Pubid::Eu::Identifiers::Regulation",
         "pubid:eu:directive" => "Pubid::Eu::Identifiers::Directive",
@@ -34,6 +57,7 @@ module Pubid
         map "date", to: :date
         map "family", to: :family
         map "number_first", to: :number_first
+        map "subtype", to: :subtype
       end
 
       PUBLISHER = "EU"
@@ -71,14 +95,25 @@ module Pubid
         [PUBLISHER]
       end
 
-      # The CELEX number: sector 3, year, type letter, number padded to 4.
+      # The conventional CELEX number: sector 3, year, type letter, number
+      # padded to 4 (EU Regulation 1227/2011 -> 32011R1227).
+      #
+      # This is the CELEX of the act only when CELLAR numbered the work with
+      # the act number, which is the usual case but not a rule: the CELEX
+      # sequence number is CELLAR's own. ECB Decision (EU) 2016/245 is
+      # 32016D0002, and this method gives 32016D0245 for it. Do not use the
+      # result as a CELLAR key; key an act by its ELI (#to_eli).
+      #
+      # @return [String]
       def to_celex
         "3#{year}#{self.class.type[:celex]}#{number.rjust(4, '0')}"
       end
 
       # The ELI of the act as published in the Official Journal.
       def to_eli
-        "http://data.europa.eu/eli/#{self.class.type[:eli]}/#{year}/#{number}/oj"
+        eli = self.class.type[:eli]
+        eli = "#{eli}_#{subtype}" if subtype
+        "http://data.europa.eu/eli/#{eli}/#{year}/#{number}/oj"
       end
 
       # The EU has no registered URN namespace (the ELI is its official
@@ -109,9 +144,45 @@ module Pubid
 
         identifier = ::Pubid.utf8_input(identifier)
 
-        parsed = Pubid::Parg::Model.bound(:eu, identifier)
-        Builder.build(parsed, identifier)
+        parsed, subtype = bound_without_subtype(identifier)
+        Builder.build(parsed, identifier, subtype: subtype)
       end
+
+      # Runs the grammar on the input without its ELI subtype.
+      #
+      # @return [Array(Hash, String|nil)] the bound captures, and the
+      #   subtype ("impl" …) or nil
+      def self.bound_without_subtype(identifier)
+        subtype = eli_subtype(identifier)
+        input = subtype ? identifier.sub(ELI_SUBTYPE, '\\1/') : identifier
+        [Pubid::Parg::Model.bound(:eu, input), subtype]
+      rescue Pubid::Errors::ParseError => e
+        raise unless subtype
+
+        raise subtype_parse_error(e, identifier, input, subtype)
+      end
+
+      # A known subtype of a known ELI type, or nil. An unknown one stays in
+      # the input, so the grammar rejects it.
+      def self.eli_subtype(identifier)
+        match = ELI_SUBTYPE.match(identifier)
+        return nil unless match
+
+        subtype = match[3]
+        subtype if ELI_SUBTYPES.fetch(match[2]).include?(subtype)
+      end
+
+      # The grammar saw the input without "_<subtype>"; report what the
+      # caller passed (the position in the message is in the shorter text).
+      def self.subtype_parse_error(error, identifier, input, subtype)
+        Pubid::Errors::ParseError.new(
+          "#{error.message} (in #{input.inspect}, the input without " \
+          "\"_#{subtype}\")", error.parse_failure_cause,
+          input: identifier, flavor: error.flavor
+        )
+      end
+      private_class_method :eli_subtype, :subtype_parse_error
+      private_class_method :bound_without_subtype
     end
   end
 end

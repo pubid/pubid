@@ -12,6 +12,7 @@ flavor, whose `Relaton::Db` cache keys on this pubid.
 | Official Journal long form | `Regulation (EU) No 1227/2011`, `Directive 2010/75/EU` | canonical; sets `family` |
 | CELEX | `32011R1227`, `CELEX 32011R1227`, `CELEX:32011R1227` | canonical |
 | ELI | `http(s)://data.europa.eu/eli/reg/2011/1227[/oj]` | canonical |
+| ELI with a subtype | `http://data.europa.eu/eli/reg_impl/2016/1356/oj` | canonical; sets `subtype` |
 
 `#to_celex` and `#to_eli` give the two official identifiers back. `to_urn`
 (`urn:eu:reg:2011:1227`) is pubid-invented: the EU has no URN namespace.
@@ -54,6 +55,38 @@ Commission act). From 2015 every act prints `<year>/<number>`.
 - CELEX and ELI years are checked against the same range, and a number of
   0 is rejected. The bracketed family and the suffixed one are separate
   captures; two different ones (`Regulation (EU) No 1227/2011/EC`) raise.
+
+## ELI type subtypes are not identity
+
+CELLAR gives sector-3 works the ELI segments `<type>_<subtype>` with the
+subtypes `impl` (implementing), `del` (delegated) and `financ` (financial
+regulation): `reg_impl` 14,782 works, `dec_impl` 5,358, `reg_del` 2,975
+(counts 2026-11-18, relaton/relaton#44). Such an act shares the numbering of
+its type — the Official Journal cites `Commission Implementing Regulation
+(EU) 2016/1356` — so it parses as the base type and the subtype goes in the
+`subtype` attribute. `subtype` is `equality_ignored` and a URN facet, so
+`EU Regulation 2016/1356` equals the `reg_impl` ELI. `#to_eli` reads it and
+gives the ELI back; `to_s`, `to_celex`, `to_urn` and the MR string do not.
+
+`Identifier.parse` removes the `_<subtype>` with `ELI_SUBTYPE` before the
+baked grammar, which knows only `reg`/`dir`/`dec` (the BSI/IETF Ruby-side
+strip). So `data/parg/eu.json` did not change. Only a subtype listed for
+its type in `ELI_SUBTYPES` is removed (`financ` only on `reg`, as CELLAR
+gives it); `reg_foo` and `dir_financ` stay in the input and fail in the
+grammar. When the grammar rejects a stripped input, the `ParseError` is
+raised again with the caller's `input`; its message names the stripped text,
+because the reported position is in that text. `subtype` is not validated on
+`new`/`from_hash`, as `family` is not.
+
+## A CELEX number is read by convention
+
+The CELEX sequence number is CELLAR's own, and it is not always the act
+number: `32016D0002` is ECB `Decision (EU) 2016/245`. The CELEX parse takes
+the sequence number as the act number, so it reads `32016D0002` as
+`EU Decision 2016/2`, and `#to_celex` gives `32016D0245` for Decision
+2016/245. Both are the *conventional* CELEX, right only when CELLAR numbered
+the work with the act number. Key an act by its ELI, not by `#to_celex`
+(relaton does so). CELEX parsing stays, because callers use it.
 
 ## Identity and matching
 

@@ -28,3 +28,8 @@ CELEX: 32011R1227
 32014R2015
 Regulation (EU) No 1227/2011/EC
 30000R0000
+http://data.europa.eu/eli/reg_impl/2016/1356/oj
+http://data.europa.eu/eli/reg_del/2025/934/oj
+http://data.europa.eu/eli/dir_del/2014/69/oj
+http://data.europa.eu/eli/dec_impl/2026/732/oj
+http://data.europa.eu/eli/reg_foo/2016/1356/oj

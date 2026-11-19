@@ -7,3 +7,4 @@
 #Directive 95/46/EC# Pubid::Errors::ParseError: "EU legal act: no year in 95/46"
 #Regulation (EU) No 1227/2011/EC# Pubid::Errors::ParseError: "EU legal act: two families, EU and EC"
 #30000R0000# Pubid::Errors::ParseError: "EU legal act: 0000 is not a year"
+#http://data.europa.eu/eli/reg_foo/2016/1356/oj# Pubid::Errors::ParseError: "Failed to match: expected one of ['/'] at line 1 char 30."

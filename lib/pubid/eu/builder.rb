@@ -27,12 +27,15 @@ module Pubid
       # One parsed act before it becomes an identifier.
       Act = Struct.new(:klass, :year, :number, :number_first)
 
-      def self.build(data, input = nil)
-        new(input).build(data)
+      # @param subtype [String, nil] the ELI type subtype that
+      #   Identifier.parse removed before the grammar ("impl", "del" …)
+      def self.build(data, input = nil, subtype: nil)
+        new(input, subtype).build(data)
       end
 
-      def initialize(input)
+      def initialize(input, subtype = nil)
         @input = input
+        @subtype = subtype
       end
 
       # Which of two printed numbers is the year, when the input has no
@@ -61,17 +64,28 @@ module Pubid
         number = strip_zeros(act.number)
         fail!("number 0") if number == "0"
 
-        id = Identifiers.const_get(act.klass).new(
-          number: number,
-          date: ::Pubid::Components::Date.new(year: act.year),
-          family: family(data),
-        )
+        id = Identifiers.const_get(act.klass)
+          .new(**attributes(act, number, data))
         keep_order(id, act.number_first)
       end
 
       private
 
+      def attributes(act, number, data)
+        {
+          number: number,
+          date: ::Pubid::Components::Date.new(year: act.year),
+          family: family(data),
+          subtype: @subtype,
+        }
+      end
+
       # CELEX and ELI: the year and the number have fixed places.
+      #
+      # A CELEX number is read by convention: its sequence number is taken
+      # as the act number. CELLAR numbers most works so, but not all of them
+      # (32016D0002 is ECB Decision 2016/245, and this reads it as Decision
+      # 2016/2). See Identifier#to_celex.
       def positional(data)
         klass = if data[:celex_letter]
                   TYPES_BY_CELEX.fetch(data[:celex_letter])
