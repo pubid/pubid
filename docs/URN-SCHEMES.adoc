@@ -477,15 +477,17 @@ Official URN: `urn:itu:…`, IANA-registered (formal template `itu`). Current
 `to_urn`: 400 ids, 299 round-trip, 84 reshape, 17 do not re-parse, 0
 colliding URNs.
 
-pubid scheme: all 2,752 pass ids emit, round-trip by `to_hash`, are
-path-safe, and give no collision (2,752 distinct URNs). The longest URN is
-154 characters, the median 48.
+pubid scheme: all 2,758 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give 2,756 distinct URNs. The two shared URNs are not
+collisions: `ITU-T OB.1096` and `ITU OB No. 1096` (with and without a date)
+are one document each since #696. The longest URN is 160 characters.
 
 [cols="3,1",options="header"]
 |===
 | `_type` | token
 | `pubid:itu:recommendation` | `rec`
 | `pubid:itu:report` | `rpt`
+| `pubid:itu:resolution` | `res`
 | `pubid:itu:combined-identifier` | `comb`
 | `pubid:itu:question` | `q`
 | `pubid:itu:handbook` | `hb`

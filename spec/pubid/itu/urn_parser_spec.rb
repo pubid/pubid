@@ -9,5 +9,6 @@ RSpec.describe Pubid::Itu::UrnParser do
     "ITU-T BO.1073-1",
     "ITU-T G.711",
     "Report ITU-R BT.2020-1",
+    "Resolution ITU-R 1-9",
   ]
 end

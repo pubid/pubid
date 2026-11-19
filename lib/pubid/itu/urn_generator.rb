@@ -30,6 +30,9 @@ module Pubid
         # well as `to_s` and the MR slug, or the two documents share an
         # identifier on that surface.
         parts << "report" if identifier.is_a?(Identifiers::Report)
+        # A Resolution numbers independently too ("1-9" is also a
+        # Recommendation number), so it gets its own segment.
+        parts << "resolution" if identifier.is_a?(Identifiers::Resolution)
 
         if identifier.series
           series = identifier.series.to_s

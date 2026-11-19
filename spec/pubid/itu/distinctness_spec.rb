@@ -32,6 +32,9 @@ RSpec.describe "ITU identifier distinctness across rendering surfaces" do
     "report corrigendum" => ["Report ITU-R M.2134 (2008) Cor. 1 (10/2009)",
                              "ITU-R M.2134 (2008) Cor. 1 (10/2009)"],
     "report annex" => ["Report ITU-R BT.2020-1 Annex A", "ITU-R BT.2020-1 Annex A"],
+    # Resolutions number independently of Recommendations too.
+    "resolution vs recommendation" => ["Resolution ITU-R 1-9", "ITU-R 1-9"],
+    "resolution vs report" => ["Resolution ITU-R 1-9", "Report ITU-R 1-9"],
   }.freeze
 
   # These differ only in their SUPPLEMENT TYPE, which the ITU URN convention

@@ -129,7 +129,12 @@ module Pubid
         # Recommendation — only the leading word, captured as :report_marker,
         # tells the two apart, and it has to, because the two series number
         # independently and the same series/number is two real documents.
-        klass = data[:report_marker] ? Identifiers::Report : Identifiers::Recommendation
+        # A Resolution ("Resolution ITU-R 1-9") is told apart the same way,
+        # by its captured :resolution_marker.
+        klass = if data[:report_marker] then Identifiers::Report
+                elsif data[:resolution_marker] then Identifiers::Resolution
+                else Identifiers::Recommendation
+                end
 
         klass.new(
           sector: sector,

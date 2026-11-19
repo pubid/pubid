@@ -19,6 +19,7 @@ module Pubid
       autoload :RadioRegulations, "#{__dir__}/identifiers/radio_regulations"
       autoload :Recommendation, "#{__dir__}/identifiers/recommendation"
       autoload :Report, "#{__dir__}/identifiers/report"
+      autoload :Resolution, "#{__dir__}/identifiers/resolution"
       autoload :SpecialPublication, "#{__dir__}/identifiers/special_publication"
       autoload :StandardSerialization, "#{__dir__}/identifiers/standard_serialization"
       autoload :Supplement, "#{__dir__}/identifiers/supplement"

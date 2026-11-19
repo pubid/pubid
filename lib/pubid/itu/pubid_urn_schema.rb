@@ -61,6 +61,7 @@ module Pubid
 
       type "pubid:itu:recommendation", "rec"
       type "pubid:itu:report", "rpt"
+      type "pubid:itu:resolution", "res"
       type "pubid:itu:combined-identifier", "comb"
       type "pubid:itu:question", "q"
       type "pubid:itu:handbook", "hb"
