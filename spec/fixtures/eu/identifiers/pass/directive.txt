@@ -7,3 +7,4 @@ EU Directive 2014/24
 !Directive 2010/75/EU!EU Directive 2010/75
 !32016L0680!EU Directive 2016/680
 !https://data.europa.eu/eli/dir/2016/680/oj!EU Directive 2016/680
+!http://data.europa.eu/eli/dir_del/2014/69/oj!EU Directive 2014/69

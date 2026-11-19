@@ -248,7 +248,85 @@ RSpec.describe Pubid::Eu do
     end
   end
 
+  describe "ELI type subtypes" do
+    {
+      "http://data.europa.eu/eli/reg_impl/2016/1356/oj" =>
+        [Pubid::Eu::Identifiers::Regulation, "impl", "EU Regulation 2016/1356"],
+      "http://data.europa.eu/eli/reg_del/2025/934/oj" =>
+        [Pubid::Eu::Identifiers::Regulation, "del", "EU Regulation 2025/934"],
+      "http://data.europa.eu/eli/reg_financ/2018/1046/oj" =>
+        [Pubid::Eu::Identifiers::Regulation, "financ",
+         "EU Regulation 2018/1046"],
+      "http://data.europa.eu/eli/dir_del/2014/69/oj" =>
+        [Pubid::Eu::Identifiers::Directive, "del", "EU Directive 2014/69"],
+      "http://data.europa.eu/eli/dir_impl/2014/94/oj" =>
+        [Pubid::Eu::Identifiers::Directive, "impl", "EU Directive 2014/94"],
+      "http://data.europa.eu/eli/dec_impl/2026/732/oj" =>
+        [Pubid::Eu::Identifiers::Decision, "impl", "EU Decision 2026/732"],
+      "http://data.europa.eu/eli/dec_del/2019/1597/oj" =>
+        [Pubid::Eu::Identifiers::Decision, "del", "EU Decision 2019/1597"],
+    }.each do |eli, (klass, subtype, canonical)|
+      context eli do
+        subject(:id) { described_class.parse(eli) }
+
+        it "parses as the base type and keeps the subtype" do
+          expect(id).to be_instance_of(klass)
+          expect(id.subtype).to eq(subtype)
+          expect(id.to_s).to eq(canonical)
+        end
+
+        it "gives the ELI back" do
+          expect(id.to_eli).to eq(eli)
+        end
+
+        it "is the act of the canonical reference" do
+          expect(id).to eq(described_class.parse(canonical))
+        end
+
+        it "round-trips the hash and the pubid URN" do
+          expect(id.to_hash["subtype"]).to eq(subtype)
+          expect(Pubid::Eu::Identifier.from_hash(id.to_hash)).to eq(id)
+          back = Pubid::Eu::Identifier.from_hash(id.to_hash)
+          expect(back.to_hash).to eq(id.to_hash)
+          expect(Pubid.parse_urn(id.to_pubid_urn).to_hash).to eq(id.to_hash)
+        end
+      end
+    end
+
+    it "keeps the conventional CELEX of a subtype act" do
+      id = described_class.parse("http://data.europa.eu/eli/reg_impl/2016/1356/oj")
+      expect(id.to_celex).to eq("32016R1356")
+    end
+
+    it "gives no subtype to a plain ELI" do
+      id = described_class.parse("http://data.europa.eu/eli/reg/2011/1227/oj")
+      expect(id.subtype).to be_nil
+      expect(id.to_hash).not_to have_key("subtype")
+    end
+
+    %w[http://data.europa.eu/eli/reg_foo/2016/1356/oj
+       http://data.europa.eu/eli/reg_/2016/1356/oj
+       http://data.europa.eu/eli/reg_impl_del/2016/1356/oj
+       http://data.europa.eu/eli/dir_financ/2016/1356/oj
+       http://data.europa.eu/eli/dec_financ/2016/1356/oj].each do |input|
+      it "rejects the unknown subtype #{input}" do
+        expect { described_class.parse(input) }
+          .to raise_error(Pubid::Errors::ParseError)
+      end
+    end
+  end
+
   describe "parse errors" do
+    it "reports the input of a subtype ELI the grammar rejects" do
+      input = "http://data.europa.eu/eli/reg_impl/20x6/1/oj"
+      expect { described_class.parse(input) }
+        .to raise_error(Pubid::Errors::ParseError) { |e|
+          expect(e.input).to eq(input)
+          expect(e.flavor).to eq("eu")
+          expect(e.message).to include("_impl")
+        }
+    end
+
     it "rejects junk" do
       expect { described_class.parse("nonsense") }.to raise_error(Pubid::Errors::ParseError)
     end

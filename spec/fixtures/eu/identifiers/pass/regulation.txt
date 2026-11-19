@@ -15,3 +15,5 @@ EU Regulation No 2015/2014
 !CELEX: 32011R1227!EU Regulation 1227/2011
 !32015R2014!EU Regulation 2015/2014
 !32014R2015!EU Regulation No 2015/2014
+!http://data.europa.eu/eli/reg_impl/2016/1356/oj!EU Regulation 2016/1356
+!http://data.europa.eu/eli/reg_del/2025/934/oj!EU Regulation 2025/934

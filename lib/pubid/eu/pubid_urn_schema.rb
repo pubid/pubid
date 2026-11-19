@@ -10,10 +10,12 @@ module Pubid
     #
     # Every act has a year and a number, so both are the positional core,
     # year first (the CELEX and ELI order). The legal family is an atom; the
-    # number-order flag records only the spelling, so it is a facet.
+    # number-order flag records only the spelling, and the ELI subtype
+    # (reg_impl …) names no other act, so both are facets.
     PubidUrnSchema = Pubid::PubidUrn.define("eu") do
       atom "family", "family"
       facet "number_first", "numberfirst", kind: :bool
+      facet "subtype", "subtype"
 
       type "pubid:eu:regulation", "reg", core: %w[year number]
       type "pubid:eu:directive", "dir", core: %w[year number]
