@@ -1,0 +1,11 @@
+# ITU-R Resolutions (https://www.itu.int/pub/R-RES/en) — a number and its
+# revision, never a series; the leading word is part of the identifier.
+# Byte-exact round-trip forms only; the "ITU-R Res. 1-9" and
+# "ITU-R Resolution 1-9" spellings normalize to the leading form and live in
+# resolution_spec.rb.
+Resolution ITU-R 1
+Resolution ITU-R 1-9
+Resolution ITU-R 1-9 (2023)
+Resolution ITU-R 2-8 (2019)
+Resolution ITU-R 10-1
+Resolution ITU-R 75 (2023)

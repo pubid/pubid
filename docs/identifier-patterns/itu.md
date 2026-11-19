@@ -67,6 +67,10 @@ id = Pubid::Itu.parse("...")
 
 **Class:** `Pubid::Itu::Identifiers::Report`
 
+### Resolution
+
+**Class:** `Pubid::Itu::Identifiers::Resolution`
+
 ### Special Publication
 
 **Class:** `Pubid::Itu::Identifiers::SpecialPublication`

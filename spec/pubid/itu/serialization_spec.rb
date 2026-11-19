@@ -29,6 +29,7 @@ RSpec.describe "Pubid::Itu compact flat serialization" do
     "handbook" => "ITU-R 23.HDB",
     "report" => "Report ITU-R BT.2020-1 (2000)",
     "report/supplement" => "Report ITU-R BT.2020-1 Suppl. 1",
+    "resolution" => "Resolution ITU-R 1-9 (2023)",
   }.freeze
 
   NESTED_KEYS = %w[sector series code combined_series combined_code].freeze

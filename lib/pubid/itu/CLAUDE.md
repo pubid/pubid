@@ -20,6 +20,34 @@ These notes were part of the root `CLAUDE.md`. Read them before you change `lib/
 
 - **ITU-R Reports (`Identifiers::Report`) and the class-strict `Identifier#==`**: ITU-R **Reports** are a publication series that numbers **independently** of Recommendations, so `ITU-R BT.2020-1` names *two* real, both-current documents (Report BT.2020-1, objective quality assessment, 2000; Recommendation BT.2020-1, UHDTV parameter values, 06/2014). 984 of 1,001 report records in `relaton-data-itu` were indexed as `pubid:itu:recommendation`, and 52 editions across 30 numbers (BT.2020, M.2083, M.2134 …) collided outright — the dataset keys files by identifier, so whichever was crawled last silently overwrote the other. ITU disambiguates with the leading word, so the identifier must too. **The leaf** `Identifiers::Report` (`_type: pubid:itu:report`) is shaped exactly like `Recommendation` — same attributes, same `StandardSerialization` flat block, so only `_type` distinguishes the two hashes — and adds just `render_base` (`"Report #{super}"`) and `mr_type` (`[super, "report"].join(".")` → `itu.r.report.bt-2020-1`). **Grammar**: a captured `report_word` marker (unlike `itu_prefix`'s decorative, *uncaptured* `"Recommendation "` literal, which stays as it is) plus a single `report_body` whose `(series >> dot).maybe` covers the with- and without-series shapes at once; `base_report` accepts **both** spellings (`Report ITU-R BT.2020-1` and the downstream `ITU-R Report BT.2020-1`), and `to_s` renders ITU's own leading form for either — so the infix spelling lives in `report_spec.rb` with an explicit expectation, **not** in the byte-exact pass fixtures. Two deliberate exclusions from `report_body`: **no `combined_suffixes`** (a joint `Report X/Y` would reach `Builder#build`'s `combined` branch, build a `CombinedIdentifier` and *silently drop the marker* — a clean parse failure is better), and a **`(str("OB") >> dot).absent?` guard** (an Operational Bulletin is cross-bureau; without it `Report ITU-T OB.1` routes to `SpecialPublication`, marker dropped, or trips `validate_ob_no_sector!`, whose `ArgumentError` escapes `Identifier.parse`'s `Parslet::ParseFailed` rescue). `base_report` is **first** in `rule(:base)` — which is what lets a supplement/annex/appendix *wrap* a Report — and order-free there because `itu_prefix` admits only `Recommendation `/`ITU` and `letter` is `[A-Z]`, so neither `series` nor `series_code_body` can consume `Report`; `report_identifier` sits in `rule(:identifier)` **after** supplement/annex/appendix (which match the longer wrapped form) and **before** `with_series`/`without_series` (which would match the infix spelling's `ITU-R` prefix and then fail on the unconsumed tail). The builder picks the class from `data[:report_marker]` in the existing Recommendation fallthrough; `build_supplement`/`build_annex_of_recommendation` need **no** change, since they recurse via `build(data[:base])`. **`Pubid::Itu::Identifier#==` is now class-strict** (`other.instance_of?(self.class)`, the rule `Supplement#==` already used) — the ITU *type* is part of the identity, not just sector/series/number. `self.class` rather than a hard-coded class keeps it **symmetric in both directions** (an `is_a?` guard would have made a Recommendation equal a Report one-way, and `#matches?` — which is `exclude(*ignore) == other.exclude(*ignore)` — resolve one to the other). Strictly stricter, so it can only turn `true` into `false`; it also closes the pre-existing one-way holes against `CombinedIdentifier` and `SpecialPublication`. **Consequences of the shared guard, both pinned by `spec/pubid/itu/type_strict_equality_spec.rb`:** comparisons that used to be *asymmetric* are now consistently false — most notably a bare primary designation vs its joint recommendation (`ITU-T G.780` vs `ITU-T G.780/Y.1351`, which was `true` one way and `false` the other on `main`, so no caller could rely on it either way). A caller matching a bare primary against a joint document must narrow on `root.number` (which still agrees) rather than on `==`. Per the cross-cutting ITU lesson, the marker reaches **all** identity surfaces: `to_s`, `generate_base_urn` (a `report` segment right after the sector — `urn:itu:r:report:BT.2020-1:2000`, which `UrnParser` also reads back), and the MR slug — including **`Supplement#mr_type`**, which is load-bearing and easy to miss: a supplement has no `mr_supplement_suffix`, so the shared MR renderer slugs it **flat** from the sector/series/code `build_supplement` copied up from its base and *never consults the base's class*, which made `Report ITU-R BT.2020-1 Suppl. 1` and `ITU-R BT.2020-1 Suppl. 1` share one slug (i.e. one output filename — the very overwrite this type prevents). It appends `report` when **`root`** is a Report, so a supplement of an *annex* of a Report is covered too. **`PREFIXES` stays `["ITU"]`** — the leading `Report` token is deliberately not registered for prefix routing (a generic English word; the mixin's ambiguous-token exclusion), and the infix spelling routes on `ITU` as before. **Backwards compatibility is exact**: a bare `ITU-R BT.2020-1` still builds a `Recommendation` with an unchanged hash/`to_s`/URN — nothing in the grammar or the builder fires without the marker, so none of the 20,728 published index rows move. Locked by `spec/pubid/itu/identifiers/report_spec.rb`, a `distinctness_spec.rb` pair, rows in `root_number_spec.rb`/`serialization_spec.rb`/`urn_parser_spec.rb`, and `spec/fixtures/itu/identifiers/pass/report.txt`. **Out of scope (relaton's side, sequenced after this):** `DataParserR`/`DataCrawlerR` emitting the new docid form, `Relaton::Itu::Pubid`'s reference parser learning a `report` rule, and the `relaton-data-itu` filename-namespace migration + re-crawl that actually recovers the 34 missing Recommendations and 18 missing Reports. (hand-off: itu-r-report-identifier-type.)
 
+- **ITU-R Resolutions (`Identifiers::Resolution`, `_type: pubid:itu:resolution`)**:
+  `Resolution ITU-R 1-9 (2023)` (ITU page id `R-RES-R.1-9-2023`). Built like
+  `Report`: the same flat `StandardSerialization` block, `render_base` adds
+  the leading word, `mr_type` adds `resolution` (`itu.r.resolution.1-9`), and
+  the URN gets a `resolution` segment (`urn:itu:r:resolution:1-9:2023`),
+  which `UrnParser::TYPE_SEGMENTS` reads back. The revision is `code.parts`,
+  so `matches?(…, ignore: %i[parts year])` finds every revision and
+  `root.number` is the bare number (`1` does not bucket with `10`). Grammar:
+  a captured `resolution_word` (`Resolution` or `Res.`), a `resolution_body`
+  of `code [document_date]` only — **no series**, so `Resolution ITU-R BT.1`
+  fails — and both the leading and the infix spelling (`ITU-R Res. 1-9`),
+  which render the leading form (`Pubid.parse` does not route
+  `Res. ITU-R 1-9`: no registered prefix and no exact round trip; a spec
+  locks this). `resolution_identifier` sits after
+  `report_identifier`, before `with_series`. It is **not** in `rule(:base)`:
+  no corpus has a wrapped Resolution, so a supplement of one fails to parse
+  rather than drop the marker. **The legacy `ITU-R R.1-9`** (the
+  relaton-data-itu spelling until the re-crawl, 245 rows) carries no marker
+  and stays a Recommendation of series `R`, unchanged. Verified: all 2,752
+  earlier ITU fixture ids byte-identical on `to_s`/`to_hash`/`to_urn`/MR/
+  pubid URN, and all 245 dataset numbers pass the relaton gate as
+  `Resolution ITU-R <n>`. **The grammar was baked here ahead of
+  pubid-grammar** (hand-off `pubid__pubid-grammar__itu-resolution-grammar`):
+  the `source` of `data/parg/itu.json` is the only copy of the change until
+  pubid-grammar adopts it. To rebake: `jq -j .source data/parg/itu.json >
+  itu.parg`, edit, `parsanol _1.5.1.0_ parg compile itu.parg -o
+  data/parg/itu.json`, `parsanol _1.5.1.0_ parg test data/parg/itu.json`.
+
 ## From the root note "Parse-failure error contract — uniform across every flavor"
 
 **ITU's length guard was an early `return`, not a raise, and its comment blamed the wrong caller.** `Identifier.normalize_whitespace` (`lib/pubid/itu/identifiers/base.rb`) carried
@@ -127,7 +155,7 @@ a replay of all 24,382 rows and every ITU pass fixture showed 0 changes.
 
 ## pubid-scheme URN (issue #656)
 
-`lib/pubid/itu/pubid_urn_schema.rb` covers all 17 types; design and rulings
+`lib/pubid/itu/pubid_urn_schema.rb` covers all 18 types; design and rulings
 in `docs/URN-SCHEMES.adoc` (`[[urn-itu]]`). **A new rendering flag needs a
 place in that schema, or `#to_pubid_urn` raises for every id that sets it.**
 Declare it as a `:bool` *facet* when it is spelling only (the
