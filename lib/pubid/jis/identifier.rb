@@ -131,6 +131,19 @@ module Pubid
           symbol == other.symbol
       end
 
+      # The bare SYMBOL face and no symbol are distinct states of a
+      # two-valued attribute: unlike the strict attributes' nil≈empty rule
+      # (a from_hash-dropped empty), nil here means NO SYMBOL clause while
+      # "" renders the bare `SYMBOL` keyword (render_empty), so the match
+      # is exact ==. Without this, a symbol-less reference wildcard-matches
+      # the bare-SYMBOL row and the two render-distinct forms match
+      # mutually (the corpus Law 4 failure on JIS Z 8211-3:2025 SYMBOL).
+      def subset_attribute_match?(name, mine, theirs)
+        return symbol == theirs if name == :symbol
+
+        super
+      end
+
       # Basic string representation. Delegates to renderer.
       def to_s(**opts)
         render(format: :human, **opts)
