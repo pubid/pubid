@@ -13,6 +13,12 @@ module Pubid
       attribute :part, :string
       attribute :subpart, :string
 
+      # How the input joined the year to the number: "-" for the
+      # "ANSI X9.62-2005" spelling, nil for the colon of "ANSI/ISO 9899:1990".
+      # Spelling only, so `==`, `hash` and `===` skip it (relaton#45).
+      attribute :date_separator, :string
+      equality_ignored :date_separator
+
       def self.parse(string)
         unless string.is_a?(String)
           raise Pubid::Errors::InvalidInputError,
@@ -27,6 +33,16 @@ module Pubid
 
         parsed = Pubid::Parg::Model.bound(:ansi, string)
         Pubid::Ansi::Builder.new.build(parsed)
+      end
+
+      # The separator belongs to the year: drop it with the year, so a
+      # year-less copy carries no orphan spelling flag in its hash.
+      def exclude(*args)
+        result = super
+        if args.include?(:year) || args.include?(:date)
+          result.date_separator = nil
+        end
+        result
       end
     end
   end

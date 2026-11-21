@@ -439,11 +439,15 @@ Namespace: `urn:pubid:ansi:`. Schema: `lib/pubid/ansi/pubid_urn_schema.rb`.
 Landed with the IEEE wave, which nests ANSI ids.
 
 Official URN: none. ANSI has no namespace in the IANA registry, and the
-current `urn:ansi:…` form of `to_urn` is pubid-invented. Current `to_urn`: 175
-ids, 0 round-trip, all 175 do not re-parse.
+current `urn:ansi:…` form of `to_urn` is pubid-invented. Current `to_urn`: 192
+ids; 136 re-parse to an equal identifier (`urn:ansi:X9.62:2005`), the rest
+carry a co-publisher or a part that `UrnParser` does not read.
 
-pubid scheme: all 175 pass ids emit, round-trip by `to_hash`, are path-safe,
-and give no collision.
+pubid scheme: all 192 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision. A trailing `-YYYY` is the year (relaton#45), so
+`ANSI 802.3-2012` is `urn:pubid:ansi:std:802.3:pub-ANSI:year-2012:f:0.datesep--`:
+the dash is the spelling facet `datesep`, and cutting the `f` group gives the
+URN of `ANSI 802.3:2012`, the same document.
 
 [cols="3,1",options="header"]
 |===
