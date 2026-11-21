@@ -5,11 +5,11 @@ module Pubid
     # The pubid-scheme URN of ANSI (issue #656; docs/URN-SCHEMES.adoc).
     #
     #   ANSI 802.3-2012
-    #   urn:pubid:ansi:std:802.3:pub-ANSI:part-2012
+    #   urn:pubid:ansi:std:802.3:pub-ANSI:year-2012:f:0.datesep--
     #
     # Landed with the IEEE wave, which nests ANSI ids ("IEEE Std 144-1971
-    # (ANSI C37.24-1971)"). Note that ANSI stores the year of
-    # "ANSI 802.3-2012" in +part+ ("2012"); the URN keeps it as it is.
+    # (ANSI C37.24-1971)"). The trailing "-2012" is the year (relaton#45);
+    # its dash is the spelling facet +datesep+.
     #
     # A component attribute maps through its identifying field only
     # (+type.abbr+, +stage.abbr+, +edition.number+ …). The registry fields of
@@ -35,6 +35,7 @@ module Pubid
 
       facet "languages.*.original_code", "langsrc"
       facet "edition.original_text", "edsrc"
+      facet "date_separator", "datesep"
 
       type "pubid:ansi:standard", "std"
       type "pubid:ansi:american-national-standard", "ans"

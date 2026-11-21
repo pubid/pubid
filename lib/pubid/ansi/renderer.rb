@@ -8,6 +8,7 @@ module Pubid
     #   "ANSI X3.4"
     #   "ANSI/ISO 9899"
     #   "ANSI X9.8-1:2007"
+    #   "ANSI X9.62-2005"  (date_separator "-")
     #
     # The renderer is registered as the `:human` format in the ANSI format
     # registry and invoked via `render(format: :human)`.
@@ -39,8 +40,15 @@ module Pubid
         [
           id.number,
           (id.part ? "-#{id.part}" : ""),
-          (id.date ? ":#{id.date.render(context:)}" : ""),
+          date_portion(id, context),
         ].join
+      end
+
+      # "ANSI X9.62-2005" keeps its dash; the colon is the default.
+      def date_portion(id, context)
+        return "" unless id.date
+
+        "#{id.date_separator || ':'}#{id.date.render(context:)}"
       end
 
       def language_portion(id)

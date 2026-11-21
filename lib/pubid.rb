@@ -502,6 +502,14 @@ module Pubid
 
     prefix_owners = candidates_by_prefix(string)
     (prefix_owners + other_candidates(prefix_owners)).each do |mod|
+      # An umbrella flavor (ANSI) also parses the joint prefix of a
+      # co-publisher that has its own flavor; that flavor's parse wins.
+      # Only as a prefix owner: in the exhaustive pass the umbrella is one
+      # flavor among the others, and stopping there would skip the rest.
+      if fallback && routing_umbrella?(mod) && prefix_owners.include?(mod)
+        return fallback
+      end
+
       begin
         parsed = mod.parse(string)
       rescue Pubid::Errors::ParseError => e
@@ -565,9 +573,18 @@ module Pubid
     routing_table.each do |prefix, modules|
       ordered.concat(modules) if prefix_match?(string, prefix)
     end
-    ordered.compact.uniq
+    # An umbrella flavor goes after the other owners (stable partition).
+    ordered.compact.uniq.partition { |mod| !routing_umbrella?(mod) }.flatten
   end
   private_class_method :candidates_by_prefix
+
+  # @param mod [Module] a flavor module
+  # @return [Boolean] see {PrefixesSupport#routing_umbrella?}
+  # @api private
+  def self.routing_umbrella?(mod)
+    mod.respond_to?(:routing_umbrella?) && mod.routing_umbrella?
+  end
+  private_class_method :routing_umbrella?
 
   # Every other registered flavor, for the exhaustive second pass.
   #

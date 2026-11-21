@@ -6,9 +6,15 @@ module Pubid
     extend Pubid::PrefixesSupport
 
     # ANSI publisher token; ANSI/ASHRAE and ANSI/AMCA joint forms come from
-    # Pubid::JOINT_PREFIXES. Parser::ORGANIZATIONS are co-publishers, not
-    # leading ANSI tokens, so they are excluded.
+    # Pubid::JOINT_PREFIXES. Co-publisher acronyms are not leading ANSI
+    # tokens, so they are excluded.
     PREFIXES = ["ANSI"].freeze
+
+    # ANSI parses any "ANSI/<ACRONYM> ..." (relaton#45), so a co-publisher
+    # with a flavor of its own (AMCA, ASHRAE) keeps the route.
+    def self.routing_umbrella?
+      true
+    end
 
     autoload :Builder, "#{__dir__}/ansi/builder"
     autoload :Identifier, "#{__dir__}/ansi/identifier"

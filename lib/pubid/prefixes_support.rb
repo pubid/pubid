@@ -48,5 +48,16 @@ module Pubid
       name.split("::").last
         .gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase.to_sym
     end
+
+    # True for a flavor that accredits other publishers' documents and so
+    # parses their joint prefix too (ANSI reads +ANSI/AMCA 210-16+). When
+    # it shares a prefix with a co-publisher's own flavor, {Pubid.parse}
+    # tries it last and prefers the co-publisher's parse, even a
+    # normalizing one. Default false.
+    #
+    # @return [Boolean]
+    def routing_umbrella?
+      false
+    end
   end
 end
