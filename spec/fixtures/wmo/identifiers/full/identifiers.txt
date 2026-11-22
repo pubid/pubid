@@ -1,0 +1,38 @@
+# WMO document identifiers (pubid#763), harvested from attested sources
+# only:
+#   - WMO-No. series numbers 8, 49 and 1364: the issue's series examples.
+#   - "2025 edition": the issue's calendar-year edition face.
+#   - S-411 1.2.1 / 1.2.0 / 1.1.0 / "S-411 Annex A": the
+#     metanorma/S-411-Product-Specification repository (the PS and DCEG
+#     front matter, the DCEG :docidentifier:, and the 1.1.0 original
+#     PDF of June 2014); S-412: the issue.
+#   - urn:mrn:wmo:pub:...: the issue's proposed IALA-pattern form (no
+#     authoritative WMO urn:mrn:wmo: rule is published; the S-411
+#     repository carries none).
+WMO-No. 1364
+WMO-No. 8
+WMO-No. 49
+WMO-No. 1364, 2025 edition
+WMO-No. 1364 2025 edition
+WMO-No. 1364:ed2025
+S-411
+S-411 1.2.1
+S-411 1.2.0
+S-411 1.1.0
+S-411 Annex A
+S-412
+urn:mrn:wmo:pub:wmo-1364
+urn:mrn:wmo:pub:wmo-1364:ed2025
+urn:mrn:wmo:pub:s-411
+urn:mrn:wmo:pub:s-411:ed1.2.1
+urn:mrn:wmo:pub:s-411:ed1.2.0
+urn:mrn:wmo:pub:s-411:annex-a
+WMO-No. edition
+WMO-No. 1364, edition
+WMO-No. 1364:ed25
+WMO 1364
+S411
+S-411 1234
+S-411:ed
+S-411 1.2
+S-411:ed1.2.1

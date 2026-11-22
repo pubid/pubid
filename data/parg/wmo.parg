@@ -1,0 +1,108 @@
+# WMO document identifiers (pubid#763): the WMO-No. publication series
+# and the WMO-published S-100 product specifications.
+#
+#   WMO-No. 1364                      publication, bare
+#   WMO-No. 1364, 2025 edition        publication, year edition (citation comma)
+#   WMO-No. 1364 2025 edition         publication, year edition (cover stack)
+#   WMO-No. 1364:ed2025               publication, compact year edition (alias)
+#   S-411                             S-100 product specification, bare
+#   S-411 1.2.1                       dotted edition (the S-411 repo form)
+#   S-411:ed1.2.1                     compact dotted edition (alias)
+#   S-411 Annex A                     annex wrapper (the DCEG docidentifier)
+#   S-411 Annex A 1.2.0               annex wrapper carrying its edition
+#
+# Editions are a type-driven face: the WMO-No. series carries calendar-year
+# editions ("2025 edition", MRN `ed2025`); the S-100 shapes carry the IHO
+# dotted x.y.z (MRN `ed1.2.1`). Both bind the one `edition_value` capture;
+# the builder keys the face off the resolved type.
+#
+# Type assignment (the #763 ruling): the S-lexical form is a WMO type,
+# publisher-parameterised per IALA's S-201 — the lexical shape is the IHO
+# S-100 form, but the flavor owns the WMO-published documents
+# (metanorma/S-411-Product-Specification, mn-document-class wmo).
+#
+# Edition-2 conversion with typed model bindings, mirroring the iala
+# grammar: each alternative path carries exactly one occurrence of every
+# capture name, so the harvest delivers one flat bound map; the annex base
+# composite stays unbound (its `doc_number` hoists to the top level) and
+# the builder dispatches on `wmomarker` / `annex_marker`. The annex letter
+# guard (!lower) keeps a following edition segment from mis-capturing.
+
+grammar PubidWmo version "0.1.0" edition 2 {
+  wmomarker = "WMO-No." as wmomarker
+  doc_number = (1*digit) as doc_number
+  s_code = "S-" (1*digit) as doc_number
+  year_value = (4digit) as edition_value
+  dotted_value = (1*digit 1*(dot 1*digit)) as edition_value
+  edition_year_human = ([comma] space year_value " edition") as edition
+  edition_year_compact = (colon "ed" year_value) as edition
+  edition_dotted_human = (space dotted_value) as edition
+  edition_dotted_compact = (colon "ed" dotted_value) as edition
+  annex_identifier = {
+    s_code
+    space
+    ("Annex" / "ANNEX") as annex_marker
+    [ (space upper as annex_letter !lower) ]
+    [edition_dotted_human / edition_dotted_compact]
+  }
+  publication_identifier = {
+    wmomarker space doc_number
+    [edition_year_human / edition_year_compact]
+  }
+  standard_identifier = {
+    s_code
+    [edition_dotted_human / edition_dotted_compact]
+  }
+  identifier = annex_identifier / publication_identifier / standard_identifier
+  entry identifier: identifier
+
+  upper = %x41-5A
+  lower = %x61-7A
+  digit = %x30-39
+  comma = ","
+  colon = ":"
+  dot = "."
+  space = " "
+
+  bindings identifier {
+    wmomarker -> wmomarker (string)
+    doc_number -> doc_number (string)
+    edition_value -> edition_value (string)
+    annex_marker -> annex_marker (string)
+    annex_letter -> annex_letter (string)
+  }
+
+  test {
+    accept "WMO-No. 1364"
+    accept "WMO-No. 1364, 2025 edition"
+    accept "WMO-No. 1364 2025 edition"
+    accept "WMO-No. 1364:ed2025"
+    accept "S-411"
+    accept "S-411 1.2.1"
+    accept "S-411:ed1.2.1"
+    accept "S-411 Annex A"
+    accept "S-411 ANNEX A"
+    accept "S-411 Annex A 1.2.0"
+    reject "nonsense"
+    reject "WMO-No. edition"
+    reject "S-411 1234"
+    example "WMO-No. 1364" { wmomarker: "WMO-No.", doc_number: "1364" }
+    example "WMO-No. 1364, 2025 edition" {
+      wmomarker: "WMO-No.",
+      doc_number: "1364",
+      edition_value: "2025",
+    }
+    example "S-411 1.2.1" { doc_number: "411", edition_value: "1.2.1" }
+    example "S-411 Annex A 1.2.0" {
+      doc_number: "411",
+      annex_marker: "Annex",
+      annex_letter: "A",
+      edition_value: "1.2.0",
+    }
+    example "WMO-No. 1364:ed2025" {
+      wmomarker: "WMO-No.",
+      doc_number: "1364",
+      edition_value: "2025",
+    }
+  }
+}

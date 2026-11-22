@@ -86,6 +86,8 @@ SUBSET_PAIRS = {
               candidate: "ISBN 978-3-16-148410-0" },
   # A version-less arXiv id is a version wildcard.
   "arxiv" => { ref: "arXiv:2301.00001", candidate: "arXiv:2301.00001v2" },
+  # A WMO edition (calendar year or dotted) is the omitted wildcard.
+  "wmo" => { ref: "WMO-No. 1364", candidate: "WMO-No. 1364, 2025 edition" },
 }.freeze
 
 # The corpus sweep reads at most this many ids per flavor, spread evenly.

@@ -119,6 +119,11 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     # arXiv: the trailing vN version is separable; a bare id matches every
     # version under ===.
     "arxiv" => { ref: "arXiv:2301.00001", omits: [:version] },
+    # WMO: the edition is the separable trailing component of both series
+    # (the calendar-year "2025 edition" of the WMO-No. series, the dotted
+    # x.y.z of the S-100 shapes), so a bare reference leaves it nil and
+    # wildcards every edition.
+    "wmo" => { ref: "WMO-No. 1364", omits: [:edition] },
   }.freeze
 
   it "has a partial-ref entry for every registered flavor" do

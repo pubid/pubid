@@ -606,6 +606,20 @@ Lookup: type code -> identifier class
 ### `parse(identifier)`
 
 Parse a W3C identifier string
+## `Pubid::Wmo`
+
+### `all_typed_stages`
+
+WMO identifiers carry no typed stages.
+### `locate_stage(_abbr)`
+
+WMO identifiers carry no typed stages.
+### `locate_type(code)`
+
+Lookup: type code -> identifier class
+### `parse(identifier)`
+
+Parse a WMO identifier string into an identifier object.
 ## `Pubid::Xsf`
 
 ### `all_typed_stages`
