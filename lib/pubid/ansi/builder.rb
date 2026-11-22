@@ -19,11 +19,26 @@ module Pubid
       private
 
       def read_dash_year(identifier)
-        return if identifier.date || !DASH_YEAR.match?(identifier.part.to_s)
+        # A revision follows the part, so "568-2009-D" keeps 2009 as a part:
+        # read as a year, it would render after the revision.
+        return if identifier.date || identifier.revision
+        return unless DASH_YEAR.match?(identifier.part.to_s)
 
         identifier.date = Components::Date.new(year: identifier.part)
         identifier.date_separator = "-"
         identifier.part = nil
+      end
+
+      # A third dash group is always the year: the grammar admits only a
+      # 19xx/20xx group there ("ANSI/ISA-61511-1-2018").
+      def split_number_with_part(value)
+        number, part, dash_year = value.split("-")
+        {
+          number: number,
+          part: part,
+          date: dash_year && Components::Date.new(year: dash_year),
+          date_separator: dash_year && "-",
+        }.compact
       end
 
       def default_identifier_class
@@ -45,14 +60,9 @@ module Pubid
             end
           end
         when :number_with_part
-          original_value = value.to_s
-          main_and_parts = original_value.split("-")
-          main_number = main_and_parts[0]
-          part_number = main_and_parts[1]
-          {
-            number: main_number,
-            part: part_number,
-          }.compact
+          split_number_with_part(value.to_s)
+        when :number_separator, :revision
+          value.to_s
         when :date
           Components::Date.new(year: value.to_s)
         when :languages

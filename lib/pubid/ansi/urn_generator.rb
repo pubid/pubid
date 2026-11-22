@@ -18,6 +18,8 @@ module Pubid
         parts << urn_part if urn_part
         parts << urn_subpart if urn_subpart
         parts << urn_year if urn_year
+        # "568.2-C" and "568.2-D" are two documents: keep them apart.
+        parts << "rev-#{identifier.revision}" if identifier.revision
         parts << urn_edition if urn_edition
         parts << urn_typed_stage if urn_typed_stage
 
