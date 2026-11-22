@@ -46,5 +46,6 @@
 | SAE | 1 | 0 | Yes | No |
 | TGPP | 2 | 2 | Yes | No |
 | UN | 1 | 1 | No | No |
+| WMO | 3 | 0 | Yes | No |
 | W3C | 11 | 10 | Yes | No |
 | XSF | 1 | 1 | Yes | No |

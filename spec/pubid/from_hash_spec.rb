@@ -71,6 +71,7 @@ RSpec.describe "Pubid.from_hash" do
     "sae" => "SAE J1939",
     "eu" => "EU Regulation 1227/2011",
     "un" => "A/RES/78/1",
+    "wmo" => "WMO-No. 1364, 2025 edition",
     "w3c" => "W3C WD-charmod-19991129",
     "xsf" => "XEP 0001",
   }.freeze
