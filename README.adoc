@@ -166,12 +166,12 @@ publisher page on https://pubid.github.io/publishers[pubid.github.io].
 |link:https://pubid.github.io/publishers/un[UN]
 
 |link:https://pubid.github.io/publishers/w3c[W3C]
+|link:https://pubid.github.io/publishers/wmo[WMO]
 |link:https://pubid.github.io/publishers/xsf[XSF]
-|link:https://pubid.github.io/publishers/adobe[Adobe]
 
+|link:https://pubid.github.io/publishers/adobe[Adobe]
 |link:https://pubid.github.io/publishers/amca[AMCA]
 |link:https://pubid.github.io/publishers/calconnect[CalConnect]
-|
 |===
 
 (The gem's 3GPP flavor key is `3gpp`; its publisher page is `tgpp`. CEN and
