@@ -1,5 +1,5 @@
-# WMO document identifiers (pubid#763), harvested from attested sources
-# only:
+# WMO document identifiers (pubid#763 and its widening round), harvested
+# from attested sources only:
 #   - WMO-No. series numbers 8, 49 and 1364: the issue's series examples.
 #   - "2025 edition": the issue's calendar-year edition face.
 #   - S-411 1.2.1 / 1.2.0 / 1.1.0 / "S-411 Annex A": the
@@ -9,6 +9,41 @@
 #   - urn:mrn:wmo:pub:...: the issue's proposed IALA-pattern form (no
 #     authoritative WMO urn:mrn:wmo: rule is published; the S-411
 #     repository carries none).
+#   - A-set rows (the widening attestation): WMO-No. 306 — library
+#     record 35713 (Manual on Codes); WMO-No. 49, 2019 edition —
+#     library record 35722; WMO-No. 574 and its 2024 edition — library
+#     viewer 31442; WMO-No. 386, 2020 edition — wmo.int news;
+#     WMO-No. 1364, 2023 edition — library record 69478; WMO-No. 1160,
+#     2023 edition — library viewer 55063; S-412 1.2.0 — the
+#     iho-ohi/S-412-Product-Specification repository and the
+#     community.wmo.int S-41X page. These parse on the #763 grammar
+#     unchanged; the rows widen the corpus, not the grammar.
+#   - Volume rows: WMO-No. 8, Volume I .. Volume V — the community.wmo.int
+#     IMOP Guide page; WMO-No. 49, Volume III — library record 35631;
+#     WMO-No. 9, Volume D — Resolution 10 (SERCOM-1); WMO-No. 306,
+#     Volume I.1 — library record 35713 (dotted-roman sub-volumes).
+#   - "WMO-No. 306, Volume I.1, 2020 edition" — the face-order row: both
+#     faces individually attested (record 35713; wmo.int news), combined
+#     per the widening ruling's order (volume before edition).
+#   - Compound-edition rows: "2021/2018 edition" — the IMOP page
+#     wording (primary year first); "2023 edition, updated in 2025" —
+#     library record 69478; "Provisional 2026 edition" — the IMOP
+#     Knowledge-Hub.
+#   - WMO/TD-No. rows: 196 — the library serial "TECHNICAL DOCUMENT /
+#     WMO/TD-No. 196" and the typhooncommittee.org TCP-23 PDF;
+#     1086/1215/1466 — the JCOMM cross-references (TR 14 = TD 1086,
+#     record 37163; TR 24 = TD 1215; TR 47 = TD 1466, record 55084).
+#   - JCOMM Technical Report No. rows: 14 — record 37163; 24 — the
+#     library serial search; 47 — record 55084.
+#   - GAW Report No. rows (bare head, WMO's own records): 312 — library
+#     record 69472 (file GAW-Report-No312_en); 285 — file GAW-285_en.
+#   - The MRN rows over the new shapes follow the same proposed form.
+#   - Reject rows: the prefix law — the bare TD-No. spellings name no
+#     publisher and parse in no flavor; IMO/TD-No. 259 is an OCR misread
+#     (no IMO TD series exists); WMO/GAW Report No. 285 is third-party
+#     citation only; the spaced cover variant "WMO/TD - No. 1469"
+#     (GAW-183 cover at gml.noaa.gov) is deliberately outside the
+#     grammar — only the glued library-serial head is defined.
 WMO-No. 1364
 WMO-No. 8
 WMO-No. 49
@@ -21,6 +56,49 @@ S-411 1.2.0
 S-411 1.1.0
 S-411 Annex A
 S-412
+# the A-set (parses on the #763 grammar unchanged)
+WMO-No. 306
+WMO-No. 49, 2019 edition
+WMO-No. 574
+WMO-No. 574, 2024 edition
+WMO-No. 386, 2020 edition
+WMO-No. 1364, 2023 edition
+WMO-No. 1160, 2023 edition
+S-412 1.2.0
+# volume faces
+WMO-No. 8, Volume I
+WMO-No. 8, Volume II
+WMO-No. 8, Volume III
+WMO-No. 8, Volume IV
+WMO-No. 8, Volume V
+WMO-No. 49, Volume III
+WMO-No. 9, Volume D
+WMO-No. 306, Volume I.1
+WMO-No. 306, Volume I.1, 2020 edition
+# compound editions
+WMO-No. 8, 2021/2018 edition
+WMO-No. 1364, 2023 edition, updated in 2025
+WMO-No. 8, Provisional 2026 edition
+# the new series heads
+WMO/TD-No. 196
+WMO/TD-No. 1086
+WMO/TD-No. 1215
+WMO/TD-No. 1466
+JCOMM Technical Report No. 14
+JCOMM Technical Report No. 24
+JCOMM Technical Report No. 47
+GAW Report No. 312
+GAW Report No. 285
+# the MRN rows over the new shapes
+urn:mrn:wmo:pub:wmo-306
+urn:mrn:wmo:pub:wmo-49:ed2019
+urn:mrn:wmo:pub:wmo-td-196
+urn:mrn:wmo:pub:jcomm-tr-14
+urn:mrn:wmo:pub:gaw-312
+urn:mrn:wmo:pub:wmo-306:vol-i.1
+urn:mrn:wmo:pub:wmo-8:ed2021-2018
+urn:mrn:wmo:pub:wmo-1364:ed2023:updated-2025
+urn:mrn:wmo:pub:wmo-8:status-provisional:ed2026
 urn:mrn:wmo:pub:wmo-1364
 urn:mrn:wmo:pub:wmo-1364:ed2025
 urn:mrn:wmo:pub:s-411
@@ -36,3 +114,9 @@ S-411 1234
 S-411:ed
 S-411 1.2
 S-411:ed1.2.1
+# the prefix-law rejects
+TD-No. 1265
+IMO/TD-No. 259
+TD No. 196
+WMO/GAW Report No. 285
+WMO/TD - No. 1469

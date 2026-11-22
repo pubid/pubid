@@ -2062,21 +2062,21 @@ Namespace: `urn:pubid:wmo:` (the `_type` flavor segment).
 
 Official URN: `urn:mrn:wmo:pub:…`, WMO's assigning authority of the IANA-registered `mrn` namespace, following the IALA pattern (pubid#763 proposed form; no authoritative WMO `urn:mrn:wmo:` rule is published — the S-411 repository carries none — so this shape is the namespace's extension until one exists).
 
-Current `to_urn` (≤400 sampled pass ids): 20 ids, 20 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 6 colliding URNs (the corpus' alternate spellings of the same documents — each distinct document has one URN).
+Current `to_urn` (≤400 sampled pass ids): 58 ids, 58 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 15 colliding URNs (the corpus' alternate spellings of the same documents — each distinct document has one URN).
 
-Corpus: 20 of 20 pass ids parse.
+Corpus: 58 of 58 pass ids parse.
 
 [cols="3,1,1,1,4",options="header"]
 |===
 | `_type` | token | core | ids | example
-| `pubid:wmo:annex` | `annex` | number | 1 | `S-411 Annex A`
-| `pubid:wmo:publication` | `pub` | number | 3 | `WMO-No. 1364, 2025 edition`
-| `pubid:wmo:standard` | `std` | number | 2 | `S-411 1.2.1`
+| `pubid:wmo:annex` | `annex` | number | 2 | `S-411 Annex A`
+| `pubid:wmo:publication` | `pub` | number | 45 | `WMO-No. 1364, 2025 edition`
+| `pubid:wmo:standard` | `std` | number | 11 | `S-411 1.2.1`
 |===
 
-Atoms, canonical order: `ed-` (`edition`), `annexform-` (`annex_form`), `letter-` (`letter`).
+Atoms, canonical order: `series-` (`series`), `vol-` (`volume`), `ed-` (`edition`), `status-` (`edition_status`), `updated-` (`updated_in`), `annexform-` (`annex_form`), `letter-` (`letter`).
 
-Landed (pubid#763) as drafted. The edition is one atom: the calendar-year face on a publication (`ed-2025`), the dotted face on a standard or annex (`ed-1.2.1`). All 20 corpus rows emit.
+Landed (pubid#763) as drafted; widened with the volume, series, status and updated-in atoms. The edition is one atom: the calendar-year face on a publication (`ed-2025`; the year pair escapes its slash as `ed-2021~2F2018`), the dotted face on a standard or annex (`ed-1.2.1`). `series` is nil on the WMO-No. default, so every pre-widening URN is unchanged. All 58 corpus rows emit.
 
 [[urn-w3c]]
 ==== w3c
