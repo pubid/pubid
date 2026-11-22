@@ -6,6 +6,7 @@ S-411 1.2.1
 S-411 1.2.0
 S-411 1.1.0
 S-412
+S-412 1.2.0
 !urn:mrn:wmo:pub:s-411!S-411
 !urn:mrn:wmo:pub:s-411:ed1.2.1!S-411 1.2.1
 !urn:mrn:wmo:pub:s-411:ed1.2.0!S-411 1.2.0

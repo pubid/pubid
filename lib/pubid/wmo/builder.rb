@@ -6,13 +6,24 @@ module Pubid
     # the flat attribute hash the grammar's bindings block declares
     # (typed at the engine, one key per capture).
     #
-    # Each grammar alternative path carries exactly one occurrence of
+    # Each grammar alternative path carries at most one occurrence of
     # `doc_number` and `edition_value`, so one flat map serves all three
-    # types; the builder dispatches on `annex_marker` and `wmomarker`.
+    # types; the builder dispatches on `annex_marker` and `series_head`.
     class Builder
+      # The series head the grammar matched -> the model's series key
+      # (the widening prefix law: every head names its publisher, and
+      # the head face is the grammar's verbatim capture, so the key
+      # mapping lives on the one construction site).
+      SERIES_HEADS = {
+        "WMO-No." => nil,
+        "WMO/TD-No." => "TD",
+        "JCOMM Technical Report No." => "JCOMM",
+        "GAW Report No." => "GAW",
+      }.freeze
+
       def build(parsed)
         return build_annex(parsed) if parsed[:annex_marker]
-        return build_publication(parsed) if parsed[:wmomarker]
+        return build_publication(parsed) if parsed[:series_head]
 
         Identifiers::Standard.new(**standard_attrs(parsed))
       end
@@ -24,7 +35,14 @@ module Pubid
       private
 
       def build_publication(hash)
-        Identifiers::Publication.new(**standard_attrs(hash))
+        attrs = standard_attrs(hash).merge(
+          series: SERIES_HEADS.fetch(hash[:series_head]),
+          volume: hash[:volume],
+          edition_status: hash[:edition_status],
+          updated_in: hash[:updated_in],
+        ).compact
+
+        Identifiers::Publication.new(**attrs)
       end
 
       def build_annex(hash)

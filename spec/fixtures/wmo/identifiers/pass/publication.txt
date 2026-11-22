@@ -7,5 +7,42 @@ WMO-No. 49
 WMO-No. 1364, 2025 edition
 !WMO-No. 1364 2025 edition!WMO-No. 1364, 2025 edition
 !WMO-No. 1364:ed2025!WMO-No. 1364, 2025 edition
+WMO-No. 306
+WMO-No. 49, 2019 edition
+WMO-No. 574
+WMO-No. 574, 2024 edition
+WMO-No. 386, 2020 edition
+WMO-No. 1364, 2023 edition
+WMO-No. 1160, 2023 edition
+WMO-No. 8, Volume I
+WMO-No. 8, Volume II
+WMO-No. 8, Volume III
+WMO-No. 8, Volume IV
+WMO-No. 8, Volume V
+WMO-No. 49, Volume III
+WMO-No. 9, Volume D
+WMO-No. 306, Volume I.1
+WMO-No. 306, Volume I.1, 2020 edition
+WMO-No. 8, 2021/2018 edition
+WMO-No. 1364, 2023 edition, updated in 2025
+WMO-No. 8, Provisional 2026 edition
+WMO/TD-No. 196
+WMO/TD-No. 1086
+WMO/TD-No. 1215
+WMO/TD-No. 1466
+JCOMM Technical Report No. 14
+JCOMM Technical Report No. 24
+JCOMM Technical Report No. 47
+GAW Report No. 312
+GAW Report No. 285
+!urn:mrn:wmo:pub:wmo-306!WMO-No. 306
+!urn:mrn:wmo:pub:wmo-49:ed2019!WMO-No. 49, 2019 edition
+!urn:mrn:wmo:pub:wmo-td-196!WMO/TD-No. 196
+!urn:mrn:wmo:pub:jcomm-tr-14!JCOMM Technical Report No. 14
+!urn:mrn:wmo:pub:gaw-312!GAW Report No. 312
+!urn:mrn:wmo:pub:wmo-306:vol-i.1!WMO-No. 306, Volume I.1
+!urn:mrn:wmo:pub:wmo-8:ed2021-2018!WMO-No. 8, 2021/2018 edition
+!urn:mrn:wmo:pub:wmo-1364:ed2023:updated-2025!WMO-No. 1364, 2023 edition, updated in 2025
+!urn:mrn:wmo:pub:wmo-8:status-provisional:ed2026!WMO-No. 8, Provisional 2026 edition
 !urn:mrn:wmo:pub:wmo-1364!WMO-No. 1364
 !urn:mrn:wmo:pub:wmo-1364:ed2025!WMO-No. 1364, 2025 edition
