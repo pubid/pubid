@@ -22,6 +22,7 @@ module Pubid
       atom "type.abbr", "type"
       atom "part", "part"
       atom "subpart", "subpart"
+      atom "revision", "rev"
       atom "year", "year"
       atom "date.year", "dateyear"
       atom "date.month", "datemonth"
@@ -36,6 +37,7 @@ module Pubid
       facet "languages.*.original_code", "langsrc"
       facet "edition.original_text", "edsrc"
       facet "date_separator", "datesep"
+      facet "number_separator", "numsep"
 
       type "pubid:ansi:standard", "std"
       type "pubid:ansi:american-national-standard", "ans"

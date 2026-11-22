@@ -19,6 +19,16 @@ module Pubid
       attribute :date_separator, :string
       equality_ignored :date_separator
 
+      # How the input joined the publisher group to the number: "-" for the
+      # "ANSI/ISA-5.1-2009" spelling, nil for the space of "ANSI/ISA 5.1".
+      # Spelling only, so `==`, `hash` and `===` skip it.
+      attribute :number_separator, :string
+      equality_ignored :number_separator
+
+      # The revision letter of "ANSI/TIA-568.2-D". It names a different
+      # document, so it is identity; `#revision_of?` reads it.
+      attribute :revision, :string
+
       def self.parse(string)
         unless string.is_a?(String)
           raise Pubid::Errors::InvalidInputError,
@@ -33,6 +43,13 @@ module Pubid
 
         parsed = Pubid::Parg::Model.bound(:ansi, string)
         Pubid::Ansi::Builder.new.build(parsed)
+      end
+
+      # The revision is identity, so it reaches the slug too: "568.2-C" and
+      # "568.2-D" must not share a filename.
+      def mr_number_with_part
+        num = super
+        num && mr_join(num, revision&.downcase)
       end
 
       # The separator belongs to the year: drop it with the year, so a

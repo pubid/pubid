@@ -16,10 +16,11 @@ module Pubid
       def render(context: nil, **opts)
         id = @id
 
-        parts = []
-        parts << publisher_portion(id, context)
-        parts << number_portion(id, context)
-        result = parts.compact.join(" ")
+        # "ANSI/ISA-5.1-2009" keeps its dash; the space is the default.
+        result = [
+          publisher_portion(id, context),
+          number_portion(id, context),
+        ].join(id.number_separator || " ")
 
         result << language_portion(id) if id.languages&.any?
 
@@ -40,6 +41,7 @@ module Pubid
         [
           id.number,
           (id.part ? "-#{id.part}" : ""),
+          (id.revision ? "-#{id.revision}" : ""),
           date_portion(id, context),
         ].join
       end
