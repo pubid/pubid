@@ -56,6 +56,29 @@ RSpec.describe Pubid::Adobe::Identifier do
       expect(pub.version).to eq("7")
     end
 
+    # The PDF Reference editions, TIFF 6.0 and XFA 3.3 carry dotted
+    # versions (adobe.parg 0.2.0).
+    {
+      "pdf-reference-1.7"                    => ["pdf-reference", "1.7"],
+      "Adobe Publication tiff-6.0"           => ["tiff", "6.0"],
+      "Adobe Publication xfa-3.3"            => ["xfa", "3.3"],
+      "pdf-signature-build-dictionary-1.4"   => ["pdf-signature-build-dictionary", "1.4"],
+      "postscript-language-reference-3.0"    => ["postscript-language-reference", "3.0"],
+    }.each do |input, attrs|
+      it "parses dotted-version #{input.inspect} → slug #{attrs[0].inspect}, version #{attrs[1].inspect}" do
+        pub = Pubid::Adobe.parse(input)
+        expect(pub.slug).to eq(attrs[0])
+        expect(pub.version).to eq(attrs[1])
+        expect(pub.to_s).to eq("Adobe Publication #{attrs[0]}-#{attrs[1]}")
+      end
+    end
+
+    it "keeps an undotted numeric tail as a slug segment, not a version" do
+      pub = Pubid::Adobe.parse("adobe-glyph-list-for-new-fonts")
+      expect(pub.slug).to eq("adobe-glyph-list-for-new-fonts")
+      expect(pub.version).to be_nil
+    end
+
     it "raises on unparseable input" do
       expect { Pubid::Adobe.parse("XYZ123-BAD!!!") }.to raise_error(StandardError)
     end
@@ -67,6 +90,7 @@ RSpec.describe Pubid::Adobe::Identifier do
       "ATN5902"                                   => "urn:adobe:tech-note:5902",
       "Adobe Publication adobe-glyph-list"        => "urn:adobe:publication:adobe-glyph-list",
       "Adobe Publication adobe-japan1-7"          => "urn:adobe:publication:adobe-japan1:v7",
+      "Adobe Publication tiff-6.0"                => "urn:adobe:publication:tiff:v6.0",
     }.each do |input, urn|
       it "renders #{input.inspect} as #{urn.inspect}" do
         expect(Pubid::Adobe.parse(input).to_urn).to eq(urn)
