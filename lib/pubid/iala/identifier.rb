@@ -9,11 +9,15 @@ module Pubid
     # IALA identifiers have the form:
     #   [IALA ]{S|R|G|M|C|X|P}<4-digit number>[-<subpart>][ Ed <edition>][ (<LangLetter>)]
     #
+    # or, for a publication with no code (Identifiers::Publication):
+    #   IALA <slug>[ Ed <edition>][ (<LangLetter>)]
+    #
     # Examples:
     #   S1070
     #   IALA S1070 Ed 2.0
     #   R1016:ed2.0(F)
     #   C0103-1 Ed 3.0
+    #   IALA arctic-seminar-report (E)
     class Identifier < ::Pubid::Identifier
       # Parse an IALA identifier — human form ("IALA G1199 Ed 1.0") or
       # MRN URN ("urn:mrn:iala:pub:g1199:ed1.0") — into an identifier.
@@ -56,6 +60,7 @@ module Pubid
         "pubid:iala:annex"             => "Pubid::Iala::Identifiers::Annex",
         "pubid:iala:report"            => "Pubid::Iala::Identifiers::Report",
         "pubid:iala:resolution"        => "Pubid::Iala::Identifiers::Resolution",
+        "pubid:iala:publication"       => "Pubid::Iala::Identifiers::Publication",
       }.freeze
 
       key_value do

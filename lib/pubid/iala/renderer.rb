@@ -8,12 +8,14 @@ module Pubid
     #   "IALA S1070"
     #   "IALA S1070 Ed 2.0"
     #   "IALA R1016 Ed 2.0 (F)"
+    #   "IALA arctic-seminar-report (E)"
     class Renderer < ::Pubid::Renderers::Base
       def render(context: nil, **_opts)
         id = @id
 
         return render_annex(id) if id.is_a?(Identifiers::Annex)
 
+        # A codeless Publication has no type letter: "IALA <slug>".
         rendered = "#{id.publisher} #{id.type_letter}#{id.number}"
         rendered << " Ed #{id.edition}" if id.edition
         rendered << " (#{id.language})" if id.language

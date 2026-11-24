@@ -62,12 +62,14 @@ module Pubid
 
     # Look up an identifier class by its IALA type letter (S, R, G, M,
     # C, X, P, GA) or a class-declared alias of one (GeneralAssembly
-    # answers to the legacy "A" session letter).
+    # answers to the legacy "A" session letter). A class with no letter
+    # (Publication, the codeless form) is not in this table.
     # @param letter [String]
     # @return [Class<Identifier>]
     def self.identifier_klass_for_type_letter(letter)
       @by_letter ||= identifier_types.flat_map do |klass|
-        ([klass.type[:short]] + Array(klass.type_letter_aliases)).map { |l| [l, klass] }
+        ([klass.type[:short]] + Array(klass.type_letter_aliases))
+          .compact.map { |l| [l, klass] }
       end.to_h
       @by_letter.fetch(letter.to_s.upcase)
     end

@@ -13,6 +13,7 @@ module Pubid
       autoload :Letter,           "#{__dir__}/identifiers/letter"
       autoload :Report,           "#{__dir__}/identifiers/report"
       autoload :Resolution,       "#{__dir__}/identifiers/resolution"
+      autoload :Publication,      "#{__dir__}/identifiers/publication"
     end
   end
 end

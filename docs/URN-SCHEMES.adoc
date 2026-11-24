@@ -1618,6 +1618,7 @@ Corpus: 715 of 715 pass ids parse.
 | `pubid:iala:letter` | `letter` | number | 6 | `IALA L2.1.11 Ed 2`
 | `pubid:iala:manual` | `manual` | number | 9 | `IALA M0001 Ed 9.0`
 | `pubid:iala:model-course` | `mc` | number | 85 | `urn:mrn:iala:pub:c0103-1:ed3.0`
+| `pubid:iala:publication` | `pub` | number | 162 | `IALA arctic-seminar-report (E)`
 | `pubid:iala:recommendation` | `rec` | number | 206 | `urn:mrn:iala:pub:r1023:ed1.0`
 | `pubid:iala:report` | `rpt` | number | 0 | —
 | `pubid:iala:resolution` | `r` | number | 0 | —
@@ -1627,6 +1628,8 @@ Corpus: 715 of 715 pass ids parse.
 Atoms, canonical order: `ed-` (`edition`), `lang-` (`language`), `annexform-` (`annex_form`), `letter-` (`letter`).
 
 Landed (issue #670) as drafted. All 715 corpus rows emit.
+
+The codeless publications (`pub`, the product-URL slug as core `number`) came later, with their 162 fixture rows. They have no official URN: `#to_urn` is nil, because IALA assigns them no MRN.
 
 [[urn-iana]]
 ==== iana

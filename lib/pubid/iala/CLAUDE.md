@@ -9,8 +9,9 @@ obeys.
 
 ## Identifier space
 
-Every IALA publication carries a coded reference: a series prefix
-followed by a number whose shape varies per series.
+Most IALA publications carry a coded reference: a series prefix
+followed by a number whose shape varies per series. The rest carry no
+code at all (see "Codeless publications" below).
 
 | Series | Type | Numbering | Example |
 |--------|------|-----------|---------|
@@ -24,6 +25,7 @@ followed by a number whose shape varies per series.
 | X | Report (reserved) | 4 digits | `IALA X0123` |
 | P | Resolution/Council publication (reserved) | 4 digits | `IALA P0123` |
 | — | Annex wrapper over any base | bare or lettered | `IALA G1128 ANNEX A Ed 1.6` |
+| — | Publication (no code) | product-URL slug | `IALA arctic-seminar-report (E)` |
 
 The A letter is GeneralAssembly's legacy session form, not a separate
 series: all 11 A-shaped primary docidentifiers in relaton-data-iala
@@ -35,9 +37,56 @@ through to_s and the URN; there is no Advice type.
 The Annex class has no prefix of its own: it wraps a base identifier of
 another series and preserves the annex marker case (`Annex` vs `ANNEX`).
 X and P are reserved for future numbered series — today's reports and
-Council publications carry no code; unnumbered report/symposium
-documents exist in relaton-data-iala only as slug-form bibliographic
-records, deliberately outside this identifier space.
+Council publications carry no code, and parse as `Publication`.
+
+## Codeless publications (`Identifiers::Publication`)
+
+iala.int lists reports and proceedings, the style guide, history books,
+questionnaires and radio plans with no code. relaton-data-iala gives
+each one its product-URL slug as docid: `IALA <slug>[ Ed <x.y>][ (E)]`
+(162 records, `spec/fixtures/iala/identifiers/pass/iala-publications.txt`).
+These used to be "deliberately outside this identifier space".
+relaton#604 removed that option: `relaton index` now fails on a document
+that no pubid parse covers.
+
+- **The slug is `number`.** It uses the inherited attribute, so
+  `root.number` (the relaton-index key) is the slug and `to_hash` is
+  `{_type: "pubid:iala:publication", number, edition?, language?}`. No
+  padding applies.
+- **Grammar**: `slug_identifier` is the last alternative of
+  `identifier`, so every typed code keeps priority (`IALA G1164 Ed 1.1`
+  stays a Guideline). A typed code starts upper-case and a slug
+  lower-case or with a digit. The slug has no space, so it never takes
+  ` Ed …` or ` (E)`.
+- **A slug is narrow on purpose**: two or more `[a-z0-9]` runs joined by
+  single hyphens (all 81 corpus slugs are), and the first run must not
+  look like a code (0–2 letters then digits). The first version took any
+  `[a-z0-9][a-z0-9-]*`, so `IALA s1070`, `IALA c0103-1` and
+  `IALA 1070 Ed 2.0` — typos of typed codes that used to raise — came
+  back as a `Publication` with a nil URN and an index key no row has:
+  a loud parse error turned into a quiet "no match".
+- **The `IALA ` prefix is mandatory for a slug** (it is optional for a
+  typed code). Without it, any lower-case word would parse as IALA, and
+  `Pubid.parse` routing's `accepts_anything?` probe would then classify
+  IALA as an anything-goes flavor and stop trusting its fallback. The
+  cost: `to_s(with_publisher: false)` (`arctic-seminar-report (E)`) does
+  not parse back, unlike a typed code's (`G1164 Ed 1.1`).
+- **`#to_urn` is nil.** `to_urn` is the organization's registered form,
+  and IALA assigns no MRN to these documents; an invented
+  `urn:mrn:iala:pub:<slug>` would also be ambiguous with the codes in
+  `UrnParser` (`guideline-…` against `g1164`). `#to_pubid_urn` names
+  them, and it escapes the first character of almost every slug
+  (`urn:pubid:iala:pub:~61rctic-seminar-report`): a `<word>-` core value
+  looks like an atom to the codec. It round-trips and is path-safe.
+- **`to_mr_string` raises** for a Publication, as it already did for
+  every IALA id: the base `mr_edition` calls `edition.number` on IALA's
+  String edition (the BIPM/ASTM crash).
+- **The grammar source is `pubid/pubid-grammar` `grammars/iala.parg`.**
+  `data/parg/iala.json` was baked locally from the changed source at
+  parsanol 1.5.1.0 under Ruby 3.4.8 (the CI pin: the unicode-table stamp
+  carries the baking Ruby, so a bake under another Ruby is not
+  byte-identical). A re-bake of the unchanged source under that pin
+  reproduced the previous artifact byte for byte.
 
 ## MRN URN scheme
 

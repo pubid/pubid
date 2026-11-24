@@ -1,7 +1,7 @@
 # IALA coded publication identifiers (S, R, G, C, M, A, GA, L series).
 # Source: relaton/relaton-data-iala data/*.yaml, primary IALA docidentifiers
-# (863 records total). The 162 slug-form unnumbered report/symposium
-# documents carry no coded identifier and are outside corpus scope.
+# (863 records total). The 162 slug-form codeless publications are in
+# iala-publications.txt.
 IALA A12-01
 IALA A12-01 (E)
 IALA A12-01 (F)
