@@ -49,18 +49,23 @@ module Pubid
       attribute :edition,   :string    # "2.0", "1.3", nil
       attribute :language,  :string    # "E", "F", "S", "C", "A", "R", nil
 
+      # The polymorphic _type → class table (one entry per line, the
+      # WMO style — the product-specification entry does not fit the
+      # padded-column alignment).
       IALA_TYPE_MAP = {
-        "pubid:iala:standard"          => "Pubid::Iala::Identifiers::Standard",
-        "pubid:iala:recommendation"    => "Pubid::Iala::Identifiers::Recommendation",
-        "pubid:iala:guideline"         => "Pubid::Iala::Identifiers::Guideline",
-        "pubid:iala:manual"            => "Pubid::Iala::Identifiers::Manual",
-        "pubid:iala:model-course"      => "Pubid::Iala::Identifiers::ModelCourse",
-        "pubid:iala:general-assembly"  => "Pubid::Iala::Identifiers::GeneralAssembly",
-        "pubid:iala:letter"            => "Pubid::Iala::Identifiers::Letter",
-        "pubid:iala:annex"             => "Pubid::Iala::Identifiers::Annex",
-        "pubid:iala:report"            => "Pubid::Iala::Identifiers::Report",
-        "pubid:iala:resolution"        => "Pubid::Iala::Identifiers::Resolution",
-        "pubid:iala:publication"       => "Pubid::Iala::Identifiers::Publication",
+        "pubid:iala:standard" => "Pubid::Iala::Identifiers::Standard",
+        "pubid:iala:product-specification" =>
+          "Pubid::Iala::Identifiers::ProductSpecification",
+        "pubid:iala:recommendation" => "Pubid::Iala::Identifiers::Recommendation",
+        "pubid:iala:guideline" => "Pubid::Iala::Identifiers::Guideline",
+        "pubid:iala:manual" => "Pubid::Iala::Identifiers::Manual",
+        "pubid:iala:model-course" => "Pubid::Iala::Identifiers::ModelCourse",
+        "pubid:iala:general-assembly" => "Pubid::Iala::Identifiers::GeneralAssembly",
+        "pubid:iala:letter" => "Pubid::Iala::Identifiers::Letter",
+        "pubid:iala:annex" => "Pubid::Iala::Identifiers::Annex",
+        "pubid:iala:report" => "Pubid::Iala::Identifiers::Report",
+        "pubid:iala:resolution" => "Pubid::Iala::Identifiers::Resolution",
+        "pubid:iala:publication" => "Pubid::Iala::Identifiers::Publication",
       }.freeze
 
       key_value do

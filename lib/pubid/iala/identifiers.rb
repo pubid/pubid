@@ -5,6 +5,8 @@ module Pubid
     module Identifiers
       autoload :Annex,            "#{__dir__}/identifiers/annex"
       autoload :Standard,         "#{__dir__}/identifiers/standard"
+      autoload :ProductSpecification,
+               "#{__dir__}/identifiers/product_specification"
       autoload :Recommendation,   "#{__dir__}/identifiers/recommendation"
       autoload :Guideline,        "#{__dir__}/identifiers/guideline"
       autoload :Manual,           "#{__dir__}/identifiers/manual"
