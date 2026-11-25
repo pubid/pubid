@@ -1,0 +1,49 @@
+[[urn-etsi]]
+= ETSI URN schemes
+
+This file is the single home of the ETSI (`etsi`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:etsi:`. Schema: `lib/pubid/etsi/pubid_urn_schema.rb`.
+
+Official URN: `urn:etsi:…`, IANA-registered, RFC 8515. It stays on `#to_urn`.
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 324 round-trip, 21 do not
+re-parse, 55 raise (the raises came from the audit script, not the gem; see
+#656).
+
+pubid scheme: all 24,718 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give one URN each, with no collision. The longest URN is 93
+characters.
+
+[cols="3,1,1",options="header"]
+|===
+| `_type` | token | core
+| `pubid:etsi:etsi-standard` | `es` | `number`
+| `pubid:etsi:amendment` | `amd` | `number` (`:int`)
+| `pubid:etsi:corrigendum` | `cor` | `number` (`:int`)
+| `pubid:etsi:supplement-identifier` | `si` | `number` (`:int`)
+| `pubid:etsi:identifier` | `id` | `number`
+|===
+
+Atoms, in the schema order: `type-`, `part-` (`parts`, list), `minor-`,
+`year-`, `month-`, `day-`, `v-` (`version`), `isedition-` (`is_edition`,
+bool). No facets. `minor` and `day` are not in the pass corpus; they are
+placed because `EtsiStandard` serializes them. `is_edition` is an atom:
+`ed.1` and `V1` are two documents.
+
+A supplement's number is its Integer ordinal, so its core is `:int`
+(<<../../../docs/URN-SCHEMES.adoc#rules-kinds,kinds>>). The document it supplements comes first, along `base`.
+
+The parser accepts what the model accepts: `urn:pubid:etsi:amd:1` builds an
+Amendment with no `base`, which round-trips but whose `to_s` raises. The URN
+makes that object reachable; it does not make it valid. The PLATEAU
+`urn:pubid:plateau:tr:1:annex` (an Annex with no letter) is the same case.
+
+----
+ETSI EN 300 175-1 V2.9.1 (2022-01)  urn:pubid:etsi:es:300~20175:type-EN:part-1:year-2022:month-01:v-2.9.1
+ETSI EN 300 019-1-0 V2.1.2 (2003-09) urn:pubid:etsi:es:300~20019:type-EN:part-1,0:year-2003:month-09:v-2.1.2
+ETSI ETR 108/A1 ed.1 (1995-08)      urn:pubid:etsi:es:108:type-ETR:year-1995:month-08:v-1:isedition-true:amd:1
+----

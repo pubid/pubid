@@ -1,0 +1,79 @@
+[[urn-bsi]]
+= BSI URN schemes
+
+This file is the single home of the BSI (`bsi`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:bsi:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:bsi:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 34 round-trip, 84 reshape, 282 do not re-parse, 0 raise, 0 empty, 6 colliding URNs.
+
+Corpus: 1499 of 1501 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:bsi:addendum-document` | `ad` | number | 22 | `BS 1902-2.3:Addendum No. 1:1976`
+| `pubid:bsi:adopted-european-norm` | `aen` | number | 448 | `BS HD 60269-3`
+| `pubid:bsi:adopted-international-standard` | `ais` | number | 95 | `BS IEC 60747-8:2000`
+| `pubid:bsi:aerospace-standard` | `as` | number | 366 | `BS A 109:2024`
+| `pubid:bsi:amendment` | `amd` | number | 114 | —
+| `pubid:bsi:british-industrial-practice` | `bip` | number | 0 | —
+| `pubid:bsi:british-standard` | `bs` | number | 411 | `BS 1501-2 Addendum No. 1:1973`
+| `pubid:bsi:bundled-identifier` | `bundle` | number | 25 | `BS 2SP 68 to BS 2SP 71:1973`
+| `pubid:bsi:committee-document` | `cd` | number | 6 | `14/30300822 DC`
+| `pubid:bsi:consolidated-identifier` | `consol` | number | 106 | `BS A 242-A 245:1974+A1:2017`
+| `pubid:bsi:corrigendum` | `cor` | number | 0 | —
+| `pubid:bsi:detailed-specification` | `ds` | number | 16 | `BS 9074 N002:1974`
+| `pubid:bsi:disc` | `disc` | number | 9 | `DISC PD 2000-2:1997`
+| `pubid:bsi:draft-document` | `dd` | number | 13 | `DD 13:1974`
+| `pubid:bsi:electronic-book` | `eb` | number | 0 | —
+| `pubid:bsi:expert-commentary` | `ec` | number | 25 | `BS EN ISO 13485 Expert Commentary`
+| `pubid:bsi:explanatory-supplement` | `es` | number | 1 | `BS 5655-1:Explanatory Supplement:1981`
+| `pubid:bsi:flex` | `flex` | number | 23 | `BSI Flex 1886 v2.0:2024-09`
+| `pubid:bsi:handbook` | `hb` | number | 0 | —
+| `pubid:bsi:identifier` | `id` | number | 59 | —
+| `pubid:bsi:index` | `index` | number | 13 | `BS 5000:Index:1981`
+| `pubid:bsi:method` | `method` | number | 14 | `BS 2782-1:Method 131B:1983`
+| `pubid:bsi:national-annex` | `na` | number | 18 | `NA to BS EN 1999-1-1:2007+A1:2009`
+| `pubid:bsi:practice-guide` | `pg` | number | 0 | —
+| `pubid:bsi:publicly-available-specification` | `pas` | number | 58 | `PAS 003:1994`
+| `pubid:bsi:published-document` | `pd` | number | 84 | `PD 0017:2001`
+| `pubid:bsi:section` | `section` | number | 11 | `DD 51:Section 0:1977`
+| `pubid:bsi:set` | `set` | number | 1 | `BS ISO 20400 + BS ISO 44001+BS ISO 44002`
+| `pubid:bsi:standalone-amendment` | `sa` | number | 4 | `AMD 11015`
+| `pubid:bsi:supplement-document` | `sd` | number | 18 | `BS 1000[9]:Supplement No. 1:1972`
+| `pubid:bsi:supplementary-index` | `si` | number | 1 | `BS 185 Supplementary Index:1965`
+| `pubid:bsi:technical-specification` | `ts` | number | 3 | `TS 3:1993`
+| `pubid:bsi:test-method` | `tm` | number | 6 | `BS 1006:B01C:LFS1:1982`
+| `pubid:bsi:value-added-publication` | `vap` | number | 6 | `PP 7722:2006 BOOK`
+|===
+
+Atoms, canonical order: `pubbody-` (`publisher.body`), `typeabbr-` (`type.abbr`), `typename-` (`type.name`), `typetypecode-` (`type.type_code`), `part-` (`part`), `year-` (`year`), `month-` (`month`, int), `ed-` (`edition`), `stageabbr-` (`stage.abbr`), `stageharmonizedstages-` (`stage.harmonized_stages`), `stagename-` (`stage.name`), `stagestagecode-` (`stage.stage_code`), `addendumnumber-` (`addendum_number`), `addendumyear-` (`addendum_year`, int), `amdsuffixform-` (`amd_suffix_form`, bool), `bundletype-` (`bundle_type`), `commonyearyear-` (`common_year.year`), `explicitpublisher-` (`explicit_publisher`, bool), `format-` (`format`), `isplural-` (`is_plural`, bool), `issuenumber-` (`issue_number`), `iteration-` (`iteration`), `methodand-` (`method_and`), `methodcode-` (`method_code`), `methodto-` (`method_to`), `prefix-` (`prefix`), `secondnumber-` (`second_number.value`), `sectionid-` (`section_id`), `separators-` (`separators`, list), `speccode-` (`spec_code.value`), `supplementnumber-` (`supplement_number`), `supplementyear-` (`supplement_year`, int), `testid-` (`test_id`), `testseries-` (`test_series`), `topic-` (`topic`), `translationlang-` (`translation_lang`), `typedstageabbr-` (`typed_stage.abbr`), `typedstage-` (`typed_stage.code`), `typedstageharmonizedstages-` (`typed_stage.harmonized_stages`), `typedstagename-` (`typed_stage.name`), `typedstagestagecode-` (`typed_stage.stage_code`), `typedstagetypecode-` (`typed_stage.type_code`).
+
+Nested identifiers: `ids-(…)` (`identifiers`, ids), `nasupplements-(…)` (`na_supplements`, ids).
+
+Facet candidates (spelling-only): `separator`, `flex_prefix`, `explicit_prefix`, `index_format`, `section_format`, `reverse_format`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `cencenelec`, `iec`, `iso`.
+
+*Landed (issue #670) with all 34 types.* The draft's atom list is the
+landed one, with three kind corrections the corpus forced:
+`typed_stage.abbr` is a list (the stage's abbreviation array), the Flex
+month is an Integer and `reverse_format` is a bool. An adopted norm
+carries the European document along `base`, so the wrapper shares the slug
+prefix of the document it wraps (`BS EN 1073-2:2002` is
+`urn:pubid:bsi:cencenelec.en:1073:part-2:year-2002:aen`) — the qualified
+`cencenelec.` token keeps the document's own schema. All 1,495 corpus rows
+emit (5 fail `parse`, the fixture spec's concern).
+
+Finding (resolved by the NIST ruling, no `to_hash` change): `type`,
+`stage` and `typed_stage` serialize every registry field of their
+components, so each field is its own atom (`typeabbr-`, `stagehs-`,
+`tsabbr-` …). Reducing them to one identifying value would change
+`to_hash` and need a re-crawl — a separate decision.

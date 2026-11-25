@@ -1,0 +1,29 @@
+[[urn-amca]]
+= AMCA URN schemes
+
+This file is the single home of the AMCA (`amca`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:amca:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:amca:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 46 ids, 46 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 46 of 46 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:amca:identifier` | `id` | number | 0 | —
+| `pubid:amca:interpretation` | `interp` | number | 7 | `AMCA 99 JW Interp`
+| `pubid:amca:publication` | `pub` | number | 8 | `AMCA Publication 211-22 (Rev. 01-23)`
+| `pubid:amca:standard` | `std` | number | 31 | `ANSI/AMCA 210-16 /ASHRAE 51-16`
+|===
+
+Atoms, canonical order: `co-` (`copublisher`), `year-` (`year`), `rev-` (`revision`), `interpretationcode-` (`interpretation_code`), `reaffirmed-` (`reaffirmed`).
+
+Landed (issue #670), with `reaffirmed-` the String year the corpus serializes (`reaffirmed-2010`), not the bool the draft guessed. All 39 corpus rows emit.

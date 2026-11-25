@@ -1,0 +1,30 @@
+[[urn-gb]]
+= GB URN schemes
+
+This file is the single home of the GB (`gb`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:gb:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:gb:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 10 ids, 0 round-trip, 0 reshape, 10 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
+
+Corpus: 10 of 10 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:gb:all-parts` | `all` | number | 1 | `GB/T 5606 (all parts)`
+| `pubid:gb:identifier` | `id` | number | 0 | —
+| `pubid:gb:standard` | `std` | number | 10 | `JB/T 13368-2018`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `part-` (`part`), `year-` (`year`), `mandate-` (`mandate`).
+
+Landed (issue #670) as drafted; `all` carries its members as `ids-`. All 10 corpus rows emit.
+
+Nested identifiers: `ids-(…)` (`identifiers`, ids).

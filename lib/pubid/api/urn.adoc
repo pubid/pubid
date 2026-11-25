@@ -1,0 +1,34 @@
+[[urn-api]]
+= API URN schemes
+
+This file is the single home of the API (`api`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:api:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:api:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 193 ids, 40 round-trip, 153 reshape, 0 do not re-parse, 0 raise, 0 empty, 11 colliding URNs.
+
+Corpus: 193 of 193 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:api:base` | `base` | number | 0 | —
+| `pubid:api:bulletin` | `bulletin` | number | 5 | `API BULL 11L2`
+| `pubid:api:continuous-operations-standard` | `cos` | number | 3 | `API COS 1-08`
+| `pubid:api:identifier` | `id` | number | 0 | —
+| `pubid:api:mpms` | `mpms` | number | 30 | `API MPMP CH 10.10`
+| `pubid:api:publication` | `pub` | number | 10 | `API PUBL 1628B`
+| `pubid:api:recommended-practice` | `rp` | number | 56 | `API RP 1637`
+| `pubid:api:specification` | `spec` | number | 22 | `API SPEC 11P`
+| `pubid:api:standard` | `std` | number | 40 | `API STD 1104`
+| `pubid:api:technical-report` | `tr` | number | 19 | `API TR 21C`
+| `pubid:api:typeless-standard` | `ts` | number | 8 | `API 1509`
+|===
+
+Atoms, canonical order: `part-` (`part`), `section-` (`section`), `subsection-` (`subsection`), `year-` (`year`; the typeless standard dates itself, `API 650:2020`).

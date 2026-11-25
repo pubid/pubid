@@ -1,0 +1,28 @@
+[[urn-3gpp]]
+= 3GPP URN schemes
+
+This file is the single home of the 3GPP (`3gpp`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:3gpp:` (the `_type` flavor segment).
+
+Official URN: `urn:3gpp:…`, IANA-registered, RFC 5279.
+
+Current `to_urn`: not audited (no fixture directory under the registry name).
+
+Corpus: 32 of 32 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:3gpp:identifier` | `id` | number | 0 | —
+| `pubid:3gpp:technical-report` | `tr` | number | 12 | `TR 01.00:REL-96/5.0.0`
+| `pubid:3gpp:technical-specification` | `ts` | number | 20 | `TS 01.01:REL-96/5.0.0`
+|===
+
+Atoms, canonical order: `part-` (`parts`, list), `v-` (`version`), `release-` (`release`), `suffix-` (`suffix`).
+
+Landed (issue #670) as drafted. All 32 corpus rows emit.

@@ -1,0 +1,33 @@
+[[urn-jcgm]]
+= JCGM URN schemes
+
+This file is the single home of the JCGM (`jcgm`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:jcgm:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:jcgm:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 31 ids, 29 round-trip, 2 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 31 of 31 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:jcgm:amendment` | `amd` | number | 3 | `JCGM 100:2008/Amd 1`
+| `pubid:jcgm:corrigendum` | `cor` | number | 2 | `JCGM 200:2008 Corrigendum`
+| `pubid:jcgm:guide` | `guide` | number | 13 | `JCGM 100`
+| `pubid:jcgm:gum-guide` | `gumguide` | number | 2 | `JCGM GUM-1:2022-11-28`
+| `pubid:jcgm:identifier` | `id` | number | 0 | —
+| `pubid:jcgm:meeting` | `meeting` | number | 16 | `JCGM 11st Meeting (2006)`
+|===
+
+Atoms, canonical order: `year-` (`year`), `month-` (`month`), `day-` (`day`), `lang-` (`languages.*.code`, list).
+
+Landed (issue #670) as drafted. All 31 corpus rows emit.
+
+Facet candidates (spelling-only): `languages.*.original_code`.

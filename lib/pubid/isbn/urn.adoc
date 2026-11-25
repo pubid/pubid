@@ -1,0 +1,26 @@
+[[urn-isbn]]
+= ISBN URN schemes
+
+This file is the single home of the ISBN (`isbn`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:isbn:` (the `_type` flavor segment).
+
+Official URN: `urn:isbn:…`, IANA-registered (formal template `isbn`).
+
+Current `to_urn` (≤400 sampled pass ids): 4 ids, 0 round-trip, 0 reshape, 4 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
+Corpus: 4 of 4 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:isbn:book` | `book` | — | 4 | `ISBN 0-306-40615-2`
+| `pubid:isbn:identifier` | `id` | — | 0 | —
+|===
+
+Atoms, canonical order: `hyphenated-` (`hyphenated`), `raw-` (`raw`).
+
+Landed (issue #670) as drafted, with no core: both spellings are optional atoms. All 4 corpus rows emit.

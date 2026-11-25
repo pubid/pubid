@@ -1,0 +1,44 @@
+[[urn-cie]]
+= CIE URN schemes
+
+This file is the single home of the CIE (`cie`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:cie:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:cie:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 264 ids, 126 round-trip, 68 reshape, 70 do not re-parse, 0 raise, 0 empty, 13 colliding URNs.
+
+Corpus: 264 of 363 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:cie:bundle` | `bundle` | number | 1 | `CIE 198-SP1.1:2011,198-SP1.2:2011,198-SP1.3:2011,198-SP1.4:2011`
+| `pubid:cie:conference` | `c` | number | 45 | `CIE x005-1992`
+| `pubid:cie:corrigendum` | `cor` | number | 2 | `CIE 198-SP1.4:2011/Cor1:2013`
+| `pubid:cie:dual-published` | `dp` | number | 1 | `CIE S 009:2002/IEC 62471:2006`
+| `pubid:cie:identical` | `i` | number | 16 | `CIE S 006.1/1998 (ISO 16508:1999)`
+| `pubid:cie:identifier` | `id` | number | 0 | —
+| `pubid:cie:joint-published` | `jp` | number | 23 | `CIE ISO 10916:2024`
+| `pubid:cie:proceedings` | `p` | number | 11 | `CIE x043-OP01`
+| `pubid:cie:standard` | `std` | number | 167 | `CIE S 004/E-2001`
+| `pubid:cie:supplement` | `sup` | number | 8 | `CIE 121-SP1:2009`
+| `pubid:cie:tutorial-bundle` | `tb` | number | 1 | `CIE Tutorials Bundle 1`
+|===
+
+Atoms, canonical order: `co-` (`copublisher`), `part-` (`part`), `year-` (`year`), `stage-` (`stage`), `lang-` (`language.code`), `langformat-` (`language.format`), `amendmentnumber-` (`amendment_number`), `conference-` (`conference`), `doctype-` (`doc_type`), `iecidentifier-` (`iec_identifier`), `isoreference-` (`iso_reference`), `iteration-` (`iteration`), `page-` (`page`), `style-` (`style`), `variant-` (`variant`).
+
+Nested identifiers: `ids-(…)` (`ids`, ids).
+
+Facet candidates (spelling-only): `s_prefix`, `part_separator`, `d_prefix`.
+
+*Landed (issue #670) as drafted*, with the facet set above (bool facets for
+the `S`/`D` prefixes) and the draft's one gap closed: the translation year
+of a paren-year language rides `transyear-`. The wrapped documents — a
+supplement's base, a bundle's members (`ids-`) — follow the wrapper
+precedents. All 363 corpus rows emit.

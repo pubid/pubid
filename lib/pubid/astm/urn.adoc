@@ -1,0 +1,52 @@
+[[urn-astm]]
+= ASTM URN schemes
+
+This file is the single home of the ASTM (`astm`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:astm:`. Schema: `lib/pubid/astm/pubid_urn_schema.rb`.
+
+Official URN: none. ASTM has no namespace in the IANA registry, and the
+current `urn:astm:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 245 ids, 25 round-trip, 153 reshape,
+67 do not re-parse, 31 colliding URNs.
+
+pubid scheme: all 248 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision (the 3 ids that the audit could not parse parse on
+`main` now). The longest URN is 75 characters.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:astm:identifier` | `id`
+| `pubid:astm:single-identifier` | `single`
+| `pubid:astm:base` | `base`
+| `pubid:astm:standard` | `std`
+| `pubid:astm:iso-dual-published` | `isodual`
+| `pubid:astm:adjunct` | `adj`
+| `pubid:astm:data-series` | `ds`
+| `pubid:astm:manual` | `mnl`
+| `pubid:astm:monograph` | `mono`
+| `pubid:astm:research-report` | `rr`
+| `pubid:astm:technical-report` | `tr`
+| `pubid:astm:work-in-progress` | `wk`
+|===
+
+Core: `number`. Atoms, in the schema order: `pub-`, `committee-`,
+`letter-`, `subseries-`, `suffix-`, `metric-` (`dual_m`, bool), `year-`,
+`subyear-`, `reapproval-`, `ed-`, `sup-` (bool), `tp-`
+(`tp_designation`), `format-` (`format_suffix`), `ea-`, `dvd-`, `hol-`
+(bool). No facets: each suffix marker names a different catalogue record.
+
+----
+ASTM E2938-15(2023)     urn:pubid:astm:std:2938:letter-E:year-2015:reapproval-2023
+ASTM DS4B-EB            urn:pubid:astm:ds:4:suffix-B:format--EB
+ASTM RR:A01-1001        urn:pubid:astm:rr:1001:committee-A01
+ISO/ASTMTR52916-EB      urn:pubid:astm:tr:52916:pub-ISO~2FASTM:format--EB
+----
+
+The `format_suffix` value keeps its own dash (`-EB`), so the atom reads
+`format--EB`; the prefix ends at the first `-`.

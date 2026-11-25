@@ -1,0 +1,43 @@
+[[urn-plateau]]
+= PLATEAU URN schemes
+
+This file is the single home of the PLATEAU (`plateau`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:plateau:`. Schema:
+`lib/pubid/plateau/pubid_urn_schema.rb`.
+
+Official URN: none. PLATEAU has no namespace in the IANA registry, and the
+current `urn:plateau:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 115 ids, 83 round-trip, 32 reshape,
+10 colliding URNs.
+
+pubid scheme: all 115 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision. The longest URN is 37 characters.
+
+[cols="3,1,1",options="header"]
+|===
+| `_type` | token | core
+| `pubid:plateau:handbook` | `hb` | `number` (`:int`)
+| `pubid:plateau:technical-report` | `tr` | `number` (`:int`)
+| `pubid:plateau:annex` | `annex` | none
+| `pubid:plateau:identifier` | `id` | `number` (`:int`)
+|===
+
+Atoms, in the schema order: `pub-`, `ed-` (`edition`), `annex-` (int),
+`vol-` (`volume`, the Handbook label `本編` or `本編＋付録`, written in
+`~XX` escapes); the Annex adds `letter-`. No facets.
+
+PLATEAU keeps `number` an Integer (the one flavor outside the `:string`
+retype), so its core is `:int`: `#00` is the core `0`. No input makes an
+Annex; one built by hand writes its document first and its letter as an atom
+(`urn:pubid:plateau:tr:46:annex:letter-A`).
+
+----
+PLATEAU Handbook #00 第1.0版      urn:pubid:plateau:hb:0:ed-1.0
+PLATEAU Handbook #03-1 第2.0版    urn:pubid:plateau:hb:3:ed-2.0:annex-1
+PLATEAU Technical Report #46-1  urn:pubid:plateau:tr:46:annex-1
+----

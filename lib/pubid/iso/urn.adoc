@@ -1,0 +1,58 @@
+[[urn-iso]]
+= ISO URN schemes
+
+This file is the single home of the ISO (`iso`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:iso:`. Schema: `lib/pubid/iso/pubid_urn_schema.rb`.
+
+Official URN: `urn:iso:std:…`, IANA-registered, RFC 5141. Current `to_urn`:
+400 ids, 72 round-trip, 326 reshape, 2 do not re-parse, 8 colliding URNs.
+
+pubid scheme: all 7,647 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give no collision.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:iso:international-standard` | `is`
+| `pubid:iso:technical-report` | `tr`
+| `pubid:iso:technical-specification` | `ts`
+| `pubid:iso:guide` | `guide`
+| `pubid:iso:pas` | `pas`
+| `pubid:iso:recommendation` | `r`
+| `pubid:iso:international-standardized-profile` | `isp`
+| `pubid:iso:international-workshop-agreement` | `iwa`
+| `pubid:iso:technology-trends-assessments` | `tta`
+| `pubid:iso:data` | `data`
+| `pubid:iso:tc-document` | `tcdoc`
+| `pubid:iso:directives` | `dir`
+| `pubid:iso:directives-supplement` | `dirsup`
+| `pubid:iso:amendment` | `amd`
+| `pubid:iso:corrigendum` | `cor`
+| `pubid:iso:addendum` | `add`
+| `pubid:iso:extract` | `ext`
+| `pubid:iso:supplement` | `sup`
+| `pubid:iso:all-parts` | `all`
+| `pubid:iso:bundled-identifier` | `bundle`
+|===
+
+Core: `number`. Atoms, canonical order: `pub-`, `co-` (list), `part-`,
+`subpart-`, `year-`, `month-`, `day-`, `undated-` (bool), `ed-`
+(`edition.number`), `stage-`, `iter-` (`stage_iteration`), `v-`
+(`supplement_version`), `lang-` (`languages.*.code`, list), `loc-`;
+`tcdoc` adds `tctype-`, `tc-`, `sctype-`, `sc-`, `wgtype-`, `wg-`; `dir`
+adds `subgroup-`; `all` adds `ids-(…)`; `bundle` adds `sups-(…)`. Facets:
+`langsrc` (`languages.*.original_code`), `edsrc` (`edition.original_text`).
+
+----
+ISO 9001                            urn:pubid:iso:is:9001
+ISO/IEC/IEEE 8802-3:2021            urn:pubid:iso:is:8802:co-IEC,IEEE:part-3:year-2021
+ISO/DIS 9001                        urn:pubid:iso:is:9001:stage-dis
+ISO 9001:2015(E)                    urn:pubid:iso:is:9001:year-2015:lang-en:f:0.langsrc-E
+ISO 9001:2015/Amd 1:2016/Cor 1:2017 urn:pubid:iso:is:9001:year-2015:amd:1:year-2016:cor:1:year-2017
+ISO 9001 (all parts)                urn:pubid:iso:all:ids-(iso:is:9001)
+----

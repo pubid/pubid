@@ -1,0 +1,37 @@
+[[urn-w3c]]
+= W3C URN schemes
+
+This file is the single home of the W3C (`w3c`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:w3c:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:w3c:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 29 ids, 29 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 29 of 29 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:w3c:candidate-recommendation` | `cr` | number | 1 | `W3C CR-exi-20091208`
+| `pubid:w3c:candidate-recommendation-draft` | `crd` | number | 2 | `W3C CRD-accelerometer-20250212`
+| `pubid:w3c:draft-note` | `dn` | number | 2 | `W3C DNOTE-webcodecs-flac-codec-registration-20240419`
+| `pubid:w3c:identifier` | `id` | number | 0 | —
+| `pubid:w3c:note` | `note` | number | 6 | `W3C NOTE-did-spec-registries-20230124`
+| `pubid:w3c:obsolete-recommendation` | `or` | number | 1 | `W3C OBSL-widgets-apis-20181011`
+| `pubid:w3c:proposed-edited-recommendation` | `per` | number | 1 | `W3C PER-rif-dtb-20121211`
+| `pubid:w3c:proposed-recommendation` | `pr` | number | 2 | `W3C PR-InkML-20110510`
+| `pubid:w3c:recommendation` | `rec` | number | 3 | `W3C REC-CSS1-19990111`
+| `pubid:w3c:standard` | `std` | number | 5 | `W3C becss`
+| `pubid:w3c:superseded-recommendation` | `sr` | number | 1 | `W3C SPSD-2dcontext-20210128`
+| `pubid:w3c:working-draft` | `wd` | number | 5 | `W3C WD-charmod-19991129`
+|===
+
+Atoms, canonical order: `date-` (`date`).
+
+Landed (issue #670) as drafted; `becss` reads as a type token by shape, so its first byte escapes (`std:~62ecss`). All 29 corpus rows emit.
