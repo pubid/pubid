@@ -245,13 +245,13 @@ RSpec.describe Pubid::Iho::Identifier do
     # with its own edition stream; `:NNN` is the official IHO product
     # number whose checks the member specifies — not a part, not a
     # profile.
-    it "binds the colon designator as the checks_for component" do
+    it "binds the colon designator as the product component" do
       id = Pubid::Iho.parse("IHO S-158:102 1.0.0")
       expect(id.number).to eq("158")
-      expect(id.checks_for).to eq("102")
+      expect(id.product).to eq("102")
       expect(id.edition).to eq("1.0.0")
       expect(id.part).to be_nil
-      expect(id.checks_for_face).to be_nil # the canonical colon face
+      expect(id.product_face).to be_nil # the canonical colon face
     end
 
     it "unifies the draft-era spellings onto one identity" do
@@ -263,7 +263,7 @@ RSpec.describe Pubid::Iho::Identifier do
       expect(part).to eq(colon)
       expect(compact).to eq(colon)
       expect(bare_number).to eq(colon)
-      expect(part.checks_for).to eq("102")
+      expect(part.product).to eq("102")
       expect(part.part).to be_nil
       expect(part.part_edition).to be_nil # the mis-bind of #775 is gone
       expect(part.edition).to eq("0.2.0")
@@ -281,9 +281,9 @@ RSpec.describe Pubid::Iho::Identifier do
         .to eq("IHO S-158:102 0.2.0")
     end
 
-    it "keeps a genuine part beside a bound checks_for" do
+    it "keeps a genuine part beside a bound product" do
       id = Pubid::Iho.parse("IHO S-158:100 Part 2 1.0.0")
-      expect(id.checks_for).to eq("100")
+      expect(id.product).to eq("100")
       expect(id.part).to eq("2")
       expect(id.part_edition).to eq("1.0.0") # the part's own edition
     end

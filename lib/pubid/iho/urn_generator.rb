@@ -89,7 +89,7 @@ module Pubid
       # The guidance-form trailing atoms in containment order — the same
       # order the legacy scheme prints them. The Appendix subnumber is
       # handled inline (it hyphen-joins its appendix, one compound
-      # segment); the checks_for member rides the name segment.
+      # segment); the product member rides the name segment.
       MRN_SEGMENTS = [
         [:year, "year"],
         [:supplement, "sup"], [:supplement_edition, "ed"],
@@ -149,7 +149,7 @@ module Pubid
       # canonical 4th position: s158-102.
       def mrn_name
         name = +"#{identifier.class.type[:short].downcase}#{identifier.number}"
-        name << "-#{identifier.checks_for}" if identifier.checks_for
+        name << "-#{identifier.product}" if identifier.product
         name
       end
 

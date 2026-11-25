@@ -33,7 +33,7 @@ module Pubid
     #
     # Segment discipline (mirrors the ISO URN parser's strictness):
     # - the docnumber occupies the first bare number segment; a further
-    #   bare digit segment binds checks_for — the S-158 member number as
+    #   bare digit segment binds product — the S-158 member number as
     #   its own segment ("urn:iho:s:158:100"), never glued into the
     #   number (issue #774);
     # - every other component is a marker-prefixed segment validated
@@ -58,7 +58,7 @@ module Pubid
     # which decodes into the two components).
     #
     # Both paths build through Builder.build — the S-158 alias
-    # unification (a draft-era part-S-102 URN decodes to the checks_for
+    # unification (a draft-era part-S-102 URN decodes to the product
     # identity) and every other semantic validation is shared with the
     # text parse.
     #
@@ -187,7 +187,7 @@ module Pubid
         attrs = { number: match[2] }
         # the member designator rides the S-158 anchor; another series
         # rejects through the builder's anchor assert
-        attrs[:checks_for] = match[3] if match[3]
+        attrs[:product] = match[3] if match[3]
         attrs
       end
 
@@ -215,7 +215,7 @@ module Pubid
       # part-S-102 decode renders the canonical colon designator.
       def build_identifier(hash, urn)
         identifier = Builder.build(hash)
-        identifier.checks_for_face = nil
+        identifier.product_face = nil
         identifier
       rescue ArgumentError => e
         raise Pubid::Errors::UrnParseError,
@@ -237,7 +237,7 @@ module Pubid
       end
 
       # The first bare number segment is the docnumber; the next bare
-      # digit segment binds the S-158 member number (checks_for — the
+      # digit segment binds the S-158 member number (product — the
       # member as its own segment, never glued into the number), and
       # anything else ends the number run (the segment loop below
       # decides whether it is a legal marker).
@@ -250,7 +250,7 @@ module Pubid
 
         attrs = { number: number }
         if segments.first&.match?(CHECKS_SEGMENT_RE)
-          attrs[:checks_for] = segments.shift
+          attrs[:product] = segments.shift
         end
         attrs
       end

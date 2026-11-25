@@ -3,4 +3,4 @@
 
 #IHO S-158:# Pubid::Errors::ParseError: "Failed to match: expected one of [[\\x30-\\x39]] at line 1 char 11."
 #IHO S-158:abc# Pubid::Errors::ParseError: "Failed to match: expected one of [[\\x30-\\x39]] at line 1 char 11."
-#IHO S-44:5# ArgumentError: "the checks_for member designator is the S-158 series device: S-44:5 cannot carry it"
+#IHO S-44:5# ArgumentError: "the product member designator is the S-158 series device: S-44:5 cannot carry it"

@@ -53,7 +53,7 @@ series the guidance types:
 
 S-158 is a framework publication defining a series of separate check
 specifications (`S-158:100` generic, `S-158:1xx` product-specific,
-`S-158:98` interoperability, `S-158:128` catalogue; the `checks_for`
+`S-158:98` interoperability, `S-158:128` catalogue; the `product`
 component carries the member number). The member joins the name segment
 hyphenated — the documented fleet extension of the guidance for
 compound publication numbers — so the edition stays in its canonical
@@ -132,7 +132,7 @@ emission of the B/C series (no guidance type code). Its laws:
 
 Both decode paths build through `Builder.build` — the S-158 alias
 unification (a draft-era `part-S-102` URN resolves to the
-`checks_for` identity) and every other semantic validation is shared
+`product` identity) and every other semantic validation is shared
 with the text parse.
 
 == The pubid-scheme URN (`urn:pubid:iho:`)
@@ -143,21 +143,21 @@ pubid's own lossless codec (issue #670;
 (`Pubid.parse_urn(id.to_pubid_urn).to_hash == id.to_hash`).
 
     urn:pubid:iho:std:100:ed-5.0.0:year-2024:part-2   IHO S-100 5.0.0 Part 2 (2024)
-    urn:pubid:iho:std:158:checks-102:ed-1.0.0         IHO S-158:102 1.0.0
+    urn:pubid:iho:std:158:product-102:ed-1.0.0         IHO S-158:102 1.0.0
     urn:pubid:iho:std:122:ed-1.0.0:appendix-D:appsub-2 IHO S-122 1.0.0 Appendix D-2
     urn:pubid:iho:pub:5:vol-2024                      IHO P-5 Vol. 2024
 
 Types: `std` (S), `pub` (P), `m` (M), `b` (B), `cl` (C), `id`.
-Atoms, canonical order: `checks-` (the S-158 member, riding the
+Atoms, canonical order: `product-` (the S-158 member, riding the
 document code before the edition — issue #774), `ed-`, `year-`,
 `sup-`/`suped-`/`supyear-`, `part-`/`parted-`/`party-`, `spec-`/
 `specsub-`/`specvar-`, `annex-`/`anned-`/`annyear-`, `appendix-`/
 `appsub-`/`apped-`/`appyear-`, `vol-`/`issue-`/`voled-`/`voly-`. Case
 is preserved (`part-A`); the yearbook year is a volume (`vol-2024`, no
-`year-` value). The S-158 member emits the typed `checks-<NNN>` atom —
+`year-` value). The S-158 member emits the typed `product-<NNN>` atom —
 the draft-era part-faceted emission (`part-S-102`, `parted-`) is dead:
 the `from_hash` unification redirects the legacy form onto the
-`checks_for` identity, so the legacy URN fails the canonical gate.
+`product` identity, so the legacy URN fails the canonical gate.
 
 == relaton-side follow-ups (not this repo)
 
@@ -166,4 +166,4 @@ the S-158 member shape changed (`s158-102`, not `s:158:100` or the
 part form): relaton-data-iho needs a re-crawl when this gem ships, and
 the frozen testsuite corpus rows are re-frozen in the coupled corpus
 round. The pubid-scheme slugs changed for S-158 identities
-(`iho/std/158/checks-102/...`).
+(`iho/std/158/product-102/...`).

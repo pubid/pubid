@@ -17,7 +17,7 @@
 #                                                        x.y.0 — official IHO
 #                                                        edition is dotted
 #                                                        x.y.z WITHOUT a year)
-#   checks_for   S-158:102           checks_for          string (the S-158
+#   product      S-158:102           product             string (the S-158
 #                                                        series member: the
 #                                                        S-100 product number
 #                                                        whose validation
@@ -34,7 +34,7 @@
 #                                                        SERIES-REFERENCE
 #                                                        value is the draft-era
 #                                                        checks spelling and
-#                                                        REBINDS to checks_for)
+#                                                        REBINDS to product)
 #   part         -X / -S-102 (short) part                string (hyphenated;
 #                                                        same S-158 rebind)
 #   annex        Annex A             annex               string
@@ -84,19 +84,19 @@
 # part and NOT a "profile".
 #
 # The colon form is the PRIMARY designator since Ed 1.0.0:
-# `S-158:102 [edition]` binds number=158 and checks_for=102 as two
+# `S-158:102 [edition]` binds number=158 and product=102 as two
 # typed components. The draft-era spellings are NON-NORMALIZED ALIASES
 # of the same identity (facets-spelling-only: each spelling keeps its
 # render, equality/URN use the canonical shape):
 #
 #   S-158 Part S-102   the expanded draft-era part face (the builder
-#                      rebinds the part value onto checks_for and the
+#                      rebinds the part value onto product and the
 #                      edition that follows it onto the BASE edition —
 #                      the parted- mis-bind of issue #775)
 #   S-158-S-102        the compact hyphenated face (same rebind)
 #   S-158 Part 102     the bare-number draft-era part face
 #
-# A series-reference-shaped part face rebinds only while checks_for is
+# A series-reference-shaped part face rebinds only while product is
 # UNBOUND: `S-158:100 Part 2` keeps a genuine part on the member
 # publication. A lettered part face on S-158 is unattested and stays a
 # plain part. The colon form on any other anchor (S-44:5) is rejected
@@ -296,10 +296,10 @@ grammar PubidIho version "0.4.0" edition 2 {
   # (the S-100 product number whose checks the member specifies),
   # never a glued number suffix. The builder restricts the designator
   # to the S-158 anchor (S-44:5 rejects).
-  checks_for = ":" (1*digit) as checks_for
+  product = ":" (1*digit) as product
   # The compact part face, hyphenated onto the code: S-5-B (lettered),
   # S-100-1 (numbered) and the draft-era S-158-S-102 (series reference,
-  # rebound to checks_for by the builder) — the dash replaces the old
+  # rebound to product by the builder) — the dash replaces the old
   # bare-glued suffix, so a number like S-1001 stays a whole number
   # (the dash is what makes the part unambiguous). The dash is an
   # inlined literal: a named dash ref here collides with the sequence's
@@ -436,7 +436,7 @@ grammar PubidIho version "0.4.0" edition 2 {
     series
     dash
     number
-    [checks_for]
+    [product]
     [compact_part]
     [glued]
     [volume_short]
@@ -538,7 +538,7 @@ grammar PubidIho version "0.4.0" edition 2 {
   bindings identifier_entry {
     type -> type (string)
     number -> number (string)
-    checks_for -> checks_for (string)
+    product -> product (string)
     part -> part (string)
     part_edition -> part_edition (string)
     part_year -> part_year (string)

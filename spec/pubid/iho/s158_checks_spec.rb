@@ -17,7 +17,7 @@ require "spec_helper"
 # `:NNN` is the official IHO product number whose checks the member
 # specifies — NOT a part, NOT a "profile".
 #
-# The wire model: the typed `checks_for` facet; the colon designator
+# The wire model: the typed `product` facet; the colon designator
 # `S-158:102` is the PRIMARY form; the draft-era spellings (`S-158 Part
 # S-102`, `S-158-S-102`, `S-158 Part 102`) are non-normalized aliases of
 # the SAME identity — facets-spelling-only (the render keeps the input's
@@ -45,10 +45,10 @@ RSpec.describe "the S-158 publication series" do
 
   # The owner's citation binds the member, not an opaque number and not
   # a part (the defect receipts of #774/#775).
-  it "binds S-158:102 1.0.0 as number=158, checks_for=102" do
+  it "binds S-158:102 1.0.0 as number=158, product=102" do
     id = Pubid::Iho.parse("S-158:102 1.0.0")
     expect(id.number).to eq("158")
-    expect(id.checks_for).to eq("102")
+    expect(id.product).to eq("102")
     expect(id.edition).to eq("1.0.0")
     expect(id.part).to be_nil
   end
@@ -64,7 +64,7 @@ RSpec.describe "the S-158 publication series" do
       ids = spellings.map { |s| Pubid::Iho.parse(s) }
       expect(ids.uniq.size).to eq(1)
       ids.each do |id|
-        expect(id.checks_for).to eq("102")
+        expect(id.product).to eq("102")
         expect(id.edition).to eq("0.2.0")
         expect(id.part).to be_nil
         expect(id.part_edition).to be_nil
@@ -99,14 +99,14 @@ RSpec.describe "the S-158 publication series" do
       reordered = Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0")
       expect(reordered.to_pubid_urn).to eq(canonical.to_pubid_urn)
       expect(reordered.to_pubid_urn)
-        .to eq("urn:pubid:iho:std:158:checks-102:ed-0.2.0")
+        .to eq("urn:pubid:iho:std:158:product-102:ed-0.2.0")
     end
 
     it "keeps the edition in its declaration slot for every scheme" do
       id = Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0")
       # edition after the name segment, never a parted- atom
       expect(id.to_urn).to match(/spec:s158-102:0\.2\.0\z/)
-      expect(id.to_pubid_urn).to include("checks-102:ed-0.2.0")
+      expect(id.to_pubid_urn).to include("product-102:ed-0.2.0")
     end
   end
 
@@ -125,7 +125,7 @@ RSpec.describe "the S-158 publication series" do
   # same identity.
   it "decodes the legacy part-S-102 MRN onto the checks identity" do
     id = Pubid::Iho::UrnParser.parse("urn:iho:s:158:part-S-102:ed-0.2.0")
-    expect(id.checks_for).to eq("102")
+    expect(id.product).to eq("102")
     expect(id.to_urn).to eq("urn:mrn:iho:pub:spec:s158-102:0.2.0")
   end
 

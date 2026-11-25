@@ -18,7 +18,7 @@ goes `Pubid::Parg::Model.bound(:iho, ...)` — the artifact's
 attribute-named scalar, and `Builder` dispatches the series letter to
 its concrete class and resolves two grammar-level aliases (the S-100
 `v1`/`v5.1` shorthand pads `edition` to `1.0.0`/`5.1.0`; the S-158
-draft-era part faces rebind onto `checks_for`). The artifact is baked
+draft-era part faces rebind onto `product`). The artifact is baked
 from `grammars/iho.parg` in pubid-grammar; the vendored twin
 `data/parg/iho.parg` is the embedded source's provenance copy and must
 move together with `data/parg/iho.json` (the ISO pattern).
@@ -38,7 +38,7 @@ never a string suffix. All of them live flat on `Pubid::Iho::Identifier`
 | component   | attribute          | canonical face    | parse-only aliases           |
 |-------------|--------------------|-------------------|------------------------------|
 | edition     | `edition`          | `1.0.0` (bare)    | `v1`/`v5.1` (padded)         |
-| checks member | `checks_for`     | `:102` (the S-158 colon designator) | `Part S-102`, `S-158-S-102`, `Part 102` (the draft-era faces; `checks_for_face` keeps the spelling) |
+| S-158 member | `product`     | `:102` (the S-158 colon designator) | `Part S-102`, `S-158-S-102`, `Part 102` (the draft-era faces; `product_face` keeps the spelling) |
 | supplement  | `supplement`       | `Sup 1`           | `Suppl 1`                    |
 | part        | `part`             | `Part A`/`Part 1` | `S-5-B`, `S-100-1` (compact) |
 | annex       | `annex`            | `Annex A`         | —                            |
@@ -85,14 +85,14 @@ never a string suffix. All of them live flat on `Pubid::Iho::Identifier`
   :102 Bathymetric Surface), S-158:98 (interoperability), S-158:128
   (catalogue) — each a publication of its own with its own edition
   stream. The colon designator `S-158:102` is the PRIMARY form and
-  binds the typed `checks_for` component; the draft-era spellings
+  binds the typed `product` component; the draft-era spellings
   (`S-158 Part S-102`, `S-158-S-102`, `S-158 Part 102`) are
   NON-NORMALIZED ALIASES of the same identity — facets-spelling-only
-  (the render keeps the Part face through `checks_for_face`;
+  (the render keeps the Part face through `product_face`;
   equality/URN use the canonical shape), and the edition that follows
   the part face is the BASE edition (the parted- mis-bind of #775 is
   fixed). A series-reference-shaped part face rebinds only while
-  checks_for is UNBOUND: `S-158:100 Part 2` keeps a genuine part. The
+  product is UNBOUND: `S-158:100 Part 2` keeps a genuine part. The
   member designator rides the S-158 anchor only (`S-44:5` rejects).
   Lettered/compound part values on other series are untouched
   (`S-100-1` stays Part 1).
@@ -208,7 +208,7 @@ owner's per-flavor split ruling of 2026-11-25). The laws:
 decodable, never emitted): the official-URN namespace moved to the
 guidance form (`urn:mrn:iho:pub:...`) for S/P/M; the S-158 member
 moved to the `s158-NNN` name encoding (issue #774) with the draft-era
-part spellings rebinding onto `checks_for` (#775's parted- mis-bind
+part spellings rebinding onto `product` (#775's parted- mis-bind
 fixed); the dotted keys (`part.4a`, `suppl.1`, `ap.A`, `annex.A`,
 `vol.30`, `issue.2`, `appendix.D-2`) and the bare a.b.c edition segment
 stay decode-only; the #635/#637 `y.2024` tag decodes into the
@@ -240,14 +240,14 @@ pubid pin moves in step with the relaton-data-iho re-key.
 `lib/pubid/iho/pubid_urn_schema.rb`; rulings in the flavor's
 `lib/pubid/iho/urn.adoc`. The atoms follow the containment order of
 the official URN — the S-158 member designator rides the document code
-(`checks-102`, issue #774) before the document's `ed-`/`year-`, then
+(`product-102`, issue #774) before the document's `ed-`/`year-`, then
 each component with its own edition/year right after it (`sup-`,
 `part-`, `parted-`, `appendix-`, `appsub-`, `vol-`, `issue-` …). Case
 is preserved (`part-A`); the yearbook year is a volume (`vol-2024`, no
 `year-` value — the legacy `y.` marker stays decodable in the official
 URN parser, never emitted). The draft-era part-faceted S-158 emission
 (`part-S-102`, `parted-`) is dead: the `from_hash` unification
-redirects it onto the `checks_for` identity, so the legacy URN fails
+redirects it onto the `product` identity, so the legacy URN fails
 the canonical gate. The official URN of the S/P/M series is the
 adopted IHO MRN guidance form (`urn:mrn:iho:pub:...`); the
 `urn:pubid:iho:` scheme is pubid's own and is not governed by the
