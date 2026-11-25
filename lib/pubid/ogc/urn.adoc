@@ -1,0 +1,26 @@
+[[urn-ogc]]
+= OGC URN schemes
+
+This file is the single home of the OGC (`ogc`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:ogc:` (the `_type` flavor segment).
+Official URN: `urn:ogc:…`, IANA-registered, RFC 5165.
+
+Current `to_urn` (≤400 sampled pass ids): 88 ids, 88 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 88 of 88 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ogc:document` | `document` | number | 88 | `01-009a`
+| `pubid:ogc:identifier` | `id` | number | 0 | —
+|===
+
+Atoms, canonical order: `year-` (`year`), `rev-` (`revision`).
+
+Landed (issue #670) as drafted; the year atom keeps the printed two-digit form (`year-06`) — it is identity here, not a date. All 88 corpus rows emit.

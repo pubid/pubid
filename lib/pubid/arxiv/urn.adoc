@@ -1,0 +1,25 @@
+[[urn-arxiv]]
+= arXiv URN schemes
+
+This file is the single home of the arXiv (`arxiv`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:arxiv:` (the `_type` flavor segment).
+
+Official URN: none. arXiv has no namespace in the IANA registry.
+
+[cols="3,1,1,4",options="header"]
+|===
+| `_type` | token | core | example
+| `pubid:arxiv:eprint` | `eprint` | year (int), month (int), number | `arXiv:2301.00001v1` -> `urn:pubid:arxiv:eprint:2023:1:00001:v-1`
+| `pubid:arxiv:identifier` | `id` | year (int), month (int), number | —
+|===
+
+Atoms, canonical order: `archive-` (`archive`), `sc-` (`subject_class`),
+`v-` (`version`, int). Every e-print has a year, a month and a number, so
+they are the core; the archive and subject class exist on old ids only
+(`arXiv:math.GT/0309136` -> `urn:pubid:arxiv:eprint:2003:9:136:archive-math:sc-GT`),
+and the version is optional. Landed with the flavor (relaton#42).

@@ -1,0 +1,29 @@
+[[urn-ecma]]
+= Ecma URN schemes
+
+This file is the single home of the Ecma (`ecma`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:ecma:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:ecma:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 400 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 833 of 833 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ecma:identifier` | `id` | number | 0 | —
+| `pubid:ecma:memento` | `memento` | number | 64 | `ECMA MEM/2026`
+| `pubid:ecma:standard` | `std` | number | 699 | `ECMA-434 ed1`
+| `pubid:ecma:technical-report` | `tr` | number | 70 | `ECMA TR/114 ed1`
+|===
+
+Atoms, canonical order: `part-` (`part`), `vol-` (`volume`), `ed-` (`edition`).
+
+Landed (issue #670) as drafted. All 833 corpus rows emit.

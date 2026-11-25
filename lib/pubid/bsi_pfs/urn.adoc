@@ -1,0 +1,20 @@
+[[urn-bsi_pfs]]
+= BSI PFS URN schemes
+
+This file is the single home of the BSI PFS (`bsi_pfs`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+The PFS-compiled module-composition flavor of bsi (pubid/pubid#706 §4 —
+the first module-composition proof flavor, `definitions/bsi.pfs` in
+pubid-grammar). The composed definition declares the scheme-canonical
+tags with a narrowed atom table (`pub-`, `part-`, `year-`, the adopted
+node and the consolidated `ids`), registered under the `bsi_pfs` flavor
+key. to_pubid_urn emits and round-trips on the absorbed BS face (the
+composed consolidated and the PAS designation included); the adoption
+rows RAISE — the codec composes nested nodes root-first along `base`,
+and the generated adopted attribute is `adopted` — the measured
+wrapper-emission boundary (pubid-grammar follow-up). Its literal corpus
+is the parity harness's absorbed faces (`spec/pubid/bsi_pfs/`).

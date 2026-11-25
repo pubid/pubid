@@ -1,0 +1,28 @@
+[[urn-ccsds]]
+= CCSDS URN schemes
+
+This file is the single home of the CCSDS (`ccsds`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:ccsds:` (the `_type` flavor segment).
+
+Official URN: `urn:ccsds:…`, IANA-registered, RFC 7738.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 365 round-trip, 0 reshape, 33 do not re-parse, 2 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 490 of 490 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ccsds:base` | `base` | number | 490 | `CCSDS 100.0-G-1-S`
+| `pubid:ccsds:corrigendum` | `cor` | number | 41 | `CCSDS 121.0-B-1-S Cor. 1`
+| `pubid:ccsds:identifier` | `id` | number | 0 | —
+|===
+
+Atoms, canonical order: `type-` (`type`), `part-` (`part`), `ed-` (`edition`), `lang-` (`language`), `suffix-` (`suffix`).
+
+Landed (issue #670) as drafted; a corrigendum carries its document along `base`, so the two share the slug prefix (`urn:pubid:ccsds:base:121:part-0:type-B:ed-1:suffix-S:cor:1`). All 490 corpus rows emit.

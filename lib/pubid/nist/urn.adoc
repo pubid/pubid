@@ -1,0 +1,99 @@
+[[urn-nist]]
+= NIST URN schemes
+
+This file is the single home of the NIST (`nist`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:nist:`. Schema: `lib/pubid/nist/pubid_urn_schema.rb`.
+
+Official URN: none. NIST has no namespace in the IANA registry, and the
+current `urn:nist:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 400 ids, 130 round-trip, 247 reshape,
+23 do not re-parse, 0 colliding URNs.
+
+pubid scheme: all 21,362 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give no collision. They give 19,803 distinct URNs, because
+the corpus has spellings with one hash (`NBS CIRC 1` and `NBS.CIRC.1` differ
+only in `parsed_format`, which is a facet). The longest URN is 154
+characters, the median 42.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:nist:identifier` | `id`
+| `pubid:nist:circular` | `circ`
+| `pubid:nist:circular-supplement` | `circsup`
+| `pubid:nist:commercial-standard` | `cs`
+| `pubid:nist:commercial-standard-emergency` | `cse`
+| `pubid:nist:commercial-standards-monthly` | `csm`
+| `pubid:nist:crpl-report` | `crpl`
+| `pubid:nist:dated-document` | `dd`
+| `pubid:nist:federal-information-processing-standards` | `fips`
+| `pubid:nist:grant-contractor-report` | `gcr`
+| `pubid:nist:handbook` | `hb`
+| `pubid:nist:interagency-report` | `ir`
+| `pubid:nist:letter-circular` | `lc`
+| `pubid:nist:miscellaneous-publication` | `mp`
+| `pubid:nist:monograph` | `mono`
+| `pubid:nist:ncstar` | `ncstar`
+| `pubid:nist:nsrds` | `nsrds`
+| `pubid:nist:owmwp` | `owmwp`
+| `pubid:nist:report` | `rpt`
+| `pubid:nist:special-publication` | `sp`
+| `pubid:nist:technical-note` | `tn`
+| `pubid:nist:supplement-identifier` | `sup`
+|===
+
+Core: `number`. `publisher` and `series` are atoms (`pub-`, `series-`),
+because the series spelling varies inside one type (`CIRC`, `NBS.CIRC`,
+`LCIRC`). Atoms, in the schema order: `pub-`, `series-`, `subseries-`,
+`parttype-`/`part-` (`part.type`/`part.value`), `section-`, `vol-`,
+`edtype-`/`ed-`/`edtext-` (`edition.type`/`id`/`additional_text`),
+`edyear-`, `sup-`/`supsuffix-`/`supyear-`/`supmonth-`/`supyearend-`/`suprev-`
+(`supplement.*`), `suprangestart-`/`suprangeend-`, `implicitsup-`,
+`updprefix-`/`upd-`/`updyear-`/`updmonth-` (`update.*`),
+`ucprefix-`/`uc-`/`ucyear-`/`ucmonth-` (`update_component.*`), `revyear-`,
+`revmonth-`, `reviseddate-`, `updnumber-`, `updnumberyear-`,
+`stagetype-`/`stage-`, `draftnumber-`, `v-` (`version_component.value`),
+`version-`, `year-` and `month-` (Integer, `NIST Research Library (2022)`),
+`dateyear-`/`datemonth-`/`dateday-`/`datedseq-` (`dated-document`),
+`prefix-` and `range-` (`crpl-report`), `lang-`
+(`translation_component.code`), `draft-`, `index-`, `insert-`, `errata-`,
+`appendix-`, `addendum-`, `addendumnumber-`. Facets: `pubparsed`
+(`publisher_was_parsed`, bool: `false` for a bare `FIPS 140-3`), `format`
+(`parsed_format`), `edprefix` (`edition.original_prefix`), `translationsrc`
+(`translation`, the bracketed `(spa)` of the `lang-` code).
+
+----
+NIST SP 800-53r5        urn:pubid:nist:sp:800-53:pub-NIST:series-SP:subseries-800:edtype-r:ed-5
+NIST SP 800-53 Rev. 5   urn:pubid:nist:sp:800-53:pub-NIST:series-SP:subseries-800:edtype-r:ed-5:f:0.edprefix-~20Rev.~20
+NIST.SP.800-53r5        urn:pubid:nist:sp:800-53:pub-NIST:series-SP:subseries-800:edtype-r:ed-5:f:0.format-mr
+NBS CIRC 11e2-1915      urn:pubid:nist:circ:11:pub-NBS:series-CIRC:edtype-e:ed-2:edtext-1915
+NBS LC 800 rJun1992     urn:pubid:nist:lc:800:pub-NBS:series-LCIRC:updprefix-slash:upd-1:updyear-1992:updmonth-06:ucprefix-slash:uc-1:ucyear-1992:ucmonth-06
+----
+
+Rulings of this wave:
+
+* *No `to_hash` change.* `update` and `update_component` serialize every
+  field of their component (the "Finding" of the proposal), so each field
+  is its own atom. Reducing them to one identifying value changes `to_hash`
+  and needs a `relaton-data-nist` re-crawl; that is a separate decision.
+  The two components often hold the same values (`NBS LC 800 rJun1992`),
+  so such a URN carries them twice.
+* *Cutting the facets merges only spellings of one document:* 19,699 slugs
+  without the `f` group, of which 104 are shared by two URNs. In each pair
+  only the facets differ: the MR string against the printed form, `Rev. 5`
+  against `r5`, `(spa)` against `es`.
+* *Not placed:* the component-typed `issue_number`, `first_number`,
+  `second_number` and `parts`, and the shared `Pubid::Identifier`
+  attributes that no NIST builder sets. No input sets them, so their
+  serialized shape is unknown; `#to_pubid_urn` raises if one appears.
+  Every `full/` input and every `parse("…")` literal of the NIST specs that
+  parses round-trips.
+
+Finding (not the URN's, recorded for NIST): `NIST.IR.8259Apt` parses as
+`NIST IR 8259(por)` and loses the `A`, so its URN is that of document 8259,
+not 8259A.

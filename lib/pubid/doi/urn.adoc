@@ -1,0 +1,27 @@
+[[urn-doi]]
+= DOI URN schemes
+
+This file is the single home of the DOI (`doi`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:doi:` (the `_type` flavor segment).
+
+Official URN: `urn:doi:…`, IANA-registered (formal template `doi`).
+
+Current `to_urn` (≤400 sampled pass ids): 4 ids, 0 round-trip, 0 reshape, 4 do not re-parse, 0 raise, 0 empty, 1 colliding URNs.
+
+Corpus: 4 of 4 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:doi:identifier` | `id` | — | 0 | —
+| `pubid:doi:resource` | `resource` | — | 4 | `doi:10.1000/182`
+|===
+
+Atoms, canonical order: `prefix-` (`prefix`), `suffix-` (`suffix`).
+
+Landed (issue #670) as drafted, with no core: the prefix/suffix pair is the whole DOI. All 4 corpus rows emit.

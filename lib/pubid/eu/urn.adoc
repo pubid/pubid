@@ -1,0 +1,28 @@
+[[urn-eu]]
+= EU URN schemes
+
+This file is the single home of the EU (`eu`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:eu:` (the `_type` flavor segment).
+
+Official URN: none. The EU has no namespace in the IANA registry; its official identifier is the ELI (`http://data.europa.eu/eli/reg/2011/1227/oj`, `#to_eli`). The `urn:eu:<eli type>:<year>:<number>` form of `to_urn` is pubid-invented.
+
+Corpus: 28 of 35 full ids parse (the 7 fail rows are a bare number, a pair with no year, two two-digit-year acts, two conflicting families, a year 0000 CELEX and an unknown ELI subtype).
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:eu:regulation` | `reg` | year, number | 14 | `EU Regulation 1227/2011`
+| `pubid:eu:directive` | `dir` | year, number | 6 | `EU Directive 2016/680`
+| `pubid:eu:decision` | `dec` | year, number | 4 | `EU Decision 2010/87`
+|===
+
+The core is year first, the CELEX and ELI order, whatever order the act prints in.
+
+Atoms, canonical order: `family-` (`family`, the bracketed legal family `EU`/`EC`/`EEC`/`Euratom`/`CFSP`).
+
+Facets: `numberfirst-` (`number_first`, bool) — the print order when it differs from the default rule; spelling only, so it is cut from identity (`urn:pubid:eu:dec:2013:1082:f:0.numberfirst-true`); `subtype-` (`subtype`, string) — the ELI type subtype `impl`/`del`/`financ` of a `reg_impl`-style ELI; it names no other act, so it is cut from identity (`urn:pubid:eu:reg:2016:1356:f:0.subtype-impl`).

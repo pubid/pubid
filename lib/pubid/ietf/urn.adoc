@@ -1,0 +1,31 @@
+[[urn-ietf]]
+= IETF URN schemes
+
+This file is the single home of the IETF (`ietf`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:ietf:` (the `_type` flavor segment).
+
+Official URN: `urn:ietf:rfc:…`, IANA-registered, RFC 2648.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 400 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
+
+Corpus: 2526 of 2526 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:ietf:bcp` | `bcp` | number | 236 | `BCP 3`
+| `pubid:ietf:fyi` | `fyi` | number | 36 | `FYI 2`
+| `pubid:ietf:identifier` | `id` | number | 0 | —
+| `pubid:ietf:internet-draft` | `id2` | number | 2144 | `draft-3gpp-collaboration-01`
+| `pubid:ietf:rfc` | `rfc` | number | 17 | `RFC 1`
+| `pubid:ietf:std` | `std` | number | 93 | `STD 3`
+|===
+
+Atoms, canonical order: `v-` (`version`).
+
+Landed (issue #670) as drafted; the internet-draft token is `id2` (the draft reserved `id` for the bare identifier), and a draft name (`draft-…`) escapes its first byte. All 2,526 corpus rows emit.
