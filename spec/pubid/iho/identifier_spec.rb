@@ -85,14 +85,35 @@ RSpec.describe Pubid::Iho::Identifier do
       #     separately-published components) ---
       "IHO P-6 1.0.0 Vol. 2" => "IHO P-6 1.0.0 Vol. 2", # within-edition volume
       "IHO P-6 Vol. 2 1.0.1" => "IHO P-6 Vol. 2 1.0.1", # volume edition
-      "IHO S-158 Part S-102 0.2.0" => "IHO S-158 Part S-102 0.2.0",
-      "IHO S-158-S-102 0.2.0" => "IHO S-158 0.2.0 Part S-102",
       "IHO S-100 Sup 1 2.0.0" => "IHO S-100 Sup 1 2.0.0", # supplement edition
       "IHO S-98 1.0.0 Annex A" => "IHO S-98 1.0.0 Annex A",
 
+      # --- the S-158 series model (issue #774; S-158 Ed 1.0.0 clause
+      #     2.1: S-158 is a framework publication defining a series of
+      #     separate check specifications — S-158:100 generic, S-158:1xx
+      #     product-specific (:102 = the S-102 Bathymetric Surface
+      #     checks), S-158:98 interoperability, S-158:128 catalogue).
+      #     The colon form is the primary designator; the member is a
+      #     publication of its own, not a part. The draft-era part-face
+      #     spellings parse to the SAME identity as non-normalized
+      #     aliases (facets-spelling-only: the render keeps the Part
+      #     face; equality/URN use the canonical shape; the citation
+      #     order law of issue #775 puts the edition in its declaration
+      #     slot, before the member face).
+      "IHO S-158 1.0.0" => "IHO S-158 1.0.0", # the framework, Ed 1.0.0
+      "IHO S-158:102" => "IHO S-158:102", # the S-102 Bathymetric Surface checks
+      "IHO S-158:102 1.0.0" => "IHO S-158:102 1.0.0", # the owner's citation
+      "IHO S-158:100" => "IHO S-158:100", # the generic checks (Table 6-1)
+      "IHO S-158:101" => "IHO S-158:101", # the S-101 ENC checks (PDF example)
+      "IHO S-158:98" => "IHO S-158:98", # interoperability checks (Table 6-1)
+      "IHO S-158:128" => "IHO S-158:128", # catalogue checks (Table 6-1)
+      "IHO S-158 Part S-102 0.2.0" => "IHO S-158 0.2.0 Part S-102",
+      "IHO S-158 Part S-102" => "IHO S-158 Part S-102",
+      "IHO S-158 Part 102" => "IHO S-158 Part 102",
+      "IHO S-158-S-102 0.2.0" => "IHO S-158 0.2.0 Part S-102",
+
       # colon-separated sub-publication and the optional IHO prefix
-      "IHO S-158:100 1.0.0" => "IHO S-158:100 1.0.0",
-      "IHO S-158:100 Part 2 1.0.0" => "IHO S-158:100 Part 2 1.0.0",
+      "IHO S-158:100 Part 2 1.0.0" => "IHO S-158:100 Part 2 1.0.0", # checks + genuine part
       "S-44 5.0.0" => "IHO S-44 5.0.0",
       "S-66 Sup 1 1.0.0" => "IHO S-66 Sup 1 1.0.0", # supplement edition
     }.each do |input, canonical|
@@ -219,18 +240,62 @@ RSpec.describe Pubid::Iho::Identifier do
     end
   end
 
-  describe "series-reference parts" do
-    it "parses the expanded series-reference part" do
-      id = Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0")
-      expect(id.part).to eq("S-102")
-      expect(id.part_edition).to eq("0.2.0")
+  describe "the S-158 series model (issue #774)" do
+    # S-158 Ed 1.0.0 clause 2.1: each member is a separate publication
+    # with its own edition stream; `:NNN` is the official IHO product
+    # number whose checks the member specifies — not a part, not a
+    # profile.
+    it "binds the colon designator as the checks_for component" do
+      id = Pubid::Iho.parse("IHO S-158:102 1.0.0")
+      expect(id.number).to eq("158")
+      expect(id.checks_for).to eq("102")
+      expect(id.edition).to eq("1.0.0")
+      expect(id.part).to be_nil
+      expect(id.checks_for_face).to be_nil # the canonical colon face
     end
 
-    it "parses and canonicalizes the compact series-reference face" do
-      id = Pubid::Iho.parse("IHO S-158-S-102 0.2.0")
-      expect(id.part).to eq("S-102")
-      expect(id.edition).to eq("0.2.0")
-      expect(id.to_s).to eq("IHO S-158 0.2.0 Part S-102")
+    it "unifies the draft-era spellings onto one identity" do
+      colon = Pubid::Iho.parse("IHO S-158:102 0.2.0")
+      part = Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0")
+      compact = Pubid::Iho.parse("IHO S-158-S-102 0.2.0")
+      bare_number = Pubid::Iho.parse("IHO S-158 Part 102 0.2.0")
+
+      expect(part).to eq(colon)
+      expect(compact).to eq(colon)
+      expect(bare_number).to eq(colon)
+      expect(part.checks_for).to eq("102")
+      expect(part.part).to be_nil
+      expect(part.part_edition).to be_nil # the mis-bind of #775 is gone
+      expect(part.edition).to eq("0.2.0")
+    end
+
+    it "keeps the draft-era part face on the render (facets-spelling-only)" do
+      expect(Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0").to_s)
+        .to eq("IHO S-158 0.2.0 Part S-102")
+      # the compact face normalizes to the expanded Part face, like
+      # S-5-B renders "S-5 Part B"
+      expect(Pubid::Iho.parse("IHO S-158-S-102 0.2.0").to_s)
+        .to eq("IHO S-158 0.2.0 Part S-102")
+      # the colon face is the canonical print
+      expect(Pubid::Iho.parse("IHO S-158:102 0.2.0").to_s)
+        .to eq("IHO S-158:102 0.2.0")
+    end
+
+    it "keeps a genuine part beside a bound checks_for" do
+      id = Pubid::Iho.parse("IHO S-158:100 Part 2 1.0.0")
+      expect(id.checks_for).to eq("100")
+      expect(id.part).to eq("2")
+      expect(id.part_edition).to eq("1.0.0") # the part's own edition
+    end
+
+    it "rejects the member designator on another anchor" do
+      expect { Pubid::Iho.parse("IHO S-44:5") }
+        .to raise_error(ArgumentError, /S-158 series device/)
+    end
+
+    it "rejects duplicate editions across the draft-era spelling" do
+      expect { Pubid::Iho.parse("IHO S-158 0.2.0 Part S-102 1.0.0") }
+        .to raise_error(ArgumentError, /duplicate edition/)
     end
 
     it "keeps the numbered part distinct from a series reference" do

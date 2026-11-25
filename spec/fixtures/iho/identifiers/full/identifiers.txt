@@ -84,8 +84,29 @@ IHO S-100 5.0.0 Part 2 (2024)
 IHO S-100 1.0.0 (2024) Part A
 IHO S-100 v5.1
 IHO S-100 v1
+# the S-158 series model (issue #774; S-158 Ed 1.0.0 clause 2.1): the
+# framework defines a series of separate check specifications; the
+# colon form is the primary designator and `:NNN` is the official IHO
+# product number whose checks the member specifies. The PDF attests
+# S-158 Ed 1.0.0 and Table 6-1 names :100/:98/:128; :101 is the PDF's
+# S-101 ENC example; S-158:102 1.0.0 is the owner's citation. The
+# members' own editions are NOT attested (each carries its own edition
+# stream) — undated rows here; :130 is parse coverage, not an
+# attestation. The draft-era part-face spellings are non-normalized
+# aliases of the same identity (facets-spelling-only: each keeps its
+# render; the citation order follows the declaration order).
+IHO S-158 1.0.0
+IHO S-158:100
+IHO S-158:101
+IHO S-158:102
+IHO S-158:102 1.0.0
+IHO S-158:98
+IHO S-158:128
+IHO S-158:130
 IHO S-158 Part S-102 0.2.0
 IHO S-158-S-102 0.2.0
+IHO S-158 Part 102
+IHO S-158 Part S-102
 IHO P-6 1.0.0 Vol. 2
 IHO P-6 Vol. 2 1.0.1
 IHO S-98 Part A 1.0.0 (2024)
@@ -128,11 +149,6 @@ IHO S-129 1.1.0
 IHO S-129 2.0.0
 IHO S-130 1.0.0
 IHO S-131 1.0.0
-IHO S-158 1.0.0
-IHO S-158:100 1.0.0
-IHO S-158:101 1.0.0
-IHO S-158:130 1.0.0
-IHO S-158:98 1.0.0
 IHO S-164 1.0.0
 IHO S-201 1.0.0
 IHO S-201 1.1.0
@@ -214,3 +230,9 @@ IHO S-4 B-170
 !S-4 Part B, Section 400!IHO S-4 B-400
 !IHO S-4 Part B, Section 400!IHO S-4 B-400
 !S-4 Part B, Section 400, B-401!IHO S-4 B-401
+# issue #774 - the malformed colon forms reject (the member designator
+# needs a product number; a non-product tail is not a designator), and
+# the member designator rides the S-158 anchor only.
+IHO S-158:
+IHO S-158:abc
+IHO S-44:5

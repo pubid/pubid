@@ -2,24 +2,33 @@
 
 module Pubid
   module Iho
-    # The pubid-scheme URN of IHO (issue #670; docs/URN-SCHEMES.adoc).
+    # The pubid-scheme URN of IHO (issue #670; the flavor's own urn
+    # scheme notes, lib/pubid/iho/urn.adoc).
     #
     #   IHO S-100 5.0.0 Part 2 (2024)  ->
     #   urn:pubid:iho:std:100:ed-5.0.0:year-2024:part-2
+    #   IHO S-158:102 1.0.0            ->
+    #   urn:pubid:iho:std:158:checks-102:ed-1.0.0
     #
-    # The atoms follow the containment order of the official URN
-    # (urn:iho:s:100:ed-5.2.0:part-2, Pubid::Iho::UrnGenerator): the
-    # document's edition and year first, then each component with its own
-    # edition/year right after it — supplement, part, annex, appendix (the
-    # two-level Appendix D-2 keeps the subnumber as its own atom), volume
-    # (the unified locator, yearbook volumes included: `vol-2024`), issue.
-    # The S-4 spec citation sits inside its part (`spec-`, `specsub-`,
-    # `specvar-`). Letters stay case-preserved (`part-A`). The legacy
-    # `y.` yearbook marker is decodable in the official URN parser, never
-    # emitted here: a periodical has no `year-` atom value, its volume
-    # carries the year. The positional urn:iho:… form of UrnGenerator
-    # stays on #to_urn — pubid emits no urn:mrn:iho:… URN.
+    # The atoms follow the containment order of the official URN: the
+    # S-158 member designator rides the document code (the checks_for
+    # component is the series member itself — `checks-<NNN>`, issue
+    # #774), then the document's edition and year, then each component
+    # with its own edition/year right after it — supplement, part,
+    # annex, appendix (the two-level Appendix D-2 keeps the subnumber as
+    # its own atom), volume (the unified locator, yearbook volumes
+    # included: `vol-2024`), issue. The S-4 spec citation sits inside
+    # its part (`spec-`, `specsub-`, `specvar-`). Letters stay
+    # case-preserved (`part-A`). The legacy `y.` yearbook marker is
+    # decodable in the official URN parser, never emitted here: a
+    # periodical has no `year-` atom value, its volume carries the year.
+    # The official URN of the S/P/M series is the adopted IHO MRN
+    # guidance form (`urn:mrn:iho:pub:spec:...`, UrnGenerator) — this
+    # scheme is pubid's own and is not governed by the guidance.
     PubidUrnSchema = Pubid::PubidUrn.define("iho") do
+      # The S-158 series member (issue #774): rides the document code,
+      # before the edition — `urn:pubid:iho:std:158:checks-102:ed-1.0.0`.
+      atom "checks_for", "checks"
       atom "edition", "ed"
       atom "year", "year"
       atom "supplement", "sup"

@@ -6,15 +6,21 @@ module Pubid
     #
     # Parse goes through {Pubid::Parg::Model.bound} — the artifact's
     # `bindings identifier` block delivers every component as an
-    # attribute-named scalar (type, number, part, annex, appendix,
-    # appendix_subnumber, supplement, edition, edition_shorthand, year,
-    # volume, issue) — so the builder only dispatches the series letter
-    # to its concrete class and resolves the one grammar-level alias:
-    # the S-100 "v1"/"v5.1" edition shorthand pads to the official
-    # dotted x.y.z edition ("1" -> "1.0.0", "5.1" -> "5.1.0").
+    # attribute-named scalar (type, number, checks_for, part, annex,
+    # appendix, appendix_subnumber, supplement, edition,
+    # edition_shorthand, year, volume, issue) — so the builder dispatches
+    # the series letter to its concrete class and resolves two
+    # grammar-level aliases:
+    # - the S-100 "v1"/"v5.1" edition shorthand pads to the official
+    #   dotted x.y.z edition ("1" -> "1.0.0", "5.1" -> "5.1.0");
+    # - the S-158 draft-era spellings of the series-member designator
+    #   (`S-158 Part S-102`, `S-158-S-102`, `S-158 Part 102`) rebind onto
+    #   `checks_for` — the model of issue #774, where the colon form
+    #   `S-158:102` is the primary designator and the member is a
+    #   publication of its own, not a part.
     class Builder
-      ATTRIBUTES = %i[number appendix appendix_subnumber part annex
-                      supplement year volume issue
+      ATTRIBUTES = %i[number checks_for appendix appendix_subnumber part
+                      annex supplement year volume issue
                       part_edition part_year supplement_edition
                       supplement_year annex_edition annex_year
                       appendix_edition appendix_year volume_edition
@@ -26,6 +32,16 @@ module Pubid
       # ruling on the two publication modes).
       COMPONENT_EDITIONS = %i[part_edition supplement_edition annex_edition
                               appendix_edition volume_edition].freeze
+      # The S-158 series anchor: the only series the checks_for member
+      # designator rides (issue #774 — the colon form `S-158:102` is the
+      # S-158 series device; `S-44:5` has no such meaning and rejects).
+      CHECKS_SERIES = "158"
+      # The draft-era part-face spellings that rebind onto checks_for:
+      # the expanded series reference ("Part S-102") and the bare member
+      # number ("Part 102"). A lettered or compound part value ("Part A",
+      # "Part 4a") is a genuine part face and never rebinds.
+      CHECKS_SERIES_REF_RE = /\A[SPMBC]-(\d+)\z/.freeze
+      CHECKS_NUMBER_RE = /\A\d+\z/.freeze
       # The S-4 anchor: the loose-leaf publication every spec citation
       # resolves through (bare "B-401" carries it implicitly).
       S4_TYPE = "S"
@@ -44,6 +60,7 @@ module Pubid
         resolve_spec_citation!(attrs)
         type = type_letter_from(hash, attrs)
         assert_spec_anchor!(attrs, type)
+        resolve_checks_alias!(attrs, type)
         assert_edition_mode!(attrs)
         klass = Pubid::Iho.identifier_klass_for_type_letter(type)
         klass.new(**attrs)
@@ -53,7 +70,117 @@ module Pubid
         new.build(parsed)
       end
 
+      class << self
+        # The alias unification {Builder#build} applies at parse time also
+        # runs on the deserialization path ({Identifier.from_hash}), so a
+        # stored row or a legacy URN carrying the draft-era part model
+        # decodes to the checks_for identity (issue #774). Pure function:
+        # returns the given hash untouched when it carries no draft-era
+        # part face, a normalized copy otherwise. The spelling face is
+        # NOT restored here — a deserialized identifier renders the
+        # canonical colon designator (equality/URN use the canonical
+        # shape; only the parse path keeps the input's spelling).
+        def normalize_checks_alias(data)
+          return data unless data.is_a?(::Hash)
+
+          part = data["part"] || data[:part]
+          number = data["number"] || data[:number]
+          checks = data["checks_for"] || data[:checks_for]
+          type_key = data["_type"] || data[:_type]
+          return data unless part && number == CHECKS_SERIES && !checks
+          return data unless standard_type?(type_key)
+
+          digits = checks_digits_of(part)
+          return data unless digits
+
+          hash = data.dup
+          edition = hash["part_edition"] || hash[:part_edition]
+          year = hash["part_year"] || hash[:part_year]
+          if (hash["edition"] || hash[:edition]) && edition
+            raise ArgumentError,
+                  "duplicate edition: the base edition and the member " \
+                  "edition #{edition} cannot both ride S-158:#{digits}"
+          end
+          hash.delete("part")
+          hash.delete(:part)
+          hash.delete("part_edition")
+          hash.delete(:part_edition)
+          hash.delete("part_year")
+          hash.delete(:part_year)
+          hash["checks_for"] = digits
+          hash["edition"] ||= edition if edition
+          hash["year"] ||= year if year
+          hash
+        end
+
+        # The member number of a draft-era part face: the digits of a
+        # series reference ("S-102") or of the bare number face ("102").
+        def checks_digits_of(part)
+          if (match = CHECKS_SERIES_REF_RE.match(part.to_s))
+            match[1]
+          elsif CHECKS_NUMBER_RE.match?(part.to_s)
+            part.to_s
+          end
+        end
+
+        private
+
+        # The rebind applies to the standard family (the S series): the
+        # member designator is a facet of the S-158 standard family.
+        def standard_type?(type_key)
+          type_key.nil? || type_key.to_s.end_with?("standard")
+        end
+      end
+
       private
+
+      # The S-158 alias unification (issue #774). A bound checks_for
+      # must ride the S-158 anchor. Otherwise a draft-era part face on
+      # the S-158 family — a series reference ("Part S-102") or the
+      # bare member number ("Part 102") — rebinds onto checks_for: the
+      # member is a publication of its own, not a part. The edition
+      # that follows the part face is the BASE edition (the parted-
+      # mis-bind fix of issue #775), and the spelling face records the
+      # part value as written so the render keeps the input's spelling
+      # (facets-spelling-only; equality/URN use the canonical shape).
+      def resolve_checks_alias!(attrs, type)
+        return assert_checks_anchor!(attrs, type) if attrs[:checks_for]
+
+        return unless type == S4_TYPE && attrs[:number] == CHECKS_SERIES
+
+        digits = Builder.checks_digits_of(attrs[:part]) if attrs[:part]
+        return unless digits
+
+        edition = attrs.delete(:part_edition)
+        year = attrs.delete(:part_year)
+        if attrs[:edition] && edition
+          raise ArgumentError,
+                "duplicate edition: the base edition " \
+                "#{attrs[:edition]} and the member edition #{edition} " \
+                "cannot both ride S-158:#{digits}"
+        end
+        if attrs[:year] && year
+          raise ArgumentError,
+                "duplicate year: the base year #{attrs[:year]} and the " \
+                "member year #{year} cannot both ride S-158:#{digits}"
+        end
+        attrs[:checks_for] = digits
+        attrs[:checks_for_face] = attrs.delete(:part)
+        attrs[:edition] ||= edition
+        attrs[:year] ||= year
+      end
+
+      # The colon member designator is the S-158 series device: another
+      # anchor cannot carry it (the grammar binds the shape for every
+      # series; the anchor is semantic).
+      def assert_checks_anchor!(attrs, type)
+        return if type == S4_TYPE && attrs[:number] == CHECKS_SERIES
+
+        raise ArgumentError,
+              "the checks_for member designator is the S-158 series " \
+              "device: #{type}-#{attrs[:number]}:#{attrs[:checks_for]} " \
+              "cannot carry it"
+      end
 
       # The citation captures resolve onto the model (see the grammar
       # header): the citation letter folds into `part` (a Part-rule

@@ -51,8 +51,11 @@ RSpec.describe "partial reference parsing (cross-flavor)" do
     # IHO's trailing component is one discriminator of edition / volume
     # [issue] (P-1 and P-6 are volume-keyed and the yearbook year IS a
     # volume; S-series carry the dotted edition, never a year), so a
-    # bare reference leaves all four nil and wildcards the series.
-    "iho" => { ref: "IHO P-5", omits: %i[edition year volume issue] },
+    # bare reference leaves all four nil and wildcards the series. The
+    # S-158 member designator (checks_for) wildcards with them: a bare
+    # "IHO S-158" is the framework, not a member.
+    "iho" => { ref: "IHO S-158",
+               omits: %i[edition year volume issue checks_for] },
     "oasis" => { ref: "OASIS EDXL", omits: [:version] },
     "sae" => { ref: "SAE AIR1936", omits: [:date] },
     "adobe" => { ref: "Adobe TN 5014", omits: [] },

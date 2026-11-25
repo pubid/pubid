@@ -104,6 +104,11 @@ class FixturesClassifier
     @stats[:total] += 1
 
     case entry
+    when /^!(.+)!(.+)!(.+)$/ # Normalized format with the URN expectation
+      # (the pass files carry `!input!rendered!urn`; the third segment
+      # is an expectation, not an input — re-classification re-derives
+      # both from the parse)
+      classify_normalized($1, $2)
     when /^!(.+)!(.+)$/ # Normalized format
       classify_normalized($1, $2)
     when /^#(.+)# (.+)$/ # Errored format
@@ -113,6 +118,25 @@ class FixturesClassifier
     end
   end
 
+  # Every IHO PASS row carries the URN expectation as its third segment
+  # (`!input!rendered!urn`) — the owner directive: every fixture row
+  # attests the URN scheme, so the corpus round can re-freeze the
+  # migrated urn representations from these files alone. The other
+  # flavors keep their legacy formats until their own URN waves.
+  def pass_row(id_str, rendered, parsed)
+    unless flavor == "iho"
+      return rendered == id_str ? id_str : "!#{id_str}!#{rendered}"
+    end
+
+    "!#{id_str}!#{rendered}!#{safe_urn(parsed)}"
+  end
+
+  def safe_urn(parsed)
+    parsed.respond_to?(:to_urn) ? parsed.to_urn : ""
+  rescue StandardError
+    ""
+  end
+
   def classify_plain(id_str)
     parsed = parse_identifier(id_str)
     rendered = parsed.to_s
@@ -120,13 +144,7 @@ class FixturesClassifier
     @stats[:passing] += 1
     class_name = detect_class_name(parsed, id_str)
     @stats[:by_class][class_name][:pass] += 1
-    if rendered == id_str
-      # Perfect round-trip - write as plain
-      append_to_file("pass", class_name, id_str)
-    else
-      # Successful parse but different rendering - write as normalized to PASS
-      append_to_file("pass", class_name, "!#{id_str}!#{rendered}")
-    end
+    append_to_file("pass", class_name, pass_row(id_str, rendered, parsed))
   rescue StandardError => e
     # Parse failed - write as errored to FAIL
     @stats[:failing] += 1
@@ -146,13 +164,8 @@ class FixturesClassifier
     @stats[:by_class][class_name][:pass] += 1
 
     # Write with ACTUAL rendered output (may differ from old expectation)
-    if actual_rendered == original
-      # Perfect round-trip now
-      append_to_file("pass", class_name, original)
-    else
-      # Still normalized, but use actual rendering
-      append_to_file("pass", class_name, "!#{original}!#{actual_rendered}")
-    end
+    append_to_file("pass", class_name,
+                   pass_row(original, actual_rendered, parsed))
   rescue StandardError => e
     # FAIL: Parse error
     @stats[:failing] += 1
@@ -171,7 +184,7 @@ class FixturesClassifier
     @stats[:passing] += 1
     class_name = detect_class_name(parsed, original)
     @stats[:by_class][class_name][:pass] += 1
-    append_to_file("pass", class_name, "!#{original}!#{rendered}")
+    append_to_file("pass", class_name, pass_row(original, rendered, parsed))
   rescue StandardError => e
     # Still fails, keep in fail with updated error
     @stats[:failing] += 1

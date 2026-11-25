@@ -1783,57 +1783,14 @@ Landed (issue #670) as drafted; the internet-draft token is `id2` (the draft res
 [[urn-iho]]
 ==== iho
 
-Namespace: `urn:pubid:iho:` (the `_type` flavor segment).
-
-Official URN: none emitted. IHO's own shapes live under the IANA-registered
-`mrn` namespace (formal template `mrn`, `urn:mrn:iho:…`), but pubid does not
-emit them: `#to_urn` emits the positional `urn:iho:` grammar of
-`lib/pubid/iho/urn_generator.rb` (the shape the atoms and examples below
-document), and `#to_pubid_urn` the `urn:pubid:iho:` scheme.
-
-Current `to_urn` (≤400 sampled pass ids): 138 ids, 138 round-trip, 0 reshape, 0 do not re-parse, 0 raise, 0 empty, 0 colliding URNs.
-
-Corpus: 138 of 138 pass ids parse.
-
-[cols="3,1,1,1,4",options="header"]
-|===
-| `_type` | token | core | ids | example
-| `pubid:iho:bibliographic` | `b` | number | 12 | `IHO B-1 1.0.0`
-| `pubid:iho:circular-letter` | `cl` | number | 8 | `IHO C-13 1.0.0`
-| `pubid:iho:identifier` | `id` | number | 0 | —
-| `pubid:iho:miscellaneous` | `m` | number | 10 | `IHO M-1 2.1.0`
-| `pubid:iho:publication` | `pub` | number | 17 | `IHO P-1 1.0.0`
-| `pubid:iho:standard` | `std` | number | 91 | `IHO S-100 1.0.0`
-|===
-
-Atoms, canonical order: `vol-` (`volume`), `issue-` (`issue`), `year-` (`year`), `v-` (`version`), `appendix-` (`appendix`).
-
-*Landed (issue #670).* The component-model rulings are LAW
-(`lib/pubid/iho/CLAUDE.md`), so the atoms follow the containment order of
-the official URN generator, not the draft list: the document's `ed-`/`year-`
-first, then each component with its own edition/year right after it —
-`sup-`/`suped-`/`supyear-`, `part-`/`parted-`/`party-`, `annex-`/…,
-`appendix-`/`appsub-`/`apped-`/`appyear-`, `vol-`/`issue-`/`voled-`/`voly-`.
-The edition the component model stores is `ed-` (the draft's `v-` named a
-field that no longer exists). Case is preserved (`part-A`), the Appendix
-subnumber is its own atom (`appendix-D-2` is `appendix-D:appsub-2`), and the
-yearbook year is a volume — `IHO P-5 Vol. 2024` emits `vol-2024` and no
-`year-` value; the legacy `y.` marker stays decodable in the official URN
-parser, never emitted. All 173 corpus rows emit; the positional
-`urn:iho:` form stays on `#to_urn`.
-
-*Landed (issue #691).* The S-4 loose-leaf spec citation is a child of its
-part — the citation letter rides the existing `part-` atom (case preserved:
-`part-B`), placed after the part's own edition/year and before `annex-`:
-`IHO S-4 4.10.0 B-401` emits `urn:pubid:iho:std:4:ed-4.10.0:part-B:spec-401`.
-The dotted sub and the parenthesized variant are the spec's own children
-(`specsub-`, `specvar-`; `B-122.1` is `spec-122:specsub-1`, `B-521(I)` is
-`spec-521:specvar-I`, `B-351.1(I)` chains both). The section is the spec
-number's hundreds digit — derivable, never stored, never an atom — so the
-section-level citation `B-400` emits `spec-400` like any leaf; the long
-form "S-4 Part B, Section 400" parses to that same identity. No `ed-`/
-`year-` attaches to a spec (it rides its publication's edition), and a
-spec-less URN is byte-identical to the pre-#691 emission.
+This flavor's URN documentation moved to its per-flavor home:
+`lib/pubid/iho/urn.adoc` (owner ruling 2026-11-25 — "for URN schemes
+how can we mix up different flavors in 1 file? SPLIT THE FILE!"; the
+convention for every flavor is `lib/pubid/<flavor>/urn.adoc`). It
+carries the adopted IHO MRN guidance form (`urn:mrn:iho:pub:spec:...`
+for the S/P/M series), the S-158 member encoding (`s158-102`, issue
+#774), the legacy positional `urn:iho:` grammar (the B/C emission;
+decode-only elsewhere), and the `urn:pubid:iho:` atom table.
 
 [[urn-isbn]]
 ==== isbn

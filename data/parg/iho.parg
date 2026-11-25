@@ -1,9 +1,10 @@
 # Port of lib/pubid/iho/parser.rb — IHO identifiers: letter series
-# (S/P/M/B/C), a number with an optional suffix, and the full component
-# tail (edition, supplement, part, annex, appendix + subnumber, volume,
-# issue, year qualifier).
+# (S/P/M/B/C), a number with the optional S-158 series-member designator,
+# and the full component tail (edition, supplement, part, annex, appendix
+# + subnumber, volume, issue, year qualifier).
 #
-# == Component model (owner rulings, 2026-11-03)
+# == Component model (owner rulings, 2026-11-03; the S-158 series model,
+#    issue #774, 2026-11-25)
 #
 # Every component below is a first-class semantic component: its own
 # named capture, its own typed binding, independently addressable in
@@ -16,11 +17,26 @@
 #                                                        x.y.0 — official IHO
 #                                                        edition is dotted
 #                                                        x.y.z WITHOUT a year)
+#   checks_for   S-158:102           checks_for          string (the S-158
+#                                                        series member: the
+#                                                        S-100 product number
+#                                                        whose validation
+#                                                        checks the member
+#                                                        specifies; the colon
+#                                                        form is the PRIMARY
+#                                                        designator since
+#                                                        S-158 Ed 1.0.0)
 #   supplement   Sup N (Suppl N)     supplement          string
-#   part         Part X / Part S-102 part                string (letter,
-#                                                        number, or SERIES
-#                                                        REFERENCE)
-#   part         -X / -S-102 (short) part                string (hyphenated)
+#   part         Part X              part                string (letter,
+#                                                        number, or compound
+#                                                        "4a"; on the S-158
+#                                                        family a digit or
+#                                                        SERIES-REFERENCE
+#                                                        value is the draft-era
+#                                                        checks spelling and
+#                                                        REBINDS to checks_for)
+#   part         -X / -S-102 (short) part                string (hyphenated;
+#                                                        same S-158 rebind)
 #   annex        Annex A             annex               string
 #   appendix     Appendix B          appendix            string
 #   appendix     Appendix D-2        appendix_subnumber  string (the -2)
@@ -56,23 +72,46 @@
 # In the URN the ed- segment attaches to the node it follows, so the
 # same positional slot records both modes.
 #
-# The part has a COMPACT face, hyphenated onto the code — `IHO S-5-B`
-# (lettered part), `IHO S-100-1` (numbered part), `IHO S-158-S-102`
-# (series-reference part) — which both parses and renders; the
-# canonical expanded face stays `IHO S-100 x.y.z Part 1`. Gluing a part
-# onto the code without a separator (S-5A) is DISALLOWED as a form: it
-# cannot extend to numbered parts without ambiguity (S-1001 = series
-# 1001 vs series 100 part 1). The four lettered bases the corpus
-# records (S-5A, S-5B, S-8A, S-8B) are LEGACY data spellings: they
-# still parse as aliases (S-5A == S-5 Part A) but are never rendered;
-# the owner rules later whether to reject them outright.
+# == The S-158 series model (issue #774; S-158 Ed 1.0.0 clause 2.1)
 #
-# Series-reference parts: a check standard applied to another IHO
-# series cites the applied series as its part — `IHO S-158 0.2.0 Part
-# S-102` (the wild glued `S-158-102` spelling is a legacy alias whose
-# normalization to Part S-102 needs an IHO series table; the syntax
-# alone cannot tell it from S-100-1 = Part 1, so it currently parses
-# as the plain number part).
+# S-158 "Validation Checks — Introduction and Structure" is a framework
+# publication defining a SERIES of separate publications, each a
+# publication of its own with its own edition stream: S-158:100 (generic
+# checks), S-158:1xx (one product-specific check specification per S-100
+# product; :101 = S-101 ENC, :102 = S-102 Bathymetric Surface),
+# S-158:98 (interoperability) and S-158:128 (catalogue). `:NNN` is the
+# official IHO product number whose checks the member specifies — NOT a
+# part and NOT a "profile".
+#
+# The colon form is the PRIMARY designator since Ed 1.0.0:
+# `S-158:102 [edition]` binds number=158 and checks_for=102 as two
+# typed components. The draft-era spellings are NON-NORMALIZED ALIASES
+# of the same identity (facets-spelling-only: each spelling keeps its
+# render, equality/URN use the canonical shape):
+#
+#   S-158 Part S-102   the expanded draft-era part face (the builder
+#                      rebinds the part value onto checks_for and the
+#                      edition that follows it onto the BASE edition —
+#                      the parted- mis-bind of issue #775)
+#   S-158-S-102        the compact hyphenated face (same rebind)
+#   S-158 Part 102     the bare-number draft-era part face
+#
+# A series-reference-shaped part face rebinds only while checks_for is
+# UNBOUND: `S-158:100 Part 2` keeps a genuine part on the member
+# publication. A lettered part face on S-158 is unattested and stays a
+# plain part. The colon form on any other anchor (S-44:5) is rejected
+# by the builder: the member designator is the S-158 series device.
+#
+# The part has a COMPACT face, hyphenated onto the code — `IHO S-5-B`
+# (lettered part), `IHO S-100-1` (numbered part) — which both parses
+# and renders; the canonical expanded face stays `IHO S-100 x.y.z
+# Part 1`. Gluing a part onto the code without a separator (S-5A) is
+# DISALLOWED as a form: it cannot extend to numbered parts without
+# ambiguity (S-1001 = series 1001 vs series 100 part 1). The four
+# lettered bases the corpus records (S-5A, S-5B, S-8A, S-8B) are LEGACY
+# data spellings: they still parse as aliases (S-5A == S-5 Part A) but
+# are never rendered; the owner rules later whether to reject them
+# outright.
 #
 # Two main syntaxes per the owner ruling: `IHO S-100 1.0.0` (dated =
 # edition-specific) and `IHO S-100` (undated = edition-non-specific).
@@ -92,7 +131,45 @@
 # (S-5A, parse-only), "S-100 v1..v5.1" (edition shorthand), "Issue N"
 # (canonical (N)), the bare year (canonical Vol. N).
 #
-# == URN segment grammar (positional, containment-ordered)
+# == URN emission — the IHO MRN guidance (owner adoption, 2026-11-25)
+#
+# The flavor emits the IHO MRN guidance form (S-100WG4, "MRN Guidelines
+# for IHO") for the series the guidance gives a publication type:
+#
+#   urn:mrn:iho:pub:<type>:<name>[:<edition>][:<trailing atoms>...]
+#     <type>  spec (S series) | per (P series) | reg (M series)
+#     <name>  sNNN — the lowercase series letter + number (the guidance's
+#             own "s57"/"s98" name form; the dotted edition is the
+#             canonical 4th segment, per IHO's printed S-98 metadata
+#             urn:mrn:iho:pub:spec:s98:1.0.0)
+#     <edition>  the bare dotted x.y.z — NOT ed-prefixed
+#
+# The S-158 member joins the name segment hyphenated — the fleet
+# extension of the guidance for compound publication numbers — so the
+# edition stays in its canonical 4th position:
+#
+#   S-158 1.0.0      -> urn:mrn:iho:pub:spec:s158:1.0.0
+#   S-158:102 1.0.0  -> urn:mrn:iho:pub:spec:s158-102:1.0.0
+#
+# The trailing atoms carry the components the guidance's tail slots do
+# not model, in the containment order below, lowercase marker tokens,
+# RFC 3986-safe, values case-preserved (identity law: part-A and part-a
+# are distinct documents); a component's own edition rides as ed- right
+# after it (the duality law), the Appendix subnumber hyphen-joins its
+# appendix (appendix-D-2):
+#
+#   [:year-<yyyy>][:sup-<n>[:ed-<x.y.z>][:year-<yyyy>]]
+#   [:part-<X>[...]][:spec-<n>[:specsub-<n>][:specvar-<X>]]
+#   [:annex-<A>[...]][:appendix-<B>[-<sub>][...]]
+#   [:vol-<n>[:issue-<n>][...]]
+#
+# The guidance's bare correction/clarification slots (the s57:3:1 form)
+# are not modeled faces and reject. The B (Bibliographic) and C
+# (Circular Letter) series have no guidance publication type code —
+# until IHO assigns one they keep the legacy positional emission below.
+#
+# == Legacy positional segment grammar (decode-only for S/P/M, the
+#    emission of the B/C series)
 #
 # The URN mirrors the containment tree, one semantic atom per segment:
 # Part contains Annexes; Annex contains Appendices; a D-2 subnumber is
@@ -203,7 +280,7 @@
 # reference-built rules as the matched text, so the v2 tree is the v1
 # tree plus named leaves for non-captured structure.
 
-grammar PubidIho version "0.3.0" edition 2 {
+grammar PubidIho version "0.4.0" edition 2 {
   digit = %x30-39
   upper = %x41-5A
   lower = %x61-7A
@@ -213,14 +290,20 @@ grammar PubidIho version "0.3.0" edition 2 {
   dot = "."
 
   series = ("S" / "P" / "M" / "B" / "C") as type
-  number_suffix = (":" 1*digit)
-  number = (1*digit [number_suffix]) as number
+  number = (1*digit) as number
+  # The S-158 series-member designator (issue #774): the colon form
+  # "S-158:102" binds the member number as its own typed component
+  # (the S-100 product number whose checks the member specifies),
+  # never a glued number suffix. The builder restricts the designator
+  # to the S-158 anchor (S-44:5 rejects).
+  checks_for = ":" (1*digit) as checks_for
   # The compact part face, hyphenated onto the code: S-5-B (lettered),
-  # S-100-1 (numbered) and S-158-S-102 (series reference) — the dash
-  # replaces the old bare-glued suffix, so a number like S-1001 stays a
-  # whole number (the dash is what makes the part unambiguous). The
-  # dash is an inlined literal: a named dash ref here collides with the
-  # sequence's own dash node in the edition-2 tree.
+  # S-100-1 (numbered) and the draft-era S-158-S-102 (series reference,
+  # rebound to checks_for by the builder) — the dash replaces the old
+  # bare-glued suffix, so a number like S-1001 stays a whole number
+  # (the dash is what makes the part unambiguous). The dash is an
+  # inlined literal: a named dash ref here collides with the sequence's
+  # own dash node in the edition-2 tree.
   compact_part = "-" ((("S" / "P" / "M" / "B" / "C") dash (1*digit)) / (1*digit [*letter]) / upper) as part
   # LEGACY glued lettered bases (S-5A, S-5B, S-8A, S-8B in the corpus):
   # parse-only aliases, never rendered. Kept because the records exist;
@@ -353,6 +436,7 @@ grammar PubidIho version "0.3.0" edition 2 {
     series
     dash
     number
+    [checks_for]
     [compact_part]
     [glued]
     [volume_short]
@@ -410,11 +494,16 @@ grammar PubidIho version "0.3.0" edition 2 {
     accept "IHO S-100 1.0.0 (2024) Part A"
     accept "IHO S-53 Ap. 1 1.0.0"
     accept "IHO S-98 Part A 1.0.0"
+    # --- the S-158 series model (issue #774) ---
     accept "IHO S-158:100 1.0.0"
     accept "IHO S-158:100 Part 2 1.0.0"
+    accept "IHO S-158:102"
+    accept "IHO S-158:102 1.0.0"
+    accept "IHO S-158:128"
     accept "IHO S-1001"
     accept "IHO S-158 Part S-102 0.2.0"
     accept "IHO S-158-S-102 0.2.0"
+    accept "IHO S-158 Part 102"
     accept "IHO P-6 1.0.0 Vol. 2"
     accept "IHO P-6 Vol. 2 1.0.1"
     accept "IHO S-98 1.0.0 Annex A"
@@ -441,11 +530,15 @@ grammar PubidIho version "0.3.0" edition 2 {
     reject "nonsense"
     reject "IHO B-12 3.0"
     reject "IHO P-5 1850"
+    # --- the S-158 series model: malformed colon forms (issue #774) ---
+    reject "IHO S-158:"
+    reject "IHO S-158:abc"
   }
 
   bindings identifier_entry {
     type -> type (string)
     number -> number (string)
+    checks_for -> checks_for (string)
     part -> part (string)
     part_edition -> part_edition (string)
     part_year -> part_year (string)
