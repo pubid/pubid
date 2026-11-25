@@ -1,0 +1,72 @@
+[[urn-bipm]]
+= BIPM URN schemes
+
+This file is the single home of the BIPM (`bipm`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:bipm:` (the `_type` flavor segment).
+
+Official URN: adopted (ruling of 2026-11-11). BIPM still has no namespace in
+the IANA registry, but the guide-of-record (bipm-editor-guides,
+`sources/bipm-references-en.adoc`, "URN" clauses) defines the official
+`urn:bipm:` shapes, and `to_urn` now emits them. Every landed
+`urn:bipm:` URN moved (a relaton-data-bipm re-crawl follows, accepted by the
+owner); the pre-adoption faces stay parseable as documented parse-in aliases
+(`lib/pubid/bipm/CLAUDE.md`) but are never emitted. The pubid-scheme URN
+below is untouched.
+
+Official `to_urn` faces, one shape per family:
+
+[cols="1,3,3",options="header"]
+|===
+| family | shape | example
+| committee document | `urn:bipm:v1:{group}:{type-word}:{identifier}[:{year}]` | `CIPM DECN 110-17 (2021)` → `urn:bipm:v1:cipm:decision:110-17:2021`
+| meeting | `urn:bipm:v1:{group}:meeting:{n}[:{year}]` | `CGPM 17th Meeting (1983)` → `urn:bipm:v1:cgpm:meeting:17:1983`
+| Metrologia | `urn:bipm:v1:metrologia:{vol}[:{issue}[:{article}]]` | `Metrologia 51 1 128` → `urn:bipm:v1:metrologia:51:1:128`
+| SI Brochure | `urn:bipm:v1:bipm:si-brochure:{edition-no-e}:{version-no-v}:{latest-year}` | `BIPM SI Brochure 9e v3.01 (2019/2024, E)` → `urn:bipm:v1:bipm:si-brochure:9:3.01:2024`
+|===
+
+The general pattern the guide states is
+`urn:bipm:{version}:{group}:{venue-type}:{venue-id}:{type}:{identifier}:{date}`
+with the venue slots optional. The flavor holds no venue attribute — the
+venue qualification lives inside the document number — so the venue slots
+stay unfilled. The type-word segment is the English type name lowercased
+(recommendation/resolution/decision/action/statement), never the REC/RES
+abbreviation; the brochure form strips the edition's `e` and the version's
+`v`, drops the language segment, and carries the latest year of the `years`
+range (the version segment stays empty when absent, per the guide's
+`urn:bipm:v1:bipm:si-brochure:9::2019`). MEP and the CC guides still emit no
+official URN: the guide's URN sections for them are empty. Two guide
+examples do not fit the guide's own stated pattern and are documented rather
+than reproduced (`urn:bipm:v1:cipm:resolution:95-2006:1`,
+`urn:bipm:v1:cgpm:26:2018:resolution:1` — venue-id placements the flavor has
+no attribute for; see `lib/pubid/bipm/CLAUDE.md`).
+
+Current `to_urn` (≤400 sampled pass ids): 90 ids, 33 round-trip, 21 reshape, 0 do not re-parse, 36 raise, 0 empty, 10 colliding URNs. *(Sampled on the pre-adoption face; the table above is the adopted face.)*
+
+Corpus: 90 of 90 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:bipm:committee-document` | `cd` | number | 26 | `CCTF REC 2 (2012)`
+| `pubid:bipm:guide` | `guide` | number | 12 | `CCL-GD-MeP-1`
+| `pubid:bipm:identifier` | `id` | number | 0 | —
+| `pubid:bipm:meeting` | `meeting` | number | 14 | `CCAUV 1st Meeting (1999)`
+| `pubid:bipm:mep` | `mep` | number | 24 | `SI MEP A1`
+| `pubid:bipm:metrologia-article` | `ma` | number | 9 | `Metrologia 1`
+| `pubid:bipm:si-brochure` | `sb` | number | 5 | `BIPM SI Brochure 9e v3.01 (2019/2024, E)`
+|===
+
+Atoms, canonical order: `part-` (`part`), `issue-` (`issue`), `year-` (`year`, int), `ed-` (`edition`), `v-` (`version`), `appendix-` (`appendix`), `annex-` (`annex`), `lang-` (`language`), `article-` (`article`), `form-` (`form`), `group-` (`group`), `guidekind-` (`guide_kind`), `mepcode-` (`mep_code`), `reportcode-` (`report_code`), `typecode-` (`type_code`), `variant-` (`variant`), `years-` (`years`).
+
+*Landed (issue #670) as drafted*, with the years Integer atoms
+(`year-2012`). A committee document with no number (`CGPM DECL (1889)`)
+emits no core segment — the atom list carries it:
+`urn:pubid:bipm:cd:year-1889:group-CGPM:typecode-DECL`. The
+`urn:bipm:…` form of `#to_urn` is now the guide's official face (ruling of
+2026-11-11, above); the schema reads `#to_hash` only and is untouched by
+that ruling — the codec needed no deviation knob. All 111 corpus rows emit.

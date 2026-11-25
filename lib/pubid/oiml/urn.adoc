@@ -1,0 +1,43 @@
+[[urn-oiml]]
+= OIML URN schemes
+
+This file is the single home of the OIML (`oiml`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:oiml:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:oiml:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn` (≤400 sampled pass ids): 105 ids, 3 round-trip, 96 reshape, 6 do not re-parse, 0 raise, 0 empty, 6 colliding URNs.
+
+Corpus: 105 of 105 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:oiml:amendment` | `amd` | number | 5 | `Amendment (2009) to OIML R 138 Edition 2007 (E)`
+| `pubid:oiml:annex` | `annex` | number | 3 | `OIML R 60 Annexes Edition 2021 (E)`
+| `pubid:oiml:basic-publication` | `bp` | number | 6 | `OIML B 18:2018`
+| `pubid:oiml:bulletin` | `bulletin` | number | 0 | —
+| `pubid:oiml:certification-system` | `cs` | number | 6 | `OIML-CS PD-05 Edition 6 (Amendment 1)`
+| `pubid:oiml:document` | `document` | number | 16 | `OIML D 11:2008`
+| `pubid:oiml:dual-published` | `dp` | — | 2 | `ISO 4064-1:2024\|OIML R 49-1:2024`
+| `pubid:oiml:errata` | `err` | number | 0 | —
+| `pubid:oiml:expert-report` | `er` | number | 3 | `OIML E 5:2015(en)`
+| `pubid:oiml:guide` | `guide` | number | 4 | `OIML G 1-100:2008`
+| `pubid:oiml:identifier` | `id` | — | 0 | —
+| `pubid:oiml:recommendation` | `rec` | number | 61 | `OIML R 106`
+| `pubid:oiml:seminar-report` | `sr` | number | 2 | `OIML S 6:2011(en)`
+| `pubid:oiml:vocabulary` | `v` | number | 7 | `OIML V 1:2012`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `part-` (`part`), `year-` (`year`), `ed-` (`edition`), `stage-` (`stage`), `lang-` (`language`), `amendment-` (`amendment`), `family-` (`family`), `iteration-` (`iteration`), `letter-` (`letter`), `trailing-` (`trailing`, bool).
+
+Nested identifiers: `first-(…)` (`first`, id), `second-(…)` (`second`, id).
+
+Facet candidates (spelling-only): `parsed_format`, `space_separator`.
+
+Nested identifiers of other flavors (written with their own schema, qualified token `<flavor>.<token>`): `iso`.

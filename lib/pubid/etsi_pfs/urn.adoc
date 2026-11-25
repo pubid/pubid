@@ -1,0 +1,31 @@
+[[urn-etsi_pfs]]
+= ETSI PFS URN schemes
+
+This file is the single home of the ETSI PFS (`etsi_pfs`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+The PFS-compiled dev alias of etsi (pubid#706 phase 2): the same scheme,
+compiled from `pubid-grammar`'s `definitions/etsi.pfs` and registered
+beside the coded flavor. It carries the SCHEME's canonical `_type` tag
+(`pubid:etsi:etsi-standard`) and the scheme's `to_urn` namespace
+(`etsi`), so its pubid-scheme URNs are byte-identical with the coded
+flavor's wherever its serialized hash is byte-identical — which is
+exactly the rows carrying none of the three constructs pfs:1 cannot
+declare (collection parts, the `ed.N` edition face, supplement
+wrappers): 18,945 of the 24,718 inventory rows. The alias's own schema
+registers under this key (the alias tags `id` and `es`, empty cores —
+a bare-path `core` only; the coded schema's `:int` supplement ordinal
+is a compiler gap), so a future cutover changes no URN shape.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:etsi_pfs:identifier` | `id` | — | 0 | —
+| `pubid:etsi_pfs:standard` | `es` | — | 4 | `ETSI EG 200 053 V1.5.1 (2004-06)`
+|===
+
+Atoms, canonical order: `type-` (`type`), `part-` (`parts`), `minor-`,
+`year-`, `month-`, `v-` (`version`). The alias's rows carry no facets.

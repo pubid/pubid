@@ -1,0 +1,28 @@
+[[urn-adobe]]
+= Adobe URN schemes
+
+This file is the single home of the Adobe (`adobe`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:adobe:` (the `_type` flavor segment).
+
+Official URN: none. The organization has no namespace in the IANA registry, and the current `urn:adobe:…` form of `to_urn` is pubid-invented (legacy, no round-trip promise).
+
+Current `to_urn`: not audited (no fixture directory under the registry name).
+
+Corpus: 0 of 0 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:adobe:publication` | `pub` | — | 0 | —
+| `pubid:adobe:tech-note` | `technote` | number | 0 | —
+|===
+
+*Landed (issue #670)* as drafted (`slug-`/`v-` atoms; the publication has
+no core). Adobe has no fixture corpus — the contract spec parses a fixed
+literal list (`LITERALS`) and `spec/pubid/pubid_urn_leaf_spec.rb` pins
+five URNs, so the schema has a net without fixtures.

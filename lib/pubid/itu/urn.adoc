@@ -1,0 +1,90 @@
+[[urn-itu]]
+= ITU URN schemes
+
+This file is the single home of the ITU (`itu`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:itu:`. Schema: `lib/pubid/itu/pubid_urn_schema.rb`.
+
+Official URN: `urn:itu:…`, IANA-registered (formal template `itu`). Current
+`to_urn`: 400 ids, 299 round-trip, 84 reshape, 17 do not re-parse, 0
+colliding URNs.
+
+pubid scheme: all 2,758 pass ids emit, round-trip by `to_hash`, are
+path-safe, and give 2,756 distinct URNs. The two shared URNs are not
+collisions: `ITU-T OB.1096` and `ITU OB No. 1096` (with and without a date)
+are one document each since #696. The longest URN is 160 characters.
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:itu:recommendation` | `rec`
+| `pubid:itu:report` | `rpt`
+| `pubid:itu:resolution` | `res`
+| `pubid:itu:combined-identifier` | `comb`
+| `pubid:itu:question` | `q`
+| `pubid:itu:handbook` | `hb`
+| `pubid:itu:radio-regulations` | `rr`
+| `pubid:itu:special-publication` | `sp`
+| `pubid:itu:contribution` | `c`
+| `pubid:itu:identifier` | `id`
+| `pubid:itu:annex` | `annex`
+| `pubid:itu:annex-of-recommendation` | `anx`
+| `pubid:itu:appendix-of-recommendation` | `app`
+| `pubid:itu:supplement` | `sup`
+| `pubid:itu:amendment` | `amd`
+| `pubid:itu:corrigendum` | `cor`
+| `pubid:itu:addendum` | `add`
+| `pubid:itu:errata` | `err`
+|===
+
+Core: `number` (of a supplement, its ordinal). Atoms, in the schema order:
+`sector-`, `series-`, `seriesword-` and `seriesdash-` (bool), `imp-`
+(`imp_marker`, the `Imp` of an implementer's guide), `subseries-`,
+`part-` (`parts`, list), `suffix-` (`series_suffix`), `qualifier-`,
+`rangeend-`, `attachment-` (bool), the second designations of a joint
+Recommendation (`combseries-`, `combnumber-`, `combsubseries-`,
+`combsuffix-`, `combqualifier-`, lists over `combined.*`), the Question
+values `sg-` (`study_group`), `bl-`, `bracketed-` and `colon-` (bool),
+`technical-` (bool), `material-`, `v-` (`version`), `year-`, `month-`,
+`day-`, `lang-` (`language`), `twin-(…)` (`common_text_twin`, the nested
+ISO/IEC id of `ITU-T H.222.0 (2021) | ISO/IEC 13818-1:2022`, with the ISO
+schema). Facets (bool): `suffixspaced`,
+`qualifierglued`, `combsuffixspaced` and `combqualifierglued` (lists),
+`numberglued`, `slashjoined`.
+
+----
+ITU-T G.729 Annex B (1996) Cor. 3 (03/2001)  urn:pubid:itu:rec:729:sector-T:series-G:anx:B:year-1996:cor:3:year-2001:month-03
+ITU-T H.264 (V14) (08/2021)                  urn:pubid:itu:rec:264:sector-T:series-H:v-14:year-2021:month-08
+Report ITU-R BT.2020-1                       urn:pubid:itu:rpt:2020:sector-R:series-BT:part-1
+ITU-T D.81/F.80 bis (11/1980)                urn:pubid:itu:comb:81:sector-T:series-D:combseries-F:combnumber-80:combsuffix-bis:year-1980:month-11:f:0.combsuffixspaced-true
+ITU-R 37-7/5:                                urn:pubid:itu:q:37:sector-R:part-7:sg-5:colon-true
+ITU-T E Suppl.1                              urn:pubid:itu:sup:1:sector-T:series-E:f:0.numberglued-true
+----
+
+Rulings of this wave:
+
+* *Facets are the flags that the ITU classes call rendering-only*: the same
+  document printed two ways (`Suppl.1`/`Suppl. 1`, `V.25 ter`/`V.25ter`,
+  `D.502R`/`D.502 R`, `Amd. 1/Cor. 1`/`Amd. 1 Cor. 1`). Each is a boolean,
+  so the codec has boolean facets now (`kind: :bool`, and `:bools` for a
+  list, see <<../../../docs/URN-SCHEMES.adoc#rules-kinds,kinds>>). Every other flag is an atom, because it names a
+  different document: `Technical Cor.`, `attachment`, the word `series`, a
+  series code joined by a dash. The Question flags `/BL`, the brackets and
+  the trailing `:` are atoms too: the design proposal had them as facets,
+  but nothing in the ITU code says that they are spelling only.
+* *The supplement chain is the `base` chain.* Supplements, annexes and
+  appendixes all name their parent `base`, so they share the slug prefix of
+  the Recommendation.
+* *Not placed:* the `parts` of a second designation (`G.780/Y.1351-2`) is
+  a list inside a list, which the codec cannot write, so `#to_pubid_urn`
+  raises for it (pinned). No pass fixture has one. Neither are the shared
+  attributes of `Pubid::Identifier` that no ITU builder sets (`date`,
+  `languages`, `stage` …).
+* *Coverage beyond the pass fixtures.* Every `full/` input and every
+  `parse("…")` literal of the ITU specs that parses also round-trips.
+* *Cutting the facets merges nothing:* 2,752 slugs without the `f` group, 0
+  shared.

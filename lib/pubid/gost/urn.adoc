@@ -1,0 +1,64 @@
+[[urn-gost]]
+= GOST URN schemes
+
+This file is the single home of the GOST (`gost`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Namespace: `urn:pubid:gost:`. Schema: `lib/pubid/gost/pubid_urn_schema.rb`.
+
+Official URN: none. GOST has no namespace in the IANA registry, and the
+current `urn:gost:…` form of `to_urn` is pubid-invented (legacy, no
+round-trip promise). Current `to_urn`: 200 ids, 77 round-trip, 123 reshape,
+9 colliding URNs.
+
+pubid scheme: all 200 pass ids emit, round-trip by `to_hash`, are path-safe,
+and give no collision. They give 199 URNs, because `ГОСТ Р 71039—2023` and
+`ГОСТ Р 71039— 2023` are one document with one `to_hash`. The longest URN is
+181 characters (a harmonized standard that nests a consolidated EN).
+
+[cols="3,1",options="header"]
+|===
+| `_type` | token
+| `pubid:gost:interstate-standard` | `is`
+| `pubid:gost:national-standard` | `ns`
+| `pubid:gost:harmonized` | `h`
+| `pubid:gost:identical-adoption` | `ia`
+| `pubid:gost:foreign-reference` | `fr`
+| `pubid:gost:identifier` | `id`
+|===
+
+Core: `number`. Atoms, in the schema order: `pub-`, `co-` (`copublisher`),
+`year-`, `subtype-`, `raw-`, `adoptedidentifiers-` (`adopted_identifiers`,
+ids), `adopted-` (id). No facets.
+
+A harmonized or identical adoption holds the GOST standard in `base`, and its
+`to_hash` repeats that standard's number and year, so the URN writes them
+twice: once in the base node, once in the adoption node. The adopted
+documents nest with their own flavor's schema: `astm`, `cencenelec`, `iec`,
+`ieee`, `iso`. `cencenelec` has a *partial* schema for this wave (see
+<<../cen_cenelec/urn.adoc#urn-cen_cenelec,CEN/CENELEC>>).
+
+----
+ГОСТ ISO 6848                          urn:pubid:gost:is:6848:co-ISO
+ГОСТ Р 58904-2020/ISO/TR 25901-1:2016  urn:pubid:gost:ns:58904:year-2020:ia:58904:year-2020:adopted-(iso:tr:25901:part-1:year-2016)
+ГОСТ 1437-2024 (ASTM D129-18)          urn:pubid:gost:is:1437:year-2024:h:1437:year-2024:adoptedidentifiers-(astm:std:129:letter-D:year-2018)
+----
+
+Known gap, pinned by `spec/pubid/gost/pubid_urn_spec.rb`: a
+`ForeignReference` (`(OECD 460:2017)`, the form for a document of a flavor
+pubid does not know) keeps its text in `raw`, which `to_hash` does not write.
+Two adoptions of different unknown documents therefore have one hash and one
+URN, and `from_hash` renders `GOST 34853-2022 (OECD 460:2017)` as
+`GOST 34853-2022`. The fallback is wider than unknown flavors: a known
+document that the adopted flavor cannot parse also becomes a
+`ForeignReference` (`(EN 1234:2010-05)`, `(CEN/CENELEC EN 1234:2010)`,
+`(EN 1234:2010/prA1)`). The fix (map `raw` in `key_value`) changes `to_hash`, so it
+needs a `pubid-testsuite` update and ships separately; the `raw-` atom is
+already declared for it. `relaton-data-gost` holds no foreign-reference row.
+
+Found in passing, not fixed: `ГОСТ 35294.2-2025 (ISO 8124-2: 2023)` (a space
+after the colon) routes its adopted document to IEEE and drops the year:
+`to_s` is `GOST 35294.2-2025 (ISO 8124-2)`.

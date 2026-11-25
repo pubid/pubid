@@ -1,0 +1,78 @@
+[[urn-iec]]
+= IEC URN schemes
+
+This file is the single home of the IEC (`iec`) flavor's URN
+documentation — the per-flavor split of the former `docs/URN-SCHEMES.adoc`
+(owner ruling 2026-11-25: "for URN schemes how can we mix up different
+flavors in 1 file? SPLIT THE FILE!"). The index that links every flavor's
+file is `docs/URN-SCHEMES.adoc`.
+
+Partial schema landed with the IEEE wave: only `pubid:iec:international-standard` (`is`), which IEEE ids nest. The GOST wave added `amd`, `consol` (no core; its members ride `ids-`), `tr` and `ts`, which GOST adoptions can name, and the `ids-` atom at the end of the atom order.
+
+Namespace: `urn:pubid:iec:` (the `_type` flavor segment).
+
+Official URN: none in the IANA registry. pubid emits the RFC 5141-style `urn:iec:std:…`; keep it as the IEC render form.
+
+Current `to_urn` (≤400 sampled pass ids): 400 ids, 249 round-trip, 71 reshape, 6 do not re-parse, 0 raise, 74 empty, 0 colliding URNs.
+
+Corpus: 12331 of 12331 pass ids parse.
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | ids | example
+| `pubid:iec:all-parts` | `all` | number | 0 | —
+| `pubid:iec:amendment` | `amd` | number | 2464 | `CISPR 12:2007/AMD1:2009`
+| `pubid:iec:base` | `base` | number | 0 | —
+| `pubid:iec:component-specification` | `cs` | number | 0 | —
+| `pubid:iec:conformity-assessment` | `ca` | number | 0 | —
+| `pubid:iec:consolidated-identifier` | `consol` | — | 1270 | —
+| `pubid:iec:corrigendum` | `cor` | number | 195 | `CISPR 16-1-3:2004/COR1:2006`
+| `pubid:iec:fragment-identifier` | `fi` | — | 16 | `IEC 60050-111/AMD1/FRAG1 ED2`
+| `pubid:iec:guide` | `guide` | number | 59 | `IEC GUIDE 103:1980`
+| `pubid:iec:identifier` | `id` | — | 0 | —
+| `pubid:iec:international-standard` | `is` | number | 5455 | `CISPR 12 ED7`
+| `pubid:iec:interpretation-sheet` | `is2` | number | 120 | `CISPR 14-1:2016/ISH1:2017`
+| `pubid:iec:operational-document` | `od` | number | 0 | —
+| `pubid:iec:publicly-available-specification` | `pas` | number | 12 | `IEC PAS 60050-732:2007`
+| `pubid:iec:sheet-identifier` | `si` | — | 7 | `IEC 60695-2-1/0:1994`
+| `pubid:iec:single-identifier` | `si2` | number | 0 | —
+| `pubid:iec:societal-technology-trend-report` | `sttr` | number | 0 | —
+| `pubid:iec:systems-reference-document` | `srd` | number | 21 | `IEC SRD 62559-4:2020`
+| `pubid:iec:technical-group` | `tg` | number | 0 | —
+| `pubid:iec:technical-report` | `tr` | number | 1418 | `CISPR TR 16-2-5:2008`
+| `pubid:iec:technical-specification` | `ts` | number | 836 | `IEC TS 60034-16-3:1996`
+| `pubid:iec:technology-report` | `tr2` | number | 0 | —
+| `pubid:iec:test-report-form` | `trf` | number | 2180 | `IECEE TRF 10079-1A:2020`
+| `pubid:iec:vap-identifier` | `vi` | — | 1999 | `CISPR 11:1975+AMD1:1976 CSV`
+| `pubid:iec:white-paper` | `wp` | number | 0 | —
+| `pubid:iec:working-document` | `wd` | number | 2350 | `1/2457/FDIS`
+|===
+
+Atoms, canonical order: `pub-` (`publisher`), `co-` (`copublishers`, list), `part-` (`part`), `subpart-` (`subpart`), `year-` (`year`), `month-` (`month`), `ed-` (`edition`), `lang-` (`languages.*.code`, list), `database-` (`database`, bool), `fragmentnumber-` (`fragment_number`), `sheetnumber-` (`sheet_number`), `sheetyear-` (`sheet_year`), `undated-` (`undated`, bool), `vap-` (`vap`, list), `tc-` (`technical_committee`), `wdlang-` (`wd_language`), `wdstage-` (`wd_stage`), `wpstage-` (`wp_stage`), `wptype-` (`wp_type`).
+
+Nested identifiers: `ids-(…)` (`identifiers`, ids), `cispr-(…)` (`cispr_identifier`, id).
+
+*Landed (issue #670)* — the wave declares all 26 types and keeps every
+earlier wave's atom in its place (`database` moves to the bool the corpus
+serializes, before any URN carried it; `frag-`/`sheet-`/`sheetyear-`/`vap-`
+sit after `database`, before `lang-`, whose landed URNs never move). All
+12,330 corpus rows emit. The wave inherited two identity gaps exactly as
+`to_hash` had them (pinned in `lib/pubid/iec/CLAUDE.md`): a
+WorkingDocument serialized only `_type`, so its URN was `urn:pubid:iec:wd`
+and all 2,350 WD rows shared that one hash — a shared hash, not a collision;
+and a TestReportForm's CISPR document sat in the unserialized
+`cispr_identifier`. A wrapper also repeated its base's `month`/`day`/`undated`
+at the top level, in the hash and so in the URN (`…:vi:month-10:…`); that
+leak is closed (the date keys map on `SingleIdentifier`, see
+`lib/pubid/iec/CLAUDE.md`), and no fixture URN moved.
+
+*Closed (issue #687)* — the two gaps are gone: the working document's
+committee, language, stage and work-programme stage/type serialize, the
+document number sits in the positional core, and a CISPR-bearing
+TestReportForm nests its document under `cispr-` (the form stays `#root` —
+a TRF is about the CISPR document, not a wrapper of it). The new atoms sit
+after `vap-` and before `lang-`, so no landed URN moves; the working
+document goes from the shared type-only form to one URN per document
+(`urn:pubid:iec:wd:2457:tc-1:wdstage-FDIS`).
+
+Facet candidates (spelling-only): `languages.*.original_code`.
