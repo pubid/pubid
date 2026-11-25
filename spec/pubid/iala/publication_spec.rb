@@ -4,10 +4,14 @@ require "spec_helper"
 
 # IALA publications with no code (reports, proceedings, style guide,
 # history books …): the docid is the product-URL slug after "IALA ".
+# The rows live in the classification source of truth
+# (identifiers/full/identifiers.txt) and are regenerated into
+# identifiers/pass/ by `rake "validation:classify[iala]"`; every slug
+# row round-trips byte-exact, so the generated file carries them plain.
 module IalaPublicationSpec
   DOCIDS = File.readlines(
     File.expand_path(
-      "../../fixtures/iala/identifiers/pass/iala-publications.txt", __dir__
+      "../../fixtures/iala/identifiers/pass/publication.txt", __dir__
     ),
     chomp: true,
   ).reject { |line| line.empty? || line.start_with?("#") }.freeze
