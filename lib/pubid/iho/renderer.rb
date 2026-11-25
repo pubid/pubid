@@ -60,7 +60,13 @@ module Pubid
 
       def render(context: nil, **opts)
         id = @id
-        rendered = "#{id.publisher} #{id.class.type[:short]}-#{id.number}"
+        rendered = +"#{id.publisher} #{id.class.type[:short]}-#{id.number}"
+        # The S-158 member designator (issue #774): the canonical face
+        # is the official colon designator (`S-158:102`). The draft-era
+        # part-face spelling keeps its own face (` Part S-102`) through
+        # the part slot below — facets-spelling-only: the render keeps
+        # the input's spelling, equality/URN use the canonical shape.
+        rendered << ":#{id.checks_for}" if id.checks_for && !id.checks_for_face
         FACES.each do |component, face|
           value = face_value(id, component)
           rendered << (face % value) if value
@@ -72,7 +78,9 @@ module Pubid
 
       # nil = the face does not print. The citation face replaces the
       # Part face (same containment slot: the citation letter IS the
-      # part), and it prints only on a spec citation.
+      # part), and it prints only on a spec citation. The S-158
+      # member's draft-era part face (`checks_for_face`, the part value
+      # as written) takes the Part slot the same way.
       def face_value(id, component)
         if component == :spec
           return nil unless id.spec
@@ -80,6 +88,7 @@ module Pubid
           return spec_citation(id)
         end
         return nil if component == :part && id.spec
+        return id.checks_for_face if component == :part && id.checks_for_face
 
         id.public_send(component)
       end

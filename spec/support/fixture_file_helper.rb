@@ -21,22 +21,26 @@ module FixtureFileHelper
 
   # Read a pass-fixture file into [input, expected_rendering] pairs.
   #
-  # `classify_fixtures.rb` writes two line shapes into `pass/`: a plain
-  # identifier that renders back byte-identically, and a `!input!rendered`
+  # `classify_fixtures.rb` writes three line shapes into `pass/`: a plain
+  # identifier that renders back byte-identically, a `!input!rendered`
   # marker that records a *normalizing* parse — one that succeeds but whose
-  # `to_s` differs from the input. A reader that does not know the marker
-  # feeds `!input!rendered` to the parser verbatim and counts a spurious
-  # failure, so the marker must be split here.
+  # `to_s` differs from the input — and, for the flavors carrying a URN
+  # expectation on every pass row (iho), the three-segment
+  # `!input!rendered!urn` form whose third segment attests the row's URN
+  # scheme. A reader that does not know the markers feeds the line to the
+  # parser verbatim and counts a spurious failure, so the markers must be
+  # split here.
   #
-  # The regex mirrors the writer in `spec/fixtures/classify_fixtures.rb`
-  # exactly (greedy `.+`, non-empty right side), so reader and writer cannot
-  # drift apart.
+  # The regexes mirror the writer in `spec/fixtures/classify_fixtures.rb`
+  # exactly (greedy `.+`, non-empty right sides, the three-segment form
+  # matched first), so reader and writer cannot drift apart.
   #
   # @param file_path [String] Path to a `pass/*.txt` fixture file
   # @return [Array<Array(String, String)>] input and its expected rendering
   def read_pass_fixture_entries(file_path)
     read_fixture_file(file_path).map do |line|
-      match = line.match(/\A!(.+)!(.+)\z/)
+      match = line.match(/\A!(.+)!(.+)!(.+)\z/) ||
+              line.match(/\A!(.+)!(.+)\z/)
       match ? [match[1], match[2]] : [line, line]
     end
   end

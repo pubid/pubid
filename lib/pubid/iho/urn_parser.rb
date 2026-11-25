@@ -2,25 +2,47 @@
 
 module Pubid
   module Iho
-    # Parses IHO URNs back into identifiers through the documented
-    # positional segment grammar (the same grammar the generator emits;
-    # the segment table lives in the grammar header and the flavor notes):
+    # Parses IHO URNs back into identifiers, both emitted schemes:
+    #
+    # == The adopted IHO MRN guidance form (S/P/M emission)
+    #
+    #   urn:mrn:iho:pub:<type>:<name>[:<edition>][:<trailing atoms>...]
+    #
+    # - <type>: spec / per / reg — the guidance publication types
+    #   (Standards and Specifications, periodic publications,
+    #   Miscellaneous Base Regulatory Publications); each maps back to
+    #   its series letter.
+    # - <name>: sNNN — the lowercase series letter + number; the S-158
+    #   member joins hyphenated (s158-102), the fleet extension of the
+    #   guidance for compound publication numbers.
+    # - <edition>: the bare dotted x.y.z right after the name (the
+    #   guidance's canonical 4th segment; the S-98 precedent).
+    # - The trailing atoms are the lowercase marker segments: a
+    #   component's own edition rides as ed- right after it (the duality
+    #   law), the Appendix subnumber hyphen-joins its appendix
+    #   (appendix-D-2), values case-preserved. The guidance's bare
+    #   correction/clarification slots (the s57:3:1 form) are not modeled
+    #   faces — a bare digit tail segment rejects as unexpected.
+    #
+    # == The legacy positional form (B/C emission; decodable for every
+    #    series, never emitted for S/P/M)
     #
     #   urn:iho:<type>:<number>[:ed-<x.y.z>][:sup-<n>][:part-<X>]
     #     [:spec-<n>[:specsub-<n>][:specvar-<X>]][:annex-<A>]
     #     [:appendix-<B>][:<sub>][:vol-<n>][:issue-<n>][:year-<yyyy>]
     #
     # Segment discipline (mirrors the ISO URN parser's strictness):
-    # - the docnumber occupies every leading bare number segment up to
-    #   the first marker, so a colon number ("158:100") round-trips
-    #   without escaping;
+    # - the docnumber occupies the first bare number segment; a further
+    #   bare digit segment binds checks_for — the S-158 member number as
+    #   its own segment ("urn:iho:s:158:100"), never glued into the
+    #   number (issue #774);
     # - every other component is a marker-prefixed segment validated
     #   against its own value pattern — unknown, reordered or junk
     #   segments raise {Pubid::Errors::UrnParseError}, never
     #   mis-consume;
-    # - the appendix subnumber is a bare digit atom allowed only
-    #   directly after its appendix segment (a year is always
-    #   marker-tagged, so a bare digit there can only be the subnumber);
+    # - the appendix subnumber is either the bare digit atom directly
+    #   after its appendix segment (the legacy emission) or the
+    #   hyphen-joined compound value ("appendix-D-2", the MRN emission);
     # - the issue is allowed only beside its volume and validated as
     #   digits;
     # - the S-4 spec atom is a child of its part (the citation letter
@@ -35,22 +57,39 @@ module Pubid
     # appendix values stored the subnumber inside one string, "D-2",
     # which decodes into the two components).
     #
+    # Both paths build through Builder.build — the S-158 alias
+    # unification (a draft-era part-S-102 URN decodes to the checks_for
+    # identity) and every other semantic validation is shared with the
+    # text parse.
+    #
     # Examples:
-    # - urn:iho:s:44:ed-5.0.0                  → IHO S-44 5.0.0
-    # - urn:iho:s:100:ed-5.0.0:part-2          → IHO S-100 5.0.0 Part 2
-    # - urn:iho:s:122:ed-1.0.0:appendix-D:2    → IHO S-122 1.0.0 Appendix D-2
-    # - urn:iho:p:5:vol-2024                   → IHO P-5 Vol. 2024
-    # - urn:iho:p:1:vol-30:issue-2             → IHO P-1 Vol. 30 (2)
-    # - urn:iho:s:158:100                      → IHO S-158:100
-    # - urn:iho:s:4:ed-4.10.0:part-B:spec-401  → IHO S-4 4.10.0 B-401
+    # - urn:mrn:iho:pub:spec:s44:5.0.0                  → IHO S-44 5.0.0
+    # - urn:mrn:iho:pub:spec:s158-102:1.0.0             → IHO S-158:102 1.0.0
+    # - urn:mrn:iho:pub:reg:m2:sup-1                    → IHO M-2 Sup 1
+    # - urn:mrn:iho:pub:per:p1:vol-30:issue-2           → IHO P-1 Vol. 30 (2)
+    # - urn:iho:s:44:ed-5.0.0                           → IHO S-44 5.0.0
+    # - urn:iho:s:158:100:ed-1.0.0                      → IHO S-158:100 1.0.0
+    # - urn:iho:s:4:ed-4.10.0:part-B:spec-401           → IHO S-4 4.10.0 B-401
     class UrnParser < Pubid::UrnParser::Base
       TYPE_LETTERS = %w[s p m b c].freeze
+
+      # The guidance publication type -> series letter (the emission's
+      # MRN_TYPES inverted). bathy/cb have no series in this flavor; an
+      # unknown type rejects.
+      MRN_TYPE_LETTERS = { "spec" => "S", "per" => "P", "reg" => "M" }.freeze
+
+      MRN_PREFIX = "urn:mrn:iho:pub:"
+      # The publication name: the lowercase series letter + number, the
+      # S-158 member hyphen-joined (s158-102).
+      MRN_NAME_RE = /\A([spmbc])(\d+)(?:-(\d+))?\z/
 
       # Marker => attribute, with the value pattern each marker's slot
       # accepts. The patterns mirror the grammar's own production rules
       # (upper-case letters are case-preserved; "part" allows the
       # digits-then-letters compound like "4a" beside a lone letter; the
-      # volume takes any serial locator, yearbook years included).
+      # volume takes any serial locator, yearbook years included;
+      # "appendix" allows the hyphen-joined compound "D-2" — the MRN
+      # emission — which splits into the appendix and its subnumber).
       MARKERS = {
         "ed" => [:edition, /\A\d+\.\d+\.\d+\z/],
         "sup" => [:supplement, /\A\d+\z/],
@@ -59,7 +98,7 @@ module Pubid
         "specsub" => [:spec_sub, /\A\d+\z/],
         "specvar" => [:spec_variant, /\A[A-Z]+\z/],
         "annex" => [:annex, /\A[A-Z]\z/],
-        "appendix" => [:appendix, /\A(?:[A-Z]|\d+)\z/],
+        "appendix" => [:appendix, /\A(?:[A-Z](?:-\d+)?|\d+)\z/],
         "vol" => [:volume, /\A\d+\z/],
         "issue" => [:issue, /\A\d+\z/],
         "year" => [:year, /\A(?:19|20)\d{2}\z/],
@@ -100,11 +139,64 @@ module Pubid
       SUBNUMBER_RE = /\A\d+\z/
       # The docnumber's own charset: digits with : / - suffix runs.
       NUMBER_RE = /\A\d+(?:[:\/-]\d+)*\z/
+      # The further bare segments that bind the S-158 member number.
+      CHECKS_SEGMENT_RE = /\A\d+\z/
 
       def parse_urn(urn)
+        return parse_mrn_urn(urn) if urn.downcase.start_with?(MRN_PREFIX)
+
+        parse_legacy_urn(urn)
+      end
+
+      private
+
+      # The guidance-form decode: publication type, name (number +
+      # optional S-158 member), the bare dotted edition, then the shared
+      # marker machinery (the positional ed-/year- attachment included).
+      # The body is NOT case-folded: values are case-preserved
+      # (appendix-D-2, part-B); only the type token lowercases.
+      def parse_mrn_urn(urn)
+        segments = urn[MRN_PREFIX.length..].split(":")
+        type_token = segments.shift.to_s.downcase
+        letter = MRN_TYPE_LETTERS.fetch(type_token) do
+          raise Pubid::Errors::UrnParseError,
+                "Unknown IHO publication type #{type_token.inspect} " \
+                "in #{urn.inspect}"
+        end
+        attrs = mrn_name_attributes!(segments, urn)
+        # the bare dotted edition in the canonical 4th segment
+        if segments.first&.match?(LEGACY_EDITION_RE)
+          attrs[:edition] = segments.shift
+        end
+        ctx = { component: nil, edition_owner: nil }
+        consume_segments!(attrs, segments, ctx, urn)
+        build_identifier({ type: letter, **attrs }, urn)
+      end
+
+      # The name segment: sNNN, or s158-NNN with the S-158 member bound
+      # as its own component. The series letter maps back through the
+      # type token; the name carries only the number (and member).
+      def mrn_name_attributes!(segments, urn)
+        name = segments.shift.to_s
+        match = MRN_NAME_RE.match(name)
+        unless match
+          raise Pubid::Errors::UrnParseError,
+                "Unknown IHO publication name #{name.inspect} in #{urn.inspect}"
+        end
+
+        attrs = { number: match[2] }
+        # the member designator rides the S-158 anchor; another series
+        # rejects through the builder's anchor assert
+        attrs[:checks_for] = match[3] if match[3]
+        attrs
+      end
+
+      # The legacy positional decode (the pre-guidance emission shape and
+      # every legacy spelling it decodes).
+      def parse_legacy_urn(urn)
         segments = split_parts(strip_namespace(urn))
         type_token = read_type!(segments, urn)
-        attrs = { number: consume_number!(segments, urn) }
+        attrs = consume_number!(segments, urn)
         # Positional context: the component the upcoming ed-/year- would
         # attach to, and the owner of the edition just consumed (a year
         # belongs to a component only when it follows that component's
@@ -114,14 +206,17 @@ module Pubid
         build_identifier({ type: type_token.upcase, **attrs }, urn)
       end
 
-      private
-
       # The semantic validations the builder applies to the decoded shape
-      # (the S-4 anchor, the citation letter) are URN validation at this
-      # layer: a URN that asserts a citation it cannot carry is a
-      # malformed URN, and the raw ArgumentError stays as the cause.
+      # (the S-4 anchor, the citation letter, the S-158 checks anchor)
+      # are URN validation at this layer: a URN that asserts a shape it
+      # cannot carry is a malformed URN, and the raw ArgumentError stays
+      # as the cause. The URN is the canonical shape, so the decoded
+      # identifier drops the parse-only spelling face — a legacy
+      # part-S-102 decode renders the canonical colon designator.
       def build_identifier(hash, urn)
-        Builder.build(hash)
+        identifier = Builder.build(hash)
+        identifier.checks_for_face = nil
+        identifier
       rescue ArgumentError => e
         raise Pubid::Errors::UrnParseError,
               "#{e.message} in #{urn.inspect}"
@@ -141,20 +236,23 @@ module Pubid
         end
       end
 
-      # The number occupies every leading bare number segment; the first
-      # segment that is not number-shaped ends it (and the segment loop
-      # below decides whether it is a legal marker).
+      # The first bare number segment is the docnumber; the next bare
+      # digit segment binds the S-158 member number (checks_for — the
+      # member as its own segment, never glued into the number), and
+      # anything else ends the number run (the segment loop below
+      # decides whether it is a legal marker).
       def consume_number!(segments, urn)
-        number = []
-        while segments.first&.match?(NUMBER_RE)
-          number << segments.shift
-        end
-        if number.empty?
+        number = segments.shift.to_s
+        unless number.match?(NUMBER_RE)
           raise Pubid::Errors::UrnParseError,
                 "Missing docnumber in #{urn.inspect}"
         end
 
-        number.join(":")
+        attrs = { number: number }
+        if segments.first&.match?(CHECKS_SEGMENT_RE)
+          attrs[:checks_for] = segments.shift
+        end
+        attrs
       end
 
       def consume_segment!(attrs, segments, ctx, urn)
@@ -174,8 +272,9 @@ module Pubid
 
       # A marker segment: validate the value against the marker's own
       # pattern, store it, and claim the bare atom that follows an
-      # appendix (its subnumber — the only bare atom allowed after a
-      # marker). The ed- and year- markers are POSITIONAL: the edition
+      # appendix (its subnumber — the legacy emission's only bare atom
+      # after a marker; the MRN emission hyphen-joins the compound
+      # instead). The ed- and year- markers are POSITIONAL: the edition
       # attaches to the component it follows (the base when no component
       # precedes it), and a year belongs to a component only when it
       # follows that component's own edition — the separately-published
@@ -188,7 +287,16 @@ module Pubid
         return consume_positional!(attrs, key, value, ctx, urn) if
           POSITIONAL_MARKERS.include?(key)
 
-        store!(attrs, key, value, urn)
+        # The hyphen-joined compound appendix value ("D-2", the MRN
+        # emission) splits into the appendix and its subnumber; the
+        # legacy emission instead carries the subnumber as the bare
+        # atom consumed below.
+        if key == :appendix && (compound = /\A([A-Z])-(\d+)\z/.match(value))
+          store!(attrs, :appendix, compound[1], urn)
+          store!(attrs, :appendix_subnumber, compound[2], urn)
+        else
+          store!(attrs, key, value, urn)
+        end
         ctx[:component] = key
         ctx[:edition_owner] = nil
         consume_subnumber!(attrs, key, segments, ctx, urn)

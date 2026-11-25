@@ -46,9 +46,25 @@ module Pubid
       # `number` overrides the generic Components::Code attribute with a plain
       # string (same pattern as the other string components); it holds the IHO
       # document number (e.g. "100", "1/21" until the slash-chain volume
-      # parse, "158:100"). Kept as the generic `number` so the relaton index
+      # parse, "158"). Kept as the generic `number` so the relaton index
       # sorts/binary-searches on it natively via `id.number`.
       attribute :number,     :string
+      # The S-158 series-member designator (issue #774; S-158 Ed 1.0.0
+      # clause 2.1): S-158 is a framework publication defining a series
+      # of separate check specifications — S-158:100 (generic),
+      # S-158:1xx (one per S-100 product; :101 ENC, :102 Bathymetric
+      # Surface), S-158:98 (interoperability), S-158:128 (catalogue) —
+      # each a publication of its own with its own edition stream. The
+      # value is the S-100 product number whose checks the member
+      # specifies; the colon form `S-158:102` is the primary designator.
+      attribute :checks_for, :string
+      # The spelling face of the member designator (facets-spelling-only,
+      # equality-ignored): the parse records the draft-era part value as
+      # written ("S-102", "102") so the render keeps the input's
+      # spelling; the canonical colon form renders when this is nil.
+      # Deserialization (from_hash) restores no face — equality/URN use
+      # the canonical shape.
+      attribute :checks_for_face, :string
       attribute :publisher,  :string, default: "IHO"
       # The official IHO edition is the dotted x.y.z (a plain string — the
       # ~16 string-edition flavors precede this). `IHO S-100 1.0.0` is
@@ -98,6 +114,12 @@ module Pubid
       attribute :spec_sub,     :string
       attribute :spec_variant, :string
 
+      # The member-designator spelling face carries no identity
+      # (facets-spelling-only): `S-158 Part S-102 0.2.0` and
+      # `S-158:102 0.2.0` are one document, so `==`, `hash`, `eql?` and
+      # the subset match skip the face; only the render reads it.
+      equality_ignored :checks_for_face
+
       # Polymorphic type map for lutaml::Model key_value serialization: maps
       # each subclass's polymorphic_name to its class name so `from_hash` can
       # re-instantiate the concrete type from `_type`.
@@ -117,6 +139,7 @@ module Pubid
       key_value do
         map "_type",      to: :_type, polymorphic_map: IHO_TYPE_MAP
         map "number",     to: :number
+        map "checks_for", to: :checks_for
         map "edition",    to: :edition
         map "year",       to: :year
         map "supplement",         to: :supplement
@@ -143,6 +166,16 @@ module Pubid
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
       # IHO_TYPE_MAP remains the key_value polymorphic_map.
+
+      # The deserialization path applies the same S-158 alias
+      # unification the parse path applies (Builder.normalize_checks_alias):
+      # a stored row or a legacy URN carrying the draft-era part model
+      # (part: "S-102", part_edition: "0.2.0") decodes to the checks_for
+      # identity (issue #774), so no construction path yields the
+      # two-identity disease of issue #775.
+      def self.from_hash(data, options = {})
+        super(Builder.normalize_checks_alias(data), options)
+      end
 
       # The volume/issue and appendix/subnumber pairs are scalar clusters:
       # a reference that omits the finer component must still match a hit
@@ -230,7 +263,10 @@ module Pubid
       end
 
       def base_code
-        "#{self.class.type[:short]}-#{number}"
+        code = +"#{self.class.type[:short]}-#{number}"
+        # the S-158 member designator rides the code (the colon form)
+        code << ":#{checks_for}" if checks_for
+        code
       end
 
       def compact_code

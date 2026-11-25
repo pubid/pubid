@@ -8,9 +8,10 @@ require "spec_helper"
 # unified vol- locator (a yearbook year IS a volume), sup-, and no legacy
 # `y.` yearbook marker emitted — its volume carries the year instead. This
 # schema bridges those rulings into the shared codec: the same atoms, in
-# the containment order of the official URN generator. The positional
-# urn:iho:… form of UrnGenerator stays on #to_urn — pubid emits no
-# urn:mrn:iho:… URN.
+# the containment order of the official URN generator, with the S-158
+# member designator riding the document code (`checks-`, issue #774).
+# The official URN of the S/P/M series is the adopted IHO MRN guidance
+# form (`urn:mrn:iho:pub:...`, UrnGenerator); this scheme is pubid's own.
 RSpec.describe "IHO pubid-scheme URN" do
   def expect_round_trip(string)
     id = Pubid::Iho.parse(string)
@@ -31,8 +32,6 @@ RSpec.describe "IHO pubid-scheme URN" do
     "IHO P-1 Vol. 30 (2)" => "urn:pubid:iho:pub:1:vol-30:issue-2",
     "IHO S-66 Sup 4" => "urn:pubid:iho:std:66:sup-4",
     "IHO S-100 Sup 1 2.0.0" => "urn:pubid:iho:std:100:sup-1:suped-2.0.0",
-    "IHO S-158 Part S-102 0.2.0" =>
-      "urn:pubid:iho:std:158:part-S-102:parted-0.2.0",
     "IHO S-52 Appendix 1 4.0.0" =>
       "urn:pubid:iho:std:52:appendix-1:apped-4.0.0",
     "IHO M-1 2.1.0" => "urn:pubid:iho:m:1:ed-2.1.0",
@@ -45,6 +44,53 @@ RSpec.describe "IHO pubid-scheme URN" do
 
     it "round-trips #{input}" do
       expect_round_trip(input)
+    end
+  end
+
+  # The S-158 series member (issue #774): the typed `checks-` atom rides
+  # the document code, before the edition; the draft-era part-faceted
+  # emission (`part-S-102`, `parted-`) is dead — no construction path
+  # yields it for an S-158 identity.
+  describe "the S-158 series member" do
+    {
+      "IHO S-158:102 1.0.0" => "urn:pubid:iho:std:158:checks-102:ed-1.0.0",
+      "IHO S-158 0.2.0 Part S-102" =>
+        "urn:pubid:iho:std:158:checks-102:ed-0.2.0",
+      "IHO S-158 Part S-102 0.2.0" =>
+        "urn:pubid:iho:std:158:checks-102:ed-0.2.0",
+      "IHO S-158 1.0.0" => "urn:pubid:iho:std:158:ed-1.0.0", # the framework
+      "IHO S-158:100" => "urn:pubid:iho:std:158:checks-100",
+    }.each do |input, urn|
+      it "renders #{input} as #{urn}" do
+        expect(Pubid::Iho.parse(input).to_pubid_urn).to eq(urn)
+      end
+    end
+
+    it "round-trips the member through the shared codec" do
+      id = Pubid::Iho.parse("IHO S-158:102 1.0.0")
+      back = Pubid.parse_urn(id.to_pubid_urn)
+      expect(back.to_hash).to eq(id.to_hash)
+    end
+
+    it "emits no part atom for the member (the parted- mis-bind is dead)" do
+      urn = Pubid::Iho.parse("IHO S-158 Part S-102 0.2.0").to_pubid_urn
+      expect(urn).not_to include("part-S-102")
+      expect(urn).not_to include("parted-")
+    end
+
+    it "rejects the legacy part-faceted URN as non-canonical" do
+      legacy = "urn:pubid:iho:std:158:part-S-102:parted-0.2.0"
+      # the decode path unifies the draft-era part model onto
+      # checks_for, so the legacy form cannot re-encode to itself
+      decoded = Pubid::Iho::Identifier.from_hash(
+        "_type" => "pubid:iho:standard", "number" => "158",
+        "part" => "S-102", "part_edition" => "0.2.0",
+      )
+      expect(decoded.checks_for).to eq("102")
+      expect(decoded.to_pubid_urn)
+        .to eq("urn:pubid:iho:std:158:checks-102:ed-0.2.0")
+      expect { Pubid.parse_urn(legacy) }
+        .to raise_error(Pubid::Errors::UrnParseError, /not canonical/)
     end
   end
 
@@ -62,8 +108,10 @@ RSpec.describe "IHO pubid-scheme URN" do
   end
 
   it "does not share the official URN's namespace" do
+    # the official URN of the S/P/M series is the adopted IHO MRN
+    # guidance form (urn:mrn:iho:...); this scheme is pubid's own
     expect(Pubid::Iho.parse("IHO S-44 5.0.0").to_urn)
-      .to start_with("urn:iho:")
+      .to start_with("urn:mrn:iho:")
     expect(Pubid::Iho.parse("IHO S-44 5.0.0").to_pubid_urn)
       .to start_with("urn:pubid:iho:")
   end

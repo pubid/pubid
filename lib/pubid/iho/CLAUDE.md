@@ -15,22 +15,20 @@ obeys.
 There is no `parser.rb` and no Parslet anywhere in this flavor: parse
 goes `Pubid::Parg::Model.bound(:iho, ...)` — the artifact's
 `bindings identifier` block delivers every component as an
-attribute-named scalar, and `Builder` only dispatches the series
-letter to its concrete class and pads one grammar-level alias (the
-S-100 `v1`/`v5.1` shorthand fills `edition` as `1.0.0`/`5.1.0`). The
-artifact is baked from `grammars/iho.parg` in pubid-grammar; the
-vendored twin `data/parg/iho.parg` is the embedded source's provenance
-copy and must move together with `data/parg/iho.json` (the ISO
-pattern).
+attribute-named scalar, and `Builder` dispatches the series letter to
+its concrete class and resolves two grammar-level aliases (the S-100
+`v1`/`v5.1` shorthand pads `edition` to `1.0.0`/`5.1.0`; the S-158
+draft-era part faces rebind onto `checks_for`). The artifact is baked
+from `grammars/iho.parg` in pubid-grammar; the vendored twin
+`data/parg/iho.parg` is the embedded source's provenance copy and must
+move together with `data/parg/iho.json` (the ISO pattern).
 
-**Bake pin:** the artifact must be baked at parsanol 1.3.126 (the
-grammar repo's `scripts/bake-one.rb` forces the gem version and
-verifies the `compiler_version` stamp). 1.3.127 is broken fleet-wide
-(parsanol-ruby#434 — its loud-loss check matches the binding PATH
-instead of the CAPTURE name), so both repos pin below it: the grammar
-repo's CI moved 1.3.121 → 1.3.126 with the component-model PR.
+**Bake pin:** the artifact must be baked at parsanol 1.5.1.0 (the
+fleet pin; the grammar repo's `scripts/bake-one.rb` forces the gem
+version and verifies the `compiler_version` stamp; bake at ruby 3.4.8).
 
-## The component model (owner rulings, 2026-11-03)
+## The component model (owner rulings, 2026-11-03; the S-158 series
+   model, issue #774, 2026-11-25)
 
 Every component is a FIRST-CLASS SEMANTIC component: a typed `:string`
 attribute, independently addressable, URN-encodable and matchable —
@@ -40,8 +38,9 @@ never a string suffix. All of them live flat on `Pubid::Iho::Identifier`
 | component   | attribute          | canonical face    | parse-only aliases           |
 |-------------|--------------------|-------------------|------------------------------|
 | edition     | `edition`          | `1.0.0` (bare)    | `v1`/`v5.1` (padded)         |
+| checks member | `checks_for`     | `:102` (the S-158 colon designator) | `Part S-102`, `S-158-S-102`, `Part 102` (the draft-era faces; `checks_for_face` keeps the spelling) |
 | supplement  | `supplement`       | `Sup 1`           | `Suppl 1`                    |
-| part        | `part`             | `Part A`/`Part 1`/`Part S-102` | `S-5-B`, `S-100-1`, `S-158-S-102` (compact) |
+| part        | `part`             | `Part A`/`Part 1` | `S-5-B`, `S-100-1` (compact) |
 | annex       | `annex`            | `Annex A`         | —                            |
 | appendix    | `appendix`         | `Appendix D`      | `App`, `Ap.`                 |
 | subnumber   | `appendix_subnumber` | `-2` (joined)   | —                            |
@@ -79,12 +78,24 @@ never a string suffix. All of them live flat on `Pubid::Iho::Identifier`
   cited edition-less). The builder raises when both appear. Every
   trailing edition now follows a component, so the historical
   edition-last spellings reinterpret as component editions.
-- **Series-reference parts**: a check standard applied to another IHO
-  series cites it as its part — `IHO S-158 0.2.0 Part S-102`, compact
-  `IHO S-158-S-102` (the part value vocabulary is letter | number |
-  `[SPMBC]-<digits>`). The wild glued `S-158-102` stays a plain number
-  part: the syntax cannot distinguish it from `S-100-1` = Part 1, and
-  normalizing it needs an IHO series table (owner call pending).
+- **Series-reference parts are DEAD on S-158 (issue #774, the S-158
+  series model; S-158 Ed 1.0.0 clause 2.1):** S-158 is a framework
+  publication defining a series of separate check specifications —
+  S-158:100 (generic), S-158:1xx (one per S-100 product; :101 ENC,
+  :102 Bathymetric Surface), S-158:98 (interoperability), S-158:128
+  (catalogue) — each a publication of its own with its own edition
+  stream. The colon designator `S-158:102` is the PRIMARY form and
+  binds the typed `checks_for` component; the draft-era spellings
+  (`S-158 Part S-102`, `S-158-S-102`, `S-158 Part 102`) are
+  NON-NORMALIZED ALIASES of the same identity — facets-spelling-only
+  (the render keeps the Part face through `checks_for_face`;
+  equality/URN use the canonical shape), and the edition that follows
+  the part face is the BASE edition (the parted- mis-bind of #775 is
+  fixed). A series-reference-shaped part face rebinds only while
+  checks_for is UNBOUND: `S-158:100 Part 2` keeps a genuine part. The
+  member designator rides the S-158 anchor only (`S-44:5` rejects).
+  Lettered/compound part values on other series are untouched
+  (`S-100-1` stays Part 1).
 - **Supplement canonical face is `Sup`** (the M-2 spelling — why save
   two characters when Annex and Appendix stay full-length); `Suppl`
   (the S-66 wild spelling) is the parse-only alias, never rendered.
@@ -162,49 +173,48 @@ Section 400` ≡ `IHO S-4 B-400` (one identity, two spellings).
   `%i[date year edition version]` already covers `:year` and
   `:edition`.
 
-## URN scheme — positional, containment-ordered
+## URN schemes — the adopted IHO MRN guidance + the legacy positional decode
 
-The URN mirrors the containment tree, one semantic atom per segment;
-the segment grammar table lives in the grammar header
-(`grammars/iho.parg`) and is implemented by
-`urn_generator.rb`/`urn_parser.rb`:
+The full scheme documentation lives in `lib/pubid/iho/urn.adoc` (the
+per-flavor home of the former `docs/URN-SCHEMES.adoc` iho section; the
+owner's per-flavor split ruling of 2026-11-25). The laws:
 
-    urn:iho:<type>:<number>[:ed-<x.y.z>][:sup-<n>][:part-<X>]
-      [:annex-<A>][:appendix-<B>][:<sub>][:vol-<n>][:issue-<n>]
-      [:year-<yyyy>]
+- **The S/P/M emission is the IHO MRN guidance form**
+  (`urn:mrn:iho:pub:<type>:<name>[:<edition>][:trailing...]`):
+  `spec` (S), `per` (P), `reg` (M); the name is the lowercase
+  `sNNN` (the guidance's own s57/s98 spelling); the dotted edition is
+  the bare canonical 4th segment; the S-158 member joins the name
+  hyphenated (`s158-102`, the fleet extension for compound publication
+  numbers). The B/C series have no guidance type code and keep the
+  legacy emission until IHO assigns one.
+- **The legacy positional `urn:iho:` grammar is decode-only for S/P/M**
+  (the B/C emission): marker segments, positional `ed-`/`year-`, the
+  bare appendix-subnumber atom, and the further bare digit segment
+  binding the S-158 member. The legacy 2.0.x spellings (dotted keys,
+  bare `a.b.c` editions, `y.`) stay decodable, never emitted.
+- **Both decode paths build through `Builder.build`** — the S-158
+  alias unification and every other semantic validation is shared
+  with the text parse; a URN decode renders the canonical shape (the
+  spelling face is parse-only).
 
-- Markers are the lowercased face tokens (`ed-` follows ISO's
-  RFC 5141 precedent); letters are case-preserved.
-- `ed-` and `year-` are POSITIONAL: the edition attaches to the node it
-  follows — the base when no component precedes it, else that
-  component's own edition (`vol-2:ed-1.0.1` = separately-published
-  volume). A `year-` belongs to a component only when it follows that
-  component's own edition; otherwise it is the base with-year
-  qualifier.
-- Containment: part ⊃ annex ⊃ appendix ⊃ subnumber (bare digit atom,
-  only directly after its appendix); vol ⊃ issue.
-- The number occupies every leading bare segment up to the first
-  marker, so a colon number (`S-158:100` → `urn:iho:s:158:100`)
-  round-trips without escaping. A colon number and a volume stay
-  distinct because the volume is marker-tagged (`urn:iho:s:158:2024`
-  vs `urn:iho:s:158:vol-2024` — the #637 hazard, kept under the
-  positional scheme).
-- The yearbook year emits as the volume (`urn:iho:p:5:vol-2024`);
-  `year-` exists only for the standards qualifier.
-- The parser validates every marker value against its own pattern and
-  rejects unknown/reordered/duplicate/junk segments with
-  `Pubid::Errors::UrnParseError` (the ISO urn_parser strictness); it
-  builds through `Builder.build` from the decoded attributes, so URN
-  decode and string parse share one construction path.
+    IHO S-44 5.0.0               -> urn:mrn:iho:pub:spec:s44:5.0.0
+    IHO S-158:102 1.0.0          -> urn:mrn:iho:pub:spec:s158-102:1.0.0
+    IHO S-158 Part S-102 0.2.0   -> urn:mrn:iho:pub:spec:s158-102:0.2.0 (order-stable)
+    IHO M-2 Sup 1                -> urn:mrn:iho:pub:reg:m2:sup-1
+    IHO P-1 Vol. 30 (2)          -> urn:mrn:iho:pub:per:p1:vol-30:issue-2
+    IHO B-4 2.19.0               -> urn:iho:b:4:ed-2.19.0 (legacy, no guidance code)
 
 **Breaking URN migrations this scheme carries** (legacy forms stay
-decodable, never emitted): the dotted keys (`part.4a`, `suppl.1`,
-`ap.A`, `annex.A`, `vol.30`, `issue.2`, `appendix.D-2`) and the bare
-a.b.c edition segment move to the marker segments; the #635/#637
-`y.2024` tag decodes into the **volume** (`urn:iho:p:5:y.2024` now
-re-emits as `urn:iho:p:5:vol-2024`). relaton-data-iho needs a re-crawl
-(it is already legacy pre-pubid-2 shape); the frozen testsuite corpus
-rows are re-frozen in the coupled corpus round.
+decodable, never emitted): the official-URN namespace moved to the
+guidance form (`urn:mrn:iho:pub:...`) for S/P/M; the S-158 member
+moved to the `s158-NNN` name encoding (issue #774) with the draft-era
+part spellings rebinding onto `checks_for` (#775's parted- mis-bind
+fixed); the dotted keys (`part.4a`, `suppl.1`, `ap.A`, `annex.A`,
+`vol.30`, `issue.2`, `appendix.D-2`) and the bare a.b.c edition segment
+stay decode-only; the #635/#637 `y.2024` tag decodes into the
+**volume**. relaton-data-iho needs a re-crawl (it is already legacy
+pre-pubid-2 shape); the frozen testsuite corpus rows are re-frozen in
+the coupled corpus round.
 
 ## Fixtures run through the classify pipeline
 
@@ -227,12 +237,18 @@ pubid pin moves in step with the relaton-data-iho re-key.
 
 ## pubid-scheme URN (issue #670)
 
-`lib/pubid/iho/pubid_urn_schema.rb`; rulings in `docs/URN-SCHEMES.adoc`
-(`[[urn-iho]]`). The atoms follow the containment order of
-`UrnGenerator::SEGMENTS` — the document's `ed-`/`year-` first, then each
-component with its own edition/year right after it (`sup-`, `part-`,
-`parted-`, `appendix-`, `appsub-`, `vol-`, `issue-` …). Case is preserved
-(`part-A`); the yearbook year is a volume (`vol-2024`, no `year-` value —
-the legacy `y.` marker stays decodable in the official URN parser, never
-emitted). The positional `urn:iho:` form of `UrnGenerator` stays on
-`#to_urn` — pubid emits no `urn:mrn:iho:…` URN.
+`lib/pubid/iho/pubid_urn_schema.rb`; rulings in the flavor's
+`lib/pubid/iho/urn.adoc`. The atoms follow the containment order of
+the official URN — the S-158 member designator rides the document code
+(`checks-102`, issue #774) before the document's `ed-`/`year-`, then
+each component with its own edition/year right after it (`sup-`,
+`part-`, `parted-`, `appendix-`, `appsub-`, `vol-`, `issue-` …). Case
+is preserved (`part-A`); the yearbook year is a volume (`vol-2024`, no
+`year-` value — the legacy `y.` marker stays decodable in the official
+URN parser, never emitted). The draft-era part-faceted S-158 emission
+(`part-S-102`, `parted-`) is dead: the `from_hash` unification
+redirects it onto the `checks_for` identity, so the legacy URN fails
+the canonical gate. The official URN of the S/P/M series is the
+adopted IHO MRN guidance form (`urn:mrn:iho:pub:...`); the
+`urn:pubid:iho:` scheme is pubid's own and is not governed by the
+guidance.
