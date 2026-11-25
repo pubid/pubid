@@ -1,0 +1,167 @@
+# IALA codeless publications (slug form): reports and proceedings, other
+# publications and manuals that iala.int lists with no code. The docid is
+# "IALA <product-URL slug>[ Ed <edition>][ (<language>)]". Source:
+# relaton/relaton-data-iala data/*.yaml, the 162 records that relaton#604
+# reported as unindexable (hand-off iala-codeless-publications).
+IALA 13th-vts-symposium-sustainable-safe-navigation-august-2016-report
+IALA 13th-vts-symposium-sustainable-safe-navigation-august-2016-report (E)
+IALA 14th-iala-symposium-report
+IALA 14th-iala-symposium-report (E)
+IALA 19th-iala-conference-report-without-the-delegates-contact-details
+IALA 19th-iala-conference-report-without-the-delegates-contact-details (E)
+IALA a-history-of-floating-aids-to-navigation-by-adrian-h-wilkins
+IALA a-history-of-floating-aids-to-navigation-by-adrian-h-wilkins (E)
+IALA ais-in-a-historic-perspective
+IALA ais-in-a-historic-perspective (E)
+IALA arctic-seminar-report
+IALA arctic-seminar-report (E)
+IALA cooperation-international-en-signalisation-maritime-1889-1955
+IALA cooperation-international-en-signalisation-maritime-1889-1955 (E)
+IALA definitions-conservation-of-historic-lighthouses
+IALA definitions-conservation-of-historic-lighthouses (E)
+IALA e-navigation-underway-2014-north-america
+IALA e-navigation-underway-2014-north-america (E)
+IALA e-navigation-underway-asia-pacific-conference-report
+IALA e-navigation-underway-asia-pacific-conference-report (E)
+IALA floataid-workshop
+IALA floataid-workshop (E)
+IALA global-sharing-of-maritime-data-2011
+IALA global-sharing-of-maritime-data-2011 (E)
+IALA guideline-for-preparation-of-conference-or-symposium Ed 3.0
+IALA guideline-for-preparation-of-conference-or-symposium Ed 3.0 (E)
+IALA heritage-seminar-santander-june-2008
+IALA heritage-seminar-santander-june-2008 (E)
+IALA iala-1957-1990-33-year-of-international-cooperation
+IALA iala-1957-1990-33-year-of-international-cooperation (E)
+IALA iala-complementary-lighthouse-manual
+IALA iala-complementary-lighthouse-manual (E)
+IALA iala-style-guide Ed 1.0
+IALA iala-style-guide Ed 1.0 (E)
+IALA iala-world-wide-radio-navigation-plan Ed 2
+IALA iala-world-wide-radio-navigation-plan Ed 2 (E)
+IALA ialabatt-ialalite-2008
+IALA ialabatt-ialalite-2008 (E)
+IALA international-cooperation-in-aids-to-navigation-1889-1955
+IALA international-cooperation-in-aids-to-navigation-1889-1955 (E)
+IALA international-e-navigation-underway-2014
+IALA international-e-navigation-underway-2014 (E)
+IALA international-e-navigation-underway-2015
+IALA international-e-navigation-underway-2015 (E)
+IALA international-e-navigation-underway-2016
+IALA international-e-navigation-underway-2016 (E)
+IALA international-e-navigation-underway-2018
+IALA international-e-navigation-underway-2018 (E)
+IALA international-e-navigation-underway-2019
+IALA international-e-navigation-underway-2019 (E)
+IALA maritime-radio-communications-plan
+IALA maritime-radio-communications-plan (E)
+IALA preliminary-results-iala-vts-questionnaire
+IALA preliminary-results-iala-vts-questionnaire (E)
+IALA questionnaire-responses-complementary-use-of-lighthouses
+IALA questionnaire-responses-complementary-use-of-lighthouses (E)
+IALA report-18th-iala-conference
+IALA report-18th-iala-conference (E)
+IALA report-conference-20th-iala-conference-in-brazil
+IALA report-conference-20th-iala-conference-in-brazil (E)
+IALA report-e-navigation-underway-international-2017
+IALA report-e-navigation-underway-international-2017 (E)
+IALA report-e-navigation-underway-north-america-2017
+IALA report-e-navigation-underway-north-america-2017 (E)
+IALA report-iala-workshop-common-phraseology-procedures-vts-communication
+IALA report-iala-workshop-common-phraseology-procedures-vts-communication (E)
+IALA report-iala-workshop-sustainable-light-power-next-generation
+IALA report-iala-workshop-sustainable-light-power-next-generation (E)
+IALA report-of-the-iala-workshop-on-the-future-of-marine-radiobeacon-dgps-dgnss
+IALA report-of-the-iala-workshop-on-the-future-of-marine-radiobeacon-dgps-dgnss (E)
+IALA report-of-the-workshop-on-marine-aton-in-the-autonomous-world
+IALA report-of-the-workshop-on-marine-aton-in-the-autonomous-world (E)
+IALA report-of-the-workshop-on-vts-competent-authorities
+IALA report-of-the-workshop-on-vts-competent-authorities (E)
+IALA report-of-the-wwa-seminar-on-the-safety-of-navigation-2019-turkey
+IALA report-of-the-wwa-seminar-on-the-safety-of-navigation-2019-turkey (E)
+IALA report-on-iala-workshop-on-vts-training-and-qualifications-2020-and-beyond
+IALA report-on-iala-workshop-on-vts-training-and-qualifications-2020-and-beyond (E)
+IALA report-on-joint-iala-iho-workshop-on-s-100-s-200-product-specification-development-and-portrayal
+IALA report-on-joint-iala-iho-workshop-on-s-100-s-200-product-specification-development-and-portrayal (E)
+IALA report-on-the-2nd-joint-iho-iala-workshop-s-100-s-200
+IALA report-on-the-2nd-joint-iho-iala-workshop-s-100-s-200 (E)
+IALA report-on-the-aton-engineering-workshop
+IALA report-on-the-aton-engineering-workshop (E)
+IALA report-on-the-iala-workshop-on-r-mode
+IALA report-on-the-iala-workshop-on-r-mode (E)
+IALA report-on-the-on-imt-workshop-for-marine-atons-september-2025-germany
+IALA report-on-the-on-imt-workshop-for-marine-atons-september-2025-germany (E)
+IALA report-on-the-seminar-on-vdes-singapore-2025
+IALA report-on-the-seminar-on-vdes-singapore-2025 (E)
+IALA report-on-the-workshop-digital-maritime-communications
+IALA report-on-the-workshop-digital-maritime-communications (E)
+IALA report-on-the-workshop-on-radionavigation-and-radiocommunication-technologies
+IALA report-on-the-workshop-on-radionavigation-and-radiocommunication-technologies (E)
+IALA report-on-the-workshop-on-sustainability-in-aton-provision
+IALA report-on-the-workshop-on-sustainability-in-aton-provision (E)
+IALA report-seminar-on-preservation-of-lighthouse-heritage-june-2013
+IALA report-seminar-on-preservation-of-lighthouse-heritage-june-2013 (E)
+IALA report-training-and-certification-of-aton-and-vts-personnel
+IALA report-training-and-certification-of-aton-and-vts-personnel (E)
+IALA report-workshop-iala-cyber-security
+IALA report-workshop-iala-cyber-security (E)
+IALA report-workshop-iala-erps
+IALA report-workshop-iala-erps (E)
+IALA report-workshop-iala-initial-operating-capabilities-phase-of-e-navigation-services-singapore
+IALA report-workshop-iala-initial-operating-capabilities-phase-of-e-navigation-services-singapore (E)
+IALA report-workshop-iala-the-enhancing-e-navigation-capability-digitalsea
+IALA report-workshop-iala-the-enhancing-e-navigation-capability-digitalsea (E)
+IALA risk-management-pawsa-iwrap-mk2-simulation
+IALA risk-management-pawsa-iwrap-mk2-simulation (E)
+IALA risk-seminar-singapore-2015
+IALA risk-seminar-singapore-2015 (E)
+IALA risk-seminar-turkey-2018
+IALA risk-seminar-turkey-2018 (E)
+IALA risk-training-seminar-cartagena-2019
+IALA risk-training-seminar-cartagena-2019 (E)
+IALA risk-training-seminar-china-2017
+IALA risk-training-seminar-china-2017 (E)
+IALA risk-training-seminar-france-2019
+IALA risk-training-seminar-france-2019 (E)
+IALA risk-training-seminar-oman-2011
+IALA risk-training-seminar-oman-2011 (E)
+IALA risk-training-seminar-panama-2016
+IALA risk-training-seminar-panama-2016 (E)
+IALA risk-training-seminar-south-africa-2018
+IALA risk-training-seminar-south-africa-2018 (E)
+IALA risk-training-seminar-sydney-2012
+IALA risk-training-seminar-sydney-2012 (E)
+IALA seminar-iwrap-mk-ii-2009-kuala-lumpur
+IALA seminar-iwrap-mk-ii-2009-kuala-lumpur (E)
+IALA seminar-on-maritime-digital-infrastructures-and-testbeds
+IALA seminar-on-maritime-digital-infrastructures-and-testbeds (E)
+IALA seminar-on-the-revision-of-imo-resolution-a-85720-guidelines-for-vts
+IALA seminar-on-the-revision-of-imo-resolution-a-85720-guidelines-for-vts (E)
+IALA seminar-simulation-in-vts-training-wageningen-2013
+IALA seminar-simulation-in-vts-training-wageningen-2013 (E)
+IALA short-range-aton-in-e-navigation-era-2012-brest
+IALA short-range-aton-in-e-navigation-era-2012-brest (E)
+IALA vts-training-workshop-warnemunda-2009
+IALA vts-training-workshop-warnemunda-2009 (E)
+IALA workshop-ais-aton-real-virtual-developments-uses
+IALA workshop-ais-aton-real-virtual-developments-uses (E)
+IALA workshop-application-of-aids-to-navigation-within-marine-spatial-planning-iala-2013
+IALA workshop-application-of-aids-to-navigation-within-marine-spatial-planning-iala-2013 (E)
+IALA workshop-aton-services-extremely-hot-climates
+IALA workshop-aton-services-extremely-hot-climates (E)
+IALA workshop-challenges-of-providing-aton-services-in-polar-regions
+IALA workshop-challenges-of-providing-aton-services-in-polar-regions (E)
+IALA workshop-employing-e-navigation-cssa
+IALA workshop-employing-e-navigation-cssa (E)
+IALA workshop-on-development-of-vhf-data-exchange-system-vdes
+IALA workshop-on-development-of-vhf-data-exchange-system-vdes (E)
+IALA workshop-on-harmonizing-vts-voice-communication
+IALA workshop-on-harmonizing-vts-voice-communication (E)
+IALA workshop-on-ioc-phase-for-e-navigation-services
+IALA workshop-on-ioc-phase-for-e-navigation-services (E)
+IALA workshop-on-shore-based-maritime-services-from-theory-to-practical-use
+IALA workshop-on-shore-based-maritime-services-from-theory-to-practical-use (E)
+IALA workshop-portrayal-of-data-and-information-at-a-vts-bremen-2013
+IALA workshop-portrayal-of-data-and-information-at-a-vts-bremen-2013 (E)
+IALA wwa-safety-of-navigation-seminar-february-2025
+IALA wwa-safety-of-navigation-seminar-february-2025 (E)

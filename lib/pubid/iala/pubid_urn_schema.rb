@@ -20,6 +20,7 @@ module Pubid
       type "pubid:iala:letter", "letter"
       type "pubid:iala:manual", "manual"
       type "pubid:iala:model-course", "mc"
+      type "pubid:iala:publication", "pub"
       type "pubid:iala:recommendation", "rec"
       type "pubid:iala:report", "rpt"
       type "pubid:iala:resolution", "r"

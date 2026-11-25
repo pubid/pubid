@@ -8,6 +8,7 @@ module Pubid
     class Builder
       def build(parsed)
         return build_annex(parsed) if parsed[:annex_marker]
+        return build_publication(parsed) if parsed[:slug]
 
         type_letter = stringify(parsed[:type_letter])&.upcase
         klass = Iala.identifier_klass_for_type_letter(type_letter)
@@ -26,6 +27,18 @@ module Pubid
       end
 
       private
+
+      # Build a codeless publication: the slug is its whole identity and
+      # goes into `number`, verbatim (no padding applies).
+      def build_publication(hash)
+        attrs = {
+          number: stringify(hash[:slug]),
+          edition: stringify(hash[:edition_value]),
+          language: stringify(hash[:language])&.upcase,
+        }.compact
+
+        Identifiers::Publication.new(**attrs)
+      end
 
       # Build the Annex wrapper from the bound map. The base composite in
       # the grammar stays unbound: its captures (type_letter, doc_number,
