@@ -6,7 +6,7 @@ module Pubid
     #
     # Parse goes through {Pubid::Parg::Model.bound} — the artifact's
     # `bindings identifier` block delivers every component as an
-    # attribute-named scalar (type, number, checks_for, part, annex,
+    # attribute-named scalar (type, number, product, part, annex,
     # appendix, appendix_subnumber, supplement, edition,
     # edition_shorthand, year, volume, issue) — so the builder dispatches
     # the series letter to its concrete class and resolves two
@@ -15,11 +15,11 @@ module Pubid
     #   dotted x.y.z edition ("1" -> "1.0.0", "5.1" -> "5.1.0");
     # - the S-158 draft-era spellings of the series-member designator
     #   (`S-158 Part S-102`, `S-158-S-102`, `S-158 Part 102`) rebind onto
-    #   `checks_for` — the model of issue #774, where the colon form
+    #   `product` — the model of issue #774, where the colon form
     #   `S-158:102` is the primary designator and the member is a
     #   publication of its own, not a part.
     class Builder
-      ATTRIBUTES = %i[number checks_for appendix appendix_subnumber part
+      ATTRIBUTES = %i[number product appendix appendix_subnumber part
                       annex supplement year volume issue
                       part_edition part_year supplement_edition
                       supplement_year annex_edition annex_year
@@ -32,11 +32,11 @@ module Pubid
       # ruling on the two publication modes).
       COMPONENT_EDITIONS = %i[part_edition supplement_edition annex_edition
                               appendix_edition volume_edition].freeze
-      # The S-158 series anchor: the only series the checks_for member
+      # The S-158 series anchor: the only series the product member
       # designator rides (issue #774 — the colon form `S-158:102` is the
       # S-158 series device; `S-44:5` has no such meaning and rejects).
       CHECKS_SERIES = "158"
-      # The draft-era part-face spellings that rebind onto checks_for:
+      # The draft-era part-face spellings that rebind onto product:
       # the expanded series reference ("Part S-102") and the bare member
       # number ("Part 102"). A lettered or compound part value ("Part A",
       # "Part 4a") is a genuine part face and never rebinds.
@@ -74,7 +74,7 @@ module Pubid
         # The alias unification {Builder#build} applies at parse time also
         # runs on the deserialization path ({Identifier.from_hash}), so a
         # stored row or a legacy URN carrying the draft-era part model
-        # decodes to the checks_for identity (issue #774). Pure function:
+        # decodes to the product identity (issue #774). Pure function:
         # returns the given hash untouched when it carries no draft-era
         # part face, a normalized copy otherwise. The spelling face is
         # NOT restored here — a deserialized identifier renders the
@@ -85,7 +85,7 @@ module Pubid
 
           part = data["part"] || data[:part]
           number = data["number"] || data[:number]
-          checks = data["checks_for"] || data[:checks_for]
+          checks = data["product"] || data[:product]
           type_key = data["_type"] || data[:_type]
           return data unless part && number == CHECKS_SERIES && !checks
           return data unless standard_type?(type_key)
@@ -107,7 +107,7 @@ module Pubid
           hash.delete(:part_edition)
           hash.delete("part_year")
           hash.delete(:part_year)
-          hash["checks_for"] = digits
+          hash["product"] = digits
           hash["edition"] ||= edition if edition
           hash["year"] ||= year if year
           hash
@@ -134,17 +134,17 @@ module Pubid
 
       private
 
-      # The S-158 alias unification (issue #774). A bound checks_for
+      # The S-158 alias unification (issue #774). A bound product
       # must ride the S-158 anchor. Otherwise a draft-era part face on
       # the S-158 family — a series reference ("Part S-102") or the
-      # bare member number ("Part 102") — rebinds onto checks_for: the
+      # bare member number ("Part 102") — rebinds onto product: the
       # member is a publication of its own, not a part. The edition
       # that follows the part face is the BASE edition (the parted-
       # mis-bind fix of issue #775), and the spelling face records the
       # part value as written so the render keeps the input's spelling
       # (facets-spelling-only; equality/URN use the canonical shape).
       def resolve_checks_alias!(attrs, type)
-        return assert_checks_anchor!(attrs, type) if attrs[:checks_for]
+        return assert_checks_anchor!(attrs, type) if attrs[:product]
 
         return unless type == S4_TYPE && attrs[:number] == CHECKS_SERIES
 
@@ -164,8 +164,8 @@ module Pubid
                 "duplicate year: the base year #{attrs[:year]} and the " \
                 "member year #{year} cannot both ride S-158:#{digits}"
         end
-        attrs[:checks_for] = digits
-        attrs[:checks_for_face] = attrs.delete(:part)
+        attrs[:product] = digits
+        attrs[:product_face] = attrs.delete(:part)
         attrs[:edition] ||= edition
         attrs[:year] ||= year
       end
@@ -177,8 +177,8 @@ module Pubid
         return if type == S4_TYPE && attrs[:number] == CHECKS_SERIES
 
         raise ArgumentError,
-              "the checks_for member designator is the S-158 series " \
-              "device: #{type}-#{attrs[:number]}:#{attrs[:checks_for]} " \
+              "the product member designator is the S-158 series " \
+              "device: #{type}-#{attrs[:number]}:#{attrs[:product]} " \
               "cannot carry it"
       end
 

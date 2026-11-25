@@ -57,14 +57,14 @@ module Pubid
       # each a publication of its own with its own edition stream. The
       # value is the S-100 product number whose checks the member
       # specifies; the colon form `S-158:102` is the primary designator.
-      attribute :checks_for, :string
+      attribute :product, :string
       # The spelling face of the member designator (facets-spelling-only,
       # equality-ignored): the parse records the draft-era part value as
       # written ("S-102", "102") so the render keeps the input's
       # spelling; the canonical colon form renders when this is nil.
       # Deserialization (from_hash) restores no face — equality/URN use
       # the canonical shape.
-      attribute :checks_for_face, :string
+      attribute :product_face, :string
       attribute :publisher,  :string, default: "IHO"
       # The official IHO edition is the dotted x.y.z (a plain string — the
       # ~16 string-edition flavors precede this). `IHO S-100 1.0.0` is
@@ -118,7 +118,7 @@ module Pubid
       # (facets-spelling-only): `S-158 Part S-102 0.2.0` and
       # `S-158:102 0.2.0` are one document, so `==`, `hash`, `eql?` and
       # the subset match skip the face; only the render reads it.
-      equality_ignored :checks_for_face
+      equality_ignored :product_face
 
       # Polymorphic type map for lutaml::Model key_value serialization: maps
       # each subclass's polymorphic_name to its class name so `from_hash` can
@@ -139,7 +139,7 @@ module Pubid
       key_value do
         map "_type",      to: :_type, polymorphic_map: IHO_TYPE_MAP
         map "number",     to: :number
-        map "checks_for", to: :checks_for
+        map "product", to: :product
         map "edition",    to: :edition
         map "year",       to: :year
         map "supplement",         to: :supplement
@@ -170,7 +170,7 @@ module Pubid
       # The deserialization path applies the same S-158 alias
       # unification the parse path applies (Builder.normalize_checks_alias):
       # a stored row or a legacy URN carrying the draft-era part model
-      # (part: "S-102", part_edition: "0.2.0") decodes to the checks_for
+      # (part: "S-102", part_edition: "0.2.0") decodes to the product
       # identity (issue #774), so no construction path yields the
       # two-identity disease of issue #775.
       def self.from_hash(data, options = {})
@@ -265,7 +265,7 @@ module Pubid
       def base_code
         code = +"#{self.class.type[:short]}-#{number}"
         # the S-158 member designator rides the code (the colon form)
-        code << ":#{checks_for}" if checks_for
+        code << ":#{product}" if product
         code
       end
 

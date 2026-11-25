@@ -9,7 +9,7 @@ require "spec_helper"
 # `y.` yearbook marker emitted — its volume carries the year instead. This
 # schema bridges those rulings into the shared codec: the same atoms, in
 # the containment order of the official URN generator, with the S-158
-# member designator riding the document code (`checks-`, issue #774).
+# member designator riding the document code (`product-`, issue #774).
 # The official URN of the S/P/M series is the adopted IHO MRN guidance
 # form (`urn:mrn:iho:pub:...`, UrnGenerator); this scheme is pubid's own.
 RSpec.describe "IHO pubid-scheme URN" do
@@ -47,19 +47,19 @@ RSpec.describe "IHO pubid-scheme URN" do
     end
   end
 
-  # The S-158 series member (issue #774): the typed `checks-` atom rides
+  # The S-158 series member (issue #774): the typed `product-` atom rides
   # the document code, before the edition; the draft-era part-faceted
   # emission (`part-S-102`, `parted-`) is dead — no construction path
   # yields it for an S-158 identity.
   describe "the S-158 series member" do
     {
-      "IHO S-158:102 1.0.0" => "urn:pubid:iho:std:158:checks-102:ed-1.0.0",
+      "IHO S-158:102 1.0.0" => "urn:pubid:iho:std:158:product-102:ed-1.0.0",
       "IHO S-158 0.2.0 Part S-102" =>
-        "urn:pubid:iho:std:158:checks-102:ed-0.2.0",
+        "urn:pubid:iho:std:158:product-102:ed-0.2.0",
       "IHO S-158 Part S-102 0.2.0" =>
-        "urn:pubid:iho:std:158:checks-102:ed-0.2.0",
+        "urn:pubid:iho:std:158:product-102:ed-0.2.0",
       "IHO S-158 1.0.0" => "urn:pubid:iho:std:158:ed-1.0.0", # the framework
-      "IHO S-158:100" => "urn:pubid:iho:std:158:checks-100",
+      "IHO S-158:100" => "urn:pubid:iho:std:158:product-100",
     }.each do |input, urn|
       it "renders #{input} as #{urn}" do
         expect(Pubid::Iho.parse(input).to_pubid_urn).to eq(urn)
@@ -81,14 +81,14 @@ RSpec.describe "IHO pubid-scheme URN" do
     it "rejects the legacy part-faceted URN as non-canonical" do
       legacy = "urn:pubid:iho:std:158:part-S-102:parted-0.2.0"
       # the decode path unifies the draft-era part model onto
-      # checks_for, so the legacy form cannot re-encode to itself
+      # product, so the legacy form cannot re-encode to itself
       decoded = Pubid::Iho::Identifier.from_hash(
         "_type" => "pubid:iho:standard", "number" => "158",
         "part" => "S-102", "part_edition" => "0.2.0",
       )
-      expect(decoded.checks_for).to eq("102")
+      expect(decoded.product).to eq("102")
       expect(decoded.to_pubid_urn)
-        .to eq("urn:pubid:iho:std:158:checks-102:ed-0.2.0")
+        .to eq("urn:pubid:iho:std:158:product-102:ed-0.2.0")
       expect { Pubid.parse_urn(legacy) }
         .to raise_error(Pubid::Errors::UrnParseError, /not canonical/)
     end

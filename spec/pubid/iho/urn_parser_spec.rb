@@ -75,7 +75,7 @@ RSpec.describe Pubid::Iho::UrnParser do
     # component, a bare base edition on the base
     "urn:iho:p:6:vol-2:ed-1.0.1" => "IHO P-6 Vol. 2 1.0.1",
     "urn:iho:p:6:ed-1.0.0:vol-2" => "IHO P-6 1.0.0 Vol. 2",
-    # the draft-era part-S-102 URN decodes to the checks_for identity
+    # the draft-era part-S-102 URN decodes to the product identity
     # through the shared builder unification (issue #774); the render
     # keeps the Part face only on the parse path — a URN decode renders
     # the canonical colon designator
@@ -125,12 +125,12 @@ RSpec.describe Pubid::Iho::UrnParser do
     "urn:iho:s:100:vol-30:vol-31" => "duplicate volume segment",
     "urn:iho:s:100:appendix-D:2:3" => "stray bare atom after the subnumber",
     # the member designator rides the S-158 anchor only (issue #774)
-    "urn:iho:s:44:5" => "the checks_for member designator is the S-158 series device",
+    "urn:iho:s:44:5" => "the product member designator is the S-158 series device",
     # the guidance form: unknown publication type, unknown name, the
     # un-modeled bare correction slot (the s57:3:1 form)
     "urn:mrn:iho:pub:bathy:s44:5.0.0" => "unknown publication type",
     "urn:mrn:iho:pub:spec:x44:5.0.0" => "unknown publication name",
-    "urn:mrn:iho:pub:spec:s44-5:1.0.0" => "the checks_for member designator is the S-158 series device",
+    "urn:mrn:iho:pub:spec:s44-5:1.0.0" => "the product member designator is the S-158 series device",
     "urn:mrn:iho:pub:spec:s57:3:1" => "unexpected segment",
     "urn:mrn:iho:pub:spec:s122:1.0.0:appendix-d-2" =>
       "invalid appendix value", # appendix letters stay case-preserved
@@ -148,7 +148,7 @@ RSpec.describe Pubid::Iho::UrnParser do
   {
     "IHO S-98 1.0.0 Annex A" => %i[edition annex],
     "IHO P-6 Vol. 2 1.0.1" => %i[volume volume_edition],
-    "IHO S-158:102 0.2.0" => %i[checks_for edition],
+    "IHO S-158:102 0.2.0" => %i[product edition],
     "IHO S-122 1.0.0 Appendix D-2" => %i[edition appendix appendix_subnumber],
     "IHO S-100 5.0.0 Part 2 (2024)" => %i[edition part year],
     "IHO S-4 4.10.0 B-401" => %i[edition part spec],
@@ -174,14 +174,14 @@ RSpec.describe Pubid::Iho::UrnParser do
 
   # The draft-era spellings survive the hash round-trip too: the
   # unification runs on from_hash, so a stored row carrying the part
-  # model decodes to the checks_for identity (issue #774).
+  # model decodes to the product identity (issue #774).
   it "unifies the draft-era part model on from_hash" do
     legacy_row = {
       "_type" => "pubid:iho:standard", "number" => "158",
       "part" => "S-102", "part_edition" => "0.2.0",
     }
     from_hash = Pubid::Iho::Identifier.from_hash(legacy_row)
-    expect(from_hash.checks_for).to eq("102")
+    expect(from_hash.product).to eq("102")
     expect(from_hash.edition).to eq("0.2.0")
     expect(from_hash.part).to be_nil
     expect(from_hash).to eq(Pubid::Iho.parse("IHO S-158:102 0.2.0"))
