@@ -15,8 +15,10 @@ module Pubid
     #   urn:mrn:iala:pub:c0103-1              → IALA C0103-1
     #   urn:mrn:iala:pub:g1045:annex:ed1      → IALA G1045 Annex Ed 1
     #   urn:mrn:iala:pub:g1128:annex-a:ed1.6  → IALA G1128 ANNEX A Ed 1.6
+    #   urn:mrn:iala:pub:s-201:ed2.0.0        → IALA S-201 2.0.0
+    #   urn:mrn:iala:pub:s-201:annex-b2       → IALA S-201 ANNEX B2
     class UrnParser < Pubid::UrnParser::Base
-      PREFIX = "urn:mrn:iala:pub:".freeze
+      PREFIX = "urn:mrn:iala:pub:"
 
       def parse_urn(urn)
         body = strip_namespace(urn)
@@ -30,17 +32,18 @@ module Pubid
 
         parts.drop(1).each do |seg|
           case seg
-          when /\Aannex(-([a-z]))?\z/i
+          when /\Aannex(-([a-z]\d?))?\z/i
             # UrnGenerator emits "annex" (bare) for the Annex-without-letter
             # form and "annex-X" (lettered) for the uppercase ANNEX form.
             # The human parser accepts both "Annex" and "ANNEX"; mirror the
-            # generator's casing so URN round-trip is exact.
+            # generator's casing so URN round-trip is exact. The letter
+            # carries the sub-numbered S-100 annex letters ("annex-b2").
             annex_letter = Regexp.last_match(2)&.upcase
             annex_form = annex_letter ? "ANNEX" : "Annex"
           # Edition marker: case-insensitive with an optional separator dot.
           # Both variants occur in published documents (R1026 prints
           # "Ed1.0" and "ed.1.0"); each parses to the canonical edition
-          # value and re-renders as lowercase "ed<x.x>".
+          # value and re-renders as lowercase "ed<x.y[.z]>".
           when /\Aed\.?/i
             edition = seg.sub(/\Aed\.?/i, "")
           when /\A[a-z]\z/i
@@ -51,6 +54,9 @@ module Pubid
         text = "IALA #{code.upcase}"
         text += " #{annex_form}" if annex_form
         text += " #{annex_letter}" if annex_letter
+        # The S-100-family codes carry the bare dotted edition on the
+        # human face; the rebuilt text names the edition through the
+        # grammar's "Ed" alias and the renderer restores the bare face.
         text += " Ed #{edition}" if edition
         text += " (#{language})" if language
         flavor_parse(text)

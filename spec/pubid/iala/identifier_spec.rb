@@ -44,6 +44,18 @@ RSpec.describe Pubid::Iala::Identifier do
       "IALA G1045 Annex Ed 1"      => "IALA G1045 Annex Ed 1",
       "IALA G1128 ANNEX A Ed 1.6"  => "IALA G1128 ANNEX A Ed 1.6",
       "IALA G1128 ANNEX D Ed 1.6 (E)" => "IALA G1128 ANNEX D Ed 1.6 (E)",
+      # S-100-family product specifications — the IHO-granted S-201..S-299
+      # range, hyphenated lexical form, bare dotted edition (iala.int's
+      # own citation form "S-201 2.0.0"). The prefixed spellings are
+      # normalizing aliases: the designation carries no publisher token.
+      "S-201 2.0.0"                => "S-201 2.0.0",
+      "IALA S-201 2.0.0"           => "S-201 2.0.0",
+      "IALA S-201 Ed 2.0.0"        => "S-201 2.0.0",
+      "IALA S-201:ed2.0.0"         => "S-201 2.0.0",
+      "IALA s-201 2.0.0"           => "S-201 2.0.0",
+      "S-201"                      => "S-201",
+      "S-230 1.0.0 (E)"            => "S-230 1.0.0 (E)",
+      "S-201 ANNEX B2"             => "S-201 ANNEX B2",
     }.each do |input, canonical|
       it "parses #{input.inspect} → #{canonical.inspect}" do
         expect(Pubid::Iala.parse(input).to_s).to eq(canonical)
@@ -100,6 +112,18 @@ RSpec.describe Pubid::Iala::Identifier do
         .to be_a(Pubid::Iala::Identifiers::Annex)
     end
 
+    it "routes S-100-family specs to Identifiers::ProductSpecification" do
+      expect(Pubid::Iala.parse("S-201 2.0.0"))
+        .to be_a(Pubid::Iala::Identifiers::ProductSpecification)
+    end
+
+    it "routes the S-100 annex wrapper to Identifiers::Annex" do
+      annex = Pubid::Iala.parse("S-201 ANNEX B2")
+      expect(annex).to be_a(Pubid::Iala::Identifiers::Annex)
+      expect(annex.base).to be_a(Pubid::Iala::Identifiers::ProductSpecification)
+      expect(annex.letter).to eq("B2")
+    end
+
     it "zero-pads typed base numbers to 4 digits" do
       expect(Pubid::Iala.parse("M1").number).to eq("0001")
       expect(Pubid::Iala.parse("M0001").number).to eq("0001")
@@ -134,6 +158,26 @@ RSpec.describe Pubid::Iala::Identifier do
     it "raises on unparseable input" do
       expect { Pubid::Iala.parse("XYZ123-BAD") }.to raise_error(StandardError)
     end
+
+    {
+      # Outside the IHO-granted S-201..S-299 range: 200 is excluded (the
+      # range "spans from S-201"), and other hundreds digits are other
+      # orgs' grants (WMO's S-4xx, IHO's S-1xx).
+      "S-200 1.0.0"  => nil,
+      "S-411 1.2.1"  => nil,
+      "S-101 1.0.0"  => nil,
+      # Not the granted three-digit shape.
+      "S-30 2.0"     => nil,
+      "S-2011 2.0.0" => nil,
+      "S-"           => nil,
+      # An edition needs a value.
+      "S-201 Ed"     => nil,
+    }.each do |input, _|
+      it "rejects #{input.inspect}" do
+        expect { Pubid::Iala.parse(input) }
+          .to raise_error(Pubid::Errors::ParseError)
+      end
+    end
   end
 
   describe "#to_urn" do
@@ -151,6 +195,12 @@ RSpec.describe Pubid::Iala::Identifier do
       # URNs for Annex variants
       "IALA G1045 Annex Ed 1"      => "urn:mrn:iala:pub:g1045:annex:ed1",
       "IALA G1128 ANNEX A Ed 1.6"  => "urn:mrn:iala:pub:g1128:annex-a:ed1.6",
+      # The S-100-family codes: hyphenated lowercase doc id, dotted
+      # edition after the same ed marker (the mission form).
+      "S-201 2.0.0"                => "urn:mrn:iala:pub:s-201:ed2.0.0",
+      "S-230 1.0.0 (E)"            => "urn:mrn:iala:pub:s-230:ed1.0.0:e",
+      "S-201 ANNEX B2"             => "urn:mrn:iala:pub:s-201:annex-b2",
+      "S-201 Annex A 1.0.0"        => "urn:mrn:iala:pub:s-201:annex-a:ed1.0.0",
     }.each do |input, urn|
       it "renders #{input.inspect} as #{urn.inspect}" do
         expect(Pubid::Iala.parse(input).to_urn).to eq(urn)
@@ -171,6 +221,10 @@ RSpec.describe Pubid::Iala::Identifier do
       urn:mrn:iala:pub:g1045:annex:ed1
       urn:mrn:iala:pub:g1128:annex-a:ed1.6
       urn:mrn:iala:pub:g1128:annex-d:ed1.6:e
+      urn:mrn:iala:pub:s-201:ed2.0.0
+      urn:mrn:iala:pub:s-201
+      urn:mrn:iala:pub:s-230:ed1.0.0:e
+      urn:mrn:iala:pub:s-201:annex-b2
     ].each do |urn|
       it "round-trips #{urn.inspect} through the parser" do
         id = Pubid::Iala.parse(urn)
@@ -230,6 +284,9 @@ RSpec.describe Pubid::Iala::Identifier do
       IALA\ L2.7.1-2\ Ed\ 2\ (E)
       IALA\ G1045\ Annex\ Ed\ 1
       IALA\ G1128\ ANNEX\ A\ Ed\ 1.6
+      S-201\ 2.0.0
+      S-230\ 1.0.0\ (E)
+      S-201\ ANNEX\ B2
     ].each do |code|
       it "round-trips #{code.inspect}" do
         id = Pubid::Iala.parse(code)

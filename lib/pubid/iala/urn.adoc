@@ -1,0 +1,133 @@
+= IALA URN schemes
+
+The IALA flavor carries two URN forms: the official Maritime Resource
+Name (`#to_urn`) and the pubid scheme (`#to_pubid_urn`, the round-trip
+codec). This file is the flavor's URN record; the mixed
+`docs/URN-SCHEMES.adoc` keeps its per-flavor snapshots frozen.
+
+== Official URN: the IALA MRN scheme (`#to_urn`)
+
+IALA owns the `mrn` URN namespace's IALA subtree. The scheme is defined
+by three IALA documents, all published through the IALA MRN portal
+(https://www.iala.int/technical/data-modelling-mrn/):
+
+* *IALA Recommendation (Normative) R1023, Maritime Resource Names, Ed
+  1.0, June 2022* —
+  https://www.iala.int/technical/data-modelling-mrn/ (R1023). Normative
+  root: it ADOPTS the MRN and RECOMMENDS observing G1143; its own cover
+  and every page footer print the attested publication form
+  `urn:mrn:iala:pub:r1023:ed1.0`.
+* *IALA Guideline G1143, Unique Identifiers for Maritime Resources, Ed
+  3.1* —
+  https://www.iala.int/technical/data-modelling-mrn/ (G1143). The
+  structure-and-use authority R1023 points at: the ABNF, the character
+  set, case rules, and the per-type annexes.
+* *IALA Guideline G1164, Management of MRN Organisation Identifiers,
+  Ed 1.1* —
+  https://www.iala.int/technical/data-modelling-mrn/ (G1164). The
+  org-ID governance: rules for OIDs, IALA's own org id, and the
+  application procedure.
+
+=== The derived scheme
+
+G1143 §5.1/§5.2 define the MRN as
+`urn:mrn:<governing-organization>:<type>:<type-specific-part>` with the
+type (the Organization-specific namespace ID) a minimum of three
+*lowercase alphanumeric* characters, the whole MRN case-insensitive and
+conventionally lowercase (§5.1.3). The flavor emits:
+
+----
+urn:mrn:iala:pub:<doc-id>[:annex[-<letter>]][:ed<edition>][:<lang>]
+----
+
+[cols="3,1,4",options="header"]
+|===
+| segment | rule | source
+| `urn:mrn:` | lowercase conventional (case-insensitive) | G1143 §5.1
+| `iala` | IALA's Organization ID (min 3 lowercase alphanumerics, never
+  an ISO 3166-1 alpha-3 code) | G1164 §3.1; the portal's OID registry
+  row `urn:mrn:iala:`
+| `pub` | the publication type, 3 lowercase alphanumerics (G1143 Annex
+  A4; the other defined types are `aton`, `vts`, `wwy`, and the
+  wildcards `obj`/`int`) | G1143 §5.2, Annex A
+| `<doc-id>` | the lowercase document identifier in IALA's managed
+  namespace: the legacy series codes joined letter+number (`s1070`,
+  `r0126`, `c0103-1`, `m0001`, `ga01.01`, `l2.1.11`, `a12-01`, the
+  reserved `x0123`, `p0123`) and the S-100-family codes hyphenated
+  (`s-201` … `s-299`) | G1143 Annex A4
+| `annex[-<letter>]` | the Annex wrapper (lettered form for `ANNEX`
+  A-style, bare for `Annex` without a letter; the letter carries the
+  sub-numbered S-100 annex letters, `annex-b2`) — a managed-namespace
+  extension; no cover prints it yet | G1143 Annex A4 (the managed
+  namespace is IALA's to define)
+| `ed<edition>` | the edition glued after the lowercase `ed` marker,
+  digits verbatim in IALA's own face: dotted `x.y` for the legacy
+  series (`ed1.0`, `ed3.1`, `ed2.0` — the cover/footer forms of R1023,
+  G1143 and G1164, and G1164 §2's `urn:mrn:iala:pub:g1143:ed2.0`
+  example), dotted `x.y.z` for the S-100-family product specifications
+  (`ed2.0.0`, IALA S-201 Edition 2.0.0) | R1023/G1143/G1164 covers;
+  G1164 §2
+| `<lang>` | one lowercase letter (`e`, `f`, `s`) — the catalogue's own
+  language suffix form (`urn:mrn:iala:pub:a12-01:e`) | relaton-data-iala
+  assigned MRNs
+|===
+
+=== Divergences found against the official rules (2026-11 revamp)
+
+* The S-100-family product specifications were outside the grammar:
+  `S-201 2.0.0` raised in the flavor, the lower-case spelling fell to
+  the codeless `Publication` (`#to_urn` nil), and the bare string was
+  claimed by the WMO flavor's generic S-rule — the wrong organization's
+  namespace (`urn:mrn:wmo:pub:s-201:ed2.0.0`). The IHO grant fixes the
+  range (S-201..S-299, hundreds digit 2), the hyphenated lexical form,
+  and the dotted edition; the exact round trip on the bare face now
+  routes the strings here, while WMO keeps its own S-4xx (the
+  pubid#469/#763 dual-perspective law: the lexical form leads no
+  prefix; each org assigns its own identifier).
+* Everything already attested was verified conformant and unchanged:
+  the 15 cover/footer URNs transcribed into the testsuite corpus and
+  the 687 catalogue-assigned MRNs in relaton-data-iala all match the
+  emission (lowercase doc id, `pub` type, glued `ed` marker, dotted
+  editions, `:lang` suffix). No frozen URN changed in the revamp.
+* The corpus-attested malformed R1026 spellings (`Ed1.0`, `ed.1.0`)
+  stay parse-accepted as normalization aliases; the canonical emission
+  is the lowercase glued form.
+
+=== Parse acceptance
+
+The MRN is case-insensitive (G1143 §5.1.3): the namespace, the code,
+the annex segments, the `ed` marker and the language letter all parse
+in any case. The parser rebuilds the human identifier through the
+grammar, so URN decode and string parse share one construction path.
+
+== The pubid-scheme URN (`#to_pubid_urn`)
+
+Namespace: `urn:pubid:iala:` (the `_type` flavor segment). Schema:
+`lib/pubid/iala/pubid_urn_schema.rb`; the fleet-wide design rules live
+in the root `CLAUDE.md`'s URN bullet (issue #656).
+
+[cols="3,1,1,1,4",options="header"]
+|===
+| `_type` | token | core | example
+| `pubid:iala:advice` | `advice` | number | `IALA A12-01`
+| `pubid:iala:annex` | `annex` | number | `IALA G1045 Annex Ed 1`
+| `pubid:iala:general-assembly` | `ga` | number | `IALA GA01.01`
+| `pubid:iala:guideline` | `g` | number | `urn:mrn:iala:pub:g1195:ed1.0`
+| `pubid:iala:identifier` | `id` | number | —
+| `pubid:iala:letter` | `letter` | number | `IALA L2.1.11 Ed 2`
+| `pubid:iala:manual` | `manual` | number | `IALA M0001 Ed 9.0`
+| `pubid:iala:model-course` | `mc` | number | `urn:mrn:iala:pub:c0103-1:ed3.0`
+| `pubid:iala:product-specification` | `ps` | number | `S-201 2.0.0`
+| `pubid:iala:publication` | `pub` | number | `IALA arctic-seminar-report (E)`
+| `pubid:iala:recommendation` | `rec` | number | `urn:mrn:iala:pub:r1023:ed1.0`
+| `pubid:iala:report` | `rpt` | number | —
+| `pubid:iala:resolution` | `r` | number | —
+| `pubid:iala:standard` | `std` | number | `urn:mrn:iala:pub:s1040:ed2.0`
+|===
+
+Atoms, canonical order: `ed-` (`edition`), `lang-` (`language`),
+`annexform-` (`annex_form`), `letter-` (`letter`).
+
+The codeless publications (`pub`, the product-URL slug as core
+`number`) have no official URN: `#to_urn` is nil, because IALA assigns
+them no MRN (the #772 ruling).

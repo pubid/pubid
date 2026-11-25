@@ -8,6 +8,7 @@ module Pubid
     class Builder
       def build(parsed)
         return build_annex(parsed) if parsed[:annex_marker]
+        return build_product_spec(parsed) if parsed[:s100_number]
         return build_publication(parsed) if parsed[:slug]
 
         type_letter = stringify(parsed[:type_letter])&.upcase
@@ -28,6 +29,21 @@ module Pubid
 
       private
 
+      # Build an S-100-family product specification: the grammar's
+      # s100_number capture (the digits after "S-", e.g. "201") is the
+      # whole identity; the hyphen and the S are the code face the
+      # renderer and the URN generator add. The edition is the S-100
+      # dotted x.y.z, carried verbatim.
+      def build_product_spec(hash)
+        attrs = {
+          number: stringify(hash[:s100_number]),
+          edition: stringify(hash[:edition_value]),
+          language: stringify(hash[:language])&.upcase,
+        }.compact
+
+        Identifiers::ProductSpecification.new(**attrs)
+      end
+
       # Build a codeless publication: the slug is its whole identity and
       # goes into `number`, verbatim (no padding applies).
       def build_publication(hash)
@@ -46,9 +62,16 @@ module Pubid
       # harvest hoists them to the top level and this branch reads the
       # same flat keys as the plain identifier.
       def build_annex(hash)
-        base_type = stringify(hash[:type_letter])&.upcase
-        base_klass = Iala.identifier_klass_for_type_letter(base_type)
-        base = base_klass.new(number: build_number(hash, base_klass))
+        base =
+          if hash[:s100_number]
+            Identifiers::ProductSpecification.new(
+              number: stringify(hash[:s100_number]),
+            )
+          else
+            base_type = stringify(hash[:type_letter])&.upcase
+            base_klass = Iala.identifier_klass_for_type_letter(base_type)
+            base_klass.new(number: build_number(hash, base_klass))
+          end
 
         attrs = {
           base: base,
