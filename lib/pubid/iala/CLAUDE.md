@@ -85,7 +85,9 @@ that no pubid parse covers.
 - **The slug is `number`.** It uses the inherited attribute, so
   `root.number` (the relaton-index key) is the slug and `to_hash` is
   `{_type: "pubid:iala:publication", number, edition?, language?}`. No
-  padding applies.
+  padding applies. (162 records, classified into
+  `spec/fixtures/iala/identifiers/pass/publication.txt` from
+  `identifiers/full/identifiers.txt`).
 - **Grammar**: `slug_identifier` is the last alternative of
   `identifier`, so every typed code keeps priority (`IALA G1164 Ed 1.1`
   stays a Guideline). A typed code starts upper-case and a slug
@@ -184,3 +186,15 @@ from relaton-data-iala primary docidentifiers plus the 15 MRN URNs
 transcribed from the published PDFs in metanorma/mn-samples-iala
 `reference-docs/` (including the two malformed R1026 spellings, kept
 byte-identical as normalization aliases).
+
+The gem's own fixture corpus follows the fleet classification layout:
+`spec/fixtures/iala/identifiers/full/identifiers.txt` is the source of
+truth (one row per line under a provenance header; the attestation
+pipeline reads it), and `pass/` + `fail/` are regenerated from it by
+`rake "validation:classify[iala]"` — never hand-edited. The former
+hand-curated `pass/iala.txt`, `pass/iala-urns.txt` and
+`pass/iala-publications.txt` moved into the full file verbatim (the
+conservation law `full/ == pass/ + fail/` replaced them). The S-2xx
+product-specification forms, their aliases and the grant-bound rejects
+(`S-411` stays WMO's; the bare S-2xx face routes to IALA, not WMO) are
+attested there with their sources.

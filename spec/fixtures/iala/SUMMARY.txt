@@ -1,0 +1,23 @@
+Flavor: IALA
+Classified: 2026-11-25 13:25:03
+======================================================================
+
+OVERALL STATISTICS
+----------------------------------------------------------------------
+Total: 905
+Pass: 899 (99.34%)
+Fail: 6 (0.66%)
+
+BY CLASS
+----------------------------------------------------------------------
+annex                                    Pass: 11/11 (100.0%)
+general_assembly                         Pass: 37/37 (100.0%)
+guideline                                Pass: 345/345 (100.0%)
+letter                                   Pass: 6/6 (100.0%)
+manual                                   Pass: 9/9 (100.0%)
+model_course                             Pass: 85/85 (100.0%)
+product_specification                    Pass: 21/21 (100.0%)
+publication                              Pass: 162/162 (100.0%)
+recommendation                           Pass: 206/206 (100.0%)
+standard                                 Pass: 17/17 (100.0%)
+unknown                                  Pass: 0/6 (0.0%)
