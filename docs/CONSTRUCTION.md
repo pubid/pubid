@@ -400,3 +400,24 @@ in pubid-grammar. The concept page and the `.pfs` language reference live
 on the website at
 [PFS — the PubID Format Schema](https://www.pubid.com/concepts/pfs) and
 [The .pfs Format Schema Language](https://www.pubid.com/library/pfs).
+
+### The tooling (`scripts/pfs`, `rake pfs:*`)
+
+The composition layer is operated by the PFS CLI in pubid-grammar
+([`scripts/pfs`](https://github.com/pubid/pubid-grammar/blob/main/scripts/pfs));
+the gem's Rakefile wraps the same commands against the sibling checkout
+(`../pubid-grammar`, or `PUBID_GRAMMAR_PATH`), so the drift checks read
+THIS checkout's vendored artifacts:
+
+| Command | What it does |
+|---------|--------------|
+| `pfs new <org>` / `rake pfs:new[Org,scheme=acme,out=...]` | the composed-flavor scaffold — the six module bindings, the adoption dispatch, the dated supplement wrappers; the generated definition compiles + verifies GREEN immediately |
+| `pfs lint <file>` / `rake pfs:lint[...]` | the compile-time guarantees as pre-compile diagnostics — named, actionable rules (`PFS001` schema version, `PFS002` module pins, `PFS003`/`PFS004` collisions, `PFS005` reserved tokens, `PFS006` citations, `PFS007` the v2 numeric-kind surface, `PFS008` supplement declarations, `PFS009` examples, `PFS010` unknown keys) |
+| `pfs doctor` / `rake pfs:doctor` | the drift checks: the fleet pin (+ the ruby toolchain — the seal is toolchain-sensitive), artifact freshness re-sealed through the compiler's own checksum machinery, the contracts round, **gem parity against this checkout's `data/parg/`**, the testsuite attestation (pubid/pubid-testsuite#130) |
+| `pfs capture <specimen>` / `rake pfs:capture[...]` | the lossless wizard substrate — the identifiers enter as data, a draft schema carries the rows in the REQUIRED format, the round-trip is verified at write time |
+| `pfs cutover <key>` / `rake pfs:cutover[...]` | the dev-alias → canonical graduation — the readiness gates (the attestation ledger, gem parity, committed outputs) and the mechanical plan; the recipe is pubid-grammar's `docs/CUTOVER.md` |
+
+`rake pfs:doctor` from the gem is the consumer-side view of the same
+drift the grammar repo's doctor reports — run it before a release: a
+vendored artifact that differs from the grammar repo's compiled one fails
+`DRIFT004` here, and the parser of record has drifted.
