@@ -4,14 +4,15 @@ module Pubid
   module Iho
     # Parses IHO URNs back into identifiers, both emitted schemes:
     #
-    # == The adopted IHO MRN guidance form (S/P/M emission)
+    # == The adopted IHO MRN guidance form (the emission of every series)
     #
     #   urn:mrn:iho:pub:<type>:<name>[:<edition>][:<trailing atoms>...]
     #
-    # - <type>: spec / per / reg — the guidance publication types
-    #   (Standards and Specifications, periodic publications,
-    #   Miscellaneous Base Regulatory Publications); each maps back to
-    #   its series letter.
+    # - <type>: bathy / cb / reg / per / spec — the guidance publication
+    #   types (the five S-11 Part C Ed 1.0.0 section 1.2 groups:
+    #   Bathymetric Publications, Capacity Building Publications,
+    #   Miscellaneous Publications, Periodic Publications, Standards and
+    #   Specifications); each maps back to its series letter.
     # - <name>: sNNN — the lowercase series letter + number; the S-158
     #   member joins hyphenated (s158-102), the fleet extension of the
     #   guidance for compound publication numbers.
@@ -24,8 +25,8 @@ module Pubid
     #   correction/clarification slots (the s57:3:1 form) are not modeled
     #   faces — a bare digit tail segment rejects as unexpected.
     #
-    # == The legacy positional form (B/C emission; decodable for every
-    #    series, never emitted for S/P/M)
+    # == The legacy positional form (decode-only for every series,
+    #    emitted by none)
     #
     #   urn:iho:<type>:<number>[:ed-<x.y.z>][:sup-<n>][:part-<X>]
     #     [:spec-<n>[:specsub-<n>][:specvar-<X>]][:annex-<A>]
@@ -67,6 +68,8 @@ module Pubid
     # - urn:mrn:iho:pub:spec:s158-102:1.0.0             → IHO S-158:102 1.0.0
     # - urn:mrn:iho:pub:reg:m2:sup-1                    → IHO M-2 Sup 1
     # - urn:mrn:iho:pub:per:p1:vol-30:issue-2           → IHO P-1 Vol. 30 (2)
+    # - urn:mrn:iho:pub:bathy:b12:3.0.0              → IHO B-12 3.0.0
+    # - urn:mrn:iho:pub:cb:c51:6.0.0                 → IHO C-51 6.0.0
     # - urn:iho:s:44:ed-5.0.0                           → IHO S-44 5.0.0
     # - urn:iho:s:158:100:ed-1.0.0                      → IHO S-158:100 1.0.0
     # - urn:iho:s:4:ed-4.10.0:part-B:spec-401           → IHO S-4 4.10.0 B-401
@@ -74,9 +77,10 @@ module Pubid
       TYPE_LETTERS = %w[s p m b c].freeze
 
       # The guidance publication type -> series letter (the emission's
-      # MRN_TYPES inverted). bathy/cb have no series in this flavor; an
-      # unknown type rejects.
-      MRN_TYPE_LETTERS = { "spec" => "S", "per" => "P", "reg" => "M" }.freeze
+      # MRN_TYPES inverted): the five S-11 Part C groups onto their
+      # series letters. An unknown type rejects.
+      MRN_TYPE_LETTERS = { "spec" => "S", "per" => "P", "reg" => "M",
+                           "bathy" => "B", "cb" => "C" }.freeze
 
       MRN_PREFIX = "urn:mrn:iho:pub:"
       # The publication name: the lowercase series letter + number, the
@@ -192,7 +196,8 @@ module Pubid
       end
 
       # The legacy positional decode (the pre-guidance emission shape and
-      # every legacy spelling it decodes).
+      # every legacy spelling it decodes; never emitted — all five series
+      # carry a guidance type code).
       def parse_legacy_urn(urn)
         segments = split_parts(strip_namespace(urn))
         type_token = read_type!(segments, urn)
@@ -303,7 +308,7 @@ module Pubid
       end
 
       # specsub-/specvar- are children of the spec atom — allowed only
-      # in their parent's slot (the SEGMENTS table in the generator).
+      # in their parent's slot (the MRN_SEGMENTS table in the generator).
       def assert_spec_parent!(key, ctx, urn)
         return unless %i[spec_sub spec_variant].include?(key)
         return if SPEC_PARENTS.include?(ctx[:component])

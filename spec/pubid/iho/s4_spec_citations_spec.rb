@@ -134,9 +134,9 @@ RSpec.describe "IHO S-4 spec citations" do
         .to raise_error(Pubid::Errors::ParseError)
     end
 
-    it "keeps the B Bibliographic series on the main branch" do
+    it "keeps the B Bathymetric series on the main branch" do
       id = Pubid::Iho.parse("IHO B-12 3.0.0")
-      expect(id).to be_a(Pubid::Iho::Identifiers::Bibliographic)
+      expect(id).to be_a(Pubid::Iho::Identifiers::Bathymetric)
       expect(id.spec).to be_nil
       expect(id.to_s).to eq("IHO B-12 3.0.0")
     end

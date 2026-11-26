@@ -3,8 +3,8 @@
 module Pubid
   module Iho
     module Identifiers
-      autoload :Bibliographic,  "#{__dir__}/identifiers/bibliographic"
-      autoload :CircularLetter, "#{__dir__}/identifiers/circular_letter"
+      autoload :Bathymetric,     "#{__dir__}/identifiers/bathymetric"
+      autoload :CapacityBuilding, "#{__dir__}/identifiers/capacity_building"
       autoload :Miscellaneous,  "#{__dir__}/identifiers/miscellaneous"
       autoload :Publication,    "#{__dir__}/identifiers/publication"
       autoload :Standard,       "#{__dir__}/identifiers/standard"

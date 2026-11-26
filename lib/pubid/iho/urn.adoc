@@ -5,10 +5,10 @@ per-flavor split of the former `docs/URN-SCHEMES.adoc`, owner ruling
 2026-11-25: "for URN schemes how can we mix up different flavors in 1
 file? SPLIT THE FILE!"). It covers the three schemes the flavor carries:
 
-1. the official URN (`#to_urn`) — the adopted IHO MRN guidance form for
-   the S/P/M series, the legacy positional form for the B/C series;
+1. the official URN (`#to_urn`) — the adopted IHO MRN guidance form,
+   the emission of every series;
 2. the legacy positional `urn:iho:` grammar — decodable for every
-   series, emitted only by the B/C series;
+   series, emitted by none;
 3. the pubid-scheme URN (`#to_pubid_urn`) — pubid's own
    `urn:pubid:iho:` codec, not governed by the IHO guidance.
 
@@ -23,14 +23,25 @@ publications, pages 8-9). The guidance proposes the Publications MRN
 
     urn:mrn:iho:pub:<publication type>:<publication name or number>:<edition number>[:<correction number>[:<clarification number>[:<optional and additional version information>]]]
 
-with the publication types `bathy` | `cb` | `reg` | `per` | `spec`, and
+with the publication types `bathy` | `cb` | `reg` | `per` | `spec` (the
+guidance: "Bathymetric Publications - bathy; Capacity Building
+Publications - cb; Miscellaneous (Base Regulatory Publications) - reg;
+Periodic Publications - per; Standards and Specifications - spec"), and
 the example `urn:mrn:iho:pub:spec:s57:3:1:supplement3` (S-57 Ed 3,
 Corr. 1, Supplement 3). IHO's own printed S-98 metadata carries
 `urn:mrn:iho:pub:spec:s98:1.0.0` — the DOTTED edition in the canonical
 4th position, which this flavor adopts verbatim.
 
-pubid adopts the guidance as the flavor's official-URN emission for the
-series the guidance types:
+The series-to-code binding is 1:1 onto the five groups IHO arranges its
+publications under (S-11 Part C Ed 1.0.0, section 1.2: "the IHO has
+arranged their publications under the following groups: B - Bathymetric
+Publications (Mainly related to GEBCO), C - Capacity Building
+Publications, M - Miscellaneous Publications (including Basic
+Documents), P - Periodic Publications, S - Standards and
+Specifications").
+
+pubid adopts the guidance as the flavor's official-URN emission for
+every series:
 
 [cols="3,1,4,4",options="header"]
 |===
@@ -38,8 +49,8 @@ series the guidance types:
 | S (Standards and Specifications) | `spec` | the guidance's own code | `IHO S-44 5.0.0` → `urn:mrn:iho:pub:spec:s44:5.0.0`
 | P (Publication, the periodic series) | `per` | the guidance's Periodic Publications code | `IHO P-5 Vol. 2024` → `urn:mrn:iho:pub:per:p5:vol-2024`
 | M (Miscellaneous Base Regulatory Publications) | `reg` | the guidance's own code | `IHO M-2 Sup 1` → `urn:mrn:iho:pub:reg:m2:sup-1`
-| B (Bibliographic) | — | no guidance code: the legacy emission below, until IHO assigns one | `IHO B-4 2.19.0` → `urn:iho:b:4:ed-2.19.0`
-| C (Circular Letter) | — | no guidance code: the legacy emission below, until IHO assigns one | `IHO C-13 1.0.0` → `urn:iho:c:13:ed-1.0.0`
+| B (Bathymetric Publications; S-11 Part C section 1.2, "Mainly related to GEBCO") | `bathy` | the guidance's Bathymetric Publications code | `IHO B-12 3.0.0` → `urn:mrn:iho:pub:bathy:b12:3.0.0`
+| C (Capacity Building Publications; S-11 Part C section 1.2) | `cb` | the guidance's Capacity Building Publications code | `IHO C-51 6.0.0` → `urn:mrn:iho:pub:cb:c51:6.0.0`
 |===
 
 === The name form
@@ -106,12 +117,13 @@ The guidance's bare correction/clarification slots (the `s57:3:1`
 form) are NOT modeled faces — the flavor has no correction component —
 and a bare digit tail segment rejects on decode.
 
-== The legacy positional grammar (decode-only for S/P/M; the B/C emission)
+== The legacy positional grammar (decode-only for every series; emitted by none)
 
 The pre-guidance emission — `urn:iho:<type>:<number>[:ed-<x.y.z>]
 [:sup-…][:part-…][:annex-…][:appendix-…][:<sub>][:vol-…][:issue-…]
-[:year-…]` — stays fully decodable for every series and remains the
-emission of the B/C series (no guidance type code). Its laws:
+[:year-…]` — stays fully decodable for every series and is emitted by
+none: all five series carry a guidance type code, so the guidance form
+above is the flavor's only emission. Its laws:
 
 - the docnumber occupies the first bare number segment; a further bare
   digit segment binds the S-158 member (`urn:iho:s:158:100`), never
@@ -161,9 +173,13 @@ the `from_hash` unification redirects the legacy form onto the
 
 == relaton-side follow-ups (not this repo)
 
-The official-URN namespace moved (`urn:mrn:iho:pub:...` for S/P/M) and
+The official-URN namespace moved (`urn:mrn:iho:pub:...`, now for every
+series — the B/C rows moved from the legacy `urn:iho:b:/c:` form onto
+their guidance codes `bathy`/`cb`) and
 the S-158 member shape changed (`s158-102`, not `s:158:100` or the
 part form): relaton-data-iho needs a re-crawl when this gem ships, and
 the frozen testsuite corpus rows are re-frozen in the coupled corpus
 round. The pubid-scheme slugs changed for S-158 identities
-(`iho/std/158/product-102/...`).
+(`iho/std/158/product-102/...`); the B/C pubid-scheme slugs (`b`, `cl`)
+are unchanged — only their `_type` names are
+(`pubid:iho:bathymetric`, `pubid:iho:capacity_building`).
