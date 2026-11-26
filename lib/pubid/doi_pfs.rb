@@ -2,7 +2,7 @@
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
 # Source: definitions/doi.pfs (pfs:1) sha256:60abc3c403c61019d727ee44d9a72591c1549672451e6609a72d36189cae6340
-# Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
+# Compiler: pubid/grammar/pfs 2.0.0 (baked with parsanol 1.5.1.0)
 # Regenerate: ruby scripts/pfs compile definitions/doi.pfs --as doi_pfs --ruby-out <dir>
 
 require "pubid"

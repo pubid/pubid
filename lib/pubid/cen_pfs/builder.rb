@@ -29,6 +29,10 @@ module Pubid
           "FprEN" => "fpren",
       }.freeze
 
+      # The model column the adopted document lands on (the vendored
+      # hook's wrapper slot) and the declared edition face, if any.
+      ADOPTED_ATTRIBUTE = "adopted"
+
       def self.build(parsed_data)
         new.build(parsed_data)
       end

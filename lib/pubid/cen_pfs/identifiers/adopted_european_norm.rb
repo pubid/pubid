@@ -17,14 +17,12 @@ module Pubid
         end
 
         attribute :publisher, ::Pubid::Components::Publisher, default: -> { self.class.default_publisher }
-        attribute :type, ::Pubid::Components::Type, default: -> { self.class.default_type }
-
-        def self.default_type
-          ::Pubid::Components::Type.new(abbr: type[:short])
-        end
 
         # The adopted document (feature 4): the whole identity lives
-        # on the nested ISO/IEC identifier.
+        # on the nested ISO/IEC identifier, under the declared
+        # model column (the uniform `base` renames the wrapper
+        # slot — the codec's root-first walk and the from_hash
+        # key read it).
         attribute :adopted, ::Pubid::Identifier, polymorphic: true
 
         def root

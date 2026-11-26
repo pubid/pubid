@@ -2,7 +2,7 @@
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
 # Source: definitions/calconnect.pfs (pfs:1) sha256:2e864f0185a1a2f18a392f2f401ad3c9d65d1f32a9ec3f3f04f7dfca9b2226c4
-# Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
+# Compiler: pubid/grammar/pfs 2.0.0 (baked with parsanol 1.5.1.0)
 # Regenerate: ruby scripts/pfs compile definitions/calconnect.pfs --as calconnect_pfs --ruby-out <dir>
 
 require "pubid"

@@ -33,6 +33,7 @@
         type "pubid:bsi:draft-document", "dd", core: ["number"]
         type "pubid:bsi:published-document", "pd", core: ["number"]
         type "pubid:bsi:publicly-available-specification", "pas", core: ["number"]
+        type "pubid:bsi:standalone-amendment", "sa", core: ["number"]
         type "pubid:bsi:technical-specification", "ts", core: ["number"]
       end
     end

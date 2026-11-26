@@ -2,7 +2,7 @@
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
 # Source: definitions/cen.pfs (pfs:1) sha256:b8f2c00e392dbc03c1fddedad141afa7c930c5430738721b7df0ac69a371d028
-# Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
+# Compiler: pubid/grammar/pfs 2.0.0 (baked with parsanol 1.5.1.0)
 # Regenerate: ruby scripts/pfs compile definitions/cen.pfs --as cen_pfs --ruby-out <dir>
 
 require "pubid"

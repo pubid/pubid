@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
-# Source: definitions/bsi.pfs (pfs:1) sha256:acb28ac064cf70b7dcaf8ec199cd535f95c201ca348746f9124ce7d080473585
-# Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
+# Source: definitions/bsi.pfs (pfs:1) sha256:e8126cde50a41d8f0e6d8f3ec7e6d2717880637ee2cbce0fdae0ca6b0ee90a8e
+# Compiler: pubid/grammar/pfs 2.0.0 (baked with parsanol 1.5.1.0)
 # Regenerate: ruby scripts/pfs compile definitions/bsi.pfs --as bsi_pfs --ruby-out <dir>
 
 require "pubid"

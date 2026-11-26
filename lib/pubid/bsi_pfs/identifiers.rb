@@ -8,6 +8,7 @@ module Pubid
           autoload :PublishedDocument, "#{__dir__}/identifiers/published_document"
           autoload :DraftDocument, "#{__dir__}/identifiers/draft_document"
           autoload :TechnicalSpecification, "#{__dir__}/identifiers/technical_specification"
+          autoload :StandaloneAmendment, "#{__dir__}/identifiers/standalone_amendment"
           autoload :Supplement, "#{__dir__}/identifiers/supplement"
           autoload :Amendment, "#{__dir__}/identifiers/amendment"
           autoload :Corrigendum, "#{__dir__}/identifiers/corrigendum"
