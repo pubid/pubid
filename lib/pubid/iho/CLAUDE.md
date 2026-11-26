@@ -227,8 +227,16 @@ stay decode-only; the #635/#637 `y.2024` tag decodes into the
 misnomers): `pubid:iho:bibliographic` -> `pubid:iho:bathymetric`
 (`Identifiers::Bathymetric`), `pubid:iho:circular-letter` ->
 `pubid:iho:capacity_building` (`Identifiers::CapacityBuilding`) — a
-clean rename, no alias kept (the S-158 checks_for->product precedent);
-the pubid-scheme slugs `b`/`cl` are unchanged. relaton-data-iho needs a
+clean rename of the model (no attribute/face alias kept; the S-158
+checks_for->product precedent); the pubid-scheme slugs `b`/`cl` are
+unchanged. The PRE-RENAME `_type` wire names stay DECODABLE (decode-only,
+never emitted — the LEGACY pattern of this wave): stored rows (the
+relaton-data-iho v2 index, snapshots crawled before the rename) still
+carry them, and the relaton index loader rejects a file whose `_type`
+fails to route — `polymorphic_type_map` merges the two aliases and
+`from_hash` re-tags a legacy `_type` onto the renamed wire name, so a
+decoded row equals a parsed query under `==` (which reads `_type`).
+Removable once relaton-data-iho is re-crawled. relaton-data-iho needs a
 re-crawl (it is already legacy pre-pubid-2 shape); the frozen
 testsuite corpus rows are re-frozen in the coupled corpus round.
 

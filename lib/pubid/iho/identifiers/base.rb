@@ -132,6 +132,24 @@ module Pubid
           "Pubid::Iho::Identifiers::CapacityBuilding",
       }.freeze
 
+      # The polymorphic ROUTE table for {from_hash}: the base derives it from
+      # the concrete classes' `polymorphic_name`s; the PRE-RENAME B/C wire
+      # names (`bibliographic`/`circular-letter` — the rows were misnomered
+      # before the bathy/cb rename) merge in beside them as decode-only
+      # aliases (class-valued, the route table's own shape). Stored rows —
+      # the relaton-data-iho v2 index, any snapshot crawled before the
+      # rename — still carry them; `Pubid.from_hash` routes through this
+      # map on the raw hash. Decode-only, never emitted: the emission side
+      # writes the renamed `polymorphic_name`. Removable once
+      # relaton-data-iho is re-crawled.
+      def self.polymorphic_type_map
+        @polymorphic_type_map ||= super.merge(
+          "pubid:iho:bibliographic" => Pubid::Iho::Identifiers::Bathymetric,
+          "pubid:iho:circular-letter" =>
+            Pubid::Iho::Identifiers::CapacityBuilding,
+        )
+      end
+
       # The base Pubid::Identifier no longer auto-maps attributes, so each
       # flavor's top class must declare its own key_value mapping. IHO
       # attributes are plain strings, so they map directly. `publisher` is
@@ -174,8 +192,36 @@ module Pubid
       # (part: "S-102", part_edition: "0.2.0") decodes to the product
       # identity (issue #774), so no construction path yields the
       # two-identity disease of issue #775.
+      # The pre-rename B/C wire names decode onto the RENAMED canonical tag:
+      # a stored row's `_type` is re-tagged beside the class route
+      # ({polymorphic_type_map}), so a decoded legacy row reads and compares
+      # as the renamed type (`==` compares `_type`; the relaton index
+      # matcher rebuilds both sides through from_hash — a row left carrying
+      # `pubid:iho:bibliographic` would never equal a parsed
+      # `pubid:iho:bathymetric` query). Pure function; the hash without a
+      # legacy `_type` passes through untouched.
+      LEGACY_TYPE_RETAG = {
+        "pubid:iho:bibliographic" => "pubid:iho:bathymetric",
+        "pubid:iho:circular-letter" => "pubid:iho:capacity_building",
+      }.freeze
+
       def self.from_hash(data, options = {})
-        super(Builder.normalize_checks_alias(data), options)
+        super(Builder.normalize_checks_alias(normalize_legacy_type(data)),
+              options)
+      end
+
+      # Pure function: retags a legacy `_type` (string or symbol key) onto
+      # the renamed wire name. Removable once relaton-data-iho is re-crawled.
+      def self.normalize_legacy_type(data)
+        return data unless data.is_a?(::Hash)
+
+        canonical = LEGACY_TYPE_RETAG[(data["_type"] || data[:_type]).to_s]
+        return data unless canonical
+
+        data.dup.tap do |hash|
+          hash["_type"] = canonical if hash.key?("_type")
+          hash[:_type] = canonical if hash.key?(:_type)
+        end
       end
 
       # The volume/issue and appendix/subnumber pairs are scalar clusters:
