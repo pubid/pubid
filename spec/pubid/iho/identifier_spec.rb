@@ -357,6 +357,67 @@ RSpec.describe Pubid::Iho::Identifier do
       expect(Pubid::Iho::Identifier::IHO_TYPE_MAP.keys.sort)
         .to eq(expected)
     end
+
+    # The pre-rename B/C wire names (`bibliographic`/`circular-letter` —
+    # the rows were misnomered before the bathy/cb rename) stay decodable:
+    # stored rows — the relaton-data-iho v2 index, any snapshot crawled
+    # before the rename — still carry them, and the relaton index loader
+    # routes each row's `_type` through this flavor's from_hash. Decode
+    # re-tags canonically: the rebuilt identifier is the renamed class AND
+    # carries the renamed `_type` (the relaton matcher compares two
+    # from_hash-rebuilt ids with `==`, which reads `_type` — a row left
+    # carrying the old tag would never equal a parsed query). Decode-only,
+    # never emitted: the emission writes the renamed polymorphic_name.
+    # Removable once relaton-data-iho is re-crawled.
+    describe "the pre-rename wire names decode onto the renamed types" do
+      {
+        "pubid:iho:bibliographic" => Pubid::Iho::Identifiers::Bathymetric,
+        "pubid:iho:circular-letter" =>
+          Pubid::Iho::Identifiers::CapacityBuilding,
+      }.each do |legacy, klass|
+        it "decodes #{legacy} as #{klass.name.split('::').last}" do
+          id = Pubid::Iho::Identifier.from_hash(
+            "_type" => legacy, "number" => "1", "edition" => "1.0.0"
+          )
+          expect(id).to be_a(klass)
+          expect(id._type).to eq(klass.polymorphic_name)
+        end
+      end
+
+      it "routes the legacy names through Pubid.from_hash too" do
+        expect(Pubid.from_hash(
+                 "_type" => "pubid:iho:bibliographic", "number" => "12"
+               )).to be_a(Pubid::Iho::Identifiers::Bathymetric)
+      end
+
+      it "keeps the round trip canonical" do
+        id = Pubid::Iho::Identifier.from_hash(
+          "_type" => "pubid:iho:circular-letter", "number" => "13"
+        )
+        expect(id.to_hash["_type"]).to eq("pubid:iho:capacity_building")
+        expect(Pubid::Iho::Identifier.from_hash(id.to_hash)).to eq(id)
+      end
+
+      it "answers false when a legacy row matches a parsed query" do
+        row = Pubid::Iho::Identifier.from_hash(
+          "_type" => "pubid:iho:bibliographic", "number" => "11",
+          "edition" => "1.0.0"
+        )
+        query = Pubid::Iho.parse("IHO B-11")
+        expect(row.class).to eq(query.class)
+        expect(row.exclude(*%i[edition volume issue year
+                               supplement_edition part_edition
+                               annex_edition appendix_edition
+                               volume_edition supplement_year part_year
+                               annex_year appendix_year volume_year]))
+          .to eq(query.exclude(*%i[edition volume issue year
+                                   supplement_edition part_edition
+                                   annex_edition appendix_edition
+                                   volume_edition supplement_year
+                                   part_year annex_year appendix_year
+                                   volume_year]))
+      end
+    end
   end
 
   describe "matching semantics" do
