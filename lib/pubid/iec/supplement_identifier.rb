@@ -183,6 +183,25 @@ module Pubid
         segments.join(".")
       end
 
+      # The chain head routes through the BASE's own #to_mr_string, not the
+      # generic renderer recursion. The renderer renders the wrapped
+      # document flat, bypassing a wrapper class's own composition — so a
+      # corrigendum over a consolidated version
+      # ("IEC 60335-1:2010+AMD1:2013 CSV/COR1:2014") dropped the part and
+      # the whole chain behind its suffix (it keyed `iec.60335.2010_cor.1.
+      # 2014`, sharing the head with the bare base document). For every
+      # class without a #to_mr_string override the base's own path produces
+      # the same string the renderer would, so the standalone supplement
+      # chains are unchanged; where a wrapper carries one
+      # (VapIdentifier#to_mr_string) the full chain survives.
+      def to_mr_string
+        suffix = mr_supplement_suffix
+        return super if base.nil? || suffix.nil?
+
+        head = base.to_mr_string
+        head.empty? ? suffix : [head, suffix].join(Pubid::Renderers::MrString::SEPARATOR_SUPPLEMENT)
+      end
+
       private
 
       def settle_standalone_layout

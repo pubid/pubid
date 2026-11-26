@@ -277,6 +277,7 @@ module Pubid
         id.ensure_base if id.is_a?(SupplementIdentifier)
         reject_standalone_dotted_supplement(id, string)
         reject_unrenderable_fragment(id, string)
+        reject_unrenderable_consolidated_edition(id, string)
         id
       end
 
@@ -385,6 +386,60 @@ module Pubid
         elsif node.class.attributes.key?(:identifiers)
           node.identifiers.first
         end
+      end
+
+      # The bare consolidated chain with a trailing edition
+      # ("IEC 60068:2005+AMD1:2012 ED2") parses, and then cannot render:
+      # the edition rides the base member, so the composition prints it
+      # onto the base designation ("IEC 60068:2005 ED2+AMD1:2012") — a face
+      # no IEC source prints and the grammar rejects, so parse(to_s)
+      # raises. The attested consolidated editions carry no edition facet
+      # on the chain at all (0 of the 33,070 primary docidentifiers in
+      # relaton-data-iec; 0 rows in the gem fixtures): the consolidated
+      # edition IS the CSV product ("IEC 60034-18-41:2014+AMD1:2019 CSV",
+      # the OBP PDF named `{ed1.1}`), and where the printed edition
+      # appears at all it is the CSV face's own facet
+      # ("IEC 60068:2005+AMD1:2012 CSV ED1" — the Vap carries the edition
+      # after the deliverable code and renders back parseably). So the
+      # shape is rejected at parse — the #727 ruling for unattested,
+      # un-renderable faces — rather than built unrenderable. The check is
+      # the SHAPE on the built object, not a grammar route (the same
+      # ruling as reject_standalone_dotted_supplement): a bare
+      # ConsolidatedIdentifier with an edition on any member. from_hash
+      # stays open (stored-data compatibility): parse can no longer
+      # produce the shape, and no stored row carries it.
+      CONSOLIDATED_EDITION_MESSAGE =
+        "the bare consolidated chain carries a trailing edition " \
+        "(e.g. \"IEC 60068:2005+AMD1:2012 ED2\"): no IEC source prints " \
+        "one — 0 of the 33,070 primary docidentifiers in relaton-data-iec " \
+        "carry an edition facet on a chain — and the canonical render " \
+        "prints the edition onto the base designation " \
+        "(\"IEC 60068:2005 ED2+AMD1:2012\"), which cannot be re-parsed. " \
+        "The consolidated edition is the CSV face (\"IEC " \
+        "60034-18-41:2014+AMD1:2019 CSV\", the OBP PDF named {ed1.1}); " \
+        "where the printed edition appears it rides the CSV face " \
+        "(\"IEC 60068:2005+AMD1:2012 CSV ED1\"), which parses and " \
+        "round-trips"
+
+      def self.reject_unrenderable_consolidated_edition(id, input)
+        node = id
+        while node
+          reject_consolidated_edition_shape(node, input)
+          node = descend_wrapper(node)
+        end
+      end
+
+      # The rejected edition shape: a bare ConsolidatedIdentifier with an
+      # edition on any member. A leaf or a wrapper whose edition rides its
+      # own render face (the Vap's `CSV ED1`) passes.
+      def self.reject_consolidated_edition_shape(node, input)
+        return unless node.is_a?(Identifiers::ConsolidatedIdentifier)
+        return unless Array(node.identifiers).any? { |m| !m.edition.nil? }
+
+        raise Pubid::Errors::ParseError.new(
+          CONSOLIDATED_EDITION_MESSAGE, nil,
+          input: input, flavor: "iec"
+        )
       end
 
       # from_hash is the shared polymorphic dispatch on Pubid::Identifier.
