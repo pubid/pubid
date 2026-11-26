@@ -47,7 +47,11 @@ module Pubid
             type_code: :ts,
             abbr: ["CD TS"],
             name: "Committee Draft Technical Specification",
-            harmonized_stages: %w[30.00 30.20 30.60 30.92 30.98 30.99],
+            # The lead is the table's own CD code — the correspondence
+            # table's CD row names IS, TR and TS deliverables
+            # (data/iec/stage-codes.md; pubid#787, the pubid-ts#187 parity
+            # round), the same lead the IS cd row carries.
+            harmonized_stages: %w[30.20 30.00 30.60 30.92 30.98 30.99],
           ),
           Pubid::Components::TypedStage.new(
             code: :dts,

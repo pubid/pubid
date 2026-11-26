@@ -160,3 +160,16 @@ stage RFDIS/50.00 — a snapshot of the project's plan, not a code rename.
   translation/preparation families (`TDTR`/`TDTS`/`PRVDTR`/`PRVDTS`/
   `PRVDPAS`, …) stay PROJECT_STAGES — queryable, deliberately
   unparseable. Locked by `spec/pubid/iec/stage_point_codes_spec.rb`.
+- **CD slot alignment (pubid#787, applied):** the IS/TR/TS committee-draft
+  rows lead their harmonized lists with this table's own CD code, 30.20
+  ("Draft circulated as CD") — the official `urn:iec:std:` stage slot
+  (which reads `harmonized_stages.first`) had carried the unsourced 30.00,
+  a code in no row of the table, while the pubid-ts#187 parity round found
+  the mirror emitting this table's 30.20. The rest of the 30.xx ladder
+  stays in the list behind the lead (the folded range honor form is
+  unchanged), so `ACD`/`CDM`/`PCC`/`SPLIT`/`MERGED` ride the same row as
+  before. The draft-supplement faces (`DCOR`/`DISH`/`FDAM`…, no rows in
+  this table) keep the slot EMPTY, which is what the testsuite ledger
+  attests for their identities (`urn:iec:std:iec:60038-1::::::cor:1:`,
+  `…::::::ish:1:`) — the slot reads the root document, not the supplement
+  layer. Locked by `spec/pubid/iec/urn_stage_edition_spec.rb`.
