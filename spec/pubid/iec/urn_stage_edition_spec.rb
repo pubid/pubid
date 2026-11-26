@@ -27,7 +27,12 @@ RSpec.describe "IEC URN stage and edition slots" do
     {
       # The identifier and the URN the issue asks for, verbatim.
       "IEC PNW 1000-1:2023 ED2" => "urn:iec:std:iec:1000-1:2023:stage-10.20:ed-2:",
-      "IEC CD 60038" => "urn:iec:std:iec:60038::stage-30.00::",
+      # CD carries the correspondence table's own code (30.20 "Draft
+      # circulated as CD", data/iec/stage-codes.md) — the slot the
+      # pubid-ts#187 parity round found the mirror already emitting and
+      # the folded 30.00 lead contradicted (pubid#787; #733 is the same
+      # ruling for the TR/TS/PAS point rows).
+      "IEC CD 60038" => "urn:iec:std:iec:60038::stage-30.20::",
       "IEC NP 60038" => "urn:iec:std:iec:60038::stage-10.00::",
       "IEC FDIS 60038" => "urn:iec:std:iec:60038::stage-50.00::",
     }.each do |input, urn|
@@ -53,7 +58,7 @@ RSpec.describe "IEC URN stage and edition slots" do
 
       it "renders a committee draft Technical Report" do
         expect(Pubid::Iec.parse("IEC CD TR 62048").to_urn)
-          .to eq("urn:iec:std:iec:62048::tr-stage-30.00::")
+          .to eq("urn:iec:std:iec:62048::tr-stage-30.20::")
       end
 
       it "does not collide a draft TR with a draft TS" do
@@ -107,13 +112,37 @@ RSpec.describe "IEC URN stage and edition slots" do
   describe "round-tripping through parse_urn" do
     [
       "urn:iec:std:iec:1000-1:2023:stage-10.20:ed-2:",
-      "urn:iec:std:iec:60038::stage-30.00::",
+      "urn:iec:std:iec:60038::stage-30.20::",
       "urn:iec:std:iec:62271-1::ts-stage-50.00::",
-      "urn:iec:std:iec:62048::tr-stage-30.00::",
+      "urn:iec:std:iec:62048::tr-stage-30.20::",
       "urn:iec:std:iec:60038:2009::ed-7:",
     ].each do |urn|
       it "round-trips #{urn.inspect}" do
         expect(Pubid::Iec.parse_urn(urn).to_urn).to eq(urn)
+      end
+    end
+  end
+
+  # The pubid-ts#187 parity round (pubid#787): the mirror used to mint
+  # different official URNs for the same identifier on the corpus-absent
+  # draft-supplement faces — `stage-dcor` / `stage-dish` in its slot where
+  # the gem leaves the slot empty. The EMPTY slot is the attested shape:
+  # the testsuite ledger records `urn:iec:std:iec:60038-1::::::cor:1:` for
+  # the CDCOR row and `...::::::ish:1:` for the DISH rows (the stage sits
+  # on the supplement layer, and the slot reads the root document), and
+  # IEC's table names no DCOR row at all. These pins hold the gem's
+  # emission, which the mirror now follows.
+  describe "the draft-supplement faces keep the attested empty stage slot" do
+    {
+      "IEC 60038-1/DCOR 1" => "urn:iec:std:iec:60038-1::::::cor:1:",
+      "IEC/DCOR 60038-1" => "urn:iec:std:iec:60038-1::::::cor:1:",
+      "IEC 60038-1/DISH 1" => "urn:iec:std:iec:60038-1::::::ish:1:",
+      "IEC/DISH 60038-1" => "urn:iec:std:iec:60038-1::::::ish:1:",
+      "IEC CDISH 60050-191" => "urn:iec:std:iec:60050-191::::::ish:1:",
+      "IEC 60038-1/FDAM 1" => "urn:iec:std:iec:60038-1::::::amd:1:",
+    }.each do |input, urn|
+      it "renders #{input.inspect} as #{urn.inspect}" do
+        expect(Pubid::Iec.parse(input).to_urn).to eq(urn)
       end
     end
   end

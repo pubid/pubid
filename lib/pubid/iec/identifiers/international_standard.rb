@@ -65,7 +65,13 @@ module Pubid
                      ACD A2CD A3CD A4CD A5CD A6CD A7CD A8CD A9CD
                      CDM PCC SPLIT MERGED],
             name: "Committee Draft",
-            harmonized_stages: %w[30.00 30.20 30.60 30.92 30.96 30.97 30.98
+            # The lead is the table's own CD code (30.20 "Draft circulated
+            # as CD", data/iec/stage-codes.md) — what the official
+            # `urn:iec:std:` stage slot carries (pubid#787, the
+            # pubid-ts#187 parity round). 30.00 is IEC-unsourced and sits
+            # in no row of the table; the rest of the 30.xx ladder stays
+            # behind it, so the folded range honor form is unchanged.
+            harmonized_stages: %w[30.20 30.00 30.60 30.92 30.96 30.97 30.98
                                   30.99],
           ),
           Pubid::Components::TypedStage.new(
