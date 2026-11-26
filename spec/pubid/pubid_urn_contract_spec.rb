@@ -213,10 +213,20 @@ module PubidUrnContract
 end
 
 RSpec.describe "pubid-scheme URN contract" do
-  it "has a pubid-scheme section in the design doc for every flavor" do
-    doc = File.read(PubidUrnContract::DESIGN_DOC)
+  # The per-flavor split (owner ruling 2026-11-25): each flavor's URN
+  # documentation lives in lib/pubid/<module dir>/urn.adoc under its
+  # [[urn-<flavor>]] anchor; docs/URN-SCHEMES.adoc is the index. Two
+  # module dirs differ from their registry keys (a Ruby constant cannot
+  # lead with a digit; the cen alias collapses onto cen_cenelec).
+  URN_DOC_DIRS = { "3gpp" => "tgpp", "cen" => "cen_cenelec" }.freeze
+
+  it "has a pubid-scheme section in its own URN doc for every flavor" do
     missing = PubidUrnContract.flavors.reject do |flavor|
-      doc.include?("[[urn-#{flavor}]]")
+      path = File.expand_path(
+        "../../lib/pubid/#{URN_DOC_DIRS.fetch(flavor, flavor)}/urn.adoc",
+        __dir__,
+      )
+      File.exist?(path) && File.read(path).include?("[[urn-#{flavor}]]")
     end
     expect(missing).to be_empty
   end
