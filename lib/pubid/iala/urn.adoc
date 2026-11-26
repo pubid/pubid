@@ -1,3 +1,4 @@
+[[urn-iala]]
 = IALA URN schemes
 
 The IALA flavor carries two URN forms: the official Maritime Resource

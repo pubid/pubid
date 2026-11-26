@@ -1,3 +1,4 @@
+[[urn-iho]]
 = IHO URN schemes
 
 This file is the single home of the IHO flavor's URN documentation (the
