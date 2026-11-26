@@ -329,3 +329,74 @@ See `docs/URN-GENERATION-GUIDE.adoc` and `docs/URN-SCHEMES.adoc`.
 Pubid::Iso::Identifier.new(number: "8601", part: "1", year: "2019").to_urn
 # => "urn:iso:std:iso:8601:-1:2019"
 ```
+
+## PFS: the declarative composition layer
+
+A flavor does not have to be hand-written. PFS — the PubID Format Schema —
+is the declarative layer above the contracts this page describes: a body
+declares its scheme once in a `.pfs` file (plain YAML) in the
+[pubid-grammar](https://github.com/pubid/pubid-grammar) repo
+(`definitions/`), and the compiler
+[`scripts/pfs`](https://github.com/pubid/pubid-grammar/blob/main/scripts/pfs)
+generates the PARG edition-2 grammar from the declarations, bakes a
+checksum-verified artifact through the pinned parsanol pipeline, verifies
+every example the file embeds against that **baked** artifact, and emits
+the Ruby flavor module this gem vendors under `lib/pubid/<flavor>_pfs/`.
+The TypeScript side loads the same baked artifact, so one definition file
+produces both engines' flavors from one conformance set. A compiled module
+is generated code — every file carries a `DO NOT EDIT BY HAND` header
+naming the source definition, its sha256 and the regeneration command;
+fix the definition, never the output.
+
+The embedded examples are not documentation — they are the definition's
+live test set. Every positive must parse, render as declared and bind
+identically through the baked artifact; every negative must fail. A
+compiled flavor ships beside its coded sibling only once its **parity
+harness** (`spec/pubid/<flavor>_pfs/parity_spec.rb`) reproduces the coded
+flavor byte-for-byte over the corpus — drift is a failed port, never a
+fixture edit.
+
+The gem carries five compiled flavors, each registered beside its coded
+sibling as the `*_pfs` dev alias (the registry sorts the coded key first,
+so `Pubid.parse` keeps routing the coded flavors):
+
+| Compiled flavor | Source definition | Parity harness |
+|-----------------|-------------------|----------------|
+| `Pubid::DoiPfs` (`doi_pfs`) | `definitions/doi.pfs` | `spec/pubid/doi_pfs/parity_spec.rb` |
+| `Pubid::EtsiPfs` (`etsi_pfs`) | `definitions/etsi.pfs` | `spec/pubid/etsi_pfs/parity_spec.rb` |
+| `Pubid::CalconnectPfs` (`calconnect_pfs`) | `definitions/calconnect.pfs` | `spec/pubid/calconnect_pfs/parity_spec.rb` |
+| `Pubid::CenPfs` (`cen_pfs`) | `definitions/cen.pfs` | `spec/pubid/cen_pfs/parity_spec.rb` |
+| `Pubid::BsiPfs` (`bsi_pfs`) | `definitions/bsi.pfs` | `spec/pubid/bsi_pfs/parity_spec.rb` |
+
+### The module library
+
+National standards bodies do not invent identifier schemes — they adopt
+the ISO and IEC inner formats, and CEN overlays the European face. That
+machinery is declared once in pubid-grammar's
+[`definitions/modules/*.pfsmod`](https://github.com/pubid/pubid-grammar/tree/main/definitions/modules)
+— six named, versioned modules a definition binds (`bsi.pfs` composes the
+BS face from five of them, `national.prefix` parameterized to
+`["BS", "BSI"]`):
+
+| Module | Provides |
+|--------|----------|
+| `iso.inner` | the ISO inner document face as a referenceable library (the declared ISO scheme itself stays coded) |
+| `iec.inner` | the IEC inner document face, likewise |
+| `en.overlay` | the adoption overlay — the EN face with its draft tokens |
+| `national.prefix` | the national body's head tokens (DIN, BS, NF, SS-, NEN-, UNE-, ÖNORM, CAN/CSA) as a **parameter** — one module, one `prefixes` value per body |
+| `supplements.core` | the amendment / corrigendum operators as bindings — a definition binds its own spellings to the operator, never the semantics (`ed`, `amd`, `cor` are reserved core tokens) |
+| `edition.core` | the edition operator as a binding (`ed` reserved; the body's spelling binds through its own grammar) |
+
+Two soundness rules are enforced at compile time. Modules declare
+**identity composition** — an adoption is a wrapper with an adopted base,
+not a grammar soup — and they declare their **extension hooks**: where a
+body exceeds the module parameters (a BS `+A1` national amendment,
+re-dating), it drops to a coded hook beside its definition, explicit and
+never implicit.
+
+The normative language reference is
+[`definitions/README.md`](https://github.com/pubid/pubid-grammar/blob/main/definitions/README.md)
+in pubid-grammar. The concept page and the `.pfs` language reference live
+on the website at
+[PFS — the PubID Format Schema](https://www.pubid.com/concepts/pfs) and
+[The .pfs Format Schema Language](https://www.pubid.com/library/pfs).
