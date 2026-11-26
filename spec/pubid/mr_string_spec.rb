@@ -295,6 +295,21 @@ RSpec.describe "Lossless MR string (issue #142)" do
       # Issue #142's specific complaint: IEC 60601-1-11 and IEC 60601-1-2 both
       # collapsed onto IEC.60601-1.<year>.
       [Pubid::Iec, "IEC 60601-1-11:2010", "IEC 60601-1-2:2010"],
+      # pubid#788: the consolidated wrappers rendered the generic flat slug,
+      # which dropped the part — two DIFFERENT documents (part 1 and part 2
+      # of IEC 60601, both consolidated) keyed one string — and shared it
+      # with the bare base document and with the bare consolidated chain.
+      [Pubid::Iec, "IEC 60601-1:2005+AMD1:2012 CSV",
+       "IEC 60601-2:2005+AMD1:2012 CSV"],
+      [Pubid::Iec, "IEC 60601-1:2005", "IEC 60601-1:2005+AMD1:2012 CSV"],
+      [Pubid::Iec, "IEC 60601-1:2005", "IEC 60601-1:2005+AMD1:2012"],
+      [Pubid::Iec, "IEC 60601-1:2005+AMD1:2012",
+       "IEC 60601-1:2005+AMD1:2012 CSV"],
+      [Pubid::Iec, "IEC 60601-1:2005+AMD1:2012 CSV",
+       "IEC 60601-1:2005/AMD1:2012"],
+      [Pubid::Iec, "IEC 60601-1:2005+AMD1:2012 CSV",
+       "IEC 60601-1:2005+AMD1:2013 CSV/COR1:2014"],
+      [Pubid::Iec, "IEC 60038:2009 CSV", "IEC 60038:2009"],
       [Pubid::Iso, "ISO 1234-1-2-3:2020", "ISO 1234-1:2020"],
       [Pubid::Iso, "ISO 1234-1-2-3:2020", "ISO 1234-1-2:2020"],
       [Pubid::Iso, "ISO 9001:2015", "ISO 9001:2015/Amd 1:2020"],

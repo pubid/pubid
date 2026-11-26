@@ -25,7 +25,7 @@ Corpus: 12331 of 12331 pass ids parse.
 | `pubid:iec:base` | `base` | number | 0 | —
 | `pubid:iec:component-specification` | `cs` | number | 0 | —
 | `pubid:iec:conformity-assessment` | `ca` | number | 0 | —
-| `pubid:iec:consolidated-identifier` | `consol` | — | 1270 | —
+| `pubid:iec:consolidated-identifier` | `consol` | — | 1270 | `IEC 60529:1989+AMD1:1999`
 | `pubid:iec:corrigendum` | `cor` | number | 195 | `CISPR 16-1-3:2004/COR1:2006`
 | `pubid:iec:fragment-identifier` | `fi` | — | 16 | `IEC 60050-111/AMD1/FRAG1 ED2`
 | `pubid:iec:guide` | `guide` | number | 59 | `IEC GUIDE 103:1980`
@@ -76,3 +76,20 @@ document goes from the shared type-only form to one URN per document
 (`urn:pubid:iec:wd:2457:tc-1:wdstage-FDIS`).
 
 Facet candidates (spelling-only): `languages.*.original_code`.
+
+*Consolidated forms (issue #788)* — the `+AMD+COR` composition face. The
+attestation base is `relaton-data-iec`: 2,031 records carry a consolidated
+primary docidentifier (`IEC <n>[-p[-sp]]:<y>+AMD<m>:<y>[+AMD…][ CSV[/
+COR<m>:<y>]]`), and their published `urn:iec:std:` values are
+byte-identical to the gem's emission — the deliverable rides the S8 slot
+(`csv`) and each chain member is a `plus:amd:…` / `::cor:…` adjunct after
+the language slot. The bare chain (no CSV) is the same composition without
+the deliverable — IEC's own citation style in the records' abstracts
+("IEC 62148-12+AMD1:2022 couvre…") — and parses as `ConsolidatedIdentifier`
+(`urn:pubid:iec:consol:ids-(…)`) since pubid v1. A bare chain carries no
+edition facet: the one trailing-edition face
+(`IEC 60068:2005+AMD1:2012 ED2`) is unattested (0 of the 33,070 primary
+docidentifiers carry one) and un-renderable (the edition would print onto
+the base designation, which the grammar cannot re-parse), so it is
+rejected at parse; the printed edition rides the CSV face
+(`IEC 60068:2005+AMD1:2012 CSV ED1`), which parses and round-trips.

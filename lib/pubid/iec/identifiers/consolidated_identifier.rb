@@ -82,6 +82,41 @@ module Pubid
         def supplements
           identifiers&.drop(1) || []
         end
+
+        # Dropping the supplement layer yields the leading member — the base
+        # standard alone (the CEN counterpart's shape). This is what makes
+        # the structural exclusions reach a consolidated chain:
+        # `exclude(:amendment)` / `exclude(:supplement)` and their
+        # `matches?(ignore:)` forms peel the composition to the document it
+        # supplements, so a consolidated reference matches the bare base
+        # record (the primitive relaton-api-js's citation-validation uses to
+        # resolve a consolidated docid onto the edition it amends).
+        def drop_supplements
+          identifiers&.first || self
+        end
+
+        # MR string: the base member's own MR (its part/subpart ride on the
+        # member, so the slug keeps the full designation), then each
+        # supplement member behind a `plus-` marker — the CEN counterpart's
+        # composition. Without it the chain rendered the generic flat slug,
+        # which both dropped the part and shared one slug with the bare base
+        # document (`IEC 60601-1:2005+AMD1:2012 CSV` keyed `iec.60601.2005`,
+        # colliding with the part-less rendering of `IEC 60601-2:2005+AMD1:
+        # 2012 CSV` and with the base itself). The `plus-` marker keeps the
+        # consolidated slug distinct from the standalone supplement chain's
+        # (`iec.60601-1.2005_amd.1.2012`), mirroring the CEN ruling that a
+        # consolidated form must not share a slug with the document it
+        # composes.
+        def to_mr_string
+          base, *supplements = identifiers
+          return "" unless base
+
+          ([base.to_mr_string] +
+            supplements.filter_map do |member|
+              suffix = member.mr_supplement_suffix
+              "plus-#{suffix}" if suffix
+            end).join(Pubid::Renderers::MrString::SEPARATOR_SUPPLEMENT)
+        end
       end
     end
   end

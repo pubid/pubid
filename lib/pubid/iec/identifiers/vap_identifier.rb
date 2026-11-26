@@ -77,6 +77,34 @@ module Pubid
         def base_document
           base&.base_document || base
         end
+
+        # MR string: the wrapped chain's MR with the VAP code (or codes —
+        # the multi-deliverable face prints `EXV-CMV`) appended as the final
+        # segment. Without it the VAP rendered the generic flat slug through
+        # its delegated `number`, which dropped the part and shared one slug
+        # with the bare base document (`IEC 60601-1:2005+AMD1:2012 CSV`
+        # keyed `iec.60601.2005`, the same slug as `IEC 60601-2:2005+AMD1:
+        # 2012 CSV` and — for a part-less base — the base itself). The
+        # corrigendum-over-VAP face (`CSV/COR1:2014`) composes on top of
+        # this, because the MrString renderer recurses into `base`.
+        def to_mr_string
+          head = base&.to_mr_string
+          return "" if head.nil? || head.empty?
+
+          codes = vap_codes
+          codes.empty? ? head : [head, codes].join(Pubid::Renderers::MrString::SEPARATOR_SUPPLEMENT)
+        end
+
+        private
+
+        # The deliverable codes, lowercased and joined — the multi-code face
+        # prints `EXV-CMV`, so the slug segment reads `exv-cmv`.
+        def vap_codes
+          Array(vap).filter_map do |code|
+            word = code.to_s.downcase.strip
+            word unless word.empty?
+          end.join("-")
+        end
       end
     end
   end
