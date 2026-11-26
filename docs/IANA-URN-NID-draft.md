@@ -367,7 +367,7 @@ the requirements for advertisement will be added to a revised registration
   <https://github.com/pubid/pubid> — encoder, decoder, escape, schema, paths;
   the Ruby gem `pubid` on RubyGems.
 - **The design document:** `docs/URN-SCHEMES.adoc` (the index) plus one
-  per-flavor scheme file `lib/pubid/<flavor>/urn.adoc` (51+ files; IHO and
+  per-flavor scheme file `lib/pubid/<flavor>/urn.adoc` (52 files; IHO and
   IALA are the full formal exemplars).
 - **The grammars:** <https://github.com/pubid/pubid-grammar> — the declarative
   PFS layer and parsanol-syntax formal grammars shared by the Ruby, TypeScript
