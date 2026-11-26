@@ -154,8 +154,8 @@ RSpec.describe Pubid::Iho::Identifier do
       "S" => Pubid::Iho::Identifiers::Standard,
       "P" => Pubid::Iho::Identifiers::Publication,
       "M" => Pubid::Iho::Identifiers::Miscellaneous,
-      "B" => Pubid::Iho::Identifiers::Bibliographic,
-      "C" => Pubid::Iho::Identifiers::CircularLetter,
+      "B" => Pubid::Iho::Identifiers::Bathymetric,
+      "C" => Pubid::Iho::Identifiers::CapacityBuilding,
     }.each do |letter, klass|
       it "maps the #{letter}- prefix to #{klass.name.split('::').last}" do
         expect(Pubid::Iho.parse("IHO #{letter}-1 1.0.0")).to be_a(klass)

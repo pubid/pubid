@@ -127,8 +127,9 @@ module Pubid
         "pubid:iho:standard" => "Pubid::Iho::Identifiers::Standard",
         "pubid:iho:publication" => "Pubid::Iho::Identifiers::Publication",
         "pubid:iho:miscellaneous" => "Pubid::Iho::Identifiers::Miscellaneous",
-        "pubid:iho:bibliographic" => "Pubid::Iho::Identifiers::Bibliographic",
-        "pubid:iho:circular-letter" => "Pubid::Iho::Identifiers::CircularLetter",
+        "pubid:iho:bathymetric" => "Pubid::Iho::Identifiers::Bathymetric",
+        "pubid:iho:capacity_building" =>
+          "Pubid::Iho::Identifiers::CapacityBuilding",
       }.freeze
 
       # The base Pubid::Identifier no longer auto-maps attributes, so each

@@ -4,12 +4,18 @@ require "spec_helper"
 
 RSpec.describe Pubid::Iho::UrnGenerator do
   # The adopted IHO MRN guidance (S-100WG4, "MRN Guidelines for IHO";
-  # owner ruling 2026-11-25): the S/P/M series emit the guidance form —
+  # owner ruling 2026-11-25): every series emits the guidance form —
   # urn:mrn:iho:pub:<type>:<name>[:<dotted edition>][:trailing atoms] —
   # with the lowercase name form (sNNN, the guidance's own s57/s98
   # spelling), the dotted edition in its canonical 4th position, and the
-  # containment-ordered trailing atoms. The B/C series have no guidance
-  # type code and keep the legacy positional emission.
+  # containment-ordered trailing atoms. The five series bind 1:1 onto
+  # the guidance's five publication type codes; the B/C bindings cite
+  # IHO S-11 Part C Ed 1.0.0 section 1.2, which arranges the IHO
+  # publications under five groups ("B - Bathymetric Publications
+  # (Mainly related to GEBCO)", "C - Capacity Building Publications",
+  # M - Miscellaneous Publications (including Basic Documents),
+  # P - Periodic Publications, S - Standards and Specifications):
+  # B -> bathy, C -> cb.
   describe "#generate" do
     {
       "IHO S-100" => "urn:mrn:iho:pub:spec:s100", # undated: no edition segment
@@ -21,7 +27,8 @@ RSpec.describe Pubid::Iho::UrnGenerator do
       "IHO S-122 1.0.0 Appendix D-2" =>
         "urn:mrn:iho:pub:spec:s122:1.0.0:appendix-D-2",
       "IHO S-52 4.0.0 Appendix 1" => "urn:mrn:iho:pub:spec:s52:4.0.0:appendix-1",
-      # the guidance type per series: S -> spec, M -> reg, P -> per
+      # the guidance type per series: S -> spec, M -> reg, P -> per,
+      # B -> bathy, C -> cb (S-11 Part C Ed 1.0.0 section 1.2 groups)
       "IHO M-2 Sup 1" => "urn:mrn:iho:pub:reg:m2:sup-1",
       "IHO S-66 2.0.0 Sup 4" => "urn:mrn:iho:pub:spec:s66:2.0.0:sup-4",
       "IHO P-1/21 1.0.0" => "urn:mrn:iho:pub:per:p1:vol-21:ed-1.0.0",
@@ -51,10 +58,22 @@ RSpec.describe Pubid::Iho::UrnGenerator do
       "IHO S-158:100 Part 2 1.0.0" =>
         "urn:mrn:iho:pub:spec:s158-100:part-2:ed-1.0.0",
       "IHO S-158 Vol. 2024" => "urn:mrn:iho:pub:spec:s158:vol-2024",
-      # no guidance code for the B/C series: the legacy emission stays
+      # --- the B/C series on the guidance codes (bathy/cb; S-11 Part C
+      #     Ed 1.0.0 section 1.2). The receipts are the testsuite corpus
+      #     rows (tests/iho/bibliographic.yaml,
+      #     tests/iho/circular_letter.yaml): B-12 is the CSB Guidance
+      #     (iho.int pubs/bathy/), C-13 the Manual on Hydrography,
+      #     C-51/C-55 the capacity-building manuals (iho.int pubs/cb/)
+      #     — real Bathymetric / Capacity Building publications, not
+      #     the old misnomers.
       "IHO M-3 2.0.0" => "urn:mrn:iho:pub:reg:m3:2.0.0",
-      "IHO B-4 2.19.0" => "urn:iho:b:4:ed-2.19.0",
-      "IHO C-13 1.0.0" => "urn:iho:c:13:ed-1.0.0",
+      "IHO B-4 2.19.0" => "urn:mrn:iho:pub:bathy:b4:2.19.0",
+      "IHO B-12 3.0.0" => "urn:mrn:iho:pub:bathy:b12:3.0.0",
+      "IHO C-13 1.0.0" => "urn:mrn:iho:pub:cb:c13:1.0.0",
+      "IHO C-51 6.0.0" => "urn:mrn:iho:pub:cb:c51:6.0.0",
+      "IHO C-55 6.0.0" => "urn:mrn:iho:pub:cb:c55:6.0.0",
+      # a volume-keyed B row keeps its vol- segments
+      "IHO B-7 Vol. 2023" => "urn:mrn:iho:pub:bathy:b7:vol-2023",
     }.each do |input, urn|
       it "renders #{input.inspect} as #{urn.inspect}" do
         expect(Pubid::Iho.parse(input).to_urn).to eq(urn)

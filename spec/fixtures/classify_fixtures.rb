@@ -232,8 +232,8 @@ class FixturesClassifier
   def detect_iho_class(id_str)
     # The series letter is the token after the optional IHO prefix.
     case id_str.sub(/\AIHO\s+/i, "").upcase[0]
-    when "B" then "bibliographic"
-    when "C" then "circular_letter"
+    when "B" then "bathymetric"
+    when "C" then "capacity_building"
     when "M" then "miscellaneous"
     when "P" then "publication"
     when "S" then "standard"

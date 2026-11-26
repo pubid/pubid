@@ -15,13 +15,13 @@ id = Pubid::Iho.parse("...")
 
 **Class:** `Pubid::Iho::Identifiers::Base`
 
-### Bibliographic
+### Bathymetric
 
-**Class:** `Pubid::Iho::Identifiers::Bibliographic`
+**Class:** `Pubid::Iho::Identifiers::Bathymetric`
 
-### Circular Letter
+### Capacity Building
 
-**Class:** `Pubid::Iho::Identifiers::CircularLetter`
+**Class:** `Pubid::Iho::Identifiers::CapacityBuilding`
 
 ### Miscellaneous
 

@@ -55,8 +55,8 @@ module Pubid
       atom "volume_edition", "voled"
       atom "volume_year", "voly"
 
-      type "pubid:iho:bibliographic", "b"
-      type "pubid:iho:circular-letter", "cl"
+      type "pubid:iho:bathymetric", "b"
+      type "pubid:iho:capacity_building", "cl"
       type "pubid:iho:identifier", "id"
       type "pubid:iho:miscellaneous", "m"
       type "pubid:iho:publication", "pub"

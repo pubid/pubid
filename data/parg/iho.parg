@@ -134,15 +134,24 @@
 # == URN emission — the IHO MRN guidance (owner adoption, 2026-11-25)
 #
 # The flavor emits the IHO MRN guidance form (S-100WG4, "MRN Guidelines
-# for IHO") for the series the guidance gives a publication type:
+# for IHO") for EVERY series — the five series bind 1:1 onto the
+# guidance's five publication type codes:
 #
 #   urn:mrn:iho:pub:<type>:<name>[:<edition>][:<trailing atoms>...]
-#     <type>  spec (S series) | per (P series) | reg (M series)
-#     <name>  sNNN — the lowercase series letter + number (the guidance's
-#             own "s57"/"s98" name form; the dotted edition is the
-#             canonical 4th segment, per IHO's printed S-98 metadata
-#             urn:mrn:iho:pub:spec:s98:1.0.0)
+#     <type>  bathy (B series) | cb (C series) | reg (M series) |
+#             per (P series) | spec (S series)
+#     <name>  sNNN / bNNN / cNNN — the lowercase series letter + number
+#             (the guidance's own "s57"/"s98" name form; the dotted
+#             edition is the canonical 4th segment, per IHO's printed
+#             S-98 metadata urn:mrn:iho:pub:spec:s98:1.0.0)
 #     <edition>  the bare dotted x.y.z — NOT ed-prefixed
+#
+# The B/C bindings cite IHO S-11 Part C Ed 1.0.0 section 1.2, which
+# arranges the IHO publications under five groups: "B - Bathymetric
+# Publications (Mainly related to GEBCO)", "C - Capacity Building
+# Publications", "M - Miscellaneous Publications (including Basic
+# Documents)", "P - Periodic Publications", "S - Standards and
+# Specifications" — the five groups onto the guidance's five codes.
 #
 # The S-158 member joins the name segment hyphenated — the fleet
 # extension of the guidance for compound publication numbers — so the
@@ -164,12 +173,10 @@
 #   [:vol-<n>[:issue-<n>][...]]
 #
 # The guidance's bare correction/clarification slots (the s57:3:1 form)
-# are not modeled faces and reject. The B (Bibliographic) and C
-# (Circular Letter) series have no guidance publication type code —
-# until IHO assigns one they keep the legacy positional emission below.
+# are not modeled faces and reject.
 #
-# == Legacy positional segment grammar (decode-only for S/P/M, the
-#    emission of the B/C series)
+# == Legacy positional segment grammar (decode-only for every series;
+#    emitted by none — all five series carry a guidance type code)
 #
 # The URN mirrors the containment tree, one semantic atom per segment:
 # Part contains Annexes; Annex contains Appendices; a D-2 subnumber is
@@ -263,8 +270,8 @@
 # B-401"); long "S-4 Part B, Section 400" (a normalizing parse; also
 # takes a trailing citation: "S-4 Part B, Section 400, B-401", where the
 # spelled section only cross-checks the citation's derived section); bare
-# "B-401" (implicit S-4 anchor; B only — bare C-x stays the Circular
-# Letter series). The builder binds the anchor: a citation requires the
+# "B-401" (implicit S-4 anchor; B only — bare C-x stays the C Capacity
+# Building series). The builder binds the anchor: a citation requires the
 # S-4 anchor (or synthesizes it for the bare form).
 #
 # Reserved numbers ("NOT CURRENTLY USED" in the S-4 contents — B-170,
@@ -343,7 +350,7 @@ grammar PubidIho version "0.4.0" edition 2 {
   # The spec number's vocabulary: the S-4 sections run 100-600 (Part C
   # 100-500), so the leaf number is 3 digits with hundreds digit 1-6 —
   # the same shape the bare citation branch leans on to keep the B
-  # Bibliographic series (B-1..B-13 style) distinct from B-4xx specs.
+  # Bathymetric series (B-1..B-13 style) distinct from B-4xx specs.
   spec_shape = ("1" / "2" / "3" / "4" / "5" / "6") digit digit
   spec_number = spec_shape as spec
   spec_subnumber = dot (1*digit) as spec_sub
@@ -367,9 +374,9 @@ grammar PubidIho version "0.4.0" edition 2 {
 
   # The bare citation branch (the entry's FIRST alternative): "B-401" /
   # "IHO B-401" — implicit S-4 anchor (the builder synthesizes series S
-  # number 4). B only: bare C-x stays the Circular Letter series, and the
-  # 3-digit [1-6]xx shape keeps the B Bibliographic series (B-12) on the
-  # main branch.
+  # number 4). B only: bare C-x stays the C Capacity Building series,
+  # and the 3-digit [1-6]xx shape keeps the B Bathymetric series (B-12)
+  # on the main branch.
   bare_spec_citation = [("IHO" space)] ("B" as spec_part) dash spec_number [spec_subnumber] [spec_variant]
 
   supplement = space ("Suppl" / "Sup") space (1*digit) as supplement [supplement_dated]

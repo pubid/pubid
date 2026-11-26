@@ -30,7 +30,8 @@ RSpec.describe Pubid::Iho::UrnParser do
     "IHO S-100",
   ]
 
-  # --- the adopted IHO MRN guidance form (the S/P/M emission) ---
+  # --- the adopted IHO MRN guidance form (the emission of every
+  #     series; the B/C codes cite S-11 Part C Ed 1.0.0 section 1.2) ---
   {
     "urn:mrn:iho:pub:spec:s44:5.0.0" => "IHO S-44 5.0.0",
     "urn:mrn:iho:pub:spec:s158:1.0.0" => "IHO S-158 1.0.0", # the framework
@@ -51,14 +52,24 @@ RSpec.describe Pubid::Iho::UrnParser do
       "IHO S-98 Part A 1.0.0 (2024)",
     # the guidance's name form: lowercase, dotted edition
     "urn:mrn:iho:pub:spec:s98:1.0.0" => "IHO S-98 1.0.0",
+    # the bathy (B) and cb (C) codes: S-11 Part C Ed 1.0.0 section 1.2
+    # groups ("B - Bathymetric Publications", "C - Capacity Building
+    # Publications") onto the guidance codes; the receipts are the
+    # testsuite corpus rows (B-12 CSB Guidance, C-13 Manual on
+    # Hydrography, C-51 6.0.0)
+    "urn:mrn:iho:pub:bathy:b12:3.0.0" => "IHO B-12 3.0.0",
+    "urn:mrn:iho:pub:bathy:b4:2.19.0" => "IHO B-4 2.19.0",
+    "urn:mrn:iho:pub:cb:c13:1.0.0" => "IHO C-13 1.0.0",
+    "urn:mrn:iho:pub:cb:c51:6.0.0" => "IHO C-51 6.0.0",
+    "urn:mrn:iho:pub:bathy:b7:vol-2023" => "IHO B-7 Vol. 2023",
   }.each do |urn, text|
     it "decodes #{urn.inspect} as #{text.inspect}" do
       expect(described_class.new.parse_urn(urn).to_s).to eq(text)
     end
   end
 
-  # --- the legacy positional form (the B/C emission; decodable for
-  #     every series, never emitted for S/P/M) ---
+  # --- the legacy positional form (decode-only for every series,
+  #     emitted by none) ---
   {
     "urn:iho:s:158:100" => "IHO S-158:100",
     "urn:iho:s:158:100:ed-1.0.0" => "IHO S-158:100 1.0.0",
@@ -126,9 +137,10 @@ RSpec.describe Pubid::Iho::UrnParser do
     "urn:iho:s:100:appendix-D:2:3" => "stray bare atom after the subnumber",
     # the member designator rides the S-158 anchor only (issue #774)
     "urn:iho:s:44:5" => "the product member designator is the S-158 series device",
-    # the guidance form: unknown publication type, unknown name, the
+    # the guidance form: unknown publication type (bathy is one of the
+    # five codes now), unknown name, the
     # un-modeled bare correction slot (the s57:3:1 form)
-    "urn:mrn:iho:pub:bathy:s44:5.0.0" => "unknown publication type",
+    "urn:mrn:iho:pub:bogus:s44:5.0.0" => "unknown publication type",
     "urn:mrn:iho:pub:spec:x44:5.0.0" => "unknown publication name",
     "urn:mrn:iho:pub:spec:s44-5:1.0.0" => "the product member designator is the S-158 series device",
     "urn:mrn:iho:pub:spec:s57:3:1" => "unexpected segment",

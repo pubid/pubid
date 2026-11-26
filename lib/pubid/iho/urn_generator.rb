@@ -6,18 +6,22 @@ module Pubid
     #
     # == The adopted IHO MRN guidance (owner ruling, 2026-11-25)
     #
-    # The series the guidance gives a publication type emit the guidance
-    # form (S-100WG4, "MRN Guidelines for IHO"; the guidance's own
-    # examples are s57 / urn:mrn:iho:pub:spec:s57:3:1:supplement3 and —
-    # IHO's printed S-98 metadata — urn:mrn:iho:pub:spec:s98:1.0.0):
+    # Every series emits the guidance form (S-100WG4, "MRN Guidelines for
+    # IHO"; the guidance's own examples are s57 /
+    # urn:mrn:iho:pub:spec:s57:3:1:supplement3 and — IHO's printed S-98
+    # metadata — urn:mrn:iho:pub:spec:s98:1.0.0):
     #
     #   urn:mrn:iho:pub:<type>:<name>[:<edition>][:<trailing atoms>...]
     #
-    # - <type>: spec (S series, Standards and Specifications) / per
-    #   (P series, periodic publications) / reg (M series, Miscellaneous
-    #   Base Regulatory Publications). The B (Bibliographic) and C
-    #   (Circular Letter) series have no guidance type code — until IHO
-    #   assigns one they keep the legacy positional emission below.
+    # - <type>: the guidance's five publication type codes, one per
+    #   series letter — bathy (B), cb (C), reg (M), per (P), spec (S).
+    #   The B/C bindings follow IHO S-11 Part C Ed 1.0.0 section 1.2,
+    #   which arranges the IHO publications under five groups ("B -
+    #   Bathymetric Publications (Mainly related to GEBCO)", "C -
+    #   Capacity Building Publications", M - Miscellaneous Publications
+    #   (including Basic Documents), P - Periodic Publications, S -
+    #   Standards and Specifications): the five groups map 1:1 onto the
+    #   guidance's five codes.
     # - <name>: sNNN — the lowercase series letter + number. The S-158
     #   member joins the name segment hyphenated (the fleet extension of
     #   the guidance for compound publication numbers, keeping the
@@ -45,33 +49,16 @@ module Pubid
     # - urn:mrn:iho:pub:spec:s158-102:1.0.0               IHO S-158:102 1.0.0
     # - urn:mrn:iho:pub:reg:m2:sup-1                      IHO M-2 Sup 1
     # - urn:mrn:iho:pub:per:p5:vol-2024                   IHO P-5 Vol. 2024
+    # - urn:mrn:iho:pub:bathy:b12:3.0.0            IHO B-12 3.0.0 (CSB)
+    # - urn:mrn:iho:pub:cb:c51:6.0.0               IHO C-51 6.0.0
     #
-    # == The legacy positional scheme (the B/C emission; decodable for
-    #    every series, never emitted for S/P/M)
+    # == The legacy positional scheme (decode-only for every series)
     #
-    # The pre-guidance positional grammar (containment-ordered, one
-    # semantic atom per segment, marker = the lowercased human-face
-    # token; ed- follows ISO's RFC 5141 precedent):
-    #
-    #   urn:iho:<type>:<number>[:ed-<x.y.z>][:year-<yyyy>]
-    #     [:sup-<n>[:ed-<x.y.z>][:year-<yyyy>]]
-    #     [:part-<X>[:ed-<x.y.z>][:year-<yyyy>]]
-    #     [:spec-<n>[:specsub-<n>][:specvar-<X>]]
-    #     [:annex-<A>[...]]
-    #     [:appendix-<B>[:<sub>][...]]
-    #     [:vol-<n>[:issue-<n>][...]]
-    #     [:year-<yyyy>]
-    #
-    # Containment: part contains annexes, annex contains appendices, the
-    # subnumber is a child atom of its appendix, the issue a child of its
-    # volume. Letters are case-preserved. The volume carries every serial
-    # locator — the yearbook year IS a volume (P-5 Vol. 2024 gives
-    # vol-2024), so a periodical identifier has no year segment; the
-    # year- segment exists only for the standards with-year qualifier.
-    #
-    # Examples (the legacy form):
-    # - urn:iho:b:4:ed-2.19.0                     IHO B-4 2.19.0
-    # - urn:iho:c:13:ed-1.0.0                     IHO C-13 1.0.0
+    # The pre-guidance positional grammar — one semantic atom per
+    # segment, marker = the lowercased human-face token, ed- following
+    # ISO's RFC 5141 precedent — is decoded by the UrnParser for every
+    # series and emitted by none: all five series carry a guidance type
+    # code, so the guidance form above is the only emission.
     class UrnGenerator
       attr_reader :identifier
 
@@ -79,12 +66,14 @@ module Pubid
         @identifier = identifier
       end
 
-      # The guidance publication type per series letter. S = Standards
-      # and Specifications -> spec (the owner ruling names the guidance
-      # code explicitly); P = the periodic publications -> per; M =
-      # Miscellaneous (Base Regulatory Publications) -> reg. B and C
-      # have no guidance code (legacy emission until IHO assigns one).
-      MRN_TYPES = { "S" => "spec", "P" => "per", "M" => "reg" }.freeze
+      # The guidance publication type per series letter — the five
+      # S-11 Part C groups onto the guidance's five codes: S =
+      # Standards and Specifications -> spec, P = the periodic
+      # publications -> per, M = Miscellaneous (Base Regulatory
+      # Publications) -> reg, B = Bathymetric Publications -> bathy,
+      # C = Capacity Building Publications -> cb.
+      MRN_TYPES = { "S" => "spec", "P" => "per", "M" => "reg",
+                    "B" => "bathy", "C" => "cb" }.freeze
 
       # The guidance-form trailing atoms in containment order — the same
       # order the legacy scheme prints them. The Appendix subnumber is
@@ -106,31 +95,8 @@ module Pubid
         [:volume_year, "year"]
       ].freeze
 
-      # [component, marker] pairs of the legacy positional scheme, in the
-      # containment/canonical-face order. A component edition/year emits
-      # right after its component (the ed- segment attaches to the node
-      # it follows, recording the separately-published mode). nil markers
-      # emit their component as a BARE atom (the appendix subnumber
-      # directly after its appendix).
-      SEGMENTS = [
-        [:edition, "ed"], [:year, "year"],
-        [:supplement, "sup"], [:supplement_edition, "ed"],
-        [:supplement_year, "year"],
-        [:part, "part"], [:part_edition, "ed"], [:part_year, "year"],
-        # the S-4 spec citation: a child of its part (the citation
-        # letter rides the part- atom), the dotted sub and the
-        # parenthesized variant its own children.
-        [:spec, "spec"], [:spec_sub, "specsub"], [:spec_variant, "specvar"],
-        [:annex, "annex"], [:annex_edition, "ed"], [:annex_year, "year"],
-        [:appendix, "appendix"], [:appendix_subnumber, nil],
-        [:appendix_edition, "ed"], [:appendix_year, "year"],
-        [:volume, "vol"], [:issue, "issue"], [:volume_edition, "ed"],
-        [:volume_year, "year"]
-      ].freeze
-
       def generate
-        letter = identifier.class.type[:short].to_s
-        MRN_TYPES[letter] ? generate_mrn(MRN_TYPES[letter]) : generate_legacy
+        generate_mrn(MRN_TYPES.fetch(identifier.class.type[:short].to_s))
       end
 
       private
@@ -174,25 +140,6 @@ module Pubid
 
             "#{marker}-#{value}"
           end
-        end
-      end
-
-      # The legacy positional form (B/C today; the shape every legacy
-      # urn:iho: URN decodes from).
-      def generate_legacy
-        parts = ["urn", "iho"]
-        parts << identifier.class.type[:short].to_s.downcase
-        parts << identifier.number.to_s
-        parts.concat(component_segments)
-        parts.join(":")
-      end
-
-      def component_segments
-        SEGMENTS.filter_map do |component, marker|
-          value = identifier.public_send(component)
-          next unless value
-
-          marker ? "#{marker}-#{value}" : value.to_s
         end
       end
     end

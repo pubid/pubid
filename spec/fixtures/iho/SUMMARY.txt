@@ -1,5 +1,5 @@
 Flavor: IHO
-Classified: 2026-11-25 19:09:32
+Classified: 2026-11-26 12:35:58
 ======================================================================
 
 OVERALL STATISTICS
@@ -10,8 +10,8 @@ Fail: 4 (1.97%)
 
 BY CLASS
 ----------------------------------------------------------------------
-bibliographic                            Pass: 13/14 (92.86%)
-circular_letter                          Pass: 8/8 (100.0%)
+bathymetric                              Pass: 13/14 (92.86%)
+capacity_building                        Pass: 8/8 (100.0%)
 miscellaneous                            Pass: 13/13 (100.0%)
 publication                              Pass: 22/22 (100.0%)
 standard                                 Pass: 143/146 (97.95%)

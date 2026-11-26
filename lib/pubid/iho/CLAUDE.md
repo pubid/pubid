@@ -134,8 +134,8 @@ Section 400` ≡ `IHO S-4 B-400` (one identity, two spellings).
   spelled section becomes `spec` alone, and beside a citation it only
   cross-checks the citation's derived section — "Section 500, B-401"
   raises) and the BARE `B-401` (implicit S-4 anchor; B only — bare
-  C-x stays the Circular Letter series, and the 3-digit `[1-6]xx`
-  shape keeps the B Bibliographic series (B-12) on the main branch).
+  C-x stays the C Capacity Building series, and the 3-digit `[1-6]xx`
+  shape keeps the B Bathymetric series (B-12) on the main branch).
   `IHO B-401` (publisher + bare) parses to the spec too.
 - **The anchor is load-bearing**: a spec citation requires the S-4
   anchor (series S number 4 — the builder raises otherwise), a
@@ -179,16 +179,24 @@ The full scheme documentation lives in `lib/pubid/iho/urn.adoc` (the
 per-flavor home of the former `docs/URN-SCHEMES.adoc` iho section; the
 owner's per-flavor split ruling of 2026-11-25). The laws:
 
-- **The S/P/M emission is the IHO MRN guidance form**
-  (`urn:mrn:iho:pub:<type>:<name>[:<edition>][:trailing...]`):
-  `spec` (S), `per` (P), `reg` (M); the name is the lowercase
-  `sNNN` (the guidance's own s57/s98 spelling); the dotted edition is
-  the bare canonical 4th segment; the S-158 member joins the name
-  hyphenated (`s158-102`, the fleet extension for compound publication
-  numbers). The B/C series have no guidance type code and keep the
-  legacy emission until IHO assigns one.
-- **The legacy positional `urn:iho:` grammar is decode-only for S/P/M**
-  (the B/C emission): marker segments, positional `ed-`/`year-`, the
+- **The emission of every series is the IHO MRN guidance form**
+  (`urn:mrn:iho:pub:<type>:<name>[:<edition>][:trailing...]`); the
+  five series bind 1:1 onto the guidance's five publication type
+  codes — `spec` (S), `per` (P), `reg` (M), `bathy` (B Bathymetric
+  Publications), `cb` (C Capacity Building Publications). The B/C
+  bindings cite IHO S-11 Part C Ed 1.0.0 section 1.2, which arranges
+  the IHO publications under five groups ("B - Bathymetric
+  Publications (Mainly related to GEBCO)", "C - Capacity Building
+  Publications", M - Miscellaneous Publications (including Basic
+  Documents), P - Periodic Publications, S - Standards and
+  Specifications) — the five groups onto the guidance's five codes.
+  The name is the lowercase `sNNN`/`bNNN`/`cNNN` (the guidance's own
+  s57/s98 spelling); the dotted edition is the bare canonical 4th
+  segment; the S-158 member joins the name hyphenated (`s158-102`,
+  the fleet extension for compound publication numbers).
+- **The legacy positional `urn:iho:` grammar is decode-only for every
+  series, emitted by none** (all five series carry a guidance type
+  code): marker segments, positional `ed-`/`year-`, the
   bare appendix-subnumber atom, and the further bare digit segment
   binding the S-158 member. The legacy 2.0.x spellings (dotted keys,
   bare `a.b.c` editions, `y.`) stay decodable, never emitted.
@@ -202,19 +210,27 @@ owner's per-flavor split ruling of 2026-11-25). The laws:
     IHO S-158 Part S-102 0.2.0   -> urn:mrn:iho:pub:spec:s158-102:0.2.0 (order-stable)
     IHO M-2 Sup 1                -> urn:mrn:iho:pub:reg:m2:sup-1
     IHO P-1 Vol. 30 (2)          -> urn:mrn:iho:pub:per:p1:vol-30:issue-2
-    IHO B-4 2.19.0               -> urn:iho:b:4:ed-2.19.0 (legacy, no guidance code)
+    IHO B-12 3.0.0               -> urn:mrn:iho:pub:bathy:b12:3.0.0 (CSB Guidance)
+    IHO C-51 6.0.0               -> urn:mrn:iho:pub:cb:c51:6.0.0 (Manual on Hydrography)
 
 **Breaking URN migrations this scheme carries** (legacy forms stay
 decodable, never emitted): the official-URN namespace moved to the
-guidance form (`urn:mrn:iho:pub:...`) for S/P/M; the S-158 member
+guidance form (`urn:mrn:iho:pub:...`) — first for S/P/M, then for the
+B/C rows too (the legacy `urn:iho:b:/c:` emission is dead); the S-158
+member
 moved to the `s158-NNN` name encoding (issue #774) with the draft-era
 part spellings rebinding onto `product` (#775's parted- mis-bind
 fixed); the dotted keys (`part.4a`, `suppl.1`, `ap.A`, `annex.A`,
 `vol.30`, `issue.2`, `appendix.D-2`) and the bare a.b.c edition segment
 stay decode-only; the #635/#637 `y.2024` tag decodes into the
-**volume**. relaton-data-iho needs a re-crawl (it is already legacy
-pre-pubid-2 shape); the frozen testsuite corpus rows are re-frozen in
-the coupled corpus round.
+**volume**. The wire-type names are honest (the B/C rows were
+misnomers): `pubid:iho:bibliographic` -> `pubid:iho:bathymetric`
+(`Identifiers::Bathymetric`), `pubid:iho:circular-letter` ->
+`pubid:iho:capacity_building` (`Identifiers::CapacityBuilding`) — a
+clean rename, no alias kept (the S-158 checks_for->product precedent);
+the pubid-scheme slugs `b`/`cl` are unchanged. relaton-data-iho needs a
+re-crawl (it is already legacy pre-pubid-2 shape); the frozen
+testsuite corpus rows are re-frozen in the coupled corpus round.
 
 ## Fixtures run through the classify pipeline
 
@@ -248,7 +264,7 @@ is preserved (`part-A`); the yearbook year is a volume (`vol-2024`, no
 URN parser, never emitted). The draft-era part-faceted S-158 emission
 (`part-S-102`, `parted-`) is dead: the `from_hash` unification
 redirects it onto the `product` identity, so the legacy URN fails
-the canonical gate. The official URN of the S/P/M series is the
+the canonical gate. The official URN of every series is the
 adopted IHO MRN guidance form (`urn:mrn:iho:pub:...`); the
 `urn:pubid:iho:` scheme is pubid's own and is not governed by the
 guidance.
