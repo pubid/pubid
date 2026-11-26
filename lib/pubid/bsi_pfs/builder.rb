@@ -8,6 +8,7 @@ module Pubid
           "PD" => "PublishedDocument",
           "DD" => "DraftDocument",
           "TS" => "TechnicalSpecification",
+          "AMD" => "StandaloneAmendment",
       }.freeze
 
       DEFAULT_TYPE = "BritishStandard"
@@ -27,12 +28,25 @@ module Pubid
       # token that selected the class is the designation face, not
       # a publisher — the column keeps the class default and the
       # identifier carries the stage entry's type/stage/typed_stage
-      # (the coded builder's cast).
+      # (the coded builder's cast). A face-only designation
+      # (designation: face) joins DESIGNATION_TOKENS without a row
+      # here — nothing serializes beyond _type.
       DESIGNATION_STAGES = {
         "PAS" => { code: "pubpas", stage_code: "published", type_code: "pas", abbr: ["PAS"], name: "Publicly Available Specification", harmonized_stages: ["60.00", "60.60"] },
         "PD" => { code: "pubpd", stage_code: "published", type_code: "pd", abbr: ["PD"], name: "Published Document", harmonized_stages: ["60.00", "60.60"] },
         "DD" => { code: "pubdd", stage_code: "published", type_code: "dd", abbr: ["DD"], name: "Draft Document", harmonized_stages: ["60.00", "60.60"] },
         "TS" => { code: "pubts", stage_code: "published", type_code: "ts", abbr: ["TS"], name: "Technical Specification", harmonized_stages: ["60.00", "60.60"] },
+      }.freeze
+
+      # Every designation token (trio and face-only): the token
+      # that selected the class never lands on the publisher
+      # column — the column keeps the organization default.
+      DESIGNATION_TOKENS = {
+        "PAS" => true,
+        "PD" => true,
+        "DD" => true,
+        "TS" => true,
+        "AMD" => true,
       }.freeze
 
       # The model column the adopted document lands on (the vendored
@@ -97,7 +111,7 @@ module Pubid
         identifier.version = present_string(data[:version])
         # A designation token selects the class but is not a publisher:
         # the column keeps the class default (the organization's).
-        if data[:publisher] && !DESIGNATION_STAGES.key?(data[:publisher].to_s)
+        if data[:publisher] && !DESIGNATION_TOKENS.key?(data[:publisher].to_s)
           identifier.publisher = ::Pubid::Components::Publisher.new(body: data[:publisher].to_s)
         end
         copubs = Array(data[:copublishers]).map do |row|

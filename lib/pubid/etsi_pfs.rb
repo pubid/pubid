@@ -2,7 +2,7 @@
 #
 # PFS-generated flavor — DO NOT EDIT BY HAND.
 # Source: definitions/etsi.pfs (pfs:1) sha256:490ba9435f44dbd2d59429ae6d9527909c39444f19fec5a33a8cad91e89e3581
-# Compiler: pubid/grammar/pfs 0.1.0 (baked with parsanol 1.3.126)
+# Compiler: pubid/grammar/pfs 2.0.0 (baked with parsanol 1.5.1.0)
 # Regenerate: ruby scripts/pfs compile definitions/etsi.pfs --as etsi_pfs --ruby-out <dir>
 
 require "pubid"

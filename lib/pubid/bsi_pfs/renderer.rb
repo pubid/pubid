@@ -2,10 +2,12 @@ module Pubid
   module BsiPfs
     # Human renderer, generated from the canonical template.
     class Renderer < ::Pubid::Renderers::Base
-      # The designation faces (the typed trio): the token that
-      # selected the class prints where the face names the
-      # publisher — the column keeps the organization default.
-      DESIGNATION_FACES = ["PAS", "PD", "DD", "TS"].freeze
+      # The designation faces (the typed trio and the face-only
+      # designations): the token that selected the class prints
+      # where the face names the publisher — the column keeps
+      # the organization default. A face-only type carries no
+      # serialized type, so the face reads the class's own short.
+      DESIGNATION_FACES = ["PAS", "PD", "DD", "TS", "AMD"].freeze
 
       def render(**_opts)
         f = render_fields(@id)
@@ -47,7 +49,7 @@ module Pubid
           run << "+#{member.supplement_notation}"
         end
         view = {
-          publisher: (t = root.type&.abbr) && DESIGNATION_FACES.include?(t) ? t : (root.publisher&.respond_to?(:body) ? root.publisher.body : root.publisher),
+          publisher: (t = root.type&.abbr || root.class.type[:short]) && DESIGNATION_FACES.include?(t) ? t : (root.publisher&.respond_to?(:body) ? root.publisher.body : root.publisher),
           number: root.number,
           part: root.part,
           year: root.date&.year,

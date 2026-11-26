@@ -15,9 +15,11 @@
 # parameterization (`adopted.attribute: base`), the root-through
 # identity, the typed-trio designation surface (type/stage/typed_stage
 # with harmonized_stages), the glued adopted edition face, the
-# marker-less consolidated bundle and the nested publisher wire shape):
+# marker-less consolidated bundle and the nested publisher wire shape —
+# and the pfs-compiler-v2 face-only designation (`designation: face`,
+# issue #151) that composes the standalone-AMD family:
 #
-#   absorbed    843 / 1,500 — byte parity on every identity surface
+#   absorbed    847 / 1,500 — byte parity on every identity surface
 #               (class, to_s, to_hash, to_urn, to_pubid_urn,
 #               to_mr_string) plus from_hash round-trip: the plain BS
 #               face (304), the adoption wrappers with the uniform
@@ -26,23 +28,29 @@
 #               60364-8-81 ED1" glued-ED face, ais 74), the typed trio
 #               (PAS 56 / PD 74 / DD 13 / TS 3) with the full
 #               type/stage/typed_stage serialization and the
-#               ":stage.published" URN segment, and the marker-less
+#               ":stage.published" URN segment, the marker-less
 #               consolidated bundles (52 — the members carry the
 #               bundle's base, the URN appends the members' chains
-#               directly, the MR slug is the base document's own).
+#               directly, the MR slug is the base document's own), and
+#               the face-only standalone amendments (4 — "AMD 11015" is
+#               {_type, number}: the head token prints and selects the
+#               class while the column keeps the organization default).
 #   classified  0 — the #737 ledger's wrapper-emission (393) and
 #               typed-trio (146) families closed: every divergence the
 #               measured boundary recorded flipped to byte parity.
-#   unabsorbed  657 — rows outside the composition surface, rejected
+#   unabsorbed  653 — rows outside the composition surface, rejected
 #               (ParseError, never a wrong class): the thirty-plus coded
 #               families the module library does not model (aerospace,
 #               Flex, committee documents, index/method/section/test
 #               suffixes, addenda/supplements, national annexes, Expert
-#               commentary, bundles, sets, standalone AMD, value-added
-#               wrappers, DISC escalation prefix) and four declared
-#               shapes (the AMD keyword supplement spelling, the
-#               second_number slash column, the CISPR aerospace routing,
-#               the "(Book)" / "(R2004)" parenthetical suffixes).
+#               commentary, bundles, sets, value-added wrappers, DISC
+#               escalation prefix) and four declared shapes (the AMD
+#               keyword supplement spelling, the second_number slash
+#               column, the CISPR aerospace routing, the "(Book)" /
+#               "(R2004)" parenthetical suffixes). Every family's
+#               fail-closed reason is recorded in pubid-grammar's
+#               definitions/bsi.pfs header (the issue-#151 tier-B/C
+#               ledger).
 #
 # A row the compiled flavor does NOT absorb fails nothing here — it sits
 # in the ledger below, pinned per payload file, so a corpus addition or
@@ -225,7 +233,7 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
     "published_document" => { absorbed: 74, classified: {}, unabsorbed: 2 },
     "section" => { absorbed: 0, classified: {}, unabsorbed: 11 },
     "set" => { absorbed: 0, classified: {}, unabsorbed: 1 },
-    "standalone_amendment" => { absorbed: 0, classified: {}, unabsorbed: 4 },
+    "standalone_amendment" => { absorbed: 4, classified: {}, unabsorbed: 0 },
     "supplement_document" => { absorbed: 0, classified: {}, unabsorbed: 18 },
     "supplementary_index" => { absorbed: 0, classified: {}, unabsorbed: 1 },
     "technical_specification" => { absorbed: 3, classified: {}, unabsorbed: 0 },
@@ -246,9 +254,9 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
     expect(actual.keys).to match_array(BSI_PFS_LEDGER.keys)
   end
 
-  it "absorbs the #737 classified families in full (843 rows) at byte parity" do
+  it "absorbs the #737 classified families in full (847 rows) at byte parity" do
     absorbed_total = measured.values.sum { |g| g[:absorbed].size }
-    expect(absorbed_total).to eq(843)
+    expect(absorbed_total).to eq(847)
     classified_total = measured.values.sum do |g|
       g[:classified].values.map(&:size).sum
     end
@@ -397,6 +405,18 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
       expect(pd.to_mr_string).to eq("bs.pd.5730")
     end
 
+    it "the face-only standalone amendment composes (issue #151): the head " \
+       "token prints and selects the class, nothing serializes beyond _type" do
+      id = Pubid::BsiPfs.parse("AMD 11015")
+      expect(id).to be_a(Pubid::BsiPfs::Identifiers::StandaloneAmendment)
+      expect(id.to_s).to eq("AMD 11015")
+      expect(id.to_hash).to eq(Pubid::Bsi.parse("AMD 11015").to_hash)
+      expect(id.to_urn).to eq("urn:bsi:bs:11015")
+      expect(id.to_pubid_urn).to eq("urn:pubid:bsi:sa:11015")
+      expect(id.to_mr_string).to eq("bs.11015")
+      expect(Pubid::BsiPfs::Identifier.from_hash(id.to_hash)).to eq(id)
+    end
+
     it "the glued adopted edition face renders (BS HD IEC 60364-8-81 ED1)" do
       input = "BS HD IEC 60364-8-81 ED1"
       id = Pubid::BsiPfs.parse(input)
@@ -487,7 +507,6 @@ RSpec.describe "Pubid::BsiPfs parity with the coded Pubid::Bsi" do
       NA to BS EN 1996-1-2:2005
       BS 7722:2006 BOOK
       BS 31100:2021 ExComm
-      AMD 11015
       BS 1425:Supplement No. 1:1966
       BS 185 Index:1962
       BS 2782-10:Method 1006:1978
