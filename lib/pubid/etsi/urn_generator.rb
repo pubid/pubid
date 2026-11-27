@@ -32,7 +32,10 @@ module Pubid
 
         date = identifier.date
         if date.month
-          "#{date.year}-#{format('%02d', date.month)}"
+          # `month` is a zero-padded string ("09"); `%d` reads it through
+          # Integer(), which refuses "08"/"09" as octal look-alikes —
+          # cast to a decimal integer first.
+          "#{date.year}-#{format('%02d', date.month.to_i)}"
         else
           date.year.to_s
         end

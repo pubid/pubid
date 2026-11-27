@@ -16,6 +16,25 @@ RSpec.describe "ETSI URN Generation" do
       urn = id.to_urn
       expect(urn).to start_with("urn:etsi:")
     end
+
+    # The two differential rows: every corpus month 08/09 row crashed
+    # urn_date with `ArgumentError: invalid value for Integer()` — the
+    # zero-padded string went through %d, which reads "08"/"09" as
+    # octal look-alikes and refuses them.
+    it "generates URN for a month-09 date" do
+      id = Pubid::Etsi.parse("ETSI EN 302 636-5-1 V1.2.1 (2014-08)")
+      expect(id.to_urn).to eq("urn:etsi:en:302 636-5-1:v1.2.1:2014-08")
+    end
+
+    it "generates URN for a month-08 date" do
+      id = Pubid::Etsi.parse("ETSI TS 123 207 V6.6.0 (2005-09)")
+      expect(id.to_urn).to eq("urn:etsi:ts:123 207:v6.6.0:2005-09")
+    end
+
+    it "generates URN for an edition-carrying month-09 date" do
+      id = Pubid::Etsi.parse("ETSI TBR 013 ed.3 (1999-09)")
+      expect(id.to_urn).to eq("urn:etsi:tbr:013:ed.3:1999-09")
+    end
   end
 
   describe "URN format compliance" do
