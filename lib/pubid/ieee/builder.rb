@@ -377,7 +377,9 @@ module Pubid
           if m.to_s.match?(/\A\d{1,2}\z/) && y
             host = drafts.find { |d| d.is_a?(Hash) && d[:draft_version] }
             if host
-              host[:draft_version] = [host[:draft_version], y, m].compact.join("-")
+              host[:draft_version] =
+                [joined_draft_version(drafts), y, m].compact.join("-")
+              drop_joined_draft_segments(drafts, host)
               parsed_hash.delete(:month)
               parsed_hash.delete(:year)
               parsed_hash.delete(:trailing_month)
@@ -390,8 +392,7 @@ module Pubid
         # is the base's year, the 2015-07 the draft's); only the
         # root-year assignment waits for an unoccupied year slot.
         if dash
-          joined = drafts.filter_map { |d| d.is_a?(Hash) ? d[:draft_version] : nil }
-                         .map { |v| v.is_a?(Hash) ? v[:value] : v.to_s }.join
+          joined = joined_draft_version(drafts)
           # dash is either the top-level spine (dash_year/dash_month) or the
           # draft's own hash (draft_date_dash_year/month on the edition-2
           # grammar, dash_year/month on v1) — read both spellings.
@@ -411,6 +412,7 @@ module Pubid
             # normalizes onto it (pubid ruling 2026-10-13).
             host[:draft_version] =
               [joined, dash_y, dash_m].compact.join("-")
+            drop_joined_draft_segments(drafts, host)
             dash.delete(:dash_year)
             dash.delete(:dash_month)
             dash.delete(:draft_date_dash_year)
@@ -430,6 +432,7 @@ module Pubid
               # "D2, 04 2015" comma spelling normalizes onto it.
               host[:draft_version] =
                 [joined, dash_y, dash_m].compact.join("-")
+              drop_joined_draft_segments(drafts, host)
               dash.delete(:dash_year)
               dash.delete(:dash_month)
               dash.delete(:draft_date_dash_year)
@@ -1625,6 +1628,27 @@ module Pubid
       def merge_parsed_array(parsed_array)
         parsed_array.inject({}) do |result, hash|
           result.merge(hash)
+        end
+      end
+
+      # The draft version spread over the segment elements, joined back.
+      # @param drafts [Array] the draft elements of the parse tree
+      # @return [String]
+      def joined_draft_version(drafts)
+        drafts.filter_map { |d| d.is_a?(Hash) ? d[:draft_version] : nil }
+              .map { |v| v.is_a?(Hash) ? v[:value] : v.to_s }.join
+      end
+
+      # The grammar splits a dotted draft version into one element per
+      # segment ("/D-6.7.2" -> "-6", ".7.2"). Once the host element holds the
+      # joined version with its embedded dash date, the other segments are
+      # already in it; left in place they are joined a second time and the
+      # version reads "6.7.2-2017-05.7.2" (relaton/relaton-data-ieee#10).
+      # @param drafts [Array] the draft elements of the parse tree
+      # @param host [Hash] the element that now holds the joined version
+      def drop_joined_draft_segments(drafts, host)
+        drafts.each do |d|
+          d.delete(:draft_version) if d.is_a?(Hash) && !d.equal?(host)
         end
       end
 
