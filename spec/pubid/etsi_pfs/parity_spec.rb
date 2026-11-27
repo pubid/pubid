@@ -233,12 +233,14 @@ RSpec.describe "Pubid::EtsiPfs parity with the coded Pubid::Etsi" do
       expect(Pubid::EtsiPfs.parse("ETSI EN 300 019-1-0 V2.1.2 (2003-09)").to_urn)
         .to eq("urn:etsi:en:300 019-1-0:v2.1.2:2003-09")
 
-      # The coded flavor's pre-existing defect: format('%02d', month) on
-      # the zero-padded string raises for 08 and 09. The compiled
-      # generator renders the captured month verbatim — the same URN the
-      # coded one produces for every other month, and no raise here.
-      expect { Pubid::Etsi.parse("ETSI EG 200 351 V2.2.2 (1998-09)").to_urn }
-        .to raise_error(ArgumentError)
+      # The coded flavor's former defect — format('%02d', month) on the
+      # zero-padded string raised `invalid value for Integer()` for 08
+      # and 09 — is repaired (decimal `to_i` before the format), so both
+      # layers now render the captured month verbatim and agree
+      # byte-for-byte. The raise pin here recorded that defect until the
+      # etsi/differential-rows fix flipped it.
+      expect(Pubid::Etsi.parse("ETSI EG 200 351 V2.2.2 (1998-09)").to_urn)
+        .to eq("urn:etsi:eg:200 351:v2.2.2:1998-09")
       expect(Pubid::EtsiPfs.parse("ETSI EG 200 351 V2.2.2 (1998-09)").to_urn)
         .to eq("urn:etsi:eg:200 351:v2.2.2:1998-09")
     end

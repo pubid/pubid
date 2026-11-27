@@ -41,3 +41,21 @@ is `:int` (`core: [["number", :int]]`), and the codec refuses a String there.
 `minor` and `day` are placed although no pass fixture sets them, because
 `EtsiStandard`'s `key_value` block maps them: a schema must place every key
 the mapping can write, not only the keys the corpus shows.
+
+## Official URN: the month 08/09 octal trap (repaired)
+
+`UrnGenerator#urn_date` fed the zero-padded `month` **string** to
+`format('%02d', …)`, and `%d` reads its argument through `Integer()` — which
+refuses `"08"`/`"09"` as octal look-alikes. So every corpus row dated
+`(YYYY-08)`/`(YYYY-09)` parsed and rendered fine but **`to_urn` raised
+`ArgumentError`** — the three-engine differential reported these rows as
+"ruby rejects" against rust/ts (which render
+`urn:etsi:<type>:<code>:<version>:<yyyy>-<mm>` for every month). The fix is
+`date.month.to_i` before the format (decimal cast); the etsi_pfs parity spec
+had pinned the raise as a known defect and the pin flipped with the fix
+(`spec/pubid/etsi_pfs/parity_spec.rb`, "official URN segments"). Locked by
+`spec/pubid/etsi/urn_spec.rb`. The testsuite corpus rows for those months
+carry no `urn:` representation precisely because the generator crashed when
+the corpus round exported them — a future etsi corpus round can now emit
+them. (hand-off: etsi-differential-rows.)
+
