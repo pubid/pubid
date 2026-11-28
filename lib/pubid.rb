@@ -491,13 +491,36 @@ module Pubid
   # A longest-match-first order matters because prefixes nest: "ISO/IEC 2131"
   # must not be handed to the flavor that merely owns "ISO".
   #
-  # Pass 2 is skipped when pass 1 resolves to EXACTLY ONE flavor (issue #803):
-  # a string whose prefix one flavor alone claims is dispatched to that flavor
-  # only — trying the other N-1 parsers cannot change the outcome, and each
-  # failed parse leaves a retained error record behind. When the prefix is
-  # ambiguous (two or more owners: a joint form like "ISO/IEC", an umbrella's
-  # "ANSI/<ACRONYM>", a PFS-compiled alias sharing its parent's tokens) or no
-  # prefix matches at all, the existing full dispatch order runs untouched.
+  # Pass 2 is pruned to the flavors the input is not known to be incompatible
+  # with (issue #803): a flavor whose grammar cannot accept +string+ is
+  # dropped from the walk, and each dropped parser is one fewer failed parse
+  # whose record the dispatch would otherwise carry to the end. The prune is
+  # a FILTER over the existing order — it drops entries and never adds or
+  # reorders one, so every surviving flavor is tried exactly where the full
+  # dispatch would have tried it. It applies only when +string+ HAS a
+  # declared leading prefix ({candidates_by_prefix} non-empty): a string no
+  # prefix owns keeps the full walk, because the corpus showed flavors
+  # accepting leading tokens their prefix tables never declared there (BSI
+  # committee documents, standalone amendments, CEN/EVS stage prefixes, IALA
+  # specification numbers — see {dispatch_candidates}). Within a pruned
+  # walk, a flavor is dropped only when both:
+  #
+  #   * it declares prefix tokens AND its grammar accepts unprefixed input
+  #     under no declared prefix (see {accepts_bare?}) — never dropped, and
+  #   * none of its declared prefix tokens occurs anywhere in +string+ at a
+  #     token-start position ({prefix_token_occurs?}) — not only as the
+  #     leading token: a co-published tail counts ("API 579-2 /ASME …" stays
+  #     compatible with the asme flavor because ASME occurs after the slash,
+  #     and "ISO/ASTMTR52905-EB" stays compatible with astm because ASTM
+  #     occurs there even glued to the type token). Per the dual-perspective
+  #     law each flavor's prefix list already carries the co-publisher faces
+  #     ({Pubid::JOINT_PREFIXES}), so the occurrence test over that one list
+  #     covers the joint forms too.
+  #
+  # Every flavor the prune keeps was tried anyway, so no accepted/rejected
+  # row can move (proven over the full testsuite corpus: 0 digest deltas —
+  # see PR #804). Ambiguous prefixes, no-owner strings and bare forms walk
+  # the survivors of their own prune, still in the full dispatch order.
   #
   # @param string [String] a human-readable identifier
   # @return [Identifier]
@@ -510,12 +533,7 @@ module Pubid
     fallback = nil
 
     prefix_owners = candidates_by_prefix(string)
-    candidates =
-      if prefix_owners.one?
-        prefix_owners
-      else
-        prefix_owners + other_candidates(prefix_owners)
-      end
+    candidates = dispatch_candidates(string, prefix_owners)
 
     candidates.each do |mod|
       # An umbrella flavor (ANSI) also parses the joint prefix of a
@@ -686,10 +704,64 @@ module Pubid
   end
   private_class_method :other_candidates
 
+  # The dispatch order for +string+ — prefix owners first, then every other
+  # flavor — filtered down to the flavors +string+ is not known to be
+  # incompatible with ({flavor_compatible?}). A filter: the survivors keep
+  # the exact original order (issue #803).
+  #
+  # The prune applies only when +string+ HAS a declared leading prefix. A
+  # string no prefix owns keeps the full walk: the testsuite corpus showed
+  # flavors accepting leading tokens their own {PrefixesSupport} table never
+  # declared there (BSI committee documents "14/30300822 DC", standalone
+  # amendments "AMD 11015", CEN stage prefixes "FprEN 16114:2011", EVS
+  # "prEVS-EN 100:2026", CSA "CAN3-A451.1-M86", IALA "S-201") — where no
+  # declared prefix occurs, the prefix data bounds nothing and every parser
+  # has to run.
+  #
+  # @param string [String] a human-readable identifier
+  # @param prefix_owners [Array<Module>] see {candidates_by_prefix}
+  # @return [Array<Module>]
+  # @api private
+  def self.dispatch_candidates(string, prefix_owners)
+    if prefix_owners.empty?
+      return prefix_owners + other_candidates(prefix_owners)
+    end
+
+    lowered = string.downcase
+    (prefix_owners + other_candidates(prefix_owners))
+      .select { |mod| flavor_compatible?(mod, lowered) }
+  end
+  private_class_method :dispatch_candidates
+
   # A meaningless string no real identifier scheme should claim. Used to find
   # the flavors whose grammar accepts anything.
   ROUTING_PROBE = "zzqx-nonsense-9714"
   private_constant :ROUTING_PROBE
+
+  # Unprefixed probe shapes for {accepts_bare?}: the bare (publisher-less)
+  # forms a grammar can accept, one representative per observed shape family.
+  # Measured acceptance over the registered flavors:
+  #
+  #   * "123" — a bare number (astm, iec, ieee, iso, nist, iana, adobe)
+  #   * "1234-56" — a bare dash-number (ogc)
+  #   * "abc" — a bare slug (adobe, iana)
+  #   * "TR 123" — a bare series token + number (ashrae, gb, iec, iso)
+  #   * "978-1-56619-909-4" — a valid bare ISBN-13 (isbn)
+  #   * "10.1234/foo" — a bare DOI (doi, doi_pfs)
+  #   * "AB/CD" — a bare slash-delimited designation (un, whose grammar
+  #     takes any two-token slash shape far outside its own UN prefix)
+  #   * "TS 1.1" — a bare series token + dotted version (tgpp, whose TS/TR
+  #     series designations need no 3GPP prefix)
+  #
+  # A flavor that parses ANY of these accepts unprefixed input, so the
+  # dispatch prune (issue #803) may never drop it — its grammar does not
+  # require a leading prefix, and a string carrying none of its prefixes can
+  # still be its identifier. Measured like {accepts_anything?}: probed, not
+  # listed, so a grammar that gains or loses the property is classified
+  # without anyone editing a constant.
+  BARE_FORM_PROBES = ["123", "1234-56", "abc", "TR 123", "978-1-56619-909-4",
+                      "10.1234/foo", "AB/CD", "TS 1.1"].freeze
+  private_constant :BARE_FORM_PROBES
 
   # True when +mod+'s grammar accepts an arbitrary slug.
   #
@@ -718,6 +790,89 @@ module Pubid
       end
   end
   private_class_method :accepts_anything?
+
+  # True when +mod+ is a possible reader of +lowered_string+ — the dispatch
+  # prune (issue #803) drops a flavor only when this answers false, and the
+  # answer is built so a kept flavor is never a wrong keep: the two escape
+  # hatches ({accepts_bare?}, any prefix occurrence anywhere) each err
+  # toward keeping.
+  #
+  # @param mod [Module] a flavor module
+  # @param lowered_string [String] the input, downcased once by the caller
+  # @return [Boolean]
+  # @api private
+  def self.flavor_compatible?(mod, lowered_string)
+    return true if accepts_bare?(mod)
+
+    mod.prefixes.any? do |prefix|
+      prefix_token_occurs?(lowered_string, prefix.downcase)
+    end
+  end
+  private_class_method :flavor_compatible?
+
+  # True when +lowered_prefix+ occurs in +lowered_string+ at a token-start
+  # position: preceded by the start of the string or by a non-alphanumeric
+  # character — the leading half of the {prefix_match?} boundary rule,
+  # applied at every position instead of only the first.
+  #
+  # The trailing half is deliberately NOT applied: a flavor's prefix may be
+  # glued to what follows it in a form its grammar accepts
+  # ("ISO/ASTMTR52905-EB" carries ASTM directly against the TR type token),
+  # so requiring a trailing boundary would drop exactly the flavor that
+  # parses the string.
+  #
+  # @param lowered_string [String]
+  # @param lowered_prefix [String]
+  # @return [Boolean]
+  # @api private
+  def self.prefix_token_occurs?(lowered_string, lowered_prefix)
+    index = -1
+    while (index = lowered_string.index(lowered_prefix, index + 1))
+      return true if index.zero?
+
+      boundary = lowered_string[index - 1]
+      return true unless /[a-z0-9]/.match?(boundary)
+    end
+    false
+  end
+  private_class_method :prefix_token_occurs?
+
+  # True when +mod+'s grammar accepts an unprefixed input — a bare form none
+  # of its prefixes leads. astm reads "123" as "ASTM 123", iec reads "CIE" as
+  # "IEC CIE", isbn reads a bare ISBN, doi reads a bare "10.…": such a flavor
+  # owns strings that carry no prefix token of its at all, so the dispatch
+  # prune (issue #803) may never drop it from the walk.
+  #
+  # Detected by probing ({BARE_FORM_PROBES}) rather than by a hardcoded list,
+  # like {accepts_anything?}: one probe round per flavor, memoised, so a
+  # grammar that gains or loses the property is classified without anyone
+  # remembering to edit a constant.
+  #
+  # @param mod [Module] a flavor module
+  # @return [Boolean]
+  # @api private
+  def self.accepts_bare?(mod)
+    @accepts_bare ||= {}
+    return @accepts_bare[mod] if @accepts_bare.key?(mod)
+
+    @accepts_bare[mod] = BARE_FORM_PROBES.any? { |p| parses_probe?(mod, p) }
+  end
+  private_class_method :accepts_bare?
+
+  # One probe parse of the bare-acceptance calibration: true when +mod+'s
+  # grammar accepts +probe+.
+  #
+  # @param mod [Module] a flavor module
+  # @param probe [String] a {BARE_FORM_PROBES} shape
+  # @return [Boolean]
+  # @api private
+  def self.parses_probe?(mod, probe)
+    mod.parse(probe)
+    true
+  rescue StandardError, Pubid::Errors::ParseError
+    false
+  end
+  private_class_method :parses_probe?
 
   # Prefix => flavor modules, longest prefix first, built once.
   #
