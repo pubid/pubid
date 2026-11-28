@@ -52,17 +52,28 @@ module Pubid
       # @return [String, nil]
       attr_reader :flavor
 
+      # The byte position where the engine gave up, when it reported one and
+      # it is an Integer. Held as a plain number: the failure path never
+      # retains the engine's error object (whose cause tree and Source pin
+      # the subject string), so this field is the only diagnostic that
+      # survives the dispatch (issue #803; the engine-side half is
+      # parsanol-ruby#123).
+      # @return [Integer, nil]
+      attr_reader :position
+
       # @param message [String]
       # @param parse_failure_cause [Object, nil] the engine's structured
       #   cause, nil for a failure raised without running a grammar
       # @param input [String, nil]
       # @param flavor [String, nil]
+      # @param position [Integer, nil] the byte position of the failure
       def initialize(message, parse_failure_cause = nil, input: nil,
-                     flavor: nil)
+                     flavor: nil, position: nil)
         super(message)
         @parse_failure_cause = parse_failure_cause
         @input = input
         @flavor = flavor
+        @position = position
       end
 
       # @return [Object, nil]
