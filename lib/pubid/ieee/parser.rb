@@ -263,8 +263,12 @@ module Pubid
         cleaned = cleaned.gsub(/\s+-\s+(\d{4})\b/, '-\1')
 
         # 3. Add missing "Std" after IEEE: "IEEE 1070-1995" → "IEEE Std 1070-1995"
-        # Only at start of string, IEEE + space + digit
-        cleaned = cleaned.gsub(/^IEEE\s+(?!Std\b)(\d)/, 'IEEE Std \1')
+        # Only at start of string, IEEE + space + digit.
+        # Not before an ISO-style colon year ("IEEE 8802-1AE:2013/Amd.1-2015"):
+        # the grammar's ieee_colon_year_identifier reads only the bare IEEE
+        # publisher, and "IEEE Std …:YYYY" stays a grammar negative.
+        cleaned = cleaned.gsub(/^IEEE\s+(?!Std\b)(?![\dA-Za-z.-]+:\d{4}\b)(\d)/,
+                               'IEEE Std \1')
 
         # 3.5. Convert "IEEE No." to "IEEE Std": "IEEE No. 264-1968" → "IEEE Std 264-1968"
         # NOTE: Do NOT convert AIEE No - AIEE uses "No" as standard format

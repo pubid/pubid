@@ -66,12 +66,20 @@ RSpec.describe "IEEE catalogue alias spellings" do
   end
 
   describe "the draft-stage ladder on project aliases" do
-    it "takes the fabricated D1 for a date-only Draft Std" do
+    # The dotted-triple draft used to fall outside the grammar capture, so
+    # this read as a date-only Draft Std and took the fabricated D1
+    # ("IEEE P754/D1"). The vendored grammar keeps the triple
+    # (relaton-data-ieee#10), and the render is a fixed point.
+    it "keeps a dotted-triple draft on a Draft Std" do
+      id = Pubid::Ieee::Identifier.parse("IEEE Draft Std P754/D1.2.6 Nov 2006")
+      expect(id.to_s).to eq("IEEE Draft P754/D1.2.6 Nov 2006")
+      expect(Pubid::Ieee::Identifier.parse(id.to_s).to_hash).to eq(id.to_hash)
+    end
+
+    it "takes the fabricated D1 for a version-less Draft Std" do
       expect(
-        Pubid::Ieee::Identifier.parse(
-          "IEEE Draft Std P754/D1.2.6 Nov 2006",
-        ).to_s,
-      ).to eq("IEEE P754/D1")
+        Pubid::Ieee::Identifier.parse("IEEE Draft Std 802.3").to_s,
+      ).to eq("IEEE P802.3/D1")
     end
 
     it "takes the stage token from a doubled-D designator" do
