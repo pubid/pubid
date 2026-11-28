@@ -31,7 +31,11 @@ module Pubid
         def mr_supplement_suffix
           segments = ["cor"]
           segments << number.to_s if number
-          segments << year.to_s if year
+          if year
+            # The month rides the year ("cor.1.2019-05"), so two monthly
+            # corrigenda of one year do not share a slug.
+            segments << (month ? "#{year}-#{month}" : year.to_s)
+          end
           segments.join(".")
         end
       end

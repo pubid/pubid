@@ -386,6 +386,8 @@ module Pubid
         result += ". " if id.number # Add period and space for formal format
         result += id.number if id.number
         result += "-#{id.year}" if id.year
+        # The corrigendum's own numeric month ("…/Cor. 1-2019-05").
+        result += "-#{id.month}" if id.year && id.month
         result
       end
 

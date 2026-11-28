@@ -47,15 +47,40 @@ RSpec.describe "IEEE dotted draft with a relaton dash date" do
     end
   end
 
-  # The canonical no-dash rendering must parse back to the same identifier.
-  # It does not yet: the baked grammar leaves the dotted-triple branch of
-  # draft_version outside its capture, so "/D6.7.2-2017-05" loses its draft
-  # (hand-off pubid__pubid-grammar__ieee-draft-version-triple-capture). Do not
-  # release the builder fix before data/parg/ieee.json carries that grammar fix:
-  # relaton would index the rendering under a draft-less identity.
+  # The canonical no-dash rendering parses back to the same identifier: the
+  # vendored grammar captures the dotted triple inside
+  # draft_version_composite (pubid-grammar, relaton-data-ieee#10).
   it "parses its own rendering back to the same identifier" do
-    pending "pubid-grammar draft_version triple-capture fix not vendored"
     id = klass.parse("IEEE P1547/D-6.7.2-2017-05")
     expect(klass.parse(id.to_s).to_hash).to eq(id.to_hash)
+  end
+
+  # Before that grammar fix the triple fell outside the capture, so the
+  # draft was dropped ("IEEE P1547") or cut to its first segment
+  # ("IEEE Unapproved P754/D1").
+  {
+    "IEEE P1547/D6.7.2-2017-05" => "IEEE P1547/D6.7.2-2017-05",
+    "IEEE Std P754/D1.2.6" => "IEEE Draft P754/D1.2.6",
+    "IEEE P1547/D6.7.2, May 2017" => "IEEE P1547/D6.7.2, May, 2017",
+    "IEEE P11073-10201/D2.1.10 October 2018" =>
+      "IEEE P11073-10201/D2.1.10 Oct 2018",
+    "IEEE Unapproved Draft Std P754/D1.4.0, Apr 2007" =>
+      "IEEE Unapproved P754/D1.4.0, Apr 2007",
+  }.each do |ref, rendered|
+    context "the triple draft #{ref.inspect}" do
+      let(:id) { klass.parse(ref) }
+
+      it "keeps the whole version" do
+        expect(id.to_s).to eq(rendered)
+      end
+
+      it "parses its rendering back to the same identifier" do
+        expect(klass.parse(id.to_s).to_hash).to eq(id.to_hash)
+      end
+
+      it "is equal after from_hash(to_hash)" do
+        expect(klass.from_hash(id.to_hash)).to eq(id)
+      end
+    end
   end
 end

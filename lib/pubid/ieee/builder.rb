@@ -574,6 +574,8 @@ module Pubid
         year = attributes.delete(:cor_year) || attributes.delete(:amd_year) ||
           attributes.delete(:conf_year) || attributes.delete(:int_year)
         attributes[:year] = year if year
+        month = attributes.delete(:cor_month)
+        attributes[:month] = month if month
       end
 
       # Reconstruct the base identifier string from a parsed `:base` subtree
@@ -666,12 +668,16 @@ module Pubid
         # identifier stores them as the uniform `number`/`year`).
         cor_number = extract_value(parsed_hash[:cor_number])
         cor_year = extract_value(parsed_hash[:cor_year])
+        # The numeric month after the corrigendum year ("…/Cor 1-2019-05").
+        cor_month = parsed_hash[:cor_month] &&
+          extract_value(parsed_hash[:cor_month])
 
         # Create Corrigendum with parsed base
         Identifiers::Corrigendum.new(
           base: base,
           number: cor_number,
           year: cor_year,
+          month: cor_month,
         )
       end
 
@@ -686,6 +692,7 @@ module Pubid
         cor_data = parsed_hash[:corrigendum]
         cor_number = extract_value(cor_data[:cor_number])
         cor_year = extract_value(cor_data[:cor_year]) if cor_data[:cor_year]
+        cor_month = extract_value(cor_data[:cor_month]) if cor_data[:cor_month]
 
         base_hash = parsed_hash.reject { |key, _| key == :corrigendum }
         base = build_single_identifier(base_hash)
@@ -694,6 +701,7 @@ module Pubid
           base: base,
           number: cor_number,
           year: cor_year,
+          month: cor_month,
         )
       end
 
@@ -2251,6 +2259,9 @@ extract_optional(parsed, attributes, :rev_sep) unless attributes[:revision] =~ /
           if cor_data[:cor_year]
             attributes[:cor_year] =
               extract_value(cor_data[:cor_year])
+          end
+          if cor_data[:cor_month]
+            attributes[:cor_month] = extract_value(cor_data[:cor_month])
           end
         elsif parsed[:corrigendum]
           attributes[:corrigendum] = extract_value(parsed[:corrigendum])
