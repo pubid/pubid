@@ -491,6 +491,14 @@ module Pubid
   # A longest-match-first order matters because prefixes nest: "ISO/IEC 2131"
   # must not be handed to the flavor that merely owns "ISO".
   #
+  # Pass 2 is skipped when pass 1 resolves to EXACTLY ONE flavor (issue #803):
+  # a string whose prefix one flavor alone claims is dispatched to that flavor
+  # only — trying the other N-1 parsers cannot change the outcome, and each
+  # failed parse leaves a retained error record behind. When the prefix is
+  # ambiguous (two or more owners: a joint form like "ISO/IEC", an umbrella's
+  # "ANSI/<ACRONYM>", a PFS-compiled alias sharing its parent's tokens) or no
+  # prefix matches at all, the existing full dispatch order runs untouched.
+  #
   # @param string [String] a human-readable identifier
   # @return [Identifier]
   # @raise [Pubid::Errors::ParseError] when no flavor accepts the string
@@ -502,7 +510,14 @@ module Pubid
     fallback = nil
 
     prefix_owners = candidates_by_prefix(string)
-    (prefix_owners + other_candidates(prefix_owners)).each do |mod|
+    candidates =
+      if prefix_owners.one?
+        prefix_owners
+      else
+        prefix_owners + other_candidates(prefix_owners)
+      end
+
+    candidates.each do |mod|
       # An umbrella flavor (ANSI) also parses the joint prefix of a
       # co-publisher that has its own flavor; that flavor's parse wins.
       # Only as a prefix owner: in the exhaustive pass the umbrella is one
@@ -524,7 +539,13 @@ module Pubid
         # IEEE `csa_identifier`) into visible ones. Catching it one layer up
         # would hand it straight back its disguise: a real builder bug in any
         # flavor would read as "this string is not an identifier".
-        first_error ||= e
+        #
+        # Only the record is kept, never the error object: the engine chains
+        # its own failure as the Ruby cause, and that chain — Source, pools,
+        # cause tree — pins the subject for as long as the dispatch lives
+        # (issue #803). The message/input/flavor strings and the failure
+        # position as an Integer are all the raise at the end needs.
+        first_error ||= DispatchFailure.from(e, string)
         next
       end
 
@@ -552,12 +573,78 @@ module Pubid
     end
 
     return fallback if fallback
-    raise first_error if first_error
+    raise first_error.to_parse_error if first_error
 
     raise Pubid::Errors::ParseError,
           "no registered flavor could parse #{string.inspect}"
   end
   private_class_method :parse_by_prefix
+
+  # One failed flavor parse of the dispatch loop, stripped to the fields the
+  # eventual raise needs: the message, input and flavor strings plus the
+  # engine's failure position as an Integer (issue #803). The error object is
+  # NOT retained — Ruby chains the engine's own failure (a
+  # +Parsanol::ParseFailed+) as the raised error's cause, and that chain holds
+  # the {Parsanol::Source} with the subject string, a scanner, a regex cache
+  # and the engine's slice and position pools; the plateau campaign measured
+  # millions of such failures alive across long compiles. The engine-side
+  # half of the same fix is parsanol-ruby#123 (position as an Integer, cause
+  # chain cut); this record is the dispatcher half.
+  #
+  # The +parse_failure_cause+ of the reconstructed error stays nil, as it
+  # already is for every raise site on this path (the PARG backend passes
+  # nil; the synthetic flavor failures pass nil), and the error is built
+  # outside any rescue, so no engine error is attached as its cause.
+  DispatchFailure = Struct.new(:message, :input, :flavor, :position) do
+    # The error raised when the dispatch ends with no flavor able to parse
+    # the input. Carries only strings and the Integer position.
+    # @return [Errors::ParseError]
+    def to_parse_error
+      Errors::ParseError.new(message, nil, input: input, flavor: flavor,
+                                           position: position)
+    end
+
+    # The record of one failed candidate parse. +input+ prefers the error's
+    # own +input+ — what the flavor actually fed its grammar, which a
+    # preprocessing flavor may spell differently from the string the
+    # dispatch was asked about — so the raised error reports the same input
+    # it always did.
+    # @param error [Errors::ParseError]
+    # @param string [String]
+    # @return [DispatchFailure]
+    def self.from(error, string)
+      new(error.message, error.input || string, error.flavor,
+          engine_position(error))
+    end
+
+    # The engine's failure position, walked off the Ruby cause chain the
+    # engine error carries ({Parsanol::ParseFailed#parse_failure_cause} holds
+    # an Integer position). A synthetic failure without an engine cause has
+    # none.
+    # @param error [Errors::ParseError]
+    # @return [Integer, nil]
+    def self.engine_position(error)
+      cause = error.cause
+      until cause.nil?
+        position = cause_position(cause)
+        return position if position
+
+        cause = cause.cause
+      end
+      nil
+    end
+
+    # @param cause [Exception, nil] one link of the engine error chain
+    # @return [Integer, nil]
+    def self.cause_position(cause)
+      return unless cause.respond_to?(:parse_failure_cause)
+
+      failure = cause.parse_failure_cause
+      position = failure.position if failure.respond_to?(:position)
+      position if position.is_a?(Integer)
+    end
+  end
+  private_constant :DispatchFailure
 
   # Flavor modules that own a prefix +string+ starts with, longest prefix
   # first. Deduplicated by module identity, so an alias registration is not
